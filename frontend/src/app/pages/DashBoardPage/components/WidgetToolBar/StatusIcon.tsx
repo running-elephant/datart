@@ -100,7 +100,9 @@ const StyledErrorIcon = styled(Button)`
     background: ${p => p.theme.componentBackground};
   }
 `;
-export const ErrorIcon: React.FC<{ errInfo }> = ({ errInfo }) => {
+export const ErrorIcon: React.FC<{
+  errInfo: React.ReactNode;
+}> = ({ errInfo }) => {
   return (
     <Tooltip title={errInfo}>
       <StyledErrorIcon

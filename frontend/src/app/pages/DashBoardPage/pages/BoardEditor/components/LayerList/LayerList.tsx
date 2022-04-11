@@ -15,9 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
+import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import produce from 'immer';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useContext, useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
@@ -43,7 +44,7 @@ export const LayerList: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const allWidgetsInfo = useSelector(selectAllWidgetInfoMap);
   const sortLayoutWidgets = useSelector(selectSortAllWidgets);
-
+  const { boardId } = useContext(BoardContext);
   const [cards, setCards] = useState<NameCard[]>([]);
   useEffect(() => {
     const card = sortLayoutWidgets.map(
@@ -63,8 +64,8 @@ export const LayerList: React.FC<{}> = memo(() => {
     (
       dragIndex: number,
       hoverIndex: number,
-      dragZindex: number,
-      hoverZindex: number,
+      dragZIndex: number,
+      hoverZIndex: number,
     ) => {
       const newCards = JSON.parse(JSON.stringify(cards));
 
@@ -72,8 +73,8 @@ export const LayerList: React.FC<{}> = memo(() => {
         newCards[hoverIndex],
         newCards[dragIndex],
       ];
-      newCards[dragIndex].index = dragZindex;
-      newCards[hoverIndex].index = hoverZindex;
+      newCards[dragIndex].index = dragZIndex;
+      newCards[hoverIndex].index = hoverZIndex;
 
       setCards(newCards);
     },
@@ -102,7 +103,12 @@ export const LayerList: React.FC<{}> = memo(() => {
   const nameList = cards
     .sort((a, b) => b.index - a.index)
     .map((ele, index) => (
-      <WidgetAllProvider id={ele.id} key={ele.id}>
+      <WidgetWrapProvider
+        id={ele.id}
+        key={ele.id}
+        boardEditing={true}
+        boardId={boardId}
+      >
         <NameItem
           widgetType={ele.widgetType}
           key={ele.id}
@@ -112,7 +118,7 @@ export const LayerList: React.FC<{}> = memo(() => {
           moveCard={moveCard}
           moveEnd={moveEnd}
         ></NameItem>
-      </WidgetAllProvider>
+      </WidgetWrapProvider>
     ));
   return (
     <DndProvider backend={HTML5Backend}>

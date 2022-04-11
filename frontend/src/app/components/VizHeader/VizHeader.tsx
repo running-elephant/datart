@@ -25,7 +25,7 @@ import {
 import { Button, Dropdown } from 'antd';
 import SaveToDashboard from 'app/components/SaveToDashboard';
 import {
-  ShareLinkModal,
+  ShareManageModal,
   VizOperationMenu,
 } from 'app/components/VizOperationMenu';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -43,7 +43,19 @@ const VizHeader: FC<{
   onRun?;
   onGotoEdit?;
   onPublish?: () => void;
-  onGenerateShareLink?: (date, usePwd?) => any;
+  onGenerateShareLink?: ({
+    expiryDate,
+    authenticationMode,
+    roles,
+    users,
+    rowPermissionBy,
+  }: {
+    expiryDate: string;
+    authenticationMode: string;
+    roles: string[];
+    users: string[];
+    rowPermissionBy: string;
+  }) => any;
   onDownloadData?;
   onSaveAsVizs?;
   onReloadData?;
@@ -160,7 +172,9 @@ const VizHeader: FC<{
           }
         />
         {showShareLinkModal && (
-          <ShareLinkModal
+          <ShareManageModal
+            vizId={backendChartId as string}
+            orgId={orgId as string}
             vizType="DATACHART"
             visibility={showShareLinkModal}
             onOk={handleCloseShareLinkModal}

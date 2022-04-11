@@ -18,8 +18,8 @@
 import { ChartEditorProps } from 'app/components/ChartEditor';
 import {
   ChartDataViewFieldCategory,
-  DataViewFieldType,
   ControllerFacadeTypes,
+  DataViewFieldType,
 } from 'app/constants';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
@@ -48,8 +48,8 @@ export interface BoardState {
   viewMap: Record<string, ChartDataView>; // View
   widgetDataMap: Record<string, WidgetData>;
 }
-// 应用内浏览，分享页模式，定时任务模式，
-export type VizRenderMode = 'read' | 'share' | 'schedule';
+// 应用内浏览，分享页模式，定时任务模式，编辑模式
+export type VizRenderMode = 'read' | 'share' | 'schedule' | 'edit';
 
 export interface Dashboard {
   id: string;
@@ -167,13 +167,14 @@ export interface JumpConfigField {
 }
 export interface JumpConfig {
   open: boolean;
-  targetType: string;
+  targetType: JumpTargetType;
   URL: string;
   queryName: string;
   field: JumpConfigField;
   target: JumpConfigTarget;
   filter: JumpConfigFilter;
 }
+export type JumpTargetType = 'INTERNAL' | 'URL';
 export interface WidgetPadding {
   left?: number;
   right?: number;

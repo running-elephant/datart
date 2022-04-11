@@ -104,6 +104,10 @@ public class PermissionDataCache {
 
     public void clear() {
         threadScope.clear();
+        try {
+            requestScope.clear();
+        } catch (Exception e) {
+        }
     }
 
 }

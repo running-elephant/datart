@@ -33,7 +33,7 @@ import { fetchShareDataSetByPreviewChartAction } from './thunks';
 import { ExecuteToken, SharePageState, ShareVizInfo } from './types';
 
 export const initialState: SharePageState = {
-  needPassword: false,
+  needVerify: false,
   vizType: undefined,
   shareToken: '',
   executeToken: '',
@@ -53,8 +53,8 @@ export const slice = createSlice({
       state.shareToken = action.payload.token;
       state.sharePassword = action.payload.pwd;
     },
-    saveNeedPassword: (state, action: PayloadAction<boolean>) => {
-      state.needPassword = action.payload;
+    saveNeedVerify: (state, action: PayloadAction<boolean>) => {
+      state.needVerify = action.payload;
     },
     setVizType: (state, action: PayloadAction<VizType | undefined>) => {
       state.vizType = action.payload;
@@ -106,7 +106,7 @@ export const slice = createSlice({
       const executeToken = data.executeToken;
       const executeKey = vizDetail?.viewId;
       if (executeKey) {
-        state.executeToken = executeToken?.[executeKey]?.token;
+        state.executeToken = executeToken?.[executeKey]?.authorizedToken;
       }
       state.chartPreview = {
         ...state.chartPreview,

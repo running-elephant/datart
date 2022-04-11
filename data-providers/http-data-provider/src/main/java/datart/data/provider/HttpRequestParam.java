@@ -22,10 +22,13 @@ import lombok.Data;
 import org.springframework.http.HttpMethod;
 
 import java.util.List;
-import java.util.Map;
+import java.util.StringJoiner;
+import java.util.TreeMap;
 
 @Data
 public class HttpRequestParam {
+    // name for the data
+    private String name;
 
     private String url;
 
@@ -41,9 +44,9 @@ public class HttpRequestParam {
 
     private Class<? extends HttpResponseParser> responseParser;
 
-    private Map<String, String> headers;
+    private TreeMap<String, String> headers;
 
-    private Map<String, String> queryParam;
+    private TreeMap<String, String> queryParam;
 
     private String body;
 
@@ -51,4 +54,10 @@ public class HttpRequestParam {
 
     private List<Column> columns;
 
+    public String toCacheKey() {
+        return new StringJoiner(":").add(url)
+                .add(headers.toString())
+                .add(queryParam.toString())
+                .add(body).toString();
+    }
 }

@@ -31,7 +31,7 @@ import { useDispatch } from 'react-redux';
 import { useRecycleViz } from '../../../../hooks/useRecycleViz';
 import { usePublishBoard } from '../../hooks/usePublishBoard';
 import { widgetsQueryAction } from '../../pages/Board/slice/asyncActions';
-import { BoardActionContext } from '../BoardProvider/BoardActionProvider';
+import { BoardActionContext } from '../ActionProvider/BoardActionProvider';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 interface Props {
   onOpenShareLink: () => void;
@@ -69,7 +69,7 @@ export const BoardDropdownList: FC<Props> = memo(
         </Menu.Item>
         {allowShare && (
           <>
-            <Menu.Divider />
+            <Menu.Divider key={'shareLinkLine'} />
             <Menu.Item
               key={'shareLink'}
               onClick={onOpenShareLink}
@@ -81,7 +81,7 @@ export const BoardDropdownList: FC<Props> = memo(
         )}
         {allowDownload && (
           <>
-            <Menu.Divider />
+            <Menu.Divider key={'downloadDataLine'} />
             <Menu.Item key={'downloadData'} icon={<CloudDownloadOutlined />}>
               <Popconfirm
                 placement="left"
@@ -99,7 +99,7 @@ export const BoardDropdownList: FC<Props> = memo(
         )}
         {allowManage && (
           <>
-            <Menu.Divider />
+            <Menu.Divider key="unpublishLine" />
             {status === 2 && (
               <Menu.Item
                 key={'unpublish'}

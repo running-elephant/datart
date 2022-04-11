@@ -19,6 +19,7 @@ package datart.data.provider.jdbc;
 
 import datart.core.base.consts.ValueType;
 import datart.core.base.consts.JavaType;
+import datart.data.provider.calcite.custom.CustomSqlTypeName;
 import org.apache.calcite.sql.type.SqlTypeFamily;
 import org.apache.calcite.sql.type.SqlTypeName;
 
@@ -31,7 +32,7 @@ public class DataTypeUtils {
         SqlTypeName sqlTypeName = SqlTypeName.get(sqlType);
         SqlTypeFamily family;
         if (sqlTypeName == null) {
-            family = SqlTypeFamily.ANY;
+            family = CustomSqlTypeName.SQL_TYPE_FAMILY_MAP.getOrDefault(sqlType, CustomSqlTypeName.ANY).getFamily();
         } else {
             family = sqlTypeName.getFamily();
         }
@@ -41,6 +42,7 @@ public class DataTypeUtils {
             case DATE:
             case TIME:
             case TIMESTAMP:
+            case DATETIME:
                 return ValueType.DATE;
             default:
                 return ValueType.STRING;
@@ -96,7 +98,7 @@ public class DataTypeUtils {
             case NUMERIC:
                 return Types.DOUBLE;
             case DATE:
-                return Types.DATE;
+                return Types.TIMESTAMP;
             case BOOLEAN:
                 return Types.BOOLEAN;
             default:

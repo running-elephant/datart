@@ -29,7 +29,7 @@ import java.util.Collections;
 public class DorisDataProviderAdapter extends JdbcDataProviderAdapter {
 
     @Override
-    protected Dataframe executeOnSource(QueryScript script, ExecuteParam executeParam) throws Exception {
+    public Dataframe executeOnSource(QueryScript script, ExecuteParam executeParam) throws Exception {
         if (CollectionUtils.isEmpty(executeParam.getOrders())) {
             executeParam.setOrders(Collections.singletonList(new OrderOperator()));
         }

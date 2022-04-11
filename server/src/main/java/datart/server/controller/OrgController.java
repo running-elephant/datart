@@ -70,7 +70,7 @@ public class OrgController extends BaseController {
     @PostMapping
     public ResponseData<Organization> createOrganization(@Validated @RequestBody OrgCreateParam createParam) {
         if (Application.getCurrMode().equals(SystemMode.SINGLE)) {
-            Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.permission.denied");
+            Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.operation.denied");
         }
         return ResponseData.success(orgService.createOrganization(createParam));
     }

@@ -30,20 +30,20 @@ import datart.core.base.exception.ServerException;
 import datart.core.common.Application;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.Organization;
+import datart.core.entity.Role;
 import datart.core.entity.User;
 import datart.core.entity.ext.UserBaseInfo;
 import datart.core.mappers.ext.OrganizationMapperExt;
+import datart.core.mappers.ext.RelRoleUserMapperExt;
 import datart.core.mappers.ext.UserMapperExt;
 import datart.security.base.PasswordToken;
 import datart.security.util.JwtUtils;
 import datart.security.util.SecurityUtils;
 import datart.server.base.dto.OrganizationBaseInfo;
 import datart.server.base.dto.UserProfile;
-import datart.server.base.params.ChangeUserPasswordParam;
-import datart.server.base.params.UserAddParam;
-import datart.server.base.params.UserRegisterParam;
-import datart.server.base.params.UserResetPasswordParam;
+import datart.server.base.params.*;
 import datart.server.service.*;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -61,6 +61,7 @@ import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static datart.core.common.Application.getProperty;
@@ -166,7 +167,12 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Override
     @Transactional
     public String activeUser(String activeString) {
-        PasswordToken passwordToken = JwtUtils.toPasswordToken(activeString);
+        PasswordToken passwordToken = null;
+        try {
+            passwordToken = JwtUtils.toPasswordToken(activeString);
+        } catch (ExpiredJwtException e) {
+            Exceptions.msg("message.user.confirm.mail.timeout");
+        }
         User user = userMapper.selectByUsername(passwordToken.getSubject());
         if (user == null) {
             Exceptions.notFound("resource.not-exist", "resource.user");
@@ -365,7 +371,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     @Override
     @Transactional
-    public boolean addUserToOrg(UserAddParam userAddParam, String orgId) throws MessagingException, UnsupportedEncodingException {
+    public User addUserToOrg(UserAddParam userAddParam, String orgId) throws MessagingException, UnsupportedEncodingException {
         securityManager.requireOrgOwner(orgId);
         if (StringUtils.isBlank(userAddParam.getPassword())) {
             userAddParam.setPassword(Const.USER_DEFAULT_PSW);
@@ -378,18 +384,61 @@ public class UserServiceImpl extends BaseService implements UserService {
         BeanUtils.copyProperties(userAddParam, userRegisterParam);
         register(userRegisterParam, false);
         User user = this.userMapper.selectByUsername(userAddParam.getUsername());
+        user.setName(userAddParam.getName());
+        user.setDescription(userAddParam.getDescription());
+        this.userMapper.updateByPrimaryKeySelective(user);
         orgService.addUserToOrg(user.getId(), orgId);
         roleService.updateRolesForUser(user.getId(), orgId, userAddParam.getRoleIds());
-        return true;
+        return user;
     }
 
     @Override
     @Transactional
     public boolean deleteUserFromOrg(String orgId, String userId) {
         securityManager.requireOrgOwner(orgId);
+        //删除组织关联
         orgService.removeUser(orgId, userId);
+        //删除角色关联
+        RelRoleUserMapperExt rruMapper = Application.getBean(RelRoleUserMapperExt.class);
+        List<String> roleIds = rruMapper.listByUserId(userId).stream().map(Role::getId).collect(Collectors.toList());
+        rruMapper.deleteByUserAndRoles(userId, roleIds);
+        Role role = roleService.getPerUserRole(orgId, userId);
+        if (role != null) {
+            roleService.delete(role.getId());
+        }
+        //删除用户信息
+        UserSettingService orgSettingService = Application.getBean(UserSettingService.class);
+        orgSettingService.deleteByUserId(userId);
         userMapper.deleteByPrimaryKey(userId);
         return true;
+    }
+
+    @Override
+    public boolean updateUserFromOrg(UserUpdateByIdParam userUpdateParam, String orgId) {
+        securityManager.requireOrgOwner(orgId);
+        User user = retrieve(userUpdateParam.getId());
+        if (!user.getEmail().equals(userUpdateParam.getEmail()) && !checkEmail(userUpdateParam.getEmail())) {
+            log.error("The email({}) has been registered", userUpdateParam.getEmail());
+            Exceptions.tr(ParamException.class, "error.param.occupied", "resource.user.email");
+        }
+        if (StringUtils.isBlank(userUpdateParam.getPassword())) {
+            userUpdateParam.setPassword(user.getPassword());
+        } else if (!userUpdateParam.getPassword().equals(user.getPassword())){
+            userUpdateParam.setPassword(BCrypt.hashpw(userUpdateParam.getPassword(), BCrypt.gensalt()));
+        }
+        roleService.updateRolesForUser(user.getId(), orgId, userUpdateParam.getRoleIds());
+        return update(userUpdateParam);
+    }
+
+    @Override
+    public UserUpdateByIdParam selectUserById(String userId, String orgId) {
+        securityManager.requireOrgOwner(orgId);
+        UserUpdateByIdParam res = new UserUpdateByIdParam();
+        User user = this.userMapper.selectByPrimaryKey(userId);
+        BeanUtils.copyProperties(user, res);
+        Set<String> roleIds = roleService.listUserRoles(orgId, userId).stream().map(Role::getId).collect(Collectors.toSet());
+        res.setRoleIds(roleIds);
+        return res;
     }
 
     @Override

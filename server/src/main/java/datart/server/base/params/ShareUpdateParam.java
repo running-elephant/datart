@@ -38,7 +38,6 @@ public class ShareUpdateParam extends BaseUpdateParam {
     @NotNull
     private ShareAuthenticationMode authenticationMode;
 
-    @NotNull
     private ShareRowPermissionBy rowPermissionBy;
 
     private Set<String> roles;

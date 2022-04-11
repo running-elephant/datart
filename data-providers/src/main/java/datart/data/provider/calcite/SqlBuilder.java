@@ -24,7 +24,6 @@ import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.SingleTypedValue;
 import datart.core.data.provider.sql.*;
 import datart.data.provider.calcite.custom.CustomSqlBetweenOperator;
-import datart.data.provider.calcite.dialect.FetchAndOffsetSupport;
 import datart.data.provider.jdbc.SqlSplitter;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlBetweenOperator;
@@ -212,7 +211,7 @@ public class SqlBuilder {
 
         SqlNode fetch = null;
         SqlNode offset = null;
-        if (withPage && (dialect instanceof FetchAndOffsetSupport) && executeParam.getPageInfo() != null) {
+        if (withPage && executeParam.getPageInfo() != null) {
             fetch = SqlLiteral.createExactNumeric(Math.min(executeParam.getPageInfo().getPageSize(), Integer.MAX_VALUE) + "", SqlParserPos.ZERO);
             offset = SqlLiteral.createExactNumeric(Math.min((executeParam.getPageInfo().getPageNo() - 1) * executeParam.getPageInfo().getPageSize(), Integer.MAX_VALUE) + "", SqlParserPos.ZERO);
         }

@@ -58,7 +58,6 @@ const TitleForShare: FC<TitleHeaderProps> = memo(
     }
     return (
       <Wrapper>
-        <h1>{name}</h1>
         <Space>
           {children}
           <Popconfirm
@@ -99,6 +98,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-shrink: 0;
   align-items: center;
+  justify-content: flex-end;
   width: 100%;
   padding: ${SPACE_SM} ${SPACE_LG};
 

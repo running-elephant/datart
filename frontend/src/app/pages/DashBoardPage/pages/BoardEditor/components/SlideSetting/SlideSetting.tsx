@@ -15,15 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
-import React, { FC, memo, useMemo } from 'react';
+import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
+import { FC, memo, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { BoardContext } from '../../../../components/BoardProvider/BoardProvider';
 import { selectSelectedIds } from '../../slice/selectors';
 import BoardSetting from './BoardSetting';
 import { WidgetSetting } from './WidgetSetting';
 
 export const SlideSetting: FC<{}> = memo(() => {
+  const { boardId } = useContext(BoardContext);
   const selectedIds = useSelector(selectSelectedIds);
   const setType = useMemo(
     () => (selectedIds.length === 1 ? 'widget' : 'board'),
@@ -33,9 +35,13 @@ export const SlideSetting: FC<{}> = memo(() => {
     <Wrapper>
       {setType === 'board' && <BoardSetting />}
       {setType === 'widget' && (
-        <WidgetAllProvider id={selectedIds[0]}>
+        <WidgetWrapProvider
+          id={selectedIds[0]}
+          boardEditing={true}
+          boardId={boardId}
+        >
           <WidgetSetting />
-        </WidgetAllProvider>
+        </WidgetWrapProvider>
       )}
     </Wrapper>
   );

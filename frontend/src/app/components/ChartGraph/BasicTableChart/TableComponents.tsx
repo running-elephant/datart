@@ -46,12 +46,14 @@ export const ResizableTitle = props => {
 };
 
 export const TableColumnTitle = props => {
-  const { desc, title } = props;
+  const { desc, title, uid } = props;
   return (
-    <TableColumnTitleStyle>
-      <span className="titleStyle">{title}</span>
+    <TableColumnTitleStyle key={uid}>
+      <span className="titleStyle" key={uid + 'title'}>
+        {title}
+      </span>
       {desc && (
-        <Tooltip placement="top" title={desc}>
+        <Tooltip placement="top" key={uid + 'desc'} title={desc}>
           <InfoCircleOutlined />
         </Tooltip>
       )}

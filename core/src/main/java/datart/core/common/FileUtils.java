@@ -55,7 +55,11 @@ public class FileUtils {
     }
 
     public static String withBasePath(String path) {
-        return concatPath(Application.getFileBasePath(), path);
+        String fileBasePath = Application.getFileBasePath();
+        if (path.startsWith(fileBasePath)) {
+            return path;
+        }
+        return concatPath(fileBasePath, path);
     }
 
     public static void delete(String path) {

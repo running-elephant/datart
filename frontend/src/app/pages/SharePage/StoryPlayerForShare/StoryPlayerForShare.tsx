@@ -42,48 +42,33 @@ import StoryPageItem from './StoryPageItem';
 
 const { Content } = Layout;
 
-export const StoryPlayerForShare: React.FC<{ storyBoard: StoryBoard }> = memo(
-  ({ storyBoard }) => {
-    const { id: storyId } = storyBoard;
-    const domId = useMemo(() => uuidv4(), []);
-    const revealRef = useRef<any>();
-    const dispatch = useDispatch();
-    const [currentPageIndex, setCurrentPageIndex] = useState(0);
-    const fullRef: RefObject<HTMLDivElement> = useRef(null);
-    const pageMap = useSelector((state: { storyBoard: StoryBoardState }) =>
-      makeSelectStoryPagesById(state, storyId),
+export const StoryPlayerForShare: React.FC<{
+  storyBoard: StoryBoard;
+  shareToken: string;
+}> = memo(({ storyBoard, shareToken }) => {
+  const { id: storyId } = storyBoard;
+  const domId = useMemo(() => uuidv4(), []);
+  const revealRef = useRef<any>();
+  const dispatch = useDispatch();
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const fullRef: RefObject<HTMLDivElement> = useRef(null);
+  const pageMap = useSelector((state: { storyBoard: StoryBoardState }) =>
+    makeSelectStoryPagesById(state, storyId),
+  );
+  const subVizTokenMap = useSelector(selectSubVizTokenMap);
+
+  const sortedPages = useMemo(() => {
+    const sortedPages = Object.values(pageMap).sort(
+      (a, b) => a.config.index - b.config.index,
     );
+    return sortedPages;
+  }, [pageMap]);
 
-    const subVizTokenMap = useSelector(selectSubVizTokenMap);
-
-    const sortedPages = useMemo(() => {
-      const sortedPages = Object.values(pageMap).sort(
-        (a, b) => a.config.index - b.config.index,
-      );
-      return sortedPages;
-    }, [pageMap]);
-
-    const changePage = useCallback(
-      e => {
-        const { indexh: slideIdx } = e;
-        setCurrentPageIndex(slideIdx);
-        const pageId = sortedPages[slideIdx].id;
-        dispatch(
-          storyActions.changePageSelected({
-            storyId,
-            pageId,
-            multiple: false,
-          }),
-        );
-      },
-      [dispatch, sortedPages, storyId],
-    );
-
-    useEffect(() => {
-      if (sortedPages.length === 0) {
-        return;
-      }
-      const pageId = sortedPages[0].id;
+  const changePage = useCallback(
+    e => {
+      const { indexh: slideIdx } = e;
+      setCurrentPageIndex(slideIdx);
+      const pageId = sortedPages[slideIdx].id;
       dispatch(
         storyActions.changePageSelected({
           storyId,
@@ -91,91 +76,110 @@ export const StoryPlayerForShare: React.FC<{ storyBoard: StoryBoard }> = memo(
           multiple: false,
         }),
       );
-    }, [dispatch, sortedPages, storyId]);
-    const autoSlide = useMemo(() => {
-      if (storyBoard?.config?.autoPlay?.auto) {
-        return storyBoard?.config?.autoPlay?.delay * 1000;
-      }
-      return null;
-    }, [
-      storyBoard?.config?.autoPlay?.auto,
-      storyBoard?.config?.autoPlay?.delay,
-    ]);
-    useEffect(() => {
-      if (sortedPages.length > 0) {
-        revealRef.current = new Reveal(document.getElementById(domId), {
-          hash: false,
-          history: false,
-          controls: true,
-          controlsLayout: 'none',
-          slideNumber: 'c/t',
-          controlsTutorial: false,
-          progress: false,
-          loop: true,
-          width: '100%',
-          height: '100%',
-          margin: 0,
-          minScale: 1,
-          maxScale: 1,
-          autoSlide: autoSlide,
-          transition: 'convex',
-          // backgroundTransition: 'fade',
-          transitionSpeed: 'slow',
-          viewDistance: 100,
-          plugins: [RevealZoom],
-          keyboard: {
-            27: () => {
-              // disabled esc
+    },
+    [dispatch, sortedPages, storyId],
+  );
 
-            }, // do something custom when ESC is pressed
-          },
-        });
-        revealRef.current?.initialize();
-        if (revealRef.current) {
-          revealRef.current.addEventListener('slidechanged', changePage);
-        }
-        return () => {
-          revealRef.current.removeEventListener('slidechanged', changePage);
-        };
-      }
-    }, [domId, changePage, sortedPages.length, autoSlide, dispatch]);
-
-    useEffect(() => {
-      const curPage = sortedPages[currentPageIndex];
-      if (!curPage || !curPage.relId || !curPage.relType) {
-        return;
-      }
-      const { relId, relType, id } = curPage;
-      const vizToken = subVizTokenMap?.[id];
-      if (!vizToken) {
-        return;
-      }
-      dispatch(
-        getPageContentDetail({
-          relId,
-          relType,
-          vizToken: vizToken,
-        }),
-      );
-    }, [currentPageIndex, dispatch, sortedPages, pageMap, subVizTokenMap]);
-
-    return (
-      <DndProvider backend={HTML5Backend}>
-        <Wrapper ref={fullRef}>
-          <Content>
-            <div id={domId} className="reveal">
-              <div className="slides">
-                {sortedPages.map(page => (
-                  <StoryPageItem key={page.id} page={page} />
-                ))}
-              </div>
-            </div>
-          </Content>
-        </Wrapper>
-      </DndProvider>
+  useEffect(() => {
+    if (sortedPages.length === 0) {
+      return;
+    }
+    const pageId = sortedPages[0].id;
+    dispatch(
+      storyActions.changePageSelected({
+        storyId,
+        pageId,
+        multiple: false,
+      }),
     );
-  },
-);
+  }, [dispatch, sortedPages, storyId]);
+  const autoSlide = useMemo(() => {
+    if (storyBoard?.config?.autoPlay?.auto) {
+      return storyBoard?.config?.autoPlay?.delay * 1000;
+    }
+    return null;
+  }, [storyBoard?.config?.autoPlay?.auto, storyBoard?.config?.autoPlay?.delay]);
+  useEffect(() => {
+    if (sortedPages.length > 0) {
+      revealRef.current = new Reveal(document.getElementById(domId), {
+        hash: false,
+        history: false,
+        controls: true,
+        controlsLayout: 'none',
+        slideNumber: 'c/t',
+        controlsTutorial: false,
+        progress: false,
+        loop: true,
+        width: '100%',
+        height: '100%',
+        margin: 0,
+        minScale: 1,
+        maxScale: 1,
+        autoSlide: autoSlide,
+        transition: 'convex',
+        // backgroundTransition: 'fade',
+        transitionSpeed: 'slow',
+        viewDistance: 100,
+        plugins: [RevealZoom],
+        keyboard: {
+          27: () => {
+            // disabled esc
+          }, // do something custom when ESC is pressed
+        },
+      });
+      revealRef.current?.initialize();
+      if (revealRef.current) {
+        revealRef.current.addEventListener('slidechanged', changePage);
+      }
+      return () => {
+        revealRef.current.removeEventListener('slidechanged', changePage);
+      };
+    }
+  }, [domId, changePage, sortedPages.length, autoSlide, dispatch]);
+
+  useEffect(() => {
+    const curPage = sortedPages[currentPageIndex];
+    if (!curPage || !curPage.relId || !curPage.relType) {
+      return;
+    }
+    const { relId, relType, id } = curPage;
+    const vizToken = subVizTokenMap?.[id];
+    if (!vizToken) {
+      return;
+    }
+    dispatch(
+      getPageContentDetail({
+        shareToken,
+        relId,
+        relType,
+        vizToken: vizToken,
+      }),
+    );
+  }, [
+    currentPageIndex,
+    dispatch,
+    sortedPages,
+    pageMap,
+    subVizTokenMap,
+    shareToken,
+  ]);
+
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <Wrapper ref={fullRef}>
+        <Content>
+          <div id={domId} className="reveal">
+            <div className="slides">
+              {sortedPages.map(page => (
+                <StoryPageItem key={page.id} page={page} />
+              ))}
+            </div>
+          </div>
+        </Content>
+      </Wrapper>
+    </DndProvider>
+  );
+});
 
 const Wrapper = styled.div`
   position: fixed;

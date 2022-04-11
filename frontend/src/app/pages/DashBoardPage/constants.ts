@@ -19,12 +19,13 @@ import { ControllerFacadeTypes } from 'app/constants';
 import {
   BackgroundConfig,
   BorderConfig,
+  JumpTargetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
 import { PRIMARY, WHITE } from 'styles/StyleConstants';
 import { WidgetType } from './pages/Board/slice/types';
-export const RGL_DRAG_HANDLE = 'dashboard-draggableHandle';
+export const WIDGET_DRAG_HANDLE = 'widget-draggableHandle';
 export const BOARD_FILE_IMG_PREFIX = 'resources/image/dashboard/';
 export const BASE_VIEW_WIDTH = 1024;
 export const BASE_ROW_HEIGHT = 32;
@@ -100,13 +101,20 @@ export const ButtonBorderDefault: BorderConfig = {
   width: 0,
 };
 
-export const CanDropToWidgetTypes: WidgetType[] = ['chart', 'media'];
-export const CanFullScreenWidgetTypes: WidgetType[] = ['chart', 'media'];
+export const CanDropToWidgetTypes: readonly WidgetType[] = ['chart', 'media'];
+export const CanFullScreenWidgetTypes: readonly Partial<WidgetType>[] = [
+  'chart',
+  'media',
+  'container',
+];
 
 export const CONTAINER_TAB = 'containerTab';
 
 //
-export const NeedFetchWidgetTypes: WidgetType[] = ['chart', 'controller'];
+export const NeedFetchWidgetTypes: readonly WidgetType[] = [
+  'chart',
+  'controller',
+];
 
 // setting
 
@@ -269,3 +277,8 @@ export const DefaultWidgetData = {
   columns: [],
   rows: [],
 };
+
+export const jumpTypes: { name: string; value: JumpTargetType }[] = [
+  { value: 'INTERNAL', name: '' },
+  { value: 'URL', name: '' },
+];

@@ -15,6 +15,8 @@ public interface ShareService extends BaseCRUDService<Share, ShareMapperExt> {
 
     ShareToken createShare(String shareUser, ShareCreateParam createParam);
 
+    ShareInfo updateShare(ShareUpdateParam updateParam);
+
     List<ShareInfo> listShare(String vizId);
 
     ShareVizDetail getShareViz(ShareToken shareToken);

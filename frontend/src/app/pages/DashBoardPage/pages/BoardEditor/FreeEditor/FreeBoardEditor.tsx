@@ -16,209 +16,87 @@
  * limitations under the License.
  */
 
-import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { getWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
-import produce from 'immer';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import { DraggableCore, DraggableEventHandler } from 'react-draggable';
-import { useDispatch, useSelector } from 'react-redux';
-import { Resizable, ResizeCallbackData } from 'react-resizable';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
+import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
+import { memo, useContext } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { BoardActionContext } from '../../../components/BoardProvider/BoardActionProvider';
-import { scaleContext } from '../../../components/FreeBoardBackground';
-import { editBoardStackActions } from '../slice';
-import { widgetMove, widgetMoveEnd } from '../slice/events';
-import { selectSelectedIds } from '../slice/selectors';
-import { WidgetItem } from './WidgetItem';
-export enum DragTriggerTypes {
-  MouseMove = 'mousemove',
-  KeyDown = 'keydown',
-}
-export const WidgetOfFreeEdit: React.FC<{}> = () => {
-  const selectedIds = useSelector(selectSelectedIds);
-  const widget = useContext(WidgetContext);
-  const { updateWidgetConfig } = useContext(BoardActionContext);
+import SlideBackground from '../../../components/FreeBoardBackground';
+import useClientRect from '../../../hooks/useClientRect';
+import useSlideStyle from '../../../hooks/useSlideStyle';
+import ZoomControl from '../../Board/FreeDashboard/ZoomControl';
+import { selectLayoutWidgetMap } from '../slice/selectors';
+import { WidgetOfFreeEdit } from './WidgetOfFreeEdit';
 
-  const dispatch = useDispatch();
-  const scale = useContext(scaleContext);
-  const { x, y, width, height } = widget.config.rect;
-  const [curXY, setCurXY] = useState<[number, number]>([
-    widget.config.rect.x,
-    widget.config.rect.y,
-  ]);
-  const curXYRef = useRef<[number, number]>([0, 0]);
-  const [curW, setCurW] = useState(widget.config.rect.width);
-  const [curH, setCurH] = useState(widget.config.rect.height);
-  useEffect(() => {
-    setCurXY([x, y]);
-    curXYRef.current = [x, y];
-    setCurW(width);
-    setCurH(height);
-  }, [height, width, x, y]);
+export const FreeBoardEditor: React.FC<{}> = memo(() => {
+  const {
+    width: boardWidth,
+    height: boardHeight,
+    scaleMode,
+  } = useContext(BoardConfigContext);
+  const { autoFit, boardId } = useContext(BoardContext);
 
-  const move = useCallback(
-    (selectedIds: string[], deltaX: number, deltaY: number) => {
-      if (!selectedIds.includes(widget.id)) return;
-      setCurXY(c => [c[0] + deltaX, c[1] + deltaY]);
-    },
-    [widget.id],
+  const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
+  const sortedLayoutWidgets = Object.values(layoutWidgetMap).sort(
+    (a, b) => a.config.index - b.config.index,
   );
-  const moveEnd = useCallback(() => {
-    const nextConf = produce(widget.config, draft => {
-      draft.rect.x = curXY[0];
-      draft.rect.y = curXY[1];
-    });
-    updateWidgetConfig(nextConf, widget.id);
-  }, [curXY, updateWidgetConfig, widget.config, widget.id]);
-  useEffect(() => {
-    widgetMove.on(move);
-    widgetMoveEnd.on(moveEnd);
-    return () => {
-      widgetMove.off(move);
-      widgetMoveEnd.off(moveEnd);
-    };
-  }, [move, moveEnd]);
 
-  const dragStart: DraggableEventHandler = useCallback((e, data) => {
-    e.stopPropagation();
-    if (e.target === data.node.lastElementChild) {
-      return false;
-    }
-    if (
-      typeof (e as MouseEvent).button === 'number' &&
-      (e as MouseEvent).button !== 0
-    ) {
-      return false;
-    }
-  }, []);
-  const drag: DraggableEventHandler = useCallback(
-    (e, data) => {
-      e.stopPropagation();
-      const { deltaX, deltaY } = data;
-      widgetMove.emit(selectedIds.concat(widget.id), deltaX, deltaY);
-    },
-    [selectedIds, widget.id],
-  );
-  const dragStop: DraggableEventHandler = (e, data) => {
-    if (curXYRef.current[0] === curXY[0] && curXYRef.current[1] === curXY[1]) {
-      // no change
-      return;
-    }
-    widgetMoveEnd.emit();
-    e.stopPropagation();
-  };
+  const [rect, refGridBackground] = useClientRect<HTMLDivElement>();
+  const {
+    zoomIn,
+    zoomOut,
+    sliderChange,
+    sliderValue,
+    scale,
+    nextBackgroundStyle,
+    slideTranslate,
+  } = useSlideStyle(autoFit, true, rect, boardWidth, boardHeight, scaleMode);
 
-  const resize = useCallback(
-    (e: React.SyntheticEvent, data: ResizeCallbackData) => {
-      e.stopPropagation();
-      setCurW(c => data.size.width);
-      setCurH(c => data.size.height);
-    },
-    [],
-  );
-  const resizeStop = useCallback(
-    (e: React.SyntheticEvent, { size }: ResizeCallbackData) => {
-      e.stopPropagation();
-      dispatch(
-        editBoardStackActions.resizeWidgetEnd({
-          id: widget.id,
-          width: Number(size.width.toFixed(1)),
-          height: Number(size.height.toFixed(1)),
-        }),
-      );
-    },
-    [dispatch, widget.id],
-  );
-  const widgetStyle = getWidgetStyle('free', widget);
-  const style: React.CSSProperties = {
-    ...widgetStyle,
-    transform: `translate(${curXY[0]}px, ${curXY[1]}px)`,
-    width: `${curW}px`,
-    height: `${curH}px`,
-  };
-  const lock = widget.config.lock;
-  const ssp = e => {
-    e.stopPropagation();
-  };
   return (
-    <DraggableCore
-      allowAnyClick
-      grid={[1, 1]}
-      scale={scale[0]}
-      onStart={dragStart}
-      onDrag={drag}
-      onStop={dragStop}
-      handle=".display-Draggable"
-      disabled={lock}
-    >
-      <Resizable
-        axis={'both'}
-        width={curW}
-        height={curH}
-        onResize={resize}
-        onResizeStop={resizeStop}
-        draggableOpts={{ grid: [1, 1], scale: scale[0], disabled: lock }}
-        minConstraints={[50, 50]}
-        handleSize={undefined}
-        // handleSize={[20, 20]}
-        resizeHandles={undefined}
-        // resizeHandles={['se']}
-        lockAspectRatio={false}
+    <Container>
+      <div
+        className="grid-background"
+        style={{ ...nextBackgroundStyle }}
+        ref={refGridBackground}
       >
-        <ItemWrap style={style} onClick={ssp}>
-          <WidgetItem />
-        </ItemWrap>
-      </Resizable>
-    </DraggableCore>
+        <SlideBackground scale={scale} slideTranslate={slideTranslate}>
+          {sortedLayoutWidgets.map(widgetConfig => (
+            <WidgetWrapProvider
+              key={widgetConfig.id}
+              id={widgetConfig.id}
+              boardEditing={true}
+              boardId={boardId}
+            >
+              <WidgetOfFreeEdit />
+            </WidgetWrapProvider>
+          ))}
+        </SlideBackground>
+      </div>
+
+      <ZoomControl
+        sliderValue={sliderValue}
+        scale={scale}
+        zoomIn={zoomIn}
+        zoomOut={zoomOut}
+        sliderChange={sliderChange}
+      />
+    </Container>
   );
-};
+});
 
-export default WidgetOfFreeEdit;
+const Container = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
 
-const ItemWrap = styled.div`
-  box-sizing: border-box;
-  & .widget-tool-bar {
-    z-index: 30;
+  .grid-background {
+    flex: 1;
+    -ms-overflow-style: none;
   }
 
-  &:hover .widget-tool-dropdown {
-    visibility: visible;
-  }
-
-  & > span:last-child {
-    z-index: 999999;
-  }
-
-  /* react-resizable style  */
-
-  .react-resizable {
-    position: relative;
-  }
-
-  .react-resizable-handle {
-    position: absolute;
-    box-sizing: border-box;
-    width: 20px;
-    height: 20px;
-    padding: 0 3px 3px 0;
-
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2IDYiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiNmZmZmZmYwMCIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSI2cHgiIGhlaWdodD0iNnB4Ij48ZyBvcGFjaXR5PSIwLjMwMiI+PHBhdGggZD0iTSA2IDYgTCAwIDYgTCAwIDQuMiBMIDQgNC4yIEwgNC4yIDQuMiBMIDQuMiAwIEwgNiAwIEwgNiA2IEwgNiA2IFoiIGZpbGw9IiMwMDAwMDAiLz48L2c+PC9zdmc+');
-    background-repeat: no-repeat;
-    background-position: bottom right;
-    background-origin: content-box;
-  }
-  &:hover .react-resizable-handle {
-    background-color: #fff;
-  }
-  .react-resizable-handle-se {
-    right: 0;
-    bottom: 0;
-    cursor: se-resize;
+  .grid-background::-webkit-scrollbar {
+    width: 0 !important;
   }
 `;

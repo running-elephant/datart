@@ -20,11 +20,11 @@ import styled from 'styled-components/macro';
 import { G60 } from 'styles/StyleConstants';
 
 export const ItemLabel: FC = memo(props => {
-  return <Warp>{props.children}</Warp>;
+  return <Wrapper>{props.children}</Wrapper>;
 });
 
 export default ItemLabel;
-const Warp = styled.span`
+const Wrapper = styled.span`
   display: inline-block;
   width: 50%;
   padding-left: 12px;

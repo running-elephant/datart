@@ -76,7 +76,7 @@ public interface VizService {
 
     boolean unpublish(ResourceType resourceType, String vizId);
 
-    String getChartConfigByVizId(String vizId, String vizType);
+    String getChartConfigByVizId(ResourceType resourceType, String vizId);
 
     ResourceTransferModel exportViz(ResourceType vizType, boolean onlyViz, String... vizIds) throws IOException;
 

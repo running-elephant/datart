@@ -18,7 +18,7 @@
 
 import { EditOutlined, MoreOutlined, SendOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Space } from 'antd';
-import { ShareLinkModal } from 'app/components/VizOperationMenu';
+import { ShareManageModal } from 'app/components/VizOperationMenu';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectPublishLoading } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import classnames from 'classnames';
@@ -35,8 +35,8 @@ import {
 } from 'styles/StyleConstants';
 import { usePublishBoard } from '../../hooks/usePublishBoard';
 import { useStatusTitle } from '../../hooks/useStatusTitle';
+import { BoardActionContext } from '../ActionProvider/BoardActionProvider';
 import { BoardDropdownList } from '../BoardDropdownList/BoardDropdownList';
-import { BoardActionContext } from '../BoardProvider/BoardActionProvider';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 import SaveToStoryBoard from '../SaveToStoryBoard';
 
@@ -123,7 +123,9 @@ const TitleHeader: FC = memo(() => {
       )}
 
       {allowShare && (
-        <ShareLinkModal
+        <ShareManageModal
+          vizId={boardId as string}
+          orgId={orgId as string}
           vizType="DASHBOARD"
           visibility={showShareLinkModal}
           onOk={() => setShowShareLinkModal(false)}

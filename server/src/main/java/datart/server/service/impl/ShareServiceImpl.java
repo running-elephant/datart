@@ -150,6 +150,49 @@ public class ShareServiceImpl extends BaseService implements ShareService {
     }
 
     @Override
+    public ShareInfo updateShare(ShareUpdateParam updateParam) {
+        Share retrieve = retrieve(updateParam.getId());
+        requirePermission(retrieve, Const.MANAGE);
+
+        Share update = new Share();
+        BeanUtils.copyProperties(updateParam, update);
+        if (updateParam.getRowPermissionBy() != null) {
+            update.setRowPermissionBy(updateParam.getRowPermissionBy().name());
+        } else {
+            update.setRowPermissionBy(ShareRowPermissionBy.CREATOR.name());
+        }
+        update.setAuthenticationMode(updateParam.getAuthenticationMode().name());
+
+        Set<String> roleIds = new HashSet<>();
+        if (!CollectionUtils.isEmpty(updateParam.getRoles())) {
+            for (String role : updateParam.getRoles()) {
+                roleIds.add('r' + role);
+            }
+        }
+        if (!CollectionUtils.isEmpty(updateParam.getUsers())) {
+            for (String user : updateParam.getUsers()) {
+                Role role = roleService.getPerUserRole(retrieve.getOrgId(), user);
+                roleIds.add('u' + role.getId());
+            }
+        }
+
+        if (ShareAuthenticationMode.CODE.equals(updateParam.getAuthenticationMode())) {
+            update.setAuthenticationCode(SecurityUtils.randomPassword());
+        }
+
+        update.setRoles(JSON.toJSONString(roleIds));
+        update.setUpdateBy(getCurrentUser().getId());
+        update.setUpdateTime(new Date());
+        shareMapper.updateByPrimaryKeySelective(update);
+
+        ShareInfo shareInfo = new ShareInfo();
+        BeanUtils.copyProperties(update, shareInfo);
+        shareInfo.setId(update.getId());
+        shareInfo.setAuthenticationMode(updateParam.getAuthenticationMode());
+        return shareInfo;
+    }
+
+    @Override
     public List<ShareInfo> listShare(String vizId) {
         List<Share> shares = shareMapper.selectByViz(vizId);
         if (CollectionUtils.isEmpty(shares)) {
@@ -246,7 +289,9 @@ public class ShareServiceImpl extends BaseService implements ShareService {
 
     private ShareVizDetail getVizDetail(ShareAuthorizedToken authorizedToken) {
 
-        getSecurityManager().runAs(authorizedToken.getPermissionBy());
+        User user = userMapperExt.selectByPrimaryKey(authorizedToken.getCreateBy());
+
+        getSecurityManager().runAs(user.getUsername());
 
         ShareVizDetail shareVizDetail = new ShareVizDetail();
 
@@ -301,36 +346,8 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         shareVizDetail.setVizDetail(vizDetail);
         shareVizDetail.setSubVizToken(subVizToken);
         shareVizDetail.setExecuteToken(executeToken);
+        shareVizDetail.setShareToken(ShareToken.create(AESUtil.encrypt(authorizedToken, Application.getTokenSecret())));
         return shareVizDetail;
-    }
-
-    @Override
-    public boolean update(BaseUpdateParam updateParam) {
-        Share retrieve = retrieve(updateParam.getId());
-        requirePermission(retrieve, Const.MANAGE);
-
-        ShareUpdateParam shareUpdateParam = (ShareUpdateParam) updateParam;
-        Share update = new Share();
-        BeanUtils.copyProperties(shareUpdateParam, update);
-        update.setRowPermissionBy(shareUpdateParam.getRowPermissionBy().name());
-        update.setAuthenticationMode(shareUpdateParam.getAuthenticationMode().name());
-
-        Set<String> roleIds = new HashSet<>();
-        if (!CollectionUtils.isEmpty(shareUpdateParam.getRoles())) {
-            for (String role : shareUpdateParam.getRoles()) {
-                roleIds.add('r' + role);
-            }
-        }
-        if (!CollectionUtils.isEmpty(shareUpdateParam.getUsers())) {
-            for (String user : shareUpdateParam.getUsers()) {
-                Role role = roleService.getPerUserRole(retrieve.getOrgId(), user);
-                roleIds.add('u' + role.getId());
-            }
-        }
-        update.setRoles(JSON.toJSONString(roleIds));
-        update.setUpdateBy(getCurrentUser().getId());
-        update.setUpdateTime(new Date());
-        return 1 == shareMapper.updateByPrimaryKeySelective(update);
     }
 
     private ShareAuthorizedToken validateExecutePermission(String authorizedToken, ViewExecuteParam executeParam) {
@@ -361,7 +378,6 @@ public class ShareServiceImpl extends BaseService implements ShareService {
                 }
                 break;
             case LOGIN:
-
                 // 验证用户是否存在
                 User user = null;
                 if (StringUtils.isBlank(shareToken.getUsername())) {

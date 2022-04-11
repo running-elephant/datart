@@ -45,6 +45,11 @@ public class UserSettingServiceImpl extends BaseService implements UserSettingSe
     }
 
     @Override
+    public boolean deleteByUserId(String userId) {
+        return userSettingsMapper.deleteByUser(userId)>0;
+    }
+
+    @Override
     @Transactional
     public UserSettings create(BaseCreateParam createParam) {
         UserSettings userSettings = new UserSettings();

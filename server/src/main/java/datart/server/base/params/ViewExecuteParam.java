@@ -20,6 +20,7 @@ package datart.server.base.params;
 
 import datart.core.base.PageInfo;
 import datart.core.data.provider.sql.*;
+import datart.security.base.ResourceType;
 import lombok.Data;
 import org.springframework.util.CollectionUtils;
 
@@ -34,7 +35,7 @@ public class ViewExecuteParam {
 
     private String vizName;
 
-    private String vizType;
+    private ResourceType vizType;
 
     private String viewId;
 
