@@ -62,6 +62,13 @@ public class NormalSqlExamples {
         sqlList.add(SqlTestEntity.createValidateSql(sqlDialect,
                 "select date_add(oclife_time, interval-day(oclife_time)+1 day) as dt from ttt",
                 "select date_add(oclife_time, interval-day(oclife_time)+1 day) as dt from ttt"));
+        sqlList.add(SqlTestEntity.createValidateSql(sqlDialect,
+                "SELECT JSON_ARRAY('a', 1, NOW()) 'a', JSON_OBJECT('key1', 1, 'key2', 'abc') 'o', JSON_ARRAY('x')=JSON_ARRAY('X') as 'x', JSON_VALID('null') 'n', \n" +
+                        "\tsentence->>\"$.mascot\" 's' from facts",
+                "SELECT JSON_ARRAY('a', 1, NOW()) 'a', JSON_OBJECT('key1', 1, 'key2', 'abc') 'o', JSON_ARRAY('x')=JSON_ARRAY('X') as 'x', JSON_VALID('null') 'n',  \tsentence->>\"$.mascot\" 's' from facts"));
+        sqlList.add(SqlTestEntity.createValidateSql(sqlDialect,
+                "SELECT SQL_CALC_FOUND_ROWS * FROM tbl_name WHERE id > 100 LIMIT 10",
+                "SELECT SQL_CALC_FOUND_ROWS * FROM tbl_name WHERE id > 100 LIMIT 10"));
     }
 
     private static void initOracleScripts() {
