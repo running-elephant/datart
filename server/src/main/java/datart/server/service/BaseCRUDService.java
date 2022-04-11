@@ -9,6 +9,7 @@ import datart.core.common.UUIDGenerator;
 import datart.core.entity.BaseEntity;
 import datart.core.entity.User;
 import datart.core.mappers.ext.CRUDMapper;
+import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.security.base.ResourceType;
 import datart.server.base.params.BaseCreateParam;
 import datart.server.base.params.BaseUpdateParam;
@@ -141,7 +142,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
     }
 
     default void deletePermissions(E e) {
-
+        getRRRMapper().deleteByResourceId(e.getId());
     }
 
     default void deleteReference(E e) {
@@ -237,5 +238,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
     User getCurrentUser();
 
     void requirePermission(E entity, int permission);
+
+    RelRoleResourceMapperExt getRRRMapper();
 
 }

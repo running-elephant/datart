@@ -145,4 +145,8 @@ public interface RelRoleResourceMapperExt extends RelRoleResourceMapper {
     })
     int deleteByResource(String resourceType, String resourceId);
 
+    @Delete({
+            "DELETE FROM rel_role_resource where resource_id=#{resourceId}",
+    })
+    int deleteByResourceId(String resourceId);
 }
