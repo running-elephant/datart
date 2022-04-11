@@ -15,8 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import WidgetToolBar from 'app/pages/DashBoardPage/components/WidgetToolBar';
 import { memo, useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
@@ -25,6 +25,9 @@ import { EditMask } from '../../WidgetComponents/EditMask';
 import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
 import { ZIdexWrapper } from '../../WidgetComponents/ZIdexWrapper';
+import { LockFnIcon } from '../../WidgetToolBar/StatusIcon';
+import { StyledWidgetToolBar } from '../../WidgetToolBar/StyledWidgetToolBar';
+import { WidgetActionDropdown } from '../../WidgetToolBar/WidgetActionDropdown';
 import { ResetBtnWidgetCore } from './ResetBtnWidgetCore';
 
 export const ResetBtnWidget: React.FC<{}> = memo(() => {
@@ -53,7 +56,16 @@ export const ResetBtnWidget: React.FC<{}> = memo(() => {
         </FlexWrapper>
       </ZIdexWrapper>
       {editing && <EditMask />}
-      <WidgetToolBar />
+      <StyledWidgetToolBar>
+        <Space size={0}>
+          <LockFnIcon
+            boardEditing={editing}
+            wid={widget.id}
+            lock={widget.config?.lock}
+          />
+          <WidgetActionDropdown widget={widget} />
+        </Space>
+      </StyledWidgetToolBar>
     </WidgetWrapper>
   );
 });

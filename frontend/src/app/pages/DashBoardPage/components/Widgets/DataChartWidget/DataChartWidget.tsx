@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import React, { memo, useContext, useEffect } from 'react';
+import { memo, useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from '../../BoardProvider/BoardInfoProvider';
@@ -27,7 +27,7 @@ import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
 import { ZIdexWrapper } from '../../WidgetComponents/ZIdexWrapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
-import { WidgetToolBar } from './components/ToolBar';
+import { ToolBar } from './components/ToolBar';
 import { DataChartWidgetCore } from './DataChartWidgetCore';
 
 export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
@@ -96,7 +96,7 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
           </FlexWrapper>
         </ZIdexWrapper>
         {editing && <EditMask />}
-        <WidgetToolBar />
+        <ToolBar />
       </WidgetWrapper>
     );
   },

@@ -16,34 +16,19 @@
  * limitations under the License.
  */
 
-import { ContainerItem } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
-import { INFO, SUCCESS } from 'styles/StyleConstants';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
-import WidgetToolBar from '../../WidgetToolBar';
 import SubMaskLayer from './components/SubMaskLayer';
 import { TabWidgetMapper } from './TabWidgetMapper';
 
-export interface IProps {
-  tabItem: ContainerItem;
-}
-const TabWidgetContainer: React.FC<IProps> = ({ tabItem }) => {
+const TabWidgetContainer: React.FC<{}> = () => {
   const { editing: boardEditing, boardType } = useContext(BoardContext);
   const widget = useContext(WidgetContext);
   const widgetInfo = useContext(WidgetInfoContext);
-  const border = useMemo(() => {
-    let border = '';
-    if (widgetInfo.selected) {
-      border = `1px solid ${INFO}`;
-    }
-    if (widgetInfo.editing) {
-      border = `1px solid ${SUCCESS}`;
-    }
-    return border;
-  }, [widgetInfo.editing, widgetInfo.selected]);
+
   const subMask = useMemo(() => {
     if (!boardEditing) return null;
     if (widgetInfo.editing) return null;
@@ -62,33 +47,24 @@ const TabWidgetContainer: React.FC<IProps> = ({ tabItem }) => {
     widgetInfo.id,
     widgetInfo.selected,
   ]);
-  const ssp = e => {
-    e.stopPropagation();
-  };
+
   return (
-    <Wrap border={border}>
-      <ItemContainer className="ItemContainer">
-        <TabWidgetMapper boardEditing={boardEditing} boardType={boardType} />
-      </ItemContainer>
+    <Wrap>
+      <TabWidgetMapper boardEditing={boardEditing} boardType={boardType} />
+
       {subMask}
-      <div className="sub-hoverBar" onClick={ssp}>
-        <WidgetToolBar />
-      </div>
     </Wrap>
   );
 };
 export default TabWidgetContainer;
-interface WrapProps {
-  border: string;
-}
-const Wrap = styled.div<WrapProps>`
+
+const Wrap = styled.div`
   position: relative;
   box-sizing: border-box;
   display: flex;
   flex: 1;
   width: 100%;
   height: 100%;
-  border: ${p => p.border};
 
   & .widget-tool-bar {
     z-index: 30;
@@ -96,10 +72,6 @@ const Wrap = styled.div<WrapProps>`
 
   &:hover .widget-tool-dropdown {
     visibility: visible;
-  }
-
-  &:active {
-    border: ${p => p.border};
   }
 `;
 const ItemContainer = styled.div`

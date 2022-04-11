@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import WidgetToolBar from 'app/pages/DashBoardPage/components/WidgetToolBar';
 import { memo, useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
@@ -27,6 +26,7 @@ import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
 import { ZIdexWrapper } from '../../WidgetComponents/ZIdexWrapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
+import { ToolBar } from './components/ToolBar';
 import { ControllerWidgetCore } from './ControllerWidgetCore';
 
 export const ControllerWIdget: React.FC<{}> = memo(() => {
@@ -88,7 +88,7 @@ export const ControllerWIdget: React.FC<{}> = memo(() => {
         </FlexWrapper>
       </ZIdexWrapper>
       {editing && <EditMask />}
-      <WidgetToolBar />
+      <ToolBar />
     </WidgetWrapper>
   );
 });

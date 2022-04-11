@@ -15,17 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import WidgetToolBar from 'app/pages/DashBoardPage/components/WidgetToolBar';
 import { memo, useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
-import { EditMask } from '../../WidgetComponents/EditMask';
+import BlockMaskLayer from '../../WidgetComponents/BlockMaskLayer';
 import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
 import { ZIdexWrapper } from '../../WidgetComponents/ZIdexWrapper';
+import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
+import { LockFnIcon } from '../../WidgetToolBar/StatusIcon';
+import { StyledWidgetToolBar } from '../../WidgetToolBar/StyledWidgetToolBar';
+import { WidgetActionDropdown } from '../../WidgetToolBar/WidgetActionDropdown';
 import { TabWidgetCore } from './TabWidgetCore';
 
 export const TabWidget: React.FC<{ hideTitle: boolean }> = memo(
@@ -33,6 +37,7 @@ export const TabWidget: React.FC<{ hideTitle: boolean }> = memo(
     const widget = useContext(WidgetContext);
     const { initialQuery } = useContext(BoardConfigContext);
     const { renderMode, boardType, editing } = useContext(BoardContext);
+    const widgetInfo = useContext(WidgetInfoContext);
     const { onRenderedWidgetById } = useContext(WidgetActionContext);
     /**
      * @param ''
@@ -62,8 +67,19 @@ export const TabWidget: React.FC<{ hideTitle: boolean }> = memo(
             <TabWidgetCore />
           </FlexWrapper>
         </ZIdexWrapper>
-        {editing && <EditMask />}
-        <WidgetToolBar />
+        {editing && (
+          <BlockMaskLayer widgetConfig={widget} widgetInfo={widgetInfo} />
+        )}
+        <StyledWidgetToolBar>
+          <Space size={0}>
+            <LockFnIcon
+              boardEditing={editing}
+              wid={widget.id}
+              lock={widget.config?.lock}
+            />
+            <WidgetActionDropdown widget={widget} />
+          </Space>
+        </StyledWidgetToolBar>
       </WidgetWrapper>
     );
   },
