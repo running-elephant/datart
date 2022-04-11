@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { useGridWidgetHeight } from 'app/hooks/useGridWidgetHeight';
-import { throttle } from 'echarts';
+import throttle from 'lodash/throttle';
 import {
   RefObject,
   useCallback,

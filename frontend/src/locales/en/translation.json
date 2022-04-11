@@ -800,8 +800,34 @@
         "expireDate": "Expire Date",
         "enablePassword": "Password",
         "generateLink": "Generate Link",
-        "shareLink": "Share Link",
-        "downloadData": "Download Excel"
+        "shareLink": "Share management",
+        "downloadData": "Download Excel",
+        "NONE": "None",
+        "CODE": "Code",
+        "LOGIN": "Login",
+        "verificationMethod": "Verification method",
+        "dataPermission": "Data permission",
+        "loginUser": "User login",
+        "shareUser": "User share",
+        "userOrRole": "Assign roles/members",
+        "selectRole": "Select role",
+        "selectUser": "select members",
+        "save": "Save"
+      },
+      "shareList": {
+        "shareList": "Share link list",
+        "shortLink": "Short link",
+        "type": "Type",
+        "expireDate": "Expiration",
+        "operate": "Operate",
+        "copy": "Copy",
+        "copySuccess": "Copy success",
+        "delete": "Delete",
+        "addLink": "Add a link",
+        "deleteError": "Failed to delete",
+        "sureDelete": "sure you want to delete?",
+        "noDataTip": "No link yet, click on the top right corner to add",
+        "Permanent":"Permanent"
       }
     },
     "board": {

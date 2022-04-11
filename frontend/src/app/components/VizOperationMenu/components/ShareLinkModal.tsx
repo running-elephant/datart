@@ -16,79 +16,143 @@
  * limitations under the License.
  */
 
-import { CopyOutlined } from '@ant-design/icons';
-import {
-  Button,
-  Checkbox,
-  DatePicker,
-  Form,
-  Input,
-  Modal,
-  Tooltip,
-} from 'antd';
+import { DatePicker, Form, Modal, Radio, Select, Space } from 'antd';
 import { FormItemEx } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { useMemberSlice } from 'app/pages/MainPage/pages/MemberPage/slice';
+import {
+  selectMembers,
+  selectRoles as rdxSelectRoles,
+} from 'app/pages/MainPage/pages/MemberPage/slice/selectors';
+import {
+  getMembers,
+  getRoles,
+} from 'app/pages/MainPage/pages/MemberPage/slice/thunks';
+import { TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
-import { FC, memo, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE } from 'styles/StyleConstants';
-import { getServerDomain } from 'utils/request';
+import { AuthenticationModeType, RowPermissionByType } from './slice/constants';
+import { ShareDetail } from './slice/type';
 
 const ShareLinkModal: FC<{
+  orgId: string;
   vizType: string;
   visibility: boolean;
-  onGenerateShareLink?: (
-    date,
-    usePwd,
-  ) => { password?: string; token?: string; usePassword?: boolean };
+  shareData?: ShareDetail | null;
   onOk?;
   onCancel?;
-}> = memo(({ visibility, onGenerateShareLink, onOk, onCancel, vizType }) => {
+}> = memo(({ visibility, onOk, onCancel, shareData, orgId }) => {
+  useMemberSlice();
+
   const t = useI18NPrefix(`viz.action`);
-  const [expireDate, setExpireDate] = useState<string>();
-  const [enablePassword, setEnablePassword] = useState(false);
-  const [shareLink, setShareLink] = useState<{
-    password?: string;
-    token?: string;
-    usePassword?: boolean;
-  }>();
+  const dispatch = useDispatch();
+  const [expiryDate, setExpiryDate] = useState<string | Date>('');
+  const [authenticationMode, setAuthenticationMode] = useState(
+    AuthenticationModeType.none,
+  );
+  const [rowPermissionBy, setRowPermissionBy] = useState('');
+  const [selectUsers, setSelectUsers] = useState<string[] | null>([]);
+  const [selectRoles, setSelectRoles] = useState<string[] | null>([]);
+  const [btnLoading, setBtnLoading] = useState<boolean>(false);
+  const usersList = useSelector(selectMembers);
+  const rolesList = useSelector(rdxSelectRoles);
 
-  const handleCopyToClipboard = value => {
-    const ta = document.createElement('textarea');
-    ta.innerText = value;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    ta.remove();
-  };
+  const handleOkFn = useCallback(
+    async ({
+      expiryDate,
+      authenticationMode,
+      roles,
+      users,
+      rowPermissionBy,
+    }) => {
+      setBtnLoading(true);
 
-  const getFullShareLinkPath = shareLink => {
-    if (!shareLink?.token) {
-      return '';
+      try {
+        let paramsData = {
+          expiryDate,
+          authenticationMode,
+          roles,
+          users,
+          rowPermissionBy,
+        };
+        if (shareData) {
+          paramsData = Object.assign({}, shareData, paramsData);
+        }
+
+        await onOk(paramsData);
+        setBtnLoading(false);
+      } catch (err) {
+        setBtnLoading(false);
+        throw err;
+      }
+    },
+    [onOk, shareData],
+  );
+
+  const handleAuthenticationMode = useCallback(async e => {
+    const value = e.target.value;
+
+    setSelectRoles([]);
+    setSelectUsers([]);
+    setRowPermissionBy('');
+
+    if (value === AuthenticationModeType.login) {
+      setRowPermissionBy(RowPermissionByType.visitor);
     }
-    const encodeToken = encodeURIComponent(shareLink?.token);
-    const urlRouter = {
-      DASHBOARD: 'shareDashboard',
-      DATACHART: 'shareChart',
-      STORYBOARD: 'shareStoryPlayer',
-    };
-    return `${getServerDomain()}/${urlRouter[vizType]}?token=${encodeToken}${
-      shareLink?.usePassword ? '&usePassword=1' : ''
-    }`;
-  };
 
-  const handleGenerateShareLink = async (expireDate, enablePassword) => {
-    const result = await onGenerateShareLink?.(expireDate, enablePassword);
-    setShareLink(result);
-  };
+    setAuthenticationMode(e.target.value);
+  }, []);
+
+  const handleRowPermissionBy = useCallback(e => {
+    setRowPermissionBy(e.target.value);
+  }, []);
+
+  const handleChangeMembers = useCallback(users => {
+    setSelectUsers(users);
+  }, []);
+
+  const handleChangeRoles = useCallback(roles => {
+    setSelectRoles(roles);
+  }, []);
+
+  const handleDefauleValue = useCallback((shareData: ShareDetail) => {
+    setExpiryDate(shareData.expiryDate);
+    setAuthenticationMode(shareData.authenticationMode);
+    setRowPermissionBy(shareData.rowPermissionBy);
+    setSelectUsers(shareData.users);
+    setSelectRoles(shareData.roles);
+  }, []);
+
+  useEffect(() => {
+    dispatch(getRoles(orgId));
+    dispatch(getMembers(orgId));
+  }, [orgId, dispatch]);
+
+  useEffect(() => {
+    shareData && handleDefauleValue(shareData);
+  }, [handleDefauleValue, shareData]);
 
   return (
     <StyledShareLinkModal
       title={t('share.shareLink')}
       visible={visibility}
-      onOk={onOk}
+      okText={shareData ? t('share.save') : t('share.generateLink')}
+      onOk={() =>
+        handleOkFn?.({
+          expiryDate,
+          authenticationMode,
+          roles: selectRoles,
+          users: selectUsers,
+          rowPermissionBy,
+        })
+      }
+      okButtonProps={{ loading: btnLoading }}
       onCancel={onCancel}
       destroyOnClose
+      forceRender
     >
       <Form
         preserve={false}
@@ -98,102 +162,78 @@ const ShareLinkModal: FC<{
       >
         <FormItemEx label={t('share.expireDate')}>
           <DatePicker
+            value={expiryDate ? moment(expiryDate, TIME_FORMATTER) : null}
             showTime
             disabledDate={current => {
               return current && current < moment().endOf('day');
             }}
             onChange={(_, dateString) => {
-              setExpireDate(dateString);
+              setExpiryDate(dateString);
             }}
           />
         </FormItemEx>
-        <FormItemEx label={t('share.enablePassword')}>
-          <Checkbox
-            checked={enablePassword}
-            onChange={e => {
-              setEnablePassword(e.target.checked);
-            }}
-          />
-        </FormItemEx>
-        <FormItemEx label={t('share.generateLink')}>
-          <Button
-            htmlType="button"
-            disabled={!expireDate}
-            onClick={() =>
-              handleGenerateShareLink?.(expireDate, enablePassword)
-            }
+        <FormItemEx label={t('share.verificationMethod')}>
+          <Radio.Group
+            onChange={handleAuthenticationMode}
+            value={authenticationMode}
           >
-            {t('share.generateLink')}
-          </Button>
+            <Radio value={AuthenticationModeType.none}>{t('share.NONE')}</Radio>
+            <Radio value={AuthenticationModeType.code}>{t('share.CODE')}</Radio>
+            <Radio value={AuthenticationModeType.login}>
+              {t('share.LOGIN')}
+            </Radio>
+          </Radio.Group>
         </FormItemEx>
-        {shareLink?.usePassword ? (
-          <FormItemEx label={t('share.link_password')}>
-            <Tooltip
-              title={
-                t('share.link') +
-                `： ` +
-                `${getFullShareLinkPath(shareLink)}` +
-                `         ` +
-                t('share.password') +
-                `： ` +
-                `${shareLink?.password}`
-              }
-            >
-              <Input
-                disabled
-                value={
-                  t('share.link') +
-                  `： ` +
-                  `${getFullShareLinkPath(shareLink)}` +
-                  `         ` +
-                  t('share.password') +
-                  `： ` +
-                  `${shareLink?.password}`
-                }
-                title={
-                  t('share.link') +
-                  `： ` +
-                  `${getFullShareLinkPath(shareLink)}` +
-                  `         ` +
-                  t('share.password') +
-                  `： ` +
-                  `${shareLink?.password}`
-                }
-                addonAfter={
-                  <CopyOutlined
-                    onClick={() =>
-                      handleCopyToClipboard(
-                        t('share.link') +
-                          `： ` +
-                          `${getFullShareLinkPath(shareLink)}` +
-                          `         ` +
-                          t('share.password') +
-                          `： ` +
-                          `${shareLink?.password}`,
-                      )
-                    }
-                  />
-                }
-              />
-            </Tooltip>
-          </FormItemEx>
-        ) : (
-          <FormItemEx label={t('share.link')} rules={[{ required: true }]}>
-            <Tooltip title={getFullShareLinkPath(shareLink)}>
-              <Input
-                disabled
-                value={getFullShareLinkPath(shareLink)}
-                title={getFullShareLinkPath(shareLink)}
-                addonAfter={
-                  <CopyOutlined
-                    onClick={() =>
-                      handleCopyToClipboard(getFullShareLinkPath(shareLink))
-                    }
-                  />
-                }
-              />
-            </Tooltip>
-          </FormItemEx>
+        {authenticationMode === AuthenticationModeType.login && (
+          <>
+            <FormItemEx label={t('share.dataPermission')}>
+              <Radio.Group
+                onChange={handleRowPermissionBy}
+                value={rowPermissionBy}
+              >
+                <Radio value={RowPermissionByType.visitor}>
+                  {t('share.loginUser')}
+                </Radio>
+                <Radio value={RowPermissionByType.creator}>
+                  {t('share.shareUser')}
+                </Radio>
+              </Radio.Group>
+            </FormItemEx>
+            <FormItemEx label={t('share.userOrRole')}>
+              <Space>
+                <StyledSelection
+                  onChange={handleChangeRoles}
+                  placeholder={t('share.selectRole')}
+                  mode="multiple"
+                  maxTagCount={2}
+                  value={selectRoles || []}
+                >
+                  {rolesList?.map((v, i) => {
+                    return (
+                      <Select.Option key={i} value={v.id}>
+                        {v.name}
+                      </Select.Option>
+                    );
+                  })}
+                </StyledSelection>
+                <StyledSelection
+                  onChange={handleChangeMembers}
+                  placeholder={t('share.selectUser')}
+                  mode="multiple"
+                  maxTagCount={2}
+                  value={selectUsers || []}
+                >
+                  {usersList?.map((v, i) => {
+                    return (
+                      <Select.Option key={i} value={v.id}>
+                        {v.username}
+                      </Select.Option>
+                    );
+                  })}
+                </StyledSelection>
+              </Space>
+            </FormItemEx>
+          </>
         )}
       </Form>
     </StyledShareLinkModal>
@@ -207,4 +247,8 @@ const StyledShareLinkModal = styled(Modal)`
     margin-top: ${SPACE};
     margin-bottom: ${SPACE};
   }
+`;
+
+const StyledSelection = styled(Select)`
+  min-width: 100px;
 `;

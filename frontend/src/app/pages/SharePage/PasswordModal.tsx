@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Form, FormInstance, Input, Modal } from 'antd';
+import { Button, Form, FormInstance, Input, Modal } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo, useRef } from 'react';
 
@@ -27,25 +27,34 @@ const PasswordModal: FC<{
   onChange: (password: string) => void;
 }> = memo(({ visible, onChange }) => {
   const t = useI18NPrefix(`share.modal`);
+  const tg = useI18NPrefix(`global`);
   const formInstance = useRef<FormInstance>(null);
 
   return (
     <Modal
       title={t('password')}
       visible={visible}
-      onOk={() => {
-        formInstance?.current
-          ?.validateFields()
-          .then(() => {
-            const useInput = formInstance?.current?.getFieldsValue([
-              INPUT_PASSWORD_KEY,
-            ]);
-            onChange(useInput?.[INPUT_PASSWORD_KEY]);
-          })
-          .catch(info => {
-            return Promise.reject();
-          });
-      }}
+      closable={false}
+      footer={[
+        <Button
+          onClick={() => {
+            formInstance?.current
+              ?.validateFields()
+              .then(() => {
+                const useInput = formInstance?.current?.getFieldsValue([
+                  INPUT_PASSWORD_KEY,
+                ]);
+                onChange(useInput?.[INPUT_PASSWORD_KEY]);
+              })
+              .catch(info => {
+                return Promise.reject();
+              });
+          }}
+          type="primary"
+        >
+          {tg('button.ok')}
+        </Button>,
+      ]}
     >
       <Form ref={formInstance}>
         <Form.Item

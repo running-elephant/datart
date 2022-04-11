@@ -216,9 +216,9 @@ module.exports = {
     historyApiFallback: {
       rewrites: [
         { from: /^\/$/, to: '/index.html' },
-        { from: /^\/shareChart$/, to: '/shareChart.html' },
-        { from: /^\/shareDashboard$/, to: '/shareDashboard.html' },
-        { from: /^\/shareStoryPlayer$/, to: '/shareStoryPlayer.html' },
+        { from: /^\/shareChart\/\w/, to: '/shareChart.html' },
+        { from: /^\/shareDashboard\/\w/, to: '/shareDashboard.html' },
+        { from: /^\/shareStoryPlayer\/\w/, to: '/shareStoryPlayer.html' },
       ],
     },
   },

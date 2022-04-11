@@ -28,7 +28,7 @@ import styled from 'styled-components/macro';
 import TitleHeader from '../../components/BoardHeader/ViewHeader';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardInitProvider } from '../../components/BoardProvider/BoardInitProvider';
-import { FullScreenPanel } from '../../components/FullScreenPanel';
+import { FullScreenPanel } from '../../components/FullScreenPanel/FullScreenPanel';
 import { checkLinkAndJumpErr } from '../../utils';
 import { editDashBoardInfoActions } from '../BoardEditor/slice';
 import { clearEditBoardState } from '../BoardEditor/slice/actions/actions';

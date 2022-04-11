@@ -801,8 +801,34 @@
         "expireDate": "截止日期",
         "enablePassword": "启用密码",
         "generateLink": "生成链接",
-        "shareLink": "分享",
-        "downloadData": "下载为 Excel"
+        "shareLink": "分享管理",
+        "downloadData": "下载为 Excel",
+        "NONE": "无",
+        "CODE": "口令",
+        "LOGIN": "登录",
+        "verificationMethod": "认证方式",
+        "dataPermission": "数据权限",
+        "loginUser": "登录者",
+        "shareUser": "分享者",
+        "userOrRole": "指定角色/成员",
+        "selectRole": "选择角色",
+        "selectUser": "选择成员",
+        "save": "保存"
+      },
+      "shareList": {
+        "shareList": "分享链接列表",
+        "shortLink": "短链接",
+        "type": "类型",
+        "expireDate": "过期时间",
+        "operate": "操作",
+        "copy": "复制链接",
+        "copySuccess": "复制成功",
+        "delete": "删除",
+        "addLink": "添加链接",
+        "deleteError": "删除失败",
+        "sureDelete":"确定要删除吗？",
+        "noDataTip":"暂无链接，点击右上角添加",
+        "Permanent":"永久"
       }
     },
     "board": {

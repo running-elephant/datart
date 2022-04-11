@@ -265,6 +265,28 @@ const config: ChartConfig = {
       ],
     },
     {
+      label: 'summary.summaryAggregation',
+      key: 'summaryAggregation',
+      comType: 'group',
+      rows: [
+        {
+          label: 'summary.aggregation',
+          key: 'aggregation',
+          default: 'SUM',
+          comType: 'select',
+          options: {
+            translateItemLabel: true,
+            items: [
+              { label: '@global@.summary.aggregations.sum', value: 'SUM' },
+              { label: '@global@.summary.aggregations.min', value: 'MIN' },
+              { label: '@global@.summary.aggregations.max', value: 'MAX' },
+              { label: '@global@.summary.aggregations.avg', value: 'AVG' },
+            ],
+          },
+        },
+      ],
+    },
+    {
       label: 'summary.rowSummary',
       key: 'rowSummary',
       comType: 'group',
@@ -315,6 +337,57 @@ const config: ChartConfig = {
         },
       ],
     },
+    {
+      label: 'summary.colSummary',
+      key: 'colSummary',
+      comType: 'group',
+      rows: [
+        {
+          label: 'summary.enableTotal',
+          key: 'enableTotal',
+          default: false,
+          comType: 'checkbox',
+        },
+        {
+          label: 'summary.totalPosition',
+          key: 'totalPosition',
+          default: true,
+          comType: 'select',
+          options: {
+            translateItemLabel: true,
+            items: [
+              { label: '@global@.summary.totalPositionType.left', value: true },
+              {
+                label: '@global@.summary.totalPositionType.right',
+                value: false,
+              },
+            ],
+          },
+        },
+        {
+          label: 'summary.enableSubTotal',
+          key: 'enableSubTotal',
+          default: false,
+          comType: 'checkbox',
+        },
+        {
+          label: 'summary.subTotalPosition',
+          key: 'subTotalPosition',
+          default: true,
+          comType: 'select',
+          options: {
+            translateItemLabel: true,
+            items: [
+              { label: '@global@.summary.totalPositionType.left', value: true },
+              {
+                label: '@global@.summary.totalPositionType.right',
+                value: false,
+              },
+            ],
+          },
+        },
+      ],
+    },
   ],
   i18ns: [
     {
@@ -344,15 +417,25 @@ const config: ChartConfig = {
         summary: {
           title: '数据汇总',
           rowSummary: '行总计',
-          columnSummary: '列总计',
+          colSummary: '列总计',
           enableTotal: '启用总计',
           enableSubTotal: '启用小计',
           totalPosition: '总计位置',
           subTotalPosition: '小计位置',
           aggregateFields: '汇总列',
+          summaryAggregation: '总计聚合',
+          aggregation: '聚合方式',
+          aggregations: {
+            sum: '求和',
+            min: '最小值',
+            max: '最大值',
+            avg: '平均值',
+          },
           totalPositionType: {
             top: '顶部',
             bottom: '底部',
+            left: '左侧',
+            right: '右侧',
           },
           subTotal: '小记',
           total: '总计',
@@ -386,15 +469,25 @@ const config: ChartConfig = {
         summary: {
           title: 'Summary',
           rowSummary: 'Row Total',
-          columnSummary: 'Column Total',
+          colSummary: 'Column Total',
           enableTotal: 'Enable Total',
           enableSubTotal: 'Enable Sub Total',
           totalPosition: 'Total Position',
           subTotalPosition: 'Sub Total Position',
           aggregateFields: 'Summary Fields',
+          summaryAggregation: 'Summary Aggregation',
+          aggregation: 'Aggregation Type',
+          aggregations: {
+            sum: 'Sum',
+            min: 'Min',
+            max: 'Max',
+            avg: 'Avg',
+          },
           totalPositionType: {
             top: 'Top',
             bottom: 'Bottom',
+            left: 'Left',
+            right: 'Right',
           },
           subTotal: 'Sub Total',
           total: 'Total',

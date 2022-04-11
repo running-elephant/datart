@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { WIDGET_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
 import {
   Widget,
   WidgetInfo,
@@ -29,11 +30,9 @@ import { selectShowBlockMask } from '../slice/selectors';
 export interface BlockMaskLayerProps {
   widgetConfig: Widget;
   widgetInfo: WidgetInfo;
-  handleClassName: string;
-  cursor?: string;
 }
 const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
-  ({ widgetConfig, widgetInfo, handleClassName, cursor }) => {
+  ({ widgetConfig, widgetInfo }) => {
     const dispatch = useDispatch();
     const showBlockMask = useSelector(selectShowBlockMask);
     const onMouseDown = useCallback(
@@ -77,11 +76,10 @@ const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
 
     return (
       <MaskLayer
-        cursor={cursor}
         front={showBlockMask && !widgetInfo.editing}
         border={border}
         selected={widgetInfo.selected}
-        className={showBlockMask ? handleClassName : 'mask-layer'}
+        className={showBlockMask ? WIDGET_DRAG_HANDLE : ''}
         onDoubleClick={doubleClick}
         onMouseDown={onMouseDown}
       ></MaskLayer>
@@ -93,7 +91,6 @@ interface MaskLayerProps {
   front: boolean;
   selected: boolean;
   border: string;
-  cursor?: string;
 }
 const MaskLayer = styled.div<MaskLayerProps>`
   &:hover,
@@ -107,6 +104,6 @@ const MaskLayer = styled.div<MaskLayerProps>`
   z-index: ${p => (p.front ? 20 : 9)};
   width: calc(100% + 10px);
   height: calc(100% + 10px);
-  cursor: ${p => p.cursor || 'move'};
+  cursor: move;
   border: ${p => p.border};
 `;

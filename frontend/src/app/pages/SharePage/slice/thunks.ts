@@ -31,8 +31,7 @@ import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { convertToChartDTO } from 'app/utils/ChartDtoHelper';
 import { RootState } from 'types';
 import persistence from 'utils/persistence';
-import { request, request2 } from 'utils/request';
-import { errorHandle } from 'utils/utils';
+import { request2 } from 'utils/request';
 import { shareActions } from '.';
 import { ShareVizInfo } from './types';
 
@@ -44,34 +43,52 @@ export const fetchShareVizInfo = createAsyncThunk(
       sharePassword,
       filterSearchParams,
       renderMode,
+      userName,
+      passWord,
+      authorizedToken,
     }: {
       shareToken?: string;
       sharePassword?: string;
       filterSearchParams?: FilterSearchParams;
       renderMode?: VizRenderMode;
+      userName?: string;
+      passWord?: string;
+      authorizedToken?: string;
     },
     thunkAPI,
   ) => {
-    let data = {} as any;
+    const authenticationMode = filterSearchParams?.type.join();
+    let data = {} as ShareVizInfo;
     try {
-      const response = await request<ShareVizInfo>({
-        url: '/share/viz',
-        method: 'GET',
-        params: {
-          shareToken,
-          password: sharePassword,
+      const response = await request2<ShareVizInfo>({
+        url: `/shares/${shareToken}/viz`,
+        method: 'POST',
+        data: {
+          authenticationMode,
+          authenticationCode: sharePassword,
+          id: shareToken,
+          username: userName,
+          password: passWord,
+          authorizedToken,
         },
       });
       data = response.data;
     } catch (error) {
-      errorHandle(error);
       throw error;
     }
     await thunkAPI.dispatch(shareActions.setVizType(data.vizType));
-    persistence.session.save(shareToken, sharePassword);
-    await thunkAPI.dispatch(shareActions.saveNeedPassword(false));
+    if (authenticationMode === 'CODE') {
+      persistence.session.save(shareToken, sharePassword);
+    }
+    if (authenticationMode === 'LOGIN' && data?.shareToken) {
+      persistence.session.save(shareToken, data.shareToken.authorizedToken);
+    }
+    await thunkAPI.dispatch(shareActions.saveNeedVerify(false));
     await thunkAPI.dispatch(
-      shareActions.saveShareInfo({ token: shareToken, pwd: sharePassword }),
+      shareActions.saveShareInfo({
+        token: data.executeToken,
+        pwd: sharePassword,
+      }),
     );
 
     await thunkAPI.dispatch(
@@ -151,16 +168,18 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
       false,
       args.preview?.backendChart?.config?.aggregation,
     );
+    const executeParam = builder
+      .addExtraSorters(args?.sorter ? [args?.sorter as any] : [])
+      .build();
+
     const response = await request2({
       method: 'POST',
-      url: `share/execute`,
+      url: `shares/execute`,
       params: {
-        executeToken: shareState?.executeToken,
-        password: shareState?.sharePassword,
+        executeToken:
+          shareState?.shareToken[executeParam.viewId]['authorizedToken'],
       },
-      data: builder
-        .addExtraSorters(args?.sorter ? [args?.sorter as any] : [])
-        .build(),
+      data: executeParam,
     });
     return response.data;
   },

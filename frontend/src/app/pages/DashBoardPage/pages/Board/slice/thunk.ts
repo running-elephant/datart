@@ -49,6 +49,7 @@ export const getBoardDetail = createAsyncThunk<
     dashboardRelId: string;
     filterSearchParams?: FilterSearchParams;
     vizToken?: ExecuteToken;
+    shareToken?: string;
   }
 >(
   'board/getBoardDetail',
@@ -100,17 +101,17 @@ export const fetchBoardDetailInShare = createAsyncThunk<
     dashboardRelId: string;
     vizToken: ExecuteToken;
     filterSearchParams?: FilterSearchParams;
+    shareToken?: string;
   }
 >(
   'board/fetchBoardDetailInShare',
   async (params, { dispatch, rejectWithValue }) => {
-    const { vizToken } = params;
+    const { vizToken, shareToken } = params;
     const { data } = await request2<ShareVizInfo>({
-      url: '/share/viz',
-      method: 'GET',
-      params: {
-        shareToken: vizToken.token,
-        password: vizToken.password,
+      url: `shares/${shareToken}/viz`,
+      method: 'POST',
+      data: {
+        authorizedToken: vizToken.authorizedToken,
       },
     });
     dispatch(
@@ -256,15 +257,15 @@ export const getChartWidgetDataAsync = createAsyncThunk<
       } else {
         const executeTokenMap = (getState() as RootState)?.share
           ?.executeTokenMap;
+
         const dataChart = dataChartMap[curWidget.datachartId];
         const viewId = viewMap[dataChart.viewId].id;
         const executeToken = executeTokenMap?.[viewId];
         const { data } = await request2<WidgetData>({
           method: 'POST',
-          url: `share/execute`,
+          url: `shares/execute`,
           params: {
-            executeToken: executeToken?.token,
-            password: executeToken?.password,
+            executeToken: executeToken?.authorizedToken,
           },
           data: requestParams,
         });
@@ -366,10 +367,9 @@ export const getControllerOptions = createAsyncThunk<
       if (executeToken && renderMode !== 'read') {
         const { data } = await request2<ChartDataSetDTO>({
           method: 'POST',
-          url: `share/execute`,
+          url: `shares/execute`,
           params: {
-            executeToken: executeToken?.token,
-            password: executeToken?.password,
+            executeToken: executeToken?.authorizedToken,
           },
           data: requestParams,
         });
