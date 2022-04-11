@@ -15,19 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {
+  BoardType,
+  MediaWidgetType,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { memo, useContext } from 'react';
-import { BoardType, MediaWidgetType } from '../../pages/Board/slice/types';
-import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
-import { WidgetContext } from '../WidgetProvider/WidgetProvider';
-import { DataChartWidget } from '../Widgets/DataChartWidget/DataChartWidget';
-import { IframeWidget } from '../Widgets/IframeWidget/IframeWidget';
-import { ImageWidget } from '../Widgets/ImageWidget/ImageWidget';
-import { RichTextWidget } from '../Widgets/RichTextWidget/RichTextWidget';
-import { TabWidget } from '../Widgets/TabWidget/TabWidget';
-import { TimerWidget } from '../Widgets/TimerWidget/TimerWidget';
-import { VideoWidget } from '../Widgets/VideoWidget/VideoWidget';
+import { WidgetDataProvider } from '../../../WidgetProvider/WidgetDataProvider';
+import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
+import { DataChartWidget } from '../../DataChartWidget/DataChartWidget';
+import { IframeWidget } from '../../IframeWidget/IframeWidget';
+import { ImageWidget } from '../../ImageWidget/ImageWidget';
+import { RichTextWidget } from '../../RichTextWidget/RichTextWidget';
+import { TimerWidget } from '../../TimerWidget/TimerWidget';
+import { VideoWidget } from '../../VideoWidget/VideoWidget';
 
-export const FullScreenWidgetMapper: React.FC<{
+export const TabWidgetMapper: React.FC<{
   boardType: BoardType;
   boardEditing: boolean;
 }> = memo(({ boardEditing }) => {
@@ -48,8 +50,7 @@ export const FullScreenWidgetMapper: React.FC<{
     case 'media':
       const mediaSubType: MediaWidgetType = widget.config.content.type;
       return MediaMapper(mediaSubType);
-    case 'container':
-      return <TabWidget hideTitle={true} />;
+
     default:
       return <div>default widget</div>;
   }

@@ -129,7 +129,7 @@ export interface WidgetConf {
   tabId?: string; //记录在父容器tab的位置
   name: string;
   nameConfig: WidgetNameConfig;
-  padding?: WidgetPadding;
+  padding: WidgetPadding;
   type: WidgetType;
   autoUpdate: boolean;
   frequency: number; // 定时同步频率
