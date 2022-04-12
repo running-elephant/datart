@@ -28,14 +28,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.headers().frameOptions().disable();
         if (this.oAuth2ClientProperties != null) {
+            http.oauth2Login().successHandler(authenticationSuccessHandler);
             http
                     .authorizeRequests()
                     .antMatchers(getApiPrefix() + "/tpa").permitAll()
                     .and().oauth2Login().loginPage("/")
                     .and().logout().logoutUrl("/tpa/oauth2/logout").permitAll();
         }
-
-        http.oauth2Login().successHandler(authenticationSuccessHandler);
 
     }
 
