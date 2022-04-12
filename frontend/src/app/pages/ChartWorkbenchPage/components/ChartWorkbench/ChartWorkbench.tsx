@@ -90,7 +90,7 @@ const ChartWorkbench: FC<{
             dataset: dataset,
             drillOption: drillOption,
             onRefreshDataset: onRefreshDataset,
-            onChartDrillOptionChange,
+            onDrillOptionChange: onChartDrillOptionChange,
           }}
         >
           <ChartDataViewContext.Provider

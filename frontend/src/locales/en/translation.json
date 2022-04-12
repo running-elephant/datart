@@ -775,11 +775,6 @@
         "cancel": "Cancel",
         "number": "No.",
         "summary": "Summary",
-        "drill": {
-          "showNextLevel": "Show Next Level",
-          "expandNextLevel": "Expand Next Level",
-          "rollUp": "Roll Up"
-        },
         "richText": {
           "bold": "Bold",
           "italic": "Italic",
@@ -801,6 +796,11 @@
           "color": "Color",
           "align": "Align"
         }
+      },
+      "drill": {
+        "showNextLevel": "Show Next Level",
+        "expandNextLevel": "Expand Next Level",
+        "rollUp": "Roll Up"
       }
     },
     "action": {

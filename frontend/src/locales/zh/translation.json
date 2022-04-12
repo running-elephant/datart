@@ -775,11 +775,6 @@
         "cancel": "取消",
         "number": "序号",
         "summary": "汇总",
-        "drill": {
-          "showNextLevel": "显示下一层级",
-          "expandNextLevel": "展开下一层级",
-          "rollUp": "上卷"
-        },
         "richText": {
           "bold": "加粗",
           "italic": "斜体",
@@ -801,6 +796,11 @@
           "color": "字体颜色",
           "align": "对齐方式"
         }
+      },
+      "drill": {
+        "showNextLevel": "显示下一层级",
+        "expandNextLevel": "展开下一层级",
+        "rollUp": "上卷"
       }
     },
     "action": {

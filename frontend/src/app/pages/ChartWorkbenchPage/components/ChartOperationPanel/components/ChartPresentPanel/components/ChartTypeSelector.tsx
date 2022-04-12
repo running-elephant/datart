@@ -18,7 +18,6 @@
 
 import {
   AreaChartOutlined,
-  ArrowDownOutlined,
   CloudDownloadOutlined,
   ConsoleSqlOutlined,
   TableOutlined,
@@ -26,11 +25,10 @@ import {
 import { Popconfirm } from 'antd';
 import { IW } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import classnames from 'classnames';
 import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
-import { FONT_SIZE_HEADING, SPACE, SPACE_XS } from 'styles/StyleConstants';
+import { FONT_SIZE_HEADING } from 'styles/StyleConstants';
 
 export enum ChartPresentType {
   GRAPH = 'graph',
@@ -41,88 +39,62 @@ export enum ChartPresentType {
 
 const ChartTypeSelector: FC<{
   type;
-  drillOption?: ChartDrillOption;
   translate: (title: string) => string;
   onChange: (value) => void;
   onCreateDownloadDataTask?: () => void;
-  onChartDrillOptionChange?: (option: ChartDrillOption) => void;
-}> = memo(
-  ({
-    type,
-    drillOption,
-    onChange,
-    translate = title => title,
-    onCreateDownloadDataTask,
-    onChartDrillOptionChange,
-  }) => {
-    const t = useI18NPrefix(`viz.action.common`);
-    const typeChange = useCallback(
-      type => () => {
-        onChange(type);
-      },
-      [onChange],
-    );
+}> = memo(({ type, onChange, onCreateDownloadDataTask }) => {
+  const t = useI18NPrefix(`viz.action.common`);
+  const typeChange = useCallback(
+    type => () => {
+      onChange(type);
+    },
+    [onChange],
+  );
 
-    return (
-      <StyledChartTypeSelector>
-        {drillOption && (
-          <TypeSelector
-            fontSize={FONT_SIZE_HEADING}
-            className={classnames({
-              active: drillOption?.isSelectedDrill(),
-            })}
-            onClick={() => {
-              drillOption?.toggleSelectedDrill();
-              onChartDrillOptionChange?.(drillOption);
-            }}
-          >
-            <ArrowDownOutlined />
-          </TypeSelector>
-        )}
-        <TypeSelector
-          fontSize={FONT_SIZE_HEADING}
-          className={classnames({ active: type === ChartPresentType.GRAPH })}
-          onClick={typeChange(ChartPresentType.GRAPH)}
+  return (
+    <StyledChartTypeSelector>
+      <TypeSelector
+        fontSize={FONT_SIZE_HEADING}
+        className={classnames({ active: type === ChartPresentType.GRAPH })}
+        onClick={typeChange(ChartPresentType.GRAPH)}
+      >
+        <AreaChartOutlined />
+      </TypeSelector>
+      <TypeSelector
+        fontSize={FONT_SIZE_HEADING}
+        className={classnames({ active: type === ChartPresentType.RAW })}
+        onClick={typeChange(ChartPresentType.RAW)}
+      >
+        <TableOutlined />
+      </TypeSelector>
+      <TypeSelector
+        fontSize={FONT_SIZE_HEADING}
+        className={classnames({ active: type === ChartPresentType.SQL })}
+        onClick={typeChange(ChartPresentType.SQL)}
+      >
+        <ConsoleSqlOutlined />
+      </TypeSelector>
+      <TypeSelector
+        fontSize={FONT_SIZE_HEADING}
+        className={classnames({ active: type === ChartPresentType.DOWNLOAD })}
+      >
+        <Popconfirm
+          placement="left"
+          title={t('confirm')}
+          onConfirm={onCreateDownloadDataTask}
         >
-          <AreaChartOutlined />
-        </TypeSelector>
-        <TypeSelector
-          fontSize={FONT_SIZE_HEADING}
-          className={classnames({ active: type === ChartPresentType.RAW })}
-          onClick={typeChange(ChartPresentType.RAW)}
-        >
-          <TableOutlined />
-        </TypeSelector>
-        <TypeSelector
-          fontSize={FONT_SIZE_HEADING}
-          className={classnames({ active: type === ChartPresentType.SQL })}
-          onClick={typeChange(ChartPresentType.SQL)}
-        >
-          <ConsoleSqlOutlined />
-        </TypeSelector>
-        <TypeSelector
-          fontSize={FONT_SIZE_HEADING}
-          className={classnames({ active: type === ChartPresentType.DOWNLOAD })}
-        >
-          <Popconfirm
-            placement="left"
-            title={t('confirm')}
-            onConfirm={onCreateDownloadDataTask}
-          >
-            <CloudDownloadOutlined />
-          </Popconfirm>
-        </TypeSelector>
-      </StyledChartTypeSelector>
-    );
-  },
-);
+          <CloudDownloadOutlined />
+        </Popconfirm>
+      </TypeSelector>
+    </StyledChartTypeSelector>
+  );
+});
 
 export default ChartTypeSelector;
 
 const StyledChartTypeSelector = styled.div`
   display: flex;
   justify-content: flex-end;
-  padding: ${SPACE} ${SPACE_XS} 0;
   color: ${p => p.theme.textColorLight};
 `;
 

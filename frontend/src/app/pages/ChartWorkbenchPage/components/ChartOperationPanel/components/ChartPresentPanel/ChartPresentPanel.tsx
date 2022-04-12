@@ -18,6 +18,8 @@
 
 import { ReloadOutlined } from '@ant-design/icons';
 import { Col, Dropdown, Menu, Row, Table } from 'antd';
+import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
+import ChartSelectedDrillButton from 'app/components/ChartDrill/ChartSelectedDrillButton';
 import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContainer';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
@@ -38,7 +40,6 @@ import {
 } from 'styles/StyleConstants';
 import { Debugger } from 'utils/debugger';
 import Chart404Graph from './components/Chart404Graph';
-import ChartDrillPath from './components/ChartDrillPath';
 import ChartTypeSelector, {
   ChartPresentType,
 } from './components/ChartTypeSelector';
@@ -72,7 +73,7 @@ const ChartPresentPanel: FC<{
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
     const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
     const datasetLoadingStatus = useSelector(datasetLoadingSelector);
-    const { drillOption, onChartDrillOptionChange } =
+    const { drillOption, onDrillOptionChange } =
       useContext(ChartDatasetContext);
 
     useMount(undefined, () => {
@@ -108,13 +109,13 @@ const ChartPresentPanel: FC<{
             }
             if (key === DrillMode.Drill) {
               drillOption?.drillDown();
-              onChartDrillOptionChange?.(drillOption);
+              onDrillOptionChange?.(drillOption);
             } else if (key === DrillMode.Expand) {
               drillOption?.expandDown();
-              onChartDrillOptionChange?.(drillOption);
+              onDrillOptionChange?.(drillOption);
             } else {
               drillOption?.rollUp();
-              onChartDrillOptionChange?.(drillOption);
+              onDrillOptionChange?.(drillOption);
             }
           }}
         >
@@ -133,7 +134,7 @@ const ChartPresentPanel: FC<{
           </Menu.Item>
         </Menu>
       );
-    }, [drillOption, drillTranslator, onChartDrillOptionChange]);
+    }, [drillOption, drillTranslator, onDrillOptionChange]);
 
     const renderReusableChartContainer = () => {
       const style = {
@@ -186,19 +187,6 @@ const ChartPresentPanel: FC<{
       );
     };
 
-    const renderChartTypeSelector = () => {
-      return (
-        <ChartTypeSelector
-          type={chartType}
-          drillOption={drillOption}
-          translate={translate}
-          onChange={setChartType}
-          onCreateDownloadDataTask={onCreateDownloadDataTask}
-          onChartDrillOptionChange={onChartDrillOptionChange}
-        />
-      );
-    };
-
     return (
       <StyledChartPresentPanel>
         {expensiveQuery && allowQuery && (
@@ -211,14 +199,21 @@ const ChartPresentPanel: FC<{
           </ReloadMask>
         )}
         <Row justify="end">
-          <Col>{renderChartTypeSelector()}</Col>
+          <Col>
+            <ChartSelectedDrillButton />
+          </Col>
+          <Col>
+            <ChartTypeSelector
+              type={chartType}
+              translate={translate}
+              onChange={setChartType}
+              onCreateDownloadDataTask={onCreateDownloadDataTask}
+            />
+          </Col>
         </Row>
         {renderReusableChartContainer()}
         <StyledChartDillPath>
-          <ChartDrillPath
-            drillOption={drillOption}
-            onChartDrillOptionChange={onChartDrillOptionChange}
-          />
+          <ChartDrillPaths />
         </StyledChartDillPath>
       </StyledChartPresentPanel>
     );

@@ -17,21 +17,22 @@
  */
 
 import { Breadcrumb } from 'antd';
-import { ChartDrillOption, DrillMode } from 'app/models/ChartDrillOption';
+import { DrillMode } from 'app/models/ChartDrillOption';
+import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import { getColumnRenderName } from 'app/utils/chartHelper';
-import { FC, memo } from 'react';
+import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 
-const ChartDrillPath: FC<{
-  drillOption?: ChartDrillOption;
-  onChartDrillOptionChange?: (option: ChartDrillOption) => void;
-}> = memo(({ drillOption, onChartDrillOptionChange }) => {
-  if (!drillOption || drillOption.mode === DrillMode.Normal)
+const ChartDrillPaths: FC<{}> = memo(() => {
+  const { drillOption, onDrillOptionChange } = useContext(ChartDatasetContext);
+
+  if (!drillOption || drillOption.mode === DrillMode.Normal) {
     return <div></div>;
+  }
 
   const drillFields = drillOption.getAllDrillFields();
   return (
-    <StyledChartDrillPath>
+    <StyledChartDrillPaths>
       <Breadcrumb>
         {drillFields.map(f => {
           return (
@@ -45,7 +46,7 @@ const ChartDrillPath: FC<{
                 } else if (drillOption.mode === DrillMode.Expand) {
                   drillOption.expandUp(f);
                 }
-                onChartDrillOptionChange?.(drillOption);
+                onDrillOptionChange?.(drillOption);
               }}
             >
               {getColumnRenderName(f)}
@@ -53,13 +54,13 @@ const ChartDrillPath: FC<{
           );
         })}
       </Breadcrumb>
-    </StyledChartDrillPath>
+    </StyledChartDrillPaths>
   );
 });
 
-export default ChartDrillPath;
+export default ChartDrillPaths;
 
-const StyledChartDrillPath = styled.div``;
+const StyledChartDrillPaths = styled.div``;
 
 const StyledDrillNode = styled(Breadcrumb.Item)<{ isActive: boolean }>`
   cursor: pointer;
