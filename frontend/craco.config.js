@@ -207,9 +207,11 @@ module.exports = {
     hot: true,
     proxy: {
       '/api/v1': {
+        changeOrigin: true,
         target: 'http://localhost:8080/',
       },
       '/resources': {
+        changeOrigin: true,
         target: 'http://localhost:8080/',
       },
     },

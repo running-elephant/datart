@@ -59,12 +59,7 @@ const SlideBackground: React.FC<IProps> = props => {
   }, [slideTranslate, slideWidth, slideHeight, scale, scaleMode, editing]);
 
   return (
-    <Wrapper
-      bg={background}
-      className="display-slide"
-      style={slideStyle}
-      editing={editing}
-    >
+    <Wrapper bg={background} style={slideStyle} editing={editing}>
       <scaleContext.Provider value={scale}>
         {props.children}
       </scaleContext.Provider>
