@@ -84,7 +84,7 @@ export const BoardEditor: React.FC<{
         allowDownload={false}
         allowShare={false}
         allowManage={false}
-        renderMode="read"
+        renderMode="edit"
       >
         <EditorHeader />
         {boardType === 'auto' && <AutoEditor />}

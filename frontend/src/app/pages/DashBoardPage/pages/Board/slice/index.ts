@@ -244,11 +244,10 @@ const boardSlice = createSlice({
       }>,
     ) {
       const { boardId, widgetId, errInfo, errorType } = action.payload;
-      console.log('__ errInfo', errInfo);
+
       if (!state.widgetInfoRecord?.[boardId]?.[widgetId]) return;
       let widgetInfo = state.widgetInfoRecord[boardId][widgetId];
-      console.log('__ widgetInfo', widgetInfo);
-      debugger;
+
       if (errInfo) {
         widgetInfo.errInfo[errorType] = errInfo;
       } else {

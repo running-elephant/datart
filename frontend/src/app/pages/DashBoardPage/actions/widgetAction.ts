@@ -311,7 +311,6 @@ export const showJumpErrorAction =
         }),
       );
     } else {
-      debugger;
       dispatch(
         boardActions.setWidgetErrInfo({
           boardId,

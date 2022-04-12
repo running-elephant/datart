@@ -251,13 +251,13 @@ const widgetInfoRecordSlice = createSlice({
       }>,
     ) {
       const { widgetId, errInfo, errorType } = action.payload;
-      if (!state.widgetInfoRecord?.[widgetId]) return;
-      let widgetInfo = state.widgetInfoRecord[widgetId];
 
+      let WidgetRrrInfo = state?.[widgetId]?.errInfo;
+      if (!WidgetRrrInfo) return;
       if (errInfo) {
-        widgetInfo[errorType] = errInfo;
+        WidgetRrrInfo[errorType] = errInfo;
       } else {
-        delete widgetInfo[errorType];
+        delete WidgetRrrInfo[errorType];
       }
     },
   },
