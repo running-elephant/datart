@@ -19,7 +19,8 @@
 import useMount from 'app/hooks/useMount';
 import useRouteQuery from 'app/hooks/useRouteQuery';
 import ChartManager from 'app/models/ChartManager';
-import { useMemo } from 'react';
+import { login } from 'app/slice/thunks';
+import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
@@ -80,20 +81,7 @@ function ShareStoryPlayer() {
         dispatch(actions.saveNeedVerify(true));
       }
     } else if (shareType === 'LOGIN' && !logged) {
-      const authorizedToken = persistence.session.get(shareToken);
-
-      if (authorizedToken) {
-        fetchShareVizInfoImpl(
-          shareToken,
-          undefined,
-          searchParams,
-          undefined,
-          undefined,
-          authorizedToken,
-        );
-      } else {
-        dispatch(actions.saveNeedVerify(true));
-      }
+      dispatch(actions.saveNeedVerify(true));
     } else {
       fetchShareVizInfoImpl(shareToken, undefined, searchParams);
     }
@@ -106,40 +94,55 @@ function ShareStoryPlayer() {
     loadVizData();
   });
 
-  const fetchShareVizInfoImpl = (
-    token?: string,
-    pwd?: string,
-    params?: FilterSearchParams,
-    loginUser?: string,
-    loginPwd?: string,
-    authorizedToken?: string,
-  ) => {
-    dispatch(
-      fetchShareVizInfo({
-        shareToken: token,
-        sharePassword: pwd,
-        filterSearchParams: params,
-        renderMode,
-        userName: loginUser,
-        passWord: loginPwd,
-        authorizedToken,
-      }),
-    );
-  };
+  const fetchShareVizInfoImpl = useCallback(
+    (
+      token?: string,
+      pwd?: string,
+      params?: FilterSearchParams,
+      loginUser?: string,
+      loginPwd?: string,
+      authorizedToken?: string,
+    ) => {
+      dispatch(
+        fetchShareVizInfo({
+          shareToken: token,
+          sharePassword: pwd,
+          filterSearchParams: params,
+          renderMode,
+          userName: loginUser,
+          passWord: loginPwd,
+          authorizedToken,
+        }),
+      );
+    },
+    [dispatch, renderMode],
+  );
+
+  const handleLogin = useCallback(
+    values => {
+      dispatch(
+        login({
+          params: values,
+          resolve: () => {
+            fetchShareVizInfoImpl(
+              shareToken,
+              undefined,
+              searchParams,
+              values.username,
+              values.password,
+            );
+          },
+        }),
+      );
+    },
+    [dispatch, fetchShareVizInfoImpl, searchParams, shareToken],
+  );
 
   return (
     <StyledWrapper className="datart-viz">
       <ShareLoginModal
         visible={Boolean(needVerify) && shareType === 'LOGIN'}
-        onChange={({ username, password }) => {
-          fetchShareVizInfoImpl(
-            shareToken,
-            undefined,
-            searchParams,
-            username,
-            password,
-          );
-        }}
+        onChange={handleLogin}
       />
       <PasswordModal
         visible={Boolean(needVerify) && shareType === 'CODE'}

@@ -19,6 +19,7 @@
 import useMount from 'app/hooks/useMount';
 import useRouteQuery from 'app/hooks/useRouteQuery';
 import ChartManager from 'app/models/ChartManager';
+import { login } from 'app/slice/thunks';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import {
   downloadShareDataChartFile,
@@ -93,20 +94,7 @@ function ShareDashboard() {
         dispatch(actions.saveNeedVerify(true));
       }
     } else if (shareType === 'LOGIN' && !logged) {
-      const authorizedToken = persistence.session.get(shareToken);
-
-      if (authorizedToken) {
-        fetchShareVizInfoImpl(
-          shareToken,
-          undefined,
-          searchParams,
-          undefined,
-          undefined,
-          authorizedToken,
-        );
-      } else {
-        dispatch(actions.saveNeedVerify(true));
-      }
+      dispatch(actions.saveNeedVerify(true));
     } else {
       fetchShareVizInfoImpl(shareToken, undefined, searchParams);
     }
@@ -119,26 +107,29 @@ function ShareDashboard() {
     loadVizData();
   });
 
-  const fetchShareVizInfoImpl = (
-    token?: string,
-    pwd?: string,
-    params?: FilterSearchParams,
-    loginUser?: string,
-    loginPwd?: string,
-    authorizedToken?: string,
-  ) => {
-    dispatch(
-      fetchShareVizInfo({
-        shareToken: token,
-        sharePassword: pwd,
-        filterSearchParams: params,
-        renderMode,
-        userName: loginUser,
-        passWord: loginPwd,
-        authorizedToken,
-      }),
-    );
-  };
+  const fetchShareVizInfoImpl = useCallback(
+    (
+      token?: string,
+      pwd?: string,
+      params?: FilterSearchParams,
+      loginUser?: string,
+      loginPwd?: string,
+      authorizedToken?: string,
+    ) => {
+      dispatch(
+        fetchShareVizInfo({
+          shareToken: token,
+          sharePassword: pwd,
+          filterSearchParams: params,
+          renderMode,
+          userName: loginUser,
+          passWord: loginPwd,
+          authorizedToken,
+        }),
+      );
+    },
+    [dispatch, renderMode],
+  );
 
   const onLoadShareTask = useMemo(() => {
     const clientId = localStorage.getItem(StorageKeys.ShareClientId);
@@ -198,19 +189,31 @@ function ShareDashboard() {
     [executeTokenMap, dispatch, actions],
   );
 
+  const handleLogin = useCallback(
+    values => {
+      dispatch(
+        login({
+          params: values,
+          resolve: () => {
+            fetchShareVizInfoImpl(
+              shareToken,
+              undefined,
+              searchParams,
+              values.username,
+              values.password,
+            );
+          },
+        }),
+      );
+    },
+    [dispatch, fetchShareVizInfoImpl, searchParams, shareToken],
+  );
+
   return (
     <StyledWrapper className="datart-viz">
       <ShareLoginModal
         visible={Boolean(needVerify) && shareType === 'LOGIN'}
-        onChange={({ username, password }) => {
-          fetchShareVizInfoImpl(
-            shareToken,
-            undefined,
-            searchParams,
-            username,
-            password,
-          );
-        }}
+        onChange={handleLogin}
       />
       <PasswordModal
         visible={Boolean(needVerify) && shareType === 'CODE'}
@@ -224,7 +227,7 @@ function ShareDashboard() {
         </div>
       )}
 
-      {!Boolean(needVerify)  && shareBoard && (
+      {!Boolean(needVerify) && shareBoard && (
         <BoardForShare
           dashboard={shareBoard}
           allowDownload={true}
