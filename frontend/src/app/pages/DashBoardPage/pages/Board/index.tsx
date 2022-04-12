@@ -32,7 +32,6 @@ import { BoardInitProvider } from '../../components/BoardProvider/BoardInitProvi
 import { FullScreenPanel } from '../../components/FullScreenPanel/FullScreenPanel';
 import { checkLinkAndJumpErr } from '../../utils';
 import { editDashBoardInfoActions } from '../BoardEditor/slice';
-import { clearEditBoardState } from '../BoardEditor/slice/actions/actions';
 import { AutoBoardCore } from './AutoDashboard/AutoBoardCore';
 import { FreeBoardCore } from './FreeDashboard/FreeBoardCore';
 import { boardActions } from './slice';
@@ -172,7 +171,6 @@ export const Board: FC<BoardProps> = memo(
       // 销毁组件 清除该对象缓存
       return () => {
         dispatch(boardActions.clearBoardStateById(boardId));
-        dispatch(clearEditBoardState());
       };
     }, [ReadBoardHide, boardId, dispatch, fetchData, searchParams]);
 
