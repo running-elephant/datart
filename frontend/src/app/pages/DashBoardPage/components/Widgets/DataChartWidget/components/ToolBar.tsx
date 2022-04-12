@@ -25,8 +25,8 @@ import {
   CanLinkageIcon,
   ErrorIcon,
   LoadingIcon,
-  LockFnIcon,
-  WaitingIcon,
+  LockIconFn,
+  WaitIconFn,
 } from '../../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetActionDropdown } from '../../../WidgetComponents/WidgetActionDropdown';
@@ -35,32 +35,16 @@ import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 
 export const ToolBar: FC = memo(() => {
   const { editing: boardEditing } = useContext(BoardContext);
-  const { onWidgetClearLinkage, onWidgetGetData } =
-    useContext(WidgetActionContext);
+  const { onWidgetClearLinkage } = useContext(WidgetActionContext);
   const { loading, inLinking, rendered, errInfo } =
     useContext(WidgetInfoContext);
   const widget = useContext(WidgetContext);
-
-  const onRefreshWidget = useCallback(() => {
-    onWidgetGetData(widget);
-  }, [onWidgetGetData, widget]);
 
   const onClearLinkage = useCallback(() => {
     onWidgetClearLinkage(widget);
   }, [onWidgetClearLinkage, widget]);
 
   const t = useI18NPrefix(`viz.widget.tips`);
-
-  const renderWaiting = () => {
-    if (rendered) return null;
-    return (
-      <WaitingIcon
-        onClick={onRefreshWidget}
-        onMouseEnter={onRefreshWidget}
-        title={t('waiting')}
-      />
-    );
-  };
 
   const renderLinkage = () => {
     if (inLinking) {
@@ -96,9 +80,9 @@ export const ToolBar: FC = memo(() => {
     <StyledWidgetToolBar>
       <Space size={0}>
         <LoadingIcon loading={loading} />
-        {renderWaiting()}
+        <WaitIconFn rendered={rendered} widget={widget} />
         {renderErrorInfo(errInfo)}
-        <LockFnIcon
+        <LockIconFn
           boardEditing={boardEditing}
           lock={widget.config.lock}
           wid={widget.id}

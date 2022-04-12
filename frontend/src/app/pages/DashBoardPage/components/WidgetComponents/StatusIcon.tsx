@@ -25,12 +25,13 @@ import {
 } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import React, { memo, useContext } from 'react';
+import React, { memo, useCallback, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { ERROR, PRIMARY } from 'styles/StyleConstants';
+import { Widget } from '../../pages/Board/slice/types';
 import { WidgetActionContext } from '../ActionProvider/WidgetActionProvider';
 
-export const LockFnIcon: React.FC<{
+export const LockIconFn: React.FC<{
   boardEditing: boolean;
   wid: string;
   lock: boolean;
@@ -57,7 +58,23 @@ export const LockIcon: React.FC<{
     </Tooltip>
   );
 };
-
+export const WaitIconFn: React.FC<{ rendered: boolean; widget: Widget }> = memo(
+  ({ rendered, widget }) => {
+    const { onWidgetGetData } = useContext(WidgetActionContext);
+    const t = useI18NPrefix(`viz.widget.tips`);
+    const onRefreshWidget = useCallback(() => {
+      onWidgetGetData(widget);
+    }, [onWidgetGetData, widget]);
+    if (rendered) return null;
+    return (
+      <WaitingIcon
+        onClick={onRefreshWidget}
+        onMouseEnter={onRefreshWidget}
+        title={t('waiting')}
+      />
+    );
+  },
+);
 export const WaitingIcon: React.FC<{
   title: React.ReactNode;
   onClick?: React.MouseEventHandler<HTMLSpanElement> | undefined;
