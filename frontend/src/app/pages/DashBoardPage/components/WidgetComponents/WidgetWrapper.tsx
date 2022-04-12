@@ -37,4 +37,8 @@ const Wrapper = styled.div`
   display: flex;
   flex: 1;
   min-height: 0;
+
+  &:hover .widget-tool-dropdown {
+    visibility: visible;
+  }
 `;

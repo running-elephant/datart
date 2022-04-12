@@ -35,10 +35,6 @@ export const WidgetOfFree: React.FC<{}> = memo(() => {
 
 export default WidgetOfFree;
 const Wrap = styled.div`
-  &:hover .widget-tool-dropdown {
-    visibility: visible;
-  }
-
   & > span:last-child {
     z-index: 999999;
   }
