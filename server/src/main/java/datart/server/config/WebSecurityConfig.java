@@ -16,6 +16,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private OAuth2ClientProperties oAuth2ClientProperties;
 
+    private Oauth2AuthenticationSuccessHandler authenticationSuccessHandler;
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(getApiPrefix() + "/tpa");
@@ -32,6 +34,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and().oauth2Login().loginPage("/")
                     .and().logout().logoutUrl("/tpa/oauth2/logout").permitAll();
         }
+
+        http.oauth2Login().successHandler(authenticationSuccessHandler);
+
     }
 
     @Autowired(required = false)
@@ -39,4 +44,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.oAuth2ClientProperties = properties;
     }
 
+    @Autowired
+    public void setAuthenticationSuccessHandler(Oauth2AuthenticationSuccessHandler authenticationSuccessHandler) {
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
+    }
 }
