@@ -18,6 +18,7 @@
 package datart.data.provider;
 
 import datart.core.data.provider.Dataframe;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -27,9 +28,13 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.ssl.SSLContexts;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
@@ -38,6 +43,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+@Slf4j
 public class HttpDataFetcher {
 
     private static final HttpClient httpClient;
@@ -45,7 +51,17 @@ public class HttpDataFetcher {
     private final HttpRequestParam param;
 
     static {
-        httpClient = HttpClientBuilder.create().build();
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        try {
+            // trust self-signed certificate and ignore hostname verification
+            SSLConnectionSocketFactory scsf = new SSLConnectionSocketFactory(
+                    SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build(),
+                    NoopHostnameVerifier.INSTANCE);
+            httpClientBuilder.setSSLSocketFactory(scsf);
+        } catch (Exception e) {
+            log.warn("HttpClient config ssl failed, and used default config.");
+        }
+        httpClient = httpClientBuilder.build();
     }
 
     public HttpDataFetcher(HttpRequestParam param) {
