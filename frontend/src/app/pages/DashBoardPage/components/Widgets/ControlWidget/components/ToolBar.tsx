@@ -33,28 +33,12 @@ export const ToolBar: FC = memo(() => {
   const { editing: boardEditing } = useContext(BoardContext);
   const { loading, rendered, errInfo } = useContext(WidgetInfoContext);
   const widget = useContext(WidgetContext);
-  const renderErrorInfo = (errInfo?: { [propName: string]: string }) => {
-    if (!errInfo) return null;
-
-    const errInfoValue = Object.values(errInfo);
-
-    if (!errInfoValue.length) return null;
-
-    const errHtml = (
-      <div style={{ maxHeight: '200px', maxWidth: '400px', overflow: 'auto' }}>
-        {errInfoValue.map((v, i) => {
-          return <p key={i}>{String(v)}</p>;
-        })}
-      </div>
-    );
-    return <ErrorIcon errInfo={errHtml} />;
-  };
   return (
     <StyledWidgetToolBar>
       <Space size={0}>
         <LoadingIcon loading={loading} />
         <WaitIconFn rendered={rendered} widget={widget} />
-        {renderErrorInfo(errInfo)}
+        <ErrorIcon errInfo={errInfo} />
         <LockIconFn
           boardEditing={boardEditing}
           lock={widget.config.lock}

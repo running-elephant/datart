@@ -105,6 +105,7 @@ export const LoadingIcon: React.FC<{ loading?: boolean }> = ({ loading }) => {
     />
   );
 };
+
 export const CancelLinkageIcon: React.FC<{
   title: React.ReactNode | undefined;
   onClick: React.MouseEventHandler<HTMLSpanElement> | undefined;
@@ -124,7 +125,23 @@ export const CanLinkageIcon: React.FC<{
     </Tooltip>
   );
 };
-
+export const LinkageIconFn: React.FC<{ inLinking: boolean; widget: Widget }> =
+  memo(({ inLinking, widget }) => {
+    const { onWidgetClearLinkage } = useContext(WidgetActionContext);
+    const t = useI18NPrefix(`viz.widget.tips`);
+    if (inLinking) {
+      return (
+        <CancelLinkageIcon
+          title={t('cancelLinkage')}
+          onClick={() => onWidgetClearLinkage(widget)}
+        />
+      );
+    } else {
+      return widget.config?.linkageConfig?.open ? (
+        <CanLinkageIcon title={t('canLinkage')} />
+      ) : null;
+    }
+  });
 const StyledErrorIcon = styled(Button)`
   background: ${p => p.theme.componentBackground};
   &:hover,
@@ -132,15 +149,26 @@ const StyledErrorIcon = styled(Button)`
     background: ${p => p.theme.componentBackground};
   }
 `;
+
 export const ErrorIcon: React.FC<{
-  errInfo: React.ReactNode;
-}> = ({ errInfo }) => {
+  errInfo?: Record<string, string>;
+}> = memo(({ errInfo }) => {
+  if (!errInfo) return null;
+  const errInfoValue = Object.values(errInfo);
+  if (!errInfoValue.length) return null;
+  const errHtml = (
+    <div style={{ maxHeight: '200px', maxWidth: '400px', overflow: 'auto' }}>
+      {errInfoValue.map((v, i) => {
+        return <p key={i}>{String(v)}</p>;
+      })}
+    </div>
+  );
   return (
-    <Tooltip title={errInfo}>
+    <Tooltip title={errHtml}>
       <StyledErrorIcon
         icon={<WarningTwoTone twoToneColor={ERROR} />}
         type="link"
       />
     </Tooltip>
   );
-};
+});

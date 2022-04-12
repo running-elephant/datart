@@ -16,14 +16,11 @@
  * limitations under the License.
  */
 import { Space } from 'antd';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { FC, memo, useCallback, useContext } from 'react';
-import { WidgetActionContext } from '../../../ActionProvider/WidgetActionProvider';
+import { FC, memo, useContext } from 'react';
 import { BoardContext } from '../../../BoardProvider/BoardProvider';
 import {
-  CancelLinkageIcon,
-  CanLinkageIcon,
   ErrorIcon,
+  LinkageIconFn,
   LoadingIcon,
   LockIconFn,
   WaitIconFn,
@@ -35,59 +32,22 @@ import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 
 export const ToolBar: FC = memo(() => {
   const { editing: boardEditing } = useContext(BoardContext);
-  const { onWidgetClearLinkage } = useContext(WidgetActionContext);
   const { loading, inLinking, rendered, errInfo } =
     useContext(WidgetInfoContext);
   const widget = useContext(WidgetContext);
 
-  const onClearLinkage = useCallback(() => {
-    onWidgetClearLinkage(widget);
-  }, [onWidgetClearLinkage, widget]);
-
-  const t = useI18NPrefix(`viz.widget.tips`);
-
-  const renderLinkage = () => {
-    if (inLinking) {
-      return (
-        <CancelLinkageIcon
-          title={t('cancelLinkage')}
-          onClick={onClearLinkage}
-        />
-      );
-    } else {
-      return widget.config?.linkageConfig?.open ? (
-        <CanLinkageIcon title={t('canLinkage')} />
-      ) : null;
-    }
-  };
-  const renderErrorInfo = (errInfo?: { [propName: string]: string }) => {
-    if (!errInfo) return null;
-
-    const errInfoValue = Object.values(errInfo);
-
-    if (!errInfoValue.length) return null;
-
-    const errHtml = (
-      <div style={{ maxHeight: '200px', maxWidth: '400px', overflow: 'auto' }}>
-        {errInfoValue.map((v, i) => {
-          return <p key={i}>{String(v)}</p>;
-        })}
-      </div>
-    );
-    return <ErrorIcon errInfo={errHtml} />;
-  };
   return (
     <StyledWidgetToolBar>
       <Space size={0}>
         <LoadingIcon loading={loading} />
         <WaitIconFn rendered={rendered} widget={widget} />
-        {renderErrorInfo(errInfo)}
+        <ErrorIcon errInfo={errInfo} />
         <LockIconFn
           boardEditing={boardEditing}
           lock={widget.config.lock}
           wid={widget.id}
         />
-        {renderLinkage()}
+        <LinkageIconFn inLinking={inLinking} widget={widget} />
         <WidgetActionDropdown widget={widget} />
       </Space>
     </StyledWidgetToolBar>
