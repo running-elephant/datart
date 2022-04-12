@@ -45,10 +45,10 @@ export default function useWidgetAction() {
           onEditChartWidget(widget);
           break;
         case 'controller':
-          onEditContainerWidget(widget.id);
+          onEditControllerWidget(widget);
           break;
         case 'container':
-          onEditControllerWidget(widget);
+          onEditContainerWidget(widget.id);
           break;
         case 'media':
           onEditMediaWidget(widget.id);

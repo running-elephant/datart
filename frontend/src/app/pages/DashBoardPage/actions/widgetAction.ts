@@ -17,7 +17,7 @@
  */
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams } from 'app/types/Chart';
-import history from 'app/utils/history';
+import { History } from 'history';
 import { RootState } from 'types';
 import { jumpTypes } from '../constants';
 import { boardActions } from '../pages/Board/slice';
@@ -43,6 +43,7 @@ import {
   getEditWidgetData,
 } from '../pages/BoardEditor/slice/thunk';
 import { getValueByRowData } from '../utils/widget';
+
 export const toggleLinkageAction =
   (boardEditing: boolean, boardId: string, widgetId: string, toggle: boolean) =>
   dispatch => {
@@ -110,6 +111,7 @@ export const widgetClickJumpAction =
     renderMode: VizRenderMode,
     widget: Widget,
     params: ChartMouseEventParams,
+    history: History,
   ) =>
   (dispatch, getState) => {
     const state = getState() as RootState;
@@ -246,6 +248,7 @@ export const widgetChartClickAction =
     renderMode: VizRenderMode,
     widget: Widget,
     params: ChartMouseEventParams,
+    history: History,
   ) =>
   dispatch => {
     //is tableChart
@@ -262,7 +265,14 @@ export const widgetChartClickAction =
     const jumpConfig = widget.config?.jumpConfig;
     if (jumpConfig && jumpConfig.open) {
       dispatch(
-        widgetClickJumpAction(boardId, editing, renderMode, widget, params),
+        widgetClickJumpAction(
+          boardId,
+          editing,
+          renderMode,
+          widget,
+          params,
+          history,
+        ),
       );
       return;
     }
