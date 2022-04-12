@@ -56,7 +56,6 @@ import {
   deleteWidgetsAction,
   editChartInWidgetAction,
   pasteWidgetsAction,
-  toggleLockWidgetAction,
   widgetsToPositionAction,
 } from '../../pages/BoardEditor/slice/actions/actions';
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
@@ -249,11 +248,11 @@ export const WidgetActionProvider: FC<{
       onEditWidgetCloseJump: (widget: Widget) => {
         dispatch(closeJumpAction(widget));
       },
-      onEditWidgetLock: (widget: Widget) => {
-        dispatch(toggleLockWidgetAction(widget, true));
+      onEditWidgetLock: (id: string) => {
+        dispatch(editBoardStackActions.toggleLockWidget({ id, lock: true }));
       },
-      onEditWidgetUnLock: (widget: Widget) => {
-        dispatch(toggleLockWidgetAction(widget, false));
+      onEditWidgetUnLock: (id: string) => {
+        dispatch(editBoardStackActions.toggleLockWidget({ id, lock: false }));
       },
     };
     return contextValue;
@@ -289,8 +288,8 @@ export interface WidgetActionContextProps {
   onEditWidgetJump: (wid: string) => void;
   onEditWidgetCloseLinkage: (widget: Widget) => void;
   onEditWidgetCloseJump: (widget: Widget) => void;
-  onEditWidgetLock: (widget: Widget) => void;
-  onEditWidgetUnLock: (widget: Widget) => void;
+  onEditWidgetLock: (id: string) => void;
+  onEditWidgetUnLock: (id: string) => void;
   onEditClearActiveWidgets: () => void;
   onEditDeleteActiveWidgets: (ids?: string[]) => void;
   onEditLayerToTop: () => void;

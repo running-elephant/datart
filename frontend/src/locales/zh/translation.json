@@ -774,12 +774,33 @@
         "ok": "确认",
         "cancel": "取消",
         "number": "序号",
-        "summary": "汇总"
-      },
-      "drill": {
-        "showNextLevel": "显示下一层级",
-        "expandNextLevel": "展开下一层级",
-        "rollUp": "上卷"
+        "summary": "汇总",
+        "drill": {
+          "showNextLevel": "显示下一层级",
+          "expandNextLevel": "展开下一层级",
+          "rollUp": "上卷"
+        },
+        "richText": {
+          "bold": "加粗",
+          "italic": "斜体",
+          "underline": "下划线",
+          "strike": "删除线",
+          "indent": "减少缩进",
+          "indentUp": "增加缩进",
+          "ordered": "有序列表",
+          "list": "无序列表",
+          "blockquote": "引用",
+          "codeBlock": "代码",
+          "link": "超链接",
+          "image": "图片",
+          "clean": "清除样式",
+          "more": "更多",
+          "families": "字体",
+          "fontSize": "字体大小",
+          "background": "背景颜色",
+          "color": "字体颜色",
+          "align": "对齐方式"
+        }
       }
     },
     "action": {

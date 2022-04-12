@@ -712,20 +712,13 @@ export const getPaddingCss = (pd: WidgetPadding) => {
 };
 
 export const getWidgetSomeStyle = (opt: {
-  config: WidgetConf;
-  background?: boolean;
-  padding?: boolean;
-  border?: boolean;
+  background: BackgroundConfig;
+  padding: WidgetPadding;
+  border: BorderConfig;
 }) => {
-  const backgroundCss = opt.background
-    ? getBackgroundCss(opt.config.background)
-    : {};
-  const paddingCss = opt.padding
-    ? getPaddingCss(opt.config.padding as WidgetPadding)
-    : {};
-  const borderCss = opt.border
-    ? getBorderCss(opt.config.border as BorderConfig)
-    : {};
+  const backgroundCss = getBackgroundCss(opt.background);
+  const paddingCss = getPaddingCss(opt.padding as WidgetPadding);
+  const borderCss = getBorderCss(opt.border as BorderConfig);
   let style: CSSProperties = {
     ...backgroundCss,
     ...paddingCss,
@@ -733,9 +726,6 @@ export const getWidgetSomeStyle = (opt: {
   };
   return style;
 };
-
-// get some css end
-// Controller
 
 export const getLinkedColumn = (
   targetWidgetId: string,

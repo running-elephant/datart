@@ -96,7 +96,7 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
         if (schedule.getId() == null || rrrMapper.countRolePermission(schedule.getId(), role.getId()) == 0) {
             Schedule parent = scheduleMapper.selectByPrimaryKey(schedule.getParentId());
             if (parent == null) {
-                return securityManager.hasPermission(PermissionHelper.viewPermission(schedule.getOrgId(), role.getId(), ResourceType.SCHEDULE.name(), permission));
+                return securityManager.hasPermission(PermissionHelper.schedulePermission(schedule.getOrgId(), role.getId(), ResourceType.SCHEDULE.name(), permission));
             } else {
                 return hasPermission(role, parent, permission);
             }

@@ -70,6 +70,7 @@ public class AttachmentPdfServiceImpl implements AttachmentService {
 
         log.info("create pdf file complete.");
         imageFile.delete();
+        shareService.delete(share.getId(), false);
         return file;
     }
 

@@ -17,14 +17,18 @@
  */
 import { memo, useContext } from 'react';
 import { BoardType, MediaWidgetType } from '../../pages/Board/slice/types';
-import { ControllerWIdget } from '../Widget/ControllerWIdget/ControllerWIdget';
-import { DataChartWidget } from '../Widget/DataChartWidget/DataChartWidget';
-import { QueryBtnWidget } from '../Widget/QueryBtnWidget/QueryBtnWidget';
-import { ResetBtnWidget } from '../Widget/ResetBtnWidget/ResetBtnWidget';
-import { TabWidget } from '../Widget/TabWidget/TabWidget';
 import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
-import { MediaWidgetMapper } from './MediaWidgetMapper';
+import { ControllerWidget } from '../Widgets/ControllerWIdget/ControllerWidget';
+import { DataChartWidget } from '../Widgets/DataChartWidget/DataChartWidget';
+import { IframeWidget } from '../Widgets/IframeWidget/IframeWidget';
+import { ImageWidget } from '../Widgets/ImageWidget/ImageWidget';
+import { QueryBtnWidget } from '../Widgets/QueryBtnWidget/QueryBtnWidget';
+import { ResetBtnWidget } from '../Widgets/ResetBtnWidget/ResetBtnWidget';
+import { RichTextWidget } from '../Widgets/RichTextWidget/RichTextWidget';
+import { TabWidget } from '../Widgets/TabWidget/TabWidget';
+import { TimerWidget } from '../Widgets/TimerWidget/TimerWidget';
+import { VideoWidget } from '../Widgets/VideoWidget/VideoWidget';
 
 export const WidgetMapper: React.FC<{
   boardType: BoardType;
@@ -57,7 +61,7 @@ export const WidgetMapper: React.FC<{
           boardId={widget.dashboardId}
           boardEditing={boardEditing}
         >
-          <ControllerWIdget />
+          <ControllerWidget />
         </WidgetDataProvider>
       );
     case 'query':
@@ -66,5 +70,24 @@ export const WidgetMapper: React.FC<{
       return <ResetBtnWidget />;
     default:
       return <div>default widget</div>;
+  }
+});
+
+export const MediaWidgetMapper: React.FC<{
+  subType: MediaWidgetType;
+}> = memo(({ subType }) => {
+  switch (subType) {
+    case 'richText':
+      return <RichTextWidget hideTitle={false} />;
+    case 'image':
+      return <ImageWidget hideTitle={false} />;
+    case 'video':
+      return <VideoWidget hideTitle={false} />;
+    case 'iframe':
+      return <IframeWidget hideTitle={false} />;
+    case 'timer':
+      return <TimerWidget hideTitle={false} />;
+    default:
+      return <div>default media</div>;
   }
 });
