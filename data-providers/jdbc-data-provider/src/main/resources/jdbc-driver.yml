@@ -52,6 +52,7 @@ HIVE:
   db-type: HIVE
   name: HIVE
   driver-class: org.apache.hive.jdbc.HiveDriver
+  adapter-class: datart.data.provider.jdbc.adapters.HiveDataProviderAdapter
   url-prefix: jdbc:hive2://
   identifier-quote: "`"
   identifier-end-quote: "`"
