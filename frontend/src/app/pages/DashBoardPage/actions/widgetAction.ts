@@ -18,6 +18,7 @@
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams } from 'app/types/Chart';
 import { History } from 'history';
+import i18next from 'i18next';
 import { RootState } from 'types';
 import { jumpTypes } from '../constants';
 import { boardActions } from '../pages/Board/slice';
@@ -106,8 +107,6 @@ export const tableChartClickAction =
 
 export const widgetClickJumpAction =
   (
-    boardId: string,
-    editing: boolean,
     renderMode: VizRenderMode,
     widget: Widget,
     params: ChartMouseEventParams,
@@ -120,17 +119,11 @@ export const widgetClickJumpAction =
     const jumpConfig = widget.config?.jumpConfig;
     const targetType = jumpConfig?.targetType || jumpTypes[0].value;
 
-    if (
-      jumpConfig?.targetType === 'INTERNAL' &&
-      !folderIds.includes(jumpConfig.target.relId)
-    ) {
-      history.push(`/404/targetVizDeleted`);
-      return;
-    }
     const URL = jumpConfig?.URL || '';
     const queryName = jumpConfig?.queryName || '';
     const targetId = jumpConfig?.target?.relId;
     const jumpFieldName: string = jumpConfig?.field?.jumpFieldName || '';
+    // table chart
     if (
       params.componentType === 'table' &&
       jumpFieldName !== params.seriesName
@@ -139,16 +132,8 @@ export const widgetClickJumpAction =
       return;
     }
     const rowDataValue = getValueByRowData(params.data, jumpFieldName);
-    if (typeof jumpConfig?.filter === 'object' && targetType === 'INTERNAL') {
-      const searchParamsStr = urlSearchTransfer.toUrlString({
-        [jumpConfig?.filter?.filterId]: rowDataValue,
-      });
-      if (targetId) {
-        history.push(
-          `/organizations/${orgId}/vizs/${targetId}?${searchParamsStr}`,
-        );
-      }
-    } else if (targetType === 'URL') {
+    // jump url
+    if (targetType === 'URL') {
       let jumpUrl;
       if (URL.indexOf('?') > -1) {
         jumpUrl = `${URL}&${queryName}=${rowDataValue}`;
@@ -156,6 +141,24 @@ export const widgetClickJumpAction =
         jumpUrl = `${URL}?${queryName}=${rowDataValue}`;
       }
       window.location.href = jumpUrl;
+      return;
+    }
+    // jump in datart
+    if (jumpConfig?.targetType === 'INTERNAL') {
+      if (!folderIds.includes(jumpConfig.target.relId)) {
+        dispatch(
+          showJumpErrorAction(renderMode, widget.dashboardId, widget.id),
+        );
+        return;
+      }
+      if (typeof jumpConfig?.filter === 'object') {
+        const searchParamsStr = urlSearchTransfer.toUrlString({
+          [jumpConfig?.filter?.filterId]: rowDataValue,
+        });
+        history.push(
+          `/organizations/${orgId}/vizs/${targetId}?${searchParamsStr}`,
+        );
+      }
     }
   };
 
@@ -264,16 +267,7 @@ export const widgetChartClickAction =
     // jump
     const jumpConfig = widget.config?.jumpConfig;
     if (jumpConfig && jumpConfig.open) {
-      dispatch(
-        widgetClickJumpAction(
-          boardId,
-          editing,
-          renderMode,
-          widget,
-          params,
-          history,
-        ),
-      );
+      dispatch(widgetClickJumpAction(renderMode, widget, params, history));
       return;
     }
     // linkage
@@ -301,5 +295,30 @@ export const widgetToClearLinkageAction =
       dispatch(editorWidgetClearLinkageAction(widget));
     } else {
       dispatch(widgetClearLinkageAction(widget, renderMode));
+    }
+  };
+
+export const showJumpErrorAction =
+  (renderMode: VizRenderMode, boardId: string, wid: string) => dispatch => {
+    const errorInfo = i18next.t('viz.jump.jumpError');
+    if (renderMode === 'edit') {
+      dispatch(
+        editWidgetInfoActions.setWidgetErrInfo({
+          boardId,
+          widgetId: wid,
+          errInfo: errorInfo, // viz.linkage.linkageError
+          errorType: 'interaction',
+        }),
+      );
+    } else {
+      debugger;
+      dispatch(
+        boardActions.setWidgetErrInfo({
+          boardId,
+          widgetId: wid,
+          errInfo: errorInfo,
+          errorType: 'interaction',
+        }),
+      );
     }
   };

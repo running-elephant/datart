@@ -28,7 +28,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useCallback, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { ERROR, PRIMARY } from 'styles/StyleConstants';
-import { Widget } from '../../pages/Board/slice/types';
+import { Widget, WidgetErrorType } from '../../pages/Board/slice/types';
 import { WidgetActionContext } from '../ActionProvider/WidgetActionProvider';
 
 export const LockIconFn: React.FC<{
@@ -151,15 +151,15 @@ const StyledErrorIcon = styled(Button)`
 `;
 
 export const ErrorIcon: React.FC<{
-  errInfo?: Record<string, string>;
+  errInfo?: Record<WidgetErrorType, string>;
 }> = memo(({ errInfo }) => {
   if (!errInfo) return null;
-  const errInfoValue = Object.values(errInfo);
-  if (!errInfoValue.length) return null;
+  const errorInfos = Object.values(errInfo);
+  if (!errorInfos.length) return null;
   const errHtml = (
     <div style={{ maxHeight: '200px', maxWidth: '400px', overflow: 'auto' }}>
-      {errInfoValue.map((v, i) => {
-        return <p key={i}>{String(v)}</p>;
+      {errorInfos.map((item, i) => {
+        return <p key={i}>{String(item)}</p>;
       })}
     </div>
   );

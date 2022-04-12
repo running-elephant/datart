@@ -235,12 +235,11 @@ export const createWidgetInfo = (id: string): WidgetInfo => {
     editing: false,
     inLinking: false,
     selected: false,
-    errInfo: {},
+    errInfo: {} as WidgetInfo['errInfo'],
     rendered: false,
     pageInfo: {
       pageNo: 1,
     },
-    selectItems: [],
   };
   return widgetInfo;
 };

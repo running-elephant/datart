@@ -19,8 +19,8 @@
 import {
   ChartDataSectionType,
   ChartDataViewFieldCategory,
-  DataViewFieldType,
   ControllerFacadeTypes,
+  DataViewFieldType,
   TimeFilterValueCategory,
 } from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
@@ -412,9 +412,7 @@ export const getChartWidgetRequestParams = (obj: {
         aggOperator: null,
         column: getLinkedColumn(link.linkerWidgetId, triggerWidget),
         sqlOperator: FilterSqlOperator.In,
-        values: [
-          { value: triggerValue, valueType: DataViewFieldType.STRING },
-        ],
+        values: [{ value: triggerValue, valueType: DataViewFieldType.STRING }],
       };
       linkFilters.push(filter);
     });
@@ -518,27 +516,4 @@ export const getDefaultWidgetName = (
   } else {
     return `xxx${index}`;
   }
-};
-export const checkLinkAndJumpErr = (
-  widgetData: Widget,
-  folderListIds?: string[],
-): string => {
-  let error: string = '';
-
-  if (
-    widgetData?.config?.linkageConfig?.open &&
-    widgetData?.relations?.length === 0
-  ) {
-    error = 'viz.linkage.linkageError';
-    return error;
-  }
-  if (
-    widgetData?.config?.jumpConfig?.open &&
-    widgetData?.config?.jumpConfig?.targetType === 'INTERNAL' &&
-    !folderListIds?.includes(widgetData.config.jumpConfig.target.relId)
-  ) {
-    error = 'viz.jump.jumpError';
-  }
-
-  return error;
 };
