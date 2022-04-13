@@ -1,8 +1,10 @@
 import EventEmitter from 'events';
 const eventBus = new EventEmitter();
+
 const WIDGET_MOVE = 'widgetMove';
 const WIDGET_MOVE_END = 'widgetMoveEnd';
 const BOARD_SCROLL = 'boardScroll';
+eventBus.setMaxListeners(100);
 interface FnWidgetMove {
   (selectedIds: string[], deltaX: number, deltaY: number): void;
 }

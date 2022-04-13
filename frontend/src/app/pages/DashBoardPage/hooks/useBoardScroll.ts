@@ -34,12 +34,12 @@ export default function useBoardScroll(boardId: string) {
 
   useEffect(() => {
     setImmediate(() => {
+      gridWrapRef?.current?.removeEventListener('scroll', thEmitScroll, false);
       if (!gridWrapRef.current) return;
       gridWrapRef.current.addEventListener('scroll', thEmitScroll, false);
     });
     return () => {
-      if (!gridWrapRef.current) return;
-      gridWrapRef.current.removeEventListener('scroll', thEmitScroll, false);
+      gridWrapRef?.current?.removeEventListener('scroll', thEmitScroll, false);
     };
   }, [thEmitScroll]);
 

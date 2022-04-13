@@ -139,8 +139,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         }) as ChartDetailConfigDTO,
       );
     });
-    console.log('__ widget.id', widgetId);
-    console.log('__ dataset,', dataset);
     return (
       <ChartIFrameContainer
         dataset={dataset}
