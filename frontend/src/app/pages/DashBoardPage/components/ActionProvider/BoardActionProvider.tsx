@@ -62,7 +62,6 @@ export const BoardActionProvider: FC<{
   const history = useHistory();
   const vizs = useSelector(selectVizs);
   const shareBoardInfo = useSelector(selectShareBoardInfo);
-  const { boardWidthHeight } = shareBoardInfo;
 
   const actions = useMemo(() => {
     const actionObj: BoardActionContextProps = {
@@ -92,6 +91,7 @@ export const BoardActionProvider: FC<{
       },
       onBoardToDownLoad: downloadType => {
         const folderId = vizs.filter(v => v.relId === boardId)[0].id;
+        const { boardWidthHeight } = shareBoardInfo;
 
         dispatch(
           boardDownLoadAction({
@@ -118,7 +118,7 @@ export const BoardActionProvider: FC<{
       },
     };
     return actionObj;
-  }, [boardId, dispatch, history, vizs, boardWidthHeight]);
+  }, [boardId, dispatch, history, vizs, shareBoardInfo]);
   return (
     <BoardActionContext.Provider value={actions}>
       {children}
