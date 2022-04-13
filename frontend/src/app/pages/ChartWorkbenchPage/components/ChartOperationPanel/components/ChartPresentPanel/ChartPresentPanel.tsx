@@ -17,19 +17,19 @@
  */
 
 import { ReloadOutlined } from '@ant-design/icons';
-import { Col, Dropdown, Menu, Row, Table } from 'antd';
+import { Col, Row, Table } from 'antd';
+import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import ChartSelectedDrillButton from 'app/components/ChartDrill/ChartSelectedDrillButton';
 import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContainer';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
-import { DrillMode } from 'app/models/ChartDrillOption';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { FC, memo, useContext, useMemo, useState } from 'react';
+import { FC, memo, useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import {
@@ -69,12 +69,10 @@ const ChartPresentPanel: FC<{
     onCreateDownloadDataTask,
   }) => {
     const translate = useI18NPrefix(`viz.palette.present`);
-    const drillTranslator = useI18NPrefix(`viz.palette.drill`);
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
     const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
     const datasetLoadingStatus = useSelector(datasetLoadingSelector);
-    const { drillOption, onDrillOptionChange } =
-      useContext(ChartDatasetContext);
+    const { drillOption } = useContext(ChartDatasetContext);
 
     useMount(undefined, () => {
       Debugger.instance.measure(`ChartPresentPanel | Dispose Event`, () => {
@@ -99,43 +97,6 @@ const ChartPresentPanel: FC<{
       );
     };
 
-    const drillMenus = useMemo(() => {
-      return (
-        <Menu
-          style={{ width: 200 }}
-          onClick={({ key }) => {
-            if (!drillOption) {
-              return;
-            }
-            if (key === DrillMode.Drill) {
-              drillOption?.drillDown();
-              onDrillOptionChange?.(drillOption);
-            } else if (key === DrillMode.Expand) {
-              drillOption?.expandDown();
-              onDrillOptionChange?.(drillOption);
-            } else {
-              drillOption?.rollUp();
-              onDrillOptionChange?.(drillOption);
-            }
-          }}
-        >
-          <Menu.Item key={'rollUp'}>{drillTranslator('rollUp')}</Menu.Item>
-          <Menu.Item
-            disabled={drillOption?.mode === DrillMode.Expand}
-            key={DrillMode.Drill}
-          >
-            {drillTranslator('showNextLevel')}
-          </Menu.Item>
-          <Menu.Item
-            disabled={drillOption?.mode === DrillMode.Drill}
-            key={DrillMode.Expand}
-          >
-            {drillTranslator('expandNextLevel')}
-          </Menu.Item>
-        </Menu>
-      );
-    }, [drillOption, drillTranslator, onDrillOptionChange]);
-
     const renderReusableChartContainer = () => {
       const style = {
         width: containerWidth,
@@ -151,18 +112,9 @@ const ChartPresentPanel: FC<{
       return (
         <StyledReusableChartContainer>
           {ChartPresentType.GRAPH === chartType && (
-            <Dropdown
-              overlay={drillMenus}
-              destroyPopupOnHide={true}
-              trigger={['contextMenu']}
-              getPopupContainer={() =>
-                document.getElementById('reusable-container')!
-              }
-            >
-              <div id="reusable-container" style={{ height: '100%' }}>
-                {renderGraph(containerId, chart, chartConfig, style)}
-              </div>
-            </Dropdown>
+            <ChartDrillContextMenu>
+              {renderGraph(containerId, chart, chartConfig, style)}
+            </ChartDrillContextMenu>
           )}
           {ChartPresentType.RAW === chartType && (
             <TableWrapper>
@@ -212,9 +164,7 @@ const ChartPresentPanel: FC<{
           </Col>
         </Row>
         {renderReusableChartContainer()}
-        <StyledChartDillPath>
-          <ChartDrillPaths />
-        </StyledChartDillPath>
+        <ChartDrillPaths />
       </StyledChartPresentPanel>
     );
   },
@@ -232,12 +182,6 @@ const StyledChartPresentPanel = styled.div`
 `;
 
 const StyledReusableChartContainer = styled.div``;
-
-const StyledChartDillPath = styled.div`
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-`;
 
 const TableWrapper = styled.div`
   padding: ${SPACE_LG};

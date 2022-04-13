@@ -21,7 +21,7 @@ import { Modal } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
-import { ChartDrillOption, DrillMode } from 'app/models/ChartDrillOption';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import workbenchSlice, {
   useWorkbenchSlice,

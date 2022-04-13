@@ -22,6 +22,7 @@ import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartData
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
+import { SPACE_TIMES } from 'styles/StyleConstants';
 
 const ChartDrillPaths: FC<{}> = memo(() => {
   const { drillOption, onDrillOptionChange } = useContext(ChartDatasetContext);
@@ -60,7 +61,11 @@ const ChartDrillPaths: FC<{}> = memo(() => {
 
 export default ChartDrillPaths;
 
-const StyledChartDrillPaths = styled.div``;
+const StyledChartDrillPaths = styled.div`
+  position: absolute;
+  bottom: ${SPACE_TIMES(2)};
+  left: ${SPACE_TIMES(2)};
+`;
 
 const StyledDrillNode = styled(Breadcrumb.Item)<{ isActive: boolean }>`
   cursor: pointer;
