@@ -17,12 +17,12 @@
  */
 import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
+import { FlexStyle } from 'app/pages/DashBoardPage/constants';
 import { memo, useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
-import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
 import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
@@ -51,9 +51,9 @@ export const ResetBtnWidget: React.FC<{}> = memo(() => {
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
       <ZIndexWrapper>
-        <FlexWrapper>
+        <div style={FlexStyle}>
           <ResetBtnWidgetCore />
-        </FlexWrapper>
+        </div>
       </ZIndexWrapper>
       {editing && <EditMask />}
       <StyledWidgetToolBar>

@@ -23,10 +23,7 @@ import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetPro
 import { LAYOUT_COLS_MAP } from 'app/pages/DashBoardPage/constants';
 import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
-import {
-  selectLayoutWidgetInfoMapById,
-  selectLayoutWidgetMapById,
-} from 'app/pages/DashBoardPage/pages/Board/slice/selector';
+import { selectLayoutWidgetMapById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getBoardMarginPadding } from 'app/pages/DashBoardPage/utils/board';
 import { memo, useCallback, useContext, useMemo } from 'react';
@@ -43,17 +40,13 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
     const { editing } = useContext(BoardContext);
     const boardConfig = useContext(BoardConfigContext);
-    const { margin, background, allowOverlap } = boardConfig;
+    const { background, allowOverlap } = boardConfig;
     const selectLayoutWidgetsConfigById = useMemo(
       selectLayoutWidgetMapById,
       [],
     );
     const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
       selectLayoutWidgetsConfigById(state, boardId),
-    );
-
-    const layoutWidgetInfoMap = useSelector((state: { board: BoardState }) =>
-      selectLayoutWidgetInfoMapById(state, boardId),
     );
 
     const sortedLayoutWidgets = useMemo(
@@ -65,27 +58,15 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       [layoutWidgetMap],
     );
 
-    const {
-      ref,
-      gridWrapRef,
-      currentLayout,
-      widgetRowHeight,
-      throttleLazyRender,
-      colsKey,
-    } = useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
+    const { ref, gridWrapRef, currentLayout, widgetRowHeight, colsKey } =
+      useAutoBoardRenderItem(boardId);
 
     const { curMargin, curPadding } = useMemo(() => {
       return getBoardMarginPadding(boardConfig, colsKey);
     }, [boardConfig, colsKey]);
     const layoutMap = useGridLayoutMap(layoutWidgetMap);
 
-    const onLayoutChange = useCallback(
-      (layouts: Layout[]) => {
-        throttleLazyRender();
-        currentLayout.current = layouts;
-      },
-      [currentLayout, throttleLazyRender],
-    );
+    const onLayoutChange = useCallback((layouts: Layout[]) => {}, []);
 
     const boardChildren = useMemo(() => {
       return sortedLayoutWidgets.map(item => {

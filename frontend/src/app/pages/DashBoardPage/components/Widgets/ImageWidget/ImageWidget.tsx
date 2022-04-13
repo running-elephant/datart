@@ -17,12 +17,12 @@
  */
 import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
+import { FlexStyle } from 'app/pages/DashBoardPage/constants';
 import { memo, useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
-import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
 import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
@@ -59,9 +59,10 @@ export const ImageWidget: React.FC<{ hideTitle: boolean }> = memo(
               config={widget.config.nameConfig}
             />
           )}
-          <FlexWrapper>
+
+          <div style={FlexStyle}>
             <ImageWidgetCore />
-          </FlexWrapper>
+          </div>
         </ZIndexWrapper>
         {editing && <EditMask />}
         <StyledWidgetToolBar>

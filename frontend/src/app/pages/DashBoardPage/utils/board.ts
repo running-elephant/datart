@@ -208,3 +208,20 @@ export const getBoardMarginPadding = (
         curPadding: containerPadding,
       };
 };
+
+export const isElView = el => {
+  let bool = false;
+  if (!el) return false;
+  let rect = el?.getBoundingClientRect();
+  let { top, bottom } = rect;
+  // top 元素顶端到可见区域顶端的距离
+  // bottom 元素底部端到可见区域顶端的距离
+  var viewHeight = window.innerHeight || document.documentElement.clientHeight; // 浏览器可见区域高度。
+
+  if (top < viewHeight && bottom > 0) {
+    bool = true;
+  } else if (top >= viewHeight || bottom <= 0) {
+    bool = false;
+  }
+  return bool;
+};

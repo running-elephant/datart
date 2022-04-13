@@ -17,107 +17,46 @@
  */
 import { useGridWidgetHeight } from 'app/hooks/useGridWidgetHeight';
 import throttle from 'lodash/throttle';
-import {
-  RefObject,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import { RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Layout } from 'react-grid-layout';
-import { WidgetActionContext } from '../components/ActionProvider/WidgetActionProvider';
-import { BoardConfigContext } from '../components/BoardProvider/BoardConfigProvider';
-import { WidgetInfo } from '../pages/Board/slice/types';
-export default function useAutoBoardRenderItem(
-  layoutWidgetInfoMap: Record<string, WidgetInfo>,
-  margin: [number, number],
-) {
+import { boardScroll } from '../pages/BoardEditor/slice/events';
+export default function useAutoBoardRenderItem(boardId: string) {
   const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
-  const { initialQuery } = useContext(BoardConfigContext);
-  const { onRenderedWidgetById } = useContext(WidgetActionContext);
 
-  const toRenderedWidget = useCallback(
-    (wid: string) => {
-      if (!initialQuery) return;
-      onRenderedWidgetById(wid);
-    },
-    [initialQuery, onRenderedWidgetById],
-  );
+  const onEmitScroll = useCallback(() => {
+    if (boardId) {
+      boardScroll.emit(boardId);
+    }
+  }, [boardId]);
+
   const currentLayout = useRef<Layout[]>([]);
-
-  let waitItemInfos = useRef<{ id: string; rendered: boolean }[]>([]);
 
   const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
 
-  useEffect(() => {
-    const layoutWaitWidgetInfos = Object.values(layoutWidgetInfoMap).filter(
-      widgetInfo => {
-        return !widgetInfo.rendered;
-      },
-    );
-
-    waitItemInfos.current = layoutWaitWidgetInfos.map(widgetInfo => ({
-      id: widgetInfo.id,
-      rendered: widgetInfo.rendered,
-    }));
-  }, [layoutWidgetInfoMap]);
-
-  const calcItemTop = useCallback(
-    (id: string) => {
-      const curItem = currentLayout.current.find(ele => ele.i === id);
-      if (!curItem) return Infinity;
-      return Math.round((widgetRowHeight + margin[0]) * curItem.y);
-    },
-    [margin, widgetRowHeight],
+  const thEmitScroll = useMemo(
+    () => throttle(onEmitScroll, 50),
+    [onEmitScroll],
   );
 
-  const lazyRender = useCallback(() => {
-    if (!gridWrapRef.current) return;
-    if (!waitItemInfos.current.length) return;
-    const waitingItems = waitItemInfos.current;
-    const { offsetHeight, scrollTop } = gridWrapRef.current! || {};
-    waitingItems.forEach(item => {
-      const itemTop = calcItemTop(item.id);
-      if (itemTop - scrollTop < offsetHeight) {
-        toRenderedWidget(item.id);
+  useEffect(() => {
+    setImmediate(() => {
+      if (gridWrapRef.current) {
+        gridWrapRef.current.addEventListener('scroll', thEmitScroll, false);
       }
     });
-  }, [calcItemTop, toRenderedWidget]);
-
-  const throttleLazyRender = useMemo(
-    () => throttle(lazyRender, 50),
-    [lazyRender],
-  );
-
-  useEffect(() => {
-    if (gridWrapRef.current) {
-      setImmediate(() => lazyRender());
-      gridWrapRef.current.removeEventListener(
-        'scroll',
-        throttleLazyRender,
-        false,
-      );
-      gridWrapRef.current.addEventListener('scroll', throttleLazyRender, false);
-      // issues#339
-      window.addEventListener('resize', throttleLazyRender, false);
-    }
+    // window.addEventListener('resize', thEmitScroll, false);
     return () => {
-      gridWrapRef?.current?.removeEventListener(
-        'scroll',
-        throttleLazyRender,
-        false,
-      );
-      window.removeEventListener('resize', throttleLazyRender, false);
+      gridWrapRef?.current?.removeEventListener('scroll', thEmitScroll, false);
+      // window.removeEventListener('resize', thEmitScroll, false);
     };
-  }, [throttleLazyRender, lazyRender, layoutWidgetInfoMap]);
+  }, [thEmitScroll]);
 
   return {
     ref,
     gridWrapRef,
     currentLayout,
     widgetRowHeight,
-    throttleLazyRender,
+    thEmitScroll,
     colsKey,
   };
 }

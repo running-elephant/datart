@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { memo, useContext, useEffect } from 'react';
+import { FlexStyle } from 'app/pages/DashBoardPage/constants';
+import { memo, useContext, useEffect, useRef } from 'react';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from '../../BoardProvider/BoardInfoProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
-import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
 import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
@@ -37,6 +37,7 @@ export const ControllerWidget: React.FC<{}> = memo(() => {
   const widgetInfo = useContext(WidgetInfoContext);
   const { visible: boardVisible } = useContext(BoardInfoContext);
   const { onRenderedWidgetById } = useContext(WidgetActionContext);
+  const widgetRef = useRef<HTMLDivElement>(null);
   /**
    * @param ''
    * @description '在定时任务的模式 直接加载不做懒加载 ,其他模式下 如果是 free 类型直接加载 如果是 autoBoard 则由 autoBoard自己控制'
@@ -83,9 +84,9 @@ export const ControllerWidget: React.FC<{}> = memo(() => {
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
       <ZIndexWrapper>
-        <FlexWrapper>
+        <div ref={widgetRef} style={FlexStyle}>
           <ControllerWidgetCore />
-        </FlexWrapper>
+        </div>
       </ZIndexWrapper>
       {editing && <EditMask />}
       <ToolBar />

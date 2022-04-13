@@ -2,6 +2,7 @@ import EventEmitter from 'events';
 const eventBus = new EventEmitter();
 const WIDGET_MOVE = 'widgetMove';
 const WIDGET_MOVE_END = 'widgetMoveEnd';
+const BOARD_SCROLL = 'boardScroll';
 interface FnWidgetMove {
   (selectedIds: string[], deltaX: number, deltaY: number): void;
 }
@@ -26,5 +27,18 @@ export const widgetMoveEnd = {
   },
   off: (fn: () => void) => {
     eventBus.removeListener(WIDGET_MOVE_END, fn);
+  },
+};
+//
+export const boardScrollEvName = (boardId: string) => BOARD_SCROLL + boardId;
+export const boardScroll = {
+  on: (boardId: string, fn: () => void) => {
+    eventBus.addListener(boardScrollEvName(boardId), fn);
+  },
+  emit: (boardId: string) => {
+    eventBus.emit(boardScrollEvName(boardId));
+  },
+  off: (boardId: string, fn: () => void) => {
+    eventBus.removeListener(boardScrollEvName(boardId), fn);
   },
 };

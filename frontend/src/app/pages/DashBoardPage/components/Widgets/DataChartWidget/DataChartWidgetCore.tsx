@@ -46,7 +46,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const { id: widgetId } = widget;
   const { onWidgetChartClick } = useContext(WidgetActionContext);
   const { ref, cacheW, cacheH } = useCacheWidthHeight();
-
   const widgetRef = useRef<Widget>(widget);
   useEffect(() => {
     widgetRef.current = widget;
@@ -140,7 +139,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         }) as ChartDetailConfigDTO,
       );
     });
-
     return (
       <ChartIFrameContainer
         dataset={dataset}

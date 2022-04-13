@@ -41,10 +41,7 @@ import { BORDER_RADIUS, SPACE_MD, SPACE_XS } from 'styles/StyleConstants';
 import StyledBackground from '../../Board/components/StyledBackground';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
-import {
-  selectLayoutWidgetInfoMap,
-  selectLayoutWidgetMap,
-} from '../slice/selectors';
+import { selectLayoutWidgetMap } from '../slice/selectors';
 import { WidgetOfAutoEditor } from './WidgetOfAutoEditor';
 
 const ReactGridLayout = WidthProvider(RGL);
@@ -53,12 +50,10 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const { boardId } = useContext(BoardContext);
   const boardConfig = useContext(BoardConfigContext);
-  const { margin, background, allowOverlap } = boardConfig;
+  const { background, allowOverlap } = boardConfig;
   const { deviceType } = useContext(BoardInfoContext);
 
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
-
-  const layoutWidgetInfoMap = useSelector(selectLayoutWidgetInfoMap);
 
   const [curWH, setCurWH] = useState<number[]>([]);
   const updateCurWH = useCallback((values: number[]) => {
@@ -82,9 +77,9 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     gridWrapRef,
     currentLayout,
     widgetRowHeight,
-    throttleLazyRender,
+    thEmitScroll,
     colsKey,
-  } = useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
+  } = useAutoBoardRenderItem(boardId);
 
   const { curMargin, curPadding } = useMemo(() => {
     return getBoardMarginPadding(boardConfig, colsKey);
@@ -103,7 +98,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
 
   const onLayoutChange = (layouts: Layout[]) => {
     currentLayout.current = layouts;
-    throttleLazyRender();
+    thEmitScroll();
     // ignore isDraggable item from out
     if (layouts.find(item => item.isDraggable === true)) {
       return;
