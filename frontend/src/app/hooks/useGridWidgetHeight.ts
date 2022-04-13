@@ -46,13 +46,14 @@ export const useGridWidgetHeight = () => {
       } else {
         setColsKey('lg');
       }
-      if (renderMode === 'schedule') {
-        dispatch(
-          boardActions.setBoardWidthHeight({ boardId, wh: [width, height] }),
-        );
-      }
+      // if (renderMode === 'schedule') {
+      dispatch(
+        boardActions.setBoardWidthHeight({ boardId, wh: [width, height] }),
+      );
+      // }
     }
-  }, [width, height, renderMode, dispatch, boardId]);
+  }, [width, height, dispatch, boardId]);
+
   const widgetRowHeight = useMemo(() => {
     let dynamicHeight = (cacheW * BASE_ROW_HEIGHT) / BASE_VIEW_WIDTH;
     return Math.max(dynamicHeight, MIN_ROW_HEIGHT);

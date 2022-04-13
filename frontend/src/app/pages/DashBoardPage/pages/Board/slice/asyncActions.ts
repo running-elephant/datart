@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { DownloadFileType } from 'app/constants';
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
@@ -85,15 +86,27 @@ export const handleServerBoardAction =
   };
 
 export const boardDownLoadAction =
-  (params: { boardId: string }) => async (dispatch, getState) => {
-    const { boardId } = params;
+  (params: {
+    boardId: string;
+    downloadType: DownloadFileType;
+    folderId?: string;
+    imageWidth?: number;
+  }) =>
+  async dispatch => {
+    const { boardId, downloadType, folderId, imageWidth } = params;
     const { requestParams, fileName } = await dispatch(
       getBoardDownloadParams({ boardId }),
     );
+
     dispatch(
       makeDownloadDataTask({
-        downloadParams: requestParams,
+        downloadParams:
+          downloadType === DownloadFileType.excel
+            ? requestParams
+            : [{ analytics: false, vizType: 'dashboard', vizId: folderId }],
         fileName,
+        downloadType,
+        imageWidth,
         resolve: () => {
           dispatch(mainActions.setDownloadPolling(true));
         },

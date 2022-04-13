@@ -26,6 +26,7 @@ import {
   VerticalAlignBottomOutlined,
 } from '@ant-design/icons';
 import { Menu, Popconfirm } from 'antd';
+import { DownloadFileType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
@@ -114,7 +115,9 @@ const VizOperationMenu: FC<{
             <Popconfirm
               placement="left"
               title={t('common.confirm')}
-              onConfirm={onDownloadDataLinkClick}
+              onConfirm={() => {
+                onDownloadDataLinkClick(DownloadFileType.excel);
+              }}
               okText={t('common.ok')}
               cancelText={t('common.cancel')}
             >
@@ -125,11 +128,26 @@ const VizOperationMenu: FC<{
             <Popconfirm
               placement="left"
               title={t('common.confirm')}
-              onConfirm={onDownloadDataLinkClick}
+              onConfirm={() => {
+                onDownloadDataLinkClick(DownloadFileType.pdf);
+              }}
               okText={t('common.ok')}
               cancelText={t('common.cancel')}
             >
               {t('share.downloadPDF')}
+            </Popconfirm>
+          </Menu.Item>,
+          <Menu.Item key="downloadPicture" icon={<CloudDownloadOutlined />}>
+            <Popconfirm
+              placement="left"
+              title={t('common.confirm')}
+              onConfirm={() => {
+                onDownloadDataLinkClick(DownloadFileType.image);
+              }}
+              okText={t('common.ok')}
+              cancelText={t('common.cancel')}
+            >
+              {t('share.downloadPicture')}
             </Popconfirm>
           </Menu.Item>,
           <Menu.Divider />,

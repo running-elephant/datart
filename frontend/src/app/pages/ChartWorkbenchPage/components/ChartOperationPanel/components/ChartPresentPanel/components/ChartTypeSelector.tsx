@@ -86,7 +86,7 @@ const ChartTypeSelector: FC<{
         >
           <Popconfirm
             placement="left"
-            title={t('confirm')}
+            title={t('downloadForExcel')}
             onConfirm={onCreateDownloadDataTask}
           >
             <CloudDownloadOutlined />

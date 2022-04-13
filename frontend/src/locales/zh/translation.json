@@ -778,6 +778,7 @@
     },
     "action": {
       "common": {
+        "downloadForExcel": "下载为 Excel",
         "confirm": "请确认",
         "ok": "确认",
         "cancel": "取消",
@@ -803,7 +804,8 @@
         "generateLink": "生成链接",
         "shareLink": "分享",
         "downloadData": "下载为 Excel",
-        "downloadPDF": "下载为 PDF"
+        "downloadPDF": "下载为 PDF",
+        "downloadPicture": "下载为 图片"
       }
     },
     "board": {

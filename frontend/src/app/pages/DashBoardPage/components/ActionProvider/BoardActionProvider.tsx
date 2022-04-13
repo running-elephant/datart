@@ -16,21 +16,23 @@
  * limitations under the License.
  */
 
+import { DownloadFileType } from 'app/constants';
 import { generateShareLinkAsync } from 'app/utils/fetch';
 import { createContext, FC, memo, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
+import { selectVizs } from '../../../MainPage/pages/VizPage/slice/selectors';
 import { BOARD_UNDO } from '../../constants';
 import { boardDownLoadAction } from '../../pages/Board/slice/asyncActions';
+import { selectShareBoardInfo } from '../../pages/Board/slice/selector';
 import { fetchBoardDetail } from '../../pages/Board/slice/thunk';
 import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 import { clearEditBoardState } from '../../pages/BoardEditor/slice/actions/actions';
 import { toUpdateDashboard } from '../../pages/BoardEditor/slice/thunk';
-
 export interface BoardActionContextProps {
   // read
   onGenerateShareLink?: (date, usePwd) => any;
-  onBoardToDownLoad: () => any;
+  onBoardToDownLoad: (downloadType: DownloadFileType) => any;
   // edit
   updateBoard?: (callback?: () => void) => void;
   boardToggleAllowOverlap: (allow: boolean) => void;
@@ -46,6 +48,9 @@ export const BoardActionProvider: FC<{
 }> = memo(({ boardId, children }) => {
   const dispatch = useDispatch();
   const history = useHistory();
+  const vizs = useSelector(selectVizs);
+  const shareBoardInfo = useSelector(selectShareBoardInfo);
+  const { boardWidthHeight } = shareBoardInfo;
 
   const actions = useMemo(() => {
     const actionObj: BoardActionContextProps = {
@@ -64,8 +69,17 @@ export const BoardActionProvider: FC<{
         );
         return result;
       },
-      onBoardToDownLoad: () => {
-        dispatch(boardDownLoadAction({ boardId }));
+      onBoardToDownLoad: downloadType => {
+        const folderId = vizs.filter(v => v.relId === boardId)[0].id;
+
+        dispatch(
+          boardDownLoadAction({
+            boardId,
+            downloadType,
+            folderId,
+            imageWidth: boardWidthHeight[0],
+          }),
+        );
       },
       onCloseBoardEditor: (boardId: string) => {
         const pathName = history.location.pathname;
@@ -83,7 +97,7 @@ export const BoardActionProvider: FC<{
       },
     };
     return actionObj;
-  }, [boardId, dispatch, history]);
+  }, [boardId, dispatch, history, vizs, boardWidthHeight]);
   return (
     <BoardActionContext.Provider value={actions}>
       {children}

@@ -209,3 +209,9 @@ export const ChartStyleSectionComponentType = {
   ScorecardListTemplate: 'scorecardListTemplate',
   ScorecardConditionalStyle: 'scorecardConditionalStyle',
 };
+
+export enum DownloadFileType {
+  'pdf' = 'PDF',
+  'excel' = 'EXCEL',
+  'image' = 'IMAGE',
+}
