@@ -21,6 +21,5 @@ export interface RowAndColStyle {
   };
   cellCfg: {
     height: number;
-    width?: number | null;
   };
 }

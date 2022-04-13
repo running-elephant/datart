@@ -269,45 +269,36 @@ class PivotSheetChart extends ReactChart {
       ['tableHeaderStyle'],
       ['height', 'width'],
     );
-
-    const columnSectionWidthConfig = columnSectionConfigRows.reduce(
-      (allConfig, config) => {
-        return {
-          ...allConfig,
-          ...chartDataSet.reduce((dataSetAllConfig, dataSetConfig) => {
-            return {
-              ...dataSetAllConfig,
-              [dataSetConfig?.getCell(config)]: bodyWidth,
-            };
-          }, {}),
-        };
-      },
-      {},
-    );
-    const metricsSectionWidthConfig = metricsSectionConfigRows.reduce(
-      (allConfig, config) => {
-        return {
-          ...allConfig,
-          [chartDataSet.getFieldKey(config)]: bodyWidth,
-        };
-      },
-      {},
+    const [metricNameShowIn] = getStyles(
+      style,
+      ['style'],
+      ['metricNameShowIn'],
     );
 
     return {
       colCfg: {
         height: headerHeight || 30,
-        widthByFieldValue: Object.assign(
-          metricsSectionWidthConfig,
-          columnSectionWidthConfig,
-        ),
+        widthByFieldValue: metricNameShowIn
+          ? metricsSectionConfigRows.reduce((allConfig, config) => {
+              return {
+                ...allConfig,
+                [chartDataSet.getFieldKey(config)]: bodyWidth,
+              };
+            }, {})
+          : chartDataSet.reduce((dataSetAllConfig, dataSetConfig) => {
+              return {
+                ...dataSetAllConfig,
+                [dataSetConfig?.getCell(
+                  columnSectionConfigRows[columnSectionConfigRows.length - 1],
+                )]: bodyWidth,
+              };
+            }, {}),
       },
       rowCfg: {
         width: headerWidth,
       },
       cellCfg: {
         height: bodyHeight || 30,
-        width: bodyWidth,
       },
     };
   }
