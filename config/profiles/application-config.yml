@@ -78,9 +78,9 @@ datart:
     register: true # 是否允许注册
     active:
       send-mail: ${datart.send-mail:false}  # 注册用户时是否需要邮件验证激活
-
-  invite:
-    duration: ${datart.invite.duration:3} #邀请有效期/天
+      expire-hours: ${datart.register.expire-hours:48} # 注册邮件有效期/小时
+    invite:
+      expire-hours: ${datart.invite.expire-hours:48} # 邀请邮件有效期/小时
 
   security:
     token:

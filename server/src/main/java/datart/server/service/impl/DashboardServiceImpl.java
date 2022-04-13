@@ -140,11 +140,6 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     }
 
     @Override
-    public void deletePermissions(Dashboard dashboard) {
-        rrrMapper.deleteByResource(ResourceType.DASHBOARD.name(), dashboard.getId());
-    }
-
-    @Override
     @Transactional
     public boolean archive(String id) {
         DashboardService.super.archive(id);

@@ -72,7 +72,7 @@ const VizOperationMenu: FC<{
           >
             {t('syncData')}
           </Menu.Item>,
-          <Menu.Divider />,
+          <Menu.Divider key={'reloadDataLine'} />,
         );
       }
 
@@ -93,7 +93,7 @@ const VizOperationMenu: FC<{
           >
             {t('addToDash')}
           </Menu.Item>,
-          <Menu.Divider />,
+          <Menu.Divider key="addToDashLine" />,
         );
       }
 
@@ -151,6 +151,7 @@ const VizOperationMenu: FC<{
             </Popconfirm>
           </Menu.Item>,
           <Menu.Divider />,
+          <Menu.Divider key="downloadDataLine" />,
         );
       }
 

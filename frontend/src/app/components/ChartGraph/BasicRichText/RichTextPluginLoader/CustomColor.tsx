@@ -104,7 +104,6 @@ export class QuillPalette {
    * @param param0
    * @returns
    */
-  // todo (tianlei) Need to nationalize
   static getToolbar = ({
     id,
     extendNodes = {},
@@ -121,9 +120,11 @@ export class QuillPalette {
     <ToolbarStyle id={id}>
       <span className="ql-formats">
         <select
+          title={t?.('viz.palette.graph.richText.families', true)}
           className="ql-font"
           key="ql-font"
           defaultValue={FONT_FAMILIES[0].value}
+          style={{ width: '126px' }}
         >
           {FONT_FAMILIES.map(font => (
             <option value={font.value} key={font.name}>
@@ -131,53 +132,90 @@ export class QuillPalette {
             </option>
           ))}
         </select>
-        <select className="ql-size" key="ql-size" defaultValue="13px">
+        <select
+          className="ql-size"
+          key="ql-size"
+          defaultValue="13px"
+          title={t?.('viz.palette.graph.richText.fontSize', true)}
+        >
           {FONT_SIZES.map(size => (
             <option value={`${size}px`} key={size}>{`${size}px`}</option>
           ))}
         </select>
-        <button className="ql-bold" key="ql-bold" title="加粗" />
-        <button className="ql-italic" key="ql-italic" title="斜体" />
-        <button className="ql-underline" key="ql-underline" title="下划线" />
-        <button className="ql-strike" key="ql-strike" title="删除线" />
+        <button
+          className="ql-bold"
+          key="ql-bold"
+          title={t?.('viz.palette.graph.richText.bold', true)}
+        />
+        <button
+          className="ql-italic"
+          key="ql-italic"
+          title={t?.('viz.palette.graph.richText.italic', true)}
+        />
+        <button
+          className="ql-underline"
+          key="ql-underline"
+          title={t?.('viz.palette.graph.richText.underline', true)}
+        />
+        <button
+          className="ql-strike"
+          key="ql-strike"
+          title={t?.('viz.palette.graph.richText.strike', true)}
+        />
         {extendNodes[0]}
       </span>
 
       <span className="ql-formats">
-        <select className="ql-color" key="ql-color">
+        <select
+          className="ql-color"
+          key="ql-color"
+          title={t?.('viz.palette.graph.richText.color', true)}
+        >
           {defaultThemes.concat(defaultPalette).map(color => (
             <option value={color} key={color} />
           ))}
           <option
             value={QuillPalette.RICH_TEXT_CUSTOM_COLOR}
             key={QuillPalette.RICH_TEXT_CUSTOM_COLOR}
-          />
+          >
+            {t?.('viz.palette.graph.richText.more', true)}
+          </option>
         </select>
-        <select className="ql-background" key="ql-background">
+        <select
+          className="ql-background"
+          key="ql-background"
+          title={t?.('viz.palette.graph.richText.background', true)}
+        >
           {defaultThemes.concat(defaultPalette).map(color => (
             <option value={color} key={color} />
           ))}
           <option
             value={QuillPalette.RICH_TEXT_CUSTOM_COLOR}
             key={QuillPalette.RICH_TEXT_CUSTOM_COLOR}
-          />
+          >
+            {t?.('viz.palette.graph.richText.more', true)}
+          </option>
         </select>
         {extendNodes[1]}
       </span>
 
       <span className="ql-formats">
-        <select className="ql-align" key="ql-align" />
+        <select
+          className="ql-align"
+          key="ql-align"
+          title={t?.('viz.palette.graph.richText.align', true)}
+        />
         <button
           className="ql-indent"
           value="-1"
           key="ql-indent"
-          title="减少缩进"
+          title={t?.('viz.palette.graph.richText.indent', true)}
         />
         <button
           className="ql-indent"
           value="+1"
           key="ql-indent-up"
-          title="增加缩进"
+          title={t?.('viz.palette.graph.richText.indentUp', true)}
         />
         {extendNodes[2]}
       </span>
@@ -187,27 +225,47 @@ export class QuillPalette {
           className="ql-list"
           value="ordered"
           key="ql-ordered"
-          title="有序列表"
+          title={t?.('viz.palette.graph.richText.ordered', true)}
         />
         <button
           className="ql-list"
           value="bullet"
           key="ql-list"
-          title="无序列表"
+          title={t?.('viz.palette.graph.richText.list', true)}
         />
-        <button className="ql-blockquote" key="ql-blockquote" title="引用" />
-        <button className="ql-code-block" key="ql-code-block" title="代码" />
+        <button
+          className="ql-blockquote"
+          key="ql-blockquote"
+          title={t?.('viz.palette.graph.richText.blockquote', true)}
+        />
+        <button
+          className="ql-code-block"
+          key="ql-code-block"
+          title={t?.('viz.palette.graph.richText.codeBlock', true)}
+        />
         {extendNodes[3]}
       </span>
 
       <span className="ql-formats">
-        <button className="ql-link" key="ql-link" title="超链接" />
-        <button className="ql-image" key="ql-image" title="图片" />
+        <button
+          className="ql-link"
+          key="ql-link"
+          title={t?.('viz.palette.graph.richText.link', true)}
+        />
+        <button
+          className="ql-image"
+          key="ql-image"
+          title={t?.('viz.palette.graph.richText.image', true)}
+        />
         {extendNodes[4]}
       </span>
 
       <span className="ql-formats">
-        <button className="ql-clean" key="ql-clean" title="清除样式" />
+        <button
+          className="ql-clean"
+          key="ql-clean"
+          title={t?.('viz.palette.graph.richText.clean', true)}
+        />
         {extendNodes[5]}
       </span>
     </ToolbarStyle>
@@ -248,14 +306,14 @@ const ToolbarStyle = styled.div`
   .ql-picker-options [data-value=${QuillPalette.RICH_TEXT_CUSTOM_COLOR}] {
     position: relative;
     width: calc(100% - 4px) !important;
-    background-color: transparent !important;
-    font-weight: 400;
     font-size: 12px;
+    font-weight: 400;
+    background-color: transparent !important;
     &::after {
-      content: '更多';
       position: absolute;
       top: 50%;
       left: 50%;
+      content: attr(data-label);
       transform: translate(-50%, -50%);
     }
   }

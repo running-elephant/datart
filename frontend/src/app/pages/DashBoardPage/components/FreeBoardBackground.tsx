@@ -59,20 +59,15 @@ const SlideBackground: React.FC<IProps> = props => {
   }, [slideTranslate, slideWidth, slideHeight, scale, scaleMode, editing]);
 
   return (
-    <Warp
-      bg={background}
-      className="display-slide"
-      style={slideStyle}
-      editing={editing}
-    >
+    <Wrapper bg={background} style={slideStyle} editing={editing}>
       <scaleContext.Provider value={scale}>
         {props.children}
       </scaleContext.Provider>
-    </Warp>
+    </Wrapper>
   );
 };
 export default SlideBackground;
-const Warp = styled(StyledBackground)<{ editing: boolean }>`
+const Wrapper = styled(StyledBackground)<{ editing: boolean }>`
   position: relative;
   box-shadow: ${p => (p.editing ? '0px 1px 8px 2px #8cb4be;' : '')};
   transform-origin: 0 0;

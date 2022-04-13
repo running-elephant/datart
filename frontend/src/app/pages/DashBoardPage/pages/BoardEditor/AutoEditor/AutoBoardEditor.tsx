@@ -20,10 +20,10 @@ import { Empty } from 'antd';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { WidgetConfAndInfoProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetConfAndInfoProvider';
+import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import {
   LAYOUT_COLS_MAP,
-  RGL_DRAG_HANDLE,
+  WIDGET_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
 import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
@@ -125,13 +125,13 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     return sortedLayoutWidgets.map(item => {
       return (
         <div key={item.id}>
-          <WidgetConfAndInfoProvider
+          <WidgetWrapProvider
             id={item.id}
             boardEditing={true}
             boardId={boardId}
           >
             <WidgetOfAutoEditor />
-          </WidgetConfAndInfoProvider>
+          </WidgetWrapProvider>
         </div>
       );
     });
@@ -168,7 +168,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
               isDraggable={true}
               isResizable={true}
               allowOverlap={allowOverlap}
-              draggableHandle={`.${RGL_DRAG_HANDLE}`}
+              draggableHandle={`.${WIDGET_DRAG_HANDLE}`}
             >
               {boardChildren}
             </ReactGridLayout>

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { useGridWidgetHeight } from 'app/hooks/useGridWidgetHeight';
-import { throttle } from 'echarts';
+import throttle from 'lodash/throttle';
 import {
   RefObject,
   useCallback,
@@ -110,7 +110,7 @@ export default function useAutoBoardRenderItem(
       );
       window.removeEventListener('resize', throttleLazyRender, false);
     };
-  }, [throttleLazyRender, lazyRender]);
+  }, [throttleLazyRender, lazyRender, layoutWidgetInfoMap]);
 
   return {
     ref,

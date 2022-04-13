@@ -71,7 +71,7 @@ export const BoardDropdownList: FC<Props> = memo(
         </Menu.Item>
         {allowShare && (
           <>
-            <Menu.Divider />
+            <Menu.Divider key={'shareLinkLine'} />
             <Menu.Item
               key={'shareLink'}
               onClick={onOpenShareLink}
@@ -83,7 +83,7 @@ export const BoardDropdownList: FC<Props> = memo(
         )}
         {allowDownload && (
           <>
-            <Menu.Divider />
+            <Menu.Divider key={'downloadDataLine'} />
             <Menu.Item key={'downloadData'} icon={<CloudDownloadOutlined />}>
               <Popconfirm
                 placement="left"
@@ -127,7 +127,7 @@ export const BoardDropdownList: FC<Props> = memo(
         )}
         {allowManage && (
           <>
-            <Menu.Divider />
+            <Menu.Divider key="unpublishLine" />
             {status === 2 && (
               <Menu.Item
                 key={'unpublish'}

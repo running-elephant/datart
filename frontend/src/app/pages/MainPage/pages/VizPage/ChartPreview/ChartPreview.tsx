@@ -177,13 +177,28 @@ const ChartPreviewBoard: FC<{
       );
     };
 
-    const handleGenerateShareLink = async (date, usePwd) => {
-      const result = await generateShareLinkAsync(
-        date,
-        usePwd,
-        backendChartId,
-        'DATACHART',
-      );
+    const handleGenerateShareLink = async ({
+      expiryDate,
+      authenticationMode,
+      roles,
+      users,
+      rowPermissionBy,
+    }: {
+      expiryDate: string;
+      authenticationMode: string;
+      roles: string[];
+      users: string[];
+      rowPermissionBy: string;
+    }) => {
+      const result = await generateShareLinkAsync({
+        expiryDate,
+        authenticationMode,
+        roles,
+        users,
+        rowPermissionBy,
+        vizId: backendChartId,
+        vizType: 'DATACHART',
+      });
       return result;
     };
 

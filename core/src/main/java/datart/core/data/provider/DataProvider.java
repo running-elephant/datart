@@ -79,6 +79,8 @@ public abstract class DataProvider extends AutoCloseBean {
 
     public abstract String getConfigDescription(String name);
 
+    public abstract String getQueryKey(DataProviderSource config, QueryScript script, ExecuteParam executeParam) throws Exception;
+
     public abstract Dataframe execute(DataProviderSource config, QueryScript script, ExecuteParam executeParam) throws Exception;
 
     /**
@@ -120,6 +122,5 @@ public abstract class DataProvider extends AutoCloseBean {
      */
     public void resetSource(DataProviderSource source) {
     }
-
 
 }

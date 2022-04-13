@@ -15,15 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { WidgetActionDropdown } from 'app/pages/DashBoardPage/components/WidgetComponents/WidgetActionDropdown';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { WidgetActionDropdown } from 'app/pages/DashBoardPage/components/WidgetToolBar/WidgetActionDropdown';
 import {
   Widget,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import classNames from 'classnames';
 import { XYCoord } from 'dnd-core';
-import React, { useCallback, useContext, useRef } from 'react';
+import { useCallback, useContext, useRef } from 'react';
 import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';

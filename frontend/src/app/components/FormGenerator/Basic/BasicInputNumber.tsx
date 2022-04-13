@@ -26,7 +26,7 @@ import { BW } from './components/BasicWrapper';
 
 const BasicInputNumber: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
-    const { options, ...rest } = data;
+    const { options, comType, ...rest } = data;
     const [formValue, debouncedUpdateValue] = useDebouncedFormValue(
       data?.value,
       {

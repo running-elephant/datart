@@ -30,6 +30,8 @@ public class ShareVizDetail {
 
     private Object vizDetail;
 
+    private ShareToken shareToken;
+
     private Map<String, ShareToken> executeToken;
 
     private Map<String, ShareToken> subVizToken;

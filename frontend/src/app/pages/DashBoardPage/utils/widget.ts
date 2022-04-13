@@ -235,12 +235,11 @@ export const createWidgetInfo = (id: string): WidgetInfo => {
     editing: false,
     inLinking: false,
     selected: false,
-    errInfo: {},
+    errInfo: {} as WidgetInfo['errInfo'],
     rendered: false,
     pageInfo: {
       pageNo: 1,
     },
-    selectItems: [],
   };
   return widgetInfo;
 };
@@ -660,43 +659,20 @@ export const getCascadeControllers = (controller: Widget) => {
     .map(ele => ele.targetId);
   return ids;
 };
-// getWidgetStyle start
-export const getWidgetStyle = (boardType: BoardType, widget: Widget) => {
-  return boardType === 'auto'
-    ? getAutoWidgetStyle(widget)
-    : getFreeWidgetStyle(widget);
-};
-
-export const getAutoWidgetStyle = (widget: Widget) => {
-  const widgetConf = widget.config;
-  let widgetStyle: CSSProperties = {
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-    height: '100%',
-    ...getBackgroundCss(widgetConf.background),
-    ...getBorderCss(widgetConf.border as BorderConfig),
-    ...getPaddingCss(widgetConf.padding as WidgetPadding),
-
-    transition: 'all 350ms ease',
-  };
-  return widgetStyle;
-};
 
 export const getFreeWidgetStyle = (widget: Widget) => {
   const widgetConf = widget.config;
   const rect = widgetConf.rect;
   let widgetStyle: CSSProperties = {
     position: 'absolute',
+    left: fillPx(rect.x),
+    top: fillPx(rect.y),
     display: 'flex',
     flexDirection: 'column',
-    ...getBackgroundCss(widgetConf.background),
-    ...getBorderCss(widgetConf.border as BorderConfig),
-    ...getPaddingCss(widgetConf.padding as WidgetPadding),
-    width: `${rect.width}px`,
-    height: `${rect.height}px`,
-    transform: `translate(${rect.x}px, ${rect.y}px)`,
+    width: fillPx(rect.width),
+    height: fillPx(rect.height),
+    zIndex: widgetConf.index,
+    // transform: `translate(${rect.x}px, ${rect.y}px)`,
     transformOrigin: ' 0 0',
   };
   return widgetStyle;
@@ -735,20 +711,13 @@ export const getPaddingCss = (pd: WidgetPadding) => {
 };
 
 export const getWidgetSomeStyle = (opt: {
-  config: WidgetConf;
-  background?: boolean;
-  padding?: boolean;
-  border?: boolean;
+  background: BackgroundConfig;
+  padding: WidgetPadding;
+  border: BorderConfig;
 }) => {
-  const backgroundCss = opt.background
-    ? getBackgroundCss(opt.config.background)
-    : {};
-  const paddingCss = opt.padding
-    ? getPaddingCss(opt.config.padding as WidgetPadding)
-    : {};
-  const borderCss = opt.border
-    ? getBorderCss(opt.config.border as BorderConfig)
-    : {};
+  const backgroundCss = getBackgroundCss(opt.background);
+  const paddingCss = getPaddingCss(opt.padding as WidgetPadding);
+  const borderCss = getBorderCss(opt.border as BorderConfig);
   let style: CSSProperties = {
     ...backgroundCss,
     ...paddingCss,
@@ -756,9 +725,6 @@ export const getWidgetSomeStyle = (opt: {
   };
   return style;
 };
-
-// get some css end
-// Controller
 
 export const getLinkedColumn = (
   targetWidgetId: string,

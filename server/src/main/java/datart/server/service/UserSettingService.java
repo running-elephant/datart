@@ -9,4 +9,6 @@ public interface UserSettingService extends BaseCRUDService<UserSettings, UserSe
 
     List<UserSettings> listUserSettings();
 
+    boolean deleteByUserId(String userId);
+
 }

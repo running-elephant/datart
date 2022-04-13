@@ -25,9 +25,20 @@ import org.apache.calcite.sql.SqlWriter;
 import org.apache.calcite.sql.dialect.H2SqlDialect;
 import org.apache.calcite.sql.dialect.MysqlSqlDialect;
 
-import static datart.core.data.provider.StdSqlOperator.symbolOf;
+import java.util.EnumSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
+
+import static datart.core.data.provider.StdSqlOperator.*;
 
 public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, FetchAndOffsetSupport {
+
+    static ConcurrentSkipListSet<StdSqlOperator> OWN_SUPPORTED = new ConcurrentSkipListSet<>(
+            EnumSet.of(AGG_DATE_YEAR, AGG_DATE_QUARTER, AGG_DATE_MONTH, AGG_DATE_WEEK, AGG_DATE_DAY));
+
+    static {
+        OWN_SUPPORTED.addAll(SUPPORTED);
+    }
 
     /**
      * Creates an H2SqlDialect.
@@ -79,5 +90,10 @@ public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, Fe
     @Override
     public void unparseOffsetFetch(SqlWriter writer, SqlNode offset, SqlNode fetch) {
         unparseFetchUsingLimit(writer, offset, fetch);
+    }
+
+    @Override
+    public Set<StdSqlOperator> supportedOperators() {
+        return OWN_SUPPORTED;
     }
 }
