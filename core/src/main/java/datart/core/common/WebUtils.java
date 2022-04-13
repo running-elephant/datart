@@ -76,8 +76,8 @@ public class WebUtils {
         if (imageWidth>0 && imageWidth != contentWidth) {
             // scale the window
             webDriver.manage().window().setSize(new Dimension(imageWidth, contentHeight.intValue()));
-            Thread.sleep(1000);
         }
+        Thread.sleep(1500);
         // scale the window again
         contentWidth = Double.parseDouble(webDriver.findElement(By.id("width")).getAttribute("value"));
         contentWidth = contentWidth>0 ? contentWidth : 1920;
@@ -126,6 +126,7 @@ public class WebUtils {
         options.addArguments("disable-web-security");
         options.addArguments("no-proxy-server");
         options.addArguments("disable-dev-shm-usage");
+        options.addArguments("window-size=2048,1536");
 
         if (isRemoteDriver(driverPath)) {
             return new RemoteWebDriver(new URL(driverPath), options);
