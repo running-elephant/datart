@@ -107,22 +107,23 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
         <StyledContainer bg={background}>
           {sortedLayoutWidgets.length ? (
             <div className="grid-wrap" ref={gridWrapRef}>
-              <ReactGridLayout
-                layout={layoutMap[colsKey]}
-                margin={curMargin}
-                containerPadding={curPadding}
-                cols={LAYOUT_COLS_MAP[colsKey]}
-                rowHeight={widgetRowHeight}
-                onLayoutChange={onLayoutChange}
-                isDraggable={false}
-                isResizable={false}
-                allowOverlap={allowOverlap}
-                measureBeforeMount={false}
-                useCSSTransforms={true}
-                innerRef={ref}
-              >
-                {boardChildren}
-              </ReactGridLayout>
+              <div ref={ref}>
+                <ReactGridLayout
+                  layout={layoutMap[colsKey]}
+                  margin={curMargin}
+                  containerPadding={curPadding}
+                  cols={LAYOUT_COLS_MAP[colsKey]}
+                  rowHeight={widgetRowHeight}
+                  onLayoutChange={onLayoutChange}
+                  isDraggable={false}
+                  isResizable={false}
+                  allowOverlap={allowOverlap}
+                  measureBeforeMount={false}
+                  useCSSTransforms={true}
+                >
+                  {boardChildren}
+                </ReactGridLayout>
+              </div>
             </div>
           ) : (
             <div className="empty">
