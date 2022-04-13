@@ -17,7 +17,9 @@
  */
 package datart.server.job;
 
+import datart.core.base.consts.AttachmentType;
 import datart.core.common.Application;
+import datart.server.base.dto.JobFile;
 import datart.server.base.dto.ScheduleJobConfig;
 import datart.server.service.MailService;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +27,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.util.CollectionUtils;
 
-import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class EmailJob extends ScheduleJob {
@@ -52,7 +49,7 @@ public class EmailJob extends ScheduleJob {
         mailService.sendMimeMessage(mimeMessage);
     }
 
-    private MimeMessage createMailMessage(ScheduleJobConfig config, List<File> attachments) throws MessagingException, UnsupportedEncodingException {
+    private MimeMessage createMailMessage(ScheduleJobConfig config, List<JobFile> attachments) throws MessagingException, UnsupportedEncodingException {
         MimeMessage mimeMessage = mailService.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, !CollectionUtils.isEmpty(attachments));
         helper.setSubject(config.getSubject());
@@ -60,40 +57,45 @@ public class EmailJob extends ScheduleJob {
         if (StringUtils.isNotBlank(config.getCc())) {
             helper.setCc(config.getCc() == null ? null : config.getCc().split(";"));
         }
-        //图片插入正文
-        List<File> images = filterImages(attachments);
-        String imageStr = images.stream().map(item -> imageHtml.replace("$CID$",item.getName())).collect(Collectors.joining());
-        helper.setText(config.getTextContent()+imageStr, true);
-        for (File image : images) {
-            helper.addInline(image.getName(), image);
-        }
 
-        if (!CollectionUtils.isEmpty(attachments)) {
-            for (File file : attachments) {
-                helper.addAttachment(file.getName(), file);
-            }
-        }
+        String imageStr = buildMailImageContent(attachments);
+        helper.setText(config.getTextContent()+imageStr, true);
+
+        putFileIntoMail(helper, attachments);
         return mimeMessage;
     }
 
     /**
-     * 筛选图片文件
-     * @param files
-     * @return
+     * 构造图片内嵌html
+     * @param attachments
      */
-    private List<File> filterImages(List<File> files) {
-        List<File> images = new ArrayList<>();
-        for (File file : files) {
-            try {
-                BufferedImage image = ImageIO.read(file);
-                if (image == null || image.getWidth() <= 0 || image.getHeight() <= 0) {
-                    continue;
-                }
-                images.add(file);
-            } catch (Exception e) {}
+    private String buildMailImageContent(List<JobFile> attachments) {
+        StringBuilder builder = new StringBuilder();
+        for (JobFile jobFile : attachments) {
+            if (jobFile.getType().equals(AttachmentType.IMAGE)) {
+                builder.append("<hr><h6>"+jobFile.getFile().getName()+"<h6>");
+                builder.append(imageHtml.replace("$CID$", jobFile.getFile().getName()));
+            }
         }
-        files.removeAll(images);
-        return images;
+        return builder.toString();
+    }
+
+    private void putFileIntoMail(MimeMessageHelper helper, List<JobFile> attachments) throws MessagingException {
+        if (CollectionUtils.isEmpty(attachments)) {
+            return;
+        }
+        for (JobFile jobFile : attachments) {
+            switch (jobFile.getType()) {
+                case IMAGE:
+                    helper.addInline(jobFile.getFile().getName(), jobFile.getFile());
+                    break;
+                case EXCEL:
+                case PDF:
+                default:
+                    helper.addAttachment(jobFile.getFile().getName(), jobFile.getFile());
+                    break;
+            }
+        }
     }
 
 
