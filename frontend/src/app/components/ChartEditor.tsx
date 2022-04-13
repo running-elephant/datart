@@ -49,6 +49,7 @@ import {
   useSaveFormContext,
 } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { IChart } from 'app/types/Chart';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { getDrillPaths } from 'app/utils/chartHelper';
 import { makeDownloadDataTask } from 'app/utils/fetch';
@@ -118,7 +119,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
   const [chart, setChart] = useState<IChart>();
-  const drillOptionRef = useRef<ChartDrillOption>();
+  const drillOptionRef = useRef<IChartDrillOption>();
 
   const [allowQuery, setAllowQuery] = useState<boolean>(false);
   const history = useHistory();
@@ -333,7 +334,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         }),
       );
     },
-    [dispatch, drillOptionRef, expensiveQuery],
+    [chartConfig?.datas, dispatch, expensiveQuery],
   );
 
   const handleDataViewChanged = useCallback(() => {
@@ -536,7 +537,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     widgetId,
   ]);
 
-  const handleDrillOptionChange = (option: ChartDrillOption) => {
+  const handleDrillOptionChange = (option: IChartDrillOption) => {
     drillOptionRef.current = option;
     dispatch(refreshDatasetAction({ drillOption: option }));
   };

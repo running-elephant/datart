@@ -35,6 +35,7 @@ import {
 } from 'app/types/ChartDataRequest';
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { getValue } from 'app/utils/chartHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import {
@@ -44,7 +45,7 @@ import {
 } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
-import { ChartDrillOption, DrillMode } from './ChartDrillOption';
+import { DrillMode } from './ChartDrillOption';
 
 export class ChartDataRequestBuilder {
   extraSorters: ChartDataRequest['orders'] = [];
@@ -54,7 +55,7 @@ export class ChartDataRequestBuilder {
   dataView;
   script: boolean;
   aggregation?: boolean;
-  drillOption?: ChartDrillOption;
+  drillOption?: IChartDrillOption;
 
   constructor(
     dataView: Pick<ChartDataView, 'id' | 'computedFields'> & {
@@ -81,7 +82,7 @@ export class ChartDataRequestBuilder {
     return this;
   }
 
-  public addDrillOption(drillOption?: ChartDrillOption) {
+  public addDrillOption(drillOption?: IChartDrillOption) {
     this.drillOption = drillOption;
     return this;
   }

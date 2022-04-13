@@ -19,8 +19,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
-import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { View } from 'app/types/View';
 import {
@@ -125,7 +125,7 @@ export const updateChartConfigAndRefreshDatasetAction = createAsyncThunk(
       type: string;
       payload: ChartConfigPayloadType;
       needRefresh?: boolean;
-      drillOption?: ChartDrillOption;
+      drillOption?: IChartDrillOption;
     },
     thunkAPI,
   ) => {
@@ -149,7 +149,7 @@ export const refreshDatasetAction = createAsyncThunk(
   'workbench/refreshDatasetAction',
   async (
     arg: {
-      drillOption?: ChartDrillOption;
+      drillOption?: IChartDrillOption;
       pageInfo?;
       sorter?: { column: string; operator: string; aggOperator?: string };
     },

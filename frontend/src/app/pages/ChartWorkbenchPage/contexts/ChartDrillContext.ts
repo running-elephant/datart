@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { createContext } from 'react';
 
 const ChartDrillContext = createContext<{
-  drillOption?: ChartDrillOption;
-  onDrillOptionChange?: (option: ChartDrillOption) => void;
+  drillOption?: IChartDrillOption;
+  onDrillOptionChange?: (option: IChartDrillOption) => void;
 }>({});
 
 export default ChartDrillContext;

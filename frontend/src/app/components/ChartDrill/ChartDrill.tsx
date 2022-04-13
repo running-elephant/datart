@@ -74,7 +74,7 @@ const ChartDrill: FC<{}> = memo(({ children }) => {
         trigger={['contextMenu']}
         getPopupContainer={triggerNode => triggerNode}
       >
-        <div>
+        <div style={{ height: '100%' }}>
           {children}
           <ChartDrillPaths />
         </div>

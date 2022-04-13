@@ -44,7 +44,6 @@ import ChartTypeSelector, {
 } from './components/ChartTypeSelector';
 
 const CHART_TYPE_SELECTOR_HEIGHT_OFFSET = 50;
-const CHART_DRILL_HEIGHT_OFFSET = 24;
 
 const ChartPresentPanel: FC<{
   containerHeight?: number;
@@ -102,8 +101,7 @@ const ChartPresentPanel: FC<{
         width: containerWidth,
         height:
           (containerHeight || CHART_TYPE_SELECTOR_HEIGHT_OFFSET) -
-          CHART_TYPE_SELECTOR_HEIGHT_OFFSET -
-          CHART_DRILL_HEIGHT_OFFSET,
+          CHART_TYPE_SELECTOR_HEIGHT_OFFSET,
       };
 
       const containerId = chart?.isISOContainer
