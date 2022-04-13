@@ -68,6 +68,7 @@ const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
   return (
     <StyledChartDrillContextMenu>
       <Dropdown
+        disabled={!drillOption}
         overlay={contextMenu}
         destroyPopupOnHide={true}
         trigger={['contextMenu']}

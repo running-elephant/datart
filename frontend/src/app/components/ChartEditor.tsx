@@ -198,6 +198,9 @@ export const ChartEditor: FC<ChartEditorProps> = ({
 
   useEffect(() => {
     const drillPaths = getDrillPaths(chartConfig?.datas);
+    if (isEmptyArray(drillPaths)) {
+      drillOptionRef.current = undefined;
+    }
     if (
       !isEmptyArray(drillPaths) &&
       drillOptionRef.current
