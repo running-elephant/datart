@@ -43,6 +43,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     const boardConfig = useContext(BoardConfigContext);
     const { background, allowOverlap } = boardConfig;
     const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
+
     const { curMargin, curPadding } = useMemo(() => {
       return getBoardMarginPadding(boardConfig, colsKey);
     }, [boardConfig, colsKey]);
@@ -89,27 +90,26 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     return (
       <Wrap>
         <StyledContainer bg={background}>
-          {sortedLayoutWidgets.length ? (
-            <div className="grid-wrap" ref={gridWrapRef}>
-              <div ref={ref}>
-                <ReactGridLayout
-                  layout={layoutMap[colsKey]}
-                  margin={curMargin}
-                  containerPadding={curPadding}
-                  cols={LAYOUT_COLS_MAP[colsKey]}
-                  rowHeight={widgetRowHeight}
-                  onLayoutChange={onLayoutChange}
-                  isDraggable={false}
-                  isResizable={false}
-                  allowOverlap={allowOverlap}
-                  measureBeforeMount={false}
-                  useCSSTransforms={true}
-                >
-                  {boardChildren}
-                </ReactGridLayout>
-              </div>
+          <div className="grid-wrap" ref={gridWrapRef}>
+            <div className="widget-row-height" ref={ref}>
+              <ReactGridLayout
+                layout={layoutMap[colsKey]}
+                margin={curMargin}
+                containerPadding={curPadding}
+                cols={LAYOUT_COLS_MAP[colsKey]}
+                rowHeight={widgetRowHeight}
+                onLayoutChange={onLayoutChange}
+                isDraggable={false}
+                isResizable={false}
+                allowOverlap={allowOverlap}
+                measureBeforeMount={false}
+                useCSSTransforms={true}
+              >
+                {boardChildren}
+              </ReactGridLayout>
             </div>
-          ) : (
+          </div>
+          {!sortedLayoutWidgets.length && (
             <div className="empty">
               <Empty description="" />
             </div>
@@ -143,7 +143,7 @@ const StyledContainer = styled(StyledBackground)`
 
   .empty {
     display: flex;
-    flex: 1;
+    flex: 100;
     align-items: center;
     justify-content: center;
   }
