@@ -197,6 +197,23 @@ const config: ChartConfig = {
           default: 'right',
           comType: 'fontAlignment',
         },
+        {
+          label: 'style.colHeight',
+          key: 'height',
+          default: 30,
+          options: {
+            min: 12,
+          },
+          comType: 'inputNumber',
+        },
+        {
+          label: 'style.rowWidth',
+          key: 'width',
+          options: {
+            min: 0,
+          },
+          comType: 'inputNumber',
+        },
       ],
     },
     {
@@ -241,6 +258,23 @@ const config: ChartConfig = {
           key: 'align',
           default: 'left',
           comType: 'fontAlignment',
+        },
+        {
+          label: 'style.height',
+          key: 'height',
+          default: 30,
+          options: {
+            min: 12,
+          },
+          comType: 'inputNumber',
+        },
+        {
+          label: 'style.width',
+          key: 'width',
+          options: {
+            min: 0,
+          },
+          comType: 'inputNumber',
         },
       ],
     },
@@ -413,6 +447,10 @@ const config: ChartConfig = {
           oddBgColor: '奇数行背景颜色',
           font: '字体',
           align: '对齐方式',
+          colHeight: '列表头高度',
+          rowWidth: '行表头宽度',
+          height: '单元格高度',
+          width: '单元格宽度',
         },
         summary: {
           title: '数据汇总',
@@ -465,6 +503,10 @@ const config: ChartConfig = {
           oddBgColor: 'Odd Row Background Color',
           font: 'Font',
           align: 'Align',
+          colHeight: 'Col Header Height',
+          rowWidth: 'Row Header Width',
+          height: 'Height',
+          width: 'Width',
         },
         summary: {
           title: 'Summary',
