@@ -16,8 +16,7 @@
  * limitations under the License.
  */
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
-import debounce from 'lodash/debounce';
-import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useContext, useEffect, useRef } from 'react';
 import { WidgetActionContext } from '../components/ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../components/BoardProvider/BoardConfigProvider';
 import { WidgetInfoContext } from '../components/WidgetProvider/WidgetInfoProvider';
@@ -42,43 +41,36 @@ export default function useRenderWidget(
     }
   }, [widget.id, onRenderedWidgetById]);
 
-  const deRenderWidget = useMemo(() => {
-    if (widgetInfo.rendered) {
-      return () => undefined;
-    }
-    return debounce(renderWidget, 100);
-  }, [renderWidget, widgetInfo.rendered]);
-
-  useEffect(() => {
-    if (initialQuery) {
-      deRenderWidget();
-    }
-  }, [deRenderWidget, cacheW, cacheH, initialQuery]);
   //监听board滚动
   useEffect(() => {
-    boardScroll.on(widget.dashboardId, deRenderWidget);
+    boardScroll.off(widget.dashboardId, renderWidget);
+    if (!widgetInfo.rendered) {
+      boardScroll.on(widget.dashboardId, renderWidget);
+    }
     return () => {
-      boardScroll.off(widget.dashboardId, deRenderWidget);
+      boardScroll.off(widget.dashboardId, renderWidget);
     };
-  }, [deRenderWidget, widget.dashboardId]);
+  }, [renderWidget, widget.dashboardId, widgetInfo.rendered]);
 
-  //初始化查询
+  //定时任务中 或者 后端截图 直接fetch
   useEffect(() => {
     if (renderMode === 'schedule') {
       onRenderedWidgetById(widget.id);
-    } else if (initialQuery) {
+    }
+  }, [onRenderedWidgetById, renderMode, widget.id]);
+  //初始化查询
+  useEffect(() => {
+    if (initialQuery && renderMode !== 'schedule' && !widgetInfo.rendered) {
       renderWidget();
     }
   }, [
-    boardType,
+    cacheW,
+    cacheH,
     initialQuery,
     renderMode,
-    onRenderedWidgetById,
-    widget.id,
-    deRenderWidget,
+    widgetInfo.rendered,
     renderWidget,
   ]);
-
   return {
     ref,
     widgetRef,

@@ -28,7 +28,7 @@ export default function useBoardScroll(boardId: string) {
   }, [boardId]);
 
   const thEmitScroll = useMemo(
-    () => throttle(onEmitScroll, 50),
+    () => throttle(onEmitScroll, 100),
     [onEmitScroll],
   );
 
