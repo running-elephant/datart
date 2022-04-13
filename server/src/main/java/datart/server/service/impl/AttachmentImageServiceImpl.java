@@ -4,6 +4,7 @@ import datart.core.base.consts.AttachmentType;
 import datart.core.base.consts.ShareAuthenticationMode;
 import datart.core.base.consts.ShareRowPermissionBy;
 import datart.core.common.Application;
+import datart.core.common.FileUtils;
 import datart.core.common.WebUtils;
 import datart.core.entity.Folder;
 import datart.security.base.ResourceType;
@@ -44,7 +45,6 @@ public class AttachmentImageServiceImpl implements AttachmentService {
     public File getFile(DownloadCreateParam downloadCreateParam, String path, String fileName) throws Exception {
         ViewExecuteParam viewExecuteParam = downloadCreateParam.getDownloadParams().size() > 0 ? downloadCreateParam.getDownloadParams().get(0) : new ViewExecuteParam();
         String folderId = viewExecuteParam.getVizId();
-        ResourceType vizType = viewExecuteParam.getVizType();
         Folder folder = folderService.retrieve(folderId);
         ShareCreateParam shareCreateParam = new ShareCreateParam();
         shareCreateParam.setVizId(folder.getRelId());
@@ -54,10 +54,9 @@ public class AttachmentImageServiceImpl implements AttachmentService {
         shareCreateParam.setRowPermissionBy(ShareRowPermissionBy.CREATOR);
         ShareToken share = shareService.createShare(securityManager.getCurrentUser().getId(), shareCreateParam);
 
-        String url = Application.getWebRootURL()+"/"+vizType.getShareRoute()+"/"+share.getId()+"?type="+share.getAuthenticationMode();
+        String url = Application.getWebRootURL()+"/"+shareCreateParam.getVizType().getShareRoute()+"/"+share.getId()+"?eager=true&type="+share.getAuthenticationMode();
         log.info("created share url: {} ", url);
-        int width = downloadCreateParam.getImageWidth()<=0 ? 1920 : downloadCreateParam.getImageWidth();
-        File target = WebUtils.screenShot2File(url, path, width);
+        File target = WebUtils.screenShot2File(url, FileUtils.withBasePath(path), downloadCreateParam.getImageWidth());
 
         path = generateFileName(path,fileName,attachmentType);
         File file = new File(path);
