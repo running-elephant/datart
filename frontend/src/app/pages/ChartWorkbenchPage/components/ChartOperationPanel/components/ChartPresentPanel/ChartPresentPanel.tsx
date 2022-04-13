@@ -19,7 +19,6 @@
 import { ReloadOutlined } from '@ant-design/icons';
 import { Col, Row, Table } from 'antd';
 import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
-import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import ChartSelectedDrillButton from 'app/components/ChartDrill/ChartSelectedDrillButton';
 import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContainer';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -164,7 +163,6 @@ const ChartPresentPanel: FC<{
           </Col>
         </Row>
         {renderReusableChartContainer()}
-        <ChartDrillPaths />
       </StyledChartPresentPanel>
     );
   },

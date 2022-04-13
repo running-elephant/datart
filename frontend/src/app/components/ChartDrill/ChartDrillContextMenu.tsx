@@ -22,6 +22,7 @@ import { DrillMode } from 'app/models/ChartDrillOption';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import { FC, memo, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
+import ChartDrillPaths from './ChartDrillPaths';
 
 const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
   const drillTranslator = useI18NPrefix(`viz.palette.drill`);
@@ -72,7 +73,10 @@ const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
         trigger={['contextMenu']}
         getPopupContainer={triggerNode => triggerNode}
       >
-        <div>{children}</div>
+        <div>
+          {children}
+          <ChartDrillPaths />
+        </div>
       </Dropdown>
     </StyledChartDrillContextMenu>
   );
