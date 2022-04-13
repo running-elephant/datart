@@ -62,9 +62,7 @@ const ChartDrillPaths: FC<{}> = memo(() => {
 export default ChartDrillPaths;
 
 const StyledChartDrillPaths = styled.div`
-  position: absolute;
-  bottom: ${SPACE_TIMES(2)};
-  left: ${SPACE_TIMES(2)};
+  margin-left: ${SPACE_TIMES(2)};
 `;
 
 const StyledDrillNode = styled(Breadcrumb.Item)<{ isActive: boolean }>`

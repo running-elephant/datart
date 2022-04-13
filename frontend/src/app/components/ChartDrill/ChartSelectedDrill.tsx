@@ -24,17 +24,14 @@ import styled from 'styled-components/macro';
 import { FONT_SIZE_HEADING } from 'styles/StyleConstants';
 import { IW } from '../IconWrapper';
 
-const ChartSelectedDrillButton: FC<{ fontSize?: string /** eg. 32px */ }> =
-  memo(({ fontSize }) => {
+const ChartSelectedDrill: FC<{ fontSize?: string /** eg. 32px */ }> = memo(
+  ({ fontSize }) => {
     const { drillOption, onDrillOptionChange } =
       useContext(ChartDatasetContext);
 
-    if (!drillOption?.canSelect) {
-      return <div></div>;
-    }
-
     return (
-      <StyledChartSelectedDrillButton
+      <StyledChartSelectedDrill
+        visibility={Boolean(drillOption?.canSelect)}
         fontSize={fontSize || FONT_SIZE_HEADING}
         className={classnames({
           active: drillOption?.isSelectedDrill,
@@ -47,13 +44,15 @@ const ChartSelectedDrillButton: FC<{ fontSize?: string /** eg. 32px */ }> =
         }}
       >
         <ArrowDownOutlined />
-      </StyledChartSelectedDrillButton>
+      </StyledChartSelectedDrill>
     );
-  });
+  },
+);
 
-export default ChartSelectedDrillButton;
+export default ChartSelectedDrill;
 
-const StyledChartSelectedDrillButton = styled(IW)`
+const StyledChartSelectedDrill = styled(IW)<{ visibility: boolean }>`
+  visibility: ${p => (p.visibility ? 'visible' : 'hidden')};
   color: ${p => p.theme.textColorLight};
   cursor: pointer;
 

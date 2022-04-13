@@ -336,10 +336,8 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       if (currentConfig?.type !== ChartDataSectionType.FILTER) {
         return;
       }
-
       return getDillConditions()?.map(drill => {
         const field = drill.field;
-        const condition = drill.condition;
         return (
           <StyledDillFilter type={field.type}>
             {getColumnRenderName(field)}

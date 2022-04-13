@@ -201,13 +201,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     if (isEmptyArray(drillPaths)) {
       drillOptionRef.current = undefined;
     }
-    if (
-      !isEmptyArray(drillPaths) &&
-      drillOptionRef.current
-        ?.getAllFields()
-        ?.map(p => p.uid)
-        .join('-') !== drillPaths.map(p => p.uid).join('-')
-    ) {
+    if (!isEmptyArray(drillPaths) && !drillOptionRef.current) {
       drillOptionRef.current = new ChartDrillOption(drillPaths);
     }
   }, [chartConfig?.datas, drillOptionRef]);
@@ -304,6 +298,20 @@ export const ChartEditor: FC<ChartEditorProps> = ({
 
   const handleChartConfigChange = useCallback(
     (type, payload) => {
+      const drillPaths = getDrillPaths(chartConfig?.datas);
+      if (isEmptyArray(drillPaths)) {
+        drillOptionRef.current = undefined;
+      }
+      if (
+        !isEmptyArray(drillPaths) &&
+        drillOptionRef.current
+          ?.getAllFields()
+          ?.map(p => p.uid)
+          .join('-') !== drillPaths.map(p => p.uid).join('-')
+      ) {
+        drillOptionRef.current = new ChartDrillOption(drillPaths);
+      }
+
       if (expensiveQuery) {
         dispatch(
           workbenchSlice.actions.updateChartConfig({

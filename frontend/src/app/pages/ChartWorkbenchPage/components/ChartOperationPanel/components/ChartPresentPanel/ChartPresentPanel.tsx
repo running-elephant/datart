@@ -18,8 +18,8 @@
 
 import { ReloadOutlined } from '@ant-design/icons';
 import { Col, Row, Table } from 'antd';
-import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
-import ChartSelectedDrillButton from 'app/components/ChartDrill/ChartSelectedDrillButton';
+import ChartDrill from 'app/components/ChartDrill/ChartDrill';
+import ChartSelectedDrill from 'app/components/ChartDrill/ChartSelectedDrill';
 import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContainer';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
@@ -44,6 +44,7 @@ import ChartTypeSelector, {
 } from './components/ChartTypeSelector';
 
 const CHART_TYPE_SELECTOR_HEIGHT_OFFSET = 50;
+const CHART_DRILL_HEIGHT_OFFSET = 24;
 
 const ChartPresentPanel: FC<{
   containerHeight?: number;
@@ -101,7 +102,8 @@ const ChartPresentPanel: FC<{
         width: containerWidth,
         height:
           (containerHeight || CHART_TYPE_SELECTOR_HEIGHT_OFFSET) -
-          CHART_TYPE_SELECTOR_HEIGHT_OFFSET,
+          CHART_TYPE_SELECTOR_HEIGHT_OFFSET -
+          CHART_DRILL_HEIGHT_OFFSET,
       };
 
       const containerId = chart?.isISOContainer
@@ -111,9 +113,9 @@ const ChartPresentPanel: FC<{
       return (
         <StyledReusableChartContainer>
           {ChartPresentType.GRAPH === chartType && (
-            <ChartDrillContextMenu>
+            <ChartDrill>
               {renderGraph(containerId, chart, chartConfig, style)}
-            </ChartDrillContextMenu>
+            </ChartDrill>
           )}
           {ChartPresentType.RAW === chartType && (
             <TableWrapper>
@@ -151,7 +153,7 @@ const ChartPresentPanel: FC<{
         )}
         <Row justify="end">
           <Col>
-            <ChartSelectedDrillButton />
+            <ChartSelectedDrill />
           </Col>
           <Col>
             <ChartTypeSelector

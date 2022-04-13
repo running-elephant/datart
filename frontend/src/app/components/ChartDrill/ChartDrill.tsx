@@ -24,7 +24,7 @@ import { FC, memo, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import ChartDrillPaths from './ChartDrillPaths';
 
-const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
+const ChartDrill: FC<{}> = memo(({ children }) => {
   const drillTranslator = useI18NPrefix(`viz.palette.drill`);
   const { drillOption, onDrillOptionChange } = useContext(ChartDatasetContext);
 
@@ -66,7 +66,7 @@ const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
   }, [drillOption, drillTranslator, onDrillOptionChange]);
 
   return (
-    <StyledChartDrillContextMenu>
+    <StyledChartDrill>
       <Dropdown
         disabled={!drillOption}
         overlay={contextMenu}
@@ -79,13 +79,13 @@ const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
           <ChartDrillPaths />
         </div>
       </Dropdown>
-    </StyledChartDrillContextMenu>
+    </StyledChartDrill>
   );
 });
 
-export default ChartDrillContextMenu;
+export default ChartDrill;
 
-const StyledChartDrillContextMenu = styled.div`
+const StyledChartDrill = styled.div`
   position: relative;
   height: 100%;
   width: 100%;

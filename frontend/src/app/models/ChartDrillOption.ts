@@ -43,6 +43,7 @@ export class ChartDrillOption implements IChartDrillOption {
 
   constructor(fields: ChartDataSectionField[]) {
     this.drillFields = fields;
+    this.clearAll();
   }
 
   public get mode() {
