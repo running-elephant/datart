@@ -104,7 +104,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     }, [boardId, editing, sortedLayoutWidgets]);
     return (
       <Wrap>
-        <StyledContainer bg={background} ref={ref}>
+        <StyledContainer bg={background}>
           {sortedLayoutWidgets.length ? (
             <div className="grid-wrap" ref={gridWrapRef}>
               <ReactGridLayout
@@ -119,6 +119,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
                 allowOverlap={allowOverlap}
                 measureBeforeMount={false}
                 useCSSTransforms={true}
+                innerRef={ref}
               >
                 {boardChildren}
               </ReactGridLayout>
