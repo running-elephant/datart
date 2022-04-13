@@ -47,6 +47,7 @@ import {
 } from 'app/utils/chartHelper';
 import { toPrecision } from 'app/utils/number';
 import { init } from 'echarts';
+import { UniqArray } from 'utils/object';
 import Chart from '../../../models/Chart';
 import { ChartRequirement } from '../../../types/ChartMetadata';
 import Config from './config';
@@ -155,9 +156,11 @@ class BasicBarChart extends Chart {
       {
         type: 'category',
         tooltip: { show: true },
-        data: chartDataSet?.map(row => {
-          return groupConfigs.map(g => row.getCell(g)).join('-');
-        }),
+        data: UniqArray(
+          chartDataSet?.map(row => {
+            return groupConfigs.map(g => row.getCell(g)).join('-');
+          }),
+        ),
       },
     ];
 
@@ -259,7 +262,6 @@ class BasicBarChart extends Chart {
       });
     }
 
-    const xAxisConfig = groupConfigs?.[0];
     const secondGroupInfos = getColorizeGroupSeriesColumns(
       chartDataSet,
       colorConfigs[0],
@@ -283,7 +285,9 @@ class BasicBarChart extends Chart {
           ),
           name: k,
           data: xAxisColumns?.[0]?.data?.map(d => {
-            const row = dataSet.find(r => r.getCell(xAxisConfig) === d)!;
+            const row = dataSet.find(
+              r => r.getMultiCell(...groupConfigs) === d,
+            )!;
             return {
               ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),
