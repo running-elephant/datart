@@ -43,6 +43,9 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     const boardConfig = useContext(BoardConfigContext);
     const { background, allowOverlap } = boardConfig;
     const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
+    const { curMargin, curPadding } = useMemo(() => {
+      return getBoardMarginPadding(boardConfig, colsKey);
+    }, [boardConfig, colsKey]);
     const { gridWrapRef, thEmitScroll } = useBoardScroll(boardId);
     const selectLayoutWidgetsConfigById = useMemo(
       selectLayoutWidgetMapById,
@@ -51,20 +54,15 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
       selectLayoutWidgetsConfigById(state, boardId),
     );
+    const layoutMap = useGridLayoutMap(layoutWidgetMap);
 
     const sortedLayoutWidgets = useMemo(
       () =>
         Object.values(layoutWidgetMap).sort(
           (a, b) => a.config.index - b.config.index,
         ),
-
       [layoutWidgetMap],
     );
-
-    const { curMargin, curPadding } = useMemo(() => {
-      return getBoardMarginPadding(boardConfig, colsKey);
-    }, [boardConfig, colsKey]);
-    const layoutMap = useGridLayoutMap(layoutWidgetMap);
 
     const onLayoutChange = useCallback(
       (layouts: Layout[]) => {

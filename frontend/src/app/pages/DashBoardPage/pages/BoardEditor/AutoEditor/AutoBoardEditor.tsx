@@ -62,10 +62,19 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const { deviceType } = useContext(BoardInfoContext);
 
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
+  const layoutMap = useGridLayoutMap(layoutWidgetMap);
   const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
+
+  const { curMargin, curPadding } = useMemo(() => {
+    return getBoardMarginPadding(boardConfig, colsKey);
+  }, [boardConfig, colsKey]);
+
   const currentLayout = useRef<Layout[]>([]);
+
   const { gridWrapRef, thEmitScroll } = useBoardScroll(boardId);
+
   const [curWH, setCurWH] = useState<number[]>([]);
+
   const updateCurWH = useCallback((values: number[]) => {
     setCurWH(values);
     setImmediate(() => {
@@ -81,12 +90,6 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
 
     [layoutWidgetMap],
   );
-
-  const { curMargin, curPadding } = useMemo(() => {
-    return getBoardMarginPadding(boardConfig, colsKey);
-  }, [boardConfig, colsKey]);
-
-  const layoutMap = useGridLayoutMap(layoutWidgetMap);
 
   const changeWidgetLayouts = debounce((layouts: Layout[]) => {
     dispatch(
