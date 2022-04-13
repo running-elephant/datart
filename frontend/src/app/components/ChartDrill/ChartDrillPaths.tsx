@@ -31,7 +31,7 @@ const ChartDrillPaths: FC<{}> = memo(() => {
     return <div></div>;
   }
 
-  const drillFields = drillOption.getAllDrillFields();
+  const drillFields = drillOption.getAllFields();
   return (
     <StyledChartDrillPaths>
       <Breadcrumb>
@@ -39,7 +39,7 @@ const ChartDrillPaths: FC<{}> = memo(() => {
           return (
             <StyledDrillNode
               isActive={Boolean(
-                drillOption?.getFields()?.some(df => df.uid === f.uid),
+                drillOption?.getCurrentFields()?.some(df => df.uid === f.uid),
               )}
               onClick={() => {
                 if (drillOption.mode === DrillMode.Drill) {

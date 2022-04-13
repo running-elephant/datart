@@ -23,7 +23,7 @@ import { ChartLifecycle } from 'app/constants';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
-import { DrillOption } from 'app/types/ChartDrillOption';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
@@ -43,7 +43,7 @@ const ChartIFrameLifecycleAdapter: FC<{
   config: ChartConfig;
   style: CSSProperties;
   isShown?: boolean;
-  drillOption?: DrillOption;
+  drillOption?: IChartDrillOption;
   widgetSpecialConfig?: any;
 }> = ({
   dataset,

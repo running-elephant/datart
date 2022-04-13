@@ -29,7 +29,7 @@ const ChartSelectedDrillButton: FC<{ fontSize?: string /** eg. 32px */ }> =
     const { drillOption, onDrillOptionChange } =
       useContext(ChartDatasetContext);
 
-    if (!drillOption?.canSelect()) {
+    if (!drillOption?.canSelect) {
       return <div></div>;
     }
 
@@ -37,7 +37,7 @@ const ChartSelectedDrillButton: FC<{ fontSize?: string /** eg. 32px */ }> =
       <StyledChartSelectedDrillButton
         fontSize={fontSize || FONT_SIZE_HEADING}
         className={classnames({
-          active: drillOption?.isSelectedDrill(),
+          active: drillOption?.isSelectedDrill,
         })}
         onClick={() => {
           if (drillOption) {

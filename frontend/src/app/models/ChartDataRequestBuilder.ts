@@ -146,7 +146,7 @@ export class ChartDataRequestBuilder {
             if (
               !this.drillOption ||
               this.drillOption?.mode === DrillMode.Normal ||
-              !this.drillOption?.getFields()
+              !this.drillOption?.getCurrentFields()
             ) {
               return acc.concat(cur.rows?.[0] || []);
             }
@@ -154,7 +154,7 @@ export class ChartDataRequestBuilder {
               cur.rows?.filter(field => {
                 return Boolean(
                   this.drillOption
-                    ?.getFields()
+                    ?.getCurrentFields()
                     ?.some(df => df.uid === field.uid),
                 );
               }) || [],
@@ -288,7 +288,7 @@ export class ChartDataRequestBuilder {
 
   private normalizeDrillFilters(): ChartDataRequestFilter[] {
     return (this.drillOption
-      ?.getDrillFields()
+      ?.getAllDrillFields()
       .filter(field => Boolean(field.condition))
       .map(f => {
         return {

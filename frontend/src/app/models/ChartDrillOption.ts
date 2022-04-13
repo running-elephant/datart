@@ -17,6 +17,7 @@
  */
 
 import { ChartDataSectionField, FilterCondition } from 'app/types/ChartConfig';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { FilterSqlOperator } from 'globalConstants';
 import { isEmptyArray } from 'utils/object';
 import { ConditionBuilder } from './ChartFilterCondition';
@@ -27,7 +28,7 @@ export enum DrillMode {
   Expand = 'expand',
 }
 
-export class ChartDrillOption {
+export class ChartDrillOption implements IChartDrillOption {
   private cursor: number = -1;
   private isSelected = false;
   private drillFields: ChartDataSectionField[] = [];
@@ -53,27 +54,27 @@ export class ChartDrillOption {
     return DrillMode.Normal;
   }
 
+  public get isSelectedDrill() {
+    return this.isSelected;
+  }
+
+  public get canSelect() {
+    return isEmptyArray(this.expandDownFields);
+  }
+
   public toggleSelectedDrill() {
     this.isSelected = !this.isSelected;
   }
 
-  public canSelect() {
-    return isEmptyArray(this.expandDownFields);
-  }
-
-  public isSelectedDrill() {
-    return this.isSelected;
-  }
-
-  public getAllDrillFields() {
+  public getAllFields() {
     return this.drillFields;
   }
 
-  public getDrillFields() {
+  public getAllDrillFields() {
     return this.drillDownFields;
   }
 
-  public getFields(): ChartDataSectionField[] | undefined {
+  public getCurrentFields(): ChartDataSectionField[] | undefined {
     return this.cursor === -1
       ? undefined
       : this.mode === DrillMode.Drill

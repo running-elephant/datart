@@ -201,7 +201,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     if (
       !isEmptyArray(drillPaths) &&
       drillOptionRef.current
-        ?.getAllDrillFields()
+        ?.getAllFields()
         ?.map(p => p.uid)
         .join('-') !== drillPaths.map(p => p.uid).join('-')
     ) {
@@ -215,7 +215,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         {
           name: 'click',
           callback: param => {
-            if (drillOptionRef.current?.isSelectedDrill()) {
+            if (drillOptionRef.current?.isSelectedDrill) {
               const option = drillOptionRef.current;
               option.drillDown(param.data.rowData);
               drillOptionRef.current = option;

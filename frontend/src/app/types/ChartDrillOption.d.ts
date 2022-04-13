@@ -16,6 +16,22 @@
  * limitations under the License.
  */
 
-export type DrillOption = {
-  current: number;
-};
+import { ChartDataSectionField } from 'app/types/ChartConfig';
+
+export interface IChartDrillOption {
+  mode: DrillMode;
+  isSelectedDrill: boolean;
+  canSelect: boolean;
+  toggleSelectedDrill(): void;
+  getAllFields(): ChartDataSectionField[];
+  getAllDrillFields(): Array<{
+    field: ChartDataSectionField;
+    condition?: FilterCondition;
+  }>;
+  getCurrentFields(): ChartDataSectionField[] | undefined;
+  drillDown(filterData?: { [key in string]: any }): void;
+  expandDown(): void;
+  drillUp(field?: ChartDataSectionField): void;
+  expandUp(field?: ChartDataSectionField): void;
+  rollUp(): void;
+}

@@ -1549,15 +1549,15 @@ export const getDrillableRows = (
         if (
           !option ||
           option?.mode === DrillMode.Normal ||
-          !option?.getFields()
+          !option?.getCurrentFields()
         ) {
           return config.rows?.[0] || [];
         }
         return (
           config.rows?.filter(
             f =>
-              !option?.getFields() ||
-              Boolean(option?.getFields()?.some(df => df.uid === f.uid)),
+              !option?.getCurrentFields() ||
+              Boolean(option?.getCurrentFields()?.some(df => df.uid === f.uid)),
           ) || []
         );
       }

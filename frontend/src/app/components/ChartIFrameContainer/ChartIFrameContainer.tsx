@@ -23,7 +23,7 @@ import {
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
-import { DrillOption } from 'app/types/ChartDrillOption';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { FC, memo } from 'react';
 import { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
@@ -37,7 +37,7 @@ const ChartIFrameContainer: FC<{
   width?: any;
   height?: any;
   isShown?: boolean;
-  drillOption?: DrillOption;
+  drillOption?: IChartDrillOption;
   widgetSpecialConfig?: any;
 }> = memo(props => {
   const iframeContainerId = `chart-iframe-root-${props.containerId}`;
