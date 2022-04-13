@@ -31,7 +31,7 @@ import { useDispatch } from 'react-redux';
 import useResizeObserver from './useResizeObserver';
 
 export const useGridWidgetHeight = () => {
-  const { boardId, renderMode } = useContext(BoardContext);
+  const { boardId, editing } = useContext(BoardContext);
   const dispatch = useDispatch();
   const [colsKey, setColsKey] = useState<ColsKeyType>(LAYOUT_COLS_KEYS[0]);
   const [cacheW, setCacheW] = useState(0);
@@ -46,13 +46,13 @@ export const useGridWidgetHeight = () => {
       } else {
         setColsKey('lg');
       }
-      // if (renderMode === 'schedule') {
-      dispatch(
-        boardActions.setBoardWidthHeight({ boardId, wh: [width, height] }),
-      );
-      // }
+      if (!editing) {
+        dispatch(
+          boardActions.setBoardWidthHeight({ boardId, wh: [width, height] }),
+        );
+      }
     }
-  }, [width, height, dispatch, boardId]);
+  }, [width, height, dispatch, boardId, editing]);
 
   const widgetRowHeight = useMemo(() => {
     let dynamicHeight = (cacheW * BASE_ROW_HEIGHT) / BASE_VIEW_WIDTH;

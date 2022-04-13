@@ -22,7 +22,7 @@ import { BoardContext } from '../components/BoardProvider/BoardProvider';
 import { boardActions } from '../pages/Board/slice';
 
 export default function useBoardWidthHeight() {
-  const { boardId, renderMode } = useContext(BoardContext);
+  const { boardId, editing } = useContext(BoardContext);
 
   const dispatch = useDispatch();
 
@@ -38,12 +38,12 @@ export default function useBoardWidthHeight() {
   useEffect(() => {
     const width = gridWidth;
     const height = gridHeight;
-    // TODO in only in  scheduleJob
-    // if (renderMode === 'schedule') {
-    dispatch(
-      boardActions.setBoardWidthHeight({ boardId, wh: [width, height] }),
-    );
-    // }
-  }, [gridHeight, dispatch, boardId, gridWidth]);
+    // TODO in only in  editing
+    if (!editing) {
+      dispatch(
+        boardActions.setBoardWidthHeight({ boardId, wh: [width, height] }),
+      );
+    }
+  }, [gridHeight, dispatch, boardId, gridWidth, editing]);
   return { gridRef };
 }
