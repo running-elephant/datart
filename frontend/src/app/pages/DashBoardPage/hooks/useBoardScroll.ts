@@ -15,23 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useGridWidgetHeight } from 'app/hooks/useGridWidgetHeight';
 import throttle from 'lodash/throttle';
 import { RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
-import { Layout } from 'react-grid-layout';
 import { boardScroll } from '../pages/BoardEditor/slice/events';
-export default function useAutoBoardRenderItem(boardId: string) {
-  const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
+export default function useBoardScroll(boardId: string) {
+  const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
 
   const onEmitScroll = useCallback(() => {
     if (boardId) {
       boardScroll.emit(boardId);
     }
   }, [boardId]);
-
-  const currentLayout = useRef<Layout[]>([]);
-
-  const gridWrapRef: RefObject<HTMLDivElement> = useRef(null);
 
   const thEmitScroll = useMemo(
     () => throttle(onEmitScroll, 50),
@@ -40,23 +34,17 @@ export default function useAutoBoardRenderItem(boardId: string) {
 
   useEffect(() => {
     setImmediate(() => {
-      if (gridWrapRef.current) {
-        gridWrapRef.current.addEventListener('scroll', thEmitScroll, false);
-      }
+      if (!gridWrapRef.current) return;
+      gridWrapRef.current.addEventListener('scroll', thEmitScroll, false);
     });
-    // window.addEventListener('resize', thEmitScroll, false);
     return () => {
-      gridWrapRef?.current?.removeEventListener('scroll', thEmitScroll, false);
-      // window.removeEventListener('resize', thEmitScroll, false);
+      if (!gridWrapRef.current) return;
+      gridWrapRef.current.removeEventListener('scroll', thEmitScroll, false);
     };
   }, [thEmitScroll]);
 
   return {
-    ref,
     gridWrapRef,
-    currentLayout,
-    widgetRowHeight,
     thEmitScroll,
-    colsKey,
   };
 }

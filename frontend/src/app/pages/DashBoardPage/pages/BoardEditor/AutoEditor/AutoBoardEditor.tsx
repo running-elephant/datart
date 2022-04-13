@@ -17,6 +17,7 @@
  */
 
 import { Empty } from 'antd';
+import { useGridWidgetHeight } from 'app/hooks/useGridWidgetHeight';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
@@ -25,13 +26,20 @@ import {
   LAYOUT_COLS_MAP,
   WIDGET_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
-import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
+import useBoardScroll from 'app/pages/DashBoardPage/hooks/useBoardScroll';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
 import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getBoardMarginPadding } from 'app/pages/DashBoardPage/utils/board';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import debounce from 'lodash/debounce';
-import React, { memo, useCallback, useContext, useMemo, useState } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import RGL, { Layout, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useDispatch, useSelector } from 'react-redux';
@@ -54,7 +62,9 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const { deviceType } = useContext(BoardInfoContext);
 
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
-
+  const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
+  const currentLayout = useRef<Layout[]>([]);
+  const { gridWrapRef, thEmitScroll } = useBoardScroll(boardId);
   const [curWH, setCurWH] = useState<number[]>([]);
   const updateCurWH = useCallback((values: number[]) => {
     setCurWH(values);
@@ -71,15 +81,6 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
 
     [layoutWidgetMap],
   );
-
-  const {
-    ref,
-    gridWrapRef,
-    currentLayout,
-    widgetRowHeight,
-    thEmitScroll,
-    colsKey,
-  } = useAutoBoardRenderItem(boardId);
 
   const { curMargin, curPadding } = useMemo(() => {
     return getBoardMarginPadding(boardConfig, colsKey);
