@@ -18,8 +18,8 @@
 
 import {
   ChartDataViewFieldCategory,
-  DataViewFieldType,
   ControllerFacadeTypes,
+  DataViewFieldType,
   TimeFilterValueCategory,
 } from 'app/constants';
 import {
@@ -36,7 +36,6 @@ import moment from 'moment';
 import {
   adaptBoardImageUrl,
   adjustRangeDataEndValue,
-  checkLinkAndJumpErr,
   convertImageUrl,
   fillPx,
   getBackgroundImage,
@@ -1880,27 +1879,5 @@ describe('getDefaultWidgetName', () => {
   });
   it('should other', () => {
     expect(getDefaultWidgetName('other' as any, 'query', 3)).toEqual('xxx3');
-  });
-});
-
-describe('checkLinkAndJumpErr', () => {
-  it('should linkageError', () => {
-    const widget1 = {
-      config: { linkageConfig: { open: true } },
-      relations: [],
-    } as any;
-    expect(checkLinkAndJumpErr(widget1, [''])).toBe('viz.linkage.linkageError');
-  });
-  it('should jumpError', () => {
-    const widget2 = {
-      config: {
-        jumpConfig: {
-          open: true,
-          targetType: 'INTERNAL',
-          target: { relId: 'id123' },
-        },
-      },
-    } as any;
-    expect(checkLinkAndJumpErr(widget2, [])).toBe('viz.jump.jumpError');
   });
 });

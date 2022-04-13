@@ -16,11 +16,9 @@
  * limitations under the License.
  */
 
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useResizeObserver from 'app/hooks/useResizeObserver';
-import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
-import { FC, memo, useEffect, useMemo, useState } from 'react';
+import { FC, memo, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
@@ -30,15 +28,11 @@ import TitleHeader from '../../components/BoardHeader/ViewHeader';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardInitProvider } from '../../components/BoardProvider/BoardInitProvider';
 import { FullScreenPanel } from '../../components/FullScreenPanel/FullScreenPanel';
-import { checkLinkAndJumpErr } from '../../utils';
 import { editDashBoardInfoActions } from '../BoardEditor/slice';
 import { AutoBoardCore } from './AutoDashboard/AutoBoardCore';
 import { FreeBoardCore } from './FreeDashboard/FreeBoardCore';
 import { boardActions } from './slice';
-import {
-  makeSelectBoardConfigById,
-  selectBoardWidgetMapById,
-} from './slice/selector';
+import { makeSelectBoardConfigById } from './slice/selector';
 import { fetchBoardDetail } from './slice/thunk';
 import { BoardState, VizRenderMode } from './slice/types';
 
@@ -71,7 +65,6 @@ export const Board: FC<BoardProps> = memo(
     const history = useHistory();
     const boardId = id;
     const dispatch = useDispatch();
-    const t = useI18NPrefix();
 
     const ReadBoardHide = history.location.pathname.includes('boardEditor');
     const { ref, width, height } = useResizeObserver<HTMLDivElement>({
@@ -82,23 +75,12 @@ export const Board: FC<BoardProps> = memo(
     const dashboard = useSelector((state: { board: BoardState }) =>
       makeSelectBoardConfigById()(state, boardId),
     );
-    const vizs = useSelector(selectVizs);
-    const [folderId, setFolderId] = useState<any[]>([]);
-    const BoardWidgetMap = useSelector((state: { board: BoardState }) =>
-      selectBoardWidgetMapById(state, boardId),
-    );
 
     const searchParams = useMemo(() => {
       return filterSearchUrl
         ? urlSearchTransfer.toParams(filterSearchUrl)
         : undefined;
     }, [filterSearchUrl]);
-
-    const propsFolderIds = useMemo(() => {
-      return vizs?.map(folder => {
-        return folder.relId;
-      });
-    }, [vizs]);
 
     const viewBoard = useMemo(() => {
       if (ReadBoardHide) return null;
@@ -173,27 +155,6 @@ export const Board: FC<BoardProps> = memo(
         dispatch(boardActions.clearBoardStateById(boardId));
       };
     }, [ReadBoardHide, boardId, dispatch, fetchData, searchParams]);
-
-    useEffect(() => {
-      if (folderId.length !== propsFolderIds?.length) {
-        setFolderId(propsFolderIds);
-      }
-    }, [propsFolderIds, folderId.length]);
-
-    useEffect(() => {
-      let WidgetMapValue = Object.values(BoardWidgetMap);
-      WidgetMapValue?.forEach(v => {
-        let errInfo = checkLinkAndJumpErr(v, folderId);
-        dispatch(
-          boardActions.setWidgetErrInfo({
-            boardId: v.dashboardId,
-            widgetId: v.id,
-            errInfo: t(errInfo),
-            errorType: 'interaction',
-          }),
-        );
-      });
-    }, [folderId, BoardWidgetMap, dispatch, t]);
 
     return (
       <Wrapper ref={ref} className="dashboard-box">
