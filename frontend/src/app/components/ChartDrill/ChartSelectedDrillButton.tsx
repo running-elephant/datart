@@ -29,6 +29,10 @@ const ChartSelectedDrillButton: FC<{ fontSize?: string /** eg. 32px */ }> =
     const { drillOption, onDrillOptionChange } =
       useContext(ChartDatasetContext);
 
+    if (!drillOption?.canSelect()) {
+      return <div></div>;
+    }
+
     return (
       <StyledChartSelectedDrillButton
         fontSize={fontSize || FONT_SIZE_HEADING}

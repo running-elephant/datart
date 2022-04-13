@@ -57,6 +57,10 @@ export class ChartDrillOption {
     this.isSelected = !this.isSelected;
   }
 
+  public canSelect() {
+    return isEmptyArray(this.expandDownFields);
+  }
+
   public isSelectedDrill() {
     return this.isSelected;
   }
@@ -98,6 +102,7 @@ export class ChartDrillOption {
   }
 
   public expandDown() {
+    this.isSelected = false;
     if (this.drillFields.length === this.cursor + 2) {
       return;
     }
@@ -125,6 +130,9 @@ export class ChartDrillOption {
     } else {
       this.cursor--;
       this.drillDownFields.pop();
+      if (isEmptyArray(this.drillDownFields)) {
+        this.clearAll();
+      }
     }
   }
 
@@ -145,19 +153,23 @@ export class ChartDrillOption {
     } else {
       this.cursor--;
       this.expandDownFields.pop();
+      if (isEmptyArray(this.expandDownFields)) {
+        this.clearAll();
+      }
     }
   }
 
-  public rollUp(field?: ChartDataSectionField) {
+  public rollUp() {
     if (this.mode === DrillMode.Drill) {
-      return this.drillUp(field);
+      return this.drillUp();
     } else if (this.mode === DrillMode.Expand) {
-      return this.expandUp(field);
+      return this.expandUp();
     }
   }
 
   private clearAll() {
     this.cursor = -1;
+    this.isSelected = false;
     this.drillDownFields = [];
     this.expandDownFields = [];
   }
