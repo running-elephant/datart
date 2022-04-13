@@ -22,9 +22,8 @@ import { DrillMode } from 'app/models/ChartDrillOption';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { FC, memo, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
-import ChartDrillPaths from './ChartDrillPaths';
 
-const ChartDrill: FC<{}> = memo(({ children }) => {
+const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
   const t = useI18NPrefix(`viz.palette.drill`);
   const { drillOption, onDrillOptionChange } = useContext(ChartDrillContext);
 
@@ -88,7 +87,7 @@ const ChartDrill: FC<{}> = memo(({ children }) => {
   }, [drillOption, t, onDrillOptionChange]);
 
   return (
-    <StyledChartDrill>
+    <StyledChartDrill className="chart-drill-menu-container">
       <Dropdown
         disabled={!drillOption}
         overlay={contextMenu}
@@ -96,19 +95,15 @@ const ChartDrill: FC<{}> = memo(({ children }) => {
         trigger={['contextMenu']}
         getPopupContainer={triggerNode => triggerNode}
       >
-        <div style={{ height: '100%' }}>
-          {children}
-          <ChartDrillPaths />
-        </div>
+        <div style={{ height: '100%' }}>{children}</div>
       </Dropdown>
     </StyledChartDrill>
   );
 });
 
-export default ChartDrill;
+export default ChartDrillContextMenu;
 
 const StyledChartDrill = styled.div`
   position: relative;
-  height: 100%;
   width: 100%;
 `;

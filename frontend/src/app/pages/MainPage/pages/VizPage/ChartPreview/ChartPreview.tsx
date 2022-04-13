@@ -17,8 +17,8 @@
  */
 
 import { message, Spin } from 'antd';
-import ChartDrill from 'app/components/ChartDrill/ChartDrill';
-import ChartSelectedDrill from 'app/components/ChartDrill/ChartSelectedDrill';
+import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
+import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { VizHeader } from 'app/components/VizHeader';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
@@ -398,7 +398,7 @@ const ChartPreviewBoard: FC<{
             </div>
             <ChartWrapper ref={ref}>
               <Spin wrapperClassName="spinWrapper" spinning={loadingStatus}>
-                <ChartDrill>
+                <ChartDrillContextMenu>
                   <ChartIFrameContainer
                     key={backendChartId}
                     containerId={backendChartId}
@@ -408,9 +408,10 @@ const ChartPreviewBoard: FC<{
                     width={cacheW}
                     height={cacheH}
                   />
-                </ChartDrill>
+                </ChartDrillContextMenu>
               </Spin>
             </ChartWrapper>
+            <ChartDrillPaths />
           </ChartDrillContext.Provider>
         </PreviewBlock>
       </StyledChartPreviewBoard>
@@ -436,6 +437,9 @@ const PreviewBlock = styled.div`
   padding: ${SPACE_LG};
   overflow: hidden;
   box-shadow: ${p => p.theme.shadowBlock};
+  .chart-drill-path {
+    background-color: ${p => p.theme.componentBackground};
+  }
 `;
 
 const ChartWrapper = styled.div`
@@ -444,6 +448,9 @@ const ChartWrapper = styled.div`
   flex: 1;
   background-color: ${p => p.theme.componentBackground};
   border-radius: ${BORDER_RADIUS};
+  .chart-drill-menu-container {
+    height: 100%;
+  }
   .spinWrapper {
     width: 100%;
     height: 100%;
