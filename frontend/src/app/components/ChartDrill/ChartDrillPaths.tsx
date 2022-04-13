@@ -18,14 +18,14 @@
 
 import { Breadcrumb } from 'antd';
 import { DrillMode } from 'app/models/ChartDrillOption';
-import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
+import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_TIMES } from 'styles/StyleConstants';
 
 const ChartDrillPaths: FC<{}> = memo(() => {
-  const { drillOption, onDrillOptionChange } = useContext(ChartDatasetContext);
+  const { drillOption, onDrillOptionChange } = useContext(ChartDrillContext);
 
   if (!drillOption || drillOption.mode === DrillMode.Normal) {
     return <div></div>;

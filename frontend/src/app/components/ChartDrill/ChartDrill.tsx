@@ -19,14 +19,14 @@
 import { Dropdown, Menu } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { DrillMode } from 'app/models/ChartDrillOption';
-import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
+import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { FC, memo, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import ChartDrillPaths from './ChartDrillPaths';
 
 const ChartDrill: FC<{}> = memo(({ children }) => {
   const drillTranslator = useI18NPrefix(`viz.palette.drill`);
-  const { drillOption, onDrillOptionChange } = useContext(ChartDatasetContext);
+  const { drillOption, onDrillOptionChange } = useContext(ChartDrillContext);
 
   const contextMenu = useMemo(() => {
     return (

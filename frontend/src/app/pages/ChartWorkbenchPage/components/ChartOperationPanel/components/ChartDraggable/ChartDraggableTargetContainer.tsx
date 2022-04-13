@@ -27,6 +27,7 @@ import useFieldActionModal from 'app/hooks/useFieldActionModal';
 import ChartAggregationContext from 'app/pages/ChartWorkbenchPage/contexts/ChartAggregationContext';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import VizDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
+import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { getColumnRenderName } from 'app/utils/chartHelper';
@@ -65,7 +66,8 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     translate: t = (...args) => args?.[0],
     onConfigChanged,
   }) {
-    const { dataset, drillOption } = useContext(ChartDatasetContext);
+    const { dataset } = useContext(ChartDatasetContext);
+    const { drillOption } = useContext(ChartDrillContext);
     const { dataView } = useContext(VizDataViewContext);
     const [currentConfig, setCurrentConfig] = useState(config);
     const [showModal, contextHolder] = useFieldActionModal({

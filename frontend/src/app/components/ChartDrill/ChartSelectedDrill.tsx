@@ -17,7 +17,7 @@
  */
 
 import { ArrowDownOutlined } from '@ant-design/icons';
-import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
+import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import classnames from 'classnames';
 import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
@@ -26,8 +26,7 @@ import { IW } from '../IconWrapper';
 
 const ChartSelectedDrill: FC<{ fontSize?: string /** eg. 32px */ }> = memo(
   ({ fontSize }) => {
-    const { drillOption, onDrillOptionChange } =
-      useContext(ChartDatasetContext);
+    const { drillOption, onDrillOptionChange } = useContext(ChartDrillContext);
 
     return (
       <StyledChartSelectedDrill
