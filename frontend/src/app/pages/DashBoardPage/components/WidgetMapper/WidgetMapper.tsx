@@ -19,7 +19,7 @@ import { memo, useContext } from 'react';
 import { BoardType, MediaWidgetType } from '../../pages/Board/slice/types';
 import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
-import { ControllerWidget } from '../Widgets/ControlWidget/ControlWidget';
+import { ControllerWidget } from '../Widgets/ControllerWidget/ControllerWidget';
 import { DataChartWidget } from '../Widgets/DataChartWidget/DataChartWidget';
 import { IframeWidget } from '../Widgets/IframeWidget/IframeWidget';
 import { ImageWidget } from '../Widgets/ImageWidget/ImageWidget';

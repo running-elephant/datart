@@ -23,7 +23,7 @@ import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
-import { LockFnIcon } from '../../WidgetComponents/StatusIcon';
+import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
@@ -58,7 +58,7 @@ export const QueryBtnWidget: React.FC<{}> = memo(() => {
       {editing && <EditMask />}
       <StyledWidgetToolBar>
         <Space size={0}>
-          <LockFnIcon
+          <LockIconFn
             boardEditing={editing}
             wid={widget.id}
             lock={widget.config?.lock}

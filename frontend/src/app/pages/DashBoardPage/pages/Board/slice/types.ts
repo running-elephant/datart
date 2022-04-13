@@ -193,8 +193,7 @@ export interface WidgetInfo {
   inLinking: boolean; //是否在触发联动
   selected: boolean;
   pageInfo: Partial<PageInfo>;
-  errInfo: { [propName: string]: string };
-  selectItems?: string[];
+  errInfo: Record<WidgetErrorType, string>;
   parameters?: any;
 }
 export interface WidgetData {
@@ -480,3 +479,5 @@ export interface getDataOption {
   pageInfo?: Partial<PageInfo>;
   sorters?: Array<{ column: string; operator?: string; aggOperator?: string }>;
 }
+
+export type WidgetErrorType = 'request' | 'interaction';
