@@ -800,6 +800,9 @@
       "drill": {
         "showNextLevel": "Show Next Level",
         "expandNextLevel": "Expand Next Level",
+        "selectDrillStatus": "Mouse Click Drill Status",
+        "enable": "Enable",
+        "disable": "Disable",
         "rollUp": "Roll Up"
       }
     },

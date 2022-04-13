@@ -151,9 +151,6 @@ const ChartPresentPanel: FC<{
         )}
         <Row justify="end">
           <Col>
-            <ChartSelectedDrill />
-          </Col>
-          <Col>
             <ChartTypeSelector
               type={chartType}
               translate={translate}

@@ -63,8 +63,12 @@ export class ChartDrillOption implements IChartDrillOption {
     return isEmptyArray(this.expandDownFields);
   }
 
-  public toggleSelectedDrill() {
-    this.isSelected = !this.isSelected;
+  public toggleSelectedDrill(enable?: boolean) {
+    if (enable !== undefined) {
+      this.isSelected = Boolean(enable);
+    } else {
+      this.isSelected = !this.isSelected;
+    }
   }
 
   public getAllFields() {

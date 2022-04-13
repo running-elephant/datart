@@ -395,7 +395,6 @@ const ChartPreviewBoard: FC<{
                 chartConfig={chartPreview?.chartConfig}
                 onChange={handleFilterChange}
               />
-              <ChartSelectedDrill />
             </div>
             <ChartWrapper ref={ref}>
               <Spin wrapperClassName="spinWrapper" spinning={loadingStatus}>

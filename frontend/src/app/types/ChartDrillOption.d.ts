@@ -22,7 +22,7 @@ export interface IChartDrillOption {
   mode: DrillMode;
   isSelectedDrill: boolean;
   canSelect: boolean;
-  toggleSelectedDrill(): void;
+  toggleSelectedDrill(enable?: boolean): void;
   getAllFields(): ChartDataSectionField[];
   getAllDrillFields(): Array<{
     field: ChartDataSectionField;

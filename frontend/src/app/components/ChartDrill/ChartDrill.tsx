@@ -25,7 +25,7 @@ import styled from 'styled-components/macro';
 import ChartDrillPaths from './ChartDrillPaths';
 
 const ChartDrill: FC<{}> = memo(({ children }) => {
-  const drillTranslator = useI18NPrefix(`viz.palette.drill`);
+  const t = useI18NPrefix(`viz.palette.drill`);
   const { drillOption, onDrillOptionChange } = useContext(ChartDrillContext);
 
   const contextMenu = useMemo(() => {
@@ -36,7 +36,17 @@ const ChartDrill: FC<{}> = memo(({ children }) => {
           if (!drillOption) {
             return;
           }
-          if (key === DrillMode.Drill) {
+          if (key === 'enable') {
+            if (!drillOption?.isSelectedDrill) {
+              drillOption?.toggleSelectedDrill(true);
+              onDrillOptionChange?.(drillOption);
+            }
+          } else if (key === 'disable') {
+            if (drillOption?.isSelectedDrill) {
+              drillOption?.toggleSelectedDrill(false);
+              onDrillOptionChange?.(drillOption);
+            }
+          } else if (key === DrillMode.Drill) {
             drillOption?.drillDown();
             onDrillOptionChange?.(drillOption);
           } else if (key === DrillMode.Expand) {
@@ -48,22 +58,34 @@ const ChartDrill: FC<{}> = memo(({ children }) => {
           }
         }}
       >
-        <Menu.Item key={'rollUp'}>{drillTranslator('rollUp')}</Menu.Item>
+        <Menu.Item key={'rollUp'}>{t('rollUp')}</Menu.Item>
         <Menu.Item
           disabled={drillOption?.mode === DrillMode.Expand}
           key={DrillMode.Drill}
         >
-          {drillTranslator('showNextLevel')}
+          {t('showNextLevel')}
         </Menu.Item>
         <Menu.Item
           disabled={drillOption?.mode === DrillMode.Drill}
           key={DrillMode.Expand}
         >
-          {drillTranslator('expandNextLevel')}
+          {t('expandNextLevel')}
         </Menu.Item>
+        <Menu.SubMenu
+          disabled={drillOption?.mode === DrillMode.Expand}
+          key="selectDrillStatus"
+          title={t('selectDrillStatus')}
+        >
+          <Menu.Item key="enable" disabled={drillOption?.isSelectedDrill}>
+            {t('enable')}
+          </Menu.Item>
+          <Menu.Item key="disable" disabled={!drillOption?.isSelectedDrill}>
+            {t('disable')}
+          </Menu.Item>
+        </Menu.SubMenu>
       </Menu>
     );
-  }, [drillOption, drillTranslator, onDrillOptionChange]);
+  }, [drillOption, t, onDrillOptionChange]);
 
   return (
     <StyledChartDrill>
