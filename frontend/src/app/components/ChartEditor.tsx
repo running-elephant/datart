@@ -479,7 +479,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           },
         ],
         fileName: backendChart?.name || 'chart',
-        downloadType: DownloadFileType.pdf,
+        downloadType: DownloadFileType.Pdf,
         resolve: () => {
           dispatch(actions.setChartEditorDownloadPolling(true));
         },

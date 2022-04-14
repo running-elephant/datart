@@ -19,16 +19,15 @@
 import { DownloadFileType } from 'app/constants';
 import { generateShareLinkAsync } from 'app/utils/fetch';
 import { createContext, FC, memo, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
-import { selectVizs } from '../../../MainPage/pages/VizPage/slice/selectors';
 import { BOARD_UNDO } from '../../constants';
 import { boardDownLoadAction } from '../../pages/Board/slice/asyncActions';
-import { selectShareBoardInfo } from '../../pages/Board/slice/selector';
 import { fetchBoardDetail } from '../../pages/Board/slice/thunk';
 import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 import { clearEditBoardState } from '../../pages/BoardEditor/slice/actions/actions';
 import { toUpdateDashboard } from '../../pages/BoardEditor/slice/thunk';
+
 export interface BoardActionContextProps {
   // read
   onGenerateShareLink?: ({
@@ -60,8 +59,6 @@ export const BoardActionProvider: FC<{
 }> = memo(({ boardId, children }) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const vizs = useSelector(selectVizs);
-  const shareBoardInfo = useSelector(selectShareBoardInfo);
 
   const actions = useMemo(() => {
     const actionObj: BoardActionContextProps = {
@@ -90,15 +87,10 @@ export const BoardActionProvider: FC<{
         return result;
       },
       onBoardToDownLoad: downloadType => {
-        const folderId = vizs.filter(v => v.relId === boardId)[0].id;
-        const { boardWidthHeight } = shareBoardInfo;
-
         dispatch(
           boardDownLoadAction({
             boardId,
             downloadType,
-            folderId,
-            imageWidth: boardWidthHeight[0],
           }),
         );
       },
@@ -118,7 +110,7 @@ export const BoardActionProvider: FC<{
       },
     };
     return actionObj;
-  }, [boardId, dispatch, history, vizs, shareBoardInfo]);
+  }, [boardId, dispatch, history]);
   return (
     <BoardActionContext.Provider value={actions}>
       {children}

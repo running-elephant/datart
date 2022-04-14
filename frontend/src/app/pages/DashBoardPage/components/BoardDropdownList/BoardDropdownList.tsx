@@ -91,7 +91,7 @@ export const BoardDropdownList: FC<Props> = memo(
                 okText={t('common.ok')}
                 cancelText={t('common.cancel')}
                 onConfirm={() => {
-                  onBoardToDownLoad?.(DownloadFileType.excel);
+                  onBoardToDownLoad?.(DownloadFileType.Excel);
                 }}
               >
                 {t('share.downloadData')}
@@ -104,7 +104,7 @@ export const BoardDropdownList: FC<Props> = memo(
                 okText={t('common.ok')}
                 cancelText={t('common.cancel')}
                 onConfirm={() => {
-                  onBoardToDownLoad?.(DownloadFileType.pdf);
+                  onBoardToDownLoad?.(DownloadFileType.Pdf);
                 }}
               >
                 {t('share.downloadPDF')}
@@ -117,7 +117,7 @@ export const BoardDropdownList: FC<Props> = memo(
                 okText={t('common.ok')}
                 cancelText={t('common.cancel')}
                 onConfirm={() => {
-                  onBoardToDownLoad?.(DownloadFileType.image);
+                  onBoardToDownLoad?.(DownloadFileType.Image);
                 }}
               >
                 {t('share.downloadPicture')}

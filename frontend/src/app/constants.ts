@@ -211,7 +211,7 @@ export const ChartStyleSectionComponentType = {
 };
 
 export enum DownloadFileType {
-  'pdf' = 'PDF',
-  'excel' = 'EXCEL',
-  'image' = 'IMAGE',
+  'Pdf' = 'PDF',
+  'Excel' = 'EXCEL',
+  'Image' = 'IMAGE',
 }

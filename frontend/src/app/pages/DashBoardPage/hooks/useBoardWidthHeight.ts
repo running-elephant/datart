@@ -22,7 +22,7 @@ import { BoardContext } from '../components/BoardProvider/BoardProvider';
 import { boardActions } from '../pages/Board/slice';
 
 export default function useBoardWidthHeight() {
-  const { boardId, editing } = useContext(BoardContext);
+  const { boardId, renderMode } = useContext(BoardContext);
 
   const dispatch = useDispatch();
 
@@ -38,12 +38,12 @@ export default function useBoardWidthHeight() {
   useEffect(() => {
     const width = gridWidth;
     const height = gridHeight;
-    // TODO in only in  editing
-    if (!editing) {
+    // TODO in only in  renderMode
+    if (renderMode !== 'edit') {
       dispatch(
         boardActions.setBoardWidthHeight({ boardId, wh: [width, height] }),
       );
     }
-  }, [gridHeight, dispatch, boardId, gridWidth, editing]);
+  }, [gridHeight, dispatch, boardId, gridWidth, renderMode]);
   return { gridRef };
 }

@@ -116,7 +116,7 @@ const VizOperationMenu: FC<{
               placement="left"
               title={t('common.confirm')}
               onConfirm={() => {
-                onDownloadDataLinkClick(DownloadFileType.excel);
+                onDownloadDataLinkClick(DownloadFileType.Excel);
               }}
               okText={t('common.ok')}
               cancelText={t('common.cancel')}
@@ -129,7 +129,7 @@ const VizOperationMenu: FC<{
               placement="left"
               title={t('common.confirm')}
               onConfirm={() => {
-                onDownloadDataLinkClick(DownloadFileType.pdf);
+                onDownloadDataLinkClick(DownloadFileType.Pdf);
               }}
               okText={t('common.ok')}
               cancelText={t('common.cancel')}
@@ -142,7 +142,7 @@ const VizOperationMenu: FC<{
               placement="left"
               title={t('common.confirm')}
               onConfirm={() => {
-                onDownloadDataLinkClick(DownloadFileType.image);
+                onDownloadDataLinkClick(DownloadFileType.Image);
               }}
               okText={t('common.ok')}
               cancelText={t('common.cancel')}
