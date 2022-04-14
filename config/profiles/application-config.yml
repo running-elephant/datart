@@ -62,6 +62,11 @@ spring:
 server:
   port: ${server.port:8080}
   address: ${server.ip:0.0.0.0}
+  ssl.enabled: ${server.ssl.enabled:false}
+  ssl.key-store: ${server.ssl.key-store:keystore.p12}
+  ssl.key-store-password: ${server.ssl.key-store-password:password}
+  ssl.keyStoreType: ${server.ssl.keyStoreType:PKCS12}
+  ssl.keyAlias: ${server.ssl.keyAlias:tomcat}
 
 datart:
   server:
