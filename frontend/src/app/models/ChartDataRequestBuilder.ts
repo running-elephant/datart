@@ -289,7 +289,7 @@ export class ChartDataRequestBuilder {
 
   private normalizeDrillFilters(): ChartDataRequestFilter[] {
     return (this.drillOption
-      ?.getAllDrillFields()
+      ?.getAllDrillDownFields()
       .filter(field => Boolean(field.condition))
       .map(f => {
         return {

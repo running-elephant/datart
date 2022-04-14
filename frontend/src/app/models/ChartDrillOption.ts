@@ -75,8 +75,15 @@ export class ChartDrillOption implements IChartDrillOption {
     return this.drillFields;
   }
 
-  public getAllDrillFields() {
+  public getAllDrillDownFields() {
     return this.drillDownFields;
+  }
+
+  public getDrilledFields() {
+    if (this.mode === DrillMode.Normal) {
+      return [];
+    }
+    return this.drillFields.slice(0, this.cursor + 2);
   }
 
   public getCurrentFields(): ChartDataSectionField[] | undefined {

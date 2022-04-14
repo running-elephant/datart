@@ -24,7 +24,8 @@ export interface IChartDrillOption {
   canSelect: boolean;
   toggleSelectedDrill(enable?: boolean): void;
   getAllFields(): ChartDataSectionField[];
-  getAllDrillFields(): Array<{
+  getDrilledFields(): ChartDataSectionField[];
+  getAllDrillDownFields(): Array<{
     field: ChartDataSectionField;
     condition?: FilterCondition;
   }>;

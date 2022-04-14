@@ -350,7 +350,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
 
     const getDillConditions = () => {
       return drillOption
-        ?.getAllDrillFields()
+        ?.getAllDrillDownFields()
         ?.filter(drill => Boolean(drill?.condition));
     };
 

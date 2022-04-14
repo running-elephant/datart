@@ -31,11 +31,11 @@ const ChartDrillPaths: FC<{}> = memo(() => {
     return <div></div>;
   }
 
-  const drillFields = drillOption.getAllFields();
+  const drilledFields = drillOption.getDrilledFields();
   return (
     <StyledChartDrillPaths className="chart-drill-path">
       <Breadcrumb>
-        {drillFields.map(f => {
+        {drilledFields.map(f => {
           return (
             <StyledDrillNode
               isActive={Boolean(
