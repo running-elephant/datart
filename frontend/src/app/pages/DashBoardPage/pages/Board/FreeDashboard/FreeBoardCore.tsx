@@ -18,7 +18,7 @@
 import { Empty } from 'antd';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { WidgetConfAndInfoProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetConfAndInfoProvider';
+import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import { selectLayoutWidgetMapById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -73,14 +73,14 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
     const boardChildren = useMemo(() => {
       return widgetConfigs.map(item => {
         return (
-          <WidgetConfAndInfoProvider
+          <WidgetWrapProvider
             key={item.id}
             id={item.id}
             boardEditing={editing}
             boardId={boardId}
           >
             <WidgetOfFree />
-          </WidgetConfAndInfoProvider>
+          </WidgetWrapProvider>
         );
       });
     }, [widgetConfigs, editing, boardId]);

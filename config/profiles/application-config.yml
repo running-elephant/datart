@@ -67,9 +67,9 @@ datart:
   server:
     address: ${datart.address:http://127.0.0.1:8080}
 
-  # 系统运行模式：normal-正常(默认)，single-单组织
-  mode: normal
-  # 用户名/密码: 仅单组织模式且两者都不为空时重置
+  # 租户管理模式：plateform-平台(默认)，team-团队
+  tenant-management-mode: platform
+  # 团队管理员用户名/密码: 仅team模式且两者都不为空时重置
   admin:
     username:
     password:
@@ -78,9 +78,9 @@ datart:
     register: true # 是否允许注册
     active:
       send-mail: ${datart.send-mail:false}  # 注册用户时是否需要邮件验证激活
-
-  invite:
-    duration: ${datart.invite.duration:3} #邀请有效期/天
+      expire-hours: ${datart.register.expire-hours:48} # 注册邮件有效期/小时
+    invite:
+      expire-hours: ${datart.invite.expire-hours:48} # 邀请邮件有效期/小时
 
   security:
     token:

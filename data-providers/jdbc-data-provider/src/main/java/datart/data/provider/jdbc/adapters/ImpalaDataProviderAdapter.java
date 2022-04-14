@@ -30,7 +30,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 
 public class ImpalaDataProviderAdapter extends JdbcDataProviderAdapter {
@@ -51,7 +50,7 @@ public class ImpalaDataProviderAdapter extends JdbcDataProviderAdapter {
     }
 
     @Override
-    protected Dataframe executeOnSource(QueryScript script, ExecuteParam executeParam) throws Exception {
+    public Dataframe executeOnSource(QueryScript script, ExecuteParam executeParam) throws Exception {
         if (CollectionUtils.isEmpty(executeParam.getOrders())) {
             executeParam.setOrders(Collections.singletonList(new OrderOperator()));
         }

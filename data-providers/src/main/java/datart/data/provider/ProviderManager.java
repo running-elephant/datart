@@ -107,7 +107,9 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
         }
         Dataframe dataframe;
 
-        String queryKey = DataProviderUtils.toCacheKey(source, queryScript, param);
+        DataProvider dataProvider = getDataProviderService(source.getType());
+
+        String queryKey = dataProvider.getQueryKey(source, queryScript, param);
 
         if (param.isCacheEnable()) {
             dataframe = getFromCache(queryKey);

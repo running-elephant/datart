@@ -21,10 +21,7 @@ import datart.core.base.PageInfo;
 import datart.core.base.consts.Const;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
-import datart.core.data.provider.Column;
-import datart.core.data.provider.Dataframe;
-import datart.core.data.provider.ExecuteParam;
-import datart.core.data.provider.QueryScript;
+import datart.core.data.provider.*;
 import datart.data.provider.calcite.dialect.H2Dialect;
 import datart.data.provider.jdbc.DataTypeUtils;
 import datart.data.provider.jdbc.ResultSetMapper;
@@ -40,6 +37,7 @@ import org.h2.tools.SimpleResultSet;
 
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -159,8 +157,8 @@ public class LocalDB {
         }
     }
 
-    public static Dataframe executeLocalQuery(QueryScript queryScript, ExecuteParam executeParam, List<Dataframe> srcData) throws Exception {
-        return executeLocalQuery(queryScript, executeParam, srcData, false, null);
+    public static Dataframe executeLocalQuery(QueryScript queryScript, ExecuteParam executeParam, Dataframes dataframes) throws Exception {
+        return executeLocalQuery(queryScript, executeParam, dataframes, false, null);
     }
 
     /**
@@ -168,32 +166,32 @@ public class LocalDB {
      *
      * @param queryScript  查询脚本
      * @param executeParam 执行参数
+     * @param dataframes      原始数据
      * @param persistent   原始数据是持久化
-     * @param srcData      原始数据
      * @return 查询脚本+执行参数 执行后结果
      */
-    public static Dataframe executeLocalQuery(QueryScript queryScript, ExecuteParam executeParam, List<Dataframe> srcData, boolean persistent, java.util.Date expire) throws Exception {
+    public static Dataframe executeLocalQuery(QueryScript queryScript, ExecuteParam executeParam, Dataframes dataframes, boolean persistent, Date expire) throws Exception {
         if (queryScript == null) {
             // 直接以指定数据源为表进行查询，生成一个默认的SQL查询全部数据
             queryScript = new QueryScript();
-            queryScript.setScript(String.format(SELECT_START_SQL, srcData.get(0).getName()));
+            queryScript.setScript(String.format(SELECT_START_SQL, dataframes.getDataframes().get(0).getName()));
             queryScript.setVariables(Collections.emptyList());
-            queryScript.setSourceId(srcData.get(0).getName());
+            queryScript.setSourceId(dataframes.getKey());
         }
 
-        String url = getConnectionUrl(persistent, queryScript.getSourceId());
+        String url = getConnectionUrl(persistent, dataframes.getKey());
         synchronized (url.intern()) {
-            return persistent ? executeInLocalDB(queryScript, executeParam, srcData, expire) : executeInMemDB(queryScript, executeParam, srcData);
+            return persistent ? executeInLocalDB(queryScript, executeParam, dataframes, expire) : executeInMemDB(queryScript, executeParam, dataframes);
         }
     }
 
     /**
      * 非持久化查询，通过函数表注册数据为临时表，执行一次后丢弃表数据。
      */
-    private static Dataframe executeInMemDB(QueryScript queryScript, ExecuteParam executeParam, List<Dataframe> srcData) throws Exception {
-        Connection connection = getConnection(false, queryScript.getSourceId());
+    private static Dataframe executeInMemDB(QueryScript queryScript, ExecuteParam executeParam, Dataframes dataframes) throws Exception {
+        Connection connection = getConnection(false, dataframes.getKey());
         try {
-            for (Dataframe dataframe : srcData) {
+            for (Dataframe dataframe : dataframes.getDataframes()) {
                 registerDataAsTable(dataframe, connection);
             }
             return execute(connection, queryScript, executeParam);
@@ -203,7 +201,7 @@ public class LocalDB {
             } catch (Exception e) {
                 log.error("connection close error ", e);
             }
-            for (Dataframe df : srcData) {
+            for (Dataframe df : dataframes.getDataframes()) {
                 unregisterData(df.getId());
             }
         }
@@ -213,16 +211,16 @@ public class LocalDB {
     /**
      * 持久化查询，将数据插入到H2表中，再进行查询
      */
-    private static Dataframe executeInLocalDB(QueryScript queryScript, ExecuteParam executeParam, List<Dataframe> srcData, java.util.Date expire) throws Exception {
-        try (Connection connection = getConnection(true, queryScript.getSourceId())) {
-            if (CollectionUtils.isNotEmpty(srcData)) {
+    private static Dataframe executeInLocalDB(QueryScript queryScript, ExecuteParam executeParam, Dataframes dataframes, Date expire) throws Exception {
+        try (Connection connection = getConnection(true, dataframes.getKey())) {
+            if (!dataframes.isEmpty()) {
 
-                for (Dataframe dataframe : srcData) {
+                for (Dataframe dataframe : dataframes.getDataframes()) {
                     registerDataAsTable(dataframe, connection);
                 }
 
                 if (expire != null) {
-                    setCacheExpire(queryScript.getSourceId(), expire);
+                    setCacheExpire(dataframes.getKey(), expire);
                 }
 
             }
@@ -231,20 +229,20 @@ public class LocalDB {
     }
 
     /**
-     * 检查数据源缓存是否过期。如果过期,会删除缓存
+     * 检查数据源缓存是否过期。如果过期,删除缓存
      *
-     * @param sourceId source 唯一标识
+     * @param cacheKey source 唯一标识
      */
-    public static boolean checkCacheExpired(String sourceId) throws SQLException {
+    public static boolean checkCacheExpired(String cacheKey) throws SQLException {
         try (Connection connection = getConnection(true, null)) {
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM `cache_expire` WHERE `source_id`='" + sourceId + "'");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM `cache_expire` WHERE `source_id`='" + cacheKey + "'");
             if (resultSet.next()) {
                 Timestamp cacheExpire = resultSet.getTimestamp("expire_time");
                 if (cacheExpire.after(new java.util.Date())) {
                     return false;
                 }
-                clearCache(sourceId);
+                clearCache(cacheKey);
             }
         }
         return true;
@@ -261,15 +259,11 @@ public class LocalDB {
         }
     }
 
-    public static void clearCache(String sourceId) throws SQLException {
+    public static void clearCache(String cacheKey) throws SQLException {
         try (Connection connection = getConnection(true, null)) {
-            connection.createStatement().execute(String.format(DELETE_EXPIRE_SQL, sourceId));
-            DeleteDbFiles.execute(getDbFileBasePath(), toDatabase(sourceId), false);
+            connection.createStatement().execute(String.format(DELETE_EXPIRE_SQL, cacheKey));
+            DeleteDbFiles.execute(getDbFileBasePath(), cacheKey, false);
         }
-    }
-
-    private static String toDatabase(String sourceId) {
-        return "D" + sourceId;
     }
 
     private static Dataframe execute(Connection connection, QueryScript queryScript, ExecuteParam executeParam) throws Exception {
@@ -307,8 +301,6 @@ public class LocalDB {
     private static String getDatabaseUrl(String database) {
         if (database == null) {
             database = "datart_meta";
-        } else {
-            database = toDatabase(database);
         }
         return String.format("jdbc:h2:file:%s/%s" + H2_PARAM, getDbFileBasePath(), database);
     }

@@ -96,8 +96,11 @@ public class MailServiceImpl extends BaseService implements MailService {
     @Value("${spring.mail.senderName:Datart}")
     private String senderName;
 
-    @Value("${spring.invite.duration:3}")
-    private Integer inviteDays;
+    @Value("${datart.user.active.expire-hours:48}")
+    private int activeExpireHours;
+
+    @Value("${datart.user.invite.expire-hours:48}")
+    private int inviteExpireHours;
 
     public MailServiceImpl(TemplateEngine templateEngine,MessageSource messageSource) {
         SpringMessageResolver springMessageResolver = new SpringMessageResolver();
@@ -164,7 +167,7 @@ public class MailServiceImpl extends BaseService implements MailService {
         inviteToken.setUserId(user.getId());
         inviteToken.setCreateTime(System.currentTimeMillis());
         inviteToken.setInviter(getCurrentUser().getUsername());
-        inviteToken.setExp(DateUtils.addDays(new Date(), inviteDays));
+        inviteToken.setExp(DateUtils.addHours(new Date(), inviteExpireHours));
         String tokenString = JwtUtils.toJwtString(inviteToken);
 
         Context context = new Context(LocaleContextHolder.getLocale());
@@ -184,6 +187,7 @@ public class MailServiceImpl extends BaseService implements MailService {
         PasswordToken passwordToken = new PasswordToken();
         passwordToken.setSubject(user.getUsername());
         passwordToken.setCreateTime(System.currentTimeMillis());
+        passwordToken.setExp(DateUtils.addHours(new Date(), activeExpireHours));
         String tokenString = JwtUtils.toJwtString(passwordToken);
 
         Context context = new Context(LocaleContextHolder.getLocale());

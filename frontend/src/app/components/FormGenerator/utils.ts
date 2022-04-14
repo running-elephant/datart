@@ -68,3 +68,22 @@ export function groupLayoutComparer<T>(
   }
   return itemLayoutComparer(prevProps, nextProps);
 }
+
+export function removeSomeObjectConfigByKey(
+  removeKeyList: string[],
+  obj?: object,
+) {
+  return (
+    obj &&
+    Object.keys(obj).reduce((data, key) => {
+      if (removeKeyList.includes(key)) {
+        return data;
+      } else {
+        return {
+          ...data,
+          key: obj?.[key],
+        };
+      }
+    }, {})
+  );
+}

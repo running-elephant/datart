@@ -58,5 +58,6 @@ export type ChartDataRequest = {
   params?: Record<string, string[]>;
   vizId?: string;
   vizName?: string;
+  vizType?: string;
   analytics?: Boolean;
 };

@@ -22,7 +22,7 @@ import { registerTheme } from 'echarts';
 import { antdLocales } from 'locales/i18n';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { GlobalStyles } from 'styles/globalStyles';
 import { LazyShareChart } from './pages/SharePage/LoadableChart';
 
@@ -40,7 +40,11 @@ export function ShareChartPage() {
         >
           <meta name="description" content="Data Art" />
         </Helmet>
-        <LazyShareChart />
+        <BrowserRouter>
+          <Switch>
+            <Route path="/shareChart/:token" component={LazyShareChart} />
+          </Switch>
+        </BrowserRouter>
         <GlobalStyles />
       </BrowserRouter>
     </ConfigProvider>

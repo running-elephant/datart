@@ -389,8 +389,12 @@ class BasicOutlineMapChart extends Chart {
         itemWidth,
         itemHeight,
         inRange,
-        text: [toFormattedValue(max, format), toFormattedValue(min, format)],
-        min,
+        // NOTE 映射最大值和最小值如果一致，会导致map所有区域全部映射成中间颜色，这里做兼容处理
+        text: [
+          toFormattedValue(max, format),
+          toFormattedValue(min !== max ? min : min - 1, format),
+        ],
+        min: min !== max ? min : min - 1,
         max,
         textStyle: {
           ...font,

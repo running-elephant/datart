@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { DownloadFileType } from 'app/constants';
 import { generateShareLinkAsync } from 'app/utils/fetch';
 import { createContext, FC, memo, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
@@ -29,8 +30,20 @@ import { toUpdateDashboard } from '../../pages/BoardEditor/slice/thunk';
 
 export interface BoardActionContextProps {
   // read
-  onGenerateShareLink?: (date, usePwd) => any;
-  onBoardToDownLoad: () => any;
+  onGenerateShareLink?: ({
+    expiryDate,
+    authenticationMode,
+    roles,
+    users,
+    rowPermissionBy,
+  }: {
+    expiryDate: string;
+    authenticationMode: string;
+    roles: string[];
+    users: string[];
+    rowPermissionBy: string;
+  }) => any;
+  onBoardToDownLoad: (downloadType: DownloadFileType) => any;
   // edit
   updateBoard?: (callback?: () => void) => void;
   boardToggleAllowOverlap: (allow: boolean) => void;
@@ -55,17 +68,31 @@ export const BoardActionProvider: FC<{
       boardToggleAllowOverlap: (allow: boolean) => {
         dispatch(editBoardStackActions.toggleAllowOverlap(allow));
       },
-      onGenerateShareLink: async (expireDate, enablePassword) => {
-        const result = await generateShareLinkAsync(
-          expireDate,
-          enablePassword,
-          boardId,
-          'DASHBOARD',
-        );
+      onGenerateShareLink: async ({
+        expiryDate,
+        authenticationMode,
+        roles,
+        users,
+        rowPermissionBy,
+      }) => {
+        const result = await generateShareLinkAsync({
+          expiryDate,
+          authenticationMode,
+          roles,
+          users,
+          rowPermissionBy,
+          vizId: boardId,
+          vizType: 'DASHBOARD',
+        });
         return result;
       },
-      onBoardToDownLoad: () => {
-        dispatch(boardDownLoadAction({ boardId }));
+      onBoardToDownLoad: downloadType => {
+        dispatch(
+          boardDownLoadAction({
+            boardId,
+            downloadType,
+          }),
+        );
       },
       onCloseBoardEditor: (boardId: string) => {
         const pathName = history.location.pathname;

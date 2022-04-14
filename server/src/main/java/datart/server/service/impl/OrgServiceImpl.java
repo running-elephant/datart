@@ -244,7 +244,7 @@ public class OrgServiceImpl extends BaseService implements OrgService {
         try {
             inviteToken = JwtUtils.toInviteToken(token);
         } catch (ExpiredJwtException e) {
-            Exceptions.msg("message.user.invite.mail.timeout");
+            Exceptions.msg("message.user.confirm.mail.timeout");
         }
         addUserToOrg(inviteToken.getUserId(), inviteToken.getOrgId());
         return true;

@@ -773,11 +773,33 @@
         "ok": "确认",
         "cancel": "取消",
         "number": "序号",
-        "summary": "汇总"
+        "summary": "汇总",
+        "richText": {
+          "bold": "加粗",
+          "italic": "斜体",
+          "underline": "下划线",
+          "strike": "删除线",
+          "indent": "减少缩进",
+          "indentUp": "增加缩进",
+          "ordered": "有序列表",
+          "list": "无序列表",
+          "blockquote": "引用",
+          "codeBlock": "代码",
+          "link": "超链接",
+          "image": "图片",
+          "clean": "清除样式",
+          "more": "更多",
+          "families": "字体",
+          "fontSize": "字体大小",
+          "background": "背景颜色",
+          "color": "字体颜色",
+          "align": "对齐方式"
+        }
       }
     },
     "action": {
       "common": {
+        "downloadForExcel": "下载为 Excel",
         "confirm": "请确认",
         "ok": "确认",
         "cancel": "取消",
@@ -801,8 +823,36 @@
         "expireDate": "截止日期",
         "enablePassword": "启用密码",
         "generateLink": "生成链接",
-        "shareLink": "分享",
-        "downloadData": "下载为 Excel"
+        "shareLink": "分享管理",
+        "downloadData": "下载为 Excel",
+        "downloadPDF": "下载为 PDF",
+        "downloadPicture": "下载为 图片",
+        "NONE": "无",
+        "CODE": "口令",
+        "LOGIN": "登录",
+        "verificationMethod": "认证方式",
+        "dataPermission": "数据权限",
+        "loginUser": "登录者",
+        "shareUser": "分享者",
+        "userOrRole": "指定角色/成员",
+        "selectRole": "选择角色",
+        "selectUser": "选择成员",
+        "save": "保存"
+      },
+      "shareList": {
+        "shareList": "分享链接列表",
+        "shortLink": "短链接",
+        "type": "类型",
+        "expireDate": "过期时间",
+        "operate": "操作",
+        "copy": "复制链接",
+        "copySuccess": "复制成功",
+        "delete": "删除",
+        "addLink": "添加链接",
+        "deleteError": "删除失败",
+        "sureDelete": "确定要删除吗？",
+        "noDataTip": "暂无链接，点击右上角添加",
+        "Permanent": "永久"
       }
     },
     "board": {

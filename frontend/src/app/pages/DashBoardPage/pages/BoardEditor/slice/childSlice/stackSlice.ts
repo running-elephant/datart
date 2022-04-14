@@ -92,6 +92,16 @@ export const editBoardStackSlice = createSlice({
       });
       state.dashBoard.config.maxWidgetIndex = maxWidgetIndex;
     },
+    //
+    toggleLockWidget(
+      state,
+      action: PayloadAction<{ id: string; lock: boolean }>,
+    ) {
+      const { id, lock } = action.payload;
+      if (state.widgetRecord?.[id]?.config) {
+        state.widgetRecord[id].config.lock = lock;
+      }
+    },
     deleteWidgets(state, action: PayloadAction<string[]>) {
       const ids = action.payload;
       if (!ids?.length) return;
@@ -131,6 +141,7 @@ export const editBoardStackSlice = createSlice({
       const { layouts, deviceType } = action.payload;
       layouts.forEach(it => {
         const { i, x, y, w, h } = it;
+        if (!state.widgetRecord?.[i]?.config) return;
         const rectItem = { x, y, width: w, height: h };
         if (deviceType === DeviceType.Desktop) {
           state.widgetRecord[i].config.rect = rectItem;

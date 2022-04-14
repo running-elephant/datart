@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { WidgetConfAndInfoProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetConfAndInfoProvider';
+import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import produce from 'immer';
 import { memo, useCallback, useContext, useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
@@ -103,7 +103,7 @@ export const LayerList: React.FC<{}> = memo(() => {
   const nameList = cards
     .sort((a, b) => b.index - a.index)
     .map((ele, index) => (
-      <WidgetConfAndInfoProvider
+      <WidgetWrapProvider
         id={ele.id}
         key={ele.id}
         boardEditing={true}
@@ -118,7 +118,7 @@ export const LayerList: React.FC<{}> = memo(() => {
           moveCard={moveCard}
           moveEnd={moveEnd}
         ></NameItem>
-      </WidgetConfAndInfoProvider>
+      </WidgetWrapProvider>
     ));
   return (
     <DndProvider backend={HTML5Backend}>

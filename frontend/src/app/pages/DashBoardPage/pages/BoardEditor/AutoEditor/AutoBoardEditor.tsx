@@ -17,21 +17,29 @@
  */
 
 import { Empty } from 'antd';
+import { useGridWidgetHeight } from 'app/hooks/useGridWidgetHeight';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { WidgetConfAndInfoProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetConfAndInfoProvider';
+import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import {
   LAYOUT_COLS_MAP,
-  RGL_DRAG_HANDLE,
+  WIDGET_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
-import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
+import useBoardScroll from 'app/pages/DashBoardPage/hooks/useBoardScroll';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
 import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getBoardMarginPadding } from 'app/pages/DashBoardPage/utils/board';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import debounce from 'lodash/debounce';
-import React, { memo, useCallback, useContext, useMemo, useState } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import RGL, { Layout, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useDispatch, useSelector } from 'react-redux';
@@ -41,10 +49,7 @@ import { BORDER_RADIUS, SPACE_MD, SPACE_XS } from 'styles/StyleConstants';
 import StyledBackground from '../../Board/components/StyledBackground';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
-import {
-  selectLayoutWidgetInfoMap,
-  selectLayoutWidgetMap,
-} from '../slice/selectors';
+import { selectLayoutWidgetMap } from '../slice/selectors';
 import { WidgetOfAutoEditor } from './WidgetOfAutoEditor';
 
 const ReactGridLayout = WidthProvider(RGL);
@@ -53,14 +58,23 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const { boardId } = useContext(BoardContext);
   const boardConfig = useContext(BoardConfigContext);
-  const { margin, background, allowOverlap } = boardConfig;
+  const { background, allowOverlap } = boardConfig;
   const { deviceType } = useContext(BoardInfoContext);
 
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
+  const layoutMap = useGridLayoutMap(layoutWidgetMap);
+  const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
 
-  const layoutWidgetInfoMap = useSelector(selectLayoutWidgetInfoMap);
+  const { curMargin, curPadding } = useMemo(() => {
+    return getBoardMarginPadding(boardConfig, colsKey);
+  }, [boardConfig, colsKey]);
+
+  const currentLayout = useRef<Layout[]>([]);
+
+  const { gridWrapRef, thEmitScroll } = useBoardScroll(boardId);
 
   const [curWH, setCurWH] = useState<number[]>([]);
+
   const updateCurWH = useCallback((values: number[]) => {
     setCurWH(values);
     setImmediate(() => {
@@ -77,21 +91,6 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     [layoutWidgetMap],
   );
 
-  const {
-    ref,
-    gridWrapRef,
-    currentLayout,
-    widgetRowHeight,
-    throttleLazyRender,
-    colsKey,
-  } = useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
-
-  const { curMargin, curPadding } = useMemo(() => {
-    return getBoardMarginPadding(boardConfig, colsKey);
-  }, [boardConfig, colsKey]);
-
-  const layoutMap = useGridLayoutMap(layoutWidgetMap);
-
   const changeWidgetLayouts = debounce((layouts: Layout[]) => {
     dispatch(
       editBoardStackActions.changeAutoBoardWidgetsRect({
@@ -103,7 +102,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
 
   const onLayoutChange = (layouts: Layout[]) => {
     currentLayout.current = layouts;
-    throttleLazyRender();
+    thEmitScroll();
     // ignore isDraggable item from out
     if (layouts.find(item => item.isDraggable === true)) {
       return;
@@ -125,13 +124,13 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     return sortedLayoutWidgets.map(item => {
       return (
         <div key={item.id}>
-          <WidgetConfAndInfoProvider
+          <WidgetWrapProvider
             id={item.id}
             boardEditing={true}
             boardId={boardId}
           >
             <WidgetOfAutoEditor />
-          </WidgetConfAndInfoProvider>
+          </WidgetWrapProvider>
         </div>
       );
     });
@@ -168,7 +167,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
               isDraggable={true}
               isResizable={true}
               allowOverlap={allowOverlap}
-              draggableHandle={`.${RGL_DRAG_HANDLE}`}
+              draggableHandle={`.${WIDGET_DRAG_HANDLE}`}
             >
               {boardChildren}
             </ReactGridLayout>

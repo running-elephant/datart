@@ -96,6 +96,10 @@ const config: ChartConfig = {
       translation: {
         common: {
           title: '富文本',
+          noData: '暂无可用字段',
+          richTextPreview: '富文本预览',
+          preview: '预览',
+          referenceFields: '引用字段',
         },
         delta: {
           text: '内容',
@@ -110,6 +114,10 @@ const config: ChartConfig = {
       translation: {
         common: {
           title: 'Rich Text',
+          noData: 'No Data',
+          richTextPreview: 'Rich Text Preview',
+          preview: 'Preview',
+          referenceFields: 'Reference Fields',
         },
         delta: {
           text: 'Text',

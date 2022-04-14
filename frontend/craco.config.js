@@ -207,18 +207,20 @@ module.exports = {
     hot: true,
     proxy: {
       '/api/v1': {
+        changeOrigin: true,
         target: 'http://localhost:8080/',
       },
       '/resources': {
+        changeOrigin: true,
         target: 'http://localhost:8080/',
       },
     },
     historyApiFallback: {
       rewrites: [
         { from: /^\/$/, to: '/index.html' },
-        { from: /^\/shareChart$/, to: '/shareChart.html' },
-        { from: /^\/shareDashboard$/, to: '/shareDashboard.html' },
-        { from: /^\/shareStoryPlayer$/, to: '/shareStoryPlayer.html' },
+        { from: /^\/shareChart\/\w/, to: '/shareChart.html' },
+        { from: /^\/shareDashboard\/\w/, to: '/shareDashboard.html' },
+        { from: /^\/shareStoryPlayer\/\w/, to: '/shareStoryPlayer.html' },
       ],
     },
   },

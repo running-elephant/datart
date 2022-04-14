@@ -308,6 +308,20 @@ describe('ChartDataRequestBuild Test', () => {
       { column: 'age' },
       { column: 'address' },
     ]);
+
+    const enableAggregation2 = false;
+
+    const builder2 = new ChartDataRequestBuilder(
+      dataView,
+      chartDataConfigs,
+      chartSettingConfigs,
+      pageInfo,
+      enableScript,
+      enableAggregation2,
+    );
+    const requestParams2 = builder2.build();
+
+    expect(requestParams2.groups).toEqual([]);
   });
 
   test('should get filters', () => {

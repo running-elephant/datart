@@ -17,7 +17,6 @@
  */
 package datart.core.common;
 
-import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -74,19 +73,23 @@ public class WebUtils {
 
         Double contentHeight = Double.parseDouble(webDriver.findElement(By.id("height")).getAttribute("value"));
 
-        if (imageWidth != contentWidth) {
+        if (imageWidth>0 && imageWidth != contentWidth) {
             // scale the window
             webDriver.manage().window().setSize(new Dimension(imageWidth, contentHeight.intValue()));
-            Thread.sleep(1000);
         }
+        Thread.sleep(1500);
         // scale the window again
         contentWidth = Double.parseDouble(webDriver.findElement(By.id("width")).getAttribute("value"));
+        contentWidth = contentWidth>0 ? contentWidth : 1920;
         contentHeight = Double.parseDouble(webDriver.findElement(By.id("height")).getAttribute("value"));
+        contentHeight = contentHeight>0 ? contentHeight : 600;
         webDriver.manage().window().setSize(new Dimension(contentWidth.intValue(), contentHeight.intValue()));
         Thread.sleep(1000);
 
         TakesScreenshot screenshot = (TakesScreenshot) webDriver;
-        return screenshot.getScreenshotAs(outputType);
+        T output = screenshot.getScreenshotAs(outputType);
+        webDriver.quit();
+        return output;
     }
 
     public static File screenShot2File(String url, String path, int imageWidth) throws Exception {
@@ -123,6 +126,7 @@ public class WebUtils {
         options.addArguments("disable-web-security");
         options.addArguments("no-proxy-server");
         options.addArguments("disable-dev-shm-usage");
+        options.addArguments("window-size=2048,1536");
 
         if (isRemoteDriver(driverPath)) {
             return new RemoteWebDriver(new URL(driverPath), options);

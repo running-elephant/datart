@@ -346,6 +346,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         shareVizDetail.setVizDetail(vizDetail);
         shareVizDetail.setSubVizToken(subVizToken);
         shareVizDetail.setExecuteToken(executeToken);
+        shareVizDetail.setShareToken(ShareToken.create(AESUtil.encrypt(authorizedToken, Application.getTokenSecret())));
         return shareVizDetail;
     }
 
@@ -408,8 +409,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
                 try {
                     checkVizReadPermission(ResourceType.valueOf(share.getVizType()), share.getVizId());
                     return;
-                } catch (PermissionDeniedException e) {
-                    Exceptions.tr(BaseException.class, "message.share.permission.denied");
+                } catch (PermissionDeniedException ignored) {
                 }
                 if (StringUtils.isBlank(shareToken.getUsername())
                         || StringUtils.isBlank(shareToken.getUsername())
