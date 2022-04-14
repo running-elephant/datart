@@ -129,7 +129,7 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
               </Dropdown>
             )}
 
-            {showShareLinkModal && (
+            {allowShare && (
               <ShareManageModal
                 vizId={stroyBoardId as string}
                 orgId={orgId as string}
