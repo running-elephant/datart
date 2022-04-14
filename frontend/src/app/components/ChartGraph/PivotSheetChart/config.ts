@@ -165,11 +165,6 @@ const config: ChartConfig = {
       comType: 'group',
       rows: [
         {
-          label: 'style.bgColor',
-          key: 'bgColor',
-          comType: 'fontColor',
-        },
-        {
           label: 'style.font',
           key: 'font',
           comType: 'font',
@@ -177,7 +172,6 @@ const config: ChartConfig = {
             fontFamily: 'PingFangSC',
             fontSize: 12,
             fontWeight: 'normal',
-            color: '#495057',
           },
           options: {
             fontFamilies: [
@@ -189,6 +183,7 @@ const config: ChartConfig = {
               'sans-serif',
             ],
             showFontStyle: false,
+            showFontColor: false,
           },
         },
         {
@@ -222,16 +217,6 @@ const config: ChartConfig = {
       comType: 'group',
       rows: [
         {
-          label: 'style.oddBgColor',
-          key: 'oddBgColor',
-          comType: 'fontColor',
-        },
-        {
-          label: 'style.evenBgColor',
-          key: 'evenBgColor',
-          comType: 'fontColor',
-        },
-        {
           label: 'style.font',
           key: 'font',
           comType: 'font',
@@ -239,7 +224,6 @@ const config: ChartConfig = {
             fontFamily: 'PingFangSC',
             fontSize: 12,
             fontWeight: 'normal',
-            color: '#495057',
           },
           options: {
             fontFamilies: [
@@ -251,6 +235,7 @@ const config: ChartConfig = {
               'sans-serif',
             ],
             showFontStyle: false,
+            showFontColor: false,
           },
         },
         {
@@ -275,6 +260,21 @@ const config: ChartConfig = {
             min: 0,
           },
           comType: 'inputNumber',
+        },
+      ],
+    },
+    {
+      label: 'theme.title',
+      key: 'theme',
+      comType: 'group',
+      rows: [
+        {
+          label: 'theme.themeType',
+          key: 'themeType',
+          comType: 'pivotSheetTheme',
+          default: {
+            themeType: 1,
+          },
         },
       ],
     },
@@ -443,14 +443,31 @@ const config: ChartConfig = {
           tableHeaderStyle: '表头样式',
           tableBodyStyle: '表体样式',
           bgColor: '背景颜色',
-          evenBgColor: '偶数行背景颜色',
-          oddBgColor: '奇数行背景颜色',
           font: '字体',
           align: '对齐方式',
           colHeight: '列表头高度',
           rowWidth: '行表头宽度',
           height: '单元格高度',
           width: '单元格宽度',
+        },
+        theme: {
+          title: '主题',
+          themeType: '主题类型',
+          headerFontColor: '表头字体颜色',
+          evenBgColor: '偶数行背景颜色',
+          oddBgColor: '奇数行背景颜色',
+          hoverDataBgColor: '数据选中背景颜色',
+          hoverHeaderBgColor: '选中列表头背景颜色',
+          headerBgColor: '表头背景颜色',
+          prepareSelectMaskBgColor: '刷选遮罩样式背景颜色',
+          linkTextColor: '超链接字体颜色',
+          hoverSplitLineColor: '划上分割线颜色',
+          dataBorderColor: '数据单元格边框颜色',
+          headerBorderColor: '表头单元格边框颜色',
+          verticalSplitLineColor: '垂直分割线颜色',
+          horizontalSplitLineColor: '水平分割线颜色',
+          dataColor: '数据单元格文字颜色',
+          rowCellFontColor: '行标题颜色',
         },
         summary: {
           title: '数据汇总',
@@ -503,14 +520,31 @@ const config: ChartConfig = {
           tableHeaderStyle: 'Table Header Style',
           tableBodyStyle: 'Table Body Style',
           bgColor: 'Background Color',
-          evenBgColor: 'Even Row Background Color',
-          oddBgColor: 'Odd Row Background Color',
           font: 'Font',
           align: 'Align',
           colHeight: 'Col Header Height',
           rowWidth: 'Row Header Width',
           height: 'Height',
           width: 'Width',
+        },
+        theme: {
+          title: 'Theme',
+          themeType: 'Theme Type',
+          headerFontColor: 'Header Font Color',
+          evenBgColor: 'Even Row Background Color',
+          oddBgColor: 'Odd Row Background Color',
+          hoverDataBgColor: 'Hover And Select Data Color',
+          hoverHeaderBgColor: 'Hover And Select Header Color',
+          headerBgColor: 'Header Background Color',
+          prepareSelectMaskBgColor: 'Prepare Select Mask Color',
+          linkTextColor: 'Link Text Color',
+          hoverSplitLineColor: 'Hover Split Line Color',
+          dataBorderColor: 'Data Border Color',
+          headerBorderColor: 'Header Border Color',
+          verticalSplitLineColor: 'Vertical Split Line Color',
+          horizontalSplitLineColor: 'Horizontal Split Line Color',
+          dataColor: 'Data Font Color',
+          rowCellFontColor: 'Row Cell Font Color',
         },
         summary: {
           title: 'Summary',

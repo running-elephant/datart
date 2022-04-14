@@ -57,6 +57,7 @@ import {
   LegendType,
   ListTemplatePanel,
   NameLocation,
+  PivotSheetTheme,
   ScorecardConditionalStylePanel,
   UnControlledTableHeaderPanel,
 } from '../Customize';
@@ -186,6 +187,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <LegendPosition {...props} />;
         case ChartStyleSectionComponentType.ScorecardConditionalStyle:
           return <ScorecardConditionalStylePanel {...props} />;
+        case ChartStyleSectionComponentType.PivotSheetTheme:
+          return <PivotSheetTheme {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

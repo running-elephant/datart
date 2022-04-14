@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { S2Theme } from '@antv/s2';
+import { Palette, S2Theme } from '@antv/s2';
 import { SheetComponent } from '@antv/s2-react';
 import '@antv/s2-react/dist/style.min.css';
 import { FC, memo } from 'react';
@@ -27,7 +27,8 @@ const AntVS2Wrapper: FC<{
   dataCfg;
   options;
   theme?: S2Theme;
-}> = memo(({ dataCfg, options, theme }) => {
+  palette?: Palette;
+}> = memo(({ dataCfg, options, theme, palette }) => {
   if (!dataCfg) {
     return <div></div>;
   }
@@ -52,7 +53,7 @@ const AntVS2Wrapper: FC<{
       sheetType="pivot"
       dataCfg={dataCfg}
       options={options}
-      themeCfg={{ theme }}
+      themeCfg={{ theme, palette }}
       onDataCellHover={onDataCellHover}
     />
   );
