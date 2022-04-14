@@ -28,6 +28,7 @@ import {
   getMembers,
   getRoles,
 } from 'app/pages/MainPage/pages/MemberPage/slice/thunks';
+import { selectIsOrgOwner } from 'app/pages/MainPage/slice/selectors';
 import { TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
@@ -59,6 +60,7 @@ const ShareLinkModal: FC<{
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
   const usersList = useSelector(selectMembers);
   const rolesList = useSelector(rdxSelectRoles);
+  const isOwner = useSelector(selectIsOrgOwner);
 
   const handleOkFn = useCallback(
     async ({
@@ -127,9 +129,11 @@ const ShareLinkModal: FC<{
   }, []);
 
   useEffect(() => {
-    dispatch(getRoles(orgId));
-    dispatch(getMembers(orgId));
-  }, [orgId, dispatch]);
+    if (isOwner) {
+      dispatch(getRoles(orgId));
+      dispatch(getMembers(orgId));
+    }
+  }, [orgId, dispatch, isOwner]);
 
   useEffect(() => {
     shareData && handleDefauleValue(shareData);
@@ -199,40 +203,42 @@ const ShareLinkModal: FC<{
                 </Radio>
               </Radio.Group>
             </FormItemEx>
-            <FormItemEx label={t('share.userOrRole')}>
-              <Space>
-                <StyledSelection
-                  onChange={handleChangeRoles}
-                  placeholder={t('share.selectRole')}
-                  mode="multiple"
-                  maxTagCount={2}
-                  value={selectRoles || []}
-                >
-                  {rolesList?.map((v, i) => {
-                    return (
-                      <Select.Option key={i} value={v.id}>
-                        {v.name}
-                      </Select.Option>
-                    );
-                  })}
-                </StyledSelection>
-                <StyledSelection
-                  onChange={handleChangeMembers}
-                  placeholder={t('share.selectUser')}
-                  mode="multiple"
-                  maxTagCount={2}
-                  value={selectUsers || []}
-                >
-                  {usersList?.map((v, i) => {
-                    return (
-                      <Select.Option key={i} value={v.id}>
-                        {v.username}
-                      </Select.Option>
-                    );
-                  })}
-                </StyledSelection>
-              </Space>
-            </FormItemEx>
+            {isOwner && (
+              <FormItemEx label={t('share.userOrRole')}>
+                <Space>
+                  <StyledSelection
+                    onChange={handleChangeRoles}
+                    placeholder={t('share.selectRole')}
+                    mode="multiple"
+                    maxTagCount={2}
+                    value={selectRoles || []}
+                  >
+                    {rolesList?.map((v, i) => {
+                      return (
+                        <Select.Option key={i} value={v.id}>
+                          {v.name}
+                        </Select.Option>
+                      );
+                    })}
+                  </StyledSelection>
+                  <StyledSelection
+                    onChange={handleChangeMembers}
+                    placeholder={t('share.selectUser')}
+                    mode="multiple"
+                    maxTagCount={2}
+                    value={selectUsers || []}
+                  >
+                    {usersList?.map((v, i) => {
+                      return (
+                        <Select.Option key={i} value={v.id}>
+                          {v.username}
+                        </Select.Option>
+                      );
+                    })}
+                  </StyledSelection>
+                </Space>
+              </FormItemEx>
+            )}
           </>
         )}
       </Form>

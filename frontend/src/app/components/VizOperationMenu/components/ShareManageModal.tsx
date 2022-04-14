@@ -257,8 +257,10 @@ const ShareManageModal: FC<{
     ]);
 
     useEffect(() => {
-      fetchShareListFn();
-    }, [fetchShareListFn]);
+      if (visibility) {
+        fetchShareListFn();
+      }
+    }, [fetchShareListFn, visibility]);
 
     return (
       <StyledShareLinkModal
