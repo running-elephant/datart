@@ -210,7 +210,10 @@ const boardSlice = createSlice({
       action: PayloadAction<{ boardId: string; wh: [number, number] }>,
     ) {
       const { boardId, wh } = action.payload;
-      state.boardInfoRecord[boardId].boardWidthHeight = wh;
+      let boardInfo = state.boardInfoRecord?.[boardId];
+      if (boardInfo) {
+        state.boardInfoRecord[boardId].boardWidthHeight = wh;
+      }
     },
     changeBoardPublish(
       state,
