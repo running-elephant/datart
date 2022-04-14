@@ -24,18 +24,21 @@ import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
 import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
+import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { ToolBar } from './components/ToolBar';
 import { ControllerWidgetCore } from './ControllerWidgetCore';
 
 export const ControllerWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
+  const widgetInfo = useContext(WidgetInfoContext);
   const { renderMode, boardType, editing } = useContext(BoardContext);
   const { rectRef, cacheWhRef } = useRenderWidget(
     widget,
     renderMode,
     boardType,
+    widgetInfo.rendered,
   );
-  useWidgetAutoFetch(widget, renderMode, rectRef);
+  useWidgetAutoFetch(widget, renderMode, rectRef, widgetInfo.rendered);
   // 自动更新
 
   const { background, border, padding } = widget.config;

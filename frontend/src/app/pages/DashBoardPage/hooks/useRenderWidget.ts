@@ -19,7 +19,6 @@ import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { useCallback, useContext, useEffect, useRef } from 'react';
 import { WidgetActionContext } from '../components/ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../components/BoardProvider/BoardConfigProvider';
-import { WidgetInfoContext } from '../components/WidgetProvider/WidgetInfoProvider';
 import { BoardType, VizRenderMode, Widget } from '../pages/Board/slice/types';
 import { boardScroll } from '../pages/BoardEditor/slice/events';
 import { isElView } from '../utils/board';
@@ -28,11 +27,12 @@ export default function useRenderWidget(
   widget: Widget,
   renderMode: VizRenderMode,
   boardType: BoardType,
+  rendered: boolean,
 ) {
   const { initialQuery } = useContext(BoardConfigContext);
   const { onRenderedWidgetById } = useContext(WidgetActionContext);
-  const widgetInfo = useContext(WidgetInfoContext);
-  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
+
+  const { cacheWhRef, cacheW } = useCacheWidthHeight();
   const rectRef = useRef<HTMLDivElement>(null);
   const renderWidget = useCallback(() => {
     const canView = isElView(rectRef.current);
@@ -44,13 +44,13 @@ export default function useRenderWidget(
   //监听board滚动
   useEffect(() => {
     boardScroll.off(widget.dashboardId, renderWidget);
-    if (!widgetInfo.rendered) {
+    if (!rendered) {
       boardScroll.on(widget.dashboardId, renderWidget);
     }
     return () => {
       boardScroll.off(widget.dashboardId, renderWidget);
     };
-  }, [renderWidget, widget.dashboardId, widgetInfo.rendered]);
+  }, [renderWidget, widget.dashboardId, rendered]);
 
   //定时任务中 或者 后端截图 直接fetch
   useEffect(() => {
@@ -60,17 +60,10 @@ export default function useRenderWidget(
   }, [onRenderedWidgetById, renderMode, widget.id]);
   //初始化查询
   useEffect(() => {
-    if (initialQuery && renderMode !== 'schedule' && !widgetInfo.rendered) {
+    if (initialQuery && renderMode !== 'schedule' && !rendered) {
       renderWidget();
     }
-  }, [
-    cacheW,
-    cacheH,
-    initialQuery,
-    renderMode,
-    widgetInfo.rendered,
-    renderWidget,
-  ]);
+  }, [cacheW, initialQuery, renderMode, rendered, renderWidget]);
   return {
     cacheWhRef,
     rectRef,

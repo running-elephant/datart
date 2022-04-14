@@ -25,19 +25,23 @@ import { EditMask } from '../../WidgetComponents/EditMask';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
 import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
+import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { ToolBar } from './components/ToolBar';
 import { DataChartWidgetCore } from './DataChartWidgetCore';
 
 export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
     const widget = useContext(WidgetContext);
+    const widgetInfo = useContext(WidgetInfoContext);
     const { renderMode, boardType, editing } = useContext(BoardContext);
     const { rectRef, cacheWhRef } = useRenderWidget(
       widget,
       renderMode,
       boardType,
+      widgetInfo.rendered,
     );
-    useWidgetAutoFetch(widget, renderMode, rectRef);
+
+    useWidgetAutoFetch(widget, renderMode, rectRef, widgetInfo.rendered);
     const { background, border, padding } = widget.config;
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>

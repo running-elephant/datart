@@ -19,24 +19,30 @@ import { useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../components/ActionProvider/WidgetActionProvider';
 import { BoardInfoContext } from '../components/BoardProvider/BoardInfoProvider';
 import { VizRenderMode, Widget } from '../pages/Board/slice/types';
+import { isElView } from '../utils/board';
 
 export default function useWidgetAutoFetch(
   widget: Widget,
   renderMode: VizRenderMode,
   rectRef: React.RefObject<HTMLDivElement>,
+  rendered: boolean,
 ) {
   const { visible: boardVisible } = useContext(BoardInfoContext);
   const { onWidgetGetData } = useContext(WidgetActionContext);
+
   useEffect(() => {
-    // TODO 优化 组件更新规则
     let timer: NodeJS.Timeout;
     if (
+      rendered &&
       boardVisible &&
       widget.config.frequency > 0 &&
       widget.config.autoUpdate
     ) {
       timer = setInterval(() => {
-        onWidgetGetData(widget);
+        const elShow = isElView(rectRef.current);
+        if (elShow) {
+          onWidgetGetData(widget);
+        }
       }, +widget.config.frequency * 1000);
     }
     return () => {
@@ -44,5 +50,13 @@ export default function useWidgetAutoFetch(
         clearInterval(timer);
       }
     };
-  }, [boardVisible, widget, onWidgetGetData, renderMode]);
+  }, [
+    boardVisible,
+    widget,
+    widget.config.autoUpdate,
+    onWidgetGetData,
+    renderMode,
+    rendered,
+    rectRef,
+  ]);
 }
