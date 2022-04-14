@@ -248,8 +248,23 @@ class PivotSheetChart extends ReactChart {
         colCell: this.getHeaderStyle(styleConfigs),
         rowCell: this.getHeaderStyle(styleConfigs),
         dataCell: this.getBodyStyle(styleConfigs),
+        background: {
+          opacity: 0,
+        },
+      },
+      palette: {
+        basicColors: this.getThemeColorList(styleConfigs),
+        semanticColors: {
+          red: '#FF4D4F',
+          green: '#29A294',
+        },
       },
     };
+  }
+
+  private getThemeColorList(style: ChartStyleConfig[]) {
+    const [basicColors] = getStyles(style, ['theme'], ['themeType']);
+    return basicColors?.colors || [];
   }
 
   private getRowAndColStyle(
@@ -327,18 +342,13 @@ class PivotSheetChart extends ReactChart {
   }
 
   private getBodyStyle(styleConfigs: ChartStyleConfig[]): TextStyle {
-    const [bodyFont, oddBgColor, evenBgColor, bodyTextAlign] = getStyles(
+    const [bodyFont, bodyTextAlign] = getStyles(
       styleConfigs,
       ['tableBodyStyle'],
-      ['font', 'oddBgColor', 'evenBgColor', 'align'],
+      ['font', 'align'],
     );
     return {
-      cell: {
-        crossBackgroundColor: evenBgColor,
-        backgroundColor: oddBgColor,
-      },
       text: {
-        fill: bodyFont?.color,
         fontFamily: bodyFont?.fontFamily,
         fontSize: bodyFont?.fontSize,
         fontWeight: bodyFont?.fontWeight,
@@ -348,24 +358,19 @@ class PivotSheetChart extends ReactChart {
   }
 
   private getHeaderStyle(styleConfigs: ChartStyleConfig[]): TextStyle {
-    const [headerFont, headerBgColor, headerTextAlign] = getStyles(
+    const [headerFont, headerTextAlign] = getStyles(
       styleConfigs,
       ['tableHeaderStyle'],
-      ['font', 'bgColor', 'align'],
+      ['font', 'align'],
     );
     return {
-      cell: {
-        backgroundColor: headerBgColor,
-      },
       text: {
-        fill: headerFont?.color,
         fontFamily: headerFont?.fontFamily,
         fontSize: headerFont?.fontSize,
         fontWeight: headerFont?.fontWeight,
         textAlign: headerTextAlign,
       },
       bolderText: {
-        fill: headerFont?.color,
         fontFamily: headerFont?.fontFamily,
         fontSize: headerFont?.fontSize,
         fontWeight: headerFont?.fontWeight,
