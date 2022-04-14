@@ -12,7 +12,14 @@ import { MainState } from 'app/pages/MainPage/slice/types';
 import { SharePageState } from 'app/pages/SharePage/slice/types';
 import { StoryBoardState } from 'app/pages/StoryBoardPage/slice/types';
 import { AppState } from 'app/slice/types';
+import { CSSProp } from 'styled-components';
 import { ThemeState } from 'styles/theme/slice/types';
+
+declare module 'react' {
+  interface DOMAttributes<T> {
+    css?: CSSProp;
+  }
+}
 
 export interface RootState {
   theme?: ThemeState;
