@@ -49,15 +49,9 @@ const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
       },
       {
         actions: {
-          [DataViewFieldType.NUMERIC]: [
-            ChartDataSectionFieldActionType.Filter,
-          ],
-          [DataViewFieldType.STRING]: [
-            ChartDataSectionFieldActionType.Filter,
-          ],
-          [DataViewFieldType.DATE]: [
-            ChartDataSectionFieldActionType.Filter,
-          ],
+          [DataViewFieldType.NUMERIC]: [ChartDataSectionFieldActionType.Filter],
+          [DataViewFieldType.STRING]: [ChartDataSectionFieldActionType.Filter],
+          [DataViewFieldType.DATE]: [ChartDataSectionFieldActionType.Filter],
         },
       },
       config,

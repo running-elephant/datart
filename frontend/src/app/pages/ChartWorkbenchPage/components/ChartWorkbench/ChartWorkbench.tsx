@@ -24,9 +24,11 @@ import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import ChartDrillContext from '../../contexts/ChartDrillContext';
 import { dateFormatSelector, languageSelector } from '../../slice/selectors';
 import ChartHeaderPanel from '../ChartHeaderPanel';
 import ChartOperationPanel from '../ChartOperationPanel';
@@ -37,6 +39,7 @@ const ChartWorkbench: FC<{
   chartConfig?: ChartConfig;
   chart?: IChart;
   aggregation?: boolean;
+  drillOption?: IChartDrillOption;
   defaultViewId?: string;
   expensiveQuery: boolean;
   allowQuery: boolean;
@@ -54,6 +57,7 @@ const ChartWorkbench: FC<{
   onDataViewChange?: () => void;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
+  onChartDrillOptionChange?: (option: IChartDrillOption) => void;
 }> = memo(
   ({
     dataset,
@@ -61,6 +65,7 @@ const ChartWorkbench: FC<{
     chartConfig,
     chart,
     aggregation,
+    drillOption,
     header,
     defaultViewId,
     expensiveQuery,
@@ -70,9 +75,11 @@ const ChartWorkbench: FC<{
     onDataViewChange,
     onRefreshDataset,
     onCreateDownloadDataTask,
+    onChartDrillOptionChange,
   }) => {
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
+
     return (
       <ChartAggregationContext.Provider
         value={{
@@ -80,45 +87,52 @@ const ChartWorkbench: FC<{
           onChangeAggregation: header?.onChangeAggregation,
         }}
       >
-        <ChartDatasetContext.Provider
+        <ChartDrillContext.Provider
           value={{
-            dataset: dataset,
-            onRefreshDataset: onRefreshDataset,
+            drillOption: drillOption,
+            onDrillOptionChange: onChartDrillOptionChange,
           }}
         >
-          <ChartDataViewContext.Provider
-            value={{ dataView: dataview, expensiveQuery: expensiveQuery }}
+          <ChartDatasetContext.Provider
+            value={{
+              dataset: dataset,
+              onRefreshDataset: onRefreshDataset,
+            }}
           >
-            <TimeConfigContext.Provider
-              value={{ locale: language, format: dateFormat }}
+            <ChartDataViewContext.Provider
+              value={{ dataView: dataview, expensiveQuery: expensiveQuery }}
             >
-              <StyledChartWorkbench>
-                {header && (
-                  <ChartHeaderPanel
-                    chartName={header?.name}
-                    orgId={header?.orgId}
-                    container={header?.container}
-                    onGoBack={header?.onGoBack}
-                    onSaveChart={header?.onSaveChart}
-                    onSaveChartToDashBoard={header?.onSaveChartToDashBoard}
-                  />
-                )}
-                <StyledChartOperationPanel>
-                  <ChartOperationPanel
-                    chart={chart}
-                    defaultViewId={defaultViewId}
-                    chartConfig={chartConfig}
-                    allowQuery={allowQuery}
-                    onChartChange={onChartChange}
-                    onChartConfigChange={onChartConfigChange}
-                    onDataViewChange={onDataViewChange}
-                    onCreateDownloadDataTask={onCreateDownloadDataTask}
-                  />
-                </StyledChartOperationPanel>
-              </StyledChartWorkbench>
-            </TimeConfigContext.Provider>
-          </ChartDataViewContext.Provider>
-        </ChartDatasetContext.Provider>
+              <TimeConfigContext.Provider
+                value={{ locale: language, format: dateFormat }}
+              >
+                <StyledChartWorkbench>
+                  {header && (
+                    <ChartHeaderPanel
+                      chartName={header?.name}
+                      orgId={header?.orgId}
+                      container={header?.container}
+                      onGoBack={header?.onGoBack}
+                      onSaveChart={header?.onSaveChart}
+                      onSaveChartToDashBoard={header?.onSaveChartToDashBoard}
+                    />
+                  )}
+                  <StyledChartOperationPanel>
+                    <ChartOperationPanel
+                      chart={chart}
+                      defaultViewId={defaultViewId}
+                      chartConfig={chartConfig}
+                      allowQuery={allowQuery}
+                      onChartChange={onChartChange}
+                      onChartConfigChange={onChartConfigChange}
+                      onDataViewChange={onDataViewChange}
+                      onCreateDownloadDataTask={onCreateDownloadDataTask}
+                    />
+                  </StyledChartOperationPanel>
+                </StyledChartWorkbench>
+              </TimeConfigContext.Provider>
+            </ChartDataViewContext.Provider>
+          </ChartDatasetContext.Provider>
+        </ChartDrillContext.Provider>
       </ChartAggregationContext.Provider>
     );
   },
@@ -128,7 +142,9 @@ const ChartWorkbench: FC<{
     prev.chart === next.chart &&
     prev.chartConfig === next.chartConfig &&
     prev.dataset === next.dataset &&
-    prev.defaultViewId === next.defaultViewId,
+    prev.defaultViewId === next.defaultViewId &&
+    prev.drillOption === next.drillOption &&
+    prev.onChartConfigChange === next.onChartConfigChange,
 );
 
 export default ChartWorkbench;

@@ -115,6 +115,9 @@ export const ChartDraggableSourceGroupContainer: FC<{
               category={item.category}
               expression={item.expression}
               type={item.type}
+              subType={item.subType}
+              role={item.role}
+              children={item.children}
               onDeleteComputedField={onDeleteComputedField}
               onEditComputedField={handleEditComputedField}
               onSelectionChange={onDataItemSelectionChange}

@@ -626,6 +626,7 @@
         "size": "大小",
         "drop": "请拖拽数据字段到这里",
         "dropCount": "请至少拖拽{{count}}个数据字段到这里",
+        "drillable": "可钻取",
         "actions": {
           "sort": {
             "title": "排序",
@@ -795,6 +796,14 @@
           "color": "字体颜色",
           "align": "对齐方式"
         }
+      },
+      "drill": {
+        "showNextLevel": "显示下一层级",
+        "expandNextLevel": "展开下一层级",
+        "selectDrillStatus": "鼠标点击钻取状态",
+        "enable": "开启",
+        "disable": "关闭",
+        "rollUp": "上卷"
       }
     },
     "action": {

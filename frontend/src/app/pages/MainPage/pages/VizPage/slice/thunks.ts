@@ -25,6 +25,7 @@ import {
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { getLoggedInUserPermissions } from 'app/pages/MainPage/slice/thunks';
 import { StoryBoard } from 'app/pages/StoryBoardPage/slice/types';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { convertToChartDTO } from 'app/utils/ChartDtoHelper';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
@@ -275,6 +276,7 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
       backendChartId: string;
       pageInfo?;
       sorter?: { column: string; operator: string; aggOperator?: string };
+      drillOption?: IChartDrillOption;
     },
     thunkAPI,
   ) => {
@@ -297,6 +299,7 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
     );
     const data = builder
       .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
+      .addDrillOption(arg?.drillOption)
       .build();
 
     const response = await request2({
@@ -314,7 +317,12 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
 export const updateFilterAndFetchDataset = createAsyncThunk(
   'viz/updateFilterAndFetchDataset',
   async (
-    arg: { backendChartId: string; chartPreview?: ChartPreview; payload },
+    arg: {
+      backendChartId: string;
+      chartPreview?: ChartPreview;
+      payload;
+      drillOption?: IChartDrillOption;
+    },
     thunkAPI,
   ) => {
     await thunkAPI.dispatch(
@@ -326,6 +334,7 @@ export const updateFilterAndFetchDataset = createAsyncThunk(
     await thunkAPI.dispatch(
       fetchDataSetByPreviewChartAction({
         backendChartId: arg.backendChartId,
+        drillOption: arg.drillOption,
       }),
     );
 
