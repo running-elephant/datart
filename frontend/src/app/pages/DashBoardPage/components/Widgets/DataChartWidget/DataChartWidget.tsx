@@ -25,15 +25,23 @@ import { EditMask } from '../../WidgetComponents/EditMask';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
 import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
+import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { ToolBar } from './components/ToolBar';
 import { DataChartWidgetCore } from './DataChartWidgetCore';
 
 export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
     const widget = useContext(WidgetContext);
+    const widgetInfo = useContext(WidgetInfoContext);
     const { renderMode, boardType, editing } = useContext(BoardContext);
-    const { widgetRef, ref } = useRenderWidget(widget, renderMode, boardType);
-    useWidgetAutoFetch(widget, renderMode);
+    const { cacheWhRef } = useRenderWidget(
+      widget,
+      renderMode,
+      boardType,
+      widgetInfo.rendered,
+    );
+
+    useWidgetAutoFetch(widget, renderMode, cacheWhRef, widgetInfo.rendered);
     const { background, border, padding } = widget.config;
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
@@ -44,10 +52,9 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
               config={widget.config.nameConfig}
             />
           )}
-          <div ref={widgetRef} style={FlexStyle}>
-            <div ref={ref} style={FlexStyle}>
-              <DataChartWidgetCore />
-            </div>
+
+          <div ref={cacheWhRef} style={FlexStyle}>
+            <DataChartWidgetCore />
           </div>
         </ZIndexWrapper>
         {editing && <EditMask />}

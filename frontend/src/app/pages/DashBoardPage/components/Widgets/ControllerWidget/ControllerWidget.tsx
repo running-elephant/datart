@@ -24,27 +24,32 @@ import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
 import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
+import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { ToolBar } from './components/ToolBar';
 import { ControllerWidgetCore } from './ControllerWidgetCore';
 
 export const ControllerWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
-  const { renderMode, boardType, editing } = useContext(BoardContext);
-  const { widgetRef, ref } = useRenderWidget(widget, renderMode, boardType);
-  useWidgetAutoFetch(widget, renderMode);
+  const { rendered } = useContext(WidgetInfoContext);
+  const { renderMode, boardType } = useContext(BoardContext);
+  const { cacheWhRef } = useRenderWidget(
+    widget,
+    renderMode,
+    boardType,
+    rendered,
+  );
+  useWidgetAutoFetch(widget, renderMode, cacheWhRef, rendered);
   // 自动更新
 
   const { background, border, padding } = widget.config;
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
       <ZIndexWrapper>
-        <div ref={widgetRef} style={FlexStyle}>
-          <div ref={ref} style={FlexStyle}>
-            <ControllerWidgetCore />
-          </div>
+        <div ref={cacheWhRef} style={FlexStyle}>
+          <ControllerWidgetCore />
         </div>
       </ZIndexWrapper>
-      {editing && <EditMask />}
+      {renderMode === 'edit' && <EditMask />}
       <ToolBar />
     </WidgetWrapper>
   );
