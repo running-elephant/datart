@@ -32,10 +32,10 @@ export default function useRenderWidget(
   const { initialQuery } = useContext(BoardConfigContext);
   const { onRenderedWidgetById } = useContext(WidgetActionContext);
   const widgetInfo = useContext(WidgetInfoContext);
-  const { ref, cacheW, cacheH } = useCacheWidthHeight();
-  const widgetRef = useRef<HTMLDivElement>(null);
+  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
+  const rectRef = useRef<HTMLDivElement>(null);
   const renderWidget = useCallback(() => {
-    const canView = isElView(widgetRef.current);
+    const canView = isElView(rectRef.current);
     if (canView) {
       onRenderedWidgetById(widget.id);
     }
@@ -72,7 +72,7 @@ export default function useRenderWidget(
     renderWidget,
   ]);
   return {
-    ref,
-    widgetRef,
+    cacheWhRef,
+    rectRef,
   };
 }

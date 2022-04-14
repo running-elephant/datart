@@ -23,6 +23,7 @@ import { VizRenderMode, Widget } from '../pages/Board/slice/types';
 export default function useWidgetAutoFetch(
   widget: Widget,
   renderMode: VizRenderMode,
+  rectRef: React.RefObject<HTMLDivElement>,
 ) {
   const { visible: boardVisible } = useContext(BoardInfoContext);
   const { onWidgetGetData } = useContext(WidgetActionContext);

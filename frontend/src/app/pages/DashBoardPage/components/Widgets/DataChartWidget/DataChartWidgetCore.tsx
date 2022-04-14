@@ -45,7 +45,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const { id: widgetId } = widget;
   const { onWidgetChartClick } = useContext(WidgetActionContext);
-  const { ref, cacheW, cacheH } = useCacheWidthHeight();
+  const { cacheWhRef: ref, cacheW, cacheH } = useCacheWidthHeight();
   const widgetRef = useRef<Widget>(widget);
   useEffect(() => {
     widgetRef.current = widget;

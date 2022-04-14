@@ -30,16 +30,20 @@ import { ControllerWidgetCore } from './ControllerWidgetCore';
 export const ControllerWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const { renderMode, boardType, editing } = useContext(BoardContext);
-  const { widgetRef, ref } = useRenderWidget(widget, renderMode, boardType);
-  useWidgetAutoFetch(widget, renderMode);
+  const { rectRef, cacheWhRef } = useRenderWidget(
+    widget,
+    renderMode,
+    boardType,
+  );
+  useWidgetAutoFetch(widget, renderMode, rectRef);
   // 自动更新
 
   const { background, border, padding } = widget.config;
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
       <ZIndexWrapper>
-        <div ref={widgetRef} style={FlexStyle}>
-          <div ref={ref} style={FlexStyle}>
+        <div ref={rectRef} style={FlexStyle}>
+          <div ref={cacheWhRef} style={FlexStyle}>
             <ControllerWidgetCore />
           </div>
         </div>
