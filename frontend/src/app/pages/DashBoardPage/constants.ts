@@ -23,6 +23,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
+import type { CSSProperties } from 'react';
 import { PRIMARY, WHITE } from 'styles/StyleConstants';
 import { WidgetType } from './pages/Board/slice/types';
 export const WIDGET_DRAG_HANDLE = 'widget-draggableHandle';
@@ -33,7 +34,6 @@ export const MIN_ROW_HEIGHT = 24;
 export const MIN_MARGIN = 8;
 export const MIN_PADDING = 8;
 export const LAYOUT_COLS_KEYS = ['lg', 'md', 'sm', 'xs', 'xxs'] as const;
-
 export const LAYOUT_COLS_MAP = {
   lg: 12,
   md: 12,
@@ -282,3 +282,8 @@ export const jumpTypes: { name: string; value: JumpTargetType }[] = [
   { value: 'INTERNAL', name: '' },
   { value: 'URL', name: '' },
 ];
+export const FlexStyle: CSSProperties = {
+  display: 'flex',
+  flex: '1',
+  minHeight: '0',
+};
