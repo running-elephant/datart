@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { message } from 'antd';
+import { DownloadFileType } from 'app/constants';
 import {
   DownloadTask,
   DownloadTaskState,
@@ -78,16 +79,21 @@ export const makeDownloadDataTask =
   (params: {
     downloadParams: ChartDataRequest[];
     fileName: string;
+    downloadType: DownloadFileType;
+    imageWidth?: number;
     resolve: () => void;
   }) =>
   async () => {
-    const { downloadParams, fileName, resolve } = params;
+    const { downloadParams, fileName, resolve, downloadType, imageWidth } =
+      params;
     const res = await request<{}>({
       url: `download/submit/task`,
       method: 'POST',
       data: {
         downloadParams: downloadParams,
         fileName: fileName,
+        downloadType,
+        imageWidth,
       },
     });
     if (res?.success) {

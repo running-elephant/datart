@@ -34,15 +34,16 @@ export default function useBoardWidthHeight() {
     refreshMode: 'debounce',
     refreshRate: 100,
   });
+
   useEffect(() => {
     const width = gridWidth;
     const height = gridHeight;
-    // TODO in only in  scheduleJob
-    if (renderMode === 'schedule') {
+    // TODO in only in  renderMode
+    if (renderMode !== 'edit') {
       dispatch(
         boardActions.setBoardWidthHeight({ boardId, wh: [width, height] }),
       );
     }
-  }, [gridHeight, renderMode, dispatch, boardId, gridWidth]);
+  }, [gridHeight, dispatch, boardId, gridWidth, renderMode]);
   return { gridRef };
 }

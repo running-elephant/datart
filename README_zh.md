@@ -64,3 +64,5 @@ datart 是新一代数据可视化开放平台，支持各类企业数据可视�
 
 ## License
 datart is under the Apache 2.0 license. See the [LICENSE](https://gitee.com/running-elephant/datart/blob/master/LICENSE) file for details.
+
+**（在使用上遇到的任何问题，以及对 datart 的建议，欢迎创建 issue 提问和讨论）**

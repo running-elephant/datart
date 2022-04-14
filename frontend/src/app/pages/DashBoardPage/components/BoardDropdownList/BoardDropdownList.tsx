@@ -24,6 +24,7 @@ import {
   ShareAltOutlined,
 } from '@ant-design/icons';
 import { Menu, Popconfirm } from 'antd';
+import { DownloadFileType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSaveAsViz } from 'app/pages/MainPage/pages/VizPage/hooks/useSaveAsViz';
 import { FC, memo, useContext } from 'react';
@@ -33,6 +34,7 @@ import { usePublishBoard } from '../../hooks/usePublishBoard';
 import { widgetsQueryAction } from '../../pages/Board/slice/asyncActions';
 import { BoardActionContext } from '../ActionProvider/BoardActionProvider';
 import { BoardContext } from '../BoardProvider/BoardProvider';
+
 interface Props {
   onOpenShareLink: () => void;
   openStoryList: () => void;
@@ -89,10 +91,36 @@ export const BoardDropdownList: FC<Props> = memo(
                 okText={t('common.ok')}
                 cancelText={t('common.cancel')}
                 onConfirm={() => {
-                  onBoardToDownLoad?.();
+                  onBoardToDownLoad?.(DownloadFileType.Excel);
                 }}
               >
                 {t('share.downloadData')}
+              </Popconfirm>
+            </Menu.Item>
+            <Menu.Item key={'downloadPDF'} icon={<CloudDownloadOutlined />}>
+              <Popconfirm
+                placement="left"
+                title={t('common.confirm')}
+                okText={t('common.ok')}
+                cancelText={t('common.cancel')}
+                onConfirm={() => {
+                  onBoardToDownLoad?.(DownloadFileType.Pdf);
+                }}
+              >
+                {t('share.downloadPDF')}
+              </Popconfirm>
+            </Menu.Item>
+            <Menu.Item key={'downloadPicture'} icon={<CloudDownloadOutlined />}>
+              <Popconfirm
+                placement="left"
+                title={t('common.confirm')}
+                okText={t('common.ok')}
+                cancelText={t('common.cancel')}
+                onConfirm={() => {
+                  onBoardToDownLoad?.(DownloadFileType.Image);
+                }}
+              >
+                {t('share.downloadPicture')}
               </Popconfirm>
             </Menu.Item>
           </>
