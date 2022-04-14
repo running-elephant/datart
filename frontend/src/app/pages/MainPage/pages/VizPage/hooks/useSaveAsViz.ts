@@ -75,6 +75,7 @@ export function useSaveAsViz() {
               ...values,
               parentId: values.parentId || null,
               index,
+              avatar: JSON.parse(vizData.config)?.chartGraphId,
             });
 
             await dispatch(
@@ -93,6 +94,8 @@ export function useSaveAsViz() {
               orgId: vizData.orgId,
               parentId: values.parentId || null,
               permissions: vizData.permissions,
+              subType: JSON.parse(vizData.config)?.type,
+              boardType: JSON.parse(vizData.config)?.type,
             };
 
             await dispatch(
