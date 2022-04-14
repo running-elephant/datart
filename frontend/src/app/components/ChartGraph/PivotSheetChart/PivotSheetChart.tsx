@@ -32,10 +32,10 @@ import {
 } from 'app/utils/chartHelper';
 import AntVS2Wrapper from './AntVS2Wrapper';
 import Config from './config';
-import { TableSorters, TextStyle } from './types';
+import { RowAndColStyle, TableSorters, TextStyle } from './types';
 
 class PivotSheetChart extends ReactChart {
-  static icon = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z" fill="gray"/></svg>`;
+  static icon = `<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' aria-hidden='true' role='img' width='1em' height='1em' preserveAspectRatio='xMidYMid meet' viewBox='0 0 24 24'><path d='M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z' fill='gray'/></svg>`;
 
   useIFrame = false;
   isISOContainer = 'piovt-sheet';
@@ -196,6 +196,12 @@ class PivotSheetChart extends ReactChart {
           },
         },
         supportCSSTransform: true,
+        style: this.getRowAndColStyle(
+          styleConfigs,
+          metricsSectionConfigRows,
+          columnSectionConfigRows,
+          chartDataSet,
+        ),
       },
       dataCfg: {
         fields: {
@@ -242,6 +248,57 @@ class PivotSheetChart extends ReactChart {
         colCell: this.getHeaderStyle(styleConfigs),
         rowCell: this.getHeaderStyle(styleConfigs),
         dataCell: this.getBodyStyle(styleConfigs),
+      },
+    };
+  }
+
+  private getRowAndColStyle(
+    style: ChartStyleConfig[],
+    metricsSectionConfigRows: ChartDataSectionField[],
+    columnSectionConfigRows: ChartDataSectionField[],
+    chartDataSet: IChartDataSet<string>,
+  ): RowAndColStyle {
+    const [bodyHeight, bodyWidth] = getStyles(
+      style,
+      ['tableBodyStyle'],
+      ['height', 'width'],
+    );
+
+    const [headerHeight, headerWidth] = getStyles(
+      style,
+      ['tableHeaderStyle'],
+      ['height', 'width'],
+    );
+    const [metricNameShowIn] = getStyles(
+      style,
+      ['style'],
+      ['metricNameShowIn'],
+    );
+
+    return {
+      colCfg: {
+        height: headerHeight || 30,
+        widthByFieldValue: metricNameShowIn
+          ? metricsSectionConfigRows.reduce((allConfig, config) => {
+              return {
+                ...allConfig,
+                [chartDataSet.getFieldKey(config)]: bodyWidth,
+              };
+            }, {})
+          : chartDataSet.reduce((dataSetAllConfig, dataSetConfig) => {
+              return {
+                ...dataSetAllConfig,
+                [dataSetConfig?.getCell(
+                  columnSectionConfigRows[columnSectionConfigRows.length - 1],
+                )]: bodyWidth,
+              };
+            }, {}),
+      },
+      rowCfg: {
+        width: headerWidth,
+      },
+      cellCfg: {
+        height: bodyHeight || 30,
       },
     };
   }

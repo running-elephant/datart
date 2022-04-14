@@ -156,20 +156,6 @@ public class SqlBuilder {
             }
         }
 
-        // aggregators
-        if (!CollectionUtils.isEmpty(executeParam.getAggregators())) {
-            for (AggregateOperator aggregator : executeParam.getAggregators()) {
-                String alias;
-                if (aggregator.getSqlOperator() == null) {
-                    alias = aggregator.getColumn();
-                } else {
-                    alias = aggregator.getSqlOperator().name() + "(" + aggregator.getColumn() + ")";
-                }
-                columnAlias.put(aggregator.getColumn(), alias);
-                selectList.add(createAggNode(aggregator.getSqlOperator(), aggregator.getColumn(), alias));
-            }
-        }
-
         //group by
         if (!CollectionUtils.isEmpty(executeParam.getGroups())) {
             for (GroupByOperator group : executeParam.getGroups()) {
@@ -182,6 +168,20 @@ public class SqlBuilder {
                     selectList.add(sqlNode);
                 }
                 groupBy.add(sqlNode);
+            }
+        }
+
+        // aggregators
+        if (!CollectionUtils.isEmpty(executeParam.getAggregators())) {
+            for (AggregateOperator aggregator : executeParam.getAggregators()) {
+                String alias;
+                if (aggregator.getSqlOperator() == null) {
+                    alias = aggregator.getColumn();
+                } else {
+                    alias = aggregator.getSqlOperator().name() + "(" + aggregator.getColumn() + ")";
+                }
+                columnAlias.put(aggregator.getColumn(), alias);
+                selectList.add(createAggNode(aggregator.getSqlOperator(), aggregator.getColumn(), alias));
             }
         }
 

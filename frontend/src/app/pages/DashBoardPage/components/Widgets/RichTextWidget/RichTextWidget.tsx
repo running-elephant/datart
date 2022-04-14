@@ -17,13 +17,13 @@
  */
 import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
+import { FlexStyle } from 'app/pages/DashBoardPage/constants';
 import { memo, useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
-import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
-import { LockFnIcon } from '../../WidgetComponents/StatusIcon';
+import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
@@ -61,19 +61,18 @@ export const RichTextWidget: React.FC<{ hideTitle: boolean }> = memo(
               config={widget.config.nameConfig}
             />
           )}
-
-          <FlexWrapper>
+          <div style={FlexStyle}>
             <RichTextWidgetCore
               widget={widget}
               widgetInfo={widgetInfo}
               boardEditing={editing}
             />
-          </FlexWrapper>
+          </div>
         </ZIndexWrapper>
         {editing && <EditMask />}
         <StyledWidgetToolBar>
           <Space size={0}>
-            <LockFnIcon
+            <LockIconFn
               boardEditing={editing}
               wid={widget.id}
               lock={widget.config?.lock}

@@ -16,13 +16,12 @@
  * limitations under the License.
  */
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { memo, useContext, useEffect } from 'react';
-import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
-import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
-import { BoardInfoContext } from '../../BoardProvider/BoardInfoProvider';
+import { FlexStyle } from 'app/pages/DashBoardPage/constants';
+import useRenderWidget from 'app/pages/DashBoardPage/hooks/useRenderWidget';
+import useWidgetAutoFetch from 'app/pages/DashBoardPage/hooks/useWidgetAutoFetch';
+import { memo, useContext } from 'react';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
-import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
 import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
@@ -33,54 +32,16 @@ import { DataChartWidgetCore } from './DataChartWidgetCore';
 export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
     const widget = useContext(WidgetContext);
-    const { onWidgetGetData } = useContext(WidgetActionContext);
-    const { initialQuery } = useContext(BoardConfigContext);
-    const { renderMode, boardType, editing } = useContext(BoardContext);
     const widgetInfo = useContext(WidgetInfoContext);
-    const { visible: boardVisible } = useContext(BoardInfoContext);
-    const { onRenderedWidgetById } = useContext(WidgetActionContext);
-    /**
-     * @param ''
-     * @description '在定时任务的模式 直接加载不做懒加载 ,其他模式下 如果是 free 类型直接加载 如果是 autoBoard 则由 autoBoard自己控制'
-     */
-    useEffect(() => {
-      if (renderMode === 'schedule') {
-        onRenderedWidgetById(widget.id);
-      } else if (boardType === 'free' && initialQuery) {
-        onRenderedWidgetById(widget.id);
-      }
-    }, [boardType, initialQuery, renderMode, onRenderedWidgetById, widget.id]);
-    // 自动更新
-    useEffect(() => {
-      // TODO 优化 组件更新规则
-      let timer: NodeJS.Timeout;
-      if (
-        !widgetInfo.loading &&
-        widgetInfo.rendered &&
-        boardVisible &&
-        widget.config.frequency > 0 &&
-        widget.config.autoUpdate
-      ) {
-        timer = setInterval(() => {
-          onWidgetGetData(widget);
-        }, +widget.config.frequency * 1000);
-      }
-      return () => {
-        if (timer) {
-          clearInterval(timer);
-        }
-      };
-    }, [
-      boardVisible,
+    const { renderMode, boardType, editing } = useContext(BoardContext);
+    const { cacheWhRef } = useRenderWidget(
       widget,
-      widget.config.autoUpdate,
-      widget.config.frequency,
-      widget.config.type,
-      widgetInfo.loading,
-      widgetInfo.rendered,
-      onWidgetGetData,
       renderMode,
-    ]);
+      boardType,
+      widgetInfo.rendered,
+    );
+
+    useWidgetAutoFetch(widget, renderMode, cacheWhRef, widgetInfo.rendered);
     const { background, border, padding } = widget.config;
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
@@ -91,9 +52,10 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
               config={widget.config.nameConfig}
             />
           )}
-          <FlexWrapper>
+
+          <div ref={cacheWhRef} style={FlexStyle}>
             <DataChartWidgetCore />
-          </FlexWrapper>
+          </div>
         </ZIndexWrapper>
         {editing && <EditMask />}
         <ToolBar />

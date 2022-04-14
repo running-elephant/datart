@@ -40,7 +40,11 @@ import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
 import { isEmptyArray } from 'utils/object';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import { useVizSlice } from '../slice';
-import { selectPreviewCharts, selectPublishLoading } from '../slice/selectors';
+import {
+  selectPreviewCharts,
+  selectPublishLoading,
+  selectVizs,
+} from '../slice/selectors';
 import {
   deleteViz,
   fetchDataSetByPreviewChartAction,
@@ -72,10 +76,11 @@ const ChartPreviewBoard: FC<{
     useVizSlice();
     // NOTE: avoid initialize width or height is zero that cause echart sampling calculation issue.
     const defaultChartContainerWH = 1;
-    const { ref, cacheW, cacheH } = useCacheWidthHeight(
-      defaultChartContainerWH,
-      defaultChartContainerWH,
-    );
+    const {
+      cacheWhRef: ref,
+      cacheW,
+      cacheH,
+    } = useCacheWidthHeight(defaultChartContainerWH, defaultChartContainerWH);
     const { actions } = useMainSlice();
     const chartManager = ChartManager.instance();
     const dispatch = useDispatch();
@@ -90,6 +95,7 @@ const ChartPreviewBoard: FC<{
     const tg = useI18NPrefix('global');
     const saveAsViz = useSaveAsViz();
     const history = useHistory();
+    const vizs = useSelector(selectVizs);
 
     useEffect(() => {
       const filterSearchParams = filterSearchUrl
@@ -227,7 +233,7 @@ const ChartPreviewBoard: FC<{
       return result;
     };
 
-    const handleCreateDownloadDataTask = async () => {
+    const handleCreateDownloadDataTask = async downloadType => {
       if (!chartPreview) {
         return;
       }
@@ -245,6 +251,9 @@ const ChartPreviewBoard: FC<{
         false,
         chartPreview?.backendChart?.config?.aggregation,
       );
+      const folderId = vizs.filter(
+        v => v.relId === chartPreview?.backendChart?.id,
+      )[0].id;
 
       dispatch(
         makeDownloadDataTask({
@@ -252,13 +261,18 @@ const ChartPreviewBoard: FC<{
             {
               ...builder.build(),
               ...{
-                vizId: chartPreview?.backendChart?.id,
+                vizId:
+                  downloadType === 'EXCEL'
+                    ? chartPreview?.backendChart?.id
+                    : folderId,
                 vizName: chartPreview?.backendChart?.name,
                 analytics: false,
                 vizType: 'dataChart',
               },
             },
           ],
+          imageWidth: cacheW,
+          downloadType,
           fileName: chartPreview?.backendChart?.name || 'chart',
           resolve: () => {
             dispatch(actions.setDownloadPolling(true));

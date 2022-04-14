@@ -186,13 +186,6 @@ export default WidgetOfFreeEdit;
 
 const ItemWrap = styled.div`
   box-sizing: border-box;
-  & .widget-tool-bar {
-    z-index: 30;
-  }
-
-  &:hover .widget-tool-dropdown {
-    visibility: visible;
-  }
 
   & > span:last-child {
     z-index: 999999;

@@ -1,6 +1,6 @@
 package datart.server.config;
 
-import datart.core.base.consts.SystemMode;
+import datart.core.base.consts.TenantManagementMode;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
 import datart.core.entity.Organization;
@@ -52,8 +52,8 @@ public class AppModeStartConfig implements ApplicationListener<ApplicationStarte
     @Override
     @Transactional
     public void onApplicationEvent(ApplicationStartedEvent applicationStartedEvent) {
-        SystemMode currMode = Application.getCurrMode();
-        if (SystemMode.SINGLE.equals(currMode)) {
+        TenantManagementMode currMode = Application.getCurrMode();
+        if (TenantManagementMode.TEAM.equals(currMode)) {
             String adminId = Application.getAdminId();
             String username = Application.getProperty("datart.admin.username");
             String password = Application.getProperty("datart.admin.password");
@@ -62,9 +62,9 @@ public class AppModeStartConfig implements ApplicationListener<ApplicationStarte
             securityManager.runAs(username);
             Organization org = initOrganization(adminUser);
 
-            log.info("The application is running in {} mode, and the admin username is {}.", currMode, username);
+            log.info("The application is running in {} tenant-management-mode, and the admin username is {}.", currMode, username);
         } else {
-            log.info("The application is running in {} mode.", currMode);
+            log.info("The application is running in {} tenant-management-mode.", currMode);
         }
     }
 
@@ -110,7 +110,7 @@ public class AppModeStartConfig implements ApplicationListener<ApplicationStarte
             }
             roleService.grantOrgOwner(organization.getId(), adminUser.getId(), false);
         } else {
-            Exceptions.base("There is more than one organization in single mode, please initialize database or switch to normal mode.");
+            Exceptions.base("There is more than one organization in team tenant-management-mode, please initialize database or switch to platform tenant-management-mode.");
         }
         return organization;
     }

@@ -80,9 +80,6 @@ export const fetchShareVizInfo = createAsyncThunk(
     if (authenticationMode === 'CODE') {
       persistence.session.save(shareToken, sharePassword);
     }
-    if (authenticationMode === 'LOGIN' && data?.shareToken) {
-      persistence.session.save(shareToken, data.shareToken.authorizedToken);
-    }
     await thunkAPI.dispatch(shareActions.saveNeedVerify(false));
     await thunkAPI.dispatch(
       shareActions.saveShareInfo({

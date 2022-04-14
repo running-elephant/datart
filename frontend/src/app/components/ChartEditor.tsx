@@ -18,6 +18,7 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
+import { DownloadFileType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
@@ -520,6 +521,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           },
         ],
         fileName: backendChart?.name || 'chart',
+        downloadType: DownloadFileType.Pdf,
         resolve: () => {
           dispatch(actions.setChartEditorDownloadPolling(true));
         },

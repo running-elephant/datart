@@ -808,6 +808,7 @@
     },
     "action": {
       "common": {
+        "downloadForExcel": "Download Excel",
         "confirm": "Please Confirm",
         "ok": "OK",
         "cancel": "Cancel",
@@ -833,6 +834,8 @@
         "generateLink": "Generate Link",
         "shareLink": "Share management",
         "downloadData": "Download Excel",
+        "downloadPDF": "Download PDF",
+        "downloadPicture": "Download Picture",
         "NONE": "None",
         "CODE": "Code",
         "LOGIN": "Login",

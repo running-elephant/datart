@@ -40,7 +40,7 @@ public class RootController {
     @SkipLogin
     @GetMapping(value = "shareDashboard/**")
     public void shareDashboard(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/shareChart.html").forward(request, response);
+        request.getRequestDispatcher("/shareDashboard.html").forward(request, response);
     }
 
     @SkipLogin

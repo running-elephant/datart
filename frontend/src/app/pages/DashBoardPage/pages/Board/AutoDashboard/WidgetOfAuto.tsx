@@ -34,8 +34,4 @@ const Wrapper = styled.div<{}>`
   flex-direction: column;
   width: 100%;
   height: 100%;
-
-  &:hover .widget-tool-dropdown {
-    visibility: visible;
-  }
 `;

@@ -83,12 +83,38 @@ const ChartTypeSelector: FC<{
           title={t('confirm')}
           onConfirm={onCreateDownloadDataTask}
         >
-          <CloudDownloadOutlined />
-        </Popconfirm>
-      </TypeSelector>
-    </StyledChartTypeSelector>
-  );
-});
+          <AreaChartOutlined />
+        </TypeSelector>
+        <TypeSelector
+          fontSize={FONT_SIZE_HEADING}
+          className={classnames({ active: type === ChartPresentType.RAW })}
+          onClick={typeChange(ChartPresentType.RAW)}
+        >
+          <TableOutlined />
+        </TypeSelector>
+        <TypeSelector
+          fontSize={FONT_SIZE_HEADING}
+          className={classnames({ active: type === ChartPresentType.SQL })}
+          onClick={typeChange(ChartPresentType.SQL)}
+        >
+          <ConsoleSqlOutlined />
+        </TypeSelector>
+        <TypeSelector
+          fontSize={FONT_SIZE_HEADING}
+          className={classnames({ active: type === ChartPresentType.DOWNLOAD })}
+        >
+          <Popconfirm
+            placement="left"
+            title={t('downloadForExcel')}
+            onConfirm={onCreateDownloadDataTask}
+          >
+            <CloudDownloadOutlined />
+          </Popconfirm>
+        </TypeSelector>
+      </StyledChartTypeSelector>
+    );
+  },
+);
 
 export default ChartTypeSelector;
 

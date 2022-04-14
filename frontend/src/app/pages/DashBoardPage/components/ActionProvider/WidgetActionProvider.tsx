@@ -22,6 +22,7 @@ import { ChartMouseEventParams } from 'app/types/Chart';
 import debounce from 'lodash/debounce';
 import { createContext, FC, memo, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import {
   widgetChartClickAction,
   widgetGetDataAction,
@@ -76,7 +77,7 @@ export const WidgetActionProvider: FC<{
   renderMode: VizRenderMode;
 }> = memo(({ boardEditing, boardId, orgId, renderMode, children }) => {
   const dispatch = useDispatch();
-
+  const history = useHistory();
   const methods = useMemo(() => {
     const contextValue: WidgetActionContextProps = {
       onEditLayerToTop: () => {
@@ -183,9 +184,11 @@ export const WidgetActionProvider: FC<{
             renderMode,
             widget,
             params,
+            history,
           ),
         );
       },
+
       onWidgetClearLinkage: (widget: Widget) => {
         dispatch(widgetToClearLinkageAction(boardEditing, widget, renderMode));
       },
@@ -256,6 +259,7 @@ export const WidgetActionProvider: FC<{
       },
     };
     return contextValue;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardEditing, boardId, dispatch, orgId, renderMode]);
 
   return (

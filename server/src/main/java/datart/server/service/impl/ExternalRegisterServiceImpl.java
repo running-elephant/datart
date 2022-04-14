@@ -98,7 +98,10 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
 
         User user = userMapper.selectByNameOrEmail(oauthUser.getName());
         if (user != null) {
-            return null;
+            PasswordToken passwordToken = new PasswordToken(user.getUsername(),
+                    null,
+                    System.currentTimeMillis());
+            return JwtUtils.toJwtString(passwordToken);
         }
 
         String emailMapping = getProperty(String.format("spring.security.oauth2.client.provider.%s.userMapping.email", oauthAuthToken.getAuthorizedClientRegistrationId()));

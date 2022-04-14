@@ -40,7 +40,7 @@ export const useCacheWidthHeight = (
     }
   }, [width, height]);
   return {
-    ref,
+    cacheWhRef: ref,
     cacheW,
     cacheH,
   };

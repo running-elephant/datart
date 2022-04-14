@@ -17,13 +17,11 @@
  */
 import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { memo, useContext, useEffect } from 'react';
-import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
-import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
+import { FlexStyle } from 'app/pages/DashBoardPage/constants';
+import { memo, useContext } from 'react';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
-import { FlexWrapper } from '../../WidgetComponents/FlexWrapper';
-import { LockFnIcon } from '../../WidgetComponents/StatusIcon';
+import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
@@ -32,33 +30,22 @@ import { QueryBtnWidgetCore } from './QueryBtnWidgetCore';
 
 export const QueryBtnWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
-  const { initialQuery } = useContext(BoardConfigContext);
-  const { renderMode, boardType, editing } = useContext(BoardContext);
-  const { onRenderedWidgetById } = useContext(WidgetActionContext);
-  /**
-   * @param ''
-   * @description '在定时任务的模式 直接加载不做懒加载 ,其他模式下 如果是 free 类型直接加载 如果是 autoBoard 则由 autoBoard自己控制'
-   */
-  useEffect(() => {
-    if (renderMode === 'schedule') {
-      onRenderedWidgetById(widget.id);
-    } else if (boardType === 'free' && initialQuery) {
-      onRenderedWidgetById(widget.id);
-    }
-  }, [boardType, initialQuery, renderMode, onRenderedWidgetById, widget.id]);
+
+  const { editing } = useContext(BoardContext);
+
   // 自动更新
   const { background, border, padding } = widget.config;
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
       <ZIndexWrapper>
-        <FlexWrapper>
+        <div style={FlexStyle}>
           <QueryBtnWidgetCore />
-        </FlexWrapper>
+        </div>
       </ZIndexWrapper>
       {editing && <EditMask />}
       <StyledWidgetToolBar>
         <Space size={0}>
-          <LockFnIcon
+          <LockIconFn
             boardEditing={editing}
             wid={widget.id}
             lock={widget.config?.lock}

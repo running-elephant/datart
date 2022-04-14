@@ -17,16 +17,14 @@
  */
 
 import { Empty } from 'antd';
+import { useGridWidgetHeight } from 'app/hooks/useGridWidgetHeight';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import { LAYOUT_COLS_MAP } from 'app/pages/DashBoardPage/constants';
-import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
+import useBoardScroll from 'app/pages/DashBoardPage/hooks/useBoardScroll';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
-import {
-  selectLayoutWidgetInfoMapById,
-  selectLayoutWidgetMapById,
-} from 'app/pages/DashBoardPage/pages/Board/slice/selector';
+import { selectLayoutWidgetMapById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getBoardMarginPadding } from 'app/pages/DashBoardPage/utils/board';
 import { memo, useCallback, useContext, useMemo } from 'react';
@@ -43,7 +41,13 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
     const { editing } = useContext(BoardContext);
     const boardConfig = useContext(BoardConfigContext);
-    const { margin, background, allowOverlap } = boardConfig;
+    const { background, allowOverlap } = boardConfig;
+    const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
+
+    const { curMargin, curPadding } = useMemo(() => {
+      return getBoardMarginPadding(boardConfig, colsKey);
+    }, [boardConfig, colsKey]);
+    const { gridWrapRef, thEmitScroll } = useBoardScroll(boardId);
     const selectLayoutWidgetsConfigById = useMemo(
       selectLayoutWidgetMapById,
       [],
@@ -51,40 +55,21 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
       selectLayoutWidgetsConfigById(state, boardId),
     );
-
-    const layoutWidgetInfoMap = useSelector((state: { board: BoardState }) =>
-      selectLayoutWidgetInfoMapById(state, boardId),
-    );
+    const layoutMap = useGridLayoutMap(layoutWidgetMap);
 
     const sortedLayoutWidgets = useMemo(
       () =>
         Object.values(layoutWidgetMap).sort(
           (a, b) => a.config.index - b.config.index,
         ),
-
       [layoutWidgetMap],
     );
 
-    const {
-      ref,
-      gridWrapRef,
-      currentLayout,
-      widgetRowHeight,
-      throttleLazyRender,
-      colsKey,
-    } = useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
-
-    const { curMargin, curPadding } = useMemo(() => {
-      return getBoardMarginPadding(boardConfig, colsKey);
-    }, [boardConfig, colsKey]);
-    const layoutMap = useGridLayoutMap(layoutWidgetMap);
-
     const onLayoutChange = useCallback(
       (layouts: Layout[]) => {
-        throttleLazyRender();
-        currentLayout.current = layouts;
+        thEmitScroll();
       },
-      [currentLayout, throttleLazyRender],
+      [thEmitScroll],
     );
 
     const boardChildren = useMemo(() => {
@@ -104,9 +89,9 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     }, [boardId, editing, sortedLayoutWidgets]);
     return (
       <Wrap>
-        <StyledContainer bg={background} ref={ref}>
-          {sortedLayoutWidgets.length ? (
-            <div className="grid-wrap" ref={gridWrapRef}>
+        <StyledContainer bg={background}>
+          <div className="grid-wrap" ref={gridWrapRef}>
+            <div className="widget-row-height" ref={ref}>
               <ReactGridLayout
                 layout={layoutMap[colsKey]}
                 margin={curMargin}
@@ -123,7 +108,8 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
                 {boardChildren}
               </ReactGridLayout>
             </div>
-          ) : (
+          </div>
+          {!sortedLayoutWidgets.length && (
             <div className="empty">
               <Empty description="" />
             </div>
@@ -157,7 +143,7 @@ const StyledContainer = styled(StyledBackground)`
 
   .empty {
     display: flex;
-    flex: 1;
+    flex: 100;
     align-items: center;
     justify-content: center;
   }

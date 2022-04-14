@@ -15,7 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { createBrowserHistory } from 'history';
-const history = createBrowserHistory();
-export default history;
+import { EllipsisOutlined } from '@ant-design/icons';
+import { Button, Dropdown } from 'antd';
+import { memo, ReactElement } from 'react';
+export const WidgetDropdown: React.FC<{ overlay: ReactElement }> = memo(
+  ({ overlay }) => {
+    return (
+      <Dropdown
+        className="widget-tool-dropdown"
+        overlay={overlay}
+        placement="bottomCenter"
+        trigger={['click']}
+        arrow
+      >
+        <Button icon={<EllipsisOutlined />} type="link" />
+      </Dropdown>
+    );
+  },
+);

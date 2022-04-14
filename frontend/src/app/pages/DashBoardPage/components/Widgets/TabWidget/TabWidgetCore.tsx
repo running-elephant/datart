@@ -134,14 +134,6 @@ const MapWrapper = styled.div`
   flex: 1;
   width: 100%;
   height: 100%;
-
-  & .widget-tool-bar {
-    z-index: 30;
-  }
-
-  &:hover .widget-tool-dropdown {
-    visibility: visible;
-  }
 `;
 const TabsBoxWrap = styled.div<{}>`
   width: 100%;

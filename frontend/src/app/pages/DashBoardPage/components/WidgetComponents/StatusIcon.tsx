@@ -25,12 +25,13 @@ import {
 } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import React, { memo, useContext } from 'react';
+import React, { memo, useCallback, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { ERROR, PRIMARY } from 'styles/StyleConstants';
+import { Widget, WidgetErrorType } from '../../pages/Board/slice/types';
 import { WidgetActionContext } from '../ActionProvider/WidgetActionProvider';
 
-export const LockFnIcon: React.FC<{
+export const LockIconFn: React.FC<{
   boardEditing: boolean;
   wid: string;
   lock: boolean;
@@ -57,7 +58,23 @@ export const LockIcon: React.FC<{
     </Tooltip>
   );
 };
-
+export const WaitIconFn: React.FC<{ rendered: boolean; widget: Widget }> = memo(
+  ({ rendered, widget }) => {
+    const { onWidgetGetData } = useContext(WidgetActionContext);
+    const t = useI18NPrefix(`viz.widget.tips`);
+    const onRefreshWidget = useCallback(() => {
+      onWidgetGetData(widget);
+    }, [onWidgetGetData, widget]);
+    if (rendered) return null;
+    return (
+      <WaitingIcon
+        onClick={onRefreshWidget}
+        onMouseEnter={onRefreshWidget}
+        title={t('waiting')}
+      />
+    );
+  },
+);
 export const WaitingIcon: React.FC<{
   title: React.ReactNode;
   onClick?: React.MouseEventHandler<HTMLSpanElement> | undefined;
@@ -88,6 +105,7 @@ export const LoadingIcon: React.FC<{ loading?: boolean }> = ({ loading }) => {
     />
   );
 };
+
 export const CancelLinkageIcon: React.FC<{
   title: React.ReactNode | undefined;
   onClick: React.MouseEventHandler<HTMLSpanElement> | undefined;
@@ -107,7 +125,23 @@ export const CanLinkageIcon: React.FC<{
     </Tooltip>
   );
 };
-
+export const LinkageIconFn: React.FC<{ inLinking: boolean; widget: Widget }> =
+  memo(({ inLinking, widget }) => {
+    const { onWidgetClearLinkage } = useContext(WidgetActionContext);
+    const t = useI18NPrefix(`viz.widget.tips`);
+    if (inLinking) {
+      return (
+        <CancelLinkageIcon
+          title={t('cancelLinkage')}
+          onClick={() => onWidgetClearLinkage(widget)}
+        />
+      );
+    } else {
+      return widget.config?.linkageConfig?.open ? (
+        <CanLinkageIcon title={t('canLinkage')} />
+      ) : null;
+    }
+  });
 const StyledErrorIcon = styled(Button)`
   background: ${p => p.theme.componentBackground};
   &:hover,
@@ -115,15 +149,26 @@ const StyledErrorIcon = styled(Button)`
     background: ${p => p.theme.componentBackground};
   }
 `;
+
 export const ErrorIcon: React.FC<{
-  errInfo: React.ReactNode;
-}> = ({ errInfo }) => {
+  errInfo?: Record<WidgetErrorType, string>;
+}> = memo(({ errInfo }) => {
+  if (!errInfo) return null;
+  const errorInfos = Object.values(errInfo);
+  if (!errorInfos.length) return null;
+  const errHtml = (
+    <div style={{ maxHeight: '200px', maxWidth: '400px', overflow: 'auto' }}>
+      {errorInfos.map((item, i) => {
+        return <p key={i}>{String(item)}</p>;
+      })}
+    </div>
+  );
   return (
-    <Tooltip title={errInfo}>
+    <Tooltip title={errHtml}>
       <StyledErrorIcon
         icon={<WarningTwoTone twoToneColor={ERROR} />}
         type="link"
       />
     </Tooltip>
   );
-};
+});

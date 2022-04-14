@@ -171,7 +171,7 @@ const VizHeader: FC<{
             </>
           }
         />
-        {showShareLinkModal && (
+        {allowShare && (
           <ShareManageModal
             vizId={backendChartId as string}
             orgId={orgId as string}
