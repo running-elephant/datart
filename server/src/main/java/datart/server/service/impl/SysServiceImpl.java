@@ -43,7 +43,7 @@ public class SysServiceImpl implements SysService {
         systemInfo.setTokenTimeout(tokenTimeout);
         systemInfo.setMailEnable(sendMail);
         systemInfo.setVersion(getVersion());
-        systemInfo.setMode(Application.getCurrMode().name());
+        systemInfo.setTenantManagementMode(Application.getCurrMode().name());
         systemInfo.setRegisterEnable(Application.canRegister());
         return systemInfo;
     }

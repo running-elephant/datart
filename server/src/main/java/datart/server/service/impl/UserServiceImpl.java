@@ -21,7 +21,7 @@ package datart.server.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.jayway.jsonpath.JsonPath;
 import datart.core.base.consts.Const;
-import datart.core.base.consts.SystemMode;
+import datart.core.base.consts.TenantManagementMode;
 import datart.core.base.consts.UserIdentityType;
 import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
@@ -240,7 +240,7 @@ public class UserServiceImpl extends BaseService implements UserService {
      */
     @Transactional(propagation = Propagation.MANDATORY)
     public void initUser(User user) {
-        if (Application.getCurrMode().equals(SystemMode.SINGLE)) {
+        if (Application.getCurrMode().equals(TenantManagementMode.TEAM)) {
             List<Organization> organizationList = orgMapper.list();
             if (organizationList.size()==1) {
                 Organization organization = organizationList.get(0);
@@ -248,7 +248,7 @@ public class UserServiceImpl extends BaseService implements UserService {
                 log.info("The user({}) is joined the default organization({}).", user.getUsername(), organization.getName());
                 return ;
             } else if (organizationList.size()>1) {
-                Exceptions.msg("There is more than one organization in single mode.");
+                Exceptions.msg("There is more than one organization in team tenant-management-mode.");
             } else{
                 Exceptions.msg("There is no organization to join.");
             }
