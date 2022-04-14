@@ -34,14 +34,14 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
     const widget = useContext(WidgetContext);
     const widgetInfo = useContext(WidgetInfoContext);
     const { renderMode, boardType, editing } = useContext(BoardContext);
-    const { rectRef, cacheWhRef } = useRenderWidget(
+    const { cacheWhRef } = useRenderWidget(
       widget,
       renderMode,
       boardType,
       widgetInfo.rendered,
     );
 
-    useWidgetAutoFetch(widget, renderMode, rectRef, widgetInfo.rendered);
+    useWidgetAutoFetch(widget, renderMode, cacheWhRef, widgetInfo.rendered);
     const { background, border, padding } = widget.config;
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
@@ -52,10 +52,9 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
               config={widget.config.nameConfig}
             />
           )}
-          <div ref={rectRef} style={FlexStyle}>
-            <div ref={cacheWhRef} style={FlexStyle}>
-              <DataChartWidgetCore />
-            </div>
+
+          <div ref={cacheWhRef} style={FlexStyle}>
+            <DataChartWidgetCore />
           </div>
         </ZIndexWrapper>
         {editing && <EditMask />}

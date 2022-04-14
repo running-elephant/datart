@@ -30,28 +30,26 @@ import { ControllerWidgetCore } from './ControllerWidgetCore';
 
 export const ControllerWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
-  const widgetInfo = useContext(WidgetInfoContext);
-  const { renderMode, boardType, editing } = useContext(BoardContext);
-  const { rectRef, cacheWhRef } = useRenderWidget(
+  const { rendered } = useContext(WidgetInfoContext);
+  const { renderMode, boardType } = useContext(BoardContext);
+  const { cacheWhRef } = useRenderWidget(
     widget,
     renderMode,
     boardType,
-    widgetInfo.rendered,
+    rendered,
   );
-  useWidgetAutoFetch(widget, renderMode, rectRef, widgetInfo.rendered);
+  useWidgetAutoFetch(widget, renderMode, cacheWhRef, rendered);
   // 自动更新
 
   const { background, border, padding } = widget.config;
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
       <ZIndexWrapper>
-        <div ref={rectRef} style={FlexStyle}>
-          <div ref={cacheWhRef} style={FlexStyle}>
-            <ControllerWidgetCore />
-          </div>
+        <div ref={cacheWhRef} style={FlexStyle}>
+          <ControllerWidgetCore />
         </div>
       </ZIndexWrapper>
-      {editing && <EditMask />}
+      {renderMode === 'edit' && <EditMask />}
       <ToolBar />
     </WidgetWrapper>
   );

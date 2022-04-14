@@ -213,8 +213,9 @@ export const isElView = el => {
   let bool = false;
   if (!el) return false;
   let rect = el?.getBoundingClientRect();
+
   let { top, bottom } = rect;
-  if (bottom - top < 2) return;
+
   // top 元素顶端到可见区域顶端的距离
   // bottom 元素底部端到可见区域顶端的距离
   var viewHeight = window.innerHeight || document.documentElement.clientHeight; // 浏览器可见区域高度。

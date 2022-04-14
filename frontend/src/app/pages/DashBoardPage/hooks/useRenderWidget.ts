@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../components/ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../components/BoardProvider/BoardConfigProvider';
 import { BoardType, VizRenderMode, Widget } from '../pages/Board/slice/types';
@@ -31,26 +31,25 @@ export default function useRenderWidget(
 ) {
   const { initialQuery } = useContext(BoardConfigContext);
   const { onRenderedWidgetById } = useContext(WidgetActionContext);
-
   const { cacheWhRef, cacheW } = useCacheWidthHeight();
-  const rectRef = useRef<HTMLDivElement>(null);
+
   const renderWidget = useCallback(() => {
-    const canView = isElView(rectRef.current);
+    const canView = isElView(cacheWhRef.current);
     if (canView) {
       onRenderedWidgetById(widget.id);
     }
-  }, [widget.id, onRenderedWidgetById]);
+  }, [cacheWhRef, onRenderedWidgetById, widget.id]);
 
   //监听board滚动
   useEffect(() => {
     boardScroll.off(widget.dashboardId, renderWidget);
-    if (!rendered) {
+    if (!rendered && boardType === 'auto') {
       boardScroll.on(widget.dashboardId, renderWidget);
     }
     return () => {
       boardScroll.off(widget.dashboardId, renderWidget);
     };
-  }, [renderWidget, widget.dashboardId, rendered]);
+  }, [renderWidget, widget.dashboardId, rendered, boardType]);
 
   //定时任务中 或者 后端截图 直接fetch
   useEffect(() => {
@@ -60,12 +59,12 @@ export default function useRenderWidget(
   }, [onRenderedWidgetById, renderMode, widget.id]);
   //初始化查询
   useEffect(() => {
-    if (initialQuery && renderMode !== 'schedule' && !rendered) {
+    const canRender = initialQuery && renderMode !== 'schedule' && !rendered;
+    if (canRender) {
       renderWidget();
     }
-  }, [cacheW, initialQuery, renderMode, rendered, renderWidget]);
+  }, [initialQuery, renderMode, rendered, renderWidget, cacheW]);
   return {
     cacheWhRef,
-    rectRef,
   };
 }
