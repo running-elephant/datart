@@ -32,15 +32,15 @@ export const widgetMoveEnd = {
   },
 };
 //
-export const boardScrollEvName = (boardId: string) => BOARD_SCROLL + boardId;
+export const getScrollEvName = id => `${BOARD_SCROLL}_${id}`;
 export const boardScroll = {
   on: (boardId: string, fn: () => void) => {
-    eventBus.addListener(boardScrollEvName(boardId), fn);
+    eventBus.addListener(getScrollEvName(boardId), fn);
   },
   emit: (boardId: string) => {
-    eventBus.emit(boardScrollEvName(boardId));
+    eventBus.emit(getScrollEvName(boardId));
   },
   off: (boardId: string, fn: () => void) => {
-    eventBus.removeListener(boardScrollEvName(boardId), fn);
+    eventBus.removeListener(getScrollEvName(boardId), fn);
   },
 };
