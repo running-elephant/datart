@@ -115,9 +115,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     }),
     [data],
   );
-
-  const chartFrame = useMemo(() => {
-    if (cacheH <= 1 || cacheW <= 1) return null;
+  const errText = useMemo(() => {
     if (!dataChart) {
       return `not found dataChart`;
     }
@@ -130,8 +128,12 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       }
       return `not found chart by ${dataChart?.config?.chartGraphId}`;
     }
-
-    const chartConfig = produce(chart.config, draft => {
+    return null;
+  }, [chart, dataChart]);
+  const config = useMemo(() => {
+    if (!chart?.config) return undefined;
+    if (!dataChart?.config) return undefined;
+    let chartConfig = produce(chart.config, draft => {
       mergeToChartConfig(
         draft,
         produce(dataChart?.config, draft => {
@@ -139,11 +141,18 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         }) as ChartDetailConfigDTO,
       );
     });
+    return chartConfig as ChartConfig;
+  }, [chart?.config, dataChart?.config]);
+
+  const chartFrame = useMemo(() => {
+    if (!config) return null;
+    if (cacheH <= 1 || cacheW <= 1) return null;
+    if (errText) return errText;
     return (
       <ChartIFrameContainer
         dataset={dataset}
-        chart={chart}
-        config={chartConfig as ChartConfig}
+        chart={chart!}
+        config={config}
         width={cacheW}
         height={cacheH}
         containerId={widgetId}
@@ -151,13 +160,14 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       />
     );
   }, [
+    config,
     cacheH,
     cacheW,
-    chart,
-    dataChart,
-    dataset,
-    widgetSpecialConfig,
+    errText,
     widgetId,
+    dataset,
+    chart,
+    widgetSpecialConfig,
   ]);
   return (
     <Wrapper className="widget-chart" ref={ref}>
