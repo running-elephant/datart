@@ -69,10 +69,11 @@ public class MysqlSqlStdOperatorSupport extends MysqlSqlDialect implements SqlSt
             case AGG_DATE_YEAR:
                 writer.print("YEAR(" + call.getOperandList().get(0).toString() + ")");
                 return true;
-            case AGG_DATE_QUARTER:
-                String column = call.getOperandList().get(0).toString();
-                writer.print("CONCAT(DATE_FORMAT("+column+",'%Y-'),QUARTER("+column+"))");
+            case AGG_DATE_QUARTER: {
+                String columnName = call.getOperandList().get(0).toString();
+                writer.print("CONCAT(DATE_FORMAT("+columnName+",'%Y-'),QUARTER("+columnName+"))");
                 return true;
+            }
             case AGG_DATE_MONTH:
                 writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toString() + ",'%Y-%m')");
                 return true;

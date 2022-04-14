@@ -18,7 +18,7 @@
 
 package datart.core.common;
 
-import datart.core.base.consts.SystemMode;
+import datart.core.base.consts.TenantManagementMode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +28,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import static datart.core.base.consts.SystemMode.NORMAL;
+import static datart.core.base.consts.TenantManagementMode.PLATFORM;
 
 @Component
 @Slf4j
@@ -36,7 +36,7 @@ public class Application implements ApplicationContextAware {
 
     private static ApplicationContext context;
 
-    private static SystemMode currMode;
+    private static TenantManagementMode currMode;
 
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
@@ -99,21 +99,21 @@ public class Application implements ApplicationContextAware {
     }
 
     public static String getAdminId() {
-        if (getCurrMode().equals(SystemMode.SINGLE)){
+        if (getCurrMode().equals(TenantManagementMode.TEAM)){
             return getProperty("datart.admin-id", "datart-admin");
         }
         return "";
     }
 
-    public static SystemMode getCurrMode() {
+    public static TenantManagementMode getCurrMode() {
         if (currMode == null) {
-            String mode = Application.getProperty("datart.mode");
+            String mode = Application.getProperty("datart.tenant-management-mode");
             try {
-                return SystemMode.valueOf(mode.toUpperCase());
+                return TenantManagementMode.valueOf(mode.toUpperCase());
             } catch (Exception e) {
-                log.warn("Unrecognized mode: '{}', and this will run in normal mode", mode);
+                log.warn("Unrecognized tenant-management-mode: '{}', and this will run in platform tenant-management-mode", mode);
             }
-            currMode = NORMAL;
+            currMode = PLATFORM;
         }
         return currMode;
     }

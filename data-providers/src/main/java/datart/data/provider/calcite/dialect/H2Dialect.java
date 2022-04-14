@@ -68,16 +68,19 @@ public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, Fe
             case AGG_DATE_YEAR:
                 writer.print("YEAR(" + call.getOperandList().get(0).toString() + ")");
                 return true;
-            case AGG_DATE_QUARTER:
-                writer.print("FORMATDATETIME("+call.getOperandList().get(0).toString()+",'yyyy-q')");
+            case AGG_DATE_QUARTER: {
+                String columnName = call.getOperandList().get(0).toString();
+                writer.print("CONCAT(FORMATDATETIME("+columnName+",'Y-'),QUARTER("+columnName+"))");
                 return true;
+            }
             case AGG_DATE_MONTH:
                 writer.print("FORMATDATETIME("+call.getOperandList().get(0).toString()+",'yyyy-MM')");
                 return true;
-            case AGG_DATE_WEEK:
-                String column = call.getOperandList().get(0).toString();
-                writer.print("CONCAT_WS('-',ISO_YEAR("+column+"),RIGHT(100+ISO_WEEK("+column+"),2))");
+            case AGG_DATE_WEEK: {
+                String columnName = call.getOperandList().get(0).toString();
+                writer.print("CONCAT_WS('-',ISO_YEAR("+columnName+"),RIGHT(100+ISO_WEEK("+columnName+"),2))");
                 return true;
+            }
             case AGG_DATE_DAY:
                 writer.print("FORMATDATETIME("+call.getOperandList().get(0).toString()+",'yyyy-MM-dd')");
                 return true;
