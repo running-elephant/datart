@@ -16,6 +16,21 @@
  * limitations under the License.
  */
 
-export { default as ChartDraggableSourceContainer } from './ChartDraggableSourceContainer';
-export { default as ChartDraggableSourceGroupContainer } from './ChartDraggableSourceGroupContainer';
-export { default as ChartDraggableTargetContainer } from './ChartDraggableTargetContainer';
+import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
+import { updateBy } from 'app/utils/mutation';
+
+export const updateDataConfigByField = (
+  uid: string,
+  config: ChartDataConfig,
+  field: ChartDataSectionField,
+): ChartDataConfig => {
+  return updateBy(config, draft => {
+    draft.rows = (draft.rows || []).map(r => {
+      if (r.uid === uid) {
+        return field;
+      }
+      return r;
+    });
+    return draft;
+  });
+};

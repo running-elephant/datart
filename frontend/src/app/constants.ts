@@ -72,6 +72,7 @@ export enum ChartDataViewSubType {
 
 export enum ChartDataViewFieldCategory {
   Field = 'field',
+  Hierarchy = 'hierarchy',
   Variable = 'variable',
   ComputedField = 'computedField',
   AggregateComputedField = 'aggregateComputedField',

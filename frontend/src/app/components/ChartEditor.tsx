@@ -22,6 +22,7 @@ import { DownloadFileType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import workbenchSlice, {
   useWorkbenchSlice,
@@ -49,15 +50,17 @@ import {
   useSaveFormContext,
 } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { IChart } from 'app/types/Chart';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
+import { getDrillPaths } from 'app/utils/chartHelper';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import { CommonFormTypes } from 'globalConstants';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
-import { CloneValueDeep } from 'utils/object';
+import { CloneValueDeep, isEmptyArray } from 'utils/object';
 import ChartWorkbench from '../pages/ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
 import {
   DataChart,
@@ -117,6 +120,8 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
   const [chart, setChart] = useState<IChart>();
+  const drillOptionRef = useRef<IChartDrillOption>();
+
   const [allowQuery, setAllowQuery] = useState<boolean>(false);
   const history = useHistory();
   const addVizFn = useAddViz({
@@ -193,12 +198,29 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [backendChart?.config?.chartGraphId]);
 
+  useEffect(() => {
+    const drillPaths = getDrillPaths(chartConfig?.datas);
+    if (isEmptyArray(drillPaths)) {
+      drillOptionRef.current = undefined;
+    }
+    if (!isEmptyArray(drillPaths) && !drillOptionRef.current) {
+      drillOptionRef.current = new ChartDrillOption(drillPaths);
+    }
+  }, [chartConfig?.datas, drillOptionRef]);
+
   const registerChartEvents = useCallback(
     chart => {
       chart?.registerMouseEvents([
         {
           name: 'click',
           callback: param => {
+            if (drillOptionRef.current?.isSelectedDrill) {
+              const option = drillOptionRef.current;
+              option.drillDown(param.data.rowData);
+              drillOptionRef.current = option;
+              handleDrillOptionChange(option);
+              return;
+            }
             if (
               param.componentType === 'table' &&
               param.seriesType === 'paging-sort-filter'
@@ -270,33 +292,51 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       }),
     );
     if (!expensiveQuery) {
-      dispatch(refreshDatasetAction({}));
+      dispatch(refreshDatasetAction({ drillOption: drillOptionRef?.current }));
     } else {
       setAllowQuery(true);
     }
   };
 
-  const handleChartConfigChange = (type, payload) => {
-    if (expensiveQuery) {
+  const handleChartConfigChange = useCallback(
+    (type, payload) => {
+      const drillPaths = getDrillPaths(chartConfig?.datas);
+      if (isEmptyArray(drillPaths)) {
+        drillOptionRef.current = undefined;
+      }
+      if (
+        !isEmptyArray(drillPaths) &&
+        drillOptionRef.current
+          ?.getAllFields()
+          ?.map(p => p.uid)
+          .join('-') !== drillPaths.map(p => p.uid).join('-')
+      ) {
+        drillOptionRef.current = new ChartDrillOption(drillPaths);
+      }
+
+      if (expensiveQuery) {
+        dispatch(
+          workbenchSlice.actions.updateChartConfig({
+            type,
+            payload: payload,
+          }),
+        );
+        dispatch(workbenchSlice.actions.updateShadowChartConfig(null));
+        setAllowQuery(payload.needRefresh);
+        return true;
+      }
+
       dispatch(
-        workbenchSlice.actions.updateChartConfig({
+        updateChartConfigAndRefreshDatasetAction({
           type,
-          payload: payload,
+          payload,
+          needRefresh: payload.needRefresh,
+          drillOption: drillOptionRef?.current,
         }),
       );
-      dispatch(workbenchSlice.actions.updateShadowChartConfig(null));
-      setAllowQuery(payload.needRefresh);
-      return true;
-    }
-
-    dispatch(
-      updateChartConfigAndRefreshDatasetAction({
-        type,
-        payload,
-        needRefresh: payload.needRefresh,
-      }),
-    );
-  };
+    },
+    [chartConfig?.datas, dispatch, expensiveQuery],
+  );
 
   const handleDataViewChanged = useCallback(() => {
     clearDataConfig();
@@ -448,9 +488,11 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   );
 
   const handleRefreshDataset = useCallback(async () => {
-    await dispatch(refreshDatasetAction({}));
+    await dispatch(
+      refreshDatasetAction({ drillOption: drillOptionRef?.current }),
+    );
     setAllowQuery(false);
-  }, [dispatch]);
+  }, [dispatch, drillOptionRef]);
 
   const handleCreateDownloadDataTask = useCallback(async () => {
     if (!dataview?.id) {
@@ -497,6 +539,11 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     widgetId,
   ]);
 
+  const handleDrillOptionChange = (option: IChartDrillOption) => {
+    drillOptionRef.current = option;
+    dispatch(refreshDatasetAction({ drillOption: option }));
+  };
+
   return (
     <StyledChartWorkbenchPage>
       <SaveFormContext.Provider value={saveFormContextValue}>
@@ -512,6 +559,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             },
             onChangeAggregation: handleAggregationState,
           }}
+          drillOption={drillOptionRef?.current}
           aggregation={aggregation}
           chart={chart}
           dataset={dataset}
@@ -522,6 +570,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           allowQuery={allowQuery}
           onChartChange={handleChartChange}
           onChartConfigChange={handleChartConfigChange}
+          onChartDrillOptionChange={handleDrillOptionChange}
           onDataViewChange={handleDataViewChanged}
           onRefreshDataset={handleRefreshDataset}
           onCreateDownloadDataTask={handleCreateDownloadDataTask}

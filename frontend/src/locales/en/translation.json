@@ -626,6 +626,7 @@
         "size": "Size",
         "drop": "Drag some data fields here",
         "dropCount": "Drag {{count}} fields here at least",
+        "drillable": "Drillable",
         "actions": {
           "sort": {
             "title": "Sort",
@@ -795,6 +796,14 @@
           "color": "Color",
           "align": "Align"
         }
+      },
+      "drill": {
+        "showNextLevel": "Show Next Level",
+        "expandNextLevel": "Expand Next Level",
+        "selectDrillStatus": "Mouse Click Drill Status",
+        "enable": "Enable",
+        "disable": "Disable",
+        "rollUp": "Roll Up"
       }
     },
     "action": {

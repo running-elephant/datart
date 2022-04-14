@@ -93,13 +93,21 @@ class Chart implements IChart {
     current?: ChartDataConfig[],
     target?: ChartDataConfig[],
   ) {
+    const getDrillableRowCount = (
+      isDrillable = false,
+      originalRowLength = 0,
+    ) => {
+      return isDrillable ? Math.min(1, originalRowLength) : originalRowLength;
+    };
+
     return (current || [])
       .filter(cc => Boolean(cc?.required))
       .every(cc => {
         // The typed chart config section relation matching logic:
         // 1. If section type exactly match, use it
-        // 2. Else If, section type and key exactly match, use it
-        // 3. Else, current section will match all target typed sections
+        // 2. Else if, section type and key exactly match, use it
+        // 3. Else if, section is drillable and target rows length is min value between 1 and rows length
+        // 4. Else, current section will match all target typed sections
         const tc = target?.filter(tc => tc.type === cc.type) || [];
         if (tc?.length > 1) {
           const subTc = tc?.find(stc => stc.key === cc.key);
@@ -107,11 +115,20 @@ class Chart implements IChart {
             const subTcTotalLength = tc
               .flatMap(tc => tc.rows)
               ?.filter(Boolean)?.length;
-            return isInRange(cc?.limit, subTcTotalLength);
+            return isInRange(
+              cc?.limit,
+              getDrillableRowCount(cc?.drillable, subTcTotalLength),
+            );
           }
-          return isInRange(cc?.limit, subTc?.rows?.length);
+          return isInRange(
+            cc?.limit,
+            getDrillableRowCount(cc?.drillable, subTc?.rows?.length),
+          );
         }
-        return isInRange(cc?.limit, tc?.[0]?.rows?.length);
+        return isInRange(
+          cc?.limit,
+          getDrillableRowCount(cc?.drillable, tc?.[0]?.rows?.length),
+        );
       });
   }
 }

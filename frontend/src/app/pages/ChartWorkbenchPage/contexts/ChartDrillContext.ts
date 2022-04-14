@@ -16,6 +16,12 @@
  * limitations under the License.
  */
 
-export { default as ChartDraggableSourceContainer } from './ChartDraggableSourceContainer';
-export { default as ChartDraggableSourceGroupContainer } from './ChartDraggableSourceGroupContainer';
-export { default as ChartDraggableTargetContainer } from './ChartDraggableTargetContainer';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import { createContext } from 'react';
+
+const ChartDrillContext = createContext<{
+  drillOption?: IChartDrillOption;
+  onDrillOptionChange?: (option: IChartDrillOption) => void;
+}>({});
+
+export default ChartDrillContext;

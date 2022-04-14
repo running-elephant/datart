@@ -28,7 +28,8 @@ const BaseDataConfigSection: FC<ChartDataConfigSectionProps> = memo(
     return (
       <StyledBaseDataConfigSection>
         <StyledBaseDataConfigSectionTitle>
-          {translate(config.label || '')}
+          {translate(config.label || '') +
+            (config?.drillable ? `(${translate('drillable')})` : '')}
           {extra?.()}
         </StyledBaseDataConfigSectionTitle>
         <ChartDraggableTargetContainer
