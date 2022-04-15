@@ -209,6 +209,7 @@ export const ChartStyleSectionComponentType = {
   LegendPosition: 'legendPosition',
   ScorecardListTemplate: 'scorecardListTemplate',
   ScorecardConditionalStyle: 'scorecardConditionalStyle',
+  PivotSheetTheme: 'pivotSheetTheme',
 };
 
 export enum DownloadFileType {

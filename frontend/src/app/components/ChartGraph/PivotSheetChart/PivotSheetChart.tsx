@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
+import { Data, DefaultCellTheme, Meta, SortParam, Style } from '@antv/s2';
 import { ChartDataSectionType, SortActionType } from 'app/constants';
 import ReactChart from 'app/models/ReactChart';
 import {
   ChartConfig,
+  ChartDataConfig,
   ChartDataSectionField,
   ChartStyleConfig,
 } from 'app/types/ChartConfig';
@@ -30,9 +32,10 @@ import {
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
+import { PIVOT_THEME_LIST } from '../../FormGenerator/Customize/PivotSheetTheme/theme';
 import AntVS2Wrapper from './AntVS2Wrapper';
 import Config from './config';
-import { RowAndColStyle, TableSorters, TextStyle } from './types';
+import { AndvS2Config } from './types';
 
 class PivotSheetChart extends ReactChart {
   static icon = `<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' aria-hidden='true' role='img' width='1em' height='1em' preserveAspectRatio='xMidYMid meet' viewBox='0 0 24 24'><path d='M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z' fill='gray'/></svg>`;
@@ -78,12 +81,18 @@ class PivotSheetChart extends ReactChart {
     }
   }
 
-  getOptions(context, dataset?: ChartDataSetDTO, config?: ChartConfig) {
+  getOptions(
+    context,
+    dataset?: ChartDataSetDTO,
+    config?: ChartConfig,
+  ): AndvS2Config {
     if (!dataset || !config) {
-      return {};
+      return {
+        options: {},
+      };
     }
 
-    const dataConfigs = config.datas || [];
+    const dataConfigs: ChartDataConfig[] = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
     const chartDataSet = transformToDataSet(
@@ -92,21 +101,21 @@ class PivotSheetChart extends ReactChart {
       dataConfigs,
     );
 
-    const rowSectionConfigRows = dataConfigs
+    const rowSectionConfigRows: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.GROUP)
       .filter(c => c.key === 'row')
       .flatMap(config => config.rows || []);
 
-    const columnSectionConfigRows = dataConfigs
+    const columnSectionConfigRows: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.GROUP)
       .filter(c => c.key === 'column')
       .flatMap(config => config.rows || []);
 
-    const metricsSectionConfigRows = dataConfigs
+    const metricsSectionConfigRows: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
 
-    const infoSectionConfigRows = dataConfigs
+    const infoSectionConfigRows: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
@@ -169,10 +178,12 @@ class PivotSheetChart extends ReactChart {
             reverseLayout: Boolean(rowTotalPosition),
             showSubTotals: Boolean(enableRowSubTotal),
             reverseSubLayout: Boolean(rowSubTotalPosition),
-            subTotalsDimensions: rowSectionConfigRows.map(
-              chartDataSet.getFieldKey,
-              chartDataSet,
-            )?.[0],
+            subTotalsDimensions: [
+              rowSectionConfigRows.map(
+                chartDataSet.getFieldKey,
+                chartDataSet,
+              )?.[0],
+            ],
             label: context.translator('summary.total'),
             subLabel: context.translator('summary.subTotal'),
             calcTotals: {
@@ -184,10 +195,12 @@ class PivotSheetChart extends ReactChart {
             reverseLayout: Boolean(colTotalPosition),
             showSubTotals: Boolean(enableColSubTotal),
             reverseSubLayout: Boolean(colSubTotalPosition),
-            subTotalsDimensions: columnSectionConfigRows.map(
-              chartDataSet.getFieldKey,
-              chartDataSet,
-            )?.[0],
+            subTotalsDimensions: [
+              columnSectionConfigRows.map(
+                chartDataSet.getFieldKey,
+                chartDataSet,
+              )?.[0],
+            ],
             label: context.translator('summary.total'),
             subLabel: context.translator('summary.subTotal'),
             calcTotals: {
@@ -224,10 +237,11 @@ class PivotSheetChart extends ReactChart {
             return {
               field: chartDataSet.getFieldKey(config),
               name: getColumnRenderName(config),
-              formatter: value => toFormattedValue(value, config?.format),
-            };
+              formatter: (value?: string | number) =>
+                toFormattedValue(value, config?.format),
+            } as Meta;
           }),
-        data: chartDataSet?.map(row => row.convertToObject()),
+        data: chartDataSet?.map(row => row.convertToObject()) as Data[],
         sortParams: this.getTableSorters(
           rowSectionConfigRows
             .concat(columnSectionConfigRows)
@@ -248,8 +262,23 @@ class PivotSheetChart extends ReactChart {
         colCell: this.getHeaderStyle(styleConfigs),
         rowCell: this.getHeaderStyle(styleConfigs),
         dataCell: this.getBodyStyle(styleConfigs),
+        background: {
+          opacity: 0,
+        },
+      },
+      palette: {
+        basicColors: this.getThemeColorList(styleConfigs),
+        semanticColors: {
+          red: '#FF4D4F',
+          green: '#29A294',
+        },
       },
     };
+  }
+
+  private getThemeColorList(style: ChartStyleConfig[]): Array<string> {
+    const [basicColors] = getStyles(style, ['theme'], ['themeType']);
+    return basicColors?.colors || PIVOT_THEME_LIST[basicColors?.themeType || 0];
   }
 
   private getRowAndColStyle(
@@ -257,7 +286,7 @@ class PivotSheetChart extends ReactChart {
     metricsSectionConfigRows: ChartDataSectionField[],
     columnSectionConfigRows: ChartDataSectionField[],
     chartDataSet: IChartDataSet<string>,
-  ): RowAndColStyle {
+  ): Partial<Style> {
     const [bodyHeight, bodyWidth] = getStyles(
       style,
       ['tableBodyStyle'],
@@ -306,7 +335,7 @@ class PivotSheetChart extends ReactChart {
   private getTableSorters(
     sectionConfigRows: ChartDataSectionField[],
     chartDataSet: IChartDataSet<string>,
-  ): TableSorters[] {
+  ): Array<SortParam> {
     return sectionConfigRows
       .map(config => {
         if (!config?.sort?.type || config?.sort?.type === SortActionType.NONE) {
@@ -323,22 +352,17 @@ class PivotSheetChart extends ReactChart {
           },
         };
       })
-      .filter(Boolean);
+      .filter(Boolean) as Array<SortParam>;
   }
 
-  private getBodyStyle(styleConfigs: ChartStyleConfig[]): TextStyle {
-    const [bodyFont, oddBgColor, evenBgColor, bodyTextAlign] = getStyles(
+  private getBodyStyle(styleConfigs: ChartStyleConfig[]): DefaultCellTheme {
+    const [bodyFont, bodyTextAlign] = getStyles(
       styleConfigs,
       ['tableBodyStyle'],
-      ['font', 'oddBgColor', 'evenBgColor', 'align'],
+      ['font', 'align'],
     );
     return {
-      cell: {
-        crossBackgroundColor: evenBgColor,
-        backgroundColor: oddBgColor,
-      },
       text: {
-        fill: bodyFont?.color,
         fontFamily: bodyFont?.fontFamily,
         fontSize: bodyFont?.fontSize,
         fontWeight: bodyFont?.fontWeight,
@@ -347,25 +371,20 @@ class PivotSheetChart extends ReactChart {
     };
   }
 
-  private getHeaderStyle(styleConfigs: ChartStyleConfig[]): TextStyle {
-    const [headerFont, headerBgColor, headerTextAlign] = getStyles(
+  private getHeaderStyle(styleConfigs: ChartStyleConfig[]): DefaultCellTheme {
+    const [headerFont, headerTextAlign] = getStyles(
       styleConfigs,
       ['tableHeaderStyle'],
-      ['font', 'bgColor', 'align'],
+      ['font', 'align'],
     );
     return {
-      cell: {
-        backgroundColor: headerBgColor,
-      },
       text: {
-        fill: headerFont?.color,
         fontFamily: headerFont?.fontFamily,
         fontSize: headerFont?.fontSize,
         fontWeight: headerFont?.fontWeight,
         textAlign: headerTextAlign,
       },
       bolderText: {
-        fill: headerFont?.color,
         fontFamily: headerFont?.fontFamily,
         fontSize: headerFont?.fontSize,
         fontWeight: headerFont?.fontWeight,
