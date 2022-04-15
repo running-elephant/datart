@@ -18,7 +18,7 @@
 
 import { DragLayer } from 'react-dnd';
 import styled from 'styled-components';
-import { EMPHASIS_LEVEL } from 'styles/StyleConstants';
+import { LEVEL_100 } from 'styles/StyleConstants';
 import ChartDragPreview from './ChartDragPreview';
 
 const collect = monitor => {
@@ -76,6 +76,6 @@ const LayerStyles = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: ${EMPHASIS_LEVEL * 10};
+  z-index: ${LEVEL_100};
   pointer-events: none;
 `;

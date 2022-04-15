@@ -27,9 +27,9 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import {
-  EMPHASIS_LEVEL,
   FONT_SIZE_ICON_SM,
   FONT_WEIGHT_MEDIUM,
+  LEVEL_100,
   LINE_HEIGHT_ICON_SM,
   SPACE_LG,
   SPACE_SM,
@@ -92,7 +92,7 @@ const FixedButton = styled.div`
   position: fixed;
   top: 8px;
   right: 8px;
-  z-index: ${EMPHASIS_LEVEL * 10};
+  z-index: ${LEVEL_100};
   cursor: pointer;
 `;
 const Wrapper = styled.div`

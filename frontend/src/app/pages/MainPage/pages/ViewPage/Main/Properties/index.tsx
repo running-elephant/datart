@@ -33,7 +33,7 @@ import {
   useState,
 } from 'react';
 import styled from 'styled-components/macro';
-import { STICKY_LEVEL } from 'styles/StyleConstants';
+import { LEVEL_1 } from 'styles/StyleConstants';
 import { EditorContext } from '../../EditorContext';
 import { ColumnPermissions } from './ColumnPermissions';
 import DataModelTree from './DataModelTree/DataModelTree';
@@ -95,5 +95,5 @@ const Container = styled.div`
   display: flex;
   flex-shrink: 0;
   background-color: ${p => p.theme.componentBackground};
-  z-index: ${STICKY_LEVEL};
+  z-index: ${LEVEL_1};
 `;

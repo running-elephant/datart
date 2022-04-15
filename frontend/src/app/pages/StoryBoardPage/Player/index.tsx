@@ -35,7 +35,7 @@ import Reveal from 'reveal.js';
 import 'reveal.js/dist/reveal.css';
 import RevealZoom from 'reveal.js/plugin/zoom/plugin';
 import styled from 'styled-components/macro';
-import { EMPHASIS_LEVEL } from 'styles/StyleConstants';
+import { LEVEL_20 } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import StoryPageItem from '../components/StoryPageItem';
 import { storyActions, useStoryBoardSlice } from '../slice';
@@ -186,7 +186,7 @@ const Wrapper = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: ${EMPHASIS_LEVEL * 4};
+  z-index: ${LEVEL_20};
   display: flex;
   flex-direction: column;
   background-color: #fff;

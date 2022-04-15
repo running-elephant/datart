@@ -10,7 +10,7 @@ import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouteMatch } from 'react-router';
 import styled from 'styled-components/macro';
-import { SPACE_TIMES, STICKY_LEVEL } from 'styles/StyleConstants';
+import { LEVEL_5, SPACE_TIMES } from 'styles/StyleConstants';
 import { selectStoryboards, selectVizs } from '../slice/selectors';
 import { Folder } from '../slice/types';
 import { Folders } from './Folders';
@@ -115,7 +115,7 @@ const Wrapper = styled.div<{
   isDragging: boolean;
   width: number;
 }>`
-  z-index: ${STICKY_LEVEL + STICKY_LEVEL};
+  z-index: ${LEVEL_5};
   display: flex;
   flex-direction: column;
   flex-shrink: 0;

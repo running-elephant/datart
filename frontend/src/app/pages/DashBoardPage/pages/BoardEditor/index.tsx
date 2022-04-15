@@ -22,7 +22,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { EMPHASIS_LEVEL } from 'styles/StyleConstants';
+import { LEVEL_50 } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import EditorHeader from '../../components/BoardHeader/EditorHeader';
 import { BoardLoading } from '../../components/BoardLoading';
@@ -167,7 +167,7 @@ const Wrapper = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: ${EMPHASIS_LEVEL * 5};
+  z-index: ${LEVEL_50};
   display: flex;
   flex-direction: column;
   padding-bottom: 0;

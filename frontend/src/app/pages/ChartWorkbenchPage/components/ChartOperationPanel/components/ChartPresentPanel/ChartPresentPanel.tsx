@@ -33,7 +33,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
-  EMPHASIS_LEVEL,
+  LEVEL_10,
   LINE_HEIGHT_ICON_XXL,
   SPACE_LG,
   SPACE_MD,
@@ -204,7 +204,7 @@ const ReloadMask = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  z-index: ${EMPHASIS_LEVEL};
+  z-index: ${LEVEL_10};
   display: flex;
   align-items: center;
   justify-content: center;

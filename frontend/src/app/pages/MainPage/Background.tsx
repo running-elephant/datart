@@ -28,7 +28,7 @@ import styled, { keyframes } from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_MD,
   FONT_WEIGHT_MEDIUM,
-  MODAL_LEVEL,
+  LEVEL_1000,
   SPACE_TIMES,
 } from 'styles/StyleConstants';
 import { OrganizationForm } from './OrganizationForm';
@@ -105,7 +105,7 @@ const Container = styled.div<{ visible: boolean }>`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: ${MODAL_LEVEL};
+  z-index: ${LEVEL_1000};
   display: ${p => (p.visible ? 'flex' : 'none')};
   flex: 1;
   align-items: center;

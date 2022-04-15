@@ -3,7 +3,7 @@ import { Tooltip } from 'antd';
 import React from 'react';
 import { Resizable } from 'react-resizable';
 import styled from 'styled-components/macro';
-import { BLUE, STICKY_LEVEL } from 'styles/StyleConstants';
+import { BLUE, LEVEL_1 } from 'styles/StyleConstants';
 
 export const TableComponentsTd = ({
   children,
@@ -78,7 +78,7 @@ const ResizableHandleStyle = styled.span`
   position: absolute;
   right: -5px;
   bottom: 0;
-  z-index: ${STICKY_LEVEL};
+  z-index: ${LEVEL_1};
   width: 10px;
   height: 100%;
   cursor: col-resize;
