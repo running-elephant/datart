@@ -126,9 +126,15 @@ const Wrapper = styled.div<{
   .hidden {
     display: none;
   }
+  > ul {
+    display: ${p => (p.sliderVisible ? 'none' : 'block')};
+  }
+  > div {
+    display: ${p => (p.sliderVisible ? 'none' : 'flex')};
+  }
   &.close {
-    width: ${SPACE_TIMES(7.5)} !important;
     position: absolute;
+    width: ${SPACE_TIMES(7.5)} !important;
     height: 100%;
     .menuUnfoldOutlined {
       position: absolute;
@@ -151,11 +157,5 @@ const Wrapper = styled.div<{
         }
       }
     }
-  }
-  > ul {
-    display: ${p => (p.sliderVisible ? 'none' : 'block')};
-  }
-  > div {
-    display: ${p => (p.sliderVisible ? 'none' : 'flex')};
   }
 `;
