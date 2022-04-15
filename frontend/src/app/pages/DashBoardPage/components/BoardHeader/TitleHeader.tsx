@@ -40,7 +40,7 @@ import { BoardDropdownList } from '../BoardDropdownList/BoardDropdownList';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 import SaveToStoryBoard from '../SaveToStoryBoard';
 
-const TitleHeader: FC = memo(() => {
+export const TitleHeader: FC = memo(() => {
   const t = useI18NPrefix(`viz.action`);
   const publishLoading = useSelector(selectPublishLoading);
   const history = useHistory();
@@ -137,7 +137,6 @@ const TitleHeader: FC = memo(() => {
   );
 });
 
-export default TitleHeader;
 const Wrapper = styled.div`
   display: flex;
   flex-shrink: 0;

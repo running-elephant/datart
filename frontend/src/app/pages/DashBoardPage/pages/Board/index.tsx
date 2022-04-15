@@ -23,7 +23,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import TitleHeader from '../../components/BoardHeader/ViewHeader';
+import { TitleHeader } from '../../components/BoardHeader/TitleHeader';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardInitProvider } from '../../components/BoardProvider/BoardInitProvider';
 import { FullScreenPanel } from '../../components/FullScreenPanel/FullScreenPanel';
