@@ -16,48 +16,45 @@
  * limitations under the License.
  */
 
-import { Palette, S2Theme } from '@antv/s2';
 import { SheetComponent } from '@antv/s2-react';
 import '@antv/s2-react/dist/style.min.css';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { FONT_SIZE_LABEL } from 'styles/StyleConstants';
+import { AndvS2Config } from './types';
 
-const AntVS2Wrapper: FC<{
-  dataCfg;
-  options;
-  theme?: S2Theme;
-  palette?: Palette;
-}> = memo(({ dataCfg, options, theme, palette }) => {
-  if (!dataCfg) {
-    return <div></div>;
-  }
+const AntVS2Wrapper: FC<AndvS2Config> = memo(
+  ({ dataCfg, options, theme, palette }) => {
+    if (!dataCfg) {
+      return <div></div>;
+    }
 
-  const onDataCellHover = ({ event, viewMeta }) => {
-    viewMeta.spreadsheet.tooltip.show({
-      position: {
-        x: event.clientX,
-        y: event.clientY,
-      },
-      content: (
-        <TableDataCellTooltip
-          datas={viewMeta.data}
-          meta={viewMeta.spreadsheet.dataCfg.meta}
-        />
-      ),
-    });
-  };
+    const onDataCellHover = ({ event, viewMeta }) => {
+      viewMeta.spreadsheet.tooltip.show({
+        position: {
+          x: event.clientX,
+          y: event.clientY,
+        },
+        content: (
+          <TableDataCellTooltip
+            datas={viewMeta.data}
+            meta={viewMeta.spreadsheet.dataCfg.meta}
+          />
+        ),
+      });
+    };
 
-  return (
-    <StyledAntVS2Wrapper
-      sheetType="pivot"
-      dataCfg={dataCfg}
-      options={options}
-      themeCfg={{ theme, palette }}
-      onDataCellHover={onDataCellHover}
-    />
-  );
-});
+    return (
+      <StyledAntVS2Wrapper
+        sheetType="pivot"
+        dataCfg={dataCfg}
+        options={options}
+        themeCfg={{ theme, palette }}
+        onDataCellHover={onDataCellHover}
+      />
+    );
+  },
+);
 
 const TableDataCellTooltip: FC<{
   datas?: object;
