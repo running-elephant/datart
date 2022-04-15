@@ -27,7 +27,7 @@ import { getLoggedInUserPermissions } from 'app/pages/MainPage/slice/thunks';
 import { StoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
-import { convertToChartDTO } from 'app/utils/ChartDtoHelper';
+import { convertToChartDto } from 'app/utils/ChartDtoHelper';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
 import { request2 } from 'utils/request';
@@ -263,7 +263,7 @@ export const fetchVizChartAction = createAsyncThunk(
       url: `viz/datacharts/${arg.backendChartId}`,
     });
     return {
-      data: convertToChartDTO(response?.data),
+      data: convertToChartDto(response?.data),
       filterSearchParams: arg.filterSearchParams,
     };
   },

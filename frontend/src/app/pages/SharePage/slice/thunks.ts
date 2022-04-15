@@ -29,7 +29,7 @@ import {
 import { handleServerStoryAction } from 'app/pages/StoryBoardPage/slice/actions';
 import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import { convertToChartDTO } from 'app/utils/ChartDtoHelper';
+import { convertToChartDto } from 'app/utils/ChartDtoHelper';
 import { RootState } from 'types';
 import persistence from 'utils/persistence';
 import { request2 } from 'utils/request';
@@ -99,7 +99,7 @@ export const fetchShareVizInfo = createAsyncThunk(
       case 'DATACHART':
         const shareVizInfo = {
           ...data,
-          vizDetail: convertToChartDTO(data.vizDetail),
+          vizDetail: convertToChartDto(data.vizDetail),
         };
         thunkAPI.dispatch(
           shareActions.setDataChart({ data: shareVizInfo, filterSearchParams }),
