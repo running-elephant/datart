@@ -47,7 +47,7 @@ import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
-  EMPHASIS_LEVEL,
+  LEVEL_100,
   SPACE_MD,
   SPACE_XS,
 } from 'styles/StyleConstants';
@@ -197,7 +197,7 @@ const Wrap = styled.div<{}>`
   overflow-y: auto;
 
   .react-resizable-handle {
-    z-index: ${EMPHASIS_LEVEL * 10};
+    z-index: ${LEVEL_100};
   }
 
   &.desktop {

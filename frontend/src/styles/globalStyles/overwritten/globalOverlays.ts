@@ -18,7 +18,7 @@
 
 import { createGlobalStyle } from 'styled-components/macro';
 import {
-  MODAL_LEVEL,
+  LEVEL_1000,
   SPACE_SM,
   SPACE_TIMES,
   SPACE_XS,
@@ -27,10 +27,10 @@ import {
 export const GlobalOverlays = createGlobalStyle`
   /* app/components/Popup */
   .datart-popup {
-    z-index: ${MODAL_LEVEL - 1};
+    z-index: ${LEVEL_1000 - 1};
 
     &.on-modal {
-      z-index: ${MODAL_LEVEL + 30};
+      z-index: ${LEVEL_1000 + 30};
     }
 
     .ant-popover-arrow {
@@ -82,7 +82,7 @@ export const GlobalOverlays = createGlobalStyle`
 
   /* data config section dropdown */
   .datart-data-section-dropdown {
-    z-index: ${MODAL_LEVEL - 1};
+    z-index: ${LEVEL_1000 - 1};
   }
 
   /* color popover */

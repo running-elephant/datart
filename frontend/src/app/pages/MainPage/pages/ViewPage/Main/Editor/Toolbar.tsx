@@ -37,10 +37,10 @@ import { format } from 'sql-formatter';
 import styled from 'styled-components/macro';
 import {
   INFO,
+  LEVEL_1,
   SPACE,
   SPACE_TIMES,
   SPACE_XS,
-  STICKY_LEVEL,
   WARNING,
 } from 'styles/StyleConstants';
 import { getInsertedNodeIndex } from 'utils/utils';
@@ -324,7 +324,7 @@ export const Toolbar = memo(({ allowManage, allowEnableViz }: ToolbarProps) => {
 });
 
 const Container = styled.div`
-  z-index: ${STICKY_LEVEL};
+  z-index: ${LEVEL_1};
   display: flex;
   flex-shrink: 0;
   align-items: center;

@@ -27,7 +27,7 @@ import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { EMPHASIS_LEVEL, G90, WHITE } from 'styles/StyleConstants';
+import { G90, LEVEL_10, WHITE } from 'styles/StyleConstants';
 import { CanFullScreenWidgetTypes } from '../../constants';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 import { FullScreenWidgetMapper } from './FullScreenWidgetMapper';
@@ -131,7 +131,7 @@ const FullScreenWrap = styled.div<{ show: boolean }>`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: ${EMPHASIS_LEVEL * 10};
+  z-index: ${LEVEL_10 * 10};
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -158,7 +158,7 @@ const FullScreenWrap = styled.div<{ show: boolean }>`
     position: absolute;
     top: 64px;
     left: ${p => (p.show ? '0' : '-300px')};
-    z-index: ${EMPHASIS_LEVEL};
+    z-index: ${LEVEL_10};
     width: 300px;
     height: 100%;
 

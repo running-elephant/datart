@@ -17,7 +17,7 @@
  */
 
 import { createGlobalStyle } from 'styled-components/macro';
-import { EMPHASIS_LEVEL, SPACE_TIMES } from 'styles/StyleConstants';
+import { LEVEL_10, SPACE_TIMES } from 'styles/StyleConstants';
 
 export const ReactSplit = createGlobalStyle`
   /* react-split */
@@ -59,12 +59,12 @@ export const ReactSplit = createGlobalStyle`
 
       &:before {
         position: absolute;
-        z-index: ${EMPHASIS_LEVEL};
+        z-index: ${LEVEL_10};
         content: '';
       }
       &:after {
         position: absolute;
-        z-index: ${EMPHASIS_LEVEL};
+        z-index: ${LEVEL_10};
         content: '';
       }
       &:hover,

@@ -60,7 +60,7 @@ import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
-import { EMPHASIS_LEVEL } from 'styles/StyleConstants';
+import { LEVEL_100 } from 'styles/StyleConstants';
 import { CloneValueDeep, isEmptyArray } from 'utils/object';
 import ChartWorkbench from '../pages/ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
 import {
@@ -598,7 +598,7 @@ const StyledChartWorkbenchPage = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: ${EMPHASIS_LEVEL * 6};
+  z-index: ${LEVEL_100};
   display: flex;
   min-width: 0;
   min-height: 0;

@@ -14,7 +14,7 @@ import {
   useRouteMatch,
 } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { STICKY_LEVEL } from 'styles/StyleConstants';
+import { LEVEL_1 } from 'styles/StyleConstants';
 import { useVizSlice } from '../slice';
 import {
   selectArchivedDashboards,
@@ -216,7 +216,7 @@ const Wrapper = styled.div`
 `;
 
 const TabsWrapper = styled.div`
-  z-index: ${STICKY_LEVEL};
+  z-index: ${LEVEL_1};
   flex-shrink: 0;
 `;
 
