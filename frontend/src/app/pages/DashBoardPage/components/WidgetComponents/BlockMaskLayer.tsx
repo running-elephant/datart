@@ -104,7 +104,7 @@ const MaskLayer = styled.div<MaskLayerProps>`
   position: absolute;
   top: -5px;
   left: -5px;
-  z-index: ${p => (p.front ? EMPHASIS_LEVEL + 1 : EMPHASIS_LEVEL - 1)};
+  z-index: ${p => (p.front ? EMPHASIS_LEVEL + 10 : EMPHASIS_LEVEL - 5)};
   width: calc(100% + 10px);
   height: calc(100% + 10px);
   cursor: move;

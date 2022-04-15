@@ -17,13 +17,14 @@
  */
 
 import type { CSSProperties } from 'react';
+import { EMPHASIS_LEVEL } from 'styles/StyleConstants';
 export const FlexStyle: CSSProperties = {
   display: 'flex',
   flex: '1',
   minHeight: '0',
 };
 export const ZIndexStyle: CSSProperties = {
-  zIndex: 10,
+  zIndex: EMPHASIS_LEVEL,
   display: 'flex',
   flexDirection: 'column',
   width: '100%',
