@@ -40,7 +40,7 @@ import Reveal from 'reveal.js';
 import 'reveal.js/dist/reveal.css';
 import RevealZoom from 'reveal.js/plugin/zoom/plugin';
 import styled from 'styled-components/macro';
-import { SPACE_MD } from 'styles/StyleConstants';
+import { EMPHASIS_LEVEL, SPACE_MD } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import PageThumbnailList from '../components/PageThumbnailList';
 import StoryPageItem from '../components/StoryPageItem';
@@ -291,7 +291,7 @@ const Wrapper = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 35;
+  z-index: ${EMPHASIS_LEVEL * 4};
   display: flex;
   flex-direction: column;
   background-color: ${p => p.theme.bodyBackground};

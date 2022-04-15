@@ -45,7 +45,12 @@ import 'react-grid-layout/css/styles.css';
 import { useDispatch, useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
-import { BORDER_RADIUS, SPACE_MD, SPACE_XS } from 'styles/StyleConstants';
+import {
+  BORDER_RADIUS,
+  EMPHASIS_LEVEL,
+  SPACE_MD,
+  SPACE_XS,
+} from 'styles/StyleConstants';
 import StyledBackground from '../../Board/components/StyledBackground';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
@@ -192,7 +197,7 @@ const Wrap = styled.div<{}>`
   overflow-y: auto;
 
   .react-resizable-handle {
-    z-index: 100;
+    z-index: ${EMPHASIS_LEVEL * 10};
   }
 
   &.desktop {

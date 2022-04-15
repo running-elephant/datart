@@ -22,6 +22,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { EMPHASIS_LEVEL } from 'styles/StyleConstants';
 import { BoardInitProvider } from '../DashBoardPage/components/BoardProvider/BoardInitProvider';
 import { FullScreenPanel } from '../DashBoardPage/components/FullScreenPanel/FullScreenPanel';
 import { AutoBoardCore } from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
@@ -165,7 +166,7 @@ const Wrapper = styled.div<{}>`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 50;
+  z-index: ${EMPHASIS_LEVEL * 5};
   display: flex;
   flex-direction: column;
 

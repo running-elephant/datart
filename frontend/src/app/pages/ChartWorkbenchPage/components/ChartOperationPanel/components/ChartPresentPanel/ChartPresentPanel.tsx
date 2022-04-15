@@ -33,6 +33,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
+  EMPHASIS_LEVEL,
   LINE_HEIGHT_ICON_XXL,
   SPACE_LG,
   SPACE_MD,
@@ -173,12 +174,12 @@ const ChartPresentPanel: FC<{
 export default ChartPresentPanel;
 
 const StyledChartPresentPanel = styled.div`
+  position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
   background-color: ${p => p.theme.componentBackground};
   border-radius: ${BORDER_RADIUS};
-  position: relative;
 `;
 
 const StyledReusableChartContainer = styled.div``;
@@ -203,16 +204,16 @@ const ReloadMask = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 10;
-  width: 100%;
-  height: 100%;
+  z-index: ${EMPHASIS_LEVEL};
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  height: 100%;
   background: rgba(255, 255, 255, 0.9);
   .fetchDataIcon {
-    cursor: pointer;
-    color: ${p => p.theme.primary};
     font-size: ${LINE_HEIGHT_ICON_XXL};
+    color: ${p => p.theme.primary};
+    cursor: pointer;
   }
 `;
