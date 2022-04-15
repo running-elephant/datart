@@ -32,6 +32,7 @@ import {
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
+import { PIVOT_THEME_LIST } from '../../FormGenerator/Customize/PivotSheetTheme/theme';
 import AntVS2Wrapper from './AntVS2Wrapper';
 import Config from './config';
 import { AndvS2Config } from './types';
@@ -277,7 +278,7 @@ class PivotSheetChart extends ReactChart {
 
   private getThemeColorList(style: ChartStyleConfig[]): Array<string> {
     const [basicColors] = getStyles(style, ['theme'], ['themeType']);
-    return basicColors?.colors || [];
+    return basicColors?.colors || PIVOT_THEME_LIST[basicColors?.themeType || 0];
   }
 
   private getRowAndColStyle(

@@ -21,7 +21,6 @@ import { updateByKey } from 'app/utils/mutation';
 import { FC, memo, useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE } from '../../../../../styles/StyleConstants';
-import { isNumber } from '../../../../utils/number';
 import { ItemLayout } from '../../Layout';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
@@ -127,13 +126,13 @@ const PivotSheetTheme: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     );
 
     useEffect(() => {
-      if (!data.value?.colors?.length && isNumber(data.value?.themeType)) {
+      if (!data.value?.colors?.length) {
         handleSettingChange({
-          themeType: data.value.themeType,
-          colors: PIVOT_THEME_LIST[data.value.themeType],
+          themeType: data.value?.themeType || 0,
+          colors: PIVOT_THEME_LIST[data.value?.themeType || 0],
         });
       }
-    }, [data, handleSettingChange]);
+    }, [data.value?.themeType, data.value, handleSettingChange]);
 
     const handlePickerSelect = useCallback(
       index => (_, colorConfig) => {
