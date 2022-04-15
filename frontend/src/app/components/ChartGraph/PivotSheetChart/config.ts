@@ -272,9 +272,6 @@ const config: ChartConfig = {
           label: 'theme.themeType',
           key: 'themeType',
           comType: 'pivotSheetTheme',
-          default: {
-            themeType: 1,
-          },
         },
       ],
     },
@@ -468,6 +465,11 @@ const config: ChartConfig = {
           horizontalSplitLineColor: '水平分割线颜色',
           dataColor: '数据单元格文字颜色',
           rowCellFontColor: '行标题颜色',
+          type: {
+            default: '默认',
+            gray: '简约灰',
+            colorful: '多彩蓝',
+          }
         },
         summary: {
           title: '数据汇总',
@@ -545,6 +547,11 @@ const config: ChartConfig = {
           horizontalSplitLineColor: 'Horizontal Split Line Color',
           dataColor: 'Data Font Color',
           rowCellFontColor: 'Row Cell Font Color',
+          type: {
+            default: 'Default',
+            gray: 'Gray',
+            colorful: 'Colorful',
+          }
         },
         summary: {
           title: 'Summary',

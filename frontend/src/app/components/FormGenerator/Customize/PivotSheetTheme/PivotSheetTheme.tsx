@@ -16,15 +16,13 @@
  * limitations under the License.
  */
 
-import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { updateByKey } from 'app/utils/mutation';
-import { FC, memo, useEffect } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE } from '../../../../../styles/StyleConstants';
 import { isNumber } from '../../../../utils/number';
-import { BasicColorSelector } from '../../Basic';
-import { BW } from '../../Basic/components/BasicWrapper';
+import { ItemLayout } from '../../Layout';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
 import { PIVOT_THEME_LIST, PIVOT_THEME_SELECT } from './theme';
@@ -107,9 +105,26 @@ const template = [
   },
 ];
 
+const themeSelectTemplate = {
+  label: 'theme.themeType',
+  key: 'themeType',
+  comType: 'select',
+  default: 0,
+  options: {
+    translateItemLabel: true,
+    items: PIVOT_THEME_SELECT,
+  },
+};
+
 const PivotSheetTheme: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
-    const { options, comType, ...rest } = data;
+    const handleSettingChange = useCallback(
+      value => {
+        const newData = updateByKey(data, 'value', value);
+        onChange?.(ancestors, newData);
+      },
+      [onChange, ancestors, data],
+    );
 
     useEffect(() => {
       if (!data.value?.colors?.length && isNumber(data.value?.themeType)) {
@@ -118,65 +133,71 @@ const PivotSheetTheme: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           colors: PIVOT_THEME_LIST[data.value.themeType],
         });
       }
-    }, [data.value?.themeType, data.value]);
+    }, [data, handleSettingChange]);
 
-    const handleSettingChange = value => {
-      const newData = updateByKey(data, 'value', value);
-      onChange?.(ancestors, newData);
-    };
+    const handlePickerSelect = useCallback(
+      index => (_, colorConfig) => {
+        const newColors = data.value?.colors?.concat();
+        newColors[index] = colorConfig.value;
+        handleSettingChange({
+          themeType: data.value.themeType,
+          colors: newColors,
+        });
+      },
+      [handleSettingChange, data],
+    );
 
-    const handlePickerSelect = index => (ancestors, value) => {
-      const newColors = data.value?.colors?.concat();
-      newColors[index] = value;
-      handleSettingChange({
-        themeType: data.value.themeType,
-        colors: newColors,
-      });
-    };
+    const handleThemeSelect = useCallback(
+      (_, config) => {
+        handleSettingChange({
+          themeType: config.value,
+          colors: PIVOT_THEME_LIST[config.value],
+        });
+      },
+      [handleSettingChange],
+    );
 
-    const handleThemeSelect = value => {
-      handleSettingChange({
-        themeType: value,
-        colors: PIVOT_THEME_LIST[value],
-      });
-    };
+    const themePropsList: ItemLayoutProps<ChartStyleConfig>[] = useMemo(() => {
+      const themeSelectProps: ItemLayoutProps<ChartStyleConfig>[] = [
+        {
+          ancestors,
+          translate: t,
+          data: {
+            label: data?.label || themeSelectTemplate.label,
+            default: data?.default?.themeType || themeSelectTemplate.default,
+            key: data.key || themeSelectTemplate.key,
+            comType: 'select',
+            options: data?.options || themeSelectTemplate.options,
+            value: data?.value?.themeType,
+          },
+          onChange: handleThemeSelect,
+          flatten: true,
+        },
+      ];
+      const colorsProps: ItemLayoutProps<ChartStyleConfig>[] = template.map(
+        item => ({
+          ancestors,
+          translate: t,
+          data: {
+            value: data.value?.colors[item.index],
+            label: item.label,
+            key: item.key,
+            comType: 'fontColor',
+          },
+          onChange: handlePickerSelect(item.index),
+          flatten: true,
+        }),
+      );
+      return themeSelectProps.concat(colorsProps);
+    }, [data, handleThemeSelect, handlePickerSelect, t, ancestors]);
 
     return (
       <>
-        <StyledItemLayout>
-          <BW label={t('theme.themeType', true)}>
-            <Select
-              className="datart-ant-select"
-              placeholder={t('select')}
-              value={data.value?.themeType}
-              onChange={handleThemeSelect}
-            >
-              {PIVOT_THEME_SELECT.map(o => (
-                <Select.Option key={o.value} value={o.value}>
-                  {t(o.name, true)}
-                </Select.Option>
-              ))}
-            </Select>
-          </BW>
-        </StyledItemLayout>
-        {template.map(item => {
-          const props = {
-            ancestors,
-            translate: t,
-            data: {
-              value: data.value?.colors[item.index],
-              label: item.label,
-              key: item.key,
-              comType: 'fontColor',
-            },
-            onChange: handlePickerSelect(item.index),
-          };
-          return (
-            <StyledItemLayout>
-              <BasicColorSelector key={item.index} {...props} />
-            </StyledItemLayout>
-          );
-        })}
+        {themePropsList.map(props => (
+          <StyledItemLayout key={props.data.key}>
+            <ItemLayout {...props} />
+          </StyledItemLayout>
+        ))}
       </>
     );
   },

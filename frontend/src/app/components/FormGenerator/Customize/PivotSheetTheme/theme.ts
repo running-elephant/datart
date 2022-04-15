@@ -18,15 +18,15 @@
 
 export const PIVOT_THEME_SELECT = [
   {
-    name: 'Default',
+    label: 'theme.type.default',
     value: 0,
   },
   {
-    name: 'Gray',
+    label: 'theme.type.gray',
     value: 1,
   },
   {
-    name: 'Colorful',
+    label: 'theme.type.colorful',
     value: 2,
   },
 ];
@@ -83,7 +83,7 @@ export const PIVOT_THEME_LIST = [
     '#282B33',
     '#121826',
   ],
-]
+];
 
 /**
  * 这只是个栗子！

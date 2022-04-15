@@ -73,7 +73,11 @@ const TableDataCellTooltip: FC<{
         .map(m => {
           const uniqKey = m?.field;
           if (uniqKey in datas) {
-            return <li>{`${m?.name}: ${m?.formatter(datas[uniqKey])}`}</li>;
+            return (
+              <li key={uniqKey}>{`${m?.name}: ${m?.formatter(
+                datas[uniqKey],
+              )}`}</li>
+            );
           }
           return null;
         })
