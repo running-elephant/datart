@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-import React from 'react';
 import { DragLayer } from 'react-dnd';
 import styled from 'styled-components';
+import { EMPHASIS_LEVEL } from 'styles/StyleConstants';
 import ChartDragPreview from './ChartDragPreview';
 
 const collect = monitor => {
@@ -72,10 +72,10 @@ export default DragLayer(collect)(CardDragLayer);
 
 const LayerStyles = styled.div`
   position: fixed;
-  pointer-events: none;
-  z-index: 100;
-  left: 0;
   top: 0;
   right: 0;
   bottom: 0;
+  left: 0;
+  z-index: ${EMPHASIS_LEVEL * 10};
+  pointer-events: none;
 `;

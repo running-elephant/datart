@@ -59,12 +59,14 @@ export default function useRenderWidget(
   }, [onRenderedWidgetById, renderMode, widget.id]);
   //初始化查询
   useEffect(() => {
-    const canRender = initialQuery && renderMode !== 'schedule' && !rendered;
+    const canRender =
+      initialQuery && renderMode !== 'schedule' && !rendered && cacheW > 1;
     if (canRender) {
       renderWidget();
     }
   }, [initialQuery, renderMode, rendered, renderWidget, cacheW]);
   return {
     cacheWhRef,
+    cacheW,
   };
 }

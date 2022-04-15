@@ -23,7 +23,7 @@ import {
 import React, { memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { INFO, SUCCESS } from 'styles/StyleConstants';
+import { EMPHASIS_LEVEL, INFO, SUCCESS } from 'styles/StyleConstants';
 import {
   editDashBoardInfoActions,
   editWidgetInfoActions,
@@ -104,7 +104,7 @@ const MaskLayer = styled.div<MaskLayerProps>`
   position: absolute;
   top: -5px;
   left: -5px;
-  z-index: ${p => (p.front ? 20 : 9)};
+  z-index: ${p => (p.front ? EMPHASIS_LEVEL + 10 : EMPHASIS_LEVEL - 5)};
   width: calc(100% + 10px);
   height: calc(100% + 10px);
   cursor: move;

@@ -209,18 +209,22 @@ export const getBoardMarginPadding = (
       };
 };
 
-export const isElView = el => {
+export const isElView = (el, inTimer?: boolean) => {
   let bool = false;
   if (!el) return false;
   let rect = el?.getBoundingClientRect();
 
-  let { top, bottom } = rect;
+  let { top, bottom, x, y, left, right } = rect;
+
+  // freeBoard widget in storyPlayer return true
+  const isFreeWidgetInStoryPlayer = top + bottom + x + y + left + right === 0;
+  if (isFreeWidgetInStoryPlayer && !inTimer) return true;
 
   // top 元素顶端到可见区域顶端的距离
   // bottom 元素底部端到可见区域顶端的距离
   var viewHeight = window.innerHeight || document.documentElement.clientHeight; // 浏览器可见区域高度。
 
-  if (top <= viewHeight && bottom >= 0) {
+  if (top < viewHeight && bottom > 0) {
     bool = true;
   } else if (top >= viewHeight || bottom <= 0) {
     bool = false;

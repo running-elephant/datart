@@ -17,6 +17,7 @@
  */
 import { memo } from 'react';
 import styled from 'styled-components/macro';
+import { EMPHASIS_LEVEL } from 'styles/StyleConstants';
 export const StyledWidgetToolBar: React.FC<{}> = memo(props => {
   return <StyleWrap>{props.children} </StyleWrap>;
 });
@@ -24,7 +25,7 @@ const StyleWrap = styled.div`
   position: absolute;
   top: 0;
   right: 0;
-  z-index: 30;
+  z-index: ${EMPHASIS_LEVEL * 3};
   overflow: hidden;
   text-align: right;
   .widget-tool-dropdown {
