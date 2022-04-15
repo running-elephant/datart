@@ -16,15 +16,14 @@
  * limitations under the License.
  */
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { FlexStyle } from 'app/pages/DashBoardPage/constants';
 import useRenderWidget from 'app/pages/DashBoardPage/hooks/useRenderWidget';
 import useWidgetAutoFetch from 'app/pages/DashBoardPage/hooks/useWidgetAutoFetch';
 import { memo, useContext } from 'react';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { ToolBar } from './components/ToolBar';
 import { DataChartWidgetCore } from './DataChartWidgetCore';
@@ -40,12 +39,11 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
       boardType,
       rendered,
     );
-
     useWidgetAutoFetch(widget, renderMode, cacheWhRef, rendered);
     const { background, border, padding } = widget.config;
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
-        <ZIndexWrapper>
+        <div ref={cacheWhRef} style={ZIndexStyle}>
           {!hideTitle && (
             <WidgetTitle
               name={widget.config.name}
@@ -53,10 +51,10 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
             />
           )}
 
-          <div ref={cacheWhRef} style={FlexStyle}>
+          <div style={FlexStyle}>
             <DataChartWidgetCore />
           </div>
-        </ZIndexWrapper>
+        </div>
         {renderMode === 'edit' && <EditMask />}
         <ToolBar />
       </WidgetWrapper>

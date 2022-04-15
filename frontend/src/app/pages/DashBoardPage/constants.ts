@@ -23,7 +23,6 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
-import type { CSSProperties } from 'react';
 import { PRIMARY, WHITE } from 'styles/StyleConstants';
 import { WidgetType } from './pages/Board/slice/types';
 export const WIDGET_DRAG_HANDLE = 'widget-draggableHandle';
@@ -282,8 +281,3 @@ export const jumpTypes: { name: string; value: JumpTargetType }[] = [
   { value: 'INTERNAL', name: '' },
   { value: 'URL', name: '' },
 ];
-export const FlexStyle: CSSProperties = {
-  display: 'flex',
-  flex: '1',
-  minHeight: '0',
-};

@@ -21,6 +21,7 @@ import { BoardInfoContext } from '../components/BoardProvider/BoardInfoProvider'
 import { VizRenderMode, Widget } from '../pages/Board/slice/types';
 import { isElView } from '../utils/board';
 
+let timer: NodeJS.Timeout;
 export default function useWidgetAutoFetch(
   widget: Widget,
   renderMode: VizRenderMode,
@@ -31,7 +32,6 @@ export default function useWidgetAutoFetch(
   const { onWidgetGetData } = useContext(WidgetActionContext);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
     if (
       rendered &&
       boardVisible &&
@@ -39,7 +39,7 @@ export default function useWidgetAutoFetch(
       widget.config.autoUpdate
     ) {
       timer = setInterval(() => {
-        const elShow = isElView(rectRef.current);
+        const elShow = isElView(rectRef.current, true);
         if (elShow) {
           onWidgetGetData(widget);
         }

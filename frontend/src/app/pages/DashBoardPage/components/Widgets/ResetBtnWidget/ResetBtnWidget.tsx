@@ -17,15 +17,14 @@
  */
 import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { FlexStyle } from 'app/pages/DashBoardPage/constants';
 import { memo, useContext } from 'react';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
 import { ResetBtnWidgetCore } from './ResetBtnWidgetCore';
 
 export const ResetBtnWidget: React.FC<{}> = memo(() => {
@@ -34,11 +33,11 @@ export const ResetBtnWidget: React.FC<{}> = memo(() => {
   const { background, border, padding } = widget.config;
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
-      <ZIndexWrapper>
+      <div style={ZIndexStyle}>
         <div style={FlexStyle}>
           <ResetBtnWidgetCore />
         </div>
-      </ZIndexWrapper>
+      </div>
       {editing && <EditMask />}
       <StyledWidgetToolBar>
         <Space size={0}>

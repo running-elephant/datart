@@ -17,18 +17,17 @@
  */
 import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { FlexStyle } from 'app/pages/DashBoardPage/constants';
 import { memo, useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { RichTextWidgetCore } from './RichTextWidgetCore';
 
@@ -54,7 +53,7 @@ export const RichTextWidget: React.FC<{ hideTitle: boolean }> = memo(
     const { background, border, padding } = widget.config;
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
-        <ZIndexWrapper>
+        <div style={ZIndexStyle}>
           {hideTitle ? null : (
             <WidgetTitle
               name={widget.config.name}
@@ -68,7 +67,7 @@ export const RichTextWidget: React.FC<{ hideTitle: boolean }> = memo(
               boardEditing={editing}
             />
           </div>
-        </ZIndexWrapper>
+        </div>
         {editing && <EditMask />}
         <StyledWidgetToolBar>
           <Space size={0}>
