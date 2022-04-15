@@ -17,16 +17,15 @@
  */
 import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { FlexStyle } from 'app/pages/DashBoardPage/constants';
 import { memo, useContext } from 'react';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
 import { ImageWidgetCore } from './ImageWidgetCore';
 
 export const ImageWidget: React.FC<{ hideTitle: boolean }> = memo(
@@ -37,7 +36,7 @@ export const ImageWidget: React.FC<{ hideTitle: boolean }> = memo(
     const { background, border, padding } = widget.config;
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
-        <ZIndexWrapper>
+        <div style={ZIndexStyle}>
           {!hideTitle && (
             <WidgetTitle
               name={widget.config.name}
@@ -48,7 +47,7 @@ export const ImageWidget: React.FC<{ hideTitle: boolean }> = memo(
           <div style={FlexStyle}>
             <ImageWidgetCore />
           </div>
-        </ZIndexWrapper>
+        </div>
         {editing && <EditMask />}
         <StyledWidgetToolBar>
           <Space size={0}>

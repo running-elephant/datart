@@ -17,16 +17,15 @@
  */
 import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { FlexStyle } from 'app/pages/DashBoardPage/constants';
 import { memo, useContext } from 'react';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { BlockMaskLayer } from '../../WidgetComponents/BlockMaskLayer';
+import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { TabWidgetCore } from './TabWidgetCore';
 
@@ -47,7 +46,7 @@ export const TabWidget: React.FC<{ hideTitle: boolean }> = memo(
 
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
-        <ZIndexWrapper>
+        <div style={ZIndexStyle}>
           {hideTitle ? null : (
             <WidgetTitle
               name={widget.config.name}
@@ -57,7 +56,7 @@ export const TabWidget: React.FC<{ hideTitle: boolean }> = memo(
           <div style={FlexStyle}>
             <TabWidgetCore />
           </div>
-        </ZIndexWrapper>
+        </div>
         {editing && (
           <BlockMaskLayer widgetConfig={widget} widgetInfo={widgetInfo} />
         )}
