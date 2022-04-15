@@ -22,13 +22,13 @@ import { FC, memo, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import TitleHeader from '../../components/BoardHeader/ViewHeader';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardInitProvider } from '../../components/BoardProvider/BoardInitProvider';
 import { FullScreenPanel } from '../../components/FullScreenPanel/FullScreenPanel';
 import { editDashBoardInfoActions } from '../BoardEditor/slice';
+import { selectEditBoard } from '../BoardEditor/slice/selectors';
 import { AutoBoardCore } from './AutoDashboard/AutoBoardCore';
 import { FreeBoardCore } from './FreeDashboard/FreeBoardCore';
 import { boardActions } from './slice';
@@ -62,11 +62,13 @@ export const Board: FC<BoardProps> = memo(
     autoFit,
     showZoomCtrl,
   }) => {
-    const history = useHistory();
     const boardId = id;
     const dispatch = useDispatch();
-
-    const ReadBoardHide = history.location.pathname.includes('boardEditor');
+    const editingBoard = useSelector(selectEditBoard);
+    const readBoardHide = useMemo(
+      () => editingBoard?.id === boardId,
+      [boardId, editingBoard.id],
+    );
     const { ref, width, height } = useResizeObserver<HTMLDivElement>({
       refreshMode: 'debounce',
       refreshRate: 2000,
@@ -83,7 +85,6 @@ export const Board: FC<BoardProps> = memo(
     }, [filterSearchUrl]);
 
     const viewBoard = useMemo(() => {
-      if (ReadBoardHide) return null;
       let boardType = dashboard?.config?.type;
       if (dashboard && boardType) {
         return (
@@ -113,7 +114,6 @@ export const Board: FC<BoardProps> = memo(
         return <BoardLoading />;
       }
     }, [
-      ReadBoardHide,
       dashboard,
       autoFit,
       renderMode,
@@ -125,7 +125,7 @@ export const Board: FC<BoardProps> = memo(
     ]);
 
     useEffect(() => {
-      if (width && height && width > 0 && height > 0 && dashboard?.id) {
+      if (width! > 0 && height! > 0 && dashboard?.id && !readBoardHide) {
         dispatch(
           boardActions.changeBoardVisible({ id: dashboard?.id, visible: true }),
         );
@@ -137,11 +137,11 @@ export const Board: FC<BoardProps> = memo(
           }),
         );
       }
-    }, [dashboard?.id, dispatch, height, width]);
+    }, [readBoardHide, dashboard?.id, dispatch, height, width]);
 
     useEffect(() => {
       dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
-      if (boardId && fetchData && !ReadBoardHide) {
+      if (boardId && fetchData) {
         dispatch(
           fetchBoardDetail({
             dashboardRelId: boardId,
@@ -154,7 +154,7 @@ export const Board: FC<BoardProps> = memo(
       return () => {
         dispatch(boardActions.clearBoardStateById(boardId));
       };
-    }, [ReadBoardHide, boardId, dispatch, fetchData, searchParams]);
+    }, [boardId, dispatch, fetchData, searchParams]);
 
     return (
       <Wrapper ref={ref} className="dashboard-box">
