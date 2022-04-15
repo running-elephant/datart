@@ -28,7 +28,8 @@ import {
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { handleServerStoryAction } from 'app/pages/StoryBoardPage/slice/actions';
 import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
-import { convertToChartDTO } from 'app/utils/ChartDtoHelper';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import { convertToChartDto } from 'app/utils/ChartDtoHelper';
 import { RootState } from 'types';
 import persistence from 'utils/persistence';
 import { request2 } from 'utils/request';
@@ -98,7 +99,7 @@ export const fetchShareVizInfo = createAsyncThunk(
       case 'DATACHART':
         const shareVizInfo = {
           ...data,
-          vizDetail: convertToChartDTO(data.vizDetail),
+          vizDetail: convertToChartDto(data.vizDetail),
         };
         thunkAPI.dispatch(
           shareActions.setDataChart({ data: shareVizInfo, filterSearchParams }),
@@ -147,6 +148,7 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
       preview: ChartPreview;
       pageInfo?: any;
       sorter?: { column: string; operator: string; aggOperator?: string };
+      drillOption?: IChartDrillOption;
     },
     thunkAPI,
   ) => {
@@ -167,6 +169,7 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
     );
     const executeParam = builder
       .addExtraSorters(args?.sorter ? [args?.sorter as any] : [])
+      .addDrillOption(args?.drillOption)
       .build();
 
     const response = await request2({
@@ -185,7 +188,12 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
 export const updateFilterAndFetchDatasetForShare = createAsyncThunk(
   'share/updateFilterAndFetchDatasetForShare',
   async (
-    arg: { backendChartId: string; chartPreview?: ChartPreview; payload },
+    arg: {
+      backendChartId: string;
+      chartPreview?: ChartPreview;
+      payload;
+      drillOption?: IChartDrillOption;
+    },
     thunkAPI,
   ) => {
     await thunkAPI.dispatch(
@@ -199,6 +207,7 @@ export const updateFilterAndFetchDatasetForShare = createAsyncThunk(
     await thunkAPI.dispatch(
       fetchShareDataSetByPreviewChartAction({
         preview: shareState?.chartPreview!,
+        drillOption: arg.drillOption,
       }),
     );
     return {

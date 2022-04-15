@@ -25,7 +25,7 @@ import { ChartDTO } from 'app/types/ChartDTO';
 import { View } from 'app/types/View';
 import {
   buildUpdateChartRequest,
-  convertToChartDTO2,
+  convertToChartDto,
 } from 'app/utils/ChartDtoHelper';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { request2 } from 'utils/request';
@@ -220,7 +220,7 @@ export const fetchChartAction = createAsyncThunk<
       method: 'GET',
       url: `viz/datacharts/${arg.chartId}`,
     });
-    return convertToChartDTO2(response?.data);
+    return convertToChartDto(response?.data);
   }
   return arg.backendChart as any;
 });

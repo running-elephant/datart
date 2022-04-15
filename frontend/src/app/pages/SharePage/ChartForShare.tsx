@@ -16,14 +16,21 @@
  * limitations under the License.
  */
 
+import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
+import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import { IChart } from 'app/types/Chart';
-import { FC, memo, useState } from 'react';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import { getDrillPaths } from 'app/utils/chartHelper';
+import { FC, memo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { isEmptyArray } from 'utils/object';
+import ChartDrillContext from '../ChartWorkbenchPage/contexts/ChartDrillContext';
 import ControllerPanel from '../MainPage/pages/VizPage/ChartPreview/components/ControllerPanel';
 import {
   ChartPreview,
@@ -43,6 +50,7 @@ const ChartForShare: FC<{
   filterSearchParams?: FilterSearchParams;
 }> = memo(({ chartPreview }) => {
   const dispatch = useDispatch();
+  const drillOptionRef = useRef<IChartDrillOption>();
   const [chart] = useState<IChart | undefined>(() => {
     const currentChart = ChartManager.instance().getById(
       chartPreview?.backendChart?.config?.chartGraphId,
@@ -69,6 +77,19 @@ const ChartForShare: FC<{
     if (!chartPreview) {
       return;
     }
+    const drillPaths = getDrillPaths(chartPreview?.chartConfig?.datas);
+    if (isEmptyArray(drillPaths)) {
+      drillOptionRef.current = undefined;
+    }
+    if (
+      !isEmptyArray(drillPaths) &&
+      drillOptionRef.current
+        ?.getAllFields()
+        ?.map(p => p.uid)
+        .join('-') !== drillPaths.map(p => p.uid).join('-')
+    ) {
+      drillOptionRef.current = new ChartDrillOption(drillPaths);
+    }
     dispatch(fetchShareDataSetByPreviewChartAction({ preview: chartPreview }));
     registerChartEvents(chart);
   });
@@ -78,6 +99,13 @@ const ChartForShare: FC<{
       {
         name: 'click',
         callback: param => {
+          if (drillOptionRef.current?.isSelectedDrill) {
+            const option = drillOptionRef.current;
+            option.drillDown(param.data.rowData);
+            drillOptionRef.current = option;
+            handleDrillOptionChange(option);
+            return;
+          }
           if (
             param.componentType === 'table' &&
             param.seriesType === 'paging-sort-filter'
@@ -108,6 +136,19 @@ const ChartForShare: FC<{
         backendChartId: chartPreview?.backendChart?.id!,
         chartPreview,
         payload,
+        drillOption: drillOptionRef?.current,
+      }),
+    );
+  };
+
+  const handleDrillOptionChange = (option: IChartDrillOption) => {
+    drillOptionRef.current = option;
+    dispatch(
+      updateFilterAndFetchDatasetForShare({
+        backendChartId: chartPreview?.backendChart?.id!,
+        chartPreview,
+        payload: null,
+        drillOption: drillOptionRef?.current,
       }),
     );
   };
@@ -121,18 +162,28 @@ const ChartForShare: FC<{
           onChange={handleFilterChange}
         />
       </div>
-
-      <div style={{ width: '100%', height: '100%' }} ref={ref}>
-        <ChartIFrameContainer
-          key={chartPreview?.backendChart?.id!}
-          containerId={chartPreview?.backendChart?.id!}
-          dataset={chartPreview?.dataset}
-          chart={chart!}
-          config={chartPreview?.chartConfig!}
-          width={width}
-          height={height}
-        />
-      </div>
+      <ChartDrillContext.Provider
+        value={{
+          drillOption: drillOptionRef.current,
+          onDrillOptionChange: handleDrillOptionChange,
+        }}
+      >
+        <div style={{ width: '100%', height: '100%' }} ref={ref}>
+          <ChartDrillContextMenu>
+            <ChartIFrameContainer
+              key={chartPreview?.backendChart?.id!}
+              containerId={chartPreview?.backendChart?.id!}
+              dataset={chartPreview?.dataset}
+              chart={chart!}
+              config={chartPreview?.chartConfig!}
+              width={width}
+              height={height}
+            />
+          </ChartDrillContextMenu>
+        </div>
+        <ChartDrillPaths />
+      </ChartDrillContext.Provider>
+      <ChartDrillPaths />x
       <HeadlessBrowserIdentifier
         renderSign={headlessBrowserRenderSign}
         width={Number(width) || 0}
@@ -149,6 +200,10 @@ const StyledChartPreviewBoard = styled.div`
   flex-flow: column;
   width: 100%;
   height: 100%;
+
+  .chart-drill-menu-container {
+    height: 100%;
+  }
 
   iframe {
     flex-grow: 1000;
