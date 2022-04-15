@@ -62,6 +62,12 @@ spring:
 server:
   port: ${server.port:8080}
   address: ${server.ip:0.0.0.0}
+  ssl:
+    enabled: false
+    key-store: keystore.p12 # Absolute path
+    key-store-password: password
+    keyStoreType: PKCS12
+    keyAlias: tomcat
 
 datart:
   server:
