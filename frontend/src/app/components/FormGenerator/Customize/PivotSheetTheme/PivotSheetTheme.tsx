@@ -28,43 +28,43 @@ import { PIVOT_THEME_LIST, PIVOT_THEME_SELECT } from './theme';
 
 const template = [
   {
-    label: 'theme.headerFontColor',
-    key: 'headerFontColor',
+    label: 'theme.colHeaderFontColor',
+    key: 'colHeaderFontColor',
     index: 0,
   },
   {
-    label: 'theme.headerBgColor',
-    key: 'headerBgColor',
+    label: 'theme.colHeaderBgColor',
+    key: 'colHeaderBgColor',
     index: 3,
   },
   {
-    label: 'theme.hoverHeaderBgColor',
-    key: 'hoverHeaderBgColor',
+    label: 'theme.colHeaderBgColorHover',
+    key: 'colHeaderBgColorHover',
     index: 4,
   },
   {
-    label: 'theme.headerBorderColor',
-    key: 'headerBorderColor',
+    label: 'theme.colHeaderBorderColor',
+    key: 'colHeaderBorderColor',
     index: 10,
   },
   {
-    label: 'theme.rowCellFontColor',
-    key: 'rowCellFontColor',
+    label: 'theme.rowHeaderFontColor',
+    key: 'rowHeaderFontColor',
     index: 14,
   },
   {
-    label: 'theme.dataColor',
-    key: 'dataColor',
+    label: 'theme.cellFontColor',
+    key: 'cellFontColor',
     index: 13,
   },
   {
-    label: 'theme.hoverDataBgColor',
-    key: 'hoverDataBgColor',
+    label: 'theme.cellBgColorHover',
+    key: 'cellBgColorHover',
     index: 2,
   },
   {
-    label: 'theme.dataBorderColor',
-    key: 'dataBorderColor',
+    label: 'theme.cellBorderColor',
+    key: 'cellBorderColor',
     index: 9,
   },
   {
@@ -88,8 +88,8 @@ const template = [
     index: 12,
   },
   {
-    label: 'theme.hoverSplitLineColor',
-    key: 'hoverSplitLineColor',
+    label: 'theme.resizeAreaColor',
+    key: 'resizeAreaColor',
     index: 7,
   },
   {
