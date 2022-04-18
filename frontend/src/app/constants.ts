@@ -16,6 +16,11 @@
  * limitations under the License.
  */
 
+export enum TenantManagementMode {
+  Team = 'TEAM',
+  Platform = 'PLATFORM',
+}
+
 export enum ControllerFacadeTypes {
   DropdownList = 'dropdownList',
   RadioGroup = 'radioGroup',

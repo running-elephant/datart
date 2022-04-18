@@ -37,9 +37,11 @@ import {
 import { getToken } from 'utils/auth';
 
 export function LoginForm({
+  registerEnable = true,
   modal = false,
   onLogin,
 }: {
+  registerEnable?: boolean;
   modal?: boolean;
   onLogin?: (value) => void;
 }) {
@@ -139,7 +141,9 @@ export function LoginForm({
               <LinkButton to="/forgetPassword">
                 {t('forgotPassword')}
               </LinkButton>
-              <LinkButton to="/register">{t('register')}</LinkButton>
+              {registerEnable && (
+                <LinkButton to="/register">{t('register')}</LinkButton>
+              )}
             </Links>
           )}
 
@@ -168,7 +172,7 @@ const LinkButton = styled(Link)`
   flex: 1;
   line-height: ${LINE_HEIGHT_ICON_LG};
 
-  &:last-of-type {
+  &:nth-child(2) {
     text-align: right;
   }
 `;

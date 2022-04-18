@@ -1236,19 +1236,27 @@
   },
   "member": {
     "memberDetail": {
-      "title": "成员详情",
+      "titleAdd": "新建成员",
+      "titleDetail": "成员详情",
       "grantOwner": "设为组织拥有者",
       "revokeOwner": "撤销拥有者",
       "remove": "移除成员",
       "removeConfirm": "确定移除该成员？",
       "removeSuccess": "移除成功",
+      "delete": "删除成员",
+      "deleteConfirm": "确定删除该成员？",
+      "deleteSuccess": "删除成功",
       "grantSuccess": "设置成功",
       "revokeSuccess": "撤销成功",
       "username": "用户名",
       "email": "邮箱",
+      "password": "密码",
+      "changePassword": "点击修改密码",
       "name": "用户姓名",
+      "description": "描述",
       "roles": "角色列表",
-      "assignRole": "为用户指定角色"
+      "assignRole": "为用户指定角色",
+      "createSuccess": "新建成员成功"
     },
     "roleDetail": {
       "role": "角色",
@@ -1267,7 +1275,12 @@
     "form": {
       "email": "邮箱",
       "search": "请搜索或粘贴被邀请成员邮箱",
-      "needConfirm": "需要被邀请成员邮件确认"
+      "needConfirm": "需要被邀请成员邮件确认",
+      "password": "密码",
+      "username": "用户名",
+      "name": "姓名",
+      "description": "描述",
+      "roles": "角色"
     },
     "sidebar": {
       "member": "成员",
@@ -1276,6 +1289,7 @@
       "inviteMember": "邀请成员",
       "inviteSuccess": "邀请邮件已成功发送",
       "invalidEmail": "请检查以下无效邮件地址",
+      "addMember": "新建成员",
       "roleTitle": "角色列表",
       "addRole": "新建角色"
     }

@@ -32,6 +32,7 @@ import {
 import { List, Menu, Tooltip } from 'antd';
 import logo from 'app/assets/images/logo.svg';
 import { Avatar, MenuListItem, Popup } from 'app/components';
+import { TenantManagementMode } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   selectCurrentOrganization,
@@ -40,7 +41,7 @@ import {
   selectOrgId,
 } from 'app/pages/MainPage/slice/selectors';
 import { getOrganizations } from 'app/pages/MainPage/slice/thunks';
-import { selectLoggedInUser } from 'app/slice/selectors';
+import { selectLoggedInUser, selectSystemInfo } from 'app/slice/selectors';
 import { logout } from 'app/slice/thunks';
 import { downloadFile } from 'app/utils/fetch';
 import { BASE_RESOURCE_URL } from 'globalConstants';
@@ -83,6 +84,7 @@ export function Navbar() {
   const [modifyPasswordVisible, setModifyPasswordVisible] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
+  const systemInfo = useSelector(selectSystemInfo);
   const orgId = useSelector(selectOrgId);
   const currentOrganization = useSelector(selectCurrentOrganization);
   const loggedInUser = useSelector(selectLoggedInUser);
@@ -289,22 +291,25 @@ export function Navbar() {
               }
             }}
           />
-          <Popup
-            content={<OrganizationList />}
-            trigger={['click']}
-            placement="rightBottom"
-            onVisibleChange={organizationListVisibleChange}
-          >
-            <li>
-              <Tooltip title={t('nav.organization.title')} placement="right">
-                <Avatar
-                  src={`${BASE_RESOURCE_URL}${currentOrganization?.avatar}`}
-                >
-                  <BankFilled />
-                </Avatar>
-              </Tooltip>
-            </li>
-          </Popup>
+          {systemInfo?.tenantManagementMode ===
+            TenantManagementMode.Platform && (
+            <Popup
+              content={<OrganizationList />}
+              trigger={['click']}
+              placement="rightBottom"
+              onVisibleChange={organizationListVisibleChange}
+            >
+              <li>
+                <Tooltip title={t('nav.organization.title')} placement="right">
+                  <Avatar
+                    src={`${BASE_RESOURCE_URL}${currentOrganization?.avatar}`}
+                  >
+                    <BankFilled />
+                  </Avatar>
+                </Tooltip>
+              </li>
+            </Popup>
+          )}
           <Popup
             content={
               <Menu
