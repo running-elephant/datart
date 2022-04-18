@@ -77,7 +77,7 @@ export const WidgetActionProvider: FC<{
   renderMode: VizRenderMode;
 }> = memo(({ boardEditing, boardId, orgId, renderMode, children }) => {
   const dispatch = useDispatch();
-  const history = useHistory();
+  const history = useHistory<any>();
   const methods = useMemo(() => {
     const contextValue: WidgetActionContextProps = {
       onEditLayerToTop: () => {

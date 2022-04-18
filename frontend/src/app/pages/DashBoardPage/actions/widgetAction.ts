@@ -17,7 +17,7 @@
  */
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams } from 'app/types/Chart';
-import { History } from 'history';
+import type { History } from 'history';
 import i18next from 'i18next';
 import { RootState } from 'types';
 import { jumpTypes } from '../constants';
@@ -110,7 +110,7 @@ export const widgetClickJumpAction =
     renderMode: VizRenderMode,
     widget: Widget,
     params: ChartMouseEventParams,
-    history: History,
+    history: History<any>,
   ) =>
   (dispatch, getState) => {
     const state = getState() as RootState;
@@ -251,7 +251,7 @@ export const widgetChartClickAction =
     renderMode: VizRenderMode,
     widget: Widget,
     params: ChartMouseEventParams,
-    history: History,
+    history: History<any>,
   ) =>
   dispatch => {
     //is tableChart
