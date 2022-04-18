@@ -23,8 +23,9 @@ import {
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { FC, memo } from 'react';
-import styled, { StyleSheetManager } from 'styled-components/macro';
+import { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
 import ChartIFrameLifecycleAdapter from './ChartIFrameLifecycleAdapter';
 
@@ -36,8 +37,11 @@ const ChartIFrameContainer: FC<{
   width?: any;
   height?: any;
   isShown?: boolean;
+  drillOption?: IChartDrillOption;
   widgetSpecialConfig?: any;
 }> = memo(props => {
+  const iframeContainerId = `chart-iframe-root-${props.containerId}`;
+
   const transformToSafeCSSProps = (width, height) => {
     let newStyle = { width, height };
     if (isNaN(newStyle?.width) || isEmpty(newStyle?.width)) {
@@ -73,6 +77,7 @@ const ChartIFrameContainer: FC<{
               style={transformToSafeCSSProps(props?.width, props?.height)}
               widgetSpecialConfig={props.widgetSpecialConfig}
               isShown={props.isShown}
+              drillOption={props?.drillOption}
             />
           </div>
         </div>
@@ -81,7 +86,7 @@ const ChartIFrameContainer: FC<{
 
     return (
       <Frame
-        id={`chart-iframe-root-${props.containerId}`}
+        id={iframeContainerId}
         key={props.containerId}
         frameBorder={0}
         style={{ width: '100%', height: '100%' }}
@@ -103,7 +108,26 @@ const ChartIFrameContainer: FC<{
         <FrameContextConsumer>
           {frameContext => (
             <StyleSheetManager target={frameContext.document?.head}>
-              <StyledChartLifecycleAdapter>
+              <div
+                onContextMenu={event => {
+                  event.stopPropagation();
+                  event.preventDefault();
+
+                  var iframe = document.getElementById(iframeContainerId);
+                  if (iframe) {
+                    var boundingClientRect = iframe.getBoundingClientRect();
+                    var evt = new CustomEvent('contextmenu', {
+                      bubbles: true,
+                      cancelable: false,
+                    }) as any;
+                    evt.clientX = event.clientX + boundingClientRect.left;
+                    evt.pageX = event.clientX + boundingClientRect.left;
+                    evt.clientY = event.clientY + boundingClientRect.top;
+                    evt.pageY = event.clientY + boundingClientRect.top;
+                    iframe.dispatchEvent(evt);
+                  }
+                }}
+              >
                 <ChartIFrameLifecycleAdapter
                   dataset={props.dataset}
                   chart={props.chart}
@@ -111,8 +135,9 @@ const ChartIFrameContainer: FC<{
                   style={transformToSafeCSSProps(props?.width, props?.height)}
                   widgetSpecialConfig={props.widgetSpecialConfig}
                   isShown={props.isShown}
+                  drillOption={props.drillOption}
                 />
-              </StyledChartLifecycleAdapter>
+              </div>
             </StyleSheetManager>
           )}
         </FrameContextConsumer>
@@ -128,5 +153,3 @@ const ChartIFrameContainer: FC<{
 });
 
 export default ChartIFrameContainer;
-
-const StyledChartLifecycleAdapter = styled.div``;

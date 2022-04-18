@@ -29,7 +29,7 @@ import { memo, useCallback, useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled, { css } from 'styled-components/macro';
-import { ORANGE, STICKY_LEVEL } from 'styles/StyleConstants';
+import { LEVEL_1, ORANGE } from 'styles/StyleConstants';
 import { ViewViewModelStages } from '../constants';
 import { EditorContext } from '../EditorContext';
 import {
@@ -201,7 +201,7 @@ function CloseIcon({ touched, stage, error }: CloseIconProps) {
 }
 
 const Wrapper = styled.div`
-  z-index: ${STICKY_LEVEL};
+  z-index: ${LEVEL_1};
   flex-shrink: 0;
 `;
 

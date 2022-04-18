@@ -25,9 +25,20 @@ import org.apache.calcite.sql.SqlWriter;
 import org.apache.calcite.sql.dialect.H2SqlDialect;
 import org.apache.calcite.sql.dialect.MysqlSqlDialect;
 
-import static datart.core.data.provider.StdSqlOperator.symbolOf;
+import java.util.EnumSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
+
+import static datart.core.data.provider.StdSqlOperator.*;
 
 public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, FetchAndOffsetSupport {
+
+    static ConcurrentSkipListSet<StdSqlOperator> OWN_SUPPORTED = new ConcurrentSkipListSet<>(
+            EnumSet.of(AGG_DATE_YEAR, AGG_DATE_QUARTER, AGG_DATE_MONTH, AGG_DATE_WEEK, AGG_DATE_DAY));
+
+    static {
+        OWN_SUPPORTED.addAll(SUPPORTED);
+    }
 
     /**
      * Creates an H2SqlDialect.
@@ -57,16 +68,19 @@ public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, Fe
             case AGG_DATE_YEAR:
                 writer.print("YEAR(" + call.getOperandList().get(0).toString() + ")");
                 return true;
-            case AGG_DATE_QUARTER:
-                writer.print("FORMATDATETIME("+call.getOperandList().get(0).toString()+",'yyyy-q')");
+            case AGG_DATE_QUARTER: {
+                String columnName = call.getOperandList().get(0).toString();
+                writer.print("CONCAT(FORMATDATETIME("+columnName+",'Y-'),QUARTER("+columnName+"))");
                 return true;
+            }
             case AGG_DATE_MONTH:
                 writer.print("FORMATDATETIME("+call.getOperandList().get(0).toString()+",'yyyy-MM')");
                 return true;
-            case AGG_DATE_WEEK:
-                String column = call.getOperandList().get(0).toString();
-                writer.print("CONCAT_WS('-',ISO_YEAR("+column+"),RIGHT(100+ISO_WEEK("+column+"),2))");
+            case AGG_DATE_WEEK: {
+                String columnName = call.getOperandList().get(0).toString();
+                writer.print("CONCAT_WS('-',ISO_YEAR("+columnName+"),RIGHT(100+ISO_WEEK("+columnName+"),2))");
                 return true;
+            }
             case AGG_DATE_DAY:
                 writer.print("FORMATDATETIME("+call.getOperandList().get(0).toString()+",'yyyy-MM-dd')");
                 return true;
@@ -79,5 +93,10 @@ public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, Fe
     @Override
     public void unparseOffsetFetch(SqlWriter writer, SqlNode offset, SqlNode fetch) {
         unparseFetchUsingLimit(writer, offset, fetch);
+    }
+
+    @Override
+    public Set<StdSqlOperator> supportedOperators() {
+        return OWN_SUPPORTED;
     }
 }

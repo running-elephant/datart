@@ -29,7 +29,8 @@ START_CLASS="datart.DatartServerApplication"
 #java -server -Xms2G -Xmx2G  -Dspring.profiles.active=config -Dfile.encoding=UTF-8 -cp "${CLASS_PATH}" datart.DatartServerApplication
 
 datart_status(){
-    result=`ps -ef | awk '/DatartServerApplication/ && !/awk/{print $2}' | wc -l`
+    #result=`ps -ef | awk '/DatartServerApplication/ && !/awk/{print $2}' | wc -l`
+    result=`ps -ef | grep -v grep | grep "${BASE_DIR}/lib" | grep 'DatartServerApplication' | awk {'print $2'} | wc -l`
 
     if [[ $result -eq 0 ]]; then
         return 0
@@ -47,7 +48,8 @@ datart_start(){
 
     else
         echo ""
-        PID=`ps -ef | awk '/DatartServerApplication/ && !/awk/{print $2}'`
+        #PID=`ps -ef | awk '/DatartServerApplication/ && !/awk/{print $2}'`
+        PID=`ps -ef | grep -v grep | grep "${BASE_DIR}/lib" | grep 'DatartServerApplication' | awk {'print $2'}`
         echo "Datart is Running Now..... PID is ${PID} "
     fi
 }
@@ -60,7 +62,8 @@ datart_stop(){
         echo "Datart is not Running....."
         echo ""
     else
-         ps -ef | awk '/DatartServerApplication/ && !/awk/{print $2}'| xargs kill -9
+         #ps -ef | awk '/DatartServerApplication/ && !/awk/{print $2}'| xargs kill -9
+         ps -ef | grep -v grep | grep "$BASE_DIR/lib" | grep 'DatartServerApplication' | awk {'print $2'} | xargs kill -9
 
     fi
 }
@@ -77,7 +80,7 @@ case $1 in
     stop )
         echo ""
 
-        echo "Datart Stoping.......... "
+        echo "Datart Stopping.......... "
 
         echo ""
         datart_stop
@@ -100,7 +103,8 @@ case $1 in
             echo ""
         else
             echo ""
-            PID=`ps -ef | awk '/DatartServerApplication/ && !/awk/{print $2}'`
+            #PID=`ps -ef | awk '/DatartServerApplication/ && !/awk/{print $2}'`
+            PID=`ps -ef | grep -v grep | grep "${BASE_DIR}/lib" | grep 'DatartServerApplication' | awk {'print $2'}`
             echo "Datart is Running..... PID is ${PID}"
             echo ""
         fi

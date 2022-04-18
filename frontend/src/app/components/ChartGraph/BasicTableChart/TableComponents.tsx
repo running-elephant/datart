@@ -3,7 +3,7 @@ import { Tooltip } from 'antd';
 import React from 'react';
 import { Resizable } from 'react-resizable';
 import styled from 'styled-components/macro';
-import { BLUE } from 'styles/StyleConstants';
+import { BLUE, LEVEL_1 } from 'styles/StyleConstants';
 
 export const TableComponentsTd = ({
   children,
@@ -46,12 +46,14 @@ export const ResizableTitle = props => {
 };
 
 export const TableColumnTitle = props => {
-  const { desc, title } = props;
+  const { desc, title, uid } = props;
   return (
-    <TableColumnTitleStyle>
-      <span className="titleStyle">{title}</span>
+    <TableColumnTitleStyle key={uid}>
+      <span className="titleStyle" key={uid + 'title'}>
+        {title}
+      </span>
       {desc && (
-        <Tooltip placement="top" title={desc}>
+        <Tooltip placement="top" key={uid + 'desc'} title={desc}>
           <InfoCircleOutlined />
         </Tooltip>
       )}
@@ -76,7 +78,7 @@ const ResizableHandleStyle = styled.span`
   position: absolute;
   right: -5px;
   bottom: 0;
-  z-index: 1;
+  z-index: ${LEVEL_1};
   width: 10px;
   height: 100%;
   cursor: col-resize;

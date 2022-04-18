@@ -25,7 +25,7 @@ import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
 import { PRIMARY, WHITE } from 'styles/StyleConstants';
 import { WidgetType } from './pages/Board/slice/types';
-export const RGL_DRAG_HANDLE = 'dashboard-draggableHandle';
+export const WIDGET_DRAG_HANDLE = 'widget-draggableHandle';
 export const BOARD_FILE_IMG_PREFIX = 'resources/image/dashboard/';
 export const BASE_VIEW_WIDTH = 1024;
 export const BASE_ROW_HEIGHT = 32;
@@ -33,7 +33,6 @@ export const MIN_ROW_HEIGHT = 24;
 export const MIN_MARGIN = 8;
 export const MIN_PADDING = 8;
 export const LAYOUT_COLS_KEYS = ['lg', 'md', 'sm', 'xs', 'xxs'] as const;
-
 export const LAYOUT_COLS_MAP = {
   lg: 12,
   md: 12,
@@ -101,13 +100,20 @@ export const ButtonBorderDefault: BorderConfig = {
   width: 0,
 };
 
-export const CanDropToWidgetTypes: WidgetType[] = ['chart', 'media'];
-export const CanFullScreenWidgetTypes: WidgetType[] = ['chart', 'media'];
+export const CanDropToWidgetTypes: readonly WidgetType[] = ['chart', 'media'];
+export const CanFullScreenWidgetTypes: readonly Partial<WidgetType>[] = [
+  'chart',
+  'media',
+  'container',
+];
 
 export const CONTAINER_TAB = 'containerTab';
 
 //
-export const NeedFetchWidgetTypes: WidgetType[] = ['chart', 'controller'];
+export const NeedFetchWidgetTypes: readonly WidgetType[] = [
+  'chart',
+  'controller',
+];
 
 // setting
 

@@ -636,6 +636,7 @@
         "AGG_DATE_MONTH": "Month",
         "AGG_DATE_WEEK": "Week",
         "AGG_DATE_DAY": "Day",
+        "drillable": "Drillable",
         "actions": {
           "sort": {
             "title": "Sort",
@@ -783,11 +784,41 @@
         "ok": "OK",
         "cancel": "Cancel",
         "number": "No.",
-        "summary": "Summary"
+        "summary": "Summary",
+        "richText": {
+          "bold": "Bold",
+          "italic": "Italic",
+          "underline": "Underline",
+          "strike": "Strike",
+          "indent": "Indent",
+          "indentUp": "Indent Up",
+          "ordered": "Ordered",
+          "list": "List",
+          "blockquote": "Blockquote",
+          "codeBlock": "Code Block",
+          "link": "Link",
+          "image": "Image",
+          "clean": "Clean",
+          "more": "More",
+          "families": "Families",
+          "fontSize": "Font Size",
+          "background": "Background",
+          "color": "Color",
+          "align": "Align"
+        }
+      },
+      "drill": {
+        "showNextLevel": "Show Next Level",
+        "expandNextLevel": "Expand Next Level",
+        "selectDrillStatus": "Mouse Click Drill Status",
+        "enable": "Enable",
+        "disable": "Disable",
+        "rollUp": "Roll Up"
       }
     },
     "action": {
       "common": {
+        "downloadForExcel": "Download Excel",
         "confirm": "Please Confirm",
         "ok": "OK",
         "cancel": "Cancel",
@@ -811,8 +842,36 @@
         "expireDate": "Expire Date",
         "enablePassword": "Password",
         "generateLink": "Generate Link",
-        "shareLink": "Share Link",
-        "downloadData": "Download Excel"
+        "shareLink": "Share management",
+        "downloadData": "Download Excel",
+        "downloadPDF": "Download PDF",
+        "downloadPicture": "Download Picture",
+        "NONE": "None",
+        "CODE": "Code",
+        "LOGIN": "Login",
+        "verificationMethod": "Verification method",
+        "dataPermission": "Data permission",
+        "loginUser": "User login",
+        "shareUser": "User share",
+        "userOrRole": "Assign roles/members",
+        "selectRole": "Select role",
+        "selectUser": "select members",
+        "save": "Save"
+      },
+      "shareList": {
+        "shareList": "Share link list",
+        "shortLink": "Short link",
+        "type": "Type",
+        "expireDate": "Expiration",
+        "operate": "Operate",
+        "copy": "Copy",
+        "copySuccess": "Copy success",
+        "delete": "Delete",
+        "addLink": "Add a link",
+        "deleteError": "Failed to delete",
+        "sureDelete": "sure you want to delete?",
+        "noDataTip": "No link yet, click on the top right corner to add",
+        "Permanent": "Permanent"
       }
     },
     "board": {
@@ -1187,19 +1246,27 @@
   },
   "member": {
     "memberDetail": {
-      "title": "Member detail",
+      "titleAdd": "Add Member",
+      "titleDetail": "Member detail",
       "grantOwner": "Granted to organization owner",
       "revokeOwner": "Revoke owner",
       "remove": "Remove",
       "removeConfirm": "Remove confirm",
       "removeSuccess": "Remove successful",
+      "delete": "Delete",
+      "deleteConfirm": "Delete confirm",
+      "deleteSuccess": "Delete successful",
       "grantSuccess": "Grant successful",
       "revokeSuccess": "Revoke successful",
       "username": "Username",
       "email": "Email",
+      "password": "Password",
+      "changePassword": "Click to change password",
       "name": "Name",
+      "description": "Description",
       "roles": "Roles",
-      "assignRole": "Assign roles"
+      "assignRole": "Assign roles",
+      "createSuccess": "Member created successfully"
     },
     "roleDetail": {
       "role": "Role",
@@ -1218,7 +1285,12 @@
     "form": {
       "email": "Email",
       "search": "Search or paste the emails of invited members",
-      "needConfirm": "Need email confirmation"
+      "needConfirm": "Need email confirmation",
+      "password": "Password",
+      "username": "Username",
+      "name": "Name",
+      "description": "Description",
+      "roles": "Roles"
     },
     "sidebar": {
       "member": "Members",
@@ -1227,6 +1299,7 @@
       "inviteMember": "Invite member",
       "inviteSuccess": "The invitation email has been sent successfully",
       "invalidEmail": "Invalid email addresses",
+      "addMember": "Add Member",
       "roleTitle": "Roles",
       "addRole": "Create role"
     }

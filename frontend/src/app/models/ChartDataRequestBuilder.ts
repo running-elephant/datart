@@ -35,6 +35,7 @@ import {
 } from 'app/types/ChartDataRequest';
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { getValue } from 'app/utils/chartHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import {
@@ -44,6 +45,7 @@ import {
 } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
+import { DrillMode } from './ChartDrillOption';
 
 export class ChartDataRequestBuilder {
   extraSorters: ChartDataRequest['orders'] = [];
@@ -53,6 +55,7 @@ export class ChartDataRequestBuilder {
   dataView;
   script: boolean;
   aggregation?: boolean;
+  drillOption?: IChartDrillOption;
 
   constructor(
     dataView: Pick<ChartDataView, 'id' | 'computedFields'> & {
@@ -76,6 +79,11 @@ export class ChartDataRequestBuilder {
     if (!isEmptyArray(sorters)) {
       this.extraSorters = this.extraSorters.concat(sorters!);
     }
+    return this;
+  }
+
+  public addDrillOption(drillOption?: IChartDrillOption) {
+    this.drillOption = drillOption;
     return this;
   }
 
@@ -128,35 +136,47 @@ export class ChartDataRequestBuilder {
     }
     const groupColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
       (acc, cur) => {
-        if (!cur.rows) {
+        if (isEmptyArray(cur.rows)) {
           return acc;
         }
-        if (
-          cur.type === ChartDataSectionType.GROUP ||
-          cur.type === ChartDataSectionType.COLOR
-        ) {
-          return acc.concat(cur.rows);
+        if (cur.type === ChartDataSectionType.COLOR) {
+          return acc.concat(cur.rows || []);
         }
-        if (
-          cur.type === ChartDataSectionType.MIXED &&
-          cur.rows?.find(v =>
+        if (cur.type === ChartDataSectionType.GROUP) {
+          if (cur.drillable) {
+            if (
+              !this.drillOption ||
+              this.drillOption?.mode === DrillMode.Normal ||
+              !this.drillOption?.getCurrentFields()
+            ) {
+              return acc.concat(cur.rows?.[0] || []);
+            }
+            return acc.concat(
+              cur.rows?.filter(field => {
+                return Boolean(
+                  this.drillOption
+                    ?.getCurrentFields()
+                    ?.some(df => df.uid === field.uid),
+                );
+              }) || [],
+            );
+          }
+          return acc.concat(cur.rows || []);
+        }
+        if (cur.type === ChartDataSectionType.MIXED) {
+          const dateAndStringFields = cur.rows?.filter(v =>
             [DataViewFieldType.DATE, DataViewFieldType.STRING].includes(v.type),
-          )
-        ) {
-          //zh: 判断数据中是否含有 DATE 和 STRING 类型 en: Determine whether the data contains DATE and STRING types
-          return acc.concat(
-            cur.rows.filter(
-              v =>
-                v.type === DataViewFieldType.DATE ||
-                v.type === DataViewFieldType.STRING,
-            ),
           );
+          //zh: 判断数据中是否含有 DATE 和 STRING 类型 en: Determine whether the data contains DATE and STRING types
+          return acc.concat(dateAndStringFields || []);
         }
         return acc;
       },
       [],
     );
-    return groupColumns.map(groupCol => ({ column: groupCol.colName }));
+    return Array.from(
+      new Set(groupColumns.map(groupCol => ({ column: groupCol.colName }))),
+    );
   }
 
   private buildFilters(): ChartDataRequestFilter[] {
@@ -180,7 +200,7 @@ export class ChartDataRequestBuilder {
         return true;
       })
       .map(col => col);
-    return this.normalizeFilters(fields) as ChartDataRequestFilter[];
+    return this.normalizeFilters(fields).concat(this.normalizeDrillFilters());
   }
 
   private normalizeFilters = (fields: ChartDataSectionField[]) => {
@@ -251,7 +271,7 @@ export class ChartDataRequestBuilder {
           field.filter?.condition?.operator === FilterSqlOperator.NotIn
         ) {
           if (isEmptyArray(_transformFieldValues(field))) {
-            return undefined;
+            return null;
           }
         }
         return {
@@ -264,8 +284,24 @@ export class ChartDataRequestBuilder {
           values: _transformFieldValues(field) || [],
         };
       })
-      .filter(Boolean);
+      .filter(Boolean) as ChartDataRequestFilter[];
   };
+
+  private normalizeDrillFilters(): ChartDataRequestFilter[] {
+    return (this.drillOption
+      ?.getAllDrillDownFields()
+      .filter(field => Boolean(field.condition))
+      .map(f => {
+        return {
+          aggOperator: null,
+          column: f.condition?.name!,
+          sqlOperator: f.condition?.operator! as FilterSqlOperator,
+          values: [
+            { value: f.condition?.value as string, valueType: 'STRING' },
+          ],
+        };
+      }) || []) as ChartDataRequestFilter[];
+  }
 
   private buildOrders() {
     const sortColumns = this.chartDataConfigs

@@ -1499,7 +1499,7 @@ describe('Internal Chart Helper ', () => {
           name: 'a',
           primaryKey: true,
           type: 'STRING',
-          category: 'field',
+          category: 'hierarchy',
           role: 'hierarchy',
           children: [
             {
@@ -1530,7 +1530,7 @@ describe('Internal Chart Helper ', () => {
           name: 'b',
           primaryKey: true,
           type: 'STRING',
-          category: 'field',
+          category: 'hierarchy',
           role: 'hierarchy',
           children: [
             {

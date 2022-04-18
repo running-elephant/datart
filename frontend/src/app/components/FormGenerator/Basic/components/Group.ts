@@ -28,7 +28,7 @@ export const WithColorPicker = styled.div`
     margin-bottom: 0;
   }
 
-  > div:last-of-type {
+  > .color-picker {
     margin-left: ${SPACE_XS};
   }
 `;

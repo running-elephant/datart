@@ -4,6 +4,7 @@ import datart.core.base.consts.AttachmentType;
 import datart.core.base.consts.ShareAuthenticationMode;
 import datart.core.base.consts.ShareRowPermissionBy;
 import datart.core.common.Application;
+import datart.core.common.FileUtils;
 import datart.core.common.WebUtils;
 import datart.core.entity.Folder;
 import datart.security.base.ResourceType;
@@ -20,8 +21,8 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.openqa.selenium.OutputType;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -49,7 +50,6 @@ public class AttachmentPdfServiceImpl implements AttachmentService {
     public File getFile(DownloadCreateParam downloadCreateParam, String path, String fileName) throws Exception {
         ViewExecuteParam viewExecuteParam = downloadCreateParam.getDownloadParams().size() > 0 ? downloadCreateParam.getDownloadParams().get(0) : new ViewExecuteParam();
         String folderId = viewExecuteParam.getVizId();
-        ResourceType vizType = viewExecuteParam.getVizType();
         Folder folder = folderService.retrieve(folderId);
         ShareCreateParam shareCreateParam = new ShareCreateParam();
         shareCreateParam.setVizId(folder.getRelId());
@@ -59,16 +59,16 @@ public class AttachmentPdfServiceImpl implements AttachmentService {
         shareCreateParam.setRowPermissionBy(ShareRowPermissionBy.CREATOR);
         ShareToken share = shareService.createShare(securityManager.getCurrentUser().getId(), shareCreateParam);
 
-        String url = Application.getWebRootURL()+"/"+vizType.getShareRoute()+"/"+share.getId()+"?type="+share.getAuthenticationMode();
+        String url = Application.getWebRootURL()+"/"+shareCreateParam.getVizType().getShareRoute()+"/"+share.getId()+"?eager=true&type="+share.getAuthenticationMode();
         log.info("share url {} ", url);
 
-        downloadCreateParam.setImageWidth(600);
-        File imageFile = WebUtils.screenShot(url, OutputType.FILE, downloadCreateParam.getImageWidth());
+        File imageFile = WebUtils.screenShot2File(url, FileUtils.withBasePath(path), downloadCreateParam.getImageWidth());
         File file = new File(generateFileName(path,fileName,attachmentType));
         createPDFFromImage(file.getPath(), imageFile.getPath());
 
         log.info("create pdf file complete.");
         imageFile.delete();
+        shareService.delete(share.getId(), false);
         return file;
     }
 
@@ -80,11 +80,13 @@ public class AttachmentPdfServiceImpl implements AttachmentService {
      */
     public void createPDFFromImage(String pdfPath, String imagePath) throws Exception {
         PDDocument doc = new PDDocument();
-        PDPage page = new PDPage();
-        doc.addPage(page);
         PDImageXObject pdImage = PDImageXObject.createFromFile(imagePath, doc);
+        float width = pdImage.getWidth();
+        float height = pdImage.getHeight();
+        PDPage page = new PDPage(new PDRectangle(width, height));
+        doc.addPage(page);
         PDPageContentStream contents = new PDPageContentStream(doc, page);
-        contents.drawImage(pdImage, 20, 20);
+        contents.drawImage(pdImage, 0, 0, width, height);
         contents.close();
         doc.save(pdfPath);
         doc.close();

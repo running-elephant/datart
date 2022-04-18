@@ -26,6 +26,7 @@ import {
   VerticalAlignBottomOutlined,
 } from '@ant-design/icons';
 import { Menu, Popconfirm } from 'antd';
+import { DownloadFileType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
@@ -71,7 +72,7 @@ const VizOperationMenu: FC<{
           >
             {t('syncData')}
           </Menu.Item>,
-          <Menu.Divider />,
+          <Menu.Divider key={'reloadDataLine'} />,
         );
       }
 
@@ -92,7 +93,7 @@ const VizOperationMenu: FC<{
           >
             {t('addToDash')}
           </Menu.Item>,
-          <Menu.Divider />,
+          <Menu.Divider key="addToDashLine" />,
         );
       }
 
@@ -110,29 +111,53 @@ const VizOperationMenu: FC<{
 
       if (allowDownload && onDownloadDataLinkClick) {
         menus.push(
-          <Menu.Item
-            className="line"
-            key="downloadData"
-            icon={<CloudDownloadOutlined />}
-          >
+          <Menu.Item key="downloadData" icon={<CloudDownloadOutlined />}>
             <Popconfirm
               placement="left"
               title={t('common.confirm')}
-              onConfirm={onDownloadDataLinkClick}
+              onConfirm={() => {
+                onDownloadDataLinkClick(DownloadFileType.Excel);
+              }}
               okText={t('common.ok')}
               cancelText={t('common.cancel')}
             >
               {t('share.downloadData')}
             </Popconfirm>
           </Menu.Item>,
+          <Menu.Item key="downloadPDF" icon={<CloudDownloadOutlined />}>
+            <Popconfirm
+              placement="left"
+              title={t('common.confirm')}
+              onConfirm={() => {
+                onDownloadDataLinkClick(DownloadFileType.Pdf);
+              }}
+              okText={t('common.ok')}
+              cancelText={t('common.cancel')}
+            >
+              {t('share.downloadPDF')}
+            </Popconfirm>
+          </Menu.Item>,
+          <Menu.Item key="downloadPicture" icon={<CloudDownloadOutlined />}>
+            <Popconfirm
+              placement="left"
+              title={t('common.confirm')}
+              onConfirm={() => {
+                onDownloadDataLinkClick(DownloadFileType.Image);
+              }}
+              okText={t('common.ok')}
+              cancelText={t('common.cancel')}
+            >
+              {t('share.downloadPicture')}
+            </Popconfirm>
+          </Menu.Item>,
           <Menu.Divider />,
+          <Menu.Divider key="downloadDataLine" />,
         );
       }
 
       if (allowManage && !isArchived && onPublish) {
         menus.push(
           <Menu.Item
-            className="line"
             key="publish"
             icon={<VerticalAlignBottomOutlined />}
             onClick={onPublish}

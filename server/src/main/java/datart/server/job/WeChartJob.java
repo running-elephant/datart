@@ -17,6 +17,7 @@
  */
 package datart.server.job;
 
+import datart.server.base.dto.JobFile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.CollectionUtils;
@@ -43,8 +44,8 @@ public class WeChartJob extends ScheduleJob {
 
         String webHookUrl = jobConfig.getWebHookUrl();
         RestTemplate restTemplate = new RestTemplate();
-        for (File attachment : attachments) {
-            restTemplate.postForEntity(webHookUrl, createParam(attachment), Object.class);
+        for (JobFile jobFile : attachments) {
+            restTemplate.postForEntity(webHookUrl, createParam(jobFile.getFile()), Object.class);
         }
     }
 

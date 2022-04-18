@@ -21,7 +21,7 @@ import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useMemo } from 'react';
 import { isEmpty } from 'utils/object';
 import { ItemLayoutProps } from '../types';
-import { itemLayoutComparer } from '../utils';
+import { itemLayoutComparer, removeSomeObjectConfigByKey } from '../utils';
 import { BW } from './components/BasicWrapper';
 
 const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
@@ -61,13 +61,18 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       return results;
     };
 
+    const newOptions = useMemo(() => {
+      const removeKeyList = ['translateItemLabel'];
+      return removeSomeObjectConfigByKey(removeKeyList, options);
+    }, [options]);
+
     return (
       <BW label={!hideLabel ? t(row.label, true) : ''}>
         <Select
           className="datart-ant-select"
           dropdownMatchSelectWidth
           {...rest}
-          {...options}
+          {...newOptions}
           defaultValue={rest.default}
           placeholder={t('select')}
           onChange={handleSelectorValueChange}

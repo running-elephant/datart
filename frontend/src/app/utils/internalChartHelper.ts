@@ -379,7 +379,9 @@ export function transformHierarchyMeta(model?: string): ChartDataViewMeta[] {
 
 function getMeta(key, column) {
   let children;
+  let isHierarchy = false;
   if (!isEmptyArray(column?.children)) {
+    isHierarchy = true;
     children = column?.children.map(child => getMeta(child?.name, child));
   }
 
@@ -387,7 +389,9 @@ function getMeta(key, column) {
     ...column,
     id: key,
     subType: column?.category,
-    category: ChartDataViewFieldCategory.Field,
+    category: isHierarchy
+      ? ChartDataViewFieldCategory.Hierarchy
+      : ChartDataViewFieldCategory.Field,
     children: children,
   };
 }
@@ -587,4 +591,14 @@ export const transformToViewConfig = (
     acc[cur] = viewConfigMap?.[cur];
     return acc;
   }, {});
+};
+
+export const buildDragItem = (item, children: any[] = []) => {
+  return {
+    colName: item?.id,
+    type: item?.type,
+    subType: item?.subType,
+    category: item?.category,
+    children: children.map(c => buildDragItem(c)),
+  };
 };

@@ -28,6 +28,8 @@ import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.util.DateString;
 import org.apache.calcite.util.TimestampString;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.CharUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +38,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SqlNodeUtils {
+
+    public static final String REG_SQL_SINGLE_LINE_COMMENT = "-{2,}.*([\r\n])";
+
+    public static final String REG_SQL_MULTI_LINE_COMMENT = "/\\*+[\\s\\S]*\\*+/";
 
     public static SqlBasicCall createSqlBasicCall(SqlOperator sqlOperator, List<SqlNode> sqlNodes) {
         return new SqlBasicCall(sqlOperator, sqlNodes.toArray(new SqlNode[0]), SqlParserPos.ZERO);
@@ -128,7 +134,9 @@ public class SqlNodeUtils {
     }
 
     private static SqlNode createDateSqlNode(String value, String format) {
-        if (DateUtils.isDateFormat(format)) {
+        if (StringUtils.isBlank(format)) {
+            return SqlLiteral.createTimestamp(new TimestampString(value), 0, SqlParserPos.ZERO);
+        } else if (DateUtils.isDateFormat(format)) {
             return SqlLiteral.createDate(new DateString(value), SqlParserPos.ZERO);
         } else if (DateUtils.isDateTimeFormat(format)) {
             return SqlLiteral.createTimestamp(new TimestampString(value), 0, SqlParserPos.ZERO);
@@ -151,5 +159,12 @@ public class SqlNodeUtils {
                         .withIndentation(0)).getSql();
     }
 
+    public static String cleanupSql(String sql) {
+        sql = sql.replaceAll(REG_SQL_SINGLE_LINE_COMMENT, " ");
+        sql = sql.replaceAll(REG_SQL_MULTI_LINE_COMMENT, " ");
+        sql = sql.replace(CharUtils.CR, CharUtils.toChar(" "));
+        sql = sql.replace(CharUtils.LF, CharUtils.toChar(" "));
+        return sql.trim();
+    }
 
 }

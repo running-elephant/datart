@@ -24,7 +24,6 @@ import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.SingleTypedValue;
 import datart.core.data.provider.sql.*;
 import datart.data.provider.calcite.custom.CustomSqlBetweenOperator;
-import datart.data.provider.calcite.dialect.FetchAndOffsetSupport;
 import datart.data.provider.jdbc.SqlSplitter;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlBetweenOperator;
@@ -157,20 +156,6 @@ public class SqlBuilder {
             }
         }
 
-        // aggregators
-        if (!CollectionUtils.isEmpty(executeParam.getAggregators())) {
-            for (AggregateOperator aggregator : executeParam.getAggregators()) {
-                String alias;
-                if (aggregator.getSqlOperator() == null) {
-                    alias = aggregator.getColumn();
-                } else {
-                    alias = aggregator.getSqlOperator().name() + "(" + aggregator.getColumn() + ")";
-                }
-                columnAlias.put(aggregator.getColumn(), alias);
-                selectList.add(createAggNode(aggregator.getSqlOperator(), aggregator.getColumn(), alias));
-            }
-        }
-
         //group by
         if (!CollectionUtils.isEmpty(executeParam.getGroups())) {
             for (GroupByOperator group : executeParam.getGroups()) {
@@ -183,6 +168,20 @@ public class SqlBuilder {
                     selectList.add(sqlNode);
                 }
                 groupBy.add(sqlNode);
+            }
+        }
+
+        // aggregators
+        if (!CollectionUtils.isEmpty(executeParam.getAggregators())) {
+            for (AggregateOperator aggregator : executeParam.getAggregators()) {
+                String alias;
+                if (aggregator.getSqlOperator() == null) {
+                    alias = aggregator.getColumn();
+                } else {
+                    alias = aggregator.getSqlOperator().name() + "(" + aggregator.getColumn() + ")";
+                }
+                columnAlias.put(aggregator.getColumn(), alias);
+                selectList.add(createAggNode(aggregator.getSqlOperator(), aggregator.getColumn(), alias));
             }
         }
 
@@ -212,7 +211,7 @@ public class SqlBuilder {
 
         SqlNode fetch = null;
         SqlNode offset = null;
-        if (withPage && (dialect instanceof FetchAndOffsetSupport) && executeParam.getPageInfo() != null) {
+        if (withPage && executeParam.getPageInfo() != null) {
             fetch = SqlLiteral.createExactNumeric(Math.min(executeParam.getPageInfo().getPageSize(), Integer.MAX_VALUE) + "", SqlParserPos.ZERO);
             offset = SqlLiteral.createExactNumeric(Math.min((executeParam.getPageInfo().getPageNo() - 1) * executeParam.getPageInfo().getPageSize(), Integer.MAX_VALUE) + "", SqlParserPos.ZERO);
         }

@@ -44,9 +44,9 @@ public class ExecParamSqlExamples {
     }
 
     private static void initExecTemplateMap() {
-        execParamTemplate.put(TestSqlDialects.MYSQL.getDatabaseProduct().name(), "SELECT `DATART_VTABLE`.`name` AS `name`, `DATART_VTABLE`.`age` AS `age`, SUM(`DATART_VTABLE`.`val`) AS `SUM(val)`, `DATART_VTABLE`.`id`  " +
+        execParamTemplate.put(TestSqlDialects.MYSQL.getDatabaseProduct().name(), "SELECT `DATART_VTABLE`.`name` AS `name`, `DATART_VTABLE`.`age` AS `age`, `DATART_VTABLE`.`id`, SUM(`DATART_VTABLE`.`val`) AS `SUM(val)`  " +
                 "FROM  ( &#%xxx%#& )  AS `DATART_VTABLE`  GROUP BY `DATART_VTABLE`.`id`  ORDER BY COUNT(`DATART_VTABLE`.`age`) DESC");
-        execParamTemplate.put(TestSqlDialects.ORACLE.getDatabaseProduct().name(), "SELECT \"DATART_VTABLE\".\"name\" \"name\", \"DATART_VTABLE\".\"age\" \"age\", SUM(\"DATART_VTABLE\".\"val\") \"SUM(val)\", \"DATART_VTABLE\".\"id\"  " +
+        execParamTemplate.put(TestSqlDialects.ORACLE.getDatabaseProduct().name(), "SELECT \"DATART_VTABLE\".\"name\" \"name\", \"DATART_VTABLE\".\"age\" \"age\", \"DATART_VTABLE\".\"id\", SUM(\"DATART_VTABLE\".\"val\") \"SUM(val)\"  " +
                 "FROM  ( &#%xxx%#& )  \"DATART_VTABLE\"  GROUP BY \"DATART_VTABLE\".\"id\"  ORDER BY COUNT(\"DATART_VTABLE\".\"age\") DESC");
     }
 

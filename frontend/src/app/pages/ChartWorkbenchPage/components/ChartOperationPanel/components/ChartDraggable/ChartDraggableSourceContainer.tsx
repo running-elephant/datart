@@ -21,14 +21,19 @@ import {
   DownOutlined,
   FieldStringOutlined,
   FileUnknownOutlined,
+  FolderAddOutlined,
+  FolderOpenOutlined,
   MoreOutlined,
   NumberOutlined,
 } from '@ant-design/icons';
-import { Collapse, Dropdown, Menu } from 'antd';
+import { Collapse, Dropdown, Menu, Row } from 'antd';
 import { IW, ToolbarButton } from 'app/components';
 import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useToggle from 'app/hooks/useToggle';
+import { ColumnRole } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { buildDragItem } from 'app/utils/internalChartHelper';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { FC, memo, useMemo } from 'react';
 import { useDrag } from 'react-dnd';
@@ -62,28 +67,31 @@ export const ChartDraggableSourceContainer: FC<
   id,
   name: colName,
   type,
+  subType,
   category,
   expression,
   selectedItems,
   isActive,
   sourceSupportDateField,
+  role,
+  children,
   onDeleteComputedField,
   onEditComputedField,
   onSelectionChange,
   onClearCheckedList,
 }) {
   const t = useI18NPrefix(`viz.workbench.dataview`);
+  const [showChild, setShowChild] = useToggle(false);
+  const isHierarchyField = role === ColumnRole.Hierarchy;
   const [, drag] = useDrag(
     () => ({
-      type: CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
+      type: isHierarchyField
+        ? CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN_GROUP
+        : CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
       canDrag: true,
       item: selectedItems?.length
-        ? selectedItems.map(item => ({
-            colName: item.id,
-            type: item.type,
-            category: item.category,
-          }))
-        : { colName, type, category },
+        ? selectedItems.map(item => buildDragItem(item))
+        : buildDragItem({ id: colName, type, subType, category }, children),
       collect: monitor => ({
         isDragging: monitor.isDragging(),
       }),
@@ -109,11 +117,17 @@ export const ChartDraggableSourceContainer: FC<
       }
     };
 
-    const _isNormalField = () => {
-      return ChartDataViewFieldCategory.Field === category;
+    const _isAllowMoreAction = () => {
+      return (
+        ChartDataViewFieldCategory.Field === category ||
+        ChartDataViewFieldCategory.Hierarchy === category
+      );
     };
 
     const _getIconStyle = () => {
+      if (role === ColumnRole.Hierarchy) {
+        return WARNING;
+      }
       if (
         ChartDataViewFieldCategory.ComputedField === category ||
         ChartDataViewFieldCategory.AggregateComputedField === category
@@ -145,80 +159,103 @@ export const ChartDraggableSourceContainer: FC<
         color: _getIconStyle(),
       },
     };
-    switch (type) {
-      case DataViewFieldType.STRING:
-        icon = <FieldStringOutlined {...props} />;
-        break;
-      case DataViewFieldType.NUMERIC:
-        icon = <NumberOutlined {...props} />;
-        break;
-      case DataViewFieldType.DATE:
-        icon = <CalendarOutlined {...props} />;
-        break;
-      default:
-        icon = <FileUnknownOutlined {...props} />;
+    if (role === ColumnRole.Hierarchy) {
+      if (!showChild) {
+        icon = (
+          <FolderAddOutlined
+            {...props}
+            onClick={() => {
+              setShowChild(!showChild);
+            }}
+          />
+        );
+      } else {
+        icon = (
+          <FolderOpenOutlined
+            {...props}
+            onClick={() => {
+              setShowChild(!showChild);
+            }}
+          />
+        );
+      }
+    } else {
+      switch (type) {
+        case DataViewFieldType.STRING:
+          icon = <FieldStringOutlined {...props} />;
+          break;
+        case DataViewFieldType.NUMERIC:
+          icon = <NumberOutlined {...props} />;
+          break;
+        case DataViewFieldType.DATE:
+          icon = <CalendarOutlined {...props} />;
+          break;
+        default:
+          icon = <FileUnknownOutlined {...props} />;
+      }
     }
 
-    return (
-      <>
-        {type === 'DATE' && category === 'field' ? (
-          <CollapseWrapper
-            defaultActiveKey={[colName]}
-            ghost
-            expandIconPosition="right"
-            expandIcon={({ isActive }) => {
-              return <DownOutlined rotate={isActive ? -180 : 0} />;
-            }}
+    return type === 'DATE' && category === 'field' ? (
+      <Row align="middle" style={{ width: '100%' }}>
+        <CollapseWrapper
+          defaultActiveKey={[colName]}
+          ghost
+          expandIconPosition="right"
+          expandIcon={({ isActive }) => {
+            return <DownOutlined rotate={isActive ? -180 : 0} />;
+          }}
+        >
+          <Panel
+            key={colName}
+            header={
+              <div ref={drag}>
+                <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
+                <p>{colName}</p>
+              </div>
+            }
           >
-            <Panel
-              key={colName}
-              header={
-                <div ref={drag}>
-                  <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
-                  <p>{colName}</p>
-                </div>
+            {dateAggregationList.map((item, i) => {
+              if (sourceSupportDateField?.includes(item.expression)) {
+                return (
+                  <DateAggregateFieldContainer
+                    colName={colName}
+                    key={i}
+                    item={item}
+                    onClearCheckedList={onClearCheckedList}
+                  />
+                );
               }
-            >
-              {dateAggregationList.map((item, i) => {
-                if (sourceSupportDateField?.includes(item.expression)) {
-                  return (
-                    <DateAggregateFieldContainer
-                      colName={colName}
-                      key={i}
-                      item={item}
-                      onClearCheckedList={onClearCheckedList}
-                    />
-                  );
-                }
-                return null;
-              })}
-            </Panel>
-          </CollapseWrapper>
-        ) : (
-          <>
-            <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
-            <p>{colName}</p>
-            <div onClick={stopPPG}>
-              <Dropdown
-                disabled={_isNormalField()}
-                overlay={_getExtraActionMenus()}
-                trigger={['click']}
-              >
-                <ToolbarButton
-                  icon={<MoreOutlined />}
-                  iconSize={FONT_SIZE_BASE}
-                  className="setting"
-                  onClick={e => e.preventDefault()}
-                />
-              </Dropdown>
-            </div>
-          </>
-        )}
-      </>
+              return null;
+            })}
+          </Panel>
+        </CollapseWrapper>
+      </Row>
+    ) : (
+      <Row align="middle" style={{ width: '100%' }}>
+        <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
+        <StyledFieldContent>{colName}</StyledFieldContent>
+        <div onClick={stopPPG}>
+          <Dropdown
+            disabled={_isAllowMoreAction()}
+            overlay={_getExtraActionMenus()}
+            trigger={['click']}
+          >
+            <ToolbarButton
+              icon={<MoreOutlined />}
+              iconSize={FONT_SIZE_BASE}
+              className="setting"
+              onClick={e => e.preventDefault()}
+            />
+          </Dropdown>
+        </div>
+      </Row>
     );
   }, [
     type,
+    role,
     colName,
+    showChild,
+    setShowChild,
     onDeleteComputedField,
     onEditComputedField,
     category,
@@ -228,9 +265,31 @@ export const ChartDraggableSourceContainer: FC<
     sourceSupportDateField,
   ]);
 
+  const renderChildren = useMemo(() => {
+    return (children || []).map(item => (
+      <ChartDraggableSourceContainer
+        key={item.id}
+        id={item.id}
+        name={item.id}
+        category={item.category}
+        expression={item.expression}
+        type={item.type}
+        role={item.role}
+        children={item.children}
+        onDeleteComputedField={onDeleteComputedField}
+        onClearCheckedList={onClearCheckedList}
+        selectedItems={selectedItems}
+      />
+    ));
+  }, [children, onDeleteComputedField, onClearCheckedList, selectedItems]);
+
   return (
     <Container
+      flexDirection={children ? 'column' : 'row'}
       onClick={e => {
+        if (isHierarchyField) {
+          return;
+        }
         onSelectionChange?.(colName, e.metaKey || e.ctrlKey, e.shiftKey);
       }}
       ref={type === 'DATE' && category === 'field' ? null : drag}
@@ -239,23 +298,24 @@ export const ChartDraggableSourceContainer: FC<
       }
     >
       {renderContent}
+      {showChild && renderChildren}
     </Container>
   );
 });
 
 export default ChartDraggableSourceContainer;
 
-const Container = styled.div`
+const Container = styled.div<{ flexDirection?: string }>`
   display: flex;
+  flex-direction: ${p => p.flexDirection || 'row'};
   flex: 1;
-  align-items: center;
   padding: ${SPACE_TIMES(0.5)} ${SPACE} ${SPACE_TIMES(0.5)} ${SPACE_TIMES(2)};
   font-size: ${FONT_SIZE_SUBTITLE};
   font-weight: ${FONT_WEIGHT_MEDIUM};
   color: ${p => p.theme.textColorSnd};
   cursor: pointer;
   &.container-active {
-    background-color: #f8f9fa;
+    background-color: ${p => p.theme.bodyBackground};
   }
   > p {
     flex: 1;
@@ -296,4 +356,10 @@ const CollapseWrapper = styled(Collapse)`
       }
     }
   }
+`;
+const StyledFieldContent = styled.p`
+  flex: 1;
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;

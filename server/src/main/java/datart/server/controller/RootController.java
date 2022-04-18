@@ -20,7 +20,6 @@ package datart.server.controller;
 
 
 import datart.core.base.annotations.SkipLogin;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,9 +32,21 @@ import java.io.IOException;
 public class RootController {
 
     @SkipLogin
-    @ApiOperation(value = "share page")
-    @GetMapping(value = "share")
-    public void share(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/share.html").forward(request, response);
+    @GetMapping(value = "shareChart/**")
+    public void shareChart(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("/shareChart.html").forward(request, response);
     }
+
+    @SkipLogin
+    @GetMapping(value = "shareDashboard/**")
+    public void shareDashboard(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("/shareDashboard.html").forward(request, response);
+    }
+
+    @SkipLogin
+    @GetMapping(value = "shareStoryPlayer/**")
+    public void shareStoryPlayer(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("/shareStoryPlayer.html").forward(request, response);
+    }
+
 }

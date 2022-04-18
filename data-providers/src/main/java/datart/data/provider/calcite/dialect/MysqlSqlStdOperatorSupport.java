@@ -23,16 +23,21 @@ import org.apache.calcite.sql.SqlWriter;
 import org.apache.calcite.sql.dialect.MysqlSqlDialect;
 
 import java.util.EnumSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import static datart.core.data.provider.StdSqlOperator.*;
 
 public class MysqlSqlStdOperatorSupport extends MysqlSqlDialect implements SqlStdOperatorSupport, FetchAndOffsetSupport {
 
+    static ConcurrentSkipListSet<StdSqlOperator> OWN_SUPPORTED = new ConcurrentSkipListSet<>(
+            EnumSet.of(STDDEV, ABS, CEILING, FLOOR, POWER, ROUND, SQRT, EXP, LOG10, LN, MOD, RAND, DEGREES, RADIANS, TRUNC, SIGN,
+            ACOS, ASIN, ATAN, ATAN2, SIN, COS, TAN, COT, LENGTH, CONCAT, REPLACE, SUBSTRING, LOWER, UPPER, LTRIM, RTRIM, TRIM,
+            NOW, DAY, SECOND, MINUTE, HOUR, DAY, WEEK, QUARTER, MONTH, YEAR, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR,
+            IF, COALESCE, AGG_DATE_YEAR, AGG_DATE_QUARTER, AGG_DATE_MONTH, AGG_DATE_WEEK, AGG_DATE_DAY));
+
     static {
-        SUPPORTED.addAll(EnumSet.of(STDDEV, ABS, CEILING, FLOOR, POWER, ROUND, SQRT, EXP, LOG10, LN, MOD, RAND, DEGREES, RADIANS, TRUNC, SIGN,
-                ACOS, ASIN, ATAN, ATAN2, SIN, COS, TAN, COT, LENGTH, CONCAT, REPLACE, SUBSTRING, LOWER, UPPER, LTRIM, RTRIM, TRIM,
-                NOW, DAY, SECOND, MINUTE, HOUR, DAY, WEEK, QUARTER, MONTH, YEAR, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR,
-                IF, COALESCE));
+        OWN_SUPPORTED.addAll(SUPPORTED);
     }
 
     public MysqlSqlStdOperatorSupport() {
@@ -64,10 +69,11 @@ public class MysqlSqlStdOperatorSupport extends MysqlSqlDialect implements SqlSt
             case AGG_DATE_YEAR:
                 writer.print("YEAR(" + call.getOperandList().get(0).toString() + ")");
                 return true;
-            case AGG_DATE_QUARTER:
-                String column = call.getOperandList().get(0).toString();
-                writer.print("CONCAT(DATE_FORMAT("+column+",'%Y-'),QUARTER("+column+"))");
+            case AGG_DATE_QUARTER: {
+                String columnName = call.getOperandList().get(0).toString();
+                writer.print("CONCAT(DATE_FORMAT("+columnName+",'%Y-'),QUARTER("+columnName+"))");
                 return true;
+            }
             case AGG_DATE_MONTH:
                 writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toString() + ",'%Y-%m')");
                 return true;
@@ -90,5 +96,8 @@ public class MysqlSqlStdOperatorSupport extends MysqlSqlDialect implements SqlSt
         buf.append(literalEndQuoteString);
     }
 
-
+    @Override
+    public Set<StdSqlOperator> supportedOperators() {
+        return OWN_SUPPORTED;
+    }
 }

@@ -16,47 +16,45 @@
  * limitations under the License.
  */
 
-import { S2Theme } from '@antv/s2';
 import { SheetComponent } from '@antv/s2-react';
 import '@antv/s2-react/dist/style.min.css';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { FONT_SIZE_LABEL } from 'styles/StyleConstants';
+import { AndvS2Config } from './types';
 
-const AntVS2Wrapper: FC<{
-  dataCfg;
-  options;
-  theme?: S2Theme;
-}> = memo(({ dataCfg, options, theme }) => {
-  if (!dataCfg) {
-    return <div></div>;
-  }
+const AntVS2Wrapper: FC<AndvS2Config> = memo(
+  ({ dataCfg, options, theme, palette }) => {
+    if (!dataCfg) {
+      return <div></div>;
+    }
 
-  const onDataCellHover = ({ event, viewMeta }) => {
-    viewMeta.spreadsheet.tooltip.show({
-      position: {
-        x: event.clientX,
-        y: event.clientY,
-      },
-      content: (
-        <TableDataCellTooltip
-          datas={viewMeta.data}
-          meta={viewMeta.spreadsheet.dataCfg.meta}
-        />
-      ),
-    });
-  };
+    const onDataCellHover = ({ event, viewMeta }) => {
+      viewMeta.spreadsheet.tooltip.show({
+        position: {
+          x: event.clientX,
+          y: event.clientY,
+        },
+        content: (
+          <TableDataCellTooltip
+            datas={viewMeta.data}
+            meta={viewMeta.spreadsheet.dataCfg.meta}
+          />
+        ),
+      });
+    };
 
-  return (
-    <StyledAntVS2Wrapper
-      sheetType="pivot"
-      dataCfg={dataCfg}
-      options={options}
-      themeCfg={{ theme }}
-      onDataCellHover={onDataCellHover}
-    />
-  );
-});
+    return (
+      <StyledAntVS2Wrapper
+        sheetType="pivot"
+        dataCfg={dataCfg}
+        options={options}
+        themeCfg={{ theme, palette }}
+        onDataCellHover={onDataCellHover}
+      />
+    );
+  },
+);
 
 const TableDataCellTooltip: FC<{
   datas?: object;
@@ -72,7 +70,11 @@ const TableDataCellTooltip: FC<{
         .map(m => {
           const uniqKey = m?.field;
           if (uniqKey in datas) {
-            return <li>{`${m?.name}: ${m?.formatter(datas[uniqKey])}`}</li>;
+            return (
+              <li key={uniqKey}>{`${m?.name}: ${m?.formatter(
+                datas[uniqKey],
+              )}`}</li>
+            );
           }
           return null;
         })

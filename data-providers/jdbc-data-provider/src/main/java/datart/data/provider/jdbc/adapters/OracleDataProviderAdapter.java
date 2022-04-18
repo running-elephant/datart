@@ -55,7 +55,7 @@ public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
             ArrayList<Object> row = new ArrayList<>();
             rows.add(row);
             for (int i = start; i < columns.size() + start; i++) {
-                row.add(rs.getObject(i));
+                row.add(getObjFromResultSet(rs, i));
             }
             c++;
             if (c >= count) {
@@ -68,7 +68,7 @@ public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
     }
 
     @Override
-    protected Dataframe executeOnSource(QueryScript script, ExecuteParam executeParam) throws Exception {
+    public Dataframe executeOnSource(QueryScript script, ExecuteParam executeParam) throws Exception {
 
         SqlScriptRender render = new SqlScriptRender(script
                 , executeParam

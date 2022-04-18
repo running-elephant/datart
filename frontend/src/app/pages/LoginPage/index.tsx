@@ -18,19 +18,40 @@
 
 import { Brand } from 'app/components/Brand';
 import { Version } from 'app/components/Version';
-import { selectVersion } from 'app/slice/selectors';
-import React from 'react';
-import { useSelector } from 'react-redux';
+import { selectSystemInfo } from 'app/slice/selectors';
+import { login } from 'app/slice/thunks';
+import React, { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { LoginForm } from './LoginForm';
 
 export function LoginPage() {
-  const version = useSelector(selectVersion);
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const systemInfo = useSelector(selectSystemInfo);
+
+  const onLogin = useCallback(
+    values => {
+      dispatch(
+        login({
+          params: values,
+          resolve: () => {
+            history.replace('/');
+          },
+        }),
+      );
+    },
+    [dispatch, history],
+  );
   return (
     <Wrapper>
       <Brand />
-      <LoginForm />
-      <Version version={version} />
+      <LoginForm
+        registerEnable={systemInfo?.registerEnable}
+        onLogin={onLogin}
+      />
+      <Version version={systemInfo?.version} />
     </Wrapper>
   );
 }

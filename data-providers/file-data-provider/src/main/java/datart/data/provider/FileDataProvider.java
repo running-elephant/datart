@@ -22,11 +22,12 @@ import datart.core.base.consts.ValueType;
 import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.*;
-import datart.core.data.provider.Column;
-import datart.core.data.provider.DataProviderSource;
-import datart.core.data.provider.Dataframe;
+import datart.core.data.provider.*;
 import datart.data.provider.jdbc.DataTypeUtils;
+import datart.data.provider.jdbc.SqlScriptRender;
+import datart.data.provider.local.LocalDB;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
@@ -61,7 +62,17 @@ public class FileDataProvider extends DefaultDataProvider {
     }
 
     @Override
-    public List<Dataframe> loadFullDataFromSource(DataProviderSource config) throws Exception {
+    public String getQueryKey(DataProviderSource config, QueryScript script, ExecuteParam executeParam) throws Exception {
+        SqlScriptRender render = new SqlScriptRender(script, executeParam, LocalDB.SQL_DIALECT);
+        return "Q" + DigestUtils.md5Hex(render.render(true, true, true));
+    }
+
+    @Override
+    public Dataframes loadDataFromSource(DataProviderSource config) throws Exception {
+        Dataframes dataframes = Dataframes.of(config.getSourceId());
+        if (cacheExists(config, dataframes.getKey())) {
+            return dataframes;
+        }
         Map<String, Object> properties = config.getProperties();
         List<Map<String, Object>> schemas;
         if (properties.containsKey(SCHEMAS)) {
@@ -69,14 +80,15 @@ public class FileDataProvider extends DefaultDataProvider {
         } else {
             schemas = Collections.singletonList(properties);
         }
-        LinkedList<Dataframe> dataframes = new LinkedList<>();
         for (Map<String, Object> schema : schemas) {
             String path = schema.get(FILE_PATH).toString();
             FileFormat fileFormat = FileFormat.valueOf(schema.get(FILE_FORMAT).toString().toUpperCase());
             List<Column> columns = parseColumns(schema);
             Dataframe dataframe = loadFromPath(FileUtils.withBasePath(path), fileFormat, columns);
-            dataframe.setName(StringUtils.isNoneBlank(schema.getOrDefault(TABLE, "").toString()) ? schema.get(TABLE).toString() : "TEST" + UUIDGenerator.generate());
-            dataframes.add(dataframe);
+            if (dataframe != null) {
+                dataframe.setName(StringUtils.isNoneBlank(schema.getOrDefault(TABLE, "").toString()) ? schema.get(TABLE).toString() : "TEST" + UUIDGenerator.generate());
+                dataframes.add(dataframe);
+            }
         }
         return dataframes;
     }

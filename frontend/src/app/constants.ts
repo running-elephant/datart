@@ -16,6 +16,11 @@
  * limitations under the License.
  */
 
+export enum TenantManagementMode {
+  Team = 'TEAM',
+  Platform = 'PLATFORM',
+}
+
 export enum ControllerFacadeTypes {
   DropdownList = 'dropdownList',
   RadioGroup = 'radioGroup',
@@ -72,6 +77,7 @@ export enum ChartDataViewSubType {
 
 export enum ChartDataViewFieldCategory {
   Field = 'field',
+  Hierarchy = 'hierarchy',
   Variable = 'variable',
   ComputedField = 'computedField',
   AggregateComputedField = 'aggregateComputedField',
@@ -209,4 +215,11 @@ export const ChartStyleSectionComponentType = {
   LegendPosition: 'legendPosition',
   ScorecardListTemplate: 'scorecardListTemplate',
   ScorecardConditionalStyle: 'scorecardConditionalStyle',
+  PivotSheetTheme: 'pivotSheetTheme',
 };
+
+export enum DownloadFileType {
+  'Pdf' = 'PDF',
+  'Excel' = 'EXCEL',
+  'Image' = 'IMAGE',
+}

@@ -19,6 +19,7 @@
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import { ChartDataSectionType, FieldFormatType } from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
+import { ChartDrillOption, DrillMode } from 'app/models/ChartDrillOption';
 import {
   AxisLabel,
   AxisLineStyle,
@@ -234,6 +235,7 @@ function currencyFormater(
     style: 'currency',
     currency: config?.currency || 'CNY',
     minimumFractionDigits: config?.decimalPlaces,
+    maximumFractionDigits: config?.decimalPlaces,
     useGrouping: config?.useThousandSeparator,
   }).format(value / realUnit)} ${
     NumericUnitDescriptions.get(config?.unitKey || NumberUnitKey.None)?.[1]
@@ -1527,4 +1529,53 @@ export const getAutoFunnelTopPosition = (config: {
   if (!chartHeight) return 16;
   // 24 marginBottom
   return chartHeight - 24 - height;
+};
+
+/**
+ * Get Fields when data section is drillable
+ *
+ * @param {ChartDataConfig[]} configs
+ * @param {ChartDrillOption} option
+ * @return {*}  {ChartDataSectionField[]}
+ */
+export const getDrillableRows = (
+  configs: ChartDataConfig[],
+  option?: ChartDrillOption,
+): ChartDataSectionField[] => {
+  return configs
+    ?.filter(c => c.type === ChartDataSectionType.GROUP)
+    .flatMap(config => {
+      if (Boolean(config.drillable)) {
+        if (
+          !option ||
+          option?.mode === DrillMode.Normal ||
+          !option?.getCurrentFields()
+        ) {
+          return config.rows?.[0] || [];
+        }
+        return (
+          config.rows?.filter(
+            f =>
+              !option?.getCurrentFields() ||
+              Boolean(option?.getCurrentFields()?.some(df => df.uid === f.uid)),
+          ) || []
+        );
+      }
+      return config.rows || [];
+    });
+};
+
+/**
+ * Get all Drill Paths
+ *
+ * @param {ChartDataConfig[]} configs
+ * @return {*}  {ChartDataSectionField[]}
+ */
+export const getDrillPaths = (
+  configs?: ChartDataConfig[],
+): ChartDataSectionField[] => {
+  return (configs || [])
+    ?.filter(c => c.type === ChartDataSectionType.GROUP)
+    ?.filter(d => Boolean(d.drillable))
+    ?.flatMap(r => r.rows || []);
 };

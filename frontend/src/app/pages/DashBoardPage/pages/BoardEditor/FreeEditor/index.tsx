@@ -24,7 +24,7 @@ import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
 import { LayerList } from '../components/LayerList/LayerList';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
-import { FreeEditorWrapper } from './FreeEditorWrapper';
+import { FreeBoardEditor } from './FreeBoardEditor';
 
 const FreeEditor: React.FC = () => {
   const dispatch = useDispatch();
@@ -40,7 +40,7 @@ const FreeEditor: React.FC = () => {
         <BoardToolBar />
         <Editor>
           <LayerList />
-          <FreeEditorWrapper />
+          <FreeBoardEditor />
           <SlideSetting />
         </Editor>
       </Wrapper>

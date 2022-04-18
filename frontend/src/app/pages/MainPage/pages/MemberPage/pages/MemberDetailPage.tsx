@@ -17,14 +17,18 @@
  */
 
 import { LoadingOutlined } from '@ant-design/icons';
-import { Button, Card, Form, message, Popconfirm, Select } from 'antd';
+import { Button, Card, Form, Input, message, Popconfirm, Select } from 'antd';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
+import { TenantManagementMode } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { selectSystemInfo } from 'app/slice/selectors';
+import { CommonFormTypes } from 'globalConstants';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
+import { getPasswordValidator } from 'utils/validators';
 import { selectOrgId } from '../../../slice/selectors';
 import { useMemberSlice } from '../slice';
 import {
@@ -32,29 +36,34 @@ import {
   selectGetMemberRolesLoading,
   selectGrantOwnerLoading,
   selectMembers,
+  selectRemoveMemberLoading,
   selectRoleListLoading,
   selectRoles,
   selectSaveMemberLoading,
 } from '../slice/selectors';
 import {
-  editMember,
+  deleteMember,
   getMemberRoles,
   getRoles,
   grantOwner,
   removeMember,
   revokeOwner,
+  saveMember,
 } from '../slice/thunks';
 
 export function MemberDetailPage() {
-  const [roleSelectValues, setRoleSelectValues] = useState<string[]>([]);
+  const [formType, setFormType] = useState(CommonFormTypes.Add);
+  const [passwordVisible, setPasswordVisible] = useState(true);
   const { actions } = useMemberSlice();
   const dispatch = useDispatch();
   const history = useHistory();
+  const systemInfo = useSelector(selectSystemInfo);
   const orgId = useSelector(selectOrgId);
   const members = useSelector(selectMembers);
   const editingMember = useSelector(selectEditingMember);
   const getMemberRolesLoading = useSelector(selectGetMemberRolesLoading);
   const saveMemberLoading = useSelector(selectSaveMemberLoading);
+  const removeMemberLoading = useSelector(selectRemoveMemberLoading);
   const roles = useSelector(selectRoles);
   const roleListLoading = useSelector(selectRoleListLoading);
   const grantLoading = useSelector(selectGrantOwnerLoading);
@@ -62,6 +71,8 @@ export function MemberDetailPage() {
     params: { memberId },
   } = useRouteMatch<{ memberId: string }>();
   const [form] = Form.useForm();
+  const isPlatformMode =
+    systemInfo?.tenantManagementMode === TenantManagementMode.Platform;
   const t = useI18NPrefix('member.memberDetail');
   const tg = useI18NPrefix('global');
 
@@ -75,17 +86,26 @@ export function MemberDetailPage() {
   }, [dispatch, orgId]);
 
   useEffect(() => {
-    if (members.length > 0) {
-      resetForm();
-      dispatch(actions.initEditingMember(memberId));
-      dispatch(getMemberRoles({ orgId: orgId, memberId }));
+    resetForm();
+    if (memberId === 'add') {
+      setFormType(CommonFormTypes.Add);
+      setPasswordVisible(true);
+    } else {
+      setFormType(CommonFormTypes.Edit);
+      setPasswordVisible(false);
+      if (members.length > 0) {
+        dispatch(actions.initEditingMember(memberId));
+        dispatch(getMemberRoles({ orgId, memberId }));
+      }
     }
   }, [dispatch, resetForm, actions, orgId, members, memberId]);
 
   useEffect(() => {
     if (editingMember) {
-      form.setFieldsValue(editingMember.info);
-      setRoleSelectValues(editingMember.roles.map(({ id }) => id));
+      form.setFieldsValue({
+        ...editingMember.info,
+        roleIds: editingMember.roles.map(({ id }) => id),
+      });
     }
   }, [form, editingMember]);
 
@@ -104,25 +124,59 @@ export function MemberDetailPage() {
     [dispatch, orgId],
   );
 
+  const showPassword = useCallback(() => {
+    setPasswordVisible(true);
+  }, []);
+
   const save = useCallback(() => {
-    dispatch(
-      editMember({
-        orgId: orgId,
-        roles: roleSelectValues.map(id => roles.find(r => r.id === id)!),
-        resolve: () => {
-          message.success(tg('operation.updateSuccess'));
-        },
-      }),
-    );
-  }, [dispatch, orgId, roleSelectValues, roles, tg]);
+    form.submit();
+  }, [form]);
+
+  const formSubmit = useCallback(
+    async values => {
+      await dispatch(
+        saveMember({
+          type:
+            formType === CommonFormTypes.Add
+              ? 'add'
+              : isPlatformMode
+              ? 'update'
+              : 'edit',
+          orgId,
+          ...values,
+          resolve: () => {
+            message.success(
+              formType === CommonFormTypes.Add
+                ? t('createSuccess')
+                : tg('operation.updateSuccess'),
+            );
+          },
+        }),
+      );
+    },
+    [dispatch, orgId, formType, isPlatformMode, t, tg],
+  );
 
   const remove = useCallback(() => {
     dispatch(
       removeMember({
         id: editingMember!.info.id,
-        orgId: orgId,
+        orgId,
         resolve: () => {
           message.success(t('removeSuccess'));
+          history.replace(`/organizations/${orgId}/members`);
+        },
+      }),
+    );
+  }, [dispatch, history, orgId, editingMember, t]);
+
+  const del = useCallback(() => {
+    dispatch(
+      deleteMember({
+        id: editingMember!.info.id,
+        orgId,
+        resolve: () => {
+          message.success(t('deleteSuccess'));
           history.replace(`/organizations/${orgId}/members`);
         },
       }),
@@ -148,51 +202,146 @@ export function MemberDetailPage() {
   return (
     <Wrapper>
       <DetailPageHeader
-        title={t('title')}
+        title={
+          formType === CommonFormTypes.Add ? t('titleAdd') : t('titleDetail')
+        }
         actions={
           <>
             <Button type="primary" loading={saveMemberLoading} onClick={save}>
               {tg('button.save')}
             </Button>
-            {editingMember?.info.orgOwner ? (
-              <Button
-                loading={grantLoading}
-                onClick={grantOrgOwner(false)}
-                danger
-              >
-                {t('revokeOwner')}
-              </Button>
-            ) : (
-              <Button loading={grantLoading} onClick={grantOrgOwner(true)}>
-                {t('grantOwner')}
-              </Button>
+            {formType === CommonFormTypes.Edit && (
+              <>
+                {editingMember?.info.orgOwner ? (
+                  <Button
+                    loading={grantLoading}
+                    onClick={grantOrgOwner(false)}
+                    danger
+                  >
+                    {t('revokeOwner')}
+                  </Button>
+                ) : (
+                  <Button loading={grantLoading} onClick={grantOrgOwner(true)}>
+                    {t('grantOwner')}
+                  </Button>
+                )}
+                {isPlatformMode ? (
+                  <Popconfirm title={t('removeConfirm')} onConfirm={remove}>
+                    <Button loading={removeMemberLoading} danger>
+                      {t('remove')}
+                    </Button>
+                  </Popconfirm>
+                ) : (
+                  <Popconfirm title={t('deleteConfirm')} onConfirm={del}>
+                    <Button loading={removeMemberLoading} danger>
+                      {t('delete')}
+                    </Button>
+                  </Popconfirm>
+                )}
+              </>
             )}
-
-            <Popconfirm title={t('removeConfirm')} onConfirm={remove}>
-              <Button danger>{t('remove')}</Button>
-            </Popconfirm>
           </>
         }
       />
       <Content>
         <Card bordered={false}>
           <Form
-            name="source_form_"
+            name="member_form_"
             form={form}
             labelAlign="left"
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
+            onFinish={formSubmit}
           >
-            <Form.Item label={t('username')}>
-              {editingMember?.info.username}
-            </Form.Item>
-            <Form.Item label={t('email')}>
-              {editingMember?.info.email}
-            </Form.Item>
-            <Form.Item label={t('name')}>
-              {editingMember?.info.name || '-'}
-            </Form.Item>
-            <Form.Item label={t('roles')}>
+            {isPlatformMode ? (
+              <>
+                <Form.Item label={t('username')}>
+                  {editingMember?.info.username}
+                </Form.Item>
+                <Form.Item label={t('email')}>
+                  {editingMember?.info.email}
+                </Form.Item>
+                <Form.Item label={t('name')}>
+                  {editingMember?.info.name || '-'}
+                </Form.Item>
+              </>
+            ) : (
+              <>
+                {formType === CommonFormTypes.Edit && (
+                  <Form.Item name="id" hidden>
+                    <Input />
+                  </Form.Item>
+                )}
+                <Form.Item
+                  name="username"
+                  label={t('username')}
+                  rules={[
+                    {
+                      required: true,
+                      message: `${t('username')}${tg('validation.required')}`,
+                    },
+                    {
+                      // validator: nameValidator,
+                    },
+                  ]}
+                >
+                  <Input
+                    placeholder={t('username')}
+                    disabled={formType === CommonFormTypes.Edit}
+                  />
+                </Form.Item>
+                <Form.Item
+                  name="email"
+                  label={t('email')}
+                  rules={[
+                    {
+                      required: true,
+                      message: `${t('email')}${tg('validation.required')}`,
+                    },
+                    { type: 'email' },
+                  ]}
+                >
+                  <Input type="email" placeholder={t('email')} />
+                </Form.Item>
+
+                <Form.Item
+                  name="password"
+                  label={t('password')}
+                  rules={
+                    passwordVisible
+                      ? [
+                          {
+                            required: true,
+                            message: `${t('password')}${tg(
+                              'validation.required',
+                            )}`,
+                          },
+                          {
+                            validator: getPasswordValidator(
+                              tg('validation.invalidPassword'),
+                            ),
+                          },
+                        ]
+                      : void 0
+                  }
+                >
+                  {passwordVisible ? (
+                    <Input.Password placeholder={t('password')} />
+                  ) : (
+                    <Button type="link" size="small" onClick={showPassword}>
+                      {t('changePassword')}
+                    </Button>
+                  )}
+                </Form.Item>
+                <Form.Item name="name" label={t('name')}>
+                  <Input placeholder={t('name')} />
+                </Form.Item>
+                <Form.Item name="description" label={t('description')}>
+                  <Input.TextArea placeholder={t('description')} />
+                </Form.Item>
+              </>
+            )}
+            <Form.Item name="roleIds" label={t('roles')}>
               {getMemberRolesLoading ? (
                 <LoadingOutlined />
               ) : (
@@ -201,8 +350,6 @@ export function MemberDetailPage() {
                   mode="multiple"
                   loading={roleListLoading}
                   onDropdownVisibleChange={roleListVisibleChange}
-                  value={roleSelectValues}
-                  onChange={setRoleSelectValues}
                 >
                   {roles.map(({ id, name }) => (
                     <Select.Option key={id} value={id}>

@@ -636,6 +636,7 @@
         "AGG_DATE_MONTH": "按月",
         "AGG_DATE_WEEK": "按周",
         "AGG_DATE_DAY": "按日",
+        "drillable": "可钻取",
         "actions": {
           "sort": {
             "title": "排序",
@@ -783,11 +784,41 @@
         "ok": "确认",
         "cancel": "取消",
         "number": "序号",
-        "summary": "汇总"
+        "summary": "汇总",
+        "richText": {
+          "bold": "加粗",
+          "italic": "斜体",
+          "underline": "下划线",
+          "strike": "删除线",
+          "indent": "减少缩进",
+          "indentUp": "增加缩进",
+          "ordered": "有序列表",
+          "list": "无序列表",
+          "blockquote": "引用",
+          "codeBlock": "代码",
+          "link": "超链接",
+          "image": "图片",
+          "clean": "清除样式",
+          "more": "更多",
+          "families": "字体",
+          "fontSize": "字体大小",
+          "background": "背景颜色",
+          "color": "字体颜色",
+          "align": "对齐方式"
+        }
+      },
+      "drill": {
+        "showNextLevel": "显示下一层级",
+        "expandNextLevel": "展开下一层级",
+        "selectDrillStatus": "鼠标点击钻取状态",
+        "enable": "开启",
+        "disable": "关闭",
+        "rollUp": "上卷"
       }
     },
     "action": {
       "common": {
+        "downloadForExcel": "下载为 Excel",
         "confirm": "请确认",
         "ok": "确认",
         "cancel": "取消",
@@ -811,8 +842,36 @@
         "expireDate": "截止日期",
         "enablePassword": "启用密码",
         "generateLink": "生成链接",
-        "shareLink": "分享",
-        "downloadData": "下载为 Excel"
+        "shareLink": "分享管理",
+        "downloadData": "下载为 Excel",
+        "downloadPDF": "下载为 PDF",
+        "downloadPicture": "下载为 图片",
+        "NONE": "无",
+        "CODE": "口令",
+        "LOGIN": "登录",
+        "verificationMethod": "认证方式",
+        "dataPermission": "数据权限",
+        "loginUser": "登录者",
+        "shareUser": "分享者",
+        "userOrRole": "指定角色/成员",
+        "selectRole": "选择角色",
+        "selectUser": "选择成员",
+        "save": "保存"
+      },
+      "shareList": {
+        "shareList": "分享链接列表",
+        "shortLink": "短链接",
+        "type": "类型",
+        "expireDate": "过期时间",
+        "operate": "操作",
+        "copy": "复制链接",
+        "copySuccess": "复制成功",
+        "delete": "删除",
+        "addLink": "添加链接",
+        "deleteError": "删除失败",
+        "sureDelete": "确定要删除吗？",
+        "noDataTip": "暂无链接，点击右上角添加",
+        "Permanent": "永久"
       }
     },
     "board": {
@@ -1187,19 +1246,27 @@
   },
   "member": {
     "memberDetail": {
-      "title": "成员详情",
+      "titleAdd": "新建成员",
+      "titleDetail": "成员详情",
       "grantOwner": "设为组织拥有者",
       "revokeOwner": "撤销拥有者",
       "remove": "移除成员",
       "removeConfirm": "确定移除该成员？",
       "removeSuccess": "移除成功",
+      "delete": "删除成员",
+      "deleteConfirm": "确定删除该成员？",
+      "deleteSuccess": "删除成功",
       "grantSuccess": "设置成功",
       "revokeSuccess": "撤销成功",
       "username": "用户名",
       "email": "邮箱",
+      "password": "密码",
+      "changePassword": "点击修改密码",
       "name": "用户姓名",
+      "description": "描述",
       "roles": "角色列表",
-      "assignRole": "为用户指定角色"
+      "assignRole": "为用户指定角色",
+      "createSuccess": "新建成员成功"
     },
     "roleDetail": {
       "role": "角色",
@@ -1218,7 +1285,12 @@
     "form": {
       "email": "邮箱",
       "search": "请搜索或粘贴被邀请成员邮箱",
-      "needConfirm": "需要被邀请成员邮件确认"
+      "needConfirm": "需要被邀请成员邮件确认",
+      "password": "密码",
+      "username": "用户名",
+      "name": "姓名",
+      "description": "描述",
+      "roles": "角色"
     },
     "sidebar": {
       "member": "成员",
@@ -1227,6 +1299,7 @@
       "inviteMember": "邀请成员",
       "inviteSuccess": "邀请邮件已成功发送",
       "invalidEmail": "请检查以下无效邮件地址",
+      "addMember": "新建成员",
       "roleTitle": "角色列表",
       "addRole": "新建角色"
     }

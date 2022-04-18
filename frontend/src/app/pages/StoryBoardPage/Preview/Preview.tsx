@@ -164,6 +164,7 @@ export const StoryPagePreview: React.FC<{
       >
         <Wrapper>
           <StoryHeader
+            orgId={orgId}
             name={story?.name}
             playStory={playStory}
             status={story?.status}

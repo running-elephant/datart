@@ -47,6 +47,7 @@ export const ColorPickerPopover: FC<ColorPickerPopoverProps> = ({
       content={<SingleColorSelection color={color} onChange={onColorChange} />}
       trigger="click"
       placement="right"
+      className="color-picker"
     >
       {children || (
         <ColorPicker
