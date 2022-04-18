@@ -27,7 +27,6 @@ import { TitleHeader } from '../../components/BoardHeader/TitleHeader';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardInitProvider } from '../../components/BoardProvider/BoardInitProvider';
 import { FullScreenPanel } from '../../components/FullScreenPanel/FullScreenPanel';
-import { editDashBoardInfoActions } from '../BoardEditor/slice';
 import { selectEditBoard } from '../BoardEditor/slice/selectors';
 import { AutoBoardCore } from './AutoDashboard/AutoBoardCore';
 import { FreeBoardCore } from './FreeDashboard/FreeBoardCore';
@@ -140,7 +139,6 @@ export const Board: FC<BoardProps> = memo(
     }, [readBoardHide, dashboard?.id, dispatch, height, width]);
 
     useEffect(() => {
-      dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
       if (boardId && fetchData) {
         dispatch(
           fetchBoardDetail({

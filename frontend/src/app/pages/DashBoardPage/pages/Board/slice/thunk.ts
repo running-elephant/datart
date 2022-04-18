@@ -31,7 +31,6 @@ import { handleServerBoardAction } from './asyncActions';
 import { selectBoardById, selectBoardWidgetMap } from './selector';
 import {
   BoardState,
-  ContainerWidgetContent,
   ControllerWidgetContent,
   getDataOption,
   ServerDashboard,
@@ -151,28 +150,6 @@ export const renderedWidgetAsync = createAsyncThunk<
     dispatch(
       getWidgetData({ boardId: boardId, widget: curWidget, renderMode }),
     );
-    if (curWidget.config.type === 'container') {
-      const content = curWidget.config.content as ContainerWidgetContent;
-      let subWidgetIds: string[] = [];
-      subWidgetIds = Object.values(content.itemMap)
-        .map(item => item.childWidgetId)
-        .filter(id => !!id);
-      // 1 widget render
-      dispatch(
-        boardActions.renderedWidgets({ boardId, widgetIds: subWidgetIds }),
-      );
-      // 2 widget getData
-      subWidgetIds.forEach(wid => {
-        dispatch(
-          getWidgetData({
-            boardId: boardId,
-            widget: widgetMap[wid],
-            renderMode,
-          }),
-        );
-      });
-    }
-
     return null;
   },
 );

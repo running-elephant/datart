@@ -539,6 +539,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
 
   const handleDrillOptionChange = (option: IChartDrillOption) => {
     drillOptionRef.current = option;
+    console.log('__ option', option);
     dispatch(refreshDatasetAction({ drillOption: option }));
   };
 

@@ -93,11 +93,12 @@ export const getRGBAColor = color => {
   }
 };
 
-export const getDataChartRequestParams = (
-  dataChart: DataChart,
-  view: ChartDataView,
-  option,
-) => {
+export const getDataChartRequestParams = (obj: {
+  dataChart: DataChart;
+  view: ChartDataView;
+  option;
+}) => {
+  const { dataChart, view, option } = obj;
   const migratedChartConfig = migrateChartConfig(
     CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
   );
@@ -382,11 +383,11 @@ export const getChartWidgetRequestParams = (obj: {
 
   const chartDataView = viewMap[dataChart?.viewId];
 
-  let requestParams = getDataChartRequestParams(
+  let requestParams = getDataChartRequestParams({
     dataChart,
-    chartDataView,
-    option,
-  );
+    view: chartDataView,
+    option: option,
+  });
 
   const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
     chartWidget: curWidget,
