@@ -18,6 +18,7 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
+import { ChartDataViewFieldCategory } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
@@ -33,6 +34,7 @@ import {
   currentDataViewSelector,
   datasetsSelector,
   shadowChartConfigSelector,
+  sourceSupportDateFieldSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import {
   initWorkbenchAction,
@@ -51,6 +53,7 @@ import { IChart } from 'app/types/Chart';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
+import { updateBy } from 'app/utils/mutation';
 import { CommonFormTypes } from 'globalConstants';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -115,6 +118,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const shadowChartConfig = useSelector(shadowChartConfigSelector);
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
+  const sourceSupportDateField = useSelector(sourceSupportDateFieldSelector);
   const [chart, setChart] = useState<IChart>();
   const [allowQuery, setAllowQuery] = useState<boolean>(false);
   const history = useHistory();
@@ -288,6 +292,56 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       return true;
     }
 
+    const dateAggregationField = payload.value.rows.filter(
+      v => v.category === ChartDataViewFieldCategory.DateAggregationField,
+    );
+    const deleteColName = payload.value.deleteColName;
+
+    /**
+     * Date aggregation field added to function Columns
+     */
+    if (dateAggregationField.length) {
+      const expressionList: any = [];
+      const newComputedFields: any = dataview?.computedFields
+        ? CloneValueDeep(dataview?.computedFields)
+        : [];
+
+      newComputedFields.forEach(v => {
+        if (v.category === ChartDataViewFieldCategory.DateAggregationField) {
+          expressionList.push(v.expression);
+        }
+      });
+
+      dateAggregationField.forEach(v => {
+        if (!expressionList.includes(v.expression)) {
+          newComputedFields.push({
+            category: v.category,
+            id: v.colName,
+            type: v.type,
+            expression: v.expression,
+          });
+        }
+      });
+
+      dispatch(
+        workbenchSlice.actions.updateCurrentDataViewComputedFields(
+          newComputedFields,
+        ),
+      );
+    }
+    if (deleteColName) {
+      const newComputedFields: any = dataview?.computedFields?.filter(
+        v => v.id !== deleteColName,
+      );
+      dispatch(
+        workbenchSlice.actions.updateCurrentDataViewComputedFields(
+          newComputedFields,
+        ),
+      );
+      payload = updateBy(payload, draft => {
+        delete draft.value.deleteColName;
+      });
+    }
     dispatch(
       updateChartConfigAndRefreshDatasetAction({
         type,
@@ -518,6 +572,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           defaultViewId={defaultViewId}
           expensiveQuery={expensiveQuery}
           allowQuery={allowQuery}
+          sourceSupportDateField={sourceSupportDateField}
           onChartChange={handleChartChange}
           onChartConfigChange={handleChartConfigChange}
           onDataViewChange={handleDataViewChanged}

@@ -75,6 +75,7 @@ export enum ChartDataViewFieldCategory {
   Variable = 'variable',
   ComputedField = 'computedField',
   AggregateComputedField = 'aggregateComputedField',
+  DateAggregationField = 'dateAggregationField',
 }
 
 export enum SortActionType {

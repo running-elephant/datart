@@ -105,7 +105,7 @@ export type ChartDataSectionField = {
   desc?: string;
   type: ChartDataViewFieldType;
   category: Lowercase<keyof typeof ChartDataViewFieldCategory>;
-
+  expression?: string;
   sort?: SortFieldAction;
   alias?: AliasFieldAction;
   format?: IFieldFormatConfig;
@@ -173,7 +173,7 @@ export type ChartDataConfig = ChartConfigBase & {
       backendSort?: boolean;
     };
   };
-
+  deleteColName?: string;
   // NOTE: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
 };

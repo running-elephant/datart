@@ -246,3 +246,18 @@ export const updateChartAction = createAsyncThunk(
     return response.data;
   },
 );
+
+export const fetchsourceSupportDateField = createAsyncThunk<
+  string[],
+  { sourceId: string }
+>('workbench/fetchsourceSupportDateField', async arg => {
+  try {
+    const { data } = await request2<string[]>({
+      url: `/data-provider/function/support/${arg.sourceId}`,
+      method: 'POST',
+    });
+    return data;
+  } catch (err) {
+    throw err;
+  }
+});

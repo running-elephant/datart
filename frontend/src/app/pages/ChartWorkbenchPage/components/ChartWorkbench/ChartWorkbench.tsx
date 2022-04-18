@@ -40,6 +40,7 @@ const ChartWorkbench: FC<{
   defaultViewId?: string;
   expensiveQuery: boolean;
   allowQuery: boolean;
+  sourceSupportDateField?: string[];
   header?: {
     name?: string;
     orgId?: string;
@@ -65,6 +66,7 @@ const ChartWorkbench: FC<{
     defaultViewId,
     expensiveQuery,
     allowQuery,
+    sourceSupportDateField,
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
@@ -87,7 +89,11 @@ const ChartWorkbench: FC<{
           }}
         >
           <ChartDataViewContext.Provider
-            value={{ dataView: dataview, expensiveQuery: expensiveQuery }}
+            value={{
+              dataView: dataview,
+              expensiveQuery: expensiveQuery,
+              sourceSupportDateField,
+            }}
           >
             <TimeConfigContext.Provider
               value={{ locale: language, format: dateFormat }}

@@ -333,7 +333,7 @@ export const deleteView = createAsyncThunk<
   { state: RootState }
 >('view/deleteView', async ({ id, archive, resolve }, { dispatch }) => {
   try {
-    await request<boolean>({
+    await request2<boolean>({
       url: `/views/${id}`,
       method: 'DELETE',
       params: { archive },
@@ -341,7 +341,6 @@ export const deleteView = createAsyncThunk<
     resolve();
     return null;
   } catch (error) {
-    errorHandle(error);
     throw error;
   }
 });

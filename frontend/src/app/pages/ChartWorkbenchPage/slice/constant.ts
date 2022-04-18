@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ChartDataViewFieldCategory } from 'app/constants';
 
 export const ChartConfigReducerActionType = {
   INIT: 'init',
@@ -23,3 +24,36 @@ export const ChartConfigReducerActionType = {
   SETTING: 'setting',
   I18N: 'i18n',
 };
+
+export const dateAggregationList = [
+  {
+    category: ChartDataViewFieldCategory.DateAggregationField,
+    expression: 'AGG_DATE_YEAR',
+    id: 'YEAR',
+    type: 'STRING',
+  },
+  {
+    category: ChartDataViewFieldCategory.DateAggregationField,
+    expression: 'AGG_DATE_QUARTER',
+    id: 'QUARTER',
+    type: 'STRING',
+  },
+  {
+    category: ChartDataViewFieldCategory.DateAggregationField,
+    expression: 'AGG_DATE_MONTH',
+    id: 'MONTH',
+    type: 'STRING',
+  },
+  {
+    category: ChartDataViewFieldCategory.DateAggregationField,
+    expression: 'AGG_DATE_WEEK',
+    id: 'WEEK',
+    type: 'STRING',
+  },
+  {
+    category: ChartDataViewFieldCategory.DateAggregationField,
+    expression: 'AGG_DATE_DAY',
+    id: 'DAY',
+    type: 'STRING',
+  },
+];

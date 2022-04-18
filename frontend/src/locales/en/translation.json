@@ -479,7 +479,12 @@
         "deleteField": "Delete",
         "editViewTip": "Going back to the view will lose the current edit state, continue?",
         "editView": "Edit View",
-        "toggleViewTip": "Switching view will clear all chart configurations, continue?"
+        "toggleViewTip": "Switching view will clear all chart configurations, continue?",
+        "AGG_DATE_YEAR": "Year",
+        "AGG_DATE_QUARTER": "Quarter",
+        "AGG_DATE_MONTH": "Month",
+        "AGG_DATE_WEEK": "Week",
+        "AGG_DATE_DAY": "Day"
       }
     },
     "palette": {
@@ -580,9 +585,6 @@
           "arial": "Arial",
           "sansSerif": "sans-serif"
         },
-        "lineHeight": {
-          "default": "Default Line Height"
-        },
         "fontWeight": {
           "normal": "Normal",
           "bold": "Bold",
@@ -594,7 +596,11 @@
           "italic": "Italic",
           "oblique": "Oblique"
         },
+        "lineHeight": {
+          "default": "Default Line Height"
+        },
         "position": {
+          "title": "Position",
           "auto": "Auto",
           "right": "Right",
           "left": "Left",
@@ -625,6 +631,11 @@
         "size": "Size",
         "drop": "Drag some data fields here",
         "dropCount": "Drag {{count}} fields here at least",
+        "AGG_DATE_YEAR": "Year",
+        "AGG_DATE_QUARTER": "Quarter",
+        "AGG_DATE_MONTH": "Month",
+        "AGG_DATE_WEEK": "Week",
+        "AGG_DATE_DAY": "Day",
         "actions": {
           "sort": {
             "title": "Sort",

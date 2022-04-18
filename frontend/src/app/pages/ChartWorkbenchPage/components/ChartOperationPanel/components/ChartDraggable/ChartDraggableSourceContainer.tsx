@@ -18,17 +18,15 @@
 
 import {
   CalendarOutlined,
+  DownOutlined,
   FieldStringOutlined,
   FileUnknownOutlined,
   MoreOutlined,
   NumberOutlined,
 } from '@ant-design/icons';
-import { Dropdown, Menu } from 'antd';
+import { Collapse, Dropdown, Menu } from 'antd';
 import { IW, ToolbarButton } from 'app/components';
-import {
-  ChartDataViewFieldCategory,
-  DataViewFieldType,
-} from 'app/constants';
+import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
@@ -47,9 +45,14 @@ import {
   WARNING,
 } from 'styles/StyleConstants';
 import { stopPPG } from 'utils/utils';
+import { dateAggregationList } from '../../../../slice/constant';
+import DateAggregateFieldContainer from './DateAggregateFieldContainer';
+
+const { Panel } = Collapse;
 
 export const ChartDraggableSourceContainer: FC<
   {
+    sourceSupportDateField?: string[];
     onDeleteComputedField?: (fieldName) => void;
     onEditComputedField?: (fieldName) => void;
     onSelectionChange?: (dataItemId, cmdKeyActive, shiftKeyActive) => void;
@@ -61,11 +64,12 @@ export const ChartDraggableSourceContainer: FC<
   type,
   category,
   expression,
+  selectedItems,
+  isActive,
+  sourceSupportDateField,
   onDeleteComputedField,
   onEditComputedField,
   onSelectionChange,
-  selectedItems,
-  isActive,
   onClearCheckedList,
 }) {
   const t = useI18NPrefix(`viz.workbench.dataview`);
@@ -157,33 +161,82 @@ export const ChartDraggableSourceContainer: FC<
 
     return (
       <>
-        <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
-        <p>{colName}</p>
-        <div onClick={stopPPG}>
-          <Dropdown
-            disabled={_isNormalField()}
-            overlay={_getExtraActionMenus()}
-            trigger={['click']}
+        {type === 'DATE' && category === 'field' ? (
+          <CollapseWrapper
+            defaultActiveKey={[colName]}
+            ghost
+            expandIconPosition="right"
+            expandIcon={({ isActive }) => {
+              return <DownOutlined rotate={isActive ? -180 : 0} />;
+            }}
           >
-            <ToolbarButton
-              icon={<MoreOutlined />}
-              iconSize={FONT_SIZE_BASE}
-              className="setting"
-              onClick={e => e.preventDefault()}
-            />
-          </Dropdown>
-        </div>
+            <Panel
+              key={colName}
+              header={
+                <div ref={drag}>
+                  <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
+                  <p>{colName}</p>
+                </div>
+              }
+            >
+              {dateAggregationList.map((item, i) => {
+                if (sourceSupportDateField?.includes(item.expression)) {
+                  return (
+                    <DateAggregateFieldContainer
+                      colName={colName}
+                      key={i}
+                      item={item}
+                      onClearCheckedList={onClearCheckedList}
+                    />
+                  );
+                }
+                return null;
+              })}
+            </Panel>
+          </CollapseWrapper>
+        ) : (
+          <>
+            <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
+            <p>{colName}</p>
+            <div onClick={stopPPG}>
+              <Dropdown
+                disabled={_isNormalField()}
+                overlay={_getExtraActionMenus()}
+                trigger={['click']}
+              >
+                <ToolbarButton
+                  icon={<MoreOutlined />}
+                  iconSize={FONT_SIZE_BASE}
+                  className="setting"
+                  onClick={e => e.preventDefault()}
+                />
+              </Dropdown>
+            </div>
+          </>
+        )}
       </>
     );
-  }, [type, colName, onDeleteComputedField, onEditComputedField, category, t]);
+  }, [
+    type,
+    colName,
+    onDeleteComputedField,
+    onEditComputedField,
+    category,
+    t,
+    onClearCheckedList,
+    drag,
+    sourceSupportDateField,
+  ]);
 
   return (
     <Container
       onClick={e => {
         onSelectionChange?.(colName, e.metaKey || e.ctrlKey, e.shiftKey);
       }}
-      ref={drag}
-      className={styleClasses.join(' ')}
+      ref={type === 'DATE' && category === 'field' ? null : drag}
+      className={
+        type === 'DATE' && category === 'field' ? '' : styleClasses.join(' ')
+      }
     >
       {renderContent}
     </Container>
@@ -207,6 +260,14 @@ const Container = styled.div`
   > p {
     flex: 1;
   }
+  .ant-collapse-header {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    > p {
+      flex: 1;
+    }
+  }
 
   .setting {
     visibility: hidden;
@@ -217,6 +278,22 @@ const Container = styled.div`
 
     .setting {
       visibility: visible;
+    }
+  }
+`;
+
+const CollapseWrapper = styled(Collapse)`
+  .ant-collapse-header {
+    padding: 0 !important;
+  }
+  &.ant-collapse {
+    width: 100%;
+    .ant-collapse-header {
+      > div {
+        display: flex;
+        align-items: center;
+        width: 100% !important;
+      }
     }
   }
 `;

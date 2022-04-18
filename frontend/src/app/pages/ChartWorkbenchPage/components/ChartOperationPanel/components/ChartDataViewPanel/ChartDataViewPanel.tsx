@@ -19,10 +19,7 @@
 import { FormOutlined, PlusOutlined } from '@ant-design/icons';
 import { message, Popover, Tooltip, TreeSelect } from 'antd';
 import { ToolbarButton } from 'app/components';
-import {
-  ChartDataViewFieldCategory,
-  DataViewFieldType,
-} from 'app/constants';
+import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
@@ -32,7 +29,10 @@ import {
   dataviewsSelector,
   makeDataviewTreeSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/selectors';
-import { fetchViewDetailAction } from 'app/pages/ChartWorkbenchPage/slice/thunks';
+import {
+  fetchsourceSupportDateField,
+  fetchViewDetailAction,
+} from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useAccess, useCascadeAccess } from 'app/pages/MainPage/Access';
 import {
   PermissionLevels,
@@ -43,7 +43,7 @@ import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { checkComputedFieldAsync } from 'app/utils/fetch';
 import { updateByKey } from 'app/utils/mutation';
-import { FC, memo, useCallback, useMemo } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
@@ -94,19 +94,17 @@ const ChartDataViewPanel: FC<{
   const history = useHistory();
 
   const handleDataViewChange = useCallback(
-    value => {
+    async value => {
       if (dataView?.id === value) {
         return false;
       }
-
       let Data = chartConfig?.datas?.filter(v => v.rows && v.rows.length);
-
       if (Data?.length) {
         (showModal as Function)({
           title: '',
           modalSize: StateModalSize.XSMALL,
           content: () => t('toggleViewTip'),
-          onOk: () => {
+          onOk: async () => {
             onDataViewChange?.();
             dispatch(fetchViewDetailAction(value));
           },
@@ -231,17 +229,20 @@ const ChartDataViewPanel: FC<{
   };
 
   const getSortedFields = (dataView?: ChartDataView) => {
+    const computedFields = dataView?.computedFields?.filter(
+      v => v.category !== ChartDataViewFieldCategory.DateAggregationField,
+    );
     const stringFields =
       (dataView?.meta || [])
-        .concat(dataView?.computedFields || [])
+        .concat(computedFields || [])
         ?.filter(f => f.type === DataViewFieldType.STRING) || [];
     const numericFields =
       (dataView?.meta || [])
-        .concat(dataView?.computedFields || [])
+        .concat(computedFields || [])
         ?.filter(f => f.type === DataViewFieldType.NUMERIC) || [];
     const dateFields =
       (dataView?.meta || [])
-        .concat(dataView?.computedFields || [])
+        .concat(computedFields || [])
         ?.filter(f => f.type === DataViewFieldType.DATE) || [];
     return [...dateFields, ...stringFields, ...numericFields];
   };
@@ -252,12 +253,6 @@ const ChartDataViewPanel: FC<{
     history.push(`/organizations/${orgId}/views/${viewId}`);
   }, [dataView?.id, dataView?.orgId, history]);
 
-  useMount(() => {
-    if (defaultViewId) {
-      handleDataViewChange(defaultViewId);
-    }
-  });
-
   const handleConfirmVisible = useCallback(() => {
     (showModal as Function)({
       title: '',
@@ -266,6 +261,18 @@ const ChartDataViewPanel: FC<{
       onOk: editView,
     });
   }, [editView, showModal, t]);
+
+  useMount(() => {
+    if (defaultViewId) {
+      handleDataViewChange(defaultViewId);
+    }
+  });
+
+  useEffect(() => {
+    if (dataView) {
+      dispatch(fetchsourceSupportDateField({ sourceId: dataView.sourceId }));
+    }
+  }, [dataView, dispatch]);
 
   return (
     <StyledChartDataViewPanel>
