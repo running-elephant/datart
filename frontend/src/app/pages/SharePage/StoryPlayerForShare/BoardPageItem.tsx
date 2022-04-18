@@ -25,6 +25,7 @@ import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { LEVEL_50 } from 'styles/StyleConstants';
 
 export interface BoardPageItemProps {
   boardId: string;
@@ -64,7 +65,7 @@ const Wrapper = styled.div<{}>`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 50;
+  z-index: ${LEVEL_50};
   display: flex;
   flex-direction: column;
 

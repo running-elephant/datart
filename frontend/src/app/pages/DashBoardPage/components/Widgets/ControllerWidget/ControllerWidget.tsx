@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { FlexStyle } from 'app/pages/DashBoardPage/constants';
 import useRenderWidget from 'app/pages/DashBoardPage/hooks/useRenderWidget';
 import useWidgetAutoFetch from 'app/pages/DashBoardPage/hooks/useWidgetAutoFetch';
 import { memo, useContext } from 'react';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { ZIndexWrapper } from '../../WidgetComponents/ZIndexWrapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { ToolBar } from './components/ToolBar';
 import { ControllerWidgetCore } from './ControllerWidgetCore';
@@ -44,11 +43,11 @@ export const ControllerWidget: React.FC<{}> = memo(() => {
   const { background, border, padding } = widget.config;
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
-      <ZIndexWrapper>
-        <div ref={cacheWhRef} style={FlexStyle}>
+      <div ref={cacheWhRef} style={ZIndexStyle}>
+        <div style={FlexStyle}>
           <ControllerWidgetCore />
         </div>
-      </ZIndexWrapper>
+      </div>
       {renderMode === 'edit' && <EditMask />}
       <ToolBar />
     </WidgetWrapper>

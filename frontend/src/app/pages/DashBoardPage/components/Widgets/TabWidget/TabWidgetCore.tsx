@@ -97,6 +97,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
         tabBarStyle={{ fontSize: '16px' }}
         type={editing ? 'editable-card' : undefined}
         onEdit={editing ? tabEdit : undefined}
+        destroyInactiveTabPane
       >
         {tabsCons.map(tab => (
           <TabPane

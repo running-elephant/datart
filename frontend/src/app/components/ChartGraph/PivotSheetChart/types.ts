@@ -1,25 +1,8 @@
-import { FontStyle } from 'app/types/ChartConfig';
+import { Palette, S2DataConfig, S2Options, S2Theme } from '@antv/s2';
 
-export type TextStyle = {
-  cell: { backgroundColor: string; crossBackgroundColor?: string };
-  text: { fill: string; textAlign: string } & FontStyle;
-  bolderText?: { fill: string; textAlign: string } & FontStyle;
-};
-
-export type TableSorters = {
-  sortFieldId: any;
-  sortFunc: (params) => string[];
-} | null;
-
-export interface RowAndColStyle {
-  colCfg: {
-    height: number;
-    widthByFieldValue: Record<string, number | undefined>;
-  };
-  rowCfg: {
-    width?: number | null;
-  };
-  cellCfg: {
-    height: number;
-  };
+export interface AndvS2Config {
+  dataCfg?: S2DataConfig;
+  options: S2Options;
+  theme?: S2Theme;
+  palette?: Palette;
 }

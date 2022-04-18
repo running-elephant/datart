@@ -15,20 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { memo } from 'react';
-import styled from 'styled-components/macro';
-import { LEVEL_50 } from 'styles/StyleConstants';
-export const StyledWidgetToolBar: React.FC<{}> = memo(props => {
-  return <StyleWrap>{props.children} </StyleWrap>;
-});
-const StyleWrap = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: ${LEVEL_50};
-  overflow: hidden;
-  text-align: right;
-  .widget-tool-dropdown {
-    visibility: hidden;
-  }
-`;
+
+import type { CSSProperties } from 'react';
+import { LEVEL_10 } from 'styles/StyleConstants';
+export const FlexStyle: CSSProperties = {
+  display: 'flex',
+  flex: '1',
+  minHeight: '0',
+};
+export const ZIndexStyle: CSSProperties = {
+  zIndex: LEVEL_10,
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  height: ' 100%',
+};

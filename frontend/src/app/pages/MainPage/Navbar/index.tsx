@@ -46,7 +46,6 @@ import { downloadFile } from 'app/utils/fetch';
 import { BASE_RESOURCE_URL } from 'globalConstants';
 import { changeLang } from 'locales/i18n';
 import React, { cloneElement, useCallback, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
@@ -55,7 +54,7 @@ import {
   BORDER_RADIUS,
   FONT_SIZE_ICON_SM,
   FONT_WEIGHT_MEDIUM,
-  NAV_LEVEL,
+  LEVEL_10,
   SPACE_LG,
   SPACE_MD,
   SPACE_TIMES,
@@ -93,7 +92,7 @@ export function Navbar() {
   const matchModules = useRouteMatch<{ moduleName: string }>(
     '/organizations/:orgId/:moduleName',
   );
-  const { i18n } = useTranslation();
+
   const t = useI18NPrefix('main');
   const brandClick = useCallback(() => {
     history.push('/');
@@ -397,7 +396,7 @@ export function Navbar() {
 }
 
 const MainNav = styled.div`
-  z-index: ${NAV_LEVEL};
+  z-index: ${LEVEL_10};
   display: flex;
   flex-direction: column;
   flex-shrink: 0;

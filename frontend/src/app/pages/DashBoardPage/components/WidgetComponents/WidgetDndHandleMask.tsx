@@ -23,6 +23,7 @@ import {
 import React, { memo } from 'react';
 import { useDrag } from 'react-dnd';
 import { useDispatch } from 'react-redux';
+import { LEVEL_10 } from 'styles/StyleConstants';
 import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 export interface WidgetDndHandleMaskProps {
   widgetId: string;
@@ -85,7 +86,7 @@ export const WidgetDndHandleMask: React.FC<WidgetDndHandleMaskProps> = memo(
             position: 'absolute',
             cursor: 'grabbing',
             top: '0',
-            zIndex: 15,
+            zIndex: LEVEL_10 + 1,
             width: '100%',
             height: '100%',
           }}

@@ -200,6 +200,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     @Override
     public boolean updateBase(ViewBaseUpdateParam updateParam) {
         View view = retrieve(updateParam.getId());
+        requirePermission(view, Const.MANAGE);
         if (!view.getName().equals(updateParam.getName())) {
             //check name
             View check = new View();

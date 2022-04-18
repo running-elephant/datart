@@ -37,10 +37,10 @@ import { format } from 'sql-formatter';
 import styled from 'styled-components/macro';
 import {
   INFO,
+  LEVEL_1,
   SPACE,
   SPACE_TIMES,
   SPACE_XS,
-  STICKY_LEVEL,
   WARNING,
 } from 'styles/StyleConstants';
 import { getInsertedNodeIndex } from 'utils/utils';
@@ -297,6 +297,8 @@ export const Toolbar = memo(({ allowManage, allowEnableViz }: ToolbarProps) => {
               <ToolbarButton
                 icon={<CopyFilled />}
                 onClick={() => saveAsView(id)}
+                disabled={isNewView(id)}
+                color={INFO}
               />
             </Tooltip>
             {/* <Tooltip title={t('saveFragment')} placement="bottom">
@@ -308,7 +310,9 @@ export const Toolbar = memo(({ allowManage, allowEnableViz }: ToolbarProps) => {
       {allowEnableViz && (
         <Tooltip title={t('startAnalysis')} placement="bottom">
           <ToolbarButton
+            disabled={isNewView(id)}
             icon={<MonitorOutlined />}
+            color={INFO}
             onClick={() => {
               startAnalysis(id);
             }}
@@ -320,7 +324,7 @@ export const Toolbar = memo(({ allowManage, allowEnableViz }: ToolbarProps) => {
 });
 
 const Container = styled.div`
-  z-index: ${STICKY_LEVEL};
+  z-index: ${LEVEL_1};
   display: flex;
   flex-shrink: 0;
   align-items: center;

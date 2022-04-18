@@ -15,15 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { memo } from 'react';
-import styled from 'styled-components/macro';
-export const ZIndexWrapper: React.FC<{}> = memo(props => {
-  return <Wrapper>{props.children} </Wrapper>;
-});
-const Wrapper = styled.div`
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-`;
+
+import PivotSheetTheme from './PivotSheetTheme';
+
+export default PivotSheetTheme;

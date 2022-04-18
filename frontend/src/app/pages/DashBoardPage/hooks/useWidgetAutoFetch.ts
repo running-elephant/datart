@@ -31,7 +31,7 @@ export default function useWidgetAutoFetch(
   const { onWidgetGetData } = useContext(WidgetActionContext);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    let timer: NodeJS.Timeout | undefined = undefined;
     if (
       rendered &&
       boardVisible &&
@@ -39,7 +39,7 @@ export default function useWidgetAutoFetch(
       widget.config.autoUpdate
     ) {
       timer = setInterval(() => {
-        const elShow = isElView(rectRef.current);
+        const elShow = isElView(rectRef.current, true);
         if (elShow) {
           onWidgetGetData(widget);
         }
