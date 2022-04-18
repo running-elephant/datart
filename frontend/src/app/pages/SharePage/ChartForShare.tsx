@@ -176,6 +176,7 @@ const ChartForShare: FC<{
               dataset={chartPreview?.dataset}
               chart={chart!}
               config={chartPreview?.chartConfig!}
+              drillOption={drillOptionRef.current}
               width={width}
               height={height}
             />

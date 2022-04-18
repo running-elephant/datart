@@ -419,6 +419,7 @@ const ChartPreviewBoard: FC<{
                     dataset={chartPreview?.dataset}
                     chart={chart!}
                     config={chartPreview?.chartConfig!}
+                    drillOption={drillOptionRef.current}
                     width={cacheW}
                     height={cacheH}
                   />
