@@ -1,3 +1,5 @@
+import { TenantManagementMode } from 'app/constants';
+
 /**
  * Datart
  *
@@ -37,6 +39,8 @@ export interface User {
 
 export interface SystemInfo {
   mailEnable: boolean;
+  registerEnable: boolean;
+  tenantManagementMode: TenantManagementMode;
   tokenTimeout: string;
   version: string;
 }

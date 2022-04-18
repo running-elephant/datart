@@ -20,18 +20,18 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { User } from 'app/slice/types';
 import omit from 'lodash/omit';
 import { RootState } from 'types';
-import { request } from 'utils/request';
+import { request, request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { selectEditingMember, selectEditingRole } from './selectors';
 import {
   AddRoleParams,
   DeleteRoleParams,
-  EditMemberParams,
   EditRoleParams,
   GrantOwnerParams,
   InviteMemberParams,
   RemoveMemberParams,
   Role,
+  SaveMemberParams,
 } from './types';
 
 export const getMembers = createAsyncThunk<User[], string>(
@@ -81,39 +81,53 @@ export const getMemberRoles = createAsyncThunk<
   }
 });
 
-export const editMember = createAsyncThunk<
-  null,
-  EditMemberParams,
+export const saveMember = createAsyncThunk<
+  User | null,
+  SaveMemberParams,
   { state: RootState }
->('member/editMember', async ({ orgId, roles, resolve }, { getState }) => {
-  try {
+>(
+  'member/editMember',
+  async ({ type, orgId, roleIds, resolve, ...memberInfo }, { getState }) => {
     const editingMember = selectEditingMember(getState());
-
-    if (editingMember) {
-      const { info, roles: originRoles } = editingMember;
-      const originRoleIds = originRoles.map(({ id }) => id);
-      const roleIds = roles.map(({ id }) => id);
-
-      await Promise.all([
-        // TODO user attributes update
-        originRoleIds.sort().join() !== roleIds.sort().join()
-          ? request<boolean>({
-              url: `/roles/${info.id}/roles`,
-              method: 'PUT',
-              params: { orgId },
-              data: roleIds,
-            })
-          : null,
-      ]);
+    if (type === 'add') {
+      const { data } = await request2<User>({
+        url: `/users/${orgId}/addUser`,
+        method: 'POST',
+        data: { roleIds, ...memberInfo },
+      });
+      resolve();
+      return data;
+    } else if (type === 'edit') {
+      if (editingMember) {
+        await request2<User>({
+          url: `/users/${orgId}/updateUser`,
+          method: 'PUT',
+          data: { roleIds, ...memberInfo },
+        });
+        resolve();
+        return { ...editingMember.info, ...memberInfo };
+      }
+    } else {
+      if (editingMember) {
+        const { info, roles: originRoles } = editingMember;
+        const originRoleIds = originRoles.map(({ id }) => id);
+        await Promise.all([
+          // TODO user attributes update
+          originRoleIds.sort().join() !== roleIds.sort().join()
+            ? request2<boolean>({
+                url: `/roles/${info.id}/roles`,
+                method: 'PUT',
+                params: { orgId },
+                data: roleIds,
+              })
+            : null,
+        ]);
+        resolve();
+      }
     }
-
-    resolve();
     return null;
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
-});
+  },
+);
 
 export const removeMember = createAsyncThunk<null, RemoveMemberParams>(
   'member/removeMember',
@@ -129,6 +143,19 @@ export const removeMember = createAsyncThunk<null, RemoveMemberParams>(
       errorHandle(error);
       throw error;
     }
+  },
+);
+
+export const deleteMember = createAsyncThunk<null, RemoveMemberParams>(
+  'member/deleteMember',
+  async ({ id, orgId, resolve }) => {
+    await request2<boolean>({
+      url: `/users/${orgId}/deleteUser`,
+      method: 'DELETE',
+      params: { userId: id },
+    });
+    resolve();
+    return null;
   },
 );
 
