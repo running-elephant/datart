@@ -29,7 +29,7 @@ import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
-import { getDrillPaths } from 'app/utils/chartHelper';
+import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import produce from 'immer';
 import React, {
   memo,
@@ -41,7 +41,6 @@ import React, {
 } from 'react';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS } from 'styles/StyleConstants';
-import { isEmptyArray } from 'utils/object';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import {
   boardDrillManager,
@@ -174,33 +173,16 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   }, [chart?.config, dataChart?.config]);
 
   useEffect(() => {
-    let drillOption;
-    const drillPaths = getDrillPaths(config?.datas);
-    if (isEmptyArray(drillPaths)) {
-      drillOption = undefined;
-      drillOptionRef.current = drillOption;
-      boardDrillManager.setWidgetDrill({
-        bid,
-        wid,
-        drillOption,
-      });
-      return;
-    }
-    const preRefIds = drillOptionRef.current
-      ?.getAllFields()
-      ?.map(p => p.uid)
-      .join('-');
-    const pathIds = drillPaths.map(p => p.uid).join('-');
-
-    if (preRefIds !== pathIds) {
-      drillOption = new ChartDrillOption(drillPaths);
-      drillOptionRef.current = drillOption;
-      boardDrillManager.setWidgetDrill({
-        bid,
-        wid,
-        drillOption,
-      });
-    }
+    let drillOption = getChartDrillOption(
+      config?.datas,
+      drillOptionRef.current,
+    ) as ChartDrillOption;
+    drillOptionRef.current = drillOption;
+    boardDrillManager.setWidgetDrill({
+      bid,
+      wid,
+      drillOption,
+    });
   }, [bid, config?.datas, wid]);
 
   const errText = useMemo(() => {
@@ -223,7 +205,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     if (cacheH <= 1 || cacheW <= 1) return null;
     if (errText) return errText;
     const drillOption = drillOptionRef.current;
-
     return (
       <ChartIFrameContainer
         dataset={dataset}
@@ -247,8 +228,9 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     chart,
     widgetSpecialConfig,
   ]);
+
   return (
-    <Wrapper className="widget-chart" ref={ref}>
+    <Wrapper id={renderMode + wid} className="widget-chart" ref={ref}>
       <ChartFrameBox>
         <PreviewBlock>
           <ChartDrillContext.Provider
