@@ -31,7 +31,22 @@ const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
   const { drillOption, onDrillOptionChange } = useContext(ChartDrillContext);
 
   const currentDrillLevel = drillOption?.getCurrentDrillLevel();
-
+  const selectDrillStatusMenu = useMemo(() => {
+    return (
+      <Menu.Item key="selectDrillStatus">
+        <StyledMenuSwitch
+          className={classnames({ on: !!drillOption?.isSelectedDrill })}
+        >
+          <p>
+            {drillOption?.isSelectedDrill
+              ? t('selectDrillOn')
+              : t('selectDrillOff')}
+          </p>
+          <CheckOutlined className="icon" />
+        </StyledMenuSwitch>
+      </Menu.Item>
+    );
+  }, [drillOption?.isSelectedDrill, t]);
   const contextMenu = useMemo(() => {
     return (
       <StyledChartDrillMenu
@@ -65,23 +80,16 @@ const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
           !drillOption?.isBottomLevel && (
             <Menu.Item key={DrillMode.Expand}>{t('expandNextLevel')}</Menu.Item>
           )}
-        {drillOption?.mode !== DrillMode.Expand && (
-          <Menu.Item key="selectDrillStatus">
-            <StyledMenuSwitch
-              className={classnames({ on: !!drillOption?.isSelectedDrill })}
-            >
-              <p>
-                {drillOption?.isSelectedDrill
-                  ? t('selectDrillOn')
-                  : t('selectDrillOff')}
-              </p>
-              <CheckOutlined className="icon" />
-            </StyledMenuSwitch>
-          </Menu.Item>
-        )}
+        {drillOption?.mode !== DrillMode.Expand && selectDrillStatusMenu}
       </StyledChartDrillMenu>
     );
-  }, [drillOption, currentDrillLevel, t, onDrillOptionChange]);
+  }, [
+    currentDrillLevel,
+    t,
+    drillOption,
+    selectDrillStatusMenu,
+    onDrillOptionChange,
+  ]);
 
   return (
     <StyledChartDrill className="chart-drill-menu-container">
