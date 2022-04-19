@@ -1236,19 +1236,27 @@
   },
   "member": {
     "memberDetail": {
-      "title": "Member detail",
+      "titleAdd": "Add Member",
+      "titleDetail": "Member detail",
       "grantOwner": "Granted to organization owner",
       "revokeOwner": "Revoke owner",
       "remove": "Remove",
       "removeConfirm": "Remove confirm",
       "removeSuccess": "Remove successful",
+      "delete": "Delete",
+      "deleteConfirm": "Delete confirm",
+      "deleteSuccess": "Delete successful",
       "grantSuccess": "Grant successful",
       "revokeSuccess": "Revoke successful",
       "username": "Username",
       "email": "Email",
+      "password": "Password",
+      "changePassword": "Click to change password",
       "name": "Name",
+      "description": "Description",
       "roles": "Roles",
-      "assignRole": "Assign roles"
+      "assignRole": "Assign roles",
+      "createSuccess": "Member created successfully"
     },
     "roleDetail": {
       "role": "Role",
@@ -1267,7 +1275,12 @@
     "form": {
       "email": "Email",
       "search": "Search or paste the emails of invited members",
-      "needConfirm": "Need email confirmation"
+      "needConfirm": "Need email confirmation",
+      "password": "Password",
+      "username": "Username",
+      "name": "Name",
+      "description": "Description",
+      "roles": "Roles"
     },
     "sidebar": {
       "member": "Members",
@@ -1276,6 +1289,7 @@
       "inviteMember": "Invite member",
       "inviteSuccess": "The invitation email has been sent successfully",
       "invalidEmail": "Invalid email addresses",
+      "addMember": "Add Member",
       "roleTitle": "Roles",
       "addRole": "Create role"
     }

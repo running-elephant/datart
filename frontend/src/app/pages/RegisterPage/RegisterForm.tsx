@@ -79,6 +79,7 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
               required: true,
               message: `${t('email')}${tg('validation.required')}`,
             },
+            { type: 'email' },
           ]}
         >
           <Input placeholder={t('email')} type="email" size="large" />

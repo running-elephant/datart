@@ -85,7 +85,7 @@ export function OrgSettingPage() {
     <Wrapper>
       <Card title={t('info')}>
         <Form
-          name="source_form_"
+          name="org_form_"
           form={form}
           labelAlign="left"
           labelCol={{ offset: 1, span: 7 }}

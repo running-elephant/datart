@@ -20,7 +20,7 @@ import { GithubOutlined } from '@ant-design/icons';
 import { Alert, Button, Popover, Space, Spin } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useResizeObserver from 'app/hooks/useResizeObserver';
-import { selectVersion } from 'app/slice/selectors';
+import { selectSystemInfo } from 'app/slice/selectors';
 import { transparentize } from 'polished';
 import React, { memo, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -36,7 +36,7 @@ import { Results } from './Results';
 export const Outputs = memo(() => {
   const { actions } = useViewSlice();
   const dispatch = useDispatch();
-  const version = useSelector(selectVersion);
+  const systemInfo = useSelector(selectSystemInfo);
   const t = useI18NPrefix('view');
 
   const error = useSelector(state =>
@@ -68,14 +68,15 @@ export const Outputs = memo(() => {
         title: 'Sql parse bug',
       };
       if (type === 'github') {
-        params.body = `version: ${version}\n` + warnings.join('');
+        params.body = `version: ${systemInfo?.version}\n` + warnings.join('');
       } else {
-        params.description = `version: ${version}\n` + warnings.join('');
+        params.description =
+          `version: ${systemInfo?.version}\n` + warnings.join('');
       }
       let url = newIssueUrl(params);
       window.open(url);
     },
-    [warnings, version],
+    [warnings, systemInfo],
   );
 
   return (
