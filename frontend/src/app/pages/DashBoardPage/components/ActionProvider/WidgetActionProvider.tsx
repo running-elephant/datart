@@ -178,14 +178,14 @@ export const WidgetActionProvider: FC<{
       //
       onWidgetChartClick: (widget: Widget, params: ChartMouseEventParams) => {
         dispatch(
-          widgetChartClickAction(
+          widgetChartClickAction({
             boardId,
-            boardEditing,
+            editing: boardEditing,
             renderMode,
             widget,
             params,
             history,
-          ),
+          }),
         );
       },
 
