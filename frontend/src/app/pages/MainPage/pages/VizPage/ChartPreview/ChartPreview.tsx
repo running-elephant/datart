@@ -444,9 +444,6 @@ const PreviewBlock = styled.div`
   padding: ${SPACE_LG};
   overflow: hidden;
   box-shadow: ${p => p.theme.shadowBlock};
-  .chart-drill-path {
-    background-color: ${p => p.theme.componentBackground};
-  }
 `;
 
 const ChartWrapper = styled.div`

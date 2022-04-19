@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionField } from 'app/types/ChartConfig';
-
+import { DrillMode } from 'app/models/ChartDrillOption';
+import { ChartDataSectionField, FilterCondition } from 'app/types/ChartConfig';
 export interface IChartDrillOption {
   mode: DrillMode;
   isSelectedDrill: boolean;
