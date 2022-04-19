@@ -59,6 +59,10 @@ export class ChartDrillOption implements IChartDrillOption {
     return this.isSelected;
   }
 
+  public get isBottomLevel() {
+    return this.cursor + 2 === this.drillFields.length;
+  }
+
   public get canSelect() {
     return isEmptyArray(this.expandDownFields);
   }
@@ -92,6 +96,10 @@ export class ChartDrillOption implements IChartDrillOption {
       : this.mode === DrillMode.Drill
       ? [this.drillFields?.[this.cursor + 1]]
       : this.drillFields.slice(0, this.cursor + 2);
+  }
+
+  public getCurrentDrillLevel(): number {
+    return this.cursor + 1;
   }
 
   public drillDown(filterData?: { [key in string]: any }) {
@@ -182,7 +190,6 @@ export class ChartDrillOption implements IChartDrillOption {
 
   private clearAll() {
     this.cursor = -1;
-    this.isSelected = false;
     this.drillDownFields = [];
     this.expandDownFields = [];
   }

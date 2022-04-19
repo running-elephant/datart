@@ -47,6 +47,7 @@ import { downloadFile } from 'app/utils/fetch';
 import { BASE_RESOURCE_URL } from 'globalConstants';
 import { changeLang } from 'locales/i18n';
 import React, { cloneElement, useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
@@ -84,6 +85,7 @@ export function Navbar() {
   const [modifyPasswordVisible, setModifyPasswordVisible] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
+  const { i18n } = useTranslation();
   const systemInfo = useSelector(selectSystemInfo);
   const orgId = useSelector(selectOrgId);
   const currentOrganization = useSelector(selectCurrentOrganization);
@@ -228,7 +230,9 @@ export function Navbar() {
           break;
         case 'zh':
         case 'en':
-          changeLang(key);
+          if (i18n.language !== key) {
+            changeLang(key);
+          }
           break;
         case 'dark':
         case 'light':
@@ -238,7 +242,7 @@ export function Navbar() {
           break;
       }
     },
-    [dispatch, history, handleChangeThemeFn],
+    [dispatch, history, i18n, handleChangeThemeFn],
   );
 
   const onSetPolling = useCallback(
