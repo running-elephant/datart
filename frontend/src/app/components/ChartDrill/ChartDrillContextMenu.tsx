@@ -98,7 +98,6 @@ const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
         overlay={contextMenu}
         destroyPopupOnHide={true}
         trigger={['contextMenu']}
-        getPopupContainer={triggerNode => triggerNode}
       >
         <div style={{ height: '100%' }}>{children}</div>
       </Dropdown>

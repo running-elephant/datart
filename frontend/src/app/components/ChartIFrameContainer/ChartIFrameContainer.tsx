@@ -39,6 +39,7 @@ const ChartIFrameContainer: FC<{
   isShown?: boolean;
   drillOption?: IChartDrillOption;
   widgetSpecialConfig?: any;
+  scale?: [number, number];
 }> = memo(props => {
   const iframeContainerId = `chart-iframe-root-${props.containerId}`;
 
@@ -115,15 +116,19 @@ const ChartIFrameContainer: FC<{
 
                   var iframe = document.getElementById(iframeContainerId);
                   if (iframe) {
+                    const [scaleX = 1, scaleY = 1] = props.scale || [];
                     var boundingClientRect = iframe.getBoundingClientRect();
                     var evt = new CustomEvent('contextmenu', {
                       bubbles: true,
                       cancelable: false,
                     }) as any;
-                    evt.clientX = event.clientX + boundingClientRect.left;
-                    evt.pageX = event.clientX + boundingClientRect.left;
-                    evt.clientY = event.clientY + boundingClientRect.top;
-                    evt.pageY = event.clientY + boundingClientRect.top;
+                    evt.clientX =
+                      event.clientX * scaleX + boundingClientRect.left;
+                    evt.pageX =
+                      event.clientX * scaleX + boundingClientRect.left;
+                    evt.clientY =
+                      event.clientY * scaleY + boundingClientRect.top;
+                    evt.pageY = event.clientY * scaleY + boundingClientRect.top;
                     iframe.dispatchEvent(evt);
                   }
                 }}
