@@ -33,7 +33,7 @@ const ChartDrillPaths: FC<{}> = memo(() => {
 
   const drilledFields = drillOption.getDrilledFields();
   return (
-    <StyledChartDrillPaths className="chart-drill-path">
+    <StyledChartDrillPaths>
       <Breadcrumb>
         {drilledFields.map(f => {
           return (
@@ -64,6 +64,7 @@ export default ChartDrillPaths;
 
 const StyledChartDrillPaths = styled.div`
   padding: ${SPACE_XS} ${SPACE_SM};
+  background-color: ${p => p.theme.componentBackground};
 `;
 
 const StyledDrillNode = styled(Breadcrumb.Item)<{ isActive: boolean }>`
