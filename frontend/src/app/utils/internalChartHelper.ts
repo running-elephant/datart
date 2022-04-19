@@ -22,6 +22,7 @@ import {
   ChartDataViewFieldCategory,
   DataViewFieldType,
 } from 'app/constants';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -33,6 +34,7 @@ import {
   ChartStyleConfigDTO,
 } from 'app/types/ChartConfigDTO';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
   cond,
   curry,
@@ -601,4 +603,46 @@ export const buildDragItem = (item, children: any[] = []) => {
     category: item?.category,
     children: children.map(c => buildDragItem(c)),
   };
+};
+
+/**
+ * Get all Drill Paths
+ *
+ * @param {ChartDataConfig[]} configs
+ * @return {*}  {ChartDataSectionField[]}
+ */
+const getDrillPaths = (
+  configs?: ChartDataConfig[],
+): ChartDataSectionField[] => {
+  return (configs || [])
+    ?.filter(c => c.type === ChartDataSectionType.GROUP)
+    ?.filter(d => Boolean(d.drillable))
+    ?.flatMap(r => r.rows || []);
+};
+
+/**
+ * Create or Update Chart Drill Option
+ *
+ * @param {ChartDataConfig[]} [datas]
+ * @param {IChartDrillOption} [drillOption]
+ * @return {*}  {(IChartDrillOption | undefined)}
+ */
+export const getChartDrillOption = (
+  datas?: ChartDataConfig[],
+  drillOption?: IChartDrillOption,
+): IChartDrillOption | undefined => {
+  const newDrillPaths = getDrillPaths(datas);
+  if (isEmptyArray(newDrillPaths)) {
+    return undefined;
+  }
+  if (
+    !isEmptyArray(newDrillPaths) &&
+    drillOption
+      ?.getAllFields()
+      ?.map(p => p.uid)
+      .join('-') !== newDrillPaths.map(p => p.uid).join('-')
+  ) {
+    return new ChartDrillOption(newDrillPaths);
+  }
+  return drillOption;
 };

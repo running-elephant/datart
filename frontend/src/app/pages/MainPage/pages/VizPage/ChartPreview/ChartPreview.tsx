@@ -24,20 +24,18 @@ import { VizHeader } from 'app/components/VizHeader';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
-import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import { getDrillPaths } from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
+import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
-import { isEmptyArray } from 'utils/object';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import { useVizSlice } from '../slice';
 import {
@@ -118,19 +116,10 @@ const ChartPreviewBoard: FC<{
         setVersion(newChartPreview.version);
         setChartPreview(newChartPreview);
 
-        const drillPaths = getDrillPaths(newChartPreview?.chartConfig?.datas);
-        if (isEmptyArray(drillPaths)) {
-          drillOptionRef.current = undefined;
-        }
-        if (
-          !isEmptyArray(drillPaths) &&
-          drillOptionRef.current
-            ?.getAllFields()
-            ?.map(p => p.uid)
-            .join('-') !== drillPaths.map(p => p.uid).join('-')
-        ) {
-          drillOptionRef.current = new ChartDrillOption(drillPaths);
-        }
+        drillOptionRef.current = getChartDrillOption(
+          newChartPreview?.chartConfig?.datas,
+          drillOptionRef?.current,
+        );
 
         if (
           !chart ||
