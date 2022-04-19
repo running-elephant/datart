@@ -73,7 +73,7 @@ datart:
   server:
     address: ${datart.address:http://127.0.0.1:8080}
 
-  # 租户管理模式：plateform-平台(默认)，team-团队
+  # 租户管理模式：platform-平台(默认)，team-团队
   tenant-management-mode: platform
   # 团队管理员用户名/密码: 仅team模式且两者都不为空时重置
   admin:
