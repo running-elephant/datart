@@ -1,5 +1,9 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
+import {
+  boardDrillManager,
+  EDIT_PREFIX,
+} from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
@@ -413,7 +417,10 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
     if (!curWidget) return null;
     const dataChartMap = boardState.dataChartMap;
     const boardLinkFilters = boardInfo.linkFilter;
-
+    const drillOption = boardDrillManager.getWidgetDrill({
+      bid: EDIT_PREFIX + curWidget.dashboardId,
+      wid: widgetId,
+    });
     let requestParams = getChartWidgetRequestParams({
       widgetId,
       widgetMap,
@@ -422,6 +429,7 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
       widgetInfo,
       dataChartMap,
       boardLinkFilters,
+      drillOption,
     });
     if (!requestParams) {
       return null;
