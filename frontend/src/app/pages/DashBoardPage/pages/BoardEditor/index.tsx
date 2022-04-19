@@ -142,6 +142,7 @@ export const BoardEditor: React.FC<{
   useEffect(() => {
     initialization();
     return () => {
+      console.log('__ 销毁 ed');
       // fix issue: #800
       onCloseChartEditor();
       dispatch(clearEditBoardState());

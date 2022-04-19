@@ -31,10 +31,10 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class ExternalRegisterRedirectStrategy {
 
-    private static final String redirectUrl = "/auth";
+    private static final String redirectUrl = "/authorization";
 
     public void redirect(HttpServletRequest request, HttpServletResponse response, String token) throws Exception {
-        String target = redirectUrl + "?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8.name());
+        String target = redirectUrl + "/" + URLEncoder.encode(token, StandardCharsets.UTF_8.name());
         response.setHeader(Const.TOKEN, token);
         response.sendRedirect(target);
     }

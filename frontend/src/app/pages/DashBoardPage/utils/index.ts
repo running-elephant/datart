@@ -25,6 +25,7 @@ import {
 } from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import {
   RelatedView,
   WidgetType,
@@ -39,6 +40,7 @@ import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';
 import moment from 'moment';
 import { CloneValueDeep } from 'utils/object';
+import { boardDrillManager } from '../components/BoardDrillManager/BoardDrillManager';
 import { BOARD_FILE_IMG_PREFIX } from '../constants';
 import {
   BoardLinkFilter,
@@ -93,11 +95,13 @@ export const getRGBAColor = color => {
   }
 };
 
-export const getDataChartRequestParams = (
-  dataChart: DataChart,
-  view: ChartDataView,
-  option,
-) => {
+export const getDataChartRequestParams = (obj: {
+  dataChart: DataChart;
+  view: ChartDataView;
+  drillOption?: ChartDrillOption;
+  option;
+}) => {
+  const { dataChart, view, option, drillOption } = obj;
   const migratedChartConfig = migrateChartConfig(
     CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
   );
@@ -117,6 +121,7 @@ export const getDataChartRequestParams = (
   );
   let requestParams = builder
     .addExtraSorters((option?.sorters as any) || [])
+    .addDrillOption(drillOption)
     .build();
   return requestParams;
 };
@@ -357,6 +362,7 @@ export const getChartWidgetRequestParams = (obj: {
   viewMap: Record<string, ChartDataView>;
   dataChartMap: Record<string, DataChart>;
   boardLinkFilters?: BoardLinkFilter[];
+  drillOption: ChartDrillOption | undefined;
 }) => {
   const {
     widgetId,
@@ -366,6 +372,7 @@ export const getChartWidgetRequestParams = (obj: {
     dataChartMap,
     option,
     boardLinkFilters,
+    drillOption,
   } = obj;
   if (!widgetId) return null;
   const curWidget = widgetMap[widgetId];
@@ -382,12 +389,12 @@ export const getChartWidgetRequestParams = (obj: {
 
   const chartDataView = viewMap[dataChart?.viewId];
 
-  let requestParams = getDataChartRequestParams(
+  let requestParams = getDataChartRequestParams({
     dataChart,
-    chartDataView,
-    option,
-  );
-
+    view: chartDataView,
+    option: option,
+    drillOption,
+  });
   const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
     chartWidget: curWidget,
     widgetMap,
@@ -452,6 +459,11 @@ export const getBoardChartRequests = (params: {
   const chartRequest = chartWidgetIds
     .map(widgetId => {
       const isWidget = widgetMap[widgetId].datachartId.indexOf('widget') !== -1;
+      const boardId = widgetMap[widgetId].dashboardId;
+      const drillOption = boardDrillManager.getWidgetDrill({
+        bid: boardId,
+        wid: widgetId,
+      });
       return {
         ...getChartWidgetRequestParams({
           widgetId,
@@ -460,6 +472,7 @@ export const getBoardChartRequests = (params: {
           option: undefined,
           widgetInfo: undefined,
           dataChartMap,
+          drillOption,
         }),
         ...{
           vizName: widgetMap[widgetId].config.name,

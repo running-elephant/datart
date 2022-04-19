@@ -173,7 +173,7 @@ const ChartForShare: FC<{
         </div>
         <ChartDrillPaths />
       </ChartDrillContext.Provider>
-      <ChartDrillPaths />x
+      <ChartDrillPaths />
       <HeadlessBrowserIdentifier
         renderSign={headlessBrowserRenderSign}
         width={Number(width) || 0}

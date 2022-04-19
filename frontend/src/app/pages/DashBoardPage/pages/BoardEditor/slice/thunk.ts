@@ -1,9 +1,12 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
+import {
+  boardDrillManager,
+  EDIT_PREFIX,
+} from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
-  ContainerWidgetContent,
   ControllerWidgetContent,
   DataChart,
   getDataOption,
@@ -342,20 +345,6 @@ export const renderedEditWidgetAsync = createAsyncThunk<
 
     dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
 
-    if (curWidget.config.type === 'container') {
-      const content = curWidget.config.content as ContainerWidgetContent;
-      let subWidgetIds: string[] = [];
-      subWidgetIds = Object.values(content.itemMap)
-        .map(item => item.childWidgetId)
-        .filter(id => !!id);
-      // 1 widget render
-      dispatch(editWidgetInfoActions.renderedWidgets(subWidgetIds));
-      //  2 widget getData
-      subWidgetIds.forEach(wid => {
-        dispatch(getEditWidgetData({ widget: WidgetMap[wid] }));
-      });
-      return null;
-    }
     // 2 widget getData
     dispatch(getEditWidgetData({ widget: curWidget }));
     return null;
@@ -428,7 +417,10 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
     if (!curWidget) return null;
     const dataChartMap = boardState.dataChartMap;
     const boardLinkFilters = boardInfo.linkFilter;
-
+    const drillOption = boardDrillManager.getWidgetDrill({
+      bid: EDIT_PREFIX + curWidget.dashboardId,
+      wid: widgetId,
+    });
     let requestParams = getChartWidgetRequestParams({
       widgetId,
       widgetMap,
@@ -437,6 +429,7 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
       widgetInfo,
       dataChartMap,
       boardLinkFilters,
+      drillOption,
     });
     if (!requestParams) {
       return null;

@@ -800,9 +800,8 @@
       "drill": {
         "showNextLevel": "显示下一层级",
         "expandNextLevel": "展开下一层级",
-        "selectDrillStatus": "鼠标点击钻取状态",
-        "enable": "开启",
-        "disable": "关闭",
+        "selectDrillOn": "已开启“点击下钻”",
+        "selectDrillOff": "开启“点击下钻”",
         "rollUp": "上卷"
       }
     },

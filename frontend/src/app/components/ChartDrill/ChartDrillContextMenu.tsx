@@ -16,35 +16,47 @@
  * limitations under the License.
  */
 
+import { CheckOutlined } from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { DrillMode } from 'app/models/ChartDrillOption';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import classnames from 'classnames';
 import { FC, memo, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
+import { FONT_WEIGHT_MEDIUM, SPACE_SM } from 'styles/StyleConstants';
 
 const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
   const t = useI18NPrefix(`viz.palette.drill`);
   const { drillOption, onDrillOptionChange } = useContext(ChartDrillContext);
 
+  const currentDrillLevel = drillOption?.getCurrentDrillLevel();
+  const selectDrillStatusMenu = useMemo(() => {
+    return (
+      <Menu.Item key="selectDrillStatus">
+        <StyledMenuSwitch
+          className={classnames({ on: !!drillOption?.isSelectedDrill })}
+        >
+          <p>
+            {drillOption?.isSelectedDrill
+              ? t('selectDrillOn')
+              : t('selectDrillOff')}
+          </p>
+          <CheckOutlined className="icon" />
+        </StyledMenuSwitch>
+      </Menu.Item>
+    );
+  }, [drillOption?.isSelectedDrill, t]);
   const contextMenu = useMemo(() => {
     return (
-      <Menu
-        style={{ width: 200 }}
+      <StyledChartDrillMenu
         onClick={({ key }) => {
           if (!drillOption) {
             return;
           }
-          if (key === 'enable') {
-            if (!drillOption?.isSelectedDrill) {
-              drillOption?.toggleSelectedDrill(true);
-              onDrillOptionChange?.(drillOption);
-            }
-          } else if (key === 'disable') {
-            if (drillOption?.isSelectedDrill) {
-              drillOption?.toggleSelectedDrill(false);
-              onDrillOptionChange?.(drillOption);
-            }
+          if (key === 'selectDrillStatus') {
+            drillOption?.toggleSelectedDrill(!drillOption?.isSelectedDrill);
+            onDrillOptionChange?.(drillOption);
           } else if (key === DrillMode.Drill) {
             drillOption?.drillDown();
             onDrillOptionChange?.(drillOption);
@@ -57,34 +69,27 @@ const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
           }
         }}
       >
-        <Menu.Item key={'rollUp'}>{t('rollUp')}</Menu.Item>
-        <Menu.Item
-          disabled={drillOption?.mode === DrillMode.Expand}
-          key={DrillMode.Drill}
-        >
-          {t('showNextLevel')}
-        </Menu.Item>
-        <Menu.Item
-          disabled={drillOption?.mode === DrillMode.Drill}
-          key={DrillMode.Expand}
-        >
-          {t('expandNextLevel')}
-        </Menu.Item>
-        <Menu.SubMenu
-          disabled={drillOption?.mode === DrillMode.Expand}
-          key="selectDrillStatus"
-          title={t('selectDrillStatus')}
-        >
-          <Menu.Item key="enable" disabled={drillOption?.isSelectedDrill}>
-            {t('enable')}
-          </Menu.Item>
-          <Menu.Item key="disable" disabled={!drillOption?.isSelectedDrill}>
-            {t('disable')}
-          </Menu.Item>
-        </Menu.SubMenu>
-      </Menu>
+        {!!currentDrillLevel && (
+          <Menu.Item key={'rollUp'}>{t('rollUp')}</Menu.Item>
+        )}
+        {drillOption?.mode !== DrillMode.Expand &&
+          !drillOption?.isBottomLevel && (
+            <Menu.Item key={DrillMode.Drill}>{t('showNextLevel')}</Menu.Item>
+          )}
+        {drillOption?.mode !== DrillMode.Drill &&
+          !drillOption?.isBottomLevel && (
+            <Menu.Item key={DrillMode.Expand}>{t('expandNextLevel')}</Menu.Item>
+          )}
+        {drillOption?.mode !== DrillMode.Expand && selectDrillStatusMenu}
+      </StyledChartDrillMenu>
     );
-  }, [drillOption, t, onDrillOptionChange]);
+  }, [
+    currentDrillLevel,
+    t,
+    drillOption,
+    selectDrillStatusMenu,
+    onDrillOptionChange,
+  ]);
 
   return (
     <StyledChartDrill className="chart-drill-menu-container">
@@ -106,4 +111,34 @@ export default ChartDrillContextMenu;
 const StyledChartDrill = styled.div`
   position: relative;
   width: 100%;
+`;
+
+const StyledChartDrillMenu = styled(Menu)`
+  min-width: 200px;
+`;
+
+const StyledMenuSwitch = styled.div`
+  display: flex;
+  align-items: center;
+
+  p {
+    flex: 1;
+  }
+
+  .icon {
+    display: none;
+  }
+
+  &.on {
+    p {
+      font-weight: ${FONT_WEIGHT_MEDIUM};
+    }
+
+    .icon {
+      display: block;
+      flex-shrink: 0;
+      padding-left: ${SPACE_SM};
+      color: ${p => p.theme.success};
+    }
+  }
 `;

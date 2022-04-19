@@ -138,6 +138,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
 
     @Override
+    @Transactional
     public boolean register(UserRegisterParam userRegisterParam, boolean sendMail) throws MessagingException, UnsupportedEncodingException {
         if (!checkUserName(userRegisterParam.getUsername())) {
             log.error("The username({}) has been registered", userRegisterParam.getUsername());
