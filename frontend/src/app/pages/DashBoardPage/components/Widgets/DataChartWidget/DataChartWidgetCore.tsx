@@ -40,19 +40,20 @@ import React, {
   useRef,
 } from 'react';
 import styled from 'styled-components/macro';
-import { BORDER_RADIUS } from 'styles/StyleConstants';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import {
   boardDrillManager,
   EDIT_PREFIX,
 } from '../../BoardDrillManager/BoardDrillManager';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { BoardScaleContext } from '../../FreeBoardBackground';
 import { WidgetChartContext } from '../../WidgetProvider/WidgetChartProvider';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
 export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const dataChart = useContext(WidgetChartContext);
+  const scale = useContext(BoardScaleContext);
   const { data } = useContext(WidgetDataContext);
   const { renderMode } = useContext(BoardContext);
   const widget = useContext(WidgetContext);
@@ -211,6 +212,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         drillOption={drillOption}
         containerId={wid}
         widgetSpecialConfig={widgetSpecialConfig}
+        scale={scale}
       />
     );
   }, [
@@ -218,11 +220,11 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     cacheH,
     cacheW,
     errText,
-    drillOptionRef,
-    wid,
     dataset,
     chart,
+    wid,
     widgetSpecialConfig,
+    scale,
   ]);
 
   return (
@@ -262,8 +264,6 @@ const ChartWrapper = styled.div`
   position: relative;
   display: flex;
   flex: 1;
-  background-color: ${p => p.theme.componentBackground};
-  border-radius: ${BORDER_RADIUS};
   .chart-drill-menu-container {
     height: 100%;
   }
