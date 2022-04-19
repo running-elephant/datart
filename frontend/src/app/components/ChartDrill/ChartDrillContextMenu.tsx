@@ -67,7 +67,7 @@ const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
           )}
         {drillOption?.mode !== DrillMode.Expand && (
           <Menu.Item key="selectDrillStatus">
-            <MenuSwitch
+            <StyledMenuSwitch
               className={classnames({ on: !!drillOption?.isSelectedDrill })}
             >
               <p>
@@ -76,7 +76,7 @@ const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
                   : t('selectDrillOff')}
               </p>
               <CheckOutlined className="icon" />
-            </MenuSwitch>
+            </StyledMenuSwitch>
           </Menu.Item>
         )}
       </StyledChartDrillMenu>
@@ -109,7 +109,7 @@ const StyledChartDrillMenu = styled(Menu)`
   min-width: 200px;
 `;
 
-const MenuSwitch = styled.div`
+const StyledMenuSwitch = styled.div`
   display: flex;
   align-items: center;
 
