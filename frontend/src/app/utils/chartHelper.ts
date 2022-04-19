@@ -1564,18 +1564,3 @@ export const getDrillableRows = (
       return config.rows || [];
     });
 };
-
-/**
- * Get all Drill Paths
- *
- * @param {ChartDataConfig[]} configs
- * @return {*}  {ChartDataSectionField[]}
- */
-export const getDrillPaths = (
-  configs?: ChartDataConfig[],
-): ChartDataSectionField[] => {
-  return (configs || [])
-    ?.filter(c => c.type === ChartDataSectionType.GROUP)
-    ?.filter(d => Boolean(d.drillable))
-    ?.flatMap(r => r.rows || []);
-};

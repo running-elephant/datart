@@ -22,7 +22,6 @@ import { DownloadFileType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
-import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import workbenchSlice, {
   useWorkbenchSlice,
@@ -52,9 +51,11 @@ import {
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
-import { getDrillPaths } from 'app/utils/chartHelper';
 import { makeDownloadDataTask } from 'app/utils/fetch';
-import { transferChartConfigs } from 'app/utils/internalChartHelper';
+import {
+  getChartDrillOption,
+  transferChartConfigs,
+} from 'app/utils/internalChartHelper';
 import { CommonFormTypes } from 'globalConstants';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -200,12 +201,8 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   }, [backendChart?.config?.chartGraphId]);
 
   useEffect(() => {
-    const drillPaths = getDrillPaths(chartConfig?.datas);
-    if (isEmptyArray(drillPaths)) {
-      drillOptionRef.current = undefined;
-    }
-    if (!isEmptyArray(drillPaths) && !drillOptionRef.current) {
-      drillOptionRef.current = new ChartDrillOption(drillPaths);
+    if (!isEmptyArray(chartConfig?.datas) && !drillOptionRef.current) {
+      drillOptionRef.current = getChartDrillOption(chartConfig?.datas);
     }
   }, [chartConfig?.datas, drillOptionRef]);
 
@@ -219,7 +216,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               const option = drillOptionRef.current;
               option.drillDown(param.data.rowData);
               drillOptionRef.current = option;
-              handleDrillOptionChange(option);
+              handleDrillOptionChange?.(option);
               return;
             }
             if (
@@ -273,6 +270,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         },
       }),
     );
+    drillOptionRef.current = getChartDrillOption(
+      chartConfig?.datas,
+      drillOptionRef.current,
+    );
   }, [dispatch, chart?.meta?.id, registerChartEvents]);
 
   const handleChartChange = (c: IChart) => {
@@ -292,6 +293,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         },
       }),
     );
+    drillOptionRef.current = getChartDrillOption(
+      chartConfig?.datas,
+      drillOptionRef.current,
+    );
     if (!expensiveQuery) {
       dispatch(refreshDatasetAction({ drillOption: drillOptionRef?.current }));
     } else {
@@ -301,20 +306,6 @@ export const ChartEditor: FC<ChartEditorProps> = ({
 
   const handleChartConfigChange = useCallback(
     (type, payload) => {
-      const drillPaths = getDrillPaths(chartConfig?.datas);
-      if (isEmptyArray(drillPaths)) {
-        drillOptionRef.current = undefined;
-      }
-      if (
-        !isEmptyArray(drillPaths) &&
-        drillOptionRef.current
-          ?.getAllFields()
-          ?.map(p => p.uid)
-          .join('-') !== drillPaths.map(p => p.uid).join('-')
-      ) {
-        drillOptionRef.current = new ChartDrillOption(drillPaths);
-      }
-
       if (expensiveQuery) {
         dispatch(
           workbenchSlice.actions.updateChartConfig({
@@ -332,11 +323,17 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           type,
           payload,
           needRefresh: payload.needRefresh,
-          drillOption: drillOptionRef?.current,
+          updateDrillOption: config => {
+            drillOptionRef.current = getChartDrillOption(
+              config?.datas,
+              drillOptionRef.current,
+            );
+            return drillOptionRef.current;
+          },
         }),
       );
     },
-    [chartConfig?.datas, dispatch, expensiveQuery],
+    [dispatch, expensiveQuery],
   );
 
   const handleDataViewChanged = useCallback(() => {
