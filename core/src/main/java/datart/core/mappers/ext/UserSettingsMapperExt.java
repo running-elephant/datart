@@ -17,7 +17,7 @@ public interface UserSettingsMapperExt extends UserSettingsMapper {
     List<UserSettings> selectByUser(String userId);
 
     @Delete({
-            "DELETE FROM user_settings t WHERE t.user_id = #{userId}"
+            "DELETE FROM user_settings WHERE user_id = #{userId}"
     })
     int deleteByUser(String userId);
 
