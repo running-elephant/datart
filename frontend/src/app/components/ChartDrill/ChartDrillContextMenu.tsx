@@ -57,12 +57,14 @@ const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
         {!!currentDrillLevel && (
           <Menu.Item key={'rollUp'}>{t('rollUp')}</Menu.Item>
         )}
-        {drillOption?.mode !== DrillMode.Expand && (
-          <Menu.Item key={DrillMode.Drill}>{t('showNextLevel')}</Menu.Item>
-        )}
-        {drillOption?.mode !== DrillMode.Drill && (
-          <Menu.Item key={DrillMode.Expand}>{t('expandNextLevel')}</Menu.Item>
-        )}
+        {drillOption?.mode !== DrillMode.Expand &&
+          !drillOption?.isBottomLevel && (
+            <Menu.Item key={DrillMode.Drill}>{t('showNextLevel')}</Menu.Item>
+          )}
+        {drillOption?.mode !== DrillMode.Drill &&
+          !drillOption?.isBottomLevel && (
+            <Menu.Item key={DrillMode.Expand}>{t('expandNextLevel')}</Menu.Item>
+          )}
         {drillOption?.mode !== DrillMode.Expand && (
           <Menu.Item key="selectDrillStatus">
             <MenuSwitch

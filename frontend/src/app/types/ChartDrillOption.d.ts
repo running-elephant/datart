@@ -21,6 +21,7 @@ import { ChartDataSectionField } from 'app/types/ChartConfig';
 export interface IChartDrillOption {
   mode: DrillMode;
   isSelectedDrill: boolean;
+  isBottomLevel: boolean;
   canSelect: boolean;
   toggleSelectedDrill(enable?: boolean): void;
   getAllFields(): ChartDataSectionField[];
