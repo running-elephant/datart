@@ -78,11 +78,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       let drillOption;
       drillOption = option;
       drillOptionRef.current = drillOption;
-      boardDrillManager.setWidgetDrill({
-        bid,
-        wid,
-        drillOption,
-      });
+      boardDrillManager.setWidgetDrill({ bid, wid, drillOption });
       onWidgetGetData(widgetRef.current);
     },
 
@@ -232,20 +228,18 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   return (
     <Wrapper id={renderMode + wid} className="widget-chart" ref={ref}>
       <ChartFrameBox>
-        <PreviewBlock>
-          <ChartDrillContext.Provider
-            value={{
-              drillOption: drillOptionRef.current,
-              onDrillOptionChange: handleDrillOptionChange,
-            }}
-          >
-            <ChartWrapper>
-              <ChartDrillContextMenu>{chartFrame}</ChartDrillContextMenu>
-            </ChartWrapper>
+        <ChartDrillContext.Provider
+          value={{
+            drillOption: drillOptionRef.current,
+            onDrillOptionChange: handleDrillOptionChange,
+          }}
+        >
+          <ChartWrapper>
+            <ChartDrillContextMenu>{chartFrame}</ChartDrillContextMenu>
+          </ChartWrapper>
 
-            <ChartDrillPaths />
-          </ChartDrillContext.Provider>
-        </PreviewBlock>
+          <ChartDrillPaths />
+        </ChartDrillContext.Provider>
       </ChartFrameBox>
     </Wrapper>
   );
@@ -257,6 +251,9 @@ const Wrapper = styled.div`
 `;
 const ChartFrameBox = styled.div`
   position: absolute;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -270,13 +267,4 @@ const ChartWrapper = styled.div`
   .chart-drill-menu-container {
     height: 100%;
   }
-`;
-const PreviewBlock = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  box-shadow: ${p => p.theme.shadowBlock};
 `;
