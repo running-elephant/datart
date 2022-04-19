@@ -22,7 +22,7 @@ import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillC
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
-import { SPACE_TIMES } from 'styles/StyleConstants';
+import { SPACE_SM, SPACE_XS } from 'styles/StyleConstants';
 
 const ChartDrillPaths: FC<{}> = memo(() => {
   const { drillOption, onDrillOptionChange } = useContext(ChartDrillContext);
@@ -38,6 +38,7 @@ const ChartDrillPaths: FC<{}> = memo(() => {
         {drilledFields.map(f => {
           return (
             <StyledDrillNode
+              key={f.uid}
               isActive={Boolean(
                 drillOption?.getCurrentFields()?.some(df => df.uid === f.uid),
               )}
@@ -62,11 +63,11 @@ const ChartDrillPaths: FC<{}> = memo(() => {
 export default ChartDrillPaths;
 
 const StyledChartDrillPaths = styled.div`
-  padding-left: ${SPACE_TIMES(2)};
+  padding: ${SPACE_XS} ${SPACE_SM};
 `;
 
 const StyledDrillNode = styled(Breadcrumb.Item)<{ isActive: boolean }>`
+  color: ${p => (p.isActive ? p.theme.primary : p.theme.normal)} !important;
   cursor: pointer;
   user-select: none;
-  color: ${p => (p.isActive ? p.theme.primary : p.theme.normal)} !important;
 `;

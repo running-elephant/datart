@@ -30,6 +30,7 @@ export interface IChartDrillOption {
     condition?: FilterCondition;
   }>;
   getCurrentFields(): ChartDataSectionField[] | undefined;
+  getCurrentDrillLevel(): number;
   drillDown(filterData?: { [key in string]: any }): void;
   expandDown(): void;
   drillUp(field?: ChartDataSectionField): void;
