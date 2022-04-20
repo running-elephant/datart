@@ -263,9 +263,9 @@ export const Toolbar = memo(({ allowManage, allowEnableViz }: ToolbarProps) => {
           />
         </Space>
       </Operates>
-      {allowManage && (
-        <Actions>
-          <Space>
+      <Actions>
+        <Space>
+          {allowManage && (
             <Tooltip
               title={
                 <TipTitle
@@ -281,18 +281,18 @@ export const Toolbar = memo(({ allowManage, allowEnableViz }: ToolbarProps) => {
                 onClick={onSave}
               />
             </Tooltip>
-
-            {!isNewView(id) && (
-              <Tooltip title={t('info')} placement="bottom">
-                <ToolbarButton
-                  icon={<SettingFilled />}
-                  disabled={isArchived}
-                  color={INFO}
-                  onClick={showEdit}
-                />
-              </Tooltip>
-            )}
-
+          )}
+          {allowManage && (
+            <Tooltip title={t('info')} placement="bottom">
+              <ToolbarButton
+                icon={<SettingFilled />}
+                disabled={isArchived || isNewView(id)}
+                color={INFO}
+                onClick={showEdit}
+              />
+            </Tooltip>
+          )}
+          {allowManage && (
             <Tooltip title={t('saveAs')} placement="bottom">
               <ToolbarButton
                 icon={<CopyFilled />}
@@ -301,24 +301,24 @@ export const Toolbar = memo(({ allowManage, allowEnableViz }: ToolbarProps) => {
                 color={INFO}
               />
             </Tooltip>
-            {/* <Tooltip title={t('saveFragment')} placement="bottom">
+          )}
+          {/* <Tooltip title={t('saveFragment')} placement="bottom">
             <ToolbarButton icon={<SnippetsFilled />} />
           </Tooltip> */}
-          </Space>
-        </Actions>
-      )}
-      {allowEnableViz && (
-        <Tooltip title={t('startAnalysis')} placement="bottom">
-          <ToolbarButton
-            disabled={isNewView(id)}
-            icon={<MonitorOutlined />}
-            color={INFO}
-            onClick={() => {
-              startAnalysis(id);
-            }}
-          />
-        </Tooltip>
-      )}
+          {allowEnableViz && (
+            <Tooltip title={t('startAnalysis')} placement="bottom">
+              <ToolbarButton
+                disabled={isNewView(id)}
+                icon={<MonitorOutlined />}
+                color={INFO}
+                onClick={() => {
+                  startAnalysis(id);
+                }}
+              />
+            </Tooltip>
+          )}
+        </Space>
+      </Actions>
     </Container>
   );
 });
