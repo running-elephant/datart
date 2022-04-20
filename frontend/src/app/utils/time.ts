@@ -48,8 +48,8 @@ export function getTime(
   };
 }
 
-export function formatTime(time: string | Moment, format): string {
-  return moment(time).format(format);
+export function formatTime(time: string | Moment, format?): string {
+  return moment(time).format(format || TIME_FORMATTER);
 }
 
 export function recommendTimeRangeConverter(relativeTimeRange) {
