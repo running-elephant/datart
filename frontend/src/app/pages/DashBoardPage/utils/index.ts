@@ -35,7 +35,7 @@ import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
-import { getTime } from 'app/utils/time';
+import { getTime, splitRangerDateFilters } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';
 import moment from 'moment';
@@ -428,6 +428,9 @@ export const getChartWidgetRequestParams = (obj: {
 
   // filter 去重
   requestParams.filters = getDistinctFiltersByColumn(requestParams.filters);
+  // splitRangerDateFilters
+  requestParams.filters = splitRangerDateFilters(requestParams.filters);
+
   // 变量
   if (variableParams) {
     requestParams.params = variableParams;

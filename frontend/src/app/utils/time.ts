@@ -16,7 +16,13 @@
  * limitations under the License.
  */
 
-import { RECOMMEND_TIME, TIME_FORMATTER } from 'globalConstants';
+import { DataViewFieldType } from 'app/constants';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import {
+  FilterSqlOperator,
+  RECOMMEND_TIME,
+  TIME_FORMATTER,
+} from 'globalConstants';
 import moment, { Moment, unitOfTime } from 'moment';
 
 export function getTimeRange(
@@ -75,3 +81,36 @@ export function recommendTimeRangeConverter(relativeTimeRange) {
   }
   return timeRange;
 }
+
+export const splitRangerDateFilters = (filters: ChartDataRequestFilter[]) => {
+  if (!Array.isArray(filters)) return [];
+  const newFilter = [] as ChartDataRequestFilter[];
+  filters.forEach(filter => {
+    let isTargetFilter = false;
+    if (
+      filter.sqlOperator === FilterSqlOperator.Between &&
+      filter.values?.[0].valueType === DataViewFieldType.DATE
+    ) {
+      isTargetFilter = true;
+    }
+    if (!isTargetFilter) {
+      newFilter.push(filter);
+      return;
+    }
+    // split date range filters
+    if (filter.values?.[0] && filter.values?.[1]) {
+      const start: ChartDataRequestFilter = {
+        ...filter,
+        sqlOperator: FilterSqlOperator.GreaterThanOrEqual,
+        values: [filter.values?.[0]],
+      };
+      const end: ChartDataRequestFilter = {
+        ...filter,
+        sqlOperator: FilterSqlOperator.LessThan,
+        values: [filter.values?.[1]],
+      };
+      newFilter.push(start, end);
+    }
+  });
+  return newFilter;
+};
