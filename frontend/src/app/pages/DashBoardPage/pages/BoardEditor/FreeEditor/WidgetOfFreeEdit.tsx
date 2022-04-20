@@ -34,7 +34,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
-import { scaleContext } from '../../../components/FreeBoardBackground';
+import { BoardScaleContext } from '../../../components/FreeBoardBackground';
 import { editBoardStackActions } from '../slice';
 import { widgetMove, widgetMoveEnd } from '../slice/events';
 import { selectSelectedIds } from '../slice/selectors';
@@ -48,7 +48,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const { onUpdateWidgetConfig } = useContext(WidgetActionContext);
 
   const dispatch = useDispatch();
-  const scale = useContext(scaleContext);
+  const scale = useContext(BoardScaleContext);
   const { x, y, width, height } = widget.config.rect;
   const [curXY, setCurXY] = useState<[number, number]>([
     widget.config.rect.x,

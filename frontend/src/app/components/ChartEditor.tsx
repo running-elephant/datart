@@ -212,7 +212,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         {
           name: 'click',
           callback: param => {
-            if (drillOptionRef.current?.isSelectedDrill) {
+            if (
+              drillOptionRef.current?.isSelectedDrill &&
+              !drillOptionRef.current.isBottomLevel
+            ) {
               const option = drillOptionRef.current;
               option.drillDown(param.data.rowData);
               drillOptionRef.current = option;

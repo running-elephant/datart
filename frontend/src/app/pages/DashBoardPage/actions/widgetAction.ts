@@ -17,7 +17,6 @@
  */
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams } from 'app/types/Chart';
-import { History } from 'history';
 import i18next from 'i18next';
 import { RootState } from 'types';
 import { jumpTypes } from '../constants';
@@ -106,13 +105,14 @@ export const tableChartClickAction =
   };
 
 export const widgetClickJumpAction =
-  (
-    renderMode: VizRenderMode,
-    widget: Widget,
-    params: ChartMouseEventParams,
-    history: History,
-  ) =>
+  (obj: {
+    renderMode: VizRenderMode;
+    widget: Widget;
+    params: ChartMouseEventParams;
+    history: any;
+  }) =>
   (dispatch, getState) => {
+    const { renderMode, widget, params, history } = obj;
     const state = getState() as RootState;
     const orgId = state?.main?.orgId || '';
     const folderIds = state.viz?.vizs?.map(v => v.relId) || [];
@@ -245,15 +245,16 @@ export const widgetClickLinkageAction =
   };
 //
 export const widgetChartClickAction =
-  (
-    boardId: string,
-    editing: boolean,
-    renderMode: VizRenderMode,
-    widget: Widget,
-    params: ChartMouseEventParams,
-    history: History,
-  ) =>
+  (obj: {
+    boardId: string;
+    editing: boolean;
+    renderMode: VizRenderMode;
+    widget: Widget;
+    params: ChartMouseEventParams;
+    history: any;
+  }) =>
   dispatch => {
+    const { boardId, editing, renderMode, widget, params, history } = obj;
     //is tableChart
     if (
       params.componentType === 'table' &&
@@ -267,7 +268,7 @@ export const widgetChartClickAction =
     // jump
     const jumpConfig = widget.config?.jumpConfig;
     if (jumpConfig && jumpConfig.open) {
-      dispatch(widgetClickJumpAction(renderMode, widget, params, history));
+      dispatch(widgetClickJumpAction({ renderMode, widget, params, history }));
       return;
     }
     // linkage
