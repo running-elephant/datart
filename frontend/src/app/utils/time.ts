@@ -83,7 +83,7 @@ export function recommendTimeRangeConverter(relativeTimeRange) {
 }
 
 export const splitRangerDateFilters = (filters: ChartDataRequestFilter[]) => {
-  if (!Array.isArray(filters)) return filters;
+  if (!Array.isArray(filters)) return [];
   const newFilter = [] as ChartDataRequestFilter[];
   filters.forEach(filter => {
     let isTargetFilter = false;
