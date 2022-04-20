@@ -64,7 +64,6 @@ export default ChartDrillPaths;
 
 const StyledChartDrillPaths = styled.div`
   padding: ${SPACE_XS} ${SPACE_SM};
-  background-color: ${p => p.theme.componentBackground};
 `;
 
 const StyledDrillNode = styled(Breadcrumb.Item)<{ isActive: boolean }>`

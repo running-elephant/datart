@@ -23,6 +23,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { boardDrillManager } from '../../components/BoardDrillManager/BoardDrillManager';
 import { TitleHeader } from '../../components/BoardHeader/TitleHeader';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardInitProvider } from '../../components/BoardProvider/BoardInitProvider';
@@ -151,6 +152,7 @@ export const Board: FC<BoardProps> = memo(
       // 销毁组件 清除该对象缓存
       return () => {
         dispatch(boardActions.clearBoardStateById(boardId));
+        boardDrillManager.clearMapByBoardId(boardId);
       };
     }, [boardId, dispatch, fetchData, searchParams]);
 

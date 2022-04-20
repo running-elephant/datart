@@ -40,19 +40,20 @@ import React, {
   useRef,
 } from 'react';
 import styled from 'styled-components/macro';
-import { BORDER_RADIUS } from 'styles/StyleConstants';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import {
   boardDrillManager,
   EDIT_PREFIX,
 } from '../../BoardDrillManager/BoardDrillManager';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { BoardScaleContext } from '../../FreeBoardBackground';
 import { WidgetChartContext } from '../../WidgetProvider/WidgetChartProvider';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
 export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const dataChart = useContext(WidgetChartContext);
+  const scale = useContext(BoardScaleContext);
   const { data } = useContext(WidgetDataContext);
   const { renderMode } = useContext(BoardContext);
   const widget = useContext(WidgetContext);
@@ -78,11 +79,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       let drillOption;
       drillOption = option;
       drillOptionRef.current = drillOption;
-      boardDrillManager.setWidgetDrill({
-        bid,
-        wid,
-        drillOption,
-      });
+      boardDrillManager.setWidgetDrill({ bid, wid, drillOption });
       onWidgetGetData(widgetRef.current);
     },
 
@@ -215,6 +212,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         drillOption={drillOption}
         containerId={wid}
         widgetSpecialConfig={widgetSpecialConfig}
+        scale={scale}
       />
     );
   }, [
@@ -222,30 +220,28 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     cacheH,
     cacheW,
     errText,
-    drillOptionRef,
-    wid,
     dataset,
     chart,
+    wid,
     widgetSpecialConfig,
+    scale,
   ]);
 
   return (
     <Wrapper id={renderMode + wid} className="widget-chart" ref={ref}>
       <ChartFrameBox>
-        <PreviewBlock>
-          <ChartDrillContext.Provider
-            value={{
-              drillOption: drillOptionRef.current,
-              onDrillOptionChange: handleDrillOptionChange,
-            }}
-          >
-            <ChartWrapper>
-              <ChartDrillContextMenu>{chartFrame}</ChartDrillContextMenu>
-            </ChartWrapper>
+        <ChartDrillContext.Provider
+          value={{
+            drillOption: drillOptionRef.current,
+            onDrillOptionChange: handleDrillOptionChange,
+          }}
+        >
+          <ChartWrapper>
+            <ChartDrillContextMenu>{chartFrame}</ChartDrillContextMenu>
+          </ChartWrapper>
 
-            <ChartDrillPaths />
-          </ChartDrillContext.Provider>
-        </PreviewBlock>
+          <ChartDrillPaths />
+        </ChartDrillContext.Provider>
       </ChartFrameBox>
     </Wrapper>
   );
@@ -257,6 +253,9 @@ const Wrapper = styled.div`
 `;
 const ChartFrameBox = styled.div`
   position: absolute;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -265,18 +264,7 @@ const ChartWrapper = styled.div`
   position: relative;
   display: flex;
   flex: 1;
-  background-color: ${p => p.theme.componentBackground};
-  border-radius: ${BORDER_RADIUS};
   .chart-drill-menu-container {
     height: 100%;
   }
-`;
-const PreviewBlock = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  box-shadow: ${p => p.theme.shadowBlock};
 `;

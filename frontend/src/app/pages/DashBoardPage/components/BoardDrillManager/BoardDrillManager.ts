@@ -1,5 +1,3 @@
-import { ChartDrillOption } from 'app/models/ChartDrillOption';
-
 /**
  * Datart
  *
@@ -17,7 +15,9 @@ import { ChartDrillOption } from 'app/models/ChartDrillOption';
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 type WidgetDrillMap = Record<string, ChartDrillOption | undefined>;
+export const EDIT_PREFIX = '@EDIT@';
 export class BoardDrillManager {
   private static _manager: BoardDrillManager;
   private boardMap: Record<string, WidgetDrillMap> = {};
@@ -59,4 +59,3 @@ export class BoardDrillManager {
 }
 
 export const boardDrillManager = BoardDrillManager.getInstance();
-export const EDIT_PREFIX = '@EDIT@';
