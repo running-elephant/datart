@@ -40,6 +40,7 @@ import React, {
   useRef,
 } from 'react';
 import styled from 'styled-components/macro';
+import { uuidv4 } from 'utils/utils';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import {
   boardDrillManager,
@@ -64,7 +65,9 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     }
     return dashboardId;
   }, [dashboardId, renderMode]);
-
+  const containerId = useMemo(() => {
+    return `${wid}_${uuidv4()}`;
+  }, [wid]);
   const { onWidgetChartClick } = useContext(WidgetActionContext);
   const { cacheWhRef: ref, cacheW, cacheH } = useCacheWidthHeight();
   const { onWidgetGetData } = useContext(WidgetActionContext);
@@ -210,7 +213,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         width={cacheW}
         height={cacheH}
         drillOption={drillOption}
-        containerId={wid}
+        containerId={containerId}
         widgetSpecialConfig={widgetSpecialConfig}
         scale={scale}
       />
@@ -222,13 +225,13 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     errText,
     dataset,
     chart,
-    wid,
+    containerId,
     widgetSpecialConfig,
     scale,
   ]);
 
   return (
-    <Wrapper id={renderMode + wid} className="widget-chart" ref={ref}>
+    <Wrapper className="widget-chart" ref={ref}>
       <ChartFrameBox>
         <ChartDrillContext.Provider
           value={{
