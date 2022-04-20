@@ -69,7 +69,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     return `${wid}_${uuidv4()}`;
   }, [wid]);
   const { onWidgetChartClick } = useContext(WidgetActionContext);
-  const { cacheWhRef: ref, cacheW, cacheH } = useCacheWidthHeight();
+  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
   const { onWidgetGetData } = useContext(WidgetActionContext);
   const widgetRef = useRef<Widget>(widget);
   const drillOptionRef = useRef<IChartDrillOption>();
@@ -229,45 +229,35 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     widgetSpecialConfig,
     scale,
   ]);
-
+  const drillContextVal = {
+    drillOption: drillOptionRef.current,
+    onDrillOptionChange: handleDrillOptionChange,
+  };
   return (
-    <Wrapper className="widget-chart" ref={ref}>
-      <ChartFrameBox>
-        <ChartDrillContext.Provider
-          value={{
-            drillOption: drillOptionRef.current,
-            onDrillOptionChange: handleDrillOptionChange,
-          }}
-        >
-          <ChartWrapper>
-            <ChartDrillContextMenu>{chartFrame}</ChartDrillContextMenu>
-          </ChartWrapper>
-
+    <ChartDrillContext.Provider value={drillContextVal}>
+      <ChartDrillContextMenu>
+        <StyledWrapper>
+          <ChartFrameBox ref={cacheWhRef}>{chartFrame}</ChartFrameBox>
           <ChartDrillPaths />
-        </ChartDrillContext.Provider>
-      </ChartFrameBox>
-    </Wrapper>
+        </StyledWrapper>
+      </ChartDrillContextMenu>
+    </ChartDrillContext.Provider>
   );
 });
-const Wrapper = styled.div`
+const StyledWrapper = styled.div`
   position: relative;
-  display: flex;
-  flex: 1;
-`;
-const ChartFrameBox = styled.div`
-  position: absolute;
   display: flex;
   flex: 1;
   flex-direction: column;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-`;
-const ChartWrapper = styled.div`
-  position: relative;
-  display: flex;
-  flex: 1;
   .chart-drill-menu-container {
     height: 100%;
   }
+`;
+const ChartFrameBox = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
 `;
