@@ -418,7 +418,10 @@ const ChartPreviewBoard: FC<{
                 </ChartDrillContextMenu>
               </Spin>
             </ChartWrapper>
-            <ChartDrillPaths />
+            <StyledChartDrillPathsContainer>
+              <ChartDrillPaths />
+            </StyledChartDrillPathsContainer>
+            <StyledChartDrillPathsContainer />
           </ChartDrillContext.Provider>
         </PreviewBlock>
       </StyledChartPreviewBoard>
@@ -463,4 +466,8 @@ const ChartWrapper = styled.div`
       height: 100%;
     }
   }
+`;
+
+const StyledChartDrillPathsContainer = styled.div`
+  background-color: ${p => p.theme.componentBackground};
 `;

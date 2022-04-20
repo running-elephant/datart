@@ -45,7 +45,7 @@ import ChartTypeSelector, {
 } from './components/ChartTypeSelector';
 
 const CHART_TYPE_SELECTOR_HEIGHT_OFFSET = 50;
-const CHART_DRILL_PATH_HEIGHT = 24;
+const CHART_DRILL_PATH_HEIGHT = 40;
 
 const ChartPresentPanel: FC<{
   containerHeight?: number;
