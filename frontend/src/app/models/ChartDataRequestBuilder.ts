@@ -381,7 +381,6 @@ export class ChartDataRequestBuilder {
 
         if (this.aggregation === false) {
           if (
-            cur.type === ChartDataSectionType.GROUP ||
             cur.type === ChartDataSectionType.COLOR ||
             cur.type === ChartDataSectionType.AGGREGATE ||
             cur.type === ChartDataSectionType.SIZE ||
@@ -389,6 +388,27 @@ export class ChartDataRequestBuilder {
             cur.type === ChartDataSectionType.MIXED
           ) {
             return acc.concat(cur.rows);
+          } else if (cur.type === ChartDataSectionType.GROUP) {
+            if (cur.drillable) {
+              if (
+                !this.drillOption ||
+                this.drillOption?.mode === DrillMode.Normal ||
+                !this.drillOption?.getCurrentFields()
+              ) {
+                return acc.concat(cur.rows?.[0] || []);
+              }
+              return acc.concat(
+                cur.rows?.filter(field => {
+                  return Boolean(
+                    this.drillOption
+                      ?.getCurrentFields()
+                      ?.some(df => df.uid === field.uid),
+                  );
+                }) || [],
+              );
+            } else {
+              return acc.concat(cur.rows);
+            }
           }
         }
 
