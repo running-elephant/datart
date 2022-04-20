@@ -297,7 +297,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       }),
     );
     drillOptionRef.current = getChartDrillOption(
-      chartConfig?.datas,
+      finalChartConfig?.datas,
       drillOptionRef.current,
     );
     if (!expensiveQuery) {
