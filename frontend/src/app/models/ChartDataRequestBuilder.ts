@@ -36,7 +36,7 @@ import {
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import { getValue } from 'app/utils/chartHelper';
+import { getInterimDateAggregateRows, getValue } from 'app/utils/chartHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import {
   formatTime,
@@ -46,7 +46,6 @@ import {
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 import { DrillMode } from './ChartDrillOption';
-
 export class ChartDataRequestBuilder {
   extraSorters: ChartDataRequest['orders'] = [];
   chartDataConfigs: ChartDataConfig[];
@@ -143,16 +142,18 @@ export class ChartDataRequestBuilder {
           return acc.concat(cur.rows || []);
         }
         if (cur.type === ChartDataSectionType.GROUP) {
+          const rows = getInterimDateAggregateRows(cur.rows);
+
           if (cur.drillable) {
             if (
               !this.drillOption ||
               this.drillOption?.mode === DrillMode.Normal ||
               !this.drillOption?.getCurrentFields()
             ) {
-              return acc.concat(cur.rows?.[0] || []);
+              return acc.concat(rows?.[0] || []);
             }
             return acc.concat(
-              cur.rows?.filter(field => {
+              rows?.filter(field => {
                 return Boolean(
                   this.drillOption
                     ?.getCurrentFields()
@@ -161,7 +162,7 @@ export class ChartDataRequestBuilder {
               }) || [],
             );
           }
-          return acc.concat(cur.rows || []);
+          return acc.concat(rows || []);
         }
         if (cur.type === ChartDataSectionType.MIXED) {
           const dateAndStringFields = cur.rows?.filter(v =>

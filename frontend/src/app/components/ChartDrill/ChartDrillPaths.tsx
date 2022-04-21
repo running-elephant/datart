@@ -66,7 +66,7 @@ const StyledChartDrillPaths = styled.div`
 `;
 
 const StyledDrillNode = styled(Breadcrumb.Item)<{ isActive: boolean }>`
+  color: ${p => (p.isActive ? p.theme.primary : p.theme.normal)} !important;
   cursor: pointer;
   user-select: none;
-  color: ${p => (p.isActive ? p.theme.primary : p.theme.normal)} !important;
 `;

@@ -39,6 +39,7 @@ const ChartDraggableElementField: FC<{
   columnConfig;
   ancestors;
   aggregation;
+  sourceSupportDateField;
   onConfigChanged;
   handleOpenActionModal;
 }> = memo(
@@ -48,6 +49,7 @@ const ChartDraggableElementField: FC<{
     columnConfig,
     ancestors,
     aggregation,
+    sourceSupportDateField,
     onConfigChanged,
     handleOpenActionModal,
   }) => {
@@ -60,6 +62,7 @@ const ChartDraggableElementField: FC<{
           ancestors={ancestors}
           config={config}
           modalSize={modalSize}
+          sourceSupportDateField={sourceSupportDateField}
           onConfigChanged={onConfigChanged}
           onOpenModal={handleOpenActionModal}
         />

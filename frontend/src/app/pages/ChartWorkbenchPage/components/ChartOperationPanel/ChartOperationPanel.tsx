@@ -73,6 +73,7 @@ const ChartOperationPanel: FC<{
       if (component === LayoutComponentType.CONFIG) {
         return (
           <ChartConfigPanel
+            dataView={dataView}
             chartId={chart?.meta?.id}
             chartConfig={chartConfig}
             expensiveQuery={expensiveQuery}

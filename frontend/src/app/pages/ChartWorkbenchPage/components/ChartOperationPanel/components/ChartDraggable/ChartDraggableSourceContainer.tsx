@@ -307,8 +307,8 @@ export default ChartDraggableSourceContainer;
 
 const Container = styled.div<{ flexDirection?: string }>`
   display: flex;
-  flex-direction: ${p => p.flexDirection || 'row'};
   flex: 1;
+  flex-direction: ${p => p.flexDirection || 'row'};
   padding: ${SPACE_TIMES(0.5)} ${SPACE} ${SPACE_TIMES(0.5)} ${SPACE_TIMES(2)};
   font-size: ${FONT_SIZE_SUBTITLE};
   font-weight: ${FONT_WEIGHT_MEDIUM};
@@ -359,7 +359,7 @@ const CollapseWrapper = styled(Collapse)`
 `;
 const StyledFieldContent = styled.p`
   flex: 1;
-  word-break: break-all;
   overflow: hidden;
   text-overflow: ellipsis;
+  word-break: break-all;
 `;

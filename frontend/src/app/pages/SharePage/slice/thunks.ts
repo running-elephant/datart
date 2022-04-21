@@ -30,6 +30,7 @@ import { handleServerStoryAction } from 'app/pages/StoryBoardPage/slice/actions'
 import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { convertToChartDto } from 'app/utils/ChartDtoHelper';
+import { fetchFieldFunctionsAsync } from 'app/utils/fetch';
 import { RootState } from 'types';
 import persistence from 'utils/persistence';
 import { request2 } from 'utils/request';
@@ -215,3 +216,45 @@ export const updateFilterAndFetchDatasetForShare = createAsyncThunk(
     };
   },
 );
+
+export const updateGroupAndFetchDatasetForShare = createAsyncThunk(
+  'share/updateGroupAndFetchDatasetForShare',
+  async (
+    arg: {
+      backendChartId: string;
+      chartPreview?: ChartPreview;
+      payload;
+      drillOption?: IChartDrillOption;
+    },
+    thunkAPI,
+  ) => {
+    await thunkAPI.dispatch(
+      shareActions.updateChartPreviewGroup({
+        backendChartId: arg.backendChartId,
+        payload: arg.payload,
+      }),
+    );
+    const state = thunkAPI.getState() as RootState;
+    const shareState = state.share;
+    await thunkAPI.dispatch(
+      fetchShareDataSetByPreviewChartAction({
+        preview: shareState?.chartPreview!,
+        drillOption: arg.drillOption,
+      }),
+    );
+    return {
+      backendChartId: arg.backendChartId,
+    };
+  },
+);
+
+export const fetchsourceSupportDateField = createAsyncThunk<
+  string[],
+  { sourceId: string }
+>('workbench/fetchsourceSupportDateField', async arg => {
+  try {
+    return await fetchFieldFunctionsAsync(arg.sourceId);
+  } catch (err) {
+    throw err;
+  }
+});

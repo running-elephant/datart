@@ -484,7 +484,8 @@
         "AGG_DATE_QUARTER": "Quarter",
         "AGG_DATE_MONTH": "Month",
         "AGG_DATE_WEEK": "Week",
-        "AGG_DATE_DAY": "Day"
+        "AGG_DATE_DAY": "Day",
+        "default": "Default"
       }
     },
     "palette": {
@@ -694,7 +695,8 @@
             "colorRange": "colorize",
             "colorSingle": "colorize",
             "size": "size",
-            "chooseTheme": "Choose theme"
+            "chooseTheme": "Choose theme",
+            "dateAggregate": "Date aggregate"
           }
         }
       },

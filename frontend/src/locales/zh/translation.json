@@ -484,7 +484,8 @@
         "AGG_DATE_QUARTER": "按季度",
         "AGG_DATE_MONTH": "按月",
         "AGG_DATE_WEEK": "按周",
-        "AGG_DATE_DAY": "按日"
+        "AGG_DATE_DAY": "按日",
+        "default": "默认"
       }
     },
     "palette": {
@@ -694,7 +695,8 @@
             "colorRange": "着色",
             "colorSingle": "着色",
             "size": "大小",
-            "chooseTheme": "选择主题"
+            "chooseTheme": "选择主题",
+            "dateAggregate": "日期聚合"
           }
         }
       },

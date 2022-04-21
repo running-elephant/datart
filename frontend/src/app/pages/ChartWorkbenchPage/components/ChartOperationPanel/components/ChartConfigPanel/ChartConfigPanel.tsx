@@ -34,6 +34,7 @@ import {
   ChartDataConfig,
   ChartStyleConfig,
 } from 'app/types/ChartConfig';
+import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -56,6 +57,7 @@ const CONFIG_PANEL_TABS = {
 };
 
 const ChartConfigPanel: FC<{
+  dataView?: ChartDataView;
   chartId?: string;
   chartConfig?: ChartConfig;
   expensiveQuery?: boolean;

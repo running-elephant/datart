@@ -21,16 +21,24 @@ import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMe
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { VizHeader } from 'app/components/VizHeader';
+import { ChartDataViewFieldCategory } from 'app/constants';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
+import { sourceSupportDateFieldSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
+import { fetchsourceSupportDateField } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import { getDrillPaths } from 'app/utils/chartHelper';
+import {
+  getDrillPaths,
+  getInterimDateAggregateRows,
+  handledateAggregaeToComputedFields,
+} from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -52,6 +60,7 @@ import {
   publishViz,
   removeTab,
   updateFilterAndFetchDataset,
+  updateGroupAndFetchDataset,
 } from '../slice/thunks';
 import { ChartPreview } from '../slice/types';
 import { urlSearchTransfer } from '../utils';
@@ -73,7 +82,6 @@ const ChartPreviewBoard: FC<{
     allowShare,
     allowManage,
   }) => {
-    useVizSlice();
     // NOTE: avoid initialize width or height is zero that cause echart sampling calculation issue.
     const defaultChartContainerWH = 1;
     const {
@@ -81,12 +89,15 @@ const ChartPreviewBoard: FC<{
       cacheW,
       cacheH,
     } = useCacheWidthHeight(defaultChartContainerWH, defaultChartContainerWH);
+    useWorkbenchSlice();
+    const { actions: vizAction } = useVizSlice();
     const { actions } = useMainSlice();
     const chartManager = ChartManager.instance();
     const dispatch = useDispatch();
     const [version, setVersion] = useState<string>();
     const previewCharts = useSelector(selectPreviewCharts);
     const publishLoading = useSelector(selectPublishLoading);
+    const sourceSupportDateField = useSelector(sourceSupportDateFieldSelector);
     const [chartPreview, setChartPreview] = useState<ChartPreview>();
     const [chart, setChart] = useState<IChart>();
     const [loadingStatus, setLoadingStatus] = useState<boolean>(false);
@@ -109,6 +120,17 @@ const ChartPreviewBoard: FC<{
         }),
       );
     }, [dispatch, orgId, backendChartId, filterSearchUrl]);
+
+    useEffect(() => {
+      const sourceId = chartPreview?.backendChart?.view.sourceId;
+      if (sourceId) {
+        dispatch(
+          fetchsourceSupportDateField({
+            sourceId: sourceId,
+          }),
+        );
+      }
+    }, [chartPreview?.backendChart?.view.sourceId, dispatch]);
 
     useEffect(() => {
       const newChartPreview = previewCharts.find(
@@ -375,6 +397,34 @@ const ChartPreviewBoard: FC<{
       );
     };
 
+    const handleChartDrillDataAggregationChange = async (type, payload) => {
+      const rows = getInterimDateAggregateRows(payload.value?.rows);
+      const dateAggregationField = rows.filter(
+        v => v.category === ChartDataViewFieldCategory.DateAggregationField,
+      );
+      const deleteColName = payload.value.deleteColName;
+      const computedFields = handledateAggregaeToComputedFields(
+        dateAggregationField,
+        deleteColName,
+        chartPreview?.backendChart?.config?.computedFields,
+        chartPreview?.chartConfig,
+      );
+
+      await dispatch(
+        vizAction.updateComputedFields({
+          backendChartId,
+          computedFields,
+        }),
+      );
+      await dispatch(
+        updateGroupAndFetchDataset({
+          backendChartId,
+          payload: payload,
+          drillOption: drillOptionRef?.current,
+        }),
+      );
+    };
+
     return (
       <StyledChartPreviewBoard>
         <VizHeader
@@ -400,6 +450,9 @@ const ChartPreviewBoard: FC<{
             value={{
               drillOption: drillOptionRef.current,
               onDrillOptionChange: handleDrillOptionChange,
+              sourceSupportDateField,
+              onChartDrillDataAggregationChange:
+                handleChartDrillDataAggregationChange,
             }}
           >
             <div>
@@ -412,7 +465,7 @@ const ChartPreviewBoard: FC<{
             </div>
             <ChartWrapper ref={ref}>
               <Spin wrapperClassName="spinWrapper" spinning={loadingStatus}>
-                <ChartDrillContextMenu>
+                <ChartDrillContextMenu chartConfig={chartPreview?.chartConfig!}>
                   <ChartIFrameContainer
                     key={backendChartId}
                     containerId={backendChartId}

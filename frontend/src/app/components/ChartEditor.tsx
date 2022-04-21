@@ -18,7 +18,11 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
-import { ChartDataViewFieldCategory, DownloadFileType } from 'app/constants';
+import {
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+  DownloadFileType,
+} from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
@@ -38,6 +42,7 @@ import {
   sourceSupportDateFieldSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import {
+  fetchsourceSupportDateField,
   initWorkbenchAction,
   refreshDatasetAction,
   updateChartAction,
@@ -53,7 +58,11 @@ import {
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
-import { getDrillPaths } from 'app/utils/chartHelper';
+import {
+  getDrillPaths,
+  getInterimDateAggregateRows,
+  handledateAggregaeToComputedFields,
+} from 'app/utils/chartHelper';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import { transferChartConfigs } from 'app/utils/internalChartHelper';
 import { updateBy } from 'app/utils/mutation';
@@ -212,6 +221,12 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     }
   }, [chartConfig?.datas, drillOptionRef]);
 
+  useEffect(() => {
+    if (dataview?.sourceId) {
+      dispatch(fetchsourceSupportDateField({ sourceId: dataview.sourceId }));
+    }
+  }, [dataview?.sourceId, dispatch]);
+
   const registerChartEvents = useCallback(
     chart => {
       chart?.registerMouseEvents([
@@ -267,6 +282,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       targetChartConfig,
     );
 
+    dispatch(workbenchSlice.actions.updateCurrentDataViewComputedFields([]));
     dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
     dispatch(
       workbenchSlice.actions.updateChartConfig({
@@ -303,7 +319,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   };
 
   const handleChartConfigChange = useCallback(
-    (type, payload) => {
+    async (type, payload) => {
       const drillPaths = getDrillPaths(chartConfig?.datas);
       if (isEmptyArray(drillPaths)) {
         drillOptionRef.current = undefined;
@@ -329,56 +345,29 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         setAllowQuery(payload.needRefresh);
         return true;
       }
+      if (payload.value.type !== ChartDataSectionType.FILTER) {
+        const dateAggregationField = payload.value.rows.filter(
+          v => v.category === ChartDataViewFieldCategory.DateAggregationField,
+        );
+        const deleteColName = payload.value.deleteColName;
+        const computedFields = handledateAggregaeToComputedFields(
+          dateAggregationField,
+          deleteColName,
+          CloneValueDeep(dataview?.computedFields),
+          chartConfig,
+        );
 
-      const dateAggregationField = payload.value.rows.filter(
-        v => v.category === ChartDataViewFieldCategory.DateAggregationField,
-      );
-      const deleteColName = payload.value.deleteColName;
-
-      /**
-       * Date aggregation field added to function Columns
-       */
-      if (dateAggregationField.length) {
-        const expressionList: any = [];
-        const newComputedFields: any = dataview?.computedFields
-          ? CloneValueDeep(dataview?.computedFields)
-          : [];
-
-        newComputedFields.forEach(v => {
-          if (v.category === ChartDataViewFieldCategory.DateAggregationField) {
-            expressionList.push(v.expression);
-          }
-        });
-
-        dateAggregationField.forEach(v => {
-          if (!expressionList.includes(v.expression)) {
-            newComputedFields.push({
-              category: v.category,
-              id: v.colName,
-              type: v.type,
-              expression: v.expression,
-            });
-          }
-        });
-
-        dispatch(
+        await dispatch(
           workbenchSlice.actions.updateCurrentDataViewComputedFields(
-            newComputedFields,
+            computedFields,
           ),
         );
-      }
-      if (deleteColName) {
-        const newComputedFields: any = dataview?.computedFields?.filter(
-          v => v.id !== deleteColName,
-        );
-        dispatch(
-          workbenchSlice.actions.updateCurrentDataViewComputedFields(
-            newComputedFields,
-          ),
-        );
-        payload = updateBy(payload, draft => {
-          delete draft.value.deleteColName;
-        });
+
+        if (deleteColName) {
+          payload = updateBy(payload, draft => {
+            delete draft.value.deleteColName;
+          });
+        }
       }
 
       dispatch(
@@ -390,7 +379,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         }),
       );
     },
-    [chartConfig?.datas, dispatch, expensiveQuery, dataview?.computedFields],
+    [chartConfig, dispatch, expensiveQuery, dataview],
   );
 
   const handleDataViewChanged = useCallback(() => {
@@ -576,7 +565,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           },
         ],
         fileName: backendChart?.name || 'chart',
-        downloadType: DownloadFileType.Pdf,
+        downloadType: DownloadFileType.Excel,
         resolve: () => {
           dispatch(actions.setChartEditorDownloadPolling(true));
         },
@@ -597,6 +586,35 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const handleDrillOptionChange = (option: IChartDrillOption) => {
     drillOptionRef.current = option;
     dispatch(refreshDatasetAction({ drillOption: option }));
+  };
+
+  const handleDrillDataAggregationChange = async (type, payload) => {
+    const rows = getInterimDateAggregateRows(payload.value?.rows);
+    const dateAggregationField = rows.filter(
+      v => v.category === ChartDataViewFieldCategory.DateAggregationField,
+    );
+    const deleteColName = payload.value.deleteColName;
+    const computedFields = handledateAggregaeToComputedFields(
+      dateAggregationField,
+      deleteColName,
+      dataview?.computedFields,
+      chartConfig,
+    );
+
+    await dispatch(
+      workbenchSlice.actions.updateCurrentDataViewComputedFields(
+        computedFields,
+      ),
+    );
+
+    dispatch(
+      updateChartConfigAndRefreshDatasetAction({
+        type,
+        payload,
+        needRefresh: payload.needRefresh,
+        drillOption: drillOptionRef?.current,
+      }),
+    );
   };
 
   return (
@@ -630,6 +648,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           onDataViewChange={handleDataViewChanged}
           onRefreshDataset={handleRefreshDataset}
           onCreateDownloadDataTask={handleCreateDownloadDataTask}
+          onChartDrillDataAggregationChange={handleDrillDataAggregationChange}
         />
         <SaveForm
           width={400}

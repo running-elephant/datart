@@ -59,6 +59,7 @@ const ChartWorkbench: FC<{
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
   onChartDrillOptionChange?: (option: IChartDrillOption) => void;
+  onChartDrillDataAggregationChange?: (type: string, option: any) => void;
 }> = memo(
   ({
     dataset,
@@ -78,6 +79,7 @@ const ChartWorkbench: FC<{
     onRefreshDataset,
     onCreateDownloadDataTask,
     onChartDrillOptionChange,
+    onChartDrillDataAggregationChange,
   }) => {
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
@@ -93,6 +95,9 @@ const ChartWorkbench: FC<{
           value={{
             drillOption: drillOption,
             onDrillOptionChange: onChartDrillOptionChange,
+            sourceSupportDateField,
+            onChartDrillDataAggregationChange:
+              onChartDrillDataAggregationChange,
           }}
         >
           <ChartDatasetContext.Provider
@@ -104,8 +109,8 @@ const ChartWorkbench: FC<{
             <ChartDataViewContext.Provider
               value={{
                 dataView: dataview,
-                expensiveQuery: expensiveQuery,
                 sourceSupportDateField,
+                expensiveQuery: expensiveQuery,
               }}
             >
               <TimeConfigContext.Provider

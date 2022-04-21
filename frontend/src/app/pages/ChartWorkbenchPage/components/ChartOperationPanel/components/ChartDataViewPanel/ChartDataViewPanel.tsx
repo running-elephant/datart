@@ -29,10 +29,7 @@ import {
   dataviewsSelector,
   makeDataviewTreeSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/selectors';
-import {
-  fetchsourceSupportDateField,
-  fetchViewDetailAction,
-} from 'app/pages/ChartWorkbenchPage/slice/thunks';
+import { fetchViewDetailAction } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useAccess, useCascadeAccess } from 'app/pages/MainPage/Access';
 import {
   PermissionLevels,
@@ -44,7 +41,7 @@ import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { checkComputedFieldAsync } from 'app/utils/fetch';
 import { updateByKey } from 'app/utils/mutation';
-import { FC, memo, useCallback, useEffect, useMemo } from 'react';
+import { FC, memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
@@ -101,7 +98,7 @@ const ChartDataViewPanel: FC<{
   const history = useHistory();
 
   const handleDataViewChange = useCallback(
-    async value => {
+    value => {
       if (dataView?.id === value) {
         return false;
       }
@@ -111,7 +108,7 @@ const ChartDataViewPanel: FC<{
           title: '',
           modalSize: StateModalSize.XSMALL,
           content: () => t('toggleViewTip'),
-          onOk: async () => {
+          onOk: () => {
             onDataViewChange?.();
             dispatch(fetchViewDetailAction(value));
           },
@@ -239,9 +236,7 @@ const ChartDataViewPanel: FC<{
     const computedFields = dataView?.computedFields?.filter(
       v => v.category !== ChartDataViewFieldCategory.DateAggregationField,
     );
-    const allFields = (dataView?.meta || []).concat(
-      dataView?.computedFields || [],
-    );
+    const allFields = (dataView?.meta || []).concat(computedFields || []);
     const hierarchyFields = allFields.filter(
       f => f.role === ColumnRole.Hierarchy,
     );
@@ -285,12 +280,6 @@ const ChartDataViewPanel: FC<{
       handleDataViewChange(defaultViewId);
     }
   });
-
-  useEffect(() => {
-    if (dataView) {
-      dispatch(fetchsourceSupportDateField({ sourceId: dataView.sourceId }));
-    }
-  }, [dataView, dispatch]);
 
   return (
     <StyledChartDataViewPanel>

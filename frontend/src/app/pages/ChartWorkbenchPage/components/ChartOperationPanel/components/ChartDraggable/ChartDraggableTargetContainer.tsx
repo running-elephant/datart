@@ -68,7 +68,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
   }) {
     const { dataset } = useContext(ChartDatasetContext);
     const { drillOption } = useContext(ChartDrillContext);
-    const { dataView } = useContext(VizDataViewContext);
+    const { dataView, sourceSupportDateField } = useContext(VizDataViewContext);
     const [currentConfig, setCurrentConfig] = useState(config);
     const [showModal, contextHolder] = useFieldActionModal({
       i18nPrefix: 'viz.palette.data.enum.actionType',
@@ -101,13 +101,14 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                   uid: uuidv4(),
                   ...val,
                   aggregate: getDefaultAggregate(val),
-                }
+                };
                 if (
                   val.category ===
                   ChartDataViewFieldCategory.DateAggregationField
                 ) {
                   config.colName = `${val.colName}（${t(val.expression)}）`;
                   config.expression = `${val.expression}(${val.colName})`;
+                  config.field = val.colName;
                 }
                 return config;
               }),
@@ -344,6 +345,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 columnConfig: columnConfig,
                 ancestors: ancestors,
                 aggregation: aggregation,
+                sourceSupportDateField,
                 onConfigChanged: onConfigChanged,
                 handleOpenActionModal: handleOpenActionModal,
               };

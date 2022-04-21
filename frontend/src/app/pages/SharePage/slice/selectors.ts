@@ -70,3 +70,8 @@ export const selectSharePassword = createSelector(
   [selectDomain],
   shareState => shareState.sharePassword,
 );
+
+export const sourceSupportDateFieldSelector = createSelector(
+  [selectDomain],
+  shareState => shareState.sourceSupportDateField,
+);

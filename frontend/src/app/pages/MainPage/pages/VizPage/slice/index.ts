@@ -24,6 +24,7 @@ import {
   saveAsDashboard,
   unarchiveViz,
   updateFilterAndFetchDataset,
+  updateGroupAndFetchDataset,
 } from './thunks';
 import { ArchivedViz, VizState, VizTab } from './types';
 import { transferChartConfig } from './utils';
@@ -98,6 +99,39 @@ const slice = createSlice({
             }
           }
         }
+      }
+    },
+    updateChartPreviewGroup(
+      state,
+      action: PayloadAction<{ backendChartId: string; payload }>,
+    ) {
+      const chartPreview = state.chartPreviews.find(
+        c => c.backendChartId === action.payload.backendChartId,
+      );
+
+      if (chartPreview) {
+        const groupSection = chartPreview?.chartConfig?.datas?.find(
+          section => section.type === ChartDataSectionType.GROUP,
+        );
+        if (groupSection) {
+          groupSection.rows = action.payload.payload?.value?.rows;
+        }
+      }
+    },
+    updateComputedFields(
+      state,
+      action: PayloadAction<{
+        backendChartId: string;
+        computedFields: any;
+      }>,
+    ) {
+      const chartPreview = state.chartPreviews.find(
+        c => c.backendChartId === action.payload.backendChartId,
+      );
+
+      if (chartPreview && chartPreview?.backendChart?.config) {
+        chartPreview.backendChart.config.computedFields =
+          action.payload.computedFields;
       }
     },
     clear(state) {
@@ -545,6 +579,18 @@ const slice = createSlice({
       },
     );
     builder.addCase(updateFilterAndFetchDataset.fulfilled, (state, action) => {
+      const index = state.chartPreviews?.findIndex(
+        c => c.backendChartId === action.payload?.backendChartId,
+      );
+      if (index < 0) {
+        return;
+      }
+      state.chartPreviews[index] = {
+        ...state.chartPreviews[index],
+        version: uuidv4(),
+      };
+    });
+    builder.addCase(updateGroupAndFetchDataset.fulfilled, (state, action) => {
       const index = state.chartPreviews?.findIndex(
         c => c.backendChartId === action.payload?.backendChartId,
       );

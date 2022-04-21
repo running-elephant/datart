@@ -108,6 +108,7 @@ export type ChartDataSectionField = {
   type: DataViewFieldType;
   category: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
   expression?: string;
+  field?: string;
 
   sort?: SortFieldAction;
   alias?: AliasFieldAction;
