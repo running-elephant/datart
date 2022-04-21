@@ -36,13 +36,13 @@ export const QueryBtnWidgetCore: React.FC<{}> = memo(() => {
   const { name, nameConfig, background } = widget.config;
 
   return (
-    <Wrap {...nameConfig} background={background.color} onClick={onQuery}>
+    <Wrapper {...nameConfig} background={background.color} onClick={onQuery}>
       <span>{name}</span>
-    </Wrap>
+    </Wrapper>
   );
 });
 
-const Wrap = styled.div<FontConfig & { background: string }>`
+const Wrapper = styled.div<FontConfig & { background: string }>`
   display: flex;
   flex: 1;
   align-items: center;

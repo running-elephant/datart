@@ -88,7 +88,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
       });
     }, [boardId, editing, sortedLayoutWidgets]);
     return (
-      <Wrap>
+      <Wrapper>
         <StyledContainer bg={background}>
           <div className="grid-wrap" ref={gridWrapRef}>
             <div className="widget-row-height" ref={ref}>
@@ -115,12 +115,12 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
             </div>
           )}
         </StyledContainer>
-      </Wrap>
+      </Wrapper>
     );
   },
 );
 
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;

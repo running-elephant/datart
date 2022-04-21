@@ -152,7 +152,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
       [rows],
     );
     return (
-      <Wrap>
+      <Wrapper>
         <div>
           <Space>
             <Button onClick={addRowByField}>从字段填充备选项</Button>
@@ -177,10 +177,10 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
             }
           />
         </div>
-      </Wrap>
+      </Wrapper>
     );
   },
 );
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: block;
 `;

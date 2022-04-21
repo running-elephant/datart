@@ -106,7 +106,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
       [form, viewMap],
     );
     return (
-      <Wrap>
+      <Wrapper>
         <Divider orientation="left">{t('associatedFields')}</Divider>
 
         <div>
@@ -183,11 +183,11 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
             );
           }}
         </Form.List>
-      </Wrap>
+      </Wrapper>
     );
   },
 );
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: block;
   min-height: 150px;
   overflow-y: auto;

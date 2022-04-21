@@ -122,15 +122,15 @@ export const LayerList: React.FC<{}> = memo(() => {
     ));
   return (
     <DndProvider backend={HTML5Backend}>
-      <Wrap onClick={clearSelectedWidgets}>
+      <Wrapper onClick={clearSelectedWidgets}>
         <h3 className="title">组件</h3>
         <div className="nameList">{nameList}</div>
         <div className="bottom"></div>
-      </Wrap>
+      </Wrapper>
     </DndProvider>
   );
 });
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 190px;
