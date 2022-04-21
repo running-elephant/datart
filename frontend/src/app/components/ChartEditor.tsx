@@ -588,7 +588,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     dispatch(refreshDatasetAction({ drillOption: option }));
   };
 
-  const handleDrillDataAggregationChange = async (type, payload) => {
+  const handleDrillDataAggregationChange = (type, payload) => {
     const rows = getInterimDateAggregateRows(payload.value?.rows);
     const dateAggregationField = rows.filter(
       v => v.category === ChartDataViewFieldCategory.DateAggregationField,
@@ -601,7 +601,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       chartConfig,
     );
 
-    await dispatch(
+    dispatch(
       workbenchSlice.actions.updateCurrentDataViewComputedFields(
         computedFields,
       ),
