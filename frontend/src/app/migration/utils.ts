@@ -16,11 +16,18 @@
  * limitations under the License.
  */
 
-import { APP_SEMANTIC_VERSIONS } from './constants';
+import { APP_CURRENT_VERSION, APP_SEMANTIC_VERSIONS } from './constants';
 
 export const versionCanDo = (curVersion: string, testVersion?: string) => {
   let testVersionIndex = APP_SEMANTIC_VERSIONS.indexOf(testVersion || '');
   if (testVersionIndex === -1) return true;
   let curVersionIndex = APP_SEMANTIC_VERSIONS.indexOf(curVersion);
   return curVersionIndex >= testVersionIndex;
+};
+
+export const finale = <T extends { version?: string }>(config: T): T => {
+  if (!versionCanDo(APP_CURRENT_VERSION, config.version)) return config;
+  if (config.version === APP_CURRENT_VERSION) return config;
+  config.version = APP_CURRENT_VERSION;
+  return config;
 };

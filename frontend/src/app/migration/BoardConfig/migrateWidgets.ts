@@ -26,12 +26,8 @@ import {
   fontDefault,
   VALUE_SPLITTER,
 } from 'app/pages/DashBoardPage/utils/widget';
-import { versionCanDo } from '../utils';
-import {
-  APP_VERSION_BETA_0,
-  APP_VERSION_BETA_1,
-  APP_VERSION_BETA_2,
-} from './../constants';
+import { finale, versionCanDo } from '../utils';
+import { APP_VERSION_BETA_0, APP_VERSION_BETA_2 } from './../constants';
 
 /**
  *
@@ -89,12 +85,6 @@ export const beta0 = (widget?: Widget) => {
   return widget;
 };
 
-export const beta1 = (widget?: Widget) => {
-  if (!widget) return undefined;
-  if (!versionCanDo(APP_VERSION_BETA_1, widget?.config.version)) return widget;
-  widget.config.version = APP_VERSION_BETA_1;
-  return widget;
-};
 export const beta2 = (widget?: Widget) => {
   if (!widget) return undefined;
   if (!versionCanDo(APP_VERSION_BETA_2, widget?.config.version)) return widget;
@@ -105,12 +95,12 @@ export const beta2 = (widget?: Widget) => {
   widget.config.version = APP_VERSION_BETA_2;
   return widget;
 };
-/**
- *
- * parseServerWidget JSON.parse(widget.config)
- * @param {ServerWidget} sWidget
- * @return {*}
- */
+
+const finaleWidget = (widget?: Widget) => {
+  if (!widget) return undefined;
+  widget.config = finale(widget.config);
+  return widget;
+};
 export const parseServerWidget = (sWidget: ServerWidget) => {
   try {
     sWidget.config = JSON.parse(sWidget.config);
@@ -140,8 +130,9 @@ export const migrateWidgets = (widgets: ServerWidget[]) => {
     .filter(widget => !!widget)
     .map(widget => {
       let resWidget = beta0(widget);
-      resWidget = beta1(resWidget);
+
       resWidget = beta2(resWidget);
+      resWidget = finaleWidget(resWidget);
       return resWidget;
     })
     .filter(widget => !!widget);
