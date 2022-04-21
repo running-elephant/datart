@@ -24,7 +24,7 @@ import {
   selectLoginLoading,
   selectOauth2Clients,
 } from 'app/slice/selectors';
-import { getOauth2Clients, tryOauth } from 'app/slice/thunks';
+import { getOauth2Clients } from 'app/slice/thunks';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
@@ -62,10 +62,6 @@ export function LoginForm({
 
   useEffect(() => {
     dispatch(getOauth2Clients());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(tryOauth());
   }, [dispatch]);
 
   const onSwitch = useCallback(() => {

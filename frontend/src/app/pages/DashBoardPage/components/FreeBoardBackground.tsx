@@ -22,7 +22,7 @@ import StyledBackground from '../pages/Board/components/StyledBackground';
 import { BoardConfigContext } from './BoardProvider/BoardConfigProvider';
 import { BoardContext } from './BoardProvider/BoardProvider';
 
-export const scaleContext = createContext<[number, number]>([1, 1]);
+export const BoardScaleContext = createContext<[number, number]>([1, 1]);
 export interface IProps {
   scale: [number, number];
   slideTranslate: [number, number];
@@ -60,9 +60,9 @@ const SlideBackground: React.FC<IProps> = props => {
 
   return (
     <Wrapper bg={background} style={slideStyle} editing={editing}>
-      <scaleContext.Provider value={scale}>
+      <BoardScaleContext.Provider value={scale}>
         {props.children}
-      </scaleContext.Provider>
+      </BoardScaleContext.Provider>
     </Wrapper>
   );
 };

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ControllerFacadeTypes } from 'app/constants';
+import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
 import {
   ContainerItem,
   WidgetType,
@@ -24,7 +24,8 @@ import {
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ChartsEventData } from 'app/types/Chart';
 import ChartDataView from 'app/types/ChartDataView';
-import { FilterSqlOperator } from 'globalConstants';
+import { formatTime } from 'app/utils/time';
+import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
 import { DeltaStatic } from 'quill';
 import { CSSProperties } from 'react';
@@ -815,6 +816,16 @@ export const getWidgetMap = (
                   _value?.[0];
                 content.config.controllerDate.endTime.exactValue = _value?.[0];
               }
+              break;
+
+            case ControllerFacadeTypes.Time:
+              content.config.controllerDate = {
+                ...(content.config.controllerDate as any),
+                startTime: {
+                  relativeOrExact: TimeFilterValueCategory.Exact,
+                  exactValue: formatTime(_value as any, TIME_FORMATTER),
+                },
+              };
               break;
             default:
               content.config.controllerValues = _value || [];

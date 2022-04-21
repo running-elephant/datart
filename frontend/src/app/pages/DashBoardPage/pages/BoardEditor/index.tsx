@@ -24,6 +24,10 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { LEVEL_50 } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
+import {
+  boardDrillManager,
+  EDIT_PREFIX,
+} from '../../components/BoardDrillManager/BoardDrillManager';
 import EditorHeader from '../../components/BoardHeader/EditorHeader';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardInitProvider } from '../../components/BoardProvider/BoardInitProvider';
@@ -147,6 +151,8 @@ export const BoardEditor: React.FC<{
       dispatch(clearEditBoardState());
       //销毁时  更新view界面数据
       dispatch(fetchBoardDetail({ dashboardRelId: boardId }));
+      //
+      boardDrillManager.clearMapByBoardId(EDIT_PREFIX + boardId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onCloseChartEditor]);

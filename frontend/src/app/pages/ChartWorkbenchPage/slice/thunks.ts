@@ -19,7 +19,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
-import { ChartDataConfig } from 'app/types/ChartConfig';
+import { ChartConfig, ChartDataConfig } from 'app/types/ChartConfig';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
@@ -127,7 +127,9 @@ export const updateChartConfigAndRefreshDatasetAction = createAsyncThunk(
       type: string;
       payload: ChartConfigPayloadType;
       needRefresh?: boolean;
-      drillOption?: IChartDrillOption;
+      updateDrillOption: (
+        config?: ChartConfig,
+      ) => IChartDrillOption | undefined;
     },
     thunkAPI,
   ) => {
@@ -136,10 +138,12 @@ export const updateChartConfigAndRefreshDatasetAction = createAsyncThunk(
       await thunkAPI.dispatch(
         workbenchSlice.actions.updateShadowChartConfig(null),
       );
+      const state = thunkAPI.getState() as any;
+      const workbenchState = state.workbench as typeof initState;
+      const chartConfig = workbenchState.chartConfig;
+      const drillOpt = arg.updateDrillOption?.(chartConfig);
       if (arg.needRefresh) {
-        thunkAPI.dispatch(
-          refreshDatasetAction({ drillOption: arg.drillOption }),
-        );
+        thunkAPI.dispatch(refreshDatasetAction({ drillOption: drillOpt }));
       }
     } catch (error) {
       return rejectHandle(error, thunkAPI.rejectWithValue);

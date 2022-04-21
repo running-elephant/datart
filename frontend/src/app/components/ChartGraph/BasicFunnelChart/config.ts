@@ -31,6 +31,7 @@ const config: ChartConfig = {
         STRING: ['alias', 'colorize', 'sortable'],
         DATE: ['alias', 'colorize', 'sortable'],
       },
+      drillable: true,
     },
     {
       label: 'metrics',

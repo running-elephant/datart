@@ -25,7 +25,8 @@ const config: ChartConfig = {
       key: 'dimension',
       required: true,
       type: 'group',
-      limit: 1,
+      limit: [1, 999],
+      drillable: true,
     },
     {
       label: 'metrics',

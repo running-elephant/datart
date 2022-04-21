@@ -15,15 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
+import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { migrateChartConfig } from 'app/migration';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
+import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { ChartMouseEventParams, IChart } from 'app/types/Chart';
+import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import produce from 'immer';
 import React, {
   memo,
@@ -34,59 +40,54 @@ import React, {
   useRef,
 } from 'react';
 import styled from 'styled-components/macro';
+import { uuidv4 } from 'utils/utils';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
+import {
+  boardDrillManager,
+  EDIT_PREFIX,
+} from '../../BoardDrillManager/BoardDrillManager';
+import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { BoardScaleContext } from '../../FreeBoardBackground';
 import { WidgetChartContext } from '../../WidgetProvider/WidgetChartProvider';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
 export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const dataChart = useContext(WidgetChartContext);
+  const scale = useContext(BoardScaleContext);
   const { data } = useContext(WidgetDataContext);
+  const { renderMode } = useContext(BoardContext);
   const widget = useContext(WidgetContext);
-  const { id: widgetId } = widget;
+  const { dashboardId, id: wid } = widget;
+  const bid = useMemo(() => {
+    if (renderMode === 'edit') {
+      return EDIT_PREFIX + dashboardId;
+    }
+    return dashboardId;
+  }, [dashboardId, renderMode]);
+  const containerId = useMemo(() => {
+    return `${wid}_${uuidv4()}`;
+  }, [wid]);
   const { onWidgetChartClick } = useContext(WidgetActionContext);
-  const { cacheWhRef: ref, cacheW, cacheH } = useCacheWidthHeight();
+  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
+  const { onWidgetGetData } = useContext(WidgetActionContext);
   const widgetRef = useRef<Widget>(widget);
+  const drillOptionRef = useRef<IChartDrillOption>();
   useEffect(() => {
     widgetRef.current = widget;
   }, [widget]);
 
-  const chartClick = useCallback(
-    (params?: ChartMouseEventParams) => {
-      if (!params) {
-        return;
-      }
-      onWidgetChartClick(widgetRef.current, params);
+  const handleDrillOptionChange = useCallback(
+    (option: IChartDrillOption) => {
+      let drillOption;
+      drillOption = option;
+      drillOptionRef.current = drillOption;
+      boardDrillManager.setWidgetDrill({ bid, wid, drillOption });
+      onWidgetGetData(widgetRef.current);
     },
-    [onWidgetChartClick],
+
+    [bid, onWidgetGetData, wid],
   );
-
-  const chart = useMemo(() => {
-    if (!dataChart) {
-      return null;
-    }
-    if (dataChart?.config?.chartGraphId) {
-      try {
-        const chartInstance = ChartManager.instance().getById(
-          dataChart.config.chartGraphId,
-        ) as IChart;
-
-        if (chartInstance) {
-          chartInstance.registerMouseEvents([
-            {
-              name: 'click',
-              callback: chartClick,
-            },
-          ]);
-        }
-        return chartInstance;
-      } catch (error) {
-        return null;
-      }
-    } else {
-      return null;
-    }
-  }, [chartClick, dataChart]);
 
   const widgetSpecialConfig = useMemo(() => {
     let linkFields: string[] = [];
@@ -115,6 +116,75 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     }),
     [data],
   );
+  const chartClick = useCallback(
+    params => {
+      if (!params) {
+        return;
+      }
+      if (drillOptionRef.current?.isSelectedDrill) {
+        const option = drillOptionRef.current;
+        option.drillDown(params.data.rowData);
+        handleDrillOptionChange(option);
+        return;
+      }
+
+      onWidgetChartClick(widgetRef.current, params);
+    },
+    [handleDrillOptionChange, onWidgetChartClick],
+  );
+  const chart = useMemo(() => {
+    if (!dataChart) {
+      return null;
+    }
+    if (dataChart?.config?.chartGraphId) {
+      try {
+        const chartInstance = ChartManager.instance().getById(
+          dataChart.config.chartGraphId,
+        ) as IChart;
+
+        if (chartInstance) {
+          chartInstance.registerMouseEvents([
+            {
+              name: 'click',
+              callback: chartClick,
+            },
+          ]);
+        }
+        return chartInstance;
+      } catch (error) {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }, [chartClick, dataChart]);
+  const config = useMemo(() => {
+    if (!chart?.config) return undefined;
+    if (!dataChart?.config) return undefined;
+    let chartConfig = produce(chart.config, draft => {
+      mergeToChartConfig(
+        draft,
+        produce(dataChart?.config, draft => {
+          migrateChartConfig(draft as ChartDetailConfigDTO);
+        }) as ChartDetailConfigDTO,
+      );
+    });
+    return chartConfig as ChartConfig;
+  }, [chart?.config, dataChart?.config]);
+
+  useEffect(() => {
+    let drillOption = getChartDrillOption(
+      config?.datas,
+      drillOptionRef.current,
+    ) as ChartDrillOption;
+    drillOptionRef.current = drillOption;
+    boardDrillManager.setWidgetDrill({
+      bid,
+      wid,
+      drillOption,
+    });
+  }, [bid, config?.datas, wid]);
+
   const errText = useMemo(() => {
     if (!dataChart) {
       return `not found dataChart`;
@@ -130,24 +200,11 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     }
     return null;
   }, [chart, dataChart]);
-  const config = useMemo(() => {
-    if (!chart?.config) return undefined;
-    if (!dataChart?.config) return undefined;
-    let chartConfig = produce(chart.config, draft => {
-      mergeToChartConfig(
-        draft,
-        produce(dataChart?.config, draft => {
-          migrateChartConfig(draft as ChartDetailConfigDTO);
-        }) as ChartDetailConfigDTO,
-      );
-    });
-    return chartConfig as ChartConfig;
-  }, [chart?.config, dataChart?.config]);
-
   const chartFrame = useMemo(() => {
     if (!config) return null;
     if (cacheH <= 1 || cacheW <= 1) return null;
     if (errText) return errText;
+    const drillOption = drillOptionRef.current;
     return (
       <ChartIFrameContainer
         dataset={dataset}
@@ -155,8 +212,10 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         config={config}
         width={cacheW}
         height={cacheH}
-        containerId={widgetId}
+        drillOption={drillOption}
+        containerId={containerId}
         widgetSpecialConfig={widgetSpecialConfig}
+        scale={scale}
       />
     );
   }, [
@@ -164,25 +223,41 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     cacheH,
     cacheW,
     errText,
-    widgetId,
     dataset,
     chart,
+    containerId,
     widgetSpecialConfig,
+    scale,
   ]);
+  const drillContextVal = {
+    drillOption: drillOptionRef.current,
+    onDrillOptionChange: handleDrillOptionChange,
+  };
   return (
-    <Wrapper className="widget-chart" ref={ref}>
-      <ChartFrameBox>{chartFrame}</ChartFrameBox>
-    </Wrapper>
+    <ChartDrillContext.Provider value={drillContextVal}>
+      <ChartDrillContextMenu>
+        <StyledWrapper>
+          <ChartFrameBox ref={cacheWhRef}>{chartFrame}</ChartFrameBox>
+          <ChartDrillPaths />
+        </StyledWrapper>
+      </ChartDrillContextMenu>
+    </ChartDrillContext.Provider>
   );
 });
-const ChartFrameBox = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-`;
-const Wrapper = styled.div`
+const StyledWrapper = styled.div`
   position: relative;
   display: flex;
   flex: 1;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  .chart-drill-menu-container {
+    height: 100%;
+  }
+`;
+const ChartFrameBox = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
 `;

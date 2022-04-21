@@ -22,19 +22,17 @@ import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { ChartDataViewFieldCategory } from 'app/constants';
 import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
-import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
-  getDrillPaths,
   getInterimDateAggregateRows,
   handledateAggregaeToComputedFields,
 } from 'app/utils/chartHelper';
+import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import { FC, memo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { isEmptyArray } from 'utils/object';
 import ChartDrillContext from '../ChartWorkbenchPage/contexts/ChartDrillContext';
 import ControllerPanel from '../MainPage/pages/VizPage/ChartPreview/components/ControllerPanel';
 import {
@@ -84,19 +82,10 @@ const ChartForShare: FC<{
     if (!chartPreview) {
       return;
     }
-    const drillPaths = getDrillPaths(chartPreview?.chartConfig?.datas);
-    if (isEmptyArray(drillPaths)) {
-      drillOptionRef.current = undefined;
-    }
-    if (
-      !isEmptyArray(drillPaths) &&
-      drillOptionRef.current
-        ?.getAllFields()
-        ?.map(p => p.uid)
-        .join('-') !== drillPaths.map(p => p.uid).join('-')
-    ) {
-      drillOptionRef.current = new ChartDrillOption(drillPaths);
-    }
+    drillOptionRef.current = getChartDrillOption(
+      chartPreview?.chartConfig?.datas,
+      drillOptionRef?.current,
+    );
     dispatch(fetchShareDataSetByPreviewChartAction({ preview: chartPreview }));
     registerChartEvents(chart);
   });
@@ -106,7 +95,10 @@ const ChartForShare: FC<{
       {
         name: 'click',
         callback: param => {
-          if (drillOptionRef.current?.isSelectedDrill) {
+          if (
+            drillOptionRef.current?.isSelectedDrill &&
+            !drillOptionRef.current.isBottomLevel
+          ) {
             const option = drillOptionRef.current;
             option.drillDown(param.data.rowData);
             drillOptionRef.current = option;
@@ -220,7 +212,6 @@ const ChartForShare: FC<{
         </div>
         <ChartDrillPaths />
       </ChartDrillContext.Provider>
-      <ChartDrillPaths />x
       <HeadlessBrowserIdentifier
         renderSign={headlessBrowserRenderSign}
         width={Number(width) || 0}

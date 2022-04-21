@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionField } from 'app/types/ChartConfig';
-
+import { DrillMode } from 'app/models/ChartDrillOption';
+import { ChartDataSectionField, FilterCondition } from 'app/types/ChartConfig';
 export interface IChartDrillOption {
   mode: DrillMode;
   isSelectedDrill: boolean;
+  isBottomLevel: boolean;
   canSelect: boolean;
   toggleSelectedDrill(enable?: boolean): void;
   getAllFields(): ChartDataSectionField[];
@@ -30,6 +31,7 @@ export interface IChartDrillOption {
     condition?: FilterCondition;
   }>;
   getCurrentFields(): ChartDataSectionField[] | undefined;
+  getCurrentDrillLevel(): number;
   drillDown(filterData?: { [key in string]: any }): void;
   expandDown(): void;
   drillUp(field?: ChartDataSectionField): void;

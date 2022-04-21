@@ -42,6 +42,7 @@ import {
   formatTime,
   getTime,
   recommendTimeRangeConverter,
+  splitRangerDateFilters,
 } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
@@ -264,8 +265,7 @@ export class ChartDataRequestBuilder {
         },
       ];
     };
-
-    return fields
+    const filters = fields
       .map(field => {
         if (
           field.filter?.condition?.operator === FilterSqlOperator.In ||
@@ -286,6 +286,7 @@ export class ChartDataRequestBuilder {
         };
       })
       .filter(Boolean) as ChartDataRequestFilter[];
+    return splitRangerDateFilters(filters);
   };
 
   private normalizeDrillFilters(): ChartDataRequestFilter[] {
@@ -383,7 +384,6 @@ export class ChartDataRequestBuilder {
 
         if (this.aggregation === false) {
           if (
-            cur.type === ChartDataSectionType.GROUP ||
             cur.type === ChartDataSectionType.COLOR ||
             cur.type === ChartDataSectionType.AGGREGATE ||
             cur.type === ChartDataSectionType.SIZE ||
@@ -391,6 +391,27 @@ export class ChartDataRequestBuilder {
             cur.type === ChartDataSectionType.MIXED
           ) {
             return acc.concat(cur.rows);
+          } else if (cur.type === ChartDataSectionType.GROUP) {
+            if (cur.drillable) {
+              if (
+                !this.drillOption ||
+                this.drillOption?.mode === DrillMode.Normal ||
+                !this.drillOption?.getCurrentFields()
+              ) {
+                return acc.concat(cur.rows?.[0] || []);
+              }
+              return acc.concat(
+                cur.rows?.filter(field => {
+                  return Boolean(
+                    this.drillOption
+                      ?.getCurrentFields()
+                      ?.some(df => df.uid === field.uid),
+                  );
+                }) || [],
+              );
+            } else {
+              return acc.concat(cur.rows);
+            }
           }
         }
 
@@ -407,6 +428,7 @@ export class ChartDataRequestBuilder {
 
   public build(): ChartDataRequest {
     return {
+      ...this.buildViewConfigs(),
       viewId: this.dataView?.id,
       aggregators: this.buildAggregators(),
       groups: this.buildGroups(),
@@ -416,7 +438,6 @@ export class ChartDataRequestBuilder {
       functionColumns: this.buildFunctionColumns(),
       columns: this.buildSelectColumns(),
       script: this.script,
-      ...this.buildViewConfigs(),
     };
   }
 }

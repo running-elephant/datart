@@ -811,10 +811,9 @@
       },
       "drill": {
         "showNextLevel": "Show Next Level",
-        "expandNextLevel": "Expand Next Level",
-        "selectDrillStatus": "Mouse Click Drill Status",
-        "enable": "Enable",
-        "disable": "Disable",
+        "expandNextLevel": "Expand to Next Level",
+        "selectDrillOn": "\"Click to drill down\" is on",
+        "selectDrillOff": "Turn on \"Click to drill down\"",
         "rollUp": "Roll Up"
       }
     },

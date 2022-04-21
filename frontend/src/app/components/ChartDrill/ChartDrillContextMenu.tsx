@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { CheckOutlined } from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
 import {
   ChartDataSectionType,
@@ -29,8 +30,10 @@ import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillC
 import { ChartConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { getInterimDateAggregateRows } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
+import classnames from 'classnames';
 import { FC, memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
+import { FONT_WEIGHT_MEDIUM, SPACE_SM } from 'styles/StyleConstants';
 
 const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
   ({ children, chartConfig }) => {
@@ -42,6 +45,7 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       onChartDrillDataAggregationChange,
     } = useContext(ChartDrillContext);
     const currentFields = drillOption?.getCurrentFields();
+    const currentDrillLevel = drillOption?.getCurrentDrillLevel();
 
     const currentDrillField = useMemo(() => {
       if (!drillOption) {
@@ -65,7 +69,9 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
 
     const handleChangeDataAggregate = useCallback(
       (config: ChartDataSectionField) => {
-        const groupData = chartConfig?.datas?.find(v => v.type === 'group');
+        const groupData = chartConfig?.datas?.find(
+          v => v.type === ChartDataSectionType.GROUP,
+        );
 
         if (groupData) {
           const _groupData = updateBy(groupData, draft => {
@@ -92,24 +98,32 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       [chartConfig?.datas, onChartDrillDataAggregationChange],
     );
 
+    const selectDrillStatusMenu = useMemo(() => {
+      return (
+        <Menu.Item key="selectDrillStatus">
+          <StyledMenuSwitch
+            className={classnames({ on: !!drillOption?.isSelectedDrill })}
+          >
+            <p>
+              {drillOption?.isSelectedDrill
+                ? t('selectDrillOn')
+                : t('selectDrillOff')}
+            </p>
+            <CheckOutlined className="icon" />
+          </StyledMenuSwitch>
+        </Menu.Item>
+      );
+    }, [drillOption?.isSelectedDrill, t]);
     const contextMenu = useMemo(() => {
       return (
-        <Menu
-          style={{ width: 200 }}
-          onClick={({ key, keyPath }) => {
+        <StyledChartDrillMenu
+          onClick={({ key }) => {
             if (!drillOption) {
               return;
             }
-            if (key === 'enable') {
-              if (!drillOption?.isSelectedDrill) {
-                drillOption?.toggleSelectedDrill(true);
-                onDrillOptionChange?.(drillOption);
-              }
-            } else if (key === 'disable') {
-              if (drillOption?.isSelectedDrill) {
-                drillOption?.toggleSelectedDrill(false);
-                onDrillOptionChange?.(drillOption);
-              }
+            if (key === 'selectDrillStatus') {
+              drillOption?.toggleSelectedDrill(!drillOption?.isSelectedDrill);
+              onDrillOptionChange?.(drillOption);
             } else if (key === DrillMode.Drill) {
               drillOption?.drillDown();
               onDrillOptionChange?.(drillOption);
@@ -122,31 +136,21 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
             }
           }}
         >
-          <Menu.Item key={'rollUp'}>{t('rollUp')}</Menu.Item>
-          <Menu.Item
-            disabled={drillOption?.mode === DrillMode.Expand}
-            key={DrillMode.Drill}
-          >
-            {t('showNextLevel')}
-          </Menu.Item>
-          <Menu.Item
-            disabled={drillOption?.mode === DrillMode.Drill}
-            key={DrillMode.Expand}
-          >
-            {t('expandNextLevel')}
-          </Menu.Item>
-          <Menu.SubMenu
-            disabled={drillOption?.mode === DrillMode.Expand}
-            key="selectDrillStatus"
-            title={t('selectDrillStatus')}
-          >
-            <Menu.Item key="enable" disabled={drillOption?.isSelectedDrill}>
-              {t('enable')}
-            </Menu.Item>
-            <Menu.Item key="disable" disabled={!drillOption?.isSelectedDrill}>
-              {t('disable')}
-            </Menu.Item>
-          </Menu.SubMenu>
+          {!!currentDrillLevel && (
+            <Menu.Item key={'rollUp'}>{t('rollUp')}</Menu.Item>
+          )}
+          {drillOption?.mode !== DrillMode.Expand &&
+            !drillOption?.isBottomLevel && (
+              <Menu.Item key={DrillMode.Drill}>{t('showNextLevel')}</Menu.Item>
+            )}
+          {drillOption?.mode !== DrillMode.Drill &&
+            !drillOption?.isBottomLevel && (
+              <Menu.Item key={DrillMode.Expand}>
+                {t('expandNextLevel')}
+              </Menu.Item>
+            )}
+          {drillOption?.mode !== DrillMode.Expand && selectDrillStatusMenu}
+
           {currentDrillField?.map((v, i) => {
             if (
               v.category === ChartDataViewFieldCategory.DateAggregationField
@@ -163,15 +167,17 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
             }
             return false;
           })}
-        </Menu>
+        </StyledChartDrillMenu>
       );
     }, [
-      drillOption,
+      currentDrillLevel,
       t,
+      drillOption,
+      selectDrillStatusMenu,
       onDrillOptionChange,
       currentDrillField,
-      sourceSupportDateField,
       handleChangeDataAggregate,
+      sourceSupportDateField,
     ]);
 
     return (
@@ -181,7 +187,6 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
           overlay={contextMenu}
           destroyPopupOnHide={true}
           trigger={['contextMenu']}
-          getPopupContainer={triggerNode => triggerNode}
         >
           <div style={{ height: '100%' }}>{children}</div>
         </Dropdown>
@@ -195,4 +200,34 @@ export default ChartDrillContextMenu;
 const StyledChartDrill = styled.div`
   position: relative;
   width: 100%;
+`;
+
+const StyledChartDrillMenu = styled(Menu)`
+  min-width: 200px;
+`;
+
+const StyledMenuSwitch = styled.div`
+  display: flex;
+  align-items: center;
+
+  p {
+    flex: 1;
+  }
+
+  .icon {
+    display: none;
+  }
+
+  &.on {
+    p {
+      font-weight: ${FONT_WEIGHT_MEDIUM};
+    }
+
+    .icon {
+      display: block;
+      flex-shrink: 0;
+      padding-left: ${SPACE_SM};
+      color: ${p => p.theme.success};
+    }
+  }
 `;

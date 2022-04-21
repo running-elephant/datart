@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { boardDrillManager } from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { shareActions } from 'app/pages/SharePage/slice';
@@ -31,7 +32,6 @@ import { handleServerBoardAction } from './asyncActions';
 import { selectBoardById, selectBoardWidgetMap } from './selector';
 import {
   BoardState,
-  ContainerWidgetContent,
   ControllerWidgetContent,
   getDataOption,
   ServerDashboard,
@@ -151,28 +151,6 @@ export const renderedWidgetAsync = createAsyncThunk<
     dispatch(
       getWidgetData({ boardId: boardId, widget: curWidget, renderMode }),
     );
-    if (curWidget.config.type === 'container') {
-      const content = curWidget.config.content as ContainerWidgetContent;
-      let subWidgetIds: string[] = [];
-      subWidgetIds = Object.values(content.itemMap)
-        .map(item => item.childWidgetId)
-        .filter(id => !!id);
-      // 1 widget render
-      dispatch(
-        boardActions.renderedWidgets({ boardId, widgetIds: subWidgetIds }),
-      );
-      // 2 widget getData
-      subWidgetIds.forEach(wid => {
-        dispatch(
-          getWidgetData({
-            boardId: boardId,
-            widget: widgetMap[wid],
-            renderMode,
-          }),
-        );
-      });
-    }
-
     return null;
   },
 );
@@ -232,7 +210,10 @@ export const getChartWidgetDataAsync = createAsyncThunk<
     const dataChartMap = boardState.board.dataChartMap;
     const boardLinkFilters =
       boardState.board.boardInfoRecord?.[boardId]?.linkFilter;
-
+    const drillOption = boardDrillManager.getWidgetDrill({
+      bid: curWidget.dashboardId,
+      wid: widgetId,
+    });
     let requestParams = getChartWidgetRequestParams({
       widgetId,
       widgetMap,
@@ -241,6 +222,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
       widgetInfo,
       dataChartMap,
       boardLinkFilters,
+      drillOption,
     });
     if (!requestParams) {
       return null;
