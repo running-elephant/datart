@@ -67,12 +67,6 @@ const ChartDataViewPanel: FC<{
   const [isDisplayAddNewModal, setIsDisplayAddNewModal] = useToggle();
   const views = useSelector(dataviewsSelector);
 
-  useMount(() => {
-    if (defaultViewId) {
-      handleDataViewChange(defaultViewId);
-    }
-  });
-
   const path = useMemo(() => {
     return views?.length && dataView
       ? getPath(

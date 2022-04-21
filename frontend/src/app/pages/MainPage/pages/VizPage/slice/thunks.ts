@@ -326,7 +326,7 @@ export const updateFilterAndFetchDataset = createAsyncThunk(
     thunkAPI,
   ) => {
     await thunkAPI.dispatch(
-      vizActions.updateChartPreviewGroup({
+      vizActions.updateChartPreviewFilter({
         backendChartId: arg.backendChartId,
         payload: arg.payload,
       }),

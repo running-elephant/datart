@@ -296,7 +296,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       chartConfig?.datas,
       drillOptionRef.current,
     );
-  }, [dispatch, chart?.meta?.id, registerChartEvents]);
+  }, [dispatch, chart?.meta?.id, registerChartEvents, chartConfig?.datas]);
 
   const handleChartChange = (c: IChart) => {
     registerChartEvents(c);
@@ -327,7 +327,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   };
 
   const handleChartConfigChange = useCallback(
-    async (type, payload) => {
+    (type, payload) => {
       if (expensiveQuery) {
         dispatch(
           workbenchSlice.actions.updateChartConfig({
@@ -357,7 +357,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           });
         }
 
-        await dispatch(
+        dispatch(
           workbenchSlice.actions.updateCurrentDataViewComputedFields(
             computedFields,
           ),

@@ -151,7 +151,8 @@ const ChartForShare: FC<{
       }),
     );
   };
-  const handleChartDrillDataAggregationChange = async (type, payload) => {
+
+  const handleChartDrillDataAggregationChange = (type, payload) => {
     const rows = getInterimDateAggregateRows(payload.value?.rows);
     const dateAggregationField = rows.filter(
       v => v.category === ChartDataViewFieldCategory.DateAggregationField,
@@ -164,13 +165,13 @@ const ChartForShare: FC<{
       chartPreview?.chartConfig,
     );
 
-    await dispatch(
+    dispatch(
       shareActions.updateComputedFields({
         backendChartId: chartPreview?.backendChart?.id!,
         computedFields,
       }),
     );
-    await dispatch(
+    dispatch(
       updateGroupAndFetchDatasetForShare({
         backendChartId: chartPreview?.backendChart?.id!,
         payload: payload,
@@ -178,6 +179,7 @@ const ChartForShare: FC<{
       }),
     );
   };
+
   return (
     <StyledChartPreviewBoard>
       <div ref={controlRef}>

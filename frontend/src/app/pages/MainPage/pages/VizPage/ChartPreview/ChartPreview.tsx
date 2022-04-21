@@ -389,7 +389,7 @@ const ChartPreviewBoard: FC<{
       );
     };
 
-    const handleChartDrillDataAggregationChange = async (type, payload) => {
+    const handleChartDrillDataAggregationChange = (type, payload) => {
       const rows = getInterimDateAggregateRows(payload.value?.rows);
       const dateAggregationField = rows.filter(
         v => v.category === ChartDataViewFieldCategory.DateAggregationField,
@@ -402,13 +402,13 @@ const ChartPreviewBoard: FC<{
         chartPreview?.chartConfig,
       );
 
-      await dispatch(
+      dispatch(
         vizAction.updateComputedFields({
           backendChartId,
           computedFields,
         }),
       );
-      await dispatch(
+      dispatch(
         updateGroupAndFetchDataset({
           backendChartId,
           payload: payload,
