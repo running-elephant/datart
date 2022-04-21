@@ -115,7 +115,7 @@ const ChartPresentPanel: FC<{
         <StyledReusableChartContainer>
           {ChartPresentType.GRAPH === chartType && (
             <>
-              <ChartDrillContextMenu>
+              <ChartDrillContextMenu chartConfig={chartConfig}>
                 {renderGraph(containerId, chart, chartConfig, style)}
               </ChartDrillContextMenu>
               <ChartDrillPaths />

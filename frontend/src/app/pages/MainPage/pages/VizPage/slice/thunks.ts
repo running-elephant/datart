@@ -344,6 +344,35 @@ export const updateFilterAndFetchDataset = createAsyncThunk(
   },
 );
 
+export const updateGroupAndFetchDataset = createAsyncThunk(
+  'viz/updateGroupAndFetchDataset',
+  async (
+    arg: {
+      backendChartId: string;
+      payload;
+      drillOption?: IChartDrillOption;
+    },
+    thunkAPI,
+  ) => {
+    await thunkAPI.dispatch(
+      vizActions.updateChartPreviewGroup({
+        backendChartId: arg.backendChartId,
+        payload: arg.payload,
+      }),
+    );
+    await thunkAPI.dispatch(
+      fetchDataSetByPreviewChartAction({
+        backendChartId: arg.backendChartId,
+        drillOption: arg.drillOption,
+      }),
+    );
+
+    return {
+      backendChartId: arg.backendChartId,
+    };
+  },
+);
+
 export const saveAsDashboard = createAsyncThunk<Folder, SaveAsDashboardParams>(
   'viz/saveAsDashboard',
   async ({ viz, dashboardId }) => {

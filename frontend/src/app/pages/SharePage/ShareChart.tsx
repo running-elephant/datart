@@ -20,7 +20,7 @@ import useMount from 'app/hooks/useMount';
 import useRouteQuery from 'app/hooks/useRouteQuery';
 import ChartManager from 'app/models/ChartManager';
 import { login } from 'app/slice/thunks';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
@@ -38,8 +38,9 @@ import {
   selectChartPreview,
   selectNeedVerify,
   selectShareVizType,
+  sourceSupportDateFieldSelector,
 } from './slice/selectors';
-import { fetchShareVizInfo } from './slice/thunks';
+import { fetchShareVizInfo, fetchsourceSupportDateField } from './slice/thunks';
 export function ShareChart() {
   const { shareActions: actions } = useShareSlice();
 
@@ -54,6 +55,7 @@ export function ShareChart() {
   const needVerify = useSelector(selectNeedVerify);
   const chartPreview = useSelector(selectChartPreview);
   const vizType = useSelector(selectShareVizType);
+  const sourceSupportDateFields = useSelector(sourceSupportDateFieldSelector);
 
   const shareType = useRouteQuery({
     key: 'type',
@@ -89,6 +91,17 @@ export function ShareChart() {
 
     loadVizData();
   });
+
+  useEffect(() => {
+    const sourceId = chartPreview?.backendChart?.view.sourceId;
+    if (sourceId) {
+      dispatch(
+        fetchsourceSupportDateField({
+          sourceId: sourceId,
+        }),
+      );
+    }
+  }, [chartPreview?.backendChart?.view.sourceId, dispatch]);
 
   const fetchShareVizInfoImpl = useCallback(
     (
@@ -152,7 +165,10 @@ export function ShareChart() {
         </div>
       )}
       {!Boolean(needVerify) && chartPreview && chartPreview?.backendChart && (
-        <ChartForShare chartPreview={chartPreview} />
+        <ChartForShare
+          chartPreview={chartPreview}
+          sourceSupportDateFields={sourceSupportDateFields}
+        />
       )}
     </StyledWrapper>
   );

@@ -67,12 +67,6 @@ const ChartDataViewPanel: FC<{
   const [isDisplayAddNewModal, setIsDisplayAddNewModal] = useToggle();
   const views = useSelector(dataviewsSelector);
 
-  useMount(() => {
-    if (defaultViewId) {
-      handleDataViewChange(defaultViewId);
-    }
-  });
-
   const path = useMemo(() => {
     return views?.length && dataView
       ? getPath(
@@ -102,9 +96,7 @@ const ChartDataViewPanel: FC<{
       if (dataView?.id === value) {
         return false;
       }
-
       let Data = chartConfig?.datas?.filter(v => v.rows && v.rows.length);
-
       if (Data?.length) {
         (showModal as Function)({
           title: '',
@@ -235,9 +227,10 @@ const ChartDataViewPanel: FC<{
   };
 
   const sortedMetaFields = useMemo(() => {
-    const allFields = (dataView?.meta || []).concat(
-      dataView?.computedFields || [],
+    const computedFields = dataView?.computedFields?.filter(
+      v => v.category !== ChartDataViewFieldCategory.DateAggregationField,
     );
+    const allFields = (dataView?.meta || []).concat(computedFields || []);
     const hierarchyFields = allFields.filter(
       f => f.role === ColumnRole.Hierarchy,
     );
@@ -275,6 +268,12 @@ const ChartDataViewPanel: FC<{
       onOk: editView,
     });
   }, [editView, showModal, t]);
+
+  useMount(() => {
+    if (defaultViewId) {
+      handleDataViewChange(defaultViewId);
+    }
+  });
 
   return (
     <StyledChartDataViewPanel>

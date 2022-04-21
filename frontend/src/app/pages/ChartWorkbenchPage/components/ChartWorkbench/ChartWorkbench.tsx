@@ -43,6 +43,7 @@ const ChartWorkbench: FC<{
   defaultViewId?: string;
   expensiveQuery: boolean;
   allowQuery: boolean;
+  sourceSupportDateField?: string[];
   header?: {
     name?: string;
     orgId?: string;
@@ -58,6 +59,7 @@ const ChartWorkbench: FC<{
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
   onChartDrillOptionChange?: (option: IChartDrillOption) => void;
+  onChartDrillDataAggregationChange?: (type: string, option: any) => void;
 }> = memo(
   ({
     dataset,
@@ -70,12 +72,14 @@ const ChartWorkbench: FC<{
     defaultViewId,
     expensiveQuery,
     allowQuery,
+    sourceSupportDateField,
     onChartChange,
     onChartConfigChange,
     onDataViewChange,
     onRefreshDataset,
     onCreateDownloadDataTask,
     onChartDrillOptionChange,
+    onChartDrillDataAggregationChange,
   }) => {
     const language = useSelector(languageSelector);
     const dateFormat = useSelector(dateFormatSelector);
@@ -91,6 +95,9 @@ const ChartWorkbench: FC<{
           value={{
             drillOption: drillOption,
             onDrillOptionChange: onChartDrillOptionChange,
+            sourceSupportDateField,
+            onChartDrillDataAggregationChange:
+              onChartDrillDataAggregationChange,
           }}
         >
           <ChartDatasetContext.Provider
@@ -100,7 +107,11 @@ const ChartWorkbench: FC<{
             }}
           >
             <ChartDataViewContext.Provider
-              value={{ dataView: dataview, expensiveQuery: expensiveQuery }}
+              value={{
+                dataView: dataview,
+                sourceSupportDateField,
+                expensiveQuery: expensiveQuery,
+              }}
             >
               <TimeConfigContext.Provider
                 value={{ locale: language, format: dateFormat }}

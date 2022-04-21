@@ -19,7 +19,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, ChartDataConfig } from 'app/types/ChartConfig';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
@@ -28,6 +28,7 @@ import {
   buildUpdateChartRequest,
   convertToChartDto,
 } from 'app/utils/ChartDtoHelper';
+import { fetchFieldFunctionsAsync } from 'app/utils/fetch';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { request2 } from 'utils/request';
 import { rejectHandle } from 'utils/utils';
@@ -154,6 +155,7 @@ export const refreshDatasetAction = createAsyncThunk(
   'workbench/refreshDatasetAction',
   async (
     arg: {
+      dataOption?: ChartDataConfig[];
       drillOption?: IChartDrillOption;
       pageInfo?;
       sorter?: { column: string; operator: string; aggOperator?: string };
@@ -166,10 +168,10 @@ export const refreshDatasetAction = createAsyncThunk(
     if (!workbenchState.currentDataView?.id) {
       return;
     }
-
+    const datas = arg?.dataOption || workbenchState.chartConfig?.datas;
     const builder = new ChartDataRequestBuilder(
       workbenchState.currentDataView,
-      workbenchState.chartConfig?.datas,
+      datas,
       workbenchState.chartConfig?.settings,
       arg?.pageInfo,
       true,
@@ -261,3 +263,14 @@ export const updateChartAction = createAsyncThunk(
     return response.data;
   },
 );
+
+export const fetchsourceSupportDateField = createAsyncThunk<
+  string[],
+  { sourceId: string }
+>('workbench/fetchsourceSupportDateField', async arg => {
+  try {
+    return await fetchFieldFunctionsAsync(arg.sourceId);
+  } catch (err) {
+    throw err;
+  }
+});
