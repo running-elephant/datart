@@ -20,6 +20,7 @@ import { Button, Form, Input } from 'antd';
 import { AuthForm } from 'app/components';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { User } from 'app/slice/types';
+import { StorageKeys } from 'globalConstants';
 import React, { useCallback, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
@@ -31,6 +32,7 @@ import {
   SPACE_XS,
 } from 'styles/StyleConstants';
 import { getToken } from 'utils/auth';
+import persistence from 'utils/persistence';
 import { AUTH_CLIENT_ICON_MAPPING } from './constants';
 
 interface LoginFormProps {
@@ -38,7 +40,7 @@ interface LoginFormProps {
   loggedInUser?: User | null;
   oauth2Clients: Array<{ name: string; value: string }>;
   registerEnable?: boolean;
-  modal?: boolean;
+  inShare?: boolean;
   onLogin?: (value) => void;
 }
 
@@ -47,7 +49,7 @@ export function LoginForm({
   loggedInUser,
   oauth2Clients,
   registerEnable = true,
-  modal = false,
+  inShare = false,
   onLogin,
 }: LoginFormProps) {
   const [switchUser, setSwitchUser] = useState(false);
@@ -65,9 +67,22 @@ export function LoginForm({
     setSwitchUser(true);
   }, []);
 
+  const toAuthClient = useCallback(
+    clientUrl => () => {
+      if (inShare) {
+        persistence.session.save(
+          StorageKeys.AuthRedirectUrl,
+          window.location.href,
+        );
+      }
+      window.location.href = clientUrl;
+    },
+    [inShare],
+  );
+
   return (
     <AuthForm>
-      {logged && !switchUser && !modal ? (
+      {logged && !switchUser && !inShare ? (
         <>
           <h2>{t('alreadyLoggedIn')}</h2>
           <UserPanel onClick={toApp}>
@@ -121,7 +136,7 @@ export function LoginForm({
               </Button>
             )}
           </Form.Item>
-          {!modal && (
+          {!inShare && (
             <Links>
               <LinkButton to="/forgetPassword">
                 {t('forgotPassword')}
@@ -139,7 +154,7 @@ export function LoginForm({
                   key={value}
                   size="large"
                   icon={AUTH_CLIENT_ICON_MAPPING[name.toLowerCase()]}
-                  href={value}
+                  onClick={toAuthClient(value)}
                   block
                 >
                   {name}

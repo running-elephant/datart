@@ -38,7 +38,7 @@ function ShareLoginModal({ visible, onChange }) {
         <LoginForm
           loading={loading}
           oauth2Clients={oauth2Clients}
-          modal={true}
+          inShare={true}
           onLogin={onChange}
         />
       </LoginWrapper>
