@@ -248,6 +248,17 @@ export const updateGroupAndFetchDatasetForShare = createAsyncThunk(
   },
 );
 
+export const getOauth2Clients = createAsyncThunk<[]>(
+  'app/getOauth2Clients',
+  async () => {
+    const { data } = await request2<[]>({
+      url: '/tpa/getOauth2Clients',
+      method: 'GET',
+    });
+    return data;
+  },
+);
+
 export const fetchAvailableSourceFunctions = createAsyncThunk<
   string[],
   { sourceId: string }
