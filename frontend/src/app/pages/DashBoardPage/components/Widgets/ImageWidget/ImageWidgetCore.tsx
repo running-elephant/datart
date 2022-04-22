@@ -55,10 +55,10 @@ export const ImageWidgetCore: React.FC<{}> = () => {
       <Empty description="" />
     );
   }, [editing, onChange, t, widgetBgImage]);
-  return <Wrap>{renderImage}</Wrap>;
+  return <Wrapper>{renderImage}</Wrapper>;
 };
 
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;

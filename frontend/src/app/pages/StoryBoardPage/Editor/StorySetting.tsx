@@ -55,7 +55,7 @@ export const StorySetting: React.FC<StorySettingProps> = memo(() => {
   }, [dispatch, storyId]);
 
   return (
-    <Wrap onClick={clearSelectedPage}>
+    <Wrapper onClick={clearSelectedPage}>
       <Form
         onValuesChange={onValuesChange}
         size="small"
@@ -69,9 +69,9 @@ export const StorySetting: React.FC<StorySettingProps> = memo(() => {
           <InputNumber />
         </Form.Item>
       </Form>
-    </Wrap>
+    </Wrapper>
   );
 });
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: block;
 `;

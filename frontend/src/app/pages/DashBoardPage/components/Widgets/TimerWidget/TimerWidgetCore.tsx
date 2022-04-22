@@ -158,14 +158,14 @@ export const TimerWidgetCore: React.FC = memo(() => {
   }, [timerConfig]);
 
   return (
-    <Wrap {...timerConfig}>
+    <Wrapper {...timerConfig}>
       {editing && setter}
       <div className="time-text">{currentTime}</div>
-    </Wrap>
+    </Wrapper>
   );
 });
 
-const Wrap = styled.div<TimerConfig>`
+const Wrapper = styled.div<TimerConfig>`
   display: flex;
   /* flex-direction: column; */
   width: 100%;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { Button, Layout, Menu } from 'antd';
+import { Button, Menu } from 'antd';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
@@ -24,17 +24,15 @@ import {
   selectBoardWidgetMapById,
 } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import { memo, useCallback, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { G90, LEVEL_10, WHITE } from 'styles/StyleConstants';
+import { LEVEL_10, LEVEL_100, SPACE_LG, SPACE_SM } from 'styles/StyleConstants';
 import { CanFullScreenWidgetTypes } from '../../constants';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 import { FullScreenWidgetMapper } from './FullScreenWidgetMapper';
 
-const { Header } = Layout;
-
-export const FullScreenPanel: React.FC<{}> = () => {
+export const FullScreenPanel: React.FC<{}> = memo(() => {
   const { boardId, boardType } = useContext(BoardContext);
   const dispatch = useDispatch();
 
@@ -93,7 +91,7 @@ export const FullScreenPanel: React.FC<{}> = () => {
     <>
       {itemId && (
         <FullScreenWrap show={collapsed}>
-          <Header className="full-header">
+          <FullHeader>
             <div onClick={toggle}>
               {collapsed ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
               <span>{widgetMap[itemId].config.name}</span>
@@ -101,13 +99,12 @@ export const FullScreenPanel: React.FC<{}> = () => {
             <Button className="close-fullscreen" onClick={closeFullScreen}>
               取消全屏
             </Button>
-          </Header>
+          </FullHeader>
           <div className="full-container">
             {chart}
             {itemId && (
               <div className="full-menu">
                 <Menu
-                  theme="light"
                   mode="inline"
                   onClick={changeItem}
                   defaultSelectedKeys={[itemId]}
@@ -123,7 +120,7 @@ export const FullScreenPanel: React.FC<{}> = () => {
       )}
     </>
   );
-};
+});
 
 const FullScreenWrap = styled.div<{ show: boolean }>`
   position: fixed;
@@ -131,24 +128,14 @@ const FullScreenWrap = styled.div<{ show: boolean }>`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: ${LEVEL_10 * 10};
+  z-index: ${LEVEL_100};
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
-
-  background-color: ${WHITE};
+  background-color: ${p => p.theme.componentBackground};
   transition: all 3s ease-out;
 
-  .full-header {
-    display: flex;
-    justify-content: space-between;
-    background-color: transparent;
-  }
-  .close-fullscreen {
-    margin-top: 20px;
-    color: ${G90};
-  }
   .full-container {
     display: flex;
     flex: 1;
@@ -161,13 +148,16 @@ const FullScreenWrap = styled.div<{ show: boolean }>`
     z-index: ${LEVEL_10};
     width: 300px;
     height: 100%;
-
-    background-color: rgba(250, 250, 250, 0.859);
-
+    background-color: ${p => p.theme.bodyBackground};
     transition: all 0.3s;
-
-    .ant-menu {
-      background-color: transparent;
-    }
   }
+`;
+const FullHeader = styled.div`
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  padding: ${SPACE_SM} ${SPACE_LG};
+  background-color: ${p => p.theme.componentBackground};
+  box-shadow: ${p => p.theme.shadowSider};
 `;

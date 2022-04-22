@@ -21,11 +21,11 @@ import styled from 'styled-components/macro';
 import { ShortcutKeys } from './ShortcutKeys';
 export const BoardToolRights: React.FC<{}> = memo(() => {
   return (
-    <Wrap>
+    <Wrapper>
       <Space>
         <ShortcutKeys />
       </Space>
-    </Wrap>
+    </Wrapper>
   );
 });
-const Wrap = styled.div``;
+const Wrapper = styled.div``;

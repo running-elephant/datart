@@ -145,7 +145,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
    * https://www.npmjs.com/package/react-grid-layout
    */
   return (
-    <Wrap className={deviceClassName}>
+    <Wrapper className={deviceClassName}>
       {deviceType === DeviceType.Mobile && (
         <DeviceList updateCurWH={updateCurWH} />
       )}
@@ -183,11 +183,11 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
           </div>
         )}
       </StyledContainer>
-    </Wrap>
+    </Wrapper>
   );
 });
 
-const Wrap = styled.div<{}>`
+const Wrapper = styled.div<{}>`
   display: flex;
   flex: 1;
   flex-direction: column;
