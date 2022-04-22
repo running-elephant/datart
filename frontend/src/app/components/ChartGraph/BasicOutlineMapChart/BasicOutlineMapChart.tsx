@@ -268,7 +268,7 @@ class BasicOutlineMapChart extends Chart {
     const [showLabel] = getStyles(styleConfigs, ['label'], ['showLabel']);
     const [cycleRatio] = getStyles(styleConfigs, ['map'], ['cycleRatio']);
     const { min, max } = getDataColumnMaxAndMin2(chartDataSet, sizeConfigs[0]);
-    const defaultSizeValue = max - min;
+    const defaultSizeValue = (max - min) / 2;
     const defaultColorValue = 1;
 
     return [
