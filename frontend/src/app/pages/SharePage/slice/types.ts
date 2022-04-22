@@ -35,6 +35,8 @@ export interface SharePageState {
   headlessBrowserRenderSign: boolean;
   pageWidthHeight: [number, number];
   shareDownloadPolling: boolean;
+  loginLoading: boolean;
+  oauth2Clients: Array<{ name: string; value: string }>;
   availableSourceFunctions?: string[];
 }
 export interface ShareVizInfo {

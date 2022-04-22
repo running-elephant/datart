@@ -17,13 +17,30 @@
  */
 
 import { LoginForm } from 'app/pages/LoginPage/LoginForm';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
+import { selectLoginLoading, selectOauth2Clients } from './slice/selectors';
+import { getOauth2Clients } from './slice/thunks';
 
 function ShareLoginModal({ visible, onChange }) {
+  const dispatch = useDispatch();
+  const loading = useSelector(selectLoginLoading);
+  const oauth2Clients = useSelector(selectOauth2Clients);
+
+  useEffect(() => {
+    dispatch(getOauth2Clients());
+  }, [dispatch]);
+
   return (
     visible && (
       <LoginWrapper>
-        <LoginForm modal={true} onLogin={onChange} />
+        <LoginForm
+          loading={loading}
+          oauth2Clients={oauth2Clients}
+          inShare={true}
+          onLogin={onChange}
+        />
       </LoginWrapper>
     )
   );
