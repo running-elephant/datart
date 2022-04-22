@@ -25,7 +25,9 @@ export const versionCanDo = (curVersion: string, testVersion?: string) => {
   return curVersionIndex >= testVersionIndex;
 };
 
-export const finale = <T extends { version?: string }>(config: T): T => {
+export const setLatestVersion = <T extends { version?: string }>(
+  config: T,
+): T => {
   if (!versionCanDo(APP_CURRENT_VERSION, config.version)) return config;
   if (config.version === APP_CURRENT_VERSION) return config;
   config.version = APP_CURRENT_VERSION;

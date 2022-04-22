@@ -17,7 +17,7 @@
  */
 import { StoryConfig } from 'app/pages/StoryBoardPage/slice/types';
 import { getInitStoryConfig } from 'app/pages/StoryBoardPage/utils';
-import { finale, versionCanDo } from '../utils';
+import { setLatestVersion, versionCanDo } from '../utils';
 import { APP_VERSION_BETA_2 } from './../constants';
 
 export const parseStoryConfig = (storyConfig: string) => {
@@ -42,6 +42,6 @@ export const migrateStoryConfig = (boardConfig: string) => {
   let config = parseStoryConfig(boardConfig);
 
   config = beta2(config);
-  config = finale(config);
+  config = setLatestVersion(config);
   return config;
 };

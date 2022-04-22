@@ -26,7 +26,7 @@ import {
   fontDefault,
   VALUE_SPLITTER,
 } from 'app/pages/DashBoardPage/utils/widget';
-import { finale, versionCanDo } from '../utils';
+import { setLatestVersion, versionCanDo } from '../utils';
 import { APP_VERSION_BETA_0, APP_VERSION_BETA_2 } from './../constants';
 
 /**
@@ -98,7 +98,7 @@ export const beta2 = (widget?: Widget) => {
 
 const finaleWidget = (widget?: Widget) => {
   if (!widget) return undefined;
-  widget.config = finale(widget.config);
+  widget.config = setLatestVersion(widget.config);
   return widget;
 };
 export const parseServerWidget = (sWidget: ServerWidget) => {

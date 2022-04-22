@@ -21,7 +21,7 @@ import {
   DashboardConfig,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getInitBoardConfig } from 'app/pages/DashBoardPage/utils/board';
-import { finale, versionCanDo } from '../utils';
+import { setLatestVersion, versionCanDo } from '../utils';
 import {
   APP_VERSION_BETA_0,
   APP_VERSION_BETA_1,
@@ -81,6 +81,6 @@ export const migrateBoardConfig = (boardConfig: string) => {
   config = beta0(config);
 
   config = beta2(config);
-  config = finale(config);
+  config = setLatestVersion(config);
   return config;
 };
