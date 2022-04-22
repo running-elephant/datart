@@ -225,7 +225,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     }
   }, [dataview?.sourceId, dispatch]);
 
-  const handleDateAggregated = useCallback(
+  const resetOriginalComputedFields = useCallback(
     config => {
       const index = config?.datas?.findIndex(
         v => v.type === ChartDataSectionType.GROUP,
@@ -339,7 +339,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       transferChartConfigs(targetChartConfig, shadowChartConfig || chartConfig),
     );
 
-    handleDateAggregated(finalChartConfig);
+    resetOriginalComputedFields(finalChartConfig);
 
     dispatch(
       workbenchSlice.actions.updateChartConfig({
@@ -468,7 +468,8 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   }, [buildDataChart, chartType, dataview, onSaveInWidget]);
 
   const saveChart = useCallback(async () => {
-    handleDateAggregated(chartConfig);
+    resetOriginalComputedFields(chartConfig);
+
     if (container === 'dataChart') {
       if (dataChartId) {
         await dispatch(
@@ -552,8 +553,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     chartConfig,
     dataview?.computedFields,
     history,
-    chartConfig,
-    handleDateAggregated,
+    resetOriginalComputedFields,
   ]);
 
   const saveChartToDashBoard = useCallback(
