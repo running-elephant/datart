@@ -339,7 +339,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         setAllowQuery(payload.needRefresh);
         return true;
       }
-      if (payload.value.type !== ChartDataSectionType.FILTER) {
+      if (
+        payload.value.type === ChartDataSectionType.GROUP ||
+        payload.value.type === ChartDataSectionType.MIXED
+      ) {
         const dateLevelComputedFields = payload.value.rows.filter(
           v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
         );
