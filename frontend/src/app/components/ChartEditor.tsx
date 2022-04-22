@@ -339,6 +339,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         setAllowQuery(payload.needRefresh);
         return true;
       }
+      // generate runtime computed fields(date level)
       if (
         payload.value.type === ChartDataSectionType.GROUP ||
         payload.value.type === ChartDataSectionType.MIXED
