@@ -18,9 +18,14 @@
 
 import { Brand } from 'app/components/Brand';
 import { Version } from 'app/components/Version';
-import { selectSystemInfo } from 'app/slice/selectors';
-import { login } from 'app/slice/thunks';
-import React, { useCallback } from 'react';
+import {
+  selectLoggedInUser,
+  selectLoginLoading,
+  selectOauth2Clients,
+  selectSystemInfo,
+} from 'app/slice/selectors';
+import { getOauth2Clients, login } from 'app/slice/thunks';
+import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
@@ -30,6 +35,13 @@ export function LoginPage() {
   const dispatch = useDispatch();
   const history = useHistory();
   const systemInfo = useSelector(selectSystemInfo);
+  const loading = useSelector(selectLoginLoading);
+  const loggedInUser = useSelector(selectLoggedInUser);
+  const oauth2Clients = useSelector(selectOauth2Clients);
+
+  useEffect(() => {
+    dispatch(getOauth2Clients());
+  }, [dispatch]);
 
   const onLogin = useCallback(
     values => {
@@ -48,6 +60,9 @@ export function LoginPage() {
     <Wrapper>
       <Brand />
       <LoginForm
+        loading={loading}
+        loggedInUser={loggedInUser}
+        oauth2Clients={oauth2Clients}
         registerEnable={systemInfo?.registerEnable}
         onLogin={onLogin}
       />

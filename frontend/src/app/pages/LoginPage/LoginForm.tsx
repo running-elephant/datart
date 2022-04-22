@@ -19,66 +19,70 @@
 import { Button, Form, Input } from 'antd';
 import { AuthForm } from 'app/components';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
-import {
-  selectLoggedInUser,
-  selectLoginLoading,
-  selectOauth2Clients,
-} from 'app/slice/selectors';
-import { getOauth2Clients } from 'app/slice/thunks';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { User } from 'app/slice/types';
+import { StorageKeys } from 'globalConstants';
+import React, { useCallback, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
   LINE_HEIGHT_ICON_LG,
+  LINE_HEIGHT_ICON_XXL,
   SPACE_MD,
+  SPACE_XS,
 } from 'styles/StyleConstants';
 import { getToken } from 'utils/auth';
+import persistence from 'utils/persistence';
+import { AUTH_CLIENT_ICON_MAPPING } from './constants';
+
+interface LoginFormProps {
+  loading: boolean;
+  loggedInUser?: User | null;
+  oauth2Clients: Array<{ name: string; value: string }>;
+  registerEnable?: boolean;
+  inShare?: boolean;
+  onLogin?: (value) => void;
+}
 
 export function LoginForm({
+  loading,
+  loggedInUser,
+  oauth2Clients,
   registerEnable = true,
-  modal = false,
+  inShare = false,
   onLogin,
-}: {
-  registerEnable?: boolean;
-  modal?: boolean;
-  onLogin?: (value) => void;
-}) {
+}: LoginFormProps) {
   const [switchUser, setSwitchUser] = useState(false);
-  const dispatch = useDispatch();
   const history = useHistory();
-  const loading = useSelector(selectLoginLoading);
-  const loggedInUser = useSelector(selectLoggedInUser);
   const [form] = Form.useForm();
   const logged = !!getToken();
   const t = usePrefixI18N('login');
   const tg = usePrefixI18N('global');
-  const oauth2Clients = useSelector(selectOauth2Clients);
 
   const toApp = useCallback(() => {
     history.replace('/');
   }, [history]);
 
-  useEffect(() => {
-    dispatch(getOauth2Clients());
-  }, [dispatch]);
-
   const onSwitch = useCallback(() => {
     setSwitchUser(true);
   }, []);
 
-  let Oauth2BtnList = oauth2Clients.map(client => {
-    return (
-      <Oauth2Button key={client.value} href={client.value}>
-        {client.name}
-      </Oauth2Button>
-    );
-  });
+  const toAuthClient = useCallback(
+    clientUrl => () => {
+      if (inShare) {
+        persistence.session.save(
+          StorageKeys.AuthRedirectUrl,
+          window.location.href,
+        );
+      }
+      window.location.href = clientUrl;
+    },
+    [inShare],
+  );
 
   return (
     <AuthForm>
-      {logged && !switchUser && !modal ? (
+      {logged && !switchUser && !inShare ? (
         <>
           <h2>{t('alreadyLoggedIn')}</h2>
           <UserPanel onClick={toApp}>
@@ -132,7 +136,7 @@ export function LoginForm({
               </Button>
             )}
           </Form.Item>
-          {!modal && (
+          {!inShare && (
             <Links>
               <LinkButton to="/forgetPassword">
                 {t('forgotPassword')}
@@ -142,8 +146,22 @@ export function LoginForm({
               )}
             </Links>
           )}
-
-          {Oauth2BtnList}
+          {oauth2Clients.length > 0 && (
+            <>
+              <AuthTitle>{t('authTitle')}</AuthTitle>
+              {oauth2Clients.map(({ name, value }) => (
+                <AuthButton
+                  key={value}
+                  size="large"
+                  icon={AUTH_CLIENT_ICON_MAPPING[name.toLowerCase()]}
+                  onClick={toAuthClient(value)}
+                  block
+                >
+                  {name}
+                </AuthButton>
+              ))}
+            </>
+          )}
         </Form>
       )}
     </AuthForm>
@@ -154,22 +172,26 @@ const Links = styled.div`
   display: flex;
 `;
 
-const Oauth2Button = styled.a`
-  display: block;
-  height: 36px;
-  font-weight: bold;
-  line-height: 36px;
-  color: #fff;
-  text-align: center;
-  background-color: blue;
-`;
-
 const LinkButton = styled(Link)`
   flex: 1;
   line-height: ${LINE_HEIGHT_ICON_LG};
 
   &:nth-child(2) {
     text-align: right;
+  }
+`;
+
+const AuthTitle = styled.p`
+  line-height: ${LINE_HEIGHT_ICON_XXL};
+  color: ${p => p.theme.textColorLight};
+  text-align: center;
+`;
+
+const AuthButton = styled(Button)`
+  margin-bottom: ${SPACE_XS};
+
+  &:last-child {
+    margin-bottom: 0;
   }
 `;
 
