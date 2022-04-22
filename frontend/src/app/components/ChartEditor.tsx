@@ -37,11 +37,11 @@ import {
   chartConfigSelector,
   currentDataViewSelector,
   datasetsSelector,
+  selectAvailableSourceFunctions,
   shadowChartConfigSelector,
-  sourceSupportDateFieldSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import {
-  fetchsourceSupportDateField,
+  fetchAvailableSourceFunctions,
   initWorkbenchAction,
   refreshDatasetAction,
   updateChartAction,
@@ -58,8 +58,9 @@ import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
-  getInterimDateAggregateRows,
-  handledateAggregaeToComputedFields,
+  clearRuntimeDateLevelFieldsInChartConfig,
+  getRuntimeComputedFields,
+  getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import {
@@ -132,7 +133,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const shadowChartConfig = useSelector(shadowChartConfigSelector);
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
-  const sourceSupportDateField = useSelector(sourceSupportDateFieldSelector);
+  const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
   const [chart, setChart] = useState<IChart>();
   const drillOptionRef = useRef<IChartDrillOption>();
 
@@ -220,9 +221,40 @@ export const ChartEditor: FC<ChartEditorProps> = ({
 
   useEffect(() => {
     if (dataview?.sourceId) {
-      dispatch(fetchsourceSupportDateField({ sourceId: dataview.sourceId }));
+      dispatch(fetchAvailableSourceFunctions({ sourceId: dataview.sourceId }));
     }
   }, [dataview?.sourceId, dispatch]);
+
+  const resetOriginalComputedFields = useCallback(
+    config => {
+      const index = config?.datas?.findIndex(
+        v => v.type === ChartDataSectionType.GROUP,
+      );
+      if (index !== undefined) {
+        const groupRows = config?.datas?.[index]?.rows;
+        if (groupRows) {
+          const dateLevelComputedFields = groupRows.filter(
+            v =>
+              v.category === ChartDataViewFieldCategory.DateLevelComputedField,
+          );
+
+          const computedFields = getRuntimeComputedFields(
+            dateLevelComputedFields,
+            '',
+            dataview?.computedFields,
+            chartConfig,
+          );
+
+          dispatch(
+            workbenchSlice.actions.updateCurrentDataViewComputedFields(
+              computedFields,
+            ),
+          );
+        }
+      }
+    },
+    [chartConfig, dataview?.computedFields, dispatch],
+  );
 
   const registerChartEvents = useCallback(
     chart => {
@@ -303,10 +335,12 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     setChart(c);
     const targetChartConfig = CloneValueDeep(c.config);
 
-    const finalChartConfig = transferChartConfigs(
-      targetChartConfig,
-      shadowChartConfig || chartConfig,
+    const finalChartConfig = clearRuntimeDateLevelFieldsInChartConfig(
+      transferChartConfigs(targetChartConfig, shadowChartConfig || chartConfig),
     );
+
+    resetOriginalComputedFields(finalChartConfig);
+
     dispatch(
       workbenchSlice.actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
@@ -339,29 +373,39 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         setAllowQuery(payload.needRefresh);
         return true;
       }
-      if (payload.value.type !== ChartDataSectionType.FILTER) {
-        const dateAggregationField = payload.value.rows.filter(
-          v => v.category === ChartDataViewFieldCategory.DateAggregationField,
+      // generate runtime computed fields(date level)
+      if (
+        payload.value.type === ChartDataSectionType.GROUP ||
+        payload.value.type === ChartDataSectionType.MIXED
+      ) {
+        const dateLevelComputedFields = payload.value.rows.filter(
+          v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
         );
-        const deleteColName = payload.value.deleteColName;
-        const computedFields = handledateAggregaeToComputedFields(
-          dateAggregationField,
-          deleteColName,
-          CloneValueDeep(dataview?.computedFields),
+
+        const replacedColName = payload.value.replacedColName;
+        const computedFields = getRuntimeComputedFields(
+          dateLevelComputedFields,
+          replacedColName,
+          dataview?.computedFields,
           chartConfig,
         );
 
-        if (deleteColName) {
+        if (replacedColName) {
           payload = updateBy(payload, draft => {
-            delete draft.value.deleteColName;
+            delete draft.value.replacedColName;
           });
         }
 
-        dispatch(
-          workbenchSlice.actions.updateCurrentDataViewComputedFields(
-            computedFields,
-          ),
-        );
+        if (
+          JSON.stringify(computedFields) !==
+          JSON.stringify(dataview?.computedFields)
+        ) {
+          dispatch(
+            workbenchSlice.actions.updateCurrentDataViewComputedFields(
+              computedFields,
+            ),
+          );
+        }
       }
 
       dispatch(
@@ -424,6 +468,8 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   }, [buildDataChart, chartType, dataview, onSaveInWidget]);
 
   const saveChart = useCallback(async () => {
+    resetOriginalComputedFields(chartConfig);
+
     if (container === 'dataChart') {
       if (dataChartId) {
         await dispatch(
@@ -507,6 +553,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     chartConfig,
     dataview?.computedFields,
     history,
+    resetOriginalComputedFields,
   ]);
 
   const saveChartToDashBoard = useCallback(
@@ -588,15 +635,15 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     dispatch(refreshDatasetAction({ drillOption: option }));
   };
 
-  const handleDrillDataAggregationChange = (type, payload) => {
-    const rows = getInterimDateAggregateRows(payload.value?.rows);
-    const dateAggregationField = rows.filter(
-      v => v.category === ChartDataViewFieldCategory.DateAggregationField,
+  const handleDateLevelChange = (type, payload) => {
+    const rows = getRuntimeDateLevelFields(payload.value?.rows);
+    const dateLevelComputedFields = rows.filter(
+      v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
     );
-    const deleteColName = payload.value.deleteColName;
-    const computedFields = handledateAggregaeToComputedFields(
-      dateAggregationField,
-      deleteColName,
+    const replacedColName = payload.value.replacedColName;
+    const computedFields = getRuntimeComputedFields(
+      dateLevelComputedFields,
+      replacedColName,
       dataview?.computedFields,
       chartConfig,
     );
@@ -647,14 +694,14 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           defaultViewId={defaultViewId}
           expensiveQuery={expensiveQuery}
           allowQuery={allowQuery}
-          sourceSupportDateField={sourceSupportDateField}
+          availableSourceFunctions={availableSourceFunctions}
           onChartChange={handleChartChange}
           onChartConfigChange={handleChartConfigChange}
           onChartDrillOptionChange={handleDrillOptionChange}
           onDataViewChange={handleDataViewChanged}
           onRefreshDataset={handleRefreshDataset}
           onCreateDownloadDataTask={handleCreateDownloadDataTask}
-          onChartDrillDataAggregationChange={handleDrillDataAggregationChange}
+          onDateLevelChange={handleDateLevelChange}
         />
         <SaveForm
           width={400}

@@ -78,6 +78,7 @@
     "login": "Log in",
     "register": "Sign up for an account",
     "forgotPassword": "Can't log in?",
+    "authTitle": "OR",
     "alreadyLoggedIn": "Your account is already logged in",
     "enter": "Click to enter",
     "switch": "Switch accounts"
@@ -696,7 +697,7 @@
             "colorSingle": "colorize",
             "size": "size",
             "chooseTheme": "Choose theme",
-            "dateAggregate": "Date aggregate"
+            "dateLevel": "Date Level"
           }
         }
       },

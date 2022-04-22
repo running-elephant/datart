@@ -27,14 +27,14 @@ export const WidgetOfFree: React.FC<{}> = memo(() => {
   const widgetStyle = getFreeWidgetStyle(widget);
 
   return (
-    <Wrap style={widgetStyle}>
+    <Wrapper style={widgetStyle}>
       <WidgetMapper boardType="free" boardEditing={false} />
-    </Wrap>
+    </Wrapper>
   );
 });
 
 export default WidgetOfFree;
-const Wrap = styled.div`
+const Wrapper = styled.div`
   & > span:last-child {
     z-index: 999999;
   }

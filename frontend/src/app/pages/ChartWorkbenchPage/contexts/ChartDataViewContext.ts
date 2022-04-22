@@ -22,11 +22,11 @@ import { createContext } from 'react';
 const ChartDataViewContext = createContext<{
   dataView?: ChartDataView;
   expensiveQuery: boolean;
-  sourceSupportDateField?: string[];
+  availableSourceFunctions?: string[];
 }>({
   dataView: {} as ChartDataView,
   expensiveQuery: false,
-  sourceSupportDateField: undefined,
+  availableSourceFunctions: undefined,
 });
 
 export default ChartDataViewContext;

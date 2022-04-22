@@ -37,7 +37,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
   const [selectedItems, setSelectedItems] = useState<ChartDataViewMeta[]>([]);
   const [selectedItemsIds, setSelectedItemsIds] = useState<Array<string>>([]);
   const [activeItemId, setActiveItemId] = useState<string>('');
-  const { sourceSupportDateField } = useContext(ChartDataViewContext);
+  const { availableSourceFunctions } = useContext(ChartDataViewContext);
 
   const onDataItemSelectionChange = (
     dataItemId: string,
@@ -118,7 +118,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
               expression={item.expression}
               type={item.type}
               selectedItems={selectedItems}
-              sourceSupportDateField={sourceSupportDateField}
+              availableSourceFunctions={availableSourceFunctions}
               subType={item.subType}
               role={item.role}
               children={item.children}

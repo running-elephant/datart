@@ -78,6 +78,7 @@
     "login": "登录",
     "register": "注册新账号",
     "forgotPassword": "忘记密码？",
+    "authTitle": "第三方登录",
     "alreadyLoggedIn": "账号已登录",
     "enter": "点击进入",
     "switch": "切换账号"
@@ -696,7 +697,7 @@
             "colorSingle": "着色",
             "size": "大小",
             "chooseTheme": "选择主题",
-            "dateAggregate": "日期聚合"
+            "dateLevel": "日期级别"
           }
         }
       },

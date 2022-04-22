@@ -30,7 +30,7 @@ import { handleServerStoryAction } from 'app/pages/StoryBoardPage/slice/actions'
 import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { convertToChartDto } from 'app/utils/ChartDtoHelper';
-import { fetchFieldFunctionsAsync } from 'app/utils/fetch';
+import { fetchAvailableSourceFunctionsAsync } from 'app/utils/fetch';
 import { RootState } from 'types';
 import persistence from 'utils/persistence';
 import { request2 } from 'utils/request';
@@ -248,12 +248,23 @@ export const updateGroupAndFetchDatasetForShare = createAsyncThunk(
   },
 );
 
-export const fetchsourceSupportDateField = createAsyncThunk<
+export const getOauth2Clients = createAsyncThunk<[]>(
+  'app/getOauth2Clients',
+  async () => {
+    const { data } = await request2<[]>({
+      url: '/tpa/getOauth2Clients',
+      method: 'GET',
+    });
+    return data;
+  },
+);
+
+export const fetchAvailableSourceFunctions = createAsyncThunk<
   string[],
   { sourceId: string }
->('workbench/fetchsourceSupportDateField', async arg => {
+>('workbench/fetchAvailableSourceFunctions', async arg => {
   try {
-    return await fetchFieldFunctionsAsync(arg.sourceId);
+    return await fetchAvailableSourceFunctionsAsync(arg.sourceId);
   } catch (err) {
     throw err;
   }

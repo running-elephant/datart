@@ -255,8 +255,11 @@ class BasicScatterChart extends Chart {
     const seriesName = groupConfigs
       ?.map(gc => getColumnRenderName(gc))
       .join('-');
-    const seriesDatas = dataSetRows?.map(row => {
-      const sizeValue = row.getCell(sizeConfigs?.[0]) || min;
+    const defaultSizeValue = (max - min) / 2;
+    const seriesDatas = dataSetRows?.map((row, dcIndex) => {
+      const sizeValue = sizeConfigs?.length
+        ? row.getCell(sizeConfigs?.[0]) || min
+        : defaultSizeValue;
       return {
         ...getExtraSeriesRowData(row),
         name: groupConfigs?.map(row.getCell, row).join('-'),

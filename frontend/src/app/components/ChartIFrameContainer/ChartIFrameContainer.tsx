@@ -24,11 +24,11 @@ import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NCont
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
 import { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
 import ChartIFrameLifecycleAdapter from './ChartIFrameLifecycleAdapter';
-
 const ChartIFrameContainer: FC<{
   dataset: any;
   chart: IChart;
@@ -42,6 +42,7 @@ const ChartIFrameContainer: FC<{
   scale?: [number, number];
 }> = memo(props => {
   const iframeContainerId = `chart-iframe-root-${props.containerId}`;
+  const config = setRuntimeDateLevelFieldsInChartConfig(props.config);
 
   const transformToSafeCSSProps = (width, height) => {
     let newStyle = { width, height };
@@ -74,7 +75,7 @@ const ChartIFrameContainer: FC<{
             <ChartIFrameLifecycleAdapter
               dataset={props.dataset}
               chart={props.chart}
-              config={props.config}
+              config={config}
               style={transformToSafeCSSProps(props?.width, props?.height)}
               widgetSpecialConfig={props.widgetSpecialConfig}
               isShown={props.isShown}
@@ -136,7 +137,7 @@ const ChartIFrameContainer: FC<{
                 <ChartIFrameLifecycleAdapter
                   dataset={props.dataset}
                   chart={props.chart}
-                  config={props.config}
+                  config={config}
                   style={transformToSafeCSSProps(props?.width, props?.height)}
                   widgetSpecialConfig={props.widgetSpecialConfig}
                   isShown={props.isShown}

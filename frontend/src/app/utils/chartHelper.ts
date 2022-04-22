@@ -21,7 +21,7 @@ import {
   ChartDataSectionType,
   ChartDataViewFieldCategory,
   FieldFormatType,
-  interimDateAggregatedKey,
+  RUNTIME_DATE_LEVEL_KEY,
 } from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
 import { ChartDrillOption, DrillMode } from 'app/models/ChartDrillOption';
@@ -1586,10 +1586,10 @@ export const getChartsAllRows = (configs?: ChartDataConfig[]) => {
     }, []);
 };
 
-export const getInterimDateAggregateRows = (rows: any) => {
+export const getRuntimeDateLevelFields = (rows: any) => {
   const _rows = updateBy(rows, draft => {
     draft?.forEach((v, i) => {
-      const symbolData = v?.[interimDateAggregatedKey];
+      const symbolData = v?.[RUNTIME_DATE_LEVEL_KEY];
       if (symbolData) {
         draft[i] = symbolData;
       }
@@ -1599,26 +1599,26 @@ export const getInterimDateAggregateRows = (rows: any) => {
 };
 
 /**
- * Date aggregation field added to function Columns
+ * Merging runtime date level into computed fields
  */
-export const handledateAggregaeToComputedFields = (
-  dateAggregationField,
-  deleteColName,
+export const getRuntimeComputedFields = (
+  dateLevelComputedFields,
+  replacedColName,
   computedFields,
   chartConfig,
 ) => {
   let _computedFields = computedFields ? CloneValueDeep(computedFields) : [];
 
-  if (dateAggregationField.length) {
+  if (dateLevelComputedFields.length) {
     const expressionList: any = [];
 
     _computedFields.forEach(v => {
-      if (v.category === ChartDataViewFieldCategory.DateAggregationField) {
+      if (v.category === ChartDataViewFieldCategory.DateLevelComputedField) {
         expressionList.push(v.expression);
       }
     });
 
-    dateAggregationField.forEach(v => {
+    dateLevelComputedFields.forEach(v => {
       if (!expressionList.includes(v.expression)) {
         _computedFields.push({
           category: v.category,
@@ -1630,13 +1630,48 @@ export const handledateAggregaeToComputedFields = (
     });
   }
 
-  if (deleteColName) {
+  if (replacedColName) {
     const allRows = getChartsAllRows(chartConfig?.datas);
-    const deleteRows = allRows.filter(v => v.colName === deleteColName);
+    const replacedRows = allRows.filter(v => v.colName === replacedColName);
 
-    if (deleteRows.length < 2) {
-      _computedFields = _computedFields.filter(v => v.id !== deleteColName);
+    if (replacedRows.length < 2) {
+      _computedFields = _computedFields.filter(v => v.id !== replacedColName);
     }
   }
   return _computedFields;
+};
+
+export const clearRuntimeDateLevelFieldsInChartConfig = (
+  config: ChartConfig,
+) => {
+  return updateBy(config, draft => {
+    if (draft?.datas) {
+      const index = draft.datas.findIndex(
+        v => v.type === ChartDataSectionType.GROUP,
+      );
+      const groupRows = draft.datas[index]?.rows;
+      groupRows?.forEach((v, i) => {
+        if (groupRows[i]) {
+          delete groupRows[i][RUNTIME_DATE_LEVEL_KEY];
+        }
+      });
+    }
+  });
+};
+
+export const setRuntimeDateLevelFieldsInChartConfig = (config: ChartConfig) => {
+  return updateBy(config, draft => {
+    if (draft?.datas) {
+      const index = draft.datas.findIndex(
+        v => v.type === ChartDataSectionType.GROUP,
+      );
+      const groupRows = draft.datas[index]?.rows;
+      groupRows?.forEach((v, i) => {
+        const runtimeDateLevel = groupRows[i][RUNTIME_DATE_LEVEL_KEY];
+        if (groupRows[i].uid === runtimeDateLevel?.uid) {
+          groupRows[i] = runtimeDateLevel;
+        }
+      });
+    }
+  });
 };

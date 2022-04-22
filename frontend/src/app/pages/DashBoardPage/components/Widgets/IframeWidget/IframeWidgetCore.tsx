@@ -71,7 +71,7 @@ export const IframeWidgetCore: React.FC<{}> = memo(() => {
   );
 
   return (
-    <Wrap>
+    <Wrapper>
       {editing && setter}
       <iframe
         title=" "
@@ -80,10 +80,10 @@ export const IframeWidgetCore: React.FC<{}> = memo(() => {
         allow="autoplay"
         style={{ width: '100%', height: '100%' }}
       ></iframe>
-    </Wrap>
+    </Wrapper>
   );
 });
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;

@@ -36,7 +36,7 @@ import {
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import { getInterimDateAggregateRows, getValue } from 'app/utils/chartHelper';
+import { getRuntimeDateLevelFields, getValue } from 'app/utils/chartHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import {
   formatTime,
@@ -143,7 +143,7 @@ export class ChartDataRequestBuilder {
           return acc.concat(cur.rows || []);
         }
         if (cur.type === ChartDataSectionType.GROUP) {
-          const rows = getInterimDateAggregateRows(cur.rows);
+          const rows = getRuntimeDateLevelFields(cur.rows);
 
           if (cur.drillable) {
             if (

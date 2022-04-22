@@ -18,30 +18,30 @@
 
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { FC } from 'react';
-import DateMeunItem from './DateMeunItem';
+import DateLevelMenuItems from './DateLevelMenuItems';
 
-const DateAggregationAction: FC<{
+const DateLevelAction: FC<{
   config: ChartDataSectionField;
-  sourceSupportDateField?: string[];
+  availableSourceFunctions?: string[];
   onConfigChange: (
     config: ChartDataSectionField,
     needRefresh?: boolean,
-    deleteColName?: string,
+    replacedColName?: string,
   ) => void;
   mode?: 'menu';
-}> = ({ config, onConfigChange, sourceSupportDateField }) => {
+}> = ({ config, onConfigChange, availableSourceFunctions }) => {
   const actionNeedNewRequest = true;
   const onChange = newConfig => {
     onConfigChange?.(newConfig, actionNeedNewRequest, config.colName);
   };
 
   return (
-    <DateMeunItem
-      sourceSupportDateField={sourceSupportDateField}
+    <DateLevelMenuItems
+      availableSourceFunctions={availableSourceFunctions}
       config={config}
       onChange={onChange}
     />
   );
 };
 
-export default DateAggregationAction;
+export default DateLevelAction;

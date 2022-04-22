@@ -71,7 +71,17 @@ export const selectSharePassword = createSelector(
   shareState => shareState.sharePassword,
 );
 
-export const sourceSupportDateFieldSelector = createSelector(
+export const selectLoginLoading = createSelector(
   [selectDomain],
-  shareState => shareState.sourceSupportDateField,
+  shareState => shareState.loginLoading,
+);
+
+export const selectOauth2Clients = createSelector(
+  [selectDomain],
+  appState => appState.oauth2Clients,
+);
+
+export const selectAvailableSourceFunctions = createSelector(
+  [selectDomain],
+  shareState => shareState.availableSourceFunctions,
 );

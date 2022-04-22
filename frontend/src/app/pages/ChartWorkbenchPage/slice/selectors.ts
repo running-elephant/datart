@@ -90,7 +90,7 @@ export const selectChartEditorDownloadPolling = createSelector(
   wb => wb.chartEditorDownloadPolling,
 );
 
-export const sourceSupportDateFieldSelector = createSelector(
+export const selectAvailableSourceFunctions = createSelector(
   workbenchSelector,
-  wb => wb.sourceSupportDateField,
+  wb => wb.availableSourceFunctions,
 );
