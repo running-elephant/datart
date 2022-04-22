@@ -131,11 +131,9 @@ export const widgetClickJumpAction =
       return;
     }
     const rowDataValue = getValueByRowData(params.data, jumpFieldName);
-
-    if (!rowDataValue) {
-      console.warn('rowDataValue for jumpValue:', rowDataValue);
-      return;
-    }
+    console.warn(' jumpValue:', rowDataValue);
+    console.warn('rowData', params.data?.rowData);
+    console.warn(`rowData[${jumpFieldName}]:${rowDataValue} `);
     if (targetType === 'URL') {
       // jump url
       let jumpUrl;
