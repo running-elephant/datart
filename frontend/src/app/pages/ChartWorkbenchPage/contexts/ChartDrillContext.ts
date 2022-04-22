@@ -21,9 +21,9 @@ import { createContext } from 'react';
 
 const ChartDrillContext = createContext<{
   drillOption?: IChartDrillOption;
+  availableSourceFunctions?: string[];
   onDrillOptionChange?: (option: IChartDrillOption) => void;
-  sourceSupportDateField?: string[];
-  onChartDrillDataAggregationChange?: (type: string, option: any) => void;
+  onDateLevelChange?: (type: string, option: any) => void;
 }>({});
 
 export default ChartDrillContext;

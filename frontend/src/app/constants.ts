@@ -81,7 +81,7 @@ export enum ChartDataViewFieldCategory {
   Variable = 'variable',
   ComputedField = 'computedField',
   AggregateComputedField = 'aggregateComputedField',
-  DateAggregationField = 'dateAggregationField',
+  DateLevelComputedField = 'dateLevelComputedField',
 }
 
 export enum SortActionType {
@@ -158,7 +158,7 @@ export const ChartDataSectionFieldActionType = {
   ColorRange: 'colorRange',
   ColorizeSingle: 'colorSingle',
   Size: 'size',
-  DateAggregate: 'dateAggregate',
+  DateLevel: 'dateLevel',
 };
 
 export const FilterRelationType = {
@@ -225,4 +225,4 @@ export enum DownloadFileType {
   'Image' = 'IMAGE',
 }
 
-export const interimDateAggregatedKey = Symbol('DateAggregated');
+export const RUNTIME_DATE_LEVEL_KEY = Symbol('DateLevel');

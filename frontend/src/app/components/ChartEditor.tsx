@@ -37,11 +37,11 @@ import {
   chartConfigSelector,
   currentDataViewSelector,
   datasetsSelector,
+  selectAvailableSourceFunctions,
   shadowChartConfigSelector,
-  sourceSupportDateFieldSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import {
-  fetchsourceSupportDateField,
+  fetchAvailableSourceFunctions,
   initWorkbenchAction,
   refreshDatasetAction,
   updateChartAction,
@@ -58,8 +58,8 @@ import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
-  getInterimDateAggregateRows,
-  handledateAggregaeToComputedFields,
+  getRuntimeComputedFields,
+  getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import {
@@ -132,7 +132,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const shadowChartConfig = useSelector(shadowChartConfigSelector);
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
-  const sourceSupportDateField = useSelector(sourceSupportDateFieldSelector);
+  const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
   const [chart, setChart] = useState<IChart>();
   const drillOptionRef = useRef<IChartDrillOption>();
 
@@ -220,7 +220,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
 
   useEffect(() => {
     if (dataview?.sourceId) {
-      dispatch(fetchsourceSupportDateField({ sourceId: dataview.sourceId }));
+      dispatch(fetchAvailableSourceFunctions({ sourceId: dataview.sourceId }));
     }
   }, [dataview?.sourceId, dispatch]);
 
@@ -340,20 +340,20 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         return true;
       }
       if (payload.value.type !== ChartDataSectionType.FILTER) {
-        const dateAggregationField = payload.value.rows.filter(
-          v => v.category === ChartDataViewFieldCategory.DateAggregationField,
+        const dateLevelComputedFields = payload.value.rows.filter(
+          v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
         );
-        const deleteColName = payload.value.deleteColName;
-        const computedFields = handledateAggregaeToComputedFields(
-          dateAggregationField,
-          deleteColName,
+        const replacedColName = payload.value.replacedColName;
+        const computedFields = getRuntimeComputedFields(
+          dateLevelComputedFields,
+          replacedColName,
           CloneValueDeep(dataview?.computedFields),
           chartConfig,
         );
 
-        if (deleteColName) {
+        if (replacedColName) {
           payload = updateBy(payload, draft => {
-            delete draft.value.deleteColName;
+            delete draft.value.replacedColName;
           });
         }
 
@@ -588,15 +588,15 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     dispatch(refreshDatasetAction({ drillOption: option }));
   };
 
-  const handleDrillDataAggregationChange = (type, payload) => {
-    const rows = getInterimDateAggregateRows(payload.value?.rows);
-    const dateAggregationField = rows.filter(
-      v => v.category === ChartDataViewFieldCategory.DateAggregationField,
+  const handleDateLevelChange = (type, payload) => {
+    const rows = getRuntimeDateLevelFields(payload.value?.rows);
+    const dateLevelComputedFields = rows.filter(
+      v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
     );
-    const deleteColName = payload.value.deleteColName;
-    const computedFields = handledateAggregaeToComputedFields(
-      dateAggregationField,
-      deleteColName,
+    const replacedColName = payload.value.replacedColName;
+    const computedFields = getRuntimeComputedFields(
+      dateLevelComputedFields,
+      replacedColName,
       dataview?.computedFields,
       chartConfig,
     );
@@ -647,14 +647,14 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           defaultViewId={defaultViewId}
           expensiveQuery={expensiveQuery}
           allowQuery={allowQuery}
-          sourceSupportDateField={sourceSupportDateField}
+          availableSourceFunctions={availableSourceFunctions}
           onChartChange={handleChartChange}
           onChartConfigChange={handleChartConfigChange}
           onChartDrillOptionChange={handleDrillOptionChange}
           onDataViewChange={handleDataViewChanged}
           onRefreshDataset={handleRefreshDataset}
           onCreateDownloadDataTask={handleCreateDownloadDataTask}
-          onChartDrillDataAggregationChange={handleDrillDataAggregationChange}
+          onDateLevelChange={handleDateLevelChange}
         />
         <SaveForm
           width={400}

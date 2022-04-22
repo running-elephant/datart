@@ -50,14 +50,14 @@ import {
   WARNING,
 } from 'styles/StyleConstants';
 import { stopPPG } from 'utils/utils';
-import { dateAggregationList } from '../../../../slice/constant';
-import DateAggregateFieldContainer from './DateAggregateFieldContainer';
+import { DATE_LEVELS } from '../../../../slice/constant';
+import DateLevelFieldContainer from './DateLevelFieldContainer';
 
 const { Panel } = Collapse;
 
 export const ChartDraggableSourceContainer: FC<
   {
-    sourceSupportDateField?: string[];
+    availableSourceFunctions?: string[];
     onDeleteComputedField?: (fieldName) => void;
     onEditComputedField?: (fieldName) => void;
     onSelectionChange?: (dataItemId, cmdKeyActive, shiftKeyActive) => void;
@@ -72,7 +72,7 @@ export const ChartDraggableSourceContainer: FC<
   expression,
   selectedItems,
   isActive,
-  sourceSupportDateField,
+  availableSourceFunctions,
   role,
   children,
   onDeleteComputedField,
@@ -214,10 +214,10 @@ export const ChartDraggableSourceContainer: FC<
               </div>
             }
           >
-            {dateAggregationList.map((item, i) => {
-              if (sourceSupportDateField?.includes(item.expression)) {
+            {DATE_LEVELS.map((item, i) => {
+              if (availableSourceFunctions?.includes(item.expression)) {
                 return (
-                  <DateAggregateFieldContainer
+                  <DateLevelFieldContainer
                     colName={colName}
                     key={i}
                     item={item}
@@ -262,7 +262,7 @@ export const ChartDraggableSourceContainer: FC<
     t,
     onClearCheckedList,
     drag,
-    sourceSupportDateField,
+    availableSourceFunctions,
   ]);
 
   const renderChildren = useMemo(() => {

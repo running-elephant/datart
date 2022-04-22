@@ -35,12 +35,15 @@ import PasswordModal from './PasswordModal';
 import ShareLoginModal from './ShareLoginModal';
 import { useShareSlice } from './slice';
 import {
+  selectAvailableSourceFunctions,
   selectChartPreview,
   selectNeedVerify,
   selectShareVizType,
-  sourceSupportDateFieldSelector,
 } from './slice/selectors';
-import { fetchShareVizInfo, fetchsourceSupportDateField } from './slice/thunks';
+import {
+  fetchAvailableSourceFunctions,
+  fetchShareVizInfo,
+} from './slice/thunks';
 export function ShareChart() {
   const { shareActions: actions } = useShareSlice();
 
@@ -55,7 +58,7 @@ export function ShareChart() {
   const needVerify = useSelector(selectNeedVerify);
   const chartPreview = useSelector(selectChartPreview);
   const vizType = useSelector(selectShareVizType);
-  const sourceSupportDateFields = useSelector(sourceSupportDateFieldSelector);
+  const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
 
   const shareType = useRouteQuery({
     key: 'type',
@@ -96,7 +99,7 @@ export function ShareChart() {
     const sourceId = chartPreview?.backendChart?.view.sourceId;
     if (sourceId) {
       dispatch(
-        fetchsourceSupportDateField({
+        fetchAvailableSourceFunctions({
           sourceId: sourceId,
         }),
       );
@@ -167,7 +170,7 @@ export function ShareChart() {
       {!Boolean(needVerify) && chartPreview && chartPreview?.backendChart && (
         <ChartForShare
           chartPreview={chartPreview}
-          sourceSupportDateFields={sourceSupportDateFields}
+          availableSourceFunctions={availableSourceFunctions}
         />
       )}
     </StyledWrapper>

@@ -37,8 +37,8 @@ import {
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
-  getInterimDateAggregateRows,
   getReference2,
+  getRuntimeDateLevelFields,
   getSeriesTooltips4Rectangular2,
   getStyles,
   hadAxisLabelOverflowConfig,
@@ -130,7 +130,7 @@ class BasicBarChart extends Chart {
     const dataConfigs: ChartDataConfig[] = config.datas || [];
     const settingConfigs: ChartStyleConfig[] = config.settings || [];
 
-    const groupConfigs: ChartDataSectionField[] = getInterimDateAggregateRows(
+    const groupConfigs: ChartDataSectionField[] = getRuntimeDateLevelFields(
       getDrillableRows(dataConfigs, drillOption),
     );
     const aggregateConfigs: ChartDataSectionField[] = dataConfigs

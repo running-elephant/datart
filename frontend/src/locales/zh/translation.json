@@ -696,7 +696,7 @@
             "colorSingle": "着色",
             "size": "大小",
             "chooseTheme": "选择主题",
-            "dateAggregate": "日期聚合"
+            "dateLevel": "日期级别"
           }
         }
       },

@@ -21,14 +21,14 @@ import { Dropdown, Menu } from 'antd';
 import {
   ChartDataSectionType,
   ChartDataViewFieldCategory,
-  interimDateAggregatedKey,
+  RUNTIME_DATE_LEVEL_KEY,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { DrillMode } from 'app/models/ChartDrillOption';
-import DateMeunItem from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/DateAggregationAction/DateMeunItem';
+import DateLevelMenuItems from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/DateLevelAction/DateLevelMenuItems';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { ChartConfig, ChartDataSectionField } from 'app/types/ChartConfig';
-import { getInterimDateAggregateRows } from 'app/utils/chartHelper';
+import { getRuntimeDateLevelFields } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import classnames from 'classnames';
 import { FC, memo, useCallback, useContext, useMemo } from 'react';
@@ -41,17 +41,18 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
     const {
       drillOption,
       onDrillOptionChange,
-      sourceSupportDateField,
-      onChartDrillDataAggregationChange,
+      availableSourceFunctions,
+      onDateLevelChange,
     } = useContext(ChartDrillContext);
-    const currentFields = drillOption?.getCurrentFields();
+
     const currentDrillLevel = drillOption?.getCurrentDrillLevel();
 
-    const currentDrillField = useMemo(() => {
+    const runtimeDateLevelFields = useMemo(() => {
       if (!drillOption) {
         return;
       }
       const allFields = drillOption.getAllFields();
+      const currentFields = drillOption.getCurrentFields();
       const groupSection = chartConfig?.datas?.find(
         v => v.type === ChartDataSectionType.GROUP,
       );
@@ -64,10 +65,10 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       } else {
         rows = groupSection?.rows?.filter(v => v.uid === allFields[0].uid);
       }
-      return getInterimDateAggregateRows(rows);
-    }, [currentFields, drillOption, chartConfig?.datas]);
+      return getRuntimeDateLevelFields(rows);
+    }, [drillOption, chartConfig?.datas]);
 
-    const handleChangeDataAggregate = useCallback(
+    const handleDateLevelChange = useCallback(
       (config: ChartDataSectionField) => {
         const groupData = chartConfig?.datas?.find(
           v => v.type === ChartDataSectionType.GROUP,
@@ -77,25 +78,25 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
           const _groupData = updateBy(groupData, draft => {
             if (draft.rows) {
               const index = draft.rows.findIndex(v => v.uid === config.uid);
-              const interimDateAggregatedValue =
-                draft.rows[index][interimDateAggregatedKey];
-              const deleteColName = interimDateAggregatedValue
-                ? interimDateAggregatedValue.colName
+              const runtimeDateLevel =
+                draft.rows[index][RUNTIME_DATE_LEVEL_KEY];
+              const replacedColName = runtimeDateLevel
+                ? runtimeDateLevel.colName
                 : draft.rows[index].colName;
 
-              draft.rows[index][interimDateAggregatedKey] = config;
-              draft.deleteColName = deleteColName;
+              draft.rows[index][RUNTIME_DATE_LEVEL_KEY] = config;
+              draft.replacedColName = replacedColName;
             }
           });
 
-          onChartDrillDataAggregationChange?.('data', {
+          onDateLevelChange?.('data', {
             needRefresh: true,
             ancestors: [0],
             value: _groupData,
           });
         }
       },
-      [chartConfig?.datas, onChartDrillDataAggregationChange],
+      [chartConfig?.datas, onDateLevelChange],
     );
 
     const selectDrillStatusMenu = useMemo(() => {
@@ -114,6 +115,7 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
         </Menu.Item>
       );
     }, [drillOption?.isSelectedDrill, t]);
+
     const contextMenu = useMemo(() => {
       return (
         <StyledChartDrillMenu
@@ -151,16 +153,16 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
             )}
           {drillOption?.mode !== DrillMode.Expand && selectDrillStatusMenu}
 
-          {currentDrillField?.map((v, i) => {
+          {runtimeDateLevelFields?.map((v, i) => {
             if (
-              v.category === ChartDataViewFieldCategory.DateAggregationField
+              v.category === ChartDataViewFieldCategory.DateLevelComputedField
             ) {
               return (
                 <Menu.SubMenu key={i} title={v.colName}>
-                  <DateMeunItem
-                    sourceSupportDateField={sourceSupportDateField}
-                    config={v[interimDateAggregatedKey] || v}
-                    onChange={config => handleChangeDataAggregate(config)}
+                  <DateLevelMenuItems
+                    availableSourceFunctions={availableSourceFunctions}
+                    config={v[RUNTIME_DATE_LEVEL_KEY] || v}
+                    onChange={config => handleDateLevelChange(config)}
                   />
                 </Menu.SubMenu>
               );
@@ -174,10 +176,10 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       t,
       drillOption,
       selectDrillStatusMenu,
+      runtimeDateLevelFields,
       onDrillOptionChange,
-      currentDrillField,
-      handleChangeDataAggregate,
-      sourceSupportDateField,
+      handleDateLevelChange,
+      availableSourceFunctions,
     ]);
 
     return (

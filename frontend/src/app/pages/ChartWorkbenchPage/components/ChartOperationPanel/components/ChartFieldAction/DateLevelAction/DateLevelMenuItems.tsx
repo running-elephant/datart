@@ -19,29 +19,29 @@ import { CheckOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import {
   ChartDataViewFieldCategory,
-  interimDateAggregatedKey,
+  RUNTIME_DATE_LEVEL_KEY,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { updateBy } from 'app/utils/mutation';
 import React, { memo, useCallback } from 'react';
-import { dateAggregationList } from '../../../../../slice/constant';
+import { DATE_LEVELS } from '../../../../../slice/constant';
 
-interface DateMeunItemProps {
-  sourceSupportDateField?: string[];
+interface DateLevelMenuItemsProps {
+  availableSourceFunctions?: string[];
   config;
   onChange;
 }
 
-const DateMeunItem = memo(
-  ({ sourceSupportDateField, config, onChange }: DateMeunItemProps) => {
+const DateLevelMenuItems = memo(
+  ({ availableSourceFunctions, config, onChange }: DateLevelMenuItemsProps) => {
     const t = useI18NPrefix(`viz.workbench.dataview`);
     const handleChangeFn = useCallback(
       selectedConfig => {
         /**
-         * If the current category is of type dateAggregationField
+         * If the current category is DateLevelComputedField
          */
         if (
-          config.category === ChartDataViewFieldCategory.DateAggregationField
+          config.category === ChartDataViewFieldCategory.DateLevelComputedField
         ) {
           /**
            * If default is selected
@@ -53,7 +53,7 @@ const DateMeunItem = memo(
                 delete draft.field;
                 draft.category = selectedConfig.category;
                 draft.colName = selectedConfig.colName;
-                draft[interimDateAggregatedKey] = null;
+                draft[RUNTIME_DATE_LEVEL_KEY] = null;
               }),
             );
           }
@@ -62,24 +62,24 @@ const DateMeunItem = memo(
             ...config,
             colName: `${config.field}（${selectedConfig.colName}）`,
             expression: selectedConfig.expression,
-            [interimDateAggregatedKey]: null,
+            [RUNTIME_DATE_LEVEL_KEY]: null,
           });
         } else {
           /**
-           * If the current category is a field type, only the selected category is judged to be dateAggregationField
+           * If the current category is Field, only the selected category is judged to be DateLevelComputedField
            */
           if (
             selectedConfig.category ===
-            ChartDataViewFieldCategory.DateAggregationField
+            ChartDataViewFieldCategory.DateLevelComputedField
           ) {
             return onChange(
               updateBy(config, draft => {
                 draft.expression = selectedConfig.expression;
                 draft.field = config.colName;
                 draft.category =
-                  ChartDataViewFieldCategory.DateAggregationField;
+                  ChartDataViewFieldCategory.DateLevelComputedField;
                 draft.colName = `${draft.colName}（${selectedConfig.colName}）`;
-                draft[interimDateAggregatedKey] = null;
+                draft[RUNTIME_DATE_LEVEL_KEY] = null;
               }),
             );
           }
@@ -102,8 +102,8 @@ const DateMeunItem = memo(
         >
           {t('default')}
         </Menu.Item>
-        {dateAggregationList.map(item => {
-          if (sourceSupportDateField?.includes(item.expression)) {
+        {DATE_LEVELS.map(item => {
+          if (availableSourceFunctions?.includes(item.expression)) {
             const colName = t(item.expression);
             const expression = `${item.expression}(${
               config.category === ChartDataViewFieldCategory.Field
@@ -118,7 +118,7 @@ const DateMeunItem = memo(
                 icon={config.expression === expression ? <CheckOutlined /> : ''}
                 onClick={() =>
                   handleChangeFn({
-                    category: ChartDataViewFieldCategory.DateAggregationField,
+                    category: ChartDataViewFieldCategory.DateLevelComputedField,
                     colName,
                     expression,
                   })
@@ -134,4 +134,4 @@ const DateMeunItem = memo(
     );
   },
 );
-export default DateMeunItem;
+export default DateLevelMenuItems;

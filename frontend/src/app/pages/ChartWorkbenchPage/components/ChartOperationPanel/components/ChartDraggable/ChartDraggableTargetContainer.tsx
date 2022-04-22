@@ -68,7 +68,8 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
   }) {
     const { dataset } = useContext(ChartDatasetContext);
     const { drillOption } = useContext(ChartDrillContext);
-    const { dataView, sourceSupportDateField } = useContext(VizDataViewContext);
+    const { dataView, availableSourceFunctions } =
+      useContext(VizDataViewContext);
     const [currentConfig, setCurrentConfig] = useState(config);
     const [showModal, contextHolder] = useFieldActionModal({
       i18nPrefix: 'viz.palette.data.enum.actionType',
@@ -104,7 +105,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 };
                 if (
                   val.category ===
-                  ChartDataViewFieldCategory.DateAggregationField
+                  ChartDataViewFieldCategory.DateLevelComputedField
                 ) {
                   config.colName = `${val.colName}（${t(val.expression)}）`;
                   config.expression = `${val.expression}(${val.colName})`;
@@ -208,7 +209,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
 
           if (
             items[0].category ===
-            ChartDataViewFieldCategory.DateAggregationField
+            ChartDataViewFieldCategory.DateLevelComputedField
           ) {
             const colNames = currentConfig.rows?.map(col => col.colName);
             return colNames
@@ -306,9 +307,10 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         let newCurrentConfig = updateBy(currentConfig, draft => {
           draft.rows = draft.rows?.filter(c => c.uid !== config.uid);
           if (
-            config.category === ChartDataViewFieldCategory.DateAggregationField
+            config.category ===
+            ChartDataViewFieldCategory.DateLevelComputedField
           ) {
-            draft.deleteColName = config.colName;
+            draft.replacedColName = config.colName;
           }
         });
         setCurrentConfig(newCurrentConfig);
@@ -345,7 +347,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 columnConfig: columnConfig,
                 ancestors: ancestors,
                 aggregation: aggregation,
-                sourceSupportDateField,
+                availableSourceFunctions,
                 onConfigChanged: onConfigChanged,
                 handleOpenActionModal: handleOpenActionModal,
               };

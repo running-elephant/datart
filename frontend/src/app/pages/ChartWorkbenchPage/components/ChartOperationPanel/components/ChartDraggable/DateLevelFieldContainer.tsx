@@ -5,7 +5,7 @@ import { useDrag } from 'react-dnd';
 import styled from 'styled-components/macro';
 import { INFO } from 'styles/StyleConstants';
 
-function DateAggregateFieldContainer({
+function DateLevelFieldContainer({
   onClearCheckedList,
   item,
   colName,
@@ -47,7 +47,7 @@ function DateAggregateFieldContainer({
     </ItemWrapper>
   );
 }
-export default DateAggregateFieldContainer;
+export default DateLevelFieldContainer;
 
 const ItemWrapper = styled.div`
   color: ${p => p.theme.textColorSnd};

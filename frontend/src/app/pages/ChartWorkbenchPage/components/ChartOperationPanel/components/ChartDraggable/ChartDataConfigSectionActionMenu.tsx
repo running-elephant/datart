@@ -28,7 +28,7 @@ import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { FC } from 'react';
 import AggregationAction from '../ChartFieldAction/AggregationAction';
 import AggregationLimitAction from '../ChartFieldAction/AggregationLimitAction';
-import DateAggregationAction from '../ChartFieldAction/DateAggregationAction/DateAggregationAction';
+import DateLevelAction from '../ChartFieldAction/DateLevelAction/DateLevelAction';
 import SortAction from '../ChartFieldAction/SortAction';
 import { updateDataConfigByField } from './utils';
 
@@ -37,7 +37,7 @@ const ChartDataConfigSectionActionMenu: FC<
     uid: string;
     type: string;
     onOpenModal;
-    sourceSupportDateField?: string[];
+    availableSourceFunctions?: string[];
   } & ChartDataConfigSectionProps
 > = ({
   uid,
@@ -45,7 +45,7 @@ const ChartDataConfigSectionActionMenu: FC<
   onOpenModal,
   ancestors,
   config,
-  sourceSupportDateField,
+  availableSourceFunctions,
   category,
   onConfigChanged,
 }) => {
@@ -54,14 +54,14 @@ const ChartDataConfigSectionActionMenu: FC<
     ChartDataSectionFieldActionType.Sortable,
     ChartDataSectionFieldActionType.Aggregate,
     ChartDataSectionFieldActionType.AggregateLimit,
-    ChartDataSectionFieldActionType.DateAggregate,
+    ChartDataSectionFieldActionType.DateLevel,
   ];
 
   const handleFieldConfigChanged = (
     columnUid: string,
     fieldConfig: ChartDataSectionField,
     needRefresh?: boolean,
-    deleteColName?: string,
+    replacedColName?: string,
   ) => {
     if (!fieldConfig) {
       return;
@@ -70,7 +70,7 @@ const ChartDataConfigSectionActionMenu: FC<
       columnUid,
       config,
       fieldConfig,
-      deleteColName,
+      replacedColName,
     );
 
     onConfigChanged?.(ancestors, newConfig, needRefresh);
@@ -148,13 +148,13 @@ const ChartDataConfigSectionActionMenu: FC<
         />
       );
     }
-    if (actionName === ChartDataSectionFieldActionType.DateAggregate) {
+    if (actionName === ChartDataSectionFieldActionType.DateLevel) {
       return (
-        <DateAggregationAction
-          sourceSupportDateField={sourceSupportDateField}
+        <DateLevelAction
+          availableSourceFunctions={availableSourceFunctions}
           config={fieldConfig}
-          onConfigChange={(config, needRefresh, deleteColName) => {
-            handleFieldConfigChanged(uid, config, needRefresh, deleteColName);
+          onConfigChange={(config, needRefresh, replacedColName) => {
+            handleFieldConfigChanged(uid, config, needRefresh, replacedColName);
           }}
           mode="menu"
         />
