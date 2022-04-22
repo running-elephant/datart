@@ -128,12 +128,14 @@ export const widgetClickJumpAction =
       params.componentType === 'table' &&
       jumpFieldName !== params.seriesName
     ) {
-      console.log('__ jumpFieldName !== params.seriesName');
       return;
     }
     const rowDataValue = getValueByRowData(params.data, jumpFieldName);
-    // jump url
+    console.warn(' jumpValue:', rowDataValue);
+    console.warn('rowData', params.data?.rowData);
+    console.warn(`rowData[${jumpFieldName}]:${rowDataValue} `);
     if (targetType === 'URL') {
+      // jump url
       let jumpUrl;
       if (URL.indexOf('?') > -1) {
         jumpUrl = `${URL}&${queryName}=${rowDataValue}`;
@@ -186,18 +188,26 @@ export const widgetClickLinkageAction =
       return true;
     });
 
-    const boardFilters = linkRelations.map(re => {
-      let linkageFieldName: string =
-        re?.config?.widgetToWidget?.triggerColumn || '';
-
-      const filter: BoardLinkFilter = {
-        triggerWidgetId: widget.id,
-        triggerValue: getValueByRowData(params.data, linkageFieldName),
-        triggerDataChartId: widget.datachartId,
-        linkerWidgetId: re.targetId,
-      };
-      return filter;
-    });
+    const boardFilters = linkRelations
+      .map(re => {
+        let linkageFieldName: string =
+          re?.config?.widgetToWidget?.triggerColumn || '';
+        const linkValue = getValueByRowData(params.data, linkageFieldName);
+        if (!linkValue) {
+          console.warn('linkageFieldName:', linkageFieldName);
+          console.warn('rowData', params.data?.rowData);
+          console.warn(`rowData[${linkageFieldName}]:${linkValue} `);
+          return undefined;
+        }
+        const filter: BoardLinkFilter = {
+          triggerWidgetId: widget.id,
+          triggerValue: linkValue,
+          triggerDataChartId: widget.datachartId,
+          linkerWidgetId: re.targetId,
+        };
+        return filter;
+      })
+      .filter(item => !!item) as BoardLinkFilter[];
 
     if (editing) {
       dispatch(
