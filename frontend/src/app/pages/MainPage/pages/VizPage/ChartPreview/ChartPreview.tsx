@@ -28,14 +28,14 @@ import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import ChartManager from 'app/models/ChartManager';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
-import { sourceSupportDateFieldSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
-import { fetchsourceSupportDateField } from 'app/pages/ChartWorkbenchPage/slice/thunks';
+import { selectAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/slice/selectors';
+import { fetchAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
-  getInterimDateAggregateRows,
-  handledateAggregaeToComputedFields,
+  getRuntimeComputedFields,
+  getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
@@ -95,7 +95,9 @@ const ChartPreviewBoard: FC<{
     const [version, setVersion] = useState<string>();
     const previewCharts = useSelector(selectPreviewCharts);
     const publishLoading = useSelector(selectPublishLoading);
-    const sourceSupportDateField = useSelector(sourceSupportDateFieldSelector);
+    const availableSourceFunctions = useSelector(
+      selectAvailableSourceFunctions,
+    );
     const [chartPreview, setChartPreview] = useState<ChartPreview>();
     const [chart, setChart] = useState<IChart>();
     const [loadingStatus, setLoadingStatus] = useState<boolean>(false);
@@ -123,7 +125,7 @@ const ChartPreviewBoard: FC<{
       const sourceId = chartPreview?.backendChart?.view.sourceId;
       if (sourceId) {
         dispatch(
-          fetchsourceSupportDateField({
+          fetchAvailableSourceFunctions({
             sourceId: sourceId,
           }),
         );
@@ -389,15 +391,15 @@ const ChartPreviewBoard: FC<{
       );
     };
 
-    const handleChartDrillDataAggregationChange = (type, payload) => {
-      const rows = getInterimDateAggregateRows(payload.value?.rows);
-      const dateAggregationField = rows.filter(
-        v => v.category === ChartDataViewFieldCategory.DateAggregationField,
+    const handleDateLevelChange = (type, payload) => {
+      const rows = getRuntimeDateLevelFields(payload.value?.rows);
+      const dateLevelComputedFields = rows.filter(
+        v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
       );
-      const deleteColName = payload.value.deleteColName;
-      const computedFields = handledateAggregaeToComputedFields(
-        dateAggregationField,
-        deleteColName,
+      const replacedColName = payload.value.replacedColName;
+      const computedFields = getRuntimeComputedFields(
+        dateLevelComputedFields,
+        replacedColName,
         chartPreview?.backendChart?.config?.computedFields,
         chartPreview?.chartConfig,
       );
@@ -442,9 +444,8 @@ const ChartPreviewBoard: FC<{
             value={{
               drillOption: drillOptionRef.current,
               onDrillOptionChange: handleDrillOptionChange,
-              sourceSupportDateField,
-              onChartDrillDataAggregationChange:
-                handleChartDrillDataAggregationChange,
+              availableSourceFunctions,
+              onDateLevelChange: handleDateLevelChange,
             }}
           >
             <div>

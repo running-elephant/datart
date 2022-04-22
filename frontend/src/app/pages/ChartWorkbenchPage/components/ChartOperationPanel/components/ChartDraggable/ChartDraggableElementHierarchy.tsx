@@ -27,7 +27,7 @@ const ChartDraggableElementHierarchy: FC<{
   columnConfig;
   ancestors;
   aggregation;
-  sourceSupportDateField;
+  availableSourceFunctions;
   onConfigChanged;
   handleOpenActionModal;
 }> = memo(
@@ -37,7 +37,7 @@ const ChartDraggableElementHierarchy: FC<{
     columnConfig,
     ancestors,
     aggregation,
-    sourceSupportDateField,
+    availableSourceFunctions,
     onConfigChanged,
     handleOpenActionModal,
   }) => {
@@ -49,7 +49,7 @@ const ChartDraggableElementHierarchy: FC<{
           columnConfig: child,
           ancestors: ancestors,
           aggregation: aggregation,
-          sourceSupportDateField,
+          availableSourceFunctions,
           onConfigChanged: onConfigChanged,
           handleOpenActionModal: handleOpenActionModal,
         };

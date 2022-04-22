@@ -26,8 +26,8 @@ import ChartManager from 'app/models/ChartManager';
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
-  getInterimDateAggregateRows,
-  handledateAggregaeToComputedFields,
+  getRuntimeComputedFields,
+  getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import { FC, memo, useRef, useState } from 'react';
@@ -52,8 +52,8 @@ const TitleHeight = 100;
 const ChartForShare: FC<{
   chartPreview?: ChartPreview;
   filterSearchParams?: FilterSearchParams;
-  sourceSupportDateFields?: string[];
-}> = memo(({ chartPreview, sourceSupportDateFields }) => {
+  availableSourceFunctions?: string[];
+}> = memo(({ chartPreview, availableSourceFunctions }) => {
   const dispatch = useDispatch();
   const drillOptionRef = useRef<IChartDrillOption>();
   const [chart] = useState<IChart | undefined>(() => {
@@ -152,15 +152,15 @@ const ChartForShare: FC<{
     );
   };
 
-  const handleChartDrillDataAggregationChange = (type, payload) => {
-    const rows = getInterimDateAggregateRows(payload.value?.rows);
-    const dateAggregationField = rows.filter(
-      v => v.category === ChartDataViewFieldCategory.DateAggregationField,
+  const handleDateLevelChange = (type, payload) => {
+    const rows = getRuntimeDateLevelFields(payload.value?.rows);
+    const dateLevelComputedFields = rows.filter(
+      v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
     );
-    const deleteColName = payload.value.deleteColName;
-    const computedFields = handledateAggregaeToComputedFields(
-      dateAggregationField,
-      deleteColName,
+    const replacedColName = payload.value.replacedColName;
+    const computedFields = getRuntimeComputedFields(
+      dateLevelComputedFields,
+      replacedColName,
       chartPreview?.backendChart?.config?.computedFields,
       chartPreview?.chartConfig,
     );
@@ -192,10 +192,9 @@ const ChartForShare: FC<{
       <ChartDrillContext.Provider
         value={{
           drillOption: drillOptionRef.current,
-          sourceSupportDateField: sourceSupportDateFields,
+          availableSourceFunctions,
           onDrillOptionChange: handleDrillOptionChange,
-          onChartDrillDataAggregationChange:
-            handleChartDrillDataAggregationChange,
+          onDateLevelChange: handleDateLevelChange,
         }}
       >
         <div style={{ width: '100%', height: '100%' }} ref={ref}>

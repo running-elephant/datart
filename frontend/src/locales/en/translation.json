@@ -696,7 +696,7 @@
             "colorSingle": "colorize",
             "size": "size",
             "chooseTheme": "Choose theme",
-            "dateAggregate": "Date aggregate"
+            "dateLevel": "Date Level"
           }
         }
       },

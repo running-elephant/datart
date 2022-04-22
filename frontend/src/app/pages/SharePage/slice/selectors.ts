@@ -71,7 +71,7 @@ export const selectSharePassword = createSelector(
   shareState => shareState.sharePassword,
 );
 
-export const sourceSupportDateFieldSelector = createSelector(
+export const selectAvailableSourceFunctions = createSelector(
   [selectDomain],
-  shareState => shareState.sourceSupportDateField,
+  shareState => shareState.availableSourceFunctions,
 );

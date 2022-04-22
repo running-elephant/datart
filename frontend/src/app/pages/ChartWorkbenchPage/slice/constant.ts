@@ -25,33 +25,33 @@ export const ChartConfigReducerActionType = {
   I18N: 'i18n',
 };
 
-export const dateAggregationList = [
+export const DATE_LEVELS = [
   {
-    category: ChartDataViewFieldCategory.DateAggregationField,
+    category: ChartDataViewFieldCategory.DateLevelComputedField,
     expression: 'AGG_DATE_YEAR',
     id: 'YEAR',
     type: 'DATE',
   },
   {
-    category: ChartDataViewFieldCategory.DateAggregationField,
+    category: ChartDataViewFieldCategory.DateLevelComputedField,
     expression: 'AGG_DATE_QUARTER',
     id: 'QUARTER',
     type: 'DATE',
   },
   {
-    category: ChartDataViewFieldCategory.DateAggregationField,
+    category: ChartDataViewFieldCategory.DateLevelComputedField,
     expression: 'AGG_DATE_MONTH',
     id: 'MONTH',
     type: 'DATE',
   },
   {
-    category: ChartDataViewFieldCategory.DateAggregationField,
+    category: ChartDataViewFieldCategory.DateLevelComputedField,
     expression: 'AGG_DATE_WEEK',
     id: 'WEEK',
     type: 'DATE',
   },
   {
-    category: ChartDataViewFieldCategory.DateAggregationField,
+    category: ChartDataViewFieldCategory.DateLevelComputedField,
     expression: 'AGG_DATE_DAY',
     id: 'DAY',
     type: 'DATE',

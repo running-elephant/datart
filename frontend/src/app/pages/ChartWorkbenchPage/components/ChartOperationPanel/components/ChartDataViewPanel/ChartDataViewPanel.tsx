@@ -228,7 +228,7 @@ const ChartDataViewPanel: FC<{
 
   const sortedMetaFields = useMemo(() => {
     const computedFields = dataView?.computedFields?.filter(
-      v => v.category !== ChartDataViewFieldCategory.DateAggregationField,
+      v => v.category !== ChartDataViewFieldCategory.DateLevelComputedField,
     );
     const allFields = (dataView?.meta || []).concat(computedFields || []);
     const hierarchyFields = allFields.filter(

@@ -29,8 +29,8 @@ import { ChartDTO } from 'app/types/ChartDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import {
+  fetchAvailableSourceFunctions,
   fetchShareDataSetByPreviewChartAction,
-  fetchsourceSupportDateField,
 } from './thunks';
 // import { fetchShareDataSetByPreviewChartAction } from './thunk';
 import { ExecuteToken, SharePageState, ShareVizInfo } from './types';
@@ -46,7 +46,7 @@ export const initialState: SharePageState = {
   headlessBrowserRenderSign: false,
   pageWidthHeight: [0, 0],
   shareDownloadPolling: false,
-  sourceSupportDateField: [],
+  availableSourceFunctions: [],
 };
 
 export const slice = createSlice({
@@ -186,9 +186,12 @@ export const slice = createSlice({
       .addCase(fetchShareDataSetByPreviewChartAction.rejected, state => {
         state.headlessBrowserRenderSign = true;
       })
-      .addCase(fetchsourceSupportDateField.fulfilled, (state, { payload }) => {
-        state.sourceSupportDateField = payload;
-      });
+      .addCase(
+        fetchAvailableSourceFunctions.fulfilled,
+        (state, { payload }) => {
+          state.availableSourceFunctions = payload;
+        },
+      );
   },
 });
 

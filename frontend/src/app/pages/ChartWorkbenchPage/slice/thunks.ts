@@ -28,7 +28,7 @@ import {
   buildUpdateChartRequest,
   convertToChartDto,
 } from 'app/utils/ChartDtoHelper';
-import { fetchFieldFunctionsAsync } from 'app/utils/fetch';
+import { fetchAvailableSourceFunctionsAsync } from 'app/utils/fetch';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { request2 } from 'utils/request';
 import { rejectHandle } from 'utils/utils';
@@ -264,12 +264,12 @@ export const updateChartAction = createAsyncThunk(
   },
 );
 
-export const fetchsourceSupportDateField = createAsyncThunk<
+export const fetchAvailableSourceFunctions = createAsyncThunk<
   string[],
   { sourceId: string }
->('workbench/fetchsourceSupportDateField', async arg => {
+>('workbench/fetchAvailableSourceFunctions', async arg => {
   try {
-    return await fetchFieldFunctionsAsync(arg.sourceId);
+    return await fetchAvailableSourceFunctionsAsync(arg.sourceId);
   } catch (err) {
     throw err;
   }

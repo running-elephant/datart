@@ -29,10 +29,10 @@ import { updateCollectionByAction } from 'app/utils/mutation';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { ChartConfigReducerActionType } from './constant';
 import {
+  fetchAvailableSourceFunctions,
   fetchChartAction,
   fetchDataSetAction,
   fetchDataViewsAction,
-  fetchsourceSupportDateField,
   fetchViewDetailAction,
 } from './thunks';
 import { ChartConfigPayloadType, WorkbenchState } from './type';
@@ -200,9 +200,12 @@ const workbenchSlice = createSlice({
             ? true
             : chartConfigDTO.aggregation;
       })
-      .addCase(fetchsourceSupportDateField.fulfilled, (state, { payload }) => {
-        state.sourceSupportDateField = payload;
-      });
+      .addCase(
+        fetchAvailableSourceFunctions.fulfilled,
+        (state, { payload }) => {
+          state.availableSourceFunctions = payload;
+        },
+      );
 
     builder.addCase(fetchDataSetAction.pending, (state, action) => {
       state.datasetLoading = true;
