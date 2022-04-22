@@ -20,6 +20,7 @@ import { Button, Card, Form, Input, message, Popconfirm } from 'antd';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { User } from 'app/slice/types';
+import { fetchCheckName } from 'app/utils/fetch';
 import debounce from 'debounce-promise';
 import { CommonFormTypes, DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -27,7 +28,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG, SPACE_MD } from 'styles/StyleConstants';
-import { request } from 'utils/request';
 import { selectOrgId } from '../../../../slice/selectors';
 import { useMemberSlice } from '../../slice';
 import {
@@ -173,7 +173,7 @@ export function RoleDetailPage() {
       <Content>
         <Card bordered={false}>
           <Form
-            name="source_form_"
+            name="role_form_"
             form={form}
             labelAlign="left"
             labelCol={{ span: 4 }}
@@ -194,15 +194,8 @@ export function RoleDetailPage() {
                     if (value === editingRole?.info.name) {
                       return Promise.resolve();
                     }
-                    return request({
-                      url: '/roles/check/name',
-                      method: 'POST',
-                      data: { name: value, orgId },
-                    }).then(
-                      () => Promise.resolve(),
-                      err =>
-                        Promise.reject(new Error(err.response.data.message)),
-                    );
+                    const data = { name: value, orgId };
+                    return fetchCheckName('roles', data);
                   }, DEFAULT_DEBOUNCE_WAIT),
                 },
               ]}

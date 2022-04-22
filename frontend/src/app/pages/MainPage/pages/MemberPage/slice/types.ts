@@ -51,9 +51,15 @@ export interface InviteMemberParams {
   resolve: ({ success, fail }: { success: string[]; fail: string[] }) => void;
 }
 
-export interface EditMemberParams {
+export interface SaveMemberParams {
+  type: 'add' | 'edit' | 'update';
   orgId: string;
-  roles: Role[];
+  username: string;
+  email: string;
+  password: string;
+  name: string;
+  description: string;
+  roleIds: string[];
   resolve: () => void;
 }
 

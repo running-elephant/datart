@@ -19,34 +19,28 @@
 import { MoreOutlined, SendOutlined } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
-import { ShareLinkModal } from 'app/components/VizOperationMenu';
+import { ShareManageModal } from 'app/components/VizOperationMenu';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { useStatusTitle } from 'app/pages/DashBoardPage/hooks/useStatusTitle';
 import { generateShareLinkAsync } from 'app/utils/fetch';
-import { TITLE_SUFFIX } from 'globalConstants';
-import React, {
-  FC,
-  memo,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
+import React, { FC, memo, useCallback, useContext, useState } from 'react';
 import { StoryContext } from '../contexts/StoryContext';
 import { StoryOverLay } from './StoryOverLay';
 
 interface StoryHeaderProps {
-  name?: string;
-  status?: number;
+  orgId: string;
+  name: string;
+  status: number;
   publishLoading?: boolean;
-  onPublish?: () => void;
+  onPublish: () => void;
   toggleEdit: () => void;
   playStory: () => void;
   allowShare?: boolean;
   allowManage?: boolean;
-  onRecycleStory?: () => void;
 }
 export const StoryHeader: FC<StoryHeaderProps> = memo(
   ({
+    orgId,
     name,
     toggleEdit,
     status,
@@ -55,31 +49,41 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
     onPublish,
     allowShare,
     allowManage,
-    onRecycleStory,
   }) => {
     const t = useI18NPrefix(`viz.action`);
-    const title = useMemo(() => {
-      const base = name || '';
-      const suffix = TITLE_SUFFIX[Number(status)]
-        ? `[${t(TITLE_SUFFIX[Number(status)])}]`
-        : '';
-      return base + suffix;
-    }, [name, status, t]);
+
+    const title = useStatusTitle(name, status);
+
     const isArchived = Number(status) === 0;
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
-    const { stroyBoardId } = useContext(StoryContext);
+    const { storyId: stroyBoardId } = useContext(StoryContext);
     const onOpenShareLink = useCallback(() => {
       setShowShareLinkModal(true);
     }, []);
 
     const onGenerateShareLink = useCallback(
-      async (expireDate, enablePassword) => {
-        const result = await generateShareLinkAsync(
-          expireDate,
-          enablePassword,
-          stroyBoardId,
-          'STORYBOARD',
-        );
+      async ({
+        expiryDate,
+        authenticationMode,
+        roles,
+        users,
+        rowPermissionBy,
+      }: {
+        expiryDate: string;
+        authenticationMode: string;
+        roles: string[];
+        users: string[];
+        rowPermissionBy: string;
+      }) => {
+        const result: any = await generateShareLinkAsync({
+          expiryDate,
+          authenticationMode,
+          roles,
+          users,
+          rowPermissionBy,
+          vizId: stroyBoardId,
+          vizType: 'STORYBOARD',
+        });
         return result;
       },
       [stroyBoardId],
@@ -117,7 +121,6 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
                     onOpenShareLink={onOpenShareLink}
                     isArchived={isArchived}
                     onPublish={Number(status) === 2 ? onPublish : ''}
-                    onRecycleStory={onRecycleStory}
                   />
                 }
                 arrow
@@ -126,12 +129,15 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
               </Dropdown>
             )}
 
-            {showShareLinkModal && (
-              <ShareLinkModal
+            {allowShare && (
+              <ShareManageModal
+                vizId={stroyBoardId as string}
+                orgId={orgId as string}
+                vizType="STORYBOARD"
                 visibility={showShareLinkModal}
                 onOk={() => setShowShareLinkModal(false)}
                 onCancel={() => setShowShareLinkModal(false)}
-                onGenerateShareLink={onGenerateShareLink as (any) => any}
+                onGenerateShareLink={onGenerateShareLink}
               />
             )}
           </>

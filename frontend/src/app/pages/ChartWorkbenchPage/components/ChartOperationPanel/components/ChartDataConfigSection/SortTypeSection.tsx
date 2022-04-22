@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionFieldActionType } from 'app/types/ChartConfig';
+import {
+  ChartDataSectionFieldActionType,
+  DataViewFieldType,
+} from 'app/constants';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import BaseDataConfigSection from './BaseDataConfigSection';
 import { dataConfigSectionComparer } from './utils';
@@ -29,10 +31,10 @@ const SortTypeSection: FC<ChartDataConfigSectionProps> = memo(
       {},
       {
         actions: {
-          [ChartDataViewFieldType.NUMERIC]: [
+          [DataViewFieldType.NUMERIC]: [
             ChartDataSectionFieldActionType.Sortable,
           ],
-          [ChartDataViewFieldType.STRING]: [
+          [DataViewFieldType.STRING]: [
             ChartDataSectionFieldActionType.Sortable,
           ],
         },

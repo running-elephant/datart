@@ -26,8 +26,8 @@ import {
   fontDefault,
   VALUE_SPLITTER,
 } from 'app/pages/DashBoardPage/utils/widget';
-import { versionCanDo } from '../utils';
-import { VERSION_BETA_0, VERSION_BETA_1, VERSION_BETA_2 } from './../constants';
+import { setLatestVersion, versionCanDo } from '../utils';
+import { APP_VERSION_BETA_0, APP_VERSION_BETA_2 } from './../constants';
 
 /**
  *
@@ -60,7 +60,7 @@ export const convertWidgetRelationsToObj = (
  */
 export const beta0 = (widget?: Widget) => {
   if (!widget) return undefined;
-  if (!versionCanDo(VERSION_BETA_0, widget?.config.version)) return widget;
+  if (!versionCanDo(APP_VERSION_BETA_0, widget?.config.version)) return widget;
 
   // 1.放弃了 filter type 新的是 controller
   if ((widget.config.type as any) === 'filter') {
@@ -81,32 +81,26 @@ export const beta0 = (widget?: Widget) => {
       ).split(VALUE_SPLITTER);
     }
   }
-  widget.config.version = VERSION_BETA_0;
+  widget.config.version = APP_VERSION_BETA_0;
   return widget;
 };
 
-export const beta1 = (widget?: Widget) => {
-  if (!widget) return undefined;
-  if (!versionCanDo(VERSION_BETA_1, widget?.config.version)) return widget;
-  widget.config.version = VERSION_BETA_1;
-  return widget;
-};
 export const beta2 = (widget?: Widget) => {
   if (!widget) return undefined;
-  if (!versionCanDo(VERSION_BETA_2, widget?.config.version)) return widget;
+  if (!versionCanDo(APP_VERSION_BETA_2, widget?.config.version)) return widget;
   // widget.lock
   if (!widget.config.lock) {
     widget.config.lock = false;
   }
-  widget.config.version = VERSION_BETA_2;
+  widget.config.version = APP_VERSION_BETA_2;
   return widget;
 };
-/**
- *
- * parseServerWidget JSON.parse(widget.config)
- * @param {ServerWidget} sWidget
- * @return {*}
- */
+
+const finaleWidget = (widget?: Widget) => {
+  if (!widget) return undefined;
+  widget.config = setLatestVersion(widget.config);
+  return widget;
+};
 export const parseServerWidget = (sWidget: ServerWidget) => {
   try {
     sWidget.config = JSON.parse(sWidget.config);
@@ -136,8 +130,9 @@ export const migrateWidgets = (widgets: ServerWidget[]) => {
     .filter(widget => !!widget)
     .map(widget => {
       let resWidget = beta0(widget);
-      resWidget = beta1(resWidget);
+
       resWidget = beta2(resWidget);
+      resWidget = finaleWidget(resWidget);
       return resWidget;
     })
     .filter(widget => !!widget);

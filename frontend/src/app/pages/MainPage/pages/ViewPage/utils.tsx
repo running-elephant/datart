@@ -17,6 +17,7 @@
  */
 
 import { TreeDataNode } from 'antd';
+import { DataViewFieldType } from 'app/constants';
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import { FONT_WEIGHT_MEDIUM, SPACE_UNIT } from 'styles/StyleConstants';
 import { Nullable } from 'types';
@@ -24,7 +25,6 @@ import { isEmptyArray } from 'utils/object';
 import { getDiffParams, getTextWidth } from 'utils/utils';
 import {
   ColumnCategories,
-  ColumnTypes,
   DEFAULT_PREVIEW_SIZE,
   UNPERSISTED_ID_PREFIX,
   ViewViewModelStages,
@@ -108,6 +108,7 @@ export function transformQueryResultToModelAndDataSource(
     return {
       ...obj,
       [name]: {
+        name,
         type: hierarchyColumn?.type || type,
         primaryKey,
         category: hierarchyColumn?.category || ColumnCategories.Uncategorized, // FIXME: model 重构时一起改
@@ -330,9 +331,9 @@ export function transformModelToViewModel(
 
 export const dataModelColumnSorter = (prev: Column, next: Column): number => {
   const columnTypePriority = {
-    [ColumnTypes.Date]: 1,
-    [ColumnTypes.String]: 1,
-    [ColumnTypes.Number]: 2,
+    [DataViewFieldType.DATE]: 1,
+    [DataViewFieldType.STRING]: 1,
+    [DataViewFieldType.NUMERIC]: 2,
   };
   const hierarchyPriority = {
     [ColumnRole.Hierarchy]: 10,
@@ -340,7 +341,7 @@ export const dataModelColumnSorter = (prev: Column, next: Column): number => {
   };
   const calcPriority = (column: Column) => {
     return (
-      columnTypePriority[column?.type || ColumnTypes.String] *
+      columnTypePriority[column?.type || DataViewFieldType.STRING] *
       hierarchyPriority[column?.role || ColumnRole.Role]
     );
   };

@@ -17,8 +17,8 @@
  */
 
 import { DeleteOutlined } from '@ant-design/icons';
+import { DataViewFieldType } from 'app/constants';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { XYCoord } from 'dnd-core';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
@@ -201,7 +201,7 @@ export default DropTarget(
 
 const StyledChartDraggableElement = styled.div<{
   isDragging;
-  type: ChartDataViewFieldType;
+  type: DataViewFieldType;
 }>`
   padding: ${SPACE_XS} ${SPACE_MD};
   margin-bottom: ${SPACE};
@@ -209,7 +209,7 @@ const StyledChartDraggableElement = styled.div<{
   color: ${p => p.theme.componentBackground};
   cursor: move;
   background: ${p =>
-    p.type === ChartDataViewFieldType.NUMERIC ? p.theme.success : p.theme.info};
+    p.type === DataViewFieldType.NUMERIC ? p.theme.success : p.theme.info};
   border-radius: ${BORDER_RADIUS};
   opacity: ${p => (p.isDragging ? 0.2 : 1)};
 `;

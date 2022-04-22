@@ -1,11 +1,10 @@
 import { RadioGroupOptionType } from 'antd/lib/radio';
+import { DataViewFieldType, TimeFilterValueCategory } from 'app/constants';
 import {
   ControllerVisibleType,
   ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
 import { RelationFilterValue } from 'app/types/ChartConfig';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
-import { TimeFilterValueCategory } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
 import { Moment, unitOfTime } from 'moment';
@@ -15,7 +14,7 @@ export interface ControllerVisibility {
   visibilityType: ControllerVisibleType;
   condition?: VisibilityCondition;
 }
-export type ValueTypes = ChartDataViewFieldType | VariableValueTypes;
+export type ValueTypes = DataViewFieldType | VariableValueTypes;
 export interface ControlOption {
   label: string;
   value: string;

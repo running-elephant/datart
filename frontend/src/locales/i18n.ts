@@ -24,16 +24,14 @@ export const translationsJson = {
 convertLanguageJsonToObject(en);
 
 export const changeLang = lang => {
-  i18next.changeLanguage(lang);
-  requestInstance.defaults.headers['Accept-Language'] =
-    lang === 'zh' ? 'zh-CN' : 'en-US'; // FIXME locale
   localStorage.setItem(StorageKeys.Locale, lang);
-  moment.locale(lang === 'zh' ? 'zh-cn' : 'en-us'); // FIXME locale
   window.location && window.location.reload();
 };
 
 const initialLocale = getInitialLocale();
-moment.locale(initialLocale);
+requestInstance.defaults.headers['Accept-Language'] =
+  initialLocale === 'zh' ? 'zh-CN' : 'en-US'; // FIXME locale
+moment.locale(initialLocale === 'zh' ? 'zh-cn' : 'en-us'); // FIXME locale
 
 export const i18n = i18next
   // pass the i18n instance to react-i18next.

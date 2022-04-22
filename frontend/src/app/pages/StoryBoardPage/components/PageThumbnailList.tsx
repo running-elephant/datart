@@ -48,7 +48,7 @@ const PageThumbnailList: React.FC<PageThumbnailListProps> = ({
   onPageClick,
   onDeletePages,
 }) => {
-  const { stroyBoardId } = useContext(StoryContext);
+  const { storyId: stroyBoardId } = useContext(StoryContext);
   const pageInfoMap = useSelector((state: { storyBoard: StoryBoardState }) =>
     selectStoryPageInfoById(state, stroyBoardId),
   );

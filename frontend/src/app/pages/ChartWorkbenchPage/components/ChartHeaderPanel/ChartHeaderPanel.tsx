@@ -20,11 +20,7 @@ import { Button, Space } from 'antd';
 import SaveToDashboard from 'app/components/SaveToDashboard';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
-import {
-  backendChartSelector,
-  selectChartEditorDownloadPolling,
-  useWorkbenchSlice,
-} from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
 import { DownloadListPopup } from 'app/pages/MainPage/Navbar/DownloadListPopup';
 import { loadTasks } from 'app/pages/MainPage/Navbar/service';
 import { selectHasVizFetched } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
@@ -42,6 +38,10 @@ import {
   SPACE_TIMES,
   SPACE_XS,
 } from 'styles/StyleConstants';
+import {
+  backendChartSelector,
+  selectChartEditorDownloadPolling,
+} from '../../slice/selectors';
 
 const ChartHeaderPanel: FC<{
   chartName?: string;

@@ -39,21 +39,19 @@ import datart.server.base.params.BaseCreateParam;
 import datart.server.base.params.BaseUpdateParam;
 import datart.server.base.params.ScheduleCreateParam;
 import datart.server.base.params.ScheduleUpdateParam;
-import datart.server.service.BaseService;
-import datart.server.service.RoleService;
 import datart.server.job.EmailJob;
 import datart.server.job.ScheduleJob;
-import datart.server.service.ScheduleService;
 import datart.server.job.WeChartJob;
+import datart.server.service.BaseService;
+import datart.server.service.RoleService;
+import datart.server.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -95,8 +93,13 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
     }
 
     private boolean hasPermission(Role role, Schedule schedule, int permission) {
-        if (schedule.getId() == null || (permission & Const.CREATE) == permission) {
-            return securityManager.hasPermission(PermissionHelper.schedulePermission(schedule.getOrgId(), role.getId(), ResourceType.SCHEDULE.name(), permission));
+        if (schedule.getId() == null || rrrMapper.countRolePermission(schedule.getId(), role.getId()) == 0) {
+            Schedule parent = scheduleMapper.selectByPrimaryKey(schedule.getParentId());
+            if (parent == null) {
+                return securityManager.hasPermission(PermissionHelper.schedulePermission(schedule.getOrgId(), role.getId(), ResourceType.SCHEDULE.name(), permission));
+            } else {
+                return hasPermission(role, parent, permission);
+            }
         } else {
             return securityManager.hasPermission(PermissionHelper.schedulePermission(schedule.getOrgId(), role.getId(), schedule.getId(), permission));
         }
@@ -104,17 +107,37 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
 
     @Override
     public List<ScheduleBaseInfo> listSchedules(String orgId) {
-        return scheduleMapper
-                .selectByOrg(orgId)
-                .stream()
-                .filter(schedule -> {
-                    try {
-                        requirePermission(schedule, Const.READ);
-                        return true;
-                    } catch (Exception e) {
-                        return false;
-                    }
-                }).map(ScheduleBaseInfo::new)
+
+        List<Schedule> schedules = scheduleMapper.selectByOrg(orgId);
+
+        Map<String, Schedule> filtered = new HashMap<>();
+
+        List<Schedule> permitted = schedules.stream().filter(schedule -> {
+            try {
+                requirePermission(schedule, Const.READ);
+                return true;
+            } catch (Exception e) {
+                filtered.put(schedule.getId(), schedule);
+                return false;
+            }
+        }).collect(Collectors.toList());
+
+        while (!filtered.isEmpty()) {
+            boolean updated = false;
+            for (Schedule schedule : permitted) {
+                Schedule parent = filtered.remove(schedule.getParentId());
+                if (parent != null) {
+                    permitted.add(parent);
+                    updated = true;
+                    break;
+                }
+            }
+            if (!updated) {
+                break;
+            }
+        }
+        return permitted.stream()
+                .map(ScheduleBaseInfo::new)
                 .collect(Collectors.toList());
     }
 

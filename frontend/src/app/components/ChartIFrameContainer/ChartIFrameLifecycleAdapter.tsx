@@ -19,10 +19,11 @@
 import { LoadingOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
 import { useFrame } from 'app/components/ReactFrameComponent';
+import { ChartLifecycle } from 'app/constants';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
-import { ChartLifecycle } from 'app/types/ChartLifecycle';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
@@ -42,6 +43,7 @@ const ChartIFrameLifecycleAdapter: FC<{
   config: ChartConfig;
   style: CSSProperties;
   isShown?: boolean;
+  drillOption?: IChartDrillOption;
   widgetSpecialConfig?: any;
 }> = ({
   dataset,
@@ -49,6 +51,7 @@ const ChartIFrameLifecycleAdapter: FC<{
   config,
   style,
   isShown = true,
+  drillOption,
   widgetSpecialConfig,
 }) => {
   const [chartResourceLoader] = useState(() => new ChartIFrameResourceLoader());
@@ -84,7 +87,7 @@ const ChartIFrameLifecycleAdapter: FC<{
           newBrokerRef.register(chart);
           newBrokerRef.publish(
             ChartLifecycle.MOUNTED,
-            { containerId, dataset, config, widgetSpecialConfig },
+            { containerId, dataset, config, widgetSpecialConfig, drillOption },
             {
               document,
               window,
@@ -111,7 +114,8 @@ const ChartIFrameLifecycleAdapter: FC<{
 
   /**
    * Chart Update Event
-   * Dependency: 'config', 'dataset', 'widgetSpecialConfig', 'containerStatus', 'document', 'window', 'isShown'
+   * Dependency: 'config', 'dataset', 'widgetSpecialConfig',
+   * 'containerStatus', 'document', 'window', 'isShown', 'drillOption'
    */
   useEffect(() => {
     if (
@@ -130,6 +134,7 @@ const ChartIFrameLifecycleAdapter: FC<{
         dataset,
         config,
         widgetSpecialConfig,
+        drillOption,
       },
       {
         document,
@@ -149,6 +154,7 @@ const ChartIFrameLifecycleAdapter: FC<{
     window,
     isShown,
     translator,
+    drillOption,
   ]);
 
   /**
@@ -173,6 +179,7 @@ const ChartIFrameLifecycleAdapter: FC<{
         dataset,
         config,
         widgetSpecialConfig,
+        drillOption,
       },
       {
         document,
@@ -183,7 +190,15 @@ const ChartIFrameLifecycleAdapter: FC<{
       },
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [style.width, style.height, document, window, isShown, translator]);
+  }, [
+    style.width,
+    style.height,
+    document,
+    window,
+    isShown,
+    translator,
+    drillOption,
+  ]);
 
   return (
     <Spin

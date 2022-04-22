@@ -18,14 +18,18 @@
 package datart.data.provider.calcite;
 
 import datart.core.base.exception.Exceptions;
+import datart.core.common.DateUtils;
 import datart.core.data.provider.ScriptVariable;
 import datart.core.data.provider.SingleTypedValue;
 import datart.data.provider.calcite.custom.SqlSimpleStringLiteral;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParserPos;
+import org.apache.calcite.util.DateString;
 import org.apache.calcite.util.TimestampString;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.CharUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +38,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SqlNodeUtils {
+
+    public static final String REG_SQL_SINGLE_LINE_COMMENT = "-{2,}.*([\r\n])";
+
+    public static final String REG_SQL_MULTI_LINE_COMMENT = "/\\*+[\\s\\S]*\\*+/";
 
     public static SqlBasicCall createSqlBasicCall(SqlOperator sqlOperator, List<SqlNode> sqlNodes) {
         return new SqlBasicCall(sqlOperator, sqlNodes.toArray(new SqlNode[0]), SqlParserPos.ZERO);
@@ -75,11 +83,9 @@ public class SqlNodeUtils {
     }
 
     public static List<SqlNode> createSqlNodes(ScriptVariable variable, SqlParserPos sqlParserPos) {
-
         if (CollectionUtils.isEmpty(variable.getValues())) {
             return Collections.singletonList(SqlLiteral.createNull(sqlParserPos));
         }
-
         switch (variable.getValueType()) {
             case STRING:
                 return variable.getValues().stream()
@@ -93,7 +99,7 @@ public class SqlNodeUtils {
                         SqlLiteral.createBoolean(Boolean.parseBoolean(v), sqlParserPos)).collect(Collectors.toList());
             case DATE:
                 return variable.getValues().stream().map(v ->
-                        SqlLiteral.createTimestamp(new TimestampString(v), 0, sqlParserPos))
+                        createDateSqlNode(v, variable.getFormat()))
                         .collect(Collectors.toList());
             case FRAGMENT:
                 return variable.getValues().stream().map(SqlFragment::new).collect(Collectors.toList());
@@ -112,7 +118,7 @@ public class SqlNodeUtils {
             case BOOLEAN:
                 return SqlLiteral.createBoolean(Boolean.parseBoolean(value.getValue().toString()), SqlParserPos.ZERO);
             case DATE:
-                return SqlLiteral.createTimestamp(new TimestampString(value.getValue().toString()), 0, SqlParserPos.ZERO);
+                return createDateSqlNode(value.getValue().toString(), value.getFormat());
             case FRAGMENT:
                 return new SqlFragment(value.getValue().toString());
             case IDENTIFIER:
@@ -127,6 +133,17 @@ public class SqlNodeUtils {
         return createSqlNode(value, null);
     }
 
+    private static SqlNode createDateSqlNode(String value, String format) {
+        if (StringUtils.isBlank(format)) {
+            return SqlLiteral.createTimestamp(new TimestampString(value), 0, SqlParserPos.ZERO);
+        } else if (DateUtils.isDateFormat(format)) {
+            return SqlLiteral.createDate(new DateString(value), SqlParserPos.ZERO);
+        } else if (DateUtils.isDateTimeFormat(format)) {
+            return SqlLiteral.createTimestamp(new TimestampString(value), 0, SqlParserPos.ZERO);
+        } else {
+            return new SqlSimpleStringLiteral(value);
+        }
+    }
 
     /**
      * SQL 输出时，字段名称要默认加上引号，否则对于特殊字段名称无法处理，以及pg数据库无法正常执行等问题。
@@ -142,5 +159,12 @@ public class SqlNodeUtils {
                         .withIndentation(0)).getSql();
     }
 
+    public static String cleanupSql(String sql) {
+        sql = sql.replaceAll(REG_SQL_SINGLE_LINE_COMMENT, " ");
+        sql = sql.replaceAll(REG_SQL_MULTI_LINE_COMMENT, " ");
+        sql = sql.replace(CharUtils.CR, CharUtils.toChar(" "));
+        sql = sql.replace(CharUtils.LF, CharUtils.toChar(" "));
+        return sql.trim();
+    }
 
 }

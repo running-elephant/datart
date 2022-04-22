@@ -18,12 +18,12 @@
 
 import { Col, Input, Row, Select, Space, Tabs } from 'antd';
 import { FormItemEx } from 'app/components';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { AggregateFieldActionType } from 'app/types/ChartConfig';
 import {
+  AggregateFieldActionType,
   ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
+  DataViewFieldType,
+} from 'app/constants';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { ChartComputedFieldHandle } from 'app/types/ComputedFieldEditor';
 import { FC, useRef, useState } from 'react';
@@ -106,7 +106,7 @@ const ChartComputedFieldSettingPanel: FC<{
     handleChange(newField);
   };
 
-  const getFunctionCategroies = (): Array<{ label; value }> => {
+  const getFunctionCategories = (): Array<{ label; value }> => {
     const functionCategories = ComputedFunctionDescriptions.reduce<string[]>(
       (acc, cur) => {
         if (acc.find(x => x === cur.type)) {
@@ -196,10 +196,10 @@ const ChartComputedFieldSettingPanel: FC<{
             >
               <Select
                 value={myComputedFieldRef.current?.type}
-                options={Object.keys(ChartDataViewFieldType).map(type => {
+                options={Object.keys(DataViewFieldType).map(type => {
                   return {
                     label: type,
-                    value: ChartDataViewFieldType[type],
+                    value: DataViewFieldType[type],
                   };
                 })}
                 onChange={handleFieldTypeChange}
@@ -244,7 +244,7 @@ const ChartComputedFieldSettingPanel: FC<{
             <span>{`${t('functions')}`}</span>
             <Select
               value={selectedFunctionCategory}
-              options={getFunctionCategroies()}
+              options={getFunctionCategories()}
               onChange={handleFunctionCategoryChange}
             />
             <ChartSearchableList

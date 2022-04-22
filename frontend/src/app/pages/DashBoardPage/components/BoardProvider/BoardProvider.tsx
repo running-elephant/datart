@@ -16,26 +16,18 @@
  * limitations under the License.
  */
 
-import produce from 'immer';
-import React, { createContext, FC, memo, useCallback, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
-import { renderedWidgetAsync } from '../../pages/Board/slice/thunk';
+import { createContext, FC, memo, useMemo } from 'react';
 import {
   BoardType,
   Dashboard,
   VizRenderMode,
 } from '../../pages/Board/slice/types';
-import { renderedEditWidgetAsync } from '../../pages/BoardEditor/slice/thunk';
-import { adaptBoardImageUrl } from '../../utils';
-import { BoardActionProvider } from './BoardActionProvider';
-import { BoardConfigProvider } from './BoardConfigProvider';
-import { BoardInfoProvider } from './BoardInfoProvider';
 
 export interface BoardContextProps {
-  name: string;
-  renderMode?: VizRenderMode;
-  boardId: string;
   orgId: string;
+  boardId: string;
+  name: string;
+  renderMode: VizRenderMode;
   boardType: BoardType;
   status: number;
   editing: boolean;
@@ -46,95 +38,60 @@ export interface BoardContextProps {
   allowShare?: boolean;
   allowManage?: boolean;
   queryVariables: Dashboard['queryVariables'];
-  // methods
-  renderedWidgetById: (wid: string) => void;
 }
 
 export const BoardContext = createContext<BoardContextProps>(
   {} as BoardContextProps,
 );
-export const BoardProvider: FC<{
-  board: Dashboard;
-  renderMode: VizRenderMode;
-  editing: boolean;
-  autoFit?: boolean;
-  allowDownload?: boolean;
-  allowShare?: boolean;
-  allowManage?: boolean;
-}> = memo(
+export const BoardProvider: FC<BoardContextProps> = memo(
   ({
-    board,
-    editing,
-    children,
+    orgId,
+    boardId,
+    name,
     renderMode,
+    editing,
+    boardType,
+    status,
     autoFit,
     allowDownload,
     allowShare,
     allowManage,
+    queryVariables,
+    children,
   }) => {
-    const dispatch = useDispatch();
-    // const boardInfo=useSelector()
-    const boardContextValue: BoardContextProps = {
-      name: board.name,
-      boardId: board.id,
-      status: board.status,
-      queryVariables: board.queryVariables,
-      renderMode,
-      orgId: board.orgId,
-      boardType: board.config.type,
-      editing: editing,
-      autoFit: autoFit,
+    const boardContextValue: BoardContextProps = useMemo(() => {
+      return {
+        orgId,
+        boardId,
+        name,
+        boardType,
+        status,
+        queryVariables,
+        renderMode,
+        editing,
+        autoFit,
+        allowDownload,
+        allowShare,
+        allowManage,
+      };
+    }, [
       allowDownload,
-      allowShare,
       allowManage,
-
-      //
-      renderedWidgetById: useCallback(
-        wid => {
-          let initialQuery = board.config.initialQuery;
-
-          if (initialQuery === false && renderMode !== 'schedule') {
-            //zh:如果 initialQuery=== false renderMode !=='schedule' 则不请求数据 en: If initialQuery=== false renderMode !=='schedule' then no data is requested
-            return false;
-          }
-
-          if (editing) {
-            dispatch(
-              renderedEditWidgetAsync({ boardId: board.id, widgetId: wid }),
-            );
-          } else {
-            dispatch(
-              renderedWidgetAsync({
-                boardId: board.id,
-                widgetId: wid,
-                renderMode: renderMode,
-              }),
-            );
-          }
-        },
-        [board.config.initialQuery, board.id, dispatch, editing, renderMode],
-      ),
-    };
-    const adaptConfig = useMemo(() => {
-      if (board.config) {
-        const nextConfig = produce(board.config, draft => {
-          draft.background.image = adaptBoardImageUrl(
-            board.config.background.image,
-            board.id,
-          );
-        });
-        return nextConfig;
-      }
-      return board.config;
-    }, [board.config, board.id]);
+      allowShare,
+      autoFit,
+      boardId,
+      boardType,
+      editing,
+      name,
+      orgId,
+      queryVariables,
+      renderMode,
+      status,
+    ]);
 
     return (
       <BoardContext.Provider value={boardContextValue}>
-        <BoardConfigProvider config={adaptConfig}>
-          <BoardInfoProvider id={board.id} editing={editing}>
-            <BoardActionProvider id={board.id}>{children}</BoardActionProvider>
-          </BoardInfoProvider>
-        </BoardConfigProvider>
+        {children}
       </BoardContext.Provider>
     );
   },

@@ -16,11 +16,20 @@
  * limitations under the License.
  */
 
-import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataSetDTO, { IChartDataSetRow } from 'app/types/ChartDataSet';
+import { ChartDataSectionType } from 'app/constants';
+import {
+  ChartConfig,
+  ChartDataSectionField,
+  ChartStyleConfig,
+  LabelStyle,
+  LegendStyle,
+  YAxis,
+} from 'app/types/ChartConfig';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getDataColumnMaxAndMin2,
+  getDrillableRows,
   getExtraSeriesRowData,
   getGridStyle,
   getReference2,
@@ -30,8 +39,10 @@ import {
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
-import Chart from '../models/Chart';
+import Chart from '../../../models/Chart';
+import { ChartDrillOption } from '../../../models/ChartDrillOption';
 import Config from './config';
+import { ScatterMetricAndSizeSerie } from './types';
 
 class BasicScatterChart extends Chart {
   dependency = [];
@@ -71,7 +82,11 @@ class BasicScatterChart extends Chart {
       this.chart?.clear();
       return;
     }
-    const newOptions = this.getOptions(props.dataset, props.config);
+    const newOptions = this.getOptions(
+      props.dataset,
+      props.config,
+      props.drillOption,
+    );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
@@ -83,13 +98,18 @@ class BasicScatterChart extends Chart {
     this.chart?.resize(opt, context);
   }
 
-  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
-    const styleConfigs = config.styles;
+  private getOptions(
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    drillOption: ChartDrillOption,
+  ) {
+    const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
-    const settingConfigs = config.settings;
-    const groupConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
-      .flatMap(config => config.rows || []);
+    const settingConfigs = config.settings || [];
+    const groupConfigs: ChartDataSectionField[] = getDrillableRows(
+      dataConfigs,
+      drillOption,
+    );
     const aggregateConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
@@ -150,15 +170,15 @@ class BasicScatterChart extends Chart {
   }
 
   protected getSeriesGroupByColorConfig(
-    chartDataSetRows: IChartDataSetRow<string>[],
-    groupConfigs,
-    aggregateConfigs,
-    sizeConfigs,
-    colorConfigs,
-    infoConfigs,
-    styleConfigs,
-    settingConfigs,
-  ) {
+    chartDataSetRows: IChartDataSet<string>,
+    groupConfigs: ChartDataSectionField[],
+    aggregateConfigs: ChartDataSectionField[],
+    sizeConfigs: ChartDataSectionField[],
+    colorConfigs: ChartDataSectionField[],
+    infoConfigs: ChartDataSectionField[],
+    styleConfigs: ChartStyleConfig[],
+    settingConfigs: ChartStyleConfig[],
+  ): ScatterMetricAndSizeSerie[] {
     const { min, max } = getDataColumnMaxAndMin2(
       chartDataSetRows,
       sizeConfigs[0],
@@ -186,7 +206,7 @@ class BasicScatterChart extends Chart {
 
     // TODO(Stephen): should be refactor by ChartDataSet groupBy function
     const groupedObjDataColumns: {
-      [key: string]: { color: string; datas: [] };
+      [key: string]: { color: string; datas: IChartDataSet<string> };
     } = chartDataSetRows?.reduce((acc, cur) => {
       const key = cur.getCell(colorConfigs?.[0]);
       if (acc?.[key]) {
@@ -220,34 +240,37 @@ class BasicScatterChart extends Chart {
   }
 
   protected getMetricAndSizeSerie(
-    { max, min },
-    dataSetRows: IChartDataSetRow<string>[],
-    groupConfigs,
-    aggregateConfigs,
-    sizeConfigs,
-    infoConfigs,
-    styleConfigs,
-    settingConfigs,
-    colorSeriesName?,
-    color?,
-  ) {
+    { max, min }: { max: number; min: number },
+    dataSetRows: IChartDataSet<string>,
+    groupConfigs: ChartDataSectionField[],
+    aggregateConfigs: ChartDataSectionField[],
+    sizeConfigs: ChartDataSectionField[],
+    infoConfigs: ChartDataSectionField[],
+    styleConfigs: ChartStyleConfig[],
+    settingConfigs: ChartStyleConfig[],
+    colorSeriesName?: string,
+    color?: string,
+  ): ScatterMetricAndSizeSerie {
     const [cycleRatio] = getStyles(styleConfigs, ['scatter'], ['cycleRatio']);
     const seriesName = groupConfigs
       ?.map(gc => getColumnRenderName(gc))
       .join('-');
-    const seriesDatas = dataSetRows?.map(row => {
-      const sizeValue = row.getCell(sizeConfigs?.[0]) || min;
+    const defaultSizeValue = (max - min) / 2;
+    const seriesDatas = dataSetRows?.map((row, dcIndex) => {
+      const sizeValue = sizeConfigs?.length
+        ? row.getCell(sizeConfigs?.[0]) || min
+        : defaultSizeValue;
       return {
         ...getExtraSeriesRowData(row),
         name: groupConfigs?.map(row.getCell, row).join('-'),
         value: aggregateConfigs
-          ?.map(row.getCell, row)
+          .map(row.getCell, row)
           .concat(infoConfigs?.map(row.getCell, row))
-          .concat([sizeValue, colorSeriesName]),
+          .concat([sizeValue, colorSeriesName] as any),
       };
     });
 
-    const sizeValueIndex = []
+    const sizeValueIndex = ([] as ChartDataSectionField[])
       .concat(aggregateConfigs)
       .concat(infoConfigs)?.length;
 
@@ -269,7 +292,11 @@ class BasicScatterChart extends Chart {
     };
   }
 
-  private getAxis(styles, xAxisColumn, axisKey) {
+  private getAxis(
+    styles: ChartStyleConfig[],
+    xAxisColumn: { type: string; name: string },
+    axisKey: string,
+  ): YAxis {
     const [
       showAxis,
       inverse,
@@ -343,14 +370,17 @@ class BasicScatterChart extends Chart {
     };
   }
 
-  private getLegendStyle(styles, seriesNames) {
+  private getLegendStyle(
+    styles: ChartStyleConfig[],
+    seriesNames: string[],
+  ): LegendStyle {
     const [show, type, font, legendPos, selectAll, height] = getStyles(
       styles,
       ['legend'],
       ['showLegend', 'type', 'font', 'position', 'selectAll', 'height'],
     );
     let positions = {};
-    let orient = {};
+    let orient = '';
 
     switch (legendPos) {
       case 'top':
@@ -390,7 +420,7 @@ class BasicScatterChart extends Chart {
     };
   }
 
-  private getLabelStyle(styles) {
+  private getLabelStyle(styles: ChartStyleConfig[]): LabelStyle {
     const [show, position, font] = getStyles(
       styles,
       ['label'],
@@ -403,13 +433,13 @@ class BasicScatterChart extends Chart {
   }
 
   private getTooltipFormmaterFunc(
-    groupConfigs,
-    aggregateConfigs,
-    colorConfigs,
-    sizeConfigs,
-    infoConfigs,
-    chartDataSet,
-  ) {
+    groupConfigs: ChartDataSectionField[],
+    aggregateConfigs: ChartDataSectionField[],
+    colorConfigs: ChartDataSectionField[],
+    sizeConfigs: ChartDataSectionField[],
+    infoConfigs: ChartDataSectionField[],
+    chartDataSet: IChartDataSet<string>,
+  ): (params) => string {
     return seriesParams => {
       return getSeriesTooltips4Polar2(
         chartDataSet,

@@ -22,6 +22,8 @@ import { ChartDataConfig, ChartDataSectionField } from './ChartConfig';
 export interface IChartDataSetRow<T> extends Array<T> {
   getCell(field: ChartDataSectionField): T;
 
+  getMultiCell(...fields: ChartDataSectionField[]): string;
+
   getCellByKey(key: string): T;
 
   getFieldKey(field: ChartDataSectionField): string;

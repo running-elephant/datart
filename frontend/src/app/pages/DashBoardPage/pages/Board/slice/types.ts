@@ -16,14 +16,15 @@
  * limitations under the License.
  */
 import { ChartEditorProps } from 'app/components/ChartEditor';
+import {
+  ChartDataViewFieldCategory,
+  ControllerFacadeTypes,
+  DataViewFieldType,
+} from 'app/constants';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDatasetMeta } from 'app/types/ChartDataSet';
-import ChartDataView, {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
+import ChartDataView from 'app/types/ChartDataView';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
 import { ChartDataSectionField } from '../../../../../types/ChartConfig';
@@ -31,18 +32,13 @@ import { View } from '../../../../../types/View';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import {
   BorderStyleType,
+  LAYOUT_COLS_KEYS,
   LAYOUT_COLS_MAP,
   ScaleModeType,
   TextAlignType,
 } from '../../../constants';
 import { ControllerConfig } from '../../BoardEditor/components/ControllerWidgetPanel/types';
 
-export const strEnumType = <T extends string>(o: Array<T>): { [K in T]: K } => {
-  return o.reduce((res, key) => {
-    res[key] = key;
-    return res;
-  }, Object.create(null));
-};
 export interface BoardState {
   boardRecord: Record<string, Dashboard>;
   boardInfoRecord: Record<string, BoardInfo>;
@@ -52,8 +48,8 @@ export interface BoardState {
   viewMap: Record<string, ChartDataView>; // View
   widgetDataMap: Record<string, WidgetData>;
 }
-// 应用内浏览，分享页模式，定时任务模式，
-export type VizRenderMode = 'read' | 'share' | 'schedule';
+// 应用内浏览，分享页模式，定时任务模式，编辑模式
+export type VizRenderMode = 'read' | 'share' | 'schedule' | 'edit';
 
 export interface Dashboard {
   id: string;
@@ -105,8 +101,10 @@ export interface DashboardConfig {
   gridStep: [number, number];
   scaleMode: ScaleModeType;
 }
-export const BoardTypeMap = strEnumType(['auto', 'free']);
-export type BoardType = keyof typeof BoardTypeMap;
+export type ColsKeyType = typeof LAYOUT_COLS_KEYS[number];
+export const BoardTypes = ['auto', 'free'] as const;
+BoardTypes.includes('auto');
+export type BoardType = typeof BoardTypes[number];
 
 export interface Chart {}
 export interface Widget {
@@ -131,7 +129,7 @@ export interface WidgetConf {
   tabId?: string; //记录在父容器tab的位置
   name: string;
   nameConfig: WidgetNameConfig;
-  padding?: WidgetPadding;
+  padding: WidgetPadding;
   type: WidgetType;
   autoUpdate: boolean;
   frequency: number; // 定时同步频率
@@ -169,13 +167,14 @@ export interface JumpConfigField {
 }
 export interface JumpConfig {
   open: boolean;
-  targetType: string;
+  targetType: JumpTargetType;
   URL: string;
   queryName: string;
   field: JumpConfigField;
   target: JumpConfigTarget;
   filter: JumpConfigFilter;
 }
+export type JumpTargetType = 'INTERNAL' | 'URL';
 export interface WidgetPadding {
   left?: number;
   right?: number;
@@ -194,8 +193,7 @@ export interface WidgetInfo {
   inLinking: boolean; //是否在触发联动
   selected: boolean;
   pageInfo: Partial<PageInfo>;
-  errInfo: { [propName: string]: string };
-  selectItems?: string[];
+  errInfo: Record<WidgetErrorType, string>;
   parameters?: any;
 }
 export interface WidgetData {
@@ -206,7 +204,7 @@ export interface WidgetData {
   pageInfo?: Partial<PageInfo>;
 }
 //
-export const RenderTypeMap = strEnumType([
+export const RenderTypes = [
   'rerender',
   'clear',
   'refresh',
@@ -214,8 +212,8 @@ export const RenderTypeMap = strEnumType([
   'loading',
   'select',
   'flush',
-]);
-export type RenderType = keyof typeof RenderTypeMap;
+] as const;
+export type RenderType = typeof RenderTypes[number];
 
 export interface Relation {
   targetId: string;
@@ -251,7 +249,7 @@ export interface RelatedView {
   viewId: string;
   relatedCategory: ChartDataViewFieldCategory;
   fieldValue: string | number | Date | undefined | string[] | number[] | Date[];
-  fieldValueType: ChartDataViewFieldType | undefined;
+  fieldValueType: DataViewFieldType | undefined;
 }
 export interface ServerRelation extends Omit<Relation, 'config'> {
   config: string;
@@ -328,15 +326,15 @@ export interface ControllerWidgetContent {
   config: ControllerConfig;
 }
 
-export const WidgetTypes = strEnumType([
+export const WidgetTypes = [
   'chart',
   'media',
   'container',
   'controller',
   'query',
   'reset',
-]);
-export type WidgetType = Uncapitalize<keyof typeof WidgetTypes>;
+] as const;
+export type WidgetType = typeof WidgetTypes[number];
 export declare const ContainerWidgetTypes: ['tab', 'carousel'];
 
 export type LightWidgetType =
@@ -350,8 +348,8 @@ export type ContainerWidgetType = typeof ContainerWidgetTypes[number];
  * widgetChart 属于board 内部 配置存在widget 表内,
  * 没有真实的datachartId
  */
-export const ChartWidgetTypesMap = strEnumType(['dataChart', 'widgetChart']);
-export type WidgetContentChartType = keyof typeof ChartWidgetTypesMap;
+export const ChartWidgetTypes = ['dataChart', 'widgetChart'] as const;
+export type WidgetContentChartType = typeof ChartWidgetTypes[number];
 export declare const MediaWidgetTypes: [
   'richText',
   'timer',
@@ -403,8 +401,8 @@ export interface DataChart {
   name: string;
   orgId?: string;
   projectId?: string;
-  publish?: boolean; //有用吗？
-  type?: string; //待修改
+  publish?: boolean; //？
+  type?: string; //?
   viewId: string;
   view?: any;
   status: any;
@@ -481,3 +479,5 @@ export interface getDataOption {
   pageInfo?: Partial<PageInfo>;
   sorters?: Array<{ column: string; operator?: string; aggOperator?: string }>;
 }
+
+export type WidgetErrorType = 'request' | 'interaction';

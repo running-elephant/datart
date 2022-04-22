@@ -18,7 +18,7 @@
 
 import { Col, Form, Input, InputNumber, Modal, Radio, Row, Select } from 'antd';
 import { ColorPickerPopover } from 'app/components/ColorPicker';
-import { ColumnTypes } from 'app/pages/MainPage/pages/ViewPage/constants';
+import { DataViewFieldType } from 'app/constants';
 import { memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
@@ -114,7 +114,7 @@ export default function Add({
   const renderValueNode = () => {
     let DefaultNode = <></>;
     switch (type) {
-      case ColumnTypes.Number:
+      case DataViewFieldType.NUMERIC:
         DefaultNode = <InputNumber />;
         break;
       default:

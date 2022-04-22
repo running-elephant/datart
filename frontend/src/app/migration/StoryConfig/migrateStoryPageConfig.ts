@@ -17,8 +17,8 @@
  */
 import { StoryPageConfig } from 'app/pages/StoryBoardPage/slice/types';
 import { getInitStoryPageConfig } from 'app/pages/StoryBoardPage/utils';
-import { versionCanDo } from '../utils';
-import { VERSION_BETA_0, VERSION_BETA_1, VERSION_BETA_2 } from './../constants';
+import { setLatestVersion, versionCanDo } from '../utils';
+import { APP_VERSION_BETA_2 } from './../constants';
 
 export const parseStoryPageConfig = (storyConfig: string) => {
   try {
@@ -30,28 +30,16 @@ export const parseStoryPageConfig = (storyConfig: string) => {
   }
 };
 
-export const beta0 = (config: StoryPageConfig) => {
-  const curVersion = VERSION_BETA_0;
-  if (!versionCanDo(curVersion, config.version)) return config;
-  config.version = curVersion;
-  return config;
-};
-export const beta1 = (config: StoryPageConfig) => {
-  const curVersion = VERSION_BETA_1;
-  if (!versionCanDo(curVersion, config.version)) return config;
-  config.version = curVersion;
-  return config;
-};
 export const beta2 = (config: StoryPageConfig) => {
-  const curVersion = VERSION_BETA_2;
+  const curVersion = APP_VERSION_BETA_2;
   if (!versionCanDo(curVersion, config.version)) return config;
   config.version = curVersion;
   return config;
 };
 export const migrateStoryPageConfig = (configStr: string) => {
   let config = parseStoryPageConfig(configStr);
-  config = beta0(config);
-  config = beta1(config);
+
   config = beta2(config);
+  config = setLatestVersion(config);
   return config;
 };

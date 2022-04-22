@@ -23,6 +23,7 @@ import datart.core.common.Application;
 import datart.core.common.MessageResolver;
 import datart.core.entity.BaseEntity;
 import datart.core.entity.User;
+import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.security.manager.DatartSecurityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -38,6 +39,8 @@ public class BaseService extends MessageResolver {
 
     protected AsyncAccessLogService accessLogService;
 
+    protected RelRoleResourceMapperExt rrrMapper;
+
     private Map<Class<? extends BaseEntity>, BaseCRUDService<?, ?>> entityServiceMap;
 
     @Autowired
@@ -50,12 +53,21 @@ public class BaseService extends MessageResolver {
         this.accessLogService = accessLogService;
     }
 
+    @Autowired
+    public void setRrrMapper(RelRoleResourceMapperExt rrrMapper) {
+        this.rrrMapper = rrrMapper;
+    }
+
     public AsyncAccessLogService getAccessLogService() {
         return accessLogService;
     }
 
     public User getCurrentUser() {
         return securityManager.getCurrentUser();
+    }
+
+    public RelRoleResourceMapperExt getRRRMapper() {
+        return rrrMapper;
     }
 
     /**

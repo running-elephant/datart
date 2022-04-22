@@ -42,7 +42,7 @@ export const StoryToolBar: React.FC<{ onCloseEditor?: () => void }> = memo(
     const closeEditor = useCallback(() => {
       onCloseEditor?.();
     }, [onCloseEditor]);
-    const { stroyBoardId: storyId, name } = useContext(StoryContext);
+    const { storyId, name } = useContext(StoryContext);
     const [visible, setVisible] = useState(false);
     const chartOptionsMock = useSelector(selectVizs);
     const chartOptions = chartOptionsMock.filter(

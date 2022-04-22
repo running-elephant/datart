@@ -18,14 +18,11 @@
 
 import { BranchesOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { Col, Row, Select, Switch } from 'antd';
+import { FilterConditionType, FilterRelationType } from 'app/constants';
 import ChartFilterCondition, {
   ConditionBuilder,
-} from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
-import {
-  ChartDataSectionField,
-  FilterConditionType,
-  FilterRelationType,
-} from 'app/types/ChartConfig';
+} from 'app/models/ChartFilterCondition';
+import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';

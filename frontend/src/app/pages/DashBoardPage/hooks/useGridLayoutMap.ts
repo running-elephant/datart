@@ -15,21 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { Layouts } from 'react-grid-layout';
 import { Widget } from '../pages/Board/slice/types';
 export default function useGridLayoutMap(
   layoutWidgetMap: Record<string, Widget>,
 ) {
-  const [layoutMap, setLayoutMap] = useState<Layouts>({});
-  useEffect(() => {
+  const layoutMap = useMemo(() => {
     const layoutMap: Layouts = {
       lg: [],
-      xs: [],
+      sm: [],
     };
     Object.values(layoutWidgetMap).forEach(widget => {
       const lg = widget.config.rect || widget.config.mobileRect || {};
-      const xs = widget.config.mobileRect || widget.config.rect || {};
+      const sm = widget.config.mobileRect || widget.config.rect || {};
       const lock = widget.config.lock;
       layoutMap.lg.push({
         i: widget.id,
@@ -39,16 +38,16 @@ export default function useGridLayoutMap(
         h: lg.height,
         static: lock,
       });
-      layoutMap.xs.push({
+      layoutMap.sm.push({
         i: widget.id,
-        x: xs.x,
-        y: xs.y,
-        w: xs.width,
-        h: xs.height,
+        x: sm.x,
+        y: sm.y,
+        w: sm.width,
+        h: sm.height,
         static: lock,
       });
     });
-    setLayoutMap(layoutMap);
+    return layoutMap;
   }, [layoutWidgetMap]);
   return layoutMap;
 }

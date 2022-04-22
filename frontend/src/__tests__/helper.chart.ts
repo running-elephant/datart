@@ -23,25 +23,27 @@ import { isFunc } from 'utils/object';
 const isChartModelImpl = (chart: IChart) => {
   return (
     Boolean(chart) &&
-    Boolean(chart?.meta?.id) &&
+    Boolean(chart.config) &&
     Boolean(chart?.meta?.name) &&
     isFunc(chart.onMount) &&
     isFunc(chart.onUpdated) &&
     isFunc(chart.onResize) &&
-    isFunc(chart.onUnMount)
+    isFunc(chart.onUnMount) &&
+    chart.isISOContainer !== undefined &&
+    chart?.meta?.id !== undefined
   );
 };
 
 expect.extend({
-  toBeDatartChartModel(received) {
-    if (isChartModelImpl(received)) {
+  toBeDatartChartModel(chart) {
+    if (isChartModelImpl(chart)) {
       return {
-        message: () => `expected ${received} to be Datart Chart Model`,
+        message: () => `expected ${chart} to be Datart Chart Model`,
         pass: true,
       };
     } else {
       return {
-        message: () => `expected ${received} not to be Datart Chart Model`,
+        message: () => `expected ${chart} not to be Datart Chart Model`,
         pass: false,
       };
     }

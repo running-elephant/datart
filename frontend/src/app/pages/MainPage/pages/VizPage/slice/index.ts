@@ -1,11 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ChartDataSectionType } from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
-import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
-import { ChartDataSectionType } from 'app/types/ChartConfig';
+import ChartManager from 'app/models/ChartManager';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
-import { rejectedActionMessageHandler } from 'utils/notification';
 import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import {
@@ -26,6 +24,7 @@ import {
   saveAsDashboard,
   unarchiveViz,
   updateFilterAndFetchDataset,
+  updateGroupAndFetchDataset,
 } from './thunks';
 import { ArchivedViz, VizState, VizTab } from './types';
 import { transferChartConfig } from './utils';
@@ -100,6 +99,39 @@ const slice = createSlice({
             }
           }
         }
+      }
+    },
+    updateChartPreviewGroup(
+      state,
+      action: PayloadAction<{ backendChartId: string; payload }>,
+    ) {
+      const chartPreview = state.chartPreviews.find(
+        c => c.backendChartId === action.payload.backendChartId,
+      );
+
+      if (chartPreview) {
+        const groupSection = chartPreview?.chartConfig?.datas?.find(
+          section => section.type === ChartDataSectionType.GROUP,
+        );
+        if (groupSection) {
+          groupSection.rows = action.payload.payload?.value?.rows;
+        }
+      }
+    },
+    updateComputedFields(
+      state,
+      action: PayloadAction<{
+        backendChartId: string;
+        computedFields: any;
+      }>,
+    ) {
+      const chartPreview = state.chartPreviews.find(
+        c => c.backendChartId === action.payload.backendChartId,
+      );
+
+      if (chartPreview && chartPreview?.backendChart?.config) {
+        chartPreview.backendChart.config.computedFields =
+          action.payload.computedFields;
       }
     },
     clear(state) {
@@ -558,10 +590,18 @@ const slice = createSlice({
         version: uuidv4(),
       };
     });
-    builder.addMatcher(
-      isMySliceRejectedAction(slice.name),
-      rejectedActionMessageHandler,
-    );
+    builder.addCase(updateGroupAndFetchDataset.fulfilled, (state, action) => {
+      const index = state.chartPreviews?.findIndex(
+        c => c.backendChartId === action.payload?.backendChartId,
+      );
+      if (index < 0) {
+        return;
+      }
+      state.chartPreviews[index] = {
+        ...state.chartPreviews[index],
+        version: uuidv4(),
+      };
+    });
   },
 });
 

@@ -19,43 +19,49 @@
 import {
   BranchesOutlined,
   CalendarOutlined,
+  DeleteOutlined,
   FieldStringOutlined,
+  FileUnknownOutlined,
   NumberOutlined,
   SisternodeOutlined,
-  SwapOutlined,
 } from '@ant-design/icons';
-import { Dropdown, Menu, Tooltip } from 'antd';
-import { IW, ToolbarButton } from 'app/components';
+import { Button, Dropdown, Menu, Tooltip } from 'antd';
+import { IW } from 'app/components';
+import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo, useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_BASE,
-  FONT_SIZE_HEADING,
+  FONT_SIZE_TITLE,
   INFO,
   SPACE,
-  SPACE_UNIT,
+  SPACE_MD,
+  SPACE_TIMES,
+  SPACE_XS,
   SUCCESS,
   WARNING,
 } from 'styles/StyleConstants';
-import { ColumnCategories, ColumnTypes } from '../../../constants';
+import { ColumnCategories } from '../../../constants';
 import { Column } from '../../../slice/types';
 import { ALLOW_COMBINE_COLUMN_TYPES } from './constant';
 
 const DataModelNode: FC<{
   node: Column;
-  getPermissionButton: (name) => JSX.Element;
+  className?: string;
   onNodeTypeChange: (type: any, name: string) => void;
   onMoveToHierarchy: (node: Column) => void;
   onCreateHierarchy?: (node: Column) => void;
+  onDeleteFromHierarchy?: (node: Column) => void;
 }> = memo(
   ({
     node,
-    getPermissionButton,
+    className,
     onCreateHierarchy,
     onMoveToHierarchy,
     onNodeTypeChange,
+    onDeleteFromHierarchy,
   }) => {
     const t = useI18NPrefix('view.model');
     const tg = useI18NPrefix('global');
@@ -65,19 +71,26 @@ const DataModelNode: FC<{
     const renderNode = (node, isDragging) => {
       let icon;
       switch (node.type) {
-        case ColumnTypes.Number:
+        case DataViewFieldType.NUMERIC:
           icon = (
             <NumberOutlined style={{ alignSelf: 'center', color: SUCCESS }} />
           );
           break;
-        case ColumnTypes.String:
+        case DataViewFieldType.STRING:
           icon = (
             <FieldStringOutlined style={{ alignSelf: 'center', color: INFO }} />
           );
           break;
+        case DataViewFieldType.DATE:
+          icon = (
+            <CalendarOutlined style={{ alignSelf: 'center', color: INFO }} />
+          );
+          break;
         default:
           icon = (
-            <CalendarOutlined style={{ alignSelf: 'center', color: WARNING }} />
+            <FileUnknownOutlined
+              style={{ alignSelf: 'center', color: WARNING }}
+            />
           );
           break;
       }
@@ -96,77 +109,74 @@ const DataModelNode: FC<{
             setIsHover(false);
           }}
         >
-          <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
+          <Dropdown
+            trigger={['click']}
+            overlay={
+              <Menu
+                selectedKeys={[node.type, `category-${node.category}`]}
+                className="datart-schema-table-header-menu"
+                onClick={({ key }) => onNodeTypeChange(key, node?.name)}
+              >
+                {Object.values(DataViewFieldType).map(t => (
+                  <Menu.Item key={t}>
+                    {tg(`columnType.${t.toLowerCase()}`)}
+                  </Menu.Item>
+                ))}
+                {hasCategory && (
+                  <>
+                    <Menu.Divider />
+                    <Menu.SubMenu
+                      key="categories"
+                      title={t('category')}
+                      popupClassName="datart-schema-table-header-menu"
+                    >
+                      {Object.values(ColumnCategories).map(t => (
+                        <Menu.Item key={`category-${t}`}>
+                          {tg(`columnCategory.${t.toLowerCase()}`)}
+                        </Menu.Item>
+                      ))}
+                    </Menu.SubMenu>
+                  </>
+                )}
+              </Menu>
+            }
+          >
+            <Tooltip
+              title={hasCategory ? t('typeAndCategory') : t('category')}
+              placement="left"
+            >
+              <StyledIW fontSize={FONT_SIZE_TITLE}>{icon}</StyledIW>
+            </Tooltip>
+          </Dropdown>
           <span>{node.name}</span>
           <div className="action">
-            {isHover && !isDragging && (
-              <Dropdown
-                trigger={['click']}
-                overlay={
-                  <Menu
-                    selectedKeys={[node.type, `category-${node.category}`]}
-                    className="datart-schema-table-header-menu"
-                    onClick={({ key }) => onNodeTypeChange(key, node?.name)}
-                  >
-                    {Object.values(ColumnTypes).map(t => (
-                      <Menu.Item key={t}>
-                        {tg(`columnType.${t.toLowerCase()}`)}
-                      </Menu.Item>
-                    ))}
-                    {hasCategory && (
-                      <>
-                        <Menu.Divider />
-                        <Menu.SubMenu
-                          key="categories"
-                          title={t('category')}
-                          popupClassName="datart-schema-table-header-menu"
-                        >
-                          {Object.values(ColumnCategories).map(t => (
-                            <Menu.Item key={`category-${t}`}>
-                              {tg(`columnCategory.${t.toLowerCase()}`)}
-                            </Menu.Item>
-                          ))}
-                        </Menu.SubMenu>
-                      </>
-                    )}
-                  </Menu>
-                }
-              >
-                <Tooltip
-                  title={hasCategory ? t('typeAndCategory') : t('category')}
-                >
-                  <ToolbarButton
-                    size="small"
-                    iconSize={FONT_SIZE_BASE}
-                    className="suffix"
-                    icon={<SwapOutlined style={{ color: INFO }} />}
-                  />
-                </Tooltip>
-              </Dropdown>
-            )}
-            {isHover && !isDragging && getPermissionButton(node?.name)}
             {isHover &&
               !isDragging &&
               isAllowCreateHierarchy(node) &&
               onCreateHierarchy && (
                 <Tooltip title={t('newHierarchy')}>
-                  <ToolbarButton
-                    size="small"
-                    iconSize={FONT_SIZE_BASE}
-                    className="suffix"
+                  <Button
+                    type="link"
                     onClick={() => onCreateHierarchy(node)}
-                    icon={<BranchesOutlined style={{ color: INFO }} />}
+                    icon={<BranchesOutlined />}
                   />
                 </Tooltip>
               )}
             {isHover && !isDragging && isAllowCreateHierarchy(node) && (
               <Tooltip title={t('addToHierarchy')}>
-                <ToolbarButton
-                  size="small"
-                  iconSize={FONT_SIZE_BASE}
-                  className="suffix"
+                <Button
+                  type="link"
                   onClick={() => onMoveToHierarchy(node)}
-                  icon={<SisternodeOutlined style={{ color: INFO }} />}
+                  icon={<SisternodeOutlined />}
+                />
+              </Tooltip>
+            )}
+            {isHover && !isDragging && onDeleteFromHierarchy && (
+              <Tooltip title={t('delete')}>
+                <Button
+                  type="link"
+                  onClick={() => onDeleteFromHierarchy(node)}
+                  icon={<DeleteOutlined />}
                 />
               </Tooltip>
             )}
@@ -180,6 +190,7 @@ const DataModelNode: FC<{
         {(draggableProvided, draggableSnapshot) => (
           <StyledDataModelNode
             isDragging={draggableSnapshot.isDragging}
+            className={className}
             style={draggableProvided.draggableProps.style}
             ref={draggableProvided.innerRef}
             {...draggableProvided.draggableProps}
@@ -198,21 +209,35 @@ export default DataModelNode;
 const StyledDataModelNode = styled.div<{
   isDragging: boolean;
 }>`
+  margin: ${SPACE} ${SPACE_MD};
+  font-size: ${FONT_SIZE_BASE};
   line-height: 32px;
-  margin: ${SPACE};
   user-select: 'none';
   background: ${p =>
     p.isDragging ? p.theme.highlightBackground : 'transparent'};
-  font-size: ${FONT_SIZE_BASE};
+
+  &.in-hierarchy {
+    margin-right: 0;
+  }
 
   & .content {
     display: flex;
+    align-items: center;
   }
 
   & .action {
     display: flex;
     flex: 1;
     justify-content: flex-end;
-    padding-right: ${FONT_SIZE_BASE}px;
+    padding-right: ${SPACE_XS};
   }
+`;
+
+const StyledIW = styled(IW)`
+  width: ${SPACE_TIMES(7)};
+  height: ${SPACE_TIMES(7)};
+  margin-right: ${SPACE_XS};
+  cursor: pointer;
+  border: 1px solid ${p => p.theme.borderColorSplit};
+  border-radius: 4px;
 `;

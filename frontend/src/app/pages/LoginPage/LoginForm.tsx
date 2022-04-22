@@ -19,76 +19,70 @@
 import { Button, Form, Input } from 'antd';
 import { AuthForm } from 'app/components';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
-import {
-  selectLoggedInUser,
-  selectLoginLoading,
-  selectOauth2Clients,
-} from 'app/slice/selectors';
-import { getOauth2Clients, login, tryOauth } from 'app/slice/thunks';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { User } from 'app/slice/types';
+import { StorageKeys } from 'globalConstants';
+import React, { useCallback, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
   LINE_HEIGHT_ICON_LG,
+  LINE_HEIGHT_ICON_XXL,
   SPACE_MD,
+  SPACE_XS,
 } from 'styles/StyleConstants';
 import { getToken } from 'utils/auth';
+import persistence from 'utils/persistence';
+import { AUTH_CLIENT_ICON_MAPPING } from './constants';
 
-export function LoginForm() {
+interface LoginFormProps {
+  loading: boolean;
+  loggedInUser?: User | null;
+  oauth2Clients: Array<{ name: string; value: string }>;
+  registerEnable?: boolean;
+  inShare?: boolean;
+  onLogin?: (value) => void;
+}
+
+export function LoginForm({
+  loading,
+  loggedInUser,
+  oauth2Clients,
+  registerEnable = true,
+  inShare = false,
+  onLogin,
+}: LoginFormProps) {
   const [switchUser, setSwitchUser] = useState(false);
-  const dispatch = useDispatch();
   const history = useHistory();
-  const loading = useSelector(selectLoginLoading);
-  const loggedInUser = useSelector(selectLoggedInUser);
   const [form] = Form.useForm();
   const logged = !!getToken();
   const t = usePrefixI18N('login');
   const tg = usePrefixI18N('global');
-  const oauth2Clients = useSelector(selectOauth2Clients);
 
   const toApp = useCallback(() => {
     history.replace('/');
   }, [history]);
 
-  useEffect(() => {
-    dispatch(getOauth2Clients());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(tryOauth());
-  }, [dispatch]);
-
-  const onLogin = useCallback(
-    values => {
-      dispatch(
-        login({
-          params: values,
-          resolve: () => {
-            toApp();
-          },
-        }),
-      );
-    },
-    [dispatch, toApp],
-  );
-
   const onSwitch = useCallback(() => {
     setSwitchUser(true);
   }, []);
 
-  let Oauth2BtnList = oauth2Clients.map(client => {
-    return (
-      <Oauth2Button key={client.value} href={client.value}>
-        {client.name}
-      </Oauth2Button>
-    );
-  });
+  const toAuthClient = useCallback(
+    clientUrl => () => {
+      if (inShare) {
+        persistence.session.save(
+          StorageKeys.AuthRedirectUrl,
+          window.location.href,
+        );
+      }
+      window.location.href = clientUrl;
+    },
+    [inShare],
+  );
 
   return (
     <AuthForm>
-      {logged && !switchUser ? (
+      {logged && !switchUser && !inShare ? (
         <>
           <h2>{t('alreadyLoggedIn')}</h2>
           <UserPanel onClick={toApp}>
@@ -142,11 +136,32 @@ export function LoginForm() {
               </Button>
             )}
           </Form.Item>
-          <Links>
-            <LinkButton to="/forgetPassword">{t('forgotPassword')}</LinkButton>
-            <LinkButton to="/register">{t('register')}</LinkButton>
-          </Links>
-          {Oauth2BtnList}
+          {!inShare && (
+            <Links>
+              <LinkButton to="/forgetPassword">
+                {t('forgotPassword')}
+              </LinkButton>
+              {registerEnable && (
+                <LinkButton to="/register">{t('register')}</LinkButton>
+              )}
+            </Links>
+          )}
+          {oauth2Clients.length > 0 && (
+            <>
+              <AuthTitle>{t('authTitle')}</AuthTitle>
+              {oauth2Clients.map(({ name, value }) => (
+                <AuthButton
+                  key={value}
+                  size="large"
+                  icon={AUTH_CLIENT_ICON_MAPPING[name.toLowerCase()]}
+                  onClick={toAuthClient(value)}
+                  block
+                >
+                  {name}
+                </AuthButton>
+              ))}
+            </>
+          )}
         </Form>
       )}
     </AuthForm>
@@ -157,22 +172,26 @@ const Links = styled.div`
   display: flex;
 `;
 
-const Oauth2Button = styled.a`
-  display: block;
-  background-color: blue;
-  text-align: center;
-  color: #fff;
-  font-weight: bold;
-  line-height: 36px;
-  height: 36px;
-`;
-
 const LinkButton = styled(Link)`
   flex: 1;
   line-height: ${LINE_HEIGHT_ICON_LG};
 
-  &:last-of-type {
+  &:nth-child(2) {
     text-align: right;
+  }
+`;
+
+const AuthTitle = styled.p`
+  line-height: ${LINE_HEIGHT_ICON_XXL};
+  color: ${p => p.theme.textColorLight};
+  text-align: center;
+`;
+
+const AuthButton = styled(Button)`
+  margin-bottom: ${SPACE_XS};
+
+  &:last-child {
+    margin-bottom: 0;
   }
 `;
 

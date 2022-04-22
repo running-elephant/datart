@@ -19,8 +19,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getDataProviderDatabases } from 'app/pages/MainPage/slice/thunks';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
-import { rejectedActionMessageHandler } from 'utils/notification';
 import { ViewViewModelStages } from '../constants';
 import {
   diffMergeHierarchyModel,
@@ -227,7 +225,7 @@ const slice = createSlice({
         v => v.id === action.meta.arg.id,
       );
 
-      if (currentEditingView) {
+      if (currentEditingView && action.payload) {
         const { model, dataSource } = transformQueryResultToModelAndDataSource(
           action.payload,
           currentEditingView.model,
@@ -243,15 +241,6 @@ const slice = createSlice({
         if (action.payload.warnings) {
           currentEditingView.warnings = action.payload.warnings;
         }
-      }
-    });
-    builder.addCase(runSql.rejected, (state, action) => {
-      const currentEditingView = state.editingViews.find(
-        v => v.id === action.meta.arg.id,
-      );
-      if (currentEditingView) {
-        currentEditingView.stage = ViewViewModelStages.Initialized;
-        currentEditingView.error = action.payload as string;
       }
     });
 
@@ -416,11 +405,6 @@ const slice = createSlice({
       state.sourceDatabaseSchema[action.payload?.sourceId] =
         action.payload.data.schemaItems;
     });
-
-    builder.addMatcher(
-      isMySliceRejectedAction(slice.name),
-      rejectedActionMessageHandler,
-    );
   },
 });
 

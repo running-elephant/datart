@@ -21,15 +21,22 @@ package datart.server.service;
 import datart.core.data.provider.SchemaInfo;
 import datart.core.entity.Source;
 import datart.core.mappers.ext.SourceMapperExt;
+import datart.server.base.params.SourceCreateParam;
+import datart.server.base.params.SourceUpdateParam;
+import datart.server.base.transfer.model.SourceTransferModel;
 
 import java.util.List;
 
-public interface SourceService extends BaseCRUDService<Source, SourceMapperExt> {
+public interface SourceService extends BaseCRUDService<Source, SourceMapperExt>, ResourceTransferService<Source, SourceTransferModel> {
 
-    List<Source> listSources(String orgId,boolean active);
+    List<Source> listSources(String orgId, boolean active);
 
     SchemaInfo getSourceSchemaInfo(String sourceId);
 
     SchemaInfo syncSourceSchema(String sourceId) throws Exception;
+
+    Source createSource(SourceCreateParam createParam);
+
+    boolean updateSource(SourceUpdateParam updateParam);
 
 }

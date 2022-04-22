@@ -24,6 +24,7 @@ import datart.core.base.consts.VariableTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Set;
 
@@ -43,6 +44,8 @@ public class ScriptVariable extends TypedValue {
 
     // Permission variable valid flag, which is false when executed by the organization owner
     private boolean disabled;
+
+    private String format;
 
     @Override
     public String toString() {
@@ -70,5 +73,12 @@ public class ScriptVariable extends TypedValue {
         nameWithQuote = StringUtils.prependIfMissing(name, Const.DEFAULT_VARIABLE_QUOTE);
         nameWithQuote = StringUtils.appendIfMissing(nameWithQuote, Const.DEFAULT_VARIABLE_QUOTE);
         return nameWithQuote;
+    }
+
+    public String valueToString() {
+        if (CollectionUtils.isEmpty(values)) {
+            return "";
+        }
+        return String.join(",", values);
     }
 }

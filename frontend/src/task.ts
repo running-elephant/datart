@@ -20,7 +20,7 @@
 import 'react-app-polyfill/stable';
 import 'core-js/features/string/replace-all';
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
-import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
+import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import {
   DataChart,
   ServerDashboard,
@@ -85,9 +85,9 @@ const getChartQueryData = (dataStr: string) => {
   const chartConfig: ChartConfig = dataConfig.chartConfig as ChartConfig;
   const builder = new ChartDataRequestBuilder(
     {
-      id: data.viewId,
+      ...data.view,
       computedFields: dataConfig.computedFields || [],
-    } as any,
+    },
     chartConfig?.datas,
     chartConfig?.settings,
     {},

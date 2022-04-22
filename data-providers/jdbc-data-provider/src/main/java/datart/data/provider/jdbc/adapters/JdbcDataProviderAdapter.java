@@ -19,7 +19,6 @@
 package datart.data.provider.jdbc.adapters;
 
 import datart.core.base.PageInfo;
-import datart.core.base.consts.Const;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.BeanUtils;
@@ -27,10 +26,10 @@ import datart.core.common.ReflectUtils;
 import datart.core.data.provider.*;
 import datart.data.provider.JdbcDataProvider;
 import datart.data.provider.calcite.dialect.CustomSqlDialect;
-import datart.data.provider.jdbc.JdbcDriverInfo;
-import datart.data.provider.jdbc.JdbcProperties;
 import datart.data.provider.calcite.dialect.FetchAndOffsetSupport;
 import datart.data.provider.jdbc.DataTypeUtils;
+import datart.data.provider.jdbc.JdbcDriverInfo;
+import datart.data.provider.jdbc.JdbcProperties;
 import datart.data.provider.jdbc.SqlScriptRender;
 import datart.data.provider.local.LocalDB;
 import lombok.Getter;
@@ -38,6 +37,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.sql.SqlDialect;
+import org.apache.calcite.sql.parser.SqlParseException;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -142,14 +143,20 @@ public class JdbcDataProviderAdapter implements Closeable {
             Set<Column> columnSet = new HashSet<>();
             DatabaseMetaData metadata = conn.getMetaData();
             Map<String, List<ForeignKey>> importedKeys = getImportedKeys(metadata, database, table);
-            ResultSet columns = metadata.getColumns(database, null, table, null);
-            while (columns.next()) {
-                Column column = readTableColumn(columns);
-                column.setForeignKeys(importedKeys.get(column.getName()));
-                columnSet.add(column);
+            try (ResultSet columns = metadata.getColumns(database, null, table, null)) {
+                while (columns.next()) {
+                    Column column = readTableColumn(columns);
+                    column.setForeignKeys(importedKeys.get(column.getName()));
+                    columnSet.add(column);
+                }
             }
             return columnSet;
         }
+    }
+
+    public String getQueryKey(QueryScript script, ExecuteParam executeParam) throws SqlParseException {
+        SqlScriptRender render = new SqlScriptRender(script, executeParam, getSqlDialect());
+        return "Q" + DigestUtils.md5Hex(render.render(true, true, true));
     }
 
     protected Column readTableColumn(ResultSet columnMetadata) throws SQLException {
@@ -164,13 +171,14 @@ public class JdbcDataProviderAdapter implements Closeable {
      */
     protected Map<String, List<ForeignKey>> getImportedKeys(DatabaseMetaData metadata, String database, String table) throws SQLException {
         HashMap<String, List<ForeignKey>> keyMap = new HashMap<>();
-        ResultSet importedKeys = metadata.getImportedKeys(database, null, table);
-        while (importedKeys.next()) {
-            ForeignKey foreignKey = new ForeignKey();
-            foreignKey.setDatabase(importedKeys.getString(PKTABLE_CAT));
-            foreignKey.setTable(importedKeys.getString(PKTABLE_NAME));
-            foreignKey.setColumn(importedKeys.getString(PKCOLUMN_NAME));
-            keyMap.computeIfAbsent(importedKeys.getString(FKCOLUMN_NAME), key->new ArrayList<>()).add(foreignKey);
+        try (ResultSet importedKeys = metadata.getImportedKeys(database, null, table)) {
+            while (importedKeys.next()) {
+                ForeignKey foreignKey = new ForeignKey();
+                foreignKey.setDatabase(importedKeys.getString(PKTABLE_CAT));
+                foreignKey.setTable(importedKeys.getString(PKTABLE_NAME));
+                foreignKey.setColumn(importedKeys.getString(PKCOLUMN_NAME));
+                keyMap.computeIfAbsent(importedKeys.getString(FKCOLUMN_NAME), key -> new ArrayList<>()).add(foreignKey);
+            }
         }
         return keyMap;
     }
@@ -218,15 +226,6 @@ public class JdbcDataProviderAdapter implements Closeable {
                     return dataframe;
                 }
             }
-        }
-    }
-
-    public Dataframe execute(QueryScript script, ExecuteParam executeParam) throws Exception {
-        //If server aggregation is enabled, query the full data before performing server aggregation
-        if (executeParam.isServerAggregate()) {
-            return executeInLocal(script, executeParam);
-        } else {
-            return executeOnSource(script, executeParam);
         }
     }
 
@@ -287,15 +286,32 @@ public class JdbcDataProviderAdapter implements Closeable {
                 sqlDialect = new CustomSqlDialect(driverInfo);
             }
         }
-        // set case not change
+        configSqlDialect(sqlDialect, driverInfo);
+        return sqlDialect;
+    }
+
+    protected void configSqlDialect(SqlDialect sqlDialect, JdbcDriverInfo driverInfo) {
         try {
-            ReflectUtils.setFiledValue(sqlDialect, "unquotedCasing", Casing.UNCHANGED);
-            ReflectUtils.setFiledValue(sqlDialect, "quotedCasing", Casing.UNCHANGED);
+            Map<String, Object> fieldValues = new HashMap<>();
+            // set identifierQuote
+            if (StringUtils.isNotBlank(driverInfo.getIdentifierQuote())) {
+                fieldValues.put("identifierQuoteString", driverInfo.getIdentifierQuote());
+                fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierQuote());
+            }
+            if (StringUtils.isNotBlank(driverInfo.getIdentifierEndQuote())) {
+                fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierEndQuote());
+            }
+            // set default casing UNCHANGED
+            fieldValues.put("unquotedCasing", Casing.UNCHANGED);
+            fieldValues.put("quotedCasing", Casing.UNCHANGED);
+
+            //set values
+            for (Map.Entry<String, Object> entry : fieldValues.entrySet()) {
+                ReflectUtils.setFiledValue(sqlDialect, entry.getKey(), entry.getValue());
+            }
         } catch (Exception e) {
             log.warn("sql dialect config error for " + driverInfo.getSqlDialect());
         }
-
-        return sqlDialect;
     }
 
     protected Dataframe parseResultSet(ResultSet rs) throws SQLException {
@@ -311,7 +327,7 @@ public class JdbcDataProviderAdapter implements Closeable {
             ArrayList<Object> row = new ArrayList<>();
             rows.add(row);
             for (int i = 1; i < columns.size() + 1; i++) {
-                row.add(rs.getObject(i));
+                row.add(getObjFromResultSet(rs, i));
             }
             c++;
             if (c >= count) {
@@ -337,11 +353,10 @@ public class JdbcDataProviderAdapter implements Closeable {
     /**
      * 本地执行，从数据源拉取全量数据，在本地执行聚合操作
      */
-    protected Dataframe executeInLocal(QueryScript script, ExecuteParam executeParam) throws Exception {
+    public Dataframe executeInLocal(QueryScript script, ExecuteParam executeParam) throws Exception {
         SqlScriptRender render = new SqlScriptRender(script
                 , executeParam
                 , getSqlDialect());
-
         String sql = render.render(false, false, false);
         Dataframe data = execute(sql);
         if (!CollectionUtils.isEmpty(script.getSchema())) {
@@ -350,13 +365,13 @@ public class JdbcDataProviderAdapter implements Closeable {
             }
         }
         data.setName(script.toQueryKey());
-        return LocalDB.executeLocalQuery(null, executeParam, Collections.singletonList(data));
+        return LocalDB.executeLocalQuery(null, executeParam, Dataframes.of(script.getSourceId(), data));
     }
 
     /**
      * 在数据源执行，组装完整SQL，提交至数据源执行
      */
-    protected Dataframe executeOnSource(QueryScript script, ExecuteParam executeParam) throws Exception {
+    public Dataframe executeOnSource(QueryScript script, ExecuteParam executeParam) throws Exception {
 
         Dataframe dataframe;
         String sql;
@@ -383,6 +398,14 @@ public class JdbcDataProviderAdapter implements Closeable {
         }
         dataframe.setScript(sql);
         return dataframe;
+    }
+
+    protected Object getObjFromResultSet(ResultSet rs, int columnIndex) throws SQLException {
+        Object obj = rs.getObject(columnIndex);
+        if (obj instanceof Boolean) {
+            obj = rs.getInt(columnIndex);
+        }
+        return obj;
     }
 
 }

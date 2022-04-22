@@ -8,12 +8,9 @@ import datart.core.common.FileUtils;
 import datart.core.common.MessageResolver;
 import datart.core.data.provider.*;
 import datart.data.provider.base.DataProviderException;
-import datart.data.provider.jdbc.JdbcDriverInfo;
-import datart.data.provider.jdbc.JdbcProperties;
+import datart.data.provider.jdbc.*;
 import datart.data.provider.calcite.SqlParserUtils;
 import datart.data.provider.calcite.dialect.SqlStdOperatorSupport;
-import datart.data.provider.jdbc.DataSourceFactory;
-import datart.data.provider.jdbc.DataSourceFactoryDruidImpl;
 import datart.data.provider.jdbc.adapters.JdbcDataProviderAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlDialect;
@@ -87,7 +84,13 @@ public class JdbcDataProvider extends DataProvider {
 
     @Override
     public Dataframe execute(DataProviderSource source, QueryScript script, ExecuteParam executeParam) throws Exception {
-        return matchProviderAdapter(source).execute(script, executeParam);
+        JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
+        //If server aggregation is enabled, query the full data before performing server aggregation
+        if (executeParam.isServerAggregate()) {
+            return adapter.executeInLocal(script, executeParam);
+        } else {
+            return adapter.executeOnSource(script, executeParam);
+        }
     }
 
     @Override
@@ -202,6 +205,12 @@ public class JdbcDataProvider extends DataProvider {
     }
 
     @Override
+    public String getQueryKey(DataProviderSource config, QueryScript script, ExecuteParam executeParam) throws Exception {
+        JdbcDataProviderAdapter adapter = matchProviderAdapter(config);
+        return adapter.getQueryKey(script, executeParam);
+    }
+
+    @Override
     public void close() throws IOException {
 
     }
@@ -299,7 +308,7 @@ public class JdbcDataProvider extends DataProvider {
                     log.error("DbType " + entry.getKey() + " driver read Exception", e);
                 }
                 return null;
-            }).filter(Objects::nonNull).collect(Collectors.toList());
+            }).filter(Objects::nonNull).sorted(Comparator.comparing(JdbcDriverInfo::getDbType)).collect(Collectors.toList());
         }
 
         private static Map<String, Map<String, String>> loadYml(String file) {

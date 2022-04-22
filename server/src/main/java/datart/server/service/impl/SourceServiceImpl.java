@@ -24,15 +24,19 @@ import com.alibaba.fastjson.JSONObject;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
 import datart.core.base.exception.Exceptions;
+import datart.core.common.Application;
+import datart.core.common.DateUtils;
+import datart.core.common.FileUtils;
 import datart.core.common.TaskExecutor;
-import datart.core.data.provider.SchemaInfo;
 import datart.core.data.provider.DataProviderConfigTemplate;
 import datart.core.data.provider.DataProviderSource;
+import datart.core.data.provider.SchemaInfo;
 import datart.core.data.provider.SchemaItem;
 import datart.core.entity.Role;
 import datart.core.entity.Source;
 import datart.core.entity.SourceSchemas;
 import datart.core.entity.ext.SourceDetail;
+import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.core.mappers.ext.SourceMapperExt;
 import datart.core.mappers.ext.SourceSchemasMapperExt;
 import datart.security.base.PermissionInfo;
@@ -46,6 +50,9 @@ import datart.server.base.params.BaseCreateParam;
 import datart.server.base.params.BaseUpdateParam;
 import datart.server.base.params.SourceCreateParam;
 import datart.server.base.params.SourceUpdateParam;
+import datart.server.base.transfer.ImportStrategy;
+import datart.server.base.transfer.TransferConfig;
+import datart.server.base.transfer.model.SourceTransferModel;
 import datart.server.job.SchemaSyncJob;
 import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -56,8 +63,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.List;
+import java.io.File;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -70,8 +77,6 @@ public class SourceServiceImpl extends BaseService implements SourceService {
 
     private final SourceMapperExt sourceMapper;
 
-    private final DataProviderService dataProviderService;
-
     private final RoleService roleService;
 
     private final FileService fileService;
@@ -80,31 +85,54 @@ public class SourceServiceImpl extends BaseService implements SourceService {
 
     private final SourceSchemasMapperExt sourceSchemasMapper;
 
+    private final RelRoleResourceMapperExt rrrMapper;
+
     public SourceServiceImpl(SourceMapperExt sourceMapper,
-                             DataProviderService dataProviderService,
                              RoleService roleService,
                              FileService fileService,
-                             Scheduler scheduler, SourceSchemasMapperExt sourceSchemasMapper) {
+                             Scheduler scheduler,
+                             SourceSchemasMapperExt sourceSchemasMapper,
+                             RelRoleResourceMapperExt rrrMapper) {
         this.sourceMapper = sourceMapper;
-        this.dataProviderService = dataProviderService;
         this.roleService = roleService;
         this.fileService = fileService;
         this.scheduler = scheduler;
         this.sourceSchemasMapper = sourceSchemasMapper;
+        this.rrrMapper = rrrMapper;
     }
 
     @Override
     public List<Source> listSources(String orgId, boolean active) throws PermissionDeniedException {
-        return sourceMapper.listByOrg(orgId, active)
-                .stream()
-                .filter(source -> {
-                    try {
-                        requirePermission(source, Const.READ);
-                    } catch (Exception e) {
-                        return false;
-                    }
-                    return true;
-                }).collect(Collectors.toList());
+
+        List<Source> sources = sourceMapper.listByOrg(orgId, active);
+
+        Map<String, Source> filtered = new HashMap<>();
+
+        List<Source> permitted = sources.stream().filter(source -> {
+            try {
+                requirePermission(source, Const.READ);
+                return true;
+            } catch (Exception e) {
+                filtered.put(source.getId(), source);
+                return false;
+            }
+        }).collect(Collectors.toList());
+
+        while (!filtered.isEmpty()) {
+            boolean updated = false;
+            for (Source source : permitted) {
+                Source parent = filtered.remove(source.getParentId());
+                if (parent != null) {
+                    permitted.add(parent);
+                    updated = true;
+                    break;
+                }
+            }
+            if (!updated) {
+                break;
+            }
+        }
+        return permitted;
     }
 
     @Override
@@ -131,6 +159,71 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
+    public List<Source> getAllParents(String sourceId) {
+        List<Source> parents = new LinkedList<>();
+        getParent(parents, sourceId);
+        return parents;
+    }
+
+    private void getParent(List<Source> list, String parentId) {
+        Source source = sourceMapper.selectByPrimaryKey(parentId);
+        if (source != null) {
+            if (source.getParentId() != null) {
+                getParent(list, source.getParentId());
+            }
+            list.add(source);
+        }
+    }
+
+    @Override
+    public SourceTransferModel exportResource(TransferConfig transferConfig, String... ids) {
+
+        if (ids == null || ids.length == 0) {
+            return null;
+        }
+
+        SourceTransferModel sourceExportModel = new SourceTransferModel();
+        sourceExportModel.setMainModels(new LinkedList<>());
+
+        Map<String, Source> parentMap = new HashMap<>();
+
+        for (String sourceId : ids) {
+            SourceTransferModel.MainModel mainModel = new SourceTransferModel.MainModel();
+            Source source = retrieve(sourceId);
+            mainModel.setSource(source);
+            // files
+            mainModel.setFiles(FileUtils.walkDirAsStream(new File(fileService.getBasePath(FileOwner.DATA_SOURCE, sourceId)), null, false));
+            sourceExportModel.getMainModels().add(mainModel);
+            // parents
+            if (transferConfig.isWithParents()) {
+                List<Source> allParents = getAllParents(sourceId);
+                if (!CollectionUtils.isEmpty(allParents)) {
+                    for (Source parent : allParents) {
+                        parentMap.put(parent.getId(), parent);
+                    }
+                }
+            }
+        }
+        sourceExportModel.setParents(new LinkedList<>(parentMap.values()));
+        return sourceExportModel;
+    }
+
+    @Override
+    public boolean importResource(SourceTransferModel model, ImportStrategy strategy, String orgId, Set<String> requireTransfer) {
+        switch (strategy) {
+            case OVERWRITE:
+                importSource(model, orgId, true, true, requireTransfer);
+                break;
+            case IGNORE:
+                importSource(model, orgId, false, true, requireTransfer);
+                break;
+            default:
+                importSource(model, orgId, false, false, requireTransfer);
+        }
+        return true;
+    }
+
+    @Override
     public void requirePermission(Source source, int permission) {
         if (securityManager.isOrgOwner(source.getOrgId())) {
             return;
@@ -144,11 +237,23 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     private boolean hasPermission(Role role, Source source, int permission) {
-        if (source.getId() == null || (permission & Const.CREATE) == Const.CREATE) {
-            return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), ResourceType.SOURCE.name(), permission));
+        if (source.getId() == null || rrrMapper.countRolePermission(source.getId(), role.getId()) == 0) {
+            Source parent = sourceMapper.selectByPrimaryKey(source.getParentId());
+            if (parent == null) {
+                return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), ResourceType.SOURCE.name(), permission));
+            } else {
+                return hasPermission(role, parent, permission);
+            }
         } else {
             return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), source.getId(), permission));
         }
+    }
+
+    @Override
+    public Source createSource(SourceCreateParam createParam) {
+        Source source = create(createParam);
+        updateJdbcSourceSyncJob(source);
+        return source;
     }
 
     @Override
@@ -165,9 +270,19 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         Source source = SourceService.super.create(createParam);
 
         grantDefaultPermission(source);
-        updateJdbcSourceSyncJob(source);
         return source;
 
+    }
+
+    @Override
+    public boolean updateSource(SourceUpdateParam updateParam) {
+        boolean success = update(updateParam);
+        if (success) {
+            Source source = retrieve(updateParam.getId());
+            getDataProviderService().updateSource(source);
+            updateJdbcSourceSyncJob(source);
+        }
+        return false;
     }
 
     @Override
@@ -180,14 +295,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         } catch (Exception e) {
             Exceptions.e(e);
         }
-        DataProviderSource providerSource = new DataProviderSource();
-        providerSource.setSourceId(updateParam.getId());
-        providerSource.setType(sourceUpdateParam.getType());
-        providerSource.setName(sourceUpdateParam.getName());
-        dataProviderService.updateSource(providerSource);
-        boolean success = SourceService.super.update(updateParam);
-        updateJdbcSourceSyncJob(retrieve(updateParam.getId()));
-        return success;
+        return SourceService.super.update(updateParam);
     }
 
     @Override
@@ -210,7 +318,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         if (StringUtils.isEmpty(config)) {
             return config;
         }
-        DataProviderConfigTemplate configTemplate = dataProviderService.getSourceConfigTemplate(type);
+        DataProviderConfigTemplate configTemplate = getDataProviderService().getSourceConfigTemplate(type);
         if (!CollectionUtils.isEmpty(configTemplate.getAttributes())) {
             JSONObject jsonObject = JSON.parseObject(config);
             for (DataProviderConfigTemplate.Attribute attribute : configTemplate.getAttributes()) {
@@ -238,8 +346,23 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
+    public void deleteReference(Source source) {
+        deleteJdbcSourceSyncJob(source);
+        sourceSchemasMapper.deleteBySource(source.getId());
+    }
+
+    @Override
     public void deleteStaticFiles(Source source) {
         fileService.deleteFiles(FileOwner.DATA_SOURCE, source.getId());
+    }
+
+    private void deleteJdbcSourceSyncJob(Source source) {
+        try {
+            JobKey jobKey = new JobKey(source.getName(), source.getId());
+            scheduler.deleteJob(jobKey);
+        } catch (Exception e) {
+            log.error("schema sync job delete error ", e);
+        }
     }
 
     private void updateJdbcSourceSyncJob(Source source) {
@@ -251,7 +374,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
             }
         });
         try {
-            DataProviderSource dataProviderSource = dataProviderService.parseDataProviderConfig(source);
+            DataProviderSource dataProviderSource = getDataProviderService().parseDataProviderConfig(source);
 
             JobKey jobKey = new JobKey(source.getName(), source.getId());
 
@@ -285,5 +408,82 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         }
     }
 
+    private void importSource(SourceTransferModel model,
+                              String orgId,
+                              boolean deleteFirst,
+                              boolean skipExists,
+                              Set<String> requireTransfer) {
+
+        if (model == null || CollectionUtils.isEmpty(model.getMainModels())) {
+            return;
+        }
+        for (SourceTransferModel.MainModel mainModel : model.getMainModels()) {
+            Source source = mainModel.getSource();
+            if (source == null) {
+                continue;
+            }
+            if (requireTransfer != null && !requireTransfer.contains(source.getId())) {
+                continue;
+            }
+            if (deleteFirst) {
+                try {
+                    delete(source.getId());
+                } catch (Exception ignore) {
+                }
+            } else if (skipExists) {
+                try {
+                    if (retrieve(source.getId()) != null) {
+                        continue;
+                    }
+                } catch (Exception ignore) {
+                }
+            }
+
+            // check name
+            try {
+                Source check = new Source();
+                check.setOrgId(orgId);
+                check.setParentId(source.getParentId());
+                check.setName(source.getName());
+                checkUnique(check);
+            } catch (Exception e) {
+                source.setName(DateUtils.withTimeString(source.getName()));
+            }
+            // insert source
+            source.setOrgId(orgId);
+            source.setUpdateBy(getCurrentUser().getId());
+            source.setUpdateTime(new Date());
+            sourceMapper.insert(source);
+
+            // insert parents
+            if (!CollectionUtils.isEmpty(model.getParents())) {
+                for (Source parent : model.getParents()) {
+                    try {
+                        parent.setOrgId(orgId);
+                        sourceMapper.insert(parent);
+                    } catch (Exception ignore) {
+                    }
+                }
+            }
+
+            // copy files
+            if (!CollectionUtils.isEmpty(mainModel.getFiles())) {
+                for (Map.Entry<String, byte[]> fileEntry : mainModel.getFiles().entrySet()) {
+                    String name = fileEntry.getKey();
+                    String basePath = fileService.getBasePath(FileOwner.DATA_SOURCE, source.getId());
+                    String filePath = FileUtils.concatPath(basePath, name);
+                    try {
+                        FileUtils.save(filePath, fileEntry.getValue(), false);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+    }
+
+    private DataProviderService getDataProviderService() {
+        return Application.getBean(DataProviderService.class);
+    }
 
 }

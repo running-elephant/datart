@@ -15,11 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { DownloadFileType } from 'app/constants';
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
-import ChartDataRequest from 'app/types/ChartDataRequest';
+import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import { makeDownloadDataTask } from 'app/utils/fetch';
+import { RootState } from 'types';
 import { boardActions } from '.';
 import { getBoardChartRequests } from '../../../utils';
 import {
@@ -85,23 +87,38 @@ export const handleServerBoardAction =
   };
 
 export const boardDownLoadAction =
-  (params: { boardId: string; renderMode: VizRenderMode }) =>
+  (params: { boardId: string; downloadType: DownloadFileType }) =>
   async (dispatch, getState) => {
-    const { boardId, renderMode } = params;
+    const state = getState() as RootState;
+    const { boardId, downloadType } = params;
+    const vizs = state.viz?.vizs;
+    const folderId = vizs?.filter(v => v.relId === boardId)[0].id;
+    const boardInfoRecord = state.board?.boardInfoRecord;
+    let imageWidth = 0;
+
+    if (boardInfoRecord) {
+      const { boardWidthHeight } = Object.values(boardInfoRecord)[0];
+      imageWidth = boardWidthHeight[0];
+    }
+
     const { requestParams, fileName } = await dispatch(
       getBoardDownloadParams({ boardId }),
     );
-    if (renderMode === 'read') {
-      dispatch(
-        makeDownloadDataTask({
-          downloadParams: requestParams,
-          fileName,
-          resolve: () => {
-            dispatch(mainActions.setDownloadPolling(true));
-          },
-        }),
-      );
-    }
+
+    dispatch(
+      makeDownloadDataTask({
+        downloadParams:
+          downloadType === DownloadFileType.Excel
+            ? requestParams
+            : [{ analytics: false, vizType: 'dashboard', vizId: folderId }],
+        fileName,
+        downloadType,
+        imageWidth,
+        resolve: () => {
+          dispatch(mainActions.setDownloadPolling(true));
+        },
+      }),
+    );
   };
 export const getBoardDownloadParams =
   (params: { boardId: string }) => (dispatch, getState) => {

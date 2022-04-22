@@ -17,7 +17,7 @@
  */
 
 import { DataChart } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { createContext, FC, useContext } from 'react';
+import { createContext, FC, memo, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import { selectDataChartById } from '../../pages/Board/slice/selector';
 import { BoardState } from '../../pages/Board/slice/types';
@@ -26,15 +26,14 @@ import { WidgetContext } from './WidgetProvider';
 export const WidgetChartContext = createContext<DataChart | undefined>(
   {} as DataChart,
 );
-export const WidgetChartProvider: FC = ({ children }) => {
+export const WidgetChartProvider: FC = memo(({ children }) => {
   const { datachartId } = useContext(WidgetContext);
   const dataChart = useSelector((state: { board: BoardState }) =>
     selectDataChartById(state, datachartId),
   );
-  // TODO 添加 widgetChart
   return (
     <WidgetChartContext.Provider value={dataChart}>
       {children}
     </WidgetChartContext.Provider>
   );
-};
+});

@@ -21,7 +21,7 @@ import DragSortEditTable from 'app/components/DragSortEditTable';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import ChartFilterCondition, {
   ConditionBuilder,
-} from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
+} from 'app/models/ChartFilterCondition';
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { getDistinctFields } from 'app/utils/fetch';
@@ -142,7 +142,7 @@ const CategoryConditionEditableTable: FC<
       const newRow: RelationFilterValue = {
         key: String(newKey),
         label: String(newKey),
-        isSelected: false,
+        isSelected: true,
       };
       const currentRows = rows.concat([newRow]);
       handleFilterConditionChange(currentRows);
@@ -212,7 +212,6 @@ const CategoryConditionEditableTable: FC<
           bordered
           rowKey={(r: RelationFilterValue) => `${r.key}-${r.label}`}
           columns={columnsWithCell}
-          pagination={false}
           onRow={(_, index) =>
             ({
               index,

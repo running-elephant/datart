@@ -16,35 +16,25 @@
  * limitations under the License.
  */
 
-import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
-import { Form, Input, Select, Tooltip } from 'antd';
-import { Popup, ToolbarButton, Tree } from 'app/components';
+import { Form, Input, Select } from 'antd';
+import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
-import { selectRoles } from 'app/pages/MainPage/pages/MemberPage/slice/selectors';
-import { SubjectTypes } from 'app/pages/MainPage/pages/PermissionPage/constants';
-import classnames from 'classnames';
-import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, memo, useEffect, useMemo, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { FONT_SIZE_BASE, INFO } from 'styles/StyleConstants';
+import { SPACE_LG } from 'styles/StyleConstants';
 import { Nullable } from 'types';
 import { CloneValueDeep, isEmpty, isEmptyArray } from 'utils/object';
-import { uuidv4 } from 'utils/utils';
-import { ColumnTypes, ViewViewModelStages } from '../../../constants';
+import { ViewViewModelStages } from '../../../constants';
 import { useViewSlice } from '../../../slice';
 import {
   selectCurrentEditingView,
   selectCurrentEditingViewAttr,
 } from '../../../slice/selectors';
-import {
-  Column,
-  ColumnPermission,
-  ColumnRole,
-  Model,
-} from '../../../slice/types';
+import { Column, ColumnRole, Model } from '../../../slice/types';
 import { dataModelColumnSorter } from '../../../utils';
 import Container from '../Container';
 import {
@@ -54,23 +44,17 @@ import {
 } from './constant';
 import DataModelBranch from './DataModelBranch';
 import DataModelNode from './DataModelNode';
+import { toModel } from './utils';
 
 const DataModelTree: FC = memo(() => {
   const t = useI18NPrefix('view');
   const { actions } = useViewSlice();
   const dispatch = useDispatch();
   const [openStateModal, contextHolder] = useStateModal({});
-  const viewId = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'id' }),
-  ) as string;
   const currentEditingView = useSelector(selectCurrentEditingView);
   const stage = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'stage' }),
   ) as ViewViewModelStages;
-  const roles = useSelector(selectRoles);
-  const columnPermissions = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'columnPermissions' }),
-  ) as ColumnPermission[];
   const [hierarchy, setHierarchy] = useState<Nullable<Model>>();
 
   useEffect(() => {
@@ -85,72 +69,13 @@ const DataModelTree: FC = memo(() => {
       .sort(dataModelColumnSorter);
   }, [hierarchy]);
 
-  const roleDropdownData = useMemo(
-    () =>
-      roles.map(({ id, name }) => ({
-        key: id,
-        title: name,
-        value: id,
-        isLeaf: true,
-      })),
-    [roles],
-  );
-
-  const checkRoleColumnPermission = useCallback(
-    columnName => checkedKeys => {
-      const fullPermissions = Object.keys(hierarchy || {});
-      dispatch(
-        actions.changeCurrentEditingView({
-          columnPermissions: roleDropdownData.reduce<ColumnPermission[]>(
-            (updated, { key }) => {
-              const permission = columnPermissions.find(
-                ({ subjectId }) => subjectId === key,
-              );
-              const checkOnCurrentRole = checkedKeys.includes(key);
-              if (permission) {
-                if (checkOnCurrentRole) {
-                  const updatedColumnPermission = Array.from(
-                    new Set(permission.columnPermission.concat(columnName)),
-                  );
-                  return fullPermissions.sort().join(',') !==
-                    updatedColumnPermission.sort().join(',')
-                    ? updated.concat({
-                        ...permission,
-                        columnPermission: updatedColumnPermission,
-                      })
-                    : updated;
-                } else {
-                  return updated.concat({
-                    ...permission,
-                    columnPermission: permission.columnPermission.filter(
-                      c => c !== columnName,
-                    ),
-                  });
-                }
-              } else {
-                return !checkOnCurrentRole
-                  ? updated.concat({
-                      id: uuidv4(),
-                      viewId,
-                      subjectId: key,
-                      subjectType: SubjectTypes.Role,
-                      columnPermission: fullPermissions.filter(
-                        c => c !== columnName,
-                      ),
-                    })
-                  : updated;
-              }
-            },
-            [],
-          ),
-        }),
-      );
-    },
-    [dispatch, actions, viewId, hierarchy, columnPermissions, roleDropdownData],
-  );
-
   const handleDeleteBranch = (node: Column) => {
     const newHierarchy = deleteBranch(tableColumns, node);
+    handleDataModelHierarchyChange(newHierarchy);
+  };
+
+  const handleDeleteFromBranch = (parent: Column) => (node: Column) => {
+    const newHierarchy = deleteFromBranch(tableColumns, parent, node);
     handleDataModelHierarchyChange(newHierarchy);
   };
 
@@ -164,16 +89,17 @@ const DataModelTree: FC = memo(() => {
       } else {
         newNode = { ...targetNode, type: type };
       }
-      const newHierarchy = updateNode(tableColumns, newNode, targetNode.index);
+      const newHierarchy = updateNode(
+        tableColumns,
+        newNode,
+        tableColumns?.findIndex(n => n.name === name),
+      );
       handleDataModelHierarchyChange(newHierarchy);
       return;
     }
-    const targetBranch = tableColumns?.find(b => {
-      if (b.children) {
-        return b.children?.find(bn => bn.name === name);
-      }
-      return false;
-    });
+    const targetBranch = tableColumns?.find(b =>
+      b?.children?.find(bn => bn.name === name),
+    );
     if (!!targetBranch) {
       const newNodeIndex = targetBranch.children?.findIndex(
         bn => bn.name === name,
@@ -192,7 +118,7 @@ const DataModelTree: FC = memo(() => {
           const newHierarchy = updateNode(
             tableColumns,
             newTargetBranch,
-            newTargetBranch.index,
+            tableColumns.findIndex(n => n.name === newTargetBranch.name),
           );
           handleDataModelHierarchyChange(newHierarchy);
         }
@@ -272,7 +198,7 @@ const DataModelTree: FC = memo(() => {
         }
         const hierarchyNode: Column = {
           name: hierarchyName,
-          type: ColumnTypes.String,
+          type: DataViewFieldType.STRING,
           role: ColumnRole.Hierarchy,
           children: nodes,
         };
@@ -287,7 +213,7 @@ const DataModelTree: FC = memo(() => {
           return c.name;
         });
         return (
-          <Form.Item
+          <StyledFormItem
             label={t('model.hierarchyName')}
             name="hierarchyName"
             rules={[
@@ -303,7 +229,7 @@ const DataModelTree: FC = memo(() => {
             ]}
           >
             <Input onChange={e => onChangeEvent(e.target?.value)} />
-          </Form.Item>
+          </StyledFormItem>
         );
       },
     });
@@ -332,7 +258,7 @@ const DataModelTree: FC = memo(() => {
       },
       content: onChangeEvent => {
         return (
-          <Form.Item
+          <StyledFormItem
             label={t('model.hierarchyName')}
             name="hierarchyName"
             rules={[{ required: true }]}
@@ -342,7 +268,7 @@ const DataModelTree: FC = memo(() => {
                 <Select.Option value={n.name}>{n.name}</Select.Option>
               ))}
             </Select>
-          </Form.Item>
+          </StyledFormItem>
         );
       },
     });
@@ -368,13 +294,13 @@ const DataModelTree: FC = memo(() => {
         const newHierarchy = updateNode(
           tableColumns,
           { ...node, name: newName },
-          node.index,
+          tableColumns.findIndex(n => n.name === node.name),
         );
         handleDataModelHierarchyChange(newHierarchy);
       },
       content: onChangeEvent => {
         return (
-          <Form.Item
+          <StyledFormItem
             label={t('model.rename')}
             initialValue={node?.name}
             name="rename"
@@ -395,7 +321,7 @@ const DataModelTree: FC = memo(() => {
                 onChangeEvent(e.target?.value);
               }}
             />
-          </Form.Item>
+          </StyledFormItem>
         );
       },
     });
@@ -458,8 +384,8 @@ const DataModelTree: FC = memo(() => {
     return toModel(newColumns);
   };
 
-  const updateNode = (columns: Column[], newNode, updateIndex) => {
-    columns[updateIndex] = newNode;
+  const updateNode = (columns: Column[], newNode, columnIndexes) => {
+    columns[columnIndexes] = newNode;
     return toModel(columns);
   };
 
@@ -470,6 +396,20 @@ const DataModelTree: FC = memo(() => {
       const children = branch?.children || [];
       columns.splice(deletedBranchIndex, 1);
       return toModel(columns, ...children);
+    }
+  };
+
+  const deleteFromBranch = (
+    columns: Column[],
+    parent: Column,
+    node: Column,
+  ) => {
+    const branchNode = columns.find(c => c.name === parent.name);
+    if (branchNode) {
+      branchNode.children = branchNode.children?.filter(
+        c => c.name !== node.name,
+      );
+      return toModel(columns, node);
     }
   };
 
@@ -503,92 +443,8 @@ const DataModelTree: FC = memo(() => {
     );
   };
 
-  const toModel = (columns: Column[], ...additional) => {
-    return columns.concat(...additional)?.reduce((acc, cur, newIndex) => {
-      if (cur?.role === ColumnRole.Hierarchy && isEmptyArray(cur?.children)) {
-        return acc;
-      }
-      if (cur?.role === ColumnRole.Hierarchy && !isEmptyArray(cur?.children)) {
-        const orderedChildren = cur.children?.map((child, newIndex) => {
-          return {
-            ...child,
-            index: newIndex,
-          };
-        });
-        acc[cur.name] = Object.assign({}, cur, {
-          index: newIndex,
-          children: orderedChildren,
-        });
-      } else {
-        acc[cur.name] = Object.assign({}, cur, { index: newIndex });
-      }
-      return acc;
-    }, {});
-  };
-
-  const getPermissionButton = useCallback(
-    (name: string) => {
-      // 没有记录相当于对所有字段都有权限
-      const checkedKeys =
-        columnPermissions.length > 0
-          ? roleDropdownData.reduce<string[]>((selected, { key }) => {
-              const permission = columnPermissions.find(
-                ({ subjectId }) => subjectId === key,
-              );
-              if (permission) {
-                return permission.columnPermission.includes(name)
-                  ? selected.concat(key)
-                  : selected;
-              } else {
-                return selected.concat(key);
-              }
-            }, [])
-          : roleDropdownData.map(({ key }) => key);
-
-      return (
-        <Popup
-          key={`${name}_columnpermission`}
-          trigger={['click']}
-          placement="bottomRight"
-          content={
-            <Tree
-              className="dropdown"
-              treeData={roleDropdownData}
-              checkedKeys={checkedKeys}
-              loading={false}
-              selectable={false}
-              onCheck={checkRoleColumnPermission(name)}
-              blockNode
-              checkable
-            />
-          }
-        >
-          <Tooltip title={t('columnPermission.title')}>
-            <ToolbarButton
-              size="small"
-              iconSize={FONT_SIZE_BASE}
-              icon={
-                checkedKeys.length > 0 ? (
-                  <EyeOutlined
-                    style={{ color: INFO }}
-                    className={classnames({
-                      partial: checkedKeys.length !== roleDropdownData.length,
-                    })}
-                  />
-                ) : (
-                  <EyeInvisibleOutlined />
-                )
-              }
-            />
-          </Tooltip>
-        </Popup>
-      );
-    },
-    [columnPermissions, roleDropdownData, checkRoleColumnPermission, t],
-  );
-
   return (
-    <Container title="model" isLoading={stage === ViewViewModelStages.Running}>
+    <Container title="model" loading={stage === ViewViewModelStages.Running}>
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable
           droppableId={ROOT_CONTAINER_ID}
@@ -605,17 +461,16 @@ const DataModelTree: FC = memo(() => {
                   <DataModelBranch
                     node={col}
                     key={col.name}
-                    getPermissionButton={getPermissionButton}
                     onNodeTypeChange={handleNodeTypeChange}
                     onMoveToHierarchy={openMoveToHierarchyModal}
                     onEditBranch={openEditBranchModal}
                     onDelete={handleDeleteBranch}
+                    onDeleteFromHierarchy={handleDeleteFromBranch}
                   />
                 ) : (
                   <DataModelNode
                     node={col}
                     key={col.name}
-                    getPermissionButton={getPermissionButton}
                     onCreateHierarchy={openCreateHierarchyModal}
                     onNodeTypeChange={handleNodeTypeChange}
                     onMoveToHierarchy={openMoveToHierarchyModal}
@@ -636,4 +491,8 @@ export default DataModelTree;
 
 const StyledDroppableContainer = styled.div<{ isDraggingOver }>`
   user-select: 'none';
+`;
+
+const StyledFormItem = styled(Form.Item)`
+  margin: ${SPACE_LG} 0 0 0;
 `;

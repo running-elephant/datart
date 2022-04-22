@@ -1,10 +1,12 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
+import {
+  boardDrillManager,
+  EDIT_PREFIX,
+} from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
-  ChartWidgetContent,
-  ContainerWidgetContent,
   ControllerWidgetContent,
   DataChart,
   getDataOption,
@@ -12,8 +14,6 @@ import {
   ServerDatachart,
   Widget,
   WidgetData,
-  WidgetInfo,
-  WidgetOfCopy,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getChartWidgetRequestParams } from 'app/pages/DashBoardPage/utils';
 import {
@@ -25,7 +25,6 @@ import {
 import {
   convertWrapChartWidget,
   createToSaveWidgetGroup,
-  createWidgetInfo,
   createWidgetInfoMap,
   getWidgetInfoMapByServer,
   getWidgetMap,
@@ -36,9 +35,7 @@ import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
-import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
-import { CloneValueDeep } from 'utils/object';
 import { request2 } from 'utils/request';
 import { uuidv4 } from 'utils/utils';
 import {
@@ -82,7 +79,6 @@ export const getEditBoardDetail = createAsyncThunk<
     if (editDashboard?.id === dashboardId) {
       return null;
     }
-    dispatch(ActionCreators.clearHistory());
     dispatch(fetchEditBoardDetail(dashboardId));
     return null;
   },
@@ -152,7 +148,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
  */
 export const toUpdateDashboard = createAsyncThunk<
   any,
-  { boardId: string; callback: () => void },
+  { boardId: string; callback?: () => void },
   { state: RootState }
 >(
   'editBoard/toUpdateDashboard',
@@ -188,7 +184,7 @@ export const toUpdateDashboard = createAsyncThunk<
       method: 'put',
       data: updateData,
     });
-    callback();
+    callback?.();
   },
 );
 /**
@@ -312,7 +308,7 @@ export const addChartWidget = createAsyncThunk<
   'editBoard/addChartWidget',
   async (
     { boardId, chartId, boardType, dataChart, view, subType },
-    { getState, dispatch },
+    { dispatch },
   ) => {
     const dataCharts = [dataChart];
     const viewViews = [view];
@@ -349,119 +345,8 @@ export const renderedEditWidgetAsync = createAsyncThunk<
 
     dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
 
-    if (curWidget.config.type === 'container') {
-      const content = curWidget.config.content as ContainerWidgetContent;
-      let subWidgetIds: string[] = [];
-      subWidgetIds = Object.values(content.itemMap)
-        .map(item => item.childWidgetId)
-        .filter(id => !!id);
-      // 1 widget render
-      dispatch(editWidgetInfoActions.renderedWidgets(subWidgetIds));
-      //  2 widget getData
-      subWidgetIds.forEach(wid => {
-        dispatch(getEditWidgetData({ widget: WidgetMap[wid] }));
-      });
-      return null;
-    }
     // 2 widget getData
     dispatch(getEditWidgetData({ widget: curWidget }));
-    return null;
-  },
-);
-
-// 复制 copy
-export const copyWidgetByIds = createAsyncThunk<
-  null,
-  string[],
-  { state: RootState }
->(
-  'editBoard/copyWidgets',
-  async (wIds, { getState, dispatch, rejectWithValue }) => {
-    const { widgetRecord } = editBoardStackState(
-      getState() as unknown as {
-        editBoard: HistoryEditBoard;
-      },
-    );
-
-    // 新复制前先清空
-    dispatch(editDashBoardInfoActions.clearClipboardWidgets());
-    const newWidgets: Record<string, WidgetOfCopy> = {};
-    wIds.forEach(wid => {
-      const widget = widgetRecord[wid];
-      newWidgets[wid] = { ...widget, selectedCopy: true };
-      if (widget.config.type === 'container') {
-        const content = widget.config.content as ContainerWidgetContent;
-        Object.values(content.itemMap).forEach(item => {
-          if (item.childWidgetId) {
-            const subWidget = widgetRecord[item.childWidgetId];
-            newWidgets[subWidget.id] = subWidget;
-          }
-        });
-      }
-    });
-    dispatch(editDashBoardInfoActions.addClipboardWidgets(newWidgets));
-    return null;
-  },
-);
-
-// 粘贴
-export const pasteWidgets = createAsyncThunk(
-  'editBoard/pasteWidgets',
-  async (_, { getState, dispatch, rejectWithValue }) => {
-    const { clipboardWidgets } = boardInfoState(
-      getState() as {
-        editBoard: EditBoardState;
-      },
-    );
-    const boardState = getState() as unknown as { board: BoardState };
-    const dataChartMap = boardState.board.dataChartMap;
-    const newWidgets: Widget[] = [];
-    Object.values(clipboardWidgets).forEach(widget => {
-      if (widget.selectedCopy) {
-        const newWidget = cloneWidget(widget);
-        newWidgets.push(newWidget);
-        if (newWidget.config.type === 'container') {
-          const content = newWidget.config.content as ContainerWidgetContent;
-          Object.values(content.itemMap).forEach(item => {
-            if (item.childWidgetId) {
-              const subWidget = clipboardWidgets[item.childWidgetId];
-              const newSubWidget = cloneWidget(subWidget, newWidget.id);
-              newWidgets.push(newSubWidget);
-            }
-          });
-        } else if (newWidget.config.type === 'chart') {
-          // #issue #588
-          let dataChart = dataChartMap[newWidget.datachartId];
-          const newDataChart: DataChart = CloneValueDeep({
-            ...dataChart,
-            id: dataChart.id + Date.now() + '_copy',
-          });
-          (newWidget.config.content as ChartWidgetContent).type = 'widgetChart';
-          newWidget.datachartId = newDataChart.id;
-          dispatch(boardActions.setDataChartToMap([newDataChart]));
-        }
-      }
-    });
-    const widgetInfoMap: Record<string, WidgetInfo> = {};
-    newWidgets.forEach(widget => {
-      const widgetInfo = createWidgetInfo(widget.id);
-      widgetInfoMap[widget.id] = widgetInfo;
-    });
-
-    dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
-    dispatch(editBoardStackActions.addWidgets(newWidgets));
-
-    //
-    function cloneWidget(widget: WidgetOfCopy, pId?: string) {
-      const newWidget = CloneValueDeep(widget);
-      newWidget.id = uuidv4();
-      newWidget.parentId = pId || '';
-      newWidget.relations = [];
-      newWidget.config.name += '_copy';
-
-      delete newWidget.selectedCopy;
-      return newWidget as Widget;
-    }
     return null;
   },
 );
@@ -469,12 +354,19 @@ export const pasteWidgets = createAsyncThunk(
 //
 export const uploadBoardImage = createAsyncThunk<
   null,
-  { boardId: string; formData: FormData; resolve: (url: string) => void }
+  {
+    boardId: string;
+    fileName: string;
+    formData: FormData;
+    resolve: (url: string) => void;
+  }
 >(
   'editBoard/uploadBoardImage',
-  async ({ boardId, formData, resolve }, { getState, dispatch }) => {
+  async ({ boardId, formData, fileName, resolve }, { getState, dispatch }) => {
     const { data } = await request2<string>({
-      url: `files/viz/image?ownerType=${'DASHBOARD'}&ownerId=${boardId}&fileName=${uuidv4()}`,
+      url: `files/viz/image?ownerType=${'DASHBOARD'}&ownerId=${boardId}&fileName=${
+        uuidv4() + '@' + fileName
+      }`,
       method: 'POST',
       data: formData,
     });
@@ -525,7 +417,10 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
     if (!curWidget) return null;
     const dataChartMap = boardState.dataChartMap;
     const boardLinkFilters = boardInfo.linkFilter;
-
+    const drillOption = boardDrillManager.getWidgetDrill({
+      bid: EDIT_PREFIX + curWidget.dashboardId,
+      wid: widgetId,
+    });
     let requestParams = getChartWidgetRequestParams({
       widgetId,
       widgetMap,
@@ -534,6 +429,7 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
       widgetInfo,
       dataChartMap,
       boardLinkFilters,
+      drillOption,
     });
     if (!requestParams) {
       return null;

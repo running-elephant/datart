@@ -22,11 +22,10 @@ import {
   WidgetContentChartType,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
+import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import { getTheWidgetFiltersAndParams } from '../..';
-import ChartDataRequest, {
-  transformToViewConfig,
-} from '../../../../../types/ChartDataRequest';
 import {
   createChartWidgetContent,
   createInitWidgetConfig,

@@ -31,8 +31,7 @@ import { getDefaultWidgetName } from 'app/pages/DashBoardPage/utils';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import produce from 'immer';
 import { Layout } from 'react-grid-layout';
-import { createSlice, isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
-import { rejectedActionMessageHandler } from 'utils/notification';
+import { createSlice } from 'utils/@reduxjs/toolkit';
 import { EditBoardStack } from '../types';
 
 export type updateWidgetConf = {
@@ -48,10 +47,6 @@ export const editBoardStackSlice = createSlice({
   name: 'editBoard',
   initialState: initEditBoardState,
   reducers: {
-    clearEditBoardState(state) {
-      state.dashBoard = {} as Dashboard;
-      state.widgetRecord = {};
-    },
     setBoardToEditStack(state, action: PayloadAction<EditBoardStack>) {
       const record = action.payload;
       Object.keys(record).forEach(key => {
@@ -86,25 +81,32 @@ export const editBoardStackSlice = createSlice({
         const widget = produce(ele, draft => {
           draft.config.index = maxWidgetIndex;
           draft.config.name =
-            ele.config.name || getDefaultWidgetName(ele, maxWidgetIndex);
+            ele.config.name ||
+            getDefaultWidgetName(
+              ele.config.type,
+              ele.config.content.type,
+              maxWidgetIndex,
+            );
         });
         state.widgetRecord[widget.id] = widget;
       });
       state.dashBoard.config.maxWidgetIndex = maxWidgetIndex;
     },
+    //
+    toggleLockWidget(
+      state,
+      action: PayloadAction<{ id: string; lock: boolean }>,
+    ) {
+      const { id, lock } = action.payload;
+      if (state.widgetRecord?.[id]?.config) {
+        state.widgetRecord[id].config.lock = lock;
+      }
+    },
     deleteWidgets(state, action: PayloadAction<string[]>) {
       const ids = action.payload;
+      if (!ids?.length) return;
       ids.forEach(id => {
-        if (state.widgetRecord[id].config.type !== 'container') {
-          delete state.widgetRecord[id];
-        } else {
-          const containerConfig = state.widgetRecord[id].config
-            .content as ContainerWidgetContent;
-          Object.values(containerConfig.itemMap).forEach(item => {
-            delete state.widgetRecord[item.childWidgetId];
-          });
-          delete state.widgetRecord[id];
-        }
+        delete state.widgetRecord[id];
       });
     },
     updateWidget(state, action: PayloadAction<Widget>) {
@@ -139,6 +141,7 @@ export const editBoardStackSlice = createSlice({
       const { layouts, deviceType } = action.payload;
       layouts.forEach(it => {
         const { i, x, y, w, h } = it;
+        if (!state.widgetRecord?.[i]?.config) return;
         const rectItem = { x, y, width: w, height: h };
         if (deviceType === DeviceType.Desktop) {
           state.widgetRecord[i].config.rect = rectItem;
@@ -165,17 +168,17 @@ export const editBoardStackSlice = createSlice({
       const { rect } = state.widgetRecord[id].config;
       state.widgetRecord[id].config.rect = { ...rect, width, height };
     },
-
-    changeTwoWidgetIndex(
+    changeWidgetsIndex(
       state,
-      action: PayloadAction<{ curId: string; targetId: string }>,
+      action: PayloadAction<{ id: string; index: number }[]>,
     ) {
-      const { curId, targetId } = action.payload;
-      let temp = state.widgetRecord[curId].config.index;
-      state.widgetRecord[curId].config.index =
-        state.widgetRecord[targetId].config.index;
-      state.widgetRecord[targetId].config.index = temp;
+      const opts = action.payload;
+      opts.forEach(it => {
+        const { id, index } = it;
+        state.widgetRecord[id].config.index = index;
+      });
     },
+
     addWidgetToContainerWidget(
       state,
       action: PayloadAction<{
@@ -254,10 +257,5 @@ export const editBoardStackSlice = createSlice({
       }
     },
   },
-  extraReducers: builder => {
-    builder.addMatcher(
-      isMySliceRejectedAction(editBoardStackSlice.name),
-      rejectedActionMessageHandler,
-    );
-  },
+  extraReducers: builder => {},
 });

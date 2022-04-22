@@ -17,6 +17,7 @@
  */
 
 import {
+  APP_CURRENT_VERSION,
   APP_SEMANTIC_VERSIONS,
   APP_VERSION_BETA_0,
   APP_VERSION_BETA_1,
@@ -38,7 +39,21 @@ describe('MigrationEventDispatcher Tests', () => {
     );
   });
 
-  test('should set version after eventinvoked', () => {
+  test('should throw error ant get original process value when did not register task', () => {
+    const originalInputValue = { version: '', id: 1 } as any;
+    const event0 = new MigrationEvent(APP_VERSION_INIT, undefined as any);
+    const dispatcher = new MigrationEventDispatcher(event0);
+    expect(dispatcher.process(originalInputValue)).toEqual(originalInputValue);
+  });
+
+  test('should do not do event sourcing when event version is not semantic version in datart', () => {
+    const originalInputValue = { version: APP_CURRENT_VERSION, id: 1 } as any;
+    const event0 = new MigrationEvent('', m => m);
+    const dispatcher = new MigrationEventDispatcher(event0);
+    expect(dispatcher.process(originalInputValue)).toEqual(originalInputValue);
+  });
+
+  test('should set version after event invoked', () => {
     const event0 = new MigrationEvent(APP_VERSION_INIT, m => m);
     const dispatcher = new MigrationEventDispatcher(event0);
     expect(dispatcher.process({ version: '', id: 1 } as any)).toEqual({

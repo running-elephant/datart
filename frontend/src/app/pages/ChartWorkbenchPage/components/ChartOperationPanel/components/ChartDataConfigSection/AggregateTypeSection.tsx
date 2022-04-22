@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionFieldActionType } from 'app/types/ChartConfig';
+import {
+  ChartDataSectionFieldActionType,
+  DataViewFieldType,
+} from 'app/constants';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
-import { ChartDataViewFieldType } from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import BaseDataConfigSection from './BaseDataConfigSection';
 import { dataConfigSectionComparer, handleDefaultConfig } from './utils';
@@ -31,14 +33,14 @@ const AggregateTypeSection: FC<ChartDataConfigSectionProps> = memo(
       },
       {
         actions: {
-          [ChartDataViewFieldType.NUMERIC]: [
+          [DataViewFieldType.NUMERIC]: [
             ChartDataSectionFieldActionType.Aggregate,
             ChartDataSectionFieldActionType.Alias,
             ChartDataSectionFieldActionType.Format,
             ChartDataSectionFieldActionType.Sortable,
             ChartDataSectionFieldActionType.ColorizeSingle,
           ],
-          [ChartDataViewFieldType.STRING]: [
+          [DataViewFieldType.STRING]: [
             ChartDataSectionFieldActionType.AggregateLimit,
             ChartDataSectionFieldActionType.Alias,
             ChartDataSectionFieldActionType.Format,

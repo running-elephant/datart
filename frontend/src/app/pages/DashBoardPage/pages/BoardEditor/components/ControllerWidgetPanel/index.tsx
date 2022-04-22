@@ -18,23 +18,21 @@
 
 import { Form, Modal } from 'antd';
 import { Split } from 'app/components';
+import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardActionContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardActionProvider';
+import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { selectViewMap } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import {
   ControllerWidgetContent,
   RelatedView,
+  Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   convertToWidgetMap,
   getOtherStringControlWidgets,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
-import {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
 import produce from 'immer';
 import React, {
   memo,
@@ -47,6 +45,7 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
+import { WidgetActionContext } from '../../../../components/ActionProvider/WidgetActionProvider';
 import { editBoardStackActions, editDashBoardInfoActions } from '../../slice';
 import {
   selectControllerPanel,
@@ -71,9 +70,10 @@ const ControllerWidgetPanel: React.FC = memo(props => {
   const tGMT = useI18NPrefix(`global.modal.title`);
   const { type, widgetId, controllerType } = useSelector(selectControllerPanel);
   const { boardId, boardType, queryVariables } = useContext(BoardContext);
+  const { hasQueryControl } = useContext(BoardConfigContext);
 
-  const { refreshWidgetsByController: refreshWidgetsByFilter } =
-    useContext(BoardActionContext);
+  const { onRefreshWidgetsByController } = useContext(WidgetActionContext);
+
   const allWidgets = useSelector(selectSortAllWidgets);
   const widgets = useMemo(
     () =>
@@ -104,6 +104,13 @@ const ControllerWidgetPanel: React.FC = memo(props => {
     [widgetId, widgetMap],
   );
 
+  const refreshLinkedWidgets = useCallback(
+    (widget: Widget) => {
+      if (hasQueryControl) return;
+      onRefreshWidgetsByController(widget);
+    },
+    [onRefreshWidgetsByController, hasQueryControl],
+  );
   const getFormRelatedViews = useCallback(() => {
     return form?.getFieldValue('relatedViews') as RelatedView[];
   }, [form]);
@@ -129,7 +136,7 @@ const ControllerWidgetPanel: React.FC = memo(props => {
               viewId: view.id,
               relatedCategory: ChartDataViewFieldCategory.Field,
               fieldValue: '',
-              fieldValueType: ChartDataViewFieldType.STRING,
+              fieldValueType: DataViewFieldType.STRING,
             };
             nextRelatedViews.push(relatedView);
           }
@@ -215,7 +222,8 @@ const ControllerWidgetPanel: React.FC = memo(props => {
         });
         dispatch(addWidgetsToEditBoard([widget]));
         dispatch(getEditControllerOptions(widget.id));
-        refreshWidgetsByFilter(widget);
+
+        refreshLinkedWidgets(widget);
       } else if (type === 'edit') {
         let newRelations = widgetToolKit.controller.tool.makeControlRelations({
           sourceId: curFilterWidget.id,
@@ -240,7 +248,7 @@ const ControllerWidgetPanel: React.FC = memo(props => {
         });
         dispatch(editBoardStackActions.updateWidget(newWidget));
         dispatch(getEditControllerOptions(newWidget.id));
-        refreshWidgetsByFilter(newWidget);
+        refreshLinkedWidgets(newWidget);
       }
     },
     [
@@ -249,7 +257,7 @@ const ControllerWidgetPanel: React.FC = memo(props => {
       controllerType,
       curFilterWidget,
       dispatch,
-      refreshWidgetsByFilter,
+      refreshLinkedWidgets,
       relatedWidgets,
       type,
       widgetMap,

@@ -20,6 +20,9 @@ package datart.server.service.impl;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
 import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.NotFoundException;
+import datart.core.base.exception.ParamException;
+import datart.core.common.DateUtils;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.Datachart;
 import datart.core.entity.Folder;
@@ -30,17 +33,19 @@ import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.security.base.ResourceType;
 import datart.security.util.PermissionHelper;
 import datart.server.base.dto.DatachartDetail;
-import datart.core.base.exception.NotFoundException;
-import datart.core.base.exception.ParamException;
 import datart.server.base.params.BaseCreateParam;
-import datart.server.base.params.BaseUpdateParam;
 import datart.server.base.params.DatachartCreateParam;
-import datart.server.base.params.VizUpdateParam;
+import datart.server.base.transfer.ImportStrategy;
+import datart.server.base.transfer.TransferConfig;
+import datart.server.base.transfer.model.DatachartTransferModel;
 import datart.server.service.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+
+import java.util.*;
 
 @Service
 public class DatachartServiceImpl extends BaseService implements DatachartService {
@@ -57,18 +62,22 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
 
     private final DatachartMapperExt datachartMapper;
 
+    private final ViewService viewService;
+
     public DatachartServiceImpl(RoleService roleService,
                                 FileService fileService,
                                 FolderMapperExt folderMapper,
                                 RelRoleResourceMapperExt rrrMapper,
                                 FolderService folderService,
-                                DatachartMapperExt datachartMapper) {
+                                DatachartMapperExt datachartMapper,
+                                ViewService viewService) {
         this.roleService = roleService;
         this.fileService = fileService;
         this.folderMapper = folderMapper;
         this.rrrMapper = rrrMapper;
         this.folderService = folderService;
         this.datachartMapper = datachartMapper;
+        this.viewService = viewService;
     }
 
     @Override
@@ -95,12 +104,6 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
     @Override
     public void deleteStaticFiles(Datachart datachart) {
         fileService.deleteFiles(FileOwner.DATACHART, datachart.getId());
-    }
-
-    @Override
-    @Transactional
-    public void deletePermissions(Datachart datachart) {
-        rrrMapper.deleteByResource(ResourceType.DATACHART.name(), datachart.getId());
     }
 
     @Override
@@ -153,7 +156,6 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
         folder.setSubType(param.getSubType());
         folder.setAvatar(param.getAvatar());
 
-
         folderService.requirePermission(folder, Const.CREATE);
         folderMapper.insert(folder);
 
@@ -161,7 +163,137 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
     }
 
     @Override
+    public DatachartTransferModel exportResource(TransferConfig transferConfig, String... ids) {
+
+        if (ids == null || ids.length == 0) {
+            return null;
+        }
+        DatachartTransferModel datachartTransferModel = new DatachartTransferModel();
+        datachartTransferModel.setMainModels(new LinkedList<>());
+
+        Set<String> viewIds = new HashSet<>();
+        Map<String, Folder> parentMap = new HashMap<>();
+
+        for (String datachartId : ids) {
+            DatachartTransferModel.MainModel mainModel = new DatachartTransferModel.MainModel();
+            Datachart datachart = retrieve(datachartId);
+            mainModel.setDatachart(datachart);
+
+            Folder vizFolder = folderService.getVizFolder(datachartId, ResourceType.DATACHART.name());
+            mainModel.setFolder(vizFolder);
+            if (StringUtils.isNotBlank(datachart.getViewId())) {
+                viewIds.add(datachart.getViewId());
+            }
+            datachartTransferModel.getMainModels().add(mainModel);
+
+            if (transferConfig.isWithParents()) {
+                List<Folder> allParents = folderService.getAllParents(vizFolder.getParentId());
+                if (!CollectionUtils.isEmpty(allParents)) {
+                    for (Folder folder : allParents) {
+                        parentMap.put(folder.getId(), folder);
+                    }
+                }
+                datachartTransferModel.setParents(folderService.getAllParents(vizFolder.getParentId()));
+            }
+        }
+        //folder
+        datachartTransferModel.setParents(new LinkedList<>(parentMap.values()));
+        // view
+        if (!transferConfig.isOnlyMainModel()) {
+            datachartTransferModel.setViewExportModel(viewService.exportResource(transferConfig, viewIds.toArray(new String[0])));
+        }
+        return datachartTransferModel;
+    }
+
+    @Override
+    public boolean importResource(DatachartTransferModel model, ImportStrategy strategy, String orgId, Set<String> requireTransfer) {
+        Set<String> requiredViews = new HashSet<>();
+        switch (strategy) {
+            case OVERWRITE:
+                importDatachart(model, orgId, true, true, requireTransfer, requiredViews);
+                break;
+            case IGNORE:
+                importDatachart(model, orgId, false, true, requireTransfer, requiredViews);
+                break;
+            default:
+                importDatachart(model, orgId, false, false, requireTransfer, requiredViews);
+        }
+        return viewService.importResource(model.getViewExportModel(), strategy, orgId, requiredViews);
+    }
+
+    private void importDatachart(DatachartTransferModel model,
+                                 String orgId,
+                                 boolean deleteFirst,
+                                 boolean skipExists,
+                                 Set<String> requireTransfer,
+                                 Set<String> requiredViews) {
+
+        if (model == null || CollectionUtils.isEmpty(model.getMainModels())) {
+            return;
+        }
+
+        for (DatachartTransferModel.MainModel mainModel : model.getMainModels()) {
+
+            Datachart datachart = mainModel.getDatachart();
+            if (requireTransfer != null && !requireTransfer.contains(datachart.getId())) {
+                continue;
+            }
+            if (deleteFirst) {
+                try {
+                    delete(datachart.getId());
+                } catch (Exception ignore) {
+                }
+            } else if (skipExists) {
+                try {
+                    if (retrieve(datachart.getId()) != null) {
+                        continue;
+                    }
+                } catch (Exception ignore) {
+                }
+            }
+
+            // datachart folder
+            Folder folder = mainModel.getFolder();
+            folder.setOrgId(orgId);
+
+            if (StringUtils.isNotBlank(datachart.getViewId())) {
+                requiredViews.add(datachart.getViewId());
+            }
+
+            try {
+                folderService.checkUnique(ResourceType.DATACHART, orgId, folder.getParentId(), folder.getName());
+            } catch (Exception e) {
+                folder.setName(DateUtils.withTimeString(folder.getName()));
+                datachart.setName(folder.getName());
+            }
+            folderMapper.insert(folder);
+
+            datachart.setOrgId(orgId);
+            datachart.setUpdateBy(getCurrentUser().getId());
+            datachart.setUpdateTime(new Date());
+            datachartMapper.insert(datachart);
+
+            // insert parents
+            if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(model.getParents())) {
+                for (Folder parent : model.getParents()) {
+                    try {
+                        parent.setOrgId(orgId);
+                        folderMapper.insert(parent);
+                    } catch (Exception ignore) {
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
     public boolean safeDelete(String datachartId) {
         return datachartMapper.countWidgetRels(datachartId) == 0;
     }
+
+    @Override
+    public List<Folder> getAllParents(String id) {
+        return null;
+    }
+
 }

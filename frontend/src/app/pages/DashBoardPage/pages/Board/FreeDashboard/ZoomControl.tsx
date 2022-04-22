@@ -39,7 +39,7 @@ const ZoomControl: React.FC<ZoomControlProps> = props => {
     return scale.map((s: number) => `${Math.floor(s * 100)}%`).join('/');
   }, [scale]);
   return (
-    <Warp>
+    <Wrapper>
       <div className="bottom-box">
         <Space>
           <Tooltip title="缩小视图">
@@ -68,11 +68,11 @@ const ZoomControl: React.FC<ZoomControlProps> = props => {
           <label className="value-label">{percentage}</label>
         </Space>
       </div>
-    </Warp>
+    </Wrapper>
   );
 };
 export default ZoomControl;
-const Warp = styled.div`
+const Wrapper = styled.div`
   display: flex;
   flex-direction: row-reverse;
   justify-content: space-between;

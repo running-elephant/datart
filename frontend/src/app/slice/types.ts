@@ -1,3 +1,5 @@
+import { TenantManagementMode } from 'app/constants';
+
 /**
  * Datart
  *
@@ -22,7 +24,7 @@ export interface AppState {
   registerLoading: boolean;
   saveProfileLoading: boolean;
   modifyPasswordLoading: boolean;
-  oauth2Clients: Array<{name:string,value:string}>;
+  oauth2Clients: Array<{ name: string; value: string }>;
 }
 
 export interface User {
@@ -37,6 +39,8 @@ export interface User {
 
 export interface SystemInfo {
   mailEnable: boolean;
+  registerEnable: boolean;
+  tenantManagementMode: TenantManagementMode;
   tokenTimeout: string;
   version: string;
 }

@@ -16,19 +16,34 @@
  * limitations under the License.
  */
 
-import React, { createContext, FC, memo } from 'react';
+import produce from 'immer';
+import { createContext, FC, memo, useMemo } from 'react';
 import { DashboardConfig } from '../../pages/Board/slice/types';
+import { adaptBoardImageUrl } from '../../utils';
 
 export const BoardConfigContext = createContext<DashboardConfig>(
   {} as DashboardConfig,
 );
 
-export const BoardConfigProvider: FC<{ config: DashboardConfig }> = memo(
-  ({ config, children }) => {
-    return (
-      <BoardConfigContext.Provider value={config}>
-        {children}
-      </BoardConfigContext.Provider>
-    );
-  },
-);
+export const BoardConfigProvider: FC<{
+  config: DashboardConfig;
+  boardId: string;
+}> = memo(({ config, boardId, children }) => {
+  const adaptConfig = useMemo(() => {
+    if (config) {
+      const nextConfig = produce(config, draft => {
+        draft.background.image = adaptBoardImageUrl(
+          config.background.image,
+          boardId,
+        );
+      });
+      return nextConfig;
+    }
+    return config;
+  }, [config, boardId]);
+  return (
+    <BoardConfigContext.Provider value={adaptConfig}>
+      {children}
+    </BoardConfigContext.Provider>
+  );
+});

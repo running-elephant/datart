@@ -18,6 +18,9 @@
 
 package datart.core.common;
 
+import datart.core.base.consts.TenantManagementMode;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -25,10 +28,15 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
+import static datart.core.base.consts.TenantManagementMode.PLATFORM;
+
 @Component
+@Slf4j
 public class Application implements ApplicationContextAware {
 
     private static ApplicationContext context;
+
+    private static TenantManagementMode currMode;
 
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
@@ -41,6 +49,10 @@ public class Application implements ApplicationContextAware {
 
     public static <T> T getBean(Class<T> t) {
         return context.getBean(t);
+    }
+
+    public static <T> T getBean(String beanName, Class<T> t) {
+        return context.getBean(beanName, t);
     }
 
     public static String getProperty(String key) {
@@ -74,8 +86,36 @@ public class Application implements ApplicationContextAware {
         return getProperty("datart.server.path-prefix");
     }
 
+    public static String getServerPrefix() {
+        return getProperty("server.servlet.context-path","/");
+    }
+
     public static String getTokenSecret() {
         return getProperty("datart.security.token.secret", "d@a$t%a^r&a*t");
+    }
+
+    public static boolean canRegister() {
+        return BooleanUtils.toBoolean(getProperty("datart.user.register", "true"));
+    }
+
+    public static String getAdminId() {
+        if (getCurrMode().equals(TenantManagementMode.TEAM)){
+            return getProperty("datart.admin-id", "datart-admin");
+        }
+        return "";
+    }
+
+    public static TenantManagementMode getCurrMode() {
+        if (currMode == null) {
+            String mode = Application.getProperty("datart.tenant-management-mode");
+            try {
+                return TenantManagementMode.valueOf(mode.toUpperCase());
+            } catch (Exception e) {
+                log.warn("Unrecognized tenant-management-mode: '{}', and this will run in platform tenant-management-mode", mode);
+            }
+            currMode = PLATFORM;
+        }
+        return currMode;
     }
 
 }

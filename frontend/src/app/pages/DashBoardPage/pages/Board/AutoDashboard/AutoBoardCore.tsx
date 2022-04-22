@@ -17,47 +17,37 @@
  */
 
 import { Empty } from 'antd';
+import { useGridWidgetHeight } from 'app/hooks/useGridWidgetHeight';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
-import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
-import {
-  BREAK_POINT_MAP,
-  LAYOUT_COLS_MAP,
-  MIN_MARGIN,
-  MIN_PADDING,
-} from 'app/pages/DashBoardPage/constants';
-import useAutoBoardRenderItem from 'app/pages/DashBoardPage/hooks/useAutoBoardRenderItem';
-import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
+import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
+import { LAYOUT_COLS_MAP } from 'app/pages/DashBoardPage/constants';
+import useBoardScroll from 'app/pages/DashBoardPage/hooks/useBoardScroll';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
-import {
-  selectLayoutWidgetInfoMapById,
-  selectLayoutWidgetMapById,
-} from 'app/pages/DashBoardPage/pages/Board/slice/selector';
-import {
-  BoardState,
-  DeviceType,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { memo, useCallback, useContext, useMemo, useState } from 'react';
-import { Layout, Responsive, WidthProvider } from 'react-grid-layout';
+import { selectLayoutWidgetMapById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
+import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { getBoardMarginPadding } from 'app/pages/DashBoardPage/utils/board';
+import { memo, useCallback, useContext, useMemo } from 'react';
+import RGL, { Layout, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
 import StyledBackground from '../components/StyledBackground';
 import { WidgetOfAuto } from './WidgetOfAuto';
-const ResponsiveGridLayout = WidthProvider(Responsive);
-const mobilePoints = Object.keys(BREAK_POINT_MAP).slice(3);
+
+const ReactGridLayout = WidthProvider(RGL);
 export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
-    // const visible = useVisibleHidden(0);
-    const {
-      margin,
-      containerPadding,
-      background,
-      mobileMargin,
-      mobileContainerPadding,
-      allowOverlap,
-    } = useContext(BoardConfigContext);
+    const { editing } = useContext(BoardContext);
+    const boardConfig = useContext(BoardConfigContext);
+    const { background, allowOverlap } = boardConfig;
+    const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
 
+    const { curMargin, curPadding } = useMemo(() => {
+      return getBoardMarginPadding(boardConfig, colsKey);
+    }, [boardConfig, colsKey]);
+    const { gridWrapRef, thEmitScroll } = useBoardScroll(boardId);
     const selectLayoutWidgetsConfigById = useMemo(
       selectLayoutWidgetMapById,
       [],
@@ -65,118 +55,72 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
       selectLayoutWidgetsConfigById(state, boardId),
     );
-
-    const layoutWidgetInfoMap = useSelector((state: { board: BoardState }) =>
-      selectLayoutWidgetInfoMapById(state, boardId),
-    );
+    const layoutMap = useGridLayoutMap(layoutWidgetMap);
 
     const sortedLayoutWidgets = useMemo(
       () =>
         Object.values(layoutWidgetMap).sort(
           (a, b) => a.config.index - b.config.index,
         ),
-
       [layoutWidgetMap],
     );
 
-    const [deviceType, setDeviceType] = useState<DeviceType>(
-      DeviceType.Desktop,
-    );
-
-    const {
-      ref,
-      gridWrapRef,
-      currentLayout,
-      widgetRowHeight,
-      throttleLazyRender,
-    } = useAutoBoardRenderItem(layoutWidgetInfoMap, margin);
-
-    const { gridRef } = useBoardWidthHeight();
-
-    const onBreakpointChange = pointKey => {
-      if (mobilePoints.includes(pointKey)) {
-        setDeviceType(DeviceType.Mobile);
-      } else {
-        setDeviceType(DeviceType.Desktop);
-      }
-    };
-
-    const { curMargin, curPadding } = useMemo(() => {
-      return deviceType === DeviceType.Mobile
-        ? {
-            curMargin: mobileMargin || [MIN_MARGIN, MIN_MARGIN],
-            curPadding: mobileContainerPadding || [MIN_PADDING, MIN_PADDING],
-          }
-        : {
-            curMargin: margin,
-            curPadding: containerPadding,
-          };
-    }, [
-      deviceType,
-      mobileMargin,
-      mobileContainerPadding,
-      margin,
-      containerPadding,
-    ]);
-    const layoutMap = useGridLayoutMap(layoutWidgetMap);
-
     const onLayoutChange = useCallback(
-      (layouts: Layout[], all) => {
-        throttleLazyRender();
-        currentLayout.current = layouts;
+      (layouts: Layout[]) => {
+        thEmitScroll();
       },
-      [currentLayout, throttleLazyRender],
+      [thEmitScroll],
     );
 
     const boardChildren = useMemo(() => {
       return sortedLayoutWidgets.map(item => {
         return (
           <div key={item.id}>
-            <WidgetAllProvider id={item.id}>
+            <WidgetWrapProvider
+              id={item.id}
+              boardEditing={editing}
+              boardId={boardId}
+            >
               <WidgetOfAuto />
-            </WidgetAllProvider>
+            </WidgetWrapProvider>
           </div>
         );
       });
-    }, [sortedLayoutWidgets]);
-
+    }, [boardId, editing, sortedLayoutWidgets]);
     return (
-      <Wrap>
-        <StyledContainer bg={background} ref={ref}>
-          {sortedLayoutWidgets.length ? (
-            <div className="grid-wrap" ref={gridWrapRef}>
-              <div className="grid-wrap" ref={gridRef}>
-                <ResponsiveGridLayout
-                  layouts={layoutMap}
-                  breakpoints={BREAK_POINT_MAP}
-                  margin={curMargin}
-                  containerPadding={curPadding}
-                  cols={LAYOUT_COLS_MAP}
-                  rowHeight={widgetRowHeight}
-                  onLayoutChange={onLayoutChange}
-                  onBreakpointChange={onBreakpointChange}
-                  isDraggable={false}
-                  isResizable={false}
-                  allowOverlap={allowOverlap}
-                  measureBeforeMount={false}
-                  useCSSTransforms={true}
-                >
-                  {boardChildren}
-                </ResponsiveGridLayout>
-              </div>
+      <Wrapper>
+        <StyledContainer bg={background}>
+          <div className="grid-wrap" ref={gridWrapRef}>
+            <div className="widget-row-height" ref={ref}>
+              <ReactGridLayout
+                layout={layoutMap[colsKey]}
+                margin={curMargin}
+                containerPadding={curPadding}
+                cols={LAYOUT_COLS_MAP[colsKey]}
+                rowHeight={widgetRowHeight}
+                onLayoutChange={onLayoutChange}
+                isDraggable={false}
+                isResizable={false}
+                allowOverlap={allowOverlap}
+                measureBeforeMount={false}
+                useCSSTransforms={true}
+              >
+                {boardChildren}
+              </ReactGridLayout>
             </div>
-          ) : (
+          </div>
+          {!sortedLayoutWidgets.length && (
             <div className="empty">
               <Empty description="" />
             </div>
           )}
         </StyledContainer>
-      </Wrap>
+      </Wrapper>
     );
   },
 );
 
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -199,7 +143,7 @@ const StyledContainer = styled(StyledBackground)`
 
   .empty {
     display: flex;
-    flex: 1;
+    flex: 100;
     align-items: center;
     justify-content: center;
   }

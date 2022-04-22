@@ -16,16 +16,37 @@
  * limitations under the License.
  */
 
-import { ChartDataSetRow } from 'app/components/ChartGraph/models/ChartDataSet';
 import {
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+  DataViewFieldType,
+} from 'app/constants';
+import { ChartDataSetRow } from 'app/models/ChartDataSet';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { IChartDataSet } from 'app/types/ChartDataSet';
+import {
+  ChartDataConfig,
   ChartDataSectionField,
+  ChartStyleConfig,
   IFieldFormatConfig,
 } from '../../types/ChartConfig';
 import {
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
+  getDataColumnMaxAndMin2,
+  getDrillableRows,
+  getGridStyle,
+  getReference2,
+  getScatterSymbolSizeFn,
+  getSeriesTooltips4Polar2,
+  getSeriesTooltips4Rectangular2,
+  getSettingValue,
   getStyles,
+  getStyleValue,
+  getStyleValueByGroup,
+  getUnusedHeaderRows,
   getValue,
+  getValueByColumnKey,
   isMatchRequirement,
   toFormattedValue,
   transformToDataSet,
@@ -559,98 +580,356 @@ describe('Chart Helper ', () => {
     });
   });
 
-  describe.each([
-    [1, undefined, 1],
-    [
-      2,
-      {
-        type: 'numeric',
-        numeric: {
-          decimalPlaces: 3,
-          unitKey: 'thousand',
-          useThousandSeparator: true,
-          prefix: 'a',
-          suffix: 'b',
+  describe('toFormattedValue Test', () => {
+    describe.each([
+      [
+        2000,
+        {
+          type: 'numeric',
+          numeric: {
+            decimalPlaces: 3,
+            unitKey: 'thousand',
+            useThousandSeparator: true,
+            prefix: 'a',
+            suffix: 'b',
+          },
         },
-      },
-      'a0.002Kb',
-    ],
-    [
-      111,
-      {
-        type: 'numeric',
-        numeric: {
-          decimalPlaces: 3,
-          unitKey: 'thousand',
-          useThousandSeparator: true,
-          prefix: '',
-          suffix: 'b',
+        'a2.000Kb',
+      ],
+      [
+        1111,
+        {
+          type: 'numeric',
+          numeric: {
+            decimalPlaces: 3,
+            unitKey: 'none',
+            useThousandSeparator: true,
+            prefix: '',
+            suffix: 'b',
+          },
         },
-      },
-      '0.111Kb',
-    ],
-    [
-      333,
-      {
-        type: 'numeric',
-        numeric: {
-          decimalPlaces: 3,
-          unitKey: '',
-          useThousandSeparator: true,
-          prefix: '',
-          suffix: 'b',
+        '1,111.000b',
+      ],
+      [
+        1111,
+        {
+          type: 'numeric',
+          numeric: {
+            decimalPlaces: 0,
+            unitKey: 'none',
+            useThousandSeparator: false,
+            prefix: '',
+            suffix: 'b',
+          },
         },
-      },
-      '333.000b',
-    ],
-    [
-      3,
-      {
-        type: 'currency',
-        currency: {
-          decimalPlaces: 3,
-          unitKey: 'thousand',
-          useThousandSeparator: true,
-          currency: 'CNY',
+        '1111b',
+      ],
+      [
+        3332,
+        {
+          type: 'numeric',
+          numeric: {
+            decimalPlaces: 1,
+            unitKey: 'none',
+            useThousandSeparator: true,
+            prefix: '',
+            suffix: '',
+          },
         },
-      },
-      '¥0.003 K',
-    ],
-    [
-      4,
-      {
-        type: 'percentage',
-        percentage: {
-          decimalPlaces: 2,
+        '3,332.0',
+      ],
+      [
+        3322,
+        {
+          type: 'numeric',
+          numeric: {
+            decimalPlaces: -1,
+            unitKey: 'none',
+            useThousandSeparator: false,
+            prefix: '',
+            suffix: '',
+          },
         },
-      },
-      '400.00%',
-    ],
-    [
-      50,
-      {
-        type: 'scientificNotation',
-        scientificNotation: {
-          decimalPlaces: 2,
+        '3322',
+      ],
+      [
+        3333,
+        {
+          type: 'numeric',
+          numeric: {
+            decimalPlaces: 1000,
+            unitKey: 'none',
+            useThousandSeparator: false,
+            prefix: '',
+            suffix: '',
+          },
         },
-      },
-      `5.00e+1`,
-    ],
-    [
-      55,
-      {
-        type: 'scientificNotation',
-        scientificNotation: {
-          decimalPlaces: 3,
+        '3333',
+      ],
+      [
+        '3232a',
+        {
+          type: 'numeric',
+          numeric: {
+            decimalPlaces: 10,
+            unitKey: 'none',
+            useThousandSeparator: false,
+            prefix: '',
+            suffix: '',
+          },
         },
-      },
-      `5.500e+1`,
-    ],
-  ])('toFormattedValue Test - ', (value, format, expected) => {
-    test(`format aggregate data`, () => {
-      expect(toFormattedValue(value, format as IFieldFormatConfig)).toEqual(
-        expected,
-      );
+        '3232a',
+      ],
+      [
+        11,
+        {
+          type: 'numeric',
+          numeric: {
+            decimalPlaces: undefined,
+            unitKey: 'none',
+            useThousandSeparator: false,
+            prefix: '',
+            suffix: '',
+          },
+        },
+        '11',
+      ],
+      [
+        12,
+        {
+          type: 'numeric',
+          numeric: {
+            decimalPlaces: 'null',
+            unitKey: undefined,
+            useThousandSeparator: false,
+            prefix: '',
+            suffix: '',
+          },
+        },
+        '12',
+      ],
+      [
+        13,
+        {
+          type: 'numeric',
+          numeric: {
+            decimalPlaces: NaN,
+            unitKey: NaN,
+            useThousandSeparator: false,
+            prefix: '',
+            suffix: '',
+          },
+        },
+        '13',
+      ],
+      [
+        0,
+        {
+          type: 'numeric',
+          numeric: {
+            decimalPlaces: 0,
+            unitKey: 'none',
+            useThousandSeparator: false,
+            prefix: '',
+            suffix: '',
+          },
+        },
+        '0',
+      ],
+      [
+        NaN,
+        {
+          type: 'numeric',
+          numeric: {
+            decimalPlaces: NaN,
+            unitKey: NaN,
+            useThousandSeparator: false,
+            prefix: '',
+            suffix: '',
+          },
+        },
+        NaN,
+      ],
+    ])('toFormattedValue Test - numeric', (value, format, expected) => {
+      test(`format aggregate data`, () => {
+        expect(toFormattedValue(value, format as IFieldFormatConfig)).toEqual(
+          expected,
+        );
+      });
+    });
+
+    describe.each([
+      [
+        3,
+        {
+          type: 'currency',
+          currency: {
+            decimalPlaces: 3,
+            unitKey: 'thousand',
+            useThousandSeparator: true,
+            currency: 'CNY',
+          },
+        },
+        '¥0.003 K',
+      ],
+      [
+        NaN,
+        {
+          type: 'currency',
+          currency: {
+            decimalPlaces: 3,
+            unitKey: 'thousand',
+            useThousandSeparator: true,
+            currency: 'CNY',
+          },
+        },
+        NaN,
+      ],
+    ])('toFormattedValue Test - currency', (value, format, expected) => {
+      test(`format aggregate data`, () => {
+        expect(toFormattedValue(value, format as IFieldFormatConfig)).toEqual(
+          expected,
+        );
+      });
+    });
+
+    describe.each([
+      [1, undefined, 1],
+      [
+        4,
+        {
+          type: 'percentage',
+          percentage: {
+            decimalPlaces: 2,
+          },
+        },
+        '400.00%',
+      ],
+      [
+        NaN,
+        {
+          type: 'percentage',
+          percentage: {
+            decimalPlaces: 2,
+          },
+        },
+        NaN,
+      ],
+      [
+        1,
+        {
+          type: 'percentage',
+          percentage: {
+            decimalPlaces: 20,
+          },
+        },
+        `100.00000000000000000000%`,
+      ],
+      [
+        1,
+        {
+          type: 'percentage',
+          percentage: {
+            decimalPlaces: 99,
+          },
+        },
+        `100%`,
+      ],
+      [
+        50,
+        {
+          type: 'scientificNotation',
+          scientificNotation: {
+            decimalPlaces: 2,
+          },
+        },
+        `5.00e+1`,
+      ],
+      [
+        55,
+        {
+          type: 'scientificNotation',
+          scientificNotation: {
+            decimalPlaces: 3,
+          },
+        },
+        `5.500e+1`,
+      ],
+      [
+        NaN,
+        {
+          type: 'scientificNotation',
+          scientificNotation: {
+            decimalPlaces: 3,
+          },
+        },
+        NaN,
+      ],
+      [
+        '20130208',
+        {
+          type: 'date',
+          date: {
+            format: 'YYYY-MM-DD',
+          },
+        },
+        `2013-02-08`,
+      ],
+      [
+        '2013-02-08 00:00:00',
+        {
+          type: 'date',
+          date: {
+            format: 'YYYY-MM-DD',
+          },
+        },
+        `2013-02-08 00:00:00`,
+      ],
+      [
+        3,
+        {
+          type: '',
+          currency: {
+            decimalPlaces: 3,
+            unitKey: 'thousand',
+            useThousandSeparator: true,
+            currency: 'CNY',
+          },
+        },
+        3,
+      ],
+      [
+        '2022-03-01',
+        {
+          type: 'string',
+          currency: {
+            decimalPlaces: 3,
+            unitKey: 'thousand',
+            useThousandSeparator: true,
+            currency: 'CNY',
+          },
+        },
+        '2022-03-01',
+      ],
+      [
+        '3',
+        {
+          type: 'string',
+          currency: {
+            decimalPlaces: 3,
+            unitKey: 'thousand',
+            useThousandSeparator: true,
+            currency: 'CNY',
+          },
+        },
+        '3',
+      ],
+    ])('toFormattedValue Test - other', (value, format, expected) => {
+      test(`format aggregate data`, () => {
+        expect(toFormattedValue(value, format as IFieldFormatConfig)).toEqual(
+          expected,
+        );
+      });
     });
   });
 
@@ -723,6 +1002,1202 @@ describe('Chart Helper ', () => {
       expect(valueFormatter(config as ChartDataSectionField, value)).toEqual(
         expected,
       );
+    });
+  });
+
+  describe('getValueByColumnKey Test', () => {
+    describe.each([
+      [undefined, ''],
+      [
+        {
+          aggregate: undefined,
+          colName: 'a',
+        },
+        'a',
+      ],
+      [
+        {
+          aggregate: null,
+          colName: 'b',
+        },
+        'b',
+      ],
+      [
+        {
+          aggregate: undefined,
+          colName: '',
+        },
+        '',
+      ],
+      [
+        {
+          aggregate: 'SUM',
+          colName: '',
+        },
+        'SUM()',
+      ],
+      [
+        {
+          aggregate: 'SUM',
+          colName: 'c',
+        },
+        'SUM(c)',
+      ],
+    ])('getValueByColumnKey Test - ', (config, expected) => {
+      test(`Get column key by data config`, () => {
+        expect(getValueByColumnKey(config)).toEqual(expected);
+      });
+    });
+  });
+
+  describe.each([
+    [
+      'constant',
+      true,
+      false,
+      {
+        markLine: {
+          data: [
+            {
+              yAxis: 0,
+              label: {
+                show: true,
+                position: 'start',
+                fontFamily: 'PingFang SC',
+                fontSize: '12',
+                fontWeight: 'normal',
+                fontStyle: 'normal',
+                color: 'black',
+              },
+              lineStyle: {
+                type: 'solid',
+                width: 1,
+                color: 'blue',
+              },
+            },
+          ],
+        },
+        markArea: {
+          data: [
+            [
+              {
+                yAxis: 0,
+                label: {
+                  show: true,
+                  position: 'start',
+                  fontFamily: 'PingFang SC',
+                  fontSize: '12',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  color: 'black',
+                },
+                itemStyle: {
+                  opacity: 0.6,
+                  color: 'grey',
+                  borderColor: 'grey',
+                  borderWidth: 1,
+                  borderType: 'dashed',
+                },
+              },
+              {
+                yAxis: 10,
+                label: {
+                  show: true,
+                  position: 'start',
+                  fontFamily: 'PingFang SC',
+                  fontSize: '12',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  color: 'black',
+                },
+                itemStyle: {
+                  opacity: 0.6,
+                  color: 'grey',
+                  borderColor: 'grey',
+                  borderWidth: 1,
+                  borderType: 'dashed',
+                },
+              },
+            ],
+          ],
+        },
+      },
+    ],
+    [
+      'constant',
+      true,
+      true,
+      {
+        markLine: {
+          data: [
+            {
+              xAxis: 0,
+              label: {
+                show: true,
+                position: 'start',
+                fontFamily: 'PingFang SC',
+                fontSize: '12',
+                fontWeight: 'normal',
+                fontStyle: 'normal',
+                color: 'black',
+              },
+              lineStyle: {
+                type: 'solid',
+                width: 1,
+                color: 'blue',
+              },
+            },
+          ],
+        },
+        markArea: {
+          data: [
+            [
+              {
+                xAxis: 0,
+                label: {
+                  show: true,
+                  position: 'start',
+                  fontFamily: 'PingFang SC',
+                  fontSize: '12',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  color: 'black',
+                },
+                itemStyle: {
+                  opacity: 0.6,
+                  color: 'grey',
+                  borderColor: 'grey',
+                  borderWidth: 1,
+                  borderType: 'dashed',
+                },
+              },
+              {
+                xAxis: 10,
+                label: {
+                  show: true,
+                  position: 'start',
+                  fontFamily: 'PingFang SC',
+                  fontSize: '12',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  color: 'black',
+                },
+                itemStyle: {
+                  opacity: 0.6,
+                  color: 'grey',
+                  borderColor: 'grey',
+                  borderWidth: 1,
+                  borderType: 'dashed',
+                },
+              },
+            ],
+          ],
+        },
+      },
+    ],
+    [
+      'average',
+      true,
+      false,
+      {
+        markLine: {
+          data: [
+            {
+              yAxis: 25,
+              label: {
+                show: true,
+                position: 'start',
+                fontFamily: 'PingFang SC',
+                fontSize: '12',
+                fontWeight: 'normal',
+                fontStyle: 'normal',
+                color: 'black',
+              },
+              lineStyle: {
+                type: 'solid',
+                width: 1,
+                color: 'blue',
+              },
+            },
+          ],
+        },
+        markArea: {
+          data: [
+            [
+              {
+                yAxis: 0,
+                label: {
+                  show: true,
+                  position: 'start',
+                  fontFamily: 'PingFang SC',
+                  fontSize: '12',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  color: 'black',
+                },
+                itemStyle: {
+                  opacity: 0.6,
+                  color: 'grey',
+                  borderColor: 'grey',
+                  borderWidth: 1,
+                  borderType: 'dashed',
+                },
+              },
+              {
+                yAxis: 25,
+                label: {
+                  show: true,
+                  position: 'start',
+                  fontFamily: 'PingFang SC',
+                  fontSize: '12',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  color: 'black',
+                },
+                itemStyle: {
+                  opacity: 0.6,
+                  color: 'grey',
+                  borderColor: 'grey',
+                  borderWidth: 1,
+                  borderType: 'dashed',
+                },
+              },
+            ],
+          ],
+        },
+      },
+    ],
+    [
+      'max',
+      true,
+      false,
+      {
+        markLine: {
+          data: [
+            {
+              yAxis: 30,
+              label: {
+                show: true,
+                position: 'start',
+                fontFamily: 'PingFang SC',
+                fontSize: '12',
+                fontWeight: 'normal',
+                fontStyle: 'normal',
+                color: 'black',
+              },
+              lineStyle: {
+                type: 'solid',
+                width: 1,
+                color: 'blue',
+              },
+            },
+          ],
+        },
+        markArea: {
+          data: [
+            [
+              {
+                yAxis: 0,
+                label: {
+                  show: true,
+                  position: 'start',
+                  fontFamily: 'PingFang SC',
+                  fontSize: '12',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  color: 'black',
+                },
+                itemStyle: {
+                  opacity: 0.6,
+                  color: 'grey',
+                  borderColor: 'grey',
+                  borderWidth: 1,
+                  borderType: 'dashed',
+                },
+              },
+              {
+                yAxis: 30,
+                label: {
+                  show: true,
+                  position: 'start',
+                  fontFamily: 'PingFang SC',
+                  fontSize: '12',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  color: 'black',
+                },
+                itemStyle: {
+                  opacity: 0.6,
+                  color: 'grey',
+                  borderColor: 'grey',
+                  borderWidth: 1,
+                  borderType: 'dashed',
+                },
+              },
+            ],
+          ],
+        },
+      },
+    ],
+    [
+      'min',
+      true,
+      false,
+      {
+        markLine: {
+          data: [
+            {
+              yAxis: 20,
+              label: {
+                show: true,
+                position: 'start',
+                fontFamily: 'PingFang SC',
+                fontSize: '12',
+                fontWeight: 'normal',
+                fontStyle: 'normal',
+                color: 'black',
+              },
+              lineStyle: {
+                type: 'solid',
+                width: 1,
+                color: 'blue',
+              },
+            },
+          ],
+        },
+        markArea: {
+          data: [
+            [
+              {
+                yAxis: 0,
+                label: {
+                  show: true,
+                  position: 'start',
+                  fontFamily: 'PingFang SC',
+                  fontSize: '12',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  color: 'black',
+                },
+                itemStyle: {
+                  opacity: 0.6,
+                  color: 'grey',
+                  borderColor: 'grey',
+                  borderWidth: 1,
+                  borderType: 'dashed',
+                },
+              },
+              {
+                yAxis: 20,
+                label: {
+                  show: true,
+                  position: 'start',
+                  fontFamily: 'PingFang SC',
+                  fontSize: '12',
+                  fontWeight: 'normal',
+                  fontStyle: 'normal',
+                  color: 'black',
+                },
+                itemStyle: {
+                  opacity: 0.6,
+                  color: 'grey',
+                  borderColor: 'grey',
+                  borderWidth: 1,
+                  borderType: 'dashed',
+                },
+              },
+            ],
+          ],
+        },
+      },
+    ],
+    [
+      'min',
+      false,
+      false,
+      {
+        markLine: {
+          data: [],
+        },
+        markArea: {
+          data: [],
+        },
+      },
+    ],
+  ])('getReference2 Test - ', (valueType, show, isHorizonDisplay, expected) => {
+    const style = [
+      {
+        key: 'reference',
+        rows: [
+          {
+            key: 'panel',
+            rows: [
+              {
+                key: 'configuration',
+                rows: [
+                  {
+                    key: 'a6fa3454',
+                    rows: [
+                      {
+                        key: 'markLine',
+                        rows: [
+                          {
+                            key: 'enableMarkLine',
+                            value: show,
+                          },
+                          {
+                            key: 'valueType',
+                            value: valueType,
+                          },
+                          {
+                            key: 'constantValue',
+                            value: 0,
+                          },
+                          {
+                            key: 'metric',
+                            value: 'a6fa3454',
+                          },
+                          {
+                            key: 'showLabel',
+                            value: true,
+                          },
+                          {
+                            key: 'position',
+                            value: 'start',
+                          },
+                          {
+                            key: 'lineStyle',
+                            value: { type: 'solid', width: 1, color: 'blue' },
+                          },
+                          {
+                            key: 'font',
+                            value: {
+                              fontFamily: 'PingFang SC',
+                              fontSize: '12',
+                              fontWeight: 'normal',
+                              fontStyle: 'normal',
+                              color: 'black',
+                            },
+                          },
+                        ],
+                      },
+                      {
+                        key: 'markArea',
+                        rows: [
+                          {
+                            key: 'enableMarkArea',
+                            value: show,
+                          },
+                          {
+                            key: 'startValueType',
+                            value: 'constant',
+                          },
+                          {
+                            key: 'startConstantValue',
+                            value: 0,
+                          },
+                          {
+                            key: 'startMetric',
+                            value: undefined,
+                          },
+                          {
+                            key: 'endValueType',
+                            value: valueType,
+                          },
+                          {
+                            key: 'endConstantValue',
+                            value: 10,
+                          },
+                          {
+                            key: 'endMetric',
+                            value: 'a6fa3454',
+                          },
+                          {
+                            key: 'showLabel',
+                            value: true,
+                          },
+                          {
+                            key: 'position',
+                            value: 'start',
+                          },
+                          {
+                            key: 'font',
+                            value: {
+                              fontFamily: 'PingFang SC',
+                              fontSize: '12',
+                              fontWeight: 'normal',
+                              fontStyle: 'normal',
+                              color: 'black',
+                            },
+                          },
+                          {
+                            key: 'backgroundColor',
+                            value: 'grey',
+                          },
+                          {
+                            key: 'opacity',
+                            value: 0.6,
+                          },
+                          {
+                            key: 'borderStyle',
+                            value: { type: 'dashed', width: 1, color: 'grey' },
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    test(`Get chart reference config`, () => {
+      const config = [
+        {
+          key: 'dimension',
+          rows: [
+            {
+              category: 'field',
+              colName: 'name',
+              type: 'STRING',
+              uid: '',
+            },
+          ],
+        },
+        {
+          key: 'metrics',
+          rows: [
+            {
+              aggregate: 'SUM',
+              category: 'field',
+              colName: 'num',
+              type: 'NUMERIC',
+              uid: 'a6fa3454',
+            },
+          ],
+        },
+      ] as ChartDataConfig[];
+      const chartDataSet = transformToDataSet(
+        [
+          [30, 'name1'],
+          [20, 'name2'],
+        ],
+        [
+          {
+            name: 'SUM(num)',
+            type: 'NUMERIC',
+          },
+          {
+            name: 'name',
+            type: 'STRING',
+          },
+        ],
+        config,
+      );
+      expect(
+        JSON.stringify(
+          getReference2(
+            style as ChartStyleConfig[],
+            chartDataSet as IChartDataSet<string>,
+            config[1]!.rows![0] as ChartDataSectionField,
+            isHorizonDisplay,
+          ),
+        ),
+      ).toEqual(JSON.stringify(expected));
+    });
+  });
+
+  describe.each([
+    [
+      [
+        { colName: 'name1' },
+        { colName: 'name2' },
+        { colName: 'name3' },
+        { colName: 'name4' },
+        { colName: 'name5' },
+        { colName: 'name6' },
+        { colName: 'name7' },
+      ],
+      [
+        {
+          colName: 'a',
+          children: [
+            {
+              colName: 'name1',
+            },
+            {
+              colName: 'name2',
+              children: [
+                {
+                  colName: 'name3',
+                },
+                {
+                  colName: 'name4',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          colName: 'name5',
+        },
+      ],
+      [{ colName: 'name6' }, { colName: 'name7' }],
+    ],
+    [
+      [
+        { colName: 'name7' },
+        { colName: 'name6' },
+        { colName: 'name5' },
+        { colName: 'name4' },
+        { colName: 'name3' },
+        { colName: 'name2' },
+        { colName: 'name1' },
+      ],
+      [
+        {
+          colName: 'a',
+          children: [
+            {
+              colName: 'name1',
+            },
+            {
+              colName: 'name2',
+              children: [
+                {
+                  colName: 'name3',
+                },
+                {
+                  colName: 'name4',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          colName: 'name5',
+        },
+      ],
+      [{ colName: 'name7' }, { colName: 'name6' }],
+    ],
+    [
+      [
+        { colName: 'name1' },
+        { colName: 'name2' },
+        { colName: 'name3' },
+        { colName: 'name4' },
+        { colName: 'name5' },
+        { colName: 'name6' },
+        { colName: 'name7' },
+      ],
+      [
+        {
+          colName: 'a',
+          isGroup: true,
+          children: [
+            {
+              colName: 'name1',
+            },
+            {
+              colName: 'name2',
+              isGroup: true,
+              children: [
+                {
+                  colName: 'name3',
+                },
+                {
+                  colName: 'name4',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          colName: 'name5',
+        },
+      ],
+      [{ colName: 'name2' }, { colName: 'name6' }, { colName: 'name7' }],
+    ],
+  ])('getUnusedHeaderRows Test - ', (allRows, originalRows, expected) => {
+    test(`Get table header rows `, () => {
+      expect(
+        JSON.stringify(getUnusedHeaderRows(allRows, originalRows)),
+      ).toEqual(JSON.stringify(expected));
+    });
+  });
+
+  describe.each([
+    [
+      [['5'], ['3'], ['-10'], ['999']],
+      {
+        colName: 'num',
+        aggregate: 'SUM',
+        type: 'STRING',
+        category: 'field',
+      },
+      {
+        min: -10,
+        max: 999,
+      },
+    ],
+    [
+      [['null'], ['3'], ['99']],
+      {
+        colName: 'num',
+        aggregate: 'SUM',
+        type: 'STRING',
+        category: 'field',
+      },
+      {
+        min: 0,
+        max: 100,
+      },
+    ],
+    [
+      [['null'], ['3'], ['990']],
+      null,
+      {
+        min: 0,
+        max: 100,
+      },
+    ],
+  ])('getDataColumnMaxAndMin2 Test - ', (data, config, expected) => {
+    test(`Get column max and min value`, () => {
+      const chartDataSet = transformToDataSet(data, [{ name: 'sum(num)' }], [
+        {
+          rows: [
+            {
+              colName: 'num',
+              aggregate: 'SUM',
+            },
+          ],
+        },
+      ] as any);
+      expect(
+        JSON.stringify(
+          getDataColumnMaxAndMin2(
+            chartDataSet as IChartDataSet<string>,
+            config as ChartDataSectionField,
+          ),
+        ),
+      ).toEqual(JSON.stringify(expected));
+    });
+  });
+
+  describe.each([
+    [0, 100, 0, 0, [100], 20],
+    [0, 100, 0, 2, [100], 40],
+    [1, 999, -30, 0, [0, 100], 3],
+    [1, 999, -30, 0, [0, 800], 16.132167152575317],
+  ])(
+    'getScatterSymbolSizeFn Test - ',
+    (valueIndex, max, min, cycleRatio, value, expected) => {
+      test(`Get some scatter symbol size`, () => {
+        const symbolSizeFunc = getScatterSymbolSizeFn(
+          valueIndex,
+          max,
+          min,
+          cycleRatio,
+        );
+        expect(symbolSizeFunc(value)).toEqual(expected);
+      });
+    },
+  );
+
+  describe('getSeriesTooltips4Rectangular2 Test', () => {
+    test(`Get series tooltips`, () => {
+      const columns = [['r1-c1-v', 'r1-c2-v', '#fff', '10', '20']];
+      const metas = [
+        { name: 'name' },
+        { name: 'avg(age)' },
+        { name: 'color' },
+        { name: 'sum(info)' },
+        { name: 'count(size)' },
+      ];
+      const rows = [
+        {
+          category: 'field',
+          type: 'STRING',
+          colName: 'Name',
+        },
+        {
+          colName: 'Age',
+          aggregate: 'AVG',
+          type: 'STRING',
+          category: 'field',
+        },
+        {
+          colName: 'Color',
+          type: 'STRING',
+          category: 'field',
+        },
+        {
+          colName: 'Info',
+          aggregate: 'SUM',
+          type: 'NUMERIC',
+          category: 'field',
+        },
+        {
+          colName: 'Size',
+          aggregate: 'COUNT',
+          type: 'NUMERIC',
+          category: 'field',
+        },
+      ];
+      const chartDataSet = transformToDataSet(columns, metas, [
+        {
+          rows,
+        },
+      ] as any);
+
+      expect(
+        getSeriesTooltips4Rectangular2(
+          chartDataSet,
+          {
+            seriesName: 'b',
+            componentType: '',
+            data: {
+              name: 'a',
+              rowData: {
+                Name: 'r1-c1-v',
+                Color: '#fff',
+                'AVG(Age)': 'r1-c2-v',
+                'SUM(Info)': '10',
+                'COUNT(Size)': '20',
+              },
+            },
+          },
+          [rows[0]] as ChartDataSectionField[],
+          [rows[2]] as ChartDataSectionField[],
+          [rows[1]] as ChartDataSectionField[],
+          [rows[3]] as ChartDataSectionField[],
+          [rows[4]] as ChartDataSectionField[],
+        ),
+      ).toEqual('');
+
+      expect(
+        getSeriesTooltips4Rectangular2(
+          chartDataSet,
+          {
+            seriesName: '',
+            componentType: 'series',
+            data: {
+              name: 'AVG(Age)',
+              rowData: {
+                Name: 'r1-c1-v',
+                Color: '#fff',
+                'AVG(Age)': 'r1-c2-v',
+                'SUM(Info)': '10',
+                'COUNT(Size)': '20',
+              },
+            },
+          },
+          [rows[0]] as ChartDataSectionField[],
+          [rows[2]] as ChartDataSectionField[],
+          rows as ChartDataSectionField[],
+          [rows[3]] as ChartDataSectionField[],
+          [rows[4]] as ChartDataSectionField[],
+        ),
+      ).toEqual(
+        'Name: r1-c1-v<br />Color: #fff<br />AVG(Age): r1-c2-v<br />COUNT(Size): 20<br />SUM(Info): 10',
+      );
+
+      expect(
+        getSeriesTooltips4Rectangular2(
+          chartDataSet,
+          {
+            seriesName: 'Name',
+            componentType: 'series',
+            data: {
+              name: '',
+              rowData: {
+                Name: 'r1-c1-v',
+                Color: '#fff',
+                'AVG(Age)': 'r1-c2-v',
+                'SUM(Info)': '10',
+                'COUNT(Size)': '20',
+              },
+            },
+          },
+          [rows[0]] as ChartDataSectionField[],
+          [rows[2]] as ChartDataSectionField[],
+          rows as ChartDataSectionField[],
+          [rows[3]] as ChartDataSectionField[],
+          [rows[4]] as ChartDataSectionField[],
+        ),
+      ).toEqual(
+        'Name: r1-c1-v<br />Color: #fff<br />Name: r1-c1-v<br />COUNT(Size): 20<br />SUM(Info): 10',
+      );
+    });
+  });
+
+  describe('getSeriesTooltips4Polar2 Test', () => {
+    test(`Get series tooltips`, () => {
+      const columns = [['r1-c1-v', 'r1-c2-v', '#fff', '10', '20']];
+      const metas = [
+        { name: 'name' },
+        { name: 'avg(age)' },
+        { name: 'color' },
+        { name: 'sum(info)' },
+        { name: 'count(size)' },
+      ];
+      const rows = [
+        {
+          category: 'field',
+          type: 'STRING',
+          colName: 'Name',
+        },
+        {
+          colName: 'Age',
+          aggregate: 'AVG',
+          type: 'STRING',
+          category: 'field',
+        },
+        {
+          colName: 'Color',
+          type: 'STRING',
+          category: 'field',
+        },
+        {
+          colName: 'Info',
+          aggregate: 'SUM',
+          type: 'NUMERIC',
+          category: 'field',
+        },
+        {
+          colName: 'Size',
+          aggregate: 'COUNT',
+          type: 'NUMERIC',
+          category: 'field',
+        },
+      ];
+      const chartDataSet = transformToDataSet(columns, metas, [
+        {
+          rows,
+        },
+      ] as any);
+      const tooltipParam = {
+        data: {
+          name: 'string',
+          rowData: {
+            Name: 'r1-c1-v',
+            Color: '#fff',
+            'AVG(Age)': 'r1-c2-v',
+            'SUM(Info)': '10',
+            'COUNT(Size)': '20',
+          },
+        },
+      };
+
+      expect(
+        getSeriesTooltips4Polar2(
+          chartDataSet,
+          tooltipParam,
+          [rows[0]] as ChartDataSectionField[],
+          [rows[2]] as ChartDataSectionField[],
+          [rows[1]] as ChartDataSectionField[],
+          [rows[3]] as ChartDataSectionField[],
+          [rows[4]] as ChartDataSectionField[],
+        ),
+      ).toEqual(
+        'Name: r1-c1-v<br />Color: #fff<br />AVG(Age): r1-c2-v<br />COUNT(Size): 20<br />SUM(Info): 10',
+      );
+    });
+  });
+
+  describe('getGridStyle Test', () => {
+    describe.each([
+      [
+        [
+          {
+            key: 'margin',
+            rows: [
+              {
+                key: 'containLabel',
+                value: true,
+              },
+              {
+                key: 'marginLeft',
+                value: '5%',
+              },
+              {
+                key: 'marginRight',
+                value: '5%',
+              },
+              {
+                key: 'marginBottom',
+                value: '5%',
+              },
+              {
+                key: 'marginTop',
+                value: '5%',
+              },
+            ],
+          },
+        ],
+        {
+          left: '5%',
+          right: '5%',
+          bottom: '5%',
+          top: '5%',
+          containLabel: true,
+        },
+      ],
+    ])('getGridStyle Test - ', (data, expected) => {
+      test(`Get grid margin config`, () => {
+        expect(
+          JSON.stringify(getGridStyle(data as ChartStyleConfig[])),
+        ).toEqual(JSON.stringify(expected));
+      });
+    });
+  });
+
+  describe('getStyleValue Test', () => {
+    test('should get value', () => {
+      expect(
+        getStyleValue([{ key: 'a', rows: [{ key: 'a-1', value: 1 }] }] as any, [
+          'a',
+          'a-1',
+        ]),
+      ).toEqual(1);
+    });
+  });
+
+  describe('getSettingValue Test', () => {
+    test('should get value', () => {
+      expect(
+        getSettingValue(
+          [{ key: 'a', rows: [{ key: 'a-1', value: 1 }] }] as any,
+          'a.a-1',
+          'value',
+        ),
+      ).toEqual(1);
+    });
+  });
+
+  describe('getStyleValueByGroup Test', () => {
+    test('should get value', () => {
+      expect(
+        getStyleValueByGroup(
+          [{ key: 'a', rows: [{ key: 'a-1', value: 1 }] }] as any,
+          'a',
+          'a-1',
+        ),
+      ).toEqual(1);
+    });
+  });
+
+  describe('getDrillableRows Test', () => {
+    test('should get group section rows when drill option is null', () => {
+      const config = [
+        {
+          type: ChartDataSectionType.GROUP,
+          rows: [1, 2],
+        },
+      ] as any[];
+      const drillRows = getDrillableRows(config, undefined);
+      expect(drillRows).toEqual([1, 2]);
+    });
+
+    test('should not get group section rows when is not group section', () => {
+      const config = [
+        {
+          type: ChartDataSectionType.AGGREGATE,
+          rows: [1, 2],
+        },
+      ] as any[];
+      const drillRows = getDrillableRows(config, undefined);
+      expect(drillRows).toEqual([]);
+    });
+
+    test('should get group section rows when drillale is false and drillOption is not empty', () => {
+      const config = [
+        {
+          type: ChartDataSectionType.GROUP,
+          key: 'col1',
+          rows: [
+            {
+              uid: '1',
+              colName: 'col1',
+              type: DataViewFieldType.STRING,
+              category: ChartDataViewFieldCategory.Field,
+            },
+            {
+              uid: '2',
+              colName: 'col2',
+              type: DataViewFieldType.STRING,
+              category: ChartDataViewFieldCategory.Field,
+            },
+          ],
+        },
+      ];
+      const drillOption = new ChartDrillOption(config[0].rows);
+      const drillRows = getDrillableRows(config, drillOption);
+      expect(drillRows).toEqual([
+        { uid: '1', colName: 'col1', type: 'STRING', category: 'field' },
+        { uid: '2', colName: 'col2', type: 'STRING', category: 'field' },
+      ]);
+    });
+
+    test('should get drillable group section rows with drillOption', () => {
+      const config = [
+        {
+          type: ChartDataSectionType.GROUP,
+          key: 'col1',
+          drillable: true,
+          rows: [
+            {
+              uid: '1',
+              colName: 'col1',
+              type: DataViewFieldType.STRING,
+              category: ChartDataViewFieldCategory.Field,
+            },
+            {
+              uid: '2',
+              colName: 'col2',
+              type: DataViewFieldType.STRING,
+              category: ChartDataViewFieldCategory.Field,
+            },
+          ],
+        },
+      ];
+      const drillOption = new ChartDrillOption(config[0].rows);
+      drillOption.drillDown();
+      const drillRows = getDrillableRows(config, drillOption);
+      expect(drillRows).toEqual([
+        { uid: '2', colName: 'col2', type: 'STRING', category: 'field' },
+      ]);
+    });
+
+    test('should get drillable group section first row without drillOption', () => {
+      const config = [
+        {
+          type: ChartDataSectionType.GROUP,
+          key: 'col1',
+          drillable: true,
+          rows: [
+            {
+              uid: '1',
+              colName: 'col1',
+              type: DataViewFieldType.STRING,
+              category: ChartDataViewFieldCategory.Field,
+            },
+            {
+              uid: '2',
+              colName: 'col2',
+              type: DataViewFieldType.STRING,
+              category: ChartDataViewFieldCategory.Field,
+            },
+          ],
+        },
+      ];
+      const drillOption = new ChartDrillOption(config[0].rows);
+      const drillRows = getDrillableRows(config, drillOption);
+      expect(drillRows).toEqual([
+        { uid: '1', colName: 'col1', type: 'STRING', category: 'field' },
+      ]);
     });
   });
 });

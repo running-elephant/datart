@@ -69,14 +69,14 @@ public class SourceController extends BaseController {
     @ApiOperation(value = "create source")
     @PostMapping()
     public ResponseData<Source> createSource(@Validated @RequestBody SourceCreateParam createParam) {
-        return ResponseData.success(sourceService.create(createParam));
+        return ResponseData.success(sourceService.createSource(createParam));
     }
 
     @ApiOperation(value = "update a source")
     @PutMapping(value = "/{sourceId}")
     public ResponseData<Boolean> updateSource(@PathVariable String sourceId,
                                               @Validated @RequestBody SourceUpdateParam updateParam) {
-        return ResponseData.success(sourceService.update(updateParam));
+        return ResponseData.success(sourceService.updateSource(updateParam));
     }
 
     @ApiOperation(value = "delete a source")

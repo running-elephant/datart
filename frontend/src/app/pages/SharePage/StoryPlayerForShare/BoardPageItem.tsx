@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 import { LoadingOutlined } from '@ant-design/icons';
-import { BoardProvider } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { FullScreenPanel } from 'app/pages/DashBoardPage/components/FullScreenPanel';
+import { BoardInitProvider } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInitProvider';
+import { FullScreenPanel } from 'app/pages/DashBoardPage/components/FullScreenPanel/FullScreenPanel';
 import { AutoBoardCore } from 'app/pages/DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
 import { FreeBoardCore } from 'app/pages/DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
 import { makeSelectBoardConfigById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
@@ -25,6 +25,7 @@ import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { LEVEL_50 } from 'styles/StyleConstants';
 
 export interface BoardPageItemProps {
   boardId: string;
@@ -34,6 +35,7 @@ export const BoardPageItem: React.FC<BoardPageItemProps> = memo(
     const dashboard = useSelector((state: { board: BoardState }) =>
       makeSelectBoardConfigById()(state, boardId),
     );
+
     if (!dashboard)
       return (
         <div>
@@ -42,7 +44,7 @@ export const BoardPageItem: React.FC<BoardPageItemProps> = memo(
       );
     let boardType = dashboard?.config?.type;
     return (
-      <BoardProvider
+      <BoardInitProvider
         board={dashboard}
         editing={false}
         autoFit={false}
@@ -53,7 +55,7 @@ export const BoardPageItem: React.FC<BoardPageItemProps> = memo(
           {boardType === 'free' && <FreeBoardCore boardId={dashboard.id} />}
           <FullScreenPanel />
         </Wrapper>
-      </BoardProvider>
+      </BoardInitProvider>
     );
   },
 );
@@ -63,7 +65,7 @@ const Wrapper = styled.div<{}>`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 50;
+  z-index: ${LEVEL_50};
   display: flex;
   flex-direction: column;
 

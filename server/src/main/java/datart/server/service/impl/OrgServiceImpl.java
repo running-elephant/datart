@@ -39,6 +39,7 @@ import datart.server.service.BaseService;
 import datart.server.service.FileService;
 import datart.server.service.MailService;
 import datart.server.service.OrgService;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -239,7 +240,12 @@ public class OrgServiceImpl extends BaseService implements OrgService {
 
     @Override
     public boolean confirmInvite(String token) {
-        InviteToken inviteToken = JwtUtils.toInviteToken(token);
+        InviteToken inviteToken = null;
+        try {
+            inviteToken = JwtUtils.toInviteToken(token);
+        } catch (ExpiredJwtException e) {
+            Exceptions.msg("message.user.confirm.mail.timeout");
+        }
         addUserToOrg(inviteToken.getUserId(), inviteToken.getOrgId());
         return true;
     }
@@ -255,7 +261,7 @@ public class OrgServiceImpl extends BaseService implements OrgService {
         }
         RelUserOrganization relUserOrganization = new RelUserOrganization();
         relUserOrganization.setId(UUIDGenerator.generate());
-        relUserOrganization.setCreateBy(getCurrentUser().getId());
+        relUserOrganization.setCreateBy(getCurrentUser()==null?userId:getCurrentUser().getId());
         relUserOrganization.setCreateTime(new Date());
         relUserOrganization.setUserId(userId);
         relUserOrganization.setOrgId(orgId);

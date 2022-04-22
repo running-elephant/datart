@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ControllerFacadeTypes } from 'app/constants';
 import {
   BoardType,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { PageInfo } from './../../../../../MainPage/pages/ViewPage/slice/types';
 import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from './../thunk';
@@ -63,28 +63,22 @@ export const addControllerAction =
     }
   };
 
-export const editWidgetsQueryAction =
-  ({ boardId }) =>
-  async (dispatch, getState) => {
-    const pageInfo: Partial<PageInfo> = {
-      pageNo: 1,
-    };
-
-    const editBoard = getState().editBoard as HistoryEditBoard;
-    const widgetMap = editBoard.stack.present.widgetRecord;
-
-    if (editBoard.boardInfo.id !== boardId) {
-      return;
-    }
-
-    Object.values(widgetMap)
-      .filter(it => it.config.type === 'chart')
-      .forEach(it => {
-        dispatch(
-          getEditChartWidgetDataAsync({
-            widgetId: it.id,
-            option: { pageInfo },
-          }),
-        );
-      });
+export const editWidgetsQueryAction = () => async (dispatch, getState) => {
+  const pageInfo: Partial<PageInfo> = {
+    pageNo: 1,
   };
+
+  const editBoard = getState().editBoard as HistoryEditBoard;
+  const widgetMap = editBoard.stack.present.widgetRecord;
+
+  Object.values(widgetMap)
+    .filter(it => it.config.type === 'chart')
+    .forEach(it => {
+      dispatch(
+        getEditChartWidgetDataAsync({
+          widgetId: it.id,
+          option: { pageInfo },
+        }),
+      );
+    });
+};

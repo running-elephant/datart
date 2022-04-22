@@ -28,6 +28,18 @@ public class SourceSqlProvider {
             sql.VALUES("org_id", "#{orgId,jdbcType=VARCHAR}");
         }
         
+        if (record.getParentId() != null) {
+            sql.VALUES("parent_id", "#{parentId,jdbcType=VARCHAR}");
+        }
+        
+        if (record.getIsFolder() != null) {
+            sql.VALUES("is_folder", "#{isFolder,jdbcType=TINYINT}");
+        }
+        
+        if (record.getIndex() != null) {
+            sql.VALUES("`index`", "#{index,jdbcType=DOUBLE}");
+        }
+        
         if (record.getCreateBy() != null) {
             sql.VALUES("create_by", "#{createBy,jdbcType=VARCHAR}");
         }
@@ -69,6 +81,18 @@ public class SourceSqlProvider {
         
         if (record.getOrgId() != null) {
             sql.SET("org_id = #{orgId,jdbcType=VARCHAR}");
+        }
+        
+        if (record.getParentId() != null) {
+            sql.SET("parent_id = #{parentId,jdbcType=VARCHAR}");
+        }
+        
+        if (record.getIsFolder() != null) {
+            sql.SET("is_folder = #{isFolder,jdbcType=TINYINT}");
+        }
+        
+        if (record.getIndex() != null) {
+            sql.SET("`index` = #{index,jdbcType=DOUBLE}");
         }
         
         if (record.getCreateBy() != null) {

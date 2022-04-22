@@ -18,24 +18,36 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
+import {
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+  DownloadFileType,
+} from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
-import { ChartDataRequestBuilder } from 'app/pages/ChartWorkbenchPage/models/ChartDataRequestBuilder';
+import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
+import ChartManager from 'app/models/ChartManager';
 import workbenchSlice, {
+  useWorkbenchSlice,
+} from 'app/pages/ChartWorkbenchPage/slice';
+import { ChartConfigReducerActionType } from 'app/pages/ChartWorkbenchPage/slice/constant';
+import {
   aggregationSelector,
   backendChartSelector,
-  ChartConfigReducerActionType,
   chartConfigSelector,
   currentDataViewSelector,
   datasetsSelector,
+  selectAvailableSourceFunctions,
+  shadowChartConfigSelector,
+} from 'app/pages/ChartWorkbenchPage/slice/selectors';
+import {
+  fetchAvailableSourceFunctions,
   initWorkbenchAction,
   refreshDatasetAction,
-  shadowChartConfigSelector,
   updateChartAction,
   updateChartConfigAndRefreshDatasetAction,
   updateRichTextAction,
-  useWorkbenchSlice,
-} from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+} from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useAddViz } from 'app/pages/MainPage/pages/VizPage/hooks/useAddViz';
 import { SaveForm } from 'app/pages/MainPage/pages/VizPage/SaveForm';
 import {
@@ -43,17 +55,27 @@ import {
   useSaveFormContext,
 } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { IChart } from 'app/types/Chart';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
+import {
+  clearRuntimeDateLevelFieldsInChartConfig,
+  getRuntimeComputedFields,
+  getRuntimeDateLevelFields,
+} from 'app/utils/chartHelper';
 import { makeDownloadDataTask } from 'app/utils/fetch';
-import { transferChartConfigs } from 'app/utils/internalChartHelper';
+import {
+  getChartDrillOption,
+  transferChartConfigs,
+} from 'app/utils/internalChartHelper';
+import { updateBy } from 'app/utils/mutation';
 import { CommonFormTypes } from 'globalConstants';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
-import { CloneValueDeep } from 'utils/object';
+import { LEVEL_100 } from 'styles/StyleConstants';
+import { CloneValueDeep, isEmptyArray } from 'utils/object';
 import ChartWorkbench from '../pages/ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
-import ChartManager from '../pages/ChartWorkbenchPage/models/ChartManager';
 import {
   DataChart,
   DataChartConfig,
@@ -71,12 +93,14 @@ export interface ChartEditorBaseProps {
   defaultViewId?: string;
   originChart?: ChartDTO | DataChart;
 }
+
 export interface HistoryState {
   dataChartId: string;
   orgId: string;
   container: 'widget' | 'dataChart';
   chartType: WidgetContentChartType;
 }
+
 export interface ChartEditorMethodsProps {
   onClose?: () => void;
   onSaveInWidget?: (
@@ -88,7 +112,7 @@ export interface ChartEditorMethodsProps {
 }
 export type ChartEditorProps = ChartEditorBaseProps & ChartEditorMethodsProps;
 
-export const ChartEditor: React.FC<ChartEditorProps> = ({
+export const ChartEditor: FC<ChartEditorProps> = ({
   originChart,
   orgId,
   container,
@@ -109,7 +133,10 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   const shadowChartConfig = useSelector(shadowChartConfigSelector);
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
+  const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
   const [chart, setChart] = useState<IChart>();
+  const drillOptionRef = useRef<IChartDrillOption>();
+
   const [allowQuery, setAllowQuery] = useState<boolean>(false);
   const history = useHistory();
   const addVizFn = useAddViz({
@@ -186,12 +213,65 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [backendChart?.config?.chartGraphId]);
 
+  useEffect(() => {
+    if (!isEmptyArray(chartConfig?.datas) && !drillOptionRef.current) {
+      drillOptionRef.current = getChartDrillOption(chartConfig?.datas);
+    }
+  }, [chartConfig?.datas, drillOptionRef]);
+
+  useEffect(() => {
+    if (dataview?.sourceId) {
+      dispatch(fetchAvailableSourceFunctions({ sourceId: dataview.sourceId }));
+    }
+  }, [dataview?.sourceId, dispatch]);
+
+  const resetOriginalComputedFields = useCallback(
+    config => {
+      const index = config?.datas?.findIndex(
+        v => v.type === ChartDataSectionType.GROUP,
+      );
+      if (index !== undefined) {
+        const groupRows = config?.datas?.[index]?.rows;
+        if (groupRows) {
+          const dateLevelComputedFields = groupRows.filter(
+            v =>
+              v.category === ChartDataViewFieldCategory.DateLevelComputedField,
+          );
+
+          const computedFields = getRuntimeComputedFields(
+            dateLevelComputedFields,
+            '',
+            dataview?.computedFields,
+            chartConfig,
+          );
+
+          dispatch(
+            workbenchSlice.actions.updateCurrentDataViewComputedFields(
+              computedFields,
+            ),
+          );
+        }
+      }
+    },
+    [chartConfig, dataview?.computedFields, dispatch],
+  );
+
   const registerChartEvents = useCallback(
     chart => {
       chart?.registerMouseEvents([
         {
           name: 'click',
           callback: param => {
+            if (
+              drillOptionRef.current?.isSelectedDrill &&
+              !drillOptionRef.current.isBottomLevel
+            ) {
+              const option = drillOptionRef.current;
+              option.drillDown(param.data.rowData);
+              drillOptionRef.current = option;
+              handleDrillOptionChange?.(option);
+              return;
+            }
             if (
               param.componentType === 'table' &&
               param.seriesType === 'paging-sort-filter'
@@ -234,6 +314,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
       targetChartConfig,
     );
 
+    dispatch(workbenchSlice.actions.updateCurrentDataViewComputedFields([]));
     dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
     dispatch(
       workbenchSlice.actions.updateChartConfig({
@@ -243,17 +324,23 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
         },
       }),
     );
-  }, [dispatch, chart?.meta?.id, registerChartEvents]);
+    drillOptionRef.current = getChartDrillOption(
+      chartConfig?.datas,
+      drillOptionRef.current,
+    );
+  }, [dispatch, chart?.meta?.id, registerChartEvents, chartConfig?.datas]);
 
   const handleChartChange = (c: IChart) => {
     registerChartEvents(c);
     setChart(c);
     const targetChartConfig = CloneValueDeep(c.config);
 
-    const finalChartConfig = transferChartConfigs(
-      targetChartConfig,
-      shadowChartConfig || chartConfig,
+    const finalChartConfig = clearRuntimeDateLevelFieldsInChartConfig(
+      transferChartConfigs(targetChartConfig, shadowChartConfig || chartConfig),
     );
+
+    resetOriginalComputedFields(finalChartConfig);
+
     dispatch(
       workbenchSlice.actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
@@ -262,34 +349,82 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
         },
       }),
     );
+    drillOptionRef.current = getChartDrillOption(
+      finalChartConfig?.datas,
+      drillOptionRef.current,
+    );
     if (!expensiveQuery) {
-      dispatch(refreshDatasetAction({}));
+      dispatch(refreshDatasetAction({ drillOption: drillOptionRef?.current }));
     } else {
       setAllowQuery(true);
     }
   };
 
-  const handleChartConfigChange = (type, payload) => {
-    if (expensiveQuery) {
+  const handleChartConfigChange = useCallback(
+    (type, payload) => {
+      if (expensiveQuery) {
+        dispatch(
+          workbenchSlice.actions.updateChartConfig({
+            type,
+            payload: payload,
+          }),
+        );
+        dispatch(workbenchSlice.actions.updateShadowChartConfig(null));
+        setAllowQuery(payload.needRefresh);
+        return true;
+      }
+      // generate runtime computed fields(date level)
+      if (
+        payload.value.type === ChartDataSectionType.GROUP ||
+        payload.value.type === ChartDataSectionType.MIXED
+      ) {
+        const dateLevelComputedFields = payload.value.rows.filter(
+          v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
+        );
+
+        const replacedColName = payload.value.replacedColName;
+        const computedFields = getRuntimeComputedFields(
+          dateLevelComputedFields,
+          replacedColName,
+          dataview?.computedFields,
+          chartConfig,
+        );
+
+        if (replacedColName) {
+          payload = updateBy(payload, draft => {
+            delete draft.value.replacedColName;
+          });
+        }
+
+        if (
+          JSON.stringify(computedFields) !==
+          JSON.stringify(dataview?.computedFields)
+        ) {
+          dispatch(
+            workbenchSlice.actions.updateCurrentDataViewComputedFields(
+              computedFields,
+            ),
+          );
+        }
+      }
+
       dispatch(
-        workbenchSlice.actions.updateChartConfig({
+        updateChartConfigAndRefreshDatasetAction({
           type,
-          payload: payload,
+          payload,
+          needRefresh: payload.needRefresh,
+          updateDrillOption: config => {
+            drillOptionRef.current = getChartDrillOption(
+              config?.datas,
+              drillOptionRef.current,
+            );
+            return drillOptionRef.current;
+          },
         }),
       );
-      dispatch(workbenchSlice.actions.updateShadowChartConfig(null));
-      setAllowQuery(payload.needRefresh);
-      return true;
-    }
-
-    dispatch(
-      updateChartConfigAndRefreshDatasetAction({
-        type,
-        payload,
-        needRefresh: payload.needRefresh,
-      }),
-    );
-  };
+    },
+    [chartConfig, dispatch, expensiveQuery, dataview],
+  );
 
   const handleDataViewChanged = useCallback(() => {
     clearDataConfig();
@@ -333,6 +468,8 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   }, [buildDataChart, chartType, dataview, onSaveInWidget]);
 
   const saveChart = useCallback(async () => {
+    resetOriginalComputedFields(chartConfig);
+
     if (container === 'dataChart') {
       if (dataChartId) {
         await dispatch(
@@ -416,6 +553,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     chartConfig,
     dataview?.computedFields,
     history,
+    resetOriginalComputedFields,
   ]);
 
   const saveChartToDashBoard = useCallback(
@@ -441,9 +579,11 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
   );
 
   const handleRefreshDataset = useCallback(async () => {
-    await dispatch(refreshDatasetAction({}));
+    await dispatch(
+      refreshDatasetAction({ drillOption: drillOptionRef?.current }),
+    );
     setAllowQuery(false);
-  }, [dispatch]);
+  }, [dispatch, drillOptionRef]);
 
   const handleCreateDownloadDataTask = useCallback(async () => {
     if (!dataview?.id) {
@@ -451,9 +591,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     }
     const isWidget = dataChartId.includes('widget');
     const builder = new ChartDataRequestBuilder(
-      {
-        ...dataview,
-      },
+      dataview,
       chartConfig?.datas,
       chartConfig?.settings,
       {},
@@ -474,6 +612,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           },
         ],
         fileName: backendChart?.name || 'chart',
+        downloadType: DownloadFileType.Excel,
         resolve: () => {
           dispatch(actions.setChartEditorDownloadPolling(true));
         },
@@ -491,6 +630,46 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
     widgetId,
   ]);
 
+  const handleDrillOptionChange = (option: IChartDrillOption) => {
+    drillOptionRef.current = option;
+    dispatch(refreshDatasetAction({ drillOption: option }));
+  };
+
+  const handleDateLevelChange = (type, payload) => {
+    const rows = getRuntimeDateLevelFields(payload.value?.rows);
+    const dateLevelComputedFields = rows.filter(
+      v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
+    );
+    const replacedColName = payload.value.replacedColName;
+    const computedFields = getRuntimeComputedFields(
+      dateLevelComputedFields,
+      replacedColName,
+      dataview?.computedFields,
+      chartConfig,
+    );
+
+    dispatch(
+      workbenchSlice.actions.updateCurrentDataViewComputedFields(
+        computedFields,
+      ),
+    );
+
+    dispatch(
+      updateChartConfigAndRefreshDatasetAction({
+        type,
+        payload,
+        needRefresh: payload.needRefresh,
+        updateDrillOption: config => {
+          drillOptionRef.current = getChartDrillOption(
+            config?.datas,
+            drillOptionRef.current,
+          );
+          return drillOptionRef.current;
+        },
+      }),
+    );
+  };
+
   return (
     <StyledChartWorkbenchPage>
       <SaveFormContext.Provider value={saveFormContextValue}>
@@ -506,6 +685,7 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
             },
             onChangeAggregation: handleAggregationState,
           }}
+          drillOption={drillOptionRef?.current}
           aggregation={aggregation}
           chart={chart}
           dataset={dataset}
@@ -514,11 +694,14 @@ export const ChartEditor: React.FC<ChartEditorProps> = ({
           defaultViewId={defaultViewId}
           expensiveQuery={expensiveQuery}
           allowQuery={allowQuery}
+          availableSourceFunctions={availableSourceFunctions}
           onChartChange={handleChartChange}
           onChartConfigChange={handleChartConfigChange}
+          onChartDrillOptionChange={handleDrillOptionChange}
           onDataViewChange={handleDataViewChanged}
           onRefreshDataset={handleRefreshDataset}
           onCreateDownloadDataTask={handleCreateDownloadDataTask}
+          onDateLevelChange={handleDateLevelChange}
         />
         <SaveForm
           width={400}
@@ -542,7 +725,7 @@ const StyledChartWorkbenchPage = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 55;
+  z-index: ${LEVEL_100};
   display: flex;
   min-width: 0;
   min-height: 0;

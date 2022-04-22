@@ -7,6 +7,7 @@ import {
   DeviceType,
   JumpPanel,
   WidgetData,
+  WidgetErrorType,
   WidgetInfo,
   WidgetPanelParams,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -246,18 +247,17 @@ const widgetInfoRecordSlice = createSlice({
         boardId?: string;
         widgetId: string;
         errInfo?: string;
-        errorType: 'request' | 'interaction';
+        errorType: WidgetErrorType;
       }>,
     ) {
       const { widgetId, errInfo, errorType } = action.payload;
-      let errorObj = state[widgetId]?.errInfo || {};
+
+      let WidgetRrrInfo = state?.[widgetId]?.errInfo;
+      if (!WidgetRrrInfo) return;
       if (errInfo) {
-        errorObj[errorType] = errInfo;
+        WidgetRrrInfo[errorType] = errInfo;
       } else {
-        delete errorObj[errorType];
-      }
-      if (state[widgetId]?.errInfo) {
-        state[widgetId].errInfo = errorObj;
+        delete WidgetRrrInfo[errorType];
       }
     },
   },
@@ -323,9 +323,11 @@ const filterActions = [
   editBoardStackActions.tabsWidgetRemoveTab,
   editBoardStackActions.updateWidgetConfig,
   editBoardStackActions.updateWidgetsConfig,
-
+  editBoardStackActions.changeWidgetsIndex,
   editBoardStackActions.changeBoardHasQueryControl,
   editBoardStackActions.changeBoardHasResetControl,
+
+  editBoardStackActions.toggleLockWidget,
 ].map(ele => ele.toString());
 const editBoardStackReducer = undoable(editBoardStackSlice.reducer, {
   undoType: BOARD_UNDO.undo,

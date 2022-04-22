@@ -17,347 +17,386 @@
  */
 
 import { Button, Row, Select, Space, Tabs, Transfer, Tree } from 'antd';
+import { FilterConditionType } from 'app/constants';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import ChartFilterCondition, {
   ConditionBuilder,
-} from 'app/pages/ChartWorkbenchPage/models/ChartFilterCondition';
-import {
-  FilterConditionType,
-  RelationFilterValue,
-} from 'app/types/ChartConfig';
+} from 'app/models/ChartFilterCondition';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { getDistinctFields } from 'app/utils/fetch';
 import { FilterSqlOperator } from 'globalConstants';
-import { FC, memo, useCallback, useState } from 'react';
+import {
+  forwardRef,
+  ForwardRefRenderFunction,
+  useCallback,
+  useImperativeHandle,
+  useState,
+} from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
-import { IsKeyIn, isTreeModel } from 'utils/object';
+import { isEmpty, isEmptyArray, IsKeyIn, isTreeModel } from 'utils/object';
+import { FilterOptionForwardRef } from '.';
 import CategoryConditionEditableTable from './CategoryConditionEditableTable';
 import CategoryConditionRelationSelector from './CategoryConditionRelationSelector';
 
-const CategoryConditionConfiguration: FC<
+const CategoryConditionConfiguration: ForwardRefRenderFunction<
+  FilterOptionForwardRef,
   {
+    colName: string;
     dataView?: ChartDataView;
     condition?: ChartFilterCondition;
     onChange: (condition: ChartFilterCondition) => void;
     fetchDataByField?: (fieldId) => Promise<string[]>;
   } & I18NComponentProps
-> = memo(
-  ({
+> = (
+  {
+    colName,
     i18nPrefix,
     condition,
     dataView,
     onChange: onConditionChange,
     fetchDataByField,
-  }) => {
-    const t = useI18NPrefix(i18nPrefix);
-    const [colName] = useState(condition?.name || '');
-    const [curTab, setCurTab] = useState<FilterConditionType>(() => {
-      if (
+  },
+  ref,
+) => {
+  const t = useI18NPrefix(i18nPrefix);
+  const [curTab, setCurTab] = useState<FilterConditionType>(() => {
+    if (
+      [
+        FilterConditionType.List,
+        FilterConditionType.Condition,
+        FilterConditionType.Customize,
+      ].includes(condition?.type!)
+    ) {
+      return condition?.type!;
+    }
+    return FilterConditionType.List;
+  });
+  const [targetKeys, setTargetKeys] = useState<string[]>(() => {
+    let values;
+    if (condition?.operator === FilterSqlOperator.In) {
+      values = condition?.value;
+      if (Array.isArray(condition?.value)) {
+        const firstValues =
+          (condition?.value as [])?.filter(n => {
+            if (IsKeyIn(n as RelationFilterValue, 'key')) {
+              return (n as RelationFilterValue).isSelected;
+            }
+            return false;
+          }) || [];
+        values = firstValues?.map((n: RelationFilterValue) => n.key);
+      }
+    }
+    return values || [];
+  });
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const [isTree, setIsTree] = useState(isTreeModel(condition?.value));
+  const [treeOptions, setTreeOptions] = useState<string[]>([]);
+  const [listDatas, setListDatas] = useState<RelationFilterValue[]>([]);
+  const [treeDatas, setTreeDatas] = useState<RelationFilterValue[]>([]);
+
+  useImperativeHandle(ref, () => ({
+    onValidate: (args: ChartFilterCondition) => {
+      if (isEmpty(args?.operator)) {
+        return false;
+      }
+      if (args?.operator === FilterSqlOperator.In) {
+        return !isEmptyArray(args?.value);
+      } else if (
         [
-          FilterConditionType.List,
-          FilterConditionType.Condition,
-          FilterConditionType.Customize,
-        ].includes(condition?.type!)
+          FilterSqlOperator.Contain,
+          FilterSqlOperator.PrefixContain,
+          FilterSqlOperator.SuffixContain,
+          FilterSqlOperator.Equal,
+          FilterSqlOperator.NotContain,
+          FilterSqlOperator.NotPrefixContain,
+          FilterSqlOperator.NotSuffixContain,
+          FilterSqlOperator.NotEqual,
+        ].includes(args?.operator as FilterSqlOperator)
       ) {
-        return condition?.type!;
+        return !isEmpty(args?.value);
+      } else if (
+        [FilterSqlOperator.Null, FilterSqlOperator.NotNull].includes(
+          args?.operator as FilterSqlOperator,
+        )
+      ) {
+        return true;
       }
-      return FilterConditionType.List;
-    });
-    const [targetKeys, setTargetKeys] = useState<string[]>(() => {
-      let values;
-      if (condition?.operator === FilterSqlOperator.In) {
-        values = condition?.value;
-        if (Array.isArray(condition?.value)) {
-          const firstValues =
-            (condition?.value as [])?.filter(n => {
-              if (IsKeyIn(n as RelationFilterValue, 'key')) {
-                return (n as RelationFilterValue).isSelected;
-              }
-              return false;
-            }) || [];
-          values = firstValues?.map((n: RelationFilterValue) => n.key);
-        }
-      }
-      return values || [];
-    });
-    const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
-    const [isTree, setIsTree] = useState(isTreeModel(condition?.value));
-    const [treeOptions, setTreeOptions] = useState<string[]>([]);
-    const [listDatas, setListDatas] = useState<RelationFilterValue[]>([]);
-    const [treeDatas, setTreeDatas] = useState<RelationFilterValue[]>([]);
+      return false;
+    },
+  }));
 
-    useMount(() => {
-      if (curTab === FilterConditionType.List) {
-        handleFetchData();
-      }
-    });
+  useMount(() => {
+    if (curTab === FilterConditionType.List) {
+      handleFetchData();
+    }
+  });
 
-    const getDataOptionFields = () => {
-      return dataView?.meta || [];
-    };
+  const getDataOptionFields = () => {
+    return dataView?.meta || [];
+  };
 
-    const isChecked = (selectedKeys, eventKey) =>
-      selectedKeys.indexOf(eventKey) !== -1;
+  const isChecked = (selectedKeys, eventKey) =>
+    selectedKeys.indexOf(eventKey) !== -1;
 
-    const fetchNewDataset = async (viewId, colName: string) => {
-      const fieldDataset = await getDistinctFields(
-        viewId,
-        [colName],
-        undefined,
-        undefined,
-      );
-      return fieldDataset;
-    };
-
-    const setListSelectedState = (
-      list?: RelationFilterValue[],
-      keys?: string[],
-    ) => {
-      return (list || []).map(c =>
-        Object.assign(c, { isSelected: isChecked(keys, c.key) }),
-      );
-    };
-
-    const setTreeCheckableState = (
-      treeList?: RelationFilterValue[],
-      keys?: string[],
-    ) => {
-      return (treeList || []).map(c => {
-        c.isSelected = isChecked(keys, c.key);
-        c.children = setTreeCheckableState(c.children, keys);
-        return c;
-      });
-    };
-
-    const handleGeneralListChange = async selectedKeys => {
-      const items = setListSelectedState(listDatas, selectedKeys);
-      setTargetKeys(selectedKeys);
-      setListDatas(items);
-
-      const generalTypeItems = items?.filter(i => i.isSelected);
-      const filter = new ConditionBuilder(condition)
-        .setOperator(FilterSqlOperator.In)
-        .setValue(generalTypeItems)
-        .asGeneral();
-      onConditionChange(filter);
-    };
-
-    const filterGeneralListOptions = useCallback(
-      (inputValue, option) => option.label?.includes(inputValue) || false,
-      [],
+  const fetchNewDataset = async (viewId, colName: string) => {
+    const fieldDataset = await getDistinctFields(
+      viewId,
+      [colName],
+      undefined,
+      undefined,
     );
+    return fieldDataset;
+  };
 
-    const handleGeneralTreeChange = async treeSelectedKeys => {
-      const selectedKeys = treeSelectedKeys.checked;
-      const treeItems = setTreeCheckableState(treeDatas, selectedKeys);
-      setTargetKeys(selectedKeys);
-      setTreeDatas(treeItems);
-      const filter = new ConditionBuilder(condition)
-        .setOperator(FilterSqlOperator.In)
-        .setValue(treeItems)
-        .asTree();
-      onConditionChange(filter);
-    };
+  const setListSelectedState = (
+    list?: RelationFilterValue[],
+    keys?: string[],
+  ) => {
+    return (list || []).map(c =>
+      Object.assign(c, { isSelected: isChecked(keys, c.key) }),
+    );
+  };
 
-    const onSelectChange = (
-      sourceSelectedKeys: string[],
-      targetSelectedKeys: string[],
-    ) => {
-      const newSelectedKeys = [...sourceSelectedKeys, ...targetSelectedKeys];
-      setSelectedKeys(newSelectedKeys);
-    };
+  const setTreeCheckableState = (
+    treeList?: RelationFilterValue[],
+    keys?: string[],
+  ) => {
+    return (treeList || []).map(c => {
+      c.isSelected = isChecked(keys, c.key);
+      c.children = setTreeCheckableState(c.children, keys);
+      return c;
+    });
+  };
 
-    const handleTreeOptionChange = (
-      associateField: string,
-      labelField: string,
-    ) => {
-      setTreeOptions([associateField, labelField]);
-    };
+  const handleGeneralListChange = async selectedKeys => {
+    const items = setListSelectedState(listDatas, selectedKeys);
+    setTargetKeys(selectedKeys);
+    setListDatas(items);
 
-    const handleFetchData = () => {
-      fetchNewDataset?.(dataView?.id, colName).then(dataset => {
-        if (isTree) {
-          // setTreeDatas(convertToTree(dataset?.columns, selectedKeys));
-          // setListDatas(convertToList(dataset?.columns, selectedKeys));
-        } else {
-          setListDatas(convertToList(dataset?.rows, selectedKeys));
-        }
-      });
-    };
+    const generalTypeItems = items?.filter(i => i.isSelected);
+    const filter = new ConditionBuilder(condition)
+      .setOperator(FilterSqlOperator.In)
+      .setValue(generalTypeItems)
+      .asGeneral();
+    onConditionChange(filter);
+  };
 
-    const convertToList = (collection, selectedKeys) => {
-      const items: string[] = (collection || []).flatMap(c => c);
-      const uniqueKeys = Array.from(new Set(items));
-      return uniqueKeys.map(item => ({
-        key: item,
-        label: item,
-        isSelected: selectedKeys.includes(item),
-      }));
-    };
+  const filterGeneralListOptions = useCallback(
+    (inputValue, option) => option.label?.includes(inputValue) || false,
+    [],
+  );
 
-    const convertToTree = (collection, selectedKeys) => {
-      const associateField = treeOptions?.[0];
-      const labelField = treeOptions?.[1];
+  const handleGeneralTreeChange = async treeSelectedKeys => {
+    const selectedKeys = treeSelectedKeys.checked;
+    const treeItems = setTreeCheckableState(treeDatas, selectedKeys);
+    setTargetKeys(selectedKeys);
+    setTreeDatas(treeItems);
+    const filter = new ConditionBuilder(condition)
+      .setOperator(FilterSqlOperator.In)
+      .setValue(treeItems)
+      .asTree();
+    onConditionChange(filter);
+  };
 
-      if (!associateField || !labelField) {
-        return [];
+  const onSelectChange = (
+    sourceSelectedKeys: string[],
+    targetSelectedKeys: string[],
+  ) => {
+    const newSelectedKeys = [...sourceSelectedKeys, ...targetSelectedKeys];
+    setSelectedKeys(newSelectedKeys);
+  };
+
+  const handleTreeOptionChange = (
+    associateField: string,
+    labelField: string,
+  ) => {
+    setTreeOptions([associateField, labelField]);
+  };
+
+  const handleFetchData = () => {
+    fetchNewDataset?.(dataView?.id, colName).then(dataset => {
+      if (isTree) {
+        // setTreeDatas(convertToTree(dataset?.columns, selectedKeys));
+        // setListDatas(convertToList(dataset?.columns, selectedKeys));
+      } else {
+        setListDatas(convertToList(dataset?.rows, selectedKeys));
       }
+    });
+  };
 
-      const associateKeys = Array.from(
-        new Set(collection?.map(c => c[associateField])),
-      );
-      const treeNodes = associateKeys
-        .map(key => {
-          const associateItem = collection?.find(c => c[colName] === key);
-          if (!associateItem) {
-            return null;
-          }
-          const associateChildren = collection
-            .filter(c => c[associateField] === key)
-            .map(c => {
-              const itemKey = c[labelField];
-              return {
-                key: itemKey,
-                label: itemKey,
-                isSelected: isChecked(selectedKeys, itemKey),
-              };
-            });
-          const itemKey = associateItem?.[colName];
-          return {
-            key: itemKey,
-            label: itemKey,
-            isSelected: isChecked(selectedKeys, itemKey),
-            children: associateChildren,
-          };
-        })
-        .filter(i => Boolean(i)) as RelationFilterValue[];
-      return treeNodes;
-    };
+  const convertToList = (collection, selectedKeys) => {
+    const items: string[] = (collection || []).flatMap(c => c);
+    const uniqueKeys = Array.from(new Set(items));
+    return uniqueKeys.map(item => ({
+      key: item,
+      label: item,
+      isSelected: selectedKeys.includes(item),
+    }));
+  };
 
-    const handleTabChange = (activeKey: string) => {
-      const conditionType = +activeKey;
-      setCurTab(conditionType);
-      const filter = new ConditionBuilder(condition)
-        .setOperator(null!)
-        .setValue(null)
-        .asFilter(conditionType);
-      setTreeDatas([]);
-      setTargetKeys([]);
-      setListDatas([]);
-      onConditionChange(filter);
-    };
+  const convertToTree = (collection, selectedKeys) => {
+    const associateField = treeOptions?.[0];
+    const labelField = treeOptions?.[1];
 
-    return (
-      <StyledTabs activeKey={curTab.toString()} onChange={handleTabChange}>
-        <Tabs.TabPane
-          tab={t('general')}
-          key={FilterConditionType.List.toString()}
-        >
-          <Row>
-            <Space>
-              <Button type="primary" onClick={handleFetchData}>
-                {t('load')}
-              </Button>
-              {/* <Checkbox
+    if (!associateField || !labelField) {
+      return [];
+    }
+
+    const associateKeys = Array.from(
+      new Set(collection?.map(c => c[associateField])),
+    );
+    const treeNodes = associateKeys
+      .map(key => {
+        const associateItem = collection?.find(c => c[colName] === key);
+        if (!associateItem) {
+          return null;
+        }
+        const associateChildren = collection
+          .filter(c => c[associateField] === key)
+          .map(c => {
+            const itemKey = c[labelField];
+            return {
+              key: itemKey,
+              label: itemKey,
+              isSelected: isChecked(selectedKeys, itemKey),
+            };
+          });
+        const itemKey = associateItem?.[colName];
+        return {
+          key: itemKey,
+          label: itemKey,
+          isSelected: isChecked(selectedKeys, itemKey),
+          children: associateChildren,
+        };
+      })
+      .filter(i => Boolean(i)) as RelationFilterValue[];
+    return treeNodes;
+  };
+
+  const handleTabChange = (activeKey: string) => {
+    const conditionType = +activeKey;
+    setCurTab(conditionType);
+    const filter = new ConditionBuilder(condition)
+      .setOperator(null!)
+      .setValue(null)
+      .asFilter(conditionType);
+    setTreeDatas([]);
+    setTargetKeys([]);
+    setListDatas([]);
+    onConditionChange(filter);
+  };
+
+  return (
+    <StyledTabs activeKey={curTab.toString()} onChange={handleTabChange}>
+      <Tabs.TabPane
+        tab={t('general')}
+        key={FilterConditionType.List.toString()}
+      >
+        <Row>
+          <Space>
+            <Button type="primary" onClick={handleFetchData}>
+              {t('load')}
+            </Button>
+            {/* <Checkbox
                 checked={isTree}
                 disabled
                 onChange={e => setIsTree(e.target.checked)}
               >
                 {t('useTree')}
               </Checkbox> */}
-            </Space>
-          </Row>
-          <Row>
-            <Space>
-              {isTree && (
-                <>
-                  {t('associateField')}
-                  <Select
-                    value={treeOptions?.[0]}
-                    options={getDataOptionFields()?.map(f => ({
-                      label: f.name,
-                      value: f.id,
-                    }))}
-                    onChange={value =>
-                      handleTreeOptionChange(value, treeOptions?.[1])
-                    }
-                  />
-                  {t('labelField')}
-                  <Select
-                    value={treeOptions?.[1]}
-                    options={getDataOptionFields()?.map(f => ({
-                      label: f.name,
-                      value: f.id,
-                    }))}
-                    onChange={value =>
-                      handleTreeOptionChange(treeOptions?.[0], value)
-                    }
-                  />
-                </>
-              )}
-            </Space>
-          </Row>
-          {isTree && (
-            <Tree
-              blockNode
-              checkable
-              checkStrictly
-              defaultExpandAll
-              checkedKeys={targetKeys}
-              treeData={treeDatas}
-              onCheck={handleGeneralTreeChange}
-              onSelect={handleGeneralTreeChange}
-            />
-          )}
-          {!isTree && (
-            <Transfer
-              operations={[t('moveToRight'), t('moveToLeft')]}
-              dataSource={listDatas}
-              titles={[`${t('sourceList')}`, `${t('targetList')}`]}
-              targetKeys={targetKeys}
-              selectedKeys={selectedKeys}
-              onChange={handleGeneralListChange}
-              onSelectChange={onSelectChange}
-              render={item => item.label}
-              showSearch
-              filterOption={filterGeneralListOptions}
-            />
-          )}
-        </Tabs.TabPane>
-        <Tabs.TabPane
-          tab={t('customize')}
-          key={FilterConditionType.Customize.toString()}
-        >
-          <CategoryConditionEditableTable
-            dataView={dataView}
-            i18nPrefix={i18nPrefix}
-            condition={condition}
-            onConditionChange={onConditionChange}
-            fetchDataByField={fetchDataByField}
+          </Space>
+        </Row>
+        <Row>
+          <Space>
+            {isTree && (
+              <>
+                {t('associateField')}
+                <Select
+                  value={treeOptions?.[0]}
+                  options={getDataOptionFields()?.map(f => ({
+                    label: f.name,
+                    value: f.id,
+                  }))}
+                  onChange={value =>
+                    handleTreeOptionChange(value, treeOptions?.[1])
+                  }
+                />
+                {t('labelField')}
+                <Select
+                  value={treeOptions?.[1]}
+                  options={getDataOptionFields()?.map(f => ({
+                    label: f.name,
+                    value: f.id,
+                  }))}
+                  onChange={value =>
+                    handleTreeOptionChange(treeOptions?.[0], value)
+                  }
+                />
+              </>
+            )}
+          </Space>
+        </Row>
+        {isTree && (
+          <Tree
+            blockNode
+            checkable
+            checkStrictly
+            defaultExpandAll
+            checkedKeys={targetKeys}
+            treeData={treeDatas}
+            onCheck={handleGeneralTreeChange}
+            onSelect={handleGeneralTreeChange}
           />
-        </Tabs.TabPane>
-        <Tabs.TabPane
-          tab={t('condition')}
-          key={FilterConditionType.Condition.toString()}
-        >
-          <CategoryConditionRelationSelector
-            condition={condition}
-            onConditionChange={onConditionChange}
+        )}
+        {!isTree && (
+          <Transfer
+            operations={[t('moveToRight'), t('moveToLeft')]}
+            dataSource={listDatas}
+            titles={[`${t('sourceList')}`, `${t('targetList')}`]}
+            targetKeys={targetKeys}
+            selectedKeys={selectedKeys}
+            onChange={handleGeneralListChange}
+            onSelectChange={onSelectChange}
+            render={item => item.label}
+            filterOption={filterGeneralListOptions}
+            showSearch
+            pagination
           />
-        </Tabs.TabPane>
-      </StyledTabs>
-    );
-  },
-);
+        )}
+      </Tabs.TabPane>
+      <Tabs.TabPane
+        tab={t('customize')}
+        key={FilterConditionType.Customize.toString()}
+      >
+        <CategoryConditionEditableTable
+          dataView={dataView}
+          i18nPrefix={i18nPrefix}
+          condition={condition}
+          onConditionChange={onConditionChange}
+          fetchDataByField={fetchDataByField}
+        />
+      </Tabs.TabPane>
+      <Tabs.TabPane
+        tab={t('condition')}
+        key={FilterConditionType.Condition.toString()}
+      >
+        <CategoryConditionRelationSelector
+          condition={condition}
+          onConditionChange={onConditionChange}
+        />
+      </Tabs.TabPane>
+    </StyledTabs>
+  );
+};
 
-export default CategoryConditionConfiguration;
+export default forwardRef(CategoryConditionConfiguration);
 
 const StyledTabs = styled(Tabs)`
   & .ant-tabs-content-holder {
-    width: 600px;
-    max-height: 300px;
+    max-height: 600px;
     margin-top: 10px;
     overflow-y: auto;
   }
@@ -375,7 +414,11 @@ const StyledTabs = styled(Tabs)`
      */
     .ant-transfer-list {
       width: ${SPACE_TIMES(56)};
-      height: ${SPACE_TIMES(64)};
+      height: ${SPACE_TIMES(80)};
+
+      .ant-pagination input {
+        width: 48px;
+      }
     }
   }
 

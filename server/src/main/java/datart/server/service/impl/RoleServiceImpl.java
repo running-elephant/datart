@@ -42,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -186,21 +187,28 @@ public class RoleServiceImpl extends BaseService implements RoleService {
     }
 
     @Override
-    @Transactional
-    public Role createPerUserRole(String orgId, String userId) {
-        // create role
-        Role role = new Role();
-        role.setId(UUIDGenerator.generate());
-        role.setOrgId(orgId);
-        role.setName("per-user-" + userId);
-        role.setType(RoleType.PER_USER.name());
-        role.setCreateBy(userId);
-        role.setCreateTime(new Date());
-        roleMapper.insert(role);
-        // add relation
-        RelRoleUser relRoleUser = createRelRoleUser(userId, role.getId());
-        rruMapper.insert(relRoleUser);
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public Role getPerUserRole(String orgId, String userId) {
+        Role role = roleMapper.selectPerUserRole(orgId, userId);
+        if (role == null) {
+            role = new Role();
+            role.setId(UUIDGenerator.generate());
+            role.setOrgId(orgId);
+            role.setName("per-user-" + userId);
+            role.setType(RoleType.PER_USER.name());
+            role.setCreateBy(userId);
+            role.setCreateTime(new Date());
+            roleMapper.insert(role);
+            // add relation
+            RelRoleUser relRoleUser = createRelRoleUser(userId, role.getId());
+            rruMapper.insert(relRoleUser);
+        }
         return role;
+    }
+
+    @Override
+    public User getPerUserRoleUser(String roleId) {
+        return roleMapper.selectPerUserRoleUser(roleId);
     }
 
     @Override
@@ -246,10 +254,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
             Role role = roleMapper.selectPerUserRole(permissionInfo.getOrgId(), permissionInfo.getSubjectId());
             relRoleResource.setRoleId(role.getId());
         } else if (permissionInfo.getSubjectType() == SubjectType.USER_ROLE) {
-            Role role = roleMapper.selectPerUserRole(permissionInfo.getOrgId(), permissionInfo.getSubjectId());
-            if (role == null) {
-                role = createPerUserRole(permissionInfo.getOrgId(), permissionInfo.getSubjectId());
-            }
+            Role role = getPerUserRole(permissionInfo.getOrgId(), permissionInfo.getSubjectId());
             relRoleResource.setRoleId(role.getId());
         } else {
             relRoleResource.setRoleId(permissionInfo.getSubjectId());
@@ -271,10 +276,7 @@ public class RoleServiceImpl extends BaseService implements RoleService {
         permissionInfo.stream().filter(permission -> {
             Role role;
             if (SubjectType.USER.equals(permission.getSubjectType())) {
-                role = roleMapper.selectPerUserRole(permission.getOrgId(), permission.getSubjectId());
-                if (role == null) {
-                    createPerUserRole(permission.getOrgId(), permission.getSubjectId());
-                }
+                role = getPerUserRole(permission.getOrgId(), permission.getSubjectId());
             } else {
                 role = roleMapper.selectByPrimaryKey(permission.getSubjectId());
             }
@@ -288,8 +290,10 @@ public class RoleServiceImpl extends BaseService implements RoleService {
 
     @Override
     @Transactional
-    public boolean grantOrgOwner(String orgId, String userId) {
-        securityManager.requireOrgOwner(orgId);
+    public boolean grantOrgOwner(String orgId, String userId, boolean checkPermission) {
+        if (checkPermission) {
+            securityManager.requireOrgOwner(orgId);
+        }
         requireExists(orgId, Organization.class);
         requireExists(userId, User.class);
         Role role = roleMapper.selectOrgOwnerRole(orgId);

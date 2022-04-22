@@ -59,8 +59,7 @@ public class Const {
     /**
      * 权限变量
      */
-//    //管理员权限，拥有所有数据的权限
-//    public static final String ALL_PERMISSION = "@ALL_PERMISSION@";
+    public static final String ALL_PERMISSION = "@DATART_ALL_PERMISSION@";
 
     /**
      * Token Key
@@ -100,5 +99,7 @@ public class Const {
 
 
     public static final String ENCRYPT_FLAG = "_encrypted_";
+
+    public static final String USER_DEFAULT_PSW = "123456";
 
 }

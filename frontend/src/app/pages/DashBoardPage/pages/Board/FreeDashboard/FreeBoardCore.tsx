@@ -18,11 +18,11 @@
 import { Empty } from 'antd';
 import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { WidgetAllProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetAllProvider';
+import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
 import { selectLayoutWidgetMapById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { memo, useContext, useMemo } from 'react';
+import { memo, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import SlideBackground from '../../../components/FreeBoardBackground';
@@ -73,15 +73,21 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
     const boardChildren = useMemo(() => {
       return widgetConfigs.map(item => {
         return (
-          <WidgetAllProvider key={item.id} id={item.id}>
+          <WidgetWrapProvider
+            key={item.id}
+            id={item.id}
+            boardEditing={editing}
+            boardId={boardId}
+          >
             <WidgetOfFree />
-          </WidgetAllProvider>
+          </WidgetWrapProvider>
         );
       });
-    }, [widgetConfigs]);
+    }, [widgetConfigs, editing, boardId]);
     const { gridRef } = useBoardWidthHeight();
+
     return (
-      <Wrap>
+      <Wrapper>
         <div className="container" ref={gridRef}>
           <div
             className="grid-background"
@@ -108,12 +114,12 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
             />
           )}
         </div>
-      </Wrap>
+      </Wrapper>
     );
   },
 );
 
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: flex;
   flex: 1;
   overflow-y: hidden;

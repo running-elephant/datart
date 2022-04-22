@@ -25,6 +25,11 @@ spring:
   web:
     resources:
       static-locations: file:${datart.env.file-path}
+      cache:
+        cachecontrol:
+          cache-public: true
+          no-cache: true
+          no-store: false
 
   messages:
     basename: i18n.datart_i18n
@@ -77,6 +82,8 @@ shiro:
 datart:
   server:
     path-prefix: /api/v1
+
+  admin-id: datart-admin
 
 
 server:

@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
+import ChartManager from 'app/models/ChartManager';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
-import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { transferChartDataConfig } from 'app/utils/internalChartHelper';
@@ -37,15 +37,17 @@ const ChartGraphPanel: FC<{
   const [requirementsStates, setRequirementStates] = useState<object>({});
 
   useLayoutEffect(() => {
-    const dict = allCharts?.reduce((acc, cur) => {
-      const transferedChartConfig = transferChartDataConfig(
-        CloneValueDeep(cur?.config),
-        chartConfig,
-      ) as ChartConfig;
-      acc[cur.meta.id] = cur?.isMatchRequirement(transferedChartConfig);
-      return acc;
-    }, {});
-    setRequirementStates(dict);
+    if (allCharts) {
+      const dict = allCharts?.reduce((acc, cur) => {
+        const transferedChartConfig = transferChartDataConfig(
+          { datas: CloneValueDeep(cur?.config?.datas || []) },
+          { datas: chartConfig?.datas },
+        );
+        acc[cur.meta.id] = cur?.isMatchRequirement(transferedChartConfig);
+        return acc;
+      }, {});
+      setRequirementStates(dict);
+    }
   }, [allCharts, chartConfig]);
 
   return (

@@ -16,18 +16,27 @@
  * limitations under the License.
  */
 
-import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
-import ChartDataSetDTO from 'app/types/ChartDataSet';
+import { ChartDataSectionType } from 'app/constants';
+import ReactChart from 'app/models/ReactChart';
+import {
+  ChartConfig,
+  ChartContext,
+  ChartDataSectionField,
+  ChartStyleConfig,
+  FontStyle,
+} from 'app/types/ChartConfig';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getStyles,
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import ReactChart from '../models/ReactChart';
+import { CSSProperties } from 'react';
 import { getConditionalStyle } from './conditionalStyle';
 import Config from './config';
 import ScorecardAdapter from './ScorecardAdapter';
+import { LabelConfig, PaddingConfig } from './types';
 
 class Scorecard extends ReactChart {
   isISOContainer = 'react-scorecard';
@@ -75,7 +84,11 @@ class Scorecard extends ReactChart {
     this.onUpdated(opt, context);
   }
 
-  getOptions(context, dataset: ChartDataSetDTO, config: ChartConfig) {
+  getOptions(
+    context: ChartContext,
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+  ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const aggregateConfigs = dataConfigs
@@ -129,7 +142,11 @@ class Scorecard extends ReactChart {
     };
   }
 
-  getColorConfig(style, aggConfig, chartDataSet) {
+  getColorConfig(
+    style: ChartStyleConfig[],
+    aggConfig: ChartDataSectionField[],
+    chartDataSet: IChartDataSet<string>,
+  ): CSSProperties[] {
     const [conditionalStylePanel] = getStyles(
       style,
       ['scorecardConditionalStyle', 'modal'],
@@ -139,12 +156,16 @@ class Scorecard extends ReactChart {
       getConditionalStyle(
         chartDataSet?.[0]?.getCell?.(ac),
         conditionalStylePanel,
-        ac.uid,
+        ac.uid!,
       ),
     );
   }
 
-  getDataConfig(aggColorConfig, style, fontSizeFn) {
+  getDataConfig(
+    aggColorConfig: CSSProperties[],
+    style: ChartStyleConfig[],
+    fontSizeFn: (path: string[]) => string,
+  ): { font: FontStyle }[] {
     const [font] = getStyles(style, ['data'], ['font']);
     return [
       {
@@ -157,7 +178,10 @@ class Scorecard extends ReactChart {
     ];
   }
 
-  getFontSize(width, style) {
+  getFontSize(
+    width: number,
+    style: ChartStyleConfig[],
+  ): (path: string[]) => string {
     return path => {
       const [autoFontSize, scale, fixedFontSize] = getStyles(style, path, [
         'autoFontSize',
@@ -171,7 +195,11 @@ class Scorecard extends ReactChart {
     };
   }
 
-  getLabelConfig(aggColorConfig, style, fontSizeFn) {
+  getLabelConfig(
+    aggColorConfig: CSSProperties[],
+    style: ChartStyleConfig[],
+    fontSizeFn: (path: string[]) => string,
+  ): LabelConfig {
     const [show, font, position, alignment] = getStyles(
       style,
       ['label'],
@@ -180,8 +208,8 @@ class Scorecard extends ReactChart {
     return {
       show,
       font: {
-        fontSize: fontSizeFn(['label']),
         ...font,
+        fontSize: fontSizeFn(['label']),
         color: aggColorConfig?.[0]?.color || font.color,
       },
       position,
@@ -189,8 +217,11 @@ class Scorecard extends ReactChart {
     };
   }
 
-  getPaddingConfig(style, contextWidth) {
-    const getPaddingNum = value => {
+  getPaddingConfig(
+    style: ChartStyleConfig[],
+    contextWidth: number,
+  ): PaddingConfig {
+    const _getPaddingNum = (value: string) => {
       if (!value || isNaN(parseFloat(value))) {
         return 0;
       }
@@ -199,9 +230,9 @@ class Scorecard extends ReactChart {
       }
       return parseFloat(value);
     };
-    const initPaddingNum = value => {
+    const _initPaddingNum = (value: string) => {
       if (!value || isNaN(parseFloat(value))) {
-        return 0;
+        return '0';
       }
       if (/%$/g.test(value)) {
         return value;
@@ -214,11 +245,11 @@ class Scorecard extends ReactChart {
       ['marginLeft', 'marginRight', 'marginTop', 'marginBottom'],
     );
     return {
-      padding: `${initPaddingNum(top)} ${initPaddingNum(
+      padding: `${_initPaddingNum(top)} ${_initPaddingNum(
         right,
-      )} ${initPaddingNum(bottom)} ${initPaddingNum(left)}`,
+      )} ${_initPaddingNum(bottom)} ${_initPaddingNum(left)}`,
       width: Math.floor(
-        contextWidth - getPaddingNum(left) - getPaddingNum(right),
+        contextWidth - _getPaddingNum(left) - _getPaddingNum(right),
       ),
     };
   }

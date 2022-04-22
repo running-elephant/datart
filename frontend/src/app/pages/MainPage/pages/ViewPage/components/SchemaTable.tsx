@@ -24,6 +24,7 @@ import {
 import { Dropdown, Menu, TableColumnType, TableProps, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import { VirtualTable } from 'app/components/VirtualTable';
+import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { memo, ReactElement, useMemo } from 'react';
 import styled from 'styled-components/macro';
@@ -34,7 +35,7 @@ import {
   WARNING,
 } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
-import { ColumnCategories, ColumnTypes } from '../constants';
+import { ColumnCategories } from '../constants';
 import { Column, Model } from '../slice/types';
 import { getColumnWidthMap, getHierarchyColumn } from '../utils';
 const ROW_KEY = 'DATART_ROW_KEY';
@@ -95,10 +96,10 @@ export const SchemaTable = memo(
 
         let icon;
         switch (hierarchyColumn.type) {
-          case ColumnTypes.Number:
+          case DataViewFieldType.NUMERIC:
             icon = <NumberOutlined />;
             break;
-          case ColumnTypes.Date:
+          case DataViewFieldType.DATE:
             icon = <CalendarOutlined />;
             break;
           default:
@@ -123,7 +124,7 @@ export const SchemaTable = memo(
                   className="datart-schema-table-header-menu"
                   onClick={onSchemaTypeChange(name, hierarchyColumn)}
                 >
-                  {Object.values(ColumnTypes).map(t => (
+                  {Object.values(DataViewFieldType).map(t => (
                     <Menu.Item key={t}>
                       {tg(`columnType.${t.toLowerCase()}`)}
                     </Menu.Item>
@@ -165,7 +166,7 @@ export const SchemaTable = memo(
           dataIndex: name,
           width,
           align:
-            column.type === ColumnTypes.Number
+            column.type === DataViewFieldType.NUMERIC
               ? ('right' as const)
               : ('left' as const),
         };

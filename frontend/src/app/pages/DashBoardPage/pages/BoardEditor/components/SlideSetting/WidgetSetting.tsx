@@ -29,10 +29,10 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
 } from 'react';
-import { useDispatch } from 'react-redux';
-import { editBoardStackActions } from '../../slice';
+import { WidgetActionContext } from '../../../../components/ActionProvider/WidgetActionProvider';
 import AutoUpdateSet from './SettingItem/AutoUpdateSet';
 import BackgroundSet from './SettingItem/BackgroundSet';
 import NumberSet from './SettingItem/BasicSet/NumberSet';
@@ -40,13 +40,12 @@ import BorderSet from './SettingItem/BorderSet';
 import NameSet from './SettingItem/NameSet';
 import PaddingSet from './SettingItem/PaddingSet';
 import { Group, SettingPanel } from './SettingPanel';
-import { WidgetNameList } from './WidgetList/WidgetNameList';
 
 const { Panel } = Collapse;
 export const WidgetSetting: FC = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
-  const dispatch = useDispatch();
   const { boardType } = useContext(BoardContext);
+  const { onUpdateWidgetConfig } = useContext(WidgetActionContext);
   const widget = useContext(WidgetContext);
   const [form] = Form.useForm();
   const { config } = widget;
@@ -88,22 +87,14 @@ export const WidgetSetting: FC = memo(() => {
         draft.autoUpdate = value.autoUpdate;
         draft.frequency = value.frequency;
       });
-
-      dispatch(
-        editBoardStackActions.updateWidgetConfig({
-          wid: widget.id,
-          config: nextConf,
-        }),
-      );
+      onUpdateWidgetConfig(nextConf, widget.id);
     },
-    [dispatch],
+    [onUpdateWidgetConfig],
   );
-  const throttledUpdate = useRef(
-    throttle((allValue, widget) => onUpdate(allValue, widget), 1000),
-  );
+  const throttledUpdate = useMemo(() => throttle(onUpdate, 1000), [onUpdate]);
   const onValuesChange = useCallback(
     (_, allValue) => {
-      throttledUpdate.current(allValue, widget);
+      throttledUpdate(allValue, widget);
     },
     [throttledUpdate, widget],
   );
@@ -117,7 +108,7 @@ export const WidgetSetting: FC = memo(() => {
         preserve
       >
         <Collapse
-          defaultActiveKey={['widgetList']}
+          defaultActiveKey={['name', 'background']}
           className="datart-config-panel"
           ghost
         >
@@ -172,11 +163,6 @@ export const WidgetSetting: FC = memo(() => {
           <Panel header={t('autoUpdate')} key="autoUpdate" forceRender>
             <Group>
               <AutoUpdateSet />
-            </Group>
-          </Panel>
-          <Panel header={t('widgetList')} key="widgetList">
-            <Group>
-              <WidgetNameList />
             </Group>
           </Panel>
         </Collapse>

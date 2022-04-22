@@ -2,6 +2,7 @@
   "global": {
     "copy": "copy",
     "tokenExpired": "Token expired, please log in",
+    "401": "Not logged in or token expired, please log in again",
     "title": {
       "action": "Action"
     },
@@ -17,7 +18,8 @@
       "close": "Close",
       "saveAs": "Save as",
       "cancel": "Cancel",
-      "ok": "OK"
+      "ok": "OK",
+      "shortcuts": "Shortcuts"
     },
     "operation": {
       "archiveConfirm": "Archive confirm",
@@ -76,6 +78,7 @@
     "login": "Log in",
     "register": "Sign up for an account",
     "forgotPassword": "Can't log in?",
+    "authTitle": "OR",
     "alreadyLoggedIn": "Your account is already logged in",
     "enter": "Click to enter",
     "switch": "Switch accounts"
@@ -477,7 +480,13 @@
         "deleteField": "Delete",
         "editViewTip": "Going back to the view will lose the current edit state, continue?",
         "editView": "Edit View",
-        "toggleViewTip": "Switching view will clear all chart configurations, continue?"
+        "toggleViewTip": "Switching view will clear all chart configurations, continue?",
+        "AGG_DATE_YEAR": "Year",
+        "AGG_DATE_QUARTER": "Quarter",
+        "AGG_DATE_MONTH": "Month",
+        "AGG_DATE_WEEK": "Week",
+        "AGG_DATE_DAY": "Day",
+        "default": "Default"
       }
     },
     "palette": {
@@ -558,11 +567,13 @@
           "dotted": "Dotted"
         },
         "nameLocation": {
+          "title": "Name Location",
           "start": "Start",
           "center": "Center",
           "end": "End"
         },
         "legendType": {
+          "title": "Type",
           "plain": "Plain",
           "scroll": "Scroll"
         },
@@ -576,9 +587,6 @@
           "arial": "Arial",
           "sansSerif": "sans-serif"
         },
-        "lineHeight": {
-          "default": "Default Line Height"
-        },
         "fontWeight": {
           "normal": "Normal",
           "bold": "Bold",
@@ -589,6 +597,26 @@
           "normal": "Normal",
           "italic": "Italic",
           "oblique": "Oblique"
+        },
+        "lineHeight": {
+          "default": "Default Line Height"
+        },
+        "position": {
+          "title": "Position",
+          "auto": "Auto",
+          "right": "Right",
+          "left": "Left",
+          "top": "Top",
+          "bottom": "Bottom",
+          "inside": "Inside",
+          "insideLeft": "Inside Left",
+          "insideRight": "Inside Right",
+          "insideTop": "Inside Top",
+          "insideBottom": "Inside Bottom",
+          "insideTopLeft": "Inside Top Left",
+          "insideBottomLeft": "Inside Bottom Left",
+          "insideTopRight": "Inside Top Right",
+          "insideBottomRight": "Inside Bottom Right"
         }
       },
       "data": {
@@ -605,6 +633,12 @@
         "size": "Size",
         "drop": "Drag some data fields here",
         "dropCount": "Drag {{count}} fields here at least",
+        "AGG_DATE_YEAR": "Year",
+        "AGG_DATE_QUARTER": "Quarter",
+        "AGG_DATE_MONTH": "Month",
+        "AGG_DATE_WEEK": "Week",
+        "AGG_DATE_DAY": "Day",
+        "drillable": "Drillable",
         "actions": {
           "sort": {
             "title": "Sort",
@@ -662,7 +696,8 @@
             "colorRange": "colorize",
             "colorSingle": "colorize",
             "size": "size",
-            "chooseTheme": "Choose theme"
+            "chooseTheme": "Choose theme",
+            "dateLevel": "Date Level"
           }
         }
       },
@@ -752,11 +787,40 @@
         "ok": "OK",
         "cancel": "Cancel",
         "number": "No.",
-        "summary": "Summary"
+        "summary": "Summary",
+        "richText": {
+          "bold": "Bold",
+          "italic": "Italic",
+          "underline": "Underline",
+          "strike": "Strike",
+          "indent": "Indent",
+          "indentUp": "Indent Up",
+          "ordered": "Ordered",
+          "list": "List",
+          "blockquote": "Blockquote",
+          "codeBlock": "Code Block",
+          "link": "Link",
+          "image": "Image",
+          "clean": "Clean",
+          "more": "More",
+          "families": "Families",
+          "fontSize": "Font Size",
+          "background": "Background",
+          "color": "Color",
+          "align": "Align"
+        }
+      },
+      "drill": {
+        "showNextLevel": "Show Next Level",
+        "expandNextLevel": "Expand to Next Level",
+        "selectDrillOn": "\"Click to drill down\" is on",
+        "selectDrillOff": "Turn on \"Click to drill down\"",
+        "rollUp": "Roll Up"
       }
     },
     "action": {
       "common": {
+        "downloadForExcel": "Download Excel",
         "confirm": "Please Confirm",
         "ok": "OK",
         "cancel": "Cancel",
@@ -780,8 +844,36 @@
         "expireDate": "Expire Date",
         "enablePassword": "Password",
         "generateLink": "Generate Link",
-        "shareLink": "Share Link",
-        "downloadData": "Download Excel"
+        "shareLink": "Share management",
+        "downloadData": "Download Excel",
+        "downloadPDF": "Download PDF",
+        "downloadPicture": "Download Picture",
+        "NONE": "None",
+        "CODE": "Code",
+        "LOGIN": "Login",
+        "verificationMethod": "Verification method",
+        "dataPermission": "Data permission",
+        "loginUser": "User login",
+        "shareUser": "User share",
+        "userOrRole": "Assign roles/members",
+        "selectRole": "Select role",
+        "selectUser": "select members",
+        "save": "Save"
+      },
+      "shareList": {
+        "shareList": "Share link list",
+        "shortLink": "Short link",
+        "type": "Type",
+        "expireDate": "Expiration",
+        "operate": "Operate",
+        "copy": "Copy",
+        "copySuccess": "Copy success",
+        "delete": "Delete",
+        "addLink": "Add a link",
+        "deleteError": "Failed to delete",
+        "sureDelete": "sure you want to delete?",
+        "noDataTip": "No link yet, click on the top right corner to add",
+        "Permanent": "Permanent"
       }
     },
     "board": {
@@ -809,7 +901,8 @@
         "paste": "Paste",
         "deviceSwitch": "Device Switch",
         "allowOverlap": "Allow Overlap",
-        "forbidOverlap": "Forbid Overlap"
+        "forbidOverlap": "Forbid Overlap",
+        "multiSelect": "MultiSelect"
       },
       "controlTypes": {
         "common": "Common",
@@ -1033,6 +1126,7 @@
     "resultEmpty1": "Click ",
     "resultEmpty2": " button to execute, the results will be displayed here",
     "errorTitle": "Error occurred",
+    "sqlRequired": "SQL statement cannot be empty",
     "sqlRunWraning": "SQL parsing failed, welcome to submit an issue to help us improve. ",
     "detail": "Click here for details",
     "warningDescription": "Datart uses calcite to parse SQL statements by default; calcite has a awesome parser, but it still can't parse all the grammars of all databases. When a parsing exception occurs, datart will still send the SQL statement to the database for execution after necessary processing. If the execution is successful, we will think that the parser needs to be improved for the syntax of the SQL statement. In this case, datart will show this warning message, which is convenient for users to submit the exceptional parsing statements to github or gitee issue, and help us improve the parser.",
@@ -1154,19 +1248,27 @@
   },
   "member": {
     "memberDetail": {
-      "title": "Member detail",
+      "titleAdd": "Add Member",
+      "titleDetail": "Member detail",
       "grantOwner": "Granted to organization owner",
       "revokeOwner": "Revoke owner",
       "remove": "Remove",
       "removeConfirm": "Remove confirm",
       "removeSuccess": "Remove successful",
+      "delete": "Delete",
+      "deleteConfirm": "Delete confirm",
+      "deleteSuccess": "Delete successful",
       "grantSuccess": "Grant successful",
       "revokeSuccess": "Revoke successful",
       "username": "Username",
       "email": "Email",
+      "password": "Password",
+      "changePassword": "Click to change password",
       "name": "Name",
+      "description": "Description",
       "roles": "Roles",
-      "assignRole": "Assign roles"
+      "assignRole": "Assign roles",
+      "createSuccess": "Member created successfully"
     },
     "roleDetail": {
       "role": "Role",
@@ -1185,7 +1287,12 @@
     "form": {
       "email": "Email",
       "search": "Search or paste the emails of invited members",
-      "needConfirm": "Need email confirmation"
+      "needConfirm": "Need email confirmation",
+      "password": "Password",
+      "username": "Username",
+      "name": "Name",
+      "description": "Description",
+      "roles": "Roles"
     },
     "sidebar": {
       "member": "Members",
@@ -1194,6 +1301,7 @@
       "inviteMember": "Invite member",
       "inviteSuccess": "The invitation email has been sent successfully",
       "invalidEmail": "Invalid email addresses",
+      "addMember": "Add Member",
       "roleTitle": "Roles",
       "addRole": "Create role"
     }

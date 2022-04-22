@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Form, FormInstance, Input } from 'antd';
+import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   BoardType,
@@ -23,7 +24,6 @@ import {
   Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import React, { memo, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import ControllerVisibility from './ControllerVisibility';
@@ -86,7 +86,7 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
       return sliderTypes.includes(controllerType);
     }, [controllerType]);
     return (
-      <Wrap>
+      <Wrapper>
         <Form.Item name="name" label={tc('title')} rules={[{ required: true }]}>
           <Input />
         </Form.Item>
@@ -116,11 +116,11 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
           otherStrFilterWidgets={otherStrFilterWidgets}
           form={form}
         />
-      </Wrap>
+      </Wrapper>
     );
   },
 );
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   overflow-y: auto;

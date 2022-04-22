@@ -17,28 +17,19 @@
  */
 
 import {
-  BgColorsOutlined,
-  DiffOutlined,
-  DownOutlined,
-  FilterOutlined,
-  FontSizeOutlined,
-  FormatPainterOutlined,
-  GroupOutlined,
-  SortAscendingOutlined,
-} from '@ant-design/icons';
-import { Dropdown } from 'antd';
+  AggregateFieldSubAggregateType,
+  ChartDataSectionFieldActionType,
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+  DataViewFieldType,
+} from 'app/constants';
 import useFieldActionModal from 'app/hooks/useFieldActionModal';
 import ChartAggregationContext from 'app/pages/ChartWorkbenchPage/contexts/ChartAggregationContext';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import VizDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
-import {
-  AggregateFieldSubAggregateType,
-  ChartDataSectionField,
-  ChartDataSectionFieldActionType,
-  ChartDataSectionType,
-} from 'app/types/ChartConfig';
+import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
-import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { reachLowerBoundCount } from 'app/utils/internalChartHelper';
 import { updateBy, updateByKey } from 'app/utils/mutation';
@@ -49,13 +40,19 @@ import { DropTargetMonitor, useDrop } from 'react-dnd';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
+  FONT_SIZE_SUBTITLE,
   LINE_HEIGHT_HEADING,
+  SPACE,
+  SPACE_MD,
   SPACE_SM,
+  SPACE_XS,
 } from 'styles/StyleConstants';
 import { ValueOf } from 'types';
 import { uuidv4 } from 'utils/utils';
-import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
 import ChartDraggableElement from './ChartDraggableElement';
+import ChartDraggableElementField from './ChartDraggableElementField';
+import ChartDraggableElementHierarchy from './ChartDraggableElementHierarchy';
+import { updateDataConfigByField } from './utils';
 
 type DragItem = {
   index?: number;
@@ -70,33 +67,65 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     onConfigChanged,
   }) {
     const { dataset } = useContext(ChartDatasetContext);
-    const { dataView } = useContext(VizDataViewContext);
+    const { drillOption } = useContext(ChartDrillContext);
+    const { dataView, availableSourceFunctions } =
+      useContext(VizDataViewContext);
     const [currentConfig, setCurrentConfig] = useState(config);
     const [showModal, contextHolder] = useFieldActionModal({
       i18nPrefix: 'viz.palette.data.enum.actionType',
     });
     const { aggregation } = useContext(ChartAggregationContext);
 
+    useEffect(() => {
+      setCurrentConfig(config);
+    }, [config]);
+
     const [{ isOver, canDrop }, drop] = useDrop(
       () => ({
         accept: [
           CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
+          CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN_GROUP,
           CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN,
         ],
         drop(item: ChartDataSectionField & DragItem, monitor) {
           let items = Array.isArray(item) ? item : [item];
           let needDelete = true;
+
           if (
             monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN
           ) {
             const currentColumns: ChartDataSectionField[] = (
               currentConfig.rows || []
             ).concat(
-              items.map(val => ({
+              items.map(val => {
+                let config: ChartDataSectionField = {
+                  uid: uuidv4(),
+                  ...val,
+                  aggregate: getDefaultAggregate(val),
+                };
+                if (
+                  val.category ===
+                  ChartDataViewFieldCategory.DateLevelComputedField
+                ) {
+                  config.colName = `${val.colName}（${t(val.expression)}）`;
+                  config.expression = `${val.expression}(${val.colName})`;
+                  config.field = val.colName;
+                }
+                return config;
+              }),
+            );
+            updateCurrentConfigColumns(currentConfig, currentColumns, true);
+          } else if (
+            monitor.getItemType() ===
+            CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN_GROUP
+          ) {
+            const hierarchyChildFields = items?.[0]?.children || [];
+            const currentColumns: ChartDataSectionField[] = (
+              currentConfig.rows || []
+            ).concat(
+              hierarchyChildFields.map(val => ({
                 uid: uuidv4(),
-                colName: val.colName,
-                category: val.category,
-                type: val.type,
+                ...val,
                 aggregate: getDefaultAggregate(val),
               })),
             );
@@ -108,6 +137,8 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               r => r.uid === item.uid,
             );
             if (originItemIndex > -1) {
+              const needRefreshData =
+                currentConfig?.type === ChartDataSectionType.GROUP;
               needDelete = false;
               const currentColumns = updateBy(
                 currentConfig?.rows || [],
@@ -117,7 +148,11 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                   return draft.splice(item?.index!, 0, item);
                 },
               );
-              updateCurrentConfigColumns(currentConfig, currentColumns);
+              updateCurrentConfigColumns(
+                currentConfig,
+                currentColumns,
+                needRefreshData,
+              );
             } else {
               const currentColumns = updateBy(
                 currentConfig?.rows || [],
@@ -134,6 +169,18 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         },
         canDrop: (item: ChartDataSectionField, monitor) => {
           let items = Array.isArray(item) ? item : [item];
+          if (
+            [CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN_GROUP].includes(
+              monitor.getItemType() as any,
+            ) &&
+            ![
+              ChartDataSectionType.GROUP,
+              ChartDataSectionType.COLOR,
+              ChartDataSectionType.MIXED,
+            ].includes(currentConfig.type as ChartDataSectionType)
+          ) {
+            return false;
+          }
 
           if (
             typeof currentConfig.actions === 'object' &&
@@ -159,6 +206,17 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           ) {
             return true;
           }
+
+          if (
+            items[0].category ===
+            ChartDataViewFieldCategory.DateLevelComputedField
+          ) {
+            const colNames = currentConfig.rows?.map(col => col.colName);
+            return colNames
+              ? colNames.every(v => !v?.includes(items[0].colName))
+              : true;
+          }
+
           const exists = currentConfig.rows?.map(col => col.colName);
           return items.every(i => !exists?.includes(i.colName));
         },
@@ -170,10 +228,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       [onConfigChanged, currentConfig, dataView, dataset],
     );
 
-    useEffect(() => {
-      setCurrentConfig(config);
-    }, [config]);
-
     const updateCurrentConfigColumns = (
       currentConfig,
       newColumns,
@@ -184,21 +238,21 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       onConfigChanged?.(ancestors, newCurrentConfig, refreshDataset);
     };
 
-    const getDefaultAggregate = item => {
+    const getDefaultAggregate = (item: ChartDataSectionField) => {
       if (
         currentConfig?.type === ChartDataSectionType.AGGREGATE ||
         currentConfig?.type === ChartDataSectionType.SIZE ||
         currentConfig?.type === ChartDataSectionType.INFO ||
         currentConfig?.type === ChartDataSectionType.MIXED
       ) {
-        if (currentConfig.disableAggregate) {
-          return;
-        }
         if (
-          item.category ===
-          (ChartDataViewFieldCategory.AggregateComputedField as string)
+          currentConfig.disableAggregate ||
+          item.category === ChartDataViewFieldCategory.AggregateComputedField
         ) {
           return;
+        }
+        if (item.aggregate) {
+          return item.aggregate;
         }
 
         let aggType: string = '';
@@ -248,10 +302,16 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       }
     };
 
-    const handleOnDeleteItem = uid => () => {
-      if (uid) {
-        const newCurrentConfig = updateBy(currentConfig, draft => {
-          draft.rows = draft.rows?.filter(c => c.uid !== uid);
+    const handleOnDeleteItem = config => () => {
+      if (config.uid) {
+        let newCurrentConfig = updateBy(currentConfig, draft => {
+          draft.rows = draft.rows?.filter(c => c.uid !== config.uid);
+          if (
+            config.category ===
+            ChartDataViewFieldCategory.DateLevelComputedField
+          ) {
+            draft.replacedColName = config.colName;
+          }
         });
         setCurrentConfig(newCurrentConfig);
         onConfigChanged?.(ancestors, newCurrentConfig, true);
@@ -281,40 +341,48 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             index={index}
             config={columnConfig}
             content={() => {
-              return (
-                <Dropdown
-                  key={columnConfig.uid}
-                  disabled={!config?.actions}
-                  destroyPopupOnHide={true}
-                  overlay={renderActionExtensionMenu(
-                    columnConfig.uid!,
-                    columnConfig.type,
-                    columnConfig.category,
-                  )}
-                  overlayClassName="datart-data-section-dropdown"
-                  trigger={['click']}
-                >
-                  <div>
-                    {currentConfig?.actions && (
-                      <DownOutlined style={{ marginRight: '10px' }} />
-                    )}
-                    <span>
-                      {aggregation === false
-                        ? columnConfig.colName
-                        : getColumnRenderName(columnConfig)}
-                    </span>
-                    <div style={{ display: 'inline-block', marginLeft: '5px' }}>
-                      {enableActionsIcons(columnConfig)}
-                    </div>
-                  </div>
-                </Dropdown>
+              const contentProps = {
+                modalSize: modalSize,
+                config: currentConfig,
+                columnConfig: columnConfig,
+                ancestors: ancestors,
+                aggregation: aggregation,
+                availableSourceFunctions,
+                onConfigChanged: onConfigChanged,
+                handleOpenActionModal: handleOpenActionModal,
+              };
+              return columnConfig.category ===
+                ChartDataViewFieldCategory.Hierarchy ? (
+                <ChartDraggableElementHierarchy {...contentProps} />
+              ) : (
+                <ChartDraggableElementField {...contentProps} />
               );
             }}
             moveCard={onDraggableItemMove}
-            onDelete={handleOnDeleteItem(columnConfig.uid)}
+            onDelete={handleOnDeleteItem(columnConfig)}
           ></ChartDraggableElement>
         );
       });
+    };
+
+    const renderDrillFilters = () => {
+      if (currentConfig?.type !== ChartDataSectionType.FILTER) {
+        return;
+      }
+      return getDillConditions()?.map(drill => {
+        const field = drill.field;
+        return (
+          <StyledDillFilter type={field.type}>
+            {getColumnRenderName(field)}
+          </StyledDillFilter>
+        );
+      });
+    };
+
+    const getDillConditions = () => {
+      return drillOption
+        ?.getAllDrillDownFields()
+        ?.filter(drill => Boolean(drill?.condition));
     };
 
     const handleFieldConfigChanged = (
@@ -325,12 +393,11 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       if (!fieldConfig) {
         return;
       }
-      const newConfig = updateBy(config, draft => {
-        const index = (draft.rows || []).findIndex(r => r.uid === columnUid);
-        if (index !== -1 && fieldConfig) {
-          (draft.rows || [])[index] = fieldConfig;
-        }
-      });
+      const newConfig = updateDataConfigByField(
+        columnUid,
+        currentConfig,
+        fieldConfig,
+      );
       onConfigChanged?.(ancestors, newConfig, needRefresh);
     };
 
@@ -340,7 +407,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         (showModal as Function)(
           uid,
           actionType,
-          config,
+          currentConfig,
           handleFieldConfigChanged,
           dataset,
           dataView,
@@ -349,50 +416,10 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         );
       };
 
-    const renderActionExtensionMenu = (uid: string, type: string, category) => {
-      return (
-        <ChartDataConfigSectionActionMenu
-          uid={uid}
-          type={type}
-          category={category}
-          ancestors={ancestors}
-          config={currentConfig}
-          modalSize={modalSize}
-          onConfigChanged={onConfigChanged}
-          onOpenModal={handleOpenActionModal}
-        />
-      );
-    };
-
-    const enableActionsIcons = col => {
-      const icons = [] as any;
-      if (col.alias) {
-        icons.push(<DiffOutlined key="alias" />);
-      }
-      if (col.sort) {
-        icons.push(<SortAscendingOutlined key="sort" />);
-      }
-      if (col.format) {
-        icons.push(<FormatPainterOutlined key="format" />);
-      }
-      if (col.aggregate) {
-        icons.push(<GroupOutlined key="aggregate" />);
-      }
-      if (col.filter) {
-        icons.push(<FilterOutlined key="filter" />);
-      }
-      if (col.color) {
-        icons.push(<BgColorsOutlined key="color" />);
-      }
-      if (col.size) {
-        icons.push(<FontSizeOutlined key="size" />);
-      }
-      return icons;
-    };
-
     return (
       <StyledContainer ref={drop} isOver={isOver} canDrop={canDrop}>
         {renderDropItems()}
+        {renderDrillFilters()}
         {contextHolder}
       </StyledContainer>
     );
@@ -418,6 +445,19 @@ const StyledContainer = styled.div<{
   .draggable-element:last-child {
     margin-bottom: 0;
   }
+`;
+
+const StyledDillFilter = styled.div<{
+  type: DataViewFieldType;
+}>`
+  padding: ${SPACE_XS} ${SPACE_MD};
+  margin-bottom: ${SPACE};
+  font-size: ${FONT_SIZE_SUBTITLE};
+  color: ${p => p.theme.componentBackground};
+  cursor: move;
+  background: ${p =>
+    p.type === DataViewFieldType.NUMERIC ? p.theme.success : p.theme.info};
+  border-radius: ${BORDER_RADIUS};
 `;
 
 const DropPlaceholder = styled.p`

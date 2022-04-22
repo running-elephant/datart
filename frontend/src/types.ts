@@ -1,4 +1,4 @@
-import { WorkbenchState } from 'app/pages/ChartWorkbenchPage/slice/workbenchSlice';
+import { WorkbenchState } from 'app/pages/ChartWorkbenchPage/slice/type';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import { MemberState } from 'app/pages/MainPage/pages/MemberPage/slice/types';
@@ -12,7 +12,14 @@ import { MainState } from 'app/pages/MainPage/slice/types';
 import { SharePageState } from 'app/pages/SharePage/slice/types';
 import { StoryBoardState } from 'app/pages/StoryBoardPage/slice/types';
 import { AppState } from 'app/slice/types';
+import { CSSProp } from 'styled-components';
 import { ThemeState } from 'styles/theme/slice/types';
+
+declare module 'react' {
+  interface DOMAttributes<T> {
+    css?: CSSProp;
+  }
+}
 
 export interface RootState {
   theme?: ThemeState;

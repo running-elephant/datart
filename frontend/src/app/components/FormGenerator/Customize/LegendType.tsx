@@ -16,36 +16,49 @@
  * limitations under the License.
  */
 
-import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { CHART_LEGEND_TYPE } from 'globalConstants';
 import { FC, memo } from 'react';
-import { BW } from '../Basic/components/BasicWrapper';
+import { ItemLayout } from '../Layout';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
-const LegendType: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
-  ({ ancestors, translate: t = title => title, data: row, onChange }) => {
-    const { comType, options, ...rest } = row;
+const template = {
+  label: `viz.palette.style.legendType.title`,
+  key: 'type',
+  default: 'scroll',
+  comType: 'select',
+  options: {
+    translateItemLabel: true,
+    items: [
+      { label: 'viz.palette.style.legendType.plain', value: 'plain' },
+      { label: 'viz.palette.style.legendType.scroll', value: 'scroll' },
+    ],
+  },
+};
 
-    return (
-      <BW label={!options?.hideLabel ? t(row.label, true) : ''}>
-        <Select
-          className="datart-ant-select"
-          dropdownMatchSelectWidth
-          {...rest}
-          {...options}
-          placeholder={t('select')}
-          onChange={value => onChange?.(ancestors, value)}
-        >
-          {CHART_LEGEND_TYPE.map(o => (
-            <Select.Option key={o.value} value={o.value}>
-              {t(o.name)}
-            </Select.Option>
-          ))}
-        </Select>
-      </BW>
-    );
+const LegendType: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
+  ({
+    ancestors,
+    translate: t = title => title,
+    data,
+    dataConfigs,
+    onChange,
+  }) => {
+    const props = {
+      ancestors,
+      data: Object.assign({}, data, {
+        label: data?.label || template.label,
+        key: data?.key || template.key,
+        default: data?.default || template.default,
+        options: data?.options || template.options,
+        comType: 'select',
+      }),
+      translate: t,
+      onChange,
+      dataConfigs,
+    };
+
+    return <ItemLayout {...props} />;
   },
   itemLayoutComparer,
 );

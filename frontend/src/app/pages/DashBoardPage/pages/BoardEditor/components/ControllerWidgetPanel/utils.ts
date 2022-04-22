@@ -15,20 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import {
+  ChartDataViewFieldCategory,
+  DataViewFieldType,
+  ControllerFacadeTypes,
+  TimeFilterValueCategory,
+} from 'app/constants';
 import {
   ValueOptionType,
   ValueOptionTypes,
 } from 'app/pages/DashBoardPage/constants';
 import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
-import {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from 'app/types/ChartDataView';
-import {
-  ControllerFacadeTypes,
-  ControllerFacadeTypes as Opt,
-  TimeFilterValueCategory,
-} from 'app/types/FilterControlPanel';
 import i18next from 'i18next';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
@@ -43,13 +41,17 @@ export const getStringFacadeOptions = (type: ValueOptionType) => {
   switch (type) {
     case 'common':
       return [
-        Opt.MultiDropdownList,
-        Opt.DropdownList,
-        Opt.RadioGroup,
+        ControllerFacadeTypes.MultiDropdownList,
+        ControllerFacadeTypes.DropdownList,
+        ControllerFacadeTypes.RadioGroup,
         // Opt.Tree,
       ];
     case 'custom':
-      return [Opt.MultiDropdownList, Opt.DropdownList, Opt.RadioGroup];
+      return [
+        ControllerFacadeTypes.MultiDropdownList,
+        ControllerFacadeTypes.DropdownList,
+        ControllerFacadeTypes.RadioGroup,
+      ];
     default:
       return [];
   }
@@ -61,21 +63,21 @@ export const getNumberFacadeOptions = (
   switch (category) {
     case ChartDataViewFieldCategory.Field:
       // return [Opt.RangeValue, Opt.Slider, Opt.Value];
-      return [Opt.Slider, Opt.Value];
+      return [ControllerFacadeTypes.Slider, ControllerFacadeTypes.Value];
     case ChartDataViewFieldCategory.Variable:
-      return [Opt.Value];
+      return [ControllerFacadeTypes.Value];
     default:
-      return [Opt.Slider, Opt.Value];
+      return [ControllerFacadeTypes.Slider, ControllerFacadeTypes.Value];
   }
 };
 export const getDateFacadeOptions = (category: ChartDataViewFieldCategory) => {
   switch (category) {
     case ChartDataViewFieldCategory.Field:
-      return [Opt.RangeTime];
+      return [ControllerFacadeTypes.RangeTime];
     case ChartDataViewFieldCategory.Variable:
-      return [Opt.Time];
+      return [ControllerFacadeTypes.Time];
     default:
-      return [Opt.Time];
+      return [ControllerFacadeTypes.Time];
   }
 };
 // 展示前处理
@@ -276,12 +278,12 @@ export const filterValueTypeByControl = (
   valueType: any,
 ) => {
   if (NumericalControllerTypes.includes(controlType)) {
-    return [VariableValueTypes.Number, ChartDataViewFieldType.NUMERIC].includes(
+    return [VariableValueTypes.Number, DataViewFieldType.NUMERIC].includes(
       valueType,
     );
   }
   if (DateControllerTypes.includes(controlType)) {
-    return [VariableValueTypes.Date, ChartDataViewFieldType.DATE].includes(
+    return [VariableValueTypes.Date, DataViewFieldType.DATE].includes(
       valueType,
     );
   }

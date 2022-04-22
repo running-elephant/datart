@@ -25,8 +25,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { createSlice, isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
-import { rejectedActionMessageHandler } from 'utils/notification';
+import { createSlice } from 'utils/@reduxjs/toolkit';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import { createWidgetInfo } from '../../../utils/widget';
 import { getChartWidgetDataAsync, getControllerOptions } from './thunk';
@@ -140,10 +139,10 @@ const boardSlice = createSlice({
     },
     updateFullScreenPanel(
       state,
-      action: PayloadAction<{ recordId: string; itemId: string }>,
+      action: PayloadAction<{ boardId: string; itemId: string }>,
     ) {
-      const { recordId, itemId } = action.payload;
-      state.boardInfoRecord[recordId].fullScreenItemId = itemId;
+      const { boardId, itemId } = action.payload;
+      state.boardInfoRecord[boardId].fullScreenItemId = itemId;
     },
 
     setWidgetData(state, action: PayloadAction<WidgetData>) {
@@ -211,7 +210,10 @@ const boardSlice = createSlice({
       action: PayloadAction<{ boardId: string; wh: [number, number] }>,
     ) {
       const { boardId, wh } = action.payload;
-      state.boardInfoRecord[boardId].boardWidthHeight = wh;
+      let boardInfo = state.boardInfoRecord?.[boardId];
+      if (boardInfo) {
+        state.boardInfoRecord[boardId].boardWidthHeight = wh;
+      }
     },
     changeBoardPublish(
       state,
@@ -245,15 +247,15 @@ const boardSlice = createSlice({
       }>,
     ) {
       const { boardId, widgetId, errInfo, errorType } = action.payload;
+
       if (!state.widgetInfoRecord?.[boardId]?.[widgetId]) return;
-      let errorObj = state.widgetInfoRecord[boardId][widgetId].errInfo || {};
+      let widgetInfo = state.widgetInfoRecord[boardId][widgetId];
 
       if (errInfo) {
-        errorObj[errorType] = errInfo;
+        widgetInfo.errInfo[errorType] = errInfo;
       } else {
-        delete errorObj[errorType];
+        delete widgetInfo[errorType];
       }
-      state.widgetInfoRecord[boardId][widgetId].errInfo = errorObj;
     },
     resetControlWidgets(
       state,
@@ -309,10 +311,6 @@ const boardSlice = createSlice({
         state.widgetInfoRecord[boardId][widgetId].loading = false;
       } catch (error) {}
     });
-    builder.addMatcher(
-      isMySliceRejectedAction(boardSlice.name),
-      rejectedActionMessageHandler,
-    );
   },
 });
 export const { actions: boardActions } = boardSlice;

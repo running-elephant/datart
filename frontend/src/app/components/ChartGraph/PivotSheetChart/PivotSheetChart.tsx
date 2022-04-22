@@ -16,28 +16,29 @@
  * limitations under the License.
  */
 
+import { Data, DefaultCellTheme, Meta, SortParam, Style } from '@antv/s2';
+import { ChartDataSectionType, SortActionType } from 'app/constants';
+import ReactChart from 'app/models/ReactChart';
 import {
   ChartConfig,
-  ChartDataSectionType,
-  SortActionType,
+  ChartDataConfig,
+  ChartDataSectionField,
+  ChartStyleConfig,
 } from 'app/types/ChartConfig';
-import ChartDataSetDTO, {
-  IChartDataSet,
-  IChartDataSetRow,
-} from 'app/types/ChartDataSet';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getStyles,
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { isNumber } from 'app/utils/number';
-import groupBy from 'lodash/groupBy';
-import ReactChart from '../models/ReactChart';
+import { PIVOT_THEME_LIST } from '../../FormGenerator/Customize/PivotSheetTheme/theme';
 import AntVS2Wrapper from './AntVS2Wrapper';
 import Config from './config';
+import { AndvS2Config } from './types';
+
 class PivotSheetChart extends ReactChart {
-  static icon = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z" fill="gray"/></svg>`;
+  static icon = `<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' aria-hidden='true' role='img' width='1em' height='1em' preserveAspectRatio='xMidYMid meet' viewBox='0 0 24 24'><path d='M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z' fill='gray'/></svg>`;
 
   useIFrame = false;
   isISOContainer = 'piovt-sheet';
@@ -80,12 +81,18 @@ class PivotSheetChart extends ReactChart {
     }
   }
 
-  getOptions(context, dataset?: ChartDataSetDTO, config?: ChartConfig) {
+  getOptions(
+    context,
+    dataset?: ChartDataSetDTO,
+    config?: ChartConfig,
+  ): AndvS2Config {
     if (!dataset || !config) {
-      return {};
+      return {
+        options: {},
+      };
     }
 
-    const dataConfigs = config.datas || [];
+    const dataConfigs: ChartDataConfig[] = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
     const chartDataSet = transformToDataSet(
@@ -94,21 +101,21 @@ class PivotSheetChart extends ReactChart {
       dataConfigs,
     );
 
-    const rowSectionConfigRows = dataConfigs
+    const rowSectionConfigRows: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.GROUP)
       .filter(c => c.key === 'row')
       .flatMap(config => config.rows || []);
 
-    const columnSectionConfigRows = dataConfigs
+    const columnSectionConfigRows: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.GROUP)
       .filter(c => c.key === 'column')
       .flatMap(config => config.rows || []);
 
-    const metricsSectionConfigRows = dataConfigs
+    const metricsSectionConfigRows: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
 
-    const infoSectionConfigRows = dataConfigs
+    const infoSectionConfigRows: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.INFO)
       .flatMap(config => config.rows || []);
 
@@ -127,12 +134,31 @@ class PivotSheetChart extends ReactChart {
         'metricNameShowIn',
       ],
     );
-    const [enableTotal, totalPosition, enableSubTotal, subTotalPosition] =
-      getStyles(
-        settingConfigs,
-        ['rowSummary'],
-        ['enableTotal', 'totalPosition', 'enableSubTotal', 'subTotalPosition'],
-      );
+    const [summaryAggregation] = getStyles(
+      settingConfigs,
+      ['summaryAggregation'],
+      ['aggregation'],
+    );
+    const [
+      enableRowTotal,
+      rowTotalPosition,
+      enableRowSubTotal,
+      rowSubTotalPosition,
+    ] = getStyles(
+      settingConfigs,
+      ['rowSummary'],
+      ['enableTotal', 'totalPosition', 'enableSubTotal', 'subTotalPosition'],
+    );
+    const [
+      enableColTotal,
+      colTotalPosition,
+      enableColSubTotal,
+      colSubTotalPosition,
+    ] = getStyles(
+      settingConfigs,
+      ['colSummary'],
+      ['enableTotal', 'totalPosition', 'enableSubTotal', 'subTotalPosition'],
+    );
 
     return {
       options: {
@@ -148,16 +174,47 @@ class PivotSheetChart extends ReactChart {
         },
         totals: {
           row: {
-            showGrandTotals: Boolean(enableTotal),
-            reverseLayout: Boolean(totalPosition),
-            showSubTotals: Boolean(enableSubTotal),
-            reverseSubLayout: Boolean(subTotalPosition),
-            subTotalsDimensions: rowSectionConfigRows.map(
-              chartDataSet.getFieldKey,
-              chartDataSet,
-            )?.[0],
+            showGrandTotals: Boolean(enableRowTotal),
+            reverseLayout: Boolean(rowTotalPosition),
+            showSubTotals: Boolean(enableRowSubTotal),
+            reverseSubLayout: Boolean(rowSubTotalPosition),
+            subTotalsDimensions: [
+              rowSectionConfigRows.map(
+                chartDataSet.getFieldKey,
+                chartDataSet,
+              )?.[0],
+            ],
+            label: context.translator('summary.total'),
+            subLabel: context.translator('summary.subTotal'),
+            calcTotals: {
+              aggregation: summaryAggregation,
+            },
+          },
+          col: {
+            showGrandTotals: Boolean(enableColTotal),
+            reverseLayout: Boolean(colTotalPosition),
+            showSubTotals: Boolean(enableColSubTotal),
+            reverseSubLayout: Boolean(colSubTotalPosition),
+            subTotalsDimensions: [
+              columnSectionConfigRows.map(
+                chartDataSet.getFieldKey,
+                chartDataSet,
+              )?.[0],
+            ],
+            label: context.translator('summary.total'),
+            subLabel: context.translator('summary.subTotal'),
+            calcTotals: {
+              aggregation: summaryAggregation,
+            },
           },
         },
+        supportCSSTransform: true,
+        style: this.getRowAndColStyle(
+          styleConfigs,
+          metricsSectionConfigRows,
+          columnSectionConfigRows,
+          chartDataSet,
+        ),
       },
       dataCfg: {
         fields: {
@@ -180,18 +237,11 @@ class PivotSheetChart extends ReactChart {
             return {
               field: chartDataSet.getFieldKey(config),
               name: getColumnRenderName(config),
-              formatter: value => toFormattedValue(value, config?.format),
-            };
+              formatter: (value?: string | number) =>
+                toFormattedValue(value, config?.format),
+            } as Meta;
           }),
-        data: chartDataSet?.map(row => row.convertToObject()),
-        totalData: this.getCalcSummaryValues(
-          chartDataSet,
-          rowSectionConfigRows,
-          columnSectionConfigRows,
-          metricsSectionConfigRows,
-          enableTotal,
-          enableSubTotal,
-        ),
+        data: chartDataSet?.map(row => row.convertToObject()) as Data[],
         sortParams: this.getTableSorters(
           rowSectionConfigRows
             .concat(columnSectionConfigRows)
@@ -212,11 +262,80 @@ class PivotSheetChart extends ReactChart {
         colCell: this.getHeaderStyle(styleConfigs),
         rowCell: this.getHeaderStyle(styleConfigs),
         dataCell: this.getBodyStyle(styleConfigs),
+        background: {
+          opacity: 0,
+        },
+      },
+      palette: {
+        basicColors: this.getThemeColorList(styleConfigs),
+        semanticColors: {
+          red: '#FF4D4F',
+          green: '#29A294',
+        },
       },
     };
   }
 
-  private getTableSorters(sectionConfigRows, chartDataSet) {
+  private getThemeColorList(style: ChartStyleConfig[]): Array<string> {
+    const [basicColors] = getStyles(style, ['theme'], ['themeType']);
+    return basicColors?.colors || PIVOT_THEME_LIST[basicColors?.themeType || 0];
+  }
+
+  private getRowAndColStyle(
+    style: ChartStyleConfig[],
+    metricsSectionConfigRows: ChartDataSectionField[],
+    columnSectionConfigRows: ChartDataSectionField[],
+    chartDataSet: IChartDataSet<string>,
+  ): Partial<Style> {
+    const [bodyHeight, bodyWidth] = getStyles(
+      style,
+      ['tableBodyStyle'],
+      ['height', 'width'],
+    );
+
+    const [headerHeight, headerWidth] = getStyles(
+      style,
+      ['tableHeaderStyle'],
+      ['height', 'width'],
+    );
+    const [metricNameShowIn] = getStyles(
+      style,
+      ['style'],
+      ['metricNameShowIn'],
+    );
+
+    return {
+      colCfg: {
+        height: headerHeight || 30,
+        widthByFieldValue: metricNameShowIn
+          ? metricsSectionConfigRows.reduce((allConfig, config) => {
+              return {
+                ...allConfig,
+                [chartDataSet.getFieldKey(config)]: bodyWidth,
+              };
+            }, {})
+          : chartDataSet.reduce((dataSetAllConfig, dataSetConfig) => {
+              return {
+                ...dataSetAllConfig,
+                [dataSetConfig?.getCell(
+                  columnSectionConfigRows[columnSectionConfigRows.length - 1],
+                )]: bodyWidth,
+              };
+            }, {}),
+      },
+      rowCfg: {
+        width: headerWidth,
+      },
+      cellCfg: {
+        height: bodyHeight || 30,
+      },
+    };
+  }
+
+  private getTableSorters(
+    sectionConfigRows: ChartDataSectionField[],
+    chartDataSet: IChartDataSet<string>,
+  ): Array<SortParam> {
     return sectionConfigRows
       .map(config => {
         if (!config?.sort?.type || config?.sort?.type === SortActionType.NONE) {
@@ -233,22 +352,17 @@ class PivotSheetChart extends ReactChart {
           },
         };
       })
-      .filter(Boolean);
+      .filter(Boolean) as Array<SortParam>;
   }
 
-  private getBodyStyle(styleConfigs) {
-    const [bodyFont, oddBgColor, evenBgColor, bodyTextAlign] = getStyles(
+  private getBodyStyle(styleConfigs: ChartStyleConfig[]): DefaultCellTheme {
+    const [bodyFont, bodyTextAlign] = getStyles(
       styleConfigs,
       ['tableBodyStyle'],
-      ['font', 'oddBgColor', 'evenBgColor', 'align'],
+      ['font', 'align'],
     );
     return {
-      cell: {
-        crossBackgroundColor: evenBgColor,
-        backgroundColor: oddBgColor,
-      },
       text: {
-        fill: bodyFont?.color,
         fontFamily: bodyFont?.fontFamily,
         fontSize: bodyFont?.fontSize,
         fontWeight: bodyFont?.fontWeight,
@@ -257,110 +371,26 @@ class PivotSheetChart extends ReactChart {
     };
   }
 
-  private getHeaderStyle(styleConfigs) {
-    const [headerFont, headerBgColor, headerTextAlign] = getStyles(
+  private getHeaderStyle(styleConfigs: ChartStyleConfig[]): DefaultCellTheme {
+    const [headerFont, headerTextAlign] = getStyles(
       styleConfigs,
       ['tableHeaderStyle'],
-      ['font', 'bgColor', 'align'],
+      ['font', 'align'],
     );
     return {
-      cell: {
-        backgroundColor: headerBgColor,
-      },
       text: {
-        fill: headerFont?.color,
         fontFamily: headerFont?.fontFamily,
         fontSize: headerFont?.fontSize,
         fontWeight: headerFont?.fontWeight,
         textAlign: headerTextAlign,
       },
       bolderText: {
-        fill: headerFont?.color,
         fontFamily: headerFont?.fontFamily,
         fontSize: headerFont?.fontSize,
         fontWeight: headerFont?.fontWeight,
         textAlign: headerTextAlign,
       },
     };
-  }
-
-  private getCalcSummaryValues(
-    chartDataSet: IChartDataSet<string>,
-    rowSectionConfigRows,
-    columnSectionConfigRows,
-    metricsSectionConfigRows,
-    enableTotal,
-    enableSubTotal,
-  ) {
-    let summarys: any[] = [];
-    if (enableTotal) {
-      if (!columnSectionConfigRows.length) {
-        const rowTotals = metricsSectionConfigRows.map(c => {
-          const values = chartDataSet
-            .map(row => +row.getCell(c))
-            .filter(isNumber);
-          return {
-            [chartDataSet.getFieldKey(c)]: values?.reduce((a, b) => a + b, 0),
-          };
-        });
-        summarys.push(...rowTotals);
-      } else {
-        const rowTotals = this.calculateGroupedColumnTotal(
-          {},
-          columnSectionConfigRows.map(config =>
-            chartDataSet.getFieldKey(config),
-          ),
-          metricsSectionConfigRows,
-          chartDataSet,
-        );
-        summarys.push(...rowTotals);
-      }
-    }
-    if (enableSubTotal) {
-      const rowTotals = this.calculateGroupedColumnTotal(
-        {},
-        [rowSectionConfigRows[0]]
-          .concat(columnSectionConfigRows)
-          .map(chartDataSet.getFieldKey, chartDataSet),
-        metricsSectionConfigRows,
-        chartDataSet,
-      );
-      summarys.push(...rowTotals);
-    }
-    return summarys;
-  }
-
-  private calculateGroupedColumnTotal(
-    preObj,
-    groupKeys,
-    metrics: any[],
-    datas: Array<IChartDataSetRow<string>>,
-  ) {
-    const _groupKeys = [...(groupKeys || [])];
-    const groupKey = _groupKeys.shift();
-    const groupDataSet = groupBy(datas, row => row.getCellByKey(groupKey));
-
-    return Object.entries(groupDataSet).flatMap(([k, v]) => {
-      if (_groupKeys.length) {
-        return this.calculateGroupedColumnTotal(
-          Object.assign({}, preObj, { [groupKey]: k }),
-          _groupKeys,
-          metrics,
-          v,
-        );
-      }
-      return metrics.map(metric => {
-        const values = (v as any[])
-          .map(dc => +dc.getCell(metric))
-          .filter(isNumber);
-
-        return {
-          ...preObj,
-          [groupKey]: k,
-          [v?.[0]?.getFieldKey(metric)]: values?.reduce((a, b) => a + b, 0),
-        };
-      });
-    });
   }
 }
 

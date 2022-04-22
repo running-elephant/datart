@@ -18,10 +18,10 @@
 
 import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { FC, memo } from 'react';
-import { AssignDeep, isEmpty } from 'utils/object';
+import { FC, memo, useMemo } from 'react';
+import { isEmpty } from 'utils/object';
 import { ItemLayoutProps } from '../types';
-import { itemLayoutComparer } from '../utils';
+import { itemLayoutComparer, removeSomeObjectConfigByKey } from '../utils';
 import { BW } from './components/BasicWrapper';
 
 const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
@@ -40,10 +40,10 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       onChange?.(ancestors, value, options?.needRefresh);
     };
 
-    const getDataConfigs = () => {
-      // TODO(stephen): consider js sandbox(ES6 Proxy?) to avoid hack injection
-      return dataConfigs?.map(col => AssignDeep(col));
-    };
+    const cachedDataConfigs = useMemo(
+      () => dataConfigs?.map(col => ({ ...col })),
+      [dataConfigs],
+    );
 
     const safeInvokeAction = () => {
       let results: any[] = [];
@@ -52,18 +52,19 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           typeof row?.options?.getItems === 'function'
             ? row?.options?.getItems.call(
                 Object.create(null),
-                getDataConfigs(),
+                cachedDataConfigs,
               ) || []
             : row?.options?.items || [];
       } catch (error) {
-        console.error(
-          `VizDataColumnSelector | invoke action error ---> `,
-          error,
-        );
+        console.error(`BasicSelector | invoke action error ---> `, error);
       }
-
       return results;
     };
+
+    const newOptions = useMemo(() => {
+      const removeKeyList = ['translateItemLabel'];
+      return removeSomeObjectConfigByKey(removeKeyList, options);
+    }, [options]);
 
     return (
       <BW label={!hideLabel ? t(row.label, true) : ''}>
@@ -71,7 +72,7 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           className="datart-ant-select"
           dropdownMatchSelectWidth
           {...rest}
-          {...options}
+          {...newOptions}
           defaultValue={rest.default}
           placeholder={t('select')}
           onChange={handleSelectorValueChange}

@@ -16,17 +16,19 @@
  * limitations under the License.
  */
 import { message } from 'antd';
+import { DownloadFileType } from 'app/constants';
 import {
   DownloadTask,
   DownloadTaskState,
 } from 'app/pages/MainPage/slice/types';
 import { ExecuteToken } from 'app/pages/SharePage/slice/types';
-import ChartDataRequest, {
-  transformToViewConfig,
-} from 'app/types/ChartDataRequest';
+import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { ChartDTO } from 'app/types/ChartDTO';
-import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
+import {
+  filterSqlOperatorName,
+  transformToViewConfig,
+} from 'app/utils/internalChartHelper';
 import { saveAs } from 'file-saver';
 import { request, request2, requestWithHeader } from 'utils/request';
 import { errorHandle } from 'utils/utils';
@@ -54,18 +56,17 @@ export const getDistinctFields = async (
     ...viewConfigs,
   };
   if (executeToken) {
-    const { data } = await request<ChartDataSetDTO>({
+    const { data } = await request2<ChartDataSetDTO>({
       method: 'POST',
-      url: `share/execute`,
+      url: `shares/execute`,
       params: {
-        executeToken: executeToken?.token,
-        password: executeToken?.password,
+        executeToken: executeToken?.authorizedToken,
       },
       data: requestParams,
     });
     return filterSqlOperatorName(requestParams, data);
   } else {
-    const { data } = await request<ChartDataSetDTO>({
+    const { data } = await request2<ChartDataSetDTO>({
       method: 'POST',
       url: `data-provider/execute`,
       data: requestParams,
@@ -78,16 +79,21 @@ export const makeDownloadDataTask =
   (params: {
     downloadParams: ChartDataRequest[];
     fileName: string;
+    downloadType: DownloadFileType;
+    imageWidth?: number;
     resolve: () => void;
   }) =>
   async () => {
-    const { downloadParams, fileName, resolve } = params;
+    const { downloadParams, fileName, resolve, downloadType, imageWidth } =
+      params;
     const res = await request<{}>({
       url: `download/submit/task`,
       method: 'POST',
       data: {
         downloadParams: downloadParams,
         fileName: fileName,
+        downloadType,
+        imageWidth,
       },
     });
     if (res?.success) {
@@ -117,16 +123,16 @@ export const makeShareDownloadDataTask =
       shareToken,
     } = params;
     const { success } = await request<{}>({
-      url: `share/download`,
+      url: `shares/download`,
       method: 'POST',
       data: {
         downloadParams,
         fileName: fileName,
         executeToken,
-        password,
         shareToken,
       },
       params: {
+        password,
         clientId,
       },
     });
@@ -143,7 +149,7 @@ export async function checkComputedFieldAsync(sourceId, expression) {
     }
     return expression.replaceAll('[', '').replaceAll(']', '');
   };
-  const response = await request<boolean>({
+  const response = await request2<boolean>({
     method: 'POST',
     url: `data-provider/function/validate`,
     params: {
@@ -154,7 +160,7 @@ export async function checkComputedFieldAsync(sourceId, expression) {
   return !!response?.data;
 }
 
-export async function fetchFieldFunctionsAsync(sourceId) {
+export async function fetchAvailableSourceFunctionsAsync(sourceId) {
   const response = await request<string[]>({
     method: 'POST',
     url: `data-provider/function/support/${sourceId}`,
@@ -162,23 +168,29 @@ export async function fetchFieldFunctionsAsync(sourceId) {
   return response?.data;
 }
 
-export async function generateShareLinkAsync(
+export async function generateShareLinkAsync({
   expiryDate,
-  usePassword,
   vizId,
   vizType,
-) {
-  const response = await request<{
-    data: { password: string; token: string; usePassword: boolean };
+  authenticationMode,
+  roles,
+  users,
+  rowPermissionBy,
+}) {
+  const response = await request2<{
+    data: any;
     errCode: number;
     message: string;
     success: boolean;
   }>({
     method: 'POST',
-    url: `share`,
+    url: `shares`,
     data: {
       expiryDate: expiryDate,
-      usePassword: usePassword,
+      authenticationMode,
+      roles,
+      users,
+      rowPermissionBy,
       vizId: vizId,
       vizType,
     },
@@ -205,7 +217,7 @@ export async function downloadFile(id) {
 }
 
 export async function fetchPluginChart(path) {
-  const result = await request(path, {
+  const result = await request2(path, {
     baseURL: '/',
     headers: { Accept: 'application/javascript' },
   }).catch(error => {
@@ -215,7 +227,7 @@ export async function fetchPluginChart(path) {
 }
 
 export async function getChartPluginPaths() {
-  const response = await request<string[]>({
+  const response = await request2<string[]>({
     method: 'GET',
     url: `plugins/custom/charts`,
   });
@@ -225,7 +237,7 @@ export async function getChartPluginPaths() {
 export async function loadShareTask(params) {
   try {
     const { data } = await request2<DownloadTask[]>({
-      url: `/share/download/task`,
+      url: `/shares/download/task`,
       method: 'GET',
       params,
     });
@@ -250,10 +262,18 @@ export async function downloadShareDataChartFile(
   params: DownloadShareDashChartFileParams,
 ) {
   const [data, headers] = (await requestWithHeader({
-    url: `share/download`,
+    url: `shares/download`,
     method: 'GET',
     responseType: 'blob',
     params,
   })) as any;
   dealFileSave(data, headers);
+}
+
+export async function fetchCheckName(url, data: any) {
+  return await request2({
+    url: `/${url}/check/name`,
+    method: 'POST',
+    data: data,
+  });
 }

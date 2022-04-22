@@ -1,6 +1,7 @@
 package datart.server.service;
 
 import datart.core.entity.Role;
+import datart.core.entity.User;
 import datart.core.entity.ext.UserBaseInfo;
 import datart.core.mappers.ext.RoleMapperExt;
 import datart.security.base.ResourceType;
@@ -21,15 +22,17 @@ public interface RoleService extends BaseCRUDService<Role, RoleMapperExt> {
 
     boolean updateRolesForUser(String userId, String orgId, Set<String> roleIds);
 
-    Role createPerUserRole(String orgId, String userId);
+    Role getPerUserRole(String orgId, String userId);
 
-    List<Role> listUserRoles(String orgId,String userId);
+    User getPerUserRoleUser(String roleId);
+
+    List<Role> listUserRoles(String orgId, String userId);
 
     List<UserBaseInfo> listRoleUsers(String roleId);
 
     boolean grantPermission(List<PermissionInfo> permissionInfo);
 
-    boolean grantOrgOwner(String orgId, String userId);
+    boolean grantOrgOwner(String orgId, String userId, boolean checkPermission);
 
     boolean revokeOrgOwner(String orgId, String userId);
 

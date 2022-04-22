@@ -21,11 +21,12 @@ package datart.server.service;
 import datart.core.entity.View;
 import datart.core.mappers.ext.ViewMapperExt;
 import datart.server.base.dto.ViewDetailDTO;
+import datart.server.base.transfer.model.ViewTransferModel;
 import datart.server.base.params.ViewBaseUpdateParam;
 
 import java.util.List;
 
-public interface ViewService extends VizCRUDService<View, ViewMapperExt> {
+public interface ViewService extends VizCRUDService<View, ViewMapperExt>,ResourceTransferService<View,ViewTransferModel> {
 
     ViewDetailDTO getViewDetail(String viewId);
 

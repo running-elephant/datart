@@ -33,18 +33,20 @@
  * limitations under the License.
  */
 
-import { BoardActionContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardActionProvider';
 import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
+import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
 import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
+import { LayerList } from '../components/LayerList/LayerList';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { AutoBoardEditor } from './AutoBoardEditor';
 const AutoEditor: React.FC<{}> = () => {
-  const { onClearActiveWidgets } = useContext(BoardActionContext);
+  const { onEditClearActiveWidgets } = useContext(WidgetActionContext);
   return (
-    <Wrapper onClick={onClearActiveWidgets}>
+    <Wrapper onClick={onEditClearActiveWidgets}>
       <BoardToolBar />
       <Editor>
+        <LayerList />
         <AutoBoardEditor />
         <SlideSetting />
       </Editor>

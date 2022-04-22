@@ -16,22 +16,26 @@
  * limitations under the License.
  */
 
+import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import { ChartConfig, ChartStyleConfig } from 'app/types/ChartConfig';
 import { ChartConfigDTO, ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
   mergeChartDataConfigs,
   mergeChartStyleConfigs,
-  transformMeta,
+  transformHierarchyMeta,
 } from 'app/utils/internalChartHelper';
 import { Omit } from 'utils/object';
 
-export function convertToChartDTO(data): ChartDTO {
+export function convertToChartDto(data): ChartDTO {
+  if (data?.view?.model) {
+    data.view.model = beginViewModelMigration(data.view.model);
+  }
   return Object.assign({}, data, {
     config: JSON.parse(data?.config),
     view: {
       ...Omit(data?.view, ['model']),
-      meta: transformMeta(data?.view?.model),
+      meta: transformHierarchyMeta(data?.view?.model),
     },
   });
 }
@@ -67,9 +71,7 @@ export function buildUpdateChartRequest({
   };
 }
 
-export function extractChartConfigValueModel(
-  config: ChartConfig,
-): ChartConfigDTO {
+function extractChartConfigValueModel(config: ChartConfig): ChartConfigDTO {
   return {
     datas: config?.datas,
     styles: getStyleValueModel(config?.styles),
@@ -92,9 +94,9 @@ function getStyleValueModel(styles?: ChartStyleConfig[]) {
 export function mergeToChartConfig(
   target?: ChartConfig,
   source?: ChartDetailConfigDTO,
-): ChartConfig {
+): ChartConfig | undefined {
   if (!target) {
-    return source! as any;
+    return undefined;
   }
   if (!source) {
     return target;

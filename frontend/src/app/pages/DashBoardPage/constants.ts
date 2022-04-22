@@ -15,25 +15,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ControllerFacadeTypes } from 'app/constants';
 import {
   BackgroundConfig,
   BorderConfig,
-  strEnumType,
+  JumpTargetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
 import { PRIMARY, WHITE } from 'styles/StyleConstants';
 import { WidgetType } from './pages/Board/slice/types';
-export const RGL_DRAG_HANDLE = 'dashboard-draggableHandle';
-export const STORAGE_BOARD_KEY_PREFIX = 'DATART_BOARD_DATA_';
-export const STORAGE_IMAGE_KEY_PREFIX = 'DATART_IMAGE_';
+export const WIDGET_DRAG_HANDLE = 'widget-draggableHandle';
+export const BOARD_FILE_IMG_PREFIX = 'resources/image/dashboard/';
 export const BASE_VIEW_WIDTH = 1024;
 export const BASE_ROW_HEIGHT = 32;
 export const MIN_ROW_HEIGHT = 24;
 export const MIN_MARGIN = 8;
 export const MIN_PADDING = 8;
-/** lg: 12,md: 12,sm: 8,xs: 2,xxs: 2 */
+export const LAYOUT_COLS_KEYS = ['lg', 'md', 'sm', 'xs', 'xxs'] as const;
 export const LAYOUT_COLS_MAP = {
   lg: 12,
   md: 12,
@@ -50,6 +49,7 @@ export const BREAK_POINT_MAP = {
   xs: 480,
   xxs: 0,
 };
+
 export const INIT_COLS = 12;
 export const DEVICE_LIST = {
   '华为 Mate 30': [360, 780],
@@ -100,60 +100,48 @@ export const ButtonBorderDefault: BorderConfig = {
   width: 0,
 };
 
-export const CanDropToWidgetTypes: WidgetType[] = ['chart', 'media'];
-export const CanFullScreenWidgetTypes: WidgetType[] = ['chart', 'media'];
+export const CanDropToWidgetTypes: readonly WidgetType[] = ['chart', 'media'];
+export const CanFullScreenWidgetTypes: readonly Partial<WidgetType>[] = [
+  'chart',
+  'media',
+  'container',
+];
 
 export const CONTAINER_TAB = 'containerTab';
 
 //
-export const NeedFetchWidgetTypes: WidgetType[] = ['chart', 'controller'];
+export const NeedFetchWidgetTypes: readonly WidgetType[] = [
+  'chart',
+  'controller',
+];
 
 // setting
 
-export const TEXT_ALIGN_ENUM = strEnumType(['left', 'center', 'right']);
-export type TextAlignType = keyof typeof TEXT_ALIGN_ENUM;
+export const TEXT_ALIGNS = ['left', 'center', 'right'] as const;
+export type TextAlignType = typeof TEXT_ALIGNS[number];
 
-export const BORDER_STYLE_ENUM = strEnumType([
+export const BORDER_STYLES = [
   'none',
   'solid',
   'dashed',
   'dotted',
   'double',
   'hidden',
-  'ridge',
   'groove',
+  'ridge',
   'inset',
   'outset',
-]);
-export type BorderStyleType = keyof typeof BORDER_STYLE_ENUM;
+] as const;
+export type BorderStyleType = typeof BORDER_STYLES[number];
 
-export const BORDER_STYLE_OPTIONS = [
-  { value: BORDER_STYLE_ENUM.none },
-  { value: BORDER_STYLE_ENUM.solid },
-  { value: BORDER_STYLE_ENUM.dashed },
-  { value: BORDER_STYLE_ENUM.dotted },
-  { value: BORDER_STYLE_ENUM.double },
-  { value: BORDER_STYLE_ENUM.hidden },
-  { value: BORDER_STYLE_ENUM.groove },
-  { value: BORDER_STYLE_ENUM.ridge },
-  { value: BORDER_STYLE_ENUM.inset },
-  { value: BORDER_STYLE_ENUM.outset },
-];
-
-export const SCALE_MODE_ENUM = strEnumType([
+export const SCALE_MODES = [
   'scaleWidth',
   'scaleHeight',
   'scaleFull',
   'noScale',
-]);
+] as const;
 
-export type ScaleModeType = keyof typeof SCALE_MODE_ENUM;
-export const SCALE_MODE__OPTIONS = [
-  { value: SCALE_MODE_ENUM.scaleWidth },
-  { value: SCALE_MODE_ENUM.scaleHeight },
-  { value: SCALE_MODE_ENUM.scaleFull },
-  { value: SCALE_MODE_ENUM.noScale },
-];
+export type ScaleModeType = typeof SCALE_MODES[number];
 
 export const enum ValueOptionTypes {
   Common = 'common',
@@ -207,6 +195,9 @@ export const ALL_SQL_OPERATOR_OPTIONS = [
 
   getOperatorItem(FilterSqlOperator.Null),
   getOperatorItem(FilterSqlOperator.NotNull),
+
+  getOperatorItem(FilterSqlOperator.Contain),
+  getOperatorItem(FilterSqlOperator.NotContain),
 
   getOperatorItem(FilterSqlOperator.PrefixContain),
   getOperatorItem(FilterSqlOperator.NotPrefixContain),
@@ -276,8 +267,8 @@ export const SQL_OPERATOR_OPTIONS_TYPES = {
 };
 
 export const WIDGET_TITLE_ALIGN_OPTIONS = [
-  { name: '左', value: TEXT_ALIGN_ENUM.left },
-  { name: '中', value: TEXT_ALIGN_ENUM.center },
+  { name: '左', value: TEXT_ALIGNS[0] },
+  { name: '中', value: TEXT_ALIGNS[1] },
 ];
 
 export const DefaultWidgetData = {
@@ -285,3 +276,8 @@ export const DefaultWidgetData = {
   columns: [],
   rows: [],
 };
+
+export const jumpTypes: { name: string; value: JumpTargetType }[] = [
+  { value: 'INTERNAL', name: '' },
+  { value: 'URL', name: '' },
+];

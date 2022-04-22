@@ -17,10 +17,11 @@
  */
 import { LinkOutlined } from '@ant-design/icons';
 import { Divider, Empty, Form, FormInstance, Select } from 'antd';
+import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
-import ChartDataView, { ChartDataViewFieldType } from 'app/types/ChartDataView';
+import ChartDataView from 'app/types/ChartDataView';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 const { Option } = Select;
@@ -66,8 +67,8 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
           return viewMap[viewLinkages[index][key]].meta
             ?.filter(item => {
               const enableTypes = [
-                ChartDataViewFieldType.STRING,
-                ChartDataViewFieldType.DATE,
+                DataViewFieldType.STRING,
+                DataViewFieldType.DATE,
               ];
               return item.type && enableTypes.includes(item.type);
             })
@@ -105,7 +106,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
       [form, viewMap],
     );
     return (
-      <Wrap>
+      <Wrapper>
         <Divider orientation="left">{t('associatedFields')}</Divider>
 
         <div>
@@ -182,11 +183,11 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
             );
           }}
         </Form.List>
-      </Wrap>
+      </Wrapper>
     );
   },
 );
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: block;
   min-height: 150px;
   overflow-y: auto;

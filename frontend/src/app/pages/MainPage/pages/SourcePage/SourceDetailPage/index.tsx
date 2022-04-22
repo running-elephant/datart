@@ -26,6 +26,7 @@ import {
   PermissionLevels,
   ResourceTypes,
 } from 'app/pages/MainPage/pages/PermissionPage/constants';
+import { fetchCheckName } from 'app/utils/fetch';
 import debounce from 'debounce-promise';
 import {
   CommonFormTypes,
@@ -73,6 +74,7 @@ import {
 import { Source, SourceFormModel } from '../slice/types';
 import { allowCreateSource, allowManageSource } from '../utils';
 import { ConfigComponent } from './ConfigComponent';
+
 export function SourceDetailPage() {
   const [formType, setFormType] = useState(CommonFormTypes.Add);
   const [providerType, setProviderType] = useState('');
@@ -442,15 +444,13 @@ export function SourceDetailPage() {
                       if (value === editingSource?.name) {
                         return Promise.resolve();
                       }
-                      return request({
-                        url: `/sources/check/name`,
-                        method: 'POST',
-                        data: { name: value, orgId },
-                      }).then(
-                        () => Promise.resolve(),
-                        err =>
-                          Promise.reject(new Error(err.response.data.message)),
-                      );
+                      if (!value.trim()) {
+                        return Promise.reject(
+                          `${t('form.name')}${tg('validation.required')}`,
+                        );
+                      }
+                      const data = { name: value, orgId };
+                      return fetchCheckName('sources', data);
                     }, DEFAULT_DEBOUNCE_WAIT),
                   },
                 ]}

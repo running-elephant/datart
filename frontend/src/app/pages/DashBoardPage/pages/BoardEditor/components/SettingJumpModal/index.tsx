@@ -2,6 +2,7 @@ import { Form, Input, Modal, ModalProps, Select } from 'antd';
 import useGetVizIcon from 'app/hooks/useGetVizIcon';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
+import { jumpTypes } from 'app/pages/DashBoardPage/constants';
 import { selectDataChartById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getChartGroupColumns } from 'app/pages/DashBoardPage/utils';
@@ -19,7 +20,6 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { editBoardStackActions, editDashBoardInfoActions } from '../../slice';
 import { selectJumpPanel, selectSortAllWidgets } from '../../slice/selectors';
-import { jumpTypes } from './config';
 import { SelectJumpFields } from './FieldsSelect';
 import { FilterSelect } from './FilterSelect';
 import { fetchGlobalControllerOptions } from './service';
@@ -95,7 +95,7 @@ export const SettingJumpModal: FC<SettingJumpModalProps> = ({
   );
   const [targetType, setTargetType] = useState(jumpTypes[0].value);
   const chartGroupColumns = useMemo(
-    () => getChartGroupColumns(dataChart),
+    () => getChartGroupColumns(dataChart?.config?.chartConfig?.datas),
     [dataChart],
   );
   const onTargetChange = useCallback(

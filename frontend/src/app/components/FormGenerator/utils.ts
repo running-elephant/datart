@@ -20,7 +20,7 @@ import { ChartStyleSectionRow } from 'app/types/ChartConfig';
 import { pickValues } from 'utils/object';
 import { FormGeneratorLayoutProps, ItemLayoutProps } from './types';
 
-export const getSafeStyleProps = (
+const getSafeStyleProps = (
   o: Partial<ChartStyleSectionRow>,
   permitProps: string[],
 ) => {
@@ -67,4 +67,23 @@ export function groupLayoutComparer<T>(
     return false;
   }
   return itemLayoutComparer(prevProps, nextProps);
+}
+
+export function removeSomeObjectConfigByKey(
+  removeKeyList: string[],
+  obj?: object,
+) {
+  return (
+    obj &&
+    Object.keys(obj).reduce((data, key) => {
+      if (removeKeyList.includes(key)) {
+        return data;
+      } else {
+        return {
+          ...data,
+          key: obj?.[key],
+        };
+      }
+    }, {})
+  );
 }

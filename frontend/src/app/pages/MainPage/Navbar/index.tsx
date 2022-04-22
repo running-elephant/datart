@@ -32,6 +32,7 @@ import {
 import { List, Menu, Tooltip } from 'antd';
 import logo from 'app/assets/images/logo.svg';
 import { Avatar, MenuListItem, Popup } from 'app/components';
+import { TenantManagementMode } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   selectCurrentOrganization,
@@ -40,7 +41,7 @@ import {
   selectOrgId,
 } from 'app/pages/MainPage/slice/selectors';
 import { getOrganizations } from 'app/pages/MainPage/slice/thunks';
-import { selectLoggedInUser } from 'app/slice/selectors';
+import { selectLoggedInUser, selectSystemInfo } from 'app/slice/selectors';
 import { logout } from 'app/slice/thunks';
 import { downloadFile } from 'app/utils/fetch';
 import { BASE_RESOURCE_URL } from 'globalConstants';
@@ -55,7 +56,7 @@ import {
   BORDER_RADIUS,
   FONT_SIZE_ICON_SM,
   FONT_WEIGHT_MEDIUM,
-  NAV_LEVEL,
+  LEVEL_10,
   SPACE_LG,
   SPACE_MD,
   SPACE_TIMES,
@@ -84,6 +85,8 @@ export function Navbar() {
   const [modifyPasswordVisible, setModifyPasswordVisible] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
+  const { i18n } = useTranslation();
+  const systemInfo = useSelector(selectSystemInfo);
   const orgId = useSelector(selectOrgId);
   const currentOrganization = useSelector(selectCurrentOrganization);
   const loggedInUser = useSelector(selectLoggedInUser);
@@ -93,7 +96,7 @@ export function Navbar() {
   const matchModules = useRouteMatch<{ moduleName: string }>(
     '/organizations/:orgId/:moduleName',
   );
-  const { i18n } = useTranslation();
+
   const t = useI18NPrefix('main');
   const brandClick = useCallback(() => {
     history.push('/');
@@ -227,7 +230,9 @@ export function Navbar() {
           break;
         case 'zh':
         case 'en':
-          changeLang(key);
+          if (i18n.language !== key) {
+            changeLang(key);
+          }
           break;
         case 'dark':
         case 'light':
@@ -237,7 +242,7 @@ export function Navbar() {
           break;
       }
     },
-    [dispatch, history, handleChangeThemeFn],
+    [dispatch, history, i18n, handleChangeThemeFn],
   );
 
   const onSetPolling = useCallback(
@@ -290,22 +295,25 @@ export function Navbar() {
               }
             }}
           />
-          <Popup
-            content={<OrganizationList />}
-            trigger={['click']}
-            placement="rightBottom"
-            onVisibleChange={organizationListVisibleChange}
-          >
-            <li>
-              <Tooltip title={t('nav.organization.title')} placement="right">
-                <Avatar
-                  src={`${BASE_RESOURCE_URL}${currentOrganization?.avatar}`}
-                >
-                  <BankFilled />
-                </Avatar>
-              </Tooltip>
-            </li>
-          </Popup>
+          {systemInfo?.tenantManagementMode ===
+            TenantManagementMode.Platform && (
+            <Popup
+              content={<OrganizationList />}
+              trigger={['click']}
+              placement="rightBottom"
+              onVisibleChange={organizationListVisibleChange}
+            >
+              <li>
+                <Tooltip title={t('nav.organization.title')} placement="right">
+                  <Avatar
+                    src={`${BASE_RESOURCE_URL}${currentOrganization?.avatar}`}
+                  >
+                    <BankFilled />
+                  </Avatar>
+                </Tooltip>
+              </li>
+            </Popup>
+          )}
           <Popup
             content={
               <Menu
@@ -397,7 +405,7 @@ export function Navbar() {
 }
 
 const MainNav = styled.div`
-  z-index: ${NAV_LEVEL};
+  z-index: ${LEVEL_10};
   display: flex;
   flex-direction: column;
   flex-shrink: 0;

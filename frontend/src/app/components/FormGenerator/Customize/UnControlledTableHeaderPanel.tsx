@@ -25,11 +25,8 @@ import {
   RedoOutlined,
 } from '@ant-design/icons';
 import { Button, Col, Input, Row, Space, Table } from 'antd';
-import {
-  ChartDataConfig,
-  ChartDataSectionType,
-  ChartStyleConfig,
-} from 'app/types/ChartConfig';
+import { ChartDataSectionType } from 'app/constants';
+import { ChartDataConfig, ChartStyleConfig } from 'app/types/ChartConfig';
 import {
   getColumnRenderName,
   getUnusedHeaderRows,
@@ -38,24 +35,11 @@ import { DATARTSEPERATOR } from 'globalConstants';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components';
 import { CloneValueDeep } from 'utils/object';
+import { TableColumnsList } from '../../ChartGraph/BasicTableChart/types';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
 
 const { Search } = Input;
-
-interface RowValue {
-  uid?: string;
-  colName: string;
-  isGroup?: boolean;
-  label?: string;
-  aggregate?: string;
-  style?: {
-    backgroundColor?: string;
-    font?: {};
-    align?: string;
-  };
-  children?: RowValue[];
-}
 
 const getFlattenHeaders = (dataConfigs: ChartDataConfig[] = []) => {
   const newDataConfigs = CloneValueDeep(dataConfigs);
@@ -80,9 +64,11 @@ const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
     }) => {
       const [selectedRowUids, setSelectedRowUids] = useState<string[]>([]);
       const [myData, setMyData] = useState(() => CloneValueDeep(data));
-      const [tableDataSource, setTableDataSource] = useState<RowValue[]>(() => {
+      const [tableDataSource, setTableDataSource] = useState<
+        TableColumnsList[]
+      >(() => {
         const originalFlattenHeaderRows = getFlattenHeaders(dataConfigs);
-        const currentHeaderRows: RowValue[] = myData?.value || [];
+        const currentHeaderRows: TableColumnsList[] = myData?.value || [];
         const unusedHeaderRows = getUnusedHeaderRows(
           originalFlattenHeaderRows || [],
           currentHeaderRows,
@@ -176,7 +162,10 @@ const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
         }
       };
 
-      const mergeBrotherRows = (mergeKeys: string[], rows: RowValue[]) => {
+      const mergeBrotherRows = (
+        mergeKeys: string[],
+        rows: TableColumnsList[],
+      ) => {
         const selectedRows = rows.filter(r => mergeKeys.includes(r.uid!));
         const restRows = rows.filter(r => !mergeKeys.includes(r.uid!));
         const insertIndex = rows.findIndex(r => r.uid === mergeKeys[0]);
@@ -255,7 +244,7 @@ const UnControlledTableHeaderPanel: FC<ItemLayoutProps<ChartStyleConfig>> =
         handleConfigChange([...tableDataSource]);
       };
 
-      const handleConfigChange = (dataSource: RowValue[]) => {
+      const handleConfigChange = (dataSource: TableColumnsList[]) => {
         myData.value = dataSource;
         setTableDataSource(dataSource);
         setMyData(myData);

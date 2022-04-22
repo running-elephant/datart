@@ -23,15 +23,20 @@ import org.apache.calcite.sql.SqlWriter;
 import org.apache.calcite.sql.dialect.OracleSqlDialect;
 
 import java.util.EnumSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import static datart.core.data.provider.StdSqlOperator.*;
 
 public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements SqlStdOperatorSupport {
 
+    static ConcurrentSkipListSet<StdSqlOperator> OWN_SUPPORTED = new ConcurrentSkipListSet<>(
+            EnumSet.of(STDDEV, ABS, CEILING, FLOOR, POWER, ROUND, SQRT, EXP, LOG10, RAND, DEGREES, RADIANS,
+            SIGN, ACOS, ASIN, ATAN, ATAN2, SIN, COS, TAN, COT, LENGTH, CONCAT, REPLACE, SUBSTRING, LOWER, UPPER, LTRIM, RTRIM, TRIM,
+            NOW, AGG_DATE_YEAR, AGG_DATE_QUARTER, AGG_DATE_MONTH, AGG_DATE_WEEK, AGG_DATE_DAY));
+
     static {
-        SUPPORTED.addAll(EnumSet.of(STDDEV, ABS, CEILING, FLOOR, POWER, ROUND, SQRT, EXP, LOG10, RAND, DEGREES, RADIANS,
-                SIGN, ACOS, ASIN, ATAN, ATAN2, SIN, COS, TAN, COT, LENGTH, CONCAT, REPLACE, SUBSTRING, LOWER, UPPER, LTRIM, RTRIM, TRIM,
-                NOW));
+        OWN_SUPPORTED.addAll(SUPPORTED);
     }
 
     public OracleSqlStdOperatorSupport() {
@@ -49,10 +54,8 @@ public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements Sql
 
     @Override
     public void unparseCall(SqlWriter writer, SqlCall call, int leftPrec, int rightPrec) {
-        if (isStdSqlOperator(call)) {
-            if (unparseStdSqlOperator(writer, call, leftPrec, rightPrec)) {
-                return;
-            }
+        if (isStdSqlOperator(call) && unparseStdSqlOperator(writer, call, leftPrec, rightPrec)) {
+            return;
         }
         super.unparseCall(writer, call, leftPrec, rightPrec);
     }
@@ -61,13 +64,28 @@ public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements Sql
     public boolean unparseStdSqlOperator(SqlWriter writer, SqlCall call, int leftPrec, int rightPrec) {
         StdSqlOperator operator = symbolOf(call.getOperator().getName());
         switch (operator) {
-            case NOW: //
-                break;
+            case NOW:
+                writer.print("SYSDATE");
+                return true;
+            case AGG_DATE_YEAR:
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY')");
+                return true;
+            case AGG_DATE_QUARTER:
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY-Q')");
+                return true;
+            case AGG_DATE_MONTH:
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY-MM')");
+                return true;
+            case AGG_DATE_WEEK:
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'IYYY-IW')");
+                return true;
+            case AGG_DATE_DAY:
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY-MM-DD')");
+                return true;
             default:
-                return false;
+                break;
         }
-        super.unparseCall(writer, call, leftPrec, rightPrec);
-        return true;
+        return false;
     }
 
     @Override
@@ -75,6 +93,11 @@ public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements Sql
         buf.append(literalQuoteString);
         buf.append(val.replace(literalEndQuoteString, literalEscapedQuote));
         buf.append(literalEndQuoteString);
+    }
+
+    @Override
+    public Set<StdSqlOperator> supportedOperators() {
+        return OWN_SUPPORTED;
     }
 
 }

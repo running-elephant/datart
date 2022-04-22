@@ -71,15 +71,16 @@ export const getPageContentDetail = createAsyncThunk<
     relId: string;
     relType: StoryPageRelType;
     vizToken?: ExecuteToken;
+    shareToken?: string;
   }
 >(
   'storyBoard/getPageContentDetail',
-  async ({ relId, relType, vizToken }, { getState, dispatch }) => {
+  async ({ relId, relType, vizToken, shareToken }, { getState, dispatch }) => {
     if (!relId) {
       return null;
     }
     if (relType === 'DASHBOARD') {
-      dispatch(getBoardDetail({ dashboardRelId: relId, vizToken }));
+      dispatch(getBoardDetail({ dashboardRelId: relId, vizToken, shareToken }));
     }
     if (relType === 'DATACHART') {
       // TODO

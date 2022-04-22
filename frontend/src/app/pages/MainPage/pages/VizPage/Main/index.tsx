@@ -3,7 +3,7 @@ import { EmptyFiller, TabPane, Tabs } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import BoardEditor from 'app/pages/DashBoardPage/pages/BoardEditor';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
-import { StoryPlayer } from 'app/pages/StoryBoardPage/Player';
+import { dispatchResize } from 'app/utils/dispatchResize';
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -14,7 +14,7 @@ import {
   useRouteMatch,
 } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { STICKY_LEVEL } from 'styles/StyleConstants';
+import { LEVEL_1 } from 'styles/StyleConstants';
 import { useVizSlice } from '../slice';
 import {
   selectArchivedDashboards,
@@ -121,6 +121,9 @@ export function Main({ sliderVisible }: { sliderVisible: boolean }) {
           `/organizations/${orgId}/vizs/${activeKey}${activeTab.search || ''}`,
         );
       }
+      setTimeout(() => {
+        dispatchResize();
+      }, 500);
     },
     [history, orgId, tabs],
   );
@@ -191,10 +194,6 @@ export function Main({ sliderVisible }: { sliderVisible: boolean }) {
 
       <Switch>
         <Route
-          path="/organizations/:orgId/vizs/:vizId?/storyPlay"
-          render={() => <StoryPlayer storyId={vizId} />}
-        />
-        <Route
           path="/organizations/:orgId/vizs/:vizId?/boardEditor"
           render={() => <BoardEditor boardId={vizId} />}
         />
@@ -217,7 +216,7 @@ const Wrapper = styled.div`
 `;
 
 const TabsWrapper = styled.div`
-  z-index: ${STICKY_LEVEL};
+  z-index: ${LEVEL_1};
   flex-shrink: 0;
 `;
 

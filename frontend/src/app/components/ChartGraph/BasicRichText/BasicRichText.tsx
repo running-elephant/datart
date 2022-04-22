@@ -16,7 +16,9 @@
  * limitations under the License.
  */
 
-import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import { ChartDataSectionType } from 'app/constants';
+import ReactChart from 'app/models/ReactChart';
+import { ChartConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
@@ -24,7 +26,6 @@ import {
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import ReactChart from '../models/ReactChart';
 import ChartRichTextAdapter from './ChartRichTextAdapter';
 import Config from './config';
 
@@ -126,7 +127,10 @@ class BasicRichText extends ReactChart {
     };
   }
 
-  getDataListValue(config, chartDataSet: IChartDataSet<string>) {
+  getDataListValue(
+    config: ChartDataSectionField,
+    chartDataSet: IChartDataSet<string>,
+  ): string {
     const value = chartDataSet.map(dc =>
       toFormattedValue(dc.getCell(config), config.format),
     )[0];
@@ -136,7 +140,7 @@ class BasicRichText extends ReactChart {
     return '';
   }
 
-  getOnChange(): any {
+  getOnChange(): { [key: string]: any } | undefined {
     return this.mouseEvents?.reduce((acc, cur) => {
       if (cur.name === 'click') {
         Object.assign(acc, {

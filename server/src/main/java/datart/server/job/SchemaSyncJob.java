@@ -20,21 +20,27 @@ package datart.server.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import datart.core.common.Application;
+import datart.core.common.TransactionHelper;
 import datart.core.common.UUIDGenerator;
 import datart.core.data.provider.SchemaItem;
 import datart.core.data.provider.TableInfo;
+import datart.core.entity.Source;
 import datart.core.entity.SourceSchemas;
 import datart.core.mappers.ext.SourceSchemasMapperExt;
 import datart.server.service.DataProviderService;
+import datart.server.service.SourceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import org.quartz.*;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 public class SchemaSyncJob implements Job, Closeable {
@@ -51,6 +57,18 @@ public class SchemaSyncJob implements Job, Closeable {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         String sourceId = (String) context.getMergedJobDataMap().get(SOURCE_ID);
         try {
+            Source source = null;
+            try {
+                source = Application.getBean(SourceService.class).retrieve(sourceId);
+            } catch (Exception ignored) {
+            }
+            // remove job if source not exists
+            if (source == null) {
+                JobKey key = context.getJobDetail().getKey();
+                Application.getBean(Scheduler.class).deleteJob(key);
+                log.warn("source {} not exists , the job has been deleted ", sourceId);
+                return;
+            }
             execute(sourceId);
         } catch (Exception e) {
             log.error("source schema sync error ", e);
@@ -82,6 +100,7 @@ public class SchemaSyncJob implements Job, Closeable {
     }
 
     private boolean upsertSchemaInfo(String sourceId, List<SchemaItem> schemaItems) {
+        TransactionStatus transaction = TransactionHelper.getTransaction(TransactionDefinition.PROPAGATION_REQUIRES_NEW, TransactionDefinition.ISOLATION_REPEATABLE_READ);
         try {
             SourceSchemasMapperExt mapper = Application.getBean(SourceSchemasMapperExt.class);
             SourceSchemas sourceSchemas = mapper.selectBySource(sourceId);
@@ -97,12 +116,13 @@ public class SchemaSyncJob implements Job, Closeable {
                 sourceSchemas.setSchemas(OBJECT_MAPPER.writeValueAsString(schemaItems));
                 mapper.updateByPrimaryKey(sourceSchemas);
             }
+            TransactionHelper.commit(transaction);
             return true;
         } catch (Exception e) {
+            TransactionHelper.rollback(transaction);
             log.error("source schema parse error ", e);
             return false;
         }
     }
-
 
 }

@@ -145,7 +145,10 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
             providerSource.setSourceId(source.getId());
             providerSource.setType(source.getType());
             providerSource.setName(source.getName());
-            Map<String, Object> properties = objectMapper.readValue(source.getConfig(), HashMap.class);
+            Map<String, Object> properties = new HashMap<>();
+            if (StringUtils.isNotBlank(source.getConfig())) {
+                properties = objectMapper.readValue(source.getConfig(), HashMap.class);
+            }
             // decrypt values
             for (String key : properties.keySet()) {
                 Object val = properties.get(key);
@@ -205,12 +208,17 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
     @Override
     public Dataframe execute(ViewExecuteParam viewExecuteParam) throws Exception {
+        return execute(viewExecuteParam, true);
+    }
+
+    @Override
+    public Dataframe execute(ViewExecuteParam viewExecuteParam, boolean checkViewPermission) throws Exception {
         if (viewExecuteParam.isEmpty()) {
             return Dataframe.empty();
         }
 
         //datasource and view
-        View view = retrieve(viewExecuteParam.getViewId(), View.class, true);
+        View view = retrieve(viewExecuteParam.getViewId(), View.class, checkViewPermission);
         Source source = retrieve(view.getSourceId(), Source.class, false);
         DataProviderSource providerSource = parseDataProviderConfig(source);
 
@@ -298,8 +306,8 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
     }
 
     @Override
-    public void updateSource(DataProviderSource source) {
-        dataProviderManager.updateSource(source);
+    public void updateSource(Source source) {
+        dataProviderManager.updateSource(parseDataProviderConfig(source));
     }
 
     private void disablePermissionVariables(List<ScriptVariable> variables) {

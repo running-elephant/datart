@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Form, Modal } from 'antd';
+import { Form, FormInstance, Modal } from 'antd';
 import { useRef } from 'react';
 import { isPromise } from 'utils/object';
 
@@ -102,6 +102,7 @@ function useStateModal({ initState }: { initState?: any }) {
     title: string;
     content: (
       cacheOnChangeValue: typeof handleSaveCacheValue,
+      form?: FormInstance<any>,
     ) => React.ReactElement<IStateModalContentProps>;
     bodyStyle?: React.CSSProperties;
     modalSize?: string | number | StateModalSize;
@@ -111,7 +112,7 @@ function useStateModal({ initState }: { initState?: any }) {
     okCallbackRef.current = props.onOk;
     cancelCallbackRef.current = props.onCancel;
 
-    // Note: should distory old modal and form effects in order to render new content
+    // Note: should destroy old modal and form effects in order to render new content
     Modal.destroyAll();
     form?.resetFields();
 
@@ -120,7 +121,7 @@ function useStateModal({ initState }: { initState?: any }) {
       width: getModalSize(props?.modalSize),
       bodyStyle: props.bodyStyle || defaultBodyStyle,
       content: FormWrapper(
-        props?.content?.call(Object.create(null), handleSaveCacheValue),
+        props?.content?.call(Object.create(null), handleSaveCacheValue, form),
       ),
       onOk: handleClickOKButton,
       onCancel: handleClickCancelButton,

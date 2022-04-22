@@ -19,6 +19,7 @@ package datart.server.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import datart.core.base.consts.Const;
+import datart.core.base.consts.FileOwner;
 import datart.core.base.consts.VariableTypeEnum;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.UUIDGenerator;
@@ -27,15 +28,21 @@ import datart.security.base.ResourceType;
 import datart.server.base.dto.*;
 import datart.server.base.dto.chart.WidgetConfig;
 import datart.server.base.params.*;
+import datart.server.base.transfer.ImportStrategy;
+import datart.server.base.transfer.TransferConfig;
+import datart.server.base.transfer.model.DashboardTransferModel;
+import datart.server.base.transfer.model.DatachartTransferModel;
+import datart.server.base.transfer.model.ResourceTransferModel;
 import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,12 +67,16 @@ public class VizServiceImpl extends BaseService implements VizService {
 
     private final VariableService variableService;
 
+    private final FileService fileService;
+
     public VizServiceImpl(DatachartService datachartService,
                           DashboardService dashboardService,
                           StoryboardService storyboardService,
                           StorypageService storypageService,
                           FolderService folderService,
-                          ViewService viewService, VariableService variableService) {
+                          ViewService viewService,
+                          VariableService variableService,
+                          FileService fileService) {
         this.datachartService = datachartService;
         this.dashboardService = dashboardService;
         this.storyboardService = storyboardService;
@@ -73,6 +84,7 @@ public class VizServiceImpl extends BaseService implements VizService {
         this.folderService = folderService;
         this.viewService = viewService;
         this.variableService = variableService;
+        this.fileService = fileService;
     }
 
     @Override
@@ -241,25 +253,68 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
-    public String getChartConfigByVizId(String vizId, String vizType) {
+    public String getChartConfigByVizId(ResourceType resourceType, String vizId) {
         String result = "";
         try {
-            if (StringUtils.isNotBlank(vizId)) {
-                switch (vizType) {
-                    case "dataChart":
-                        return retrieve(vizId, Datachart.class).getConfig();
-                    case "widget":
-                        String config = retrieve(vizId, Widget.class).getConfig();
-                        WidgetConfig widgetConfig = JSON.parseObject(config, WidgetConfig.class);
-                        return  widgetConfig.getChartConfig();
-                    default:
-                        return result;
-                }
+            switch (resourceType) {
+                case DATACHART:
+                    return retrieve(vizId, Datachart.class).getConfig();
+                case WIDGET:
+                    String config = retrieve(vizId, Widget.class).getConfig();
+                    WidgetConfig widgetConfig = JSON.parseObject(config, WidgetConfig.class);
+                    return widgetConfig.getChartConfig();
+                default:
+                    return result;
             }
         } catch (Exception e) {
-            log.warn("query chart("+vizId+") config fail, download with none style.");
+            log.warn("query chart(" + vizId + ") config fail, download with none style.");
         }
         return result;
+    }
+
+    @Override
+    public ResourceTransferModel exportViz(ResourceType vizType, boolean onlyViz, String... vizIds) throws IOException {
+        TransferConfig transferConfig = TransferConfig.builder().withParents(true)
+                .onlyMainModel(onlyViz)
+                .build();
+        switch (vizType) {
+            case DATACHART:
+//                return datachartService.export(vizId, true);
+            case DASHBOARD:
+                return dashboardService.exportResource(transferConfig, vizIds);
+            default:
+                Exceptions.msg("unsupported viz type " + vizType);
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional
+    public boolean importViz(MultipartFile file, ImportStrategy importStrategy, String orgId) throws IOException {
+        ResourceTransferModel model = null;
+        try {
+            model = extractModel(file);
+        } catch (Exception e) {
+            log.error("viz model extract error ", e);
+        }
+        if (model == null) {
+            Exceptions.msg("message.viz.import.invalid");
+        }
+        Organization organization = null;
+        try {
+            // TODO  暂时不支持同库迁移
+            organization = retrieve(model.getOrgId(), Organization.class);
+        } catch (Exception ignore) {
+        }
+        if (organization != null) {
+            Exceptions.msg("Current version does not support migration on the same database");
+        }
+        if (model instanceof DashboardTransferModel) {
+            dashboardService.importResource((DashboardTransferModel) model, importStrategy, orgId, null);
+        } else if (model instanceof DatachartTransferModel) {
+            datachartService.importResource((DatachartTransferModel) model, importStrategy, orgId, null);
+        }
+        return true;
     }
 
     @Override
@@ -398,4 +453,13 @@ public class VizServiceImpl extends BaseService implements VizService {
         folderService.getDefaultMapper().insert(folder);
     }
 
+    private String getExportFile(String name) {
+        return fileService.getBasePath(FileOwner.EXPORT, null) + "/" + name + "-" + System.currentTimeMillis() + ".viz";
+    }
+
+    public ResourceTransferModel extractModel(MultipartFile file) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream inputStream = new ObjectInputStream(file.getInputStream());) {
+            return (ResourceTransferModel) inputStream.readObject();
+        }
+    }
 }

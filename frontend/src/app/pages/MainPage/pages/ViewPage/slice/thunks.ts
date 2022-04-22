@@ -25,7 +25,7 @@ import i18n from 'i18next';
 import { monaco } from 'react-monaco-editor';
 import { RootState } from 'types';
 import { request, request2 } from 'utils/request';
-import { errorHandle, rejectHandle } from 'utils/utils';
+import { errorHandle, getErrorMessage, rejectHandle } from 'utils/utils';
 import { viewActions } from '.';
 import { View } from '../../../../../types/View';
 import { selectVariables } from '../../VariablePage/slice/selectors';
@@ -153,25 +153,25 @@ export const getSchemaBySourceId = createAsyncThunk<any, string>(
 );
 
 export const runSql = createAsyncThunk<
-  QueryResult,
+  QueryResult | null,
   { id: string; isFragment: boolean },
   { state: RootState }
->('view/runSql', async (_, { getState, rejectWithValue }) => {
+>('view/runSql', async (_, { getState, dispatch }) => {
   const currentEditingView = selectCurrentEditingView(
     getState(),
   ) as ViewViewModel;
   const { script, sourceId, size, fragment, variables } = currentEditingView;
 
-  if (!sourceId) {
-    return rejectWithValue(i18n.t('view.selectSource'));
-  }
-
-  if (!script.trim()) {
-    return rejectWithValue('');
-  }
-
   try {
-    const { data, warnings } = await request<QueryResult>({
+    if (!sourceId) {
+      throw Error(i18n.t('view.selectSource'));
+    }
+
+    if (!script.trim()) {
+      throw Error(i18n.t('view.sqlRequired'));
+    }
+
+    const { data, warnings } = await request2<QueryResult>({
       url: '/data-provider/execute/test',
       method: 'POST',
       data: {
@@ -191,7 +191,13 @@ export const runSql = createAsyncThunk<
     });
     return { ...data, warnings };
   } catch (error) {
-    return rejectHandle(error, rejectWithValue);
+    dispatch(
+      viewActions.changeCurrentEditingView({
+        stage: ViewViewModelStages.Initialized,
+        error: getErrorMessage(error),
+      }),
+    );
+    return null;
   }
 });
 
@@ -326,18 +332,13 @@ export const deleteView = createAsyncThunk<
   DeleteViewParams,
   { state: RootState }
 >('view/deleteView', async ({ id, archive, resolve }, { dispatch }) => {
-  try {
-    await request<boolean>({
-      url: `/views/${id}`,
-      method: 'DELETE',
-      params: { archive },
-    });
-    resolve();
-    return null;
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
+  await request2<boolean>({
+    url: `/views/${id}`,
+    method: 'DELETE',
+    params: { archive },
+  });
+  resolve();
+  return null;
 });
 
 export const getEditorProvideCompletionItems = createAsyncThunk<

@@ -18,6 +18,7 @@
 
 package datart.server.base.params;
 
+import datart.core.base.consts.AttachmentType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -30,6 +31,10 @@ public class DownloadCreateParam extends BaseCreateParam {
     private String fileName;
 
     private List<ViewExecuteParam> downloadParams;
+
+    private AttachmentType downloadType;
+
+    private int imageWidth;
 
 }
 

@@ -2,6 +2,7 @@
   "global": {
     "copy": "副本",
     "tokenExpired": "会话过期，请重新登录",
+    "401": "未登录或会话过期，请重新登录",
     "title": {
       "action": "操作"
     },
@@ -17,7 +18,8 @@
       "close": "关闭",
       "saveAs": "另存为",
       "cancel": "取消",
-      "ok": "确定"
+      "ok": "确定",
+      "shortcuts": "快捷键"
     },
     "operation": {
       "archiveConfirm": "确定移至回收站？",
@@ -76,6 +78,7 @@
     "login": "登录",
     "register": "注册新账号",
     "forgotPassword": "忘记密码？",
+    "authTitle": "第三方登录",
     "alreadyLoggedIn": "账号已登录",
     "enter": "点击进入",
     "switch": "切换账号"
@@ -477,7 +480,13 @@
         "deleteField": "删除",
         "editViewTip": "回到数据视图会丢失当前编辑状态，是否继续？",
         "editView": "编辑数据视图",
-        "toggleViewTip": "切换数据视图将会清空所有图表配置，确认继续？"
+        "toggleViewTip": "切换数据视图将会清空所有图表配置，确认继续？",
+        "AGG_DATE_YEAR": "按年",
+        "AGG_DATE_QUARTER": "按季度",
+        "AGG_DATE_MONTH": "按月",
+        "AGG_DATE_WEEK": "按周",
+        "AGG_DATE_DAY": "按日",
+        "default": "默认"
       }
     },
     "palette": {
@@ -558,11 +567,13 @@
           "dotted": "点"
         },
         "nameLocation": {
+          "title": "标题位置",
           "start": "开始",
           "center": "中间",
           "end": "结束"
         },
         "legendType": {
+          "title": "图例类型",
           "plain": "普通",
           "scroll": "滚动"
         },
@@ -589,6 +600,23 @@
         },
         "lineHeight": {
           "default": "默认行高"
+        },
+        "position": {
+          "title": "位置",
+          "auto": "自动",
+          "right": "右",
+          "left": "左",
+          "top": "上",
+          "bottom": "下",
+          "inside": "内",
+          "insideLeft": "内左",
+          "insideRight": "内右",
+          "insideTop": "内上",
+          "insideBottom": "内下",
+          "insideTopLeft": "内左上",
+          "insideBottomLeft": "内左下",
+          "insideTopRight": "内右上",
+          "insideBottomRight": "内右下"
         }
       },
       "data": {
@@ -605,6 +633,12 @@
         "size": "大小",
         "drop": "请拖拽数据字段到这里",
         "dropCount": "请至少拖拽{{count}}个数据字段到这里",
+        "AGG_DATE_YEAR": "按年",
+        "AGG_DATE_QUARTER": "按季度",
+        "AGG_DATE_MONTH": "按月",
+        "AGG_DATE_WEEK": "按周",
+        "AGG_DATE_DAY": "按日",
+        "drillable": "可钻取",
         "actions": {
           "sort": {
             "title": "排序",
@@ -662,7 +696,8 @@
             "colorRange": "着色",
             "colorSingle": "着色",
             "size": "大小",
-            "chooseTheme": "选择主题"
+            "chooseTheme": "选择主题",
+            "dateLevel": "日期级别"
           }
         }
       },
@@ -752,11 +787,40 @@
         "ok": "确认",
         "cancel": "取消",
         "number": "序号",
-        "summary": "汇总"
+        "summary": "汇总",
+        "richText": {
+          "bold": "加粗",
+          "italic": "斜体",
+          "underline": "下划线",
+          "strike": "删除线",
+          "indent": "减少缩进",
+          "indentUp": "增加缩进",
+          "ordered": "有序列表",
+          "list": "无序列表",
+          "blockquote": "引用",
+          "codeBlock": "代码",
+          "link": "超链接",
+          "image": "图片",
+          "clean": "清除样式",
+          "more": "更多",
+          "families": "字体",
+          "fontSize": "字体大小",
+          "background": "背景颜色",
+          "color": "字体颜色",
+          "align": "对齐方式"
+        }
+      },
+      "drill": {
+        "showNextLevel": "显示下一层级",
+        "expandNextLevel": "展开下一层级",
+        "selectDrillOn": "已开启“点击下钻”",
+        "selectDrillOff": "开启“点击下钻”",
+        "rollUp": "上卷"
       }
     },
     "action": {
       "common": {
+        "downloadForExcel": "下载为 Excel",
         "confirm": "请确认",
         "ok": "确认",
         "cancel": "取消",
@@ -780,8 +844,36 @@
         "expireDate": "截止日期",
         "enablePassword": "启用密码",
         "generateLink": "生成链接",
-        "shareLink": "分享",
-        "downloadData": "下载为 Excel"
+        "shareLink": "分享管理",
+        "downloadData": "下载为 Excel",
+        "downloadPDF": "下载为 PDF",
+        "downloadPicture": "下载为 图片",
+        "NONE": "无",
+        "CODE": "口令",
+        "LOGIN": "登录",
+        "verificationMethod": "认证方式",
+        "dataPermission": "数据权限",
+        "loginUser": "登录者",
+        "shareUser": "分享者",
+        "userOrRole": "指定角色/成员",
+        "selectRole": "选择角色",
+        "selectUser": "选择成员",
+        "save": "保存"
+      },
+      "shareList": {
+        "shareList": "分享链接列表",
+        "shortLink": "短链接",
+        "type": "类型",
+        "expireDate": "过期时间",
+        "operate": "操作",
+        "copy": "复制链接",
+        "copySuccess": "复制成功",
+        "delete": "删除",
+        "addLink": "添加链接",
+        "deleteError": "删除失败",
+        "sureDelete": "确定要删除吗？",
+        "noDataTip": "暂无链接，点击右上角添加",
+        "Permanent": "永久"
       }
     },
     "board": {
@@ -809,7 +901,8 @@
         "paste": "粘贴",
         "deviceSwitch": "设备切换",
         "allowOverlap": "允许组件重叠",
-        "forbidOverlap": "禁止组件重叠"
+        "forbidOverlap": "禁止组件重叠",
+        "multiSelect": "多选"
       },
       "controlTypes": {
         "common": "常规",
@@ -1033,6 +1126,7 @@
     "resultEmpty1": "请点击 ",
     "resultEmpty2": " 按钮执行，运行结果将在此处展示",
     "errorTitle": "执行错误",
+    "sqlRequired": "SQL 语句不能为空",
     "sqlRunWraning": "SQL 解析失败，欢迎一键提交 issue 帮助我们优化。",
     "detail": "查看详情",
     "warningDescription": "Datart 默认使用 calcite 解析 SQL 语句；calcite 拥有的非常棒的语法解析器，但依然做不到解析所有数据库的所有语法。当发生解析异常时，datart 对 SQL 语句进行必要的处理之后仍然会发送到数据库执行，如果可以执行成功，我们会认为解析器需要针对该条 SQL 语句的语法进行优化。在这种情况下，datart 会显示该警告信息，方便用户将解析异常的语句提交到 github 或 gitee issue，帮助我们优化解析器。",
@@ -1154,19 +1248,27 @@
   },
   "member": {
     "memberDetail": {
-      "title": "成员详情",
+      "titleAdd": "新建成员",
+      "titleDetail": "成员详情",
       "grantOwner": "设为组织拥有者",
       "revokeOwner": "撤销拥有者",
       "remove": "移除成员",
       "removeConfirm": "确定移除该成员？",
       "removeSuccess": "移除成功",
+      "delete": "删除成员",
+      "deleteConfirm": "确定删除该成员？",
+      "deleteSuccess": "删除成功",
       "grantSuccess": "设置成功",
       "revokeSuccess": "撤销成功",
       "username": "用户名",
       "email": "邮箱",
+      "password": "密码",
+      "changePassword": "点击修改密码",
       "name": "用户姓名",
+      "description": "描述",
       "roles": "角色列表",
-      "assignRole": "为用户指定角色"
+      "assignRole": "为用户指定角色",
+      "createSuccess": "新建成员成功"
     },
     "roleDetail": {
       "role": "角色",
@@ -1185,7 +1287,12 @@
     "form": {
       "email": "邮箱",
       "search": "请搜索或粘贴被邀请成员邮箱",
-      "needConfirm": "需要被邀请成员邮件确认"
+      "needConfirm": "需要被邀请成员邮件确认",
+      "password": "密码",
+      "username": "用户名",
+      "name": "姓名",
+      "description": "描述",
+      "roles": "角色"
     },
     "sidebar": {
       "member": "成员",
@@ -1194,6 +1301,7 @@
       "inviteMember": "邀请成员",
       "inviteSuccess": "邀请邮件已成功发送",
       "invalidEmail": "请检查以下无效邮件地址",
+      "addMember": "新建成员",
       "roleTitle": "角色列表",
       "addRole": "新建角色"
     }

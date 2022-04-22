@@ -22,15 +22,15 @@ export const BoardLoading: React.FC<{ tip?: string }> = ({
   tip = 'Loading',
 }) => {
   return (
-    <Wrap>
+    <Wrapper>
       <Spin size="large" tip={tip} />
-    </Wrap>
+    </Wrapper>
   );
 };
 
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: flex;
   flex: 1;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 `;

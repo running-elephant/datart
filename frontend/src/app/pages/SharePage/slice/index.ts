@@ -16,25 +16,29 @@
  * limitations under the License.
  */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ChartDataSectionType } from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
-import ChartManager from 'app/pages/ChartWorkbenchPage/models/ChartManager';
+import ChartManager from 'app/models/ChartManager';
 import {
   FilterSearchParams,
   VizType,
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transferChartConfig } from 'app/pages/MainPage/pages/VizPage/slice/utils';
-import { ChartConfig, ChartDataSectionType } from 'app/types/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { isMySliceRejectedAction } from 'utils/@reduxjs/toolkit';
-import { rejectedActionMessageHandler } from 'utils/notification';
-import { fetchShareDataSetByPreviewChartAction } from './thunks';
+import {
+  fetchAvailableSourceFunctions,
+  fetchShareDataSetByPreviewChartAction,
+  fetchShareVizInfo,
+  getOauth2Clients,
+} from './thunks';
 // import { fetchShareDataSetByPreviewChartAction } from './thunk';
 import { ExecuteToken, SharePageState, ShareVizInfo } from './types';
 
 export const initialState: SharePageState = {
-  needPassword: false,
+  needVerify: false,
   vizType: undefined,
   shareToken: '',
   executeToken: '',
@@ -44,6 +48,9 @@ export const initialState: SharePageState = {
   headlessBrowserRenderSign: false,
   pageWidthHeight: [0, 0],
   shareDownloadPolling: false,
+  loginLoading: false,
+  oauth2Clients: [],
+  availableSourceFunctions: [],
 };
 
 export const slice = createSlice({
@@ -54,8 +61,8 @@ export const slice = createSlice({
       state.shareToken = action.payload.token;
       state.sharePassword = action.payload.pwd;
     },
-    saveNeedPassword: (state, action: PayloadAction<boolean>) => {
-      state.needPassword = action.payload;
+    saveNeedVerify: (state, action: PayloadAction<boolean>) => {
+      state.needVerify = action.payload;
     },
     setVizType: (state, action: PayloadAction<VizType | undefined>) => {
       state.vizType = action.payload;
@@ -107,7 +114,7 @@ export const slice = createSlice({
       const executeToken = data.executeToken;
       const executeKey = vizDetail?.viewId;
       if (executeKey) {
-        state.executeToken = executeToken?.[executeKey]?.token;
+        state.executeToken = executeToken?.[executeKey]?.authorizedToken;
       }
       state.chartPreview = {
         ...state.chartPreview,
@@ -142,9 +149,43 @@ export const slice = createSlice({
         }
       }
     },
+    updateChartPreviewGroup(
+      state,
+      action: PayloadAction<{ backendChartId: string; payload }>,
+    ) {
+      if (state.chartPreview) {
+        const groupSection = state.chartPreview?.chartConfig?.datas?.find(
+          section => section.type === ChartDataSectionType.GROUP,
+        );
+        if (groupSection) {
+          groupSection.rows = action.payload.payload?.value?.rows;
+        }
+      }
+    },
+    updateComputedFields(
+      state,
+      action: PayloadAction<{
+        backendChartId: string;
+        computedFields: any;
+      }>,
+    ) {
+      if (state.chartPreview && state.chartPreview?.backendChart?.config) {
+        state.chartPreview.backendChart.config.computedFields =
+          action.payload.computedFields;
+      }
+    },
   },
   extraReducers: builder => {
     builder
+      .addCase(fetchShareVizInfo.pending, state => {
+        state.loginLoading = true;
+      })
+      .addCase(fetchShareVizInfo.fulfilled, state => {
+        state.loginLoading = false;
+      })
+      .addCase(fetchShareVizInfo.rejected, state => {
+        state.loginLoading = false;
+      })
       .addCase(
         fetchShareDataSetByPreviewChartAction.fulfilled,
         (state, { payload }) => {
@@ -158,9 +199,17 @@ export const slice = createSlice({
       .addCase(fetchShareDataSetByPreviewChartAction.rejected, state => {
         state.headlessBrowserRenderSign = true;
       })
-      .addMatcher(
-        isMySliceRejectedAction(slice.name),
-        rejectedActionMessageHandler,
+      .addCase(getOauth2Clients.fulfilled, (state, action) => {
+        state.oauth2Clients = action.payload.map(x => ({
+          name: Object.keys(x)[0],
+          value: x[Object.keys(x)[0]],
+        }));
+      })
+      .addCase(
+        fetchAvailableSourceFunctions.fulfilled,
+        (state, { payload }) => {
+          state.availableSourceFunctions = payload;
+        },
       );
   },
 });

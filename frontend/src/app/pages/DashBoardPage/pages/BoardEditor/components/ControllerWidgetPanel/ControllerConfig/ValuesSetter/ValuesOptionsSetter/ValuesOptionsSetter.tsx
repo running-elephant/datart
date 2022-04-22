@@ -18,6 +18,7 @@
 
 import { Form, FormInstance, Radio, Select, Space } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
+import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   OPERATOR_TYPE_OPTION,
@@ -25,7 +26,6 @@ import {
 } from 'app/pages/DashBoardPage/constants';
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
-import { ControllerFacadeTypes } from 'app/types/FilterControlPanel';
 import { View } from 'app/types/View';
 import { getDistinctFields } from 'app/utils/fetch';
 import { transformMeta } from 'app/utils/internalChartHelper';
@@ -36,6 +36,7 @@ import { errorHandle } from 'utils/utils';
 import { ControllerConfig } from '../../../types';
 import { AssistViewFields } from './AssistViewFields';
 import { CustomOptions } from './CustomOptions';
+
 const ValuesOptionsSetter: FC<{
   controllerType: ControllerFacadeTypes;
   form: FormInstance<{ config: ControllerConfig }> | undefined;
@@ -204,7 +205,7 @@ const ValuesOptionsSetter: FC<{
   }, [getControllerConfig]);
 
   return (
-    <Wrap>
+    <Wrapper>
       <Form.Item
         label={tc('valueConfig')}
         shouldUpdate
@@ -298,13 +299,13 @@ const ValuesOptionsSetter: FC<{
           }}
         </Form.Item>
       </Form.Item>
-    </Wrap>
+    </Wrapper>
   );
 });
 
 export default ValuesOptionsSetter;
 
-const Wrap = styled.div`
+const Wrapper = styled.div`
   .transfer {
     padding: 10px 0;
   }
