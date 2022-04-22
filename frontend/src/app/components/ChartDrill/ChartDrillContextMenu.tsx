@@ -20,7 +20,7 @@ import { CheckOutlined } from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
 import {
   ChartDataSectionType,
-  ChartDataViewFieldCategory,
+  DataViewFieldType,
   RUNTIME_DATE_LEVEL_KEY,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -154,9 +154,7 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
           {drillOption?.mode !== DrillMode.Expand && selectDrillStatusMenu}
 
           {runtimeDateLevelFields?.map((v, i) => {
-            if (
-              v.category === ChartDataViewFieldCategory.DateLevelComputedField
-            ) {
+            if (v.type === DataViewFieldType.DATE) {
               return (
                 <Menu.SubMenu key={i} title={v.colName}>
                   <DateLevelMenuItems
