@@ -28,11 +28,12 @@ import {
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { handleServerStoryAction } from 'app/pages/StoryBoardPage/slice/actions';
 import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
-import { convertToChartDTO } from 'app/utils/ChartDtoHelper';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import { convertToChartDto } from 'app/utils/ChartDtoHelper';
+import { fetchAvailableSourceFunctionsAsync } from 'app/utils/fetch';
 import { RootState } from 'types';
 import persistence from 'utils/persistence';
-import { request, request2 } from 'utils/request';
-import { errorHandle } from 'utils/utils';
+import { request2 } from 'utils/request';
 import { shareActions } from '.';
 import { ShareVizInfo } from './types';
 
@@ -44,34 +45,49 @@ export const fetchShareVizInfo = createAsyncThunk(
       sharePassword,
       filterSearchParams,
       renderMode,
+      userName,
+      passWord,
+      authorizedToken,
     }: {
       shareToken?: string;
       sharePassword?: string;
       filterSearchParams?: FilterSearchParams;
       renderMode?: VizRenderMode;
+      userName?: string;
+      passWord?: string;
+      authorizedToken?: string;
     },
     thunkAPI,
   ) => {
-    let data = {} as any;
+    const authenticationMode = filterSearchParams?.type.join();
+    let data = {} as ShareVizInfo;
     try {
-      const response = await request<ShareVizInfo>({
-        url: '/share/viz',
-        method: 'GET',
-        params: {
-          shareToken,
-          password: sharePassword,
+      const response = await request2<ShareVizInfo>({
+        url: `/shares/${shareToken}/viz`,
+        method: 'POST',
+        data: {
+          authenticationMode,
+          authenticationCode: sharePassword,
+          id: shareToken,
+          username: userName,
+          password: passWord,
+          authorizedToken,
         },
       });
       data = response.data;
     } catch (error) {
-      errorHandle(error);
       throw error;
     }
     await thunkAPI.dispatch(shareActions.setVizType(data.vizType));
-    persistence.session.save(shareToken, sharePassword);
-    await thunkAPI.dispatch(shareActions.saveNeedPassword(false));
+    if (authenticationMode === 'CODE') {
+      persistence.session.save(shareToken, sharePassword);
+    }
+    await thunkAPI.dispatch(shareActions.saveNeedVerify(false));
     await thunkAPI.dispatch(
-      shareActions.saveShareInfo({ token: shareToken, pwd: sharePassword }),
+      shareActions.saveShareInfo({
+        token: data.executeToken,
+        pwd: sharePassword,
+      }),
     );
 
     await thunkAPI.dispatch(
@@ -84,7 +100,7 @@ export const fetchShareVizInfo = createAsyncThunk(
       case 'DATACHART':
         const shareVizInfo = {
           ...data,
-          vizDetail: convertToChartDTO(data.vizDetail),
+          vizDetail: convertToChartDto(data.vizDetail),
         };
         thunkAPI.dispatch(
           shareActions.setDataChart({ data: shareVizInfo, filterSearchParams }),
@@ -133,6 +149,7 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
       preview: ChartPreview;
       pageInfo?: any;
       sorter?: { column: string; operator: string; aggOperator?: string };
+      drillOption?: IChartDrillOption;
     },
     thunkAPI,
   ) => {
@@ -151,16 +168,19 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
       false,
       args.preview?.backendChart?.config?.aggregation,
     );
+    const executeParam = builder
+      .addExtraSorters(args?.sorter ? [args?.sorter as any] : [])
+      .addDrillOption(args?.drillOption)
+      .build();
+
     const response = await request2({
       method: 'POST',
-      url: `share/execute`,
+      url: `shares/execute`,
       params: {
-        executeToken: shareState?.executeToken,
-        password: shareState?.sharePassword,
+        executeToken:
+          shareState?.shareToken[executeParam.viewId]['authorizedToken'],
       },
-      data: builder
-        .addExtraSorters(args?.sorter ? [args?.sorter as any] : [])
-        .build(),
+      data: executeParam,
     });
     return response.data;
   },
@@ -169,7 +189,12 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
 export const updateFilterAndFetchDatasetForShare = createAsyncThunk(
   'share/updateFilterAndFetchDatasetForShare',
   async (
-    arg: { backendChartId: string; chartPreview?: ChartPreview; payload },
+    arg: {
+      backendChartId: string;
+      chartPreview?: ChartPreview;
+      payload;
+      drillOption?: IChartDrillOption;
+    },
     thunkAPI,
   ) => {
     await thunkAPI.dispatch(
@@ -183,6 +208,7 @@ export const updateFilterAndFetchDatasetForShare = createAsyncThunk(
     await thunkAPI.dispatch(
       fetchShareDataSetByPreviewChartAction({
         preview: shareState?.chartPreview!,
+        drillOption: arg.drillOption,
       }),
     );
     return {
@@ -190,3 +216,56 @@ export const updateFilterAndFetchDatasetForShare = createAsyncThunk(
     };
   },
 );
+
+export const updateGroupAndFetchDatasetForShare = createAsyncThunk(
+  'share/updateGroupAndFetchDatasetForShare',
+  async (
+    arg: {
+      backendChartId: string;
+      chartPreview?: ChartPreview;
+      payload;
+      drillOption?: IChartDrillOption;
+    },
+    thunkAPI,
+  ) => {
+    await thunkAPI.dispatch(
+      shareActions.updateChartPreviewGroup({
+        backendChartId: arg.backendChartId,
+        payload: arg.payload,
+      }),
+    );
+    const state = thunkAPI.getState() as RootState;
+    const shareState = state.share;
+    await thunkAPI.dispatch(
+      fetchShareDataSetByPreviewChartAction({
+        preview: shareState?.chartPreview!,
+        drillOption: arg.drillOption,
+      }),
+    );
+    return {
+      backendChartId: arg.backendChartId,
+    };
+  },
+);
+
+export const getOauth2Clients = createAsyncThunk<[]>(
+  'app/getOauth2Clients',
+  async () => {
+    const { data } = await request2<[]>({
+      url: '/tpa/getOauth2Clients',
+      method: 'GET',
+    });
+    return data;
+  },
+);
+
+export const fetchAvailableSourceFunctions = createAsyncThunk<
+  string[],
+  { sourceId: string }
+>('workbench/fetchAvailableSourceFunctions', async arg => {
+  try {
+    return await fetchAvailableSourceFunctionsAsync(arg.sourceId);
+  } catch (err) {
+    throw err;
+  }
+});

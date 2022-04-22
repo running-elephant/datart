@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { boardDrillManager } from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { shareActions } from 'app/pages/SharePage/slice';
@@ -31,7 +32,6 @@ import { handleServerBoardAction } from './asyncActions';
 import { selectBoardById, selectBoardWidgetMap } from './selector';
 import {
   BoardState,
-  ContainerWidgetContent,
   ControllerWidgetContent,
   getDataOption,
   ServerDashboard,
@@ -49,6 +49,7 @@ export const getBoardDetail = createAsyncThunk<
     dashboardRelId: string;
     filterSearchParams?: FilterSearchParams;
     vizToken?: ExecuteToken;
+    shareToken?: string;
   }
 >(
   'board/getBoardDetail',
@@ -100,17 +101,17 @@ export const fetchBoardDetailInShare = createAsyncThunk<
     dashboardRelId: string;
     vizToken: ExecuteToken;
     filterSearchParams?: FilterSearchParams;
+    shareToken?: string;
   }
 >(
   'board/fetchBoardDetailInShare',
   async (params, { dispatch, rejectWithValue }) => {
-    const { vizToken } = params;
+    const { vizToken, shareToken } = params;
     const { data } = await request2<ShareVizInfo>({
-      url: '/share/viz',
-      method: 'GET',
-      params: {
-        shareToken: vizToken.token,
-        password: vizToken.password,
+      url: `shares/${shareToken}/viz`,
+      method: 'POST',
+      data: {
+        authorizedToken: vizToken.authorizedToken,
       },
     });
     dispatch(
@@ -150,28 +151,6 @@ export const renderedWidgetAsync = createAsyncThunk<
     dispatch(
       getWidgetData({ boardId: boardId, widget: curWidget, renderMode }),
     );
-    if (curWidget.config.type === 'container') {
-      const content = curWidget.config.content as ContainerWidgetContent;
-      let subWidgetIds: string[] = [];
-      subWidgetIds = Object.values(content.itemMap)
-        .map(item => item.childWidgetId)
-        .filter(id => !!id);
-      // 1 widget render
-      dispatch(
-        boardActions.renderedWidgets({ boardId, widgetIds: subWidgetIds }),
-      );
-      // 2 widget getData
-      subWidgetIds.forEach(wid => {
-        dispatch(
-          getWidgetData({
-            boardId: boardId,
-            widget: widgetMap[wid],
-            renderMode,
-          }),
-        );
-      });
-    }
-
     return null;
   },
 );
@@ -231,7 +210,10 @@ export const getChartWidgetDataAsync = createAsyncThunk<
     const dataChartMap = boardState.board.dataChartMap;
     const boardLinkFilters =
       boardState.board.boardInfoRecord?.[boardId]?.linkFilter;
-
+    const drillOption = boardDrillManager.getWidgetDrill({
+      bid: curWidget.dashboardId,
+      wid: widgetId,
+    });
     let requestParams = getChartWidgetRequestParams({
       widgetId,
       widgetMap,
@@ -240,6 +222,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
       widgetInfo,
       dataChartMap,
       boardLinkFilters,
+      drillOption,
     });
     if (!requestParams) {
       return null;
@@ -256,15 +239,15 @@ export const getChartWidgetDataAsync = createAsyncThunk<
       } else {
         const executeTokenMap = (getState() as RootState)?.share
           ?.executeTokenMap;
+
         const dataChart = dataChartMap[curWidget.datachartId];
         const viewId = viewMap[dataChart.viewId].id;
         const executeToken = executeTokenMap?.[viewId];
         const { data } = await request2<WidgetData>({
           method: 'POST',
-          url: `share/execute`,
+          url: `shares/execute`,
           params: {
-            executeToken: executeToken?.token,
-            password: executeToken?.password,
+            executeToken: executeToken?.authorizedToken,
           },
           data: requestParams,
         });
@@ -366,10 +349,9 @@ export const getControllerOptions = createAsyncThunk<
       if (executeToken && renderMode !== 'read') {
         const { data } = await request2<ChartDataSetDTO>({
           method: 'POST',
-          url: `share/execute`,
+          url: `shares/execute`,
           params: {
-            executeToken: executeToken?.token,
-            password: executeToken?.password,
+            executeToken: executeToken?.authorizedToken,
           },
           data: requestParams,
         });

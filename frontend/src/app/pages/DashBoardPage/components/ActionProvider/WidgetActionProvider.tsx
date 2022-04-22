@@ -22,6 +22,7 @@ import { ChartMouseEventParams } from 'app/types/Chart';
 import debounce from 'lodash/debounce';
 import { createContext, FC, memo, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import {
   widgetChartClickAction,
   widgetGetDataAction,
@@ -56,7 +57,6 @@ import {
   deleteWidgetsAction,
   editChartInWidgetAction,
   pasteWidgetsAction,
-  toggleLockWidgetAction,
   widgetsToPositionAction,
 } from '../../pages/BoardEditor/slice/actions/actions';
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
@@ -77,7 +77,7 @@ export const WidgetActionProvider: FC<{
   renderMode: VizRenderMode;
 }> = memo(({ boardEditing, boardId, orgId, renderMode, children }) => {
   const dispatch = useDispatch();
-
+  const history = useHistory<any>();
   const methods = useMemo(() => {
     const contextValue: WidgetActionContextProps = {
       onEditLayerToTop: () => {
@@ -178,15 +178,17 @@ export const WidgetActionProvider: FC<{
       //
       onWidgetChartClick: (widget: Widget, params: ChartMouseEventParams) => {
         dispatch(
-          widgetChartClickAction(
+          widgetChartClickAction({
             boardId,
-            boardEditing,
+            editing: boardEditing,
             renderMode,
             widget,
             params,
-          ),
+            history,
+          }),
         );
       },
+
       onWidgetClearLinkage: (widget: Widget) => {
         dispatch(widgetToClearLinkageAction(boardEditing, widget, renderMode));
       },
@@ -249,14 +251,15 @@ export const WidgetActionProvider: FC<{
       onEditWidgetCloseJump: (widget: Widget) => {
         dispatch(closeJumpAction(widget));
       },
-      onEditWidgetLock: (widget: Widget) => {
-        dispatch(toggleLockWidgetAction(widget, true));
+      onEditWidgetLock: (id: string) => {
+        dispatch(editBoardStackActions.toggleLockWidget({ id, lock: true }));
       },
-      onEditWidgetUnLock: (widget: Widget) => {
-        dispatch(toggleLockWidgetAction(widget, false));
+      onEditWidgetUnLock: (id: string) => {
+        dispatch(editBoardStackActions.toggleLockWidget({ id, lock: false }));
       },
     };
     return contextValue;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardEditing, boardId, dispatch, orgId, renderMode]);
 
   return (
@@ -289,8 +292,8 @@ export interface WidgetActionContextProps {
   onEditWidgetJump: (wid: string) => void;
   onEditWidgetCloseLinkage: (widget: Widget) => void;
   onEditWidgetCloseJump: (widget: Widget) => void;
-  onEditWidgetLock: (widget: Widget) => void;
-  onEditWidgetUnLock: (widget: Widget) => void;
+  onEditWidgetLock: (id: string) => void;
+  onEditWidgetUnLock: (id: string) => void;
   onEditClearActiveWidgets: () => void;
   onEditDeleteActiveWidgets: (ids?: string[]) => void;
   onEditLayerToTop: () => void;

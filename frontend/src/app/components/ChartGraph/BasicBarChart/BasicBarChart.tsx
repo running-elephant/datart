@@ -17,6 +17,7 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -32,6 +33,7 @@ import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
+  getDrillableRows,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
@@ -100,7 +102,11 @@ class BasicBarChart extends Chart {
       this.chart?.clear();
       return;
     }
-    const newOptions = this.getOptions(options.dataset, options.config);
+    const newOptions = this.getOptions(
+      options.dataset,
+      options.config,
+      options.drillOption,
+    );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
@@ -114,13 +120,19 @@ class BasicBarChart extends Chart {
       this.onUpdated(opt, context);
   }
 
-  getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
+  getOptions(
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    drillOption: ChartDrillOption,
+  ) {
     const styleConfigs: ChartStyleConfig[] = config.styles || [];
     const dataConfigs: ChartDataConfig[] = config.datas || [];
     const settingConfigs: ChartStyleConfig[] = config.settings || [];
-    const groupConfigs: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
-      .flatMap(config => config.rows || []);
+
+    const groupConfigs: ChartDataSectionField[] = getDrillableRows(
+      dataConfigs,
+      drillOption,
+    );
     const aggregateConfigs: ChartDataSectionField[] = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
@@ -140,13 +152,18 @@ class BasicBarChart extends Chart {
     if (this.isHorizonDisplay) {
       chartDataSet.reverse();
     }
-    const xAxisColumns: XAxisColumns[] = (groupConfigs || []).map(config => {
-      return {
+    const xAxisColumns: XAxisColumns[] = [
+      {
         type: 'category',
         tooltip: { show: true },
-        data: UniqArray(chartDataSet.map(row => row.getCell(config))),
-      };
-    });
+        data: UniqArray(
+          chartDataSet?.map(row => {
+            return groupConfigs.map(g => row.getCell(g)).join('-');
+          }),
+        ),
+      },
+    ];
+
     const yAxisNames: string[] = aggregateConfigs.map(getColumnRenderName);
     const series = this.getSeries(
       settingConfigs,
@@ -225,9 +242,8 @@ class BasicBarChart extends Chart {
     infoConfigs: ChartDataSectionField[],
     xAxisColumns: XAxisColumns[],
   ): Series[] {
-    const xAxisConfig = groupConfigs?.[0];
     if (!colorConfigs.length) {
-      const flatSeries = aggregateConfigs.map(aggConfig => {
+      return aggregateConfigs.map(aggConfig => {
         return {
           ...this.getBarSeriesImpl(
             styleConfigs,
@@ -244,7 +260,6 @@ class BasicBarChart extends Chart {
           })),
         };
       });
-      return flatSeries;
     }
 
     const secondGroupInfos = getColorizeGroupSeriesColumns(
@@ -270,7 +285,9 @@ class BasicBarChart extends Chart {
           ),
           name: k,
           data: xAxisColumns?.[0]?.data?.map(d => {
-            const row = dataSet.find(r => r.getCell(xAxisConfig) === d)!;
+            const row = dataSet.find(
+              r => r.getMultiCell(...groupConfigs) === d,
+            )!;
             return {
               ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),

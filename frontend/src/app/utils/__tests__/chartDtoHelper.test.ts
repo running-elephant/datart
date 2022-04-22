@@ -19,7 +19,7 @@
 import {
   buildUpdateChartRequest,
   convertToChartConfigDTO,
-  convertToChartDTO,
+  convertToChartDto,
   mergeToChartConfig,
 } from '../ChartDtoHelper';
 
@@ -31,11 +31,19 @@ describe('chartDtoHelper Test', () => {
         model: JSON.stringify({ name: 2 }),
       },
     };
-    const dto = convertToChartDTO(data);
+    const dto = convertToChartDto(data);
     expect(dto).toEqual({
       config: { id: 1 },
       view: {
-        meta: [{ id: 'name', category: 'field' }],
+        meta: [
+          {
+            name: 'name',
+            id: 'name',
+            subType: undefined,
+            category: 'field',
+            children: undefined,
+          },
+        ],
       },
     });
   });

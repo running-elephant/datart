@@ -17,8 +17,14 @@
  */
 
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
-import { ChartDataSectionType, FieldFormatType } from 'app/constants';
+import {
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+  FieldFormatType,
+  RUNTIME_DATE_LEVEL_KEY,
+} from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
+import { ChartDrillOption, DrillMode } from 'app/models/ChartDrillOption';
 import {
   AxisLabel,
   AxisLineStyle,
@@ -46,12 +52,19 @@ import {
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
 import ChartMetadata from 'app/types/ChartMetadata';
+import { updateBy } from 'app/utils/mutation';
 import { ECharts } from 'echarts';
 import { ECBasicOption } from 'echarts/types/dist/shared';
 import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
 import moment from 'moment';
 import { Debugger } from 'utils/debugger';
-import { isEmpty, isEmptyArray, meanValue, pipe } from 'utils/object';
+import {
+  CloneValueDeep,
+  isEmpty,
+  isEmptyArray,
+  meanValue,
+  pipe,
+} from 'utils/object';
 import { TableColumnsList } from '../components/ChartGraph/BasicTableChart/types';
 import {
   flattenHeaderRowsWithoutGroupRow,
@@ -234,6 +247,7 @@ function currencyFormater(
     style: 'currency',
     currency: config?.currency || 'CNY',
     minimumFractionDigits: config?.decimalPlaces,
+    maximumFractionDigits: config?.decimalPlaces,
     useGrouping: config?.useThousandSeparator,
   }).format(value / realUnit)} ${
     NumericUnitDescriptions.get(config?.unitKey || NumberUnitKey.None)?.[1]
@@ -1527,4 +1541,137 @@ export const getAutoFunnelTopPosition = (config: {
   if (!chartHeight) return 16;
   // 24 marginBottom
   return chartHeight - 24 - height;
+};
+
+/**
+ * Get Fields when data section is drillable
+ *
+ * @param {ChartDataConfig[]} configs
+ * @param {ChartDrillOption} option
+ * @return {*}  {ChartDataSectionField[]}
+ */
+export const getDrillableRows = (
+  configs: ChartDataConfig[],
+  option?: ChartDrillOption,
+): ChartDataSectionField[] => {
+  return configs
+    ?.filter(c => c.type === ChartDataSectionType.GROUP)
+    .flatMap(config => {
+      if (Boolean(config.drillable)) {
+        if (
+          !option ||
+          option?.mode === DrillMode.Normal ||
+          !option?.getCurrentFields()
+        ) {
+          return config.rows?.[0] || [];
+        }
+        return (
+          config.rows?.filter(
+            f =>
+              !option?.getCurrentFields() ||
+              Boolean(option?.getCurrentFields()?.some(df => df.uid === f.uid)),
+          ) || []
+        );
+      }
+      return config.rows || [];
+    });
+};
+
+export const getChartsAllRows = (configs?: ChartDataConfig[]) => {
+  const datas = configs || [];
+  return datas
+    .filter(v => v.rows)
+    .reduce((acc: ChartDataSectionField[], cur) => {
+      return acc.concat(cur.rows || []);
+    }, []);
+};
+
+export const getRuntimeDateLevelFields = (rows: any) => {
+  const _rows = updateBy(rows, draft => {
+    draft?.forEach((v, i) => {
+      const symbolData = v?.[RUNTIME_DATE_LEVEL_KEY];
+      if (symbolData) {
+        draft[i] = symbolData;
+      }
+    });
+  });
+  return _rows;
+};
+
+/**
+ * Merging runtime date level into computed fields
+ */
+export const getRuntimeComputedFields = (
+  dateLevelComputedFields,
+  replacedColName,
+  computedFields,
+  chartConfig,
+) => {
+  let _computedFields = computedFields ? CloneValueDeep(computedFields) : [];
+
+  if (dateLevelComputedFields.length) {
+    const expressionList: any = [];
+
+    _computedFields.forEach(v => {
+      if (v.category === ChartDataViewFieldCategory.DateLevelComputedField) {
+        expressionList.push(v.expression);
+      }
+    });
+
+    dateLevelComputedFields.forEach(v => {
+      if (!expressionList.includes(v.expression)) {
+        _computedFields.push({
+          category: v.category,
+          id: v.colName,
+          type: v.type,
+          expression: v.expression,
+        });
+      }
+    });
+  }
+
+  if (replacedColName) {
+    const allRows = getChartsAllRows(chartConfig?.datas);
+    const replacedRows = allRows.filter(v => v.colName === replacedColName);
+
+    if (replacedRows.length < 2) {
+      _computedFields = _computedFields.filter(v => v.id !== replacedColName);
+    }
+  }
+  return _computedFields;
+};
+
+export const clearRuntimeDateLevelFieldsInChartConfig = (
+  config: ChartConfig,
+) => {
+  return updateBy(config, draft => {
+    if (draft?.datas) {
+      const index = draft.datas.findIndex(
+        v => v.type === ChartDataSectionType.GROUP,
+      );
+      const groupRows = draft.datas[index]?.rows;
+      groupRows?.forEach((v, i) => {
+        if (groupRows[i]) {
+          delete groupRows[i][RUNTIME_DATE_LEVEL_KEY];
+        }
+      });
+    }
+  });
+};
+
+export const setRuntimeDateLevelFieldsInChartConfig = (config: ChartConfig) => {
+  return updateBy(config, draft => {
+    if (draft?.datas) {
+      const index = draft.datas.findIndex(
+        v => v.type === ChartDataSectionType.GROUP,
+      );
+      const groupRows = draft.datas[index]?.rows;
+      groupRows?.forEach((v, i) => {
+        const runtimeDateLevel = groupRows[i][RUNTIME_DATE_LEVEL_KEY];
+        if (groupRows[i].uid === runtimeDateLevel?.uid) {
+          groupRows[i] = runtimeDateLevel;
+        }
+      });
+    }
+  });
 };

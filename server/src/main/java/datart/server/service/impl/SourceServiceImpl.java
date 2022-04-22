@@ -240,13 +240,20 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         if (source.getId() == null || rrrMapper.countRolePermission(source.getId(), role.getId()) == 0) {
             Source parent = sourceMapper.selectByPrimaryKey(source.getParentId());
             if (parent == null) {
-                return securityManager.hasPermission(PermissionHelper.viewPermission(source.getOrgId(), role.getId(), ResourceType.SOURCE.name(), permission));
+                return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), ResourceType.SOURCE.name(), permission));
             } else {
                 return hasPermission(role, parent, permission);
             }
         } else {
             return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), source.getId(), permission));
         }
+    }
+
+    @Override
+    public Source createSource(SourceCreateParam createParam) {
+        Source source = create(createParam);
+        updateJdbcSourceSyncJob(source);
+        return source;
     }
 
     @Override
@@ -263,9 +270,19 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         Source source = SourceService.super.create(createParam);
 
         grantDefaultPermission(source);
-        updateJdbcSourceSyncJob(source);
         return source;
 
+    }
+
+    @Override
+    public boolean updateSource(SourceUpdateParam updateParam) {
+        boolean success = update(updateParam);
+        if (success) {
+            Source source = retrieve(updateParam.getId());
+            getDataProviderService().updateSource(source);
+            updateJdbcSourceSyncJob(source);
+        }
+        return false;
     }
 
     @Override
@@ -278,13 +295,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         } catch (Exception e) {
             Exceptions.e(e);
         }
-        boolean success = SourceService.super.update(updateParam);
-        if (success) {
-            Source source = retrieve(updateParam.getId());
-            getDataProviderService().updateSource(source);
-            updateJdbcSourceSyncJob(source);
-        }
-        return success;
+        return SourceService.super.update(updateParam);
     }
 
     @Override
@@ -337,6 +348,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     @Override
     public void deleteReference(Source source) {
         deleteJdbcSourceSyncJob(source);
+        sourceSchemasMapper.deleteBySource(source.getId());
     }
 
     @Override

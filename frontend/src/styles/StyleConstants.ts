@@ -11,11 +11,14 @@ export const SPACE_XL = SPACE_TIMES(9); // 36 = 16 + 20
 export const SPACE_XXL = SPACE_TIMES(14); // 56 = 20 + 36
 
 // z-index
-export const BACKGROUND_LEVEL = -1;
-export const STICKY_LEVEL = 1;
-export const NAV_LEVEL = 10;
-export const EMPHASIS_LEVEL = 10;
-export const MODAL_LEVEL = 1000;
+export const MINUS_LEVEL_1 = -1;
+export const LEVEL_1 = 1;
+export const LEVEL_5 = 5;
+export const LEVEL_10 = 10;
+export const LEVEL_20 = 20;
+export const LEVEL_50 = 50;
+export const LEVEL_100 = 100;
+export const LEVEL_1000 = 1000;
 
 // base color
 export const BLUE = '#1B9AEE';

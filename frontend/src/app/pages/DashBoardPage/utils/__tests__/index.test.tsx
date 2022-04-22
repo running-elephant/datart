@@ -18,11 +18,12 @@
 
 import {
   ChartDataViewFieldCategory,
-  DataViewFieldType,
   ControllerFacadeTypes,
+  DataViewFieldType,
   TimeFilterValueCategory,
 } from 'app/constants';
 import {
+  DataChart,
   RelatedView,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -31,12 +32,12 @@ import {
   ControllerDate,
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { ChartDataConfig } from 'app/types/ChartConfig';
+import ChartDataView from 'app/types/ChartDataView';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import {
   adaptBoardImageUrl,
   adjustRangeDataEndValue,
-  checkLinkAndJumpErr,
   convertImageUrl,
   fillPx,
   getBackgroundImage,
@@ -310,7 +311,12 @@ describe('should getDataChartRequestParams', () => {
       description: '',
     };
     const viewConfig = JSON.parse(view.config);
-    const res = getDataChartRequestParams(dataChart as any, view as any, opt);
+
+    const res = getDataChartRequestParams({
+      dataChart: dataChart as unknown as DataChart,
+      view: view as unknown as ChartDataView,
+      option: opt as any,
+    });
     expect(res.viewId).toBe(dataChart.viewId);
     expect(res.filters).toEqual([]);
     expect(res.cache).toEqual(viewConfig.cache);
@@ -393,30 +399,7 @@ describe('should getDataChartRequestParams', () => {
             },
           ],
           styles: [],
-          settings: [
-            {
-              label: 'paging.title',
-              key: 'paging',
-              comType: 'group',
-              rows: [
-                {
-                  label: 'paging.pageSize',
-                  key: 'pageSize',
-                  default: 100,
-                  comType: 'inputNumber',
-                  options: {
-                    needRefresh: true,
-                    step: 1,
-                    min: 0,
-                  },
-                  watcher: {
-                    deps: ['enablePaging'],
-                  },
-                  value: 100,
-                },
-              ],
-            },
-          ],
+          settings: [],
           i18ns: [],
         },
         chartGraphId: 'mingxi-table',
@@ -439,7 +422,11 @@ describe('should getDataChartRequestParams', () => {
         ],
       },
     ];
-    const res = getDataChartRequestParams(dataChart as any, view as any, opt);
+    const res = getDataChartRequestParams({
+      dataChart: dataChart as DataChart,
+      view: view as unknown as ChartDataView,
+      option: opt as any,
+    });
     expect(res.viewId).toBe(dataChart.viewId);
     expect(res.filters).toEqual(targetFilter);
   });
@@ -1880,27 +1867,5 @@ describe('getDefaultWidgetName', () => {
   });
   it('should other', () => {
     expect(getDefaultWidgetName('other' as any, 'query', 3)).toEqual('xxx3');
-  });
-});
-
-describe('checkLinkAndJumpErr', () => {
-  it('should linkageError', () => {
-    const widget1 = {
-      config: { linkageConfig: { open: true } },
-      relations: [],
-    } as any;
-    expect(checkLinkAndJumpErr(widget1, [''])).toBe('viz.linkage.linkageError');
-  });
-  it('should jumpError', () => {
-    const widget2 = {
-      config: {
-        jumpConfig: {
-          open: true,
-          targetType: 'INTERNAL',
-          target: { relId: 'id123' },
-        },
-      },
-    } as any;
-    expect(checkLinkAndJumpErr(widget2, [])).toBe('viz.jump.jumpError');
   });
 });

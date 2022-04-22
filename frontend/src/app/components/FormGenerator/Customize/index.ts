@@ -24,5 +24,6 @@ export { default as LegendPosition } from './LegendPosition';
 export { default as LegendType } from './LegendType';
 export { default as ListTemplatePanel } from './ListTemplatePanel';
 export { default as NameLocation } from './NameLocation';
+export { default as PivotSheetTheme } from './PivotSheetTheme';
 export { default as ScorecardConditionalStylePanel } from './ScorecardConditionalStyle';
 export { default as UnControlledTableHeaderPanel } from './UnControlledTableHeaderPanel';

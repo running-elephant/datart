@@ -87,7 +87,7 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
     const { gridRef } = useBoardWidthHeight();
 
     return (
-      <Wrap>
+      <Wrapper>
         <div className="container" ref={gridRef}>
           <div
             className="grid-background"
@@ -114,12 +114,12 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
             />
           )}
         </div>
-      </Wrap>
+      </Wrapper>
     );
   },
 );
 
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: flex;
   flex: 1;
   overflow-y: hidden;

@@ -55,6 +55,7 @@ export function useSaveAsViz() {
       let vizData = await getVizDetail(vizId, type).then(data => {
         return data;
       });
+      const boardType = JSON.parse(vizData.config)?.type;
 
       showSaveForm({
         vizType: type,
@@ -64,7 +65,7 @@ export function useSaveAsViz() {
           ...vizData,
           parentId: vizData.parentId || void 0,
           name: vizData.name + '_' + tg('copy'),
-          boardType: JSON.parse(vizData.config)?.type,
+          boardType: boardType,
         },
         onSave: async (values: SaveFormModel, onClose) => {
           let index = getInsertedNodeIndex(values, vizsData);
@@ -75,6 +76,7 @@ export function useSaveAsViz() {
               ...values,
               parentId: values.parentId || null,
               index,
+              avatar: JSON.parse(vizData.config)?.chartGraphId,
             });
 
             await dispatch(
@@ -93,6 +95,8 @@ export function useSaveAsViz() {
               orgId: vizData.orgId,
               parentId: values.parentId || null,
               permissions: vizData.permissions,
+              subType: boardType,
+              boardType: boardType,
             };
 
             await dispatch(

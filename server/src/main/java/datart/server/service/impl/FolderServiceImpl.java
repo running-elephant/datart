@@ -195,6 +195,7 @@ public class FolderServiceImpl extends BaseService implements FolderService {
         if (folder == null) {
             Exceptions.notFound("resource.folder");
         }
+        requirePermission(folder, Const.MANAGE);
         // check name
         if (!folder.getName().equals(updateParam.getName())) {
             Folder check = new Folder();

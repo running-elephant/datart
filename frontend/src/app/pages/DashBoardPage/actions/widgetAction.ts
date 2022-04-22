@@ -17,7 +17,7 @@
  */
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams } from 'app/types/Chart';
-import history from 'app/utils/history';
+import i18next from 'i18next';
 import { RootState } from 'types';
 import { jumpTypes } from '../constants';
 import { boardActions } from '../pages/Board/slice';
@@ -43,6 +43,7 @@ import {
   getEditWidgetData,
 } from '../pages/BoardEditor/slice/thunk';
 import { getValueByRowData } from '../utils/widget';
+
 export const toggleLinkageAction =
   (boardEditing: boolean, boardId: string, widgetId: string, toggle: boolean) =>
   dispatch => {
@@ -104,49 +105,37 @@ export const tableChartClickAction =
   };
 
 export const widgetClickJumpAction =
-  (
-    boardId: string,
-    editing: boolean,
-    renderMode: VizRenderMode,
-    widget: Widget,
-    params: ChartMouseEventParams,
-  ) =>
+  (obj: {
+    renderMode: VizRenderMode;
+    widget: Widget;
+    params: ChartMouseEventParams;
+    history: any;
+  }) =>
   (dispatch, getState) => {
+    const { renderMode, widget, params, history } = obj;
     const state = getState() as RootState;
     const orgId = state?.main?.orgId || '';
     const folderIds = state.viz?.vizs?.map(v => v.relId) || [];
     const jumpConfig = widget.config?.jumpConfig;
     const targetType = jumpConfig?.targetType || jumpTypes[0].value;
 
-    if (
-      jumpConfig?.targetType === 'INTERNAL' &&
-      !folderIds.includes(jumpConfig.target.relId)
-    ) {
-      history.push(`/404/targetVizDeleted`);
-      return;
-    }
     const URL = jumpConfig?.URL || '';
     const queryName = jumpConfig?.queryName || '';
     const targetId = jumpConfig?.target?.relId;
     const jumpFieldName: string = jumpConfig?.field?.jumpFieldName || '';
+    // table chart
     if (
       params.componentType === 'table' &&
       jumpFieldName !== params.seriesName
     ) {
-      console.log('__ jumpFieldName !== params.seriesName');
       return;
     }
     const rowDataValue = getValueByRowData(params.data, jumpFieldName);
-    if (typeof jumpConfig?.filter === 'object' && targetType === 'INTERNAL') {
-      const searchParamsStr = urlSearchTransfer.toUrlString({
-        [jumpConfig?.filter?.filterId]: rowDataValue,
-      });
-      if (targetId) {
-        history.push(
-          `/organizations/${orgId}/vizs/${targetId}?${searchParamsStr}`,
-        );
-      }
-    } else if (targetType === 'URL') {
+    console.warn(' jumpValue:', rowDataValue);
+    console.warn('rowData', params.data?.rowData);
+    console.warn(`rowData[${jumpFieldName}]:${rowDataValue} `);
+    if (targetType === 'URL') {
+      // jump url
       let jumpUrl;
       if (URL.indexOf('?') > -1) {
         jumpUrl = `${URL}&${queryName}=${rowDataValue}`;
@@ -154,6 +143,24 @@ export const widgetClickJumpAction =
         jumpUrl = `${URL}?${queryName}=${rowDataValue}`;
       }
       window.location.href = jumpUrl;
+      return;
+    }
+    // jump in datart
+    if (jumpConfig?.targetType === 'INTERNAL') {
+      if (!folderIds.includes(jumpConfig.target.relId)) {
+        dispatch(
+          showJumpErrorAction(renderMode, widget.dashboardId, widget.id),
+        );
+        return;
+      }
+      if (typeof jumpConfig?.filter === 'object') {
+        const searchParamsStr = urlSearchTransfer.toUrlString({
+          [jumpConfig?.filter?.filterId]: rowDataValue,
+        });
+        history.push(
+          `/organizations/${orgId}/vizs/${targetId}?${searchParamsStr}`,
+        );
+      }
     }
   };
 
@@ -181,18 +188,26 @@ export const widgetClickLinkageAction =
       return true;
     });
 
-    const boardFilters = linkRelations.map(re => {
-      let linkageFieldName: string =
-        re?.config?.widgetToWidget?.triggerColumn || '';
-
-      const filter: BoardLinkFilter = {
-        triggerWidgetId: widget.id,
-        triggerValue: getValueByRowData(params.data, linkageFieldName),
-        triggerDataChartId: widget.datachartId,
-        linkerWidgetId: re.targetId,
-      };
-      return filter;
-    });
+    const boardFilters = linkRelations
+      .map(re => {
+        let linkageFieldName: string =
+          re?.config?.widgetToWidget?.triggerColumn || '';
+        const linkValue = getValueByRowData(params.data, linkageFieldName);
+        if (!linkValue) {
+          console.warn('linkageFieldName:', linkageFieldName);
+          console.warn('rowData', params.data?.rowData);
+          console.warn(`rowData[${linkageFieldName}]:${linkValue} `);
+          return undefined;
+        }
+        const filter: BoardLinkFilter = {
+          triggerWidgetId: widget.id,
+          triggerValue: linkValue,
+          triggerDataChartId: widget.datachartId,
+          linkerWidgetId: re.targetId,
+        };
+        return filter;
+      })
+      .filter(item => !!item) as BoardLinkFilter[];
 
     if (editing) {
       dispatch(
@@ -240,14 +255,16 @@ export const widgetClickLinkageAction =
   };
 //
 export const widgetChartClickAction =
-  (
-    boardId: string,
-    editing: boolean,
-    renderMode: VizRenderMode,
-    widget: Widget,
-    params: ChartMouseEventParams,
-  ) =>
+  (obj: {
+    boardId: string;
+    editing: boolean;
+    renderMode: VizRenderMode;
+    widget: Widget;
+    params: ChartMouseEventParams;
+    history: any;
+  }) =>
   dispatch => {
+    const { boardId, editing, renderMode, widget, params, history } = obj;
     //is tableChart
     if (
       params.componentType === 'table' &&
@@ -261,9 +278,7 @@ export const widgetChartClickAction =
     // jump
     const jumpConfig = widget.config?.jumpConfig;
     if (jumpConfig && jumpConfig.open) {
-      dispatch(
-        widgetClickJumpAction(boardId, editing, renderMode, widget, params),
-      );
+      dispatch(widgetClickJumpAction({ renderMode, widget, params, history }));
       return;
     }
     // linkage
@@ -291,5 +306,29 @@ export const widgetToClearLinkageAction =
       dispatch(editorWidgetClearLinkageAction(widget));
     } else {
       dispatch(widgetClearLinkageAction(widget, renderMode));
+    }
+  };
+
+export const showJumpErrorAction =
+  (renderMode: VizRenderMode, boardId: string, wid: string) => dispatch => {
+    const errorInfo = i18next.t('viz.jump.jumpError');
+    if (renderMode === 'edit') {
+      dispatch(
+        editWidgetInfoActions.setWidgetErrInfo({
+          boardId,
+          widgetId: wid,
+          errInfo: errorInfo, // viz.linkage.linkageError
+          errorType: 'interaction',
+        }),
+      );
+    } else {
+      dispatch(
+        boardActions.setWidgetErrInfo({
+          boardId,
+          widgetId: wid,
+          errInfo: errorInfo,
+          errorType: 'interaction',
+        }),
+      );
     }
   };

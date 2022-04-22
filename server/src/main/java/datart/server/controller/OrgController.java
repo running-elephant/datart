@@ -19,7 +19,7 @@
 package datart.server.controller;
 
 
-import datart.core.base.consts.SystemMode;
+import datart.core.base.consts.TenantManagementMode;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
 import datart.core.entity.Organization;
@@ -69,7 +69,7 @@ public class OrgController extends BaseController {
     @ApiOperation(value = "create organization")
     @PostMapping
     public ResponseData<Organization> createOrganization(@Validated @RequestBody OrgCreateParam createParam) {
-        if (Application.getCurrMode().equals(SystemMode.SINGLE)) {
+        if (Application.getCurrMode().equals(TenantManagementMode.TEAM)) {
             Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.operation.denied");
         }
         return ResponseData.success(orgService.createOrganization(createParam));

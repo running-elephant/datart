@@ -29,6 +29,7 @@ import styled from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_SM,
   FONT_WEIGHT_MEDIUM,
+  LEVEL_100,
   LINE_HEIGHT_ICON_SM,
   SPACE_LG,
   SPACE_SM,
@@ -58,7 +59,6 @@ const TitleForShare: FC<TitleHeaderProps> = memo(
     }
     return (
       <Wrapper>
-        <h1>{name}</h1>
         <Space>
           {children}
           <Popconfirm
@@ -92,13 +92,14 @@ const FixedButton = styled.div`
   position: fixed;
   top: 8px;
   right: 8px;
-  z-index: 100;
+  z-index: ${LEVEL_100};
   cursor: pointer;
 `;
 const Wrapper = styled.div`
   display: flex;
   flex-shrink: 0;
   align-items: center;
+  justify-content: flex-end;
   width: 100%;
   padding: ${SPACE_SM} ${SPACE_LG};
 

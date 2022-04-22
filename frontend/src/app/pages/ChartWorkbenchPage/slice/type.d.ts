@@ -41,4 +41,5 @@ export type WorkbenchState = {
   aggregation?: boolean;
   datasetLoading: boolean;
   chartEditorDownloadPolling: boolean;
+  availableSourceFunctions?: string[];
 };

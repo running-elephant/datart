@@ -37,10 +37,10 @@ import { format } from 'sql-formatter';
 import styled from 'styled-components/macro';
 import {
   INFO,
+  LEVEL_1,
   SPACE,
   SPACE_TIMES,
   SPACE_XS,
-  STICKY_LEVEL,
   WARNING,
 } from 'styles/StyleConstants';
 import { getInsertedNodeIndex } from 'utils/utils';
@@ -263,9 +263,9 @@ export const Toolbar = memo(({ allowManage, allowEnableViz }: ToolbarProps) => {
           />
         </Space>
       </Operates>
-      {allowManage && (
-        <Actions>
-          <Space>
+      <Actions>
+        <Space>
+          {allowManage && (
             <Tooltip
               title={
                 <TipTitle
@@ -281,46 +281,50 @@ export const Toolbar = memo(({ allowManage, allowEnableViz }: ToolbarProps) => {
                 onClick={onSave}
               />
             </Tooltip>
-
-            {!isNewView(id) && (
-              <Tooltip title={t('info')} placement="bottom">
-                <ToolbarButton
-                  icon={<SettingFilled />}
-                  disabled={isArchived}
-                  color={INFO}
-                  onClick={showEdit}
-                />
-              </Tooltip>
-            )}
-
+          )}
+          {allowManage && (
+            <Tooltip title={t('info')} placement="bottom">
+              <ToolbarButton
+                icon={<SettingFilled />}
+                disabled={isArchived || isNewView(id)}
+                color={INFO}
+                onClick={showEdit}
+              />
+            </Tooltip>
+          )}
+          {allowManage && (
             <Tooltip title={t('saveAs')} placement="bottom">
               <ToolbarButton
                 icon={<CopyFilled />}
                 onClick={() => saveAsView(id)}
+                disabled={isNewView(id)}
+                color={INFO}
               />
             </Tooltip>
-            {/* <Tooltip title={t('saveFragment')} placement="bottom">
+          )}
+          {/* <Tooltip title={t('saveFragment')} placement="bottom">
             <ToolbarButton icon={<SnippetsFilled />} />
           </Tooltip> */}
-          </Space>
-        </Actions>
-      )}
-      {allowEnableViz && (
-        <Tooltip title={t('startAnalysis')} placement="bottom">
-          <ToolbarButton
-            icon={<MonitorOutlined />}
-            onClick={() => {
-              startAnalysis(id);
-            }}
-          />
-        </Tooltip>
-      )}
+          {allowEnableViz && (
+            <Tooltip title={t('startAnalysis')} placement="bottom">
+              <ToolbarButton
+                disabled={isNewView(id)}
+                icon={<MonitorOutlined />}
+                color={INFO}
+                onClick={() => {
+                  startAnalysis(id);
+                }}
+              />
+            </Tooltip>
+          )}
+        </Space>
+      </Actions>
     </Container>
   );
 });
 
 const Container = styled.div`
-  z-index: ${STICKY_LEVEL};
+  z-index: ${LEVEL_1};
   display: flex;
   flex-shrink: 0;
   align-items: center;

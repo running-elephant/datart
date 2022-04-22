@@ -34,6 +34,7 @@ import {
   ChartDataConfig,
   ChartStyleConfig,
 } from 'app/types/ChartConfig';
+import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -56,6 +57,7 @@ const CONFIG_PANEL_TABS = {
 };
 
 const ChartConfigPanel: FC<{
+  dataView?: ChartDataView;
   chartId?: string;
   chartConfig?: ChartConfig;
   expensiveQuery?: boolean;
@@ -204,11 +206,11 @@ const StyledChartDataViewPanel = styled.div`
 
 const ConfigBlock = styled.div`
   display: flex;
+  flex: 1;
   flex-direction: column;
   min-height: 0;
-  flex: 1;
-  border-radius: ${BORDER_RADIUS};
   background-color: ${p => p.theme.componentBackground};
+  border-radius: ${BORDER_RADIUS};
 
   .tabs {
     flex-shrink: 0;

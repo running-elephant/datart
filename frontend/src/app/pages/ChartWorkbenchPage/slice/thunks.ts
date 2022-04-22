@@ -19,13 +19,16 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
+import { ChartConfig, ChartDataConfig } from 'app/types/ChartConfig';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { View } from 'app/types/View';
 import {
   buildUpdateChartRequest,
-  convertToChartDTO,
+  convertToChartDto,
 } from 'app/utils/ChartDtoHelper';
+import { fetchAvailableSourceFunctionsAsync } from 'app/utils/fetch';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { request2 } from 'utils/request';
 import { rejectHandle } from 'utils/utils';
@@ -124,6 +127,9 @@ export const updateChartConfigAndRefreshDatasetAction = createAsyncThunk(
       type: string;
       payload: ChartConfigPayloadType;
       needRefresh?: boolean;
+      updateDrillOption: (
+        config?: ChartConfig,
+      ) => IChartDrillOption | undefined;
     },
     thunkAPI,
   ) => {
@@ -132,8 +138,12 @@ export const updateChartConfigAndRefreshDatasetAction = createAsyncThunk(
       await thunkAPI.dispatch(
         workbenchSlice.actions.updateShadowChartConfig(null),
       );
+      const state = thunkAPI.getState() as any;
+      const workbenchState = state.workbench as typeof initState;
+      const chartConfig = workbenchState.chartConfig;
+      const drillOpt = arg.updateDrillOption?.(chartConfig);
       if (arg.needRefresh) {
-        thunkAPI.dispatch(refreshDatasetAction({}));
+        thunkAPI.dispatch(refreshDatasetAction({ drillOption: drillOpt }));
       }
     } catch (error) {
       return rejectHandle(error, thunkAPI.rejectWithValue);
@@ -145,6 +155,8 @@ export const refreshDatasetAction = createAsyncThunk(
   'workbench/refreshDatasetAction',
   async (
     arg: {
+      dataOption?: ChartDataConfig[];
+      drillOption?: IChartDrillOption;
       pageInfo?;
       sorter?: { column: string; operator: string; aggOperator?: string };
     },
@@ -156,10 +168,10 @@ export const refreshDatasetAction = createAsyncThunk(
     if (!workbenchState.currentDataView?.id) {
       return;
     }
-
+    const datas = arg?.dataOption || workbenchState.chartConfig?.datas;
     const builder = new ChartDataRequestBuilder(
       workbenchState.currentDataView,
-      workbenchState.chartConfig?.datas,
+      datas,
       workbenchState.chartConfig?.settings,
       arg?.pageInfo,
       true,
@@ -167,6 +179,7 @@ export const refreshDatasetAction = createAsyncThunk(
     );
     const requestParams = builder
       .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
+      .addDrillOption(arg?.drillOption)
       .build();
     return thunkAPI.dispatch(fetchDataSetAction(requestParams));
   },
@@ -214,7 +227,7 @@ export const fetchChartAction = createAsyncThunk<
       method: 'GET',
       url: `viz/datacharts/${arg.chartId}`,
     });
-    return convertToChartDTO(response?.data);
+    return convertToChartDto(response?.data);
   }
   return arg.backendChart as any;
 });
@@ -250,3 +263,14 @@ export const updateChartAction = createAsyncThunk(
     return response.data;
   },
 );
+
+export const fetchAvailableSourceFunctions = createAsyncThunk<
+  string[],
+  { sourceId: string }
+>('workbench/fetchAvailableSourceFunctions', async arg => {
+  try {
+    return await fetchAvailableSourceFunctionsAsync(arg.sourceId);
+  } catch (err) {
+    throw err;
+  }
+});

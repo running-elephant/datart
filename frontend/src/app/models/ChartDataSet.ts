@@ -165,6 +165,14 @@ export class ChartDataSetRow<T>
     return this?.[this.toIndexBy(this.columnIndexTable, field)] as T;
   }
 
+  public getMultiCell(...fields: ChartDataSectionField[]): string {
+    return (fields || [])
+      .map(field => {
+        return this?.[this.toIndexBy(this.columnIndexTable, field)];
+      })
+      .join('-');
+  }
+
   public getCellByKey(key: string) {
     return this?.[this.toIndex(this.columnIndexTable, key)] as T;
   }

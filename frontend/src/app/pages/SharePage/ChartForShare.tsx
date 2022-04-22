@@ -16,40 +16,46 @@
  * limitations under the License.
  */
 
+import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
+import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
-import { VizHeader } from 'app/components/VizHeader';
+import { ChartDataViewFieldCategory } from 'app/constants';
 import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import ChartManager from 'app/models/ChartManager';
 import { IChart } from 'app/types/Chart';
-import { ChartDataRequest } from 'app/types/ChartDataRequest';
-import { FC, memo, useState } from 'react';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import {
+  getRuntimeComputedFields,
+  getRuntimeDateLevelFields,
+} from 'app/utils/chartHelper';
+import { getChartDrillOption } from 'app/utils/internalChartHelper';
+import { FC, memo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { ChartDataRequestBuilder } from '../../models/ChartDataRequestBuilder';
+import ChartDrillContext from '../ChartWorkbenchPage/contexts/ChartDrillContext';
 import ControllerPanel from '../MainPage/pages/VizPage/ChartPreview/components/ControllerPanel';
 import {
   ChartPreview,
   FilterSearchParams,
 } from '../MainPage/pages/VizPage/slice/types';
 import { HeadlessBrowserIdentifier } from './HeadlessBrowserIdentifier';
-import {} from './slice';
+import { shareActions } from './slice';
 import { selectHeadlessBrowserRenderSign } from './slice/selectors';
 import {
   fetchShareDataSetByPreviewChartAction,
   updateFilterAndFetchDatasetForShare,
+  updateGroupAndFetchDatasetForShare,
 } from './slice/thunks';
 
 const TitleHeight = 100;
 const ChartForShare: FC<{
   chartPreview?: ChartPreview;
   filterSearchParams?: FilterSearchParams;
-  onCreateDataChartDownloadTask: (
-    downloadParams: ChartDataRequest[],
-    fileName: string,
-  ) => void;
-}> = memo(({ chartPreview, onCreateDataChartDownloadTask }) => {
+  availableSourceFunctions?: string[];
+}> = memo(({ chartPreview, availableSourceFunctions }) => {
   const dispatch = useDispatch();
+  const drillOptionRef = useRef<IChartDrillOption>();
   const [chart] = useState<IChart | undefined>(() => {
     const currentChart = ChartManager.instance().getById(
       chartPreview?.backendChart?.config?.chartGraphId,
@@ -76,6 +82,10 @@ const ChartForShare: FC<{
     if (!chartPreview) {
       return;
     }
+    drillOptionRef.current = getChartDrillOption(
+      chartPreview?.chartConfig?.datas,
+      drillOptionRef?.current,
+    );
     dispatch(fetchShareDataSetByPreviewChartAction({ preview: chartPreview }));
     registerChartEvents(chart);
   });
@@ -85,6 +95,16 @@ const ChartForShare: FC<{
       {
         name: 'click',
         callback: param => {
+          if (
+            drillOptionRef.current?.isSelectedDrill &&
+            !drillOptionRef.current.isBottomLevel
+          ) {
+            const option = drillOptionRef.current;
+            option.drillDown(param.data.rowData);
+            drillOptionRef.current = option;
+            handleDrillOptionChange(option);
+            return;
+          }
           if (
             param.componentType === 'table' &&
             param.seriesType === 'paging-sort-filter'
@@ -115,46 +135,53 @@ const ChartForShare: FC<{
         backendChartId: chartPreview?.backendChart?.id!,
         chartPreview,
         payload,
+        drillOption: drillOptionRef?.current,
       }),
     );
   };
 
-  const handleCreateDownloadDataTask = async () => {
-    const builder = new ChartDataRequestBuilder(
-      {
-        id: chartPreview?.backendChart?.view.id || '',
-        config: chartPreview?.backendChart?.view.config || {},
-        computedFields:
-          chartPreview?.backendChart?.config?.computedFields || [],
-      },
-      chartPreview?.chartConfig?.datas,
-      chartPreview?.chartConfig?.settings,
-      {},
-      false,
-      chartPreview?.backendChart?.config?.aggregation,
+  const handleDrillOptionChange = (option: IChartDrillOption) => {
+    drillOptionRef.current = option;
+    dispatch(
+      updateFilterAndFetchDatasetForShare({
+        backendChartId: chartPreview?.backendChart?.id!,
+        chartPreview,
+        payload: null,
+        drillOption: drillOptionRef?.current,
+      }),
+    );
+  };
+
+  const handleDateLevelChange = (type, payload) => {
+    const rows = getRuntimeDateLevelFields(payload.value?.rows);
+    const dateLevelComputedFields = rows.filter(
+      v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
+    );
+    const replacedColName = payload.value.replacedColName;
+    const computedFields = getRuntimeComputedFields(
+      dateLevelComputedFields,
+      replacedColName,
+      chartPreview?.backendChart?.config?.computedFields,
+      chartPreview?.chartConfig,
     );
 
-    const downloadParams = [
-      {
-        ...builder.build(),
-        analytics: false,
-        vizType: 'dataChart',
-        vizName: chartPreview?.backendChart?.name || 'chart',
-        vizId: chartPreview?.backendChart?.id,
-      },
-    ];
-    const fileName = chartPreview?.backendChart?.name || 'chart';
-    onCreateDataChartDownloadTask(downloadParams, fileName);
+    dispatch(
+      shareActions.updateComputedFields({
+        backendChartId: chartPreview?.backendChart?.id!,
+        computedFields,
+      }),
+    );
+    dispatch(
+      updateGroupAndFetchDatasetForShare({
+        backendChartId: chartPreview?.backendChart?.id!,
+        payload: payload,
+        drillOption: drillOptionRef?.current,
+      }),
+    );
   };
 
   return (
     <StyledChartPreviewBoard>
-      <VizHeader
-        chartName={chartPreview?.backendChart?.name}
-        onDownloadData={handleCreateDownloadDataTask}
-        allowShare
-        allowDownload
-      />
       <div ref={controlRef}>
         <ControllerPanel
           viewId={chartPreview?.backendChart?.viewId}
@@ -162,18 +189,30 @@ const ChartForShare: FC<{
           onChange={handleFilterChange}
         />
       </div>
-
-      <div style={{ width: '100%', height: '100%' }} ref={ref}>
-        <ChartIFrameContainer
-          key={chartPreview?.backendChart?.id!}
-          containerId={chartPreview?.backendChart?.id!}
-          dataset={chartPreview?.dataset}
-          chart={chart!}
-          config={chartPreview?.chartConfig!}
-          width={width}
-          height={height}
-        />
-      </div>
+      <ChartDrillContext.Provider
+        value={{
+          drillOption: drillOptionRef.current,
+          availableSourceFunctions,
+          onDrillOptionChange: handleDrillOptionChange,
+          onDateLevelChange: handleDateLevelChange,
+        }}
+      >
+        <div style={{ width: '100%', height: '100%' }} ref={ref}>
+          <ChartDrillContextMenu chartConfig={chartPreview?.chartConfig}>
+            <ChartIFrameContainer
+              key={chartPreview?.backendChart?.id!}
+              containerId={chartPreview?.backendChart?.id!}
+              dataset={chartPreview?.dataset}
+              chart={chart!}
+              config={chartPreview?.chartConfig!}
+              drillOption={drillOptionRef.current}
+              width={width}
+              height={height}
+            />
+          </ChartDrillContextMenu>
+        </div>
+        <ChartDrillPaths />
+      </ChartDrillContext.Provider>
       <HeadlessBrowserIdentifier
         renderSign={headlessBrowserRenderSign}
         width={Number(width) || 0}
@@ -190,6 +229,10 @@ const StyledChartPreviewBoard = styled.div`
   flex-flow: column;
   width: 100%;
   height: 100%;
+
+  .chart-drill-menu-container {
+    height: 100%;
+  }
 
   iframe {
     flex-grow: 1000;

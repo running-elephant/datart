@@ -21,11 +21,13 @@ import { FONT_FAMILY } from 'styles/StyleConstants';
 export const DATARTSEPERATOR = '@datart@';
 export const CHARTCONFIG_FIELD_PLACEHOLDER_UID = '@placeholder@';
 export const DATART_TRANSLATE_HOLDER = '@global@';
+export const EVENT_ACTION_DELAY_MS = 200;
 
 export enum StorageKeys {
   AuthorizationToken = 'AUTHORIZATION_TOKEN',
   LoggedInUser = 'LOGGED_IN_USER',
   ShareClientId = 'SHARE_CLIENT_ID',
+  AuthRedirectUrl = 'AUTH_REDIRECT_URL',
   Locale = 'LOCALE',
   Theme = 'THEME',
 }
@@ -122,6 +124,7 @@ export const CHART_LINE_WIDTH = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 export const CHART_DRAG_ELEMENT_TYPE = {
   DATA_CONFIG_COLUMN: 'data_config_column',
   DATASET_COLUMN: 'dataset_column',
+  DATASET_COLUMN_GROUP: 'dataset_column_group',
 };
 
 export const TIME_UNIT_OPTIONS = [

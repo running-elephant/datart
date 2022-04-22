@@ -31,6 +31,7 @@ import ChartDataSetDTO, {
 import {
   getAutoFunnelTopPosition,
   getColumnRenderName,
+  getDrillableRows,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
@@ -42,6 +43,7 @@ import {
 import { init } from 'echarts';
 import isEmpty from 'lodash/isEmpty';
 import Chart from '../../../models/Chart';
+import { ChartDrillOption } from '../../../models/ChartDrillOption';
 import Config from './config';
 import { Series, SeriesData } from './types';
 
@@ -86,7 +88,11 @@ class BasicFunnelChart extends Chart {
     if (!this.isMatchRequirement(props.config)) {
       return;
     }
-    const newOptions = this.getOptions(props.dataset, props.config);
+    const newOptions = this.getOptions(
+      props.dataset,
+      props.config,
+      props.drillOption,
+    );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
@@ -98,12 +104,17 @@ class BasicFunnelChart extends Chart {
     this.chart?.resize({ width: context?.width, height: context?.height });
   }
 
-  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
+  private getOptions(
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    drillOption: ChartDrillOption,
+  ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
-    const groupConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
-      .flatMap(config => config.rows || []);
+    const groupConfigs: ChartDataSectionField[] = getDrillableRows(
+      dataConfigs,
+      drillOption,
+    );
     const aggregateConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);

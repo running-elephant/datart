@@ -30,6 +30,14 @@ spring:
 #             name: "attributes.name"
 #             avatar: "attributes.avatar"
 
+# ldap config
+
+# ldap:
+#   urls: ldap://{IP}:{PORT}
+#   base: xxx
+#   username: {username}
+#   password: {password}
+
 # mail config
 
 # mail:
@@ -62,14 +70,20 @@ spring:
 server:
   port: ${server.port:8080}
   address: ${server.ip:0.0.0.0}
+  ssl:
+    enabled: false
+    key-store: keystore.p12 # Absolute path
+    key-store-password: password
+    keyStoreType: PKCS12
+    keyAlias: tomcat
 
 datart:
   server:
     address: ${datart.address:http://127.0.0.1:8080}
 
-  # 系统运行模式：normal-正常(默认)，single-单组织
-  mode: normal
-  # 用户名/密码: 仅单组织模式且两者都不为空时重置
+  # 租户管理模式：platform-平台(默认)，team-团队
+  tenant-management-mode: platform
+  # 团队管理员用户名/密码: 仅team模式且两者都不为空时重置
   admin:
     username:
     password:

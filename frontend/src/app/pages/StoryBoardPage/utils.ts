@@ -86,17 +86,3 @@ export const getStoryPage = (pages: StoryPageOfServer[]) => {
     config: migrateStoryPageConfig(page.config),
   }));
 };
-
-export const generateShareLink = async (
-  expireDate,
-  enablePassword,
-  storyId: string,
-) => {
-  const result = await generateShareLinkAsync(
-    expireDate,
-    enablePassword,
-    storyId,
-    'STORYBOARD',
-  );
-  return result;
-};

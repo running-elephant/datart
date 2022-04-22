@@ -29,6 +29,7 @@ import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
   getDataColumnMaxAndMin2,
+  getDrillableRows,
   getExtraSeriesRowData,
   getGridStyle,
   getReference2,
@@ -39,6 +40,7 @@ import {
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import Chart from '../../../models/Chart';
+import { ChartDrillOption } from '../../../models/ChartDrillOption';
 import Config from './config';
 import { ScatterMetricAndSizeSerie } from './types';
 
@@ -80,7 +82,11 @@ class BasicScatterChart extends Chart {
       this.chart?.clear();
       return;
     }
-    const newOptions = this.getOptions(props.dataset, props.config);
+    const newOptions = this.getOptions(
+      props.dataset,
+      props.config,
+      props.drillOption,
+    );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
@@ -92,13 +98,18 @@ class BasicScatterChart extends Chart {
     this.chart?.resize(opt, context);
   }
 
-  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
+  private getOptions(
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    drillOption: ChartDrillOption,
+  ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const settingConfigs = config.settings || [];
-    const groupConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
-      .flatMap(config => config.rows || []);
+    const groupConfigs: ChartDataSectionField[] = getDrillableRows(
+      dataConfigs,
+      drillOption,
+    );
     const aggregateConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
@@ -244,8 +255,11 @@ class BasicScatterChart extends Chart {
     const seriesName = groupConfigs
       ?.map(gc => getColumnRenderName(gc))
       .join('-');
-    const seriesDatas = dataSetRows?.map(row => {
-      const sizeValue = row.getCell(sizeConfigs?.[0]) || min;
+    const defaultSizeValue = (max - min) / 2;
+    const seriesDatas = dataSetRows?.map((row, dcIndex) => {
+      const sizeValue = sizeConfigs?.length
+        ? row.getCell(sizeConfigs?.[0]) || min
+        : defaultSizeValue;
       return {
         ...getExtraSeriesRowData(row),
         name: groupConfigs?.map(row.getCell, row).join('-'),

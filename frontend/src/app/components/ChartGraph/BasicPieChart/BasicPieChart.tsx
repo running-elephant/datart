@@ -30,6 +30,7 @@ import ChartDataSetDTO, {
 } from 'app/types/ChartDataSet';
 import {
   getColumnRenderName,
+  getDrillableRows,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
@@ -40,6 +41,7 @@ import {
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import Chart from '../../../models/Chart';
+import { ChartDrillOption } from '../../../models/ChartDrillOption';
 import Config from './config';
 import { PieSeries, PieSeriesImpl, PieSeriesStyle } from './types';
 
@@ -83,7 +85,11 @@ class BasicPieChart extends Chart {
       this.chart?.clear();
       return;
     }
-    const newOptions = this.getOptions(props.dataset, props.config);
+    const newOptions = this.getOptions(
+      props.dataset,
+      props.config,
+      props.drillOption,
+    );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
@@ -95,12 +101,17 @@ class BasicPieChart extends Chart {
     this.chart?.resize(context);
   }
 
-  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
+  private getOptions(
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    drillOption: ChartDrillOption,
+  ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
-    const groupConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
-      .flatMap(config => config.rows || []);
+    const groupConfigs: ChartDataSectionField[] = getDrillableRows(
+      dataConfigs,
+      drillOption,
+    );
     const aggregateConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);

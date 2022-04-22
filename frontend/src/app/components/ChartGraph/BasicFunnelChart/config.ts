@@ -29,7 +29,9 @@ const config: ChartConfig = {
       actions: {
         NUMERIC: ['alias', 'colorize', 'sortable'],
         STRING: ['alias', 'colorize', 'sortable'],
+        DATE: ['alias', 'colorize', 'sortable'],
       },
+      drillable: true,
     },
     {
       label: 'metrics',

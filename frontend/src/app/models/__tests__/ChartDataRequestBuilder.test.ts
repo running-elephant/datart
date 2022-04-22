@@ -23,6 +23,7 @@ import {
   DataViewFieldType,
   FilterConditionType,
 } from 'app/constants';
+import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import { FilterSqlOperator, RECOMMEND_TIME } from 'globalConstants';
 import moment from 'moment';
 import { ChartDataRequestBuilder } from '../ChartDataRequestBuilder';
@@ -308,6 +309,20 @@ describe('ChartDataRequestBuild Test', () => {
       { column: 'age' },
       { column: 'address' },
     ]);
+
+    const enableAggregation2 = false;
+
+    const builder2 = new ChartDataRequestBuilder(
+      dataView,
+      chartDataConfigs,
+      chartSettingConfigs,
+      pageInfo,
+      enableScript,
+      enableAggregation2,
+    );
+    const requestParams2 = builder2.build();
+
+    expect(requestParams2.groups).toEqual([]);
   });
 
   test('should get filters', () => {
@@ -1056,6 +1071,122 @@ describe('ChartDataRequestBuild Test', () => {
       'sex',
       'name',
       'name',
+    ]);
+  });
+
+  test('should get select columns with drill option', () => {
+    const dataView = { id: 'view-id' } as any;
+    const chartDataConfigs = [
+      {
+        type: ChartDataSectionType.GROUP,
+        key: 'GROUP',
+        drillable: true,
+        rows: [
+          {
+            uid: 'group-r1',
+            colName: 'group-r1',
+            type: '',
+            category: '',
+          },
+          {
+            uid: 'group-r2',
+            colName: 'group-r2',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.AGGREGATE,
+        key: 'aggregation',
+        rows: [
+          {
+            colName: 'amount',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.SIZE,
+        key: 'size',
+        rows: [
+          {
+            colName: 'size',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.INFO,
+        key: 'info',
+        rows: [
+          {
+            colName: 'info',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.COLOR,
+        key: 'color',
+        rows: [
+          {
+            colName: 'color',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.MIXED,
+        key: 'MIXED',
+        rows: [
+          {
+            colName: 'mix',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.FILTER,
+        key: 'filter',
+        rows: [
+          {
+            colName: 'filter',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+    ] as any;
+    const chartSettingConfigs = [];
+    const pageInfo = {};
+    const enableScript = false;
+    const enableAggregation = false;
+    const drillOption = getChartDrillOption(chartDataConfigs);
+    drillOption?.drillDown();
+
+    const builder = new ChartDataRequestBuilder(
+      dataView,
+      chartDataConfigs,
+      chartSettingConfigs,
+      pageInfo,
+      enableScript,
+      enableAggregation,
+    ).addDrillOption(drillOption);
+    const requestParams = builder.build();
+
+    expect(requestParams.columns).toEqual([
+      'group-r2',
+      'amount',
+      'size',
+      'info',
+      'color',
+      'mix',
     ]);
   });
 });

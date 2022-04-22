@@ -89,3 +89,8 @@ export const selectChartEditorDownloadPolling = createSelector(
   workbenchSelector,
   wb => wb.chartEditorDownloadPolling,
 );
+
+export const selectAvailableSourceFunctions = createSelector(
+  workbenchSelector,
+  wb => wb.availableSourceFunctions,
+);

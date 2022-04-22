@@ -210,7 +210,10 @@ const boardSlice = createSlice({
       action: PayloadAction<{ boardId: string; wh: [number, number] }>,
     ) {
       const { boardId, wh } = action.payload;
-      state.boardInfoRecord[boardId].boardWidthHeight = wh;
+      let boardInfo = state.boardInfoRecord?.[boardId];
+      if (boardInfo) {
+        state.boardInfoRecord[boardId].boardWidthHeight = wh;
+      }
     },
     changeBoardPublish(
       state,
@@ -244,15 +247,15 @@ const boardSlice = createSlice({
       }>,
     ) {
       const { boardId, widgetId, errInfo, errorType } = action.payload;
+
       if (!state.widgetInfoRecord?.[boardId]?.[widgetId]) return;
-      let errorObj = state.widgetInfoRecord[boardId][widgetId].errInfo || {};
+      let widgetInfo = state.widgetInfoRecord[boardId][widgetId];
 
       if (errInfo) {
-        errorObj[errorType] = errInfo;
+        widgetInfo.errInfo[errorType] = errInfo;
       } else {
-        delete errorObj[errorType];
+        delete widgetInfo[errorType];
       }
-      state.widgetInfoRecord[boardId][widgetId].errInfo = errorObj;
     },
     resetControlWidgets(
       state,

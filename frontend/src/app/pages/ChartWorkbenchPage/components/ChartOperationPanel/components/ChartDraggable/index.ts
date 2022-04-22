@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-export { default as ChartDraggableElement } from './ChartDraggableElement';
 export { default as ChartDraggableSourceContainer } from './ChartDraggableSourceContainer';
 export { default as ChartDraggableSourceGroupContainer } from './ChartDraggableSourceGroupContainer';
 export { default as ChartDraggableTargetContainer } from './ChartDraggableTargetContainer';

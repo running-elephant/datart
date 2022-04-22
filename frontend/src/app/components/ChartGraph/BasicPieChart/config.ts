@@ -25,11 +25,13 @@ const config: ChartConfig = {
       key: 'dimension',
       required: true,
       type: 'group',
-      limit: [0, 1],
+      limit: [0, 999],
       actions: {
         NUMERIC: ['alias', 'colorize', 'sortable'],
         STRING: ['alias', 'colorize', 'sortable'],
+        DATE: ['alias', 'colorize', 'sortable'],
       },
+      drillable: true,
     },
     {
       label: 'metrics',

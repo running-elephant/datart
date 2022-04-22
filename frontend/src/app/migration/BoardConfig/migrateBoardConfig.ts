@@ -21,7 +21,7 @@ import {
   DashboardConfig,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getInitBoardConfig } from 'app/pages/DashBoardPage/utils/board';
-import { versionCanDo } from '../utils';
+import { setLatestVersion, versionCanDo } from '../utils';
 import {
   APP_VERSION_BETA_0,
   APP_VERSION_BETA_1,
@@ -66,11 +66,6 @@ export const beta0 = (config: DashboardConfig) => {
   return config;
 };
 
-export const beta1 = (config: DashboardConfig) => {
-  if (!versionCanDo(APP_VERSION_BETA_1, config.version)) return config;
-  config.version = APP_VERSION_BETA_1;
-  return config;
-};
 export const beta2 = (config: DashboardConfig) => {
   if (!versionCanDo(APP_VERSION_BETA_1, config.version)) return config;
   // allowOverlap in autoBoard
@@ -80,10 +75,12 @@ export const beta2 = (config: DashboardConfig) => {
   config.version = APP_VERSION_BETA_2;
   return config;
 };
+
 export const migrateBoardConfig = (boardConfig: string) => {
   let config = parseBoardConfig(boardConfig);
   config = beta0(config);
-  config = beta1(config);
+
   config = beta2(config);
+  config = setLatestVersion(config);
   return config;
 };

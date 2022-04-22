@@ -16,7 +16,13 @@
  * limitations under the License.
  */
 
-import { AggregateFieldActionType, FieldFormatType } from 'app/constants';
+import {
+  AggregateFieldActionType,
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+  DataViewFieldType,
+  FieldFormatType,
+} from 'app/constants';
 import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,
@@ -27,10 +33,6 @@ import {
   RECOMMEND_TIME,
 } from 'globalConstants';
 import { ValueOf } from 'types';
-import {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from './ChartDataView';
 
 export type FilterFieldAction = {
   condition?: FilterCondition;
@@ -103,8 +105,10 @@ export type ChartDataSectionField = {
   uid?: string;
   colName: string;
   desc?: string;
-  type: ChartDataViewFieldType;
-  category: Lowercase<keyof typeof ChartDataViewFieldCategory>;
+  type: DataViewFieldType;
+  category: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
+  expression?: string;
+  field?: string;
 
   sort?: SortFieldAction;
   alias?: AliasFieldAction;
@@ -168,12 +172,13 @@ export type ChartDataConfig = ChartConfigBase & {
   actions?: Array<ValueOf<typeof ChartDataSectionFieldActionType>> | object;
   limit?: null | number | string | number[] | string[];
   disableAggregate?: boolean;
+  drillable?: boolean;
   options?: {
     [key in ValueOf<typeof ChartDataSectionFieldActionType>]: {
       backendSort?: boolean;
     };
   };
-
+  replacedColName?: string;
   // NOTE: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
 };

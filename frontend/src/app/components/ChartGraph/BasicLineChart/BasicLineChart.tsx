@@ -35,6 +35,7 @@ import {
   getAxisTick,
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
+  getDrillableRows,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
@@ -51,6 +52,7 @@ import {
 import { init } from 'echarts';
 import { UniqArray } from 'utils/object';
 import Chart from '../../../models/Chart';
+import { ChartDrillOption } from '../../../models/ChartDrillOption';
 import Config from './config';
 import { Series } from './types';
 
@@ -97,7 +99,11 @@ class BasicLineChart extends Chart {
       this.chart?.clear();
       return;
     }
-    const newOptions = this.getOptions(props.dataset, props.config);
+    const newOptions = this.getOptions(
+      props.dataset,
+      props.config,
+      props.drillOption,
+    );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
@@ -110,13 +116,18 @@ class BasicLineChart extends Chart {
     this.chart?.dispose();
   }
 
-  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
+  private getOptions(
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    drillOption: ChartDrillOption,
+  ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const settingConfigs = config.settings || [];
-    const groupConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
-      .flatMap(config => config.rows || []);
+    const groupConfigs: ChartDataSectionField[] = getDrillableRows(
+      dataConfigs,
+      drillOption,
+    );
     const aggregateConfigs = dataConfigs
       .filter(c => c.type === ChartDataSectionType.AGGREGATE)
       .flatMap(config => config.rows || []);
@@ -133,13 +144,17 @@ class BasicLineChart extends Chart {
       dataConfigs,
     );
 
-    const xAxisColumns: XAxisColumns[] = (groupConfigs || []).map(config => {
-      return {
+    const xAxisColumns: XAxisColumns[] = [
+      {
         type: 'category',
         tooltip: { show: true },
-        data: UniqArray(chartDataSet.map(dc => dc.getCell(config))),
-      };
-    });
+        data: UniqArray(
+          chartDataSet?.map(row => {
+            return groupConfigs.map(g => row.getCell(g)).join('-');
+          }),
+        ),
+      },
+    ];
     const series = this.getSeries(
       settingConfigs,
       styleConfigs,
@@ -215,7 +230,6 @@ class BasicLineChart extends Chart {
       });
     }
 
-    const xAxisConfig = groupConfigs?.[0];
     const secondGroupInfos = getColorizeGroupSeriesColumns(
       chartDataSet,
       colorConfigs[0],
@@ -239,7 +253,9 @@ class BasicLineChart extends Chart {
             normal: { color: itemStyleColor?.value },
           },
           data: xAxisColumns[0].data.map(d => {
-            const row = dataSet.find(r => r.getCell(xAxisConfig) === d)!;
+            const row = dataSet.find(
+              r => r.getMultiCell(...groupConfigs) === d,
+            )!;
             return {
               ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),

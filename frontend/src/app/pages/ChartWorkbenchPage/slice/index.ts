@@ -29,6 +29,7 @@ import { updateCollectionByAction } from 'app/utils/mutation';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { ChartConfigReducerActionType } from './constant';
 import {
+  fetchAvailableSourceFunctions,
   fetchChartAction,
   fetchDataSetAction,
   fetchDataViewsAction,
@@ -198,7 +199,13 @@ const workbenchSlice = createSlice({
           chartConfigDTO.aggregation === undefined
             ? true
             : chartConfigDTO.aggregation;
-      });
+      })
+      .addCase(
+        fetchAvailableSourceFunctions.fulfilled,
+        (state, { payload }) => {
+          state.availableSourceFunctions = payload;
+        },
+      );
 
     builder.addCase(fetchDataSetAction.pending, (state, action) => {
       state.datasetLoading = true;
