@@ -30,6 +30,14 @@ spring:
 #             name: "attributes.name"
 #             avatar: "attributes.avatar"
 
+# ldap config
+
+# ldap:
+#   urls: ldap://{IP}:{PORT}
+#   base: xxx
+#   username: {username}
+#   password: {password}
+
 # mail config
 
 # mail:
