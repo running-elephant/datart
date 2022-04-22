@@ -23,6 +23,7 @@ export const updateDataConfigByField = (
   uid: string,
   config: ChartDataConfig,
   field: ChartDataSectionField,
+  deleteColName?: string,
 ): ChartDataConfig => {
   return updateBy(config, draft => {
     draft.rows = (draft.rows || []).map(r => {
@@ -31,6 +32,9 @@ export const updateDataConfigByField = (
       }
       return r;
     });
+    if (deleteColName) {
+      draft.deleteColName = deleteColName;
+    }
     return draft;
   });
 };

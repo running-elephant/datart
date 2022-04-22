@@ -18,92 +18,182 @@
 
 import { CheckOutlined } from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
+import {
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+  interimDateAggregatedKey,
+} from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { DrillMode } from 'app/models/ChartDrillOption';
+import DateMeunItem from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/DateAggregationAction/DateMeunItem';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import { ChartConfig, ChartDataSectionField } from 'app/types/ChartConfig';
+import { getInterimDateAggregateRows } from 'app/utils/chartHelper';
+import { updateBy } from 'app/utils/mutation';
 import classnames from 'classnames';
-import { FC, memo, useContext, useMemo } from 'react';
+import { FC, memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { FONT_WEIGHT_MEDIUM, SPACE_SM } from 'styles/StyleConstants';
 
-const ChartDrillContextMenu: FC<{}> = memo(({ children }) => {
-  const t = useI18NPrefix(`viz.palette.drill`);
-  const { drillOption, onDrillOptionChange } = useContext(ChartDrillContext);
+const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
+  ({ children, chartConfig }) => {
+    const t = useI18NPrefix(`viz.palette.drill`);
+    const {
+      drillOption,
+      onDrillOptionChange,
+      sourceSupportDateField,
+      onChartDrillDataAggregationChange,
+    } = useContext(ChartDrillContext);
+    const currentFields = drillOption?.getCurrentFields();
+    const currentDrillLevel = drillOption?.getCurrentDrillLevel();
 
-  const currentDrillLevel = drillOption?.getCurrentDrillLevel();
-  const selectDrillStatusMenu = useMemo(() => {
-    return (
-      <Menu.Item key="selectDrillStatus">
-        <StyledMenuSwitch
-          className={classnames({ on: !!drillOption?.isSelectedDrill })}
+    const currentDrillField = useMemo(() => {
+      if (!drillOption) {
+        return;
+      }
+      const allFields = drillOption.getAllFields();
+      const groupSection = chartConfig?.datas?.find(
+        v => v.type === ChartDataSectionType.GROUP,
+      );
+      let rows: ChartDataSectionField[] | undefined = [];
+
+      if (currentFields) {
+        rows = groupSection?.rows?.filter(v =>
+          currentFields.some(val => val.uid === v.uid),
+        );
+      } else {
+        rows = groupSection?.rows?.filter(v => v.uid === allFields[0].uid);
+      }
+      return getInterimDateAggregateRows(rows);
+    }, [currentFields, drillOption, chartConfig?.datas]);
+
+    const handleChangeDataAggregate = useCallback(
+      (config: ChartDataSectionField) => {
+        const groupData = chartConfig?.datas?.find(
+          v => v.type === ChartDataSectionType.GROUP,
+        );
+
+        if (groupData) {
+          const _groupData = updateBy(groupData, draft => {
+            if (draft.rows) {
+              const index = draft.rows.findIndex(v => v.uid === config.uid);
+              const interimDateAggregatedValue =
+                draft.rows[index][interimDateAggregatedKey];
+              const deleteColName = interimDateAggregatedValue
+                ? interimDateAggregatedValue.colName
+                : draft.rows[index].colName;
+
+              draft.rows[index][interimDateAggregatedKey] = config;
+              draft.deleteColName = deleteColName;
+            }
+          });
+
+          onChartDrillDataAggregationChange?.('data', {
+            needRefresh: true,
+            ancestors: [0],
+            value: _groupData,
+          });
+        }
+      },
+      [chartConfig?.datas, onChartDrillDataAggregationChange],
+    );
+
+    const selectDrillStatusMenu = useMemo(() => {
+      return (
+        <Menu.Item key="selectDrillStatus">
+          <StyledMenuSwitch
+            className={classnames({ on: !!drillOption?.isSelectedDrill })}
+          >
+            <p>
+              {drillOption?.isSelectedDrill
+                ? t('selectDrillOn')
+                : t('selectDrillOff')}
+            </p>
+            <CheckOutlined className="icon" />
+          </StyledMenuSwitch>
+        </Menu.Item>
+      );
+    }, [drillOption?.isSelectedDrill, t]);
+    const contextMenu = useMemo(() => {
+      return (
+        <StyledChartDrillMenu
+          onClick={({ key }) => {
+            if (!drillOption) {
+              return;
+            }
+            if (key === 'selectDrillStatus') {
+              drillOption?.toggleSelectedDrill(!drillOption?.isSelectedDrill);
+              onDrillOptionChange?.(drillOption);
+            } else if (key === DrillMode.Drill) {
+              drillOption?.drillDown();
+              onDrillOptionChange?.(drillOption);
+            } else if (key === DrillMode.Expand) {
+              drillOption?.expandDown();
+              onDrillOptionChange?.(drillOption);
+            } else if (key === 'rollUp') {
+              drillOption?.rollUp();
+              onDrillOptionChange?.(drillOption);
+            }
+          }}
         >
-          <p>
-            {drillOption?.isSelectedDrill
-              ? t('selectDrillOn')
-              : t('selectDrillOff')}
-          </p>
-          <CheckOutlined className="icon" />
-        </StyledMenuSwitch>
-      </Menu.Item>
-    );
-  }, [drillOption?.isSelectedDrill, t]);
-  const contextMenu = useMemo(() => {
-    return (
-      <StyledChartDrillMenu
-        onClick={({ key }) => {
-          if (!drillOption) {
-            return;
-          }
-          if (key === 'selectDrillStatus') {
-            drillOption?.toggleSelectedDrill(!drillOption?.isSelectedDrill);
-            onDrillOptionChange?.(drillOption);
-          } else if (key === DrillMode.Drill) {
-            drillOption?.drillDown();
-            onDrillOptionChange?.(drillOption);
-          } else if (key === DrillMode.Expand) {
-            drillOption?.expandDown();
-            onDrillOptionChange?.(drillOption);
-          } else {
-            drillOption?.rollUp();
-            onDrillOptionChange?.(drillOption);
-          }
-        }}
-      >
-        {!!currentDrillLevel && (
-          <Menu.Item key={'rollUp'}>{t('rollUp')}</Menu.Item>
-        )}
-        {drillOption?.mode !== DrillMode.Expand &&
-          !drillOption?.isBottomLevel && (
-            <Menu.Item key={DrillMode.Drill}>{t('showNextLevel')}</Menu.Item>
+          {!!currentDrillLevel && (
+            <Menu.Item key={'rollUp'}>{t('rollUp')}</Menu.Item>
           )}
-        {drillOption?.mode !== DrillMode.Drill &&
-          !drillOption?.isBottomLevel && (
-            <Menu.Item key={DrillMode.Expand}>{t('expandNextLevel')}</Menu.Item>
-          )}
-        {drillOption?.mode !== DrillMode.Expand && selectDrillStatusMenu}
-      </StyledChartDrillMenu>
-    );
-  }, [
-    currentDrillLevel,
-    t,
-    drillOption,
-    selectDrillStatusMenu,
-    onDrillOptionChange,
-  ]);
+          {drillOption?.mode !== DrillMode.Expand &&
+            !drillOption?.isBottomLevel && (
+              <Menu.Item key={DrillMode.Drill}>{t('showNextLevel')}</Menu.Item>
+            )}
+          {drillOption?.mode !== DrillMode.Drill &&
+            !drillOption?.isBottomLevel && (
+              <Menu.Item key={DrillMode.Expand}>
+                {t('expandNextLevel')}
+              </Menu.Item>
+            )}
+          {drillOption?.mode !== DrillMode.Expand && selectDrillStatusMenu}
 
-  return (
-    <StyledChartDrill className="chart-drill-menu-container">
-      <Dropdown
-        disabled={!drillOption}
-        overlay={contextMenu}
-        destroyPopupOnHide={true}
-        trigger={['contextMenu']}
-      >
-        <div style={{ height: '100%' }}>{children}</div>
-      </Dropdown>
-    </StyledChartDrill>
-  );
-});
+          {currentDrillField?.map((v, i) => {
+            if (
+              v.category === ChartDataViewFieldCategory.DateAggregationField
+            ) {
+              return (
+                <Menu.SubMenu key={i} title={v.colName}>
+                  <DateMeunItem
+                    sourceSupportDateField={sourceSupportDateField}
+                    config={v[interimDateAggregatedKey] || v}
+                    onChange={config => handleChangeDataAggregate(config)}
+                  />
+                </Menu.SubMenu>
+              );
+            }
+            return false;
+          })}
+        </StyledChartDrillMenu>
+      );
+    }, [
+      currentDrillLevel,
+      t,
+      drillOption,
+      selectDrillStatusMenu,
+      onDrillOptionChange,
+      currentDrillField,
+      handleChangeDataAggregate,
+      sourceSupportDateField,
+    ]);
+
+    return (
+      <StyledChartDrill className="chart-drill-menu-container">
+        <Dropdown
+          disabled={!drillOption}
+          overlay={contextMenu}
+          destroyPopupOnHide={true}
+          trigger={['contextMenu']}
+        >
+          <div style={{ height: '100%' }}>{children}</div>
+        </Dropdown>
+      </StyledChartDrill>
+    );
+  },
+);
 
 export default ChartDrillContextMenu;
 

@@ -35,6 +35,7 @@ export interface SharePageState {
   headlessBrowserRenderSign: boolean;
   pageWidthHeight: [number, number];
   shareDownloadPolling: boolean;
+  sourceSupportDateField?: string[];
 }
 export interface ShareVizInfo {
   vizType: VizType | undefined;

@@ -18,9 +18,10 @@
 
 import { List } from 'antd';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
-import { FC, memo, useCallback, useState } from 'react';
+import { FC, memo, useCallback, useContext, useState } from 'react';
 import styled from 'styled-components/macro';
 import { stopPPG } from 'utils/utils';
+import ChartDataViewContext from '../../../../contexts/ChartDataViewContext';
 import { ChartDraggableSourceContainer } from './ChartDraggableSourceContainer';
 import ChartDragLayer from './ChartDragLayer';
 
@@ -36,6 +37,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
   const [selectedItems, setSelectedItems] = useState<ChartDataViewMeta[]>([]);
   const [selectedItemsIds, setSelectedItemsIds] = useState<Array<string>>([]);
   const [activeItemId, setActiveItemId] = useState<string>('');
+  const { sourceSupportDateField } = useContext(ChartDataViewContext);
 
   const onDataItemSelectionChange = (
     dataItemId: string,
@@ -115,6 +117,8 @@ export const ChartDraggableSourceGroupContainer: FC<{
               category={item.category}
               expression={item.expression}
               type={item.type}
+              selectedItems={selectedItems}
+              sourceSupportDateField={sourceSupportDateField}
               subType={item.subType}
               role={item.role}
               children={item.children}
@@ -123,7 +127,6 @@ export const ChartDraggableSourceGroupContainer: FC<{
               onSelectionChange={onDataItemSelectionChange}
               onClearCheckedList={onClearCheckedList}
               isActive={selectedItemsIds.includes(item.id)}
-              selectedItems={selectedItems}
             />
           </Item>
         )}

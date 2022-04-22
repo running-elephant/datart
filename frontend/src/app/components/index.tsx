@@ -11,6 +11,7 @@ export { ListItem } from './ListItem';
 export { ListNav, ListPane } from './ListNav';
 export { ListSwitch } from './ListSwitch';
 export { ListTitle } from './ListTitle';
+export type { ListTitleProps } from './ListTitle';
 export { LoadingMask } from './LoadingMask';
 export { ModalForm } from './ModalForm';
 export type { ModalFormProps } from './ModalForm';

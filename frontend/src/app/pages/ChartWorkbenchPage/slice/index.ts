@@ -32,6 +32,7 @@ import {
   fetchChartAction,
   fetchDataSetAction,
   fetchDataViewsAction,
+  fetchsourceSupportDateField,
   fetchViewDetailAction,
 } from './thunks';
 import { ChartConfigPayloadType, WorkbenchState } from './type';
@@ -198,6 +199,9 @@ const workbenchSlice = createSlice({
           chartConfigDTO.aggregation === undefined
             ? true
             : chartConfigDTO.aggregation;
+      })
+      .addCase(fetchsourceSupportDateField.fulfilled, (state, { payload }) => {
+        state.sourceSupportDateField = payload;
       });
 
     builder.addCase(fetchDataSetAction.pending, (state, action) => {

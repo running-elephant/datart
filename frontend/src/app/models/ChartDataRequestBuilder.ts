@@ -36,17 +36,17 @@ import {
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import { getValue } from 'app/utils/chartHelper';
+import { getInterimDateAggregateRows, getValue } from 'app/utils/chartHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import {
   formatTime,
   getTime,
   recommendTimeRangeConverter,
+  splitRangerDateFilters,
 } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 import { DrillMode } from './ChartDrillOption';
-
 export class ChartDataRequestBuilder {
   extraSorters: ChartDataRequest['orders'] = [];
   chartDataConfigs: ChartDataConfig[];
@@ -143,16 +143,18 @@ export class ChartDataRequestBuilder {
           return acc.concat(cur.rows || []);
         }
         if (cur.type === ChartDataSectionType.GROUP) {
+          const rows = getInterimDateAggregateRows(cur.rows);
+
           if (cur.drillable) {
             if (
               !this.drillOption ||
               this.drillOption?.mode === DrillMode.Normal ||
               !this.drillOption?.getCurrentFields()
             ) {
-              return acc.concat(cur.rows?.[0] || []);
+              return acc.concat(rows?.[0] || []);
             }
             return acc.concat(
-              cur.rows?.filter(field => {
+              rows?.filter(field => {
                 return Boolean(
                   this.drillOption
                     ?.getCurrentFields()
@@ -161,7 +163,7 @@ export class ChartDataRequestBuilder {
               }) || [],
             );
           }
-          return acc.concat(cur.rows || []);
+          return acc.concat(rows || []);
         }
         if (cur.type === ChartDataSectionType.MIXED) {
           const dateAndStringFields = cur.rows?.filter(v =>
@@ -263,8 +265,7 @@ export class ChartDataRequestBuilder {
         },
       ];
     };
-
-    return fields
+    const filters = fields
       .map(field => {
         if (
           field.filter?.condition?.operator === FilterSqlOperator.In ||
@@ -285,6 +286,7 @@ export class ChartDataRequestBuilder {
         };
       })
       .filter(Boolean) as ChartDataRequestFilter[];
+    return splitRangerDateFilters(filters);
   };
 
   private normalizeDrillFilters(): ChartDataRequestFilter[] {
@@ -366,6 +368,7 @@ export class ChartDataRequestBuilder {
       }
       return expression.replaceAll('[', '').replaceAll(']', '');
     };
+
     return (this.dataView.computedFields || []).map(f => ({
       alias: f.id!,
       snippet: _removeSquareBrackets(f.expression),
@@ -425,6 +428,7 @@ export class ChartDataRequestBuilder {
 
   public build(): ChartDataRequest {
     return {
+      ...this.buildViewConfigs(),
       viewId: this.dataView?.id,
       aggregators: this.buildAggregators(),
       groups: this.buildGroups(),
@@ -434,7 +438,6 @@ export class ChartDataRequestBuilder {
       functionColumns: this.buildFunctionColumns(),
       columns: this.buildSelectColumns(),
       script: this.script,
-      ...this.buildViewConfigs(),
     };
   }
 }

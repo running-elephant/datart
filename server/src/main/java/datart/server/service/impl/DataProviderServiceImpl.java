@@ -145,7 +145,10 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
             providerSource.setSourceId(source.getId());
             providerSource.setType(source.getType());
             providerSource.setName(source.getName());
-            Map<String, Object> properties = objectMapper.readValue(source.getConfig(), HashMap.class);
+            Map<String, Object> properties = new HashMap<>();
+            if (StringUtils.isNotBlank(source.getConfig())) {
+                properties = objectMapper.readValue(source.getConfig(), HashMap.class);
+            }
             // decrypt values
             for (String key : properties.keySet()) {
                 Object val = properties.get(key);

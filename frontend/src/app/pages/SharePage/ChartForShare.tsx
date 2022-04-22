@@ -19,11 +19,16 @@
 import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
+import { ChartDataViewFieldCategory } from 'app/constants';
 import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import ChartManager from 'app/models/ChartManager';
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import {
+  getInterimDateAggregateRows,
+  handledateAggregaeToComputedFields,
+} from 'app/utils/chartHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import { FC, memo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -35,18 +40,20 @@ import {
   FilterSearchParams,
 } from '../MainPage/pages/VizPage/slice/types';
 import { HeadlessBrowserIdentifier } from './HeadlessBrowserIdentifier';
-import {} from './slice';
+import { shareActions } from './slice';
 import { selectHeadlessBrowserRenderSign } from './slice/selectors';
 import {
   fetchShareDataSetByPreviewChartAction,
   updateFilterAndFetchDatasetForShare,
+  updateGroupAndFetchDatasetForShare,
 } from './slice/thunks';
 
 const TitleHeight = 100;
 const ChartForShare: FC<{
   chartPreview?: ChartPreview;
   filterSearchParams?: FilterSearchParams;
-}> = memo(({ chartPreview }) => {
+  sourceSupportDateFields?: string[];
+}> = memo(({ chartPreview, sourceSupportDateFields }) => {
   const dispatch = useDispatch();
   const drillOptionRef = useRef<IChartDrillOption>();
   const [chart] = useState<IChart | undefined>(() => {
@@ -145,6 +152,34 @@ const ChartForShare: FC<{
     );
   };
 
+  const handleChartDrillDataAggregationChange = (type, payload) => {
+    const rows = getInterimDateAggregateRows(payload.value?.rows);
+    const dateAggregationField = rows.filter(
+      v => v.category === ChartDataViewFieldCategory.DateAggregationField,
+    );
+    const deleteColName = payload.value.deleteColName;
+    const computedFields = handledateAggregaeToComputedFields(
+      dateAggregationField,
+      deleteColName,
+      chartPreview?.backendChart?.config?.computedFields,
+      chartPreview?.chartConfig,
+    );
+
+    dispatch(
+      shareActions.updateComputedFields({
+        backendChartId: chartPreview?.backendChart?.id!,
+        computedFields,
+      }),
+    );
+    dispatch(
+      updateGroupAndFetchDatasetForShare({
+        backendChartId: chartPreview?.backendChart?.id!,
+        payload: payload,
+        drillOption: drillOptionRef?.current,
+      }),
+    );
+  };
+
   return (
     <StyledChartPreviewBoard>
       <div ref={controlRef}>
@@ -157,11 +192,14 @@ const ChartForShare: FC<{
       <ChartDrillContext.Provider
         value={{
           drillOption: drillOptionRef.current,
+          sourceSupportDateField: sourceSupportDateFields,
           onDrillOptionChange: handleDrillOptionChange,
+          onChartDrillDataAggregationChange:
+            handleChartDrillDataAggregationChange,
         }}
       >
         <div style={{ width: '100%', height: '100%' }} ref={ref}>
-          <ChartDrillContextMenu>
+          <ChartDrillContextMenu chartConfig={chartPreview?.chartConfig}>
             <ChartIFrameContainer
               key={chartPreview?.backendChart?.id!}
               containerId={chartPreview?.backendChart?.id!}

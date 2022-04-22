@@ -68,7 +68,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
   }) {
     const { dataset } = useContext(ChartDatasetContext);
     const { drillOption } = useContext(ChartDrillContext);
-    const { dataView } = useContext(VizDataViewContext);
+    const { dataView, sourceSupportDateField } = useContext(VizDataViewContext);
     const [currentConfig, setCurrentConfig] = useState(config);
     const [showModal, contextHolder] = useFieldActionModal({
       i18nPrefix: 'viz.palette.data.enum.actionType',
@@ -89,17 +89,29 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         drop(item: ChartDataSectionField & DragItem, monitor) {
           let items = Array.isArray(item) ? item : [item];
           let needDelete = true;
+
           if (
             monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN
           ) {
             const currentColumns: ChartDataSectionField[] = (
               currentConfig.rows || []
             ).concat(
-              items.map(val => ({
-                uid: uuidv4(),
-                ...val,
-                aggregate: getDefaultAggregate(val),
-              })),
+              items.map(val => {
+                let config: ChartDataSectionField = {
+                  uid: uuidv4(),
+                  ...val,
+                  aggregate: getDefaultAggregate(val),
+                };
+                if (
+                  val.category ===
+                  ChartDataViewFieldCategory.DateAggregationField
+                ) {
+                  config.colName = `${val.colName}（${t(val.expression)}）`;
+                  config.expression = `${val.expression}(${val.colName})`;
+                  config.field = val.colName;
+                }
+                return config;
+              }),
             );
             updateCurrentConfigColumns(currentConfig, currentColumns, true);
           } else if (
@@ -193,6 +205,17 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           ) {
             return true;
           }
+
+          if (
+            items[0].category ===
+            ChartDataViewFieldCategory.DateAggregationField
+          ) {
+            const colNames = currentConfig.rows?.map(col => col.colName);
+            return colNames
+              ? colNames.every(v => !v?.includes(items[0].colName))
+              : true;
+          }
+
           const exists = currentConfig.rows?.map(col => col.colName);
           return items.every(i => !exists?.includes(i.colName));
         },
@@ -278,10 +301,15 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       }
     };
 
-    const handleOnDeleteItem = uid => () => {
-      if (uid) {
-        const newCurrentConfig = updateBy(currentConfig, draft => {
-          draft.rows = draft.rows?.filter(c => c.uid !== uid);
+    const handleOnDeleteItem = config => () => {
+      if (config.uid) {
+        let newCurrentConfig = updateBy(currentConfig, draft => {
+          draft.rows = draft.rows?.filter(c => c.uid !== config.uid);
+          if (
+            config.category === ChartDataViewFieldCategory.DateAggregationField
+          ) {
+            draft.deleteColName = config.colName;
+          }
         });
         setCurrentConfig(newCurrentConfig);
         onConfigChanged?.(ancestors, newCurrentConfig, true);
@@ -317,6 +345,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 columnConfig: columnConfig,
                 ancestors: ancestors,
                 aggregation: aggregation,
+                sourceSupportDateField,
                 onConfigChanged: onConfigChanged,
                 handleOpenActionModal: handleOpenActionModal,
               };
@@ -328,8 +357,8 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               );
             }}
             moveCard={onDraggableItemMove}
-            onDelete={handleOnDeleteItem(columnConfig.uid)}
-          />
+            onDelete={handleOnDeleteItem(columnConfig)}
+          ></ChartDraggableElement>
         );
       });
     };

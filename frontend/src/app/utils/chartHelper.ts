@@ -17,7 +17,12 @@
  */
 
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
-import { ChartDataSectionType, FieldFormatType } from 'app/constants';
+import {
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+  FieldFormatType,
+  interimDateAggregatedKey,
+} from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
 import { ChartDrillOption, DrillMode } from 'app/models/ChartDrillOption';
 import {
@@ -47,12 +52,19 @@ import {
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
 import ChartMetadata from 'app/types/ChartMetadata';
+import { updateBy } from 'app/utils/mutation';
 import { ECharts } from 'echarts';
 import { ECBasicOption } from 'echarts/types/dist/shared';
 import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
 import moment from 'moment';
 import { Debugger } from 'utils/debugger';
-import { isEmpty, isEmptyArray, meanValue, pipe } from 'utils/object';
+import {
+  CloneValueDeep,
+  isEmpty,
+  isEmptyArray,
+  meanValue,
+  pipe,
+} from 'utils/object';
 import { TableColumnsList } from '../components/ChartGraph/BasicTableChart/types';
 import {
   flattenHeaderRowsWithoutGroupRow,
@@ -1563,4 +1575,68 @@ export const getDrillableRows = (
       }
       return config.rows || [];
     });
+};
+
+export const getChartsAllRows = (configs?: ChartDataConfig[]) => {
+  const datas = configs || [];
+  return datas
+    .filter(v => v.rows)
+    .reduce((acc: ChartDataSectionField[], cur) => {
+      return acc.concat(cur.rows || []);
+    }, []);
+};
+
+export const getInterimDateAggregateRows = (rows: any) => {
+  const _rows = updateBy(rows, draft => {
+    draft?.forEach((v, i) => {
+      const symbolData = v?.[interimDateAggregatedKey];
+      if (symbolData) {
+        draft[i] = symbolData;
+      }
+    });
+  });
+  return _rows;
+};
+
+/**
+ * Date aggregation field added to function Columns
+ */
+export const handledateAggregaeToComputedFields = (
+  dateAggregationField,
+  deleteColName,
+  computedFields,
+  chartConfig,
+) => {
+  let _computedFields = computedFields ? CloneValueDeep(computedFields) : [];
+
+  if (dateAggregationField.length) {
+    const expressionList: any = [];
+
+    _computedFields.forEach(v => {
+      if (v.category === ChartDataViewFieldCategory.DateAggregationField) {
+        expressionList.push(v.expression);
+      }
+    });
+
+    dateAggregationField.forEach(v => {
+      if (!expressionList.includes(v.expression)) {
+        _computedFields.push({
+          category: v.category,
+          id: v.colName,
+          type: v.type,
+          expression: v.expression,
+        });
+      }
+    });
+  }
+
+  if (deleteColName) {
+    const allRows = getChartsAllRows(chartConfig?.datas);
+    const deleteRows = allRows.filter(v => v.colName === deleteColName);
+
+    if (deleteRows.length < 2) {
+      _computedFields = _computedFields.filter(v => v.id !== deleteColName);
+    }
+  }
+  return _computedFields;
 };

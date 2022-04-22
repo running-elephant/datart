@@ -479,7 +479,13 @@
         "deleteField": "删除",
         "editViewTip": "回到数据视图会丢失当前编辑状态，是否继续？",
         "editView": "编辑数据视图",
-        "toggleViewTip": "切换数据视图将会清空所有图表配置，确认继续？"
+        "toggleViewTip": "切换数据视图将会清空所有图表配置，确认继续？",
+        "AGG_DATE_YEAR": "按年",
+        "AGG_DATE_QUARTER": "按季度",
+        "AGG_DATE_MONTH": "按月",
+        "AGG_DATE_WEEK": "按周",
+        "AGG_DATE_DAY": "按日",
+        "default": "默认"
       }
     },
     "palette": {
@@ -626,6 +632,11 @@
         "size": "大小",
         "drop": "请拖拽数据字段到这里",
         "dropCount": "请至少拖拽{{count}}个数据字段到这里",
+        "AGG_DATE_YEAR": "按年",
+        "AGG_DATE_QUARTER": "按季度",
+        "AGG_DATE_MONTH": "按月",
+        "AGG_DATE_WEEK": "按周",
+        "AGG_DATE_DAY": "按日",
         "drillable": "可钻取",
         "actions": {
           "sort": {
@@ -684,7 +695,8 @@
             "colorRange": "着色",
             "colorSingle": "着色",
             "size": "大小",
-            "chooseTheme": "选择主题"
+            "chooseTheme": "选择主题",
+            "dateAggregate": "日期聚合"
           }
         }
       },

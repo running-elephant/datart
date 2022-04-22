@@ -21,8 +21,8 @@ import {
   EditOutlined,
   FolderOpenOutlined,
 } from '@ant-design/icons';
-import { Tooltip } from 'antd';
-import { IW, ToolbarButton } from 'app/components';
+import { Button, Tooltip } from 'antd';
+import { IW } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo, useState } from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
@@ -30,8 +30,9 @@ import styled from 'styled-components/macro';
 import {
   FONT_SIZE_BASE,
   FONT_SIZE_HEADING,
-  INFO,
-  SPACE_UNIT,
+  SPACE,
+  SPACE_MD,
+  SPACE_XS,
   YELLOW,
 } from 'styles/StyleConstants';
 import { Column } from '../../../slice/types';
@@ -40,19 +41,19 @@ import DataModelNode from './DataModelNode';
 
 const DataModelBranch: FC<{
   node: Column;
-  getPermissionButton: (name) => JSX.Element;
   onNodeTypeChange: (type: any, name: string) => void;
   onMoveToHierarchy: (node: Column) => void;
   onEditBranch;
   onDelete: (node: Column) => void;
+  onDeleteFromHierarchy: (parent: Column) => (node: Column) => void;
 }> = memo(
   ({
     node,
-    getPermissionButton,
     onNodeTypeChange,
     onMoveToHierarchy,
     onEditBranch,
     onDelete,
+    onDeleteFromHierarchy,
   }) => {
     const t = useI18NPrefix('view.model');
     const [isHover, setIsHover] = useState(false);
@@ -78,23 +79,19 @@ const DataModelBranch: FC<{
             <div className="action">
               {isHover && !isDragging && (
                 <Tooltip title={t('rename')}>
-                  <ToolbarButton
-                    size="small"
-                    iconSize={FONT_SIZE_BASE}
-                    className="suffix"
+                  <Button
+                    type="link"
                     onClick={() => onEditBranch(node)}
-                    icon={<EditOutlined style={{ color: INFO }} />}
+                    icon={<EditOutlined />}
                   />
                 </Tooltip>
               )}
               {isHover && !isDragging && (
                 <Tooltip title={t('delete')}>
-                  <ToolbarButton
-                    size="small"
-                    iconSize={FONT_SIZE_BASE}
-                    className="suffix"
+                  <Button
+                    type="link"
                     onClick={() => onDelete(node)}
-                    icon={<DeleteOutlined style={{ color: INFO }} />}
+                    icon={<DeleteOutlined />}
                   />
                 </Tooltip>
               )}
@@ -103,11 +100,12 @@ const DataModelBranch: FC<{
           <div className="children">
             {node?.children?.map(childNode => (
               <DataModelNode
+                className="in-hierarchy"
                 node={childNode}
                 key={childNode.name}
-                getPermissionButton={getPermissionButton}
                 onMoveToHierarchy={onMoveToHierarchy}
                 onNodeTypeChange={onNodeTypeChange}
+                onDeleteFromHierarchy={onDeleteFromHierarchy(node)}
               />
             ))}
           </div>
@@ -152,23 +150,23 @@ const DataModelBranch: FC<{
 export default DataModelBranch;
 
 const StyledDataModelBranch = styled.div<{}>`
-  line-height: 32px;
-  margin: ${SPACE_UNIT};
-  user-select: 'none';
+  margin: ${SPACE} ${SPACE_MD};
   font-size: ${FONT_SIZE_BASE};
+  line-height: 32px;
+  user-select: 'none';
 
   & .content {
     display: flex;
   }
 
   & .children {
-    margin-left: 40px;
+    margin-left: ${SPACE_MD};
   }
 
   & .action {
     display: flex;
     flex: 1;
     justify-content: flex-end;
-    padding-right: ${FONT_SIZE_BASE}px;
+    padding-right: ${SPACE_XS};
   }
 `;

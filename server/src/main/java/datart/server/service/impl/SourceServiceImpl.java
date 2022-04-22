@@ -250,6 +250,13 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
+    public Source createSource(SourceCreateParam createParam) {
+        Source source = create(createParam);
+        updateJdbcSourceSyncJob(source);
+        return source;
+    }
+
+    @Override
     @Transactional
     public Source create(BaseCreateParam createParam) {
         // encrypt property
@@ -263,9 +270,19 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         Source source = SourceService.super.create(createParam);
 
         grantDefaultPermission(source);
-        updateJdbcSourceSyncJob(source);
         return source;
 
+    }
+
+    @Override
+    public boolean updateSource(SourceUpdateParam updateParam) {
+        boolean success = update(updateParam);
+        if (success) {
+            Source source = retrieve(updateParam.getId());
+            getDataProviderService().updateSource(source);
+            updateJdbcSourceSyncJob(source);
+        }
+        return false;
     }
 
     @Override
@@ -278,13 +295,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         } catch (Exception e) {
             Exceptions.e(e);
         }
-        boolean success = SourceService.super.update(updateParam);
-        if (success) {
-            Source source = retrieve(updateParam.getId());
-            getDataProviderService().updateSource(source);
-            updateJdbcSourceSyncJob(source);
-        }
-        return success;
+        return SourceService.super.update(updateParam);
     }
 
     @Override
@@ -337,6 +348,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     @Override
     public void deleteReference(Source source) {
         deleteJdbcSourceSyncJob(source);
+        sourceSchemasMapper.deleteBySource(source.getId());
     }
 
     @Override

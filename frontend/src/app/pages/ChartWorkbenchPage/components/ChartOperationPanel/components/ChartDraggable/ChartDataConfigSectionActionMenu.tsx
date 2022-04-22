@@ -28,6 +28,7 @@ import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { FC } from 'react';
 import AggregationAction from '../ChartFieldAction/AggregationAction';
 import AggregationLimitAction from '../ChartFieldAction/AggregationLimitAction';
+import DateAggregationAction from '../ChartFieldAction/DateAggregationAction/DateAggregationAction';
 import SortAction from '../ChartFieldAction/SortAction';
 import { updateDataConfigByField } from './utils';
 
@@ -36,6 +37,7 @@ const ChartDataConfigSectionActionMenu: FC<
     uid: string;
     type: string;
     onOpenModal;
+    sourceSupportDateField?: string[];
   } & ChartDataConfigSectionProps
 > = ({
   uid,
@@ -43,7 +45,7 @@ const ChartDataConfigSectionActionMenu: FC<
   onOpenModal,
   ancestors,
   config,
-  modalSize,
+  sourceSupportDateField,
   category,
   onConfigChanged,
 }) => {
@@ -52,17 +54,25 @@ const ChartDataConfigSectionActionMenu: FC<
     ChartDataSectionFieldActionType.Sortable,
     ChartDataSectionFieldActionType.Aggregate,
     ChartDataSectionFieldActionType.AggregateLimit,
+    ChartDataSectionFieldActionType.DateAggregate,
   ];
 
   const handleFieldConfigChanged = (
     columnUid: string,
     fieldConfig: ChartDataSectionField,
     needRefresh?: boolean,
+    deleteColName?: string,
   ) => {
     if (!fieldConfig) {
       return;
     }
-    const newConfig = updateDataConfigByField(columnUid, config, fieldConfig);
+    const newConfig = updateDataConfigByField(
+      columnUid,
+      config,
+      fieldConfig,
+      deleteColName,
+    );
+
     onConfigChanged?.(ancestors, newConfig, needRefresh);
   };
 
@@ -85,6 +95,7 @@ const ChartDataConfigSectionActionMenu: FC<
     } else if (type in actions) {
       modalActions = actions[type] as string[];
     }
+
     if (category === ChartDataViewFieldCategory.AggregateComputedField) {
       modalActions = modalActions.filter(
         action =>
@@ -132,6 +143,18 @@ const ChartDataConfigSectionActionMenu: FC<
           config={fieldConfig}
           onConfigChange={(config, needRefresh) => {
             handleFieldConfigChanged(uid, config, needRefresh);
+          }}
+          mode="menu"
+        />
+      );
+    }
+    if (actionName === ChartDataSectionFieldActionType.DateAggregate) {
+      return (
+        <DateAggregationAction
+          sourceSupportDateField={sourceSupportDateField}
+          config={fieldConfig}
+          onConfigChange={(config, needRefresh, deleteColName) => {
+            handleFieldConfigChanged(uid, config, needRefresh, deleteColName);
           }}
           mode="menu"
         />

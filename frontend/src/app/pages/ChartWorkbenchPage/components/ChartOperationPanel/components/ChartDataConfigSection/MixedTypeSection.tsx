@@ -44,6 +44,7 @@ const MixedTypeSection: FC<ChartDataConfigSectionProps> = memo(
           [DataViewFieldType.DATE]: [
             ChartDataSectionFieldActionType.Alias,
             ChartDataSectionFieldActionType.Sortable,
+            ChartDataSectionFieldActionType.DateAggregate,
           ],
         },
       },

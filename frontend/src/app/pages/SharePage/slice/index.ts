@@ -28,7 +28,10 @@ import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { fetchShareDataSetByPreviewChartAction } from './thunks';
+import {
+  fetchShareDataSetByPreviewChartAction,
+  fetchsourceSupportDateField,
+} from './thunks';
 // import { fetchShareDataSetByPreviewChartAction } from './thunk';
 import { ExecuteToken, SharePageState, ShareVizInfo } from './types';
 
@@ -43,6 +46,7 @@ export const initialState: SharePageState = {
   headlessBrowserRenderSign: false,
   pageWidthHeight: [0, 0],
   shareDownloadPolling: false,
+  sourceSupportDateField: [],
 };
 
 export const slice = createSlice({
@@ -141,6 +145,31 @@ export const slice = createSlice({
         }
       }
     },
+    updateChartPreviewGroup(
+      state,
+      action: PayloadAction<{ backendChartId: string; payload }>,
+    ) {
+      if (state.chartPreview) {
+        const groupSection = state.chartPreview?.chartConfig?.datas?.find(
+          section => section.type === ChartDataSectionType.GROUP,
+        );
+        if (groupSection) {
+          groupSection.rows = action.payload.payload?.value?.rows;
+        }
+      }
+    },
+    updateComputedFields(
+      state,
+      action: PayloadAction<{
+        backendChartId: string;
+        computedFields: any;
+      }>,
+    ) {
+      if (state.chartPreview && state.chartPreview?.backendChart?.config) {
+        state.chartPreview.backendChart.config.computedFields =
+          action.payload.computedFields;
+      }
+    },
   },
   extraReducers: builder => {
     builder
@@ -156,6 +185,9 @@ export const slice = createSlice({
       )
       .addCase(fetchShareDataSetByPreviewChartAction.rejected, state => {
         state.headlessBrowserRenderSign = true;
+      })
+      .addCase(fetchsourceSupportDateField.fulfilled, (state, { payload }) => {
+        state.sourceSupportDateField = payload;
       });
   },
 });

@@ -18,6 +18,7 @@
 
 import {
   CalendarOutlined,
+  DownOutlined,
   FieldStringOutlined,
   FileUnknownOutlined,
   FolderAddOutlined,
@@ -25,7 +26,7 @@ import {
   MoreOutlined,
   NumberOutlined,
 } from '@ant-design/icons';
-import { Dropdown, Menu, Row } from 'antd';
+import { Collapse, Dropdown, Menu, Row } from 'antd';
 import { IW, ToolbarButton } from 'app/components';
 import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -49,9 +50,14 @@ import {
   WARNING,
 } from 'styles/StyleConstants';
 import { stopPPG } from 'utils/utils';
+import { dateAggregationList } from '../../../../slice/constant';
+import DateAggregateFieldContainer from './DateAggregateFieldContainer';
+
+const { Panel } = Collapse;
 
 export const ChartDraggableSourceContainer: FC<
   {
+    sourceSupportDateField?: string[];
     onDeleteComputedField?: (fieldName) => void;
     onEditComputedField?: (fieldName) => void;
     onSelectionChange?: (dataItemId, cmdKeyActive, shiftKeyActive) => void;
@@ -64,13 +70,14 @@ export const ChartDraggableSourceContainer: FC<
   subType,
   category,
   expression,
+  selectedItems,
+  isActive,
+  sourceSupportDateField,
   role,
   children,
   onDeleteComputedField,
   onEditComputedField,
   onSelectionChange,
-  selectedItems,
-  isActive,
   onClearCheckedList,
 }) {
   const t = useI18NPrefix(`viz.workbench.dataview`);
@@ -188,7 +195,42 @@ export const ChartDraggableSourceContainer: FC<
       }
     }
 
-    return (
+    return type === 'DATE' && category === 'field' ? (
+      <Row align="middle" style={{ width: '100%' }}>
+        <CollapseWrapper
+          defaultActiveKey={[colName]}
+          ghost
+          expandIconPosition="right"
+          expandIcon={({ isActive }) => {
+            return <DownOutlined rotate={isActive ? -180 : 0} />;
+          }}
+        >
+          <Panel
+            key={colName}
+            header={
+              <div ref={drag}>
+                <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
+                <p>{colName}</p>
+              </div>
+            }
+          >
+            {dateAggregationList.map((item, i) => {
+              if (sourceSupportDateField?.includes(item.expression)) {
+                return (
+                  <DateAggregateFieldContainer
+                    colName={colName}
+                    key={i}
+                    item={item}
+                    onClearCheckedList={onClearCheckedList}
+                  />
+                );
+              }
+              return null;
+            })}
+          </Panel>
+        </CollapseWrapper>
+      </Row>
+    ) : (
       <Row align="middle" style={{ width: '100%' }}>
         <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
         <StyledFieldContent>{colName}</StyledFieldContent>
@@ -218,6 +260,9 @@ export const ChartDraggableSourceContainer: FC<
     onEditComputedField,
     category,
     t,
+    onClearCheckedList,
+    drag,
+    sourceSupportDateField,
   ]);
 
   const renderChildren = useMemo(() => {
@@ -247,8 +292,10 @@ export const ChartDraggableSourceContainer: FC<
         }
         onSelectionChange?.(colName, e.metaKey || e.ctrlKey, e.shiftKey);
       }}
-      ref={drag}
-      className={styleClasses.join(' ')}
+      ref={type === 'DATE' && category === 'field' ? null : drag}
+      className={
+        type === 'DATE' && category === 'field' ? '' : styleClasses.join(' ')
+      }
     >
       {renderContent}
       {showChild && renderChildren}
@@ -260,8 +307,8 @@ export default ChartDraggableSourceContainer;
 
 const Container = styled.div<{ flexDirection?: string }>`
   display: flex;
-  flex-direction: ${p => p.flexDirection || 'row'};
   flex: 1;
+  flex-direction: ${p => p.flexDirection || 'row'};
   padding: ${SPACE_TIMES(0.5)} ${SPACE} ${SPACE_TIMES(0.5)} ${SPACE_TIMES(2)};
   font-size: ${FONT_SIZE_SUBTITLE};
   font-weight: ${FONT_WEIGHT_MEDIUM};
@@ -272,6 +319,14 @@ const Container = styled.div<{ flexDirection?: string }>`
   }
   > p {
     flex: 1;
+  }
+  .ant-collapse-header {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    > p {
+      flex: 1;
+    }
   }
 
   .setting {
@@ -287,9 +342,24 @@ const Container = styled.div<{ flexDirection?: string }>`
   }
 `;
 
+const CollapseWrapper = styled(Collapse)`
+  .ant-collapse-header {
+    padding: 0 !important;
+  }
+  &.ant-collapse {
+    width: 100%;
+    .ant-collapse-header {
+      > div {
+        display: flex;
+        align-items: center;
+        width: 100% !important;
+      }
+    }
+  }
+`;
 const StyledFieldContent = styled.p`
   flex: 1;
-  word-break: break-all;
   overflow: hidden;
   text-overflow: ellipsis;
+  word-break: break-all;
 `;
