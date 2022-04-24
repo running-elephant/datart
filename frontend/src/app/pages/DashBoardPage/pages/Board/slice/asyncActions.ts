@@ -63,10 +63,9 @@ export const handleServerBoardAction =
     if (renderMode === 'schedule') {
       boardInfo = getScheduleBoardInfo(boardInfo, widgetMap);
     }
+
     const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
-
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
-
     const viewViews = getChartDataView(serverViews, allDataCharts);
 
     await dispatch(

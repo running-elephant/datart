@@ -1638,5 +1638,41 @@ export const getRuntimeComputedFields = (
       _computedFields = _computedFields.filter(v => v.id !== replacedColName);
     }
   }
+
   return _computedFields;
+};
+
+export const clearRuntimeDateLevelFieldsInChartConfig = (
+  config: ChartConfig,
+) => {
+  return updateBy(config, draft => {
+    if (draft?.datas) {
+      const index = draft.datas.findIndex(
+        v => v.type === ChartDataSectionType.GROUP,
+      );
+      const groupRows = draft.datas[index]?.rows;
+      groupRows?.forEach((v, i) => {
+        if (groupRows[i]) {
+          delete groupRows[i][RUNTIME_DATE_LEVEL_KEY];
+        }
+      });
+    }
+  });
+};
+
+export const setRuntimeDateLevelFieldsInChartConfig = (config: ChartConfig) => {
+  return updateBy(config, draft => {
+    if (draft?.datas) {
+      const index = draft.datas.findIndex(
+        v => v.type === ChartDataSectionType.GROUP,
+      );
+      const groupRows = draft.datas[index]?.rows;
+      groupRows?.forEach((v, i) => {
+        const runtimeDateLevel = groupRows[i][RUNTIME_DATE_LEVEL_KEY];
+        if (groupRows[i].uid === runtimeDateLevel?.uid) {
+          groupRows[i] = runtimeDateLevel;
+        }
+      });
+    }
+  });
 };

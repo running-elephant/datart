@@ -257,6 +257,21 @@ export const WidgetActionProvider: FC<{
       onEditWidgetUnLock: (id: string) => {
         dispatch(editBoardStackActions.toggleLockWidget({ id, lock: false }));
       },
+      onWidgetDataUpdate: ({ computedFields, payload, widgetId }) => {
+        dispatch(
+          boardActions.updateDataChartGroup({
+            id: widgetId,
+            payload,
+          }),
+        );
+
+        dispatch(
+          boardActions.updateDataChartComputedFields({
+            id: widgetId,
+            computedFields,
+          }),
+        );
+      },
     };
     return contextValue;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -278,6 +293,7 @@ export interface WidgetActionContextProps {
   onRefreshWidgetsByController: (widget: Widget) => void;
   onWidgetsQuery: () => void;
   onRenderedWidgetById: (wid: string) => void;
+  onWidgetDataUpdate: ({ computedFields, payload, widgetId }) => void;
 
   // read
   onWidgetFullScreen: (itemId: string) => void;

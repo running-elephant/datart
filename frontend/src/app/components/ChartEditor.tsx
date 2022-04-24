@@ -58,6 +58,7 @@ import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
+  clearRuntimeDateLevelFieldsInChartConfig,
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
@@ -303,10 +304,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     setChart(c);
     const targetChartConfig = CloneValueDeep(c.config);
 
-    const finalChartConfig = transferChartConfigs(
-      targetChartConfig,
-      shadowChartConfig || chartConfig,
+    const finalChartConfig = clearRuntimeDateLevelFieldsInChartConfig(
+      transferChartConfigs(targetChartConfig, shadowChartConfig || chartConfig),
     );
+
     dispatch(
       workbenchSlice.actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
@@ -318,6 +319,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     drillOptionRef.current = getChartDrillOption(
       finalChartConfig?.datas,
       drillOptionRef.current,
+      true,
     );
     if (!expensiveQuery) {
       dispatch(refreshDatasetAction({ drillOption: drillOptionRef?.current }));
@@ -343,11 +345,12 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         const dateLevelComputedFields = payload.value.rows.filter(
           v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
         );
+
         const replacedColName = payload.value.replacedColName;
         const computedFields = getRuntimeComputedFields(
           dateLevelComputedFields,
           replacedColName,
-          CloneValueDeep(dataview?.computedFields),
+          dataview?.computedFields,
           chartConfig,
         );
 
@@ -357,11 +360,16 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           });
         }
 
-        dispatch(
-          workbenchSlice.actions.updateCurrentDataViewComputedFields(
-            computedFields,
-          ),
-        );
+        if (
+          JSON.stringify(computedFields) !==
+          JSON.stringify(dataview?.computedFields)
+        ) {
+          dispatch(
+            workbenchSlice.actions.updateCurrentDataViewComputedFields(
+              computedFields,
+            ),
+          );
+        }
       }
 
       dispatch(

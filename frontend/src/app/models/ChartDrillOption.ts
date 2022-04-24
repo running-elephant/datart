@@ -188,7 +188,7 @@ export class ChartDrillOption implements IChartDrillOption {
     }
   }
 
-  private clearAll() {
+  public clearAll() {
     this.cursor = -1;
     this.drillDownFields = [];
     this.expandDownFields = [];

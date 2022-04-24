@@ -368,7 +368,6 @@ export class ChartDataRequestBuilder {
       }
       return expression.replaceAll('[', '').replaceAll(']', '');
     };
-
     return (this.dataView.computedFields || []).map(f => ({
       alias: f.id!,
       snippet: _removeSquareBrackets(f.expression),

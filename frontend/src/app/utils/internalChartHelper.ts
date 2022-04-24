@@ -630,6 +630,7 @@ const getDrillPaths = (
 export const getChartDrillOption = (
   datas?: ChartDataConfig[],
   drillOption?: IChartDrillOption,
+  isClearAll?: boolean,
 ): IChartDrillOption | undefined => {
   const newDrillPaths = getDrillPaths(datas);
   if (isEmptyArray(newDrillPaths)) {
@@ -643,6 +644,9 @@ export const getChartDrillOption = (
       .join('-') !== newDrillPaths.map(p => p.uid).join('-')
   ) {
     return new ChartDrillOption(newDrillPaths);
+  }
+  if (isClearAll) {
+    drillOption?.clearAll();
   }
   return drillOption;
 };

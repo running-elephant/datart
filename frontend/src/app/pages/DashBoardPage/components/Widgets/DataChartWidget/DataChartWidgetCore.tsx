@@ -18,6 +18,7 @@
 import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
+import { ChartDataViewFieldCategory } from 'app/constants';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { migrateChartConfig } from 'app/migration';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
@@ -29,6 +30,10 @@ import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import {
+  getRuntimeComputedFields,
+  getRuntimeDateLevelFields,
+} from 'app/utils/chartHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import produce from 'immer';
 import React, {
@@ -53,7 +58,8 @@ import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
 export const DataChartWidgetCore: React.FC<{}> = memo(() => {
-  const dataChart = useContext(WidgetChartContext);
+  const { dataChart, availableSourceFunctions } =
+    useContext(WidgetChartContext);
   const scale = useContext(BoardScaleContext);
   const { data } = useContext(WidgetDataContext);
   const { renderMode } = useContext(BoardContext);
@@ -68,14 +74,40 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const containerId = useMemo(() => {
     return `${wid}_${uuidv4()}`;
   }, [wid]);
-  const { onWidgetChartClick } = useContext(WidgetActionContext);
+  const { onWidgetChartClick, onWidgetGetData, onWidgetDataUpdate } =
+    useContext(WidgetActionContext);
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
-  const { onWidgetGetData } = useContext(WidgetActionContext);
   const widgetRef = useRef<Widget>(widget);
   const drillOptionRef = useRef<IChartDrillOption>();
   useEffect(() => {
     widgetRef.current = widget;
   }, [widget]);
+
+  const handleDateLevelChange = useCallback(
+    (type, payload) => {
+      const rows = getRuntimeDateLevelFields(payload.value?.rows);
+      const dateLevelComputedFields = rows.filter(
+        v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
+      );
+      const replacedColName = payload.value.replacedColName;
+      const computedFields = getRuntimeComputedFields(
+        dateLevelComputedFields,
+        replacedColName,
+        dataChart?.config?.computedFields,
+        dataChart?.config?.chartConfig,
+      );
+
+      onWidgetDataUpdate({ computedFields, payload, widgetId: dataChart?.id });
+      onWidgetGetData(widgetRef.current);
+    },
+    [
+      onWidgetDataUpdate,
+      dataChart?.config?.computedFields,
+      dataChart?.config?.chartConfig,
+      dataChart?.id,
+      onWidgetGetData,
+    ],
+  );
 
   const handleDrillOptionChange = useCallback(
     (option: IChartDrillOption) => {
@@ -232,10 +264,13 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const drillContextVal = {
     drillOption: drillOptionRef.current,
     onDrillOptionChange: handleDrillOptionChange,
+    availableSourceFunctions,
+    onDateLevelChange: handleDateLevelChange,
   };
+
   return (
     <ChartDrillContext.Provider value={drillContextVal}>
-      <ChartDrillContextMenu>
+      <ChartDrillContextMenu chartConfig={dataChart?.config.chartConfig}>
         <StyledWrapper>
           <ChartFrameBox ref={cacheWhRef}>{chartFrame}</ChartFrameBox>
           <ChartDrillPaths />

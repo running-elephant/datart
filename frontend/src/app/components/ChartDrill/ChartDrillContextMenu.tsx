@@ -20,7 +20,7 @@ import { CheckOutlined } from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
 import {
   ChartDataSectionType,
-  ChartDataViewFieldCategory,
+  DataViewFieldType,
   RUNTIME_DATE_LEVEL_KEY,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -46,13 +46,13 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
     } = useContext(ChartDrillContext);
 
     const currentDrillLevel = drillOption?.getCurrentDrillLevel();
+    const currentFields = drillOption?.getCurrentFields();
 
     const runtimeDateLevelFields = useMemo(() => {
       if (!drillOption) {
         return;
       }
       const allFields = drillOption.getAllFields();
-      const currentFields = drillOption.getCurrentFields();
       const groupSection = chartConfig?.datas?.find(
         v => v.type === ChartDataSectionType.GROUP,
       );
@@ -66,7 +66,7 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
         rows = groupSection?.rows?.filter(v => v.uid === allFields[0].uid);
       }
       return getRuntimeDateLevelFields(rows);
-    }, [drillOption, chartConfig?.datas]);
+    }, [drillOption, chartConfig?.datas, currentFields]);
 
     const handleDateLevelChange = useCallback(
       (config: ChartDataSectionField) => {
@@ -88,7 +88,6 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
               draft.replacedColName = replacedColName;
             }
           });
-
           onDateLevelChange?.('data', {
             needRefresh: true,
             ancestors: [0],
@@ -154,15 +153,13 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
           {drillOption?.mode !== DrillMode.Expand && selectDrillStatusMenu}
 
           {runtimeDateLevelFields?.map((v, i) => {
-            if (
-              v.category === ChartDataViewFieldCategory.DateLevelComputedField
-            ) {
+            if (v.type === DataViewFieldType.DATE) {
               return (
                 <Menu.SubMenu key={i} title={v.colName}>
                   <DateLevelMenuItems
                     availableSourceFunctions={availableSourceFunctions}
                     config={v[RUNTIME_DATE_LEVEL_KEY] || v}
-                    onChange={config => handleDateLevelChange(config)}
+                    onChange={handleDateLevelChange}
                   />
                 </Menu.SubMenu>
               );
