@@ -63,6 +63,10 @@ export class ChartDrillOption implements IChartDrillOption {
     return this.cursor + 2 === this.drillFields.length;
   }
 
+  public get isDrillable() {
+    return this.drillFields.length > 1;
+  }
+
   public get canSelect() {
     return isEmptyArray(this.expandDownFields);
   }

@@ -31,6 +31,8 @@ import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import {
   fetchAvailableSourceFunctions,
   fetchShareDataSetByPreviewChartAction,
+  fetchShareVizInfo,
+  getOauth2Clients,
 } from './thunks';
 // import { fetchShareDataSetByPreviewChartAction } from './thunk';
 import { ExecuteToken, SharePageState, ShareVizInfo } from './types';
@@ -46,6 +48,8 @@ export const initialState: SharePageState = {
   headlessBrowserRenderSign: false,
   pageWidthHeight: [0, 0],
   shareDownloadPolling: false,
+  loginLoading: false,
+  oauth2Clients: [],
   availableSourceFunctions: [],
 };
 
@@ -173,6 +177,15 @@ export const slice = createSlice({
   },
   extraReducers: builder => {
     builder
+      .addCase(fetchShareVizInfo.pending, state => {
+        state.loginLoading = true;
+      })
+      .addCase(fetchShareVizInfo.fulfilled, state => {
+        state.loginLoading = false;
+      })
+      .addCase(fetchShareVizInfo.rejected, state => {
+        state.loginLoading = false;
+      })
       .addCase(
         fetchShareDataSetByPreviewChartAction.fulfilled,
         (state, { payload }) => {
@@ -185,6 +198,12 @@ export const slice = createSlice({
       )
       .addCase(fetchShareDataSetByPreviewChartAction.rejected, state => {
         state.headlessBrowserRenderSign = true;
+      })
+      .addCase(getOauth2Clients.fulfilled, (state, action) => {
+        state.oauth2Clients = action.payload.map(x => ({
+          name: Object.keys(x)[0],
+          value: x[Object.keys(x)[0]],
+        }));
       })
       .addCase(
         fetchAvailableSourceFunctions.fulfilled,

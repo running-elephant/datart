@@ -22,13 +22,13 @@ import React, { memo, useCallback, useMemo } from 'react';
 import { G50 } from 'styles/StyleConstants';
 const { Option } = Select;
 
-export interface JumpeFieldsProps<T = JumpConfigField> {
+export interface JumpFieldsProps<T = JumpConfigField> {
   chartGroupColumns?: ChartDataSectionField[];
   onChange?: (value?: T) => void;
   value?: T;
   form?: FormInstance;
 }
-export const SelectJumpFields: React.FC<JumpeFieldsProps> = memo(
+export const SelectJumpFields: React.FC<JumpFieldsProps> = memo(
   ({ chartGroupColumns, onChange, value, form }) => {
     const _value = useMemo(() => {
       return value?.jumpFieldName;

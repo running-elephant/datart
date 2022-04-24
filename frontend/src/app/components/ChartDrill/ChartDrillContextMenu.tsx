@@ -179,16 +179,23 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       availableSourceFunctions,
     ]);
 
+    const hasContextMenu =
+      drillOption?.isDrillable || runtimeDateLevelFields?.length;
+
     return (
       <StyledChartDrill className="chart-drill-menu-container">
-        <Dropdown
-          disabled={!drillOption}
-          overlay={contextMenu}
-          destroyPopupOnHide={true}
-          trigger={['contextMenu']}
-        >
+        {hasContextMenu ? (
+          <Dropdown
+            disabled={!drillOption}
+            overlay={contextMenu}
+            destroyPopupOnHide={true}
+            trigger={['contextMenu']}
+          >
+            <div style={{ height: '100%' }}>{children}</div>
+          </Dropdown>
+        ) : (
           <div style={{ height: '100%' }}>{children}</div>
-        </Dropdown>
+        )}
       </StyledChartDrill>
     );
   },

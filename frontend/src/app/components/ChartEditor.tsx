@@ -225,6 +225,37 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     }
   }, [dataview?.sourceId, dispatch]);
 
+  const resetOriginalComputedFields = useCallback(
+    config => {
+      const index = config?.datas?.findIndex(
+        v => v.type === ChartDataSectionType.GROUP,
+      );
+      if (index !== undefined) {
+        const groupRows = config?.datas?.[index]?.rows;
+        if (groupRows) {
+          const dateLevelComputedFields = groupRows.filter(
+            v =>
+              v.category === ChartDataViewFieldCategory.DateLevelComputedField,
+          );
+
+          const computedFields = getRuntimeComputedFields(
+            dateLevelComputedFields,
+            '',
+            dataview?.computedFields,
+            chartConfig,
+          );
+
+          dispatch(
+            workbenchSlice.actions.updateCurrentDataViewComputedFields(
+              computedFields,
+            ),
+          );
+        }
+      }
+    },
+    [chartConfig, dataview?.computedFields, dispatch],
+  );
+
   const registerChartEvents = useCallback(
     chart => {
       chart?.registerMouseEvents([
@@ -308,6 +339,8 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       transferChartConfigs(targetChartConfig, shadowChartConfig || chartConfig),
     );
 
+    resetOriginalComputedFields(finalChartConfig);
+
     dispatch(
       workbenchSlice.actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
@@ -341,7 +374,11 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         setAllowQuery(payload.needRefresh);
         return true;
       }
-      if (payload.value.type !== ChartDataSectionType.FILTER) {
+      // generate runtime computed fields(date level)
+      if (
+        payload.value.type === ChartDataSectionType.GROUP ||
+        payload.value.type === ChartDataSectionType.MIXED
+      ) {
         const dateLevelComputedFields = payload.value.rows.filter(
           v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
         );
@@ -432,6 +469,8 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   }, [buildDataChart, chartType, dataview, onSaveInWidget]);
 
   const saveChart = useCallback(async () => {
+    resetOriginalComputedFields(chartConfig);
+
     if (container === 'dataChart') {
       if (dataChartId) {
         await dispatch(
@@ -515,6 +554,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     chartConfig,
     dataview?.computedFields,
     history,
+    resetOriginalComputedFields,
   ]);
 
   const saveChartToDashBoard = useCallback(
