@@ -28,7 +28,11 @@ import { FullScreenPanel } from '../DashBoardPage/components/FullScreenPanel/Ful
 import { AutoBoardCore } from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
 import { FreeBoardCore } from '../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
 import { getBoardDownloadParams } from '../DashBoardPage/pages/Board/slice/asyncActions';
-import { selectShareBoardInfo } from '../DashBoardPage/pages/Board/slice/selector';
+import {
+  selectShareBoardInfo,
+  selectViewMap,
+} from '../DashBoardPage/pages/Board/slice/selector';
+import { fetchAvailableSourceFunctions } from '../DashBoardPage/pages/Board/slice/thunk';
 import {
   Dashboard,
   VizRenderMode,
@@ -67,6 +71,7 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
     const dispatch = useDispatch();
 
     const shareBoardInfo = useSelector(selectShareBoardInfo);
+    const viewMap = useSelector(selectViewMap);
     const { needFetchItems, hasFetchItems, boardWidthHeight } = shareBoardInfo;
 
     const [allItemFetched, setAllItemFetched] = useState(false);
@@ -145,6 +150,18 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
       onShareDownloadData,
       renderMode,
     ]);
+
+    useEffect(() => {
+      if (viewMap) {
+        const sourceIdList = Array.from(
+          new Set(Object.values(viewMap).map(v => v.sourceId)),
+        );
+
+        sourceIdList.forEach(sourceId => {
+          dispatch(fetchAvailableSourceFunctions(sourceId));
+        });
+      }
+    }, [viewMap, dispatch]);
 
     return (
       <DndProvider backend={HTML5Backend}>

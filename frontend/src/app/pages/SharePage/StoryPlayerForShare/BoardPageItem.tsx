@@ -22,19 +22,36 @@ import { AutoBoardCore } from 'app/pages/DashBoardPage/pages/Board/AutoDashboard
 import { FreeBoardCore } from 'app/pages/DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
 import { makeSelectBoardConfigById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { memo } from 'react';
-import { useSelector } from 'react-redux';
+import React, { memo, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { LEVEL_50 } from 'styles/StyleConstants';
+import { selectViewMap } from '../../DashBoardPage/pages/Board/slice/selector';
+import { fetchAvailableSourceFunctions } from '../../DashBoardPage/pages/Board/slice/thunk';
 
 export interface BoardPageItemProps {
   boardId: string;
 }
 export const BoardPageItem: React.FC<BoardPageItemProps> = memo(
   ({ boardId }) => {
+    const dispatch = useDispatch();
+
     const dashboard = useSelector((state: { board: BoardState }) =>
       makeSelectBoardConfigById()(state, boardId),
     );
+    const viewMap = useSelector(selectViewMap);
+
+    useEffect(() => {
+      if (viewMap) {
+        const sourceIdList = Array.from(
+          new Set(Object.values(viewMap).map(v => v.sourceId)),
+        );
+
+        sourceIdList.forEach(sourceId => {
+          dispatch(fetchAvailableSourceFunctions(sourceId));
+        });
+      }
+    }, [viewMap, dispatch]);
 
     if (!dashboard)
       return (

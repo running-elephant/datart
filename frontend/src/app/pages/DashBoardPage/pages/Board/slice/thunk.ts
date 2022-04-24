@@ -404,10 +404,16 @@ export const fetchAvailableSourceFunctions = createAsyncThunk<
   string,
   { state: RootState }
 >('workbench/fetchAvailableSourceFunctions', async (sourceId, { getState }) => {
-  try {
-    const functions = await fetchAvailableSourceFunctionsAsync(sourceId);
-    return { value: functions, sourceId: sourceId };
-  } catch (err) {
-    throw err;
+  const boardState = getState() as { board: BoardState };
+  const availableSourceFunctionsMap =
+    boardState.board.availableSourceFunctionsMap;
+  if (!availableSourceFunctionsMap[sourceId]) {
+    try {
+      const functions = await fetchAvailableSourceFunctionsAsync(sourceId);
+      return { value: functions, sourceId: sourceId };
+    } catch (err) {
+      throw err;
+    }
   }
+  return false;
 });
