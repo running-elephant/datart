@@ -398,6 +398,48 @@ function getMeta(key, column) {
   };
 }
 
+export function determineTheMergeChartStyleConfigsValueType(
+  tEle: any,
+  sEle: any,
+) {
+  const v: 'value' = 'value';
+  switch (typeof tEle[v]) {
+    /*case 'bigint':
+      if (typeof sEle?.[v] === 'bigint') return sEle?.[v];
+      break;*/
+    case 'boolean':
+      if (typeof sEle?.[v] === 'boolean') return sEle?.[v];
+      break;
+    case 'number':
+    case 'string':
+      if (typeof sEle?.[v] === 'number' || typeof sEle?.[v] === 'string')
+        return sEle?.[v];
+      break;
+    case 'object':
+      if (tEle[v] === null) {
+        return sEle?.[v];
+      } else if (
+        Object.prototype.toString.call(tEle[v]) === '[object Array]' &&
+        Object.prototype.toString.call(sEle?.[v]) === '[object Array]'
+      ) {
+        return sEle?.[v];
+      } else if (
+        Object.prototype.toString.call(tEle[v]) === '[object Object]' &&
+        Object.prototype.toString.call(sEle?.[v]) === '[object Object]'
+      ) {
+        return sEle?.[v];
+      }
+      break;
+    case 'undefined':
+      return sEle?.[v];
+    default:
+      if (typeof tEle[v] === typeof sEle[v]) {
+        return sEle[v];
+      }
+  }
+  return tEle[v];
+}
+
 export function mergeChartStyleConfigs(
   target?: ChartStyleConfig[],
   source?: ChartStyleConfigDTO[],
@@ -424,7 +466,7 @@ export function mergeChartStyleConfigs(
       'key' in tEle ? source?.find(s => s?.key === tEle.key) : source?.[index];
 
     if (!isUndefined(sEle?.['value'])) {
-      tEle['value'] = sEle?.['value'];
+      tEle['value'] = determineTheMergeChartStyleConfigsValueType(tEle, sEle);
     }
     if (!isEmptyArray(tEle?.rows)) {
       tEle['rows'] = mergeChartStyleConfigs(tEle.rows, sEle?.rows, options);
