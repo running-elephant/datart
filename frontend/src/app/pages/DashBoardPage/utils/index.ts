@@ -426,8 +426,6 @@ export const getChartWidgetRequestParams = (obj: {
     requestParams.filters = requestParams.filters.concat(linkFilters);
   }
 
-  // filter 去重
-  requestParams.filters = getDistinctFiltersByColumn(requestParams.filters);
   // splitRangerDateFilters
   requestParams.filters = splitRangerDateFilters(requestParams.filters);
 
