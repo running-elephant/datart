@@ -398,46 +398,38 @@ function getMeta(key, column) {
   };
 }
 
-export function determineTheMergeChartStyleConfigsValueType(
-  tEle: any,
-  sEle: any,
-) {
-  const v: 'value' = 'value';
-  switch (typeof tEle[v]) {
+export function determineCanUpdateByValueType(tEle: any, sEle: any) {
+  switch (typeof tEle) {
     /*case 'bigint':
-      if (typeof sEle?.[v] === 'bigint') return sEle?.[v];
+      if (typeof sEle === 'bigint') return sEle;
       break;*/
     case 'boolean':
-      if (typeof sEle?.[v] === 'boolean') return sEle?.[v];
+      if (typeof sEle === 'boolean') return sEle;
       break;
     case 'number':
     case 'string':
-      if (typeof sEle?.[v] === 'number' || typeof sEle?.[v] === 'string')
-        return sEle?.[v];
+      if (typeof sEle === 'number' || typeof sEle === 'string') return sEle;
       break;
     case 'object':
-      if (tEle[v] === null) {
-        return sEle?.[v];
+      if (tEle === null) {
+        return sEle;
+      } else if (Array.isArray(tEle) && Array.isArray(sEle)) {
+        return sEle;
       } else if (
-        Object.prototype.toString.call(tEle[v]) === '[object Array]' &&
-        Object.prototype.toString.call(sEle?.[v]) === '[object Array]'
+        Object.prototype.toString.call(tEle) === '[object Object]' &&
+        Object.prototype.toString.call(sEle) === '[object Object]'
       ) {
-        return sEle?.[v];
-      } else if (
-        Object.prototype.toString.call(tEle[v]) === '[object Object]' &&
-        Object.prototype.toString.call(sEle?.[v]) === '[object Object]'
-      ) {
-        return sEle?.[v];
+        return sEle;
       }
       break;
     case 'undefined':
-      return sEle?.[v];
+      return sEle;
     default:
-      if (typeof tEle[v] === typeof sEle[v]) {
-        return sEle[v];
+      if (typeof tEle === typeof sEle) {
+        return sEle;
       }
   }
-  return tEle[v];
+  return tEle;
 }
 
 export function mergeChartStyleConfigs(
@@ -466,7 +458,10 @@ export function mergeChartStyleConfigs(
       'key' in tEle ? source?.find(s => s?.key === tEle.key) : source?.[index];
 
     if (!isUndefined(sEle?.['value'])) {
-      tEle['value'] = determineTheMergeChartStyleConfigsValueType(tEle, sEle);
+      tEle['value'] = determineCanUpdateByValueType(
+        tEle['value'],
+        sEle?.['value'],
+      );
     }
     if (!isEmptyArray(tEle?.rows)) {
       tEle['rows'] = mergeChartStyleConfigs(tEle.rows, sEle?.rows, options);

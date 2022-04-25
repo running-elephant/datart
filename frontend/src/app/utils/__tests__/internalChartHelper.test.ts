@@ -20,7 +20,7 @@ import { ChartDataSectionType, DataViewFieldType } from 'app/constants';
 import { ChartDataSectionField, ChartStyleConfig } from 'app/types/ChartConfig';
 import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import {
-  determineTheMergeChartStyleConfigsValueType,
+  determineCanUpdateByValueType,
   diffHeaderRows,
   flattenHeaderRowsWithoutGroupRow,
   getColumnRenderOriginName,
@@ -1563,65 +1563,43 @@ describe('Internal Chart Helper ', () => {
   });
 
   describe.each([
-    [{ value: false }, { value: 0 }, false],
-    [{ value: false }, { value: true }, true],
+    [false, 0, false],
+    [false, true, true],
 
-    [{ value: 0 }, { value: '11' }, '11'],
-    [{ value: '0' }, { value: 12 }, 12],
-    [{ value: 0 }, { value: 13 }, 13],
-    [{ value: '0' }, { value: '14' }, '14'],
+    [0, '11', '11'],
+    ['0', 12, 12],
+    [0, 13, 13],
+    ['0', '14', '14'],
 
-    [
-      { value: { font: 'default1' } },
-      { value: { font: 'Ping Fang1' } },
-      { font: 'Ping Fang1' },
-    ],
-    [
-      { value: { font: 'default2' } },
-      { value: { font: 'Ping Fang2' } },
-      { font: 'Ping Fang2' },
-    ],
-    [{ value: [1, 2, 3] }, { value: { font: 'Ping Fang' } }, [1, 2, 3]],
-    [
-      { value: { font: 'default3' } },
-      { value: [4, 5, 6] },
-      { font: 'default3' },
-    ],
-    [
-      { value: { font: 'default4' } },
-      { value: '[4,5,6]' },
-      { font: 'default4' },
-    ],
-    [{ value: [7, 8, 9] }, { value: '789' }, [7, 8, 9]],
+    [{ font: 'default1' }, { font: 'Ping Fang1' }, { font: 'Ping Fang1' }],
+    [{ font: 'default2' }, { font: 'Ping Fang2' }, { font: 'Ping Fang2' }],
+    [[1, 2, 3], { font: 'Ping Fang' }, [1, 2, 3]],
+    [{ font: 'default3' }, [4, 5, 6], { font: 'default3' }],
+    [{ font: 'default4' }, '[4,5,6]', { font: 'default4' }],
+    [[7, 8, 9], '789', [7, 8, 9]],
 
-    [{ value: null }, { value: '111' }, '111'],
-    [{ value: null }, { value: 123 }, 123],
-    [{ value: null }, { value: [10, 11, 12] }, [10, 11, 12]],
-    [{ value: null }, { value: { abc: 'abc' } }, { abc: 'abc' }],
-    [{ value: null }, { value: false }, false],
-    [{ value: null }, { value: undefined }, undefined],
-    [{ value: null }, { value: null }, null],
+    [null, '111', '111'],
+    [null, 123, 123],
+    [null, [10, 11, 12], [10, 11, 12]],
+    [null, { abc: 'abc' }, { abc: 'abc' }],
+    [null, false, false],
+    [null, undefined, undefined],
+    [null, null, null],
 
-    [{ value: undefined }, { value: undefined }, undefined],
-    [{ value: undefined }, { value: null }, null],
-    [{ value: undefined }, { value: 'abcd' }, 'abcd'],
-    [{ value: undefined }, { value: 54321 }, 54321],
-    [{ value: undefined }, { value: [21, 22, 23] }, [21, 22, 23]],
-    [{ value: undefined }, { value: { esc: 'esc' } }, { esc: 'esc' }],
-  ])(
-    'determineTheMergeChartStyleConfigsValueType Test - ',
-    (target, source, expected) => {
-      test(`deep merge target: ${JSON.stringify(
-        target,
-      )} from source: ${JSON.stringify(source)} result is ${JSON.stringify(
-        expected,
-      )}`, () => {
-        const result = determineTheMergeChartStyleConfigsValueType(
-          target,
-          source,
-        );
-        expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-      });
-    },
-  );
+    [undefined, undefined, undefined],
+    [undefined, null, null],
+    [undefined, 'abcd', 'abcd'],
+    [undefined, 54321, 54321],
+    [undefined, [21, 22, 23], [21, 22, 23]],
+    [undefined, { esc: 'esc' }, { esc: 'esc' }],
+  ])('determineCanUpdateValueByType Test - ', (target, source, expected) => {
+    test(`deep merge target: ${JSON.stringify(
+      target,
+    )} from source: ${JSON.stringify(source)} result is ${JSON.stringify(
+      expected,
+    )}`, () => {
+      const result = determineCanUpdateByValueType(target, source);
+      expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    });
+  });
 });
