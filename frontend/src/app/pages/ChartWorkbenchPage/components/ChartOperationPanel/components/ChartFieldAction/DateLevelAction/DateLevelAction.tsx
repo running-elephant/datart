@@ -26,13 +26,13 @@ const DateLevelAction: FC<{
   onConfigChange: (
     config: ChartDataSectionField,
     needRefresh?: boolean,
-    replacedColName?: string,
+    replacedConfig?: ChartDataSectionField,
   ) => void;
   mode?: 'menu';
 }> = ({ config, onConfigChange, availableSourceFunctions }) => {
   const actionNeedNewRequest = true;
   const onChange = newConfig => {
-    onConfigChange?.(newConfig, actionNeedNewRequest, config.colName);
+    onConfigChange?.(newConfig, actionNeedNewRequest, config);
   };
 
   return (

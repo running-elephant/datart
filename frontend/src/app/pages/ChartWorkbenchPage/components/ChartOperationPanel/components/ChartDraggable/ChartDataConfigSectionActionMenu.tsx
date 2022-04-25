@@ -61,7 +61,7 @@ const ChartDataConfigSectionActionMenu: FC<
     columnUid: string,
     fieldConfig: ChartDataSectionField,
     needRefresh?: boolean,
-    replacedColName?: string,
+    replacedConfig?: ChartDataSectionField,
   ) => {
     if (!fieldConfig) {
       return;
@@ -70,7 +70,7 @@ const ChartDataConfigSectionActionMenu: FC<
       columnUid,
       config,
       fieldConfig,
-      replacedColName,
+      replacedConfig,
     );
 
     onConfigChanged?.(ancestors, newConfig, needRefresh);
@@ -153,8 +153,8 @@ const ChartDataConfigSectionActionMenu: FC<
         <DateLevelAction
           availableSourceFunctions={availableSourceFunctions}
           config={fieldConfig}
-          onConfigChange={(config, needRefresh, replacedColName) => {
-            handleFieldConfigChanged(uid, config, needRefresh, replacedColName);
+          onConfigChange={(config, needRefresh, replacedConfig) => {
+            handleFieldConfigChanged(uid, config, needRefresh, replacedConfig);
           }}
           mode="menu"
         />

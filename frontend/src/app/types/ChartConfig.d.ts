@@ -178,7 +178,7 @@ export type ChartDataConfig = ChartConfigBase & {
       backendSort?: boolean;
     };
   };
-  replacedColName?: string;
+  replacedConfig?: ChartDataSectionField;
   // NOTE: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
 };

@@ -80,14 +80,15 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
               const index = draft.rows.findIndex(v => v.uid === config.uid);
               const runtimeDateLevel =
                 draft.rows[index][RUNTIME_DATE_LEVEL_KEY];
-              const replacedColName = runtimeDateLevel
-                ? runtimeDateLevel.colName
-                : draft.rows[index].colName;
+              const replacedConfig = runtimeDateLevel
+                ? runtimeDateLevel
+                : draft.rows[index];
 
               draft.rows[index][RUNTIME_DATE_LEVEL_KEY] = config;
-              draft.replacedColName = replacedColName;
+              draft.replacedConfig = replacedConfig;
             }
           });
+
           onDateLevelChange?.('data', {
             needRefresh: true,
             ancestors: [0],

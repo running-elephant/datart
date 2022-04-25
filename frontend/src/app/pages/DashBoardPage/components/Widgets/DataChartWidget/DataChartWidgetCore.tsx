@@ -89,12 +89,12 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       const dateLevelComputedFields = rows.filter(
         v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
       );
-      const replacedColName = payload.value.replacedColName;
+      const replacedConfig = payload.value.replacedConfig;
       const computedFields = getRuntimeComputedFields(
         dateLevelComputedFields,
-        replacedColName,
+        replacedConfig,
         dataChart?.config?.computedFields,
-        dataChart?.config?.chartConfig,
+        true,
       );
 
       onWidgetDataUpdate({ computedFields, payload, widgetId: dataChart?.id });
@@ -103,7 +103,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     [
       onWidgetDataUpdate,
       dataChart?.config?.computedFields,
-      dataChart?.config?.chartConfig,
       dataChart?.id,
       onWidgetGetData,
     ],
