@@ -1577,15 +1577,6 @@ export const getDrillableRows = (
     });
 };
 
-export const getChartsAllRows = (configs?: ChartDataConfig[]) => {
-  const datas = configs || [];
-  return datas
-    .filter(v => v.rows)
-    .reduce((acc: ChartDataSectionField[], cur) => {
-      return acc.concat(cur.rows || []);
-    }, []);
-};
-
 export const getRuntimeDateLevelFields = (rows: any) => {
   const _rows = updateBy(rows, draft => {
     draft?.forEach((v, i) => {
