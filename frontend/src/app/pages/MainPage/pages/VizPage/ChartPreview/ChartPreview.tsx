@@ -29,7 +29,7 @@ import ChartManager from 'app/models/ChartManager';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
 import { selectAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/slice/selectors';
-import { fetchAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/slice/thunks';
+import { fetchAvailableSourceFunctionsForChart } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
@@ -124,11 +124,7 @@ const ChartPreviewBoard: FC<{
     useEffect(() => {
       const sourceId = chartPreview?.backendChart?.view.sourceId;
       if (sourceId) {
-        dispatch(
-          fetchAvailableSourceFunctions({
-            sourceId: sourceId,
-          }),
-        );
+        dispatch(fetchAvailableSourceFunctionsForChart(sourceId));
       }
     }, [chartPreview?.backendChart?.view.sourceId, dispatch]);
 
@@ -396,12 +392,12 @@ const ChartPreviewBoard: FC<{
       const dateLevelComputedFields = rows.filter(
         v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
       );
-      const replacedColName = payload.value.replacedColName;
+      const replacedConfig = payload.value.replacedConfig;
       const computedFields = getRuntimeComputedFields(
         dateLevelComputedFields,
-        replacedColName,
+        replacedConfig,
         chartPreview?.backendChart?.config?.computedFields,
-        chartPreview?.chartConfig,
+        true,
       );
 
       dispatch(

@@ -215,7 +215,10 @@ export const ChartDraggableSourceContainer: FC<
             }
           >
             {DATE_LEVELS.map((item, i) => {
-              if (availableSourceFunctions?.includes(item.expression)) {
+              if (
+                availableSourceFunctions &&
+                availableSourceFunctions.includes(item.expression)
+              ) {
                 return (
                   <DateLevelFieldContainer
                     colName={colName}

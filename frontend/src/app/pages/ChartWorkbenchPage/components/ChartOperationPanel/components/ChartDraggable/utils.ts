@@ -23,7 +23,7 @@ export const updateDataConfigByField = (
   uid: string,
   config: ChartDataConfig,
   field: ChartDataSectionField,
-  replacedColName?: string,
+  replacedConfig?: ChartDataSectionField,
 ): ChartDataConfig => {
   return updateBy(config, draft => {
     draft.rows = (draft.rows || []).map(r => {
@@ -32,8 +32,8 @@ export const updateDataConfigByField = (
       }
       return r;
     });
-    if (replacedColName) {
-      draft.replacedColName = replacedColName;
+    if (replacedConfig) {
+      draft.replacedConfig = replacedConfig;
     }
     return draft;
   });
