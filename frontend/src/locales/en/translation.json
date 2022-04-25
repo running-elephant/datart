@@ -689,7 +689,7 @@
             "alias": "Alias",
             "format": "Format",
             "aggregate": "Aggregate",
-            "aggregateLimit": "aggregate",
+            "aggregateLimit": "Aggregate",
             "filter": "Filter",
             "categoryFilter": "Category Filter",
             "colorize": "Colorize",
