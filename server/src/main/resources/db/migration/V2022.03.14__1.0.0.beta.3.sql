@@ -49,6 +49,16 @@ ALTER TABLE `variable`
 ALTER TABLE `variable`
     ADD INDEX `source_id`(`source_id`) USING BTREE;
 
+DELETE FROM `source_schemas`
+WHERE id IN
+      (SELECT temp.id FROM (
+                            SELECT id FROM `source_schemas`
+                            WHERE source_id IN
+                                  (SELECT source_id FROM `source_schemas` GROUP BY source_id HAVING count(*) > 1)
+                              AND id NOT IN
+                                  (SELECT max(id) FROM `source_schemas` GROUP BY source_id HAVING count(*) > 1)
+                        ) temp );
+
 ALTER TABLE `source_schemas`
     ADD UNIQUE INDEX `source_id`(`source_id`) USING BTREE;
 
