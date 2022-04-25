@@ -354,7 +354,7 @@
           "alignment": "Alignment",
           "left": "Left",
           "center": "Center",
-          "right": "right"
+          "right": "Right"
         }
       },
       "filter": {
@@ -510,9 +510,9 @@
             "font": "Font",
             "align": {
               "title": "Align",
-              "left": "left",
-              "center": "center",
-              "right": "right"
+              "left": "Left",
+              "center": "Center",
+              "right": "Right"
             }
           }
         },
@@ -928,18 +928,18 @@
         "background": "Background",
         "color": "Color",
         "image": "Image",
-        "uploadTip": "click to Upload",
-        "padding": "padding",
-        "paddingTop": "padding Top",
-        "paddingRight": "padding Right",
-        "paddingBottom": "padding Bottom",
-        "paddingLeft": "padding Left",
+        "uploadTip": "Click to Upload",
+        "padding": "Padding",
+        "paddingTop": "Padding Top",
+        "paddingRight": "Padding Right",
+        "paddingBottom": "Padding Bottom",
+        "paddingLeft": "Padding Left",
         "border": "Border",
         "style": "Style",
         "radius": "Radius",
         "autoUpdate": "Auto Refresh",
-        "openAutoUpdate": "open Refresh",
-        "frequency": "frequency (s)",
+        "openAutoUpdate": "Enable Auto Refresh",
+        "frequency": "Frequency (s)",
         "baseProperty": "Base Property",
         "marginTB": "Margin-TB",
         "marginLR": "Margin-LR",
@@ -948,7 +948,7 @@
         "rowHeight": "rowHeight",
         "scaleMode": "scale Mode",
         "queryMode": "query Mode",
-        "openInitQuery": "open Init Query",
+        "openInitQuery": "Open Init Query",
         "cutIn": "Cut In",
         "cutOut": "Cut Out",
         "speed": "Speed",
