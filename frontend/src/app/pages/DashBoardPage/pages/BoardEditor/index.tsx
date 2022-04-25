@@ -31,11 +31,7 @@ import {
 import EditorHeader from '../../components/BoardHeader/EditorHeader';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardInitProvider } from '../../components/BoardProvider/BoardInitProvider';
-import { selectViewMap } from '../Board/slice/selector';
-import {
-  fetchAvailableSourceFunctions,
-  fetchBoardDetail,
-} from '../Board/slice/thunk';
+import { fetchBoardDetail } from '../Board/slice/thunk';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
 import AutoEditor from './AutoEditor/index';
 import ControllerWidgetPanel from './components/ControllerWidgetPanel';
@@ -63,7 +59,6 @@ export const BoardEditor: React.FC<{
   const board = useSelector(selectEditBoard);
   const boardLoading = useSelector(selectEditBoardLoading);
   const boardChartEditorProps = useSelector(selectBoardChartEditorProps);
-  const viewMap = useSelector(selectViewMap);
 
   const onCloseChartEditor = useCallback(() => {
     dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
@@ -161,18 +156,6 @@ export const BoardEditor: React.FC<{
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onCloseChartEditor]);
-
-  useEffect(() => {
-    if (viewMap) {
-      const sourceIdList = Array.from(
-        new Set(Object.values(viewMap).map(v => v.sourceId)),
-      );
-
-      sourceIdList.forEach(sourceId => {
-        dispatch(fetchAvailableSourceFunctions(sourceId));
-      });
-    }
-  }, [viewMap, dispatch]);
 
   return (
     <Wrapper>

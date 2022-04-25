@@ -19,6 +19,7 @@
 import { ControllerFacadeTypes } from 'app/constants';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartMouseEventParams } from 'app/types/Chart';
+import { ChartConfig } from 'app/types/ChartConfig';
 import debounce from 'lodash/debounce';
 import { createContext, FC, memo, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
@@ -293,7 +294,15 @@ export interface WidgetActionContextProps {
   onRefreshWidgetsByController: (widget: Widget) => void;
   onWidgetsQuery: () => void;
   onRenderedWidgetById: (wid: string) => void;
-  onWidgetDataUpdate: ({ computedFields, payload, widgetId }) => void;
+  onWidgetDataUpdate: ({
+    computedFields,
+    payload,
+    widgetId,
+  }: {
+    computedFields: any;
+    payload: ChartConfig;
+    widgetId: string;
+  }) => void;
 
   // read
   onWidgetFullScreen: (itemId: string) => void;

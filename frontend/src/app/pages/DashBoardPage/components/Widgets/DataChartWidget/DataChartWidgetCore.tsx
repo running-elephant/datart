@@ -96,8 +96,13 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         dataChart?.config?.computedFields,
         true,
       );
-
-      onWidgetDataUpdate({ computedFields, payload, widgetId: dataChart?.id });
+      if (dataChart?.id) {
+        onWidgetDataUpdate({
+          computedFields,
+          payload,
+          widgetId: dataChart.id,
+        });
+      }
       onWidgetGetData(widgetRef.current);
     },
     [

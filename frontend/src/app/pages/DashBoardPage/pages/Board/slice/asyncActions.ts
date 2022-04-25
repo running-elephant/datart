@@ -33,7 +33,11 @@ import {
 } from '../../../utils/board';
 import { getWidgetInfoMapByServer, getWidgetMap } from '../../../utils/widget';
 import { PageInfo } from './../../../../MainPage/pages/ViewPage/slice/types';
-import { getChartWidgetDataAsync, getWidgetData } from './thunk';
+import {
+  fetchAvailableSourceFunctions,
+  getChartWidgetDataAsync,
+  getWidgetData,
+} from './thunk';
 import { BoardState, DataChart, ServerDashboard, VizRenderMode } from './types';
 
 export const handleServerBoardAction =
@@ -67,6 +71,16 @@ export const handleServerBoardAction =
     const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
     const viewViews = getChartDataView(serverViews, allDataCharts);
+
+    if (viewViews) {
+      const sourceIdList = Array.from(
+        new Set(Object.values(viewViews).map(v => v.sourceId)),
+      );
+
+      sourceIdList.forEach(sourceId => {
+        dispatch(fetchAvailableSourceFunctions(sourceId));
+      });
+    }
 
     await dispatch(
       boardActions.setBoardState({

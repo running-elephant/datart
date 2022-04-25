@@ -22,6 +22,7 @@ import {
   ChartDataSectionType,
   ChartDataViewFieldCategory,
   DownloadFileType,
+  RUNTIME_DATE_LEVEL_KEY,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
@@ -310,10 +311,22 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const handleChartChange = (c: IChart) => {
     registerChartEvents(c);
     setChart(c);
-    const targetChartConfig = CloneValueDeep(c.config);
 
+    const targetChartConfig = CloneValueDeep(c.config);
     const finalChartConfig = clearRuntimeDateLevelFieldsInChartConfig(
       transferChartConfigs(targetChartConfig, shadowChartConfig || chartConfig),
+    );
+
+    const computedFields = updateBy(dataview?.computedFields || [], draft => {
+      draft.forEach((v, i) => {
+        delete draft[i][RUNTIME_DATE_LEVEL_KEY];
+      });
+    });
+
+    dispatch(
+      workbenchSlice.actions.updateCurrentDataViewComputedFields(
+        computedFields,
+      ),
     );
 
     dispatch(

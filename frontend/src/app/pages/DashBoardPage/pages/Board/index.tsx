@@ -32,8 +32,8 @@ import { selectEditBoard } from '../BoardEditor/slice/selectors';
 import { AutoBoardCore } from './AutoDashboard/AutoBoardCore';
 import { FreeBoardCore } from './FreeDashboard/FreeBoardCore';
 import { boardActions } from './slice';
-import { makeSelectBoardConfigById, selectViewMap } from './slice/selector';
-import { fetchAvailableSourceFunctions, fetchBoardDetail } from './slice/thunk';
+import { makeSelectBoardConfigById } from './slice/selector';
+import { fetchBoardDetail } from './slice/thunk';
 import { BoardState, VizRenderMode } from './slice/types';
 
 export interface BoardProps {
@@ -65,7 +65,6 @@ export const Board: FC<BoardProps> = memo(
     const boardId = id;
     const dispatch = useDispatch();
     const editingBoard = useSelector(selectEditBoard);
-    const viewMap = useSelector(selectViewMap);
 
     const readBoardHide = useMemo(
       () => editingBoard?.id === boardId,
@@ -157,18 +156,6 @@ export const Board: FC<BoardProps> = memo(
         boardDrillManager.clearMapByBoardId(boardId);
       };
     }, [boardId, dispatch, fetchData, searchParams]);
-
-    useEffect(() => {
-      if (viewMap) {
-        const sourceIdList = Array.from(
-          new Set(Object.values(viewMap).map(v => v.sourceId)),
-        );
-
-        sourceIdList.forEach(sourceId => {
-          dispatch(fetchAvailableSourceFunctions(sourceId));
-        });
-      }
-    }, [viewMap, dispatch]);
 
     return (
       <Wrapper ref={ref} className="dashboard-box">
