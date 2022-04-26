@@ -39,6 +39,8 @@ import {
   MIN_PADDING,
   NeedFetchWidgetTypes,
 } from '../constants';
+import { initAutoBoardConfig } from './autoBoard';
+import { initFreeBoardConfig } from './freeBoard';
 
 export const getDashBoardByResBoard = (data: ServerDashboard): Dashboard => {
   const {
@@ -162,6 +164,13 @@ export const getInitBoardConfig = (boardType?: BoardType) => {
   return dashboardConfig;
 };
 
+export const getInitBoardConfig2 = (boardType: BoardType) => {
+  if (boardType === 'auto') {
+    return initAutoBoardConfig();
+  } else {
+    return initFreeBoardConfig();
+  }
+};
 // dataCharts
 export const getDataChartsByServer = (serverDataCharts: ServerDatachart[]) => {
   const dataCharts: DataChart[] = serverDataCharts.map(item => {
