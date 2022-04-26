@@ -398,7 +398,7 @@ function getMeta(key, column) {
   };
 }
 
-export function determineCanUpdateByValueType(tEle: any, sEle: any) {
+export function getUpdatedChartStyleValue(tEle: any, sEle: any) {
   switch (typeof tEle) {
     /*case 'bigint':
       if (typeof sEle === 'bigint') return sEle;
@@ -458,10 +458,7 @@ export function mergeChartStyleConfigs(
       'key' in tEle ? source?.find(s => s?.key === tEle.key) : source?.[index];
 
     if (!isUndefined(sEle?.['value'])) {
-      tEle['value'] = determineCanUpdateByValueType(
-        tEle['value'],
-        sEle?.['value'],
-      );
+      tEle['value'] = getUpdatedChartStyleValue(tEle['value'], sEle?.['value']);
     }
     if (!isEmptyArray(tEle?.rows)) {
       tEle['rows'] = mergeChartStyleConfigs(tEle.rows, sEle?.rows, options);

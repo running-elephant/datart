@@ -20,10 +20,10 @@ import { ChartDataSectionType, DataViewFieldType } from 'app/constants';
 import { ChartDataSectionField, ChartStyleConfig } from 'app/types/ChartConfig';
 import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import {
-  determineCanUpdateByValueType,
   diffHeaderRows,
   flattenHeaderRowsWithoutGroupRow,
   getColumnRenderOriginName,
+  getUpdatedChartStyleValue,
   isInRange,
   isUnderUpperBound,
   mergeChartDataConfigs,
@@ -1598,7 +1598,7 @@ describe('Internal Chart Helper ', () => {
     )} from source: ${JSON.stringify(source)} result is ${JSON.stringify(
       expected,
     )}`, () => {
-      const result = determineCanUpdateByValueType(target, source);
+      const result = getUpdatedChartStyleValue(target, source);
       expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
     });
   });
