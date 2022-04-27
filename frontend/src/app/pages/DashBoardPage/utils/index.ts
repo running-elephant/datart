@@ -319,7 +319,6 @@ export const getControllerDateValues = (obj: {
       const isStart = !obj.execute;
       const time = getTime(+(direction + amount), unit)(unit, isStart);
       timeValues[1] = time.format(TIME_FORMATTER);
-      debugger;
     }
   }
 
