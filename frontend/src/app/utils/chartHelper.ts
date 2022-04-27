@@ -1588,7 +1588,7 @@ export const getChartsAllRows = (configs?: ChartDataConfig[]) => {
 
 export const getRuntimeDateLevelFields = (rows: any) => {
   const _rows = CloneValueDeep(rows);
-  _rows.forEach((v, i) => {
+  _rows?.forEach((v, i) => {
     const symbolData = v?.[RUNTIME_DATE_LEVEL_KEY];
     if (symbolData) {
       _rows[i] = symbolData;
