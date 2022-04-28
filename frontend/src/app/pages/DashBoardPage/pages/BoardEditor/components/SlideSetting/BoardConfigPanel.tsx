@@ -36,6 +36,7 @@ const StyledWrapper = styled.div`
 `;
 export const BoardConfigPanel: FC<{}> = memo(() => {
   const dispatch = useDispatch();
+  const t = useI18NPrefix(`viz.board.setting`);
   const boardConfig = useContext(BoardConfigContext);
   const configs = boardConfig.jsonConfig.props;
   const i18ns = boardConfig.jsonConfig.i18ns;
@@ -50,7 +51,7 @@ export const BoardConfigPanel: FC<{}> = memo(() => {
   };
   return (
     <ChartI18NContext.Provider value={{ i18NConfigs: i18ns }}>
-      <h3>Board</h3>
+      <h3 style={{ textAlign: 'center' }}>{t('board')}</h3>
       <StyledWrapper onClick={e => e.stopPropagation()}>
         <BoardConfigCollapse configs={configs} onChange={onChange} />
       </StyledWrapper>

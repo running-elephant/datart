@@ -357,7 +357,7 @@ export const renderedEditWidgetAsync = createAsyncThunk<
 
 //
 export const uploadBoardImage = createAsyncThunk<
-  null,
+  string,
   {
     boardId: string;
     fileName: string;
@@ -375,7 +375,7 @@ export const uploadBoardImage = createAsyncThunk<
       data: formData,
     });
     resolve(data);
-    return null;
+    return data;
   },
 );
 

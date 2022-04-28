@@ -29,6 +29,7 @@ const Wrapper = styled.div`
   > h3 {
     flex-shrink: 0;
     padding: ${SPACE_MD} 0;
+    text-align: center;
   }
 
   .form-wrapper {

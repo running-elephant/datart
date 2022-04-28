@@ -19,7 +19,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { Form, Upload } from 'antd';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { convertImageUrl } from 'app/pages/DashBoardPage/utils';
-import React, { useCallback, useContext } from 'react';
+import { memo, useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
@@ -49,7 +49,7 @@ export const UploadDragger: React.FC<{
   value: string;
   onChange?: any;
   placeholder: string;
-}> = ({ value, onChange, placeholder }) => {
+}> = memo(({ value, onChange, placeholder }) => {
   const dispatch = useDispatch();
   const { boardId } = useContext(BoardContext);
 
@@ -57,7 +57,7 @@ export const UploadDragger: React.FC<{
     async info => {
       const formData = new FormData();
       formData.append('file', info);
-      await dispatch(
+      dispatch(
         uploadBoardImage({
           boardId,
           fileName: info.name,
@@ -101,7 +101,7 @@ export const UploadDragger: React.FC<{
       )}
     </StyleUpload>
   );
-};
+});
 const StyleUpload = styled(Upload.Dragger)`
   .image-box {
     position: relative;
