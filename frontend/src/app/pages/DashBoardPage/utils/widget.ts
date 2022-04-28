@@ -48,7 +48,6 @@ import {
   ContainerWidgetContent,
   ContainerWidgetType,
   ControllerWidgetContent,
-  DashboardConfig,
   DataChart,
   MediaWidgetContent,
   MediaWidgetType,
@@ -411,12 +410,12 @@ export const getWidgetInfoMapByServer = (widgetMap: Record<string, Widget>) => {
 
 export const updateWidgetsRect = (
   widgets: Widget[],
-  boardConfig: DashboardConfig,
+  boardType: BoardType,
   layouts?: ReactGridLayout.Layout[],
 ) => {
-  if (boardConfig.type === 'auto') {
+  if (boardType === 'auto') {
     return updateAutoWidgetsRect(widgets, layouts || []);
-  } else if (boardConfig.type === 'free') {
+  } else if (boardType === 'free') {
     return updateFreeWidgetsRect(widgets);
   }
   return widgets;
