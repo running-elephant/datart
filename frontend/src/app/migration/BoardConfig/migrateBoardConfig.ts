@@ -16,33 +16,34 @@
  * limitations under the License.
  */
 import { MIN_MARGIN, MIN_PADDING } from 'app/pages/DashBoardPage/constants';
+import { BoardTypes } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { BoardConfig } from 'app/pages/DashBoardPage/types/boardTypes';
 import {
-  BoardTypes,
-  DashboardConfig,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { getInitBoardConfig } from 'app/pages/DashBoardPage/utils/board';
-import { setLatestVersion, versionCanDo } from '../utils';
+  getInitBoardConfig,
+  getInitBoardConfigBeta3,
+} from 'app/pages/DashBoardPage/utils/board';
 import {
   APP_VERSION_BETA_0,
-  APP_VERSION_BETA_1,
   APP_VERSION_BETA_2,
-} from './../constants';
+  APP_VERSION_BETA_4,
+} from '../constants';
+import { setLatestVersion, versionCanDo } from '../utils';
 
 export const parseBoardConfig = (boardConfig: string) => {
   try {
-    let nextConfig: DashboardConfig = JSON.parse(boardConfig);
+    let nextConfig = JSON.parse(boardConfig);
     if (!BoardTypes.includes(nextConfig?.type)) {
-      return getInitBoardConfig('auto');
+      return getInitBoardConfigBeta3('auto');
     }
     return nextConfig;
   } catch (error) {
     console.log('解析 config 出错');
-    let nextConfig = getInitBoardConfig('auto');
+    let nextConfig = getInitBoardConfigBeta3('auto');
     return nextConfig;
   }
 };
 
-export const beta0 = (config: DashboardConfig) => {
+export const beta0 = config => {
   if (!versionCanDo(APP_VERSION_BETA_0, config.version)) return config;
   // 1. initialQuery 新增属性 检测没有这个属性就设置为 true,如果已经设置为false，则保持false
   if (!config.hasOwnProperty('initialQuery')) {
@@ -66,9 +67,8 @@ export const beta0 = (config: DashboardConfig) => {
   return config;
 };
 
-export const beta2 = (config: DashboardConfig) => {
-  if (!versionCanDo(APP_VERSION_BETA_1, config.version)) return config;
-  // allowOverlap in autoBoard
+export const beta2 = config => {
+  if (!versionCanDo(APP_VERSION_BETA_2, config.version)) return config;
   if (!config.allowOverlap) {
     config.allowOverlap = false;
   }
@@ -76,11 +76,108 @@ export const beta2 = (config: DashboardConfig) => {
   return config;
 };
 
+export const beta4 = (config: any) => {
+  if (!versionCanDo(APP_VERSION_BETA_4, config.version)) return config;
+
+  if (config.type === 'auto') {
+    let newConfig: BoardConfig = config.jsonConfig
+      ? config
+      : getInitBoardConfig('auto');
+    if (config.background || config.initialQuery) {
+      newConfig.maxWidgetIndex = config.maxWidgetIndex;
+      newConfig.jsonConfig.props.forEach(item => {
+        if (item.key === 'basic') {
+          item!.rows!.forEach(row => {
+            if (row.key === 'initialQuery') {
+              row.value = config.initialQuery;
+            }
+            if (row.key === 'allowOverlap') {
+              row.value = config.allowOverlap;
+            }
+          });
+        }
+        if (item.key === 'background') {
+          if (item?.rows?.[0]?.default) {
+            item.rows[0].value = config.background;
+          }
+        }
+        if (item.key === 'space') {
+          item!.rows!.forEach(row => {
+            if (row.key === 'paddingTB') {
+              row.value = config.containerPadding[1];
+            }
+            if (row.key === 'paddingLR') {
+              row.value = config.containerPadding[0];
+            }
+            if (row.key === 'marginTB') {
+              row.value = config.margin[1];
+            }
+            if (row.key === 'marginLR') {
+              row.value = config.margin[0];
+            }
+          });
+        }
+        if (item.key === 'mSpace') {
+          item!.rows!.forEach(row => {
+            if (row.key === 'paddingTB') {
+              row.value = config.mobileContainerPadding[0];
+            }
+            if (row.key === 'paddingLR') {
+              row.value = config.mobileContainerPadding[1];
+            }
+            if (row.key === 'marginTB') {
+              row.value = config.mobileMargin[0];
+            }
+            if (row.key === 'marginLR') {
+              row.value = config.mobileMargin[1];
+            }
+          });
+        }
+      });
+    }
+    return newConfig;
+  } else {
+    let newConfig: BoardConfig = config.jsonConfig
+      ? config
+      : getInitBoardConfig('free');
+    if (config.background || config.initialQuery) {
+      newConfig.maxWidgetIndex = config.maxWidgetIndex;
+      newConfig.jsonConfig.props.forEach(item => {
+        if (item.key === 'basic') {
+          item!.rows!.forEach(row => {
+            if (row.key === 'initialQuery') {
+              row.value = config.initialQuery;
+            }
+            if (row.key === 'scaleMode') {
+              row.value = config.scaleMode;
+            }
+          });
+        }
+        if (item.key === 'size') {
+          item!.rows!.forEach(row => {
+            if (row.key === 'width') {
+              row.value = config.width;
+            }
+            if (row.key === 'height') {
+              row.value = config.height;
+            }
+          });
+        }
+        if (item.key === 'background') {
+          if (item?.rows?.[0]?.default) {
+            item.rows[0].value = config.background;
+          }
+        }
+      });
+    }
+    return newConfig;
+  }
+};
 export const migrateBoardConfig = (boardConfig: string) => {
   let config = parseBoardConfig(boardConfig);
   config = beta0(config);
-
   config = beta2(config);
+  config = beta4(config);
   config = setLatestVersion(config);
-  return config;
+  return config as BoardConfig;
 };

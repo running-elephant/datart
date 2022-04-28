@@ -21,7 +21,7 @@ import {
   BoardType,
   ColsKeyType,
   Dashboard,
-  DashboardConfig,
+  DashboardConfigBeta3,
   DataChart,
   DeviceType,
   ServerDashboard,
@@ -31,6 +31,7 @@ import {
 import { ChartDataView } from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
 import { transformMeta } from 'app/utils/internalChartHelper';
+import { BoardConfigValue } from '../components/BoardProvider/BoardConfigProvider';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
@@ -134,8 +135,8 @@ export const getInitBoardInfo = (obj: {
   return boardInfo;
 };
 
-export const getInitBoardConfig = (boardType?: BoardType) => {
-  const dashboardConfig: DashboardConfig = {
+export const getInitBoardConfigBeta3 = (boardType?: BoardType) => {
+  const dashboardConfig: DashboardConfigBeta3 = {
     type: boardType || 'auto',
     version: '',
     background: BackgroundDefault,
@@ -163,8 +164,7 @@ export const getInitBoardConfig = (boardType?: BoardType) => {
   };
   return dashboardConfig;
 };
-
-export const getInitBoardConfig2 = (boardType: BoardType) => {
+export const getInitBoardConfig = (boardType?: BoardType) => {
   if (boardType === 'auto') {
     return initAutoBoardConfig();
   } else {
@@ -201,20 +201,19 @@ export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
 };
 
 export const getBoardMarginPadding = (
-  boardConfig: DashboardConfig,
+  boardConfig: BoardConfigValue,
   colsKey: ColsKeyType,
 ) => {
-  const { margin, containerPadding, mobileMargin, mobileContainerPadding } =
-    boardConfig;
+  const { margin, padding, mMargin, mPadding } = boardConfig;
   const isMobile = colsKey === 'sm';
   return isMobile
     ? {
-        curMargin: mobileMargin || [MIN_MARGIN, MIN_MARGIN],
-        curPadding: mobileContainerPadding || [MIN_PADDING, MIN_PADDING],
+        curMargin: mMargin || [MIN_MARGIN, MIN_MARGIN],
+        curPadding: mPadding || [MIN_PADDING, MIN_PADDING],
       }
     : {
         curMargin: margin,
-        curPadding: containerPadding,
+        curPadding: padding,
       };
 };
 

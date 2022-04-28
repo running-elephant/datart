@@ -16,30 +16,41 @@
  * limitations under the License.
  */
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
-import { DashboardConfig } from '../types/boardTypes';
+import { BoardConfig } from '../types/boardTypes';
 
 export const initAutoBoardConfig = () => {
-  const config: DashboardConfig = {
+  const config: BoardConfig = {
     type: 'auto',
     version: APP_CURRENT_VERSION,
     maxWidgetIndex: 0,
     jsonConfig: {
       props: [
         {
-          label: 'basic',
+          label: 'basic.basic',
           key: 'basic',
           comType: 'group',
+          options: {
+            expand: true,
+          },
           rows: [
             {
               label: 'basic.initialQuery',
               key: 'initialQuery',
               default: true,
+              value: true,
+              comType: 'switch',
+            },
+            {
+              label: 'basic.allowOverlap',
+              key: 'allowOverlap',
+              default: false,
+              value: true,
               comType: 'switch',
             },
           ],
         },
         {
-          label: 'space',
+          label: 'space.space',
           key: 'space',
           comType: 'group',
           rows: [
@@ -47,44 +58,88 @@ export const initAutoBoardConfig = () => {
               label: 'space.paddingTB',
               key: 'paddingTB',
               default: 8,
+              value: 8,
               comType: 'inputNumber',
             },
             {
               label: 'space.paddingLR',
               key: 'paddingLR',
               default: 8,
+              value: 8,
               comType: 'inputNumber',
             },
             {
               label: 'space.marginTB',
               key: 'marginTB',
               default: 8,
+              value: 8,
               comType: 'inputNumber',
             },
             {
               label: 'space.marginLR',
               key: 'marginLR',
               default: 8,
+              value: 8,
               comType: 'inputNumber',
             },
           ],
         },
         {
-          label: 'background',
+          label: 'mSpace.mSpace',
+          key: 'mSpace',
+          comType: 'group',
+          rows: [
+            {
+              label: 'mSpace.paddingTB',
+              key: 'paddingTB',
+              default: 8,
+              value: 8,
+              comType: 'inputNumber',
+            },
+            {
+              label: 'mSpace.paddingLR',
+              key: 'paddingLR',
+              default: 8,
+              value: 8,
+              comType: 'inputNumber',
+            },
+            {
+              label: 'mSpace.marginTB',
+              key: 'marginTB',
+              default: 8,
+              value: 8,
+              comType: 'inputNumber',
+            },
+            {
+              label: 'mSpace.marginLR',
+              key: 'marginLR',
+              default: 8,
+              value: 8,
+              comType: 'inputNumber',
+            },
+          ],
+        },
+        {
+          label: 'background.background',
           key: 'background',
           comType: 'group',
           rows: [
             {
-              label: 'background.color',
-              key: 'color',
-              default: '#fff', // TODO 根据当前主题色配置
-              comType: 'fontColor',
-            },
-            {
-              label: 'background.url',
-              key: 'url',
-              default: '',
-              comType: 'input',
+              label: 'background.background',
+              key: 'background',
+              default: {
+                color: 'transparent', // TODO 根据当前主题色配置
+                image: '',
+                size: '100% 100%',
+                repeat: 'no-repeat',
+              },
+              value: {
+                color: 'transparent', // TODO 根据当前主题色配置
+                image: '',
+                size: '100% 100%',
+                repeat: 'no-repeat',
+              },
+              comType: 'background',
             },
           ],
         },
@@ -94,17 +149,26 @@ export const initAutoBoardConfig = () => {
           lang: 'zh-CN',
           translation: {
             basic: {
+              basic: '基本属性',
               initialQuery: '开启初始化查询',
+              allowOverlap: '允许组件重叠',
             },
             space: {
-              paddingTB: '上下间距',
-              paddingLR: '左右间距',
-              marginTB: '上下边距',
-              marginLR: '左右边距',
+              space: '间距',
+              paddingTB: '画布上下间距',
+              paddingLR: '画布左右间距',
+              marginTB: '组件上下间距',
+              marginLR: '组件左右间距',
+            },
+            mSpace: {
+              mSpace: '移动端间距',
+              paddingTB: '画布上下间距',
+              paddingLR: '画布左右间距',
+              marginTB: '组件上下间距',
+              marginLR: '组件左右间距',
             },
             background: {
-              color: '背景颜色',
-              url: '背景图片',
+              background: '背景',
             },
           },
         },
@@ -112,17 +176,26 @@ export const initAutoBoardConfig = () => {
           lang: 'en-US',
           translation: {
             basic: {
+              basic: 'Basic',
               initialQuery: 'Open Init Query',
+              allowOverlap: 'Allow Overlap',
             },
             space: {
-              paddingTB: 'Padding TB',
-              paddingLR: 'Padding LR',
-              marginTB: 'Margin TB',
-              marginLR: 'Margin LR',
+              space: 'Space',
+              paddingTB: 'Board Padding TB',
+              paddingLR: 'Board Padding LR',
+              marginTB: 'Widget Margin TB',
+              marginLR: 'Widget Margin LR',
+            },
+            mSpace: {
+              mSpace: 'Mobile Space',
+              paddingTB: 'Board Padding TB',
+              paddingLR: 'Board Padding LR',
+              marginTB: 'Widget Margin TB',
+              marginLR: 'Widget Margin LR',
             },
             background: {
-              color: 'Background Color',
-              url: 'Background Image',
+              background: 'Background',
             },
           },
         },

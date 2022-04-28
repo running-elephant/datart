@@ -16,17 +16,17 @@
  * limitations under the License.
  */
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
-import { DashboardConfig } from '../types/boardTypes';
+import { BoardConfig } from '../types/boardTypes';
 
 export const initFreeBoardConfig = () => {
-  const config: DashboardConfig = {
-    type: 'auto',
+  const config: BoardConfig = {
+    type: 'free',
     version: APP_CURRENT_VERSION,
     maxWidgetIndex: 0,
     jsonConfig: {
       props: [
         {
-          label: 'basic',
+          label: 'basic.basic',
           key: 'basic',
           comType: 'group',
           rows: [
@@ -34,22 +34,46 @@ export const initFreeBoardConfig = () => {
               label: 'basic.initialQuery',
               key: 'initialQuery',
               default: true,
+              value: true,
               comType: 'switch',
             },
+            // TODO Step 步长
+            // {
+            //   label: 'basic.Step',
+            //   key: 'Step',
+            //   default: 1,
+            //   value: 5,
+            //   comType: 'inputNumber',
+            // },
             {
-              label: 'basic.scaleMode',
+              label: 'basic.scaleMode.scaleMode',
               key: 'scaleMode',
-              default: 'single',
+              default: 'scaleWidth',
+              value: 'scaleWidth',
               comType: 'select',
               options: {
+                translateItemLabel: true,
                 items: [
-                  { label: 'basic.scaleMode.scaleWidth', value: 'scaleWidth' },
                   {
-                    label: 'basic.scaleMode.scaleHeight',
+                    label: '@global@.basic.scaleMode.scaleWidth',
+                    key: 'scaleWidth',
+                    value: 'scaleWidth',
+                  },
+                  {
+                    label: '@global@.basic.scaleMode.scaleHeight',
+                    key: 'scaleHeight',
                     value: 'scaleHeight',
                   },
-                  { label: 'basic.scaleMode.scaleFull', value: 'scaleFull' },
-                  { label: 'basic.scaleMode.noScale', value: 'noScale' },
+                  {
+                    label: '@global@.basic.scaleMode.scaleFull',
+                    key: 'scaleFull',
+                    value: 'scaleFull',
+                  },
+                  {
+                    label: '@global@.basic.scaleMode.noScale',
+                    key: 'noScale',
+                    value: 'noScale',
+                  },
                 ],
               },
             },
@@ -57,7 +81,7 @@ export const initFreeBoardConfig = () => {
         },
 
         {
-          label: 'size',
+          label: 'size.size',
           key: 'size',
           comType: 'group',
           rows: [
@@ -65,51 +89,39 @@ export const initFreeBoardConfig = () => {
               label: 'size.width',
               key: 'width',
               default: 1920,
+              value: 1920,
               comType: 'inputNumber',
             },
             {
               label: 'size.height',
               key: 'height',
               default: 1080,
+              value: 1080,
               comType: 'inputNumber',
             },
           ],
         },
         {
-          label: 'background',
+          label: 'background.background',
           key: 'background',
           comType: 'group',
           rows: [
             {
-              label: 'background.color',
-              key: 'color',
-              default: '#fff', // TODO 根据当前主题色配置
-              comType: 'fontColor',
-            },
-            {
-              label: 'background.url',
-              key: 'url',
-              default: '',
-              comType: 'inputNumber',
-            },
-          ],
-        },
-        {
-          label: 'background',
-          key: 'background',
-          comType: 'group',
-          rows: [
-            {
-              label: 'background.color',
-              key: 'color',
-              default: '#fff', // TODO 根据当前主题色配置
-              comType: 'fontColor',
-            },
-            {
-              label: 'background.url',
-              key: 'url',
-              default: '',
-              comType: 'inputNumber',
+              label: 'background.background',
+              key: 'background',
+              default: {
+                color: 'transparent', // TODO 根据当前主题色配置
+                image: '',
+                size: '100% 100%',
+                repeat: 'no-repeat',
+              },
+              value: {
+                color: 'transparent', // TODO 根据当前主题色配置
+                image: '',
+                size: '100% 100%',
+                repeat: 'no-repeat',
+              },
+              comType: 'background',
             },
           ],
         },
@@ -119,17 +131,24 @@ export const initFreeBoardConfig = () => {
           lang: 'zh-CN',
           translation: {
             basic: {
+              basic: '基础',
               initialQuery: '开启初始化查询',
+              scaleMode: {
+                scaleMode: '缩放模式',
+                scaleWidth: '等比宽度缩放',
+                scaleHeight: '等比高度缩放',
+                scaleFull: '全屏缩放',
+                noScale: '不缩放',
+              },
             },
-            space: {
-              paddingTB: '上下间距',
-              paddingLR: '左右间距',
-              marginTB: '上下边距',
-              marginLR: '左右边距',
+            size: {
+              size: '尺寸',
+              width: '宽度',
+              height: '高度',
             },
+
             background: {
-              color: '背景颜色',
-              url: '背景图片',
+              background: '背景',
             },
           },
         },
@@ -137,17 +156,30 @@ export const initFreeBoardConfig = () => {
           lang: 'en-US',
           translation: {
             basic: {
+              basic: 'Basic',
               initialQuery: 'Open Init Query',
+              scaleMode: {
+                scaleMode: 'Scale Mode',
+                scaleWidth: 'Scale Width',
+                scaleHeight: 'Scale Height',
+                scaleFull: 'Scale Full',
+                noScale: 'No Scale',
+              },
+            },
+            size: {
+              size: 'Size',
+              width: 'Width',
+              height: 'Height',
             },
             space: {
+              space: 'Space',
               paddingTB: 'Padding TB',
               paddingLR: 'Padding LR',
               marginTB: 'Margin TB',
               marginLR: 'Margin LR',
             },
             background: {
-              color: 'Background Color',
-              url: 'Background Image',
+              background: 'Background',
             },
           },
         },
