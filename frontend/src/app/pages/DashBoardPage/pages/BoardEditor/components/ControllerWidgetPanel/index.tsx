@@ -20,7 +20,6 @@ import { Form, Modal } from 'antd';
 import { Split } from 'app/components';
 import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { selectViewMap } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import {
@@ -70,8 +69,9 @@ const ControllerWidgetPanel: React.FC = memo(props => {
   const tGMT = useI18NPrefix(`global.modal.title`);
   const { type, widgetId, controllerType } = useSelector(selectControllerPanel);
   const { boardId, boardType, queryVariables } = useContext(BoardContext);
-  const { hasQueryControl } = useContext(BoardConfigContext);
-
+  // const { hasQueryControl } = useContext(BoardConfigContext) as any;
+  // TODO
+  const hasQueryControl = false;
   const { onRefreshWidgetsByController } = useContext(WidgetActionContext);
 
   const allWidgets = useSelector(selectSortAllWidgets);

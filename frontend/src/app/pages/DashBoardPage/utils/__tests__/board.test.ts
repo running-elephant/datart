@@ -16,32 +16,32 @@
  * limitations under the License.
  */
 
+import { BoardConfigValue } from '../../components/BoardProvider/BoardConfigProvider';
 import { MIN_MARGIN, MIN_PADDING } from '../../constants';
-import { DashboardConfig } from '../../pages/Board/slice/types';
 import { getBoardMarginPadding } from '../board';
 
 describe('test getBoardMarginPadding', () => {
   const boardConfig = {
     margin: [10, 10],
-    containerPadding: [20, 20],
-    mobileMargin: [12, 12],
-    mobileContainerPadding: [13, 13],
+    padding: [20, 20],
+    mMargin: [12, 12],
+    mPadding: [13, 13],
   };
   it('should colsKey=lg ', () => {
-    expect(getBoardMarginPadding(boardConfig as DashboardConfig, 'lg')).toEqual(
-      {
-        curMargin: boardConfig.margin,
-        curPadding: boardConfig.containerPadding,
-      },
-    );
+    expect(
+      getBoardMarginPadding(boardConfig as BoardConfigValue, 'lg'),
+    ).toEqual({
+      curMargin: boardConfig.margin,
+      curPadding: boardConfig.padding,
+    });
   });
   it('should colsKey=sm has mobileData', () => {
-    expect(getBoardMarginPadding(boardConfig as DashboardConfig, 'sm')).toEqual(
-      {
-        curMargin: boardConfig.mobileMargin,
-        curPadding: boardConfig.mobileContainerPadding,
-      },
-    );
+    expect(
+      getBoardMarginPadding(boardConfig as BoardConfigValue, 'sm'),
+    ).toEqual({
+      curMargin: boardConfig.mMargin,
+      curPadding: boardConfig.mPadding,
+    });
   });
   it('should colsKey=sm has no mobileData', () => {
     const config = {

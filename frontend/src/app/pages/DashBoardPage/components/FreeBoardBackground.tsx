@@ -19,7 +19,7 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import StyledBackground from '../pages/Board/components/StyledBackground';
-import { BoardConfigContext } from './BoardProvider/BoardConfigProvider';
+import { BoardConfigValContext } from './BoardProvider/BoardConfigProvider';
 import { BoardContext } from './BoardProvider/BoardProvider';
 
 export const BoardScaleContext = createContext<[number, number]>([1, 1]);
@@ -33,7 +33,7 @@ const SlideBackground: React.FC<IProps> = props => {
     height: slideHeight,
     scaleMode,
     background,
-  } = useContext(BoardConfigContext);
+  } = useContext(BoardConfigValContext);
   const { editing } = useContext(BoardContext);
   const { scale, slideTranslate } = props;
   const slideStyle = useMemo(() => {

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
+import { BoardConfigValContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import { memo, useContext } from 'react';
@@ -34,7 +34,7 @@ export const FreeBoardEditor: React.FC<{}> = memo(() => {
     width: boardWidth,
     height: boardHeight,
     scaleMode,
-  } = useContext(BoardConfigContext);
+  } = useContext(BoardConfigValContext);
   const { autoFit, boardId } = useContext(BoardContext);
 
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
