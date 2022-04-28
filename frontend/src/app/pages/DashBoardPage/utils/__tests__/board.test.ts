@@ -46,8 +46,8 @@ describe('test getBoardMarginPadding', () => {
   it('should colsKey=sm has no mobileData', () => {
     const config = {
       ...boardConfig,
-      mobileMargin: undefined,
-      mobileContainerPadding: undefined,
+      mMargin: undefined,
+      mPadding: undefined,
     };
     expect(getBoardMarginPadding(config as any, 'sm')).toEqual({
       curMargin: [MIN_MARGIN, MIN_MARGIN],
