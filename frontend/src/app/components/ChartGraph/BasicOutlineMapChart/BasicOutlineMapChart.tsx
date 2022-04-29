@@ -35,8 +35,24 @@ import {
 import { init, registerMap } from 'echarts';
 import Chart from '../../../models/Chart';
 import Config from './config';
-import geoChinaCity from './geo-china-city.map.json';
+import geoAustralia from './geo-australia.map.json';
+import geoBhutan from './geo-bhutan.map.json';
+import geoCanada from './geo-canada.map.json';
 import geoChina from './geo-china.map.json';
+import geoChinaCity from './geo-china-city.map.json';
+import geoChinaEng from './geo-china-eng.map.json';
+import geoIndia from './geo-india.map.json';
+import geoIndonesia from './geo-indonesia.map.json';
+import geoMalaysia from './geo-malaysia.map.json';
+import geoMyanmar from './geo-myanmar.map.json';
+import geoNewZealand from './geo-newZealand.map.json';
+import geoPhilippines from './geo-philippines.map.json';
+import geoSingapore from './geo-singapore.map.json';
+import geoSouthKorea from './geo-southKorea.map.json';
+import geoSriLanka from './geo-sriLanka.map.json';
+import geoThailand from './geo-thailand.map.json';
+import geoUnitedStates from './geo-unitedStates.map.json';
+import geoVietnam from './geo-vietnam.map.json';
 import {
   GeoInfo,
   GeoSeries,
@@ -45,8 +61,24 @@ import {
 } from './types';
 
 // NOTE: source from: http://datav.aliyun.com/tools/atlas/index.html#&lat=31.39115752282472&lng=103.7548828125&zoom=4
+registerMap('australia', geoAustralia as any);
+registerMap('bhutan', geoBhutan as any);
+registerMap('canada', geoCanada as any);
 registerMap('china', geoChina as any);
 registerMap('china-city', geoChinaCity as any);
+registerMap('china-eng', geoChinaEng as any);
+registerMap('india', geoIndia as any);
+registerMap('indonesia', geoIndonesia as any);
+registerMap('malaysia', geoMalaysia as any);
+registerMap('myanmar', geoMyanmar as any);
+registerMap('newZealand', geoNewZealand as any);
+registerMap('philippines', geoPhilippines as any);
+registerMap('singapore', geoSingapore as any);
+registerMap('southKorea', geoSouthKorea as any);
+registerMap('sriLanka', geoSriLanka as any);
+registerMap('thailand', geoThailand as any);
+registerMap('unitedStates', geoUnitedStates as any);
+registerMap('vietnam', geoVietnam as any);
 
 class BasicOutlineMapChart extends Chart {
   chart: any = null;
@@ -163,7 +195,46 @@ class BasicOutlineMapChart extends Chart {
 
   private registerGeoMap(styleConfigs: ChartStyleConfig[]) {
     const [mapLevelName] = getStyles(styleConfigs, ['map'], ['level']);
-    this.geoMap = mapLevelName === 'china' ? geoChina : geoChinaCity;
+    /*this.geoMap = mapLevelName === 'china' ? geoChina : geoChinaCity;*/
+    
+    switch(mapLevelName){
+    	case 'australia':	this.geoMap = geoAustralia;
+    				break;
+    	case 'bhutan':		this.geoMap = geoBhutan;
+    				break;
+    	case 'canada':		this.geoMap = geoCanada;
+    				break;
+    	case 'china':		this.geoMap = geoChina;
+    				break;
+    	case 'china-city':	this.geoMap = geoChinaCity;
+    				break;
+    	case 'china-eng':	this.geoMap = geoChinaEng;
+    				break;
+    	case 'india':		this.geoMap = geoIndia;
+    				break;
+    	case 'indonesia':	this.geoMap = geoIndonesia;
+    				break;
+    	case 'malaysia':	this.geoMap = geoMalaysia;
+    				break;
+    	case 'myanmar':	this.geoMap = geoMyanmar;
+    				break;
+    	case 'newZealand':	this.geoMap = geoNewZealand;
+    				break;
+    	case 'philippines':	this.geoMap = geoPhilippines;
+    				break;
+    	case 'singapore':	this.geoMap = geoSingapore;
+    				break;
+    	case 'southKorea':	this.geoMap = geoSouthKorea;
+    				break;
+    	case 'sriLanka':	this.geoMap = geoSriLanka;
+    				break;
+    	case 'thailand':	this.geoMap = geoThailand;
+    				break;
+    	case 'unitedStates':	this.geoMap = geoUnitedStates;
+    				break;
+    	case 'vietnam':	this.geoMap = geoVietnam;
+    				break;
+    }
   }
 
   private getGeoInfo(styleConfigs: ChartStyleConfig[]): GeoInfo {
