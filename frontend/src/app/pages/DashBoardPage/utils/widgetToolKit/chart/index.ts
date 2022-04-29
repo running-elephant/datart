@@ -82,6 +82,7 @@ export const getControlOptionQueryParams = (obj: {
     params: undefined,
   });
   const requestParams: ChartDataRequest = {
+    ...viewConfigs,
     aggregators: [],
     filters: filterParams,
     groups: [],
@@ -94,7 +95,6 @@ export const getControlOptionQueryParams = (obj: {
     orders: [],
     keywords: ['DISTINCT'],
     viewId: obj.view.id,
-    ...viewConfigs,
   };
   if (variableParams) {
     requestParams.params = variableParams;
