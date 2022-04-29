@@ -35,8 +35,6 @@ public class ExternalRegisterRedirectStrategy {
 
     private static final String redirectUrl = "/authorization";
 
-    private static final String redirectErrorUrl = "/error";
-
     public void redirect(HttpServletRequest request, HttpServletResponse response, String token) throws Exception {
         String target = redirectUrl + "/" + URLEncoder.encode(token, StandardCharsets.UTF_8.name());
         response.setHeader(Const.TOKEN, token);
@@ -45,7 +43,7 @@ public class ExternalRegisterRedirectStrategy {
 
     public void redirectError(HttpServletRequest request, HttpServletResponse response, String message) {
         try {
-            String target = redirectErrorUrl + "/" + URLEncoder.encode(message, StandardCharsets.UTF_8.name());
+            String target = redirectUrl + "?errorMessage=" + URLEncoder.encode(message, StandardCharsets.UTF_8.name());
             response.sendRedirect(target);
         } catch (IOException e) {
             Exceptions.e(e);
