@@ -21,7 +21,6 @@ import {
   ContainerItem,
   ContainerWidgetContent,
   Dashboard,
-  DashboardConfig,
   DeviceType,
   MediaWidgetContent,
   Widget,
@@ -29,6 +28,8 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getDefaultWidgetName } from 'app/pages/DashBoardPage/utils';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
+import { updateCollectionByAction } from 'app/utils/mutation';
 import produce from 'immer';
 import { Layout } from 'react-grid-layout';
 import { createSlice } from 'utils/@reduxjs/toolkit';
@@ -47,6 +48,27 @@ export const editBoardStackSlice = createSlice({
   name: 'editBoard',
   initialState: initEditBoardState,
   reducers: {
+    // styles: updateCollectionByAction(state.styles || [], {
+    //   ancestors: action.payload.ancestors!,
+    //   value: action.payload.value,
+    // }),
+    updateBoardConfigByKey(
+      state,
+      action: PayloadAction<{
+        ancestors: number[];
+        configItem: ChartStyleConfig;
+      }>,
+    ) {
+      const { ancestors, configItem } = action.payload;
+
+      state.dashBoard.config.jsonConfig.props = updateCollectionByAction(
+        state.dashBoard.config.jsonConfig.props || [],
+        {
+          ancestors: ancestors!,
+          value: configItem,
+        },
+      );
+    },
     setBoardToEditStack(state, action: PayloadAction<EditBoardStack>) {
       const record = action.payload;
       Object.keys(record).forEach(key => {
@@ -56,22 +78,15 @@ export const editBoardStackSlice = createSlice({
     updateBoard(state, action: PayloadAction<Dashboard>) {
       state.dashBoard = action.payload;
     },
-    toggleAllowOverlap(state, action: PayloadAction<boolean>) {
-      state.dashBoard.config.allowOverlap = action.payload;
-    },
-    updateBoardConfig(state, action: PayloadAction<DashboardConfig>) {
-      state.dashBoard.config = action.payload;
+
+    updateBoardConfig(state, action: PayloadAction<{}>) {
+      // state.dashBoard.config = action.payload;
     },
     updateQueryVariables(state, action: PayloadAction<Variable[]>) {
       const variables = action.payload;
       state.dashBoard.queryVariables = variables;
     },
-    changeBoardHasQueryControl(state, action: PayloadAction<boolean>) {
-      state.dashBoard.config.hasQueryControl = action.payload;
-    },
-    changeBoardHasResetControl(state, action: PayloadAction<boolean>) {
-      state.dashBoard.config.hasResetControl = action.payload;
-    },
+
     // Widget
     addWidgets(state, action: PayloadAction<Widget[]>) {
       const widgets = action.payload;

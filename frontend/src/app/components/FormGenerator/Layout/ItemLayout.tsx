@@ -49,6 +49,7 @@ import {
   BasicUnControlledTabPanel,
 } from '../Basic';
 import {
+  Background,
   ConditionalStylePanel,
   DataReferencePanel,
   FontAlignment,
@@ -189,6 +190,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <ScorecardConditionalStylePanel {...props} />;
         case ChartStyleSectionComponentType.PivotSheetTheme:
           return <PivotSheetTheme {...props} />;
+        case ChartStyleSectionComponentType.BACKGROUND:
+          return <Background {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

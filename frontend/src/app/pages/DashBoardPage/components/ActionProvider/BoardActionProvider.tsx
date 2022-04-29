@@ -24,7 +24,6 @@ import { useHistory } from 'react-router';
 import { BOARD_UNDO } from '../../constants';
 import { boardDownLoadAction } from '../../pages/Board/slice/asyncActions';
 import { fetchBoardDetail } from '../../pages/Board/slice/thunk';
-import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 import { clearEditBoardState } from '../../pages/BoardEditor/slice/actions/actions';
 import { toUpdateDashboard } from '../../pages/BoardEditor/slice/thunk';
 
@@ -46,7 +45,7 @@ export interface BoardActionContextProps {
   onBoardToDownLoad: (downloadType: DownloadFileType) => any;
   // edit
   updateBoard?: (callback?: () => void) => void;
-  boardToggleAllowOverlap: (allow: boolean) => void;
+
   onCloseBoardEditor: (boardId: string) => void;
   undo: () => void;
   redo: () => void;
@@ -65,9 +64,7 @@ export const BoardActionProvider: FC<{
       updateBoard: (callback?: () => void) => {
         dispatch(toUpdateDashboard({ boardId, callback }));
       },
-      boardToggleAllowOverlap: (allow: boolean) => {
-        dispatch(editBoardStackActions.toggleAllowOverlap(allow));
-      },
+
       onGenerateShareLink: async ({
         expiryDate,
         authenticationMode,

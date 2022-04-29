@@ -33,11 +33,11 @@ import { BoardLoading } from '../../components/BoardLoading';
 import { BoardInitProvider } from '../../components/BoardProvider/BoardInitProvider';
 import { fetchBoardDetail } from '../Board/slice/thunk';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
-import AutoEditor from './AutoEditor/index';
+import { AutoEditor } from './AutoEditor';
 import ControllerWidgetPanel from './components/ControllerWidgetPanel';
 import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
-import FreeEditor from './FreeEditor/index';
+import { FreeEditor } from './FreeEditor';
 import { editDashBoardInfoActions } from './slice';
 import {
   addVariablesToBoard,

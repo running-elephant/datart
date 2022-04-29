@@ -15,18 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React, { FC, memo } from 'react';
-import styled from 'styled-components/macro';
-import { G60 } from 'styles/StyleConstants';
 
-export const ItemLabel: FC = memo(props => {
-  return <Wrapper>{props.children}</Wrapper>;
-});
-
-export default ItemLabel;
-const Wrapper = styled.span`
-  display: inline-block;
-  width: 50%;
-  padding-left: 12px;
-  color: ${G60};
-`;
+import { Background } from './Background';
+export default Background;

@@ -20,7 +20,6 @@ import { Dropdown, Menu, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useContext } from 'react';
 import { useDispatch } from 'react-redux';
@@ -42,7 +41,6 @@ export const AddController: React.FC<AddControlBtnProps> = () => {
   const tWt = useI18NPrefix(`viz.widget.type`);
   const { boardId, boardType } = useContext(BoardToolBarContext);
   const dispatch = useDispatch();
-  const { hasQueryControl, hasResetControl } = useContext(BoardConfigContext);
 
   const onAddController = (info: { key: any }) => {
     dispatch(
@@ -120,12 +118,10 @@ export const AddController: React.FC<AddControlBtnProps> = () => {
     {
       icon: '',
       type: 'query',
-      disabled: !!hasQueryControl,
     },
     {
       icon: '',
       type: 'reset',
-      disabled: !!hasResetControl,
     },
   ];
   const renderTitle = (text: string) => {

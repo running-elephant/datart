@@ -112,12 +112,6 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
   WidgetTypes.forEach(widgetType => {
     if (effectTypes.includes(widgetType)) {
       switch (widgetType) {
-        case 'query':
-          dispatch(editBoardStackActions.changeBoardHasQueryControl(false));
-          break;
-        case 'reset':
-          dispatch(editBoardStackActions.changeBoardHasResetControl(false));
-          break;
         case 'controller':
           dispatch(editWidgetsQueryAction());
           break;
