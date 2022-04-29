@@ -32,6 +32,7 @@ import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.PermissionHelper;
 import datart.server.base.dto.StoryboardDetail;
 import datart.server.base.params.BaseCreateParam;
+import datart.server.base.params.StoryboardBaseUpdateParam;
 import datart.server.service.BaseService;
 import datart.server.service.RoleService;
 import datart.server.service.StoryboardService;
@@ -40,8 +41,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,16 +71,36 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
 
     @Override
     public List<Storyboard> listStoryBoards(String orgId) {
-        return storyboardMapper.selectByOrg(orgId)
-                .stream()
-                .filter(storyboard -> {
-                    try {
-                        requirePermission(storyboard, Const.READ);
-                        return true;
-                    } catch (Exception e) {
-                        return false;
-                    }
-                }).collect(Collectors.toList());
+        List<Storyboard> storyboards = storyboardMapper.selectByOrg(orgId);
+
+        Map<String, Storyboard> filtered = new HashMap<>();
+
+        List<Storyboard> permitted = storyboards.stream().filter(storyboard -> {
+            try {
+                requirePermission(storyboard, Const.READ);
+                return true;
+            } catch (Exception e) {
+                filtered.put(storyboard.getId(), storyboard);
+                return false;
+            }
+        }).collect(Collectors.toList());
+
+        while (!filtered.isEmpty()) {
+            boolean updated = false;
+            for (Storyboard storyboard : permitted) {
+                Storyboard parent = filtered.remove(storyboard.getParentId());
+                if (parent != null) {
+                    permitted.add(parent);
+                    updated = true;
+                    break;
+                }
+            }
+            if (!updated) {
+                break;
+            }
+        }
+
+        return permitted;
     }
 
     @Override
@@ -95,6 +115,29 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
                 .hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), "*", storyboardId, Const.DOWNLOAD)));
 
         return storyboardDetail;
+    }
+
+    @Override
+    public boolean updateBase(StoryboardBaseUpdateParam updateParam) {
+        Storyboard storyboard = retrieve(updateParam.getId(), Storyboard.class);
+        requirePermission(storyboard, Const.MANAGE);
+        if (!storyboard.getName().equals(updateParam.getName())) {
+            //check name
+            Storyboard check = new Storyboard();
+            check.setParentId(updateParam.getParentId());
+            check.setOrgId(storyboard.getOrgId());
+            check.setName(updateParam.getName());
+            checkUnique(check);
+        }
+
+        // update base info
+        storyboard.setId(updateParam.getId());
+        storyboard.setUpdateBy(getCurrentUser().getId());
+        storyboard.setUpdateTime(new Date());
+        storyboard.setName(updateParam.getName());
+        storyboard.setParentId(updateParam.getParentId());
+        storyboard.setIndex(updateParam.getIndex());
+        return 1 == storyboardMapper.updateByPrimaryKey(storyboard);
     }
 
     @Override
@@ -120,8 +163,13 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
     }
 
     private boolean hasPermission(Role role, Storyboard storyboard, int permission) {
-        if (storyboard.getId() == null || (permission & Const.CREATE) == Const.CREATE) {
-            return securityManager.hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), role.getId(), ResourceType.STORYBOARD.name(), permission));
+        if (storyboard.getId() == null || rrrMapper.countRolePermission(storyboard.getId(), role.getId()) == 0) {
+            Storyboard parent = storyboardMapper.selectByPrimaryKey(storyboard.getParentId());
+            if (parent == null) {
+                return securityManager.hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), role.getId(), ResourceType.STORYBOARD.name(), permission));
+            } else {
+                return hasPermission(role, parent, permission);
+            }
         } else {
             return securityManager.hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), role.getId(), storyboard.getId(), permission));
         }

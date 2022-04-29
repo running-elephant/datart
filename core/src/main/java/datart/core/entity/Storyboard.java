@@ -12,5 +12,11 @@ public class Storyboard extends BaseEntity {
 
     private String config;
 
+    private String parentId;
+
+    private Boolean isFolder;
+
+    private Double index;
+
     private Byte status;
 }

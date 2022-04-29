@@ -11,4 +11,10 @@ public class StoryboardUpdateParam extends VizUpdateParam{
 
     private String config;
 
+    private String parentId;
+
+    private Boolean isFolder;
+
+    private Double index;
+
 }

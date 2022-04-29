@@ -46,10 +46,7 @@ import datart.security.exception.PermissionDeniedException;
 import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.AESUtil;
 import datart.security.util.PermissionHelper;
-import datart.server.base.params.BaseCreateParam;
-import datart.server.base.params.BaseUpdateParam;
-import datart.server.base.params.SourceCreateParam;
-import datart.server.base.params.SourceUpdateParam;
+import datart.server.base.params.*;
 import datart.server.base.transfer.ImportStrategy;
 import datart.server.base.transfer.TransferConfig;
 import datart.server.base.transfer.model.SourceTransferModel;
@@ -267,6 +264,10 @@ public class SourceServiceImpl extends BaseService implements SourceService {
             Exceptions.e(e);
         }
 
+        if (sourceCreateParam.getIsFolder()) {
+            sourceCreateParam.setType(ResourceType.FOLDER.name());
+        }
+
         Source source = SourceService.super.create(createParam);
 
         grantDefaultPermission(source);
@@ -283,6 +284,32 @@ public class SourceServiceImpl extends BaseService implements SourceService {
             updateJdbcSourceSyncJob(source);
         }
         return false;
+    }
+
+    @Override
+    public boolean updateBase(SourceBaseUpdateParam updateParam) {
+        Source source = retrieve(updateParam.getId());
+        requirePermission(source, Const.MANAGE);
+        if (!source.getName().equals(updateParam.getName())) {
+            //check name
+            Source check = new Source();
+            check.setParentId(updateParam.getParentId());
+            check.setOrgId(source.getOrgId());
+            check.setName(updateParam.getName());
+            checkUnique(check);
+        }
+
+        // update base info
+        if (source.getIsFolder()) {
+            source.setType(ResourceType.FOLDER.name());
+        }
+        source.setId(updateParam.getId());
+        source.setUpdateBy(getCurrentUser().getId());
+        source.setUpdateTime(new Date());
+        source.setName(updateParam.getName());
+        source.setParentId(updateParam.getParentId());
+        source.setIndex(updateParam.getIndex());
+        return 1 == sourceMapper.updateByPrimaryKey(source);
     }
 
     @Override
