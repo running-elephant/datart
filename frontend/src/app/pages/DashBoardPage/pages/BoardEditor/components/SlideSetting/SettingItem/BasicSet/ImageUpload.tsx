@@ -19,7 +19,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { Form, Upload } from 'antd';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { convertImageUrl } from 'app/pages/DashBoardPage/utils';
-import { memo, useCallback, useContext } from 'react';
+import { memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
@@ -79,6 +79,7 @@ export const UploadDragger: React.FC<{
     },
     [onChange],
   );
+  const imgUrl = useMemo(() => convertImageUrl(value), [value]);
   return (
     <StyleUpload
       name={'upload-image'}
@@ -88,12 +89,7 @@ export const UploadDragger: React.FC<{
     >
       {value ? (
         <div className="image-box">
-          <img
-            className="image"
-            src={convertImageUrl(value)}
-            alt=""
-            onError={getImageError}
-          />
+          <img className="image" src={imgUrl} alt="" onError={getImageError} />
           <DeleteOutlined className="del-button" onClick={delImageUrl} />
         </div>
       ) : (
