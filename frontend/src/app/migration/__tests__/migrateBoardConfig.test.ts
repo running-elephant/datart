@@ -17,7 +17,7 @@
  */
 
 import { MIN_MARGIN, MIN_PADDING } from 'app/pages/DashBoardPage/constants';
-import { DashboardConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { DashboardConfigBeta3 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   beta0,
   migrateBoardConfig,
@@ -36,56 +36,58 @@ describe('test migrateBoard ', () => {
   test('Only versions prior to Beta1 can be processed', () => {
     const config = {
       version: APP_VERSION_BETA_1,
-    } as DashboardConfig;
+    } as DashboardConfigBeta3;
     expect(beta0(config)).toMatchObject({
       version: APP_VERSION_BETA_1,
     });
   });
   test('add config.initialQuery=true if no initialQuery', () => {
-    const config = {} as DashboardConfig;
+    const config = {} as DashboardConfigBeta3;
     expect(beta0(config)).toMatchObject({
       initialQuery: true,
     });
-    const config1 = { initialQuery: false } as DashboardConfig;
+    const config1 = { initialQuery: false } as DashboardConfigBeta3;
     expect(beta0(config1)).toMatchObject(config1);
   });
 
   test('handle config.mobileMargin', () => {
-    const config = {} as DashboardConfig;
+    const config = {} as DashboardConfigBeta3;
     expect(beta0(config)).toMatchObject({
       mobileMargin: [MIN_MARGIN, MIN_MARGIN],
     });
-    const config1 = { mobileMargin: [22, 22] } as DashboardConfig;
+    const config1 = { mobileMargin: [22, 22] } as DashboardConfigBeta3;
     expect(beta0(config1)).toMatchObject(config1);
   });
 
   test('handle config.mobileContainerPadding', () => {
-    const config = {} as DashboardConfig;
+    const config = {} as DashboardConfigBeta3;
     expect(beta0(config)).toMatchObject({
       mobileContainerPadding: [MIN_PADDING, MIN_PADDING],
     });
-    const config1 = { mobileContainerPadding: [22, 22] } as DashboardConfig;
+    const config1 = {
+      mobileContainerPadding: [22, 22],
+    } as DashboardConfigBeta3;
     expect(beta0(config1)).toMatchObject(config1);
   });
 
   test('test hasQueryControl', () => {
-    const config = {} as DashboardConfig;
+    const config = {} as DashboardConfigBeta3;
     expect(beta0(config)).toMatchObject({
       hasQueryControl: false,
     });
-    const config1 = { hasQueryControl: false } as DashboardConfig;
+    const config1 = { hasQueryControl: false } as DashboardConfigBeta3;
     expect(beta0(config1)).toMatchObject(config1);
 
-    const config2 = { hasQueryControl: true } as DashboardConfig;
+    const config2 = { hasQueryControl: true } as DashboardConfigBeta3;
     expect(beta0(config2)).toMatchObject(config2);
   });
 
   test('test beta0 version', () => {
-    const config = {} as DashboardConfig;
+    const config = {} as DashboardConfigBeta3;
     expect(beta0(config)).toMatchObject({
       version: APP_VERSION_BETA_0,
     });
-    const config1 = { version: APP_VERSION_BETA_0 } as DashboardConfig;
+    const config1 = { version: APP_VERSION_BETA_0 } as DashboardConfigBeta3;
     expect(beta0(config1)).toMatchObject(config1);
   });
 
@@ -94,6 +96,6 @@ describe('test migrateBoard ', () => {
     expect(migrateBoardConfig(config)).toMatchObject({
       type: 'auto',
       version: APP_CURRENT_VERSION,
-    } as DashboardConfig);
+    } as DashboardConfigBeta3);
   });
 });

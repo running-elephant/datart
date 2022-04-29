@@ -43,10 +43,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -315,6 +312,11 @@ public class VizServiceImpl extends BaseService implements VizService {
             datachartService.importResource((DatachartTransferModel) model, importStrategy, orgId, null);
         }
         return true;
+    }
+
+    @Override
+    public boolean updateStoryboardBase(StoryboardBaseUpdateParam updateParam) {
+        return storyboardService.updateBase(updateParam);
     }
 
     @Override

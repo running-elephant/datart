@@ -259,13 +259,13 @@ export const getOauth2Clients = createAsyncThunk<[]>(
   },
 );
 
-export const fetchAvailableSourceFunctions = createAsyncThunk<
-  string[],
-  { sourceId: string }
->('workbench/fetchAvailableSourceFunctions', async arg => {
-  try {
-    return await fetchAvailableSourceFunctionsAsync(arg.sourceId);
-  } catch (err) {
-    throw err;
-  }
-});
+export const fetchAvailableSourceFunctions = createAsyncThunk<string[], string>(
+  'workbench/fetchAvailableSourceFunctions',
+  async sourceId => {
+    try {
+      return await fetchAvailableSourceFunctionsAsync(sourceId);
+    } catch (err) {
+      throw err;
+    }
+  },
+);

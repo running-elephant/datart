@@ -22,9 +22,7 @@ package datart.server.controller;
 import datart.core.data.provider.SchemaInfo;
 import datart.core.entity.Source;
 import datart.server.base.dto.ResponseData;
-import datart.server.base.params.CheckNameParam;
-import datart.server.base.params.SourceCreateParam;
-import datart.server.base.params.SourceUpdateParam;
+import datart.server.base.params.*;
 import datart.server.service.SourceService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
@@ -77,6 +75,14 @@ public class SourceController extends BaseController {
     public ResponseData<Boolean> updateSource(@PathVariable String sourceId,
                                               @Validated @RequestBody SourceUpdateParam updateParam) {
         return ResponseData.success(sourceService.updateSource(updateParam));
+    }
+
+    @ApiOperation(value = "update a source base info")
+    @PutMapping(value = "/{sourceId}/base")
+    public ResponseData<Boolean> updateSourceBaseInfo(@PathVariable String sourceId,
+                                                    @Validated @RequestBody SourceBaseUpdateParam updateParam) {
+        checkBlank(sourceId, "sourceId");
+        return ResponseData.success(sourceService.updateBase(updateParam));
     }
 
     @ApiOperation(value = "delete a source")

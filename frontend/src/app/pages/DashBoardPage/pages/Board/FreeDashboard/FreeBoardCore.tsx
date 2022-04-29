@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { Empty } from 'antd';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
+import { BoardConfigValContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
@@ -41,7 +41,7 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
       width: slideWidth,
       height: slideHeight,
       scaleMode,
-    } = useContext(BoardConfigContext);
+    } = useContext(BoardConfigValContext);
     const { editing, autoFit } = useContext(BoardContext);
 
     const widgetConfigRecords = useSelector((state: { board: BoardState }) =>

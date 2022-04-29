@@ -38,4 +38,5 @@ export interface IChartDrillOption {
   drillUp(field?: ChartDataSectionField): void;
   expandUp(field?: ChartDataSectionField): void;
   rollUp(): void;
+  clearAll();
 }

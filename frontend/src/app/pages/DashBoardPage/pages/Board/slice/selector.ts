@@ -154,6 +154,11 @@ export const selectViewMap = createSelector(
   state => state.viewMap,
 );
 
+export const selectAvailableSourceFunctionsMap = createSelector(
+  [boardState],
+  state => state.availableSourceFunctionsMap,
+);
+
 // dataChartMap
 export const selectWidgetDataById = createSelector(
   [boardState, selectPropsId],

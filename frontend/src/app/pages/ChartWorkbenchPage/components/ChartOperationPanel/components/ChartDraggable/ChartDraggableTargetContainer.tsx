@@ -310,7 +310,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             config.category ===
             ChartDataViewFieldCategory.DateLevelComputedField
           ) {
-            draft.replacedColName = config.colName;
+            draft.replacedConfig = config;
           }
         });
         setCurrentConfig(newCurrentConfig);

@@ -19,6 +19,7 @@
 import { ControllerFacadeTypes } from 'app/constants';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartMouseEventParams } from 'app/types/Chart';
+import { ChartConfig } from 'app/types/ChartConfig';
 import debounce from 'lodash/debounce';
 import { createContext, FC, memo, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
@@ -257,6 +258,21 @@ export const WidgetActionProvider: FC<{
       onEditWidgetUnLock: (id: string) => {
         dispatch(editBoardStackActions.toggleLockWidget({ id, lock: false }));
       },
+      onWidgetDataUpdate: ({ computedFields, payload, widgetId }) => {
+        dispatch(
+          boardActions.updateDataChartGroup({
+            id: widgetId,
+            payload,
+          }),
+        );
+
+        dispatch(
+          boardActions.updateDataChartComputedFields({
+            id: widgetId,
+            computedFields,
+          }),
+        );
+      },
     };
     return contextValue;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -278,6 +294,15 @@ export interface WidgetActionContextProps {
   onRefreshWidgetsByController: (widget: Widget) => void;
   onWidgetsQuery: () => void;
   onRenderedWidgetById: (wid: string) => void;
+  onWidgetDataUpdate: ({
+    computedFields,
+    payload,
+    widgetId,
+  }: {
+    computedFields: any;
+    payload: ChartConfig;
+    widgetId: string;
+  }) => void;
 
   // read
   onWidgetFullScreen: (itemId: string) => void;
