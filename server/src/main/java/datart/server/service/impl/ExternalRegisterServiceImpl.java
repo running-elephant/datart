@@ -20,6 +20,8 @@ package datart.server.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jayway.jsonpath.JsonPath;
+import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.ParamException;
 import datart.core.entity.User;
 import datart.core.mappers.ext.UserMapperExt;
 import datart.security.base.PasswordToken;
@@ -28,9 +30,12 @@ import datart.server.base.params.UserRegisterParam;
 import datart.server.service.ExternalRegisterService;
 import datart.server.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQueryBuilder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -68,6 +73,15 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
         } catch (Exception e) {
             return null;
         }
+
+        User user = userMapper.selectByNameOrEmail(filter);
+        if (user != null) {
+            PasswordToken passwordToken = new PasswordToken(user.getUsername(),
+                    user.getPassword(),
+                    System.currentTimeMillis());
+            return JwtUtils.toJwtString(passwordToken);
+        }
+
         String email = null;
 
         try {
@@ -76,9 +90,13 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
         } catch (Exception ignored) {
         }
 
+        if (StringUtils.isBlank(email)) {
+            Exceptions.tr(ParamException.class, "error.param.empty", "resource.user.email");
+        }
+
         UserRegisterParam registerParam = new UserRegisterParam();
         registerParam.setUsername(filter);
-        registerParam.setPassword(password);
+        registerParam.setPassword(BCrypt.hashpw(RandomStringUtils.randomAscii(32), BCrypt.gensalt()));
         registerParam.setEmail(email);
 
         if (userService.register(registerParam, false)) {
@@ -109,7 +127,7 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
 
         UserRegisterParam userRegisterParam = new UserRegisterParam();
         userRegisterParam.setUsername(oauthUser.getName());
-        userRegisterParam.setPassword(oauthUser.getName());
+        userRegisterParam.setPassword(BCrypt.hashpw(RandomStringUtils.randomAscii(32), BCrypt.gensalt()));
         if (emailMapping != null) {
             userRegisterParam.setEmail(JsonPath.read(jsonObj, emailMapping));
         }
