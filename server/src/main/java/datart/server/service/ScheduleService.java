@@ -4,6 +4,7 @@ import datart.core.entity.Schedule;
 import datart.core.entity.ScheduleLog;
 import datart.core.mappers.ext.ScheduleMapperExt;
 import datart.server.base.dto.ScheduleBaseInfo;
+import datart.server.base.params.ScheduleBaseUpdateParam;
 import org.quartz.SchedulerException;
 
 import java.util.List;
@@ -22,4 +23,5 @@ public interface ScheduleService extends BaseCRUDService<Schedule, ScheduleMappe
 
     List<ScheduleLog> getScheduleLogs(String scheduleId,int count);
 
+    boolean updateBase(ScheduleBaseUpdateParam updateParam);
 }

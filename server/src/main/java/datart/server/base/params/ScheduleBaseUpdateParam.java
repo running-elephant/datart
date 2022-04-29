@@ -18,34 +18,18 @@
 
 package datart.server.base.params;
 
-import datart.core.base.consts.JobType;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ScheduleCreateParam extends BaseCreateParam {
+public class ScheduleBaseUpdateParam extends BaseUpdateParam {
 
     private String name;
 
-    private String orgId;
-
-    private JobType type;
-
-    private String cronExpression;
-
-    private Date startDate;
-
-    private Date endDate;
-
-    private String config;
-
     private String parentId;
 
-    private Boolean isFolder;
-
-    private Integer index;
+    private Double index;
 
 }
