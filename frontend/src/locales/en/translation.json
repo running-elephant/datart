@@ -345,6 +345,14 @@
           "slider": "Slider",
           "rangeSlider": "RangeSlider"
         },
+        "controllerPlaceHolders": {
+          "multiSelectController": "Select ..",
+          "numberController": "Enter a number",
+          "rangeNumberControllerMin": "Min",
+          "rangeNumberControllerMax": "Max",
+          "selectController": "Select ..",
+          "textController": "Enter text"
+        },
         "controllerVisibilityTypes": {
           "hide": "Hide",
           "show": "Show",
@@ -826,6 +834,7 @@
         "cancel": "Cancel",
         "save": "Save"
       },
+      "downloadTaskSuccess": "Download task created successfully",
       "edit": "Edit",
       "run": "Run",
       "publish": "Publish",
@@ -902,7 +911,10 @@
         "deviceSwitch": "Device Switch",
         "allowOverlap": "Allow Overlap",
         "forbidOverlap": "Forbid Overlap",
-        "multiSelect": "MultiSelect"
+        "multiSelect": "MultiSelect",
+        "zoomIn": "Zoom Out",
+        "zoomOut": "Zoom In",
+        "widgetList": "Widget List"
       },
       "controlTypes": {
         "common": "Common",
@@ -925,6 +937,7 @@
         "px": "px",
         "width": "Width",
         "height": "Height",
+        "font": "Font",
         "background": "Background",
         "color": "Color",
         "image": "Image",
@@ -956,7 +969,9 @@
         "duration": "Duration (s) ",
         "delPagesTip": "Confirm to delete all selected story pages?",
         "delPageTip": "Confirm to delete this story page?",
-        "enterHere": "Enter here"
+        "enterHere": "Enter here",
+        "storyName": "Name",
+        "storyDescription": "Description"
       }
     },
     "widget": {
@@ -983,6 +998,7 @@
       "action": {
         "refresh": "Refresh",
         "fullScreen": "FullScreen",
+        "exitFullScreen": "Exit FullScreen",
         "lock": "Lock",
         "edit": "Edit",
         "delete": "Delete",
