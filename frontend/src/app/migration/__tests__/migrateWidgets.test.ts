@@ -22,7 +22,7 @@ import {
   ServerWidget,
   Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { fontDefault } from 'app/pages/DashBoardPage/utils/widget';
+import { FontDefault } from 'app/pages/DashBoardPage/utils/widget';
 import {
   beta0,
   convertWidgetRelationsToObj,
@@ -54,7 +54,7 @@ describe('test migrateWidgets ', () => {
     } as Widget;
     const widget2 = {
       config: {
-        nameConfig: fontDefault,
+        nameConfig: FontDefault,
         version: APP_VERSION_BETA_0,
       },
     } as Widget;

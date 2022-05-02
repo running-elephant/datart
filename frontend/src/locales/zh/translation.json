@@ -879,7 +879,7 @@
     "board": {
       "action": {
         "dataChart": "数据图表",
-        "ImportExistingDataCharts": "引入已有数据图表",
+        "importExistingDataCharts": "引入已有数据图表",
         "createDataChartInBoard": "新建数据图表",
         "searchValue": "搜索名称关键字",
         "media": "媒体组件",

@@ -29,9 +29,6 @@ export const initAutoBoardConfig = () => {
           label: 'basic.basic',
           key: 'basic',
           comType: 'group',
-          options: {
-            expand: true,
-          },
           rows: [
             {
               label: 'basic.initialQuery',

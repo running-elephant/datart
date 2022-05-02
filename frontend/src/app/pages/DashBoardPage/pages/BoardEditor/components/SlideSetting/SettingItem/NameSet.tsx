@@ -20,13 +20,13 @@ import BasicFont from 'app/components/FormGenerator/Basic/BasicFont';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { WIDGET_TITLE_ALIGN_OPTIONS } from 'app/pages/DashBoardPage/constants';
 import { WidgetNameConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { fontDefault } from 'app/pages/DashBoardPage/utils/widget';
+import { FontDefault } from 'app/pages/DashBoardPage/utils/widget';
 import React, { FC, memo, useMemo } from 'react';
 import SelectSet from './BasicSet/SelectSet';
 
 const FONT_DATA = {
   comType: 'font',
-  default: fontDefault,
+  default: FontDefault,
   disabled: undefined,
   key: 'font',
   label: '字体',

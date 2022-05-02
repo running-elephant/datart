@@ -194,7 +194,7 @@ export const createInitWidgetConfig = (opt: {
     nameConfig: {
       show: true,
       textAlign: 'left',
-      ...fontDefault,
+      ...FontDefault,
       color: opt.type === 'query' ? WHITE : G90,
     },
     padding: createWidgetPadding(opt.type),
@@ -220,7 +220,7 @@ export const createWidget = (option: {
   };
   return widget;
 };
-export const fontDefault = {
+export const FontDefault = {
   fontFamily: FONT_FAMILY,
   fontSize: '14',
   fontWeight: 'normal',

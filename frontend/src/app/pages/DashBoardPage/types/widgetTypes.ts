@@ -3,7 +3,12 @@ import {
   ChartI18NSectionConfig,
   ChartStyleConfig,
 } from 'app/types/ChartConfig';
-import { Relation } from '../pages/Board/slice/types';
+import {
+  BoardType,
+  RectConfig,
+  Relation,
+  WidgetType,
+} from '../pages/Board/slice/types';
 
 export interface IWidget {
   id: string;
@@ -11,54 +16,29 @@ export interface IWidget {
   datachartId: string;
   relations: Relation[];
   viewIds: string[];
-  config: WidgetConf;
+  config: IWidgetConf;
   parentId?: string;
-  children: any;
 }
 export type JsonConfig = {
   datas?: ChartDataConfig[];
-  styles?: ChartStyleConfig[];
+  props?: ChartStyleConfig[];
   settings?: ChartStyleConfig[];
   i18ns?: ChartI18NSectionConfig[];
 };
-export interface WidgetConf {
+export interface IWidgetConf {
   version: string;
+  boardType: BoardType;
   index: number;
-  //type: WidgetType;
+  type: WidgetType;
+  widgetTypeId: string;
+  lock: boolean;
   JsonConfig: JsonConfig;
-  linkageConfig?: any;
-  jumpConfig?: any;
-  // {
-  //   name: string;
-  //   nameConfig: WidgetNameConfig;
-  //   padding: WidgetPadding;
-  // autoUpdate: boolean;
-  // frequency: number; /
-  // rect: RectConfig; //desktop_rect
-  //   lock: boolean; //Locking forbids dragging resizing
-  //   mobileRect?: RectConfig; //mobile_rect 移动端适配
-  //   background: BackgroundConfig;
-  //   border: BorderConfig;
-  // }
+  content: any;
+  // linkageConfig?: LinkageConfig;
+  // jumpConfig?: JumpConfig;
+  selfConfig: any;
+  rect: RectConfig;
+  mRect?: RectConfig;
+  parentId?: string;
+  children?: IWidget[];
 }
-const widgetConfig: WidgetConf = {
-  version: '1.0.0',
-  index: 3,
-  JsonConfig: {
-    styles: [
-      {
-        label: 'widget.title',
-        key: 'widget',
-        comType: 'group',
-        rows: [
-          {
-            label: 'widget.title',
-            key: 'title',
-            default: 'unTitle',
-            comType: 'input',
-          },
-        ],
-      },
-    ],
-  },
-};

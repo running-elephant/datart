@@ -23,7 +23,7 @@ import {
   Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
-  fontDefault,
+  FontDefault,
   VALUE_SPLITTER,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { setLatestVersion, versionCanDo } from '../utils';
@@ -68,7 +68,7 @@ export const beta0 = (widget?: Widget) => {
   }
   // 2.migration about font 5 旧数据没有 widget.config.nameConfig。统一把旧数据填充上fontDefault
   widget.config.nameConfig = {
-    ...fontDefault,
+    ...FontDefault,
     ...widget.config.nameConfig,
   };
 
