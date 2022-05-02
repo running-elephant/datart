@@ -21,7 +21,7 @@ import {
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
-import { editBoardStackActions, editDashBoardInfoActions } from '..';
+import { editDashBoardInfoActions } from '..';
 import { PageInfo } from './../../../../../MainPage/pages/ViewPage/slice/types';
 import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from './../thunk';
 import { HistoryEditBoard } from './../types';
@@ -41,7 +41,7 @@ export const addControllerAction =
           type: opt.type as any,
         });
         dispatch(addWidgetsToEditBoard([queryWidget]));
-        dispatch(editBoardStackActions.changeBoardHasQueryControl(true));
+
         break;
       case 'reset':
         const resetWidget = widgetToolKit.query.create({
@@ -50,7 +50,7 @@ export const addControllerAction =
           type: opt.type as any,
         });
         dispatch(addWidgetsToEditBoard([resetWidget]));
-        dispatch(editBoardStackActions.changeBoardHasResetControl(true));
+
         break;
       default:
         dispatch(

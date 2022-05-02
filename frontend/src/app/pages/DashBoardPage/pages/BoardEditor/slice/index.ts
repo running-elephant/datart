@@ -21,12 +21,6 @@ import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
 import { WidgetControllerPanelParams } from './../../Board/slice/types';
 import { editBoardStackSlice } from './childSlice/stackSlice';
-import {
-  fetchEditBoardDetail,
-  getEditChartWidgetDataAsync,
-  getEditControllerOptions,
-  toUpdateDashboard,
-} from './thunk';
 
 // BoardInfo
 // editDashBoardInfoActions
@@ -49,12 +43,7 @@ const editDashBoardInfoSlice = createSlice({
         state[key] = boardInfo[key];
       });
     },
-    changeDashboardEdit(state, action: PayloadAction<boolean>) {
-      state.editing = action.payload;
-    },
-    changeEditBoardLoading(state, action: PayloadAction<boolean>) {
-      state.loading = action.payload;
-    },
+
     changeFullScreenItem(state, action: PayloadAction<string>) {
       state.fullScreenItemId = action.payload;
     },
@@ -118,25 +107,25 @@ const editDashBoardInfoSlice = createSlice({
   },
   extraReducers: builder => {
     //  updateDashboard
-    builder.addCase(toUpdateDashboard.pending, state => {
-      state.saving = true;
-    });
-    builder.addCase(toUpdateDashboard.fulfilled, (state, action) => {
-      state.saving = false;
-    });
-    builder.addCase(toUpdateDashboard.rejected, state => {
-      state.saving = false;
-    });
+    // builder.addCase(toUpdateDashboard.pending, state => {
+    //   state.saving = true;
+    // });
+    // builder.addCase(toUpdateDashboard.fulfilled, (state, action) => {
+    //   state.saving = false;
+    // });
+    // builder.addCase(toUpdateDashboard.rejected, state => {
+    //   state.saving = false;
+    // });
     //loadEditBoardDetail
-    builder.addCase(fetchEditBoardDetail.pending, state => {
-      state.loading = true;
-    });
-    builder.addCase(fetchEditBoardDetail.fulfilled, (state, action) => {
-      state.loading = false;
-    });
-    builder.addCase(fetchEditBoardDetail.rejected, state => {
-      state.loading = false;
-    });
+    // builder.addCase(fetchEditBoardDetail.pending, state => {
+    //   state.loading = true;
+    // });
+    // builder.addCase(fetchEditBoardDetail.fulfilled, (state, action) => {
+    //   state.loading = false;
+    // });
+    // builder.addCase(fetchEditBoardDetail.rejected, state => {
+    //   state.loading = false;
+    // });
   },
 });
 // widgetInfo
@@ -262,37 +251,36 @@ const widgetInfoRecordSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    builder.addCase(getEditChartWidgetDataAsync.pending, (state, action) => {
-      const { widgetId } = action.meta.arg;
-      if (!state?.[widgetId]) return;
-      state[widgetId].loading = true;
-    });
-    builder.addCase(getEditChartWidgetDataAsync.fulfilled, (state, action) => {
-      const { widgetId } = action.meta.arg;
-      if (!state?.[widgetId]) return;
-
-      state[widgetId].loading = false;
-    });
-    builder.addCase(getEditChartWidgetDataAsync.rejected, (state, action) => {
-      const { widgetId } = action.meta.arg;
-      if (!state?.[widgetId]) return;
-      state[widgetId].loading = false;
-    });
-    builder.addCase(getEditControllerOptions.pending, (state, action) => {
-      const widgetId = action.meta.arg;
-      if (!state?.[widgetId]) return;
-      state[widgetId].loading = true;
-    });
-    builder.addCase(getEditControllerOptions.fulfilled, (state, action) => {
-      const widgetId = action.meta.arg;
-      if (!state?.[widgetId]) return;
-      state[widgetId].loading = false;
-    });
-    builder.addCase(getEditControllerOptions.rejected, (state, action) => {
-      const widgetId = action.meta.arg;
-      if (!state?.[widgetId]) return;
-      state[widgetId].loading = false;
-    });
+    // builder.addCase(getEditChartWidgetDataAsync.pending, (state, action) => {
+    //   const { widgetId } = action.meta.arg;
+    //   if (!state?.[widgetId]) return;
+    //   state[widgetId].loading = true;
+    // });
+    // builder.addCase(getEditChartWidgetDataAsync.fulfilled, (state, action) => {
+    //   const { widgetId } = action.meta.arg;
+    //   if (!state?.[widgetId]) return;
+    //   state[widgetId].loading = false;
+    // });
+    // builder.addCase(getEditChartWidgetDataAsync.rejected, (state, action) => {
+    //   const { widgetId } = action.meta.arg;
+    //   if (!state?.[widgetId]) return;
+    //   state[widgetId].loading = false;
+    // });
+    // builder.addCase(getEditControllerOptions.pending, (state, action) => {
+    //   const widgetId = action.meta.arg;
+    //   if (!state?.[widgetId]) return;
+    //   state[widgetId].loading = true;
+    // });
+    // builder.addCase(getEditControllerOptions.fulfilled, (state, action) => {
+    //   const widgetId = action.meta.arg;
+    //   if (!state?.[widgetId]) return;
+    //   state[widgetId].loading = false;
+    // });
+    // builder.addCase(getEditControllerOptions.rejected, (state, action) => {
+    //   const widgetId = action.meta.arg;
+    //   if (!state?.[widgetId]) return;
+    //   state[widgetId].loading = false;
+    // });
   },
 });
 const editWidgetDataSlice = createSlice({
@@ -312,7 +300,7 @@ export const { actions: editWidgetDataActions } = editWidgetDataSlice;
 const filterActions = [
   editBoardStackActions.setBoardToEditStack,
   editBoardStackActions.updateBoard,
-  editBoardStackActions.toggleAllowOverlap,
+
   editBoardStackActions.updateBoardConfig,
   editBoardStackActions.addWidgets,
   editBoardStackActions.deleteWidgets,
@@ -324,10 +312,9 @@ const filterActions = [
   editBoardStackActions.updateWidgetConfig,
   editBoardStackActions.updateWidgetsConfig,
   editBoardStackActions.changeWidgetsIndex,
-  editBoardStackActions.changeBoardHasQueryControl,
-  editBoardStackActions.changeBoardHasResetControl,
 
   editBoardStackActions.toggleLockWidget,
+  editBoardStackActions.updateBoardConfigByKey,
 ].map(ele => ele.toString());
 const editBoardStackReducer = undoable(editBoardStackSlice.reducer, {
   undoType: BOARD_UNDO.undo,

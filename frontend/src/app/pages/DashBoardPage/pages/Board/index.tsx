@@ -65,6 +65,7 @@ export const Board: FC<BoardProps> = memo(
     const boardId = id;
     const dispatch = useDispatch();
     const editingBoard = useSelector(selectEditBoard);
+
     const readBoardHide = useMemo(
       () => editingBoard?.id === boardId,
       [boardId, editingBoard.id],

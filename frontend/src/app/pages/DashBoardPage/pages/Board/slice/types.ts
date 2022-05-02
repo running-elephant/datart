@@ -21,6 +21,7 @@ import {
   ControllerFacadeTypes,
   DataViewFieldType,
 } from 'app/constants';
+import { BoardConfig } from 'app/pages/DashBoardPage/types/boardTypes';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDatasetMeta } from 'app/types/ChartDataSet';
@@ -47,6 +48,7 @@ export interface BoardState {
   dataChartMap: Record<string, DataChart>;
   viewMap: Record<string, ChartDataView>; // View
   widgetDataMap: Record<string, WidgetData>;
+  availableSourceFunctionsMap: Record<string, string[]>;
 }
 // 应用内浏览，分享页模式，定时任务模式，编辑模式
 export type VizRenderMode = 'read' | 'share' | 'schedule' | 'edit';
@@ -59,7 +61,7 @@ export interface Dashboard {
   status: number;
   thumbnail: string;
   index?: number;
-  config: DashboardConfig;
+  config: BoardConfig;
   permissions?: any;
   queryVariables: Variable[];
 }
@@ -75,7 +77,7 @@ export interface ServerDashboard extends Omit<Dashboard, 'config'> {
   datacharts: ServerDatachart[];
   widgets: ServerWidget[];
 }
-export interface DashboardConfig {
+export interface DashboardConfigBeta3 {
   version: string;
   background: BackgroundConfig;
   widgetDefaultSettings: {
@@ -101,6 +103,7 @@ export interface DashboardConfig {
   gridStep: [number, number];
   scaleMode: ScaleModeType;
 }
+
 export type ColsKeyType = typeof LAYOUT_COLS_KEYS[number];
 export const BoardTypes = ['auto', 'free'] as const;
 BoardTypes.includes('auto');

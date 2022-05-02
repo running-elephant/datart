@@ -22,9 +22,7 @@ import datart.core.entity.Schedule;
 import datart.core.entity.ScheduleLog;
 import datart.server.base.dto.ResponseData;
 import datart.server.base.dto.ScheduleBaseInfo;
-import datart.server.base.params.CheckNameParam;
-import datart.server.base.params.ScheduleCreateParam;
-import datart.server.base.params.ScheduleUpdateParam;
+import datart.server.base.params.*;
 import datart.server.service.ScheduleService;
 import io.swagger.annotations.ApiOperation;
 import org.quartz.SchedulerException;
@@ -83,6 +81,14 @@ public class ScheduleController extends BaseController {
     public ResponseData<Boolean> updateSchedule(@PathVariable String scheduleId, @Validated @RequestBody ScheduleUpdateParam updateParam) {
         updateParam.setId(scheduleId);
         return ResponseData.success(scheduleService.update(updateParam));
+    }
+
+    @ApiOperation(value = "update a schedule base info")
+    @PutMapping(value = "/{scheduleId}/base")
+    public ResponseData<Boolean> updateScheduleBaseInfo(@PathVariable String scheduleId,
+                                                    @Validated @RequestBody ScheduleBaseUpdateParam updateParam) {
+        checkBlank(scheduleId, "scheduleId");
+        return ResponseData.success(scheduleService.updateBase(updateParam));
     }
 
     @ApiOperation(value = "delete a schedule")

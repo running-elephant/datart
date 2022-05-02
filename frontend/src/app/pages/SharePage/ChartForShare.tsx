@@ -157,12 +157,12 @@ const ChartForShare: FC<{
     const dateLevelComputedFields = rows.filter(
       v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
     );
-    const replacedColName = payload.value.replacedColName;
+    const replacedConfig = payload.value.replacedConfig;
     const computedFields = getRuntimeComputedFields(
       dateLevelComputedFields,
-      replacedColName,
+      replacedConfig,
       chartPreview?.backendChart?.config?.computedFields,
-      chartPreview?.chartConfig,
+      true,
     );
 
     dispatch(

@@ -26,7 +26,6 @@ import { AddChart } from './AddChart/AddChart';
 import { AddContainer } from './AddContainer/AddContainer';
 import { AddController } from './AddControler/AddControler';
 import { AddMedia } from './AddMedia/AddMedia';
-import { AllowOverlapBtn } from './AllowOverlap';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
 import { CopyBtn, PasteBtn } from './CopyPaste/CopyPaste';
 import { DelWidgetsBtn } from './DelWidgetsBtn';
@@ -82,7 +81,6 @@ export const ToolBar = () => {
             <Divider type="vertical" />
 
             <DeviceSwitcher />
-            <AllowOverlapBtn />
           </>
         )}
       </Space>

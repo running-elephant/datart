@@ -33,6 +33,7 @@ import {
   Dashboard,
   VizRenderMode,
 } from '../DashBoardPage/pages/Board/slice/types';
+import { getJsonConfigs } from '../DashBoardPage/utils';
 import { OnLoadTasksType } from '../MainPage/Navbar/DownloadListPopup';
 import { DownloadTask } from '../MainPage/slice/types';
 import { DownloadTaskContainer } from './DownloadTaskContainer';
@@ -85,7 +86,12 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
       };
       if (dashboard) {
         if (dashboard?.config?.type === 'free') {
-          const { width, height } = dashboard.config;
+          const props = dashboard.config.jsonConfig.props;
+          const [width, height] = getJsonConfigs(
+            props,
+            ['size'],
+            ['width', 'height'],
+          );
           const ratio = width / (height || 1) || 1;
           const targetHeight = taskWH.taskW / ratio;
           taskWH.taskH = targetHeight;

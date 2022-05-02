@@ -18,7 +18,7 @@
 
 import { Empty } from 'antd';
 import { useGridWidgetHeight } from 'app/hooks/useGridWidgetHeight';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
+import { BoardConfigValContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import { LAYOUT_COLS_MAP } from 'app/pages/DashBoardPage/constants';
@@ -40,7 +40,7 @@ const ReactGridLayout = WidthProvider(RGL);
 export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
   ({ boardId }) => {
     const { editing } = useContext(BoardContext);
-    const boardConfig = useContext(BoardConfigContext);
+    const boardConfig = useContext(BoardConfigValContext);
     const { background, allowOverlap } = boardConfig;
     const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
 

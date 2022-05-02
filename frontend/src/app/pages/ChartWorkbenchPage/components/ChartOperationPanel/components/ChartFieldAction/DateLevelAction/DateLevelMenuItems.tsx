@@ -103,7 +103,10 @@ const DateLevelMenuItems = memo(
           {t('default')}
         </Menu.Item>
         {DATE_LEVELS.map(item => {
-          if (availableSourceFunctions?.includes(item.expression)) {
+          if (
+            availableSourceFunctions &&
+            availableSourceFunctions.includes(item.expression)
+          ) {
             const colName = t(item.expression);
             const expression = `${item.expression}(${
               config.category === ChartDataViewFieldCategory.Field

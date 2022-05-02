@@ -33,7 +33,6 @@ import produce from 'immer';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
-import { BoardConfigContext } from '../../BoardProvider/BoardConfigProvider';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
@@ -52,7 +51,9 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const { onWidgetUpdate, onRefreshWidgetsByController } =
     useContext(WidgetActionContext);
-  const { hasQueryControl } = useContext(BoardConfigContext);
+  // TODO(duo)
+  // const { hasQueryControl } = useContext(BoardConfigContext);
+  const hasQueryControl = false;
   const [form] = Form.useForm();
 
   const {

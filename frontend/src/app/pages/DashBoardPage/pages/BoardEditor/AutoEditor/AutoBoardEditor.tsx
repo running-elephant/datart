@@ -18,7 +18,7 @@
 
 import { Empty } from 'antd';
 import { useGridWidgetHeight } from 'app/hooks/useGridWidgetHeight';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
+import { BoardConfigValContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
@@ -62,7 +62,7 @@ const ReactGridLayout = WidthProvider(RGL);
 export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const { boardId } = useContext(BoardContext);
-  const boardConfig = useContext(BoardConfigContext);
+  const boardConfig = useContext(BoardConfigValContext) as any;
   const { background, allowOverlap } = boardConfig;
   const { deviceType } = useContext(BoardInfoContext);
 

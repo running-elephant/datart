@@ -29,7 +29,7 @@ import { updateCollectionByAction } from 'app/utils/mutation';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { ChartConfigReducerActionType } from './constant';
 import {
-  fetchAvailableSourceFunctions,
+  fetchAvailableSourceFunctionsForChart,
   fetchChartAction,
   fetchDataSetAction,
   fetchDataViewsAction,
@@ -201,7 +201,7 @@ const workbenchSlice = createSlice({
             : chartConfigDTO.aggregation;
       })
       .addCase(
-        fetchAvailableSourceFunctions.fulfilled,
+        fetchAvailableSourceFunctionsForChart.fulfilled,
         (state, { payload }) => {
           state.availableSourceFunctions = payload;
         },

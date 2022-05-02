@@ -693,18 +693,18 @@
         },
         "enum": {
           "actionType": {
-            "sortable": "sortable",
-            "alias": "alias",
-            "format": "format",
-            "aggregate": "aggregate",
-            "aggregateLimit": "aggregate",
-            "filter": "filter",
-            "categoryFilter": "category filter",
-            "colorize": "colorize",
-            "colorRange": "colorize",
-            "colorSingle": "colorize",
-            "size": "size",
-            "chooseTheme": "Choose theme",
+            "sortable": "Sortable",
+            "alias": "Alias",
+            "format": "Format",
+            "aggregate": "Aggregate",
+            "aggregateLimit": "Aggregate",
+            "filter": "Filter",
+            "categoryFilter": "Category Filter",
+            "colorize": "Colorize",
+            "colorRange": "Colorize",
+            "colorSingle": "Colorize",
+            "size": "Size",
+            "chooseTheme": "Choose Theme",
             "dateLevel": "Date Level"
           }
         }
@@ -866,7 +866,7 @@
         "shareUser": "User share",
         "userOrRole": "Assign roles/members",
         "selectRole": "Select role",
-        "selectUser": "select members",
+        "selectUser": "Select members",
         "save": "Save"
       },
       "shareList": {
@@ -959,8 +959,8 @@
         "paddingTB": "Padding-TB",
         "paddingLR": "Padding-LR",
         "rowHeight": "rowHeight",
-        "scaleMode": "scale Mode",
-        "queryMode": "query Mode",
+        "scaleMode": "Scale Mode",
+        "queryMode": "Query Mode",
         "openInitQuery": "Open Init Query",
         "cutIn": "Cut In",
         "cutOut": "Cut Out",

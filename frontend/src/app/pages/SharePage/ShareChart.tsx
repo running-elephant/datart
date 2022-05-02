@@ -98,11 +98,7 @@ export function ShareChart() {
   useEffect(() => {
     const sourceId = chartPreview?.backendChart?.view.sourceId;
     if (sourceId) {
-      dispatch(
-        fetchAvailableSourceFunctions({
-          sourceId: sourceId,
-        }),
-      );
+      dispatch(fetchAvailableSourceFunctions(sourceId));
     }
   }, [chartPreview?.backendChart?.view.sourceId, dispatch]);
 
