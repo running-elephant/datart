@@ -18,8 +18,10 @@
 package datart.core.common;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiPredicate;
 
 public class ReflectUtils {
 
@@ -55,7 +57,7 @@ public class ReflectUtils {
         }
     }
 
-    public static Map<Field, Object> getNotNullFields(Object o) {
+    public static Map<Field, Object> getFields(Object o, BiPredicate<Field, Object> filter) {
         Map<Field, Object> fieldMap = new HashMap<>();
         Class<?> clz = o.getClass();
         while (clz != null) {
@@ -64,7 +66,7 @@ public class ReflectUtils {
                 for (Field field : fields) {
                     field.setAccessible(true);
                     Object v = field.get(o);
-                    if (v != null) {
+                    if (filter.test(field, v)) {
                         fieldMap.put(field, v);
                     }
                 }
@@ -73,5 +75,9 @@ public class ReflectUtils {
             clz = clz.getSuperclass();
         }
         return fieldMap;
+    }
+
+    public static Map<Field, Object> getNotNullAndNotStaticFields(Object o) {
+        return getFields(o, (field, v) -> v != null && !Modifier.isStatic(field.getModifiers()));
     }
 }

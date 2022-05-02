@@ -53,7 +53,7 @@ public interface CRUDMapper extends BaseMapper {
     default boolean checkUnique(BaseEntity entity) {
         SQL sql = new SQL();
         sql.SELECT("COUNT(*)").FROM(format(entity.getClass().getSimpleName()));
-        Map<Field, Object> fields = ReflectUtils.getNotNullFields(entity);
+        Map<Field, Object> fields = ReflectUtils.getNotNullAndNotStaticFields(entity);
         if (CollectionUtils.isEmpty(fields)) return false;
         for (Map.Entry<Field, Object> entry : fields.entrySet()) {
             sql.WHERE(String.format("`%s` = '%s'", format(entry.getKey().getName()),
