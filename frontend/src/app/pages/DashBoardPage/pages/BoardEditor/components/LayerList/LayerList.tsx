@@ -31,6 +31,7 @@ import {
   selectSortAllWidgets,
 } from '../../slice/selectors';
 import NameItem from './NameItem';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 
 export type NameCard = {
   index: number;
@@ -120,10 +121,12 @@ export const LayerList: React.FC<{}> = memo(() => {
         ></NameItem>
       </WidgetWrapProvider>
     ));
+  const t = useI18NPrefix(`viz.board.action`);
+  
   return (
     <DndProvider backend={HTML5Backend}>
       <Wrapper onClick={clearSelectedWidgets}>
-        <h3 className="title">组件</h3>
+        <h3 className="title">{t('widgetList')}</h3>
         <div className="nameList">{nameList}</div>
         <div className="bottom"></div>
       </Wrapper>
