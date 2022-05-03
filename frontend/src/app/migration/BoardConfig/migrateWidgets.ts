@@ -22,12 +22,17 @@ import {
   ServerWidget,
   Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { IWidget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
   FontDefault,
   VALUE_SPLITTER,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { setLatestVersion, versionCanDo } from '../utils';
-import { APP_VERSION_BETA_0, APP_VERSION_BETA_2 } from './../constants';
+import {
+  APP_VERSION_BETA_0,
+  APP_VERSION_BETA_2,
+  APP_VERSION_BETA_4,
+} from './../constants';
 
 /**
  *
@@ -96,6 +101,14 @@ export const beta2 = (widget?: Widget) => {
   return widget;
 };
 
+export const beta4 = (widget?: IWidget | Widget) => {
+  if (!widget) return undefined;
+  if (!versionCanDo(APP_VERSION_BETA_4, widget?.config.version)) return widget;
+  if (widget.config.version !== APP_VERSION_BETA_4) {
+  } else {
+  }
+  return widget;
+};
 const finaleWidget = (widget?: Widget) => {
   if (!widget) return undefined;
   widget.config = setLatestVersion(widget.config);
@@ -132,8 +145,9 @@ export const migrateWidgets = (widgets: ServerWidget[]) => {
       let resWidget = beta0(widget);
 
       resWidget = beta2(resWidget);
-      resWidget = finaleWidget(resWidget);
-      return resWidget;
+      let beta4Widget = beta4(resWidget);
+      beta4Widget = finaleWidget(resWidget);
+      return beta4Widget;
     })
     .filter(widget => !!widget);
   return targetWidgets as Widget[];

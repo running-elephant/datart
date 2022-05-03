@@ -15,6 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import linkChartProto from '../Widgets/DataChartWidget/linkChartConfig';
+import selfChartProto from '../Widgets/DataChartWidget/selfChartConfig';
 import { widgetManager } from './WidgetManager';
+widgetManager.register(linkChartProto);
+widgetManager.register(selfChartProto);
 
 export default widgetManager;

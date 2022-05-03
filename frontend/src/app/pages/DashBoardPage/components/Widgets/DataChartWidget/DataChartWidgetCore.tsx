@@ -103,7 +103,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
           widgetId: dataChart.id,
         });
       }
-      onWidgetGetData(widgetRef.current);
+      onWidgetGetData(widgetRef.current as any);
     },
     [
       onWidgetDataUpdate,
@@ -119,7 +119,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       drillOption = option;
       drillOptionRef.current = drillOption;
       boardDrillManager.setWidgetDrill({ bid, wid, drillOption });
-      onWidgetGetData(widgetRef.current);
+      onWidgetGetData(widgetRef.current as any);
     },
 
     [bid, onWidgetGetData, wid],

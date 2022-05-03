@@ -19,7 +19,7 @@ import { Checkbox, Form, Input } from 'antd';
 import BasicFont from 'app/components/FormGenerator/Basic/BasicFont';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { WIDGET_TITLE_ALIGN_OPTIONS } from 'app/pages/DashBoardPage/constants';
-import { WidgetNameConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetTitleConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FontDefault } from 'app/pages/DashBoardPage/utils/widget';
 import React, { FC, memo, useMemo } from 'react';
 import SelectSet from './BasicSet/SelectSet';
@@ -33,7 +33,7 @@ const FONT_DATA = {
 };
 
 export const NameSet: FC<{
-  config: WidgetNameConfig;
+  config: WidgetTitleConfig;
 }> = memo(({ config }) => {
   const t = useI18NPrefix(`viz.board.setting`);
   const fontData = useMemo(() => {

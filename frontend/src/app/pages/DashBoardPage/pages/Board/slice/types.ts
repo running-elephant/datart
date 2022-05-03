@@ -131,7 +131,7 @@ export interface WidgetConf {
   index: number;
   tabId?: string; //记录在父容器tab的位置
   name: string;
-  nameConfig: WidgetNameConfig;
+  nameConfig: WidgetTitleConfig;
   padding: WidgetPadding;
   type: WidgetType;
   autoUpdate: boolean;
@@ -146,9 +146,11 @@ export interface WidgetConf {
   linkageConfig?: LinkageConfig; //联动设置
   jumpConfig?: JumpConfig; // 跳转 设置
 }
-export interface WidgetNameConfig extends FontConfig {
-  show: boolean;
+export interface WidgetTitleConfig {
+  text: string;
+  showTitle: boolean;
   textAlign?: TextAlignType;
+  font: FontConfig;
 }
 export interface LinkageConfig {
   open: boolean;

@@ -19,7 +19,6 @@ import { memo, useContext } from 'react';
 import { BoardType, MediaWidgetType } from '../../pages/Board/slice/types';
 import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
-import { DataChartWidget } from '../Widgets/DataChartWidget/DataChartWidget';
 import { IframeWidget } from '../Widgets/IframeWidget/IframeWidget';
 import { ImageWidget } from '../Widgets/ImageWidget/ImageWidget';
 import { RichTextWidget } from '../Widgets/RichTextWidget/RichTextWidget';
@@ -42,7 +41,7 @@ export const FullScreenWidgetMapper: React.FC<{
           boardId={widget.dashboardId}
           boardEditing={boardEditing}
         >
-          <DataChartWidget hideTitle={true} />
+          {/* <DataChartWidget hideTitle={true} /> */}
         </WidgetDataProvider>
       );
     case 'media':

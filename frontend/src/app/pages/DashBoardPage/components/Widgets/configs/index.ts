@@ -25,66 +25,68 @@ import type {
 import { IWidget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { FontDefault } from 'app/pages/DashBoardPage/utils/widget';
 import type { ChartStyleConfig } from 'app/types/ChartConfig';
-
-export const TitleTpl: ChartStyleConfig = {
-  label: 'title.title',
-  key: 'title',
-  comType: 'group',
-  rows: [
-    {
-      label: 'title.text',
-      key: 'text',
-      value: '',
-      comType: 'input',
-    },
-    {
-      label: 'title.showTitle',
-      key: 'showTitle',
-      value: true,
-      comType: 'switch',
-    },
-    {
-      label: 'title.textAlign',
-      key: 'textAlign',
-      value: 'left',
-      comType: 'switch',
-    },
-    {
-      label: 'title.textAlign.textAlign',
-      key: 'textAlign',
-      value: 'left',
-      comType: 'select',
-      options: {
-        translateItemLabel: true,
-        items: [
-          {
-            label: '@global@.title.textAlign.left',
-            key: 'left',
-            value: 'left',
-          },
-          {
-            label: '@global@.title.textAlign.center',
-            key: 'center',
-            value: 'center',
-          },
-        ],
+import { uuidv4 } from 'utils/utils';
+export const initTitleTpl = () => {
+  const titleTpl: ChartStyleConfig = {
+    label: 'title.title',
+    key: 'title',
+    comType: 'group',
+    rows: [
+      {
+        label: 'title.text',
+        key: 'text',
+        value: '',
+        comType: 'input',
       },
-    },
-    {
-      label: 'title.titleFont',
-      key: 'titleFont',
-      value: FontDefault,
-      comType: 'font',
-      default: FontDefault,
-    },
-  ],
+      {
+        label: 'title.showTitle',
+        key: 'showTitle',
+        value: true,
+        comType: 'switch',
+      },
+      {
+        label: 'title.textAlign',
+        key: 'textAlign',
+        value: 'left',
+        comType: 'switch',
+      },
+      {
+        label: 'title.textAlign.textAlign',
+        key: 'textAlign',
+        value: 'left',
+        comType: 'select',
+        options: {
+          translateItemLabel: true,
+          items: [
+            {
+              label: '@global@.title.textAlign.left',
+              key: 'left',
+              value: 'left',
+            },
+            {
+              label: '@global@.title.textAlign.center',
+              key: 'center',
+              value: 'center',
+            },
+          ],
+        },
+      },
+      {
+        label: 'title.font',
+        key: 'font',
+        value: FontDefault,
+        comType: 'font',
+      },
+    ],
+  };
+  return titleTpl;
 };
 export const TitleI18N = {
   zh: {
     title: '标题配置',
     text: '标题',
     showTitle: '显示标题',
-    titleFont: '标题字体',
+    font: '标题字体',
     textAlign: {
       textAlign: '对齐方式',
       left: '左对齐',
@@ -95,7 +97,7 @@ export const TitleI18N = {
     title: 'Title Config',
     text: 'Title',
     showTitle: 'Show Title',
-    titleFont: 'Title Font',
+    font: 'Title Font',
     textAlign: {
       textAlign: 'Align',
       left: 'Left',
@@ -103,37 +105,41 @@ export const TitleI18N = {
     },
   },
 };
-export const PaddingTpl: ChartStyleConfig = {
-  label: 'padding.padding',
-  key: 'padding',
-  comType: 'group',
-  rows: [
-    {
-      label: 'padding.top',
-      key: 'top',
-      value: '8',
-      comType: 'inputNumber',
-    },
-    {
-      label: 'padding.bottom',
-      key: 'bottom',
-      value: '8',
-      comType: 'inputNumber',
-    },
-    {
-      label: 'padding.left',
-      key: 'left',
-      value: '8',
-      comType: 'inputNumber',
-    },
-    {
-      label: 'padding.right',
-      key: 'right',
-      value: '8',
-      comType: 'inputNumber',
-    },
-  ],
+export const initPaddingTpl = () => {
+  const paddingTpl: ChartStyleConfig = {
+    label: 'padding.padding',
+    key: 'padding',
+    comType: 'group',
+    rows: [
+      {
+        label: 'padding.top',
+        key: 'top',
+        value: '8',
+        comType: 'inputNumber',
+      },
+      {
+        label: 'padding.bottom',
+        key: 'bottom',
+        value: '8',
+        comType: 'inputNumber',
+      },
+      {
+        label: 'padding.left',
+        key: 'left',
+        value: '8',
+        comType: 'inputNumber',
+      },
+      {
+        label: 'padding.right',
+        key: 'right',
+        value: '8',
+        comType: 'inputNumber',
+      },
+    ],
+  };
+  return paddingTpl;
 };
+
 export const PaddingI18N = {
   zh: {
     padding: '内边距',
@@ -150,25 +156,29 @@ export const PaddingI18N = {
     right: 'Right',
   },
 };
-export const LoopFetchTpl: ChartStyleConfig = {
-  label: 'loopFetch.loopFetch',
-  key: 'loopFetch',
-  comType: 'group',
-  rows: [
-    {
-      label: 'loopFetch.enable',
-      key: 'enable',
-      value: false,
-      comType: 'switch',
-    },
-    {
-      label: 'loopFetch.interval',
-      key: 'interval',
-      value: '60', //60s
-      comType: 'inputNumber',
-    },
-  ],
+export const initLoopFetchTpl = () => {
+  const loopFetchTpl: ChartStyleConfig = {
+    label: 'loopFetch.loopFetch',
+    key: 'loopFetch',
+    comType: 'group',
+    rows: [
+      {
+        label: 'loopFetch.enable',
+        key: 'enable',
+        value: false,
+        comType: 'switch',
+      },
+      {
+        label: 'loopFetch.interval',
+        key: 'interval',
+        value: '60', //60s
+        comType: 'inputNumber',
+      },
+    ],
+  };
+  return loopFetchTpl;
 };
+
 export const LoopFetchI18N = {
   zh: {
     loopFetch: '自动刷新数据',
@@ -181,60 +191,67 @@ export const LoopFetchI18N = {
     interval: 'Interval',
   },
 };
-export const BackgroundTpl: ChartStyleConfig = {
-  label: 'background.background',
-  key: 'background',
-  comType: 'group',
-  rows: [
-    {
-      label: 'background.background',
-      key: 'background',
-      default: {
-        color: 'transparent', // TODO 根据当前主题色配置
-        image: '',
-        size: '100% 100%',
-        repeat: 'no-repeat',
+export const initBackgroundTpl = () => {
+  const backgroundTpl: ChartStyleConfig = {
+    label: 'background.background',
+    key: 'background',
+    comType: 'group',
+    rows: [
+      {
+        label: 'background.background',
+        key: 'background',
+        default: {
+          color: 'transparent', // TODO 根据当前主题色配置
+          image: '',
+          size: '100% 100%',
+          repeat: 'no-repeat',
+        },
+        value: {
+          color: 'transparent', // TODO 根据当前主题色配置
+          image: '',
+          size: '100% 100%',
+          repeat: 'no-repeat',
+        },
+        comType: 'background',
       },
-      value: {
-        color: 'transparent', // TODO 根据当前主题色配置
-        image: '',
-        size: '100% 100%',
-        repeat: 'no-repeat',
-      },
-      comType: 'background',
-    },
-  ],
+    ],
+  };
+  return backgroundTpl;
 };
-export const BorderTpl: ChartStyleConfig = {
-  label: 'border.borderGroup',
-  key: 'borderGroup',
-  comType: 'group',
-  rows: [
-    {
-      label: 'border.border',
-      key: 'border',
-      value: {
-        color: 'transparent', // TODO 根据当前主题色配置
-        width: '0',
-        style: 'solid',
-        radius: 'no-repeat',
+export const initBorderTpl = () => {
+  const borderTpl: ChartStyleConfig = {
+    label: 'border.borderGroup',
+    key: 'borderGroup',
+    comType: 'group',
+    rows: [
+      {
+        label: 'border.border',
+        key: 'border',
+        value: {
+          color: 'transparent', // TODO 根据当前主题色配置
+          width: '0',
+          style: 'solid',
+          radius: 'no-repeat',
+        },
+        comType: 'border',
       },
-      comType: 'border',
-    },
-  ],
+    ],
+  };
+  return borderTpl;
 };
-
-export const WidgetViewActionTpl = {
-  fullScreen: {
-    label: 'action.fullScreen',
-    icon: 'fullscreen', //svg TODO
-    key: 'fullScreen',
-  },
-  refresh: {
-    label: 'action.refresh',
-    icon: 'refresh',
-    key: 'refresh',
-  },
+export const initWidgetViewActionTpl = () => {
+  return {
+    fullScreen: {
+      label: 'action.fullScreen',
+      icon: 'fullscreen', //svg TODO
+      key: 'fullScreen',
+    },
+    refresh: {
+      label: 'action.refresh',
+      icon: 'refresh',
+      key: 'refresh',
+    },
+  };
 };
 
 export const WidgetViewActionI18N = {
@@ -247,30 +264,33 @@ export const WidgetViewActionI18N = {
     refresh: 'Refresh',
   },
 };
-
-export const WidgetEditActionTpl = {
-  copy: {
-    label: 'action.copy',
-    icon: 'copy',
-    key: 'copy',
-  },
-  paste: {
-    label: 'action.paste',
-    icon: 'paste',
-    key: 'paste',
-  },
-  delete: {
-    label: 'action.delete',
-    icon: 'delete',
-    key: 'delete',
-    danger: true,
-  },
-  lock: {
-    label: 'action.lock',
-    icon: 'lock',
-    key: 'lock',
-  },
+export const initWidgetEditActionTpl = () => {
+  const widgetEditActionTpl = {
+    copy: {
+      label: 'action.copy',
+      icon: 'copy',
+      key: 'copy',
+    },
+    paste: {
+      label: 'action.paste',
+      icon: 'paste',
+      key: 'paste',
+    },
+    delete: {
+      label: 'action.delete',
+      icon: 'delete',
+      key: 'delete',
+      danger: true,
+    },
+    lock: {
+      label: 'action.lock',
+      icon: 'lock',
+      key: 'lock',
+    },
+  };
+  return widgetEditActionTpl;
 };
+
 export const WidgetEditActionI18N = {
   zh: {
     copy: '复制',
@@ -286,22 +306,22 @@ export const WidgetEditActionI18N = {
   },
 };
 
-export const AutoWidgetRectTpl: RectConfig = {
+export const initAutoWidgetRect = (): RectConfig => ({
   x: 0,
   y: 0,
   width: 6,
   height: 6,
-};
-export const FreeWidgetRectTpl: RectConfig = {
+});
+export const initFreeWidgetRect = (): RectConfig => ({
   x: 0,
   y: 0,
   width: 300,
   height: 400,
-};
+});
 
 export const widgetTpl = (): IWidget => {
   return {
-    id: '',
+    id: uuidv4(),
     dashboardId: '',
     datachartId: '',
     relations: [],
@@ -314,16 +334,19 @@ export const widgetTpl = (): IWidget => {
       type: '' as WidgetType,
       selfConfig: {} as any,
       widgetTypeId: '',
+      controllable: true,
+      linkable: true,
+      // visible: true,
       lock: false,
       content: {} as any,
       rect: { x: 0, y: 0, width: 0, height: 0 },
-      JsonConfig: {
+      jsonConfig: {
         props: [
-          { ...TitleTpl },
-          { ...LoopFetchTpl },
-          { ...PaddingTpl },
-          { ...BackgroundTpl },
-          { ...BorderTpl },
+          { ...initTitleTpl() },
+          { ...initLoopFetchTpl() },
+          { ...initPaddingTpl() },
+          { ...initBackgroundTpl() },
+          { ...initBorderTpl() },
         ],
       },
     },

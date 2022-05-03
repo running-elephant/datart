@@ -22,8 +22,9 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { dataChartCreator, getMeta } from './config';
 
-export const meta = getMeta({
+export const selfChartMeta = getMeta({
   icon: 'selfChart',
+  widgetTypeId: 'selfChart',
   zh: {
     desc: '自建数据图表的内部是一个独立的数据图表 ',
     widgetTypeId: '自建数据图表',
@@ -33,8 +34,8 @@ export const meta = getMeta({
     widgetTypeId: 'Link Chart',
   },
 });
-export const toolkit = {
-  creator: (opt: {
+export const selfChartToolkit = {
+  create: (opt: {
     dashboardId: string;
     boardType: BoardType;
     dataChartId: string;
@@ -61,3 +62,15 @@ export const toolkit = {
   setJump() {},
   closeJump() {},
 };
+// class SelfChartProto{
+//   public widgetTypeId
+//   constructor(){
+//     return this;
+//   }
+// }
+const selfChartProto = {
+  widgetTypeId: 'selfChart',
+  meta: selfChartMeta,
+  toolkit: selfChartToolkit,
+};
+export default selfChartProto;

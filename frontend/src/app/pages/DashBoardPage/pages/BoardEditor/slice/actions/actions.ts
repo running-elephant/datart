@@ -235,7 +235,7 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
   });
 
   dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
-  dispatch(editBoardStackActions.addWidgets(newWidgets));
+  dispatch(editBoardStackActions.addWidgets(newWidgets as any));
 
   //
   function cloneWidget(widget: WidgetOfCopy, pId?: string) {

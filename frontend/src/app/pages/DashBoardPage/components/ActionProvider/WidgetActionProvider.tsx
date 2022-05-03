@@ -66,6 +66,7 @@ import {
   getEditControllerOptions,
   renderedEditWidgetAsync,
 } from '../../pages/BoardEditor/slice/thunk';
+import { IWidget } from '../../types/widgetTypes';
 import {
   getCascadeControllers,
   getNeedRefreshWidgetsByController,
@@ -201,7 +202,7 @@ export const WidgetActionProvider: FC<{
           }),
         );
       },
-      onWidgetGetData: (widget: Widget) => {
+      onWidgetGetData: (widget: IWidget) => {
         dispatch(widgetGetDataAction(boardEditing, widget, renderMode));
       },
 
@@ -288,7 +289,7 @@ export interface WidgetActionContextProps {
   // all
   onWidgetChartClick: (widget: Widget, params: ChartMouseEventParams) => void;
   onWidgetClearLinkage: (widget: Widget) => void;
-  onWidgetGetData: (widget: Widget) => void;
+  onWidgetGetData: (widget: IWidget) => void;
   onWidgetUpdate: (widget: Widget) => void;
   onUpdateWidgetConfig: (config: WidgetConf, wid: string) => void;
   onRefreshWidgetsByController: (widget: Widget) => void;

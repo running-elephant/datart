@@ -18,17 +18,19 @@
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import useRenderWidget from 'app/pages/DashBoardPage/hooks/useRenderWidget';
 import useWidgetAutoFetch from 'app/pages/DashBoardPage/hooks/useWidgetAutoFetch';
+import { IWidget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { memo, useContext } from 'react';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
+import { getWidgetBaseStyle } from '../../WidgetManager/utils';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { ToolBar } from './components/ToolBar';
 import { ControllerWidgetCore } from './ControllerWidgetCore';
 
 export const ControllerWidget: React.FC<{}> = memo(() => {
-  const widget = useContext(WidgetContext);
+  const widget = useContext(WidgetContext) as unknown as IWidget;
   const { rendered } = useContext(WidgetInfoContext);
   const { renderMode, boardType } = useContext(BoardContext);
   const { cacheWhRef } = useRenderWidget(
@@ -40,7 +42,9 @@ export const ControllerWidget: React.FC<{}> = memo(() => {
   useWidgetAutoFetch(widget, renderMode, cacheWhRef, rendered);
   // 自动更新
 
-  const { background, border, padding } = widget.config;
+  const { background, border, padding } = getWidgetBaseStyle(
+    widget.config.jsonConfig.props,
+  );
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
       <div ref={cacheWhRef} style={ZIndexStyle}>

@@ -48,6 +48,7 @@ export const ToolBar = () => {
   const { undo, redo } = useContext(BoardActionContext);
   //
   useBoardEditorHotkeys();
+
   const t = useI18NPrefix(`viz.board.action`);
   return (
     <Wrapper onClick={ssp}>

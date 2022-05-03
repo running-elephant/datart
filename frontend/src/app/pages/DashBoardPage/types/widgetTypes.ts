@@ -32,13 +32,17 @@ export interface IWidgetConf {
   type: WidgetType;
   widgetTypeId: string;
   lock: boolean;
-  JsonConfig: JsonConfig;
+  controllable: boolean; // 是否可以关联 controller
+  linkable: boolean; // 是否可以关联其他 widget
+  // visible: boolean; // 是否可见 TODO: 后续考虑
+  jsonConfig: JsonConfig;
   content: any;
   // linkageConfig?: LinkageConfig;
   // jumpConfig?: JumpConfig;
+
   selfConfig: any;
   rect: RectConfig;
   mRect?: RectConfig;
   parentId?: string;
-  children?: IWidget[];
+  children?: string[];
 }

@@ -63,7 +63,7 @@ export const WaitIconFn: React.FC<{ rendered: boolean; widget: Widget }> = memo(
     const { onWidgetGetData } = useContext(WidgetActionContext);
     const t = useI18NPrefix(`viz.widget.tips`);
     const onRefreshWidget = useCallback(() => {
-      onWidgetGetData(widget);
+      onWidgetGetData(widget as any);
     }, [onWidgetGetData, widget]);
     if (rendered) return null;
     return (

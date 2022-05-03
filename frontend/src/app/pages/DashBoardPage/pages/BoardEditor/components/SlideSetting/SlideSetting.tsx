@@ -22,7 +22,6 @@ import styled from 'styled-components/macro';
 import { BoardContext } from '../../../../components/BoardProvider/BoardProvider';
 import { selectSelectedIds } from '../../slice/selectors';
 import { BoardConfigPanel } from './BoardConfigPanel';
-import WidgetSetting from './WidgetSetting';
 
 export const SlideSetting: FC<{}> = memo(() => {
   const { boardId } = useContext(BoardContext);
@@ -40,7 +39,7 @@ export const SlideSetting: FC<{}> = memo(() => {
           boardEditing={true}
           boardId={boardId}
         >
-          <WidgetSetting />
+          {/* <WidgetSetting /> */}
         </WidgetWrapProvider>
       )}
     </Wrapper>

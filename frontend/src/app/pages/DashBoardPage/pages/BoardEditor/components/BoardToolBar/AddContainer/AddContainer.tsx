@@ -38,7 +38,7 @@ export const AddContainer: React.FC<{}> = () => {
         boardType: boardType,
         type: type,
       });
-      dispatch(addWidgetsToEditBoard([widget]));
+      dispatch(addWidgetsToEditBoard([widget] as any));
     },
     [boardId, boardType, dispatch],
   );

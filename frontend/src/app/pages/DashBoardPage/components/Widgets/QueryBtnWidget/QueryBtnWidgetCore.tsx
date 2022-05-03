@@ -16,15 +16,15 @@
  * limitations under the License.
  */
 
-import { FontConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { darken, getLuminance, lighten } from 'polished';
 import { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
+import { getWidgetBaseStyle, getWidgetTitle } from '../../WidgetManager/utils';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
 export const QueryBtnWidgetCore: React.FC<{}> = memo(() => {
-  const widget = useContext(WidgetContext);
+  const widget = useContext(WidgetContext) as any;
 
   const { onWidgetsQuery } = useContext(WidgetActionContext);
 
@@ -33,28 +33,35 @@ export const QueryBtnWidgetCore: React.FC<{}> = memo(() => {
     onWidgetsQuery();
   };
 
-  const { name, nameConfig, background } = widget.config;
-
+  const title = getWidgetTitle(widget.config.jsonConfig.props);
+  const { background } = getWidgetBaseStyle(widget.config.jsonConfig.props);
   return (
-    <Wrapper {...nameConfig} background={background.color} onClick={onQuery}>
-      <span>{name}</span>
+    <Wrapper color={background.color} onClick={onQuery}>
+      <span
+        style={{
+          color: title.font.color,
+          fontSize: title.font.fontSize,
+          fontWeight: title.font.fontWeight,
+          fontFamily: title.font.fontFamily,
+        }}
+      >
+        {title.text}
+      </span>
     </Wrapper>
   );
 });
 
-const Wrapper = styled.div<FontConfig & { background: string }>`
+const Wrapper = styled.div<{ color: string }>`
   display: flex;
   flex: 1;
   align-items: center;
   justify-content: center;
-  font: ${p =>
-    `${p.fontStyle} ${p.fontWeight} ${p.fontSize}px ${p.fontFamily}`};
-  color: ${p => p.color};
+
   cursor: pointer;
   &:hover {
     background: ${p =>
-      getLuminance(p.background) > 0.5
-        ? darken(0.05, p.background)
-        : lighten(0.05, p.background)};
+      getLuminance(p.color) > 0.5
+        ? darken(0.05, p.color)
+        : lighten(0.05, p.color)};
   }
 `;

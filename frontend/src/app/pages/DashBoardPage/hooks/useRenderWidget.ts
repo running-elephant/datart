@@ -19,12 +19,13 @@ import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { useCallback, useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../components/ActionProvider/WidgetActionProvider';
 import { BoardConfigValContext } from '../components/BoardProvider/BoardConfigProvider';
-import { BoardType, VizRenderMode, Widget } from '../pages/Board/slice/types';
+import { BoardType, VizRenderMode } from '../pages/Board/slice/types';
 import { boardScroll } from '../pages/BoardEditor/slice/events';
+import { IWidget } from '../types/widgetTypes';
 import { isElView } from '../utils/board';
 
 export default function useRenderWidget(
-  widget: Widget,
+  widget: IWidget,
   renderMode: VizRenderMode,
   boardType: BoardType,
   rendered: boolean,

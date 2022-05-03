@@ -34,6 +34,7 @@ import React, { memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
+import { getWidgetTitle } from '../../WidgetManager/utils';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { CheckboxGroupControllerForm } from './Controller/CheckboxGroupController';
@@ -48,7 +49,7 @@ import { TextControllerForm } from './Controller/TextController';
 import { TimeControllerForm } from './Controller/TimeController';
 
 export const ControllerWidgetCore: React.FC<{}> = memo(() => {
-  const widget = useContext(WidgetContext);
+  const widget = useContext(WidgetContext) as any;
   const { onWidgetUpdate, onRefreshWidgetsByController } =
     useContext(WidgetActionContext);
   // TODO(duo)
@@ -79,36 +80,29 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     valueOptionType,
     // sqlOperator,
   } = useMemo(() => config as ControllerConfig, [config]);
+  const title = getWidgetTitle(widget.config.jsonConfig.props);
   const leftControlLabel = useMemo(() => {
-    if (!widget.config.nameConfig.show) {
+    if (!title.showTitle) {
       return null;
     }
-    if (widget.config.nameConfig?.textAlign === 'center') {
+    if (title.textAlign === 'center') {
       return null;
     }
-    return (
-      <WidgetTitle
-        name={widget.config.name}
-        config={widget.config.nameConfig}
-      />
-    );
-  }, [widget.config]);
+    return <WidgetTitle title={title} />;
+  }, [title]);
   const centerControlLabel = useMemo(() => {
-    if (!widget.config.nameConfig.show) {
+    if (!title.showTitle) {
       return null;
     }
-    if (widget.config.nameConfig?.textAlign === 'center') {
+    if (title.textAlign === 'center') {
       return (
         <div style={{ width: '100%', textAlign: 'center' }}>
-          <WidgetTitle
-            name={widget.config.name}
-            config={widget.config.nameConfig}
-          />
+          <WidgetTitle title={title} />
         </div>
       );
     }
     return null;
-  }, [widget.config]);
+  }, [title]);
   const optionRows = useMemo(() => {
     const dataRows = rows || [];
     if (valueOptionType === 'common') {
@@ -137,7 +131,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
       return;
     }
     const _values = values ? (Array.isArray(values) ? values : [values]) : [];
-    const nextWidget = produce(widget, draft => {
+    const nextWidget = produce(widget as Widget, draft => {
       (
         draft.config.content as ControllerWidgetContent
       ).config.controllerValues = _values;
@@ -172,7 +166,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           exactValue: timeValues?.[1],
         },
       };
-      const nextWidget = produce(widget, draft => {
+      const nextWidget = produce(widget as Widget, draft => {
         (
           draft.config.content as ControllerWidgetContent
         ).config.controllerDate = nextFilterDate;
@@ -192,7 +186,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           exactValue: value,
         },
       };
-      const nextWidget = produce(widget, draft => {
+      const nextWidget = produce(widget as Widget, draft => {
         (
           draft.config.content as ControllerWidgetContent
         ).config.controllerDate = nextFilterDate;

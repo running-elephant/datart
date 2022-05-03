@@ -18,7 +18,7 @@
 export interface WidgetProto {
   id: string;
   meta: object;
-  methods: object;
+  toolkit: any;
 }
 export class WidgetManager {
   private static _instance: WidgetManager;
@@ -33,24 +33,31 @@ export class WidgetManager {
   }
 
   public register(obj: {
-    widgetType: string;
+    widgetTypeId: string;
     meta: WidgetProto['meta'];
-    methods: WidgetProto['methods'];
+    toolkit: WidgetProto['toolkit'];
   }) {
-    if (this.widgetProtoMap[obj.widgetType]) {
-      throw new Error(`Widget ${obj.widgetType} already registered`);
+    if (this.widgetProtoMap[obj.widgetTypeId]) {
+      throw new Error(`Widget ${obj.widgetTypeId} already registered`);
     }
-    this.widgetProtoMap[obj.widgetType] = {
-      id: obj.widgetType,
+    this.widgetProtoMap[obj.widgetTypeId] = {
+      id: obj.widgetTypeId,
       meta: obj.meta,
-      methods: obj.methods,
+      toolkit: obj.toolkit,
     };
   }
-  public meta(widgetType: string) {
-    return this.widgetProtoMap[widgetType]?.meta;
+  public allWidgetProto() {
+    return this.widgetProtoMap;
   }
-  public methods(widgetType: string) {
-    return this.widgetProtoMap[widgetType]?.methods;
+  public widgetProto(widgetTypeId: string) {
+    return this.widgetProtoMap[widgetTypeId];
+  }
+  public meta(widgetTypeId: string) {
+    return this.widgetProtoMap[widgetTypeId]?.meta;
+  }
+
+  public toolkit(widgetTypeId: string) {
+    return this.widgetProtoMap[widgetTypeId]?.toolkit;
   }
 }
 

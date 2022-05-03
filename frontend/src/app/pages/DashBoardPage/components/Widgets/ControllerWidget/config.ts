@@ -17,11 +17,11 @@
  */
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import {
-  BackgroundTpl,
-  BorderTpl,
-  LoopFetchTpl,
-  PaddingTpl,
-  TitleTpl,
+  initBackgroundTpl,
+  initBorderTpl,
+  initLoopFetchTpl,
+  initPaddingTpl,
+  initTitleTpl,
 } from '../configs';
 
 export const widgetTpl = () => {
@@ -42,11 +42,11 @@ export const widgetTpl = () => {
       rect: { x: 0, y: 0, width: 2, height: 2 },
       JsonConfig: {
         props: [
-          { ...TitleTpl },
-          { ...LoopFetchTpl },
-          { ...PaddingTpl },
-          { ...BackgroundTpl },
-          { ...BorderTpl },
+          { ...initTitleTpl() },
+          { ...initLoopFetchTpl() },
+          { ...initPaddingTpl() },
+          { ...initBackgroundTpl() },
+          { ...initBorderTpl() },
         ],
       },
     },

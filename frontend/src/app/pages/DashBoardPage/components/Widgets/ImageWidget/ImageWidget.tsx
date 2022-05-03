@@ -26,23 +26,21 @@ import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar'
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
+import { getWidgetBaseStyle, getWidgetTitle } from '../../WidgetManager/utils';
 import { ImageWidgetCore } from './ImageWidgetCore';
 
 export const ImageWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
-    const widget = useContext(WidgetContext);
+    const widget = useContext(WidgetContext) as any;
     const { editing } = useContext(BoardContext);
-
-    const { background, border, padding } = widget.config;
+    const title = getWidgetTitle(widget.config.jsonConfig.props);
+    const { background, border, padding } = getWidgetBaseStyle(
+      widget.config.jsonConfig.props,
+    );
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
         <div style={ZIndexStyle}>
-          {!hideTitle && (
-            <WidgetTitle
-              name={widget.config.name}
-              config={widget.config.nameConfig}
-            />
-          )}
+          {!hideTitle && <WidgetTitle title={title} />}
 
           <div style={FlexStyle}>
             <ImageWidgetCore />

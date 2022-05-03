@@ -26,10 +26,11 @@ import {
   Widget,
   WidgetConf,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { getDefaultWidgetName } from 'app/pages/DashBoardPage/utils';
+import { IWidget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { updateCollectionByAction } from 'app/utils/mutation';
+import produce from 'immer';
 import { Layout } from 'react-grid-layout';
 import { createSlice } from 'utils/@reduxjs/toolkit';
 import { EditBoardStack } from '../types';
@@ -87,20 +88,31 @@ export const editBoardStackSlice = createSlice({
     },
 
     // Widget
-    addWidgets(state, action: PayloadAction<Widget[]>) {
+    addWidgets(state, action: PayloadAction<IWidget[]>) {
       const widgets = action.payload;
       let maxWidgetIndex = state.dashBoard.config.maxWidgetIndex || 0;
       widgets.forEach(ele => {
         maxWidgetIndex++;
-        ele.config.index = maxWidgetIndex;
-        ele.config.name =
-          ele.config.name ||
-          getDefaultWidgetName(
-            ele.config.type,
-            ele.config.content.type,
-            maxWidgetIndex,
-          );
-        state.widgetRecord[ele.id] = ele;
+        const widget = produce(ele, draft => {
+          draft.config.index = maxWidgetIndex;
+          //  draft.config.name =
+          //    ele.config.name ||
+          //    getDefaultWidgetName(
+          //      ele.config.type,
+          //      ele.config.content.type,
+          //      maxWidgetIndex,
+          //    );
+        });
+        state.widgetRecord[widget.id] = widget as any;
+        //  ele.config.index = maxWidgetIndex;
+        // ele.config.name =
+        //   ele.config.name ||
+        //   getDefaultWidgetName(
+        //     ele.config.type,
+        //     ele.config.content.type,
+        //     maxWidgetIndex,
+        //   );
+        // state.widgetRecord[ele.id] = ele;
       });
       state.dashBoard.config.maxWidgetIndex = maxWidgetIndex;
     },

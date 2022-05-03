@@ -21,20 +21,21 @@ import {
   DataChart,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
-  AutoWidgetRectTpl,
-  FreeWidgetRectTpl,
+  initAutoWidgetRect,
+  initFreeWidgetRect,
+  initWidgetEditActionTpl,
+  initWidgetViewActionTpl,
   LoopFetchI18N,
   PaddingI18N,
   TitleI18N,
   WidgetEditActionI18N,
-  WidgetEditActionTpl,
   widgetTpl,
   WidgetViewActionI18N,
-  WidgetViewActionTpl,
 } from '../configs';
 
 export const getMeta = (opt: {
   icon: any;
+  widgetTypeId: 'linkChart' | 'selfChart';
   zh: {
     desc: string;
     widgetTypeId: string;
@@ -46,11 +47,12 @@ export const getMeta = (opt: {
 }) => {
   const meta = {
     icon: opt.icon,
+    widgetTypeId: opt.widgetTypeId,
     viewAction: {
-      ...WidgetViewActionTpl,
+      ...initWidgetViewActionTpl(),
     },
     editAction: {
-      ...WidgetEditActionTpl,
+      ...initWidgetEditActionTpl(),
       setLinkage: {
         label: 'action.setLinkage',
         icon: 'linkage',
@@ -143,7 +145,7 @@ export const dataChartCreator = (opt: {
   widget.config.boardType = opt.boardType;
   widget.config.type = 'chart';
   widget.config.selfConfig.dataChartConfig = opt.dataChartConfig;
-  widget.config.JsonConfig.props?.forEach(ele => {
+  widget.config.jsonConfig.props?.forEach(ele => {
     if (ele.key === 'title') {
       ele.rows?.forEach(row => {
         if (row.key === 'text') {
@@ -153,10 +155,10 @@ export const dataChartCreator = (opt: {
     }
   });
   if (opt.boardType === 'auto') {
-    widget.config.rect = { ...AutoWidgetRectTpl };
-    widget.config.mRect = { ...AutoWidgetRectTpl };
+    widget.config.rect = { ...initAutoWidgetRect() };
+    widget.config.mRect = { ...initAutoWidgetRect() };
   } else {
-    widget.config.rect = { ...FreeWidgetRectTpl };
+    widget.config.rect = { ...initFreeWidgetRect() };
   }
   return widget;
 };

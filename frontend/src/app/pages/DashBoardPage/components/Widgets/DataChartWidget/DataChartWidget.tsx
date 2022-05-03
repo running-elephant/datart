@@ -18,19 +18,21 @@
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import useRenderWidget from 'app/pages/DashBoardPage/hooks/useRenderWidget';
 import useWidgetAutoFetch from 'app/pages/DashBoardPage/hooks/useWidgetAutoFetch';
+import { IWidget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { memo, useContext } from 'react';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
+import { getWidgetBaseStyle, getWidgetTitle } from '../../WidgetManager/utils';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { ToolBar } from './components/ToolBar';
 import { DataChartWidgetCore } from './DataChartWidgetCore';
 
 export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
-    const widget = useContext(WidgetContext);
+    const widget = useContext(WidgetContext) as unknown as IWidget;
     const { rendered } = useContext(WidgetInfoContext);
     const { renderMode, boardType } = useContext(BoardContext);
     const { cacheWhRef } = useRenderWidget(
@@ -40,16 +42,14 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
       rendered,
     );
     useWidgetAutoFetch(widget, renderMode, cacheWhRef, rendered);
-    const { background, border, padding } = widget.config;
+    const title = getWidgetTitle(widget.config.jsonConfig.props);
+    const { background, border, padding } = getWidgetBaseStyle(
+      widget.config.jsonConfig.props,
+    );
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
         <div ref={cacheWhRef} style={ZIndexStyle}>
-          {!hideTitle && (
-            <WidgetTitle
-              name={widget.config.name}
-              config={widget.config.nameConfig}
-            />
-          )}
+          {!hideTitle && <WidgetTitle title={title} />}
 
           <div style={FlexStyle}>
             <DataChartWidgetCore />

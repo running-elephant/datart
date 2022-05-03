@@ -25,12 +25,15 @@ import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
+import { getWidgetBaseStyle } from '../../WidgetManager/utils';
 import { ResetBtnWidgetCore } from './ResetBtnWidgetCore';
 
 export const ResetBtnWidget: React.FC<{}> = memo(() => {
-  const widget = useContext(WidgetContext);
+  const widget = useContext(WidgetContext) as any;
   const { editing } = useContext(BoardContext);
-  const { background, border, padding } = widget.config;
+  const { background, border, padding } = getWidgetBaseStyle(
+    widget.config.jsonConfig.props,
+  );
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
       <div style={ZIndexStyle}>

@@ -22,8 +22,9 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { dataChartCreator, getMeta } from './config';
 
-export const LinkChartMeta = getMeta({
+export const linkChartMeta = getMeta({
   icon: 'linkChart',
+  widgetTypeId: 'linkChart',
   zh: {
     desc: '引入图表部件的内部是一个引用的数据图表,原有数据图表有改动时,引入图表部件也会跟着改变',
     widgetTypeId: '引入图表',
@@ -33,8 +34,8 @@ export const LinkChartMeta = getMeta({
     widgetTypeId: 'Link Chart',
   },
 });
-export const toolkit = {
-  creator: (opt: {
+export const linkChartToolkit = {
+  create: (opt: {
     dashboardId: string;
     boardType: BoardType;
     dataChartId: string;
@@ -61,3 +62,10 @@ export const toolkit = {
   setJump() {},
   closeJump() {},
 };
+
+const linkChartProto = {
+  widgetTypeId: 'linkChart',
+  meta: linkChartMeta,
+  toolkit: linkChartToolkit,
+};
+export default linkChartProto;

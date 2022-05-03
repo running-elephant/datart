@@ -23,7 +23,7 @@ import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getRGBAColor } from 'app/pages/DashBoardPage/utils';
 import produce from 'immer';
 import throttle from 'lodash/throttle';
-import React, {
+import {
   FC,
   memo,
   useCallback,

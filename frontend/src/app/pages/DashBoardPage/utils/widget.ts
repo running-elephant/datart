@@ -66,6 +66,7 @@ import {
 import { StrControlTypes } from '../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { ControllerConfig } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { BtnActionParams } from '../pages/BoardEditor/slice/actions/controlActions';
+import { IWidget } from '../types/widgetTypes';
 
 export const VALUE_SPLITTER = '###';
 
@@ -196,7 +197,7 @@ export const createInitWidgetConfig = (opt: {
       textAlign: 'left',
       ...FontDefault,
       color: opt.type === 'query' ? WHITE : G90,
-    },
+    } as any,
     padding: createWidgetPadding(opt.type),
   };
 };
@@ -409,7 +410,7 @@ export const getWidgetInfoMapByServer = (widgetMap: Record<string, Widget>) => {
 };
 
 export const updateWidgetsRect = (
-  widgets: Widget[],
+  widgets: IWidget[],
   boardType: BoardType,
   layouts?: ReactGridLayout.Layout[],
 ) => {
@@ -422,10 +423,10 @@ export const updateWidgetsRect = (
 };
 
 export const updateAutoWidgetsRect = (
-  widgets: Widget[],
+  widgets: IWidget[],
   layouts: ReactGridLayout.Layout[],
-): Widget[] => {
-  const upDatedWidgets: Widget[] = [];
+): IWidget[] => {
+  const upDatedWidgets: IWidget[] = [];
   const dashWidgetRectYs = layouts.map(ele => ele.y);
   let widgetsCount = dashWidgetRectYs.length;
   let itemYs = [...dashWidgetRectYs];
@@ -448,8 +449,8 @@ export const updateAutoWidgetsRect = (
   return upDatedWidgets;
 };
 
-export const updateFreeWidgetsRect = (widgets: Widget[]) => {
-  const upDatedWidgets: Widget[] = [];
+export const updateFreeWidgetsRect = (widgets: IWidget[]) => {
+  const upDatedWidgets: IWidget[] = [];
   let diffValue = 0; // 避免完全重叠
   widgets.forEach(widget => {
     widget = produce(widget, draft => {
@@ -519,7 +520,7 @@ export const convertToWidgetMap = (widgets: Widget[]) => {
   }, {} as Record<string, Widget>);
 };
 
-export const createWidgetInfoMap = (widgets: Widget[]) => {
+export const createWidgetInfoMap = (widgets: IWidget[]) => {
   return widgets.reduce((acc, cur) => {
     acc[cur.id] = createWidgetInfo(cur.id);
     return acc;

@@ -179,7 +179,7 @@ const ControllerWidgetPanel: React.FC = memo(props => {
       });
     setRelatedWidgets(oldRelatedWidgetIds);
     setFormRelatedViews(setViewsRelatedView(oldRelatedWidgetIds));
-    const preRelatedViews = confContent.relatedViews.filter(t => t.viewId);
+    const preRelatedViews = confContent.relatedViews?.filter(t => t.viewId);
     form?.setFieldsValue({ relatedViews: preRelatedViews });
 
     const { config } = confContent;

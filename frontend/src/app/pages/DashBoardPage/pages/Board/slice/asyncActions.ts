@@ -193,7 +193,7 @@ export const resetControllerAction =
       dispatch(
         getWidgetData({
           boardId,
-          widget: widget,
+          widget: widget as any,
           renderMode,
           option: { pageInfo },
         }),
