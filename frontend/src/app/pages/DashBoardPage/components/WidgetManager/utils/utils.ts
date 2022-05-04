@@ -36,12 +36,16 @@ export const getLoopFetch = props => {
   };
 };
 export const getWidgetBackground = props => {
-  const background = getJsonConfigs(props, ['background'], ['background']);
+  const [background] = getJsonConfigs(
+    props,
+    ['backgroundGroup'],
+    ['background'],
+  );
   return background as unknown as BackgroundConfig;
 };
 export const getWidgetBorder = props => {
-  const background = getJsonConfigs(props, ['borderGroup'], ['border']);
-  return background as unknown as BorderConfig;
+  const [border] = getJsonConfigs(props, ['borderGroup'], ['border']);
+  return border as unknown as BorderConfig;
 };
 export const getWidgetPadding = props => {
   const [top, right, bottom, left] = getJsonConfigs(
