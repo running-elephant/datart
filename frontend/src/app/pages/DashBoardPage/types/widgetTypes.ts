@@ -5,6 +5,7 @@ import {
 } from 'app/types/ChartConfig';
 import {
   BoardType,
+  DataChart,
   RectConfig,
   Relation,
   WidgetType,
@@ -45,4 +46,30 @@ export interface IWidgetConf {
   mRect?: RectConfig;
   parentId?: string;
   children?: string[];
+}
+
+export interface WidgetToolkit {
+  create: (opt: {
+    dashboardId: string;
+    boardType: BoardType;
+    dataChartId: string;
+    dataChartConfig?: DataChart;
+    viewIds: string[];
+    widgetTypeId: string;
+  }) => IWidget;
+  edit?: () => void;
+  save?: () => void;
+  // lock?() {},
+  // unlock?() {},
+  // copy() {},
+  // paste() {},
+  // delete() {},
+  // changeTitle() {},
+  // getMeta() {},
+  // getWidgetName() {},
+  // //
+  // setLinkage() {},
+  // closeLinkage() {},
+  // setJump() {},
+  // closeJump() {},
 }

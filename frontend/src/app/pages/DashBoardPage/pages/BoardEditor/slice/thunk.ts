@@ -245,6 +245,7 @@ export const addDataChartWidgets = createAsyncThunk<
 
     const widgets = chartIds.map(dcId => {
       const dataChart = dataChartMap[dcId];
+
       const viewIds = dataChart.viewId ? [dataChart.viewId] : [];
       let widget = widgetManager.toolkit('linkChart').create({
         dashboardId: boardId,

@@ -15,10 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import type { WidgetToolkit } from '../../types/widgetTypes';
+
 export interface WidgetProto {
   id: string;
   meta: object;
-  toolkit: any;
+  toolkit: WidgetToolkit;
 }
 export class WidgetManager {
   private static _instance: WidgetManager;

@@ -20,6 +20,7 @@ import {
   BoardType,
   DataChart,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetToolkit } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { dataChartCreator, getMeta } from './config';
 
 export const linkChartMeta = getMeta({
@@ -61,7 +62,7 @@ export const linkChartToolkit = {
   closeLinkage() {},
   setJump() {},
   closeJump() {},
-};
+} as WidgetToolkit;
 
 const linkChartProto = {
   widgetTypeId: 'linkChart',
