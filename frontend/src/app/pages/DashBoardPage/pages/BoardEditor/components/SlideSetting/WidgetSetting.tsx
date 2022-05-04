@@ -17,112 +17,100 @@
  */
 import { Collapse, InputNumber } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { FC, memo, useContext } from 'react';
+import { IWidget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import throttle from 'lodash/throttle';
+import { FC, memo, useCallback, useContext, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
+import styled from 'styled-components/macro';
+import { RectConfig } from '../../../Board/slice/types';
+import { editBoardStackActions } from '../../slice';
 import { Group, SettingPanel } from './SettingPanel';
 import { WidgetConfigPanel } from './WidgetConfigPanel';
 
 const { Panel } = Collapse;
 export const WidgetSetting: FC = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
-  const { boardType } = useContext(BoardContext);
+  // const { boardType } = useContext(BoardContext);
+  const dispatch = useDispatch();
+  const widget = useContext(WidgetContext) as unknown as IWidget;
+  const { boardType } = widget.config;
+  const rect = useMemo(() => {
+    const rect = widget.config.rect;
+    return rect;
+  }, [widget]);
 
-  const widget = useContext(WidgetContext);
-
-  const { config } = widget;
-
-  // useEffect(() => {
-  //   cacheValue.current = {
-  //     name: config.name,
-  //     nameConfig: config.nameConfig,
-  //     backgroundColor: config.background.color,
-  //     backgroundImage: config.background.image,
-  //     border: config.border,
-  //     rect: config.rect,
-  //     autoUpdate: config.autoUpdate || false,
-  //     frequency: config.frequency || 60,
-  //     padding: config.padding,
-  //   };
-  //   form.setFieldsValue({ ...cacheValue.current });
-  // }, [config, form]);
-
-  // const onUpdate = useCallback(
-  //   (newValues, widget: Widget) => {
-  //     const value = { ...cacheValue.current, ...newValues };
-
-  //     value.border.color = getRGBAColor(value.border.color);
-  //     value.nameConfig = {
-  //       ...value.nameConfig,
-  //       color: getRGBAColor(value.nameConfig.color),
-  //     };
-  //     // value.nameConfig.color = getRGBAColor(value.nameConfig.color);
-
-  //     const nextConf = produce(widget.config, draft => {
-  //       draft.name = value.name;
-  //       draft.nameConfig = value.nameConfig;
-  //       draft.background.color = getRGBAColor(value.backgroundColor);
-  //       draft.background.image = value.backgroundImage;
-  //       draft.border = value.border;
-  //       draft.rect = value.rect;
-  //       draft.padding = value.padding;
-  //       draft.autoUpdate = value.autoUpdate;
-  //       draft.frequency = value.frequency;
-  //     });
-  //     onUpdateWidgetConfig(nextConf, widget.id);
-  //   },
-  //   [onUpdateWidgetConfig],
-  // );
-  // const throttledUpdate = useMemo(() => throttle(onUpdate, 1000), [onUpdate]);
+  const onUpdate = useCallback(
+    (newRect: RectConfig, wid: string) => {
+      dispatch(editBoardStackActions.updateWidgetRect({ wid, newRect }));
+    },
+    [dispatch],
+  );
+  const throttledUpdate = useMemo(() => throttle(onUpdate, 300), [onUpdate]);
+  const changeRect = useCallback(
+    (key: string, value) => {
+      const newRect = { ...rect!, [key]: value };
+      throttledUpdate(newRect, widget.id);
+    },
+    [rect, throttledUpdate, widget.id],
+  );
+  const changeX = useCallback(val => changeRect('x', val), [changeRect]);
+  const changeY = useCallback(val => changeRect('y', val), [changeRect]);
+  const changeW = useCallback(val => changeRect('width', val), [changeRect]);
+  const changeH = useCallback(val => changeRect('height', val), [changeRect]);
 
   return (
-    <SettingPanel title={`${t('widget')} ${t('setting')}`}>
+    <SettingPanel title={`${t('widget')}${t('setting')}`}>
       <>
         <Collapse className="datart-config-panel" ghost>
           {boardType === 'free' && (
             <>
               <Panel header={t('position')} key="position" forceRender>
                 <Group>
-                  {/* <NumberSet
-                  onChange={() => {}}
-                  label={t('xAxis') + ` (${t('px')})`}
-                  name={['rect', 'x']}
-                /> */}
-                  {/* <NumberSet
-                  onChange={() => {}}
-                  label={t('yAxis') + ` (${t('px')})`}
-                  name={['rect', 'y']}
-                /> */}
-                  <InputNumber
-                    className="datart-ant-input-number"
-                    onChange={() => {}}
-                  />
-                  <InputNumber
-                    className="datart-ant-input-number"
-                    onChange={() => {}}
-                  />
+                  <StyledFlex>
+                    <StyledPadding>
+                      <label>X</label>
+                      <InputNumber
+                        value={rect.x?.toFixed(1)}
+                        className="datart-ant-input-number"
+                        onChange={changeX}
+                      />
+                    </StyledPadding>
+                    <StyledFlex>
+                      <StyledPadding>
+                        <label>Y</label>
+                        <InputNumber
+                          value={rect.y?.toFixed(1)}
+                          className="datart-ant-input-number"
+                          onChange={changeY}
+                        />
+                      </StyledPadding>
+                    </StyledFlex>
+                  </StyledFlex>
                 </Group>
               </Panel>
               <Panel header={t('size')} key="size" forceRender>
                 <Group>
-                  <InputNumber
-                    className="datart-ant-input-number"
-                    onChange={() => {}}
-                  />
-                  <InputNumber
-                    className="datart-ant-input-number"
-                    onChange={() => {}}
-                  />
-                  {/* <NumberSet
-                  onChange={() => {}}
-                  label={t('width') + ` (${t('px')})`}
-                  name={['rect', 'width']}
-                />
-                <NumberSet
-                  onChange={() => {}}
-                  label={t('height') + ` (${t('px')})`}
-                  name={['rect', 'height']}
-                /> */}
+                  <StyledFlex>
+                    <StyledPadding>
+                      <label>W</label>
+                      <InputNumber
+                        value={rect.width?.toFixed(1)}
+                        className="datart-ant-input-number"
+                        onChange={changeW}
+                      />
+                    </StyledPadding>
+                    <StyledFlex>
+                      <StyledPadding>
+                        <label>H</label>
+                        <InputNumber
+                          value={rect.height?.toFixed(1)}
+                          className="datart-ant-input-number"
+                          onChange={changeH}
+                        />
+                      </StyledPadding>
+                    </StyledFlex>
+                  </StyledFlex>
                 </Group>
               </Panel>
             </>
@@ -135,3 +123,13 @@ export const WidgetSetting: FC = memo(() => {
 });
 
 export default WidgetSetting;
+const StyledFlex = styled.div`
+  display: flex;
+`;
+const StyledPadding = styled.div`
+  display: flex;
+  padding: 0 4px;
+  margin: 0 4px;
+  line-height: 30px;
+  background-color: ${p => p.theme.bodyBackground};
+`;

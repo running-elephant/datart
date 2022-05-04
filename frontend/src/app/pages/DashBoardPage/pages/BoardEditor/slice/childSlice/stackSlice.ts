@@ -23,6 +23,7 @@ import {
   Dashboard,
   DeviceType,
   MediaWidgetContent,
+  RectConfig,
   Widget,
   WidgetConf,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -155,6 +156,17 @@ export const editBoardStackSlice = createSlice({
             value: configItem,
           },
         );
+    },
+    updateWidgetRect(
+      state,
+      action: PayloadAction<{
+        wid: string;
+        newRect: RectConfig;
+      }>,
+    ) {
+      const { wid, newRect } = action.payload;
+      if (!state.widgetRecord[wid]) return;
+      state.widgetRecord[wid].config.rect = newRect;
     },
     updateWidgetConfig(
       state,

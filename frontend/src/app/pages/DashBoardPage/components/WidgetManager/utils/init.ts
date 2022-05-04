@@ -309,8 +309,8 @@ export const initAutoWidgetRect = (): RectConfig => ({
 export const initFreeWidgetRect = (): RectConfig => ({
   x: 0,
   y: 0,
-  width: 300,
-  height: 400,
+  width: 400,
+  height: 300,
 });
 
 export const widgetTpl = (): IWidget => {
