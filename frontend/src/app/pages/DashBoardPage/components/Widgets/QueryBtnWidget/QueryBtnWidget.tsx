@@ -25,7 +25,7 @@ import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { getWidgetBaseStyle } from '../../WidgetManager/utils';
+import { getWidgetBaseStyle } from '../../WidgetManager/utils/utils';
 import { QueryBtnWidgetCore } from './QueryBtnWidgetCore';
 
 export const QueryBtnWidget: React.FC<{}> = memo(() => {

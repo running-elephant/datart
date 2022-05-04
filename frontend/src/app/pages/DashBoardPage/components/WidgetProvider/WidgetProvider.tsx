@@ -60,7 +60,7 @@ export const WidgetProvider: FC<{
       // return adaptBoardImageWidget;
     }
     return widget;
-  }, [boardEditing, editWidget, readWidget, boardId]);
+  }, [boardEditing, editWidget, readWidget]);
 
   return widget ? <WProvider val={widget}>{children}</WProvider> : null;
 });

@@ -22,7 +22,7 @@ import {
   initLoopFetchTpl,
   initPaddingTpl,
   initTitleTpl,
-} from '../configs';
+} from '../../WidgetManager/utils/init';
 
 export const widgetTpl = () => {
   const tpl = {
@@ -39,7 +39,7 @@ export const widgetTpl = () => {
       widgetTypeId: '',
       lock: false,
       content: {} as any,
-      rect: { x: 0, y: 0, width: 2, height: 2 },
+      rect: { x: 0, y: 0, width: 0, height: 0 },
       JsonConfig: {
         props: [
           { ...initTitleTpl() },

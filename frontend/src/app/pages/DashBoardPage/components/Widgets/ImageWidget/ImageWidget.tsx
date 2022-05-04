@@ -26,7 +26,10 @@ import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar'
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { getWidgetBaseStyle, getWidgetTitle } from '../../WidgetManager/utils';
+import {
+  getWidgetBaseStyle,
+  getWidgetTitle,
+} from '../../WidgetManager/utils/utils';
 import { ImageWidgetCore } from './ImageWidgetCore';
 
 export const ImageWidget: React.FC<{ hideTitle: boolean }> = memo(

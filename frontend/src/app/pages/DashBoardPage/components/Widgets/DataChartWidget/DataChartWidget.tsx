@@ -25,7 +25,10 @@ import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { getWidgetBaseStyle, getWidgetTitle } from '../../WidgetManager/utils';
+import {
+  getWidgetBaseStyle,
+  getWidgetTitle,
+} from '../../WidgetManager/utils/utils';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { ToolBar } from './components/ToolBar';
 import { DataChartWidgetCore } from './DataChartWidgetCore';

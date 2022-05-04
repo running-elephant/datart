@@ -73,3 +73,11 @@ export interface WidgetToolkit {
   // setJump() {},
   // closeJump() {},
 }
+
+export interface WidgetMeta {
+  icon: any;
+  widgetTypeId: string;
+  viewAction: Record<string, { label: string; icon: any; key: string }>;
+  editAction: Record<string, { label: string; icon: any; key: string }>;
+  i18ns: ChartI18NSectionConfig[];
+}

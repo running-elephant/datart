@@ -20,7 +20,10 @@ import { darken, getLuminance, lighten } from 'polished';
 import { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
-import { getWidgetBaseStyle, getWidgetTitle } from '../../WidgetManager/utils';
+import {
+  getWidgetBaseStyle,
+  getWidgetTitle,
+} from '../../WidgetManager/utils/utils';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
 export const QueryBtnWidgetCore: React.FC<{}> = memo(() => {

@@ -26,7 +26,10 @@ import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar'
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
-import { getWidgetBaseStyle, getWidgetTitle } from '../../WidgetManager/utils';
+import {
+  getWidgetBaseStyle,
+  getWidgetTitle,
+} from '../../WidgetManager/utils/utils';
 import { TimerWidgetCore } from './TimerWidgetCore';
 
 export const TimerWidget: React.FC<{ hideTitle: boolean }> = memo(

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { DeleteOutlined } from '@ant-design/icons';
-import { Form, Upload } from 'antd';
+import { Upload } from 'antd';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { convertImageUrl } from 'app/pages/DashBoardPage/utils';
 import { memo, useCallback, useContext, useMemo } from 'react';
@@ -25,26 +25,6 @@ import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
 import { uploadBoardImage } from '../../../../slice/thunk';
 
-export interface ImageUploadProps {
-  filedName: string;
-  value: string;
-  label: string;
-  placeholder: string;
-}
-export const ImageUpload: React.FC<ImageUploadProps> = ({
-  filedName,
-  value,
-  label,
-  placeholder,
-}) => {
-  return (
-    <Wrapper>
-      <Form.Item name={filedName} label={label} preserve>
-        <UploadDragger value={value} placeholder={placeholder} />
-      </Form.Item>
-    </Wrapper>
-  );
-};
 export const UploadDragger: React.FC<{
   value: string;
   onChange?: any;
@@ -123,11 +103,6 @@ const StyleUpload = styled(Upload.Dragger)`
   .image {
     width: 100%;
     height: auto;
-  }
-`;
-const Wrapper = styled.div`
-  .ant-upload-list {
-    display: none;
   }
 `;
 

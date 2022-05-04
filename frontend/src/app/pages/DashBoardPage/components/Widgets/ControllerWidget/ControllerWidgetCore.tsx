@@ -34,7 +34,7 @@ import React, { memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
-import { getWidgetTitle } from '../../WidgetManager/utils';
+import { getWidgetTitle } from '../../WidgetManager/utils/utils';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { CheckboxGroupControllerForm } from './Controller/CheckboxGroupController';

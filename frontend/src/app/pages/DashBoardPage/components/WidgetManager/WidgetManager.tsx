@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-import type { WidgetToolkit } from '../../types/widgetTypes';
+import type { WidgetMeta, WidgetToolkit } from '../../types/widgetTypes';
 
 export interface WidgetProto {
   id: string;
-  meta: object;
+  meta: WidgetMeta;
   toolkit: WidgetToolkit;
 }
 export class WidgetManager {
@@ -41,7 +41,7 @@ export class WidgetManager {
     toolkit: WidgetProto['toolkit'];
   }) {
     if (this.widgetProtoMap[obj.widgetTypeId]) {
-      throw new Error(`Widget ${obj.widgetTypeId} already registered`);
+      console.warn(`Widget ${obj.widgetTypeId} already registered`);
     }
     this.widgetProtoMap[obj.widgetTypeId] = {
       id: obj.widgetTypeId,

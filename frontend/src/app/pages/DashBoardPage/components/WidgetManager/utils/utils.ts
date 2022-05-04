@@ -22,12 +22,12 @@ import {
   WidgetPadding,
   WidgetTitleConfig,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { getJsonConfigs } from '../../utils';
+import { getJsonConfigs } from '../../../utils';
 
 export const getLoopFetch = props => {
   const [enable, interval] = getJsonConfigs(
     props,
-    ['loopFetch'],
+    ['loopFetchGroup'],
     ['enable', 'interval'],
   );
   return {
@@ -46,7 +46,7 @@ export const getWidgetBorder = props => {
 export const getWidgetPadding = props => {
   const [top, right, bottom, left] = getJsonConfigs(
     props,
-    ['padding'],
+    ['paddingGroup'],
     ['top', 'right', 'bottom', 'left'],
   );
   return {
@@ -66,8 +66,8 @@ export const getWidgetBaseStyle = props => {
 export const getWidgetTitle = props => {
   const [text, showTitle, textAlign, font] = getJsonConfigs(
     props,
-    ['title'],
-    ['text', 'showTitle', 'textAlign', 'font'],
+    ['titleGroup'],
+    ['title', 'showTitle', 'textAlign', 'font'],
   );
   return {
     text,

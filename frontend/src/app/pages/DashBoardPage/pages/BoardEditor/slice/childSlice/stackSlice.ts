@@ -137,6 +137,25 @@ export const editBoardStackSlice = createSlice({
       const widget = action.payload;
       state.widgetRecord[widget.id] = widget;
     },
+    updateWidgetConfigByKey(
+      state,
+      action: PayloadAction<{
+        wid: string;
+        ancestors: number[];
+        configItem: ChartStyleConfig;
+      }>,
+    ) {
+      const { ancestors, configItem, wid } = action.payload;
+      if (!state.widgetRecord[wid]) return;
+      (state.widgetRecord[wid].config as any).jsonConfig.props =
+        updateCollectionByAction(
+          (state.widgetRecord[wid].config as any).jsonConfig.props || [],
+          {
+            ancestors: ancestors!,
+            value: configItem,
+          },
+        );
+    },
     updateWidgetConfig(
       state,
       action: PayloadAction<{ wid: string; config: WidgetConf }>,

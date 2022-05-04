@@ -18,7 +18,7 @@
 import { useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../components/ActionProvider/WidgetActionProvider';
 import { BoardInfoContext } from '../components/BoardProvider/BoardInfoProvider';
-import { getLoopFetch } from '../components/WidgetManager/utils';
+import { getLoopFetch } from '../components/WidgetManager/utils/utils';
 import { VizRenderMode } from '../pages/Board/slice/types';
 import { IWidget } from '../types/widgetTypes';
 import { isElView } from '../utils/board';

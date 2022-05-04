@@ -20,6 +20,7 @@ import {
   BoardType,
   DataChart,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetMeta } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
   initAutoWidgetRect,
   initFreeWidgetRect,
@@ -31,7 +32,7 @@ import {
   WidgetEditActionI18N,
   widgetTpl,
   WidgetViewActionI18N,
-} from '../configs';
+} from '../../WidgetManager/utils/init';
 
 export const getMeta = (opt: {
   icon: any;
@@ -45,7 +46,7 @@ export const getMeta = (opt: {
     widgetTypeId: string;
   };
 }) => {
-  const meta = {
+  const meta: WidgetMeta = {
     icon: opt.icon,
     widgetTypeId: opt.widgetTypeId,
     viewAction: {
@@ -90,14 +91,10 @@ export const getMeta = (opt: {
             closeJump: '关闭跳转',
           },
           title: TitleI18N.zh,
-          background: {
-            background: '背景',
-          },
+          background: { backgroundGroup: '背景' },
           padding: PaddingI18N.zh,
           loopFetch: LoopFetchI18N.zh,
-          border: {
-            border: '边框',
-          },
+          border: { borderGroup: '边框' },
         },
       },
       {
@@ -114,14 +111,10 @@ export const getMeta = (opt: {
             closeJump: 'Close Jump',
           },
           title: TitleI18N.en,
-          background: {
-            background: 'Background',
-          },
+          background: { backgroundGroup: 'Background' },
           padding: PaddingI18N.en,
           loopFetch: LoopFetchI18N.en,
-          border: {
-            border: 'Border',
-          },
+          border: { borderGroup: 'Border' },
         },
       },
     ],
@@ -146,9 +139,9 @@ export const dataChartCreator = (opt: {
   widget.config.type = 'chart';
   widget.config.selfConfig.dataChartConfig = opt.dataChartConfig;
   widget.config.jsonConfig.props?.forEach(ele => {
-    if (ele.key === 'title') {
+    if (ele.key === 'titleGroup') {
       ele.rows?.forEach(row => {
-        if (row.key === 'text') {
+        if (row.key === 'title') {
           row.value = opt.dataChartConfig.name || '';
         }
       });

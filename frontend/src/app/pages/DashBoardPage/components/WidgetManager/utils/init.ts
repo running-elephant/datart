@@ -28,13 +28,13 @@ import type { ChartStyleConfig } from 'app/types/ChartConfig';
 import { uuidv4 } from 'utils/utils';
 export const initTitleTpl = () => {
   const titleTpl: ChartStyleConfig = {
-    label: 'title.title',
-    key: 'title',
+    label: 'title.titleGroup',
+    key: 'titleGroup',
     comType: 'group',
     rows: [
       {
-        label: 'title.text',
-        key: 'text',
+        label: 'title.title',
+        key: 'title',
         value: '',
         comType: 'input',
       },
@@ -42,12 +42,6 @@ export const initTitleTpl = () => {
         label: 'title.showTitle',
         key: 'showTitle',
         value: true,
-        comType: 'switch',
-      },
-      {
-        label: 'title.textAlign',
-        key: 'textAlign',
-        value: 'left',
         comType: 'switch',
       },
       {
@@ -83,8 +77,8 @@ export const initTitleTpl = () => {
 };
 export const TitleI18N = {
   zh: {
-    title: '标题配置',
-    text: '标题',
+    titleGroup: '标题配置',
+    title: '标题',
     showTitle: '显示标题',
     font: '标题字体',
     textAlign: {
@@ -94,8 +88,8 @@ export const TitleI18N = {
     },
   },
   en: {
-    title: 'Title Config',
-    text: 'Title',
+    titleGroup: 'Title Config',
+    title: 'Title',
     showTitle: 'Show Title',
     font: 'Title Font',
     textAlign: {
@@ -107,8 +101,8 @@ export const TitleI18N = {
 };
 export const initPaddingTpl = () => {
   const paddingTpl: ChartStyleConfig = {
-    label: 'padding.padding',
-    key: 'padding',
+    label: 'padding.paddingGroup',
+    key: 'paddingGroup',
     comType: 'group',
     rows: [
       {
@@ -142,14 +136,14 @@ export const initPaddingTpl = () => {
 
 export const PaddingI18N = {
   zh: {
-    padding: '内边距',
+    paddingGroup: '内边距',
     top: '上',
     bottom: '下',
     left: '左',
     right: '右',
   },
   en: {
-    padding: 'Padding',
+    paddingGroup: 'Padding',
     top: 'Top',
     bottom: 'Bottom',
     left: 'Left',
@@ -158,8 +152,8 @@ export const PaddingI18N = {
 };
 export const initLoopFetchTpl = () => {
   const loopFetchTpl: ChartStyleConfig = {
-    label: 'loopFetch.loopFetch',
-    key: 'loopFetch',
+    label: 'loopFetch.loopFetchGroup',
+    key: 'loopFetchGroup',
     comType: 'group',
     rows: [
       {
@@ -181,20 +175,20 @@ export const initLoopFetchTpl = () => {
 
 export const LoopFetchI18N = {
   zh: {
-    loopFetch: '自动刷新数据',
+    loopFetchGroup: '自动刷新数据',
     enable: '启用',
-    interval: '间隔',
+    interval: '间隔(s)',
   },
   en: {
-    loopFetch: 'Loop Fetch',
+    loopFetchGroup: 'Loop Fetch',
     enable: 'Enable',
-    interval: 'Interval',
+    interval: 'Interval (s)',
   },
 };
 export const initBackgroundTpl = () => {
   const backgroundTpl: ChartStyleConfig = {
-    label: 'background.background',
-    key: 'background',
+    label: 'background.backgroundGroup',
+    key: 'backgroundGroup',
     comType: 'group',
     rows: [
       {
