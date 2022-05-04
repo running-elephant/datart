@@ -15,26 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Input } from 'antd';
+import { InputNumber, Select } from 'antd';
 import { ColorPickerPopover } from 'app/components/ColorPicker';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BackgroundConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { UploadDragger } from 'app/pages/DashBoardPage/pages/BoardEditor/components/SlideSetting/SettingItem/BasicSet/ImageUpload';
+import { BORDER_STYLES } from 'app/pages/DashBoardPage/constants';
+import { BorderConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useEffect, useRef } from 'react';
 import styled from 'styled-components/macro';
 import { Group, WithColorPicker } from '../../Basic/components/Group';
 import { ItemLayoutProps } from '../../types';
 
-export const Background: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
+export const WidgetBorder: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange, ...rest }) => {
     const { value, options } = data;
     const gt = useI18NPrefix(`viz.board.setting`);
-    const valRef = useRef<BackgroundConfig>();
+    const tLine = useI18NPrefix(`viz.lineOptions`);
+    const valRef = useRef<BorderConfig>();
     useEffect(() => {
       valRef.current = value;
     }, [value]);
-
     const handleChange = (obj: { key: string; val: string }) => {
       const newVal = {
         ...valRef.current,
@@ -42,40 +42,54 @@ export const Background: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       };
       onChange?.(ancestors, newVal);
     };
-    const onImageChange = imageUrl => {
-      handleChange({ key: 'image', val: imageUrl });
-    };
-    const onImageUrlChange = e => {
-      handleChange({ key: 'image', val: e.target.value });
-    };
-    const onColorChange = value => {
-      handleChange({ key: 'color', val: value });
-    };
+    const changeW = val => handleChange({ key: 'width', val });
+    const changeR = val => handleChange({ key: 'radius', val });
+    const changeC = val => handleChange({ key: 'color', val });
+    const changeS = val => handleChange({ key: 'style', val });
+
     return (
       <Wrap>
         <Group>
-          {gt('color')}
+          <label className="label">{gt('color')}</label>
           <WithColorPicker>
             <ColorPickerPopover
               {...rest}
               {...options}
               defaultValue={data.value?.color}
-              onSubmit={onColorChange}
+              onSubmit={changeC}
             />
           </WithColorPicker>
         </Group>
-        <span>{gt('image')}</span>
-        <UploadDragger
-          value={value.image as string}
-          onChange={onImageChange}
-          placeholder={gt('uploadTip')}
-        />
-        <div>URL</div>
-        <Input
-          className="datart-ant-input"
-          value={value.image}
-          onChange={onImageUrlChange}
-        />
+        <Group>
+          <label className="label">{gt('width')}</label>
+          <InputNumber
+            value={data.value?.width}
+            className="datart-ant-input-number"
+            onChange={changeW}
+          />
+        </Group>
+        <Group>
+          <label className="label">{gt('radius')}</label>
+          <InputNumber
+            value={data.value?.radius}
+            className="datart-ant-input-number"
+            onChange={changeR}
+          />
+        </Group>
+        <Group>
+          <label className="label">{gt('style')}</label>
+          <Select
+            className="datart-ant-select"
+            value={data.value?.style}
+            onChange={changeS}
+          >
+            {BORDER_STYLES.map(item => (
+              <Select.Option key={item} value={item}>
+                {tLine(item)}
+              </Select.Option>
+            ))}
+          </Select>
+        </Group>
       </Wrap>
     );
   },
@@ -84,5 +98,15 @@ const Wrap = styled.div`
   display: block;
   .ant-upload-list {
     display: none;
+  }
+  .label {
+    display: block;
+    width: 60px;
+  }
+  .datart-ant-select {
+    flex: 1;
+  }
+  .datart-ant-input-number {
+    flex: 1;
   }
 `;

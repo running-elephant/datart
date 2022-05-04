@@ -28,3 +28,4 @@ export { default as NameLocation } from './NameLocation';
 export { default as PivotSheetTheme } from './PivotSheetTheme';
 export { default as ScorecardConditionalStylePanel } from './ScorecardConditionalStyle';
 export { default as UnControlledTableHeaderPanel } from './UnControlledTableHeaderPanel';
+export { default as WidgetBorder } from './WidgetBorder';

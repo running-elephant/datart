@@ -225,9 +225,9 @@ export const initBorderTpl = () => {
           color: 'transparent', // TODO 根据当前主题色配置
           width: '0',
           style: 'solid',
-          radius: 'no-repeat',
+          radius: '0',
         },
-        comType: 'border',
+        comType: 'widgetBorder',
       },
     ],
   };

@@ -61,6 +61,7 @@ import {
   PivotSheetTheme,
   ScorecardConditionalStylePanel,
   UnControlledTableHeaderPanel,
+  WidgetBorder,
 } from '../Customize';
 import { FormGeneratorLayoutProps } from '../types';
 import { groupLayoutComparer, invokeDependencyWatcher } from '../utils';
@@ -192,6 +193,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <PivotSheetTheme {...props} />;
         case ChartStyleSectionComponentType.BACKGROUND:
           return <Background {...props} />;
+        case ChartStyleSectionComponentType.WIDGET_BORDER:
+          return <WidgetBorder {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }
