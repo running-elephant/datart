@@ -194,12 +194,6 @@ export const initBackgroundTpl = () => {
       {
         label: 'background.background',
         key: 'background',
-        default: {
-          color: 'transparent', // TODO 根据当前主题色配置
-          image: '',
-          size: '100% 100%',
-          repeat: 'no-repeat',
-        },
         value: {
           color: 'transparent', // TODO 根据当前主题色配置
           image: '',
