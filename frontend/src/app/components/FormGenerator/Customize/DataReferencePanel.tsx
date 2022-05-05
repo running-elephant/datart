@@ -415,6 +415,7 @@ const DataReferencePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           draft.rows?.map(tab => {
             tab.template = referencePanelConfig[0].template;
             tab.options = referencePanelConfig[0].options;
+            tab.comType = referencePanelConfig[0].comType;
             tab.rows = tab.rows?.map(panel => {
               const template = CloneValueDeep(referencePanelConfig[0].template);
               template.key = panel.key;
