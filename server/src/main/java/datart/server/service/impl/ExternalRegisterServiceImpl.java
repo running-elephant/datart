@@ -146,6 +146,6 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
     }
 
     private String getLdapUsernameAttr() {
-        return Application.getProperty("spring.ldap.username_attribute", "cn");
+        return Application.getProperty("spring.ldap.attribute-mapping.username", "cn");
     }
 }

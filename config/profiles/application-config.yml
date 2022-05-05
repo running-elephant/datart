@@ -37,7 +37,8 @@ spring:
 #   base: xxx
 #   username: {username}
 #   password: {password}
-#   username_attribute: cn # 自定义登录用户名对应属性名
+#   attribute-mapping:
+#     username: cn # 自定义登录用户名对应属性名
 
 # mail config
 
