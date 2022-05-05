@@ -41,7 +41,7 @@ export const initTitleTpl = () => {
       {
         label: 'title.showTitle',
         key: 'showTitle',
-        value: true,
+        value: false,
         comType: 'switch',
       },
       {
@@ -259,11 +259,6 @@ export const initWidgetEditActionTpl = () => {
       icon: 'copy',
       key: 'copy',
     },
-    paste: {
-      label: 'action.paste',
-      icon: 'paste',
-      key: 'paste',
-    },
     delete: {
       label: 'action.delete',
       icon: 'delete',
@@ -275,6 +270,11 @@ export const initWidgetEditActionTpl = () => {
       icon: 'lock',
       key: 'lock',
     },
+    unLock: {
+      label: 'action.unLock',
+      icon: 'unLock',
+      key: 'unLock',
+    },
   };
   return widgetEditActionTpl;
 };
@@ -285,12 +285,14 @@ export const WidgetEditActionI18N = {
     paste: '粘贴',
     delete: '删除',
     lock: '锁定',
+    unLock: '解锁',
   },
   en: {
     copy: 'Copy',
     paste: 'Paste',
     delete: 'Delete',
     lock: 'Lock',
+    unLock: 'UnLock',
   },
 };
 
@@ -322,19 +324,19 @@ export const widgetTpl = (): Widget => {
       type: '' as WidgetType,
       selfConfig: {} as any,
       widgetTypeId: '',
-      controllable: true,
-      linkable: true,
+      controllable: false,
+      linkable: false,
       // visible: true,
       lock: false,
       content: {} as any,
       rect: { x: 0, y: 0, width: 0, height: 0 },
       jsonConfig: {
         props: [
-          { ...initTitleTpl() },
-          { ...initLoopFetchTpl() },
-          { ...initPaddingTpl() },
-          { ...initBackgroundTpl() },
-          { ...initBorderTpl() },
+          // { ...initTitleTpl() },
+          // { ...initLoopFetchTpl() },
+          // { ...initPaddingTpl() },
+          // { ...initBackgroundTpl() },
+          // { ...initBorderTpl() },
         ],
       },
     },

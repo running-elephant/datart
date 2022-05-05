@@ -17,8 +17,16 @@
  */
 import linkChartProto from '../Widgets/DataChartWidget/linkChartConfig';
 import selfChartProto from '../Widgets/DataChartWidget/selfChartConfig';
+import tabProto from '../Widgets/TabWidget/TabConfig';
 import { widgetManager } from './WidgetManager';
 widgetManager.register(linkChartProto);
 widgetManager.register(selfChartProto);
+widgetManager.register(tabProto);
+// widgetManager.register(videoProto);
+// widgetManager.register(imageProto);
+// widgetManager.register(richTextProto);
+// widgetManager.register(iframeProto);
+// widgetManager.register(timerProto);
+// widgetManager.register(controllerProto);
 
 export default widgetManager;

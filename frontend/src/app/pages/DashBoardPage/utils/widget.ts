@@ -775,7 +775,7 @@ export const getWidgetMap = (
     .filter(w => w.parentId)
     .forEach(widget => {
       const parentWidgetId = widget.parentId!;
-      const childTabId = widget.config.tabId as string;
+      const childTabId = String(widget.config.index);
       const curItem = (
         widgetMap[parentWidgetId].config.content as ContainerWidgetContent
       ).itemMap[childTabId];
@@ -855,18 +855,15 @@ export const getWidgetMap = (
   widgetList
     .filter(w => (w as unknown as Widget).config.widgetTypeId === 'selfChart')
     .forEach(widget => {
-      debugger;
       let dataChart = (widget.config.content as any).dataChart as DataChart;
-      debugger;
+
       const self_dataChartId = `widget_${widget.dashboardId}_${widget.id}`;
       if (dataChart) {
         dataChart.id = self_dataChartId;
         wrappedDataCharts.push(dataChart!);
       }
       widget.datachartId = self_dataChartId;
-      debugger;
     });
-  debugger;
   return {
     widgetMap,
     wrappedDataCharts,

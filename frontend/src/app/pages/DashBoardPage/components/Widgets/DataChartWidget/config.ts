@@ -22,7 +22,12 @@ import {
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
   initAutoWidgetRect,
+  initBackgroundTpl,
+  initBorderTpl,
   initFreeWidgetRect,
+  initLoopFetchTpl,
+  initPaddingTpl,
+  initTitleTpl,
   initWidgetEditActionTpl,
   initWidgetViewActionTpl,
   LoopFetchI18N,
@@ -38,11 +43,11 @@ export const getMeta = (opt: {
   widgetTypeId: 'linkChart' | 'selfChart';
   zh: {
     desc: string;
-    widgetTypeId: string;
+    widgetType: string;
   };
   en: {
     desc: string;
-    widgetTypeId: string;
+    widgetType: string;
   };
 }) => {
   const meta: WidgetMeta = {
@@ -79,7 +84,7 @@ export const getMeta = (opt: {
         lang: 'zh-CN',
         translation: {
           desc: opt.zh.desc,
-          widgetTypeId: opt.zh.widgetTypeId,
+          widgetType: opt.zh.widgetType,
           action: {
             ...WidgetViewActionI18N.zh,
             ...WidgetEditActionI18N.zh,
@@ -100,7 +105,7 @@ export const getMeta = (opt: {
         lang: 'en-US',
         translation: {
           desc: opt.en.desc,
-          widgetTypeId: opt.en.widgetTypeId,
+          widgetType: opt.en.widgetType,
           action: {
             ...WidgetViewActionI18N.en,
             ...WidgetEditActionI18N.en,
@@ -127,16 +132,26 @@ export const dataChartCreator: WidgetToolkit['create'] = opt => {
   widget.dashboardId = opt.dashboardId || '';
   widget.datachartId = opt.datachartId || '';
   widget.viewIds = opt.viewIds || [];
-  widget.relations = opt.relations;
+  widget.relations = opt.relations || [];
   widget.config.widgetTypeId = opt.widgetTypeId;
   widget.config.type = 'chart';
-  widget.config.selfConfig.dataChart = opt.dataChart;
   widget.config.content.dataChart = opt.dataChart;
-  widget.config.jsonConfig.props?.forEach(ele => {
+
+  widget.config.jsonConfig.props = [
+    { ...initTitleTpl() },
+    { ...initLoopFetchTpl() },
+    { ...initPaddingTpl() },
+    { ...initBackgroundTpl() },
+    { ...initBorderTpl() },
+  ];
+  widget.config.jsonConfig.props.forEach(ele => {
     if (ele.key === 'titleGroup') {
       ele.rows?.forEach(row => {
         if (row.key === 'title') {
           row.value = opt?.dataChart?.name || '';
+        }
+        if (row.key === 'showTitle') {
+          row.value = true;
         }
       });
     }

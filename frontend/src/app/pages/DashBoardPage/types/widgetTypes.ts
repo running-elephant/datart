@@ -52,13 +52,13 @@ export interface WidgetConf {
 
 export interface WidgetToolkit {
   create: (opt: {
+    widgetTypeId: string;
     dashboardId: string;
     boardType?: BoardType;
-    datachartId: string;
-    relations: Relation[];
+    datachartId?: string;
+    relations?: Relation[];
     dataChart?: DataChart;
-    viewIds: string[];
-    widgetTypeId: string;
+    viewIds?: string[];
     parentId?: string;
   }) => Widget;
   edit?: () => void;

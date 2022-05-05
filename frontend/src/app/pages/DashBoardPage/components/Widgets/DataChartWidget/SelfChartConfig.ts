@@ -24,11 +24,11 @@ export const selfChartMeta = getMeta({
   widgetTypeId: 'selfChart',
   zh: {
     desc: '自建数据图表的内部是一个独立的数据图表 ',
-    widgetTypeId: '自建数据图表',
+    widgetType: '自建数据图表',
   },
   en: {
     desc: 'selfChart Widget core is a independent dataChart',
-    widgetTypeId: 'Link Chart',
+    widgetType: 'Link Chart',
   },
 });
 export type SelfChartToolkit = WidgetToolkit & {};

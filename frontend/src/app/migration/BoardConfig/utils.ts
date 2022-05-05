@@ -119,7 +119,6 @@ export const convertWidgetToBeta4 = (widget: WidgetBeta3) => {
     newWidget = commonConvert(newWidget, widget);
     newWidget.config.jumpConfig = widget.config.jumpConfig;
     newWidget.config.linkageConfig = widget.config.linkageConfig;
-    newWidget.config.selfConfig = widget.config.content;
     return newWidget;
   }
 };

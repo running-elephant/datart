@@ -19,8 +19,8 @@ import { ContainerOutlined } from '@ant-design/icons';
 import { Dropdown, Menu, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import { LightWidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
 import React, { useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { addWidgetsToEditBoard } from '../../../slice/thunk';
@@ -33,10 +33,13 @@ export const AddContainer: React.FC<{}> = () => {
   const onSelectContainerWidget = useCallback(
     ({ keyPath }) => {
       const [type] = keyPath;
-      const widget = widgetToolKit.container.create({
+      console.log('__ type', type);
+
+      let widget = widgetManager.toolkit('tab').create({
         dashboardId: boardId,
         boardType: boardType,
-        type: type,
+        relations: [],
+        widgetTypeId: 'tab',
       });
       dispatch(addWidgetsToEditBoard([widget] as any));
     },
