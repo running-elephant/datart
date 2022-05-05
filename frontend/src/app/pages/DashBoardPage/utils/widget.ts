@@ -528,13 +528,13 @@ export const createWidgetInfoMap = (widgets: IWidget[]) => {
 };
 
 export const convertWrapChartWidget = (params: {
-  widgetMap: Record<string, Widget>;
+  widgetMap: Record<string, IWidget>;
   dataChartMap: Record<string, DataChart>;
   viewMap: Record<string, ChartDataView>;
 }) => {
   const { widgetMap, dataChartMap } = params;
   const widgets = Object.values(widgetMap).map(widget => {
-    if (widget.config.content.type !== 'widgetChart') {
+    if (widget.config.widgetTypeId !== 'selfChart') {
       return widget;
     }
     // widgetChart wrapChartWidget
@@ -851,7 +851,7 @@ export const getWidgetMap = (
 
   // 处理 自有 chart widgetControl
   widgetList
-    .filter(w => w.config.content.type === 'widgetChart')
+    .filter(w => (w as unknown as IWidget).config.widgetTypeId === 'selfChart')
     .forEach(widget => {
       let content = widget.config.content as ChartWidgetContent;
       const self_dataChartId = `widget_${widget.dashboardId}_${widget.id}`;

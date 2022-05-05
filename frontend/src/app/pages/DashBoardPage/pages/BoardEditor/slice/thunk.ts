@@ -166,12 +166,12 @@ export const toUpdateDashboard = createAsyncThunk<
 
     const { dataChartMap, viewMap } = boardState.board;
     const widgets = convertWrapChartWidget({
-      widgetMap: widgetRecord,
+      widgetMap: widgetRecord as any,
       dataChartMap,
       viewMap,
     });
 
-    const group = createToSaveWidgetGroup(widgets, boardInfo.widgetIds);
+    const group = createToSaveWidgetGroup(widgets as any, boardInfo.widgetIds);
     const updateData: SaveDashboard = {
       ...dashBoard,
       config: JSON.stringify(dashBoard.config),
@@ -287,13 +287,14 @@ export const addWrapChartWidget = createAsyncThunk<
     const viewViews = view ? [view] : [];
     dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
-    let widget = widgetToolKit.chart.create({
+
+    let widget = widgetManager.toolkit('selfChart').create({
       dashboardId: boardId,
       boardType: boardType,
       dataChartId: chartId,
-      viewId: view?.id || '',
       dataChartConfig: dataChart,
-      subType: 'widgetChart',
+      viewIds: view?.id ? [view.id] : [],
+      widgetTypeId: 'selfChart',
     });
     dispatch(addWidgetsToEditBoard([widget]));
     dispatch(addVariablesToBoard(view?.variables));

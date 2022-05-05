@@ -43,7 +43,6 @@ import {
   VizRenderMode,
   Widget,
   WidgetConf,
-  WidgetContentChartType,
 } from '../../pages/Board/slice/types';
 import {
   editBoardStackActions,
@@ -207,14 +206,16 @@ export const WidgetActionProvider: FC<{
       },
 
       onEditChartWidget: (widget: Widget) => {
-        const chartType = widget.config.content.type;
+        const widgetTypeId = (widget as any).config.widgetTypeId;
+        const chartType =
+          widgetTypeId === 'selfChart' ? 'widgetChart' : 'dataChart';
         dispatch(
           editChartInWidgetAction({
             orgId,
             widgetId: widget.id,
             chartName: widget.config.name,
             dataChartId: widget.datachartId,
-            chartType: chartType as WidgetContentChartType,
+            chartType: chartType,
           }),
         );
       },

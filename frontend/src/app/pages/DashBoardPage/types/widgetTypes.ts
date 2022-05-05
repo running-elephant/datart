@@ -6,6 +6,8 @@ import {
 import {
   BoardType,
   DataChart,
+  JumpConfig,
+  LinkageConfig,
   RectConfig,
   Relation,
   WidgetType,
@@ -37,15 +39,15 @@ export interface IWidgetConf {
   linkable: boolean; // 是否可以关联其他 widget
   // visible: boolean; // 是否可见 TODO: 后续考虑
   jsonConfig: JsonConfig;
-  content: any;
-  // linkageConfig?: LinkageConfig;
-  // jumpConfig?: JumpConfig;
+  content?: any;
 
   selfConfig: any;
   rect: RectConfig;
   mRect?: RectConfig;
   parentId?: string;
   children?: string[];
+  linkageConfig?: LinkageConfig; //联动设置 TODO: in selfConfig
+  jumpConfig?: JumpConfig; // 跳转 设置 TODO: in selfConfig
 }
 
 export interface WidgetToolkit {

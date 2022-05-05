@@ -138,6 +138,7 @@ export const dataChartCreator = (opt: {
   widget.config.boardType = opt.boardType;
   widget.config.type = 'chart';
   widget.config.selfConfig.dataChartConfig = opt.dataChartConfig;
+
   widget.config.jsonConfig.props?.forEach(ele => {
     if (ele.key === 'titleGroup') {
       ele.rows?.forEach(row => {
