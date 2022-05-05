@@ -21,7 +21,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   BoardType,
   ControllerWidgetContent,
-  Widget,
+  WidgetBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import React, { memo, useMemo } from 'react';
@@ -66,7 +66,7 @@ export interface RelatedViewFormProps {
   controllerType: ControllerFacadeTypes;
   form: FormInstance<ControllerWidgetContent> | undefined;
   viewMap: Record<string, ChartDataView>;
-  otherStrFilterWidgets: Widget[];
+  otherStrFilterWidgets: WidgetBeta3[];
   boardType: BoardType;
 }
 

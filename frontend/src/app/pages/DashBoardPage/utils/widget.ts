@@ -56,8 +56,8 @@ import {
   Relation,
   ServerRelation,
   ServerWidget,
-  Widget,
-  WidgetConf,
+  WidgetBeta3,
+  WidgetConfBeta3,
   WidgetContent,
   WidgetContentChartType,
   WidgetInfo,
@@ -66,7 +66,7 @@ import {
 import { StrControlTypes } from '../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { ControllerConfig } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { BtnActionParams } from '../pages/BoardEditor/slice/actions/controlActions';
-import { IWidget } from '../types/widgetTypes';
+import { Widget } from '../types/widgetTypes';
 
 export const VALUE_SPLITTER = '###';
 
@@ -104,7 +104,7 @@ export const createControllerWidget = (opt: {
   });
 
   const widgetId = relations[0]?.sourceId || uuidv4();
-  const widget: Widget = createWidget({
+  const widget: WidgetBeta3 = createWidget({
     id: widgetId,
     dashboardId: boardId,
     config: widgetConf,
@@ -123,7 +123,7 @@ export const createMediaWidget = (opt: {
     content: content,
     boardType: opt.boardType,
   });
-  const widget: Widget = createWidget({
+  const widget: WidgetBeta3 = createWidget({
     dashboardId: opt.dashboardId,
     config: widgetConf,
   });
@@ -140,7 +140,7 @@ export const createContainerWidget = (opt: {
     content: content,
     boardType: opt.boardType,
   });
-  const widget: Widget = createWidget({
+  const widget: WidgetBeta3 = createWidget({
     dashboardId: opt.dashboardId,
     config: widgetConf,
   });
@@ -154,7 +154,7 @@ export const createControlBtn = (opt: BtnActionParams) => {
     content: content,
     boardType: opt.boardType,
   });
-  const widget: Widget = createWidget({
+  const widget: WidgetBeta3 = createWidget({
     dashboardId: opt.boardId,
     config: widgetConf,
   });
@@ -168,7 +168,7 @@ export const createInitWidgetConfig = (opt: {
   name?: string;
   autoUpdate?: boolean;
   frequency?: number;
-}): WidgetConf => {
+}): WidgetConfBeta3 => {
   return {
     version: '',
     type: opt.type,
@@ -203,14 +203,14 @@ export const createInitWidgetConfig = (opt: {
 };
 export const createWidget = (option: {
   dashboardId: string;
-  config: WidgetConf;
+  config: WidgetConfBeta3;
   datachartId?: string;
   id?: string;
   viewIds?: string[];
   parentId?: string;
   relations?: Relation[];
 }) => {
-  const widget: Widget = {
+  const widget: WidgetBeta3 = {
     id: option.id || 'newWidget_' + uuidv4(),
     dashboardId: option.dashboardId,
     config: option.config,
@@ -401,7 +401,9 @@ export const createMediaContent = (type: MediaWidgetType) => {
   return content;
 };
 
-export const getWidgetInfoMapByServer = (widgetMap: Record<string, Widget>) => {
+export const getWidgetInfoMapByServer = (
+  widgetMap: Record<string, WidgetBeta3>,
+) => {
   const widgetInfoMap = {};
   Object.values(widgetMap).forEach(item => {
     widgetInfoMap[item.id] = createWidgetInfo(item.id);
@@ -410,7 +412,7 @@ export const getWidgetInfoMapByServer = (widgetMap: Record<string, Widget>) => {
 };
 
 export const updateWidgetsRect = (
-  widgets: IWidget[],
+  widgets: Widget[],
   boardType: BoardType,
   layouts?: ReactGridLayout.Layout[],
 ) => {
@@ -423,10 +425,10 @@ export const updateWidgetsRect = (
 };
 
 export const updateAutoWidgetsRect = (
-  widgets: IWidget[],
+  widgets: Widget[],
   layouts: ReactGridLayout.Layout[],
-): IWidget[] => {
-  const upDatedWidgets: IWidget[] = [];
+): Widget[] => {
+  const upDatedWidgets: Widget[] = [];
   const dashWidgetRectYs = layouts.map(ele => ele.y);
   let widgetsCount = dashWidgetRectYs.length;
   let itemYs = [...dashWidgetRectYs];
@@ -449,8 +451,8 @@ export const updateAutoWidgetsRect = (
   return upDatedWidgets;
 };
 
-export const updateFreeWidgetsRect = (widgets: IWidget[]) => {
-  const upDatedWidgets: IWidget[] = [];
+export const updateFreeWidgetsRect = (widgets: Widget[]) => {
+  const upDatedWidgets: Widget[] = [];
   let diffValue = 0; // 避免完全重叠
   widgets.forEach(widget => {
     widget = produce(widget, draft => {
@@ -469,7 +471,7 @@ export const updateFreeWidgetsRect = (widgets: IWidget[]) => {
  * @description ''
  */
 export const createToSaveWidgetGroup = (
-  widgets: Widget[],
+  widgets: WidgetBeta3[],
   widgetIds: string[],
 ) => {
   const curWidgetIds = widgets.map(widget => widget.id);
@@ -497,7 +499,7 @@ export const createToSaveWidgetGroup = (
   };
 };
 
-export const convertWidgetToSave = (widget: Widget): ServerWidget => {
+export const convertWidgetToSave = (widget: WidgetBeta3): ServerWidget => {
   return {
     ...widget,
     config: JSON.stringify(widget.config),
@@ -513,14 +515,14 @@ export const convertWidgetRelationsToSave = (
   });
 };
 
-export const convertToWidgetMap = (widgets: Widget[]) => {
+export const convertToWidgetMap = (widgets: WidgetBeta3[]) => {
   return widgets.reduce((acc, cur) => {
     acc[cur.id] = cur;
     return acc;
-  }, {} as Record<string, Widget>);
+  }, {} as Record<string, WidgetBeta3>);
 };
 
-export const createWidgetInfoMap = (widgets: IWidget[]) => {
+export const createWidgetInfoMap = (widgets: Widget[]) => {
   return widgets.reduce((acc, cur) => {
     acc[cur.id] = createWidgetInfo(cur.id);
     return acc;
@@ -528,7 +530,7 @@ export const createWidgetInfoMap = (widgets: IWidget[]) => {
 };
 
 export const convertWrapChartWidget = (params: {
-  widgetMap: Record<string, IWidget>;
+  widgetMap: Record<string, Widget>;
   dataChartMap: Record<string, DataChart>;
   viewMap: Record<string, ChartDataView>;
 }) => {
@@ -552,17 +554,17 @@ export const convertWrapChartWidget = (params: {
  * @param ''
  * @description 'get all filter widget of board'
  */
-export const getAllControlWidget = (widgetMap: Record<string, Widget>) => {
+export const getAllControlWidget = (widgetMap: Record<string, WidgetBeta3>) => {
   const controlWidgetMap = Object.values(widgetMap)
     .filter(widget => widget.config.type === 'controller')
     .reduce((acc, cur) => {
       acc[cur.id] = cur;
       return acc;
-    }, {} as Record<string, Widget>);
+    }, {} as Record<string, WidgetBeta3>);
   return controlWidgetMap;
 };
 export const getOtherStringControlWidgets = (
-  allWidgets: Widget[],
+  allWidgets: WidgetBeta3[],
   widgetId: string | undefined,
 ) => {
   const allFilterWidgets = allWidgets.filter(ele => {
@@ -584,7 +586,7 @@ export const getOtherStringControlWidgets = (
  * @description 'get showing controller by all filterWidget of board'
  */
 export const getVisibleControlWidgetIds = (
-  controlWidgetMap: Record<string, Widget>,
+  controlWidgetMap: Record<string, WidgetBeta3>,
 ) => {
   const widgets = Object.values(controlWidgetMap);
   const visibleWidgets = getNoHiddenControllers(widgets);
@@ -596,13 +598,13 @@ export const getVisibleControlWidgetIds = (
   };
 };
 
-export const getLayoutWidgets = (widgetMap: Record<string, Widget>) => {
+export const getLayoutWidgets = (widgetMap: Record<string, WidgetBeta3>) => {
   const noSubWidgets = Object.values(widgetMap).filter(w => !w.parentId);
   const layoutWidgets = getNoHiddenControllers(noSubWidgets);
   return layoutWidgets;
 };
 
-export const getNoHiddenControllers = (widgets: Widget[]) => {
+export const getNoHiddenControllers = (widgets: WidgetBeta3[]) => {
   const noHiddenControlWidgets = widgets.filter(w => {
     if (w.config.type !== 'controller') {
       return true;
@@ -646,14 +648,14 @@ export const getNoHiddenControllers = (widgets: Widget[]) => {
   return noHiddenControlWidgets;
 };
 
-export const getNeedRefreshWidgetsByController = (controller: Widget) => {
+export const getNeedRefreshWidgetsByController = (controller: WidgetBeta3) => {
   const relations = controller.relations;
   const widgetIds = relations
     .filter(ele => ele.config.type === 'controlToWidget')
     .map(ele => ele.targetId);
   return widgetIds;
 };
-export const getCascadeControllers = (controller: Widget) => {
+export const getCascadeControllers = (controller: WidgetBeta3) => {
   const relations = controller.relations;
   const ids = relations
     .filter(ele => ele.config.type === 'controlToControlCascade')
@@ -661,7 +663,7 @@ export const getCascadeControllers = (controller: Widget) => {
   return ids;
 };
 
-export const getFreeWidgetStyle = (widget: Widget) => {
+export const getFreeWidgetStyle = (widget: WidgetBeta3) => {
   const widgetConf = widget.config;
   const rect = widgetConf.rect;
   let widgetStyle: CSSProperties = {
@@ -729,7 +731,7 @@ export const getWidgetSomeStyle = (opt: {
 
 export const getLinkedColumn = (
   targetWidgetId: string,
-  triggerWidget: Widget,
+  triggerWidget: WidgetBeta3,
 ) => {
   const relations = triggerWidget.relations;
   const relation = relations.find(item => item.targetId === targetWidgetId);
@@ -743,7 +745,7 @@ export const getLinkedColumn = (
 
 // TODO chart widget
 export const getWidgetMap = (
-  widgets: Widget[],
+  widgets: WidgetBeta3[],
   dataCharts: DataChart[],
   filterSearchParamsMap?: FilterSearchParamsWithMatch,
 ) => {
@@ -762,10 +764,10 @@ export const getWidgetMap = (
       viewIds,
     };
     return acc;
-  }, {} as Record<string, Widget>);
+  }, {} as Record<string, WidgetBeta3>);
 
   const wrappedDataCharts: DataChart[] = [];
-  const controllerWidgets: Widget[] = []; // use for reset button
+  const controllerWidgets: WidgetBeta3[] = []; // use for reset button
   const widgetList = Object.values(widgetMap);
 
   // 处理 widget包含关系 containerWidget 被包含的 widget.parentId 不为空
@@ -851,7 +853,7 @@ export const getWidgetMap = (
 
   // 处理 自有 chart widgetControl
   widgetList
-    .filter(w => (w as unknown as IWidget).config.widgetTypeId === 'selfChart')
+    .filter(w => (w as unknown as Widget).config.widgetTypeId === 'selfChart')
     .forEach(widget => {
       let content = widget.config.content as ChartWidgetContent;
       const self_dataChartId = `widget_${widget.dashboardId}_${widget.id}`;

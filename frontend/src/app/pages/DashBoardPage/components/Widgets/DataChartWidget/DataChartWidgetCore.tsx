@@ -24,7 +24,7 @@ import { migrateChartConfig } from 'app/migration';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
-import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetBeta3 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
@@ -77,7 +77,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const { onWidgetChartClick, onWidgetGetData, onWidgetDataUpdate } =
     useContext(WidgetActionContext);
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
-  const widgetRef = useRef<Widget>(widget);
+  const widgetRef = useRef<WidgetBeta3>(widget);
   const drillOptionRef = useRef<IChartDrillOption>();
   useEffect(() => {
     widgetRef.current = widget;

@@ -20,7 +20,7 @@ import {
   BoardType,
   ContainerWidgetType,
   MediaWidgetType,
-  Widget,
+  WidgetBeta3,
   WidgetType,
 } from './../../pages/Board/slice/types';
 import { createMediaWidget } from './../widget';
@@ -31,7 +31,7 @@ export interface CreateParamsType {
   [key: string]: any;
 }
 export interface WidgetToolKit {
-  create: (option) => Widget;
+  create: (option) => WidgetBeta3;
 }
 export const widgetToolKit = {
   chart: chartWidgetToolKit,

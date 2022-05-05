@@ -24,10 +24,10 @@ import {
   DeviceType,
   MediaWidgetContent,
   RectConfig,
-  Widget,
-  WidgetConf,
+  WidgetBeta3,
+  WidgetConfBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { IWidget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { updateCollectionByAction } from 'app/utils/mutation';
@@ -38,7 +38,7 @@ import { EditBoardStack } from '../types';
 
 export type updateWidgetConf = {
   id: string;
-  config: WidgetConf;
+  config: WidgetConfBeta3;
 };
 export const initEditBoardState: EditBoardStack = {
   dashBoard: {} as Dashboard,
@@ -89,7 +89,7 @@ export const editBoardStackSlice = createSlice({
     },
 
     // Widget
-    addWidgets(state, action: PayloadAction<IWidget[]>) {
+    addWidgets(state, action: PayloadAction<Widget[]>) {
       const widgets = action.payload;
       let maxWidgetIndex = state.dashBoard.config.maxWidgetIndex || 0;
       widgets.forEach(ele => {
@@ -134,7 +134,7 @@ export const editBoardStackSlice = createSlice({
         delete state.widgetRecord[id];
       });
     },
-    updateWidget(state, action: PayloadAction<Widget>) {
+    updateWidget(state, action: PayloadAction<WidgetBeta3>) {
       const widget = action.payload;
       state.widgetRecord[widget.id] = widget;
     },
@@ -170,7 +170,7 @@ export const editBoardStackSlice = createSlice({
     },
     updateWidgetConfig(
       state,
-      action: PayloadAction<{ wid: string; config: WidgetConf }>,
+      action: PayloadAction<{ wid: string; config: WidgetConfBeta3 }>,
     ) {
       const { wid, config } = action.payload;
       state.widgetRecord[wid].config = config;

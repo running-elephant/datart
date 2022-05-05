@@ -19,7 +19,7 @@ import { LinkOutlined } from '@ant-design/icons';
 import { Divider, Empty, Form, FormInstance, Select } from 'antd';
 import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetBeta3 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import React, { memo, useCallback } from 'react';
@@ -35,7 +35,7 @@ export interface ViewLinkageItem {
   linkerName: string;
 }
 export interface LinkageFieldsProps {
-  curWidget: Widget;
+  curWidget: WidgetBeta3;
   viewMap: Record<string, ChartDataView>;
   form: FormInstance<any> | undefined;
   chartGroupColumns?: ChartDataSectionField[];

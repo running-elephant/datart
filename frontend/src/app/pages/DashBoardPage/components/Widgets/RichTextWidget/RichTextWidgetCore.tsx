@@ -23,7 +23,7 @@ import {
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   MediaWidgetContent,
-  Widget,
+  WidgetBeta3,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editBoardStackActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
@@ -58,7 +58,7 @@ const CUSTOM_COLOR_INIT = {
 };
 
 type RichTextWidgetProps = {
-  widget: Widget;
+  widget: WidgetBeta3;
   widgetInfo: WidgetInfo;
   boardEditing: boolean;
 };

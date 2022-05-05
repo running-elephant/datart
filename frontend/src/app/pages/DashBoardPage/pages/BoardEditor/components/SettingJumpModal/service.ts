@@ -1,5 +1,5 @@
 import { ChartDataSectionType, DataViewFieldType } from 'app/constants';
-import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetBeta3 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { VizType } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { getColumnRenderName } from 'app/utils/chartHelper';
@@ -12,7 +12,7 @@ const computedDashboardControllers = (data): ControlOptionItem[] => {
   widgets.forEach(item => {
     item.config = item.config ? JSON.parse(item.config) : undefined;
   });
-  const filterWidgets = widgets.filter((v: Widget) => {
+  const filterWidgets = widgets.filter((v: WidgetBeta3) => {
     const _isFilter = v?.config?.type === 'controller';
     // TODO fix about jump xld
     // isDateOrStr = FILTER_MENU.includes(v?.config?.content?.fieldValueType);

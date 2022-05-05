@@ -20,7 +20,7 @@ import { Form } from 'antd';
 import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
 import {
   ControllerWidgetContent,
-  Widget,
+  WidgetBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ControllerConfig,
@@ -62,7 +62,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   } = useContext(WidgetDataContext);
 
   const refreshLinkedWidgets = useCallback(
-    (widget: Widget) => {
+    (widget: WidgetBeta3) => {
       if (hasQueryControl) return;
       onRefreshWidgetsByController(widget);
     },
@@ -131,7 +131,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
       return;
     }
     const _values = values ? (Array.isArray(values) ? values : [values]) : [];
-    const nextWidget = produce(widget as Widget, draft => {
+    const nextWidget = produce(widget as WidgetBeta3, draft => {
       (
         draft.config.content as ControllerWidgetContent
       ).config.controllerValues = _values;
@@ -166,7 +166,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           exactValue: timeValues?.[1],
         },
       };
-      const nextWidget = produce(widget as Widget, draft => {
+      const nextWidget = produce(widget as WidgetBeta3, draft => {
         (
           draft.config.content as ControllerWidgetContent
         ).config.controllerDate = nextFilterDate;
@@ -186,7 +186,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           exactValue: value,
         },
       };
-      const nextWidget = produce(widget as Widget, draft => {
+      const nextWidget = produce(widget as WidgetBeta3, draft => {
         (
           draft.config.content as ControllerWidgetContent
         ).config.controllerDate = nextFilterDate;

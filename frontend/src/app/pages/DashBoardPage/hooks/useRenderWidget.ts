@@ -21,11 +21,11 @@ import { WidgetActionContext } from '../components/ActionProvider/WidgetActionPr
 import { BoardConfigValContext } from '../components/BoardProvider/BoardConfigProvider';
 import { BoardType, VizRenderMode } from '../pages/Board/slice/types';
 import { boardScroll } from '../pages/BoardEditor/slice/events';
-import { IWidget } from '../types/widgetTypes';
+import { Widget } from '../types/widgetTypes';
 import { isElView } from '../utils/board';
 
 export default function useRenderWidget(
-  widget: IWidget,
+  widget: Widget,
   renderMode: VizRenderMode,
   boardType: BoardType,
   rendered: boolean,

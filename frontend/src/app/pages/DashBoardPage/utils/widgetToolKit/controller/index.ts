@@ -23,7 +23,7 @@ import {
   RelatedView,
   Relation,
   RelationConfigType,
-  Widget,
+  WidgetBeta3,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { RelatedWidgetItem } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/RelatedWidgets';
@@ -65,7 +65,7 @@ export const createControllerWidget = (opt: {
   });
 
   const widgetId = relations[0]?.sourceId || uuidv4();
-  const widget: Widget = createWidget({
+  const widget: WidgetBeta3 = createWidget({
     id: widgetId,
     dashboardId: boardId,
     config: widgetConf,
@@ -85,7 +85,7 @@ export const getViewIdsInControlConfig = (
     return [];
   }
 };
-export const getCanLinkControlWidgets = (widgets: Widget[]) => {
+export const getCanLinkControlWidgets = (widgets: WidgetBeta3[]) => {
   const CanLinkControllerWidgetTypes: WidgetType[] = ['chart', 'controller'];
 
   const canLinkWidgets = widgets.filter(widget => {
@@ -103,7 +103,7 @@ export const getCanLinkControlWidgets = (widgets: Widget[]) => {
 const makeControlRelations = (obj: {
   sourceId: string | undefined;
   relatedWidgets: RelatedWidgetItem[];
-  widgetMap: Record<string, Widget>;
+  widgetMap: Record<string, WidgetBeta3>;
   config: ControllerConfig;
 }) => {
   const sourceId = obj.sourceId || uuidv4();
@@ -111,8 +111,8 @@ const makeControlRelations = (obj: {
   const trimRelatedWidgets = relatedWidgets.filter(relatedWidgetItem => {
     return widgetMap[relatedWidgetItem.widgetId];
   });
-  let chartWidgets: Widget[] = [];
-  let controllerWidgets: Widget[] = [];
+  let chartWidgets: WidgetBeta3[] = [];
+  let controllerWidgets: WidgetBeta3[] = [];
   trimRelatedWidgets.forEach(relatedWidgetItem => {
     let widget = widgetMap[relatedWidgetItem.widgetId];
     if (!widget) return false;

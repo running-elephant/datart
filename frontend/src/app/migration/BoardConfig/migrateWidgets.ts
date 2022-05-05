@@ -20,9 +20,9 @@ import {
   Relation,
   ServerRelation,
   ServerWidget,
-  Widget,
+  WidgetBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { IWidget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
   FontDefault,
   VALUE_SPLITTER,
@@ -33,6 +33,7 @@ import {
   APP_VERSION_BETA_2,
   APP_VERSION_BETA_4,
 } from './../constants';
+import { convertWidgetToBeta4 } from './utils';
 
 /**
  *
@@ -60,10 +61,10 @@ export const convertWidgetRelationsToObj = (
 /**
  *
  * migrate beta0
- * @param {Widget} [widget]
+ * @param {WidgetBeta3} [widget]
  * @return {*}
  */
-export const beta0 = (widget?: Widget) => {
+export const beta0 = (widget?: WidgetBeta3) => {
   if (!widget) return undefined;
   if (!versionCanDo(APP_VERSION_BETA_0, widget?.config.version)) return widget;
 
@@ -90,7 +91,7 @@ export const beta0 = (widget?: Widget) => {
   return widget;
 };
 
-export const beta2 = (widget?: Widget) => {
+export const beta2 = (widget?: WidgetBeta3) => {
   if (!widget) return undefined;
   if (!versionCanDo(APP_VERSION_BETA_2, widget?.config.version)) return widget;
   // widget.lock
@@ -101,15 +102,18 @@ export const beta2 = (widget?: Widget) => {
   return widget;
 };
 
-export const beta4 = (widget?: IWidget | Widget) => {
+export const beta4 = (widget?: Widget | WidgetBeta3) => {
   if (!widget) return undefined;
-  if (!versionCanDo(APP_VERSION_BETA_4, widget?.config.version)) return widget;
+  if (!versionCanDo(APP_VERSION_BETA_4, widget?.config.version))
+    return widget as Widget;
   if (widget.config.version !== APP_VERSION_BETA_4) {
   } else {
+    let newWidget = convertWidgetToBeta4(widget as WidgetBeta3);
+    return newWidget;
   }
   return widget;
 };
-const finaleWidget = (widget?: Widget) => {
+const finaleWidget = (widget?: WidgetBeta3) => {
   if (!widget) return undefined;
   widget.config = setLatestVersion(widget.config);
   return widget;
@@ -123,7 +127,7 @@ export const parseServerWidget = (sWidget: ServerWidget) => {
   sWidget.relations = convertWidgetRelationsToObj(
     sWidget.relations,
   ) as unknown as ServerRelation[];
-  return sWidget as unknown as Widget;
+  return sWidget as unknown as WidgetBeta3;
 };
 /**
  *
@@ -150,5 +154,5 @@ export const migrateWidgets = (widgets: ServerWidget[]) => {
       return beta4Widget;
     })
     .filter(widget => !!widget);
-  return targetWidgets as Widget[];
+  return targetWidgets as WidgetBeta3[];
 };

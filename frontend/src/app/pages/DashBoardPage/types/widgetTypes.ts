@@ -13,13 +13,13 @@ import {
   WidgetType,
 } from '../pages/Board/slice/types';
 
-export interface IWidget {
+export interface Widget {
   id: string;
   dashboardId: string;
   datachartId: string;
   relations: Relation[];
   viewIds: string[];
-  config: IWidgetConf;
+  config: WidgetConf;
   parentId?: string;
 }
 export type JsonConfig = {
@@ -28,7 +28,7 @@ export type JsonConfig = {
   settings?: ChartStyleConfig[];
   i18ns?: ChartI18NSectionConfig[];
 };
-export interface IWidgetConf {
+export interface WidgetConf {
   version: string;
   boardType: BoardType;
   index: number;
@@ -58,7 +58,7 @@ export interface WidgetToolkit {
     dataChartConfig?: DataChart;
     viewIds: string[];
     widgetTypeId: string;
-  }) => IWidget;
+  }) => Widget;
   edit?: () => void;
   save?: () => void;
   // lock?() {},

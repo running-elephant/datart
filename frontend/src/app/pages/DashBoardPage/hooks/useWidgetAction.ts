@@ -18,7 +18,7 @@
 import { useCallback, useContext } from 'react';
 import { WidgetActionContext } from '../components/ActionProvider/WidgetActionProvider';
 import { widgetActionType } from '../components/WidgetComponents/config';
-import { Widget } from '../pages/Board/slice/types';
+import { WidgetBeta3 } from '../pages/Board/slice/types';
 
 export default function useWidgetAction() {
   const {
@@ -38,7 +38,7 @@ export default function useWidgetAction() {
   } = useContext(WidgetActionContext);
 
   const onWidgetEdit = useCallback(
-    (widget: Widget) => {
+    (widget: WidgetBeta3) => {
       const type = widget.config.type;
       switch (type) {
         case 'chart':
@@ -60,42 +60,45 @@ export default function useWidgetAction() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
-  const widgetAction = useCallback((key: widgetActionType, widget: Widget) => {
-    switch (key) {
-      case 'delete':
-        onEditDeleteActiveWidgets([widget.id]);
-        break;
-      case 'fullScreen':
-        onWidgetFullScreen(widget.id);
-        break;
-      case 'refresh':
-        onWidgetGetData(widget as any);
-        break;
-      case 'edit':
-        onWidgetEdit(widget);
-        break;
-      case 'makeLinkage':
-        onEditWidgetLinkage(widget.id);
-        break;
-      case 'closeLinkage':
-        onEditWidgetCloseLinkage(widget);
-        break;
-      case 'makeJump':
-        onEditWidgetJump(widget.id);
-        break;
-      case 'closeJump':
-        onEditWidgetCloseJump(widget);
-        break;
-      case 'lock':
-        onEditWidgetLock(widget.id);
-        break;
-      case 'unlock':
-        onEditWidgetUnLock(widget.id);
-        break;
-      default:
-        console.log('__ not found __ action', key);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const widgetAction = useCallback(
+    (key: widgetActionType, widget: WidgetBeta3) => {
+      switch (key) {
+        case 'delete':
+          onEditDeleteActiveWidgets([widget.id]);
+          break;
+        case 'fullScreen':
+          onWidgetFullScreen(widget.id);
+          break;
+        case 'refresh':
+          onWidgetGetData(widget as any);
+          break;
+        case 'edit':
+          onWidgetEdit(widget);
+          break;
+        case 'makeLinkage':
+          onEditWidgetLinkage(widget.id);
+          break;
+        case 'closeLinkage':
+          onEditWidgetCloseLinkage(widget);
+          break;
+        case 'makeJump':
+          onEditWidgetJump(widget.id);
+          break;
+        case 'closeJump':
+          onEditWidgetCloseJump(widget);
+          break;
+        case 'lock':
+          onEditWidgetLock(widget.id);
+          break;
+        case 'unlock':
+          onEditWidgetUnLock(widget.id);
+          break;
+        default:
+          console.log('__ not found __ action', key);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [],
+  );
   return widgetAction;
 }

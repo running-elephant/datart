@@ -26,7 +26,7 @@ import {
   DeviceType,
   ServerDashboard,
   ServerDatachart,
-  Widget,
+  WidgetBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataView } from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
@@ -72,7 +72,7 @@ export const preprocessBoardConfig = (config: BoardConfig, boardId: string) => {
 };
 export const getScheduleBoardInfo = (
   boardInfo: BoardInfo,
-  widgetMap: Record<string, Widget>,
+  widgetMap: Record<string, WidgetBeta3>,
 ) => {
   let newBoardInfo: BoardInfo = { ...boardInfo };
   const needFetchItems = Object.values(widgetMap)
@@ -96,7 +96,7 @@ export const getScheduleBoardInfo = (
 export const getInitBoardInfo = (obj: {
   id: string;
   widgetIds?: string[];
-  controllerWidgets?: Widget[];
+  controllerWidgets?: WidgetBeta3[];
 }) => {
   //
   const boardInfo: BoardInfo = {

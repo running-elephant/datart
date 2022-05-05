@@ -15,7 +15,7 @@ import {
   ServerDatachart,
   WidgetData,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { IWidget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getChartWidgetRequestParams } from 'app/pages/DashBoardPage/utils';
 import {
   getChartDataView,
@@ -387,7 +387,7 @@ export const uploadBoardImage = createAsyncThunk<
 
 export const getEditWidgetData = createAsyncThunk<
   null,
-  { widget: IWidget; option?: getDataOption },
+  { widget: Widget; option?: getDataOption },
   { state: RootState }
 >(
   'editBoard/getEditWidgetData',

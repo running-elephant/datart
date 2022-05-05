@@ -22,7 +22,7 @@ import type {
   RectConfig,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { IWidget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { FontDefault } from 'app/pages/DashBoardPage/utils/widget';
 import type { ChartStyleConfig } from 'app/types/ChartConfig';
 import { uuidv4 } from 'utils/utils';
@@ -307,7 +307,7 @@ export const initFreeWidgetRect = (): RectConfig => ({
   height: 300,
 });
 
-export const widgetTpl = (): IWidget => {
+export const widgetTpl = (): Widget => {
   return {
     id: uuidv4(),
     dashboardId: '',

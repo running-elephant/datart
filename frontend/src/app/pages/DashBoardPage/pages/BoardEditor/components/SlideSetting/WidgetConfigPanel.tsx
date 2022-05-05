@@ -23,7 +23,7 @@ import GroupLayout from 'app/components/FormGenerator/Layout/GroupLayout';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { IWidget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useContext } from 'react';
 import { useDispatch } from 'react-redux';
@@ -38,7 +38,7 @@ const StyledWrapper = styled.div`
 `;
 export const WidgetConfigPanel: FC<{}> = memo(() => {
   const dispatch = useDispatch();
-  const widget = useContext(WidgetContext) as unknown as IWidget;
+  const widget = useContext(WidgetContext) as unknown as Widget;
   const configs = widget.config.jsonConfig.props;
 
   const widgetTypeId = widget.config.widgetTypeId;

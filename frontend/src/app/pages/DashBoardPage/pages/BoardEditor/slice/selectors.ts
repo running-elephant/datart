@@ -19,7 +19,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import { DefaultWidgetData } from 'app/pages/DashBoardPage/constants';
 import {
   DeviceType,
-  Widget,
+  WidgetBeta3,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
@@ -76,7 +76,7 @@ export const selectLayoutWidgetMap = createSelector(
   [selectWidgetRecord],
   allWidgetMap => {
     const layoutWidgets = getLayoutWidgets(allWidgetMap);
-    const LayoutWidgetMap: Record<string, Widget> = {};
+    const LayoutWidgetMap: Record<string, WidgetBeta3> = {};
     layoutWidgets.forEach(w => {
       LayoutWidgetMap[w.id] = allWidgetMap[w.id];
     });

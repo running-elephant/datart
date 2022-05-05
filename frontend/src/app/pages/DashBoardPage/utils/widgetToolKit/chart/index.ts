@@ -18,7 +18,7 @@
 import {
   BoardType,
   DataChart,
-  Widget,
+  WidgetBeta3,
   WidgetContentChartType,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -39,7 +39,7 @@ export const createDataChartWidget = (opt: {
   dataChartConfig: DataChart;
   viewId: string;
   subType: WidgetContentChartType;
-}): Widget => {
+}): WidgetBeta3 => {
   const content = createChartWidgetContent(opt.subType);
   const widgetConf = createInitWidgetConfig({
     type: 'chart',
@@ -47,7 +47,7 @@ export const createDataChartWidget = (opt: {
     boardType: opt.boardType,
     name: opt.dataChartConfig.name,
   });
-  const widget: Widget = createWidget({
+  const widget: WidgetBeta3 = createWidget({
     dashboardId: opt.dashboardId,
     datachartId: opt.dataChartId,
     viewIds: opt.viewId ? [opt.viewId] : [],
@@ -55,7 +55,7 @@ export const createDataChartWidget = (opt: {
   });
   return widget;
 };
-export const getCanLinkageWidgets = (widgets: Widget[]) => {
+export const getCanLinkageWidgets = (widgets: WidgetBeta3[]) => {
   const CanLinkageTypes: WidgetType[] = ['chart'];
   const canLinkWidgets = widgets.filter(widget => {
     if (!CanLinkageTypes.includes(widget.config.type)) {
@@ -72,8 +72,8 @@ export const getCanLinkageWidgets = (widgets: Widget[]) => {
 export const getControlOptionQueryParams = (obj: {
   view: ChartDataView;
   columns: string[];
-  curWidget: Widget;
-  widgetMap: Record<string, Widget>;
+  curWidget: WidgetBeta3;
+  widgetMap: Record<string, WidgetBeta3>;
 }) => {
   const viewConfigs = transformToViewConfig(obj.view?.config);
   const { filterParams, variableParams } = getTheWidgetFiltersAndParams({

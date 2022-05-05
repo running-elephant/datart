@@ -17,9 +17,9 @@
  */
 import { useMemo } from 'react';
 import { Layouts } from 'react-grid-layout';
-import { Widget } from '../pages/Board/slice/types';
+import { WidgetBeta3 } from '../pages/Board/slice/types';
 export default function useGridLayoutMap(
-  layoutWidgetMap: Record<string, Widget>,
+  layoutWidgetMap: Record<string, WidgetBeta3>,
 ) {
   const layoutMap = useMemo(() => {
     const layoutMap: Layouts = {

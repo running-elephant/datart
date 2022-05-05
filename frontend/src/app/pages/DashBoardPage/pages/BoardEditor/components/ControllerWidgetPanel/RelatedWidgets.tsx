@@ -17,7 +17,7 @@
  */
 import { Table } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetBeta3 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useEffect, useMemo, useState } from 'react';
 
 export type RelatedWidgetItem = {
@@ -26,7 +26,7 @@ export type RelatedWidgetItem = {
 };
 export interface RelatedWidgetsProps {
   relatedWidgets: RelatedWidgetItem[];
-  widgets: Widget[];
+  widgets: WidgetBeta3[];
   onChange?: (values: string[]) => void;
 }
 
@@ -52,11 +52,11 @@ export const RelatedWidgets: React.FC<RelatedWidgetsProps> = memo(
       () => [
         {
           title: tw('widgetName'),
-          render: (w: Widget) => <span>{w.config.name}</span>,
+          render: (w: WidgetBeta3) => <span>{w.config.name}</span>,
         },
         {
           title: tw('widgetType'),
-          render: (w: Widget) => <span>{w.config.type}</span>,
+          render: (w: WidgetBeta3) => <span>{w.config.type}</span>,
         },
       ],
       [tw],

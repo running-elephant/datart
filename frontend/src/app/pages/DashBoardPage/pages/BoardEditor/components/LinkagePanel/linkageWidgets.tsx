@@ -17,13 +17,13 @@
  */
 import { Checkbox, Col, Divider, Row } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetBeta3 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 
 export interface RelatedWidgetsProps {
-  widgets: Widget[];
+  widgets: WidgetBeta3[];
   onChange: (pickedIds: string[]) => void;
-  curWidget: Widget;
+  curWidget: WidgetBeta3;
 }
 
 export const LinkageWidgets: React.FC<RelatedWidgetsProps> = memo(

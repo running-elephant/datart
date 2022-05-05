@@ -18,7 +18,7 @@
 import { Collapse, InputNumber } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { IWidget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import throttle from 'lodash/throttle';
 import { FC, memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
@@ -33,7 +33,7 @@ export const WidgetSetting: FC = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
   // const { boardType } = useContext(BoardContext);
   const dispatch = useDispatch();
-  const widget = useContext(WidgetContext) as unknown as IWidget;
+  const widget = useContext(WidgetContext) as unknown as Widget;
   const { boardType } = widget.config;
   const rect = useMemo(() => {
     const rect = widget.config.rect;

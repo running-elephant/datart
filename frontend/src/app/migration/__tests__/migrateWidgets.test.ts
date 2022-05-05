@@ -20,7 +20,7 @@ import {
   Relation,
   ServerRelation,
   ServerWidget,
-  Widget,
+  WidgetBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FontDefault } from 'app/pages/DashBoardPage/utils/widget';
 import {
@@ -37,28 +37,28 @@ describe('test migrateWidgets ', () => {
         type: 'filter',
       },
     };
-    expect(beta0(widget1 as Widget)).toBeUndefined();
+    expect(beta0(widget1 as WidgetBeta3)).toBeUndefined();
   });
   test('should return self  when widget.config.type !== filter', () => {
     const widget2 = {
       config: {
         type: 'chart',
       },
-    } as Widget;
-    expect(beta0(widget2 as Widget)).toEqual(widget2);
+    } as WidgetBeta3;
+    expect(beta0(widget2 as WidgetBeta3)).toEqual(widget2);
   });
 
   test('should return widget.config.nameConfig', () => {
     const widget1 = {
       config: {},
-    } as Widget;
+    } as WidgetBeta3;
     const widget2 = {
       config: {
         nameConfig: FontDefault,
         version: APP_VERSION_BETA_0,
       },
-    } as Widget;
-    expect(beta0(widget1 as Widget)).toMatchObject(widget2);
+    } as WidgetBeta3;
+    expect(beta0(widget1 as WidgetBeta3)).toMatchObject(widget2);
   });
 
   test('should return Array Type about assistViewFields', () => {
@@ -82,7 +82,7 @@ describe('test migrateWidgets ', () => {
         },
       },
     };
-    expect(beta0(widget1 as unknown as Widget)).toMatchObject(widget2);
+    expect(beta0(widget1 as unknown as WidgetBeta3)).toMatchObject(widget2);
   });
 
   test('convertWidgetRelationsToObj parse Relation.config', () => {
@@ -121,13 +121,13 @@ describe('test migrateWidgets ', () => {
         version: APP_CURRENT_VERSION,
       },
       relations: [] as Relation[],
-    } as Widget;
+    } as WidgetBeta3;
     const resWidget2 = {
       config: {
         version: APP_CURRENT_VERSION,
       },
       relations: [] as Relation[],
-    } as Widget;
+    } as WidgetBeta3;
     const widgets: ServerWidget[] = [widget1, widget2, widget3, widget4];
 
     expect(migrateWidgets(widgets)).toMatchObject([

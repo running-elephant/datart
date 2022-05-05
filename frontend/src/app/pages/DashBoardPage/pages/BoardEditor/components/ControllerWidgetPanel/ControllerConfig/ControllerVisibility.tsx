@@ -22,7 +22,7 @@ import {
   ALL_SQL_OPERATOR_OPTIONS,
   VISIBILITY_TYPE_OPTION,
 } from 'app/pages/DashBoardPage/constants';
-import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetBeta3 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
@@ -30,7 +30,7 @@ import { ControllerConfig } from '../types';
 
 const ControllerVisibility: FC<{
   form: FormInstance<{ config: ControllerConfig }> | undefined;
-  otherStrFilterWidgets: Widget[];
+  otherStrFilterWidgets: WidgetBeta3[];
 }> = memo(({ form, otherStrFilterWidgets }) => {
   const tc = useI18NPrefix('viz.control');
   const showVisibilityCondition = useCallback(() => {

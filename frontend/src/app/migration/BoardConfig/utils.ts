@@ -16,26 +16,12 @@
  * limitations under the License.
  */
 
-import {
-  BoardInfo,
-  Dashboard,
-  WidgetBeta3,
-  WidgetData,
-  WidgetInfo,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { StateWithHistory } from 'redux-undo';
+import { widgetTpl } from 'app/pages/DashBoardPage/components/WidgetManager/utils/init';
+import { WidgetBeta3 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 
-export interface EditBoardState {
-  stack: EditBoardStack;
-  boardInfo: BoardInfo;
-  widgetInfoRecord: Record<string, WidgetInfo>;
-  widgetDataMap: Record<string, WidgetData>;
-}
-export interface HistoryEditBoard extends Omit<EditBoardState, 'stack'> {
-  stack: StateWithHistory<EditBoardStack>;
-}
-
-export interface EditBoardStack {
-  dashBoard: Dashboard;
-  widgetRecord: Record<string, WidgetBeta3>;
-}
+export const convertWidgetToBeta4 = (widget: WidgetBeta3) => {
+  let newWidget = { ...widget } as unknown as Widget;
+  newWidget.config = widgetTpl().config;
+  return newWidget;
+};

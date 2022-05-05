@@ -18,7 +18,7 @@
 import { WidgetActionDropdown } from 'app/pages/DashBoardPage/components/WidgetComponents/WidgetActionDropdown';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import {
-  Widget,
+  WidgetBeta3,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import classNames from 'classnames';
@@ -49,7 +49,7 @@ interface DragItem {
   index: number;
   id: string;
   selected: boolean;
-  widgetConfig: Widget;
+  widgetConfig: WidgetBeta3;
 }
 const NameItem: React.FC<NameItemProps> = ({
   index,

@@ -28,7 +28,7 @@ import {
   RelatedView,
   Relation,
   VizRenderMode,
-  Widget,
+  WidgetBeta3,
   WidgetInfo,
   WidgetOfCopy,
   WidgetType,
@@ -200,7 +200,7 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
 
   const dataChartMap = boardState.dataChartMap;
 
-  const newWidgets: Widget[] = [];
+  const newWidgets: WidgetBeta3[] = [];
 
   clipboardWidgetList.forEach(widget => {
     if (widget.selectedCopy) {
@@ -246,7 +246,7 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
     newWidget.config.name += '_copy';
 
     delete newWidget.selectedCopy;
-    return newWidget as Widget;
+    return newWidget as WidgetBeta3;
   }
 };
 
@@ -286,7 +286,7 @@ export const updateWidgetControllerAction =
     });
 
     const widgetId = relations[0]?.sourceId || uuidv4();
-    const widget: Widget = createWidget({
+    const widget: WidgetBeta3 = createWidget({
       id: widgetId,
       dashboardId: boardId,
       config: widgetConf,
@@ -356,29 +356,31 @@ export const editHasChartWidget =
     dispatch(getEditChartWidgetDataAsync({ widgetId: curWidget.id }));
   };
 
-export const closeJumpAction = (widget: Widget) => (dispatch, getState) => {
-  const nextConf = produce(widget.config, draft => {
-    draft!.jumpConfig!.open = false;
-  });
-  dispatch(
-    editBoardStackActions.updateWidgetConfig({
-      wid: widget.id,
-      config: nextConf,
-    }),
-  );
-};
+export const closeJumpAction =
+  (widget: WidgetBeta3) => (dispatch, getState) => {
+    const nextConf = produce(widget.config, draft => {
+      draft!.jumpConfig!.open = false;
+    });
+    dispatch(
+      editBoardStackActions.updateWidgetConfig({
+        wid: widget.id,
+        config: nextConf,
+      }),
+    );
+  };
 
-export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
-  const nextConf = produce(widget.config, draft => {
-    draft!.linkageConfig!.open = false;
-  });
-  dispatch(
-    editBoardStackActions.updateWidgetConfig({
-      wid: widget.id,
-      config: nextConf,
-    }),
-  );
-};
+export const closeLinkageAction =
+  (widget: WidgetBeta3) => (dispatch, getState) => {
+    const nextConf = produce(widget.config, draft => {
+      draft!.linkageConfig!.open = false;
+    });
+    dispatch(
+      editBoardStackActions.updateWidgetConfig({
+        wid: widget.id,
+        config: nextConf,
+      }),
+    );
+  };
 
 export const addVariablesToBoard =
   (variables: Variable[]) => (dispatch, getState) => {
@@ -399,7 +401,7 @@ export const clearActiveWidgets = () => dispatch => {
   dispatch(editDashBoardInfoActions.changeShowBlockMask(true));
 };
 export const widgetClearLinkageAction =
-  (widget: Widget, renderMode: VizRenderMode) => dispatch => {
+  (widget: WidgetBeta3, renderMode: VizRenderMode) => dispatch => {
     const { id, dashboardId } = widget;
     dispatch(
       boardActions.changeWidgetInLinking({
@@ -431,33 +433,34 @@ export const widgetClearLinkageAction =
       );
     });
   };
-export const editorWidgetClearLinkageAction = (widget: Widget) => dispatch => {
-  const { id, dashboardId } = widget;
-  dispatch(
-    editWidgetInfoActions.changeWidgetInLinking({
-      boardId: dashboardId,
-      widgetId: id,
-      toggle: false,
-    }),
-  );
-  dispatch(
-    editDashBoardInfoActions.changeBoardLinkFilter({
-      boardId: dashboardId,
-      triggerId: id,
-      linkFilters: [],
-    }),
-  );
-  const linkRelations = widget.relations.filter(
-    re => re.config.type === 'widgetToWidget',
-  );
-  linkRelations.forEach(link => {
+export const editorWidgetClearLinkageAction =
+  (widget: WidgetBeta3) => dispatch => {
+    const { id, dashboardId } = widget;
     dispatch(
-      getEditChartWidgetDataAsync({
-        widgetId: link.targetId,
-        option: {
-          pageInfo: { pageNo: 1 },
-        },
+      editWidgetInfoActions.changeWidgetInLinking({
+        boardId: dashboardId,
+        widgetId: id,
+        toggle: false,
       }),
     );
-  });
-};
+    dispatch(
+      editDashBoardInfoActions.changeBoardLinkFilter({
+        boardId: dashboardId,
+        triggerId: id,
+        linkFilters: [],
+      }),
+    );
+    const linkRelations = widget.relations.filter(
+      re => re.config.type === 'widgetToWidget',
+    );
+    linkRelations.forEach(link => {
+      dispatch(
+        getEditChartWidgetDataAsync({
+          widgetId: link.targetId,
+          option: {
+            pageInfo: { pageNo: 1 },
+          },
+        }),
+      );
+    });
+  };

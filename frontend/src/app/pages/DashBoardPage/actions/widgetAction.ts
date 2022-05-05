@@ -28,7 +28,7 @@ import {
 import {
   BoardLinkFilter,
   VizRenderMode,
-  Widget,
+  WidgetBeta3,
 } from '../pages/Board/slice/types';
 import {
   editDashBoardInfoActions,
@@ -42,7 +42,7 @@ import {
   getEditChartWidgetDataAsync,
   getEditWidgetData,
 } from '../pages/BoardEditor/slice/thunk';
-import { IWidget } from '../types/widgetTypes';
+import { Widget } from '../types/widgetTypes';
 import { getValueByRowData } from '../utils/widget';
 
 export const toggleLinkageAction =
@@ -72,7 +72,7 @@ export const tableChartClickAction =
     boardId: string,
     editing: boolean,
     renderMode: VizRenderMode,
-    widget: Widget,
+    widget: WidgetBeta3,
     params: ChartMouseEventParams,
   ) =>
   dispatch => {
@@ -108,7 +108,7 @@ export const tableChartClickAction =
 export const widgetClickJumpAction =
   (obj: {
     renderMode: VizRenderMode;
-    widget: Widget;
+    widget: WidgetBeta3;
     params: ChartMouseEventParams;
     history: any;
   }) =>
@@ -170,7 +170,7 @@ export const widgetClickLinkageAction =
     boardId: string,
     editing: boolean,
     renderMode: VizRenderMode,
-    widget: Widget,
+    widget: WidgetBeta3,
     params: ChartMouseEventParams,
   ) =>
   (dispatch, getState) => {
@@ -260,7 +260,7 @@ export const widgetChartClickAction =
     boardId: string;
     editing: boolean;
     renderMode: VizRenderMode;
-    widget: Widget;
+    widget: WidgetBeta3;
     params: ChartMouseEventParams;
     history: any;
   }) =>
@@ -292,8 +292,7 @@ export const widgetChartClickAction =
     }
   };
 export const widgetGetDataAction =
-  (editing: boolean, widget: IWidget, renderMode: VizRenderMode) =>
-  dispatch => {
+  (editing: boolean, widget: Widget, renderMode: VizRenderMode) => dispatch => {
     const boardId = widget.dashboardId;
     if (editing) {
       dispatch(getEditWidgetData({ widget }));
@@ -303,7 +302,8 @@ export const widgetGetDataAction =
   };
 
 export const widgetToClearLinkageAction =
-  (editing: boolean, widget: Widget, renderMode: VizRenderMode) => dispatch => {
+  (editing: boolean, widget: WidgetBeta3, renderMode: VizRenderMode) =>
+  dispatch => {
     if (editing) {
       dispatch(editorWidgetClearLinkageAction(widget));
     } else {

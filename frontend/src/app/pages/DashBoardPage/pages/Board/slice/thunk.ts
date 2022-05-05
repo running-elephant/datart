@@ -17,7 +17,7 @@
  */
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { boardDrillManager } from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
-import { IWidget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { shareActions } from 'app/pages/SharePage/slice';
@@ -161,7 +161,7 @@ export const getWidgetData = createAsyncThunk<
   null,
   {
     boardId: string;
-    widget: IWidget;
+    widget: Widget;
     renderMode: VizRenderMode | undefined;
     option?: getDataOption;
   },

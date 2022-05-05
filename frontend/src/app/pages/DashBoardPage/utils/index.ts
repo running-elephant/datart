@@ -48,7 +48,7 @@ import {
   ControllerWidgetContent,
   DataChart,
   getDataOption,
-  Widget,
+  WidgetBeta3,
   WidgetInfo,
 } from '../pages/Board/slice/types';
 import {
@@ -153,8 +153,8 @@ export const getChartGroupColumns = (datas: ChartDataConfig[] | undefined) => {
 };
 
 export const getTheWidgetFiltersAndParams = (obj: {
-  chartWidget: Widget;
-  widgetMap: Record<string, Widget>;
+  chartWidget: WidgetBeta3;
+  widgetMap: Record<string, WidgetBeta3>;
   params: Record<string, string[]> | undefined;
 }) => {
   // TODO chart 本身携带了变量，board没有相关配置的时候要拿到 chart本身的 变量值 Params
@@ -360,7 +360,7 @@ export const adjustRangeDataEndValue = (
 };
 export const getChartWidgetRequestParams = (obj: {
   widgetId: string;
-  widgetMap: Record<string, Widget>;
+  widgetMap: Record<string, WidgetBeta3>;
   widgetInfo: WidgetInfo | undefined;
   option: getDataOption | undefined;
   viewMap: Record<string, ChartDataView>;
@@ -452,7 +452,7 @@ export const getChartWidgetRequestParams = (obj: {
   return requestParams;
 };
 export const getBoardChartRequests = (params: {
-  widgetMap: Record<string, Widget>;
+  widgetMap: Record<string, WidgetBeta3>;
   viewMap: Record<string, ChartDataView>;
   dataChartMap: Record<string, DataChart>;
 }) => {

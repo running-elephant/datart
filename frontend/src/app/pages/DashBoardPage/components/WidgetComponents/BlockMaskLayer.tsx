@@ -17,7 +17,7 @@
  */
 import { WIDGET_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
 import {
-  Widget,
+  WidgetBeta3,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useCallback, useMemo } from 'react';
@@ -31,7 +31,7 @@ import {
 import { selectShowBlockMask } from '../../pages/BoardEditor/slice/selectors';
 
 export interface BlockMaskLayerProps {
-  widgetConfig: Widget;
+  widgetConfig: WidgetBeta3;
   widgetInfo: WidgetInfo;
 }
 export const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(

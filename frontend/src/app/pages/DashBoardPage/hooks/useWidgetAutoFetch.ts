@@ -20,11 +20,11 @@ import { WidgetActionContext } from '../components/ActionProvider/WidgetActionPr
 import { BoardInfoContext } from '../components/BoardProvider/BoardInfoProvider';
 import { getLoopFetch } from '../components/WidgetManager/utils/utils';
 import { VizRenderMode } from '../pages/Board/slice/types';
-import { IWidget } from '../types/widgetTypes';
+import { Widget } from '../types/widgetTypes';
 import { isElView } from '../utils/board';
 
 export default function useWidgetAutoFetch(
-  widget: IWidget,
+  widget: Widget,
   renderMode: VizRenderMode,
   rectRef: React.RefObject<HTMLDivElement>,
   rendered: boolean,
