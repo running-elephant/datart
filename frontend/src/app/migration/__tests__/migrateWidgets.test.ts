@@ -57,7 +57,7 @@ describe('test migrateWidgets ', () => {
         nameConfig: FontDefault,
         version: APP_VERSION_BETA_0,
       },
-    } as WidgetBeta3;
+    } as any;
     expect(beta0(widget1 as WidgetBeta3)).toMatchObject(widget2);
   });
 

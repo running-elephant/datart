@@ -16,10 +16,6 @@
  * limitations under the License.
  */
 
-import {
-  BoardType,
-  DataChart,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { WidgetToolkit } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { dataChartCreator, getMeta } from './config';
 
@@ -35,34 +31,31 @@ export const linkChartMeta = getMeta({
     widgetTypeId: 'Link Chart',
   },
 });
-export const linkChartToolkit = {
-  create: (opt: {
-    dashboardId: string;
-    boardType: BoardType;
-    dataChartId: string;
-    dataChartConfig: DataChart;
-    viewIds: string[];
-    widgetTypeId: 'linkChart' | 'selfChart';
-  }) => {
-    const widget = dataChartCreator(opt);
+export type LinkChartToolkit = WidgetToolkit & {};
+export const linkChartToolkit: LinkChartToolkit = {
+  create: opt => {
+    const widget = dataChartCreator({
+      ...opt,
+      widgetTypeId: linkChartMeta.widgetTypeId,
+    });
     return widget;
   },
   edit() {},
   save() {},
-  lock() {},
-  unlock() {},
-  copy() {},
-  paste() {},
-  delete() {},
-  changeTitle() {},
-  getMeta() {},
-  getWidgetName() {},
-  //
-  setLinkage() {},
-  closeLinkage() {},
-  setJump() {},
-  closeJump() {},
-} as WidgetToolkit;
+  // lock() {},
+  // unlock() {},
+  // copy() {},
+  // paste() {},
+  // delete() {},
+  // changeTitle() {},
+  // getMeta() {},
+  // getWidgetName() {},
+  // //
+  // setLinkage() {},
+  // closeLinkage() {},
+  // setJump() {},
+  // closeJump() {},
+};
 
 const linkChartProto = {
   widgetTypeId: 'linkChart',

@@ -1,20 +1,3 @@
-/**
- * Datart
- *
- * Copyright 2021
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 import {
   ControllerWidgetContent,
   Relation,
@@ -107,13 +90,17 @@ export const beta4 = (widget?: Widget | WidgetBeta3) => {
   if (!versionCanDo(APP_VERSION_BETA_4, widget?.config.version))
     return widget as Widget;
   if (widget.config.version !== APP_VERSION_BETA_4) {
-  } else {
     let newWidget = convertWidgetToBeta4(widget as WidgetBeta3);
     return newWidget;
+  } else {
+    if ((widget.config as any).background) {
+      let newWidget = convertWidgetToBeta4(widget as WidgetBeta3);
+      return newWidget;
+    }
+    return widget;
   }
-  return widget;
 };
-const finaleWidget = (widget?: WidgetBeta3) => {
+const finaleWidget = (widget?: Widget) => {
   if (!widget) return undefined;
   widget.config = setLatestVersion(widget.config);
   return widget;
@@ -150,9 +137,9 @@ export const migrateWidgets = (widgets: ServerWidget[]) => {
 
       resWidget = beta2(resWidget);
       let beta4Widget = beta4(resWidget);
-      beta4Widget = finaleWidget(resWidget);
+      beta4Widget = finaleWidget(beta4Widget as Widget);
       return beta4Widget;
     })
     .filter(widget => !!widget);
-  return targetWidgets as WidgetBeta3[];
+  return targetWidgets as Widget[];
 };

@@ -855,14 +855,18 @@ export const getWidgetMap = (
   widgetList
     .filter(w => (w as unknown as Widget).config.widgetTypeId === 'selfChart')
     .forEach(widget => {
-      let content = widget.config.content as ChartWidgetContent;
+      debugger;
+      let dataChart = (widget.config.content as any).dataChart as DataChart;
+      debugger;
       const self_dataChartId = `widget_${widget.dashboardId}_${widget.id}`;
-      content.dataChart!.id = self_dataChartId;
+      if (dataChart) {
+        dataChart.id = self_dataChartId;
+        wrappedDataCharts.push(dataChart!);
+      }
       widget.datachartId = self_dataChartId;
-      wrappedDataCharts.push(content.dataChart!);
-      delete content.dataChart;
+      debugger;
     });
-
+  debugger;
   return {
     widgetMap,
     wrappedDataCharts,

@@ -17,10 +17,9 @@
  */
 
 import {
-  BoardType,
-  DataChart,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { WidgetMeta } from 'app/pages/DashBoardPage/types/widgetTypes';
+  WidgetMeta,
+  WidgetToolkit,
+} from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
   initAutoWidgetRect,
   initFreeWidgetRect,
@@ -122,28 +121,22 @@ export const getMeta = (opt: {
   return meta;
 };
 
-export const dataChartCreator = (opt: {
-  dashboardId: string;
-  boardType: BoardType;
-  dataChartId: string;
-  dataChartConfig: DataChart;
-  viewIds: string[];
-  widgetTypeId: 'linkChart' | 'selfChart';
-}) => {
+export const dataChartCreator: WidgetToolkit['create'] = opt => {
   const widget = widgetTpl();
-  widget.dashboardId = opt.dashboardId;
-  widget.datachartId = opt.dataChartId;
+  widget.parentId = opt.parentId || '';
+  widget.dashboardId = opt.dashboardId || '';
+  widget.datachartId = opt.datachartId || '';
   widget.viewIds = opt.viewIds || [];
+  widget.relations = opt.relations;
   widget.config.widgetTypeId = opt.widgetTypeId;
-  widget.config.boardType = opt.boardType;
   widget.config.type = 'chart';
-  widget.config.selfConfig.dataChartConfig = opt.dataChartConfig;
-
+  widget.config.selfConfig.dataChart = opt.dataChart;
+  widget.config.content.dataChart = opt.dataChart;
   widget.config.jsonConfig.props?.forEach(ele => {
     if (ele.key === 'titleGroup') {
       ele.rows?.forEach(row => {
         if (row.key === 'title') {
-          row.value = opt.dataChartConfig.name || '';
+          row.value = opt?.dataChart?.name || '';
         }
       });
     }
