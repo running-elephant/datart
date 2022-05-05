@@ -1578,13 +1578,12 @@ export const getDrillableRows = (
 };
 
 export const getRuntimeDateLevelFields = (rows: any) => {
-  const _rows = updateBy(rows, draft => {
-    draft?.forEach((v, i) => {
-      const symbolData = v?.[RUNTIME_DATE_LEVEL_KEY];
-      if (symbolData) {
-        draft[i] = symbolData;
-      }
-    });
+  const _rows = CloneValueDeep(rows);
+  _rows?.forEach((v, i) => {
+    const symbolData = v?.[RUNTIME_DATE_LEVEL_KEY];
+    if (symbolData) {
+      _rows[i] = symbolData;
+    }
   });
   return _rows;
 };

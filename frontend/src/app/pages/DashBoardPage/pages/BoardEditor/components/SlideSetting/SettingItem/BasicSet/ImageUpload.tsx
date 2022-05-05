@@ -70,8 +70,8 @@ export const UploadDragger: React.FC<{
     [boardId, dispatch, onChange],
   );
   const getImageError = useCallback(() => {
-    onChange('');
-  }, [onChange]);
+    console.warn('get BackgroundImageError');
+  }, []);
   const delImageUrl = useCallback(
     e => {
       e.stopPropagation();

@@ -19,6 +19,7 @@ import { Modal, Table } from 'antd';
 import { RowSelectionType } from 'antd/lib/table/interface';
 import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import React, { useEffect, useState } from 'react';
+import i18next from 'i18next';
 
 // import { ChartWidget } from '../../../types';
 
@@ -48,15 +49,14 @@ const StoryPageAddModal: React.FC<IProps> = props => {
       setSelectedDataChartIds([]);
     }
   }, [visible]);
-
   const columns = [
     {
-      title: '名称',
+      title: i18next.t('viz.board.setting.storyName'),
       dataIndex: 'name',
       render: (text: string) => text,
     },
     {
-      title: '描述',
+      title: i18next.t('viz.board.setting.storyDescription'),
       dataIndex: 'description',
       render: (text: string) => text,
     },
@@ -71,7 +71,7 @@ const StoryPageAddModal: React.FC<IProps> = props => {
 
   return (
     <Modal
-      title="add StoryPage"
+      title="Add Story Page"
       visible={visible}
       onOk={onOk}
       centered
