@@ -144,7 +144,9 @@ class ChartIFrameEventBroker {
     } catch (e) {
       console.error(`ChartEventBroker | ${event} exception ----> `, e);
     } finally {
-      this._chart!.state = 'ready';
+      if (this._chart) {
+        this._chart.state = 'ready';
+      }
     }
   }
 

@@ -550,7 +550,7 @@ const slice = createSlice({
           backendChart: newChartDto,
           chartConfig: transferChartConfig(
             mergeToChartConfig(
-              prevChartPreview?.chartConfig || currentChart?.config,
+              currentChart?.config,
               migrateChartConfig(newChartDto?.config),
             ),
             filterSearchParams,
