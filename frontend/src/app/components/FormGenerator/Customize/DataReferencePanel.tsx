@@ -409,17 +409,23 @@ const DataReferencePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           mergeDefaultToValue(CloneValueDeep(referencePanelConfig)),
         );
         onChange?.(ancestors, newData);
-      } else {
-        // add default component template if not exist, the template should only keep/save in component self
-        if (!data.rows[0].template) {
-          const newData = updateBy(data, draft => {
-            draft['rows'] = mergeChartStyleConfigs(
-              CloneValueDeep(referencePanelConfig),
-              data?.rows,
-            );
+      } else if (!data.rows[0].template) {
+        // init component template and component props.
+        const newData = updateBy(data, draft => {
+          draft.rows?.map(tab => {
+            tab.template = referencePanelConfig[0].template;
+            tab.options = referencePanelConfig[0].options;
+            tab.rows = tab.rows?.map(panel => {
+              const template = CloneValueDeep(referencePanelConfig[0].template);
+              template.key = panel.key;
+              template.label = panel.label;
+              const rowPanels = mergeChartStyleConfigs([template], [panel]);
+              return rowPanels?.[0]!;
+            });
+            return tab;
           });
-          onChange?.(ancestors, newData);
-        }
+        });
+        onChange?.(ancestors, newData);
       }
     }, [ancestors, data, onChange]);
 
