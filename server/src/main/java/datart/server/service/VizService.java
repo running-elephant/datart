@@ -82,4 +82,5 @@ public interface VizService {
 
     boolean importViz(MultipartFile file, ImportStrategy importStrategy, String orgId) throws IOException;
 
+    boolean updateStoryboardBase(StoryboardBaseUpdateParam updateParam);
 }

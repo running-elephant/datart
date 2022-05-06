@@ -498,7 +498,7 @@ const config: ChartConfig = {
             left: '左侧',
             right: '右侧',
           },
-          subTotal: '小记',
+          subTotal: '小计',
           total: '总计',
         },
       },

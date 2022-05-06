@@ -368,8 +368,11 @@ export class ChartDataRequestBuilder {
       }
       return expression.replaceAll('[', '').replaceAll(']', '');
     };
+    const computedFields = getRuntimeDateLevelFields(
+      this.dataView.computedFields,
+    );
 
-    return (this.dataView.computedFields || []).map(f => ({
+    return (computedFields || []).map(f => ({
       alias: f.id!,
       snippet: _removeSquareBrackets(f.expression),
     }));

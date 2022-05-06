@@ -22,9 +22,7 @@ import datart.core.base.consts.JobType;
 import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.UUIDGenerator;
-import datart.core.entity.Role;
-import datart.core.entity.Schedule;
-import datart.core.entity.ScheduleLog;
+import datart.core.entity.*;
 import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.core.mappers.ext.ScheduleLogMapperExt;
 import datart.core.mappers.ext.ScheduleMapperExt;
@@ -35,10 +33,7 @@ import datart.security.exception.PermissionDeniedException;
 import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.PermissionHelper;
 import datart.server.base.dto.ScheduleBaseInfo;
-import datart.server.base.params.BaseCreateParam;
-import datart.server.base.params.BaseUpdateParam;
-import datart.server.base.params.ScheduleCreateParam;
-import datart.server.base.params.ScheduleUpdateParam;
+import datart.server.base.params.*;
 import datart.server.job.EmailJob;
 import datart.server.job.ScheduleJob;
 import datart.server.job.WeChartJob;
@@ -160,7 +155,12 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
         requirePermission(schedule, Const.CREATE);
 
         schedule.setCreateBy(getCurrentUser().getId());
-        schedule.setType(scheduleCreateParam.getType().name());
+        if (Objects.equals(schedule.getIsFolder(), Boolean.TRUE)) {
+            schedule.setType(ResourceType.FOLDER.name());
+        } else {
+            schedule.setIsFolder(Boolean.FALSE);
+            schedule.setType(scheduleCreateParam.getType().name());
+        }
         schedule.setCreateTime(new Date());
         schedule.setId(UUIDGenerator.generate());
         schedule.setStatus((byte) 1);
@@ -177,10 +177,15 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
     public boolean update(BaseUpdateParam updateParam) {
         ScheduleUpdateParam scheduleUpdateParam = (ScheduleUpdateParam) updateParam;
         Schedule schedule = retrieve(updateParam.getId());
+        requirePermission(schedule, Const.MANAGE);
         BeanUtils.copyProperties(updateParam, schedule);
         schedule.setUpdateBy(getCurrentUser().getId());
         schedule.setUpdateTime(new Date());
-        schedule.setType(scheduleUpdateParam.getType().name());
+        if (schedule.getIsFolder()) {
+            schedule.setType(ResourceType.FOLDER.name());
+        } else {
+            schedule.setType(scheduleUpdateParam.getType().name());
+        }
         return scheduleMapper.updateByPrimaryKey(schedule) == 1;
     }
 
@@ -242,6 +247,29 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
     @Override
     public List<ScheduleLog> getScheduleLogs(String scheduleId, int count) {
         return scheduleLogMapper.selectByScheduleId(scheduleId, count);
+    }
+
+    @Override
+    public boolean updateBase(ScheduleBaseUpdateParam updateParam) {
+        Schedule schedule = retrieve(updateParam.getId());
+        requirePermission(schedule, Const.MANAGE);
+        if (!schedule.getName().equals(updateParam.getName())) {
+            //check name
+            Schedule check = new Schedule();
+            check.setParentId(updateParam.getParentId());
+            check.setOrgId(schedule.getOrgId());
+            check.setName(updateParam.getName());
+            checkUnique(check);
+        }
+
+        // update base info
+        schedule.setId(updateParam.getId());
+        schedule.setUpdateBy(getCurrentUser().getId());
+        schedule.setUpdateTime(new Date());
+        schedule.setName(updateParam.getName());
+        schedule.setParentId(updateParam.getParentId());
+        schedule.setIndex(updateParam.getIndex());
+        return 1 == scheduleMapper.updateByPrimaryKey(schedule);
     }
 
     @Override

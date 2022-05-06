@@ -35,6 +35,7 @@ import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
+import { getStyles } from 'app/utils/chartHelper';
 import { getTime, splitRangerDateFilters } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';
@@ -302,6 +303,7 @@ export const getControllerDateValues = (obj: {
     timeValues[0] = time.format(TIME_FORMATTER);
   }
   if (endTime) {
+    //end 精确时间
     if (endTime.relativeOrExact === TimeFilterValueCategory.Exact) {
       timeValues[1] = endTime.exactValue as string;
       if (obj.execute) {
@@ -313,8 +315,10 @@ export const getControllerDateValues = (obj: {
         timeValues[1] = endTime.exactValue as string;
       }
     } else {
+      // end 相对时间
       const { amount, unit, direction } = endTime.relativeValue!;
-      const time = getTime(+(direction + amount), unit)(unit, false);
+      const isStart = !obj.execute;
+      const time = getTime(+(direction + amount), unit)(unit, isStart);
       timeValues[1] = time.format(TIME_FORMATTER);
     }
   }
@@ -426,8 +430,6 @@ export const getChartWidgetRequestParams = (obj: {
     requestParams.filters = requestParams.filters.concat(linkFilters);
   }
 
-  // filter 去重
-  requestParams.filters = getDistinctFiltersByColumn(requestParams.filters);
   // splitRangerDateFilters
   requestParams.filters = splitRangerDateFilters(requestParams.filters);
 
@@ -533,3 +535,5 @@ export const getDefaultWidgetName = (
     return `xxx${index}`;
   }
 };
+
+export const getJsonConfigs = getStyles;

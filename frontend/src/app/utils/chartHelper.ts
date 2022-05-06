@@ -1577,23 +1577,13 @@ export const getDrillableRows = (
     });
 };
 
-export const getChartsAllRows = (configs?: ChartDataConfig[]) => {
-  const datas = configs || [];
-  return datas
-    .filter(v => v.rows)
-    .reduce((acc: ChartDataSectionField[], cur) => {
-      return acc.concat(cur.rows || []);
-    }, []);
-};
-
 export const getRuntimeDateLevelFields = (rows: any) => {
-  const _rows = updateBy(rows, draft => {
-    draft?.forEach((v, i) => {
-      const symbolData = v?.[RUNTIME_DATE_LEVEL_KEY];
-      if (symbolData) {
-        draft[i] = symbolData;
-      }
-    });
+  const _rows = CloneValueDeep(rows);
+  _rows?.forEach((v, i) => {
+    const symbolData = v?.[RUNTIME_DATE_LEVEL_KEY];
+    if (symbolData) {
+      _rows[i] = symbolData;
+    }
   });
   return _rows;
 };
@@ -1603,41 +1593,62 @@ export const getRuntimeDateLevelFields = (rows: any) => {
  */
 export const getRuntimeComputedFields = (
   dateLevelComputedFields,
-  replacedColName,
-  computedFields,
-  chartConfig,
+  replacedConfig?: ChartDataSectionField,
+  computedFields?,
+  isRuntime?: boolean,
 ) => {
   let _computedFields = computedFields ? CloneValueDeep(computedFields) : [];
 
-  if (dateLevelComputedFields.length) {
-    const expressionList: any = [];
+  if (isRuntime && replacedConfig?.field) {
+    const index = getRuntimeDateLevelFields(_computedFields).findIndex(
+      v => v.id === replacedConfig?.colName,
+    );
+    const replacedConfigIndex = dateLevelComputedFields.findIndex(
+      v => v.field === replacedConfig?.field,
+    );
 
-    _computedFields.forEach(v => {
-      if (v.category === ChartDataViewFieldCategory.DateLevelComputedField) {
-        expressionList.push(v.expression);
+    _computedFields = updateBy(_computedFields, draft => {
+      const dateLevelConfig = dateLevelComputedFields[replacedConfigIndex];
+
+      if (dateLevelConfig) {
+        draft[index][RUNTIME_DATE_LEVEL_KEY] = {
+          category: dateLevelConfig.category,
+          id: dateLevelConfig.colName,
+          type: dateLevelConfig.type,
+          expression: dateLevelConfig.expression,
+        };
       }
     });
+  } else {
+    if (dateLevelComputedFields.length) {
+      const expressionList: any = [];
 
-    dateLevelComputedFields.forEach(v => {
-      if (!expressionList.includes(v.expression)) {
-        _computedFields.push({
-          category: v.category,
-          id: v.colName,
-          type: v.type,
-          expression: v.expression,
-        });
-      }
-    });
-  }
+      _computedFields.forEach(v => {
+        if (v.category === ChartDataViewFieldCategory.DateLevelComputedField) {
+          expressionList.push(v.expression);
+        }
+      });
 
-  if (replacedColName) {
-    const allRows = getChartsAllRows(chartConfig?.datas);
-    const replacedRows = allRows.filter(v => v.colName === replacedColName);
-
-    if (replacedRows.length < 2) {
-      _computedFields = _computedFields.filter(v => v.id !== replacedColName);
+      dateLevelComputedFields.forEach(v => {
+        if (!expressionList.includes(v.expression)) {
+          _computedFields = updateBy(_computedFields, draft => {
+            draft.push({
+              category: v.category,
+              id: v.colName,
+              type: v.type,
+              expression: v.expression,
+            });
+          });
+        }
+      });
+    }
+    if (replacedConfig) {
+      _computedFields = _computedFields.filter(
+        v => v.id !== replacedConfig.colName,
+      );
     }
   }
+
   return _computedFields;
 };
 

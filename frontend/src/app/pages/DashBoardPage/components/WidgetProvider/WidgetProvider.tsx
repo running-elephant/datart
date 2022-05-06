@@ -63,5 +63,6 @@ export const WidgetProvider: FC<{
     }
     return widget;
   }, [boardEditing, editWidget, readWidget, boardId]);
+
   return widget ? <WProvider val={widget}>{children}</WProvider> : null;
 });

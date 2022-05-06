@@ -39,6 +39,18 @@ public class StoryboardSqlProvider {
         if (record.getUpdateTime() != null) {
             sql.VALUES("update_time", "#{updateTime,jdbcType=TIMESTAMP}");
         }
+
+        if (record.getParentId() != null) {
+            sql.VALUES("parent_id", "#{parentId,jdbcType=VARCHAR}");
+        }
+
+        if (record.getIsFolder() != null) {
+            sql.VALUES("is_folder", "#{isFolder,jdbcType=TINYINT}");
+        }
+
+        if (record.getIndex() != null) {
+            sql.VALUES("`index`", "#{index,jdbcType=DOUBLE}");
+        }
         
         if (record.getStatus() != null) {
             sql.VALUES("`status`", "#{status,jdbcType=TINYINT}");
@@ -77,6 +89,18 @@ public class StoryboardSqlProvider {
         
         if (record.getUpdateTime() != null) {
             sql.SET("update_time = #{updateTime,jdbcType=TIMESTAMP}");
+        }
+
+        if (record.getParentId() != null) {
+            sql.SET("parent_id = #{parentId,jdbcType=VARCHAR}");
+        }
+
+        if (record.getIsFolder() != null) {
+            sql.SET("is_folder = #{isFolder,jdbcType=TINYINT}");
+        }
+
+        if (record.getIndex() != null) {
+            sql.SET("`index` = #{index,jdbcType=DOUBLE}");
         }
         
         if (record.getStatus() != null) {

@@ -26,7 +26,7 @@ import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
 import { FreeBoardEditor } from './FreeBoardEditor';
 
-const FreeEditor: React.FC = () => {
+export const FreeEditor: React.FC = () => {
   const dispatch = useDispatch();
   const clearSelectedWidgets = e => {
     e.stopPropagation();
@@ -47,8 +47,6 @@ const FreeEditor: React.FC = () => {
     </Layout>
   );
 };
-
-export default FreeEditor;
 
 const Wrapper = styled.div`
   display: flex;
