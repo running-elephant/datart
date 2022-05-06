@@ -21,7 +21,6 @@ import type {
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
   initPaddingTpl,
@@ -36,8 +35,8 @@ import {
 } from '../../WidgetManager/utils/init';
 
 export const widgetMeta: WidgetMeta = {
-  icon: 'img',
-  widgetTypeId: 'image',
+  icon: 'reset',
+  widgetTypeId: 'resetBtn',
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -48,14 +47,14 @@ export const widgetMeta: WidgetMeta = {
     {
       lang: 'zh-CN',
       translation: {
-        desc: 'img',
-        widgetType: 'img',
+        desc: '重置按钮',
+        widgetType: '重置',
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
         },
         title: TitleI18N.zh,
-        background: { backgroundGroup: '图片编辑' },
+        background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
 
         border: { borderGroup: '边框' },
@@ -64,14 +63,14 @@ export const widgetMeta: WidgetMeta = {
     {
       lang: 'en-US',
       translation: {
-        desc: 'img',
-        widgetType: 'img',
+        desc: 'resetBtn',
+        widgetType: 'reset',
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
         },
         title: TitleI18N.en,
-        background: { backgroundGroup: 'Image Setting' },
+        background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
 
         border: { borderGroup: 'Border' },
@@ -80,8 +79,7 @@ export const widgetMeta: WidgetMeta = {
   ],
 };
 
-export type ImageToolkit = WidgetToolkit & {};
-export const widgetToolkit: ImageToolkit = {
+export const widgetToolkit: WidgetToolkit = {
   create: opt => {
     const widget = widgetTpl();
     widget.id = widgetMeta.widgetTypeId + widget.id;
@@ -91,47 +89,47 @@ export const widgetToolkit: ImageToolkit = {
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
     widget.config.widgetTypeId = opt.widgetTypeId;
-    widget.config.type = 'media';
+    widget.config.type = widgetMeta.widgetTypeId;
     if (opt.boardType === 'auto') {
       const rect: RectConfig = {
         x: 0,
         y: 0,
-        width: 6,
-        height: 9,
+        width: 1,
+        height: 1,
       };
       widget.config.rect = rect;
-      widget.config.mRect = { ...initAutoWidgetRect() };
+      widget.config.mRect = rect;
     } else {
       const rect: RectConfig = {
         x: 0,
         y: 0,
-        width: 400,
-        height: 400,
+        width: 128,
+        height: 32,
       };
       widget.config.rect = rect;
     }
 
     widget.config.jsonConfig.props = [
-      { ...initBackgroundTpl() },
       { ...initTitleTpl() },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
+      { ...initBackgroundTpl() },
     ];
     widget.config.jsonConfig.props?.forEach(ele => {
       if (ele.key === 'titleGroup') {
         ele.rows?.forEach(row => {
           if (row.key === 'title') {
-            row.value = 'Image';
+            row.value = 'reset';
           }
         });
       }
-      if (ele.key === 'backgroundGroup') {
-        ele.rows?.forEach(row => {
-          if (row.key === 'background') {
-            row.value.image = '/images/example.png';
-          }
-        });
-      }
+      // if (ele.key === 'titleGroup') {
+      //   ele.rows?.forEach(row => {
+      //     if (row.key === 'title') {
+      //       row.value = '查询';
+      //     }
+      //   });
+      // }
     });
 
     return widget;
@@ -149,9 +147,9 @@ export const widgetToolkit: ImageToolkit = {
   // //
 };
 
-const imageProto = {
+const resetBtnProto = {
   widgetTypeId: widgetMeta.widgetTypeId,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };
-export default imageProto;
+export default resetBtnProto;

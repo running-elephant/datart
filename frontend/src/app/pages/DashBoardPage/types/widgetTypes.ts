@@ -10,7 +10,6 @@ import {
   LinkageConfig,
   RectConfig,
   Relation,
-  WidgetType,
 } from '../pages/Board/slice/types';
 
 export interface Widget {
@@ -33,7 +32,7 @@ export interface WidgetConf {
   boardType: BoardType;
   clientId: string; // replace tabId
   index: number;
-  type: WidgetType;
+  type: string; //WidgetType
   widgetTypeId: string;
   lock: boolean;
   controllable: boolean; // 是否可以关联 controller

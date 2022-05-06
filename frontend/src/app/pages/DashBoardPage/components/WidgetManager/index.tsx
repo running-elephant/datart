@@ -17,19 +17,23 @@
  */
 import linkChartProto from '../Widgets/DataChartWidget/linkChartConfig';
 import selfChartProto from '../Widgets/DataChartWidget/selfChartConfig1';
+import iframeProto from '../Widgets/IframeWidget/iframeConfig';
 import imageProto from '../Widgets/ImageWidget/imageConfig';
+import richTextProto from '../Widgets/RichTextWidget/richTextConfig';
 import tabProto from '../Widgets/TabWidget/TabConfig';
+import timerProto from '../Widgets/TimerWidget/richTextConfig';
+import videoProto from '../Widgets/VideoWidget/videoConfig';
 import { widgetManager } from './WidgetManager';
 
 widgetManager.register(linkChartProto);
 widgetManager.register(selfChartProto);
 widgetManager.register(tabProto);
 widgetManager.register(imageProto);
-// widgetManager.register(videoProto);
-// widgetManager.register(imageProto);
-// widgetManager.register(richTextProto);
-// widgetManager.register(iframeProto);
-// widgetManager.register(timerProto);
+widgetManager.register(videoProto);
+widgetManager.register(imageProto);
+widgetManager.register(richTextProto);
+widgetManager.register(iframeProto);
+widgetManager.register(timerProto);
 // widgetManager.register(controllerProto);
 
 export default widgetManager;
