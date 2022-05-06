@@ -1003,7 +1003,7 @@
         "edit": "Edit",
         "delete": "Delete",
         "confirmDel": "Confirm Delete",
-        "ContainerConfirmDel": "The components within this component will also be deleted, confirm whether to delete them or not?",
+        "ContainerConfirmDel": "The components within this component will also be deleted, confirm to delete them?",
         "info": "Info",
         "makeLinkage": "Set Linkage",
         "closeLinkage": "Close Linkage",
