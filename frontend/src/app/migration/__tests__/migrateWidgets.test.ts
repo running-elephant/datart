@@ -17,18 +17,15 @@
  */
 
 import {
-  Relation,
   ServerRelation,
-  ServerWidget,
   WidgetBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FontDefault } from 'app/pages/DashBoardPage/utils/widget';
 import {
   beta0,
   convertWidgetRelationsToObj,
-  migrateWidgets,
 } from '../BoardConfig/migrateWidgets';
-import { APP_CURRENT_VERSION, APP_VERSION_BETA_0 } from '../constants';
+import { APP_VERSION_BETA_0 } from '../constants';
 
 describe('test migrateWidgets ', () => {
   test('should return undefined  when widget.config.type === filter', () => {
@@ -101,40 +98,5 @@ describe('test migrateWidgets ', () => {
       },
     ] as ServerRelation[];
     expect(convertWidgetRelationsToObj(relations1)).toMatchObject(relations2);
-  });
-
-  test('should get new target version after adjust widgets before save', () => {
-    const widget1 = {
-      config: '{}',
-    } as ServerWidget;
-    const widget2 = {
-      config: `{"version":"1.0.0-beta.0"}`,
-    } as ServerWidget;
-    const widget3 = {
-      config: '{"version":"rrr"}',
-    } as ServerWidget;
-    const widget4 = {
-      config: '{"version":"1.0.0-beta.1"}',
-    } as ServerWidget;
-    const resWidget = {
-      config: {
-        version: APP_CURRENT_VERSION,
-      },
-      relations: [] as Relation[],
-    } as WidgetBeta3;
-    const resWidget2 = {
-      config: {
-        version: APP_CURRENT_VERSION,
-      },
-      relations: [] as Relation[],
-    } as WidgetBeta3;
-    const widgets: ServerWidget[] = [widget1, widget2, widget3, widget4];
-
-    expect(migrateWidgets(widgets)).toMatchObject([
-      resWidget,
-      resWidget,
-      resWidget,
-      resWidget2,
-    ]);
   });
 });

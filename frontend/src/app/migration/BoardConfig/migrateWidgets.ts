@@ -136,8 +136,11 @@ export const migrateWidgets = (widgets: ServerWidget[]) => {
       let resWidget = beta0(widget);
 
       resWidget = beta2(resWidget);
+      console.log('__ resWidget', resWidget);
       let beta4Widget = beta4(resWidget);
+      console.log('__ beta4Widget', beta4Widget);
       beta4Widget = finaleWidget(beta4Widget as Widget);
+      console.log('__ finaleWidget', beta4Widget);
       return beta4Widget;
     })
     .filter(widget => !!widget);
