@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetMeta,
   WidgetToolkit,
@@ -24,6 +23,7 @@ import {
   initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
+  initFreeWidgetRect,
   initPaddingTpl,
   initTitleTpl,
   initWidgetEditActionTpl,
@@ -36,8 +36,8 @@ import {
 } from '../../WidgetManager/utils/init';
 
 export const widgetMeta: WidgetMeta = {
-  icon: 'img',
-  widgetTypeId: 'image',
+  icon: 'timer',
+  widgetTypeId: 'timer',
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -48,14 +48,14 @@ export const widgetMeta: WidgetMeta = {
     {
       lang: 'zh-CN',
       translation: {
-        desc: 'img',
-        widgetType: 'img',
+        desc: 'richText',
+        widgetType: 'richText',
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
         },
         title: TitleI18N.zh,
-        background: { backgroundGroup: '图片编辑' },
+        background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
 
         border: { borderGroup: '边框' },
@@ -64,14 +64,14 @@ export const widgetMeta: WidgetMeta = {
     {
       lang: 'en-US',
       translation: {
-        desc: 'img',
-        widgetType: 'img',
+        desc: 'richText',
+        widgetType: 'richText',
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
         },
         title: TitleI18N.en,
-        background: { backgroundGroup: 'Image Setting' },
+        background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
 
         border: { borderGroup: 'Border' },
@@ -80,8 +80,7 @@ export const widgetMeta: WidgetMeta = {
   ],
 };
 
-export type ImageToolkit = WidgetToolkit & {};
-export const widgetToolkit: ImageToolkit = {
+export const widgetToolkit: WidgetToolkit = {
   create: opt => {
     const widget = widgetTpl();
     widget.id = widgetMeta.widgetTypeId + widget.id;
@@ -93,27 +92,15 @@ export const widgetToolkit: ImageToolkit = {
     widget.config.widgetTypeId = opt.widgetTypeId;
     widget.config.type = 'media';
     if (opt.boardType === 'auto') {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 6,
-        height: 9,
-      };
-      widget.config.rect = rect;
+      widget.config.rect = { ...initAutoWidgetRect() };
       widget.config.mRect = { ...initAutoWidgetRect() };
     } else {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 400,
-        height: 400,
-      };
-      widget.config.rect = rect;
+      widget.config.rect = { ...initFreeWidgetRect() };
     }
 
     widget.config.jsonConfig.props = [
-      { ...initBackgroundTpl() },
       { ...initTitleTpl() },
+      { ...initBackgroundTpl() },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
     ];
@@ -121,17 +108,17 @@ export const widgetToolkit: ImageToolkit = {
       if (ele.key === 'titleGroup') {
         ele.rows?.forEach(row => {
           if (row.key === 'title') {
-            row.value = 'Image';
+            row.value = 'timer';
           }
         });
       }
-      if (ele.key === 'backgroundGroup') {
-        ele.rows?.forEach(row => {
-          if (row.key === 'background') {
-            row.value.image = '/images/example.png';
-          }
-        });
-      }
+      // if (ele.key === 'titleGroup') {
+      //   ele.rows?.forEach(row => {
+      //     if (row.key === 'title') {
+      //       row.value = '查询';
+      //     }
+      //   });
+      // }
     });
 
     return widget;
@@ -149,9 +136,9 @@ export const widgetToolkit: ImageToolkit = {
   // //
 };
 
-const imageProto = {
+const timerProto = {
   widgetTypeId: widgetMeta.widgetTypeId,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };
-export default imageProto;
+export default timerProto;

@@ -108,49 +108,29 @@ const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
   });
   return newWidget;
 };
-/**
- *
- *
- * @param {WidgetBeta3} widget
- * @return {*}
- */
-export const convertWidgetToBeta4 = (widget: WidgetBeta3) => {
-  const widgetType = widget.config.type;
+export const convertChartWidgetToBeta4 = (widget: WidgetBeta3) => {
   const subType = widget.config.content.type;
-  // chart
-  if (widgetType === 'chart') {
-    let newWidget = {} as Widget;
-    if (widget.config.content.type === 'dataChart') {
-      newWidget = widgetManager
-        .toolkit('linkChart')
-        .create({ ...widget, widgetTypeId: 'linkChart' });
-    } else {
-      newWidget = widgetManager.toolkit('selfChart').create({
-        ...widget,
-        widgetTypeId: 'selfChart',
-      });
-    }
+  let newWidget = {} as Widget;
+  if (subType === 'dataChart') {
+    newWidget = widgetManager
+      .toolkit('linkChart')
+      .create({ ...widget, widgetTypeId: 'linkChart' });
+  } else {
+    newWidget = widgetManager.toolkit('selfChart').create({
+      ...widget,
+      widgetTypeId: 'selfChart',
+    });
+  }
 
-    newWidget = commonBeta4Convert(newWidget, widget);
-    newWidget.config.jumpConfig = widget.config.jumpConfig;
-    newWidget.config.linkageConfig = widget.config.linkageConfig;
-    return newWidget;
-  }
-  // media
-  if (widgetType === 'media') {
-    if (subType === 'image') {
-      let newWidget = widgetManager.toolkit('image').create({
-        ...widget,
-        widgetTypeId: 'image',
-      });
-      newWidget = commonBeta4Convert(newWidget, widget);
-      return newWidget;
-    }
-  }
-  // container
-  if (widgetType === 'container') {
-    if (subType === 'tab') {
-      /**
+  newWidget = commonBeta4Convert(newWidget, widget);
+  newWidget.config.jumpConfig = widget.config.jumpConfig;
+  newWidget.config.linkageConfig = widget.config.linkageConfig;
+  return newWidget;
+};
+export const convertContainerWidgetToBeta4 = (widget: WidgetBeta3) => {
+  const subType = widget.config.content.type;
+  if (subType === 'tab') {
+    /**
        old data 
        {
          "itemMap": {
@@ -170,7 +150,7 @@ export const convertWidgetToBeta4 = (widget: WidgetBeta3) => {
        }
 
        */
-      /**
+    /**
        new data 
        {
          "itemMap": {
@@ -190,22 +170,109 @@ export const convertWidgetToBeta4 = (widget: WidgetBeta3) => {
 }
 
        */
-      let newWidget = widgetManager.toolkit('tab').create({
-        ...widget,
-        widgetTypeId: 'tab',
-      });
-      newWidget = commonBeta4Convert(newWidget, widget);
+    let newWidget = widgetManager.toolkit('tab').create({
+      ...widget,
+      widgetTypeId: 'tab',
+    });
+    newWidget = commonBeta4Convert(newWidget, widget);
 
-      const itemMap = newWidget.config.content?.itemMap;
-      if (!itemMap) return newWidget;
-      const tabItems = Object.values(itemMap) as any[];
-      let newIndex = Number(Date.now());
-      tabItems.forEach(item => {
-        item.index = newIndex;
-        delete item.config;
-        newIndex++;
-      });
-      return newWidget;
+    const itemMap = newWidget.config.content?.itemMap;
+    if (!itemMap) return newWidget;
+    const tabItems = Object.values(itemMap) as any[];
+    let newIndex = Number(Date.now());
+    tabItems.forEach(item => {
+      item.index = newIndex;
+      delete item.config;
+      newIndex++;
+    });
+    return newWidget;
+  }
+};
+/**
+ *
+ *
+ * @param {WidgetBeta3} widget
+ * @return {*}
+ */
+export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
+  const subType = widget.config.content.type;
+  if (subType === 'image') {
+    let newWidget = widgetManager.toolkit('image').create({
+      ...widget,
+      widgetTypeId: 'image',
+    });
+    newWidget = commonBeta4Convert(newWidget, widget);
+    return newWidget;
+  }
+  if (subType === 'richText') {
+    let newWidget = widgetManager.toolkit('richText').create({
+      ...widget,
+      widgetTypeId: 'richText',
+    });
+    newWidget = commonBeta4Convert(newWidget, widget);
+    // getWidgetIframe;
+    return newWidget;
+  }
+  if (subType === 'iframe') {
+    /**
+     * old data
+    {
+    "content": {
+        "type": "iframe",
+        "iframeConfig": {
+            "src": "https://ant.design/components/overview-cn/"
+        }
     }
+}
+    */
+    let newWidget = widgetManager.toolkit('iframe').create({
+      ...widget,
+      widgetTypeId: 'iframe',
+    });
+    newWidget = commonBeta4Convert(newWidget, widget);
+    const oldConf = widget.config.content.iframeConfig;
+    newWidget.config.jsonConfig.props?.forEach(prop => {
+      // iframeGroup
+
+      if (prop.key === 'iframeGroup') {
+        prop.rows?.forEach(row => {
+          if (row.key === 'src') {
+            row.value = oldConf.src;
+          }
+        });
+      }
+    });
+    return newWidget;
+  }
+
+  if (subType === 'video') {
+    let newWidget = widgetManager.toolkit('video').create({
+      ...widget,
+      widgetTypeId: 'video',
+    });
+    newWidget = commonBeta4Convert(newWidget, widget);
+    return newWidget;
+  }
+};
+/**
+ *
+ *
+ * @param {WidgetBeta3} widget
+ * @return {*}
+ */
+export const convertWidgetToBeta4 = (widget: WidgetBeta3) => {
+  const widgetType = widget.config.type;
+
+  // chart
+  if (widgetType === 'chart') {
+    return convertChartWidgetToBeta4(widget);
+  }
+  // media
+  if (widgetType === 'media') {
+    return convertMediaWidgetToBeta4(widget);
+  }
+  // container
+  if (widgetType === 'container') {
+    return convertContainerWidgetToBeta4(widget);
   }
 };

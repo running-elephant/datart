@@ -15,15 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
 import {
   initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
+  initFreeWidgetRect,
   initPaddingTpl,
   initTitleTpl,
   initWidgetEditActionTpl,
@@ -34,10 +35,35 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
-
+const initIframeTpl = () => {
+  return {
+    label: 'iframe.iframeGroup',
+    key: 'iframeGroup',
+    comType: 'group',
+    rows: [
+      {
+        label: 'iframe.src',
+        key: 'src',
+        value:
+          'https://www.bing.com/search?q=%E5%BC%80%E6%BA%90+Datart&form=QBLH&sp=-1&pq=%E5%BC%80%E6%BA%90+datart', //https://www.oschina.net/p/datart, http://www.retech.cc/product/datart
+        comType: 'input',
+      },
+    ],
+  };
+};
+const iframeI18N = {
+  zh: {
+    iframeGroup: '嵌入页配置',
+    src: '嵌入地址', //资源？
+  },
+  en: {
+    iframeGroup: 'Iframe Config',
+    src: 'URL', // Source?
+  },
+};
 export const widgetMeta: WidgetMeta = {
-  icon: 'img',
-  widgetTypeId: 'image',
+  icon: 'iframe',
+  widgetTypeId: 'iframe',
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -48,40 +74,39 @@ export const widgetMeta: WidgetMeta = {
     {
       lang: 'zh-CN',
       translation: {
-        desc: 'img',
-        widgetType: 'img',
+        desc: 'iframe',
+        widgetType: 'iframe',
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
         },
         title: TitleI18N.zh,
-        background: { backgroundGroup: '图片编辑' },
+        iframe: iframeI18N.zh,
+        background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
-
         border: { borderGroup: '边框' },
       },
     },
     {
       lang: 'en-US',
       translation: {
-        desc: 'img',
-        widgetType: 'img',
+        desc: 'iframe',
+        widgetType: 'iframe',
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
         },
         title: TitleI18N.en,
-        background: { backgroundGroup: 'Image Setting' },
+        iframe: iframeI18N.en,
+        background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
-
         border: { borderGroup: 'Border' },
       },
     },
   ],
 };
 
-export type ImageToolkit = WidgetToolkit & {};
-export const widgetToolkit: ImageToolkit = {
+export const widgetToolkit: WidgetToolkit = {
   create: opt => {
     const widget = widgetTpl();
     widget.id = widgetMeta.widgetTypeId + widget.id;
@@ -93,27 +118,16 @@ export const widgetToolkit: ImageToolkit = {
     widget.config.widgetTypeId = opt.widgetTypeId;
     widget.config.type = 'media';
     if (opt.boardType === 'auto') {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 6,
-        height: 9,
-      };
-      widget.config.rect = rect;
+      widget.config.rect = { ...initAutoWidgetRect() };
       widget.config.mRect = { ...initAutoWidgetRect() };
     } else {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 400,
-        height: 400,
-      };
-      widget.config.rect = rect;
+      widget.config.rect = { ...initFreeWidgetRect() };
     }
 
     widget.config.jsonConfig.props = [
-      { ...initBackgroundTpl() },
+      { ...initIframeTpl() },
       { ...initTitleTpl() },
+      { ...initBackgroundTpl() },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
     ];
@@ -121,17 +135,17 @@ export const widgetToolkit: ImageToolkit = {
       if (ele.key === 'titleGroup') {
         ele.rows?.forEach(row => {
           if (row.key === 'title') {
-            row.value = 'Image';
+            row.value = 'iframe';
           }
         });
       }
-      if (ele.key === 'backgroundGroup') {
-        ele.rows?.forEach(row => {
-          if (row.key === 'background') {
-            row.value.image = '/images/example.png';
-          }
-        });
-      }
+      // if (ele.key === 'titleGroup') {
+      //   ele.rows?.forEach(row => {
+      //     if (row.key === 'title') {
+      //       row.value = '查询';
+      //     }
+      //   });
+      // }
     });
 
     return widget;
@@ -148,10 +162,15 @@ export const widgetToolkit: ImageToolkit = {
   // getWidgetName() {},
   // //
 };
-
-const imageProto = {
+export const getWidgetIframe = props => {
+  const [src] = getJsonConfigs(props, ['iframeGroup'], ['src']);
+  return {
+    src,
+  };
+};
+const iframeProto = {
   widgetTypeId: widgetMeta.widgetTypeId,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };
-export default imageProto;
+export default iframeProto;

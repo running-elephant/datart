@@ -15,8 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import type {
+import {
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
@@ -36,8 +37,8 @@ import {
 } from '../../WidgetManager/utils/init';
 
 export const widgetMeta: WidgetMeta = {
-  icon: 'img',
-  widgetTypeId: 'image',
+  icon: 'controller',
+  widgetTypeId: 'controller',
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -48,14 +49,14 @@ export const widgetMeta: WidgetMeta = {
     {
       lang: 'zh-CN',
       translation: {
-        desc: 'img',
-        widgetType: 'img',
+        desc: '控制器',
+        widgetType: '控制器',
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
         },
         title: TitleI18N.zh,
-        background: { backgroundGroup: '图片编辑' },
+        background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
 
         border: { borderGroup: '边框' },
@@ -64,14 +65,14 @@ export const widgetMeta: WidgetMeta = {
     {
       lang: 'en-US',
       translation: {
-        desc: 'img',
-        widgetType: 'img',
+        desc: '控制器',
+        widgetType: '控制器',
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
         },
         title: TitleI18N.en,
-        background: { backgroundGroup: 'Image Setting' },
+        background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
 
         border: { borderGroup: 'Border' },
@@ -80,8 +81,7 @@ export const widgetMeta: WidgetMeta = {
   ],
 };
 
-export type ImageToolkit = WidgetToolkit & {};
-export const widgetToolkit: ImageToolkit = {
+export const widgetToolkit: WidgetToolkit = {
   create: opt => {
     const widget = widgetTpl();
     widget.id = widgetMeta.widgetTypeId + widget.id;
@@ -91,7 +91,7 @@ export const widgetToolkit: ImageToolkit = {
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
     widget.config.widgetTypeId = opt.widgetTypeId;
-    widget.config.type = 'media';
+    widget.config.type = 'controller';
     if (opt.boardType === 'auto') {
       const rect: RectConfig = {
         x: 0,
@@ -149,9 +149,9 @@ export const widgetToolkit: ImageToolkit = {
   // //
 };
 
-const imageProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+const controllerProto = {
+  widgetTypeId: 'controller',
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };
-export default imageProto;
+export default controllerProto;

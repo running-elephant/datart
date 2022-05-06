@@ -128,6 +128,7 @@ export const getMeta = (opt: {
 
 export const dataChartCreator: WidgetToolkit['create'] = opt => {
   const widget = widgetTpl();
+  widget.id = opt.widgetTypeId + widget.id;
   widget.parentId = opt.parentId || '';
   widget.dashboardId = opt.dashboardId || '';
   widget.datachartId = opt.datachartId || '';
