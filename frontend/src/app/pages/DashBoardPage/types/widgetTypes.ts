@@ -31,6 +31,7 @@ export type JsonConfig = {
 export interface WidgetConf {
   version: string;
   boardType: BoardType;
+  clientId: string; // replace tabId
   index: number;
   type: WidgetType;
   widgetTypeId: string;

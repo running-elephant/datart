@@ -318,6 +318,7 @@ export const widgetTpl = (): Widget => {
     viewIds: [],
     parentId: '',
     config: {
+      clientId: initClientId(),
       version: APP_CURRENT_VERSION,
       index: 0,
       boardType: '' as BoardType,
@@ -341,4 +342,8 @@ export const widgetTpl = (): Widget => {
       },
     },
   };
+};
+
+export const initClientId = () => {
+  return 'client_' + uuidv4();
 };

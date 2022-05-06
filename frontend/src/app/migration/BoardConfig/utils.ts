@@ -20,12 +20,15 @@ import { WidgetBeta3 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { widgetManager } from '../../pages/DashBoardPage/components/WidgetManager/WidgetManager';
 
-const commonConvert = (newWidget: Widget, oldW: WidgetBeta3) => {
+const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
   const oldConf = oldW.config;
   newWidget.config.index = oldW.config.index;
   newWidget.config.lock = oldW.config.lock;
   newWidget.config.rect = oldW.config.rect;
   newWidget.config.content = oldW.config.content; //Todo
+  if (oldW.config.tabId) {
+    newWidget.config.clientId = oldW.config.tabId;
+  }
 
   if (oldW.config.mobileRect) {
     newWidget.config.mRect = oldW.config.mobileRect;
@@ -116,7 +119,7 @@ export const convertWidgetToBeta4 = (widget: WidgetBeta3) => {
         widgetTypeId: 'selfChart',
       });
     }
-    newWidget = commonConvert(newWidget, widget);
+    newWidget = commonBeta4Convert(newWidget, widget);
     newWidget.config.jumpConfig = widget.config.jumpConfig;
     newWidget.config.linkageConfig = widget.config.linkageConfig;
     return newWidget;

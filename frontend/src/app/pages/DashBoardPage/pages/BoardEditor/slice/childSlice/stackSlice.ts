@@ -247,13 +247,19 @@ export const editBoardStackSlice = createSlice({
       debugger;
       const tabContent = state.widgetRecord[parentId].config
         .content as TabWidgetContent;
-      const sourceWidget = state.widgetRecord[sourceId] as any;
+      const sourceWidget = state.widgetRecord[sourceId] as unknown as Widget;
+
       debugger;
       let tabName =
-        getWidgetTitle(sourceWidget.config?.jsonConfig?.props).title || '***';
-      tabContent.itemMap[tabItem.tabId].name = tabName;
-      tabContent.itemMap[tabItem.tabId].childWidgetId = sourceWidget.id;
+        getWidgetTitle(sourceWidget.config?.jsonConfig?.props).title || 'tab*';
+      tabContent.itemMap[sourceWidget.config.clientId] = {
+        ...tabItem,
+        name: tabName,
+        tabId: sourceWidget.config.clientId,
+        childWidgetId: sourceWidget.id,
+      };
       state.widgetRecord[sourceId].parentId = parentId;
+      delete tabContent.itemMap[tabItem.tabId];
     },
     /* tabs widget */
     tabsWidgetAddTab(
