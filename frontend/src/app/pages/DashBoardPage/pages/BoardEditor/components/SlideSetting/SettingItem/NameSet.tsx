@@ -23,13 +23,14 @@ import { WidgetTitleConfig } from 'app/pages/DashBoardPage/pages/Board/slice/typ
 import { FontDefault } from 'app/pages/DashBoardPage/utils/widget';
 import React, { FC, memo, useMemo } from 'react';
 import SelectSet from './BasicSet/SelectSet';
+import i18next from 'i18next';
 
 const FONT_DATA = {
   comType: 'font',
   default: FontDefault,
   disabled: undefined,
   key: 'font',
-  label: '字体',
+  label: i18next.t('viz.board.setting.font'),
 };
 
 export const NameSet: FC<{

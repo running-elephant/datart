@@ -31,6 +31,7 @@ import { LEVEL_10, LEVEL_100, SPACE_LG, SPACE_SM } from 'styles/StyleConstants';
 import { CanFullScreenWidgetTypes } from '../../constants';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 import { FullScreenWidgetMapper } from './FullScreenWidgetMapper';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 
 export const FullScreenPanel: React.FC<{}> = memo(() => {
   const { boardId, boardType } = useContext(BoardContext);
@@ -86,6 +87,8 @@ export const FullScreenPanel: React.FC<{}> = memo(() => {
       );
     }
   }, [boardId, boardType, itemId, widgetMap]);
+  
+  const t = useI18NPrefix(`viz.widget.action`);
 
   return (
     <>
@@ -97,7 +100,7 @@ export const FullScreenPanel: React.FC<{}> = memo(() => {
               <span>{widgetMap[itemId].config.name}</span>
             </div>
             <Button className="close-fullscreen" onClick={closeFullScreen}>
-              取消全屏
+              {t('exitFullScreen')}
             </Button>
           </FullHeader>
           <div className="full-container">

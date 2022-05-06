@@ -1,6 +1,6 @@
 {
   "global": {
-    "copy": "copy",
+    "copy": "Copy",
     "tokenExpired": "Token expired, please log in",
     "401": "Not logged in or token expired, please log in again",
     "title": {
@@ -34,7 +34,7 @@
     "validation": {
       "required": " is required",
       "invalidPassword": "Password must be 6-20 characters",
-      "passwordNotMatch": "Password and confirm password does not match"
+      "passwordNotMatch": "Password and confirm password do not match"
     },
     "time": {
       "minute": "Minute",
@@ -67,7 +67,7 @@
     "columnCategory": {
       "uncategorized": "Uncategorized",
       "country": "Country",
-      "provinceorstate": "ProvinceOrState",
+      "provinceorstate": "Province Or State",
       "city": "City",
       "county": "County"
     }
@@ -333,7 +333,7 @@
           "dropdownList": "Dropdown List",
           "radioGroup": "Radio Group",
           "checkboxGroup": "Checkbox Group",
-          "multiDropdownList": "multiple Dropdown List",
+          "multiDropdownList": "Multiple Dropdown List",
           "rangeTime": "Range Time",
           "rangeTimePicker": "Range Time",
           "recommendTime": "Recommend Time",
@@ -343,7 +343,23 @@
           "value": "Value",
           "time": "Time",
           "slider": "Slider",
-          "rangeSlider": "RangeSlider"
+          "rangeSlider": "Range Slider"
+        },
+        "controllerPlaceHolders": {
+          "multiSelectController": "Select ..",
+          "numberController": "Enter a number",
+          "rangeNumberControllerMin": "Min",
+          "rangeNumberControllerMax": "Max",
+          "selectController": "Select ..",
+          "textController": "Enter text"
+        },
+        "controllerPlaceHolders": {
+          "multiSelectController": "Select ..",
+          "numberController": "Enter a number",
+          "rangeNumberControllerMin": "Min",
+          "rangeNumberControllerMax": "Max",
+          "selectController": "Select ..",
+          "textController": "Enter text"
         },
         "controllerVisibilityTypes": {
           "hide": "Hide",
@@ -369,9 +385,9 @@
         "widthOption": "Width Option",
         "columnName": "Current Edit Column Name",
         "arrange": "Arrange",
-        "hide": "hide",
-        "show": "show",
-        "condition": "condition",
+        "hide": "Hide",
+        "show": "Show",
+        "condition": "Condition",
         "min": "Min",
         "max": "Max",
         "radioType": "Style",
@@ -403,7 +419,7 @@
           "select": "Select",
           "currentTime": "Current Time",
           "startTime": "Start Time",
-          "endTime": "end Time",
+          "endTime": "End Time",
           "exact": "Exact",
           "relative": "Relative"
         },
@@ -422,7 +438,7 @@
           "tableHeaderAction": "Operation",
           "deleteRow": "Delete",
           "setDefault": "As Default",
-          "setUnDefault": "As UnDefault",
+          "setUnDefault": "As Undefault",
           "addRow": "Add Row",
           "AddFromFields": "Add Row Current Field",
           "associateField": "Associate Field",
@@ -433,14 +449,14 @@
       }
     },
     "management": {
-      "title": "widgets management",
-      "subTitle": "widgets list",
+      "title": "Widgets Management",
+      "subTitle": "Widget List",
       "table": {
         "header": {
           "name": "Name",
           "description": "Description",
           "type": "Type",
-          "action": "action"
+          "action": "Action"
         }
       }
     },
@@ -503,8 +519,8 @@
             "newName": "Enter a new header name",
             "merge": "Merge",
             "reset": "Reset",
-            "moveUp": "moveUp",
-            "moveDown": "moveDown",
+            "moveUp": "Move Up",
+            "moveDown": "Move Down",
             "columnName": "Column Name",
             "backgroundColor": "Background Color",
             "font": "Font",
@@ -735,7 +751,7 @@
           "backgroundColor": "Background Color",
           "borderStyle": "Border Style",
           "constant": "Constant",
-          "avg": "AVG",
+          "avg": "Avg",
           "max": "Max",
           "min": "Min"
         },
@@ -826,6 +842,7 @@
         "cancel": "Cancel",
         "save": "Save"
       },
+      "downloadTaskSuccess": "Download task created successfully",
       "edit": "Edit",
       "run": "Run",
       "publish": "Publish",
@@ -844,7 +861,7 @@
         "expireDate": "Expire Date",
         "enablePassword": "Password",
         "generateLink": "Generate Link",
-        "shareLink": "Share management",
+        "shareLink": "Share Management",
         "downloadData": "Download Excel",
         "downloadPDF": "Download PDF",
         "downloadPicture": "Download Picture",
@@ -871,7 +888,7 @@
         "delete": "Delete",
         "addLink": "Add a link",
         "deleteError": "Failed to delete",
-        "sureDelete": "sure you want to delete?",
+        "sureDelete": "Confirm to delete?",
         "noDataTip": "No link yet, click on the top right corner to add",
         "Permanent": "Permanent"
       }
@@ -886,14 +903,14 @@
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",
-        "iframe": "iframe",
+        "iframe": "iFrame",
         "video": "Video",
         "container": "Container",
         "tab": "Tab",
         "carousel": "Carousel",
         "controller": "Controller",
-        "toTop": "move To Top",
-        "toBottom": "move To Bottom",
+        "toTop": "Move To Top",
+        "toBottom": "Move To Bottom",
         "undo": "Undo",
         "redo": "Redo",
         "delete": "Delete",
@@ -902,7 +919,10 @@
         "deviceSwitch": "Device Switch",
         "allowOverlap": "Allow Overlap",
         "forbidOverlap": "Forbid Overlap",
-        "multiSelect": "MultiSelect"
+        "multiSelect": "MultiSelect",
+        "zoomIn": "Zoom Out",
+        "zoomOut": "Zoom In",
+        "widgetList": "Widget List"
       },
       "controlTypes": {
         "common": "Common",
@@ -919,12 +939,13 @@
         "align": "Align",
         "showTitle": "Show Title",
         "position": "Position",
-        "xAxis": "xAxis",
-        "yAxis": "yAxis",
+        "xAxis": "x-Axis",
+        "yAxis": "y-Axis",
         "size": "Size",
         "px": "px",
         "width": "Width",
         "height": "Height",
+        "font": "Font",
         "background": "Background",
         "color": "Color",
         "image": "Image",
@@ -945,7 +966,7 @@
         "marginLR": "Margin-LR",
         "paddingTB": "Padding-TB",
         "paddingLR": "Padding-LR",
-        "rowHeight": "rowHeight",
+        "rowHeight": "Row Height",
         "scaleMode": "Scale Mode",
         "queryMode": "Query Mode",
         "openInitQuery": "Open Init Query",
@@ -956,7 +977,9 @@
         "duration": "Duration (s) ",
         "delPagesTip": "Confirm to delete all selected story pages?",
         "delPageTip": "Confirm to delete this story page?",
-        "enterHere": "Enter here"
+        "enterHere": "Enter here",
+        "storyName": "Name",
+        "storyDescription": "Description"
       }
     },
     "widget": {
@@ -966,8 +989,8 @@
       "widgetType": "Widget Type",
       "type": {
         "chart": "Chart",
-        "widgetChart": "privateChart",
-        "dataChart": "publicChart",
+        "widgetChart": "Private Chart",
+        "dataChart": "Public Chart",
         "media": "Media",
         "container": "Container",
         "controller": "Controller",
@@ -976,18 +999,19 @@
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",
-        "iframe": "iframe",
+        "iframe": "iFrame",
         "video": "Video",
         "tab": "Tab"
       },
       "action": {
         "refresh": "Refresh",
         "fullScreen": "FullScreen",
+        "exitFullScreen": "Exit FullScreen",
         "lock": "Lock",
         "edit": "Edit",
         "delete": "Delete",
         "confirmDel": "Confirm Delete",
-        "ContainerConfirmDel": "The components within this component will also be deleted, confirm whether to delete them or not?",
+        "ContainerConfirmDel": "The components within this component will also be deleted, confirm to delete them?",
         "info": "Info",
         "makeLinkage": "Set Linkage",
         "closeLinkage": "Close Linkage",
@@ -995,7 +1019,7 @@
         "closeJump": "Close Jump"
       },
       "tips": {
-        "unlock": "LockIng drag and click to unlock",
+        "unlock": "Locking drag and click to unlock",
         "waiting": "Waiting for loadData",
         "cancelLinkage": "Cancel Linkage",
         "canLinkage": "Click the Widget to link"
@@ -1012,7 +1036,7 @@
     },
     "jump": {
       "title": "Jump Settings",
-      "mode": "Jumping mode",
+      "mode": "Jump Mode",
       "target": "Target",
       "INTERNAL": "Dashboard/DataChart",
       "URL": "URL",
@@ -1033,9 +1057,9 @@
       "presentation": "Presentation",
       "folders": {
         "folderTitle": "Dashboards & Datacharts",
-        "dashboard": "Create dashboard",
-        "dataChart": "Create dataChart",
-        "folder": "Create folder",
+        "dashboard": "Create Dashboard",
+        "dataChart": "Create Datachart",
+        "folder": "Create Folder",
         "recycle": "Recycle",
         "open": "Open",
         "close": "Close",
@@ -1043,38 +1067,38 @@
       },
       "storyboards": {
         "title": "Storyboards",
-        "add": "Create storyboard",
+        "add": "Create Storyboard",
         "recycle": "Recycle"
       }
     },
     "lineOptions": {
-      "none": "none",
-      "solid": "solid",
-      "dashed": "dashed",
-      "dotted": "dotted",
-      "double": "double",
-      "hidden": "hidden",
-      "ridge": "ridge",
-      "groove": "groove",
-      "inset": "inset",
-      "outset": "outset"
+      "none": "None",
+      "solid": "Solid",
+      "dashed": "Dashed",
+      "dotted": "Dotted",
+      "double": "Double",
+      "hidden": "Hidden",
+      "ridge": "Ridge",
+      "groove": "Groove",
+      "inset": "Inset",
+      "outset": "Outset"
     },
     "scaleMode": {
-      "scaleWidth": "scaleWidth",
-      "scaleHeight": "scaleHeight",
-      "scaleFull": "scaleFull",
-      "noScale": "noScale"
+      "scaleWidth": "Scale Width",
+      "scaleHeight": "Scale Height",
+      "scaleFull": "Scale Full",
+      "noScale": "No Scale"
     },
     "tips": {
       "noStartValue": "Input Start Value",
       "noEndValue": "Input End Value",
-      "endGTStartErr": "End Value should GT StartValue "
+      "endGTStartErr": "End Value should be greater than Start Value "
     },
     "control": {
       "title": "Control Title",
       "valueConfig": "Value Config",
-      "selectViewField": "Select ViewField",
-      "selectDefaultValue": "Select DefaultValue",
+      "selectViewField": "Select View Field",
+      "selectDefaultValue": "Select Default Value",
       "defaultValue": "Default Value",
       "visibility": "Visibility",
       "sqlOperator": "Sql Operator",
@@ -1129,7 +1153,7 @@
     "sqlRequired": "SQL statement cannot be empty",
     "sqlRunWraning": "SQL parsing failed, welcome to submit an issue to help us improve. ",
     "detail": "Click here for details",
-    "warningDescription": "Datart uses calcite to parse SQL statements by default; calcite has a awesome parser, but it still can't parse all the grammars of all databases. When a parsing exception occurs, datart will still send the SQL statement to the database for execution after necessary processing. If the execution is successful, we will think that the parser needs to be improved for the syntax of the SQL statement. In this case, datart will show this warning message, which is convenient for users to submit the exceptional parsing statements to github or gitee issue, and help us improve the parser.",
+    "warningDescription": "Datart uses calcite to parse SQL statements by default; calcite has an awesome parser, but it still can't parse all the grammars of all databases. When a parsing exception occurs, datart will still send the SQL statement to the database for execution after necessary processing. If the execution is successful, we will think that the parser needs to be improved for the syntax of the SQL statement. In this case, datart will show this warning message, which is convenient for users to submit the exceptional parsing statements to github or gitee issue, and help us improve the parser.",
     "close": "Close",
     "tabs": {
       "discard": "Discard",
@@ -1155,7 +1179,7 @@
       "readonlyTip": "Not editable in recycle"
     },
     "properties": {
-      "reference": "Source reference",
+      "reference": "Source Reference",
       "variable": "Variables",
       "model": "Data Model",
       "columnPermissions": "Column Permissions"
@@ -1166,7 +1190,7 @@
     },
     "variable": {
       "title": "Variables",
-      "formTitle": "variable",
+      "formTitle": "Variable",
       "add": "Create variable",
       "prefix": "[Public]",
       "suffix": "duplicate"
@@ -1243,7 +1267,7 @@
       "addConfig": "Add configuration",
       "editConfig": "Edit configuration",
       "duplicate": "Duplicate key",
-      "duplicateName": "Duplicate Name"
+      "duplicateName": "Duplicate name"
     }
   },
   "member": {

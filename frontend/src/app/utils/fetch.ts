@@ -32,6 +32,7 @@ import {
 import { saveAs } from 'file-saver';
 import { request, request2, requestWithHeader } from 'utils/request';
 import { errorHandle } from 'utils/utils';
+import i18next from 'i18next';
 
 export const getDistinctFields = async (
   viewId: string,
@@ -97,7 +98,7 @@ export const makeDownloadDataTask =
       },
     });
     if (res?.success) {
-      message.success('下载任务创建成功');
+      message.success(i18next.t('viz.action.downloadTaskSuccess'));
     }
     resolve();
   };
@@ -137,7 +138,7 @@ export const makeShareDownloadDataTask =
       },
     });
     if (success) {
-      message.success('下载任务创建成功');
+      message.success(i18next.t('viz.action.downloadTaskSuccess'));
     }
     resolve();
   };
