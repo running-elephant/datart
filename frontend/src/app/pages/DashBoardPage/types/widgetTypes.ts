@@ -41,8 +41,6 @@ export interface WidgetConf {
   // visible: boolean; // 是否可见 TODO: 后续考虑
   jsonConfig: JsonConfig;
   content?: any;
-
-  selfConfig: any;
   rect: RectConfig;
   mRect?: RectConfig;
   parentId?: string;

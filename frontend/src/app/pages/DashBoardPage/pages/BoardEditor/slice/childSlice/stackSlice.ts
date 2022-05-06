@@ -244,7 +244,6 @@ export const editBoardStackSlice = createSlice({
       }>,
     ) {
       const { parentId, tabItem, sourceId } = action.payload;
-      debugger;
       const tabContent = state.widgetRecord[parentId].config
         .content as TabWidgetContent;
       const sourceWidget = state.widgetRecord[sourceId] as unknown as Widget;
@@ -289,6 +288,7 @@ export const editBoardStackSlice = createSlice({
       const tabItem = tabContent.itemMap[sourceTabId];
 
       const rt = state.widgetRecord[parentId].config.rect;
+      delete tabContent.itemMap[sourceTabId];
       if (state.widgetRecord[tabItem.childWidgetId]) {
         if (mode === 'auto') {
           state.widgetRecord[tabItem.childWidgetId].config.rect = rt;
@@ -302,7 +302,6 @@ export const editBoardStackSlice = createSlice({
         }
 
         state.widgetRecord[tabItem.childWidgetId].parentId = '';
-        delete tabContent.itemMap[sourceTabId];
       }
     },
     /* MediaWidgetConfig */

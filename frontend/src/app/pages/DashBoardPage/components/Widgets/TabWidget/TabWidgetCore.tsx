@@ -43,7 +43,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
   } = useContext(BoardContext);
   const { itemMap } = widget.config.content as TabWidgetContent;
   const tabsCons = Object.values(itemMap).sort((a, b) => a.index - b.index);
-
+  debugger;
   const [activeKey, SetActiveKey] = useState<string | number>(
     tabsCons[0]?.index || 0,
   );
@@ -54,8 +54,6 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
   const tabAdd = useCallback(() => {
     const newTabId = `tab_${uuidv4()}`;
     const nextIndex = Date.now();
-    console.log('__ newTabId', newTabId);
-    console.log('__ nextIndex', nextIndex);
     dispatch(
       editBoardStackActions.tabsWidgetAddTab({
         parentId: widget.id,

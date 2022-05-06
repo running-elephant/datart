@@ -323,7 +323,6 @@ export const widgetTpl = (): Widget => {
       index: 0,
       boardType: '' as BoardType,
       type: '' as WidgetType,
-      selfConfig: {} as any,
       widgetTypeId: '',
       controllable: false,
       linkable: false,

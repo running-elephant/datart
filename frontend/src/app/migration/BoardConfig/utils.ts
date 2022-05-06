@@ -21,11 +21,13 @@ import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { widgetManager } from '../../pages/DashBoardPage/components/WidgetManager/WidgetManager';
 
 const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
-  const oldConf = oldW.config;
+  newWidget.id = oldW.id;
   newWidget.config.index = oldW.config.index;
   newWidget.config.lock = oldW.config.lock;
   newWidget.config.rect = oldW.config.rect;
   newWidget.config.content = oldW.config.content; //Todo
+
+  const oldConf = oldW.config;
   if (oldW.config.tabId) {
     newWidget.config.clientId = oldW.config.tabId;
   }
@@ -106,8 +108,17 @@ const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
   });
   return newWidget;
 };
+/**
+ *
+ *
+ * @param {WidgetBeta3} widget
+ * @return {*}
+ */
 export const convertWidgetToBeta4 = (widget: WidgetBeta3) => {
-  if (widget.config.type === 'chart') {
+  const widgetType = widget.config.type;
+  const subType = widget.config.content.type;
+  // chart
+  if (widgetType === 'chart') {
     let newWidget = {} as Widget;
     if (widget.config.content.type === 'dataChart') {
       newWidget = widgetManager
@@ -119,9 +130,82 @@ export const convertWidgetToBeta4 = (widget: WidgetBeta3) => {
         widgetTypeId: 'selfChart',
       });
     }
+
     newWidget = commonBeta4Convert(newWidget, widget);
     newWidget.config.jumpConfig = widget.config.jumpConfig;
     newWidget.config.linkageConfig = widget.config.linkageConfig;
     return newWidget;
+  }
+  // media
+  if (widgetType === 'media') {
+    if (subType === 'image') {
+      let newWidget = widgetManager.toolkit('image').create({
+        ...widget,
+        widgetTypeId: 'image',
+      });
+      newWidget = commonBeta4Convert(newWidget, widget);
+      return newWidget;
+    }
+  }
+  // container
+  if (widgetType === 'container') {
+    if (subType === 'tab') {
+      /**
+       old data 
+       {
+         "itemMap": {
+               "de693d55-04ef-497c-b465-a2420abe1e05": {
+                   "tabId": "de693d55-04ef-497c-b465-a2420abe1e05",
+                   "name": "私有图表_7",
+                   "childWidgetId": "newWidget_0e970200-bc0e-4fc8-9de0-caea67e350f2",
+                   "config": {}
+               },
+               "8f44ec1e-4602-4db1-9ec9-ab1ac8543251": {
+                   "tabId": "8f44ec1e-4602-4db1-9ec9-ab1ac8543251",
+                   "name": "图片_5",
+                   "childWidgetId": "75e272ae570749468f94913cb9857203",
+                   "config": {}
+               }
+           }
+       }
+
+       */
+      /**
+       new data 
+       {
+         "itemMap": {
+            "client_b17323f7-8670-4c71-a43f-86a02359b2f5": {
+                   "index": 1651831223742,
+                    "name": "Image",
+                    "tabId": "client_b17323f7-8670-4c71-a43f-86a02359b2f5",
+                    "childWidgetId": "226c8f69c42b41109fdcfd84d7b8a2da"
+          },
+           "client_6cf95a9a-4052-4809-88f2-bad52aff1d24": {
+                   "index": 1651833022936,
+                   "name": "tab*",
+                   "tabId": "client_6cf95a9a-4052-4809-88f2-bad52aff1d24",
+                  "childWidgetId": "a4134a55-b79d-4518-92dc-0631678b98c6"
+          }
+      }
+}
+
+       */
+      let newWidget = widgetManager.toolkit('tab').create({
+        ...widget,
+        widgetTypeId: 'tab',
+      });
+      newWidget = commonBeta4Convert(newWidget, widget);
+
+      const itemMap = newWidget.config.content?.itemMap;
+      if (!itemMap) return newWidget;
+      const tabItems = Object.values(itemMap) as any[];
+      let newIndex = Number(Date.now());
+      tabItems.forEach(item => {
+        item.index = newIndex;
+        delete item.config;
+        newIndex++;
+      });
+      return newWidget;
+    }
   }
 };
