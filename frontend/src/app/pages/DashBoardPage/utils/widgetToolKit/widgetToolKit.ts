@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createContainerWidget, createControlBtn } from '../widget';
+import { createControlBtn } from '../widget';
 import {
   BoardType,
   ContainerWidgetType,
@@ -42,7 +42,7 @@ export const widgetToolKit = {
       boardType: BoardType;
       type: ContainerWidgetType;
     }) => {
-      return createContainerWidget(opt);
+      // return createContainerWidget(opt);
     },
   },
 

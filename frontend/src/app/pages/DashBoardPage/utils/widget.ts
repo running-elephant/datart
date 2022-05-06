@@ -18,7 +18,7 @@
 
 import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
 import {
-  ContainerItem,
+  TabWidgetContent,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
@@ -45,8 +45,6 @@ import {
   BoardType,
   BorderConfig,
   ChartWidgetContent,
-  ContainerWidgetContent,
-  ContainerWidgetType,
   ControllerWidgetContent,
   DataChart,
   MediaWidgetContent,
@@ -129,23 +127,23 @@ export const createMediaWidget = (opt: {
   });
   return widget;
 };
-export const createContainerWidget = (opt: {
-  dashboardId: string;
-  boardType: BoardType;
-  type: ContainerWidgetType;
-}) => {
-  const content = createContainerWidgetContent(opt.type);
-  const widgetConf = createInitWidgetConfig({
-    type: 'container',
-    content: content,
-    boardType: opt.boardType,
-  });
-  const widget: WidgetBeta3 = createWidget({
-    dashboardId: opt.dashboardId,
-    config: widgetConf,
-  });
-  return widget;
-};
+// export const createContainerWidget = (opt: {
+//   dashboardId: string;
+//   boardType: BoardType;
+//   type: ContainerWidgetType;
+// }) => {
+//   const content = createContainerWidgetContent(opt.type);
+//   const widgetConf = createInitWidgetConfig({
+//     type: 'container',
+//     content: content,
+//     boardType: opt.boardType,
+//   });
+//   const widget: WidgetBeta3 = createWidget({
+//     dashboardId: opt.dashboardId,
+//     config: widgetConf,
+//   });
+//   return widget;
+// };
 export const createControlBtn = (opt: BtnActionParams) => {
   const content = { type: opt.type };
   const widgetConf = createInitWidgetConfig({
@@ -333,23 +331,23 @@ export const getInitControllerWidgetRect = (
     };
   }
 };
-export const createContainerWidgetContent = (type: ContainerWidgetType) => {
-  let content: ContainerWidgetContent = {
-    type: type,
-    itemMap: {},
-  };
-  switch (type) {
-    case 'tab':
-      content.tabConfig = {};
-      break;
-    case 'carousel':
-      content.carouselConfig = {};
-      break;
-    default:
-      break;
-  }
-  return content;
-};
+// export const createContainerWidgetContent = (type: ContainerWidgetType) => {
+//   let content: ContainerWidgetContent = {
+//     type: type,
+//     itemMap: {},
+//   };
+//   switch (type) {
+//     case 'tab':
+//       content.tabConfig = {};
+//       break;
+//     case 'carousel':
+//       content.carouselConfig = {};
+//       break;
+//     default:
+//       break;
+//   }
+//   return content;
+// };
 
 export const createChartWidgetContent = (subType: WidgetContentChartType) => {
   let content: ChartWidgetContent = {
@@ -775,23 +773,22 @@ export const getWidgetMap = (
     .filter(w => w.parentId)
     .forEach(widget => {
       const parentWidgetId = widget.parentId!;
-      const childTabId = String(widget.config.index);
-      const curItem = (
-        widgetMap[parentWidgetId].config.content as ContainerWidgetContent
-      ).itemMap[childTabId];
-      if (curItem) {
-        curItem.childWidgetId = widget.id;
-        curItem.name = widget.config.name;
-      } else {
-        let newItem: ContainerItem = {
-          tabId: childTabId,
-          name: widget.config.name,
-          childWidgetId: widget.id,
-        };
-        (
-          widgetMap[parentWidgetId].config.content as ContainerWidgetContent
-        ).itemMap[childTabId] = newItem;
+      const parentWidget = widgetMap[parentWidgetId];
+      if (!parentWidget) {
+        widget.parentId = '';
+        return;
       }
+      const tabContent = parentWidget.config.content as TabWidgetContent;
+      if (!tabContent.itemMap) {
+        widget.parentId = '';
+        return;
+      }
+      const iWidget = widget as unknown as Widget;
+      // tabContent.itemMap[widget.id] = {
+
+      //   name: getWidgetTitle(iWidget.config?.jsonConfig?.props).title || '***',
+      //   childWidgetId: widget.id,
+      // };
     });
 
   // 处理 controller config visibility依赖关系 id, url参数修改filter

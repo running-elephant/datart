@@ -21,12 +21,12 @@ import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
   ChartWidgetContent,
-  ContainerWidgetContent,
   ControllerWidgetContent,
   Dashboard,
   DataChart,
   RelatedView,
   Relation,
+  TabWidgetContent,
   VizRenderMode,
   WidgetBeta3,
   WidgetInfo,
@@ -96,7 +96,7 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
 
     // delete 递归删除所子节点;
     if (widgetType === 'container') {
-      const content = curWidget.config.content as ContainerWidgetContent;
+      const content = curWidget.config.content as TabWidgetContent;
       Object.values(content.itemMap).forEach(item => {
         if (item.childWidgetId) {
           selectedIds.push(item.childWidgetId);
@@ -176,7 +176,7 @@ export const copyWidgetsAction = (wIds?: string[]) => (dispatch, getState) => {
     const widget = widgetRecord[wid];
     newWidgets[wid] = { ...widget, selectedCopy: true };
     if (widget.config.type === 'container') {
-      const content = widget.config.content as ContainerWidgetContent;
+      const content = widget.config.content as TabWidgetContent;
       Object.values(content.itemMap).forEach(item => {
         if (item.childWidgetId) {
           const subWidget = widgetRecord[item.childWidgetId];
@@ -207,7 +207,7 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
       const newWidget = cloneWidget(widget);
       newWidgets.push(newWidget);
       if (newWidget.config.type === 'container') {
-        const content = newWidget.config.content as ContainerWidgetContent;
+        const content = newWidget.config.content as TabWidgetContent;
         Object.values(content.itemMap).forEach(item => {
           if (item.childWidgetId) {
             const subWidget = clipboardWidgets[item.childWidgetId];

@@ -110,7 +110,7 @@ export const RichTextWidgetCore: React.FC<RichTextWidgetProps> = ({
                 content: JSON.parse(strContents),
               };
             },
-          ) as MediaWidgetContent;
+          ) as unknown as MediaWidgetContent;
 
           dispatch(
             editBoardStackActions.changeMediaWidgetConfig({

@@ -28,6 +28,7 @@ export const EditMask: React.FC<{}> = memo(() => {
       {!widgetInfo.editing && (
         <WidgetDndHandleMask
           widgetId={widget.id}
+          widgetIndex={widget.config.index}
           widgetType={widget.config.type}
         />
       )}

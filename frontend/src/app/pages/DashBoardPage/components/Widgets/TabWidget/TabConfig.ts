@@ -15,11 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { TabWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { uuidv4 } from 'utils/utils';
 import {
   initAutoWidgetRect,
   initBackgroundTpl,
@@ -115,11 +116,16 @@ export const widgetToolkit: TabToolkit = {
         });
       }
     });
-
-    const content = {
-      type: 'tab',
-      itemMap: {},
-      tabConfig: {},
+    const newTabId = `tab_${uuidv4()}`;
+    const content: TabWidgetContent = {
+      itemMap: {
+        [newTabId]: {
+          index: Date.now(),
+          tabId: newTabId,
+          name: 'tab',
+          childWidgetId: '',
+        },
+      },
     };
     widget.config.content = content;
     return widget;
@@ -136,7 +142,32 @@ export const widgetToolkit: TabToolkit = {
   // getWidgetName() {},
   // //
 };
-
+// {
+//     "content": {
+//         "type": "tab",
+//         "itemMap": {
+//             "e0b91da7-8f66-4fa5-bcc3-d66806b5d29f": {
+//                 'index': 0,
+//                 "tabId": "e0b91da7-8f66-4fa5-bcc3-d66806b5d29f",
+//                 "name": "时间筛选",
+//                 "childWidgetId": "newWidget_54b6abfc-b71d-423c-8c0d-d3641ff45b61",
+//             },
+//             "d93cb3dd-0c15-4568-97e5-aaafe85e3f17": {
+//                 'index': 1,
+//                 "tabId": "d93cb3dd-0c15-4568-97e5-aaafe85e3f17",
+//                 "name": "图片_14",
+//                 "childWidgetId": "newWidget_a2bc9c3c-22ef-4bbd-8345-3b2e8567d986",
+//             },
+//             "eac42b77-41be-4389-be43-202b70c4c2fd": {
+//                 'index': 2,
+//                 "tabId": "eac42b77-41be-4389-be43-202b70c4c2fd",
+//                 "name": "iframe_17",
+//                 "childWidgetId": "newWidget_3ceb5e04-f3d4-4dea-8675-680f5b7c8201",
+//             }
+//         },
+//         "tabConfig": {}
+//     }
+// }
 const tabProto = {
   widgetTypeId: widgetMeta.widgetTypeId,
   meta: widgetMeta,

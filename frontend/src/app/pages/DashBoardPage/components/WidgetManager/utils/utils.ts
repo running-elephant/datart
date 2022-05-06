@@ -68,13 +68,13 @@ export const getWidgetBaseStyle = props => {
   };
 };
 export const getWidgetTitle = props => {
-  const [text, showTitle, textAlign, font] = getJsonConfigs(
+  const [title, showTitle, textAlign, font] = getJsonConfigs(
     props,
     ['titleGroup'],
     ['title', 'showTitle', 'textAlign', 'font'],
   );
   return {
-    text,
+    title,
     showTitle,
     textAlign,
     font,

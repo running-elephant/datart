@@ -47,7 +47,7 @@ export const ResetBtnWidgetCore: React.FC<{}> = () => {
           fontFamily: title.font.fontFamily,
         }}
       >
-        {title.text}
+        {title.title}
       </span>
     </Wrapper>
   );

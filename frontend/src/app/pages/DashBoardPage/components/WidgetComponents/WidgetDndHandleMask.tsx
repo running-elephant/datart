@@ -28,9 +28,10 @@ import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 export interface WidgetDndHandleMaskProps {
   widgetId: string;
   widgetType: WidgetType;
+  widgetIndex: number;
 }
 export const WidgetDndHandleMask: React.FC<WidgetDndHandleMaskProps> = memo(
-  ({ widgetId, widgetType }) => {
+  ({ widgetId, widgetType, widgetIndex }) => {
     const dispatch = useDispatch();
     interface DropResult {
       tabItem: ContainerItem;
@@ -45,9 +46,12 @@ export const WidgetDndHandleMask: React.FC<WidgetDndHandleMaskProps> = memo(
         if (item && dropResult) {
           const { tabItem, parentId } = dropResult;
           dispatch(
-            editBoardStackActions.addWidgetToContainerWidget({
+            editBoardStackActions.addWidgetToTabWidget({
               parentId,
-              tabItem: { ...tabItem, childWidgetId: widgetId },
+              tabItem: {
+                ...tabItem,
+                childWidgetId: widgetId,
+              },
               sourceId: widgetId,
             }),
           );

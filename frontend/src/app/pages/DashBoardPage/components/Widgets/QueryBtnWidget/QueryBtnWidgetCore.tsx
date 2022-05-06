@@ -48,7 +48,7 @@ export const QueryBtnWidgetCore: React.FC<{}> = memo(() => {
           fontFamily: title.font.fontFamily,
         }}
       >
-        {title.text}
+        {title.title}
       </span>
     </Wrapper>
   );

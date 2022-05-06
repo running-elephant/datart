@@ -141,13 +141,14 @@ export interface WidgetConfBeta3 {
   mobileRect?: RectConfig; //mobile_rect 移动端适配
   background: BackgroundConfig;
   border: BorderConfig;
-  content: WidgetContent;
+  // content: WidgetContent;
+  content: any;
   tabIndex?: number; // 在tab 等容器widget里面的排序索引
   linkageConfig?: LinkageConfig; //联动设置
   jumpConfig?: JumpConfig; // 跳转 设置
 }
 export interface WidgetTitleConfig {
-  text: string;
+  title: string;
   showTitle: boolean;
   textAlign?: TextAlignType;
   font: FontConfig;
@@ -267,7 +268,8 @@ export interface ServerRelation extends Omit<Relation, 'config'> {
 // TODO xld migration about filter xld
 export type WidgetContent =
   | MediaWidgetContent
-  | ContainerWidgetContent
+  // | ContainerWidgetContent
+  | TabWidgetContent
   | ControllerWidgetContent
   | ChartWidgetContent
   | BoardBtnContent;
@@ -310,18 +312,20 @@ export type MediaWidgetContent = {
   };
 };
 // 容器组件配置
-export type ContainerWidgetContent = {
-  type: ContainerWidgetType;
+// export type ContainerWidgetContent = {
+//   type: ContainerWidgetType;
+//   itemMap: Record<string, ContainerItem>;
+//   tabConfig?: any;
+//   carouselConfig?: any;
+// };
+export type TabWidgetContent = {
   itemMap: Record<string, ContainerItem>;
-  tabConfig?: any;
-  carouselConfig?: any;
 };
-
 export interface ContainerItem {
-  tabId: string;
+  index: number;
   name: string;
+  tabId: string;
   childWidgetId: string;
-  config?: any;
 }
 // 控制器组件配置
 export interface ControllerWidgetContent {

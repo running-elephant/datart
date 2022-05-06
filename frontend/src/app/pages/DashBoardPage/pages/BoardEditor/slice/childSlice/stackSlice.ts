@@ -17,13 +17,14 @@
  */
 
 import { PayloadAction } from '@reduxjs/toolkit';
+import { getWidgetTitle } from 'app/pages/DashBoardPage/components/WidgetManager/utils/utils';
 import {
   ContainerItem,
-  ContainerWidgetContent,
   Dashboard,
   DeviceType,
   MediaWidgetContent,
   RectConfig,
+  TabWidgetContent,
   WidgetBeta3,
   WidgetConfBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -234,7 +235,7 @@ export const editBoardStackSlice = createSlice({
       });
     },
 
-    addWidgetToContainerWidget(
+    addWidgetToTabWidget(
       state,
       action: PayloadAction<{
         parentId: string;
@@ -243,16 +244,16 @@ export const editBoardStackSlice = createSlice({
       }>,
     ) {
       const { parentId, tabItem, sourceId } = action.payload;
-      const tabsContainerConfig = state.widgetRecord[parentId].config
-        .content as ContainerWidgetContent;
-      const sourceWidget = state.widgetRecord[sourceId];
-
-      tabsContainerConfig.itemMap[tabItem.tabId].name =
-        sourceWidget.config.name;
-      tabsContainerConfig.itemMap[tabItem.tabId].childWidgetId =
-        sourceWidget.id;
+      debugger;
+      const tabContent = state.widgetRecord[parentId].config
+        .content as TabWidgetContent;
+      const sourceWidget = state.widgetRecord[sourceId] as any;
+      debugger;
+      let tabName =
+        getWidgetTitle(sourceWidget.config?.jsonConfig?.props).title || '***';
+      tabContent.itemMap[tabItem.tabId].name = tabName;
+      tabContent.itemMap[tabItem.tabId].childWidgetId = sourceWidget.id;
       state.widgetRecord[sourceId].parentId = parentId;
-      state.widgetRecord[sourceId].config.tabId = tabItem.tabId;
     },
     /* tabs widget */
     tabsWidgetAddTab(
@@ -265,8 +266,8 @@ export const editBoardStackSlice = createSlice({
       const { parentId, tabItem } = action.payload;
 
       const tabsContainerConfig = state.widgetRecord[parentId].config
-        .content as ContainerWidgetContent;
-      tabsContainerConfig.itemMap[tabItem.tabId] = tabItem;
+        .content as TabWidgetContent;
+      tabsContainerConfig.itemMap[tabItem.childWidgetId] = tabItem;
     },
     tabsWidgetRemoveTab(
       state,
@@ -278,7 +279,7 @@ export const editBoardStackSlice = createSlice({
     ) {
       const { parentId, sourceTabId, mode } = action.payload;
       const tabsContainerConfig = state.widgetRecord[parentId].config
-        .content as ContainerWidgetContent;
+        .content as TabWidgetContent;
       const sourceWidgetId =
         tabsContainerConfig.itemMap[sourceTabId].childWidgetId;
       delete tabsContainerConfig.itemMap[sourceTabId];

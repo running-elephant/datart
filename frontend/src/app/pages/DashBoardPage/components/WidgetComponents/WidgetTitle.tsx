@@ -29,7 +29,7 @@ export const WidgetTitle: FC<{
   return (
     <StyledWrap conf={title}>
       <NameWrap className="widget-name" conf={title}>
-        {title.text}
+        {title.title}
       </NameWrap>
     </StyledWrap>
   );

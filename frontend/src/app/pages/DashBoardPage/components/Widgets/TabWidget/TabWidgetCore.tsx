@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { Tabs } from 'antd';
-import { ContainerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { TabWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { memo, useCallback, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -41,23 +41,24 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
     editing: boardEditing,
     boardId,
   } = useContext(BoardContext);
-  const { itemMap } = widget.config.content as ContainerWidgetContent;
-  const tabsCons = Object.values(itemMap);
-  const [activeKey, SetActiveKey] = useState(tabsCons[0]?.tabId || '');
+  const { itemMap } = widget.config.content as TabWidgetContent;
+  const tabsCons = Object.values(itemMap).sort((a, b) => a.index - b.index);
+
+  const [activeKey, SetActiveKey] = useState(tabsCons[0]?.childWidgetId || '');
   const onTabClick = useCallback((activeKey: string, event) => {
     SetActiveKey(activeKey);
   }, []);
 
   const tabAdd = useCallback(() => {
-    const newTabId = uuidv4();
+    const newTabId = `tab_${uuidv4()}`;
     dispatch(
       editBoardStackActions.tabsWidgetAddTab({
         parentId: widget.id,
         tabItem: {
-          tabId: newTabId,
+          index: Date.now(),
           name: 'tab',
+          tabId: newTabId,
           childWidgetId: '',
-          config: {},
         },
       }),
     );
@@ -75,7 +76,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
         }),
       );
       setImmediate(() => {
-        SetActiveKey(tabsCons[0].tabId || '');
+        SetActiveKey(tabsCons[0].childWidgetId || '');
       });
     },
 
@@ -102,7 +103,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
         {tabsCons.map(tab => (
           <TabPane
             tab={tab.name || 'tab'}
-            key={tab.tabId}
+            key={tab.childWidgetId}
             className="TabPane"
             forceRender
           >
