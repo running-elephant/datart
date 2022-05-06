@@ -50,7 +50,9 @@ export const WidgetMapper: React.FC<{
       );
     case 'media':
       const widgetTypeId = widget.config.widgetTypeId;
-      return <MediaWidgetMapper widgetTypeId={widgetTypeId} />;
+      return (
+        <MediaWidgetMapper widgetTypeId={widgetTypeId} hideTitle={false} />
+      );
     case 'container':
       // const containerSubType: MediaWidgetType = widget.config.content.type;
       return <TabWidget hideTitle={false} />;
@@ -73,21 +75,22 @@ export const WidgetMapper: React.FC<{
   }
 });
 
-export const MediaWidgetMapper: React.FC<{
+export const MediaWidgetMapper = (opt: {
   widgetTypeId: string;
-}> = memo(({ widgetTypeId }) => {
-  switch (widgetTypeId) {
+  hideTitle: boolean;
+}) => {
+  switch (opt.widgetTypeId) {
     case 'richText':
-      return <RichTextWidget hideTitle={false} />;
+      return <RichTextWidget hideTitle={opt.hideTitle} />;
     case 'image':
-      return <ImageWidget hideTitle={false} />;
+      return <ImageWidget hideTitle={opt.hideTitle} />;
     case 'video':
-      return <VideoWidget hideTitle={false} />;
+      return <VideoWidget hideTitle={opt.hideTitle} />;
     case 'iframe':
-      return <IframeWidget hideTitle={false} />;
+      return <IframeWidget hideTitle={opt.hideTitle} />;
     case 'timer':
-      return <TimerWidget hideTitle={false} />;
+      return <TimerWidget hideTitle={opt.hideTitle} />;
     default:
       return <div>default media</div>;
   }
-});
+};

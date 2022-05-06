@@ -73,7 +73,8 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
   }, [dispatch, widget.id]);
   const tabRemove = useCallback(
     targetKey => {
-      const tabId = tabsCons.find(tab => tab.index === targetKey)?.tabId || '';
+      const tabId =
+        tabsCons.find(tab => String(tab.index) === targetKey)?.tabId || '';
       dispatch(
         editBoardStackActions.tabsWidgetRemoveTab({
           parentId: widget.id,

@@ -16,21 +16,18 @@
  * limitations under the License.
  */
 import { memo, useContext } from 'react';
-import { BoardType, MediaWidgetType } from '../../pages/Board/slice/types';
+import { BoardType } from '../../pages/Board/slice/types';
+import { Widget } from '../../types/widgetTypes';
+import { MediaWidgetMapper } from '../WidgetMapper/WidgetMapper';
 import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
-import { IframeWidget } from '../Widgets/IframeWidget/IframeWidget';
-import { ImageWidget } from '../Widgets/ImageWidget/ImageWidget';
-import { RichTextWidget } from '../Widgets/RichTextWidget/RichTextWidget';
 import { TabWidget } from '../Widgets/TabWidget/TabWidget';
-import { TimerWidget } from '../Widgets/TimerWidget/TimerWidget';
-import { VideoWidget } from '../Widgets/VideoWidget/VideoWidget';
 
 export const FullScreenWidgetMapper: React.FC<{
   boardType: BoardType;
   boardEditing: boolean;
 }> = memo(({ boardEditing }) => {
-  const widget = useContext(WidgetContext);
+  const widget = useContext(WidgetContext) as unknown as Widget;
   const widgetType = widget.config.type;
 
   switch (widgetType) {
@@ -45,28 +42,13 @@ export const FullScreenWidgetMapper: React.FC<{
         </WidgetDataProvider>
       );
     case 'media':
-      const mediaSubType: MediaWidgetType = widget.config.content.type;
-      return MediaMapper(mediaSubType);
+      return MediaWidgetMapper({
+        widgetTypeId: widget.config.widgetTypeId,
+        hideTitle: true,
+      });
     case 'container':
       return <TabWidget hideTitle={true} />;
     default:
       return <div>default widget</div>;
   }
 });
-
-export const MediaMapper = (subType: MediaWidgetType) => {
-  switch (subType) {
-    case 'richText':
-      return <RichTextWidget hideTitle={true} />;
-    case 'image':
-      return <ImageWidget hideTitle={true} />;
-    case 'video':
-      return <VideoWidget hideTitle={true} />;
-    case 'iframe':
-      return <IframeWidget hideTitle={true} />;
-    case 'timer':
-      return <TimerWidget hideTitle={true} />;
-    default:
-      return <div>default media</div>;
-  }
-};

@@ -15,25 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  BoardType,
-  MediaWidgetType,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { BoardType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { memo, useContext } from 'react';
+import { MediaWidgetMapper } from '../../../WidgetMapper/WidgetMapper';
 import { WidgetDataProvider } from '../../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 import { DataChartWidget } from '../../DataChartWidget/DataChartWidget';
-import { IframeWidget } from '../../IframeWidget/IframeWidget';
-import { ImageWidget } from '../../ImageWidget/ImageWidget';
-import { RichTextWidget } from '../../RichTextWidget/RichTextWidget';
-import { TimerWidget } from '../../TimerWidget/TimerWidget';
-import { VideoWidget } from '../../VideoWidget/VideoWidget';
 
 export const TabWidgetMapper: React.FC<{
   boardType: BoardType;
   boardEditing: boolean;
 }> = memo(({ boardEditing }) => {
-  const widget = useContext(WidgetContext);
+  const widget = useContext(WidgetContext) as unknown as Widget;
   const widgetType = widget.config.type;
 
   switch (widgetType) {
@@ -48,27 +42,29 @@ export const TabWidgetMapper: React.FC<{
         </WidgetDataProvider>
       );
     case 'media':
-      const mediaSubType: MediaWidgetType = widget.config.content.type;
-      return MediaMapper(mediaSubType);
+      return MediaWidgetMapper({
+        widgetTypeId: widget.config.widgetTypeId,
+        hideTitle: true,
+      });
 
     default:
       return <div>default widget</div>;
   }
 });
 
-export const MediaMapper = (subType: MediaWidgetType) => {
-  switch (subType) {
-    case 'richText':
-      return <RichTextWidget hideTitle={true} />;
-    case 'image':
-      return <ImageWidget hideTitle={true} />;
-    case 'video':
-      return <VideoWidget hideTitle={true} />;
-    case 'iframe':
-      return <IframeWidget hideTitle={true} />;
-    case 'timer':
-      return <TimerWidget hideTitle={true} />;
-    default:
-      return <div>default media</div>;
-  }
-};
+// export const MediaMapper = (widgetTypeId: string, hideTitle: boolean) => {
+//   switch (widgetTypeId) {
+//     case 'richText':
+//       return <RichTextWidget hideTitle={hideTitle} />;
+//     case 'image':
+//       return <ImageWidget hideTitle={hideTitle} />;
+//     case 'video':
+//       return <VideoWidget hideTitle={hideTitle} />;
+//     case 'iframe':
+//       return <IframeWidget hideTitle={hideTitle} />;
+//     case 'timer':
+//       return <TimerWidget hideTitle={hideTitle} />;
+//     default:
+//       return <div>default media</div>;
+//   }
+// };
