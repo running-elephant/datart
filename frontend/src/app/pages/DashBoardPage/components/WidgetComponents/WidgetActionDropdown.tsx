@@ -148,6 +148,9 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
 
       return <Menu onClick={menuClick}>{menuItems}</Menu>;
     }, [actionList, menuClick]);
+    if (actionList.length === 0) {
+      return null;
+    }
     return (
       <Dropdown
         className="widget-tool-dropdown"
