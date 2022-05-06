@@ -44,18 +44,23 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
   const { itemMap } = widget.config.content as TabWidgetContent;
   const tabsCons = Object.values(itemMap).sort((a, b) => a.index - b.index);
 
-  const [activeKey, SetActiveKey] = useState(tabsCons[0]?.childWidgetId || '');
+  const [activeKey, SetActiveKey] = useState<string | number>(
+    tabsCons[0]?.index || 0,
+  );
   const onTabClick = useCallback((activeKey: string, event) => {
     SetActiveKey(activeKey);
   }, []);
 
   const tabAdd = useCallback(() => {
     const newTabId = `tab_${uuidv4()}`;
+    const nextIndex = Date.now();
+    console.log('__ newTabId', newTabId);
+    console.log('__ nextIndex', nextIndex);
     dispatch(
       editBoardStackActions.tabsWidgetAddTab({
         parentId: widget.id,
         tabItem: {
-          index: Date.now(),
+          index: nextIndex,
           name: 'tab',
           tabId: newTabId,
           childWidgetId: '',
@@ -63,20 +68,21 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
       }),
     );
     setImmediate(() => {
-      SetActiveKey(newTabId);
+      SetActiveKey(nextIndex);
     });
   }, [dispatch, widget.id]);
   const tabRemove = useCallback(
     targetKey => {
+      const tabId = tabsCons.find(tab => tab.index === targetKey)?.tabId || '';
       dispatch(
         editBoardStackActions.tabsWidgetRemoveTab({
           parentId: widget.id,
-          sourceTabId: targetKey,
+          sourceTabId: tabId,
           mode: boardType,
         }),
       );
       setImmediate(() => {
-        SetActiveKey(tabsCons[0].childWidgetId || '');
+        SetActiveKey(tabsCons[0].index);
       });
     },
 
@@ -93,7 +99,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
       <Tabs
         onTabClick={editing ? onTabClick : undefined}
         size="small"
-        activeKey={editing ? activeKey : undefined}
+        activeKey={editing ? String(activeKey) : undefined}
         centered
         tabBarStyle={{ fontSize: '16px' }}
         type={editing ? 'editable-card' : undefined}
@@ -103,7 +109,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
         {tabsCons.map(tab => (
           <TabPane
             tab={tab.name || 'tab'}
-            key={tab.childWidgetId}
+            key={tab.index}
             className="TabPane"
             forceRender
           >

@@ -19,7 +19,7 @@
 import { WidgetToolkit } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { dataChartCreator, getMeta } from './config';
 
-export const selfChartMeta = getMeta({
+const widgetMeta = getMeta({
   icon: 'selfChart',
   widgetTypeId: 'selfChart',
   zh: {
@@ -36,7 +36,7 @@ export const selfChartToolkit: SelfChartToolkit = {
   create: opt => {
     const widget = dataChartCreator({
       ...opt,
-      widgetTypeId: selfChartMeta.widgetTypeId,
+      widgetTypeId: widgetMeta.widgetTypeId,
     });
     return widget;
   },
@@ -64,7 +64,7 @@ export const selfChartToolkit: SelfChartToolkit = {
 // }
 const selfChartProto = {
   widgetTypeId: 'selfChart',
-  meta: selfChartMeta,
+  meta: widgetMeta,
   toolkit: selfChartToolkit,
 };
 export default selfChartProto;

@@ -22,6 +22,7 @@ import {
 import { memo, useContext } from 'react';
 import { WidgetDataProvider } from '../../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
+import { DataChartWidget } from '../../DataChartWidget/DataChartWidget';
 import { IframeWidget } from '../../IframeWidget/IframeWidget';
 import { ImageWidget } from '../../ImageWidget/ImageWidget';
 import { RichTextWidget } from '../../RichTextWidget/RichTextWidget';
@@ -43,7 +44,7 @@ export const TabWidgetMapper: React.FC<{
           boardId={widget.dashboardId}
           boardEditing={boardEditing}
         >
-          {/* <DataChartWidget hideTitle={true} /> */}
+          <DataChartWidget hideTitle={true} />
         </WidgetDataProvider>
       );
     case 'media':

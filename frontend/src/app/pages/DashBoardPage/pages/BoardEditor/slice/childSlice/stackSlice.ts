@@ -248,8 +248,6 @@ export const editBoardStackSlice = createSlice({
       const tabContent = state.widgetRecord[parentId].config
         .content as TabWidgetContent;
       const sourceWidget = state.widgetRecord[sourceId] as unknown as Widget;
-
-      debugger;
       let tabName =
         getWidgetTitle(sourceWidget.config?.jsonConfig?.props).title || 'tab*';
       tabContent.itemMap[sourceWidget.config.clientId] = {
@@ -258,8 +256,9 @@ export const editBoardStackSlice = createSlice({
         tabId: sourceWidget.config.clientId,
         childWidgetId: sourceWidget.id,
       };
+      delete state.widgetRecord[parentId].config.content.itemMap[tabItem.tabId];
+      state.widgetRecord[parentId].config.content = tabContent;
       state.widgetRecord[sourceId].parentId = parentId;
-      delete tabContent.itemMap[tabItem.tabId];
     },
     /* tabs widget */
     tabsWidgetAddTab(
@@ -271,9 +270,9 @@ export const editBoardStackSlice = createSlice({
     ) {
       const { parentId, tabItem } = action.payload;
 
-      const tabsContainerConfig = state.widgetRecord[parentId].config
+      const tabContent = state.widgetRecord[parentId].config
         .content as TabWidgetContent;
-      tabsContainerConfig.itemMap[tabItem.childWidgetId] = tabItem;
+      tabContent.itemMap[tabItem.tabId] = tabItem;
     },
     tabsWidgetRemoveTab(
       state,
@@ -284,25 +283,26 @@ export const editBoardStackSlice = createSlice({
       }>,
     ) {
       const { parentId, sourceTabId, mode } = action.payload;
-      const tabsContainerConfig = state.widgetRecord[parentId].config
+      const tabContent = state.widgetRecord[parentId].config
         .content as TabWidgetContent;
-      const sourceWidgetId =
-        tabsContainerConfig.itemMap[sourceTabId].childWidgetId;
-      delete tabsContainerConfig.itemMap[sourceTabId];
+
+      const tabItem = tabContent.itemMap[sourceTabId];
 
       const rt = state.widgetRecord[parentId].config.rect;
-      if (state.widgetRecord[sourceWidgetId]) {
+      if (state.widgetRecord[tabItem.childWidgetId]) {
         if (mode === 'auto') {
-          state.widgetRecord[sourceWidgetId].config.rect = rt;
+          state.widgetRecord[tabItem.childWidgetId].config.rect = rt;
         }
         if (mode === 'free') {
-          state.widgetRecord[sourceWidgetId].config.rect = {
+          state.widgetRecord[tabItem.childWidgetId].config.rect = {
             ...rt,
             x: rt.x + 30,
             y: rt.y + 30,
           };
         }
-        state.widgetRecord[sourceWidgetId].parentId = '';
+
+        state.widgetRecord[tabItem.childWidgetId].parentId = '';
+        delete tabContent.itemMap[sourceTabId];
       }
     },
     /* MediaWidgetConfig */

@@ -321,6 +321,7 @@ export type MediaWidgetContent = {
 export type TabWidgetContent = {
   itemMap: Record<string, ContainerItem>;
 };
+
 export interface ContainerItem {
   index: number;
   name: string;

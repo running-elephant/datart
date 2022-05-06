@@ -16,12 +16,15 @@
  * limitations under the License.
  */
 import linkChartProto from '../Widgets/DataChartWidget/linkChartConfig';
-import selfChartProto from '../Widgets/DataChartWidget/selfChartConfig';
+import selfChartProto from '../Widgets/DataChartWidget/selfChartConfig1';
+import imageProto from '../Widgets/ImageWidget/imageConfig';
 import tabProto from '../Widgets/TabWidget/TabConfig';
 import { widgetManager } from './WidgetManager';
+
 widgetManager.register(linkChartProto);
 widgetManager.register(selfChartProto);
 widgetManager.register(tabProto);
+widgetManager.register(imageProto);
 // widgetManager.register(videoProto);
 // widgetManager.register(imageProto);
 // widgetManager.register(richTextProto);

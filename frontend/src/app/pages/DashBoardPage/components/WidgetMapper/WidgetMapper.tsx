@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 import { memo, useContext } from 'react';
-import { BoardType, MediaWidgetType } from '../../pages/Board/slice/types';
+import { BoardType } from '../../pages/Board/slice/types';
+import { Widget } from '../../types/widgetTypes';
 import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import { DataChartWidget } from '../Widgets/DataChartWidget/DataChartWidget';
@@ -33,7 +34,7 @@ export const WidgetMapper: React.FC<{
   boardType: BoardType;
   boardEditing: boolean;
 }> = memo(({ boardEditing }) => {
-  const widget = useContext(WidgetContext);
+  const widget = useContext(WidgetContext) as unknown as Widget;
   const widgetType = widget.config.type;
 
   switch (widgetType) {
@@ -48,8 +49,8 @@ export const WidgetMapper: React.FC<{
         </WidgetDataProvider>
       );
     case 'media':
-      const mediaSubType: MediaWidgetType = widget.config.content.type;
-      return <MediaWidgetMapper subType={mediaSubType} />;
+      const widgetTypeId = widget.config.widgetTypeId;
+      return <MediaWidgetMapper widgetTypeId={widgetTypeId} />;
     case 'container':
       // const containerSubType: MediaWidgetType = widget.config.content.type;
       return <TabWidget hideTitle={false} />;
@@ -73,9 +74,9 @@ export const WidgetMapper: React.FC<{
 });
 
 export const MediaWidgetMapper: React.FC<{
-  subType: MediaWidgetType;
-}> = memo(({ subType }) => {
-  switch (subType) {
+  widgetTypeId: string;
+}> = memo(({ widgetTypeId }) => {
+  switch (widgetTypeId) {
     case 'richText':
       return <RichTextWidget hideTitle={false} />;
     case 'image':

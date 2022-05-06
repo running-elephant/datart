@@ -783,12 +783,14 @@ export const getWidgetMap = (
         widget.parentId = '';
         return;
       }
-      const iWidget = widget as unknown as Widget;
-      // tabContent.itemMap[widget.id] = {
 
-      //   name: getWidgetTitle(iWidget.config?.jsonConfig?.props).title || '***',
-      //   childWidgetId: widget.id,
-      // };
+      const iWidget = widget as unknown as Widget;
+      const targetTabItem = tabContent.itemMap?.[iWidget.config.clientId];
+      if (!targetTabItem) {
+        widget.parentId = '';
+        return;
+      }
+      targetTabItem.childWidgetId = widget.id;
     });
 
   // 处理 controller config visibility依赖关系 id, url参数修改filter
