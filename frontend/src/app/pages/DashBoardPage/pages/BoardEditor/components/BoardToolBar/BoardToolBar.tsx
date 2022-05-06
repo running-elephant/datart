@@ -20,7 +20,6 @@ import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/B
 import React, { useContext } from 'react';
 import styled from 'styled-components/macro';
 import { LEVEL_1, SPACE, SPACE_XL } from 'styles/StyleConstants';
-import { BoardToolRights } from './BoardToolRights';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
 import { ToolBar } from './ToolBar';
 
@@ -32,7 +31,6 @@ export const BoardToolBar = () => {
         value={{ className: '', boardId: boardId, boardType: boardType }}
       >
         <ToolBar />
-        <BoardToolRights />
       </BoardToolBarContext.Provider>
     </Wrapper>
   );
