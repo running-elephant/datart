@@ -40,7 +40,7 @@ import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
 import { LayerList } from '../components/LayerList/LayerList';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { AutoBoardEditor } from './AutoBoardEditor';
-const AutoEditor: React.FC<{}> = () => {
+export const AutoEditor: React.FC<{}> = () => {
   const { onEditClearActiveWidgets } = useContext(WidgetActionContext);
   return (
     <Wrapper onClick={onEditClearActiveWidgets}>
@@ -53,7 +53,6 @@ const AutoEditor: React.FC<{}> = () => {
     </Wrapper>
   );
 };
-export default AutoEditor;
 
 const Wrapper = styled.div`
   display: flex;

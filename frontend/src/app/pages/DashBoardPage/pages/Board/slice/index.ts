@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { PayloadAction } from '@reduxjs/toolkit';
+import { ChartDataSectionType } from 'app/constants';
 import {
   BoardLinkFilter,
   Dashboard,
@@ -28,7 +29,11 @@ import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import { createWidgetInfo } from '../../../utils/widget';
-import { getChartWidgetDataAsync, getControllerOptions } from './thunk';
+import {
+  fetchAvailableSourceFunctions,
+  getChartWidgetDataAsync,
+  getControllerOptions,
+} from './thunk';
 import { BoardInfo, BoardState, Widget } from './types';
 
 export const boardInit: BoardState = {
@@ -39,6 +44,7 @@ export const boardInit: BoardState = {
   widgetDataMap: {} as Record<string, WidgetData>,
   dataChartMap: {} as Record<string, DataChart>,
   viewMap: {} as Record<string, ChartDataView>, // View
+  availableSourceFunctionsMap: {} as Record<string, string[]>,
 };
 // boardActions
 const boardSlice = createSlice({
@@ -273,6 +279,37 @@ const boardSlice = createSlice({
         state.widgetRecord[boardId][widget.id] = widget;
       });
     },
+    updateDataChartGroup(
+      state,
+      action: PayloadAction<{ id: string; payload }>,
+    ) {
+      const dataChart = state.dataChartMap[action.payload.id];
+
+      if (dataChart?.config) {
+        const index = dataChart?.config?.chartConfig?.datas?.findIndex(
+          section => section.type === ChartDataSectionType.GROUP,
+        );
+        if (index !== undefined && dataChart.config.chartConfig.datas) {
+          dataChart.config.chartConfig.datas[index].rows =
+            action.payload.payload?.value?.rows;
+        }
+        state.dataChartMap[action.payload.id] = dataChart;
+      }
+    },
+    updateDataChartComputedFields(
+      state,
+      action: PayloadAction<{
+        id: string;
+        computedFields: any;
+      }>,
+    ) {
+      const dataChart = state.dataChartMap[action.payload.id];
+
+      if (dataChart?.config) {
+        dataChart.config.computedFields = action.payload.computedFields;
+        state.dataChartMap[action.payload.id] = dataChart;
+      }
+    },
   },
   extraReducers: builder => {
     builder.addCase(getChartWidgetDataAsync.pending, (state, action) => {
@@ -311,6 +348,17 @@ const boardSlice = createSlice({
         state.widgetInfoRecord[boardId][widgetId].loading = false;
       } catch (error) {}
     });
+    builder.addCase(
+      fetchAvailableSourceFunctions.fulfilled,
+      (state, action) => {
+        try {
+          if (action.payload) {
+            const { sourceId, value } = action.payload;
+            state.availableSourceFunctionsMap[sourceId] = value;
+          }
+        } catch (error) {}
+      },
+    );
   },
 });
 export const { actions: boardActions } = boardSlice;

@@ -49,7 +49,7 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
     const { editing: boardEditing } = useContext(BoardContext);
 
     const widgetAction = useWidgetAction();
-    const dataChart = useContext(WidgetChartContext)!;
+    const { dataChart } = useContext(WidgetChartContext)!;
     const t = useI18NPrefix(`viz.widget.action`);
     const menuClick = useCallback(
       ({ key }) => {

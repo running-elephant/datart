@@ -21,6 +21,7 @@ package datart.server.service;
 import datart.core.data.provider.SchemaInfo;
 import datart.core.entity.Source;
 import datart.core.mappers.ext.SourceMapperExt;
+import datart.server.base.params.SourceBaseUpdateParam;
 import datart.server.base.params.SourceCreateParam;
 import datart.server.base.params.SourceUpdateParam;
 import datart.server.base.transfer.model.SourceTransferModel;
@@ -38,5 +39,7 @@ public interface SourceService extends BaseCRUDService<Source, SourceMapperExt>,
     Source createSource(SourceCreateParam createParam);
 
     boolean updateSource(SourceUpdateParam updateParam);
+
+    boolean updateBase(SourceBaseUpdateParam updateParam);
 
 }

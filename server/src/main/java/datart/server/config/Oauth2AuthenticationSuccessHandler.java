@@ -18,7 +18,6 @@
 
 package datart.server.config;
 
-import datart.core.base.exception.Exceptions;
 import datart.server.service.ExternalRegisterService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -49,7 +48,8 @@ public class Oauth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
             String token = externalRegisterService.oauth2Register((OAuth2AuthenticationToken) authentication);
             registerRedirectStrategy.redirect(request, response, token);
         } catch (Exception e) {
-            Exceptions.e(e);
+            logger.error(e.getMessage(), e);
+            registerRedirectStrategy.redirectError(request, response, e.getMessage());
         }
     }
 

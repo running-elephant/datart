@@ -18,6 +18,7 @@
 import { Form, Input } from 'antd';
 import React, { memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 
 export interface TextControllerProps {
   value?: any;
@@ -56,6 +57,7 @@ export const TextController: React.FC<TextControllerProps> = memo(
         onChange(val);
       }
     };
+    const t = useI18NPrefix(`viz.common.enum.controllerPlaceHolders`);
     useEffect(() => {
       setVal(value);
     }, [value]);
@@ -65,7 +67,7 @@ export const TextController: React.FC<TextControllerProps> = memo(
           <Input
             allowClear={true}
             value={val}
-            placeholder="请输入"
+            placeholder={t('textController')}
             onChange={_onChange}
             onPressEnter={_onChangeEnter}
             onBlur={_onBlur}
