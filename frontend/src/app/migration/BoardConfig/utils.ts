@@ -327,7 +327,6 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
     const oldConf = widget.config.content.timerConfig;
     newWidget.config.jsonConfig.props?.forEach(prop => {
       // timerGroup
-      debugger;
       if (prop.key === 'timerGroup') {
         prop.rows?.forEach(row => {
           if (row.key === 'time') {

@@ -43,7 +43,6 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
   } = useContext(BoardContext);
   const { itemMap } = widget.config.content as TabWidgetContent;
   const tabsCons = Object.values(itemMap).sort((a, b) => a.index - b.index);
-  debugger;
   const [activeKey, SetActiveKey] = useState<string | number>(
     tabsCons[0]?.index || 0,
   );
