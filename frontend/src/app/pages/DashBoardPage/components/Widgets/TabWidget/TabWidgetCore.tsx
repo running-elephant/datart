@@ -24,11 +24,11 @@ import { PRIMARY } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions } from '../../../pages/BoardEditor/slice';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { WidgetMapper } from '../../WidgetMapper/WidgetMapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { WidgetWrapProvider } from '../../WidgetProvider/WidgetWrapProvider';
 import { DropHolder } from './components/DropHolder';
-import { TabWidgetMapper } from './components/TabWidgetMapper';
 
 const { TabPane } = Tabs;
 
@@ -118,10 +118,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
                 boardId={boardId}
               >
                 <MapWrapper>
-                  <TabWidgetMapper
-                    boardEditing={boardEditing}
-                    boardType={boardType}
-                  />
+                  <WidgetMapper boardEditing={boardEditing} hideTitle={true} />
                 </MapWrapper>
               </WidgetWrapProvider>
             ) : (

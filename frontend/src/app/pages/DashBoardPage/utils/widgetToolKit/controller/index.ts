@@ -24,7 +24,7 @@ import {
   Relation,
   RelationConfigType,
   WidgetBeta3,
-  WidgetType,
+  WidgetTypeBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { RelatedWidgetItem } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/RelatedWidgets';
 import { ControllerConfig } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
@@ -86,7 +86,10 @@ export const getViewIdsInControlConfig = (
   }
 };
 export const getCanLinkControlWidgets = (widgets: WidgetBeta3[]) => {
-  const CanLinkControllerWidgetTypes: WidgetType[] = ['chart', 'controller'];
+  const CanLinkControllerWidgetTypes: WidgetTypeBeta3[] = [
+    'chart',
+    'controller',
+  ];
 
   const canLinkWidgets = widgets.filter(widget => {
     if (!CanLinkControllerWidgetTypes.includes(widget.config.type)) {

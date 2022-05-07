@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import produce from 'immer';
@@ -23,7 +24,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { WidgetType } from '../../../Board/slice/types';
+import { WidgetTypeBeta3 } from '../../../Board/slice/types';
 import { editBoardStackActions, editWidgetInfoActions } from '../../slice';
 import { updateWidgetConf } from '../../slice/childSlice/stackSlice';
 import {
@@ -31,13 +32,12 @@ import {
   selectSortAllWidgets,
 } from '../../slice/selectors';
 import NameItem from './NameItem';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 
 export type NameCard = {
   index: number;
   name: string;
   id: string;
-  widgetType: WidgetType;
+  widgetType: WidgetTypeBeta3;
   editing: boolean;
   selected: boolean;
 };
@@ -122,7 +122,7 @@ export const LayerList: React.FC<{}> = memo(() => {
       </WidgetWrapProvider>
     ));
   const t = useI18NPrefix(`viz.board.action`);
-  
+
   return (
     <DndProvider backend={HTML5Backend}>
       <Wrapper onClick={clearSelectedWidgets}>

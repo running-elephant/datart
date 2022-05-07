@@ -28,7 +28,7 @@ import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import {
   RelatedView,
-  WidgetType,
+  WidgetTypeBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
@@ -514,19 +514,19 @@ export const getDistinctFiltersByColumn = (
 };
 
 export const getDefaultWidgetName = (
-  widgetType: WidgetType,
+  widgetType: WidgetTypeBeta3,
   subWidgetType: string,
   index: number,
 ) => {
   const typeTitle = i18next.t(`viz.widget.type.${widgetType}`);
   const subTypeTitle = i18next.t(`viz.widget.type.${subWidgetType}`);
-  const widgetTypes: WidgetType[] = [
+  const widgetTypes: WidgetTypeBeta3[] = [
     'chart',
     'container',
     'controller',
     'media',
   ];
-  const BtnTypes: WidgetType[] = ['query', 'reset'];
+  const BtnTypes: WidgetTypeBeta3[] = ['query', 'reset'];
   if (widgetTypes.includes(widgetType)) {
     return `${subTypeTitle}_${index}`;
   } else if (BtnTypes.includes(widgetType)) {

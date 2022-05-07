@@ -16,39 +16,37 @@
  * limitations under the License.
  */
 import { ControllerFacadeTypes } from 'app/constants';
-import {
-  BoardType,
-  WidgetType,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
+import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
+import { BoardType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editDashBoardInfoActions } from '..';
 import { PageInfo } from './../../../../../MainPage/pages/ViewPage/slice/types';
 import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from './../thunk';
 import { HistoryEditBoard } from './../types';
 
 export type BtnActionParams = {
-  type: WidgetType;
+  type: any;
   boardId: string;
   boardType: BoardType;
 };
 export const addControllerAction =
   (opt: BtnActionParams) => async (dispatch, getState) => {
-    switch (opt.type as WidgetType) {
-      case 'query':
-        const queryWidget = widgetToolKit.query.create({
-          boardId: opt.boardId,
+    switch (opt.type) {
+      case 'queryBtn':
+        const queryWidget = widgetManager.toolkit('queryBtn').create({
+          dashboardId: opt.boardId,
           boardType: opt.boardType,
-          type: opt.type as any,
+          widgetTypeId: 'queryBtn',
         });
         dispatch(addWidgetsToEditBoard([queryWidget]));
 
         break;
-      case 'reset':
-        const resetWidget = widgetToolKit.query.create({
-          boardId: opt.boardId,
+      case 'resetBtn':
+        const resetWidget = widgetManager.toolkit('resetBtn').create({
+          dashboardId: opt.boardId,
           boardType: opt.boardType,
-          type: opt.type as any,
+          widgetTypeId: 'resetBtn',
         });
+
         dispatch(addWidgetsToEditBoard([resetWidget]));
 
         break;

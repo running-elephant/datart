@@ -23,7 +23,7 @@ import {
 } from 'app/constants';
 import {
   TabWidgetContent,
-  WidgetType,
+  WidgetTypeBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ChartsEventData } from 'app/types/Chart';
@@ -152,7 +152,7 @@ export const createControlBtn = (opt: BtnActionParams) => {
   const content = { type: opt.type };
   const widgetConf = createInitWidgetConfig({
     name: '',
-    type: opt.type as WidgetType,
+    type: opt.type as WidgetTypeBeta3,
     content: content,
     boardType: opt.boardType,
   });
@@ -163,7 +163,7 @@ export const createControlBtn = (opt: BtnActionParams) => {
   return widget;
 };
 export const createInitWidgetConfig = (opt: {
-  type: WidgetType;
+  type: WidgetTypeBeta3;
   content: WidgetContent;
   boardType: BoardType;
   index?: number;
@@ -239,7 +239,7 @@ export const createWidgetInfo = (id: string): WidgetInfo => {
   };
   return widgetInfo;
 };
-export const createWidgetPadding = (widgetType: WidgetType) => {
+export const createWidgetPadding = (widgetType: WidgetTypeBeta3) => {
   if (widgetType === 'query' || widgetType === 'reset') {
     return {
       left: 0,
@@ -264,7 +264,7 @@ export const createWidgetPadding = (widgetType: WidgetType) => {
 };
 export const createWidgetRect = (
   boardType: BoardType,
-  widgetType: WidgetType,
+  widgetType: WidgetTypeBeta3,
 ): RectConfig => {
   if (widgetType === 'controller') {
     return getInitControllerWidgetRect(boardType);

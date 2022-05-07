@@ -31,8 +31,8 @@ import {
   WidgetBeta3,
   WidgetInfo,
   WidgetOfCopy,
-  WidgetType,
-  WidgetTypes,
+  WidgetTypeBeta3,
+  WidgetTypesBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import {
@@ -70,7 +70,7 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
   const editBoard = getState().editBoard as HistoryEditBoard;
   let selectedIds: string[] = [];
   let shouldDeleteIds: string[] = [];
-  let effectTypes: WidgetType[] = [];
+  let effectTypes: WidgetTypeBeta3[] = [];
   if (ids?.length) {
     selectedIds = ids;
   } else {
@@ -109,7 +109,7 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
 
   dispatch(editBoardStackActions.deleteWidgets(shouldDeleteIds));
 
-  WidgetTypes.forEach(widgetType => {
+  WidgetTypesBeta3.forEach(widgetType => {
     if (effectTypes.includes(widgetType)) {
       switch (widgetType) {
         case 'controller':

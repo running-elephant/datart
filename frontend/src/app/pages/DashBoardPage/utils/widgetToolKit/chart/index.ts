@@ -20,7 +20,7 @@ import {
   DataChart,
   WidgetBeta3,
   WidgetContentChartType,
-  WidgetType,
+  WidgetTypeBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
@@ -56,7 +56,7 @@ export const createDataChartWidget = (opt: {
   return widget;
 };
 export const getCanLinkageWidgets = (widgets: WidgetBeta3[]) => {
-  const CanLinkageTypes: WidgetType[] = ['chart'];
+  const CanLinkageTypes: WidgetTypeBeta3[] = ['chart'];
   const canLinkWidgets = widgets.filter(widget => {
     if (!CanLinkageTypes.includes(widget.config.type)) {
       return false;

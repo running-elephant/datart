@@ -19,7 +19,7 @@ import { WidgetActionDropdown } from 'app/pages/DashBoardPage/components/WidgetC
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import {
   WidgetBeta3,
-  WidgetType,
+  WidgetTypeBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import classNames from 'classnames';
 import { XYCoord } from 'dnd-core';
@@ -34,7 +34,7 @@ import { NameCard } from './LayerList';
 export interface NameItemProps {
   index: number;
   zIndex: number;
-  widgetType: WidgetType;
+  widgetType: WidgetTypeBeta3;
   moveCard: (
     dragIndex: number,
     hoverIndex: number,

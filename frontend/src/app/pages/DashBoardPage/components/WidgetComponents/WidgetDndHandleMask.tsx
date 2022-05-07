@@ -18,7 +18,7 @@
 import { CONTAINER_TAB } from 'app/pages/DashBoardPage/constants';
 import {
   ContainerItem,
-  WidgetType,
+  WidgetTypeBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo } from 'react';
 import { useDrag } from 'react-dnd';
@@ -27,7 +27,7 @@ import { LEVEL_10 } from 'styles/StyleConstants';
 import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 export interface WidgetDndHandleMaskProps {
   widgetId: string;
-  widgetType: WidgetType;
+  widgetType: WidgetTypeBeta3;
   widgetIndex: number;
 }
 export const WidgetDndHandleMask: React.FC<WidgetDndHandleMaskProps> = memo(
