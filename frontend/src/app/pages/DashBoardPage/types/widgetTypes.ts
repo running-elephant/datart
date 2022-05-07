@@ -83,3 +83,12 @@ export interface WidgetMeta {
   editAction: Record<string, { label: string; icon: any; key: string }>;
   i18ns: ChartI18NSectionConfig[];
 }
+
+export interface ITimeDefault {
+  format: string;
+  duration: number;
+}
+// {
+//           format: 'YYYY-MM-DD HH:mm:ss',
+//           duration: 1000,
+//         }

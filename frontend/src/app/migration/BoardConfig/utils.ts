@@ -202,15 +202,36 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
       widgetTypeId: 'image',
     });
     newWidget = commonBeta4Convert(newWidget, widget);
+    newWidget.config.content = {};
     return newWidget;
   }
   if (subType === 'richText') {
+    /**
+     * old data
+    {
+    "content": {
+        "type": "richText",
+        "richTextConfig": {
+            "content": {
+                "ops": [
+                    {
+                        "insert": "\n"
+                    }
+                ]
+            }
+        }
+    }
+    }  
+     */
     let newWidget = widgetManager.toolkit('richText').create({
       ...widget,
       widgetTypeId: 'richText',
     });
     newWidget = commonBeta4Convert(newWidget, widget);
     // getWidgetIframe;
+    newWidget.config.content = {
+      richText: newWidget.config.content.richTextConfig,
+    };
     return newWidget;
   }
   if (subType === 'iframe') {
@@ -241,6 +262,7 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
         });
       }
     });
+    newWidget.config.content = {};
     return newWidget;
   }
 
@@ -250,7 +272,29 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
       widgetTypeId: 'video',
     });
     newWidget = commonBeta4Convert(newWidget, widget);
+    newWidget.config.content = {};
     return newWidget;
+  }
+  if (subType === 'timer') {
+    /**
+    * old data
+    "content": {
+        "type": "timer",
+        "timerConfig": {
+            "time": {
+                "timeFormat": "YYYY-MM-DD HH:mm:ss",
+                "timeDuration": 1000
+            },
+            "font": {
+                "fontFamily": "PingFang SC",
+                "fontSize": "18",
+                "fontWeight": "bolder",
+                "fontStyle": "normal",
+                "color": ""
+            }
+        }
+    }
+  */
   }
 };
 /**

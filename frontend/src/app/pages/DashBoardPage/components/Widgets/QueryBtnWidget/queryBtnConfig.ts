@@ -119,17 +119,10 @@ export const widgetToolkit: WidgetToolkit = {
       if (ele.key === 'titleGroup') {
         ele.rows?.forEach(row => {
           if (row.key === 'title') {
-            row.value = '查询';
+            row.value = '查询query';
           }
         });
       }
-      // if (ele.key === 'titleGroup') {
-      //   ele.rows?.forEach(row => {
-      //     if (row.key === 'title') {
-      //       row.value = '查询';
-      //     }
-      //   });
-      // }
     });
 
     return widget;

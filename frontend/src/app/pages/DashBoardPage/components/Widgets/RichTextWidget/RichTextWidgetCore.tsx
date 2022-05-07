@@ -22,7 +22,6 @@ import {
 } from 'app/components/ChartGraph/BasicRichText/RichTextPluginLoader/CustomColor';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
-  MediaWidgetContent,
   WidgetBeta3,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -72,8 +71,7 @@ export const RichTextWidgetCore: React.FC<RichTextWidgetProps> = ({
 
   const { onEditClearActiveWidgets } = useContext(WidgetActionContext);
   const initContent = useMemo(() => {
-    return (widget.config.content as MediaWidgetContent).richTextConfig
-      ?.content;
+    return (widget.config.content as any).richText?.content;
   }, [widget.config.content]);
   const [quillValue, setQuillValue] = useState<DeltaStatic | undefined>(
     initContent,
@@ -106,11 +104,11 @@ export const RichTextWidgetCore: React.FC<RichTextWidgetProps> = ({
           const nextMediaWidgetContent = produce(
             widget.config.content,
             draft => {
-              (draft as MediaWidgetContent).richTextConfig = {
+              (draft as any).richText = {
                 content: JSON.parse(strContents),
               };
             },
-          ) as unknown as MediaWidgetContent;
+          ) as any;
 
           dispatch(
             editBoardStackActions.changeMediaWidgetConfig({
