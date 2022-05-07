@@ -1857,7 +1857,7 @@ describe('getDefaultWidgetName', () => {
   const reset: WidgetType = 'reset';
   it('should chart', () => {
     expect(getDefaultWidgetName(chart, 'widgetChart', 3)).toEqual(
-      'privateChart_3',
+      'Private Chart_3',
     );
     expect(getDefaultWidgetName(media, 'image', 3)).toEqual('Image_3');
   });
