@@ -215,6 +215,30 @@ export const updateRichTextAction = createAsyncThunk(
   },
 );
 
+export const updatePivotSheetDrillableAction = createAsyncThunk(
+  'workbench/updatePivotSheetDrillableAction',
+  async (value: ChartDataConfig, thunkAPI) => {
+    try {
+      const state = thunkAPI.getState() as any;
+      const workbenchState = state.workbench as typeof initState;
+      if (!workbenchState.currentDataView?.id) {
+        return;
+      }
+      await thunkAPI.dispatch(
+        workbenchSlice.actions.updateChartConfig({
+          type: 'data',
+          payload: {
+            ancestors: [1],
+            value,
+          },
+        }),
+      );
+    } catch (error) {
+      return rejectHandle(error, thunkAPI.rejectWithValue);
+    }
+  },
+);
+
 export const fetchChartAction = createAsyncThunk<
   ChartDTO,
   { chartId?: string; backendChart?: ChartDTO },

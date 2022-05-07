@@ -47,6 +47,7 @@ import {
   refreshDatasetAction,
   updateChartAction,
   updateChartConfigAndRefreshDatasetAction,
+  updatePivotSheetDrillableAction,
   updateRichTextAction,
 } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useAddViz } from 'app/pages/MainPage/pages/VizPage/hooks/useAddViz';
@@ -272,6 +273,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               dispatch(updateRichTextAction(param.value));
               return;
             }
+            if (param.seriesName === 'drillOptionChange') {
+              handleDrillOptionChange?.(param.value);
+              return;
+            }
           },
         },
       ]);
@@ -396,6 +401,17 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         }
       }
 
+      if (payload.value.key === 'enableExpandRow') {
+        dispatch(
+          updatePivotSheetDrillableAction({
+            ...chartConfig?.datas?.[1]!,
+            drillable: payload.value.value as boolean,
+          }),
+        );
+        drillOptionRef.current?.clearAll();
+        handleDrillOptionChange(drillOptionRef.current!);
+      }
+
       dispatch(
         updateChartConfigAndRefreshDatasetAction({
           type,
@@ -411,7 +427,13 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         }),
       );
     },
-    [dispatch, expensiveQuery, dataview],
+    [
+      dispatch,
+      expensiveQuery,
+      dataview,
+      handleDrillOptionChange,
+      chartConfig?.datas,
+    ],
   );
 
   const handleDataViewChanged = useCallback(() => {
