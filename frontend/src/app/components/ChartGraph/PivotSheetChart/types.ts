@@ -5,4 +5,5 @@ export interface AndvS2Config {
   options: S2Options;
   theme?: S2Theme;
   palette?: Palette;
+  eventConfig?: Record<string, any>;
 }

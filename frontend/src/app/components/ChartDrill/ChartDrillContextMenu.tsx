@@ -116,7 +116,16 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       );
     }, [drillOption?.isSelectedDrill, t]);
 
+    const hasContextMenu =
+      chartConfig?.datas?.filter(v => v.hiddenDrillable).length ||
+      !chartConfig?.datas?.filter(v => v.drillable).length ||
+      drillOption?.isDrillable ||
+      runtimeDateLevelFields?.length;
+
     const contextMenu = useMemo(() => {
+      if (!hasContextMenu) {
+        return <></>;
+      }
       return (
         <StyledChartDrillMenu
           onClick={({ key }) => {
@@ -178,25 +187,19 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       onDrillOptionChange,
       handleDateLevelChange,
       availableSourceFunctions,
+      hasContextMenu,
     ]);
-
-    const hasContextMenu =
-      drillOption?.isDrillable || runtimeDateLevelFields?.length;
 
     return (
       <StyledChartDrill className="chart-drill-menu-container">
-        {hasContextMenu ? (
-          <Dropdown
-            disabled={!drillOption}
-            overlay={contextMenu}
-            destroyPopupOnHide={true}
-            trigger={['contextMenu']}
-          >
-            <div style={{ height: '100%' }}>{children}</div>
-          </Dropdown>
-        ) : (
+        <Dropdown
+          disabled={!drillOption}
+          overlay={contextMenu}
+          destroyPopupOnHide={true}
+          trigger={['contextMenu']}
+        >
           <div style={{ height: '100%' }}>{children}</div>
-        )}
+        </Dropdown>
       </StyledChartDrill>
     );
   },

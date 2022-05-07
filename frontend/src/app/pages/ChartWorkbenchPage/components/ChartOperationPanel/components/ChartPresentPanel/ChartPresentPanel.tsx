@@ -120,7 +120,7 @@ const ChartPresentPanel: FC<{
               <ChartDrillContextMenu chartConfig={chartConfig}>
                 {renderGraph(containerId, chart, chartConfig, style)}
               </ChartDrillContextMenu>
-              <ChartDrillPaths />
+              <ChartDrillPaths chartConfig={chartConfig} />
             </>
           )}
           {ChartPresentType.RAW === chartType && (
