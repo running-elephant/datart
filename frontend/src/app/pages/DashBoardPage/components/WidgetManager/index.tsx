@@ -19,21 +19,39 @@ import linkChartProto from '../Widgets/DataChartWidget/linkChartConfig';
 import selfChartProto from '../Widgets/DataChartWidget/selfChartConfig1';
 import iframeProto from '../Widgets/IframeWidget/iframeConfig';
 import imageProto from '../Widgets/ImageWidget/imageConfig';
+import queryBtnProto from '../Widgets/QueryBtnWidget/queryBtnConfig';
+import resetBtnProto from '../Widgets/ResetBtnWidget/resetBtnConfig';
 import richTextProto from '../Widgets/RichTextWidget/richTextConfig';
-import tabProto from '../Widgets/TabWidget/TabConfig';
+import tabProto from '../Widgets/TabWidget/tabConfig1';
 import timerProto from '../Widgets/TimerWidget/timerConfig';
 import videoProto from '../Widgets/VideoWidget/videoConfig';
 import { widgetManager } from './WidgetManager';
 
+// -- chart
 widgetManager.register(linkChartProto);
 widgetManager.register(selfChartProto);
+
+// -- container
 widgetManager.register(tabProto);
+// TODO 轮播容器
+
+// media
 widgetManager.register(imageProto);
 widgetManager.register(videoProto);
-widgetManager.register(imageProto);
 widgetManager.register(richTextProto);
 widgetManager.register(iframeProto);
 widgetManager.register(timerProto);
-// widgetManager.register(controllerProto);
+
+// buttons
+widgetManager.register(queryBtnProto);
+widgetManager.register(resetBtnProto);
+// other buttons
+
+// TODO 素材 或者边框等
+
+// controller
+
+// Group
+// TODO Group 组容器
 
 export default widgetManager;

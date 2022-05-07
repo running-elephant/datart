@@ -24,7 +24,7 @@ import {
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';
 import { PRIMARY, WHITE } from 'styles/StyleConstants';
-import { WidgetType } from './pages/Board/slice/types';
+import { WidgetTypeBeta3 } from './pages/Board/slice/types';
 import { ITimeDefault } from './types/widgetTypes';
 export const WIDGET_DRAG_HANDLE = 'widget-draggableHandle';
 export const BOARD_FILE_IMG_PREFIX = 'resources/image/dashboard/';
@@ -104,8 +104,11 @@ export const ButtonBorderDefault: BorderConfig = {
   width: 0,
 };
 
-export const CanDropToWidgetTypes: readonly WidgetType[] = ['chart', 'media'];
-export const CanFullScreenWidgetTypes: readonly Partial<WidgetType>[] = [
+export const CanDropToWidgetTypes: readonly WidgetTypeBeta3[] = [
+  'chart',
+  'media',
+];
+export const CanFullScreenWidgetTypes: readonly Partial<WidgetTypeBeta3>[] = [
   'chart',
   'media',
   'container',
@@ -114,7 +117,7 @@ export const CanFullScreenWidgetTypes: readonly Partial<WidgetType>[] = [
 export const CONTAINER_TAB = 'containerTab';
 
 //
-export const NeedFetchWidgetTypes: readonly WidgetType[] = [
+export const NeedFetchWidgetTypes: readonly WidgetTypeBeta3[] = [
   'chart',
   'controller',
 ];

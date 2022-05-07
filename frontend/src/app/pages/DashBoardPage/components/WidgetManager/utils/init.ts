@@ -21,7 +21,7 @@ import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import type {
   BoardType,
   RectConfig,
-  WidgetType,
+  WidgetTypeBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import type { ChartStyleConfig } from 'app/types/ChartConfig';
@@ -323,7 +323,7 @@ export const widgetTpl = (): Widget => {
       version: APP_CURRENT_VERSION,
       index: 0,
       boardType: '' as BoardType,
-      type: '' as WidgetType,
+      type: '' as WidgetTypeBeta3,
       widgetTypeId: '',
       controllable: false,
       linkable: false,

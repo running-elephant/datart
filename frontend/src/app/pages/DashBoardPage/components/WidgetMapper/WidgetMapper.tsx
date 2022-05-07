@@ -15,11 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ControllerFacadeTypes } from 'app/constants';
 import { memo, useContext } from 'react';
-import { BoardType } from '../../pages/Board/slice/types';
 import { Widget } from '../../types/widgetTypes';
 import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
+import { ControllerWidget } from '../Widgets/ControllerWidget/ControllerWidget';
 import { DataChartWidget } from '../Widgets/DataChartWidget/DataChartWidget';
 import { IframeWidget } from '../Widgets/IframeWidget/IframeWidget';
 import { ImageWidget } from '../Widgets/ImageWidget/ImageWidget';
@@ -31,14 +32,15 @@ import { TimerWidget } from '../Widgets/TimerWidget/TimerWidget';
 import { VideoWidget } from '../Widgets/VideoWidget/VideoWidget';
 
 export const WidgetMapper: React.FC<{
-  boardType: BoardType;
   boardEditing: boolean;
+  hideTitle: boolean;
 }> = memo(({ boardEditing }) => {
   const widget = useContext(WidgetContext) as unknown as Widget;
-  const widgetType = widget.config.type;
-
-  switch (widgetType) {
-    case 'chart':
+  const widgetTypeId = widget.config.widgetTypeId;
+  switch (widgetTypeId) {
+    // chart
+    case 'linkChart':
+    case 'selfChart':
       return (
         <WidgetDataProvider
           widgetId={widget.id}
@@ -48,49 +50,50 @@ export const WidgetMapper: React.FC<{
           <DataChartWidget hideTitle={false} />
         </WidgetDataProvider>
       );
-    case 'media':
-      const widgetTypeId = widget.config.widgetTypeId;
-      return (
-        <MediaWidgetMapper widgetTypeId={widgetTypeId} hideTitle={false} />
-      );
-    case 'container':
-      // const containerSubType: MediaWidgetType = widget.config.content.type;
+    // media
+    case 'richText':
+      return <RichTextWidget hideTitle={false} />;
+    case 'image':
+      return <ImageWidget hideTitle={false} />;
+    case 'video':
+      return <VideoWidget hideTitle={false} />;
+    case 'iframe':
+      return <IframeWidget hideTitle={false} />;
+    case 'timer':
+      return <TimerWidget hideTitle={false} />;
+
+    // tab
+    case 'tab':
       return <TabWidget hideTitle={false} />;
-    case 'controller':
+
+    // btn
+    case 'queryBtn':
+      return <QueryBtnWidget />;
+    case 'resetBtn':
+      return <ResetBtnWidget />;
+    // controller
+    case ControllerFacadeTypes.DropdownList:
+    case ControllerFacadeTypes.MultiDropdownList:
+    case ControllerFacadeTypes.CheckboxGroup:
+    case ControllerFacadeTypes.RadioGroup:
+    case ControllerFacadeTypes.Text:
+    case ControllerFacadeTypes.Time:
+    case ControllerFacadeTypes.RangeTime:
+    case ControllerFacadeTypes.RangeValue:
+    case ControllerFacadeTypes.Value:
+    case ControllerFacadeTypes.Slider:
       return (
         <WidgetDataProvider
           widgetId={widget.id}
           boardId={widget.dashboardId}
           boardEditing={boardEditing}
         >
-          {/* <ControllerWidget /> */}
+          <ControllerWidget />
         </WidgetDataProvider>
       );
-    case 'query':
-      return <QueryBtnWidget />;
-    case 'reset':
-      return <ResetBtnWidget />;
+
+    // unknown
     default:
-      return <div>default widget</div>;
+      return <div> unknown widget ? </div>;
   }
 });
-
-export const MediaWidgetMapper = (opt: {
-  widgetTypeId: string;
-  hideTitle: boolean;
-}) => {
-  switch (opt.widgetTypeId) {
-    case 'richText':
-      return <RichTextWidget hideTitle={opt.hideTitle} />;
-    case 'image':
-      return <ImageWidget hideTitle={opt.hideTitle} />;
-    case 'video':
-      return <VideoWidget hideTitle={opt.hideTitle} />;
-    case 'iframe':
-      return <IframeWidget hideTitle={opt.hideTitle} />;
-    case 'timer':
-      return <TimerWidget hideTitle={opt.hideTitle} />;
-    default:
-      return <div>default media</div>;
-  }
-};

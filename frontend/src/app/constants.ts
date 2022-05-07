@@ -27,19 +27,23 @@ export enum TenantManagementMode {
 
 export enum ControllerFacadeTypes {
   DropdownList = 'dropdownList',
+  MultiDropdownList = 'multiDropdownList',
+
   RadioGroup = 'radioGroup',
   CheckboxGroup = 'checkboxGroup',
-  MultiDropdownList = 'multiDropdownList',
+  Text = 'text',
+
+  Value = 'value',
+  RangeValue = 'rangeValue',
+  Slider = 'slider',
+  RangeSlider = 'rangeSlider',
+
+  Time = 'time',
   RangeTime = 'rangeTime',
   RangeTimePicker = 'rangeTimePicker',
   RecommendTime = 'recommendTime',
-  RangeValue = 'rangeValue',
-  Text = 'text',
+
   Tree = 'tree',
-  Value = 'value',
-  Time = 'time',
-  Slider = 'slider',
-  RangeSlider = 'rangeSlider',
 }
 
 export enum ControllerRadioFacadeTypes {

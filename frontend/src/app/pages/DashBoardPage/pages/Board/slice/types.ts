@@ -28,6 +28,7 @@ import { ChartDatasetMeta } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
+import { IFontDefault } from '../../../../../../types';
 import { ChartDataSectionField } from '../../../../../types/ChartConfig';
 import { View } from '../../../../../types/View';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
@@ -133,7 +134,7 @@ export interface WidgetConfBeta3 {
   name: string;
   nameConfig: WidgetTitleConfig;
   padding: WidgetPadding;
-  type: WidgetType;
+  type: WidgetTypeBeta3;
   autoUpdate: boolean;
   frequency: number; // 定时同步频率
   rect: RectConfig; //desktop_rect
@@ -151,7 +152,7 @@ export interface WidgetTitleConfig {
   title: string;
   showTitle: boolean;
   textAlign?: TextAlignType;
-  font: FontConfig;
+  font: IFontDefault;
 }
 export interface LinkageConfig {
   open: boolean;
@@ -336,7 +337,7 @@ export interface ControllerWidgetContent {
   config: ControllerConfig;
 }
 
-export const WidgetTypes = [
+export const WidgetTypesBeta3 = [
   'chart',
   'media',
   'container',
@@ -344,7 +345,17 @@ export const WidgetTypes = [
   'query',
   'reset',
 ] as const;
+export type WidgetTypeBeta3 = typeof WidgetTypesBeta3[number];
+
+export const WidgetTypes = [
+  'chart',
+  'media',
+  'container',
+  'controller',
+  'button',
+] as const;
 export type WidgetType = typeof WidgetTypes[number];
+
 export declare const ContainerWidgetTypes: ['tab', 'carousel'];
 
 export type LightWidgetType =
@@ -392,14 +403,6 @@ export interface LineConfig {
 
 export interface BorderConfig extends LineConfig {
   radius: number;
-}
-
-export interface FontConfig {
-  fontFamily: string;
-  fontSize: string;
-  fontWeight: string;
-  fontStyle: string;
-  color: string;
 }
 
 //

@@ -21,7 +21,7 @@ import {
   ContainerWidgetType,
   MediaWidgetType,
   WidgetBeta3,
-  WidgetType,
+  WidgetTypeBeta3,
 } from './../../pages/Board/slice/types';
 import { createMediaWidget } from './../widget';
 import { chartWidgetToolKit } from './chart/index';
@@ -57,7 +57,7 @@ export const widgetToolKit = {
   },
   query: {
     create: (opt: {
-      type: WidgetType;
+      type: WidgetTypeBeta3;
       boardId: string;
       boardType: BoardType;
     }) => {
@@ -66,7 +66,7 @@ export const widgetToolKit = {
   },
   reset: {
     create: (opt: {
-      type: WidgetType;
+      type: WidgetTypeBeta3;
       boardId: string;
       boardType: BoardType;
     }) => {

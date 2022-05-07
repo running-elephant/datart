@@ -25,7 +25,7 @@ import {
 import {
   DataChart,
   RelatedView,
-  WidgetType,
+  WidgetTypeBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ControllerConfig,
@@ -1851,10 +1851,10 @@ describe('getBoardChartRequests', () => {
 });
 
 describe('getDefaultWidgetName', () => {
-  const chart: WidgetType = 'chart';
-  const media: WidgetType = 'media';
-  const query: WidgetType = 'query';
-  const reset: WidgetType = 'reset';
+  const chart: WidgetTypeBeta3 = 'chart';
+  const media: WidgetTypeBeta3 = 'media';
+  const query: WidgetTypeBeta3 = 'query';
+  const reset: WidgetTypeBeta3 = 'reset';
   it('should chart', () => {
     expect(getDefaultWidgetName(chart, 'widgetChart', 3)).toEqual(
       'Private Chart_3',
