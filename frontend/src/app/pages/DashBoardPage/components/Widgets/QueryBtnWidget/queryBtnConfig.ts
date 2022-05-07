@@ -88,8 +88,8 @@ export const widgetToolkit: WidgetToolkit = {
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.widgetTypeId = opt.widgetTypeId;
-    widget.config.type = widgetMeta.widgetTypeId;
+    widget.config.widgetTypeId = widgetMeta.widgetTypeId;
+    widget.config.type = 'button';
     if (opt.boardType === 'auto') {
       const rect: RectConfig = {
         x: 0,

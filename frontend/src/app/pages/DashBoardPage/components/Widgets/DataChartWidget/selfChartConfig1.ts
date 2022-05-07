@@ -32,7 +32,7 @@ const widgetMeta = getMeta({
   },
 });
 export type SelfChartToolkit = WidgetToolkit & {};
-export const selfChartToolkit: SelfChartToolkit = {
+const widgetToolkit: SelfChartToolkit = {
   create: opt => {
     const widget = dataChartCreator({
       ...opt,
@@ -63,8 +63,8 @@ export const selfChartToolkit: SelfChartToolkit = {
 //   }
 // }
 const selfChartProto = {
-  widgetTypeId: 'selfChart',
+  widgetTypeId: widgetMeta.widgetTypeId,
   meta: widgetMeta,
-  toolkit: selfChartToolkit,
+  toolkit: widgetToolkit,
 };
 export default selfChartProto;

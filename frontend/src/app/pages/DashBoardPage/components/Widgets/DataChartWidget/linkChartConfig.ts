@@ -31,8 +31,8 @@ export const widgetMeta = getMeta({
     widgetType: 'Link Chart',
   },
 });
-export type LinkChartToolkit = WidgetToolkit & {};
-export const linkChartToolkit: LinkChartToolkit = {
+
+export const linkChartToolkit: WidgetToolkit = {
   create: opt => {
     const widget = dataChartCreator({
       ...opt,
@@ -58,7 +58,7 @@ export const linkChartToolkit: LinkChartToolkit = {
 };
 
 const linkChartProto = {
-  widgetTypeId: 'linkChart',
+  widgetTypeId: widgetMeta.widgetTypeId,
   meta: widgetMeta,
   toolkit: linkChartToolkit,
 };

@@ -18,7 +18,7 @@
 
 import {
   WidgetMeta,
-  WidgetToolkit,
+  WidgetTplProps,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
   initAutoWidgetRect,
@@ -126,7 +126,7 @@ export const getMeta = (opt: {
   return meta;
 };
 
-export const dataChartCreator: WidgetToolkit['create'] = opt => {
+export const dataChartCreator = (opt: WidgetTplProps) => {
   const widget = widgetTpl();
   widget.id = opt.widgetTypeId + widget.id;
   widget.parentId = opt.parentId || '';
@@ -136,7 +136,7 @@ export const dataChartCreator: WidgetToolkit['create'] = opt => {
   widget.relations = opt.relations || [];
   widget.config.widgetTypeId = opt.widgetTypeId;
   widget.config.type = 'chart';
-  widget.config.content.dataChart = opt.dataChart;
+  widget.config.content.dataChart = opt.content; // DataChart
 
   widget.config.jsonConfig.props = [
     { ...initTitleTpl() },
@@ -149,7 +149,7 @@ export const dataChartCreator: WidgetToolkit['create'] = opt => {
     if (ele.key === 'titleGroup') {
       ele.rows?.forEach(row => {
         if (row.key === 'title') {
-          row.value = opt?.dataChart?.name || '';
+          row.value = opt?.content?.name || '';
         }
         if (row.key === 'showTitle') {
           row.value = true;

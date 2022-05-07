@@ -37,7 +37,6 @@ export const AddMedia: React.FC<{}> = () => {
       const widget = widgetManager.toolkit(mediaType).create({
         dashboardId: boardId,
         boardType,
-        widgetTypeId: mediaType,
       });
       dispatch(addWidgetsToEditBoard([widget]));
     },

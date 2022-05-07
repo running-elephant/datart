@@ -24,10 +24,10 @@ import {
   Relation,
   RelationConfigType,
   WidgetBeta3,
-  WidgetTypeBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { RelatedWidgetItem } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/RelatedWidgets';
 import { ControllerConfig } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { uuidv4 } from 'utils/utils';
 import { createInitWidgetConfig, createWidget } from '../../widget';
 export const createControllerWidget = (opt: {
@@ -85,14 +85,9 @@ export const getViewIdsInControlConfig = (
     return [];
   }
 };
-export const getCanLinkControlWidgets = (widgets: WidgetBeta3[]) => {
-  const CanLinkControllerWidgetTypes: WidgetTypeBeta3[] = [
-    'chart',
-    'controller',
-  ];
-
+export const getCanLinkControlWidgets = (widgets: Widget[]) => {
   const canLinkWidgets = widgets.filter(widget => {
-    if (!CanLinkControllerWidgetTypes.includes(widget.config.type)) {
+    if (widget.config.controllable) {
       return false;
     }
     if (widget.viewIds.length === 0) {
