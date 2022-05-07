@@ -322,6 +322,7 @@ export const widgetTpl = (): Widget => {
       clientId: initClientId(),
       version: APP_CURRENT_VERSION,
       index: 0,
+      canWrapped: true,
       boardType: '' as BoardType,
       type: '' as WidgetTypeBeta3,
       widgetTypeId: '',
@@ -332,13 +333,7 @@ export const widgetTpl = (): Widget => {
       content: {} as any,
       rect: { x: 0, y: 0, width: 0, height: 0 },
       jsonConfig: {
-        props: [
-          // { ...initTitleTpl() },
-          // { ...initLoopFetchTpl() },
-          // { ...initPaddingTpl() },
-          // { ...initBackgroundTpl() },
-          // { ...initBorderTpl() },
-        ],
+        props: [],
       },
     },
   };

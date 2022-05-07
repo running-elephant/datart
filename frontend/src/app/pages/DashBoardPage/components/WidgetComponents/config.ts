@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { WidgetBeta3, WidgetTypeBeta3 } from '../../pages/Board/slice/types';
+import { WidgetBeta3, WidgetType } from '../../pages/Board/slice/types';
 export interface WidgetActionListItem<T> {
   key: T;
   label: string;
@@ -44,25 +44,21 @@ export const widgetActionTypes = [
 export type widgetActionType = typeof widgetActionTypes[number];
 
 // 浏览 view
-export const widgetViewActionMap: Record<WidgetTypeBeta3, widgetActionType[]> =
-  {
-    chart: ['refresh', 'fullScreen'],
-    media: ['fullScreen'],
-    container: ['info'],
-    controller: ['refresh'],
-    query: [],
-    reset: [],
-  };
+export const widgetViewActionMap: Record<WidgetType, widgetActionType[]> = {
+  chart: ['refresh', 'fullScreen'],
+  media: ['fullScreen'],
+  container: ['info'],
+  controller: ['refresh'],
+  button: [],
+};
 // 编辑 edit
-export const widgetEditActionMap: Record<WidgetTypeBeta3, widgetActionType[]> =
-  {
-    chart: ['refresh', 'lock', 'edit', 'delete'],
-    media: ['edit', 'lock', 'delete'],
-    controller: ['refresh', 'edit', 'lock', 'delete'],
-    container: ['edit', 'lock', 'delete'],
-    query: ['lock', 'delete'],
-    reset: ['lock', 'delete'],
-  };
+export const widgetEditActionMap: Record<WidgetType, widgetActionType[]> = {
+  chart: ['refresh', 'lock', 'edit', 'delete'],
+  media: ['edit', 'lock', 'delete'],
+  controller: ['refresh', 'edit', 'lock', 'delete'],
+  container: ['edit', 'lock', 'delete'],
+  button: ['lock', 'delete'],
+};
 
 export const widgetActionMap = {
   view: widgetViewActionMap,

@@ -15,6 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import checkboxGroupProto from '../Widgets/ControllerWidget/checkboxGroup';
+import dropdownListProto from '../Widgets/ControllerWidget/dropdownList';
+import multiDropdownListProto from '../Widgets/ControllerWidget/multiDropdownList';
+import radioGroupProto from '../Widgets/ControllerWidget/radioGroup';
+import rangeTimeProto from '../Widgets/ControllerWidget/rangeTimeProto';
+import rangeValueProto from '../Widgets/ControllerWidget/rangeValueProto';
+import sliderProto from '../Widgets/ControllerWidget/sliderProto';
+import textProto from '../Widgets/ControllerWidget/textProto';
+import timeProto from '../Widgets/ControllerWidget/timeProto';
+import valueProto from '../Widgets/ControllerWidget/valueProto';
 import linkChartProto from '../Widgets/DataChartWidget/linkChartConfig';
 import selfChartProto from '../Widgets/DataChartWidget/selfChartConfig1';
 import iframeProto from '../Widgets/IframeWidget/iframeConfig';
@@ -45,11 +55,26 @@ widgetManager.register(timerProto);
 // buttons
 widgetManager.register(queryBtnProto);
 widgetManager.register(resetBtnProto);
-// other buttons
 
+// other buttons
 // TODO 素材 或者边框等
 
 // controller
+widgetManager.register(dropdownListProto);
+widgetManager.register(multiDropdownListProto);
+widgetManager.register(checkboxGroupProto);
+widgetManager.register(radioGroupProto);
+widgetManager.register(textProto);
+
+widgetManager.register(timeProto);
+widgetManager.register(rangeTimeProto);
+
+widgetManager.register(rangeValueProto);
+widgetManager.register(valueProto);
+widgetManager.register(sliderProto);
+
+// checkboxGroupProto
+// dropdownListProto
 
 // Group
 // TODO Group 组容器

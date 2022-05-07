@@ -92,7 +92,7 @@ export const widgetToolkit: TabToolkit = {
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.widgetTypeId = opt.widgetTypeId;
+    widget.config.widgetTypeId = widgetMeta.widgetTypeId;
     widget.config.type = 'container';
     if (opt.boardType === 'auto') {
       widget.config.rect = { ...initAutoWidgetRect() };

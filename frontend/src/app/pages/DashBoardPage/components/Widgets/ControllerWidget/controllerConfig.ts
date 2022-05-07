@@ -17,141 +17,41 @@
  */
 
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import {
-  WidgetMeta,
-  WidgetToolkit,
-} from 'app/pages/DashBoardPage/types/widgetTypes';
-import {
-  initAutoWidgetRect,
-  initBackgroundTpl,
-  initBorderTpl,
-  initPaddingTpl,
-  initTitleTpl,
-  initWidgetEditActionTpl,
-  initWidgetViewActionTpl,
-  PaddingI18N,
-  TitleI18N,
-  WidgetEditActionI18N,
-  widgetTpl,
-  WidgetViewActionI18N,
-} from '../../WidgetManager/utils/init';
+import { WidgetCreateProps } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { initTitleTpl, widgetTpl } from '../../WidgetManager/utils/init';
 
-export const widgetMeta: WidgetMeta = {
-  icon: 'controller',
-  widgetTypeId: 'controller',
-  viewAction: {
-    ...initWidgetViewActionTpl(),
-  },
-  editAction: {
-    ...initWidgetEditActionTpl(),
-  },
-  i18ns: [
-    {
-      lang: 'zh-CN',
-      translation: {
-        desc: '控制器',
-        widgetType: '控制器',
-        action: {
-          ...WidgetViewActionI18N.zh,
-          ...WidgetEditActionI18N.zh,
-        },
-        title: TitleI18N.zh,
-        background: { backgroundGroup: '背景' },
-        padding: PaddingI18N.zh,
+export const controlWidgetTpl = (opt: WidgetCreateProps) => {
+  const widget = widgetTpl();
+  widget.id = opt.relations?.[0]?.sourceId || widget.id;
+  widget.parentId = opt.parentId || '';
+  widget.dashboardId = opt.dashboardId || '';
+  widget.datachartId = opt.datachartId || '';
+  widget.viewIds = opt.viewIds || [];
+  widget.relations = opt.relations || [];
+  widget.config.controllable = true;
+  widget.config.canWrapped = false;
+  widget.config.content = opt.content;
+  widget.config.type = 'controller';
+  if (opt.boardType === 'auto') {
+    const rect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: 3,
+      height: 1,
+    };
+    widget.config.rect = rect;
+    widget.config.mRect = { ...rect, width: 6 };
+  } else {
+    const rect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 32,
+    };
+    widget.config.rect = rect;
+  }
+  widget.config.content = opt.content; //controller
+  widget.config.jsonConfig.props = [{ ...initTitleTpl() }];
 
-        border: { borderGroup: '边框' },
-      },
-    },
-    {
-      lang: 'en-US',
-      translation: {
-        desc: '控制器',
-        widgetType: '控制器',
-        action: {
-          ...WidgetViewActionI18N.en,
-          ...WidgetEditActionI18N.en,
-        },
-        title: TitleI18N.en,
-        background: { backgroundGroup: 'Background' },
-        padding: PaddingI18N.en,
-
-        border: { borderGroup: 'Border' },
-      },
-    },
-  ],
+  return widget;
 };
-
-export const widgetToolkit: WidgetToolkit = {
-  create: opt => {
-    const widget = widgetTpl();
-    widget.id = widgetMeta.widgetTypeId + widget.id;
-    widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
-    widget.datachartId = opt.datachartId || '';
-    widget.viewIds = opt.viewIds || [];
-    widget.relations = opt.relations || [];
-    widget.config.widgetTypeId = opt.widgetTypeId;
-    widget.config.type = 'controller';
-    if (opt.boardType === 'auto') {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 6,
-        height: 9,
-      };
-      widget.config.rect = rect;
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 400,
-        height: 400,
-      };
-      widget.config.rect = rect;
-    }
-
-    widget.config.jsonConfig.props = [
-      { ...initBackgroundTpl() },
-      { ...initTitleTpl() },
-      { ...initPaddingTpl() },
-      { ...initBorderTpl() },
-    ];
-    widget.config.jsonConfig.props?.forEach(ele => {
-      if (ele.key === 'titleGroup') {
-        ele.rows?.forEach(row => {
-          if (row.key === 'title') {
-            row.value = 'Image';
-          }
-        });
-      }
-      if (ele.key === 'backgroundGroup') {
-        ele.rows?.forEach(row => {
-          if (row.key === 'background') {
-            row.value.image = '/images/example.png';
-          }
-        });
-      }
-    });
-
-    return widget;
-  },
-  edit() {},
-  save() {},
-  // lock() {},
-  // unlock() {},
-  // copy() {},
-  // paste() {},
-  // delete() {},
-  // changeTitle() {},
-  // getMeta() {},
-  // getWidgetName() {},
-  // //
-};
-
-const controllerProto = {
-  widgetTypeId: 'controller',
-  meta: widgetMeta,
-  toolkit: widgetToolkit,
-};
-export default controllerProto;

@@ -39,7 +39,6 @@ export const AddContainer: React.FC<{}> = () => {
         dashboardId: boardId,
         boardType: boardType,
         relations: [],
-        widgetTypeId: 'tab',
       });
       dispatch(addWidgetsToEditBoard([widget] as any));
     },

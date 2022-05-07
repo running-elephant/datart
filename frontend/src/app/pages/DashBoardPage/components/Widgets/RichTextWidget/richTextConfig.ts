@@ -89,7 +89,7 @@ export const widgetToolkit: WidgetToolkit = {
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.widgetTypeId = opt.widgetTypeId;
+    widget.config.widgetTypeId = widgetMeta.widgetTypeId;
     widget.config.type = 'media';
     if (opt.boardType === 'auto') {
       widget.config.rect = { ...initAutoWidgetRect() };

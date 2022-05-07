@@ -15,54 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type {
+
+import { ControllerFacadeTypes } from 'app/constants';
+import {
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
-import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
-  initFreeWidgetRect,
   initPaddingTpl,
-  initTitleTpl,
   initWidgetEditActionTpl,
   initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
   WidgetEditActionI18N,
-  widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
-const initIframeTpl = () => {
-  return {
-    label: 'iframe.iframeGroup',
-    key: 'iframeGroup',
-    comType: 'group',
-    rows: [
-      {
-        label: 'iframe.src',
-        key: 'src',
-        value: 'http://www.retech.cc', //https://www.oschina.net/p/datart, http://www.retech.cc/product/datart
-        comType: 'input',
-      },
-    ],
-  };
-};
-const iframeI18N = {
-  zh: {
-    iframeGroup: '嵌入页配置',
-    src: '嵌入地址', //资源？
-  },
-  en: {
-    iframeGroup: 'Iframe Config',
-    src: 'URL', // Source?
-  },
-};
+import { controlWidgetTpl } from './controllerConfig';
+
 export const widgetMeta: WidgetMeta = {
-  icon: 'iframe',
-  widgetTypeId: 'iframe',
+  icon: '',
+  widgetTypeId: ControllerFacadeTypes.RangeValue,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -73,63 +47,44 @@ export const widgetMeta: WidgetMeta = {
     {
       lang: 'zh-CN',
       translation: {
-        desc: 'iframe',
-        widgetType: 'iframe',
+        desc: '',
+        widgetType: '',
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
         },
         title: TitleI18N.zh,
-        iframe: iframeI18N.zh,
         background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
+
         border: { borderGroup: '边框' },
       },
     },
     {
       lang: 'en-US',
       translation: {
-        desc: 'iframe',
-        widgetType: 'iframe',
+        desc: '',
+        widgetType: '',
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
         },
         title: TitleI18N.en,
-        iframe: iframeI18N.en,
         background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
+
         border: { borderGroup: 'Border' },
       },
     },
   ],
 };
-export interface IframeWidgetToolKit extends WidgetToolkit {
-  getIframe: (props) => {
-    src: string;
-  };
-}
-const widgetToolkit: IframeWidgetToolKit = {
-  create: opt => {
-    const widget = widgetTpl();
-    widget.id = widgetMeta.widgetTypeId + widget.id;
-    widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
-    widget.datachartId = opt.datachartId || '';
-    widget.viewIds = opt.viewIds || [];
-    widget.relations = opt.relations || [];
-    widget.config.widgetTypeId = widgetMeta.widgetTypeId;
-    widget.config.type = 'media';
-    if (opt.boardType === 'auto') {
-      widget.config.rect = { ...initAutoWidgetRect() };
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      widget.config.rect = { ...initFreeWidgetRect() };
-    }
 
-    widget.config.jsonConfig.props = [
-      { ...initIframeTpl() },
-      { ...initTitleTpl() },
+export const widgetToolkit: WidgetToolkit = {
+  create: opt => {
+    const widget = controlWidgetTpl(opt);
+    widget.id = widgetMeta.widgetTypeId + widget.id;
+    widget.config.widgetTypeId = widgetMeta.widgetTypeId;
+    const addProps = [
       { ...initBackgroundTpl() },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
@@ -138,22 +93,20 @@ const widgetToolkit: IframeWidgetToolKit = {
       if (ele.key === 'titleGroup') {
         ele.rows?.forEach(row => {
           if (row.key === 'title') {
-            row.value = 'iframe';
+            row.value = widget.config.content?.name;
+          }
+          if (row.key === 'showTitle') {
+            row.value = true;
           }
         });
       }
     });
-
+    widget.config.jsonConfig.props =
+      widget.config.jsonConfig.props?.concat(addProps);
     return widget;
   },
   edit() {},
   save() {},
-  getIframe(props) {
-    const [src] = getJsonConfigs(props, ['iframeGroup'], ['src']);
-    return {
-      src,
-    };
-  },
   // lock() {},
   // unlock() {},
   // copy() {},
@@ -164,16 +117,10 @@ const widgetToolkit: IframeWidgetToolKit = {
   // getWidgetName() {},
   // //
 };
-// export const getWidgetIframe = props => {
-//   const [src] = getJsonConfigs(props, ['iframeGroup'], ['src']);
-//   return {
-//     src,
-//   };
-// };
-const iframeProto = {
+
+const rangeValueProto = {
   widgetTypeId: widgetMeta.widgetTypeId,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };
-export const iframeWidgetToolKit = widgetToolkit;
-export default iframeProto;
+export default rangeValueProto;

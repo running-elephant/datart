@@ -14,7 +14,7 @@ import {
   APP_VERSION_BETA_2,
   APP_VERSION_BETA_4,
 } from './../constants';
-import { convertWidgetToBeta4 } from './utils';
+import { convertWidgetToBeta4 } from './utils/beta4utils';
 
 /**
  *

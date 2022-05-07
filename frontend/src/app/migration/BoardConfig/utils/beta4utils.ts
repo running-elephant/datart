@@ -22,7 +22,7 @@ import {
   Widget,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { IFontDefault } from 'types';
-import { widgetManager } from '../../pages/DashBoardPage/components/WidgetManager/WidgetManager';
+import { widgetManager } from '../../../pages/DashBoardPage/components/WidgetManager/WidgetManager';
 
 const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
   newWidget.id = oldW.id;
@@ -116,13 +116,10 @@ export const convertChartWidgetToBeta4 = (widget: WidgetBeta3) => {
   const subType = widget.config.content.type;
   let newWidget = {} as Widget;
   if (subType === 'dataChart') {
-    newWidget = widgetManager
-      .toolkit('linkChart')
-      .create({ ...widget, widgetTypeId: 'linkChart' });
+    newWidget = widgetManager.toolkit('linkChart').create({ ...widget });
   } else {
     newWidget = widgetManager.toolkit('selfChart').create({
       ...widget,
-      widgetTypeId: 'selfChart',
     });
   }
 
@@ -176,7 +173,6 @@ export const convertContainerWidgetToBeta4 = (widget: WidgetBeta3) => {
        */
     let newWidget = widgetManager.toolkit('tab').create({
       ...widget,
-      widgetTypeId: 'tab',
     });
     newWidget = commonBeta4Convert(newWidget, widget);
 
@@ -203,7 +199,6 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
   if (subType === 'image') {
     let newWidget = widgetManager.toolkit('image').create({
       ...widget,
-      widgetTypeId: 'image',
     });
     newWidget = commonBeta4Convert(newWidget, widget);
     newWidget.config.content = {};
@@ -229,7 +224,6 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
      */
     let newWidget = widgetManager.toolkit('richText').create({
       ...widget,
-      widgetTypeId: 'richText',
     });
     newWidget = commonBeta4Convert(newWidget, widget);
     // getWidgetIframe;
@@ -252,7 +246,6 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
     */
     let newWidget = widgetManager.toolkit('iframe').create({
       ...widget,
-      widgetTypeId: 'iframe',
     });
     newWidget = commonBeta4Convert(newWidget, widget);
     const oldConf = widget.config.content.iframeConfig;
@@ -273,7 +266,6 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
   if (subType === 'video') {
     let newWidget = widgetManager.toolkit('video').create({
       ...widget,
-      widgetTypeId: 'video',
     });
     newWidget = commonBeta4Convert(newWidget, widget);
     newWidget.config.content = {};
@@ -320,7 +312,6 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
   */
     let newWidget = widgetManager.toolkit('timer').create({
       ...widget,
-      widgetTypeId: 'timer',
     });
     newWidget = commonBeta4Convert(newWidget, widget);
 
@@ -349,6 +340,26 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
     return newWidget;
   }
 };
+
+export const convertBtnWidgetToBeta4 = (widget: WidgetBeta3) => {
+  const subType = widget.config.content.type;
+  let newWidget = {} as Widget;
+  if (subType === 'query') {
+    newWidget = widgetManager.toolkit('queryBtn').create({ ...widget });
+  } else {
+    newWidget = widgetManager.toolkit('resetBtn').create({ ...widget });
+  }
+  newWidget = commonBeta4Convert(newWidget, widget);
+  return newWidget;
+};
+
+export const convertControllerToBeta4 = (widget: WidgetBeta3) => {
+  const subType = widget.config.content.type;
+  let newWidget = {} as Widget;
+  newWidget = widgetManager.toolkit(subType).create({ ...widget });
+  newWidget = commonBeta4Convert(newWidget, widget);
+  return newWidget;
+};
 /**
  *
  *
@@ -369,5 +380,14 @@ export const convertWidgetToBeta4 = (widget: WidgetBeta3) => {
   // container
   if (widgetType === 'container') {
     return convertContainerWidgetToBeta4(widget);
+  }
+  // query
+  if (widgetType === 'query' || widgetType === 'reset') {
+    return convertBtnWidgetToBeta4(widget);
+  }
+
+  // reset
+  if (widgetType === 'controller') {
+    return convertControllerToBeta4(widget);
   }
 };

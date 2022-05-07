@@ -5,7 +5,6 @@ import {
 } from 'app/types/ChartConfig';
 import {
   BoardType,
-  DataChart,
   JumpConfig,
   LinkageConfig,
   RectConfig,
@@ -35,6 +34,7 @@ export interface WidgetConf {
   type: string; //WidgetType
   widgetTypeId: string;
   lock: boolean;
+  canWrapped: boolean; // 是否可以被包裹 被 widget container 包裹
   controllable: boolean; // 是否可以关联 controller
   linkable: boolean; // 是否可以关联其他 widget
   // visible: boolean; // 是否可见 TODO: 后续考虑
@@ -48,17 +48,20 @@ export interface WidgetConf {
   jumpConfig?: JumpConfig; // 跳转 设置 TODO: in selfConfig
 }
 
+export interface WidgetCreateProps {
+  dashboardId: string;
+  boardType?: BoardType;
+  datachartId?: string;
+  relations?: Relation[];
+  content?: any;
+  viewIds?: string[];
+  parentId?: string;
+}
+export type WidgetTplProps = WidgetCreateProps & {
+  widgetTypeId: string;
+};
 export interface WidgetToolkit {
-  create: (opt: {
-    widgetTypeId: string;
-    dashboardId: string;
-    boardType?: BoardType;
-    datachartId?: string;
-    relations?: Relation[];
-    dataChart?: DataChart;
-    viewIds?: string[];
-    parentId?: string;
-  }) => Widget;
+  create: (T: WidgetCreateProps) => Widget;
   edit?: () => void;
   save?: () => void;
   // lock?() {},

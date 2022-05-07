@@ -91,7 +91,8 @@ export const WidgetMapper: React.FC<{
           <ControllerWidget />
         </WidgetDataProvider>
       );
-
+    //RangeSlider
+    //Tree
     // unknown
     default:
       return <div> unknown widget ? </div>;

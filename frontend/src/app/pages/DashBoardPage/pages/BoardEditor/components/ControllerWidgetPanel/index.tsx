@@ -21,6 +21,7 @@ import { Split } from 'app/components';
 import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
+import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import { selectViewMap } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import {
   ControllerWidgetContent,
@@ -78,7 +79,7 @@ const ControllerWidgetPanel: React.FC = memo(props => {
   const widgets = useMemo(
     () =>
       widgetToolKit.controller.tool
-        .getCanLinkControlWidgets(allWidgets)
+        .getCanLinkControlWidgets(allWidgets as any)
         .filter(t => t.id !== widgetId),
     [allWidgets, widgetId],
   );
@@ -199,6 +200,7 @@ const ControllerWidgetPanel: React.FC = memo(props => {
 
   const onFinish = useCallback(
     (values: ControllerWidgetContent) => {
+      if (!controllerType) return;
       console.log('--values', values);
       setVisible(false);
       const { relatedViews, config, name } = values;
@@ -209,21 +211,26 @@ const ControllerWidgetPanel: React.FC = memo(props => {
           widgetMap,
           config: config,
         });
-        const widget = widgetToolKit.controller.create({
-          boardId,
-          boardType,
-          name,
-          relations: newRelations,
-          controllerType: controllerType!,
-          views: relatedViews,
+        const content: ControllerWidgetContent = {
+          type: controllerType!,
+          relatedViews: relatedViews,
+          name: name,
           config: postControlConfig(config, controllerType!),
-          viewIds:
-            widgetToolKit.controller.tool.getViewIdsInControlConfig(config),
+        };
+        const viewIds =
+          widgetToolKit.controller.tool.getViewIdsInControlConfig(config);
+        let newWidget = widgetManager.toolkit(controllerType).create({
+          dashboardId: boardId,
+          boardType,
+          relations: newRelations,
+          content: content,
+          viewIds: viewIds,
         });
-        dispatch(addWidgetsToEditBoard([widget]));
-        dispatch(getEditControllerOptions(widget.id));
 
-        refreshLinkedWidgets(widget);
+        dispatch(addWidgetsToEditBoard([newWidget]));
+        dispatch(getEditControllerOptions(newWidget.id));
+
+        refreshLinkedWidgets(newWidget as any);
       } else if (type === 'edit') {
         let newRelations = widgetToolKit.controller.tool.makeControlRelations({
           sourceId: curFilterWidget.id,
