@@ -139,6 +139,11 @@ class PivotSheetChart extends ReactChart {
       ['summaryAggregation'],
       ['aggregation'],
     );
+    const [calcSubAggregation] = getStyles(
+      settingConfigs,
+      ['calcSubAggregation'],
+      ['aggregation'],
+    );
     const [
       enableRowTotal,
       rowTotalPosition,
@@ -189,6 +194,9 @@ class PivotSheetChart extends ReactChart {
             calcTotals: {
               aggregation: summaryAggregation,
             },
+            calcSubTotals: {
+              aggregation: calcSubAggregation,
+            },
           },
           col: {
             showGrandTotals: Boolean(enableColTotal),
@@ -205,6 +213,9 @@ class PivotSheetChart extends ReactChart {
             subLabel: context.translator('summary.subTotal'),
             calcTotals: {
               aggregation: summaryAggregation,
+            },
+            calcSubTotals: {
+              aggregation: calcSubAggregation,
             },
           },
         },
