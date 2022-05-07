@@ -44,8 +44,7 @@ const initIframeTpl = () => {
       {
         label: 'iframe.src',
         key: 'src',
-        value:
-          'https://www.bing.com/search?q=%E5%BC%80%E6%BA%90+Datart&form=QBLH&sp=-1&pq=%E5%BC%80%E6%BA%90+datart', //https://www.oschina.net/p/datart, http://www.retech.cc/product/datart
+        value: 'http://www.retech.cc', //https://www.oschina.net/p/datart, http://www.retech.cc/product/datart
         comType: 'input',
       },
     ],
@@ -105,8 +104,12 @@ export const widgetMeta: WidgetMeta = {
     },
   ],
 };
-
-export const widgetToolkit: WidgetToolkit = {
+export interface IframeWidgetToolKit extends WidgetToolkit {
+  getIframe: (props) => {
+    src: string;
+  };
+}
+const widgetToolkit: IframeWidgetToolKit = {
   create: opt => {
     const widget = widgetTpl();
     widget.id = widgetMeta.widgetTypeId + widget.id;
@@ -139,19 +142,18 @@ export const widgetToolkit: WidgetToolkit = {
           }
         });
       }
-      // if (ele.key === 'titleGroup') {
-      //   ele.rows?.forEach(row => {
-      //     if (row.key === 'title') {
-      //       row.value = '查询';
-      //     }
-      //   });
-      // }
     });
 
     return widget;
   },
   edit() {},
   save() {},
+  getIframe(props) {
+    const [src] = getJsonConfigs(props, ['iframeGroup'], ['src']);
+    return {
+      src,
+    };
+  },
   // lock() {},
   // unlock() {},
   // copy() {},
@@ -162,15 +164,16 @@ export const widgetToolkit: WidgetToolkit = {
   // getWidgetName() {},
   // //
 };
-export const getWidgetIframe = props => {
-  const [src] = getJsonConfigs(props, ['iframeGroup'], ['src']);
-  return {
-    src,
-  };
-};
+// export const getWidgetIframe = props => {
+//   const [src] = getJsonConfigs(props, ['iframeGroup'], ['src']);
+//   return {
+//     src,
+//   };
+// };
 const iframeProto = {
   widgetTypeId: widgetMeta.widgetTypeId,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };
+export const iframeWidgetToolKit = widgetToolkit;
 export default iframeProto;

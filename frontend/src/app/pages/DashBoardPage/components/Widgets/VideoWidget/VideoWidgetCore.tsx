@@ -16,67 +16,20 @@
  * limitations under the License.
  */
 
-import { Button, Form, Input } from 'antd';
-import { MediaWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
-import produce from 'immer';
-import { memo, useContext, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { memo, useContext } from 'react';
 import styled from 'styled-components';
 import { Player } from 'video-react';
 import 'video-react/dist/video-react.css';
-import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
-import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
+import { videoWidgetToolKit } from './videoConfig';
 
 export const VideoWidgetCore: React.FC = memo(() => {
-  const widget = useContext(WidgetContext);
-  const dispatch = useDispatch();
-  const { editing } = useContext(WidgetInfoContext);
-  const { onWidgetUpdate } = useContext(WidgetActionContext);
-  const src = (widget.config.content as MediaWidgetContent).videoConfig?.src;
-  const [curSrc, setCurSrc] = useState<string | undefined>('');
-  useEffect(() => {
-    setCurSrc(src);
-  }, [src]);
-  let srcWithParams = curSrc;
-  const onFinish = () => {
-    const nextWidget = produce(widget, draft => {
-      (draft.config.content as MediaWidgetContent).videoConfig = {
-        src: curSrc,
-      };
-    });
-    dispatch(editWidgetInfoActions.closeWidgetEditing(widget.id));
-    onWidgetUpdate(nextWidget);
-  };
-  const setter = (
-    <div className="wrap-form">
-      <Form
-        initialValues={{ videoSrc: src }}
-        onFinish={onFinish}
-        layout="inline"
-        // onFinishFailed={onFinishFailed}
-        autoComplete="off"
-      >
-        <Form.Item
-          label="视频地址"
-          name="videoSrc"
-          rules={[{ required: true, message: 'input video URL' }]}
-        >
-          <Input onChange={e => setCurSrc(e.target.value)} value={curSrc} />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            确认
-          </Button>
-        </Form.Item>
-      </Form>
-    </div>
-  );
+  const widget = useContext(WidgetContext) as unknown as Widget;
+  let video = videoWidgetToolKit.getVideo(widget.config.jsonConfig.props);
+  let srcWithParams = video.src;
   return (
     <WrapVideo className="WrapVideo">
-      {editing && setter}
-
       <Player>
         <source src={srcWithParams} />
       </Player>
