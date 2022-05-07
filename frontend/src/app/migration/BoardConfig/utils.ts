@@ -17,7 +17,11 @@
  */
 
 import { WidgetBeta3 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import {
+  ITimeDefault,
+  Widget,
+} from 'app/pages/DashBoardPage/types/widgetTypes';
+import { IFontDefault } from 'types';
 import { widgetManager } from '../../pages/DashBoardPage/components/WidgetManager/WidgetManager';
 
 const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
@@ -276,6 +280,25 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
     return newWidget;
   }
   if (subType === 'timer') {
+    // return {
+    //   label: 'timer.timerGroup',
+    //   key: 'timerGroup',
+    //   comType: 'group',
+    //   rows: [
+    //     {
+    //       label: 'timer.time',
+    //       key: 'time',
+    //       value: TimeDefault,
+    //       comType: 'timerFormat',
+    //     },
+    //     {
+    //       label: 'timer.font',
+    //       key: 'font',
+    //       value: { ...FontDefault, fontSize: '20' },
+    //       comType: 'font',
+    //     },
+    //   ],
+    // };
     /**
     * old data
     "content": {
@@ -295,6 +318,36 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
         }
     }
   */
+    let newWidget = widgetManager.toolkit('timer').create({
+      ...widget,
+      widgetTypeId: 'timer',
+    });
+    newWidget = commonBeta4Convert(newWidget, widget);
+
+    const oldConf = widget.config.content.timerConfig;
+    newWidget.config.jsonConfig.props?.forEach(prop => {
+      // timerGroup
+      debugger;
+      if (prop.key === 'timerGroup') {
+        prop.rows?.forEach(row => {
+          if (row.key === 'time') {
+            const newVal: ITimeDefault = {
+              format: oldConf.time.timeFormat,
+              duration: oldConf.time.timeDuration,
+            };
+            row.value = newVal;
+          }
+
+          if (row.key === 'font') {
+            const newVal: IFontDefault = oldConf.font;
+            row.value = newVal;
+          }
+        });
+      }
+    });
+    newWidget.config.content = {};
+
+    return newWidget;
   }
 };
 /**
