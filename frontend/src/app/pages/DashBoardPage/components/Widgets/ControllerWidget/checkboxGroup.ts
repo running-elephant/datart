@@ -87,10 +87,10 @@ export const widgetToolkit: WidgetToolkit = {
     widget.id = widgetMeta.widgetTypeId + widget.id;
     widget.config.widgetTypeId = widgetMeta.widgetTypeId;
     const addProps = [
-      { ...initLoopFetchTpl() },
       { ...initBackgroundTpl() },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
+      { ...initLoopFetchTpl() },
     ];
     widget.config.jsonConfig.props =
       widget.config.jsonConfig.props?.concat(addProps);
