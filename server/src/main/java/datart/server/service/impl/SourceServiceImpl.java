@@ -264,8 +264,10 @@ public class SourceServiceImpl extends BaseService implements SourceService {
             Exceptions.e(e);
         }
 
-        if (sourceCreateParam.getIsFolder()) {
+        if (Objects.equals(sourceCreateParam.getIsFolder(), Boolean.TRUE)) {
             sourceCreateParam.setType(ResourceType.FOLDER.name());
+        } else {
+            sourceCreateParam.setIsFolder(Boolean.FALSE);
         }
 
         Source source = SourceService.super.create(createParam);
