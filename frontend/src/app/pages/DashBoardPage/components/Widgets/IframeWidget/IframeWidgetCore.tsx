@@ -19,12 +19,14 @@ import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
-import { getWidgetIframe } from './iframeConfig';
+import { iframeWidgetToolKit } from './iframeConfig';
 
 export const IframeWidgetCore: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext) as unknown as Widget;
   // getWidgetIframe;
-  const iframeVal = getWidgetIframe(widget.config.jsonConfig.props);
+  const iframeVal = iframeWidgetToolKit.getIframe(
+    widget.config.jsonConfig.props,
+  );
 
   return (
     <Wrapper>

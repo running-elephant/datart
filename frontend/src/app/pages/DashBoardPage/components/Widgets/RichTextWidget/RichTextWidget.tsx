@@ -39,10 +39,6 @@ export const RichTextWidget: React.FC<{ hideTitle: boolean }> = memo(
     const { editing } = useContext(BoardContext);
     const widgetInfo = useContext(WidgetInfoContext);
     const title = getWidgetTitle(widget.config.jsonConfig.props);
-    /**
-     * @param ''
-     * @description '在定时任务的模式 直接加载不做懒加载 ,其他模式下 如果是 free 类型直接加载 如果是 autoBoard 则由 autoBoard自己控制'
-     */
 
     // 自动更新
     const { background, border, padding } = getWidgetBaseStyle(

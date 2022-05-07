@@ -19,6 +19,7 @@ import type {
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
 import {
   initAutoWidgetRect,
   initBackgroundTpl,
@@ -34,7 +35,32 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
-
+const initVideoTpl = () => {
+  return {
+    label: 'video.videoGroup',
+    key: 'videoGroup',
+    comType: 'group',
+    rows: [
+      {
+        label: 'video.src',
+        key: 'src',
+        value:
+          'https://prod-streaming-video-msn-com.akamaized.net/a75a7d73-21ab-4ac9-8c30-890433965c24/e9f6bdcb-eba0-4eca-b9d2-60d3415bf65f.mp4',
+        comType: 'input',
+      },
+    ],
+  };
+};
+const videoI18N = {
+  zh: {
+    videoGroup: '视频配置',
+    src: '嵌入地址', //资源？
+  },
+  en: {
+    videoGroup: 'video Config',
+    src: 'URL', // Source?
+  },
+};
 export const widgetMeta: WidgetMeta = {
   icon: 'video',
   widgetTypeId: 'video',
@@ -57,7 +83,7 @@ export const widgetMeta: WidgetMeta = {
         title: TitleI18N.zh,
         background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
-
+        video: videoI18N.zh,
         border: { borderGroup: '边框' },
       },
     },
@@ -73,14 +99,18 @@ export const widgetMeta: WidgetMeta = {
         title: TitleI18N.en,
         background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
-
+        video: videoI18N.en,
         border: { borderGroup: 'Border' },
       },
     },
   ],
 };
-
-export const widgetToolkit: WidgetToolkit = {
+export interface VideoWidgetToolKit extends WidgetToolkit {
+  getVideo: (props) => {
+    src: string;
+  };
+}
+const widgetToolkit: VideoWidgetToolKit = {
   create: opt => {
     const widget = widgetTpl();
     widget.id = widgetMeta.widgetTypeId + widget.id;
@@ -99,6 +129,7 @@ export const widgetToolkit: WidgetToolkit = {
     }
 
     widget.config.jsonConfig.props = [
+      { ...initVideoTpl() },
       { ...initTitleTpl() },
       { ...initBackgroundTpl() },
       { ...initPaddingTpl() },
@@ -125,6 +156,12 @@ export const widgetToolkit: WidgetToolkit = {
   },
   edit() {},
   save() {},
+  getVideo(props) {
+    const [src] = getJsonConfigs(props, ['videoGroup'], ['src']);
+    return {
+      src,
+    };
+  },
   // lock() {},
   // unlock() {},
   // copy() {},
@@ -141,4 +178,6 @@ const videoProto = {
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };
+
+export const videoWidgetToolKit = widgetToolkit;
 export default videoProto;

@@ -233,7 +233,6 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
     const oldConf = widget.config.content.iframeConfig;
     newWidget.config.jsonConfig.props?.forEach(prop => {
       // iframeGroup
-
       if (prop.key === 'iframeGroup') {
         prop.rows?.forEach(row => {
           if (row.key === 'src') {
