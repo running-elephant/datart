@@ -17,6 +17,7 @@
  */
 import { FontDefault } from 'app/constants';
 import { TimeDefault } from 'app/pages/DashBoardPage/constants';
+import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetMeta,
   WidgetToolkit,
@@ -25,10 +26,8 @@ import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
 import { IFontDefault } from '../../../../../../types';
 import { ITimeDefault } from '../../../types/widgetTypes';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
-  initFreeWidgetRect,
   initPaddingTpl,
   initTitleTpl,
   initWidgetEditActionTpl,
@@ -135,10 +134,22 @@ export const widgetToolkit: TimerWidgetToolKit = {
     widget.config.widgetTypeId = opt.widgetTypeId;
     widget.config.type = 'media';
     if (opt.boardType === 'auto') {
-      widget.config.rect = { ...initAutoWidgetRect() };
-      widget.config.mRect = { ...initAutoWidgetRect() };
+      const rect: RectConfig = {
+        x: 0,
+        y: 0,
+        width: 6,
+        height: 2,
+      };
+      widget.config.rect = { ...rect };
+      widget.config.mRect = { ...rect };
     } else {
-      widget.config.rect = { ...initFreeWidgetRect() };
+      const rect: RectConfig = {
+        x: 0,
+        y: 0,
+        width: 400,
+        height: 200,
+      };
+      widget.config.rect = { ...rect };
     }
 
     widget.config.jsonConfig.props = [

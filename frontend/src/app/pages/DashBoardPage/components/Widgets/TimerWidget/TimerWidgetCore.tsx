@@ -27,7 +27,6 @@ import { timerWidgetToolkit } from './timerConfig';
 
 export const TimerWidgetCore: React.FC = memo(() => {
   const widget = useContext(WidgetContext) as unknown as Widget;
-
   const { time, font } = timerWidgetToolkit.getTimer(
     widget.config.jsonConfig.props,
   );
@@ -53,22 +52,21 @@ export const TimerWidgetCore: React.FC = memo(() => {
 
 const Wrapper = styled.div<IFontDefault>`
   display: flex;
-  /* flex-direction: column; */
+  flex: 1;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   overflow-y: hidden;
   .time-text {
+    display: flex;
     flex: 1;
+    justify-content: center;
+
     font-family: ${p => p?.fontFamily};
     font-size: ${p => p?.fontSize}px;
     font-style: ${p => p?.fontStyle};
     font-weight: ${p => p?.fontWeight};
     color: ${p => p?.color};
-  }
-  .wrap-form {
-    width: 340px;
-    padding: 4px;
-    margin-bottom: 4px;
-    overflow-y: auto;
-    background-color: ${p => p.theme.bodyBackground};
+    text-align: center;
   }
 `;
