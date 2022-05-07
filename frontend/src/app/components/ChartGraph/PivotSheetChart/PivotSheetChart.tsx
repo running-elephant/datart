@@ -189,9 +189,15 @@ class PivotSheetChart extends ReactChart {
         this.getCollapsedRows(rowSectionConfigRows, chartDataSet, true);
         this.oldRowsConfig = rowSectionConfigRows;
       }
+      this.getCollapsedRows(rowSectionConfigRows, chartDataSet);
+    } else {
+      if (Object.keys(this.collapsedRows).length) {
+        this.oldRowsConfig = [];
+        this.hierarchyCollapse = true;
+        this.drillLevel = 0;
+        this.collapsedRows = {};
+      }
     }
-
-    this.getCollapsedRows(rowSectionConfigRows, chartDataSet);
 
     return {
       options: {
