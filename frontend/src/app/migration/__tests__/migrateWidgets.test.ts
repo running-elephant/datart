@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
+import { FontDefault } from 'app/constants';
 import {
   ServerRelation,
   WidgetBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { FontDefault } from 'app/pages/DashBoardPage/utils/widget';
 import {
   beta0,
   convertWidgetRelationsToObj,

@@ -16,7 +16,11 @@
  * limitations under the License.
  */
 
-import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
+import {
+  ControllerFacadeTypes,
+  FontDefault,
+  TimeFilterValueCategory,
+} from 'app/constants';
 import {
   TabWidgetContent,
   WidgetType,
@@ -29,7 +33,7 @@ import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
 import { DeltaStatic } from 'quill';
 import { CSSProperties } from 'react';
-import { FONT_FAMILY, G90, WHITE } from 'styles/StyleConstants';
+import { G90, WHITE } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import { fillPx, getBackgroundImage } from '.';
 import {
@@ -218,13 +222,6 @@ export const createWidget = (option: {
     relations: option.relations || [],
   };
   return widget;
-};
-export const FontDefault = {
-  fontFamily: FONT_FAMILY,
-  fontSize: '14',
-  fontWeight: 'normal',
-  fontStyle: 'normal',
-  color: G90,
 };
 
 export const createWidgetInfo = (id: string): WidgetInfo => {

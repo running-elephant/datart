@@ -143,13 +143,6 @@ const widgetToolkit: VideoWidgetToolKit = {
           }
         });
       }
-      // if (ele.key === 'titleGroup') {
-      //   ele.rows?.forEach(row => {
-      //     if (row.key === 'title') {
-      //       row.value = '查询';
-      //     }
-      //   });
-      // }
     });
 
     return widget;

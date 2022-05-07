@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { FontDefault } from 'app/constants';
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import type {
   BoardType,
@@ -23,9 +24,9 @@ import type {
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
-import { FontDefault } from 'app/pages/DashBoardPage/utils/widget';
 import type { ChartStyleConfig } from 'app/types/ChartConfig';
 import { uuidv4 } from 'utils/utils';
+
 export const initTitleTpl = () => {
   const titleTpl: ChartStyleConfig = {
     label: 'title.titleGroup',

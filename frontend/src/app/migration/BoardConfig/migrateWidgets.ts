@@ -1,3 +1,4 @@
+import { FontDefault } from 'app/constants';
 import {
   ControllerWidgetContent,
   Relation,
@@ -6,10 +7,7 @@ import {
   WidgetBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
-import {
-  FontDefault,
-  VALUE_SPLITTER,
-} from 'app/pages/DashBoardPage/utils/widget';
+import { VALUE_SPLITTER } from 'app/pages/DashBoardPage/utils/widget';
 import { setLatestVersion, versionCanDo } from '../utils';
 import {
   APP_VERSION_BETA_0,

@@ -16,6 +16,10 @@
  * limitations under the License.
  */
 
+import { FONT_FAMILY } from '@antv/s2';
+import { G90 } from 'styles/StyleConstants';
+import { IFontDefault } from 'types';
+
 export enum TenantManagementMode {
   Team = 'TEAM',
   Platform = 'PLATFORM',
@@ -228,3 +232,11 @@ export enum DownloadFileType {
 }
 
 export const RUNTIME_DATE_LEVEL_KEY = Symbol('DateLevel');
+
+export const FontDefault: IFontDefault = {
+  fontFamily: FONT_FAMILY,
+  fontSize: '14',
+  fontWeight: 'normal',
+  fontStyle: 'normal',
+  color: G90,
+};

@@ -108,18 +108,22 @@ export const widgetToolkit: WidgetToolkit = {
       if (ele.key === 'titleGroup') {
         ele.rows?.forEach(row => {
           if (row.key === 'title') {
-            row.value = 'reset';
+            row.value = '富文本richText';
           }
         });
       }
-      // if (ele.key === 'titleGroup') {
-      //   ele.rows?.forEach(row => {
-      //     if (row.key === 'title') {
-      //       row.value = '查询';
-      //     }
-      //   });
-      // }
     });
+    widget.config.content = {
+      richText: {
+        content: {
+          ops: [
+            {
+              insert: '\n',
+            },
+          ],
+        },
+      },
+    };
 
     return widget;
   },

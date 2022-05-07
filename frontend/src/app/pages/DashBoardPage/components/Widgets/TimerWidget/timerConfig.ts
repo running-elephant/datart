@@ -15,10 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { FontDefault } from 'app/constants';
+import { TimeDefault } from 'app/pages/DashBoardPage/constants';
 import type {
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
+import { IFontDefault } from '../../../../../../types';
+import { ITimeDefault } from '../../../types/widgetTypes';
 import {
   initAutoWidgetRect,
   initBackgroundTpl,
@@ -35,6 +40,39 @@ import {
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
 
+const initTimerTpl = () => {
+  return {
+    label: 'timer.timerGroup',
+    key: 'timerGroup',
+    comType: 'group',
+    rows: [
+      {
+        label: 'timer.time',
+        key: 'time',
+        value: TimeDefault,
+        comType: 'timerFormat',
+      },
+      {
+        label: 'timer.font',
+        key: 'font',
+        value: { ...FontDefault, fontSize: '20' },
+        comType: 'font',
+      },
+    ],
+  };
+};
+const timerI18N = {
+  zh: {
+    timerGroup: '时间配置',
+    time: '时间',
+    font: '字体',
+  },
+  en: {
+    timerGroup: 'Timer Config',
+    time: 'Time',
+    font: 'Font',
+  },
+};
 export const widgetMeta: WidgetMeta = {
   icon: 'timer',
   widgetTypeId: 'timer',
@@ -48,8 +86,8 @@ export const widgetMeta: WidgetMeta = {
     {
       lang: 'zh-CN',
       translation: {
-        desc: 'richText',
-        widgetType: 'richText',
+        desc: 'timer',
+        widgetType: 'timer',
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
@@ -57,15 +95,15 @@ export const widgetMeta: WidgetMeta = {
         title: TitleI18N.zh,
         background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
-
+        timer: timerI18N.zh,
         border: { borderGroup: '边框' },
       },
     },
     {
       lang: 'en-US',
       translation: {
-        desc: 'richText',
-        widgetType: 'richText',
+        desc: 'timer',
+        widgetType: 'timer',
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
@@ -73,14 +111,19 @@ export const widgetMeta: WidgetMeta = {
         title: TitleI18N.en,
         background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
-
+        timer: timerI18N.en,
         border: { borderGroup: 'Border' },
       },
     },
   ],
 };
-
-export const widgetToolkit: WidgetToolkit = {
+export interface TimerWidgetToolKit extends WidgetToolkit {
+  getTimer: (props) => {
+    time: ITimeDefault;
+    font: IFontDefault;
+  };
+}
+export const widgetToolkit: TimerWidgetToolKit = {
   create: opt => {
     const widget = widgetTpl();
     widget.id = widgetMeta.widgetTypeId + widget.id;
@@ -99,6 +142,7 @@ export const widgetToolkit: WidgetToolkit = {
     }
 
     widget.config.jsonConfig.props = [
+      { ...initTimerTpl() },
       { ...initTitleTpl() },
       { ...initBackgroundTpl() },
       { ...initPaddingTpl() },
@@ -112,19 +156,23 @@ export const widgetToolkit: WidgetToolkit = {
           }
         });
       }
-      // if (ele.key === 'titleGroup') {
-      //   ele.rows?.forEach(row => {
-      //     if (row.key === 'title') {
-      //       row.value = '查询';
-      //     }
-      //   });
-      // }
     });
 
     return widget;
   },
   edit() {},
   save() {},
+  getTimer(props) {
+    const [time, font] = getJsonConfigs(
+      props,
+      ['timerGroup'],
+      ['time', 'font'],
+    ) as [ITimeDefault, IFontDefault];
+    return {
+      time,
+      font,
+    };
+  },
   // lock() {},
   // unlock() {},
   // copy() {},
@@ -141,4 +189,5 @@ const timerProto = {
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };
+export const timerWidgetToolkit = widgetToolkit;
 export default timerProto;

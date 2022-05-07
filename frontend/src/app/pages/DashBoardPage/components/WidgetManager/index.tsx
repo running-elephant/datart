@@ -21,7 +21,7 @@ import iframeProto from '../Widgets/IframeWidget/iframeConfig';
 import imageProto from '../Widgets/ImageWidget/imageConfig';
 import richTextProto from '../Widgets/RichTextWidget/richTextConfig';
 import tabProto from '../Widgets/TabWidget/TabConfig';
-import timerProto from '../Widgets/TimerWidget/richTextConfig';
+import timerProto from '../Widgets/TimerWidget/timerConfig';
 import videoProto from '../Widgets/VideoWidget/videoConfig';
 import { widgetManager } from './WidgetManager';
 
