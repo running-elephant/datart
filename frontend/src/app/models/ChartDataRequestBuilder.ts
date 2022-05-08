@@ -146,11 +146,7 @@ export class ChartDataRequestBuilder {
           const rows = getRuntimeDateLevelFields(cur.rows);
 
           if (cur.drillable) {
-            if (
-              !this.drillOption ||
-              this.drillOption?.mode === DrillMode.Normal ||
-              !this.drillOption?.getCurrentFields()
-            ) {
+            if (this.isInValidDrillOption()) {
               return acc.concat(rows?.[0] || []);
             }
             return acc.concat(
@@ -312,11 +308,29 @@ export class ChartDataRequestBuilder {
           return acc;
         }
         if (
-          cur.type === ChartDataSectionType.GROUP ||
           cur.type === ChartDataSectionType.AGGREGATE ||
           cur.type === ChartDataSectionType.MIXED
         ) {
           return acc.concat(cur.rows);
+        }
+        if (cur.type === ChartDataSectionType.GROUP) {
+          const rows = getRuntimeDateLevelFields(cur.rows);
+
+          if (cur.drillable) {
+            if (this.isInValidDrillOption()) {
+              return acc.concat(cur.rows?.[0] || []);
+            }
+            return acc.concat(
+              rows?.filter(field => {
+                return Boolean(
+                  this.drillOption
+                    ?.getCurrentFields()
+                    ?.some(df => df.uid === field.uid),
+                );
+              }) || [],
+            );
+          }
+          return acc.concat(rows || []);
         }
         return acc;
       }, [])
@@ -396,11 +410,7 @@ export class ChartDataRequestBuilder {
             return acc.concat(cur.rows);
           } else if (cur.type === ChartDataSectionType.GROUP) {
             if (cur.drillable) {
-              if (
-                !this.drillOption ||
-                this.drillOption?.mode === DrillMode.Normal ||
-                !this.drillOption?.getCurrentFields()
-              ) {
+              if (this.isInValidDrillOption()) {
                 return acc.concat(cur.rows?.[0] || []);
               }
               return acc.concat(
@@ -427,6 +437,14 @@ export class ChartDataRequestBuilder {
 
   private buildViewConfigs() {
     return transformToViewConfig(this.dataView?.config);
+  }
+
+  private isInValidDrillOption() {
+    return (
+      !this.drillOption ||
+      this.drillOption?.mode === DrillMode.Normal ||
+      !this.drillOption?.getCurrentFields()
+    );
   }
 
   public build(): ChartDataRequest {
