@@ -16,8 +16,23 @@
  * limitations under the License.
  */
 
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { WidgetCreateProps } from 'app/pages/DashBoardPage/types/widgetTypes';
+import {
+  RectConfig,
+  Relation,
+  RelationConfigType,
+  WidgetBeta3,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { RelatedWidgetItem } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/RelatedWidgets';
+import { ControllerConfig } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
+import {
+  Widget,
+  WidgetCreateProps,
+} from 'app/pages/DashBoardPage/types/widgetTypes';
+import { getTheWidgetFiltersAndParams } from 'app/pages/DashBoardPage/utils';
+import { ChartDataRequest } from 'app/types/ChartDataRequest';
+import ChartDataView from 'app/types/ChartDataView';
+import { transformToViewConfig } from 'app/utils/internalChartHelper';
+import { uuidv4 } from 'utils/utils';
 import { initTitleTpl, widgetTpl } from '../../WidgetManager/utils/init';
 
 export const controlWidgetTpl = (opt: WidgetCreateProps) => {
@@ -54,4 +69,126 @@ export const controlWidgetTpl = (opt: WidgetCreateProps) => {
   widget.config.jsonConfig.props = [{ ...initTitleTpl() }];
 
   return widget;
+};
+export const getCanLinkControlWidgets = (widgets: Widget[]) => {
+  const canLinkWidgets = widgets.filter(widget => {
+    if (widget.config.controllable) {
+      return false;
+    }
+    if (widget.viewIds.length === 0) {
+      return false;
+    }
+    return true;
+  });
+  return canLinkWidgets;
+};
+export const makeControlRelations = (obj: {
+  sourceId: string | undefined;
+  relatedWidgets: RelatedWidgetItem[];
+  widgetMap: Record<string, WidgetBeta3>;
+  config: ControllerConfig;
+}) => {
+  const sourceId = obj.sourceId || uuidv4();
+  const { relatedWidgets, widgetMap, config } = obj;
+  const trimRelatedWidgets = relatedWidgets.filter(relatedWidgetItem => {
+    return widgetMap[relatedWidgetItem.widgetId];
+  });
+  let chartWidgets: WidgetBeta3[] = [];
+  let controllerWidgets: WidgetBeta3[] = [];
+  trimRelatedWidgets.forEach(relatedWidgetItem => {
+    let widget = widgetMap[relatedWidgetItem.widgetId];
+    if (!widget) return false;
+    if (widget.config.type === 'chart') {
+      chartWidgets.push(widget);
+    }
+    if (widget.config.type === 'controller') {
+      controllerWidgets.push(widget);
+    }
+  });
+  const controlToChartRelations: Relation[] = chartWidgets.map(widget => {
+    const relationType: RelationConfigType = 'controlToWidget';
+    return {
+      sourceId,
+      targetId: widget.id,
+      config: {
+        type: relationType,
+        controlToWidget: {
+          widgetRelatedViewIds: widget.viewIds,
+        },
+      },
+      id: uuidv4(),
+    };
+  });
+  const controlToCascadeRelations: Relation[] = controllerWidgets.map(
+    widget => {
+      const relationType: RelationConfigType = 'controlToControlCascade';
+      return {
+        sourceId,
+        targetId: widget.id,
+        config: {
+          type: relationType,
+        },
+        id: uuidv4(),
+      };
+    },
+  );
+  let newRelations = [...controlToChartRelations, ...controlToCascadeRelations];
+  const controllerVisible = (config as ControllerConfig).visibility;
+  if (controllerVisible) {
+    const { visibilityType, condition } = controllerVisible;
+    if (visibilityType === 'condition' && condition) {
+      const controlToControlRelation: Relation = {
+        sourceId,
+        targetId: condition.dependentControllerId,
+        config: {
+          type: 'controlToControl',
+        },
+        id: uuidv4(),
+      };
+      newRelations = newRelations.concat([controlToControlRelation]);
+    }
+  }
+  return newRelations;
+};
+export const getViewIdsInControlConfig = (
+  controllerConfig: ControllerConfig,
+) => {
+  if (!controllerConfig.assistViewFields) return [];
+  if (controllerConfig.assistViewFields?.[0]) {
+    return [controllerConfig.assistViewFields[0]];
+  } else {
+    return [];
+  }
+};
+export const getControlOptionQueryParams = (obj: {
+  view: ChartDataView;
+  columns: string[];
+  curWidget: WidgetBeta3;
+  widgetMap: Record<string, WidgetBeta3>;
+}) => {
+  const viewConfigs = transformToViewConfig(obj.view?.config);
+  const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
+    chartWidget: obj.curWidget,
+    widgetMap: obj.widgetMap,
+    params: undefined,
+  });
+  const requestParams: ChartDataRequest = {
+    ...viewConfigs,
+    aggregators: [],
+    filters: filterParams,
+    groups: [],
+    columns: [...new Set(obj.columns)],
+    pageInfo: {
+      pageNo: 1,
+      pageSize: 99999999,
+      total: 99999999,
+    },
+    orders: [],
+    keywords: ['DISTINCT'],
+    viewId: obj.view.id,
+  };
+  if (variableParams) {
+    requestParams.params = variableParams;
+  }
+  return requestParams;
 };

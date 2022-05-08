@@ -5,6 +5,7 @@ import {
   EDIT_PREFIX,
 } from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
 import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
+import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/components/Widgets/ControllerWidget/controllerConfig';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
@@ -30,8 +31,6 @@ import {
   getWidgetInfoMapByServer,
   getWidgetMap,
 } from 'app/pages/DashBoardPage/utils/widget';
-import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
-import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
@@ -324,14 +323,18 @@ export const addChartWidget = createAsyncThunk<
     const viewViews = [view];
     dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
-    let widget = widgetToolKit.chart.create({
+
+    const widgetTypeId = subType === 'dataChart' ? 'linkChart' : 'selfChart';
+
+    let widget = widgetManager.toolkit(widgetTypeId).create({
       dashboardId: boardId,
       boardType: boardType,
-      dataChartId: chartId,
-      viewId: view.id,
-      dataChartConfig: dataChart,
-      subType,
+      datachartId: chartId,
+      relations: [],
+      content: dataChart,
+      viewIds: view.id ? [view.id] : [],
     });
+
     dispatch(addWidgetsToEditBoard([widget]));
     dispatch(addVariablesToBoard(view.variables));
     return null;
@@ -499,7 +502,7 @@ export const getEditControllerOptions = createAsyncThunk<
   async (widgetId, { getState, dispatch }) => {
     dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
     const rootState = getState() as RootState;
-
+    debugger;
     const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
     const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
     const widget = widgetMap[widgetId];
@@ -520,7 +523,7 @@ export const getEditControllerOptions = createAsyncThunk<
       curWidget: widget,
       widgetMap,
     });
-
+    debugger;
     if (!requestParams) {
       return null;
     }
