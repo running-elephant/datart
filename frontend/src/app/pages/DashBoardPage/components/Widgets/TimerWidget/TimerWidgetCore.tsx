@@ -36,7 +36,7 @@ export const TimerWidgetCore: React.FC = memo(() => {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentTime(moment().format(time?.format));
+      setCurrentTime(moment().format(time?.format || TIME_FORMATTER));
     }, time?.duration);
     return () => {
       clearInterval(timer);
