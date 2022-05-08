@@ -23,6 +23,7 @@ import { BorderConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useEffect, useRef } from 'react';
 import styled from 'styled-components/macro';
+import { BW } from '../../Basic/components/BasicWrapper';
 import { Group, WithColorPicker } from '../../Basic/components/Group';
 import { ItemLayoutProps } from '../../types';
 
@@ -60,36 +61,40 @@ export const WidgetBorder: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             />
           </WithColorPicker>
         </Group>
-        <Group>
-          <label className="label">{gt('width')}</label>
-          <InputNumber
-            value={data.value?.width}
-            className="datart-ant-input-number"
-            onChange={changeW}
-          />
-        </Group>
-        <Group>
-          <label className="label">{gt('radius')}</label>
-          <InputNumber
-            value={data.value?.radius}
-            className="datart-ant-input-number"
-            onChange={changeR}
-          />
-        </Group>
-        <Group>
-          <label className="label">{gt('style')}</label>
-          <Select
-            className="datart-ant-select"
-            value={data.value?.style}
-            onChange={changeS}
-          >
-            {BORDER_STYLES.map(item => (
-              <Select.Option key={item} value={item}>
-                {tLine(item)}
-              </Select.Option>
-            ))}
-          </Select>
-        </Group>
+
+        <BW label={gt('width')}>
+          <Group>
+            <InputNumber
+              value={data.value?.width}
+              className="datart-ant-input-number"
+              onChange={changeW}
+            />
+          </Group>
+        </BW>
+        <BW label={gt('radius')}>
+          <Group>
+            <InputNumber
+              value={data.value?.radius}
+              className="datart-ant-input-number"
+              onChange={changeR}
+            />
+          </Group>
+        </BW>
+        <BW label={gt('style')}>
+          <Group>
+            <Select
+              className="datart-ant-select"
+              value={data.value?.style}
+              onChange={changeS}
+            >
+              {BORDER_STYLES.map(item => (
+                <Select.Option key={item} value={item}>
+                  {tLine(item)}
+                </Select.Option>
+              ))}
+            </Select>
+          </Group>
+        </BW>
       </Wrap>
     );
   },

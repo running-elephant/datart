@@ -28,7 +28,7 @@ import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import {
   RelatedView,
-  WidgetTypeBeta3,
+  WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
@@ -48,13 +48,13 @@ import {
   ControllerWidgetContent,
   DataChart,
   getDataOption,
-  WidgetBeta3,
   WidgetInfo,
 } from '../pages/Board/slice/types';
 import {
   ControllerConfig,
   ControllerDate,
 } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { Widget } from '../types/widgetTypes';
 import { DateControllerTypes } from './../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
@@ -153,8 +153,8 @@ export const getChartGroupColumns = (datas: ChartDataConfig[] | undefined) => {
 };
 
 export const getTheWidgetFiltersAndParams = (obj: {
-  chartWidget: WidgetBeta3;
-  widgetMap: Record<string, WidgetBeta3>;
+  chartWidget: Widget;
+  widgetMap: Record<string, Widget>;
   params: Record<string, string[]> | undefined;
 }) => {
   // TODO chart 本身携带了变量，board没有相关配置的时候要拿到 chart本身的 变量值 Params
@@ -360,7 +360,7 @@ export const adjustRangeDataEndValue = (
 };
 export const getChartWidgetRequestParams = (obj: {
   widgetId: string;
-  widgetMap: Record<string, WidgetBeta3>;
+  widgetMap: Record<string, Widget>;
   widgetInfo: WidgetInfo | undefined;
   option: getDataOption | undefined;
   viewMap: Record<string, ChartDataView>;
@@ -452,7 +452,7 @@ export const getChartWidgetRequestParams = (obj: {
   return requestParams;
 };
 export const getBoardChartRequests = (params: {
-  widgetMap: Record<string, WidgetBeta3>;
+  widgetMap: Record<string, Widget>;
   viewMap: Record<string, ChartDataView>;
   dataChartMap: Record<string, DataChart>;
 }) => {
@@ -514,23 +514,21 @@ export const getDistinctFiltersByColumn = (
 };
 
 export const getDefaultWidgetName = (
-  widgetType: WidgetTypeBeta3,
+  widgetType: WidgetType,
   subWidgetType: string,
   index: number,
 ) => {
-  const typeTitle = i18next.t(`viz.widget.type.${widgetType}`);
   const subTypeTitle = i18next.t(`viz.widget.type.${subWidgetType}`);
-  const widgetTypes: WidgetTypeBeta3[] = [
+  const widgetTypes: WidgetType[] = [
     'chart',
     'container',
     'controller',
     'media',
+    'button',
   ];
-  const BtnTypes: WidgetTypeBeta3[] = ['query', 'reset'];
+
   if (widgetTypes.includes(widgetType)) {
     return `${subTypeTitle}_${index}`;
-  } else if (BtnTypes.includes(widgetType)) {
-    return `${typeTitle}`;
   } else {
     return `xxx${index}`;
   }

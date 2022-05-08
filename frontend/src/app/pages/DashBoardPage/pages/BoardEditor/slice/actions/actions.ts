@@ -16,30 +16,22 @@
  * limitations under the License.
  */
 import { ChartEditorBaseProps } from 'app/components/ChartEditor';
-import { ControllerFacadeTypes, DataViewFieldType } from 'app/constants';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
   ChartWidgetContent,
-  ControllerWidgetContent,
   Dashboard,
   DataChart,
-  RelatedView,
-  Relation,
   TabWidgetContent,
   VizRenderMode,
-  WidgetBeta3,
   WidgetInfo,
   WidgetOfCopy,
-  WidgetTypeBeta3,
-  WidgetTypesBeta3,
+  WidgetType,
+  WidgetTypes,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
-import {
-  createInitWidgetConfig,
-  createWidget,
-  createWidgetInfo,
-} from 'app/pages/DashBoardPage/utils/widget';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { createWidgetInfo } from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import produce from 'immer';
@@ -49,9 +41,7 @@ import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
-import { BoardType } from '../../../Board/slice/types';
-import { ControllerConfig } from '../../components/ControllerWidgetPanel/types';
-import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from '../thunk';
+import { getEditChartWidgetDataAsync } from '../thunk';
 import { EditBoardState, HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
 
@@ -70,7 +60,7 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
   const editBoard = getState().editBoard as HistoryEditBoard;
   let selectedIds: string[] = [];
   let shouldDeleteIds: string[] = [];
-  let effectTypes: WidgetTypeBeta3[] = [];
+  let effectTypes: WidgetType[] = [];
   debugger;
   if (ids?.length) {
     selectedIds = ids;
@@ -110,7 +100,7 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
 
   dispatch(editBoardStackActions.deleteWidgets(shouldDeleteIds));
 
-  WidgetTypesBeta3.forEach(widgetType => {
+  WidgetTypes.forEach(widgetType => {
     if (effectTypes.includes(widgetType)) {
       switch (widgetType) {
         case 'controller':
@@ -201,7 +191,7 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
 
   const dataChartMap = boardState.dataChartMap;
 
-  const newWidgets: WidgetBeta3[] = [];
+  const newWidgets: Widget[] = [];
 
   clipboardWidgetList.forEach(widget => {
     if (widget.selectedCopy) {
@@ -247,61 +237,61 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
     newWidget.config.name += '_copy';
 
     delete newWidget.selectedCopy;
-    return newWidget as WidgetBeta3;
+    return newWidget as Widget;
   }
 };
 
-export const updateWidgetControllerAction =
-  (params: {
-    boardId: string;
-    boardType: BoardType;
-    relations: Relation[];
-    name?: string;
-    fieldValueType: DataViewFieldType;
-    controllerFacadeType: ControllerFacadeTypes;
-    views: RelatedView[];
-    config: ControllerConfig;
-  }) =>
-  async (dispatch, getState) => {
-    const {
-      boardId,
-      boardType,
-      views,
-      config,
-      controllerFacadeType,
-      relations,
-      name,
-    } = params;
-    const content: ControllerWidgetContent = {
-      type: controllerFacadeType,
-      relatedViews: views,
-      name: name || 'newController',
-      config: config,
-    };
+// export const updateWidgetControllerAction =
+//   (params: {
+//     boardId: string;
+//     boardType: BoardType;
+//     relations: Relation[];
+//     name?: string;
+//     fieldValueType: DataViewFieldType;
+//     controllerFacadeType: ControllerFacadeTypes;
+//     views: RelatedView[];
+//     config: ControllerConfig;
+//   }) =>
+//   async (dispatch, getState) => {
+//     const {
+//       boardId,
+//       boardType,
+//       views,
+//       config,
+//       controllerFacadeType,
+//       relations,
+//       name,
+//     } = params;
+//     const content: ControllerWidgetContent = {
+//       type: controllerFacadeType,
+//       relatedViews: views,
+//       name: name || 'newController',
+//       config: config,
+//     };
 
-    const widgetConf = createInitWidgetConfig({
-      name: name || 'newController',
-      type: 'controller',
-      content: content,
-      boardType: boardType,
-    });
+//     const widgetConf = createInitWidgetConfig({
+//       name: name || 'newController',
+//       type: 'controller',
+//       content: content,
+//       boardType: boardType,
+//     });
 
-    const widgetId = relations[0]?.sourceId || uuidv4();
-    const widget: WidgetBeta3 = createWidget({
-      id: widgetId,
-      dashboardId: boardId,
-      config: widgetConf,
-      relations,
-    });
-    dispatch(addWidgetsToEditBoard([widget]));
-    dispatch(
-      editDashBoardInfoActions.changeControllerPanel({
-        type: 'hide',
-        widgetId: '',
-        controllerType: undefined,
-      }),
-    );
-  };
+//     const widgetId = relations[0]?.sourceId || uuidv4();
+//     const widget: Widget = createWidget({
+//       id: widgetId,
+//       dashboardId: boardId,
+//       config: widgetConf,
+//       relations,
+//     });
+//     dispatch(addWidgetsToEditBoard([widget]));
+//     dispatch(
+//       editDashBoardInfoActions.changeControllerPanel({
+//         type: 'hide',
+//         widgetId: '',
+//         controllerType: undefined,
+//       }),
+//     );
+//   };
 // changeChartEditorProps
 
 export const editChartInWidgetAction =
@@ -357,31 +347,29 @@ export const editHasChartWidget =
     dispatch(getEditChartWidgetDataAsync({ widgetId: curWidget.id }));
   };
 
-export const closeJumpAction =
-  (widget: WidgetBeta3) => (dispatch, getState) => {
-    const nextConf = produce(widget.config, draft => {
-      draft!.jumpConfig!.open = false;
-    });
-    dispatch(
-      editBoardStackActions.updateWidgetConfig({
-        wid: widget.id,
-        config: nextConf,
-      }),
-    );
-  };
+export const closeJumpAction = (widget: Widget) => (dispatch, getState) => {
+  const nextConf = produce(widget.config, draft => {
+    draft!.jumpConfig!.open = false;
+  });
+  dispatch(
+    editBoardStackActions.updateWidgetConfig({
+      wid: widget.id,
+      config: nextConf,
+    }),
+  );
+};
 
-export const closeLinkageAction =
-  (widget: WidgetBeta3) => (dispatch, getState) => {
-    const nextConf = produce(widget.config, draft => {
-      draft!.linkageConfig!.open = false;
-    });
-    dispatch(
-      editBoardStackActions.updateWidgetConfig({
-        wid: widget.id,
-        config: nextConf,
-      }),
-    );
-  };
+export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
+  const nextConf = produce(widget.config, draft => {
+    draft!.linkageConfig!.open = false;
+  });
+  dispatch(
+    editBoardStackActions.updateWidgetConfig({
+      wid: widget.id,
+      config: nextConf,
+    }),
+  );
+};
 
 export const addVariablesToBoard =
   (variables: Variable[]) => (dispatch, getState) => {
@@ -402,7 +390,7 @@ export const clearActiveWidgets = () => dispatch => {
   dispatch(editDashBoardInfoActions.changeShowBlockMask(true));
 };
 export const widgetClearLinkageAction =
-  (widget: WidgetBeta3, renderMode: VizRenderMode) => dispatch => {
+  (widget: Widget, renderMode: VizRenderMode) => dispatch => {
     const { id, dashboardId } = widget;
     dispatch(
       boardActions.changeWidgetInLinking({
@@ -434,34 +422,33 @@ export const widgetClearLinkageAction =
       );
     });
   };
-export const editorWidgetClearLinkageAction =
-  (widget: WidgetBeta3) => dispatch => {
-    const { id, dashboardId } = widget;
+export const editorWidgetClearLinkageAction = (widget: Widget) => dispatch => {
+  const { id, dashboardId } = widget;
+  dispatch(
+    editWidgetInfoActions.changeWidgetInLinking({
+      boardId: dashboardId,
+      widgetId: id,
+      toggle: false,
+    }),
+  );
+  dispatch(
+    editDashBoardInfoActions.changeBoardLinkFilter({
+      boardId: dashboardId,
+      triggerId: id,
+      linkFilters: [],
+    }),
+  );
+  const linkRelations = widget.relations.filter(
+    re => re.config.type === 'widgetToWidget',
+  );
+  linkRelations.forEach(link => {
     dispatch(
-      editWidgetInfoActions.changeWidgetInLinking({
-        boardId: dashboardId,
-        widgetId: id,
-        toggle: false,
+      getEditChartWidgetDataAsync({
+        widgetId: link.targetId,
+        option: {
+          pageInfo: { pageNo: 1 },
+        },
       }),
     );
-    dispatch(
-      editDashBoardInfoActions.changeBoardLinkFilter({
-        boardId: dashboardId,
-        triggerId: id,
-        linkFilters: [],
-      }),
-    );
-    const linkRelations = widget.relations.filter(
-      re => re.config.type === 'widgetToWidget',
-    );
-    linkRelations.forEach(link => {
-      dispatch(
-        getEditChartWidgetDataAsync({
-          widgetId: link.targetId,
-          option: {
-            pageInfo: { pageNo: 1 },
-          },
-        }),
-      );
-    });
-  };
+  });
+};

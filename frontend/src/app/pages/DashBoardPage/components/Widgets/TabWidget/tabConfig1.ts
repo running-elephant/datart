@@ -41,6 +41,9 @@ import {
 export const widgetMeta: WidgetMeta = {
   icon: '',
   widgetTypeId: 'tab',
+  canWrapped: false,
+  controllable: false,
+  linkable: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },

@@ -22,14 +22,15 @@ import { BlockMaskLayer } from './BlockMaskLayer';
 import { WidgetDndHandleMask } from './WidgetDndHandleMask';
 export const EditMask: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
+  // widgetManager
   const widgetInfo = useContext(WidgetInfoContext);
   return (
     <>
       {!widgetInfo.editing && (
         <WidgetDndHandleMask
           widgetId={widget.id}
-          widgetIndex={widget.config.index}
           widgetType={widget.config.type}
+          widgetTypeId={widget.config.widgetTypeId}
         />
       )}
       <BlockMaskLayer widgetConfig={widget} widgetInfo={widgetInfo} />

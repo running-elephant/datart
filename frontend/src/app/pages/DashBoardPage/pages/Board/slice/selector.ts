@@ -17,10 +17,11 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 import { DefaultWidgetData } from 'app/pages/DashBoardPage/constants';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { RootState } from 'types';
 import { boardInit } from '.';
 import { getLayoutWidgets } from '../../../utils/widget';
-import { WidgetBeta3, WidgetInfo } from './types';
+import { WidgetInfo } from './types';
 
 export const selectPropsId = (_: unknown, id: string) => id;
 
@@ -79,7 +80,7 @@ export const selectLayoutWidgetMapById = () =>
     if (!widgetRecord[id]) return {};
     const allWidgetMap = widgetRecord[id];
     const layoutWidgets = getLayoutWidgets(allWidgetMap);
-    const LayoutWidgetMap: Record<string, WidgetBeta3> = {};
+    const LayoutWidgetMap: Record<string, Widget> = {};
     layoutWidgets.forEach(w => {
       LayoutWidgetMap[w.id] = allWidgetMap[w.id];
     });

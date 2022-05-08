@@ -979,7 +979,9 @@
         "delPageTip": "Confirm to delete this story page?",
         "enterHere": "Enter here",
         "storyName": "Name",
-        "storyDescription": "Description"
+        "storyDescription": "Description",
+        "format": "Format",
+        "interval": "Interval"
       }
     },
     "widget": {

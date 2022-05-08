@@ -25,10 +25,8 @@ import {
   MediaWidgetContent,
   RectConfig,
   TabWidgetContent,
-  WidgetBeta3,
-  WidgetConfBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { Widget, WidgetConf } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { updateCollectionByAction } from 'app/utils/mutation';
@@ -39,7 +37,7 @@ import { EditBoardStack } from '../types';
 
 export type updateWidgetConf = {
   id: string;
-  config: WidgetConfBeta3;
+  config: WidgetConf;
 };
 export const initEditBoardState: EditBoardStack = {
   dashBoard: {} as Dashboard,
@@ -135,7 +133,7 @@ export const editBoardStackSlice = createSlice({
         delete state.widgetRecord[id];
       });
     },
-    updateWidget(state, action: PayloadAction<WidgetBeta3>) {
+    updateWidget(state, action: PayloadAction<Widget>) {
       const widget = action.payload;
       state.widgetRecord[widget.id] = widget;
     },
@@ -171,7 +169,7 @@ export const editBoardStackSlice = createSlice({
     },
     updateWidgetConfig(
       state,
-      action: PayloadAction<{ wid: string; config: WidgetConfBeta3 }>,
+      action: PayloadAction<{ wid: string; config: WidgetConf }>,
     ) {
       const { wid, config } = action.payload;
       state.widgetRecord[wid].config = config;
@@ -203,7 +201,7 @@ export const editBoardStackSlice = createSlice({
           state.widgetRecord[i].config.rect = rectItem;
         }
         if (deviceType === DeviceType.Mobile) {
-          state.widgetRecord[i].config.mobileRect = rectItem;
+          state.widgetRecord[i].config.mRect = rectItem;
         }
       });
     },

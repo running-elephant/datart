@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import { WidgetBeta3, WidgetType } from '../../pages/Board/slice/types';
+import { WidgetType } from '../../pages/Board/slice/types';
+import { Widget } from '../../types/widgetTypes';
 export interface WidgetActionListItem<T> {
   key: T;
   label: string;
@@ -90,7 +91,7 @@ export const SupportTriggerChartIds: string[] = [
 
 export const getWidgetActionList = (opt: {
   allList: WidgetActionListItem<widgetActionType>[];
-  widget: WidgetBeta3;
+  widget: Widget;
   boardEditing: boolean;
   chartGraphId?: string;
 }) => {
@@ -114,7 +115,7 @@ export const getWidgetActionList = (opt: {
 };
 export const getEditChartActionList = (opt: {
   allList: WidgetActionListItem<widgetActionType>[];
-  widget: WidgetBeta3;
+  widget: Widget;
   chartGraphId?: string;
 }) => {
   const { widget, allList, chartGraphId } = opt;

@@ -22,6 +22,7 @@ import {
   DataViewFieldType,
 } from 'app/constants';
 import { BoardConfig } from 'app/pages/DashBoardPage/types/boardTypes';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDatasetMeta } from 'app/types/ChartDataSet';
@@ -44,7 +45,7 @@ import { ControllerConfig } from '../../BoardEditor/components/ControllerWidgetP
 export interface BoardState {
   boardRecord: Record<string, Dashboard>;
   boardInfoRecord: Record<string, BoardInfo>;
-  widgetRecord: Record<string, Record<string, WidgetBeta3>>;
+  widgetRecord: Record<string, Record<string, Widget>>;
   widgetInfoRecord: Record<string, Record<string, WidgetInfo>>;
   dataChartMap: Record<string, DataChart>;
   viewMap: Record<string, ChartDataView>; // View
@@ -119,11 +120,10 @@ export interface WidgetBeta3 {
   config: WidgetConfBeta3;
   parentId?: string;
 }
-export interface WidgetOfCopy extends WidgetBeta3 {
+export interface WidgetOfCopy extends Widget {
   selectedCopy?: boolean;
 }
-export interface ServerWidget
-  extends Omit<WidgetBeta3, 'config' | 'relations'> {
+export interface ServerWidget extends Omit<Widget, 'config' | 'relations'> {
   config: string;
   relations: ServerRelation[];
 }
@@ -452,7 +452,7 @@ export interface BoardInfo {
   needFetchItems: string[];
   hasFetchItems: string[];
   boardWidthHeight: [number, number];
-  originControllerWidgets: WidgetBeta3[]; // use for reset button
+  originControllerWidgets: Widget[]; // use for reset button
 }
 export enum DeviceType {
   Desktop = 'desktop',

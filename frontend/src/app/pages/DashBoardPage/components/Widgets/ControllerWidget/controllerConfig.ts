@@ -20,7 +20,6 @@ import {
   RectConfig,
   Relation,
   RelationConfigType,
-  WidgetBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { RelatedWidgetItem } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/RelatedWidgets';
 import { ControllerConfig } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
@@ -33,6 +32,7 @@ import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import { uuidv4 } from 'utils/utils';
+import widgetManager from '../../WidgetManager';
 import { initTitleTpl, widgetTpl } from '../../WidgetManager/utils/init';
 
 export const controlWidgetTpl = (opt: WidgetCreateProps) => {
@@ -43,8 +43,8 @@ export const controlWidgetTpl = (opt: WidgetCreateProps) => {
   widget.datachartId = opt.datachartId || '';
   widget.viewIds = opt.viewIds || [];
   widget.relations = opt.relations || [];
-  widget.config.controllable = true;
-  widget.config.canWrapped = false;
+  // widget.config.controllable = true;
+  // widget.config.canWrapped = false;
   widget.config.content = opt.content;
   widget.config.type = 'controller';
   if (opt.boardType === 'auto') {
@@ -72,12 +72,11 @@ export const controlWidgetTpl = (opt: WidgetCreateProps) => {
 };
 export const getCanLinkControlWidgets = (widgets: Widget[]) => {
   const canLinkWidgets = widgets.filter(widget => {
-    if (widget.config.controllable) {
-      return false;
-    }
-    if (widget.viewIds.length === 0) {
-      return false;
-    }
+    const controllable = widgetManager.meta(
+      widget.config.widgetTypeId,
+    ).controllable;
+    if (!controllable) return false;
+    if (widget.viewIds.length === 0) return false;
     return true;
   });
   return canLinkWidgets;
@@ -85,7 +84,7 @@ export const getCanLinkControlWidgets = (widgets: Widget[]) => {
 export const makeControlRelations = (obj: {
   sourceId: string | undefined;
   relatedWidgets: RelatedWidgetItem[];
-  widgetMap: Record<string, WidgetBeta3>;
+  widgetMap: Record<string, Widget>;
   config: ControllerConfig;
 }) => {
   const sourceId = obj.sourceId || uuidv4();
@@ -93,8 +92,8 @@ export const makeControlRelations = (obj: {
   const trimRelatedWidgets = relatedWidgets.filter(relatedWidgetItem => {
     return widgetMap[relatedWidgetItem.widgetId];
   });
-  let chartWidgets: WidgetBeta3[] = [];
-  let controllerWidgets: WidgetBeta3[] = [];
+  let chartWidgets: Widget[] = [];
+  let controllerWidgets: Widget[] = [];
   trimRelatedWidgets.forEach(relatedWidgetItem => {
     let widget = widgetMap[relatedWidgetItem.widgetId];
     if (!widget) return false;
@@ -163,8 +162,8 @@ export const getViewIdsInControlConfig = (
 export const getControlOptionQueryParams = (obj: {
   view: ChartDataView;
   columns: string[];
-  curWidget: WidgetBeta3;
-  widgetMap: Record<string, WidgetBeta3>;
+  curWidget: Widget;
+  widgetMap: Record<string, Widget>;
 }) => {
   const viewConfigs = transformToViewConfig(obj.view?.config);
   const { filterParams, variableParams } = getTheWidgetFiltersAndParams({

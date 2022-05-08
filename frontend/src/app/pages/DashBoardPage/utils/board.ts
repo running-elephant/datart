@@ -26,7 +26,6 @@ import {
   DeviceType,
   ServerDashboard,
   ServerDatachart,
-  WidgetBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataView } from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
@@ -39,9 +38,9 @@ import {
   LAYOUT_COLS_MAP,
   MIN_MARGIN,
   MIN_PADDING,
-  NeedFetchWidgetTypes,
 } from '../constants';
 import { BoardConfig } from '../types/boardTypes';
+import { Widget } from '../types/widgetTypes';
 import { initAutoBoardConfig } from './autoBoard';
 import { initFreeBoardConfig } from './freeBoard';
 
@@ -72,16 +71,12 @@ export const preprocessBoardConfig = (config: BoardConfig, boardId: string) => {
 };
 export const getScheduleBoardInfo = (
   boardInfo: BoardInfo,
-  widgetMap: Record<string, WidgetBeta3>,
+  widgetMap: Record<string, Widget>,
 ) => {
   let newBoardInfo: BoardInfo = { ...boardInfo };
   const needFetchItems = Object.values(widgetMap)
     .filter(widget => {
-      if (
-        widget.viewIds &&
-        widget.viewIds.length > 0 &&
-        NeedFetchWidgetTypes.includes(widget.config.type)
-      ) {
+      if (widget.viewIds && widget.viewIds.length > 0) {
         return true;
       }
       return false;
@@ -96,7 +91,7 @@ export const getScheduleBoardInfo = (
 export const getInitBoardInfo = (obj: {
   id: string;
   widgetIds?: string[];
-  controllerWidgets?: WidgetBeta3[];
+  controllerWidgets?: Widget[];
 }) => {
   //
   const boardInfo: BoardInfo = {

@@ -24,6 +24,7 @@ import {
   WidgetData,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import ChartDataView from 'app/types/ChartDataView';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
@@ -34,12 +35,12 @@ import {
   getChartWidgetDataAsync,
   getControllerOptions,
 } from './thunk';
-import { BoardInfo, BoardState, WidgetBeta3 } from './types';
+import { BoardInfo, BoardState } from './types';
 
 export const boardInit: BoardState = {
   boardRecord: {} as Record<string, Dashboard>,
   boardInfoRecord: {} as Record<string, BoardInfo>,
-  widgetRecord: {} as Record<string, Record<string, WidgetBeta3>>,
+  widgetRecord: {} as Record<string, Record<string, Widget>>,
   widgetInfoRecord: {} as Record<string, Record<string, WidgetInfo>>,
   widgetDataMap: {} as Record<string, WidgetData>,
   dataChartMap: {} as Record<string, DataChart>,
@@ -67,7 +68,7 @@ const boardSlice = createSlice({
       state,
       action: PayloadAction<{
         boardId: string;
-        widgetMap: Record<string, WidgetBeta3>;
+        widgetMap: Record<string, Widget>;
         widgetInfoMap: Record<string, WidgetInfo>;
       }>,
     ) {
@@ -105,7 +106,7 @@ const boardSlice = createSlice({
     },
     setGroupWidgetsById(
       state,
-      action: PayloadAction<{ boardId: string; widgets: WidgetBeta3[] }>,
+      action: PayloadAction<{ boardId: string; widgets: Widget[] }>,
     ) {
       const { boardId: groupId, widgets } = action.payload;
       state.widgetRecord[groupId] = widgets.reduce((obj, widget) => {
@@ -119,7 +120,7 @@ const boardSlice = createSlice({
       }, {});
     },
 
-    updateWidget(state, action: PayloadAction<WidgetBeta3>) {
+    updateWidget(state, action: PayloadAction<Widget>) {
       const widget = action.payload;
       state.widgetRecord[widget.dashboardId][widget.id] = widget;
     },

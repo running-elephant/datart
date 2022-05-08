@@ -21,6 +21,7 @@ import { ITimeDefault } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useEffect, useRef } from 'react';
 import styled from 'styled-components/macro';
+import { BW } from '../../Basic/components/BasicWrapper';
 import { Group } from '../../Basic/components/Group';
 import { ItemLayoutProps } from '../../types';
 const TIME_FORMATS = [
@@ -72,7 +73,6 @@ export const TimerFormat: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     const { value, options } = data;
 
     const gt = useI18NPrefix(`viz.board.setting`);
-    const tLine = useI18NPrefix(`viz.lineOptions`);
     const valRef = useRef<ITimeDefault>();
     const selectRef = useRef<any>();
     useEffect(() => {
@@ -100,45 +100,40 @@ export const TimerFormat: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
 
     return (
       <Wrap>
-        {/* <label className="label">{gt('style')}</label> */}
-        <label className="label">{'format'}</label>
-        <Group>
-          <Select
-            ref={selectRef}
-            mode="tags"
-            className="datart-ant-select"
-            maxTagCount={1}
-            value={value.format}
-            onChange={changeF}
-          >
-            {TIME_FORMATS.map(item => (
-              <Select.Option key={item} value={item}>
-                {item}
-              </Select.Option>
-            ))}
-          </Select>
-        </Group>
-        <label className="label">{gt('width')}</label>
-        <Group>
-          <InputNumber
-            value={value.duration}
-            className="datart-ant-input-number"
-            onChange={changeD}
-          />
-        </Group>
+        <BW label={gt('format')}>
+          <Group>
+            <Select
+              ref={selectRef}
+              mode="tags"
+              className="datart-ant-select"
+              maxTagCount={1}
+              value={value.format}
+              onChange={changeF}
+            >
+              {TIME_FORMATS.map(item => (
+                <Select.Option key={item} value={item}>
+                  {item}
+                </Select.Option>
+              ))}
+            </Select>
+          </Group>
+        </BW>
+        <BW label={gt('interval')}>
+          <Group>
+            <InputNumber
+              value={value.duration}
+              className="datart-ant-input-number"
+              onChange={changeD}
+            />
+          </Group>
+        </BW>
       </Wrap>
     );
   },
 );
 const Wrap = styled.div`
   display: block;
-  .ant-upload-list {
-    display: none;
-  }
-  .label {
-    display: block;
-    width: 60px;
-  }
+
   .datart-ant-select {
     flex: 1;
   }

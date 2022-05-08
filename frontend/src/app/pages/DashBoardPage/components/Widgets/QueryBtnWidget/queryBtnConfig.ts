@@ -37,6 +37,9 @@ import {
 export const widgetMeta: WidgetMeta = {
   icon: 'query',
   widgetTypeId: 'queryBtn',
+  canWrapped: true,
+  controllable: false,
+  linkable: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },

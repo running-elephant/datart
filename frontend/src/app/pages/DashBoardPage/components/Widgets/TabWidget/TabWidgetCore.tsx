@@ -24,11 +24,11 @@ import { PRIMARY } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions } from '../../../pages/BoardEditor/slice';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { DropHolder } from '../../WidgetComponents/DropHolder';
 import { WidgetMapper } from '../../WidgetMapper/WidgetMapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { WidgetWrapProvider } from '../../WidgetProvider/WidgetWrapProvider';
-import { DropHolder } from './components/DropHolder';
 
 const { TabPane } = Tabs;
 

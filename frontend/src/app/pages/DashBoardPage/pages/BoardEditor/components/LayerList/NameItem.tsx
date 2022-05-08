@@ -17,10 +17,8 @@
  */
 import { WidgetActionDropdown } from 'app/pages/DashBoardPage/components/WidgetComponents/WidgetActionDropdown';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import {
-  WidgetBeta3,
-  WidgetTypeBeta3,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import classNames from 'classnames';
 import { XYCoord } from 'dnd-core';
 import { useCallback, useContext, useRef } from 'react';
@@ -34,7 +32,7 @@ import { NameCard } from './LayerList';
 export interface NameItemProps {
   index: number;
   zIndex: number;
-  widgetType: WidgetTypeBeta3;
+  widgetType: WidgetType;
   moveCard: (
     dragIndex: number,
     hoverIndex: number,
@@ -49,7 +47,7 @@ interface DragItem {
   index: number;
   id: string;
   selected: boolean;
-  widgetConfig: WidgetBeta3;
+  widgetConfig: Widget;
 }
 const NameItem: React.FC<NameItemProps> = ({
   index,

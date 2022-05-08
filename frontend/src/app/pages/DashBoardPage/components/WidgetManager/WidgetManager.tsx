@@ -63,5 +63,6 @@ export class WidgetManager {
     return this.widgetProtoMap[widgetTypeId]?.toolkit;
   }
 }
+const widgetManager = WidgetManager.getInstance();
 
-export const widgetManager = WidgetManager.getInstance();
+// export const widgetManager = WidgetManager.getInstance();

@@ -64,6 +64,9 @@ const videoI18N = {
 export const widgetMeta: WidgetMeta = {
   icon: 'video',
   widgetTypeId: 'video',
+  canWrapped: true,
+  controllable: false,
+  linkable: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },

@@ -21,7 +21,7 @@ import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import type {
   BoardType,
   RectConfig,
-  WidgetTypeBeta3,
+  WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import type { ChartStyleConfig } from 'app/types/ChartConfig';
@@ -322,12 +322,11 @@ export const widgetTpl = (): Widget => {
       clientId: initClientId(),
       version: APP_CURRENT_VERSION,
       index: 0,
-      canWrapped: true,
+      name: '',
       boardType: '' as BoardType,
-      type: '' as WidgetTypeBeta3,
+      type: '' as WidgetType,
       widgetTypeId: '',
-      controllable: false,
-      linkable: false,
+
       // visible: true,
       lock: false,
       content: {} as any,
