@@ -18,15 +18,13 @@
 
 import { Form } from 'antd';
 import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
-import {
-  ControllerWidgetContent,
-  WidgetBeta3,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ControllerConfig,
   ControllerDate,
   ControlOption,
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getControllerDateValues } from 'app/pages/DashBoardPage/utils';
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import produce from 'immer';
@@ -62,7 +60,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   } = useContext(WidgetDataContext);
 
   const refreshLinkedWidgets = useCallback(
-    (widget: WidgetBeta3) => {
+    (widget: Widget) => {
       if (hasQueryControl) return;
       onRefreshWidgetsByController(widget);
     },
@@ -131,7 +129,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
       return;
     }
     const _values = values ? (Array.isArray(values) ? values : [values]) : [];
-    const nextWidget = produce(widget as WidgetBeta3, draft => {
+    const nextWidget = produce(widget as Widget, draft => {
       (
         draft.config.content as ControllerWidgetContent
       ).config.controllerValues = _values;
@@ -166,7 +164,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           exactValue: timeValues?.[1],
         },
       };
-      const nextWidget = produce(widget as WidgetBeta3, draft => {
+      const nextWidget = produce(widget as Widget, draft => {
         (
           draft.config.content as ControllerWidgetContent
         ).config.controllerDate = nextFilterDate;
@@ -186,7 +184,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           exactValue: value,
         },
       };
-      const nextWidget = produce(widget as WidgetBeta3, draft => {
+      const nextWidget = produce(widget as Widget, draft => {
         (
           draft.config.content as ControllerWidgetContent
         ).config.controllerDate = nextFilterDate;

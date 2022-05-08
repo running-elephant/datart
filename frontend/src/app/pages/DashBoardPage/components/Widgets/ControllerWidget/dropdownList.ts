@@ -39,6 +39,9 @@ import { controlWidgetTpl } from './controllerConfig';
 export const widgetMeta: WidgetMeta = {
   icon: 'dropdownList',
   widgetTypeId: ControllerFacadeTypes.DropdownList,
+  canWrapped: true,
+  controllable: true,
+  linkable: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },

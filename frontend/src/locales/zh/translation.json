@@ -971,7 +971,9 @@
         "delPageTip": "确认删除此故事页？",
         "enterHere": "请输入",
         "storyName": "名称",
-        "storyDescription": "描述"
+        "storyDescription": "描述",
+        "format": "格式",
+        "interval": "间隔"
       }
     },
     "widget": {

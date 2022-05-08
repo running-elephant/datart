@@ -37,6 +37,9 @@ import { controlWidgetTpl } from './controllerConfig';
 export const widgetMeta: WidgetMeta = {
   icon: '',
   widgetTypeId: ControllerFacadeTypes.RangeValue,
+  canWrapped: true,
+  controllable: true,
+  linkable: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },

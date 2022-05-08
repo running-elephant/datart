@@ -9,6 +9,7 @@ import {
   LinkageConfig,
   RectConfig,
   Relation,
+  WidgetType,
 } from '../pages/Board/slice/types';
 
 export interface Widget {
@@ -28,15 +29,14 @@ export type JsonConfig = {
 };
 export interface WidgetConf {
   version: string;
+  name: string;
   boardType: BoardType;
   clientId: string; // replace tabId
   index: number;
-  type: string; //WidgetType
+  type: WidgetType; //WidgetType
   widgetTypeId: string;
   lock: boolean;
-  canWrapped: boolean; // 是否可以被包裹 被 widget container 包裹
-  controllable: boolean; // 是否可以关联 controller
-  linkable: boolean; // 是否可以关联其他 widget
+
   // visible: boolean; // 是否可见 TODO: 后续考虑
   jsonConfig: JsonConfig;
   content?: any;
@@ -82,6 +82,9 @@ export interface WidgetToolkit {
 export interface WidgetMeta {
   icon: any;
   widgetTypeId: string;
+  canWrapped: boolean; // 是否可以被包裹 被 widget container 包裹
+  controllable: boolean; // 是否可以 被 controller 关联
+  linkable: boolean; // 是否可以 被 widget 联动
   viewAction: Record<string, { label: string; icon: any; key: string }>;
   editAction: Record<string, { label: string; icon: any; key: string }>;
   i18ns: ChartI18NSectionConfig[];

@@ -31,7 +31,7 @@ import { Button, Dropdown, Menu } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import useWidgetAction from '../../hooks/useWidgetAction';
-import { WidgetBeta3 } from '../../pages/Board/slice/types';
+import { Widget } from '../../types/widgetTypes';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 import { WidgetChartContext } from '../WidgetProvider/WidgetChartProvider';
 import {
@@ -41,7 +41,7 @@ import {
 } from './config';
 
 export interface WidgetActionDropdownProps {
-  widget: WidgetBeta3;
+  widget: Widget;
 }
 
 export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(

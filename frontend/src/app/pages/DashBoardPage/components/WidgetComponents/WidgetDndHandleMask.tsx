@@ -16,10 +16,7 @@
  * limitations under the License.
  */
 import { CONTAINER_TAB } from 'app/pages/DashBoardPage/constants';
-import {
-  ContainerItem,
-  WidgetTypeBeta3,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { ContainerItem } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo } from 'react';
 import { useDrag } from 'react-dnd';
 import { useDispatch } from 'react-redux';
@@ -27,11 +24,11 @@ import { LEVEL_10 } from 'styles/StyleConstants';
 import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 export interface WidgetDndHandleMaskProps {
   widgetId: string;
-  widgetType: WidgetTypeBeta3;
-  widgetIndex: number;
+  widgetType: string;
+  widgetTypeId: string;
 }
 export const WidgetDndHandleMask: React.FC<WidgetDndHandleMaskProps> = memo(
-  ({ widgetId, widgetType, widgetIndex }) => {
+  ({ widgetId, widgetType }) => {
     const dispatch = useDispatch();
     interface DropResult {
       tabItem: ContainerItem;
@@ -43,6 +40,7 @@ export const WidgetDndHandleMask: React.FC<WidgetDndHandleMaskProps> = memo(
       item: { type: widgetType },
       end: (item, monitor) => {
         const dropResult = monitor.getDropResult<DropResult>();
+        console.log('__end item ', item);
         if (item && dropResult) {
           const { tabItem, parentId } = dropResult;
           dispatch(

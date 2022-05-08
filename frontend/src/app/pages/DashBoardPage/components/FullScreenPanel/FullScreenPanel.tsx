@@ -24,15 +24,17 @@ import {
   makeSelectBoardFullScreenPanelById,
   selectBoardWidgetMapById,
 } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
-import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import {
+  BoardState,
+  WidgetType,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { memo, useCallback, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { LEVEL_10, LEVEL_100, SPACE_LG, SPACE_SM } from 'styles/StyleConstants';
-import { CanFullScreenWidgetTypes } from '../../constants';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 import { WidgetMapper } from '../WidgetMapper/WidgetMapper';
-
+const CanFullScreenWidgetTypes: WidgetType[] = ['chart', 'media'];
 export const FullScreenPanel: React.FC<{}> = memo(() => {
   const { boardId, boardType } = useContext(BoardContext);
   const dispatch = useDispatch();

@@ -22,7 +22,7 @@ import {
   Widget,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { IFontDefault } from 'types';
-import { widgetManager } from '../../../pages/DashBoardPage/components/WidgetManager/WidgetManager';
+import widgetManager from '../../../pages/DashBoardPage/components/WidgetManager';
 
 const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
   newWidget.id = oldW.id;

@@ -44,7 +44,7 @@ const initIframeTpl = () => {
       {
         label: 'iframe.src',
         key: 'src',
-        value: 'http://www.retech.cc', //https://www.oschina.net/p/datart, http://www.retech.cc/product/datart
+        value: '/', //https://www.oschina.net/p/datart, http://www.retech.cc/product/datart
         comType: 'input',
       },
     ],
@@ -63,6 +63,9 @@ const iframeI18N = {
 export const widgetMeta: WidgetMeta = {
   icon: 'iframe',
   widgetTypeId: 'iframe',
+  canWrapped: true,
+  controllable: false,
+  linkable: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },

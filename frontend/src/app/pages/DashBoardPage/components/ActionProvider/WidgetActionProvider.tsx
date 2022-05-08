@@ -39,11 +39,7 @@ import {
   getControllerOptions,
   renderedWidgetAsync,
 } from '../../pages/Board/slice/thunk';
-import {
-  VizRenderMode,
-  WidgetBeta3,
-  WidgetConfBeta3,
-} from '../../pages/Board/slice/types';
+import { VizRenderMode } from '../../pages/Board/slice/types';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
@@ -65,7 +61,7 @@ import {
   getEditControllerOptions,
   renderedEditWidgetAsync,
 } from '../../pages/BoardEditor/slice/thunk';
-import { Widget } from '../../types/widgetTypes';
+import { Widget, WidgetConf } from '../../types/widgetTypes';
 import {
   getCascadeControllers,
   getNeedRefreshWidgetsByController,
@@ -128,7 +124,7 @@ export const WidgetActionProvider: FC<{
           dispatch(resetControllerAction({ boardId, renderMode }));
         }
       }, 500),
-      onRefreshWidgetsByController: debounce((widget: WidgetBeta3) => {
+      onRefreshWidgetsByController: debounce((widget: Widget) => {
         const controllerIds = getCascadeControllers(widget);
         controllerIds.forEach(controlWidgetId => {
           if (boardEditing) {
@@ -166,10 +162,10 @@ export const WidgetActionProvider: FC<{
           }
         });
       }, 500),
-      onUpdateWidgetConfig: (config: WidgetConfBeta3, wid: string) => {
+      onUpdateWidgetConfig: (config: WidgetConf, wid: string) => {
         dispatch(editBoardStackActions.updateWidgetConfig({ wid, config }));
       },
-      onWidgetUpdate: (widget: WidgetBeta3) => {
+      onWidgetUpdate: (widget: Widget) => {
         if (boardEditing) {
           dispatch(editBoardStackActions.updateWidget(widget));
         } else {
@@ -177,10 +173,7 @@ export const WidgetActionProvider: FC<{
         }
       },
       //
-      onWidgetChartClick: (
-        widget: WidgetBeta3,
-        params: ChartMouseEventParams,
-      ) => {
+      onWidgetChartClick: (widget: Widget, params: ChartMouseEventParams) => {
         dispatch(
           widgetChartClickAction({
             boardId,
@@ -193,7 +186,7 @@ export const WidgetActionProvider: FC<{
         );
       },
 
-      onWidgetClearLinkage: (widget: WidgetBeta3) => {
+      onWidgetClearLinkage: (widget: Widget) => {
         dispatch(widgetToClearLinkageAction(boardEditing, widget, renderMode));
       },
       onWidgetFullScreen: (itemId: string) => {
@@ -208,7 +201,7 @@ export const WidgetActionProvider: FC<{
         dispatch(widgetGetDataAction(boardEditing, widget, renderMode));
       },
 
-      onEditChartWidget: (widget: WidgetBeta3) => {
+      onEditChartWidget: (widget: Widget) => {
         const widgetTypeId = (widget as any).config.widgetTypeId;
         const chartType =
           widgetTypeId === 'selfChart' ? 'widgetChart' : 'dataChart';
@@ -229,7 +222,7 @@ export const WidgetActionProvider: FC<{
         dispatch(editWidgetInfoActions.openWidgetEditing({ id }));
         dispatch(editDashBoardInfoActions.changeShowBlockMask(false));
       },
-      onEditControllerWidget: (widget: WidgetBeta3) => {
+      onEditControllerWidget: (widget: Widget) => {
         dispatch(
           editDashBoardInfoActions.changeControllerPanel({
             type: 'edit',
@@ -251,10 +244,10 @@ export const WidgetActionProvider: FC<{
           editDashBoardInfoActions.changeJumpPanel({ visible: true, widgetId }),
         );
       },
-      onEditWidgetCloseLinkage: (widget: WidgetBeta3) => {
+      onEditWidgetCloseLinkage: (widget: Widget) => {
         dispatch(closeLinkageAction(widget));
       },
-      onEditWidgetCloseJump: (widget: WidgetBeta3) => {
+      onEditWidgetCloseJump: (widget: Widget) => {
         dispatch(closeJumpAction(widget));
       },
       onEditWidgetLock: (id: string) => {
@@ -291,15 +284,12 @@ export const WidgetActionProvider: FC<{
 });
 export interface WidgetActionContextProps {
   // all
-  onWidgetChartClick: (
-    widget: WidgetBeta3,
-    params: ChartMouseEventParams,
-  ) => void;
-  onWidgetClearLinkage: (widget: WidgetBeta3) => void;
+  onWidgetChartClick: (widget: Widget, params: ChartMouseEventParams) => void;
+  onWidgetClearLinkage: (widget: Widget) => void;
   onWidgetGetData: (widget: Widget) => void;
-  onWidgetUpdate: (widget: WidgetBeta3) => void;
-  onUpdateWidgetConfig: (config: WidgetConfBeta3, wid: string) => void;
-  onRefreshWidgetsByController: (widget: WidgetBeta3) => void;
+  onWidgetUpdate: (widget: Widget) => void;
+  onUpdateWidgetConfig: (config: WidgetConf, wid: string) => void;
+  onRefreshWidgetsByController: (widget: Widget) => void;
   onWidgetsQuery: () => void;
   onRenderedWidgetById: (wid: string) => void;
   onWidgetDataUpdate: ({
@@ -317,14 +307,14 @@ export interface WidgetActionContextProps {
   onWidgetsReset: () => void;
 
   // editor
-  onEditChartWidget: (widget: WidgetBeta3) => void;
+  onEditChartWidget: (widget: Widget) => void;
   onEditContainerWidget: (wid: string) => void;
   onEditMediaWidget: (wid: string) => void;
-  onEditControllerWidget: (widget: WidgetBeta3) => void;
+  onEditControllerWidget: (widget: Widget) => void;
   onEditWidgetLinkage: (wid: string) => void;
   onEditWidgetJump: (wid: string) => void;
-  onEditWidgetCloseLinkage: (widget: WidgetBeta3) => void;
-  onEditWidgetCloseJump: (widget: WidgetBeta3) => void;
+  onEditWidgetCloseLinkage: (widget: Widget) => void;
+  onEditWidgetCloseJump: (widget: Widget) => void;
   onEditWidgetLock: (id: string) => void;
   onEditWidgetUnLock: (id: string) => void;
   onEditClearActiveWidgets: () => void;

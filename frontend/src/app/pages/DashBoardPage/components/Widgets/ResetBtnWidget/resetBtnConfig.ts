@@ -37,6 +37,9 @@ import {
 export const widgetMeta: WidgetMeta = {
   icon: 'reset',
   widgetTypeId: 'resetBtn',
+  canWrapped: true,
+  controllable: false,
+  linkable: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },

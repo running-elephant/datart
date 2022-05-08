@@ -19,10 +19,10 @@
 import {
   BoardInfo,
   Dashboard,
-  WidgetBeta3,
   WidgetData,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { StateWithHistory } from 'redux-undo';
 
 export interface EditBoardState {
@@ -37,5 +37,5 @@ export interface HistoryEditBoard extends Omit<EditBoardState, 'stack'> {
 
 export interface EditBoardStack {
   dashBoard: Dashboard;
-  widgetRecord: Record<string, WidgetBeta3>;
+  widgetRecord: Record<string, Widget>;
 }

@@ -31,9 +31,9 @@ import { selectViewMap } from 'app/pages/DashBoardPage/pages/Board/slice/selecto
 import {
   ControllerWidgetContent,
   RelatedView,
-  WidgetBeta3,
   WidgetControllerPanelParams,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
   convertToWidgetMap,
   getOtherStringControlWidgets,
@@ -112,7 +112,7 @@ const ControllerWidgetPanel: React.FC<WidgetControllerPanelParams> = memo(
     );
 
     const refreshLinkedWidgets = useCallback(
-      (widget: WidgetBeta3) => {
+      (widget: Widget) => {
         debugger;
         if (hasQueryControl) return;
         onRefreshWidgetsByController(widget);

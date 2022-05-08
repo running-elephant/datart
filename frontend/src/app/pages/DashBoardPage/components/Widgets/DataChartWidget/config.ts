@@ -21,6 +21,7 @@ import {
   WidgetMeta,
   WidgetTplProps,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import widgetManager from '../../WidgetManager';
 import {
   initAutoWidgetRect,
   initBackgroundTpl,
@@ -42,6 +43,7 @@ import {
 export const getMeta = (opt: {
   icon: any;
   widgetTypeId: 'linkChart' | 'selfChart';
+
   zh: {
     desc: string;
     widgetType: string;
@@ -54,6 +56,9 @@ export const getMeta = (opt: {
   const meta: WidgetMeta = {
     icon: opt.icon,
     widgetTypeId: opt.widgetTypeId,
+    canWrapped: true,
+    controllable: true,
+    linkable: true,
     viewAction: {
       ...initWidgetViewActionTpl(),
     },
@@ -168,7 +173,8 @@ export const dataChartCreator = (opt: WidgetTplProps) => {
 };
 export const getCanLinkageWidgets = (widgets: Widget[]) => {
   const canLinkWidgets = widgets.filter(widget => {
-    if (!widget.config.linkable) return false;
+    const linkable = widgetManager.meta(widget.config.widgetTypeId).linkable;
+    if (!linkable) return false;
     if (widget.viewIds.length === 0) return false;
     return true;
   });

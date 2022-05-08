@@ -75,6 +75,9 @@ const timerI18N = {
 export const widgetMeta: WidgetMeta = {
   icon: 'timer',
   widgetTypeId: 'timer',
+  canWrapped: true,
+  controllable: false,
+  linkable: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },

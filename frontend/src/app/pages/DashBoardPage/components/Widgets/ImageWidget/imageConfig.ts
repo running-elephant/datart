@@ -38,6 +38,9 @@ import {
 export const widgetMeta: WidgetMeta = {
   icon: 'img',
   widgetTypeId: 'image',
+  canWrapped: true,
+  controllable: false,
+  linkable: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },

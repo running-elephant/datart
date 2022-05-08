@@ -28,7 +28,7 @@ import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
-import { widgetManager } from '../../../../components/WidgetManager/WidgetManager';
+import widgetManager from '../../../../components/WidgetManager';
 import { editBoardStackActions } from '../../slice';
 
 const StyledWrapper = styled.div`

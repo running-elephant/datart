@@ -25,11 +25,7 @@ import {
   getChartWidgetDataAsync,
   getWidgetData,
 } from '../pages/Board/slice/thunk';
-import {
-  BoardLinkFilter,
-  VizRenderMode,
-  WidgetBeta3,
-} from '../pages/Board/slice/types';
+import { BoardLinkFilter, VizRenderMode } from '../pages/Board/slice/types';
 import {
   editDashBoardInfoActions,
   editWidgetInfoActions,
@@ -72,7 +68,7 @@ export const tableChartClickAction =
     boardId: string,
     editing: boolean,
     renderMode: VizRenderMode,
-    widget: WidgetBeta3,
+    widget: Widget,
     params: ChartMouseEventParams,
   ) =>
   dispatch => {
@@ -108,7 +104,7 @@ export const tableChartClickAction =
 export const widgetClickJumpAction =
   (obj: {
     renderMode: VizRenderMode;
-    widget: WidgetBeta3;
+    widget: Widget;
     params: ChartMouseEventParams;
     history: any;
   }) =>
@@ -170,7 +166,7 @@ export const widgetClickLinkageAction =
     boardId: string,
     editing: boolean,
     renderMode: VizRenderMode,
-    widget: WidgetBeta3,
+    widget: Widget,
     params: ChartMouseEventParams,
   ) =>
   (dispatch, getState) => {
@@ -260,7 +256,7 @@ export const widgetChartClickAction =
     boardId: string;
     editing: boolean;
     renderMode: VizRenderMode;
-    widget: WidgetBeta3;
+    widget: Widget;
     params: ChartMouseEventParams;
     history: any;
   }) =>
@@ -302,8 +298,7 @@ export const widgetGetDataAction =
   };
 
 export const widgetToClearLinkageAction =
-  (editing: boolean, widget: WidgetBeta3, renderMode: VizRenderMode) =>
-  dispatch => {
+  (editing: boolean, widget: Widget, renderMode: VizRenderMode) => dispatch => {
     if (editing) {
       dispatch(editorWidgetClearLinkageAction(widget));
     } else {

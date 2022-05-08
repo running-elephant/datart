@@ -16,17 +16,17 @@
  * limitations under the License.
  */
 
-import { WidgetBeta3 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { createContext, FC, memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { selectWidgetBy2Id } from '../../pages/Board/slice/selector';
 import { BoardState } from '../../pages/Board/slice/types';
 import { selectEditWidgetById } from '../../pages/BoardEditor/slice/selectors';
 import { HistoryEditBoard } from '../../pages/BoardEditor/slice/types';
+import { Widget } from '../../types/widgetTypes';
 
-export const WidgetContext = createContext<WidgetBeta3>({} as WidgetBeta3);
+export const WidgetContext = createContext<Widget>({} as Widget);
 
-const WProvider: FC<{ val: WidgetBeta3 }> = memo(({ val, children }) => {
+const WProvider: FC<{ val: Widget }> = memo(({ val, children }) => {
   return (
     <WidgetContext.Provider value={val}>{children}</WidgetContext.Provider>
   );

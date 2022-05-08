@@ -21,11 +21,9 @@ import {
   QuillPalette,
 } from 'app/components/ChartGraph/BasicRichText/RichTextPluginLoader/CustomColor';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import {
-  WidgetBeta3,
-  WidgetInfo,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetInfo } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editBoardStackActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import produce from 'immer';
 import { DeltaStatic } from 'quill';
 import { ImageDrop } from 'quill-image-drop-module'; // 拖动加载图片组件。
@@ -57,7 +55,7 @@ const CUSTOM_COLOR_INIT = {
 };
 
 type RichTextWidgetProps = {
-  widget: WidgetBeta3;
+  widget: Widget;
   widgetInfo: WidgetInfo;
   boardEditing: boolean;
 };

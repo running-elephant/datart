@@ -35,9 +35,10 @@ import richTextProto from '../Widgets/RichTextWidget/richTextConfig';
 import tabProto from '../Widgets/TabWidget/tabConfig1';
 import timerProto from '../Widgets/TimerWidget/timerConfig';
 import videoProto from '../Widgets/VideoWidget/videoConfig';
-import { widgetManager } from './WidgetManager';
+import { WidgetManager } from './WidgetManager';
 
 // -- chart
+const widgetManager = WidgetManager.getInstance();
 widgetManager.register(linkChartProto);
 widgetManager.register(selfChartProto);
 

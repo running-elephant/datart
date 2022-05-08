@@ -24,7 +24,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { WidgetTypeBeta3 } from '../../../Board/slice/types';
+import { WidgetType } from '../../../Board/slice/types';
 import { editBoardStackActions, editWidgetInfoActions } from '../../slice';
 import { updateWidgetConf } from '../../slice/childSlice/stackSlice';
 import {
@@ -37,7 +37,7 @@ export type NameCard = {
   index: number;
   name: string;
   id: string;
-  widgetType: WidgetTypeBeta3;
+  widgetType: WidgetType;
   editing: boolean;
   selected: boolean;
 };

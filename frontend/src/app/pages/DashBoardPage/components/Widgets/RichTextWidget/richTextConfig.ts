@@ -38,6 +38,9 @@ import {
 export const widgetMeta: WidgetMeta = {
   icon: 'richText',
   widgetTypeId: 'richText',
+  canWrapped: true,
+  controllable: false,
+  linkable: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },

@@ -21,8 +21,10 @@ import {
 } from 'app/pages/DashBoardPage/constants';
 import { memo, useMemo } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
-import { ContainerItem } from '../../../../pages/Board/slice/types';
+import { ContainerItem } from '../../pages/Board/slice/types';
+import { editBoardStackActions } from '../../pages/BoardEditor/slice';
 
 export interface DropHolderProps {
   tabItem: ContainerItem;
@@ -30,11 +32,26 @@ export interface DropHolderProps {
 }
 export const DropHolder: React.FC<DropHolderProps> = memo(
   ({ tabItem, parentId }) => {
+    const dispatch = useDispatch();
     const [{ isOver, canDrop }, refDrop] = useDrop(
       () => ({
         accept: CONTAINER_TAB,
         item: { tabItem, parentId },
-        drop: () => ({ tabItem, parentId }),
+        drop: item => {
+          console.log('__ drop item', item);
+          // return { tabItem, parentId };
+          dispatch(
+            editBoardStackActions.addWidgetToTabWidget({
+              parentId,
+              tabItem: {
+                ...tabItem,
+                childWidgetId: parentId,
+              },
+              sourceId: parentId,
+            }),
+          );
+          // return { tabItem, parentId };
+        },
         canDrop: (item: any) => {
           if (CanDropToWidgetTypes.includes(item.type)) {
             return true;

@@ -16,14 +16,10 @@
  * limitations under the License.
  */
 
-import {
-  ControllerFacadeTypes,
-  FontDefault,
-  TimeFilterValueCategory,
-} from 'app/constants';
+import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
 import {
   TabWidgetContent,
-  WidgetTypeBeta3,
+  WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ChartsEventData } from 'app/types/Chart';
@@ -31,19 +27,9 @@ import ChartDataView from 'app/types/ChartDataView';
 import { formatTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
-import { DeltaStatic } from 'quill';
 import { CSSProperties } from 'react';
-import { G90, WHITE } from 'styles/StyleConstants';
-import { uuidv4 } from 'utils/utils';
 import { fillPx, getBackgroundImage } from '.';
-import {
-  AutoBoardWidgetBackgroundDefault,
-  BackgroundDefault,
-  BorderDefault,
-  ButtonBorderDefault,
-  LAYOUT_COLS_MAP,
-  QueryButtonWidgetBackgroundDefault,
-} from '../constants';
+import { LAYOUT_COLS_MAP } from '../constants';
 import {
   BackgroundConfig,
   BoardType,
@@ -51,15 +37,9 @@ import {
   ChartWidgetContent,
   ControllerWidgetContent,
   DataChart,
-  MediaWidgetContent,
-  MediaWidgetType,
-  RectConfig,
   Relation,
   ServerRelation,
   ServerWidget,
-  WidgetBeta3,
-  WidgetConfBeta3,
-  WidgetContent,
   WidgetContentChartType,
   WidgetInfo,
   WidgetPadding,
@@ -69,67 +49,47 @@ import { Widget } from '../types/widgetTypes';
 
 export const VALUE_SPLITTER = '###';
 
-export const createInitWidgetConfig = (opt: {
-  type: WidgetTypeBeta3;
-  content: WidgetContent;
-  boardType: BoardType;
-  index?: number;
-  name?: string;
-  autoUpdate?: boolean;
-  frequency?: number;
-}): WidgetConfBeta3 => {
-  return {
-    version: '',
-    type: opt.type,
-    index: opt.index || 0,
-    name: opt.name || '',
-    linkageConfig: {
-      open: false,
-      chartGroupColumns: [],
-    },
-    autoUpdate: opt.autoUpdate || false,
-    lock: false,
-    frequency: opt.frequency || 60, // 60秒
-    rect: createWidgetRect(opt.boardType, opt.type),
-    background:
-      opt.boardType === 'auto'
-        ? opt.type === 'query'
-          ? QueryButtonWidgetBackgroundDefault
-          : AutoBoardWidgetBackgroundDefault
-        : BackgroundDefault,
-    border: ['query', 'reset'].includes(opt.type)
-      ? ButtonBorderDefault
-      : BorderDefault,
-    content: opt.content,
-    nameConfig: {
-      show: true,
-      textAlign: 'left',
-      ...FontDefault,
-      color: opt.type === 'query' ? WHITE : G90,
-    } as any,
-    padding: createWidgetPadding(opt.type),
-  };
-};
-export const createWidget = (option: {
-  dashboardId: string;
-  config: WidgetConfBeta3;
-  datachartId?: string;
-  id?: string;
-  viewIds?: string[];
-  parentId?: string;
-  relations?: Relation[];
-}) => {
-  const widget: WidgetBeta3 = {
-    id: option.id || 'newWidget_' + uuidv4(),
-    dashboardId: option.dashboardId,
-    config: option.config,
-    datachartId: option.datachartId || '',
-    viewIds: option.viewIds || [],
-    parentId: option.parentId || '',
-    relations: option.relations || [],
-  };
-  return widget;
-};
+// export const createInitWidgetConfig = (opt: {
+//   type: WidgetType;
+//   content: WidgetContent;
+//   boardType: BoardType;
+//   index?: number;
+//   name?: string;
+//   autoUpdate?: boolean;
+//   frequency?: number;
+// }): WidgetConf => {
+//   return {
+//     version: '',
+//     type: opt.type,
+//     index: opt.index || 0,
+//     name: opt.name || '',
+//     linkageConfig: {
+//       open: false,
+//       chartGroupColumns: [],
+//     },
+//     autoUpdate: opt.autoUpdate || false,
+//     lock: false,
+//     frequency: opt.frequency || 60, // 60秒
+//     rect: createWidgetRect(opt.boardType, opt.type),
+//     background:
+//       opt.boardType === 'auto'
+//         ? opt.type === 'query'
+//           ? QueryButtonWidgetBackgroundDefault
+//           : AutoBoardWidgetBackgroundDefault
+//         : BackgroundDefault,
+//     border: ['query', 'reset'].includes(opt.type)
+//       ? ButtonBorderDefault
+//       : BorderDefault,
+//     content: opt.content,
+//     nameConfig: {
+//       show: true,
+//       textAlign: 'left',
+//       ...FontDefault,
+//       color: opt.type === 'query' ? WHITE : G90,
+//     } as any,
+//     padding: createWidgetPadding(opt.type),
+//   };
+// };
 
 export const createWidgetInfo = (id: string): WidgetInfo => {
   const widgetInfo: WidgetInfo = {
@@ -146,8 +106,8 @@ export const createWidgetInfo = (id: string): WidgetInfo => {
   };
   return widgetInfo;
 };
-export const createWidgetPadding = (widgetType: WidgetTypeBeta3) => {
-  if (widgetType === 'query' || widgetType === 'reset') {
+export const createWidgetPadding = (widgetType: WidgetType) => {
+  if (widgetType === 'button') {
     return {
       left: 0,
       right: 0,
@@ -169,72 +129,7 @@ export const createWidgetPadding = (widgetType: WidgetTypeBeta3) => {
     bottom: 8,
   };
 };
-export const createWidgetRect = (
-  boardType: BoardType,
-  widgetType: WidgetTypeBeta3,
-): RectConfig => {
-  if (widgetType === 'controller') {
-    return getInitControllerWidgetRect(boardType);
-  }
-  if (widgetType === 'query' || widgetType === 'reset') {
-    return getInitButtonWidgetRect(boardType);
-  }
-  if (boardType === 'auto') {
-    return {
-      x: 0,
-      y: 0,
-      width: 6,
-      height: 6,
-    };
-  } else {
-    // free
-    return {
-      x: 0,
-      y: 0,
-      width: 400,
-      height: 300,
-    };
-  }
-};
 
-export const getInitButtonWidgetRect = (boardType: BoardType): RectConfig => {
-  if (boardType === 'auto') {
-    return {
-      x: 0,
-      y: 0,
-      width: 1,
-      height: 1,
-    };
-  } else {
-    // free
-    return {
-      x: 0,
-      y: 0,
-      width: 128,
-      height: 32,
-    };
-  }
-};
-export const getInitControllerWidgetRect = (
-  boardType: BoardType,
-): RectConfig => {
-  if (boardType === 'auto') {
-    return {
-      x: 0,
-      y: 0,
-      width: 3,
-      height: 1,
-    };
-  } else {
-    // free
-    return {
-      x: 0,
-      y: 0,
-      width: 300,
-      height: 32,
-    };
-  }
-};
 // export const createContainerWidgetContent = (type: ContainerWidgetType) => {
 //   let content: ContainerWidgetContent = {
 //     type: type,
@@ -260,52 +155,7 @@ export const createChartWidgetContent = (subType: WidgetContentChartType) => {
   return content;
 };
 
-export const createMediaContent = (type: MediaWidgetType) => {
-  let content: MediaWidgetContent = {
-    type: type,
-  };
-  switch (type) {
-    case 'richText':
-      content.richTextConfig = {
-        content: {
-          ops: [
-            {
-              insert: '\n',
-            },
-          ],
-        } as DeltaStatic,
-      };
-      break;
-    case 'image':
-      content.imageConfig = {
-        type: 'WIDGET_SIZE',
-        src: '',
-      };
-      break;
-    case 'iframe':
-      content.iframeConfig = {
-        src: '',
-      };
-      break;
-    case 'timer':
-      content.iframeConfig = {
-        src: '',
-      };
-      break;
-    case 'video':
-      content.videoConfig = {
-        src: '',
-      };
-      break;
-    default:
-      break;
-  }
-  return content;
-};
-
-export const getWidgetInfoMapByServer = (
-  widgetMap: Record<string, WidgetBeta3>,
-) => {
+export const getWidgetInfoMapByServer = (widgetMap: Record<string, Widget>) => {
   const widgetInfoMap = {};
   Object.values(widgetMap).forEach(item => {
     widgetInfoMap[item.id] = createWidgetInfo(item.id);
@@ -373,7 +223,7 @@ export const updateFreeWidgetsRect = (widgets: Widget[]) => {
  * @description ''
  */
 export const createToSaveWidgetGroup = (
-  widgets: WidgetBeta3[],
+  widgets: Widget[],
   widgetIds: string[],
 ) => {
   const curWidgetIds = widgets.map(widget => widget.id);
@@ -401,7 +251,7 @@ export const createToSaveWidgetGroup = (
   };
 };
 
-export const convertWidgetToSave = (widget: WidgetBeta3): ServerWidget => {
+export const convertWidgetToSave = (widget: Widget): ServerWidget => {
   return {
     ...widget,
     config: JSON.stringify(widget.config),
@@ -417,11 +267,11 @@ export const convertWidgetRelationsToSave = (
   });
 };
 
-export const convertToWidgetMap = (widgets: WidgetBeta3[]) => {
+export const convertToWidgetMap = (widgets: Widget[]) => {
   return widgets.reduce((acc, cur) => {
     acc[cur.id] = cur;
     return acc;
-  }, {} as Record<string, WidgetBeta3>);
+  }, {} as Record<string, Widget>);
 };
 
 export const createWidgetInfoMap = (widgets: Widget[]) => {
@@ -456,17 +306,17 @@ export const convertWrapChartWidget = (params: {
  * @param ''
  * @description 'get all filter widget of board'
  */
-export const getAllControlWidget = (widgetMap: Record<string, WidgetBeta3>) => {
+export const getAllControlWidget = (widgetMap: Record<string, Widget>) => {
   const controlWidgetMap = Object.values(widgetMap)
     .filter(widget => widget.config.type === 'controller')
     .reduce((acc, cur) => {
       acc[cur.id] = cur;
       return acc;
-    }, {} as Record<string, WidgetBeta3>);
+    }, {} as Record<string, Widget>);
   return controlWidgetMap;
 };
 export const getOtherStringControlWidgets = (
-  allWidgets: WidgetBeta3[],
+  allWidgets: Widget[],
   widgetId: string | undefined,
 ) => {
   const allFilterWidgets = allWidgets.filter(ele => {
@@ -488,7 +338,7 @@ export const getOtherStringControlWidgets = (
  * @description 'get showing controller by all filterWidget of board'
  */
 export const getVisibleControlWidgetIds = (
-  controlWidgetMap: Record<string, WidgetBeta3>,
+  controlWidgetMap: Record<string, Widget>,
 ) => {
   const widgets = Object.values(controlWidgetMap);
   const visibleWidgets = getNoHiddenControllers(widgets);
@@ -500,13 +350,13 @@ export const getVisibleControlWidgetIds = (
   };
 };
 
-export const getLayoutWidgets = (widgetMap: Record<string, WidgetBeta3>) => {
+export const getLayoutWidgets = (widgetMap: Record<string, Widget>) => {
   const noSubWidgets = Object.values(widgetMap).filter(w => !w.parentId);
   const layoutWidgets = getNoHiddenControllers(noSubWidgets);
   return layoutWidgets;
 };
 
-export const getNoHiddenControllers = (widgets: WidgetBeta3[]) => {
+export const getNoHiddenControllers = (widgets: Widget[]) => {
   const noHiddenControlWidgets = widgets.filter(w => {
     if (w.config.type !== 'controller') {
       return true;
@@ -550,14 +400,14 @@ export const getNoHiddenControllers = (widgets: WidgetBeta3[]) => {
   return noHiddenControlWidgets;
 };
 
-export const getNeedRefreshWidgetsByController = (controller: WidgetBeta3) => {
+export const getNeedRefreshWidgetsByController = (controller: Widget) => {
   const relations = controller.relations;
   const widgetIds = relations
     .filter(ele => ele.config.type === 'controlToWidget')
     .map(ele => ele.targetId);
   return widgetIds;
 };
-export const getCascadeControllers = (controller: WidgetBeta3) => {
+export const getCascadeControllers = (controller: Widget) => {
   const relations = controller.relations;
   const ids = relations
     .filter(ele => ele.config.type === 'controlToControlCascade')
@@ -565,7 +415,7 @@ export const getCascadeControllers = (controller: WidgetBeta3) => {
   return ids;
 };
 
-export const getFreeWidgetStyle = (widget: WidgetBeta3) => {
+export const getFreeWidgetStyle = (widget: Widget) => {
   const widgetConf = widget.config;
   const rect = widgetConf.rect;
   let widgetStyle: CSSProperties = {
@@ -633,7 +483,7 @@ export const getWidgetSomeStyle = (opt: {
 
 export const getLinkedColumn = (
   targetWidgetId: string,
-  triggerWidget: WidgetBeta3,
+  triggerWidget: Widget,
 ) => {
   const relations = triggerWidget.relations;
   const relation = relations.find(item => item.targetId === targetWidgetId);
@@ -647,7 +497,7 @@ export const getLinkedColumn = (
 
 // TODO chart widget
 export const getWidgetMap = (
-  widgets: WidgetBeta3[],
+  widgets: Widget[],
   dataCharts: DataChart[],
   filterSearchParamsMap?: FilterSearchParamsWithMatch,
 ) => {
@@ -666,10 +516,10 @@ export const getWidgetMap = (
       viewIds,
     };
     return acc;
-  }, {} as Record<string, WidgetBeta3>);
+  }, {} as Record<string, Widget>);
 
   const wrappedDataCharts: DataChart[] = [];
-  const controllerWidgets: WidgetBeta3[] = []; // use for reset button
+  const controllerWidgets: Widget[] = []; // use for reset button
   const widgetList = Object.values(widgetMap);
 
   // 处理 widget包含关系 containerWidget 被包含的 widget.parentId 不为空
