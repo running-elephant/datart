@@ -215,8 +215,6 @@ export const ChartStyleSectionComponentType = {
   TEXT: 'text',
   CONDITIONALSTYLE: 'conditionalStylePanel',
   RADIO: 'radio',
-  BACKGROUND: 'background',
-  WIDGET_BORDER: 'widgetBorder',
 
   // Customize Component
   FontAlignment: 'fontAlignment',
@@ -227,6 +225,9 @@ export const ChartStyleSectionComponentType = {
   ScorecardListTemplate: 'scorecardListTemplate',
   ScorecardConditionalStyle: 'scorecardConditionalStyle',
   PivotSheetTheme: 'pivotSheetTheme',
+  BACKGROUND: 'background',
+  WIDGET_BORDER: 'widgetBorder',
+  TIMER_FORMAT: 'timerFormat',
 };
 
 export enum DownloadFileType {
