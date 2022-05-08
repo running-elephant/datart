@@ -17,6 +17,7 @@
  */
 import { Collapse, InputNumber } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import throttle from 'lodash/throttle';
@@ -31,10 +32,10 @@ import { WidgetConfigPanel } from './WidgetConfigPanel';
 const { Panel } = Collapse;
 export const WidgetSetting: FC = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
-  // const { boardType } = useContext(BoardContext);
+  const { boardType } = useContext(BoardContext);
   const dispatch = useDispatch();
   const widget = useContext(WidgetContext) as unknown as Widget;
-  const { boardType } = widget.config;
+  // const { boardType } = widget.config;
   const rect = useMemo(() => {
     const rect = widget.config.rect;
     return rect;

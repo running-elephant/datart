@@ -84,7 +84,6 @@ export const widgetMeta: WidgetMeta = {
 
 export const widgetToolkit: WidgetToolkit = {
   create: opt => {
-    debugger;
     const widget = controlWidgetTpl(opt);
     widget.id = widgetMeta.widgetTypeId + widget.id;
     widget.config.widgetTypeId = widgetMeta.widgetTypeId;

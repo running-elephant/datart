@@ -97,7 +97,7 @@ export const widgetToolkit: WidgetToolkit = {
       const rect: RectConfig = {
         x: 0,
         y: 0,
-        width: 1,
+        width: 2,
         height: 1,
       };
       widget.config.rect = rect;
