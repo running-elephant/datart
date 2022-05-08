@@ -147,14 +147,16 @@ export const editBoardStackSlice = createSlice({
     ) {
       const { ancestors, configItem, wid } = action.payload;
       if (!state.widgetRecord[wid]) return;
-      (state.widgetRecord[wid].config as any).jsonConfig.props =
-        updateCollectionByAction(
-          (state.widgetRecord[wid].config as any).jsonConfig.props || [],
-          {
-            ancestors: ancestors!,
-            value: configItem,
-          },
-        );
+      const newProps = updateCollectionByAction(
+        state.widgetRecord[wid].config.jsonConfig.props || [],
+        {
+          ancestors: ancestors!,
+          value: configItem,
+        },
+      );
+      state.widgetRecord[wid].config.jsonConfig.props = newProps;
+      const title = getWidgetTitle(newProps);
+      state.widgetRecord[wid].config.name = title.title;
     },
     updateWidgetRect(
       state,

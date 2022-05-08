@@ -108,7 +108,7 @@ export const widgetToolkit: ImageToolkit = {
       const rect: RectConfig = {
         x: 0,
         y: 0,
-        width: 400,
+        width: 500,
         height: 400,
       };
       widget.config.rect = rect;

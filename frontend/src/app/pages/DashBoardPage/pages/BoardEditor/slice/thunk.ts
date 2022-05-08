@@ -502,7 +502,6 @@ export const getEditControllerOptions = createAsyncThunk<
   async (widgetId, { getState, dispatch }) => {
     dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
     const rootState = getState() as RootState;
-    debugger;
     const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
     const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
     const widget = widgetMap[widgetId];
@@ -523,7 +522,6 @@ export const getEditControllerOptions = createAsyncThunk<
       curWidget: widget,
       widgetMap,
     });
-    debugger;
     if (!requestParams) {
       return null;
     }

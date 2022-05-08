@@ -113,7 +113,6 @@ const ControllerWidgetPanel: React.FC<WidgetControllerPanelParams> = memo(
 
     const refreshLinkedWidgets = useCallback(
       (widget: Widget) => {
-        debugger;
         if (hasQueryControl) return;
         onRefreshWidgetsByController(widget);
       },
