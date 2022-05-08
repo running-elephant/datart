@@ -17,6 +17,7 @@
  */
 
 import {
+  Widget,
   WidgetMeta,
   WidgetTplProps,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
@@ -164,4 +165,12 @@ export const dataChartCreator = (opt: WidgetTplProps) => {
     widget.config.rect = { ...initFreeWidgetRect() };
   }
   return widget;
+};
+export const getCanLinkageWidgets = (widgets: Widget[]) => {
+  const canLinkWidgets = widgets.filter(widget => {
+    if (!widget.config.linkable) return false;
+    if (widget.viewIds.length === 0) return false;
+    return true;
+  });
+  return canLinkWidgets;
 };

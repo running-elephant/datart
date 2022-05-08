@@ -71,6 +71,7 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
   let selectedIds: string[] = [];
   let shouldDeleteIds: string[] = [];
   let effectTypes: WidgetTypeBeta3[] = [];
+  debugger;
   if (ids?.length) {
     selectedIds = ids;
   } else {

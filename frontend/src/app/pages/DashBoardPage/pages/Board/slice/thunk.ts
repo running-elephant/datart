@@ -17,8 +17,8 @@
  */
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { boardDrillManager } from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
+import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/components/Widgets/ControllerWidget/controllerConfig';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
-import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { shareActions } from 'app/pages/SharePage/slice';
 import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';

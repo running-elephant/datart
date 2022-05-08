@@ -18,6 +18,7 @@
 
 import { Form, Modal } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { getCanLinkageWidgets } from 'app/pages/DashBoardPage/components/Widgets/DataChartWidget/config';
 import {
   selectDataChartById,
   selectViewMap,
@@ -28,7 +29,6 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getChartGroupColumns } from 'app/pages/DashBoardPage/utils';
 import { convertToWidgetMap } from 'app/pages/DashBoardPage/utils/widget';
-import { getCanLinkageWidgets } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
 import produce from 'immer';
 import React, {
   memo,
@@ -56,7 +56,8 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
   const allWidgets = useSelector(selectSortAllWidgets);
   const viewMap = useSelector(selectViewMap);
   const widgets = useMemo(
-    () => getCanLinkageWidgets(allWidgets).filter(w => w.id !== widgetId),
+    () =>
+      getCanLinkageWidgets(allWidgets as any).filter(w => w.id !== widgetId),
     [allWidgets, widgetId],
   );
   const widgetMap = useMemo(() => convertToWidgetMap(allWidgets), [allWidgets]);
@@ -245,7 +246,7 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
 
         <LinkageWidgets
           curWidget={curWidget}
-          widgets={widgets}
+          widgets={widgets as any}
           onChange={setColNames}
         />
         {curWidget && (

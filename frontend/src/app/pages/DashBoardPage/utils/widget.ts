@@ -54,7 +54,6 @@ import {
   MediaWidgetContent,
   MediaWidgetType,
   RectConfig,
-  RelatedView,
   Relation,
   ServerRelation,
   ServerWidget,
@@ -66,102 +65,10 @@ import {
   WidgetPadding,
 } from '../pages/Board/slice/types';
 import { StrControlTypes } from '../pages/BoardEditor/components/ControllerWidgetPanel/constants';
-import { ControllerConfig } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
-import { BtnActionParams } from '../pages/BoardEditor/slice/actions/controlActions';
 import { Widget } from '../types/widgetTypes';
 
 export const VALUE_SPLITTER = '###';
 
-export const createControllerWidget = (opt: {
-  boardId: string;
-  boardType: BoardType;
-  relations: Relation[];
-  name?: string;
-  controllerType: ControllerFacadeTypes;
-  views: RelatedView[];
-  config: ControllerConfig;
-  viewIds: string[];
-}) => {
-  const {
-    boardId,
-    boardType,
-    views,
-    config,
-    controllerType,
-    relations,
-    name = 'newController',
-  } = opt;
-  const content: ControllerWidgetContent = {
-    type: controllerType,
-    relatedViews: views,
-    name: name,
-    config: config,
-  };
-
-  const widgetConf = createInitWidgetConfig({
-    name: name,
-    type: 'controller',
-    content: content,
-    boardType: boardType,
-  });
-
-  const widgetId = relations[0]?.sourceId || uuidv4();
-  const widget: WidgetBeta3 = createWidget({
-    id: widgetId,
-    dashboardId: boardId,
-    config: widgetConf,
-    relations,
-  });
-  return widget;
-};
-export const createMediaWidget = (opt: {
-  dashboardId: string;
-  boardType: BoardType;
-  type: MediaWidgetType;
-}) => {
-  const content = createMediaContent(opt.type);
-  const widgetConf = createInitWidgetConfig({
-    type: 'media',
-    content: content,
-    boardType: opt.boardType,
-  });
-  const widget: WidgetBeta3 = createWidget({
-    dashboardId: opt.dashboardId,
-    config: widgetConf,
-  });
-  return widget;
-};
-// export const createContainerWidget = (opt: {
-//   dashboardId: string;
-//   boardType: BoardType;
-//   type: ContainerWidgetType;
-// }) => {
-//   const content = createContainerWidgetContent(opt.type);
-//   const widgetConf = createInitWidgetConfig({
-//     type: 'container',
-//     content: content,
-//     boardType: opt.boardType,
-//   });
-//   const widget: WidgetBeta3 = createWidget({
-//     dashboardId: opt.dashboardId,
-//     config: widgetConf,
-//   });
-//   return widget;
-// };
-export const createControlBtn = (opt: BtnActionParams) => {
-  const content = { type: opt.type };
-  const widgetConf = createInitWidgetConfig({
-    name: '',
-    type: opt.type as WidgetTypeBeta3,
-    content: content,
-    boardType: opt.boardType,
-  });
-  const widget: WidgetBeta3 = createWidget({
-    dashboardId: opt.boardId,
-    config: widgetConf,
-  });
-  return widget;
-};
 export const createInitWidgetConfig = (opt: {
   type: WidgetTypeBeta3;
   content: WidgetContent;

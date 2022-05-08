@@ -1853,18 +1853,13 @@ describe('getBoardChartRequests', () => {
 describe('getDefaultWidgetName', () => {
   const chart: WidgetTypeBeta3 = 'chart';
   const media: WidgetTypeBeta3 = 'media';
-  const query: WidgetTypeBeta3 = 'query';
-  const reset: WidgetTypeBeta3 = 'reset';
   it('should chart', () => {
     expect(getDefaultWidgetName(chart, 'widgetChart', 3)).toEqual(
       'Private Chart_3',
     );
     expect(getDefaultWidgetName(media, 'image', 3)).toEqual('Image_3');
   });
-  it('should btn', () => {
-    expect(getDefaultWidgetName(query, 'query', 3)).toEqual('Query');
-    expect(getDefaultWidgetName(reset, 'reset', 3)).toEqual('Reset');
-  });
+
   it('should other', () => {
     expect(getDefaultWidgetName('other' as any, 'query', 3)).toEqual('xxx3');
   });
