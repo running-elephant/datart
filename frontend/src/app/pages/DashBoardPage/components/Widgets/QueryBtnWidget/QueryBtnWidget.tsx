@@ -29,7 +29,7 @@ import { getWidgetBaseStyle } from '../../WidgetManager/utils/utils';
 import { QueryBtnWidgetCore } from './QueryBtnWidgetCore';
 
 export const QueryBtnWidget: React.FC<{}> = memo(() => {
-  const widget = useContext(WidgetContext) as any;
+  const widget = useContext(WidgetContext);
 
   const { editing } = useContext(BoardContext);
 

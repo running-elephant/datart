@@ -34,7 +34,7 @@ import { VideoWidgetCore } from './VideoWidgetCore';
 
 export const VideoWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
-    const widget = useContext(WidgetContext) as any;
+    const widget = useContext(WidgetContext);
     const { editing } = useContext(BoardContext);
     const { background, border, padding } = getWidgetBaseStyle(
       widget.config.jsonConfig.props,

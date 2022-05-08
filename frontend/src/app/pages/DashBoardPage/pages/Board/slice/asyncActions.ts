@@ -54,7 +54,7 @@ export const handleServerBoardAction =
     const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
     const migratedWidgets = migrateWidgets(serverWidgets);
     const { widgetMap, wrappedDataCharts, controllerWidgets } = getWidgetMap(
-      migratedWidgets as any, //TODO
+      migratedWidgets,
       dataCharts,
       filterSearchMap,
     );
@@ -193,7 +193,7 @@ export const resetControllerAction =
       dispatch(
         getWidgetData({
           boardId,
-          widget: widget as any,
+          widget: widget,
           renderMode,
           option: { pageInfo },
         }),

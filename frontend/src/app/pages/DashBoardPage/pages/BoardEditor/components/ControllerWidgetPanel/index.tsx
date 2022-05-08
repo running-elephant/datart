@@ -78,10 +78,7 @@ const ControllerWidgetPanel: React.FC<WidgetControllerPanelParams> = memo(
     const { onRefreshWidgetsByController } = useContext(WidgetActionContext);
     const allWidgets = useSelector(selectSortAllWidgets);
     const widgets = useMemo(
-      () =>
-        getCanLinkControlWidgets(allWidgets as any).filter(
-          t => t.id !== widgetId,
-        ),
+      () => getCanLinkControlWidgets(allWidgets).filter(t => t.id !== widgetId),
       [allWidgets, widgetId],
     );
     const otherStrTypeController = useMemo(

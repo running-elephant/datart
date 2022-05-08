@@ -69,7 +69,7 @@ export default function useWidgetAction() {
         onWidgetFullScreen(widget.id);
         break;
       case 'refresh':
-        onWidgetGetData(widget as any);
+        onWidgetGetData(widget);
         break;
       case 'edit':
         onWidgetEdit(widget);

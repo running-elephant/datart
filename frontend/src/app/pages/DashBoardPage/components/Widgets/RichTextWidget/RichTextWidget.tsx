@@ -35,7 +35,7 @@ import { RichTextWidgetCore } from './RichTextWidgetCore';
 
 export const RichTextWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
-    const widget = useContext(WidgetContext) as any;
+    const widget = useContext(WidgetContext);
     const { editing } = useContext(BoardContext);
     const widgetInfo = useContext(WidgetInfoContext);
     const title = getWidgetTitle(widget.config.jsonConfig.props);

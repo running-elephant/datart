@@ -56,8 +56,7 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
   const allWidgets = useSelector(selectSortAllWidgets);
   const viewMap = useSelector(selectViewMap);
   const widgets = useMemo(
-    () =>
-      getCanLinkageWidgets(allWidgets as any).filter(w => w.id !== widgetId),
+    () => getCanLinkageWidgets(allWidgets).filter(w => w.id !== widgetId),
     [allWidgets, widgetId],
   );
   const widgetMap = useMemo(() => convertToWidgetMap(allWidgets), [allWidgets]);
@@ -246,7 +245,7 @@ export const LinkagePanel: React.FC<LinkagePanelProps> = memo(() => {
 
         <LinkageWidgets
           curWidget={curWidget}
-          widgets={widgets as any}
+          widgets={widgets}
           onChange={setColNames}
         />
         {curWidget && (

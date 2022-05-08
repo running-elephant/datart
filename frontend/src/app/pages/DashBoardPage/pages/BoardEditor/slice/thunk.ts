@@ -109,7 +109,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
     const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
     const migratedWidgets = migrateWidgets(serverWidgets);
     const { widgetMap, wrappedDataCharts } = getWidgetMap(
-      migratedWidgets as any, //todo
+      migratedWidgets, //todo
       dataCharts,
     );
     const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
@@ -165,12 +165,12 @@ export const toUpdateDashboard = createAsyncThunk<
 
     const { dataChartMap, viewMap } = boardState.board;
     const widgets = convertWrapChartWidget({
-      widgetMap: widgetRecord as any,
+      widgetMap: widgetRecord,
       dataChartMap,
       viewMap,
     });
 
-    const group = createToSaveWidgetGroup(widgets as any, boardInfo.widgetIds);
+    const group = createToSaveWidgetGroup(widgets, boardInfo.widgetIds);
     const updateData: SaveDashboard = {
       ...dashBoard,
       config: JSON.stringify(dashBoard.config),
@@ -353,7 +353,7 @@ export const renderedEditWidgetAsync = createAsyncThunk<
         editBoard: HistoryEditBoard;
       },
     );
-    const curWidget = WidgetMap[widgetId] as any;
+    const curWidget = WidgetMap[widgetId];
     if (!curWidget) return null;
 
     dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));

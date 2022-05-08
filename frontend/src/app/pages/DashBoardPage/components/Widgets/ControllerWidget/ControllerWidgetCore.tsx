@@ -47,7 +47,7 @@ import { TextControllerForm } from './Controller/TextController';
 import { TimeControllerForm } from './Controller/TimeController';
 
 export const ControllerWidgetCore: React.FC<{}> = memo(() => {
-  const widget = useContext(WidgetContext) as any;
+  const widget = useContext(WidgetContext);
   const { onWidgetUpdate, onRefreshWidgetsByController } =
     useContext(WidgetActionContext);
   // TODO(duo)

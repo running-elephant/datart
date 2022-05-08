@@ -40,7 +40,7 @@ export const AddContainer: React.FC<{}> = () => {
         boardType: boardType,
         relations: [],
       });
-      dispatch(addWidgetsToEditBoard([widget] as any));
+      dispatch(addWidgetsToEditBoard([widget]));
     },
     [boardId, boardType, dispatch],
   );

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import produce from 'immer';
 import { createContext, FC, memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { selectWidgetBy2Id } from '../../pages/Board/slice/selector';
@@ -23,6 +24,7 @@ import { BoardState } from '../../pages/Board/slice/types';
 import { selectEditWidgetById } from '../../pages/BoardEditor/slice/selectors';
 import { HistoryEditBoard } from '../../pages/BoardEditor/slice/types';
 import { Widget } from '../../types/widgetTypes';
+import { getWidgetTitle } from '../WidgetManager/utils/utils';
 
 export const WidgetContext = createContext<Widget>({} as Widget);
 
@@ -48,6 +50,12 @@ export const WidgetProvider: FC<{
   const widget = useMemo(() => {
     const widget = boardEditing ? editWidget : readWidget;
     if (widget) {
+      const title = getWidgetTitle(widget.config.jsonConfig.props);
+
+      const newWidget = produce(widget, draft => {
+        draft.config.name = title.title;
+      });
+      return newWidget;
       // 为了board可以被整体复制，服务端拷贝文件图片文件 副本到新的boardId文件夹下，前端替换掉原来的boardId 使用当前boardId
       //这样副本 图片引用可以不受原来 board 资源删除影响
       // url=resources/image/dashboard/3062ff86cdcb47b3bba75565b3f2991d/2e1cac3a-600c-4636-b858-cbcb07f4a3b3

@@ -103,7 +103,7 @@ export const editBoardStackSlice = createSlice({
           //      maxWidgetIndex,
           //    );
         });
-        state.widgetRecord[widget.id] = widget as any;
+        state.widgetRecord[widget.id] = widget;
         //  ele.config.index = maxWidgetIndex;
         // ele.config.name =
         //   ele.config.name ||
@@ -155,8 +155,8 @@ export const editBoardStackSlice = createSlice({
         },
       );
       state.widgetRecord[wid].config.jsonConfig.props = newProps;
-      const title = getWidgetTitle(newProps);
-      state.widgetRecord[wid].config.name = title.title;
+      // const title = getWidgetTitle(newProps);
+      // state.widgetRecord[wid].config.name = title.title;
     },
     updateWidgetRect(
       state,

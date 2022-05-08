@@ -27,7 +27,7 @@ import {
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 
 export const QueryBtnWidgetCore: React.FC<{}> = memo(() => {
-  const widget = useContext(WidgetContext) as any;
+  const widget = useContext(WidgetContext);
 
   const { onWidgetsQuery } = useContext(WidgetActionContext);
 
