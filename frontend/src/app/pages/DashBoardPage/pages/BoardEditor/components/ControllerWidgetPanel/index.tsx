@@ -21,12 +21,12 @@ import { Split } from 'app/components';
 import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
+import widgetManagerInstance from 'app/pages/DashBoardPage/components/WidgetManager';
 import {
   getCanLinkControlWidgets,
   getViewIdsInControlConfig,
   makeControlRelations,
-} from 'app/pages/DashBoardPage/components/Widgets/ControllerWidget/controllerConfig';
+} from 'app/pages/DashBoardPage/components/Widgets/ControllerWidget/config';
 import { selectViewMap } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
 import {
   ControllerWidgetContent,
@@ -221,9 +221,10 @@ const ControllerWidgetPanel: React.FC<WidgetControllerPanelParams> = memo(
             config: postControlConfig(config, controllerType!),
           };
           const viewIds = getViewIdsInControlConfig(config);
-          let newWidget = widgetManager.toolkit(controllerType).create({
+          let newWidget = widgetManagerInstance.toolkit(controllerType).create({
             dashboardId: boardId,
             boardType,
+            name: name,
             relations: newRelations,
             content: content,
             viewIds: viewIds,

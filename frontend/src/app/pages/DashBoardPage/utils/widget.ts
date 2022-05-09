@@ -538,8 +538,7 @@ export const getWidgetMap = (
         return;
       }
 
-      const iWidget = widget as unknown as Widget;
-      const targetTabItem = tabContent.itemMap?.[iWidget.config.clientId];
+      const targetTabItem = tabContent.itemMap?.[widget.config.clientId];
       if (!targetTabItem) {
         widget.parentId = '';
         return;
@@ -606,7 +605,7 @@ export const getWidgetMap = (
 
   // 处理 自有 chart widgetControl
   widgetList
-    .filter(w => (w as unknown as Widget).config.widgetTypeId === 'selfChart')
+    .filter(w => w.config.widgetTypeId === 'selfChart')
     .forEach(widget => {
       let dataChart = (widget.config.content as any).dataChart as DataChart;
 

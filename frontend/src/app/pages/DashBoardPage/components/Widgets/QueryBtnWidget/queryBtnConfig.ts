@@ -20,12 +20,14 @@ import type {
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { PRIMARY } from 'styles/StyleConstants';
 import {
   initBackgroundTpl,
   initBorderTpl,
   initPaddingTpl,
   initTitleTpl,
   initWidgetEditActionTpl,
+  initWidgetName,
   initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
@@ -33,7 +35,10 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
-
+const NameI18N = {
+  zh: '查询按钮',
+  en: 'queryBtn',
+};
 export const widgetMeta: WidgetMeta = {
   icon: 'query',
   widgetTypeId: 'queryBtn',
@@ -51,7 +56,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'zh-CN',
       translation: {
         desc: '查询按钮',
-        widgetType: '查询',
+        widgetName: NameI18N.zh,
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
@@ -67,7 +72,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'en-US',
       translation: {
         desc: 'queryBtn',
-        widgetType: 'query',
+        widgetName: NameI18N.en,
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
@@ -92,6 +97,7 @@ export const widgetToolkit: WidgetToolkit = {
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
     widget.config.widgetTypeId = widgetMeta.widgetTypeId;
+    widget.config.name = opt.name || '';
     widget.config.type = 'button';
     if (opt.boardType === 'auto') {
       const rect: RectConfig = {
@@ -116,19 +122,13 @@ export const widgetToolkit: WidgetToolkit = {
       { ...initTitleTpl() },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
-      { ...initBackgroundTpl() },
+      { ...initBackgroundTpl(PRIMARY) },
     ];
-    widget.config.jsonConfig.props?.forEach(ele => {
-      if (ele.key === 'titleGroup') {
-        ele.rows?.forEach(row => {
-          if (row.key === 'title') {
-            row.value = '查询query';
-          }
-        });
-      }
-    });
 
     return widget;
+  },
+  getName(key) {
+    return initWidgetName(NameI18N, key);
   },
   edit() {},
   save() {},

@@ -50,6 +50,7 @@ export interface WidgetConf {
 
 export interface WidgetCreateProps {
   dashboardId: string;
+  name?: string;
   boardType?: BoardType;
   datachartId?: string;
   relations?: Relation[];
@@ -62,8 +63,10 @@ export type WidgetTplProps = WidgetCreateProps & {
 };
 export interface WidgetToolkit {
   create: (T: WidgetCreateProps) => Widget;
+  getName: (local?: string) => string;
   edit?: () => void;
   save?: () => void;
+
   // lock?() {},
   // unlock?() {},
   // copy() {},

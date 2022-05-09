@@ -27,6 +27,7 @@ import {
   initPaddingTpl,
   initTitleTpl,
   initWidgetEditActionTpl,
+  initWidgetName,
   initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
@@ -34,7 +35,10 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
-
+const NameI18N = {
+  zh: '富文本',
+  en: 'RichText',
+};
 export const widgetMeta: WidgetMeta = {
   icon: 'richText',
   widgetTypeId: 'richText',
@@ -52,7 +56,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'zh-CN',
       translation: {
         desc: 'richText',
-        widgetType: 'richText',
+        widgetName: NameI18N.zh,
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
@@ -67,8 +71,8 @@ export const widgetMeta: WidgetMeta = {
     {
       lang: 'en-US',
       translation: {
-        desc: 'richText',
-        widgetType: 'richText',
+        desc: NameI18N,
+        widgetName: NameI18N.en,
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
@@ -94,6 +98,7 @@ export const widgetToolkit: WidgetToolkit = {
     widget.relations = opt.relations || [];
     widget.config.widgetTypeId = widgetMeta.widgetTypeId;
     widget.config.type = 'media';
+    widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
       widget.config.rect = { ...initAutoWidgetRect() };
       widget.config.mRect = { ...initAutoWidgetRect() };
@@ -103,23 +108,22 @@ export const widgetToolkit: WidgetToolkit = {
 
     widget.config.jsonConfig.props = [
       { ...initTitleTpl() },
-      { ...initBackgroundTpl() },
+      { ...initBackgroundTpl('#fff') },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
     ];
-    widget.config.jsonConfig.props?.forEach(ele => {
-      if (ele.key === 'titleGroup') {
-        ele.rows?.forEach(row => {
-          if (row.key === 'title') {
-            row.value = '富文本richText';
-          }
-        });
-      }
-    });
+
     widget.config.content = {
       richText: {
         content: {
           ops: [
+            {
+              attributes: {
+                size: '24px',
+                italic: true,
+              },
+              insert: 'ABCDEFG...',
+            },
             {
               insert: '\n',
             },
@@ -129,6 +133,9 @@ export const widgetToolkit: WidgetToolkit = {
     };
 
     return widget;
+  },
+  getName(key) {
+    return initWidgetName(NameI18N, key);
   },
   edit() {},
   save() {},

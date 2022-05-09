@@ -28,6 +28,7 @@ import {
   initPaddingTpl,
   initTitleTpl,
   initWidgetEditActionTpl,
+  initWidgetName,
   initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
@@ -61,6 +62,10 @@ const videoI18N = {
     src: 'URL', // Source?
   },
 };
+const NameI18N = {
+  zh: '视频',
+  en: 'Video',
+};
 export const widgetMeta: WidgetMeta = {
   icon: 'video',
   widgetTypeId: 'video',
@@ -78,7 +83,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'zh-CN',
       translation: {
         desc: 'video',
-        widgetType: 'video',
+        widgetName: NameI18N.zh,
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
@@ -94,7 +99,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'en-US',
       translation: {
         desc: 'video',
-        widgetType: 'video',
+        widgetName: NameI18N.en,
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
@@ -124,6 +129,7 @@ const widgetToolkit: VideoWidgetToolKit = {
     widget.relations = opt.relations || [];
     widget.config.widgetTypeId = widgetMeta.widgetTypeId;
     widget.config.type = 'media';
+    widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
       widget.config.rect = { ...initAutoWidgetRect() };
       widget.config.mRect = { ...initAutoWidgetRect() };
@@ -138,17 +144,10 @@ const widgetToolkit: VideoWidgetToolKit = {
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
     ];
-    widget.config.jsonConfig.props?.forEach(ele => {
-      if (ele.key === 'titleGroup') {
-        ele.rows?.forEach(row => {
-          if (row.key === 'title') {
-            row.value = 'video';
-          }
-        });
-      }
-    });
-
     return widget;
+  },
+  getName(key) {
+    return initWidgetName(NameI18N, key);
   },
   edit() {},
   save() {},

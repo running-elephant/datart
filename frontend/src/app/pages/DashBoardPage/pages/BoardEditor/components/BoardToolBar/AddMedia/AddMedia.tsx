@@ -20,7 +20,7 @@ import { AppstoreAddOutlined } from '@ant-design/icons';
 import { Dropdown, Menu, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
+import widgetManagerInstance from 'app/pages/DashBoardPage/components/WidgetManager';
 import { LightWidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
@@ -34,7 +34,7 @@ export const AddMedia: React.FC<{}> = () => {
   const onSelectMediaWidget = useCallback(
     ({ keyPath }) => {
       const [mediaType] = keyPath;
-      const widget = widgetManager.toolkit(mediaType).create({
+      const widget = widgetManagerInstance.toolkit(mediaType).create({
         dashboardId: boardId,
         boardType,
       });

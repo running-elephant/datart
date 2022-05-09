@@ -37,6 +37,7 @@ export const QueryBtnWidgetCore: React.FC<{}> = memo(() => {
   };
 
   const title = getWidgetTitle(widget.config.jsonConfig.props);
+  title.title = widget.config.name;
   const { background } = getWidgetBaseStyle(widget.config.jsonConfig.props);
   return (
     <Wrapper color={background.color} onClick={onQuery}>

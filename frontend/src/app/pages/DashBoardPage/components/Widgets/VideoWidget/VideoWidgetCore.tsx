@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { memo, useContext } from 'react';
 import styled from 'styled-components';
 import { Player } from 'video-react';
@@ -25,7 +24,7 @@ import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { videoWidgetToolKit } from './videoConfig';
 
 export const VideoWidgetCore: React.FC = memo(() => {
-  const widget = useContext(WidgetContext) as unknown as Widget;
+  const widget = useContext(WidgetContext);
   let video = videoWidgetToolKit.getVideo(widget.config.jsonConfig.props);
   let srcWithParams = video.src;
   return (

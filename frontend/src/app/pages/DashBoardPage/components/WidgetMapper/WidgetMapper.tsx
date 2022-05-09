@@ -17,7 +17,6 @@
  */
 import { ControllerFacadeTypes } from 'app/constants';
 import { memo, useContext } from 'react';
-import { Widget } from '../../types/widgetTypes';
 import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import { ControllerWidget } from '../Widgets/ControllerWidget/ControllerWidget';
@@ -34,8 +33,8 @@ import { VideoWidget } from '../Widgets/VideoWidget/VideoWidget';
 export const WidgetMapper: React.FC<{
   boardEditing: boolean;
   hideTitle: boolean;
-}> = memo(({ boardEditing }) => {
-  const widget = useContext(WidgetContext) as unknown as Widget;
+}> = memo(({ boardEditing, hideTitle }) => {
+  const widget = useContext(WidgetContext);
   const widgetTypeId = widget.config.widgetTypeId;
   switch (widgetTypeId) {
     // chart
@@ -47,24 +46,24 @@ export const WidgetMapper: React.FC<{
           boardId={widget.dashboardId}
           boardEditing={boardEditing}
         >
-          <DataChartWidget hideTitle={false} />
+          <DataChartWidget hideTitle={hideTitle} />
         </WidgetDataProvider>
       );
     // media
     case 'richText':
-      return <RichTextWidget hideTitle={false} />;
+      return <RichTextWidget hideTitle={hideTitle} />;
     case 'image':
-      return <ImageWidget hideTitle={false} />;
+      return <ImageWidget hideTitle={hideTitle} />;
     case 'video':
-      return <VideoWidget hideTitle={false} />;
+      return <VideoWidget hideTitle={hideTitle} />;
     case 'iframe':
-      return <IframeWidget hideTitle={false} />;
+      return <IframeWidget hideTitle={hideTitle} />;
     case 'timer':
-      return <TimerWidget hideTitle={false} />;
+      return <TimerWidget hideTitle={hideTitle} />;
 
     // tab
     case 'tab':
-      return <TabWidget hideTitle={false} />;
+      return <TabWidget hideTitle={hideTitle} />;
 
     // btn
     case 'queryBtn':

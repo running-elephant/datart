@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import { memo, useContext, useEffect, useState } from 'react';
@@ -26,7 +25,7 @@ import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { timerWidgetToolkit } from './timerConfig';
 
 export const TimerWidgetCore: React.FC = memo(() => {
-  const widget = useContext(WidgetContext) as unknown as Widget;
+  const widget = useContext(WidgetContext);
   const { time, font } = timerWidgetToolkit.getTimer(
     widget.config.jsonConfig.props,
   );

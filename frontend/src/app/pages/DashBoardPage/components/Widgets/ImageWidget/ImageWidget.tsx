@@ -37,6 +37,7 @@ export const ImageWidget: React.FC<{ hideTitle: boolean }> = memo(
     const widget = useContext(WidgetContext);
     const { editing } = useContext(BoardContext);
     const title = getWidgetTitle(widget.config.jsonConfig.props);
+    title.title = widget.config.name;
     const { background, border, padding } = getWidgetBaseStyle(
       widget.config.jsonConfig.props,
     );

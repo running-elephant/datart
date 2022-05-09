@@ -165,6 +165,15 @@ export const WidgetActionProvider: FC<{
       onUpdateWidgetConfig: (config: WidgetConf, wid: string) => {
         dispatch(editBoardStackActions.updateWidgetConfig({ wid, config }));
       },
+      onUpdateWidgetConfigByKey: ops => {
+        if (boardEditing) {
+          dispatch(editBoardStackActions.updateWidgetConfigByKey(ops));
+        } else {
+          dispatch(boardActions.updateWidgetConfigByKey({ ...ops, boardId }));
+        }
+        dispatch(editBoardStackActions.updateWidgetConfigByKey(ops));
+      },
+
       onWidgetUpdate: (widget: Widget) => {
         if (boardEditing) {
           dispatch(editBoardStackActions.updateWidget(widget));
@@ -289,6 +298,7 @@ export interface WidgetActionContextProps {
   onWidgetGetData: (widget: Widget) => void;
   onWidgetUpdate: (widget: Widget) => void;
   onUpdateWidgetConfig: (config: WidgetConf, wid: string) => void;
+  onUpdateWidgetConfigByKey: (opt: { wid: string; key: string; val }) => void;
   onRefreshWidgetsByController: (widget: Widget) => void;
   onWidgetsQuery: () => void;
   onRenderedWidgetById: (wid: string) => void;

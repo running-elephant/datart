@@ -21,19 +21,24 @@ import {
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { controlWidgetTpl } from '.';
 import {
   initBackgroundTpl,
   initBorderTpl,
   initPaddingTpl,
   initWidgetEditActionTpl,
+  initWidgetName,
   initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
   WidgetEditActionI18N,
   WidgetViewActionI18N,
-} from '../../WidgetManager/utils/init';
-import { controlWidgetTpl } from './controllerConfig';
+} from '../../../WidgetManager/utils/init';
 
+const NameI18N = {
+  zh: '文本',
+  en: 'Text',
+};
 export const widgetMeta: WidgetMeta = {
   icon: '',
   widgetTypeId: ControllerFacadeTypes.Text,
@@ -51,7 +56,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'zh-CN',
       translation: {
         desc: '',
-        widgetType: '',
+        widgetName: NameI18N.zh,
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
@@ -67,7 +72,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'en-US',
       translation: {
         desc: '',
-        widgetType: '',
+        widgetName: NameI18N.en,
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
@@ -87,17 +92,15 @@ export const widgetToolkit: WidgetToolkit = {
     const widget = controlWidgetTpl(opt);
     widget.id = widgetMeta.widgetTypeId + widget.id;
     widget.config.widgetTypeId = widgetMeta.widgetTypeId;
+    widget.config.name = opt.name || '';
     const addProps = [
-      { ...initBackgroundTpl() },
+      { ...initBackgroundTpl('#fff') },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
     ];
     widget.config.jsonConfig.props?.forEach(ele => {
       if (ele.key === 'titleGroup') {
         ele.rows?.forEach(row => {
-          if (row.key === 'title') {
-            row.value = widget.config.content?.name;
-          }
           if (row.key === 'showTitle') {
             row.value = true;
           }
@@ -107,6 +110,9 @@ export const widgetToolkit: WidgetToolkit = {
     widget.config.jsonConfig.props =
       widget.config.jsonConfig.props?.concat(addProps);
     return widget;
+  },
+  getName(key) {
+    return initWidgetName(NameI18N, key);
   },
   edit() {},
   save() {},

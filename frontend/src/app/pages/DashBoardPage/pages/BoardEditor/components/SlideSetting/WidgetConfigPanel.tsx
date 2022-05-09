@@ -23,33 +23,32 @@ import GroupLayout from 'app/components/FormGenerator/Layout/GroupLayout';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
-import widgetManager from '../../../../components/WidgetManager';
+import widgetManagerInstance from '../../../../components/WidgetManager';
 import { editBoardStackActions } from '../../slice';
 
 const StyledWrapper = styled.div`
   width: 100%;
   min-height: 0;
-  overflow-y: auto;
+  /* overflow-y: auto; */
 `;
 export const WidgetConfigPanel: FC<{}> = memo(() => {
   const dispatch = useDispatch();
-  const widget = useContext(WidgetContext) as unknown as Widget;
+  const widget = useContext(WidgetContext);
   const configs = widget.config.jsonConfig.props;
 
   const widgetTypeId = widget.config.widgetTypeId;
-  const i18ns = widgetManager.meta(widgetTypeId).i18ns;
+  const i18ns = widgetManagerInstance.meta(widgetTypeId).i18ns;
   const onChange = (
     ancestors: number[],
     configItem: ChartStyleConfig,
     needRefresh?: boolean,
   ) => {
     dispatch(
-      editBoardStackActions.updateWidgetConfigByKey({
+      editBoardStackActions.updateWidgetConfigByPath({
         ancestors,
         configItem,
         wid: widget.id,

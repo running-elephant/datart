@@ -23,7 +23,7 @@ export interface WidgetProto {
   meta: WidgetMeta;
   toolkit: WidgetToolkit;
 }
-export class WidgetManager {
+class WidgetManager {
   private static _instance: WidgetManager;
   private widgetProtoMap: Record<string, WidgetProto> = {};
   private constructor() {}
@@ -63,6 +63,4 @@ export class WidgetManager {
     return this.widgetProtoMap[widgetTypeId]?.toolkit;
   }
 }
-const widgetManager = WidgetManager.getInstance();
-
-// export const widgetManager = WidgetManager.getInstance();
+export const widgetManagerInstance = WidgetManager.getInstance();

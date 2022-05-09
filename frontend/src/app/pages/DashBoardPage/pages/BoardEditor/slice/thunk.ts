@@ -4,8 +4,8 @@ import {
   boardDrillManager,
   EDIT_PREFIX,
 } from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
-import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
-import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/components/Widgets/ControllerWidget/controllerConfig';
+import widgetManagerInstance from 'app/pages/DashBoardPage/components/WidgetManager';
+import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/components/Widgets/ControllerWidget/config';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
@@ -244,13 +244,13 @@ export const addDataChartWidgets = createAsyncThunk<
 
     const widgets = chartIds.map(dcId => {
       const dataChart = dataChartMap[dcId];
-
       const viewIds = dataChart.viewId ? [dataChart.viewId] : [];
-      let widget = widgetManager.toolkit('linkChart').create({
+      let widget = widgetManagerInstance.toolkit('linkChart').create({
         dashboardId: boardId,
         boardType: boardType,
         datachartId: dcId,
         relations: [],
+        name: dataChart.name,
         content: dataChartMap[dcId],
         viewIds: viewIds,
       });
@@ -286,12 +286,12 @@ export const addWrapChartWidget = createAsyncThunk<
     const viewViews = view ? [view] : [];
     dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
-
-    let widget = widgetManager.toolkit('selfChart').create({
+    let widget = widgetManagerInstance.toolkit('selfChart').create({
       dashboardId: boardId,
       boardType: boardType,
       datachartId: chartId,
       relations: [],
+      name: dataChart.name,
       content: dataChart,
       viewIds: view?.id ? [view.id] : [],
     });
@@ -326,7 +326,7 @@ export const addChartWidget = createAsyncThunk<
 
     const widgetTypeId = subType === 'dataChart' ? 'linkChart' : 'selfChart';
 
-    let widget = widgetManager.toolkit(widgetTypeId).create({
+    let widget = widgetManagerInstance.toolkit(widgetTypeId).create({
       dashboardId: boardId,
       boardType: boardType,
       datachartId: chartId,

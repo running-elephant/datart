@@ -16,22 +16,21 @@
  * limitations under the License.
  */
 import { memo, useContext } from 'react';
+import widgetManagerInstance from '../WidgetManager';
 import { WidgetInfoContext } from '../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import { BlockMaskLayer } from './BlockMaskLayer';
 import { WidgetDndHandleMask } from './WidgetDndHandleMask';
 export const EditMask: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
-  // widgetManager
+  const canWrapped = widgetManagerInstance.meta(
+    widget.config.widgetTypeId,
+  ).canWrapped;
   const widgetInfo = useContext(WidgetInfoContext);
   return (
     <>
       {!widgetInfo.editing && (
-        <WidgetDndHandleMask
-          widgetId={widget.id}
-          widgetType={widget.config.type}
-          widgetTypeId={widget.config.widgetTypeId}
-        />
+        <WidgetDndHandleMask widgetId={widget.id} canWrapped={canWrapped} />
       )}
       <BlockMaskLayer widgetConfig={widget} widgetInfo={widgetInfo} />
     </>

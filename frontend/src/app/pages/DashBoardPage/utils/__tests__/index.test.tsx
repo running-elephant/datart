@@ -25,7 +25,6 @@ import {
 import {
   DataChart,
   RelatedView,
-  WidgetTypeBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ControllerConfig,
@@ -45,7 +44,6 @@ import {
   getChartGroupColumns,
   getControllerDateValues,
   getDataChartRequestParams,
-  getDefaultWidgetName,
   getRGBAColor,
   getTheWidgetFiltersAndParams,
   getWidgetControlValues,
@@ -1847,20 +1845,5 @@ describe('getBoardChartRequests', () => {
       },
     ];
     expect(getBoardChartRequests(obj as any)).toEqual(res);
-  });
-});
-
-describe('getDefaultWidgetName', () => {
-  const chart: WidgetTypeBeta3 = 'chart';
-  const media: WidgetTypeBeta3 = 'media';
-  it('should chart', () => {
-    expect(getDefaultWidgetName(chart, 'widgetChart', 3)).toEqual(
-      'Private Chart_3',
-    );
-    expect(getDefaultWidgetName(media, 'image', 3)).toEqual('Image_3');
-  });
-
-  it('should other', () => {
-    expect(getDefaultWidgetName('other' as any, 'query', 3)).toEqual('xxx3');
   });
 });

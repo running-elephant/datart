@@ -26,6 +26,7 @@ import {
   initPaddingTpl,
   initTitleTpl,
   initWidgetEditActionTpl,
+  initWidgetName,
   initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
@@ -33,7 +34,10 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
-
+const NameI18N = {
+  zh: '重置按钮',
+  en: 'ResetBtn',
+};
 export const widgetMeta: WidgetMeta = {
   icon: 'reset',
   widgetTypeId: 'resetBtn',
@@ -51,7 +55,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'zh-CN',
       translation: {
         desc: '重置按钮',
-        widgetType: '重置',
+        widgetName: '重置',
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
@@ -67,7 +71,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'en-US',
       translation: {
         desc: 'resetBtn',
-        widgetType: 'reset',
+        widgetName: 'reset',
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
@@ -93,6 +97,7 @@ export const widgetToolkit: WidgetToolkit = {
     widget.relations = opt.relations || [];
     widget.config.widgetTypeId = widgetMeta.widgetTypeId;
     widget.config.type = 'button';
+    widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
       const rect: RectConfig = {
         x: 0,
@@ -116,19 +121,13 @@ export const widgetToolkit: WidgetToolkit = {
       { ...initTitleTpl() },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
-      { ...initBackgroundTpl() },
+      { ...initBackgroundTpl('#fff') },
     ];
-    widget.config.jsonConfig.props?.forEach(ele => {
-      if (ele.key === 'titleGroup') {
-        ele.rows?.forEach(row => {
-          if (row.key === 'title') {
-            row.value = '重置reset';
-          }
-        });
-      }
-    });
 
     return widget;
+  },
+  getName(key) {
+    return initWidgetName(NameI18N, key);
   },
   edit() {},
   save() {},

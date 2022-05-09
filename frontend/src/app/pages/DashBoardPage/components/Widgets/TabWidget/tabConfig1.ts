@@ -29,6 +29,7 @@ import {
   initPaddingTpl,
   initTitleTpl,
   initWidgetEditActionTpl,
+  initWidgetName,
   initWidgetViewActionTpl,
   LoopFetchI18N,
   PaddingI18N,
@@ -37,7 +38,10 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
-
+const NameI18N = {
+  zh: '标签卡',
+  en: 'Tab',
+};
 export const widgetMeta: WidgetMeta = {
   icon: '',
   widgetTypeId: 'tab',
@@ -55,7 +59,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'zh-CN',
       translation: {
         desc: '标签卡 容器组件可以切换',
-        widgetType: '标签卡',
+        widgetName: NameI18N.zh,
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
@@ -71,7 +75,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'en-US',
       translation: {
         desc: 'Tab container',
-        widgetType: 'Tab',
+        widgetName: NameI18N.en,
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
@@ -97,6 +101,7 @@ export const widgetToolkit: TabToolkit = {
     widget.relations = opt.relations || [];
     widget.config.widgetTypeId = widgetMeta.widgetTypeId;
     widget.config.type = 'container';
+    widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
       widget.config.rect = { ...initAutoWidgetRect() };
       widget.config.mRect = { ...initAutoWidgetRect() };
@@ -107,18 +112,10 @@ export const widgetToolkit: TabToolkit = {
     widget.config.jsonConfig.props = [
       { ...initTitleTpl() },
       { ...initPaddingTpl() },
-      { ...initBackgroundTpl() },
+      { ...initBackgroundTpl('#fff') },
       { ...initBorderTpl() },
     ];
-    widget.config.jsonConfig.props?.forEach(ele => {
-      if (ele.key === 'titleGroup') {
-        ele.rows?.forEach(row => {
-          if (row.key === 'title') {
-            row.value = 'Tab';
-          }
-        });
-      }
-    });
+
     const newTabId = `tab_${uuidv4()}`;
     const content: TabWidgetContent = {
       itemMap: {
@@ -132,6 +129,9 @@ export const widgetToolkit: TabToolkit = {
     };
     widget.config.content = content;
     return widget;
+  },
+  getName(key) {
+    return initWidgetName(NameI18N, key);
   },
   edit() {},
   save() {},

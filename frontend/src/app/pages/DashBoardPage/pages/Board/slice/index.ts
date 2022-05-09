@@ -124,6 +124,14 @@ const boardSlice = createSlice({
       const widget = action.payload;
       state.widgetRecord[widget.dashboardId][widget.id] = widget;
     },
+    updateWidgetConfigByKey(
+      state,
+      action: PayloadAction<{ boardId: string; wid: string; key: string; val }>,
+    ) {
+      const { boardId, wid, key, val } = action.payload;
+      if (!state.widgetRecord?.[boardId]?.[wid]?.config) return;
+      state.widgetRecord[boardId][wid].config[key] = val;
+    },
 
     updateViewMap(state, action: PayloadAction<ChartDataView[]>) {
       const views = action.payload;

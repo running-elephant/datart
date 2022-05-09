@@ -26,10 +26,7 @@ import {
 import { migrateChartConfig } from 'app/migration';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
-import {
-  RelatedView,
-  WidgetType,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
@@ -38,7 +35,6 @@ import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
 import { getStyles } from 'app/utils/chartHelper';
 import { getTime, splitRangerDateFilters } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
-import i18next from 'i18next';
 import moment from 'moment';
 import { CloneValueDeep } from 'utils/object';
 import { boardDrillManager } from '../components/BoardDrillManager/BoardDrillManager';
@@ -511,27 +507,6 @@ export const getDistinctFiltersByColumn = (
   });
 
   return Object.values(filterMap);
-};
-
-export const getDefaultWidgetName = (
-  widgetType: WidgetType,
-  subWidgetType: string,
-  index: number,
-) => {
-  const subTypeTitle = i18next.t(`viz.widget.type.${subWidgetType}`);
-  const widgetTypes: WidgetType[] = [
-    'chart',
-    'container',
-    'controller',
-    'media',
-    'button',
-  ];
-
-  if (widgetTypes.includes(widgetType)) {
-    return `${subTypeTitle}_${index}`;
-  } else {
-    return `xxx${index}`;
-  }
 };
 
 export const getJsonConfigs = getStyles;

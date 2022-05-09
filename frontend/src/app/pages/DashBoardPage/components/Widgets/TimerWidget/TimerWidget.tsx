@@ -40,6 +40,7 @@ export const TimerWidget: React.FC<{ hideTitle: boolean }> = memo(
       widget.config.jsonConfig.props,
     );
     const title = getWidgetTitle(widget.config.jsonConfig.props);
+    title.title = widget.config.name;
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
         <div style={ZIndexStyle}>

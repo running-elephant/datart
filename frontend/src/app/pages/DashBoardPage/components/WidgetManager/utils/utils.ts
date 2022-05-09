@@ -74,7 +74,7 @@ export const getWidgetTitle = props => {
     ['title', 'showTitle', 'textAlign', 'font'],
   );
   return {
-    title,
+    title: '',
     showTitle,
     textAlign,
     font,

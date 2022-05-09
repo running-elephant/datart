@@ -15,16 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  CanDropToWidgetTypes,
-  CONTAINER_TAB,
-} from 'app/pages/DashBoardPage/constants';
+import { CONTAINER_TAB } from 'app/pages/DashBoardPage/constants';
 import { memo, useMemo } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { ContainerItem } from '../../pages/Board/slice/types';
 import { editBoardStackActions } from '../../pages/BoardEditor/slice';
+import { DropItem } from './WidgetDndHandleMask';
 
 export interface DropHolderProps {
   tabItem: ContainerItem;
@@ -37,26 +35,20 @@ export const DropHolder: React.FC<DropHolderProps> = memo(
       () => ({
         accept: CONTAINER_TAB,
         item: { tabItem, parentId },
-        drop: item => {
-          console.log('__ drop item', item);
-          // return { tabItem, parentId };
+        drop: (dropItem: DropItem) => {
           dispatch(
             editBoardStackActions.addWidgetToTabWidget({
               parentId,
               tabItem: {
                 ...tabItem,
-                childWidgetId: parentId,
+                childWidgetId: dropItem.childId,
               },
-              sourceId: parentId,
+              sourceId: dropItem.childId,
             }),
           );
-          // return { tabItem, parentId };
         },
-        canDrop: (item: any) => {
-          if (CanDropToWidgetTypes.includes(item.type)) {
-            return true;
-          }
-          return false;
+        canDrop: (dropItem: DropItem) => {
+          return dropItem.canWrapped;
         },
         collect: (monitor: DropTargetMonitor) => ({
           isOver: monitor.isOver(),

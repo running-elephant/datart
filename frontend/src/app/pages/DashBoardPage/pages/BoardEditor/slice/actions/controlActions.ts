@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { ControllerFacadeTypes } from 'app/constants';
-import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
+import widgetManagerInstance from 'app/pages/DashBoardPage/components/WidgetManager';
 import { BoardType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editDashBoardInfoActions } from '..';
 import { PageInfo } from './../../../../../MainPage/pages/ViewPage/slice/types';
@@ -32,7 +32,7 @@ export const addControllerAction =
   (opt: BtnActionParams) => async (dispatch, getState) => {
     switch (opt.type) {
       case 'queryBtn':
-        const queryWidget = widgetManager.toolkit('queryBtn').create({
+        const queryWidget = widgetManagerInstance.toolkit('queryBtn').create({
           dashboardId: opt.boardId,
           boardType: opt.boardType,
         });
@@ -40,7 +40,7 @@ export const addControllerAction =
 
         break;
       case 'resetBtn':
-        const resetWidget = widgetManager.toolkit('resetBtn').create({
+        const resetWidget = widgetManagerInstance.toolkit('resetBtn').create({
           dashboardId: opt.boardId,
           boardType: opt.boardType,
         });

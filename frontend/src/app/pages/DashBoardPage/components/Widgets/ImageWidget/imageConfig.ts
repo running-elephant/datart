@@ -27,6 +27,7 @@ import {
   initPaddingTpl,
   initTitleTpl,
   initWidgetEditActionTpl,
+  initWidgetName,
   initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
@@ -34,7 +35,10 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
-
+const NameI18N = {
+  zh: '图片',
+  en: 'Image',
+};
 export const widgetMeta: WidgetMeta = {
   icon: 'img',
   widgetTypeId: 'image',
@@ -52,7 +56,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'zh-CN',
       translation: {
         desc: 'img',
-        widgetType: 'img',
+        widgetName: NameI18N.zh,
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
@@ -68,7 +72,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'en-US',
       translation: {
         desc: 'img',
-        widgetType: 'img',
+        widgetName: NameI18N.en,
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
@@ -95,6 +99,7 @@ export const widgetToolkit: ImageToolkit = {
     widget.relations = opt.relations || [];
     widget.config.widgetTypeId = widgetMeta.widgetTypeId;
     widget.config.type = 'media';
+    widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
       const rect: RectConfig = {
         x: 0,
@@ -121,13 +126,6 @@ export const widgetToolkit: ImageToolkit = {
       { ...initBorderTpl() },
     ];
     widget.config.jsonConfig.props?.forEach(ele => {
-      if (ele.key === 'titleGroup') {
-        ele.rows?.forEach(row => {
-          if (row.key === 'title') {
-            row.value = 'Image';
-          }
-        });
-      }
       if (ele.key === 'backgroundGroup') {
         ele.rows?.forEach(row => {
           if (row.key === 'background') {
@@ -138,6 +136,9 @@ export const widgetToolkit: ImageToolkit = {
     });
 
     return widget;
+  },
+  getName(key) {
+    return initWidgetName(NameI18N, key);
   },
   edit() {},
   save() {},

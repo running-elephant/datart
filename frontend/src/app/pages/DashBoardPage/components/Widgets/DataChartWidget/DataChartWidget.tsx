@@ -18,7 +18,6 @@
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import useRenderWidget from 'app/pages/DashBoardPage/hooks/useRenderWidget';
 import useWidgetAutoFetch from 'app/pages/DashBoardPage/hooks/useWidgetAutoFetch';
-import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { memo, useContext } from 'react';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
@@ -35,7 +34,7 @@ import { DataChartWidgetCore } from './DataChartWidgetCore';
 
 export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
-    const widget = useContext(WidgetContext) as unknown as Widget;
+    const widget = useContext(WidgetContext);
     const { rendered } = useContext(WidgetInfoContext);
     const { renderMode, boardType } = useContext(BoardContext);
     const { cacheWhRef } = useRenderWidget(
@@ -46,6 +45,7 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
     );
     useWidgetAutoFetch(widget, renderMode, cacheWhRef, rendered);
     const title = getWidgetTitle(widget.config.jsonConfig.props);
+    title.title = widget.config.name;
     const { background, border, padding } = getWidgetBaseStyle(
       widget.config.jsonConfig.props,
     );

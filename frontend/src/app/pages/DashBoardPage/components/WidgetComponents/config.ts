@@ -48,8 +48,8 @@ export type widgetActionType = typeof widgetActionTypes[number];
 export const widgetViewActionMap: Record<WidgetType, widgetActionType[]> = {
   chart: ['refresh', 'fullScreen'],
   media: ['fullScreen'],
-  container: ['info'],
-  controller: ['refresh'],
+  container: [],
+  controller: [],
   button: [],
 };
 // 编辑 edit

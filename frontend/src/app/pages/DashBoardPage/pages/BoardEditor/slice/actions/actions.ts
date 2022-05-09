@@ -19,7 +19,6 @@ import { ChartEditorBaseProps } from 'app/components/ChartEditor';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
-  ChartWidgetContent,
   Dashboard,
   DataChart,
   TabWidgetContent,
@@ -75,9 +74,9 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
   while (selectedIds.length > 0) {
     const id = selectedIds.pop();
 
-    if (!id) return;
+    if (!id) continue;
     const curWidget = widgetMap[id];
-    if (!curWidget) return;
+    if (!curWidget) continue;
 
     const widgetType = curWidget.config.type;
 
@@ -195,13 +194,14 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
   clipboardWidgetList.forEach(widget => {
     if (widget.selectedCopy) {
       const newWidget = cloneWidget(widget);
-      newWidgets.push(newWidget);
+
       if (newWidget.config.type === 'container') {
         const content = newWidget.config.content as TabWidgetContent;
         Object.values(content.itemMap).forEach(item => {
           if (item.childWidgetId) {
             const subWidget = clipboardWidgets[item.childWidgetId];
             const newSubWidget = cloneWidget(subWidget, newWidget.id);
+            item.childWidgetId = newSubWidget.id;
             newWidgets.push(newSubWidget);
           }
         });
@@ -212,10 +212,11 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
           ...dataChart,
           id: dataChart.id + Date.now() + '_copy',
         });
-        (newWidget.config.content as ChartWidgetContent).type = 'widgetChart';
+        newWidget.config.widgetTypeId = 'selfChart';
         newWidget.datachartId = newDataChart.id;
         dispatch(boardActions.setDataChartToMap([newDataChart]));
       }
+      newWidgets.push(newWidget);
     }
   });
   const widgetInfoMap: Record<string, WidgetInfo> = {};
@@ -230,7 +231,7 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
   //
   function cloneWidget(widget: WidgetOfCopy, pId?: string) {
     const newWidget = CloneValueDeep(widget);
-    newWidget.id = uuidv4();
+    newWidget.id = newWidget.config.widgetTypeId + '_' + uuidv4();
     newWidget.parentId = pId || '';
     newWidget.relations = [];
     newWidget.config.name += '_copy';

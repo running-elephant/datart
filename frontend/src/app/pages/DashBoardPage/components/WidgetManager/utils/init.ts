@@ -25,6 +25,7 @@ import type {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import type { ChartStyleConfig } from 'app/types/ChartConfig';
+import { getInitialLocale } from 'locales/i18n';
 import { uuidv4 } from 'utils/utils';
 
 export const initTitleTpl = () => {
@@ -33,12 +34,6 @@ export const initTitleTpl = () => {
     key: 'titleGroup',
     comType: 'group',
     rows: [
-      {
-        label: 'title.title',
-        key: 'title',
-        value: '',
-        comType: 'input',
-      },
       {
         label: 'title.showTitle',
         key: 'showTitle',
@@ -78,10 +73,10 @@ export const initTitleTpl = () => {
 };
 export const TitleI18N = {
   zh: {
-    titleGroup: '标题配置',
+    titleGroup: '标题格式',
     title: '标题',
     showTitle: '显示标题',
-    font: '标题字体',
+    font: '字体',
     textAlign: {
       textAlign: '对齐方式',
       left: '左对齐',
@@ -89,10 +84,10 @@ export const TitleI18N = {
     },
   },
   en: {
-    titleGroup: 'Title Config',
+    titleGroup: 'Title Format',
     title: 'Title',
     showTitle: 'Show Title',
-    font: 'Title Font',
+    font: 'Font',
     textAlign: {
       textAlign: 'Align',
       left: 'Left',
@@ -186,7 +181,7 @@ export const LoopFetchI18N = {
     interval: 'Interval (s)',
   },
 };
-export const initBackgroundTpl = () => {
+export const initBackgroundTpl = (color?: string) => {
   const backgroundTpl: ChartStyleConfig = {
     label: 'background.backgroundGroup',
     key: 'backgroundGroup',
@@ -196,7 +191,7 @@ export const initBackgroundTpl = () => {
         label: 'background.background',
         key: 'background',
         value: {
-          color: 'transparent', // TODO 根据当前主题色配置
+          color: color || 'transparent', // TODO 根据当前主题色配置
           image: '',
           size: '100% 100%',
           repeat: 'no-repeat',
@@ -340,4 +335,13 @@ export const widgetTpl = (): Widget => {
 
 export const initClientId = () => {
   return 'client_' + uuidv4();
+};
+export const initWidgetName = (i18nMap: object, local?: string) => {
+  if (local && i18nMap[local]) {
+    return i18nMap[local];
+  } else {
+    let key = getInitialLocale();
+    if (i18nMap[key]) return i18nMap[key];
+    return Object.values(i18nMap)?.[0];
+  }
 };

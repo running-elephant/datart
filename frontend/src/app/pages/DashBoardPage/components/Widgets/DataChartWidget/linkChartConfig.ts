@@ -17,18 +17,23 @@
  */
 
 import { WidgetToolkit } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { initWidgetName } from '../../WidgetManager/utils/init';
 import { dataChartCreator, getMeta } from './config';
 
+const NameI18N = {
+  zh: '引用图表',
+  en: 'LinkChart',
+};
 export const widgetMeta = getMeta({
   icon: 'linkChart',
   widgetTypeId: 'linkChart',
   zh: {
     desc: '引入图表部件的内部是一个引用的数据图表,原有数据图表有改动时,引入图表部件也会跟着改变',
-    widgetType: '引入图表',
+    widgetName: NameI18N.zh,
   },
   en: {
     desc: 'linkChart Widget core is a referenced dataChart,When the original dataChart is changed, the widget will also change',
-    widgetType: 'Link Chart',
+    widgetName: NameI18N.en,
   },
 });
 
@@ -39,6 +44,9 @@ export const linkChartToolkit: WidgetToolkit = {
       widgetTypeId: widgetMeta.widgetTypeId,
     });
     return widget;
+  },
+  getName(key) {
+    return initWidgetName(NameI18N, key);
   },
   edit() {},
   save() {},

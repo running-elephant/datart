@@ -21,7 +21,7 @@ import {
   WidgetMeta,
   WidgetTplProps,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
-import widgetManager from '../../WidgetManager';
+import widgetManagerInstance from '../../WidgetManager';
 import {
   initAutoWidgetRect,
   initBackgroundTpl,
@@ -46,11 +46,11 @@ export const getMeta = (opt: {
 
   zh: {
     desc: string;
-    widgetType: string;
+    widgetName: string;
   };
   en: {
     desc: string;
-    widgetType: string;
+    widgetName: string;
   };
 }) => {
   const meta: WidgetMeta = {
@@ -90,7 +90,7 @@ export const getMeta = (opt: {
         lang: 'zh-CN',
         translation: {
           desc: opt.zh.desc,
-          widgetType: opt.zh.widgetType,
+          widgetName: opt.zh.widgetName,
           action: {
             ...WidgetViewActionI18N.zh,
             ...WidgetEditActionI18N.zh,
@@ -111,7 +111,7 @@ export const getMeta = (opt: {
         lang: 'en-US',
         translation: {
           desc: opt.en.desc,
-          widgetType: opt.en.widgetType,
+          widgetName: opt.en.widgetName,
           action: {
             ...WidgetViewActionI18N.en,
             ...WidgetEditActionI18N.en,
@@ -142,8 +142,9 @@ export const dataChartCreator = (opt: WidgetTplProps) => {
   widget.relations = opt.relations || [];
   widget.config.widgetTypeId = opt.widgetTypeId;
   widget.config.type = 'chart';
-  widget.config.content.dataChart = opt.content; // DataChart
 
+  widget.config.content.dataChart = opt.content; // DataChart
+  widget.config.name = opt.name || opt.content?.name;
   widget.config.jsonConfig.props = [
     { ...initTitleTpl() },
     { ...initLoopFetchTpl() },
@@ -154,9 +155,6 @@ export const dataChartCreator = (opt: WidgetTplProps) => {
   widget.config.jsonConfig.props.forEach(ele => {
     if (ele.key === 'titleGroup') {
       ele.rows?.forEach(row => {
-        if (row.key === 'title') {
-          row.value = opt?.content?.name || '';
-        }
         if (row.key === 'showTitle') {
           row.value = true;
         }
@@ -173,7 +171,9 @@ export const dataChartCreator = (opt: WidgetTplProps) => {
 };
 export const getCanLinkageWidgets = (widgets: Widget[]) => {
   const canLinkWidgets = widgets.filter(widget => {
-    const linkable = widgetManager.meta(widget.config.widgetTypeId).linkable;
+    const linkable = widgetManagerInstance.meta(
+      widget.config.widgetTypeId,
+    ).linkable;
     if (!linkable) return false;
     if (widget.viewIds.length === 0) return false;
     return true;

@@ -15,16 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import checkboxGroupProto from '../Widgets/ControllerWidget/checkboxGroup';
-import dropdownListProto from '../Widgets/ControllerWidget/dropdownList';
-import multiDropdownListProto from '../Widgets/ControllerWidget/multiDropdownList';
-import radioGroupProto from '../Widgets/ControllerWidget/radioGroup';
-import rangeTimeProto from '../Widgets/ControllerWidget/rangeTimeProto';
-import rangeValueProto from '../Widgets/ControllerWidget/rangeValueProto';
-import sliderProto from '../Widgets/ControllerWidget/sliderProto';
-import textProto from '../Widgets/ControllerWidget/textProto';
-import timeProto from '../Widgets/ControllerWidget/timeProto';
-import valueProto from '../Widgets/ControllerWidget/valueProto';
+import checkboxGroupProto from '../Widgets/ControllerWidget/config/checkboxGroup';
+import dropdownListProto from '../Widgets/ControllerWidget/config/dropdownList';
+import multiDropdownListProto from '../Widgets/ControllerWidget/config/multiDropdownList';
+import radioGroupProto from '../Widgets/ControllerWidget/config/radioGroup';
+import rangeTimeProto from '../Widgets/ControllerWidget/config/rangeTimeProto';
+import rangeValueProto from '../Widgets/ControllerWidget/config/rangeValueProto';
+import sliderProto from '../Widgets/ControllerWidget/config/sliderProto';
+import textProto from '../Widgets/ControllerWidget/config/textProto';
+import timeProto from '../Widgets/ControllerWidget/config/timeProto';
+import valueProto from '../Widgets/ControllerWidget/config/valueProto';
 import linkChartProto from '../Widgets/DataChartWidget/linkChartConfig';
 import selfChartProto from '../Widgets/DataChartWidget/selfChartConfig1';
 import iframeProto from '../Widgets/IframeWidget/iframeConfig';
@@ -35,10 +35,10 @@ import richTextProto from '../Widgets/RichTextWidget/richTextConfig';
 import tabProto from '../Widgets/TabWidget/tabConfig1';
 import timerProto from '../Widgets/TimerWidget/timerConfig';
 import videoProto from '../Widgets/VideoWidget/videoConfig';
-import { WidgetManager } from './WidgetManager';
+import { widgetManagerInstance as widgetManager } from './WidgetManager';
 
 // -- chart
-const widgetManager = WidgetManager.getInstance();
+
 widgetManager.register(linkChartProto);
 widgetManager.register(selfChartProto);
 

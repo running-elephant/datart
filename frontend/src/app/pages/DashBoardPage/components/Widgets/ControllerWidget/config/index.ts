@@ -32,8 +32,8 @@ import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import { uuidv4 } from 'utils/utils';
-import widgetManager from '../../WidgetManager';
-import { initTitleTpl, widgetTpl } from '../../WidgetManager/utils/init';
+import widgetManagerInstance from '../../../WidgetManager';
+import { initTitleTpl, widgetTpl } from '../../../WidgetManager/utils/init';
 
 export const controlWidgetTpl = (opt: WidgetCreateProps) => {
   const widget = widgetTpl();
@@ -43,8 +43,7 @@ export const controlWidgetTpl = (opt: WidgetCreateProps) => {
   widget.datachartId = opt.datachartId || '';
   widget.viewIds = opt.viewIds || [];
   widget.relations = opt.relations || [];
-  // widget.config.controllable = true;
-  // widget.config.canWrapped = false;
+
   widget.config.content = opt.content;
   widget.config.type = 'controller';
   if (opt.boardType === 'auto') {
@@ -72,7 +71,7 @@ export const controlWidgetTpl = (opt: WidgetCreateProps) => {
 };
 export const getCanLinkControlWidgets = (widgets: Widget[]) => {
   const canLinkWidgets = widgets.filter(widget => {
-    const controllable = widgetManager.meta(
+    const controllable = widgetManagerInstance.meta(
       widget.config.widgetTypeId,
     ).controllable;
     if (!controllable) return false;

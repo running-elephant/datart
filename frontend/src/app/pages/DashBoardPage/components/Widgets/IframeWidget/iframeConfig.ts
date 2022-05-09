@@ -28,6 +28,7 @@ import {
   initPaddingTpl,
   initTitleTpl,
   initWidgetEditActionTpl,
+  initWidgetName,
   initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
@@ -60,8 +61,12 @@ const iframeI18N = {
     src: 'URL', // Source?
   },
 };
+const NameI18N = {
+  zh: '嵌入页',
+  en: 'Embed',
+};
 export const widgetMeta: WidgetMeta = {
-  icon: 'iframe',
+  icon: 'embed',
   widgetTypeId: 'iframe',
   canWrapped: true,
   controllable: false,
@@ -77,7 +82,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'zh-CN',
       translation: {
         desc: 'iframe',
-        widgetType: 'iframe',
+        widgetName: NameI18N.zh,
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
@@ -93,7 +98,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'en-US',
       translation: {
         desc: 'iframe',
-        widgetType: 'iframe',
+        widgetName: NameI18N.en,
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
@@ -123,6 +128,7 @@ const widgetToolkit: IframeWidgetToolKit = {
     widget.relations = opt.relations || [];
     widget.config.widgetTypeId = widgetMeta.widgetTypeId;
     widget.config.type = 'media';
+    widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
       widget.config.rect = { ...initAutoWidgetRect() };
       widget.config.mRect = { ...initAutoWidgetRect() };
@@ -137,17 +143,11 @@ const widgetToolkit: IframeWidgetToolKit = {
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
     ];
-    widget.config.jsonConfig.props?.forEach(ele => {
-      if (ele.key === 'titleGroup') {
-        ele.rows?.forEach(row => {
-          if (row.key === 'title') {
-            row.value = 'iframe';
-          }
-        });
-      }
-    });
 
     return widget;
+  },
+  getName(key) {
+    return initWidgetName(NameI18N, key);
   },
   edit() {},
   save() {},

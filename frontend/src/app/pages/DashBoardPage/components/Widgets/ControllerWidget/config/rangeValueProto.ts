@@ -21,24 +21,26 @@ import {
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { controlWidgetTpl } from '.';
 import {
   initBackgroundTpl,
   initBorderTpl,
-  initLoopFetchTpl,
   initPaddingTpl,
   initWidgetEditActionTpl,
+  initWidgetName,
   initWidgetViewActionTpl,
-  LoopFetchI18N,
   PaddingI18N,
   TitleI18N,
   WidgetEditActionI18N,
   WidgetViewActionI18N,
-} from '../../WidgetManager/utils/init';
-import { controlWidgetTpl } from './controllerConfig';
-
+} from '../../../WidgetManager/utils/init';
+const NameI18N = {
+  zh: '数值范围',
+  en: 'RangeValue',
+};
 export const widgetMeta: WidgetMeta = {
   icon: '',
-  widgetTypeId: ControllerFacadeTypes.MultiDropdownList,
+  widgetTypeId: ControllerFacadeTypes.RangeValue,
   canWrapped: true,
   controllable: true,
   linkable: false,
@@ -53,7 +55,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'zh-CN',
       translation: {
         desc: '',
-        widgetType: '',
+        widgetName: NameI18N.zh,
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
@@ -61,7 +63,7 @@ export const widgetMeta: WidgetMeta = {
         title: TitleI18N.zh,
         background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
-        loopFetch: LoopFetchI18N.zh,
+
         border: { borderGroup: '边框' },
       },
     },
@@ -69,7 +71,7 @@ export const widgetMeta: WidgetMeta = {
       lang: 'en-US',
       translation: {
         desc: '',
-        widgetType: '',
+        widgetName: NameI18N.en,
         action: {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
@@ -77,7 +79,7 @@ export const widgetMeta: WidgetMeta = {
         title: TitleI18N.en,
         background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
-        loopFetch: LoopFetchI18N.en,
+
         border: { borderGroup: 'Border' },
       },
     },
@@ -89,18 +91,15 @@ export const widgetToolkit: WidgetToolkit = {
     const widget = controlWidgetTpl(opt);
     widget.id = widgetMeta.widgetTypeId + widget.id;
     widget.config.widgetTypeId = widgetMeta.widgetTypeId;
+    widget.config.name = opt.name || '';
     const addProps = [
-      { ...initBackgroundTpl() },
+      { ...initBackgroundTpl('#fff') },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
-      { ...initLoopFetchTpl() },
     ];
     widget.config.jsonConfig.props?.forEach(ele => {
       if (ele.key === 'titleGroup') {
         ele.rows?.forEach(row => {
-          if (row.key === 'title') {
-            row.value = widget.config.content?.name;
-          }
           if (row.key === 'showTitle') {
             row.value = true;
           }
@@ -110,6 +109,9 @@ export const widgetToolkit: WidgetToolkit = {
     widget.config.jsonConfig.props =
       widget.config.jsonConfig.props?.concat(addProps);
     return widget;
+  },
+  getName(key) {
+    return initWidgetName(NameI18N, key);
   },
   edit() {},
   save() {},
@@ -124,9 +126,9 @@ export const widgetToolkit: WidgetToolkit = {
   // //
 };
 
-const multiDropdownListProto = {
+const rangeValueProto = {
   widgetTypeId: widgetMeta.widgetTypeId,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };
-export default multiDropdownListProto;
+export default rangeValueProto;

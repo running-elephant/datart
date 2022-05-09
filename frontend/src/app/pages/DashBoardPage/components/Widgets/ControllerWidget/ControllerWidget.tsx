@@ -18,7 +18,6 @@
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import useRenderWidget from 'app/pages/DashBoardPage/hooks/useRenderWidget';
 import useWidgetAutoFetch from 'app/pages/DashBoardPage/hooks/useWidgetAutoFetch';
-import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { memo, useContext } from 'react';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
@@ -30,7 +29,7 @@ import { ToolBar } from './components/ToolBar';
 import { ControllerWidgetCore } from './ControllerWidgetCore';
 
 export const ControllerWidget: React.FC<{}> = memo(() => {
-  const widget = useContext(WidgetContext) as unknown as Widget;
+  const widget = useContext(WidgetContext);
   const { rendered } = useContext(WidgetInfoContext);
   const { renderMode, boardType } = useContext(BoardContext);
   const { cacheWhRef } = useRenderWidget(

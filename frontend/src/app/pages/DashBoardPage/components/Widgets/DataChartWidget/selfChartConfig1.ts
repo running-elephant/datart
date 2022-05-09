@@ -17,18 +17,22 @@
  */
 
 import { WidgetToolkit } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { initWidgetName } from '../../WidgetManager/utils/init';
 import { dataChartCreator, getMeta } from './config';
-
+const NameI18N = {
+  zh: '自建数据图表',
+  en: 'SelfChart',
+};
 const widgetMeta = getMeta({
   icon: 'selfChart',
   widgetTypeId: 'selfChart',
   zh: {
     desc: '自建数据图表的内部是一个独立的数据图表 ',
-    widgetType: '自建数据图表',
+    widgetName: NameI18N.zh,
   },
   en: {
     desc: 'selfChart Widget core is a independent dataChart',
-    widgetType: 'Link Chart',
+    widgetName: NameI18N.en,
   },
 });
 export type SelfChartToolkit = WidgetToolkit & {};
@@ -39,6 +43,9 @@ const widgetToolkit: SelfChartToolkit = {
       widgetTypeId: widgetMeta.widgetTypeId,
     });
     return widget;
+  },
+  getName(key) {
+    return initWidgetName(NameI18N, key);
   },
   edit() {},
   save() {},

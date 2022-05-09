@@ -84,7 +84,7 @@ export const FullScreenPanel: React.FC<{}> = memo(() => {
           boardEditing={false}
           boardId={boardId}
         >
-          <WidgetMapper boardEditing={true} hideTitle={false} />
+          <WidgetMapper boardEditing={true} hideTitle={true} />
         </WidgetWrapProvider>
       );
     }

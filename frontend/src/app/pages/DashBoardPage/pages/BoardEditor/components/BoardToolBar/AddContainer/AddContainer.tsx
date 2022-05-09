@@ -19,7 +19,7 @@ import { ContainerOutlined } from '@ant-design/icons';
 import { Dropdown, Menu, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
+import widgetManagerInstance from 'app/pages/DashBoardPage/components/WidgetManager';
 import { LightWidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
@@ -35,7 +35,7 @@ export const AddContainer: React.FC<{}> = () => {
       const [type] = keyPath;
       console.log('__ type', type);
 
-      let widget = widgetManager.toolkit('tab').create({
+      let widget = widgetManagerInstance.toolkit('tab').create({
         dashboardId: boardId,
         boardType: boardType,
         relations: [],

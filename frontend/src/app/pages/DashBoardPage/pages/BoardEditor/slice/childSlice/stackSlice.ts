@@ -17,7 +17,7 @@
  */
 
 import { PayloadAction } from '@reduxjs/toolkit';
-import { getWidgetTitle } from 'app/pages/DashBoardPage/components/WidgetManager/utils/utils';
+import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import {
   ContainerItem,
   Dashboard,
@@ -90,29 +90,21 @@ export const editBoardStackSlice = createSlice({
     // Widget
     addWidgets(state, action: PayloadAction<Widget[]>) {
       const widgets = action.payload;
-      let maxWidgetIndex = state.dashBoard.config.maxWidgetIndex || 0;
+      let { maxWidgetIndex, type } = state.dashBoard.config;
+
       widgets.forEach(ele => {
         maxWidgetIndex++;
-        const widget = produce(ele, draft => {
+        const newName = widgetManager
+          .toolkit(ele.config.widgetTypeId)
+          .getName();
+        const newEle = produce(ele, draft => {
           draft.config.index = maxWidgetIndex;
-          //  draft.config.name =
-          //    ele.config.name ||
-          //    getDefaultWidgetName(
-          //      ele.config.type,
-          //      ele.config.content.type,
-          //      maxWidgetIndex,
-          //    );
+          draft.config.name =
+            draft.config.name || `${newName}_${maxWidgetIndex}`;
+          draft.config.boardType = type;
         });
-        state.widgetRecord[widget.id] = widget;
-        //  ele.config.index = maxWidgetIndex;
-        // ele.config.name =
-        //   ele.config.name ||
-        //   getDefaultWidgetName(
-        //     ele.config.type,
-        //     ele.config.content.type,
-        //     maxWidgetIndex,
-        //   );
-        // state.widgetRecord[ele.id] = ele;
+
+        state.widgetRecord[newEle.id] = newEle;
       });
       state.dashBoard.config.maxWidgetIndex = maxWidgetIndex;
     },
@@ -137,7 +129,7 @@ export const editBoardStackSlice = createSlice({
       const widget = action.payload;
       state.widgetRecord[widget.id] = widget;
     },
-    updateWidgetConfigByKey(
+    updateWidgetConfigByPath(
       state,
       action: PayloadAction<{
         wid: string;
@@ -175,6 +167,14 @@ export const editBoardStackSlice = createSlice({
     ) {
       const { wid, config } = action.payload;
       state.widgetRecord[wid].config = config;
+    },
+    updateWidgetConfigByKey(
+      state,
+      action: PayloadAction<{ wid: string; key: string; val }>,
+    ) {
+      const { wid, key, val } = action.payload;
+      if (!state.widgetRecord?.[wid]?.config) return;
+      state.widgetRecord[wid].config[key] = val;
     },
     updateWidgetsConfig(state, action: PayloadAction<updateWidgetConf[]>) {
       const nextWidgetConfigs = action.payload;
@@ -246,12 +246,10 @@ export const editBoardStackSlice = createSlice({
       const { parentId, tabItem, sourceId } = action.payload;
       const tabContent = state.widgetRecord[parentId].config
         .content as TabWidgetContent;
-      const sourceWidget = state.widgetRecord[sourceId] as unknown as Widget;
-      let tabName =
-        getWidgetTitle(sourceWidget.config?.jsonConfig?.props).title || 'tab*';
+      const sourceWidget = state.widgetRecord[sourceId];
       tabContent.itemMap[sourceWidget.config.clientId] = {
         ...tabItem,
-        name: tabName,
+        name: sourceWidget.config.name,
         tabId: sourceWidget.config.clientId,
         childWidgetId: sourceWidget.id,
       };

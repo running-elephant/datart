@@ -15,14 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { iframeWidgetToolKit } from './iframeConfig';
 
 export const IframeWidgetCore: React.FC<{}> = memo(() => {
-  const widget = useContext(WidgetContext) as unknown as Widget;
+  const widget = useContext(WidgetContext);
   // getWidgetIframe;
   const iframeVal = iframeWidgetToolKit.getIframe(
     widget.config.jsonConfig.props,
