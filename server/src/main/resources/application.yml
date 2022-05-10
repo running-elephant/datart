@@ -85,6 +85,8 @@ datart:
 
   admin-id: datart-admin
 
+  migration:
+    enable: true
 
 server:
   port: 8080
