@@ -155,9 +155,10 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
         requirePermission(schedule, Const.CREATE);
 
         schedule.setCreateBy(getCurrentUser().getId());
-        if (schedule.getIsFolder()) {
+        if (Objects.equals(schedule.getIsFolder(), Boolean.TRUE)) {
             schedule.setType(ResourceType.FOLDER.name());
         } else {
+            schedule.setIsFolder(Boolean.FALSE);
             schedule.setType(scheduleCreateParam.getType().name());
         }
         schedule.setCreateTime(new Date());
