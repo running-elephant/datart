@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { WidgetTypeIdMap } from 'app/pages/DashBoardPage/constants';
 import { WidgetToolkit } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { initWidgetName } from '../../WidgetManager/utils/init';
 import { dataChartCreator, getMeta } from './config';
@@ -26,7 +27,7 @@ const NameI18N = {
 };
 export const widgetMeta = getMeta({
   icon: 'linkChart',
-  widgetTypeId: 'linkChart',
+  widgetTypeId: WidgetTypeIdMap.linkChart,
   zh: {
     desc: '引入图表部件的内部是一个引用的数据图表,原有数据图表有改动时,引入图表部件也会跟着改变',
     widgetName: NameI18N.zh,

@@ -72,6 +72,35 @@ export const BOARD_UNDO = {
   redo: 'EDITOR_REDO',
 };
 
+export const WidgetTypeIdMap = {
+  linkChart: 'linkChart',
+  selfChart: 'selfChart',
+
+  tab: 'tab',
+
+  image: 'image',
+  video: 'video',
+  timer: 'timer',
+  richText: 'richText',
+  iframe: 'iframe',
+
+  queryBtn: 'queryBtn',
+  resetBtn: 'resetBtn',
+
+  dropdownList: ControllerFacadeTypes.DropdownList,
+  multiDropdownList: ControllerFacadeTypes.MultiDropdownList,
+  checkboxGroup: ControllerFacadeTypes.CheckboxGroup,
+  radioGroup: ControllerFacadeTypes.RadioGroup,
+  text: ControllerFacadeTypes.Text,
+  time: ControllerFacadeTypes.Time,
+  rangeTime: ControllerFacadeTypes.RangeTime,
+  rangeValue: ControllerFacadeTypes.RangeValue,
+  value: ControllerFacadeTypes.Value,
+  slider: ControllerFacadeTypes.Slider,
+
+  // custom: 'custom', TODO:
+};
+
 export const BackgroundDefault: BackgroundConfig = {
   color: 'transparent',
   image: '',

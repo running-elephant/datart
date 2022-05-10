@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { WidgetTypeIdMap } from 'app/pages/DashBoardPage/constants';
 import { WidgetToolkit } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { initWidgetName } from '../../WidgetManager/utils/init';
 import { dataChartCreator, getMeta } from './config';
@@ -25,7 +26,7 @@ const NameI18N = {
 };
 const widgetMeta = getMeta({
   icon: 'selfChart',
-  widgetTypeId: 'selfChart',
+  widgetTypeId: WidgetTypeIdMap.selfChart,
   zh: {
     desc: '自建数据图表的内部是一个独立的数据图表 ',
     widgetName: NameI18N.zh,

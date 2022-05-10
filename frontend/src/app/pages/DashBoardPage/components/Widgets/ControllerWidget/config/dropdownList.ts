@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ControllerFacadeTypes } from 'app/constants';
+import { WidgetTypeIdMap } from 'app/pages/DashBoardPage/constants';
 import {
   WidgetMeta,
   WidgetToolkit,
@@ -42,7 +42,7 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: 'dropdownList',
-  widgetTypeId: ControllerFacadeTypes.DropdownList,
+  widgetTypeId: WidgetTypeIdMap.dropdownList,
   canWrapped: true,
   controllable: true,
   linkable: false,

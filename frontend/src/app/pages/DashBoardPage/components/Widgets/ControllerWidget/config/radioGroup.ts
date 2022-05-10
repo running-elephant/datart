@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ControllerFacadeTypes } from 'app/constants';
+import { WidgetTypeIdMap } from 'app/pages/DashBoardPage/constants';
 import {
   WidgetMeta,
   WidgetToolkit,
@@ -43,7 +43,7 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: '',
-  widgetTypeId: ControllerFacadeTypes.RadioGroup,
+  widgetTypeId: WidgetTypeIdMap.radioGroup,
   canWrapped: true,
   controllable: true,
   linkable: false,

@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { WidgetTypeIdMap } from 'app/pages/DashBoardPage/constants';
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetMeta,
@@ -41,7 +42,7 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: 'img',
-  widgetTypeId: 'image',
+  widgetTypeId: WidgetTypeIdMap.image,
   canWrapped: true,
   controllable: false,
   linkable: false,

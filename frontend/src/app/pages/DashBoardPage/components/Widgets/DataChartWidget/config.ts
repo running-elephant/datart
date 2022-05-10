@@ -42,7 +42,7 @@ import {
 
 export const getMeta = (opt: {
   icon: any;
-  widgetTypeId: 'linkChart' | 'selfChart';
+  widgetTypeId: string;
 
   zh: {
     desc: string;

@@ -16,7 +16,10 @@
  * limitations under the License.
  */
 import { FontDefault } from 'app/constants';
-import { TimeDefault } from 'app/pages/DashBoardPage/constants';
+import {
+  TimeDefault,
+  WidgetTypeIdMap,
+} from 'app/pages/DashBoardPage/constants';
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetMeta,
@@ -79,7 +82,7 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: 'timer',
-  widgetTypeId: 'timer',
+  widgetTypeId: WidgetTypeIdMap.timer,
   canWrapped: true,
   controllable: false,
   linkable: false,

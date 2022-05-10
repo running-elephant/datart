@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { WidgetTypeIdMap } from 'app/pages/DashBoardPage/constants';
 import { TabWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetMeta,
@@ -44,7 +45,7 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: '',
-  widgetTypeId: 'tab',
+  widgetTypeId: WidgetTypeIdMap.tab,
   canWrapped: false,
   controllable: false,
   linkable: false,

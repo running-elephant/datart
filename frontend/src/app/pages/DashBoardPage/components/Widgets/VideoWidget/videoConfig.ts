@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { WidgetTypeIdMap } from 'app/pages/DashBoardPage/constants';
 import type {
   WidgetMeta,
   WidgetToolkit,
@@ -68,7 +69,7 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: 'video',
-  widgetTypeId: 'video',
+  widgetTypeId: WidgetTypeIdMap.video,
   canWrapped: true,
   controllable: false,
   linkable: false,
