@@ -122,7 +122,6 @@ export const LayerList: React.FC<{}> = memo(() => {
       </WidgetWrapProvider>
     ));
   const t = useI18NPrefix(`viz.board.action`);
-
   return (
     <DndProvider backend={HTML5Backend}>
       <Wrapper onClick={clearSelectedWidgets}>
