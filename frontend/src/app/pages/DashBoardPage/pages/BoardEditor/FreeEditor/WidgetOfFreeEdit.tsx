@@ -175,7 +175,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
         lockAspectRatio={false}
       >
         <ItemWrap style={style} onClick={ssp}>
-          <WidgetMapper boardType="free" boardEditing={true} />
+          <WidgetMapper boardEditing={true} hideTitle={false} />
         </ItemWrap>
       </Resizable>
     </DraggableCore>

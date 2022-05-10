@@ -896,7 +896,7 @@
     "board": {
       "action": {
         "dataChart": "DataChart",
-        "ImportExistingDataCharts": "Import Existing DataCharts",
+        "importExistingDataCharts": "Import Existing DataCharts",
         "createDataChartInBoard": "Create DataChart In Board",
         "searchValue": "Search keywords",
         "media": "Media",
@@ -979,7 +979,9 @@
         "delPageTip": "Confirm to delete this story page?",
         "enterHere": "Enter here",
         "storyName": "Name",
-        "storyDescription": "Description"
+        "storyDescription": "Description",
+        "format": "Format",
+        "interval": "Interval"
       }
     },
     "widget": {
@@ -994,8 +996,8 @@
         "media": "Media",
         "container": "Container",
         "controller": "Controller",
-        "query": "Query",
-        "reset": "Reset",
+        "queryBtn": "Query",
+        "resetBtn": "Reset",
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",

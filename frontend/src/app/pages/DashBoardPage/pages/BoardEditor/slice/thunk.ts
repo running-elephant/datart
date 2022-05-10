@@ -4,6 +4,8 @@ import {
   boardDrillManager,
   EDIT_PREFIX,
 } from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
+import widgetManagerInstance from 'app/pages/DashBoardPage/components/WidgetManager';
+import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/components/Widgets/ControllerWidget/config';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
@@ -12,9 +14,9 @@ import {
   getDataOption,
   SaveDashboard,
   ServerDatachart,
-  Widget,
   WidgetData,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getChartWidgetRequestParams } from 'app/pages/DashBoardPage/utils';
 import {
   getChartDataView,
@@ -29,8 +31,6 @@ import {
   getWidgetInfoMapByServer,
   getWidgetMap,
 } from 'app/pages/DashBoardPage/utils/widget';
-import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
-import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
@@ -99,7 +99,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
     );
 
     const dashboard = getDashBoardByResBoard(data);
-
+    const boardType = dashboard.config.type;
     const {
       datacharts: serverDataCharts,
       views: serverViews,
@@ -109,8 +109,9 @@ export const fetchEditBoardDetail = createAsyncThunk<
     const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
     const migratedWidgets = migrateWidgets(serverWidgets);
     const { widgetMap, wrappedDataCharts } = getWidgetMap(
-      migratedWidgets,
+      migratedWidgets, //todo
       dataCharts,
+      boardType,
     );
     const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
     // TODO xld migration about filter
@@ -193,7 +194,8 @@ export const toUpdateDashboard = createAsyncThunk<
  */
 export const addWidgetsToEditBoard = createAsyncThunk<
   null,
-  Widget[],
+  any,
+  // IWidget[],
   { state: RootState }
 >('editBoard/addWidgetsToEditBoard', (widgets, { getState, dispatch }) => {
   const { dashBoard } = editBoardStackState(
@@ -242,13 +244,16 @@ export const addDataChartWidgets = createAsyncThunk<
     dispatch(boardActions.setViewMap(viewViews));
 
     const widgets = chartIds.map(dcId => {
-      let widget = widgetToolKit.chart.create({
+      const dataChart = dataChartMap[dcId];
+      const viewIds = dataChart.viewId ? [dataChart.viewId] : [];
+      let widget = widgetManagerInstance.toolkit('linkedChart').create({
         dashboardId: boardId,
         boardType: boardType,
-        dataChartId: dcId,
-        dataChartConfig: dataChartMap[dcId],
-        viewId: dataChartMap[dcId].viewId,
-        subType: 'dataChart',
+        datachartId: dcId,
+        relations: [],
+        name: dataChart.name,
+        content: dataChartMap[dcId],
+        viewIds: viewIds,
       });
       return widget;
     });
@@ -282,13 +287,14 @@ export const addWrapChartWidget = createAsyncThunk<
     const viewViews = view ? [view] : [];
     dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
-    let widget = widgetToolKit.chart.create({
+    let widget = widgetManagerInstance.toolkit('ownedChart').create({
       dashboardId: boardId,
       boardType: boardType,
-      dataChartId: chartId,
-      viewId: view?.id || '',
-      dataChartConfig: dataChart,
-      subType: 'widgetChart',
+      datachartId: chartId,
+      relations: [],
+      name: dataChart.name,
+      content: dataChart,
+      viewIds: view?.id ? [view.id] : [],
     });
     dispatch(addWidgetsToEditBoard([widget]));
     dispatch(addVariablesToBoard(view?.variables));
@@ -318,14 +324,18 @@ export const addChartWidget = createAsyncThunk<
     const viewViews = [view];
     dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
-    let widget = widgetToolKit.chart.create({
+
+    const widgetTypeId = subType === 'dataChart' ? 'linkedChart' : 'ownedChart';
+
+    let widget = widgetManagerInstance.toolkit(widgetTypeId).create({
       dashboardId: boardId,
       boardType: boardType,
-      dataChartId: chartId,
-      viewId: view.id,
-      dataChartConfig: dataChart,
-      subType,
+      datachartId: chartId,
+      relations: [],
+      content: dataChart,
+      viewIds: view.id ? [view.id] : [],
     });
+
     dispatch(addWidgetsToEditBoard([widget]));
     dispatch(addVariablesToBoard(view.variables));
     return null;
@@ -493,7 +503,6 @@ export const getEditControllerOptions = createAsyncThunk<
   async (widgetId, { getState, dispatch }) => {
     dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
     const rootState = getState() as RootState;
-
     const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
     const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
     const widget = widgetMap[widgetId];
@@ -514,7 +523,6 @@ export const getEditControllerOptions = createAsyncThunk<
       curWidget: widget,
       widgetMap,
     });
-
     if (!requestParams) {
       return null;
     }

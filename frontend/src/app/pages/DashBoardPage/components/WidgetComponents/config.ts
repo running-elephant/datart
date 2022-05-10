@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import { Widget, WidgetType } from '../../pages/Board/slice/types';
+import { WidgetType } from '../../pages/Board/slice/types';
+import { Widget } from '../../types/widgetTypes';
 export interface WidgetActionListItem<T> {
   key: T;
   label: string;
@@ -47,10 +48,9 @@ export type widgetActionType = typeof widgetActionTypes[number];
 export const widgetViewActionMap: Record<WidgetType, widgetActionType[]> = {
   chart: ['refresh', 'fullScreen'],
   media: ['fullScreen'],
-  container: ['info'],
-  controller: ['refresh'],
-  query: [],
-  reset: [],
+  container: [],
+  controller: [],
+  button: [],
 };
 // 编辑 edit
 export const widgetEditActionMap: Record<WidgetType, widgetActionType[]> = {
@@ -58,8 +58,7 @@ export const widgetEditActionMap: Record<WidgetType, widgetActionType[]> = {
   media: ['edit', 'lock', 'delete'],
   controller: ['refresh', 'edit', 'lock', 'delete'],
   container: ['edit', 'lock', 'delete'],
-  query: ['lock', 'delete'],
-  reset: ['lock', 'delete'],
+  button: ['lock', 'delete'],
 };
 
 export const widgetActionMap = {
@@ -104,13 +103,13 @@ export const getWidgetActionList = (opt: {
       return getEditChartActionList({ allList, widget, chartGraphId });
     } else {
       return allList.filter(item =>
-        widgetActionMap.edit[widgetType].includes(item.key),
+        widgetActionMap.edit?.[widgetType]?.includes(item.key),
       );
     }
   } else {
     // 浏览模式
     return allList.filter(item =>
-      widgetActionMap.view[widgetType].includes(item.key),
+      widgetActionMap.view?.[widgetType]?.includes(item.key),
     );
   }
 };

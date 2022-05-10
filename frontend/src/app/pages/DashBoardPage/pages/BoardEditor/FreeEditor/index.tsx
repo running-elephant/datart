@@ -17,7 +17,7 @@
  */
 
 import { Layout } from 'antd';
-import React from 'react';
+import { memo } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
@@ -26,7 +26,7 @@ import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
 import { FreeBoardEditor } from './FreeBoardEditor';
 
-export const FreeEditor: React.FC = () => {
+export const FreeEditor: React.FC = memo(() => {
   const dispatch = useDispatch();
   const clearSelectedWidgets = e => {
     e.stopPropagation();
@@ -46,7 +46,7 @@ export const FreeEditor: React.FC = () => {
       </Wrapper>
     </Layout>
   );
-};
+});
 
 const Wrapper = styled.div`
   display: flex;

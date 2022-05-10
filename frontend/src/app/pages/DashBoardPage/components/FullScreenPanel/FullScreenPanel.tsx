@@ -17,22 +17,24 @@
  */
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button, Menu } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   makeSelectBoardFullScreenPanelById,
   selectBoardWidgetMapById,
 } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
-import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import {
+  BoardState,
+  WidgetType,
+} from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { memo, useCallback, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { LEVEL_10, LEVEL_100, SPACE_LG, SPACE_SM } from 'styles/StyleConstants';
-import { CanFullScreenWidgetTypes } from '../../constants';
 import { BoardContext } from '../BoardProvider/BoardProvider';
-import { FullScreenWidgetMapper } from './FullScreenWidgetMapper';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
-
+import { WidgetMapper } from '../WidgetMapper/WidgetMapper';
+const CanFullScreenWidgetTypes: WidgetType[] = ['chart', 'media'];
 export const FullScreenPanel: React.FC<{}> = memo(() => {
   const { boardId, boardType } = useContext(BoardContext);
   const dispatch = useDispatch();
@@ -82,12 +84,12 @@ export const FullScreenPanel: React.FC<{}> = memo(() => {
           boardEditing={false}
           boardId={boardId}
         >
-          <FullScreenWidgetMapper boardEditing={false} boardType={boardType} />
+          <WidgetMapper boardEditing={true} hideTitle={true} />
         </WidgetWrapProvider>
       );
     }
-  }, [boardId, boardType, itemId, widgetMap]);
-  
+  }, [boardId, itemId, widgetMap]);
+
   const t = useI18NPrefix(`viz.widget.action`);
 
   return (

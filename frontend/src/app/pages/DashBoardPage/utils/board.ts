@@ -26,11 +26,11 @@ import {
   DeviceType,
   ServerDashboard,
   ServerDatachart,
-  Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataView } from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
 import { transformMeta } from 'app/utils/internalChartHelper';
+import { adaptBoardImageUrl } from '.';
 import { BoardConfigValue } from '../components/BoardProvider/BoardConfigProvider';
 import {
   AutoBoardWidgetBackgroundDefault,
@@ -38,38 +38,37 @@ import {
   LAYOUT_COLS_MAP,
   MIN_MARGIN,
   MIN_PADDING,
-  NeedFetchWidgetTypes,
 } from '../constants';
+import { BoardConfig } from '../types/boardTypes';
+import { Widget } from '../types/widgetTypes';
 import { initAutoBoardConfig } from './autoBoard';
 import { initFreeBoardConfig } from './freeBoard';
 
 export const getDashBoardByResBoard = (data: ServerDashboard): Dashboard => {
-  const {
-    id,
-    name,
-    orgId,
-    parentId,
-    status,
-    thumbnail,
-    index,
-    config,
-    permissions,
-    queryVariables,
-  } = data;
   return {
-    id,
-    queryVariables,
-    name,
-    orgId,
-    parentId,
-    status,
-    thumbnail,
-    index,
-    config: migrateBoardConfig(config),
-    permissions,
+    id: data.id,
+    queryVariables: data.queryVariables,
+    name: data.name,
+    orgId: data.orgId,
+    parentId: data.parentId,
+    status: data.status,
+    thumbnail: data.thumbnail,
+    index: data.index,
+    config: preprocessBoardConfig(migrateBoardConfig(data.config), data.id),
+    permissions: data.permissions,
   };
 };
-
+export const preprocessBoardConfig = (config: BoardConfig, boardId: string) => {
+  config.jsonConfig.props.forEach(item => {
+    if (item.key === 'background') {
+      const rowsValue = item?.rows?.[0]?.value;
+      if (rowsValue?.image) {
+        rowsValue.image = adaptBoardImageUrl(rowsValue.image, boardId);
+      }
+    }
+  });
+  return config;
+};
 export const getScheduleBoardInfo = (
   boardInfo: BoardInfo,
   widgetMap: Record<string, Widget>,
@@ -77,11 +76,7 @@ export const getScheduleBoardInfo = (
   let newBoardInfo: BoardInfo = { ...boardInfo };
   const needFetchItems = Object.values(widgetMap)
     .filter(widget => {
-      if (
-        widget.viewIds &&
-        widget.viewIds.length > 0 &&
-        NeedFetchWidgetTypes.includes(widget.config.type)
-      ) {
+      if (widget.viewIds && widget.viewIds.length > 0) {
         return true;
       }
       return false;

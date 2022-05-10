@@ -19,10 +19,10 @@
 import {
   BoardInfo,
   Dashboard,
-  Widget,
   WidgetData,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { StateWithHistory } from 'redux-undo';
 
 export interface EditBoardState {

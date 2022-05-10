@@ -17,10 +17,8 @@
  */
 import { WidgetActionDropdown } from 'app/pages/DashBoardPage/components/WidgetComponents/WidgetActionDropdown';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import {
-  Widget,
-  WidgetType,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import classNames from 'classnames';
 import { XYCoord } from 'dnd-core';
 import { useCallback, useContext, useRef } from 'react';

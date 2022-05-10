@@ -16,91 +16,71 @@
  * limitations under the License.
  */
 
-import { ControllerFacadeTypes } from 'app/constants';
 import {
-  BoardType,
-  ControllerWidgetContent,
-  RelatedView,
+  RectConfig,
   Relation,
   RelationConfigType,
-  Widget,
-  WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { RelatedWidgetItem } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/RelatedWidgets';
 import { ControllerConfig } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
+import {
+  Widget,
+  WidgetCreateProps,
+} from 'app/pages/DashBoardPage/types/widgetTypes';
+import { getTheWidgetFiltersAndParams } from 'app/pages/DashBoardPage/utils';
+import { ChartDataRequest } from 'app/types/ChartDataRequest';
+import ChartDataView from 'app/types/ChartDataView';
+import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import { uuidv4 } from 'utils/utils';
-import { createInitWidgetConfig, createWidget } from '../../widget';
-export const createControllerWidget = (opt: {
-  boardId: string;
-  boardType: BoardType;
-  relations: Relation[];
-  name?: string;
-  controllerType: ControllerFacadeTypes;
-  views: RelatedView[];
-  config: ControllerConfig;
-  viewIds: string[];
-}) => {
-  const {
-    boardId,
-    boardType,
-    views,
-    config,
-    controllerType,
-    relations,
-    name = 'newController',
-    viewIds,
-  } = opt;
-  const content: ControllerWidgetContent = {
-    type: controllerType,
-    relatedViews: views,
-    name: name,
-    config: config,
-  };
+import widgetManagerInstance from '../../../WidgetManager';
+import { initTitleTpl, widgetTpl } from '../../../WidgetManager/utils/init';
 
-  const widgetConf = createInitWidgetConfig({
-    name: name,
-    type: 'controller',
-    content: content,
-    boardType: boardType,
-  });
+export const controlWidgetTpl = (opt: WidgetCreateProps) => {
+  const widget = widgetTpl();
+  widget.id = opt.relations?.[0]?.sourceId || widget.id;
+  widget.parentId = opt.parentId || '';
+  widget.dashboardId = opt.dashboardId || '';
+  widget.datachartId = opt.datachartId || '';
+  widget.viewIds = opt.viewIds || [];
+  widget.relations = opt.relations || [];
 
-  const widgetId = relations[0]?.sourceId || uuidv4();
-  const widget: Widget = createWidget({
-    id: widgetId,
-    dashboardId: boardId,
-    config: widgetConf,
-    relations,
-    viewIds,
-  });
+  widget.config.content = opt.content;
+  widget.config.type = 'controller';
+  if (opt.boardType === 'auto') {
+    const rect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: 3,
+      height: 1,
+    };
+    widget.config.rect = rect;
+    widget.config.mRect = { ...rect, width: 6 };
+  } else {
+    const rect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 32,
+    };
+    widget.config.rect = rect;
+  }
+  widget.config.content = opt.content; //controller
+  widget.config.customConfig.props = [{ ...initTitleTpl() }];
+
   return widget;
 };
-
-export const getViewIdsInControlConfig = (
-  controllerConfig: ControllerConfig,
-) => {
-  if (!controllerConfig.assistViewFields) return [];
-  if (controllerConfig.assistViewFields?.[0]) {
-    return [controllerConfig.assistViewFields[0]];
-  } else {
-    return [];
-  }
-};
 export const getCanLinkControlWidgets = (widgets: Widget[]) => {
-  const CanLinkControllerWidgetTypes: WidgetType[] = ['chart', 'controller'];
-
   const canLinkWidgets = widgets.filter(widget => {
-    if (!CanLinkControllerWidgetTypes.includes(widget.config.type)) {
-      return false;
-    }
-    if (widget.viewIds.length === 0) {
-      return false;
-    }
+    const controllable = widgetManagerInstance.meta(
+      widget.config.originalType,
+    ).controllable;
+    if (!controllable) return false;
+    if (widget.viewIds.length === 0) return false;
     return true;
   });
   return canLinkWidgets;
 };
-
-const makeControlRelations = (obj: {
+export const makeControlRelations = (obj: {
   sourceId: string | undefined;
   relatedWidgets: RelatedWidgetItem[];
   widgetMap: Record<string, Widget>;
@@ -168,12 +148,45 @@ const makeControlRelations = (obj: {
   }
   return newRelations;
 };
-
-export const controllerWidgetToolKit = {
-  create: createControllerWidget,
-  tool: {
-    getViewIdsInControlConfig,
-    getCanLinkControlWidgets,
-    makeControlRelations,
-  },
+export const getViewIdsInControlConfig = (
+  controllerConfig: ControllerConfig,
+) => {
+  if (!controllerConfig.assistViewFields) return [];
+  if (controllerConfig.assistViewFields?.[0]) {
+    return [controllerConfig.assistViewFields[0]];
+  } else {
+    return [];
+  }
+};
+export const getControlOptionQueryParams = (obj: {
+  view: ChartDataView;
+  columns: string[];
+  curWidget: Widget;
+  widgetMap: Record<string, Widget>;
+}) => {
+  const viewConfigs = transformToViewConfig(obj.view?.config);
+  const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
+    chartWidget: obj.curWidget,
+    widgetMap: obj.widgetMap,
+    params: undefined,
+  });
+  const requestParams: ChartDataRequest = {
+    ...viewConfigs,
+    aggregators: [],
+    filters: filterParams,
+    groups: [],
+    columns: [...new Set(obj.columns)],
+    pageInfo: {
+      pageNo: 1,
+      pageSize: 99999999,
+      total: 99999999,
+    },
+    orders: [],
+    keywords: ['DISTINCT'],
+    viewId: obj.view.id,
+  };
+  if (variableParams) {
+    requestParams.params = variableParams;
+  }
+  return requestParams;
 };

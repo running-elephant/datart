@@ -18,35 +18,34 @@
 
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetNameConfig } from '../../pages/Board/slice/types';
+import { WidgetTitleConfig } from '../../pages/Board/slice/types';
 
 export const WidgetTitle: FC<{
-  name: string;
-  config: WidgetNameConfig;
-}> = memo(({ config, name }) => {
-  if (!config.show) {
+  title: WidgetTitleConfig;
+}> = memo(({ title }) => {
+  if (!title.showTitle) {
     return null;
   }
   return (
-    <StyledWrap conf={config}>
-      <NameWrap className="widget-name" conf={config}>
-        {name}
+    <StyledWrap conf={title}>
+      <NameWrap className="widget-name" conf={title}>
+        {title.title}
       </NameWrap>
     </StyledWrap>
   );
 });
 
-const StyledWrap = styled.div<{ conf: WidgetNameConfig }>`
+const StyledWrap = styled.div<{ conf: WidgetTitleConfig }>`
   width: 100%;
   line-height: 24px;
   text-align: ${p => p.conf.textAlign};
   cursor: pointer;
 `;
-const NameWrap = styled.span<{ conf: WidgetNameConfig }>`
-  font-family: ${p => p.conf.fontFamily};
-  font-size: ${p => p.conf.fontSize}px;
-  font-style: ${p => p.conf.fontStyle};
-  font-weight: ${p => p.conf.fontWeight};
-  color: ${p => p.conf.color};
+const NameWrap = styled.span<{ conf: WidgetTitleConfig }>`
+  font-family: ${p => p.conf.font.fontFamily};
+  font-size: ${p => p.conf.font.fontSize}px;
+  font-style: ${p => p.conf.font.fontStyle};
+  font-weight: ${p => p.conf.font.fontWeight};
+  color: ${p => p.conf.font.color};
   text-align: ${p => p.conf.textAlign};
 `;

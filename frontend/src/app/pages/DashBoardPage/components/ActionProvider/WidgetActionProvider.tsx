@@ -39,12 +39,7 @@ import {
   getControllerOptions,
   renderedWidgetAsync,
 } from '../../pages/Board/slice/thunk';
-import {
-  VizRenderMode,
-  Widget,
-  WidgetConf,
-  WidgetContentChartType,
-} from '../../pages/Board/slice/types';
+import { VizRenderMode } from '../../pages/Board/slice/types';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
@@ -66,6 +61,7 @@ import {
   getEditControllerOptions,
   renderedEditWidgetAsync,
 } from '../../pages/BoardEditor/slice/thunk';
+import { Widget, WidgetConf } from '../../types/widgetTypes';
 import {
   getCascadeControllers,
   getNeedRefreshWidgetsByController,
@@ -169,6 +165,15 @@ export const WidgetActionProvider: FC<{
       onUpdateWidgetConfig: (config: WidgetConf, wid: string) => {
         dispatch(editBoardStackActions.updateWidgetConfig({ wid, config }));
       },
+      onUpdateWidgetConfigByKey: ops => {
+        if (boardEditing) {
+          dispatch(editBoardStackActions.updateWidgetConfigByKey(ops));
+        } else {
+          dispatch(boardActions.updateWidgetConfigByKey({ ...ops, boardId }));
+        }
+        dispatch(editBoardStackActions.updateWidgetConfigByKey(ops));
+      },
+
       onWidgetUpdate: (widget: Widget) => {
         if (boardEditing) {
           dispatch(editBoardStackActions.updateWidget(widget));
@@ -206,14 +211,16 @@ export const WidgetActionProvider: FC<{
       },
 
       onEditChartWidget: (widget: Widget) => {
-        const chartType = widget.config.content.type;
+        const widgetTypeId = widget.config.originalType;
+        const chartType =
+          widgetTypeId === 'ownedChart' ? 'widgetChart' : 'dataChart';
         dispatch(
           editChartInWidgetAction({
             orgId,
             widgetId: widget.id,
             chartName: widget.config.name,
             dataChartId: widget.datachartId,
-            chartType: chartType as WidgetContentChartType,
+            chartType: chartType,
           }),
         );
       },
@@ -291,6 +298,7 @@ export interface WidgetActionContextProps {
   onWidgetGetData: (widget: Widget) => void;
   onWidgetUpdate: (widget: Widget) => void;
   onUpdateWidgetConfig: (config: WidgetConf, wid: string) => void;
+  onUpdateWidgetConfigByKey: (opt: { wid: string; key: string; val }) => void;
   onRefreshWidgetsByController: (widget: Widget) => void;
   onWidgetsQuery: () => void;
   onRenderedWidgetById: (wid: string) => void;

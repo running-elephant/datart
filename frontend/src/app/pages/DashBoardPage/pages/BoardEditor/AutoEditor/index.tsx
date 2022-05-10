@@ -33,14 +33,14 @@
  * limitations under the License.
  */
 
-import React, { useContext } from 'react';
+import React, { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
 import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
 import { LayerList } from '../components/LayerList/LayerList';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { AutoBoardEditor } from './AutoBoardEditor';
-export const AutoEditor: React.FC<{}> = () => {
+export const AutoEditor: React.FC<{}> = memo(() => {
   const { onEditClearActiveWidgets } = useContext(WidgetActionContext);
   return (
     <Wrapper onClick={onEditClearActiveWidgets}>
@@ -52,7 +52,7 @@ export const AutoEditor: React.FC<{}> = () => {
       </Editor>
     </Wrapper>
   );
-};
+});
 
 const Wrapper = styled.div`
   display: flex;

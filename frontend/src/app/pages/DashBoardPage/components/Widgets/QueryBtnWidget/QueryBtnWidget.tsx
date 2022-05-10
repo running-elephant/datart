@@ -25,6 +25,7 @@ import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
+import { getWidgetBaseStyle } from '../../WidgetManager/utils/utils';
 import { QueryBtnWidgetCore } from './QueryBtnWidgetCore';
 
 export const QueryBtnWidget: React.FC<{}> = memo(() => {
@@ -33,7 +34,9 @@ export const QueryBtnWidget: React.FC<{}> = memo(() => {
   const { editing } = useContext(BoardContext);
 
   // 自动更新
-  const { background, border, padding } = widget.config;
+  const { background, border, padding } = getWidgetBaseStyle(
+    widget.config.customConfig.props,
+  );
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
       <div style={ZIndexStyle}>
