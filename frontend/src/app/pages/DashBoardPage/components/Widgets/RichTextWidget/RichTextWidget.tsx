@@ -38,11 +38,11 @@ export const RichTextWidget: React.FC<{ hideTitle: boolean }> = memo(
     const widget = useContext(WidgetContext);
     const { editing } = useContext(BoardContext);
     const widgetInfo = useContext(WidgetInfoContext);
-    const title = getWidgetTitle(widget.config.jsonConfig.props);
+    const title = getWidgetTitle(widget.config.customConfig.props);
     title.title = widget.config.name;
     // 自动更新
     const { background, border, padding } = getWidgetBaseStyle(
-      widget.config.jsonConfig.props,
+      widget.config.customConfig.props,
     );
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>

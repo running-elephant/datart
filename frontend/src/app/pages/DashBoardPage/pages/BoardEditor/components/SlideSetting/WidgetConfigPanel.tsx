@@ -38,9 +38,9 @@ const StyledWrapper = styled.div`
 export const WidgetConfigPanel: FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const widget = useContext(WidgetContext);
-  const configs = widget.config.jsonConfig.props;
+  const configs = widget.config.customConfig.props;
 
-  const widgetTypeId = widget.config.widgetTypeId;
+  const widgetTypeId = widget.config.originalType;
   const i18ns = widgetManagerInstance.meta(widgetTypeId).i18ns;
   const onChange = (
     ancestors: number[],

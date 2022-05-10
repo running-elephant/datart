@@ -65,14 +65,14 @@ export const controlWidgetTpl = (opt: WidgetCreateProps) => {
     widget.config.rect = rect;
   }
   widget.config.content = opt.content; //controller
-  widget.config.jsonConfig.props = [{ ...initTitleTpl() }];
+  widget.config.customConfig.props = [{ ...initTitleTpl() }];
 
   return widget;
 };
 export const getCanLinkControlWidgets = (widgets: Widget[]) => {
   const canLinkWidgets = widgets.filter(widget => {
     const controllable = widgetManagerInstance.meta(
-      widget.config.widgetTypeId,
+      widget.config.originalType,
     ).controllable;
     if (!controllable) return false;
     if (widget.viewIds.length === 0) return false;

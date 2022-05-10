@@ -35,9 +35,9 @@ export const ResetBtnWidgetCore: React.FC<{}> = () => {
     onWidgetsReset();
   };
 
-  const title = getWidgetTitle(widget.config.jsonConfig.props);
+  const title = getWidgetTitle(widget.config.customConfig.props);
   title.title = widget.config.name;
-  const { background } = getWidgetBaseStyle(widget.config.jsonConfig.props);
+  const { background } = getWidgetBaseStyle(widget.config.customConfig.props);
   return (
     <Wrapper color={background.color} onClick={onQuery}>
       <span

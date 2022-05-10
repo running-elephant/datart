@@ -140,19 +140,19 @@ export const dataChartCreator = (opt: WidgetTplProps) => {
   widget.datachartId = opt.datachartId || '';
   widget.viewIds = opt.viewIds || [];
   widget.relations = opt.relations || [];
-  widget.config.widgetTypeId = opt.widgetTypeId;
+  widget.config.originalType = opt.widgetTypeId;
   widget.config.type = 'chart';
 
   widget.config.content.dataChart = opt.content; // DataChart
   widget.config.name = opt.name || opt.content?.name;
-  widget.config.jsonConfig.props = [
+  widget.config.customConfig.props = [
     { ...initTitleTpl() },
     { ...initLoopFetchTpl() },
     { ...initPaddingTpl() },
     { ...initBackgroundTpl() },
     { ...initBorderTpl() },
   ];
-  widget.config.jsonConfig.props.forEach(ele => {
+  widget.config.customConfig.props.forEach(ele => {
     if (ele.key === 'titleGroup') {
       ele.rows?.forEach(row => {
         if (row.key === 'showTitle') {
@@ -172,7 +172,7 @@ export const dataChartCreator = (opt: WidgetTplProps) => {
 export const getCanLinkageWidgets = (widgets: Widget[]) => {
   const canLinkWidgets = widgets.filter(widget => {
     const linkable = widgetManagerInstance.meta(
-      widget.config.widgetTypeId,
+      widget.config.originalType,
     ).linkable;
     if (!linkable) return false;
     if (widget.viewIds.length === 0) return false;

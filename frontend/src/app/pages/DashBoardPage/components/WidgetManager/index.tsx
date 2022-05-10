@@ -25,22 +25,22 @@ import sliderProto from '../Widgets/ControllerWidget/config/sliderProto';
 import textProto from '../Widgets/ControllerWidget/config/textProto';
 import timeProto from '../Widgets/ControllerWidget/config/timeProto';
 import valueProto from '../Widgets/ControllerWidget/config/valueProto';
-import linkChartProto from '../Widgets/DataChartWidget/linkChartConfig';
-import selfChartProto from '../Widgets/DataChartWidget/selfChartConfig1';
+import linkedChartProto from '../Widgets/DataChartWidget/linkedChartConfig';
+import ownedChartProto from '../Widgets/DataChartWidget/ownedChartConfig';
 import iframeProto from '../Widgets/IframeWidget/iframeConfig';
 import imageProto from '../Widgets/ImageWidget/imageConfig';
 import queryBtnProto from '../Widgets/QueryBtnWidget/queryBtnConfig';
 import resetBtnProto from '../Widgets/ResetBtnWidget/resetBtnConfig';
 import richTextProto from '../Widgets/RichTextWidget/richTextConfig';
-import tabProto from '../Widgets/TabWidget/tabConfig1';
+import tabProto from '../Widgets/TabWidget/tabConfig';
 import timerProto from '../Widgets/TimerWidget/timerConfig';
 import videoProto from '../Widgets/VideoWidget/videoConfig';
 import { widgetManagerInstance as widgetManager } from './WidgetManager';
 
 // -- chart
 
-widgetManager.register(linkChartProto);
-widgetManager.register(selfChartProto);
+widgetManager.register(linkedChartProto);
+widgetManager.register(ownedChartProto);
 
 // -- container
 widgetManager.register(tabProto);

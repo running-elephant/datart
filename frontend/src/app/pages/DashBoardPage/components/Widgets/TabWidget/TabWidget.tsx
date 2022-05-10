@@ -47,9 +47,9 @@ export const TabWidget: React.FC<{ hideTitle: boolean }> = memo(
 
     // 自动更新
     const { background, border, padding } = getWidgetBaseStyle(
-      widget.config.jsonConfig.props,
+      widget.config.customConfig.props,
     );
-    const title = getWidgetTitle(widget.config.jsonConfig.props);
+    const title = getWidgetTitle(widget.config.customConfig.props);
     title.title = widget.config.name;
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>

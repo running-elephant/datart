@@ -1,4 +1,4 @@
-import { FontDefault } from 'app/constants';
+import { FONT_DEFAULT } from 'app/constants';
 import {
   ControllerWidgetContent,
   Relation,
@@ -55,7 +55,7 @@ export const beta0 = (widget?: WidgetBeta3) => {
   }
   // 2.migration about font 5 旧数据没有 widget.config.nameConfig。统一把旧数据填充上fontDefault
   widget.config.nameConfig = {
-    ...FontDefault,
+    ...FONT_DEFAULT,
     ...widget.config.nameConfig,
   };
 

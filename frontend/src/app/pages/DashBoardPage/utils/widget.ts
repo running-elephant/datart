@@ -28,7 +28,7 @@ import { formatTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
 import { CSSProperties } from 'react';
-import { fillPx, getBackgroundImage } from '.';
+import { adaptBoardImageUrl, fillPx, getBackgroundImage } from '.';
 import { LAYOUT_COLS_MAP } from '../constants';
 import {
   BackgroundConfig,
@@ -288,7 +288,7 @@ export const convertWrapChartWidget = (params: {
 }) => {
   const { widgetMap, dataChartMap } = params;
   const widgets = Object.values(widgetMap).map(widget => {
-    if (widget.config.widgetTypeId !== 'selfChart') {
+    if (widget.config.originalType !== 'ownedChart') {
       return widget;
     }
     // widgetChart wrapChartWidget
@@ -499,6 +499,7 @@ export const getLinkedColumn = (
 export const getWidgetMap = (
   widgets: Widget[],
   dataCharts: DataChart[],
+  boardType: BoardType,
   filterSearchParamsMap?: FilterSearchParamsWithMatch,
 ) => {
   const filterSearchParams = filterSearchParamsMap?.params,
@@ -605,7 +606,7 @@ export const getWidgetMap = (
 
   // 处理 自有 chart widgetControl
   widgetList
-    .filter(w => w.config.widgetTypeId === 'selfChart')
+    .filter(w => w.config.originalType === 'ownedChart')
     .forEach(widget => {
       let dataChart = (widget.config.content as any).dataChart as DataChart;
 
@@ -616,6 +617,23 @@ export const getWidgetMap = (
       }
       widget.datachartId = self_dataChartId;
     });
+
+  // preprocess widget
+  widgetList.forEach(widget => {
+    widget.config.boardType = boardType;
+    widget.config.customConfig.props?.forEach(item => {
+      if (item.key === 'backgroundGroup') {
+        const rowsValue = item?.rows?.[0]?.value;
+        if (rowsValue?.image) {
+          rowsValue.image = adaptBoardImageUrl(
+            rowsValue.image,
+            widget.dashboardId,
+          );
+        }
+      }
+    });
+  });
+
   return {
     widgetMap,
     wrappedDataCharts,

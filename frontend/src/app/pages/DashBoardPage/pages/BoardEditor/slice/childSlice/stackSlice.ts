@@ -95,7 +95,7 @@ export const editBoardStackSlice = createSlice({
       widgets.forEach(ele => {
         maxWidgetIndex++;
         const newName = widgetManager
-          .toolkit(ele.config.widgetTypeId)
+          .toolkit(ele.config.originalType)
           .getName();
         const newEle = produce(ele, draft => {
           draft.config.index = maxWidgetIndex;
@@ -140,13 +140,13 @@ export const editBoardStackSlice = createSlice({
       const { ancestors, configItem, wid } = action.payload;
       if (!state.widgetRecord[wid]) return;
       const newProps = updateCollectionByAction(
-        state.widgetRecord[wid].config.jsonConfig.props || [],
+        state.widgetRecord[wid].config.customConfig.props || [],
         {
           ancestors: ancestors!,
           value: configItem,
         },
       );
-      state.widgetRecord[wid].config.jsonConfig.props = newProps;
+      state.widgetRecord[wid].config.customConfig.props = newProps;
       // const title = getWidgetTitle(newProps);
       // state.widgetRecord[wid].config.name = title.title;
     },

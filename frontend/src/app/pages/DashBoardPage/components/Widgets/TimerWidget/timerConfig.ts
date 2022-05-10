@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { FontDefault } from 'app/constants';
+import { FONT_DEFAULT } from 'app/constants';
 import {
+  ORIGINAL_TYPE_MAP,
   TimeDefault,
-  WidgetTypeIdMap,
 } from 'app/pages/DashBoardPage/constants';
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
@@ -58,7 +58,7 @@ const initTimerTpl = () => {
       {
         label: 'timer.font',
         key: 'font',
-        value: { ...FontDefault, fontSize: '20' },
+        value: { ...FONT_DEFAULT, fontSize: '20' },
         comType: 'font',
       },
     ],
@@ -82,7 +82,7 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: 'timer',
-  widgetTypeId: WidgetTypeIdMap.timer,
+  widgetTypeId: ORIGINAL_TYPE_MAP.timer,
   canWrapped: true,
   controllable: false,
   linkable: false,
@@ -142,7 +142,7 @@ export const widgetToolkit: TimerWidgetToolKit = {
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.widgetTypeId = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.widgetTypeId;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
@@ -164,7 +164,7 @@ export const widgetToolkit: TimerWidgetToolKit = {
       widget.config.rect = { ...rect };
     }
 
-    widget.config.jsonConfig.props = [
+    widget.config.customConfig.props = [
       { ...initTimerTpl() },
       { ...initTitleTpl() },
       { ...initBackgroundTpl('#fff') },

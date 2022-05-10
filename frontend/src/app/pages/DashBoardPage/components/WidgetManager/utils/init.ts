@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { FontDefault } from 'app/constants';
+import { FONT_DEFAULT } from 'app/constants';
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import type {
   BoardType,
@@ -64,7 +64,7 @@ export const initTitleTpl = () => {
       {
         label: 'title.font',
         key: 'font',
-        value: FontDefault,
+        value: FONT_DEFAULT,
         comType: 'font',
       },
     ],
@@ -320,13 +320,13 @@ export const widgetTpl = (): Widget => {
       name: '',
       boardType: '' as BoardType,
       type: '' as WidgetType,
-      widgetTypeId: '',
+      originalType: '',
 
       // visible: true,
       lock: false,
       content: {} as any,
       rect: { x: 0, y: 0, width: 0, height: 0 },
-      jsonConfig: {
+      customConfig: {
         props: [],
       },
     },

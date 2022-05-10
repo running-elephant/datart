@@ -27,7 +27,7 @@ import { timerWidgetToolkit } from './timerConfig';
 export const TimerWidgetCore: React.FC = memo(() => {
   const widget = useContext(WidgetContext);
   const { time, font } = timerWidgetToolkit.getTimer(
-    widget.config.jsonConfig.props,
+    widget.config.customConfig.props,
   );
   const [currentTime, setCurrentTime] = useState(
     moment().format(time?.format || TIME_FORMATTER),

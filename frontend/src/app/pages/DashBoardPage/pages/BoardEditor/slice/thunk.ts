@@ -99,7 +99,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
     );
 
     const dashboard = getDashBoardByResBoard(data);
-
+    const boardType = dashboard.config.type;
     const {
       datacharts: serverDataCharts,
       views: serverViews,
@@ -111,6 +111,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
     const { widgetMap, wrappedDataCharts } = getWidgetMap(
       migratedWidgets, //todo
       dataCharts,
+      boardType,
     );
     const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
     // TODO xld migration about filter
@@ -245,7 +246,7 @@ export const addDataChartWidgets = createAsyncThunk<
     const widgets = chartIds.map(dcId => {
       const dataChart = dataChartMap[dcId];
       const viewIds = dataChart.viewId ? [dataChart.viewId] : [];
-      let widget = widgetManagerInstance.toolkit('linkChart').create({
+      let widget = widgetManagerInstance.toolkit('linkedChart').create({
         dashboardId: boardId,
         boardType: boardType,
         datachartId: dcId,
@@ -286,7 +287,7 @@ export const addWrapChartWidget = createAsyncThunk<
     const viewViews = view ? [view] : [];
     dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
-    let widget = widgetManagerInstance.toolkit('selfChart').create({
+    let widget = widgetManagerInstance.toolkit('ownedChart').create({
       dashboardId: boardId,
       boardType: boardType,
       datachartId: chartId,
@@ -324,7 +325,7 @@ export const addChartWidget = createAsyncThunk<
     dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
 
-    const widgetTypeId = subType === 'dataChart' ? 'linkChart' : 'selfChart';
+    const widgetTypeId = subType === 'dataChart' ? 'linkedChart' : 'ownedChart';
 
     let widget = widgetManagerInstance.toolkit(widgetTypeId).create({
       dashboardId: boardId,

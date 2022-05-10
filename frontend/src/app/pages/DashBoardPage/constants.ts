@@ -72,9 +72,9 @@ export const BOARD_UNDO = {
   redo: 'EDITOR_REDO',
 };
 
-export const WidgetTypeIdMap = {
-  linkChart: 'linkChart',
-  selfChart: 'selfChart',
+export const ORIGINAL_TYPE_MAP = {
+  linkedChart: 'linkedChart',
+  ownedChart: 'ownedChart',
 
   tab: 'tab',
 

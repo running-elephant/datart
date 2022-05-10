@@ -21,7 +21,7 @@ export interface Widget {
   config: WidgetConf;
   parentId?: string;
 }
-export type JsonConfig = {
+export type CustomConfig = {
   datas?: ChartDataConfig[];
   props?: ChartStyleConfig[];
   settings?: ChartStyleConfig[];
@@ -34,11 +34,11 @@ export interface WidgetConf {
   clientId: string; // replace tabId
   index: number;
   type: WidgetType; //WidgetType
-  widgetTypeId: string;
+  originalType: string;
   lock: boolean;
 
   // visible: boolean; // 是否可见 TODO: 后续考虑
-  jsonConfig: JsonConfig;
+  customConfig: CustomConfig;
   content?: any;
   rect: RectConfig;
   mRect?: RectConfig;

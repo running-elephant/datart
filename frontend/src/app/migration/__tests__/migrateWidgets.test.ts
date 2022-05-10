@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { FontDefault } from 'app/constants';
+import { FONT_DEFAULT } from 'app/constants';
 import {
   ServerRelation,
   WidgetBeta3,
@@ -51,7 +51,7 @@ describe('test migrateWidgets ', () => {
     } as WidgetBeta3;
     const widget2 = {
       config: {
-        nameConfig: FontDefault,
+        nameConfig: FONT_DEFAULT,
         version: APP_VERSION_BETA_0,
       },
     } as any;

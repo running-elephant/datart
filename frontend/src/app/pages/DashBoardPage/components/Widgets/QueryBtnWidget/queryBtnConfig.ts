@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetTypeIdMap } from 'app/pages/DashBoardPage/constants';
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetMeta,
@@ -42,7 +42,7 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: 'query',
-  widgetTypeId: WidgetTypeIdMap.queryBtn,
+  widgetTypeId: ORIGINAL_TYPE_MAP.queryBtn,
   canWrapped: true,
   controllable: false,
   linkable: false,
@@ -97,7 +97,7 @@ export const widgetToolkit: WidgetToolkit = {
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.widgetTypeId = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.widgetTypeId;
     widget.config.name = opt.name || '';
     widget.config.type = 'button';
     if (opt.boardType === 'auto') {
@@ -119,7 +119,7 @@ export const widgetToolkit: WidgetToolkit = {
       widget.config.rect = rect;
     }
 
-    widget.config.jsonConfig.props = [
+    widget.config.customConfig.props = [
       { ...initTitleTpl() },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },

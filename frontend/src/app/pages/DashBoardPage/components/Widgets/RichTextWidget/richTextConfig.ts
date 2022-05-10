@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetTypeIdMap } from 'app/pages/DashBoardPage/constants';
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import type {
   WidgetMeta,
   WidgetToolkit,
@@ -42,7 +42,7 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: 'richText',
-  widgetTypeId: WidgetTypeIdMap.richText,
+  widgetTypeId: ORIGINAL_TYPE_MAP.richText,
   canWrapped: true,
   controllable: false,
   linkable: false,
@@ -97,7 +97,7 @@ export const widgetToolkit: WidgetToolkit = {
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.widgetTypeId = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.widgetTypeId;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
@@ -107,7 +107,7 @@ export const widgetToolkit: WidgetToolkit = {
       widget.config.rect = { ...initFreeWidgetRect() };
     }
 
-    widget.config.jsonConfig.props = [
+    widget.config.customConfig.props = [
       { ...initTitleTpl() },
       { ...initBackgroundTpl('#fff') },
       { ...initPaddingTpl() },

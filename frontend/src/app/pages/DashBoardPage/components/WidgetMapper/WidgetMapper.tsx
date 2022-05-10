@@ -35,11 +35,11 @@ export const WidgetMapper: React.FC<{
   hideTitle: boolean;
 }> = memo(({ boardEditing, hideTitle }) => {
   const widget = useContext(WidgetContext);
-  const widgetTypeId = widget.config.widgetTypeId;
+  const widgetTypeId = widget.config.originalType;
   switch (widgetTypeId) {
     // chart
-    case 'linkChart':
-    case 'selfChart':
+    case 'linkedChart':
+    case 'ownedChart':
       return (
         <WidgetDataProvider
           widgetId={widget.id}
@@ -94,6 +94,6 @@ export const WidgetMapper: React.FC<{
     //Tree
     // unknown
     default:
-      return <div> unknown widget ? </div>;
+      return <div> unknown widget ?{widgetTypeId} </div>;
   }
 });

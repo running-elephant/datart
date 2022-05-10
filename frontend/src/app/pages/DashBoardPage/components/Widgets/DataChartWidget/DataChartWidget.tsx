@@ -44,10 +44,10 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
       rendered,
     );
     useWidgetAutoFetch(widget, renderMode, cacheWhRef, rendered);
-    const title = getWidgetTitle(widget.config.jsonConfig.props);
+    const title = getWidgetTitle(widget.config.customConfig.props);
     title.title = widget.config.name;
     const { background, border, padding } = getWidgetBaseStyle(
-      widget.config.jsonConfig.props,
+      widget.config.customConfig.props,
     );
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>

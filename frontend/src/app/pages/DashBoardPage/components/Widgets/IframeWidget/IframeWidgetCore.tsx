@@ -24,7 +24,7 @@ export const IframeWidgetCore: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   // getWidgetIframe;
   const iframeVal = iframeWidgetToolKit.getIframe(
-    widget.config.jsonConfig.props,
+    widget.config.customConfig.props,
   );
 
   return (

@@ -211,9 +211,9 @@ export const WidgetActionProvider: FC<{
       },
 
       onEditChartWidget: (widget: Widget) => {
-        const widgetTypeId = widget.config.widgetTypeId;
+        const widgetTypeId = widget.config.originalType;
         const chartType =
-          widgetTypeId === 'selfChart' ? 'widgetChart' : 'dataChart';
+          widgetTypeId === 'ownedChart' ? 'widgetChart' : 'dataChart';
         dispatch(
           editChartInWidgetAction({
             orgId,

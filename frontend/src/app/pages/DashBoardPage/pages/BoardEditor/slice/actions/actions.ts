@@ -212,7 +212,7 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
           ...dataChart,
           id: dataChart.id + Date.now() + '_copy',
         });
-        newWidget.config.widgetTypeId = 'selfChart';
+        newWidget.config.originalType = 'ownedChart';
         newWidget.datachartId = newDataChart.id;
         dispatch(boardActions.setDataChartToMap([newDataChart]));
       }
@@ -231,7 +231,7 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
   //
   function cloneWidget(widget: WidgetOfCopy, pId?: string) {
     const newWidget = CloneValueDeep(widget);
-    newWidget.id = newWidget.config.widgetTypeId + '_' + uuidv4();
+    newWidget.id = newWidget.config.originalType + '_' + uuidv4();
     newWidget.parentId = pId || '';
     newWidget.relations = [];
     newWidget.config.name += '_copy';

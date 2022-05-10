@@ -76,7 +76,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     valueOptionType,
     // sqlOperator,
   } = useMemo(() => config as ControllerConfig, [config]);
-  const title = getWidgetTitle(widget.config.jsonConfig.props);
+  const title = getWidgetTitle(widget.config.customConfig.props);
   title.title = widget.config.name;
   const leftControlLabel = useMemo(() => {
     if (!title.showTitle) {

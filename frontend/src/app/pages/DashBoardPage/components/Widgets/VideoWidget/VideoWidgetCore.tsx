@@ -25,7 +25,7 @@ import { videoWidgetToolKit } from './videoConfig';
 
 export const VideoWidgetCore: React.FC = memo(() => {
   const widget = useContext(WidgetContext);
-  let video = videoWidgetToolKit.getVideo(widget.config.jsonConfig.props);
+  let video = videoWidgetToolKit.getVideo(widget.config.customConfig.props);
   let srcWithParams = video.src;
   return (
     <WrapVideo className="WrapVideo">

@@ -33,7 +33,7 @@ export default function useWidgetAutoFetch(
   const { onWidgetGetData } = useContext(WidgetActionContext);
 
   useEffect(() => {
-    const loopFetch = getLoopFetch(widget.config.jsonConfig.props);
+    const loopFetch = getLoopFetch(widget.config.customConfig.props);
     let timer: NodeJS.Timeout | undefined = undefined;
     if (
       rendered &&

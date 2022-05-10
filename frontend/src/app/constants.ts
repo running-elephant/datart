@@ -238,7 +238,7 @@ export enum DownloadFileType {
 
 export const RUNTIME_DATE_LEVEL_KEY = Symbol('DateLevel');
 
-export const FontDefault: IFontDefault = {
+export const FONT_DEFAULT: IFontDefault = {
   fontFamily: FONT_FAMILY,
   fontSize: '14',
   fontWeight: 'normal',

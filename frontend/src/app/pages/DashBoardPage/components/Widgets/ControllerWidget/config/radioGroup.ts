@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { WidgetTypeIdMap } from 'app/pages/DashBoardPage/constants';
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import {
   WidgetMeta,
   WidgetToolkit,
@@ -43,7 +43,7 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: '',
-  widgetTypeId: WidgetTypeIdMap.radioGroup,
+  widgetTypeId: ORIGINAL_TYPE_MAP.radioGroup,
   canWrapped: true,
   controllable: true,
   linkable: false,
@@ -93,7 +93,7 @@ export const widgetToolkit: WidgetToolkit = {
   create: opt => {
     const widget = controlWidgetTpl(opt);
     widget.id = widgetMeta.widgetTypeId + widget.id;
-    widget.config.widgetTypeId = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.widgetTypeId;
     widget.config.name = opt.name || '';
     const addProps = [
       { ...initBackgroundTpl('#fff') },
@@ -101,7 +101,7 @@ export const widgetToolkit: WidgetToolkit = {
       { ...initBorderTpl() },
       { ...initLoopFetchTpl() },
     ];
-    widget.config.jsonConfig.props?.forEach(ele => {
+    widget.config.customConfig.props?.forEach(ele => {
       if (ele.key === 'titleGroup') {
         ele.rows?.forEach(row => {
           if (row.key === 'showTitle') {
@@ -110,8 +110,8 @@ export const widgetToolkit: WidgetToolkit = {
         });
       }
     });
-    widget.config.jsonConfig.props =
-      widget.config.jsonConfig.props?.concat(addProps);
+    widget.config.customConfig.props =
+      widget.config.customConfig.props?.concat(addProps);
     return widget;
   },
   getName(key) {

@@ -33,15 +33,13 @@ export const initAutoBoardConfig = () => {
             {
               label: 'basic.initialQuery',
               key: 'initialQuery',
-              default: true,
               value: true,
               comType: 'switch',
             },
             {
               label: 'basic.allowOverlap',
               key: 'allowOverlap',
-              default: false,
-              value: true,
+              value: false,
               comType: 'switch',
             },
           ],

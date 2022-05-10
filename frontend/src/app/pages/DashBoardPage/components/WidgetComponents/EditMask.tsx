@@ -24,7 +24,7 @@ import { WidgetDndHandleMask } from './WidgetDndHandleMask';
 export const EditMask: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const canWrapped = widgetManagerInstance.meta(
-    widget.config.widgetTypeId,
+    widget.config.originalType,
   ).canWrapped;
   const widgetInfo = useContext(WidgetInfoContext);
   return (

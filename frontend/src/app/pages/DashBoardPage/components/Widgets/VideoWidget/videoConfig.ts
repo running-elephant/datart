@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetTypeIdMap } from 'app/pages/DashBoardPage/constants';
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import type {
   WidgetMeta,
   WidgetToolkit,
@@ -69,7 +69,7 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: 'video',
-  widgetTypeId: WidgetTypeIdMap.video,
+  widgetTypeId: ORIGINAL_TYPE_MAP.video,
   canWrapped: true,
   controllable: false,
   linkable: false,
@@ -128,7 +128,7 @@ const widgetToolkit: VideoWidgetToolKit = {
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.widgetTypeId = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.widgetTypeId;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
@@ -138,7 +138,7 @@ const widgetToolkit: VideoWidgetToolKit = {
       widget.config.rect = { ...initFreeWidgetRect() };
     }
 
-    widget.config.jsonConfig.props = [
+    widget.config.customConfig.props = [
       { ...initVideoTpl() },
       { ...initTitleTpl() },
       { ...initBackgroundTpl() },

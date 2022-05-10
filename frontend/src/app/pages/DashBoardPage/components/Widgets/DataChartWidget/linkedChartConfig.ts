@@ -16,28 +16,29 @@
  * limitations under the License.
  */
 
-import { WidgetTypeIdMap } from 'app/pages/DashBoardPage/constants';
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { WidgetToolkit } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { initWidgetName } from '../../WidgetManager/utils/init';
 import { dataChartCreator, getMeta } from './config';
+
 const NameI18N = {
-  zh: '自建数据图表',
-  en: 'SelfChart',
+  zh: '引用图表',
+  en: 'LinkedChart',
 };
-const widgetMeta = getMeta({
-  icon: 'selfChart',
-  widgetTypeId: WidgetTypeIdMap.selfChart,
+export const widgetMeta = getMeta({
+  icon: 'linkedChart',
+  widgetTypeId: ORIGINAL_TYPE_MAP.linkedChart,
   zh: {
-    desc: '自建数据图表的内部是一个独立的数据图表 ',
+    desc: '引入图表部件的内部是一个引用的数据图表,原有数据图表有改动时,引入图表部件也会跟着改变',
     widgetName: NameI18N.zh,
   },
   en: {
-    desc: 'selfChart Widget core is a independent dataChart',
+    desc: 'linkedChart Widget core is a referenced dataChart,When the original dataChart is changed, the widget will also change',
     widgetName: NameI18N.en,
   },
 });
-export type SelfChartToolkit = WidgetToolkit & {};
-const widgetToolkit: SelfChartToolkit = {
+
+export const linkedChartToolkit: WidgetToolkit = {
   create: opt => {
     const widget = dataChartCreator({
       ...opt,
@@ -64,15 +65,10 @@ const widgetToolkit: SelfChartToolkit = {
   // setJump() {},
   // closeJump() {},
 };
-// class SelfChartProto{
-//   public widgetTypeId
-//   constructor(){
-//     return this;
-//   }
-// }
-const selfChartProto = {
+
+const linkedChartProto = {
   widgetTypeId: widgetMeta.widgetTypeId,
   meta: widgetMeta,
-  toolkit: widgetToolkit,
+  toolkit: linkedChartToolkit,
 };
-export default selfChartProto;
+export default linkedChartProto;

@@ -39,7 +39,7 @@ const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
   if (oldW.config.mobileRect) {
     newWidget.config.mRect = oldW.config.mobileRect;
   }
-  newWidget.config.jsonConfig.props?.forEach(prop => {
+  newWidget.config.customConfig.props?.forEach(prop => {
     // titleGroup name nameConfig
     if (prop.key === 'titleGroup') {
       const oNameConf = oldConf.nameConfig as any;
@@ -114,10 +114,10 @@ export const convertChartWidgetToBeta4 = (widget: WidgetBeta3) => {
   let newWidget = {} as Widget;
   if (subType === 'dataChart') {
     newWidget = widgetManagerInstance
-      .toolkit('linkChart')
+      .toolkit('linkedChart')
       .create({ ...widget });
   } else {
-    newWidget = widgetManagerInstance.toolkit('selfChart').create({
+    newWidget = widgetManagerInstance.toolkit('ownedChart').create({
       ...widget,
     });
   }
@@ -248,7 +248,7 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
     });
     newWidget = commonBeta4Convert(newWidget, widget);
     const oldConf = widget.config.content.iframeConfig;
-    newWidget.config.jsonConfig.props?.forEach(prop => {
+    newWidget.config.customConfig.props?.forEach(prop => {
       // iframeGroup
       if (prop.key === 'iframeGroup') {
         prop.rows?.forEach(row => {
@@ -315,7 +315,7 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
     newWidget = commonBeta4Convert(newWidget, widget);
 
     const oldConf = widget.config.content.timerConfig;
-    newWidget.config.jsonConfig.props?.forEach(prop => {
+    newWidget.config.customConfig.props?.forEach(prop => {
       // timerGroup
       if (prop.key === 'timerGroup') {
         prop.rows?.forEach(row => {

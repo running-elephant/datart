@@ -42,7 +42,7 @@ export const ControllerWidget: React.FC<{}> = memo(() => {
   // 自动更新
 
   const { background, border, padding } = getWidgetBaseStyle(
-    widget.config.jsonConfig.props,
+    widget.config.customConfig.props,
   );
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>

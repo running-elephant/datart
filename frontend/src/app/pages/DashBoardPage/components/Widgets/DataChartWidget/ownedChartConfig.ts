@@ -16,29 +16,28 @@
  * limitations under the License.
  */
 
-import { WidgetTypeIdMap } from 'app/pages/DashBoardPage/constants';
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { WidgetToolkit } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { initWidgetName } from '../../WidgetManager/utils/init';
 import { dataChartCreator, getMeta } from './config';
-
 const NameI18N = {
-  zh: '引用图表',
-  en: 'LinkChart',
+  zh: '自建数据图表',
+  en: 'OwnedChart',
 };
-export const widgetMeta = getMeta({
-  icon: 'linkChart',
-  widgetTypeId: WidgetTypeIdMap.linkChart,
+const widgetMeta = getMeta({
+  icon: 'ownedChart',
+  widgetTypeId: ORIGINAL_TYPE_MAP.ownedChart,
   zh: {
-    desc: '引入图表部件的内部是一个引用的数据图表,原有数据图表有改动时,引入图表部件也会跟着改变',
+    desc: '自建数据图表的内部是一个独立的数据图表 ',
     widgetName: NameI18N.zh,
   },
   en: {
-    desc: 'linkChart Widget core is a referenced dataChart,When the original dataChart is changed, the widget will also change',
+    desc: 'ownedChart Widget core is a independent dataChart',
     widgetName: NameI18N.en,
   },
 });
-
-export const linkChartToolkit: WidgetToolkit = {
+export type OwnedChartToolkit = WidgetToolkit & {};
+const widgetToolkit: OwnedChartToolkit = {
   create: opt => {
     const widget = dataChartCreator({
       ...opt,
@@ -65,10 +64,15 @@ export const linkChartToolkit: WidgetToolkit = {
   // setJump() {},
   // closeJump() {},
 };
-
-const linkChartProto = {
+// class OwnedChartProto{
+//   public widgetTypeId
+//   constructor(){
+//     return this;
+//   }
+// }
+const ownedChartProto = {
   widgetTypeId: widgetMeta.widgetTypeId,
   meta: widgetMeta,
-  toolkit: linkChartToolkit,
+  toolkit: widgetToolkit,
 };
-export default linkChartProto;
+export default ownedChartProto;
