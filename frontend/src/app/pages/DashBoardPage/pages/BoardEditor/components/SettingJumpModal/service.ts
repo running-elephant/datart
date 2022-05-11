@@ -1,11 +1,12 @@
 import { ChartDataSectionType, DataViewFieldType } from 'app/constants';
-import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { VizType } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { ControlOptionItem } from './types';
+
 const FILTER_MENU = [DataViewFieldType.STRING];
 const computedDashboardControllers = (data): ControlOptionItem[] => {
   const widgets = data?.widgets || [];

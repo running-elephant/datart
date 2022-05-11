@@ -26,6 +26,7 @@ import { AddChart } from './AddChart/AddChart';
 import { AddContainer } from './AddContainer/AddContainer';
 import { AddController } from './AddControler/AddControler';
 import { AddMedia } from './AddMedia/AddMedia';
+import { BoardToolRights } from './BoardToolRights';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
 import { CopyBtn, PasteBtn } from './CopyPaste/CopyPaste';
 import { DelWidgetsBtn } from './DelWidgetsBtn';
@@ -48,6 +49,7 @@ export const ToolBar = () => {
   const { undo, redo } = useContext(BoardActionContext);
   //
   useBoardEditorHotkeys();
+
   const t = useI18NPrefix(`viz.board.action`);
   return (
     <Wrapper onClick={ssp}>
@@ -83,10 +85,16 @@ export const ToolBar = () => {
             <DeviceSwitcher />
           </>
         )}
+        {/*  */}
       </Space>
+
+      <BoardToolRights />
     </Wrapper>
   );
 };
 const Wrapper = styled.div`
   z-index: 0;
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
 `;

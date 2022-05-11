@@ -17,10 +17,11 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 import { DefaultWidgetData } from 'app/pages/DashBoardPage/constants';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { RootState } from 'types';
 import { boardInit } from '.';
 import { getLayoutWidgets } from '../../../utils/widget';
-import { Widget, WidgetInfo } from './types';
+import { WidgetInfo } from './types';
 
 export const selectPropsId = (_: unknown, id: string) => id;
 

@@ -31,7 +31,7 @@ import { Button, Dropdown, Menu } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import useWidgetAction from '../../hooks/useWidgetAction';
-import { Widget } from '../../pages/Board/slice/types';
+import { Widget } from '../../types/widgetTypes';
 import { BoardContext } from '../BoardProvider/BoardProvider';
 import { WidgetChartContext } from '../WidgetProvider/WidgetChartProvider';
 import {
@@ -148,6 +148,9 @@ export const WidgetActionDropdown: React.FC<WidgetActionDropdownProps> = memo(
 
       return <Menu onClick={menuClick}>{menuItems}</Menu>;
     }, [actionList, menuClick]);
+    if (actionList.length === 0) {
+      return null;
+    }
     return (
       <Dropdown
         className="widget-tool-dropdown"

@@ -62,7 +62,7 @@ const ReactGridLayout = WidthProvider(RGL);
 export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const { boardId } = useContext(BoardContext);
-  const boardConfig = useContext(BoardConfigValContext) as any;
+  const boardConfig = useContext(BoardConfigValContext);
   const { background, allowOverlap } = boardConfig;
   const { deviceType } = useContext(BoardInfoContext);
 

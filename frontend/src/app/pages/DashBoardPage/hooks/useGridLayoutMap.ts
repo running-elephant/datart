@@ -17,7 +17,8 @@
  */
 import { useMemo } from 'react';
 import { Layouts } from 'react-grid-layout';
-import { Widget } from '../pages/Board/slice/types';
+import { Widget } from '../types/widgetTypes';
+
 export default function useGridLayoutMap(
   layoutWidgetMap: Record<string, Widget>,
 ) {
@@ -27,8 +28,8 @@ export default function useGridLayoutMap(
       sm: [],
     };
     Object.values(layoutWidgetMap).forEach(widget => {
-      const lg = widget.config.rect || widget.config.mobileRect || {};
-      const sm = widget.config.mobileRect || widget.config.rect || {};
+      const lg = widget.config.rect || widget.config.mRect || {};
+      const sm = widget.config.mRect || widget.config.rect || {};
       const lock = widget.config.lock;
       layoutMap.lg.push({
         i: widget.id,

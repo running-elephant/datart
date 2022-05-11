@@ -16,30 +16,21 @@
  * limitations under the License.
  */
 import { ChartEditorBaseProps } from 'app/components/ChartEditor';
-import { ControllerFacadeTypes, DataViewFieldType } from 'app/constants';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
-  ChartWidgetContent,
-  ContainerWidgetContent,
-  ControllerWidgetContent,
   Dashboard,
   DataChart,
-  RelatedView,
-  Relation,
+  TabWidgetContent,
   VizRenderMode,
-  Widget,
   WidgetInfo,
   WidgetOfCopy,
   WidgetType,
   WidgetTypes,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
-import {
-  createInitWidgetConfig,
-  createWidget,
-  createWidgetInfo,
-} from 'app/pages/DashBoardPage/utils/widget';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { createWidgetInfo } from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import produce from 'immer';
@@ -49,9 +40,7 @@ import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
-import { BoardType } from '../../../Board/slice/types';
-import { ControllerConfig } from '../../components/ControllerWidgetPanel/types';
-import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from '../thunk';
+import { getEditChartWidgetDataAsync } from '../thunk';
 import { EditBoardState, HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
 
@@ -85,9 +74,9 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
   while (selectedIds.length > 0) {
     const id = selectedIds.pop();
 
-    if (!id) return;
+    if (!id) continue;
     const curWidget = widgetMap[id];
-    if (!curWidget) return;
+    if (!curWidget) continue;
 
     const widgetType = curWidget.config.type;
 
@@ -96,7 +85,7 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
 
     // delete 递归删除所子节点;
     if (widgetType === 'container') {
-      const content = curWidget.config.content as ContainerWidgetContent;
+      const content = curWidget.config.content as TabWidgetContent;
       Object.values(content.itemMap).forEach(item => {
         if (item.childWidgetId) {
           selectedIds.push(item.childWidgetId);
@@ -176,7 +165,7 @@ export const copyWidgetsAction = (wIds?: string[]) => (dispatch, getState) => {
     const widget = widgetRecord[wid];
     newWidgets[wid] = { ...widget, selectedCopy: true };
     if (widget.config.type === 'container') {
-      const content = widget.config.content as ContainerWidgetContent;
+      const content = widget.config.content as TabWidgetContent;
       Object.values(content.itemMap).forEach(item => {
         if (item.childWidgetId) {
           const subWidget = widgetRecord[item.childWidgetId];
@@ -205,13 +194,14 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
   clipboardWidgetList.forEach(widget => {
     if (widget.selectedCopy) {
       const newWidget = cloneWidget(widget);
-      newWidgets.push(newWidget);
+
       if (newWidget.config.type === 'container') {
-        const content = newWidget.config.content as ContainerWidgetContent;
+        const content = newWidget.config.content as TabWidgetContent;
         Object.values(content.itemMap).forEach(item => {
           if (item.childWidgetId) {
             const subWidget = clipboardWidgets[item.childWidgetId];
             const newSubWidget = cloneWidget(subWidget, newWidget.id);
+            item.childWidgetId = newSubWidget.id;
             newWidgets.push(newSubWidget);
           }
         });
@@ -222,10 +212,11 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
           ...dataChart,
           id: dataChart.id + Date.now() + '_copy',
         });
-        (newWidget.config.content as ChartWidgetContent).type = 'widgetChart';
+        newWidget.config.originalType = 'ownedChart';
         newWidget.datachartId = newDataChart.id;
         dispatch(boardActions.setDataChartToMap([newDataChart]));
       }
+      newWidgets.push(newWidget);
     }
   });
   const widgetInfoMap: Record<string, WidgetInfo> = {};
@@ -240,7 +231,7 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
   //
   function cloneWidget(widget: WidgetOfCopy, pId?: string) {
     const newWidget = CloneValueDeep(widget);
-    newWidget.id = uuidv4();
+    newWidget.id = newWidget.config.originalType + '_' + uuidv4();
     newWidget.parentId = pId || '';
     newWidget.relations = [];
     newWidget.config.name += '_copy';
@@ -250,57 +241,57 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
   }
 };
 
-export const updateWidgetControllerAction =
-  (params: {
-    boardId: string;
-    boardType: BoardType;
-    relations: Relation[];
-    name?: string;
-    fieldValueType: DataViewFieldType;
-    controllerFacadeType: ControllerFacadeTypes;
-    views: RelatedView[];
-    config: ControllerConfig;
-  }) =>
-  async (dispatch, getState) => {
-    const {
-      boardId,
-      boardType,
-      views,
-      config,
-      controllerFacadeType,
-      relations,
-      name,
-    } = params;
-    const content: ControllerWidgetContent = {
-      type: controllerFacadeType,
-      relatedViews: views,
-      name: name || 'newController',
-      config: config,
-    };
+// export const updateWidgetControllerAction =
+//   (params: {
+//     boardId: string;
+//     boardType: BoardType;
+//     relations: Relation[];
+//     name?: string;
+//     fieldValueType: DataViewFieldType;
+//     controllerFacadeType: ControllerFacadeTypes;
+//     views: RelatedView[];
+//     config: ControllerConfig;
+//   }) =>
+//   async (dispatch, getState) => {
+//     const {
+//       boardId,
+//       boardType,
+//       views,
+//       config,
+//       controllerFacadeType,
+//       relations,
+//       name,
+//     } = params;
+//     const content: ControllerWidgetContent = {
+//       type: controllerFacadeType,
+//       relatedViews: views,
+//       name: name || 'newController',
+//       config: config,
+//     };
 
-    const widgetConf = createInitWidgetConfig({
-      name: name || 'newController',
-      type: 'controller',
-      content: content,
-      boardType: boardType,
-    });
+//     const widgetConf = createInitWidgetConfig({
+//       name: name || 'newController',
+//       type: 'controller',
+//       content: content,
+//       boardType: boardType,
+//     });
 
-    const widgetId = relations[0]?.sourceId || uuidv4();
-    const widget: Widget = createWidget({
-      id: widgetId,
-      dashboardId: boardId,
-      config: widgetConf,
-      relations,
-    });
-    dispatch(addWidgetsToEditBoard([widget]));
-    dispatch(
-      editDashBoardInfoActions.changeControllerPanel({
-        type: 'hide',
-        widgetId: '',
-        controllerType: undefined,
-      }),
-    );
-  };
+//     const widgetId = relations[0]?.sourceId || uuidv4();
+//     const widget: Widget = createWidget({
+//       id: widgetId,
+//       dashboardId: boardId,
+//       config: widgetConf,
+//       relations,
+//     });
+//     dispatch(addWidgetsToEditBoard([widget]));
+//     dispatch(
+//       editDashBoardInfoActions.changeControllerPanel({
+//         type: 'hide',
+//         widgetId: '',
+//         controllerType: undefined,
+//       }),
+//     );
+//   };
 // changeChartEditorProps
 
 export const editChartInWidgetAction =

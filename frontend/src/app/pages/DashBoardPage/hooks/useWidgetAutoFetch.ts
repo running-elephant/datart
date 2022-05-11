@@ -18,7 +18,9 @@
 import { useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../components/ActionProvider/WidgetActionProvider';
 import { BoardInfoContext } from '../components/BoardProvider/BoardInfoProvider';
-import { VizRenderMode, Widget } from '../pages/Board/slice/types';
+import { getLoopFetch } from '../components/WidgetManager/utils/utils';
+import { VizRenderMode } from '../pages/Board/slice/types';
+import { Widget } from '../types/widgetTypes';
 import { isElView } from '../utils/board';
 
 export default function useWidgetAutoFetch(
@@ -31,32 +33,25 @@ export default function useWidgetAutoFetch(
   const { onWidgetGetData } = useContext(WidgetActionContext);
 
   useEffect(() => {
+    const loopFetch = getLoopFetch(widget.config.customConfig.props);
     let timer: NodeJS.Timeout | undefined = undefined;
     if (
       rendered &&
       boardVisible &&
-      widget.config.frequency > 0 &&
-      widget.config.autoUpdate
+      loopFetch.interval > 0 &&
+      loopFetch.enable
     ) {
       timer = setInterval(() => {
         const elShow = isElView(rectRef.current, true);
         if (elShow) {
           onWidgetGetData(widget);
         }
-      }, +widget.config.frequency * 1000);
+      }, +loopFetch.interval * 1000);
     }
     return () => {
       if (timer) {
         clearInterval(timer);
       }
     };
-  }, [
-    boardVisible,
-    widget,
-    widget.config.autoUpdate,
-    onWidgetGetData,
-    renderMode,
-    rendered,
-    rectRef,
-  ]);
+  }, [boardVisible, widget, onWidgetGetData, renderMode, rendered, rectRef]);
 }

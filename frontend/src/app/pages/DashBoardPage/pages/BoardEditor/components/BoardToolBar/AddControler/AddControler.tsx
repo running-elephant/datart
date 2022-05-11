@@ -20,7 +20,6 @@ import { Dropdown, Menu, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { G60 } from 'styles/StyleConstants';
@@ -114,14 +113,14 @@ export const AddController: React.FC<AddControlBtnProps> = () => {
       disabled: true,
     },
   ];
-  const buttonControllers: ButtonItemType<WidgetType>[] = [
+  const buttonControllers: ButtonItemType<any>[] = [
     {
       icon: '',
-      type: 'query',
+      type: 'queryBtn',
     },
     {
       icon: '',
-      type: 'reset',
+      type: 'resetBtn',
     },
   ];
   const renderTitle = (text: string) => {

@@ -22,12 +22,14 @@ import {
   DataViewFieldType,
 } from 'app/constants';
 import { BoardConfig } from 'app/pages/DashBoardPage/types/boardTypes';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDatasetMeta } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
+import { IFontDefault } from '../../../../../../types';
 import { ChartDataSectionField } from '../../../../../types/ChartConfig';
 import { View } from '../../../../../types/View';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
@@ -109,14 +111,13 @@ export const BoardTypes = ['auto', 'free'] as const;
 BoardTypes.includes('auto');
 export type BoardType = typeof BoardTypes[number];
 
-export interface Chart {}
-export interface Widget {
+export interface WidgetBeta3 {
   id: string;
   dashboardId: string;
   datachartId: string;
   relations: Relation[];
   viewIds: string[];
-  config: WidgetConf;
+  config: WidgetConfBeta3;
   parentId?: string;
 }
 export interface WidgetOfCopy extends Widget {
@@ -126,14 +127,14 @@ export interface ServerWidget extends Omit<Widget, 'config' | 'relations'> {
   config: string;
   relations: ServerRelation[];
 }
-export interface WidgetConf {
+export interface WidgetConfBeta3 {
   version: string;
   index: number;
   tabId?: string; //记录在父容器tab的位置
   name: string;
-  nameConfig: WidgetNameConfig;
+  nameConfig: WidgetTitleConfig;
   padding: WidgetPadding;
-  type: WidgetType;
+  type: WidgetTypeBeta3;
   autoUpdate: boolean;
   frequency: number; // 定时同步频率
   rect: RectConfig; //desktop_rect
@@ -141,14 +142,17 @@ export interface WidgetConf {
   mobileRect?: RectConfig; //mobile_rect 移动端适配
   background: BackgroundConfig;
   border: BorderConfig;
-  content: WidgetContent;
+  // content: WidgetContent;
+  content: any;
   tabIndex?: number; // 在tab 等容器widget里面的排序索引
   linkageConfig?: LinkageConfig; //联动设置
   jumpConfig?: JumpConfig; // 跳转 设置
 }
-export interface WidgetNameConfig extends FontConfig {
-  show: boolean;
+export interface WidgetTitleConfig {
+  title: string;
+  showTitle: boolean;
   textAlign?: TextAlignType;
+  font: IFontDefault;
 }
 export interface LinkageConfig {
   open: boolean;
@@ -265,7 +269,8 @@ export interface ServerRelation extends Omit<Relation, 'config'> {
 // TODO xld migration about filter xld
 export type WidgetContent =
   | MediaWidgetContent
-  | ContainerWidgetContent
+  // | ContainerWidgetContent
+  | TabWidgetContent
   | ControllerWidgetContent
   | ChartWidgetContent
   | BoardBtnContent;
@@ -308,18 +313,21 @@ export type MediaWidgetContent = {
   };
 };
 // 容器组件配置
-export type ContainerWidgetContent = {
-  type: ContainerWidgetType;
+// export type ContainerWidgetContent = {
+//   type: ContainerWidgetType;
+//   itemMap: Record<string, ContainerItem>;
+//   tabConfig?: any;
+//   carouselConfig?: any;
+// };
+export type TabWidgetContent = {
   itemMap: Record<string, ContainerItem>;
-  tabConfig?: any;
-  carouselConfig?: any;
 };
 
 export interface ContainerItem {
-  tabId: string;
+  index: number;
   name: string;
+  tabId: string;
   childWidgetId: string;
-  config?: any;
 }
 // 控制器组件配置
 export interface ControllerWidgetContent {
@@ -329,7 +337,7 @@ export interface ControllerWidgetContent {
   config: ControllerConfig;
 }
 
-export const WidgetTypes = [
+export const WidgetTypesBeta3 = [
   'chart',
   'media',
   'container',
@@ -337,7 +345,17 @@ export const WidgetTypes = [
   'query',
   'reset',
 ] as const;
+export type WidgetTypeBeta3 = typeof WidgetTypesBeta3[number];
+
+export const WidgetTypes = [
+  'chart',
+  'media',
+  'container',
+  'controller',
+  'button',
+] as const;
 export type WidgetType = typeof WidgetTypes[number];
+
 export declare const ContainerWidgetTypes: ['tab', 'carousel'];
 
 export type LightWidgetType =
@@ -385,14 +403,6 @@ export interface LineConfig {
 
 export interface BorderConfig extends LineConfig {
   radius: number;
-}
-
-export interface FontConfig {
-  fontFamily: string;
-  fontSize: string;
-  fontWeight: string;
-  fontStyle: string;
-  color: string;
 }
 
 //

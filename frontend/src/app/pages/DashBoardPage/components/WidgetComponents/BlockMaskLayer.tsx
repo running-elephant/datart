@@ -16,10 +16,7 @@
  * limitations under the License.
  */
 import { WIDGET_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
-import {
-  Widget,
-  WidgetInfo,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetInfo } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -29,6 +26,7 @@ import {
   editWidgetInfoActions,
 } from '../../pages/BoardEditor/slice';
 import { selectShowBlockMask } from '../../pages/BoardEditor/slice/selectors';
+import { Widget } from '../../types/widgetTypes';
 
 export interface BlockMaskLayerProps {
   widgetConfig: Widget;

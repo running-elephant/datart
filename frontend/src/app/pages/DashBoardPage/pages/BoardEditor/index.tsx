@@ -46,6 +46,7 @@ import {
 } from './slice/actions/actions';
 import {
   selectBoardChartEditorProps,
+  selectControllerPanel,
   selectEditBoard,
   selectEditBoardLoading,
 } from './slice/selectors';
@@ -59,7 +60,7 @@ export const BoardEditor: React.FC<{
   const board = useSelector(selectEditBoard);
   const boardLoading = useSelector(selectEditBoardLoading);
   const boardChartEditorProps = useSelector(selectBoardChartEditorProps);
-
+  const widgetControllerPanelParams = useSelector(selectControllerPanel);
   const onCloseChartEditor = useCallback(() => {
     dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
   }, [dispatch]);
@@ -94,7 +95,9 @@ export const BoardEditor: React.FC<{
         <EditorHeader />
         {boardType === 'auto' && <AutoEditor />}
         {boardType === 'free' && <FreeEditor />}
-        <ControllerWidgetPanel />
+        {widgetControllerPanelParams.type !== 'hide' && (
+          <ControllerWidgetPanel {...widgetControllerPanelParams} />
+        )}
         <LinkagePanel />
         <SettingJumpModal />
         {boardChartEditorProps && (
@@ -107,9 +110,10 @@ export const BoardEditor: React.FC<{
       </BoardInitProvider>
     );
   }, [
-    boardChartEditorProps,
     board,
     boardId,
+    widgetControllerPanelParams,
+    boardChartEditorProps,
     onCloseChartEditor,
     onSaveToWidget,
   ]);

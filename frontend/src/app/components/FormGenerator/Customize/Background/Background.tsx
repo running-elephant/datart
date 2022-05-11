@@ -18,6 +18,7 @@
 import { Input } from 'antd';
 import { ColorPickerPopover } from 'app/components/ColorPicker';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { BackgroundConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { UploadDragger } from 'app/pages/DashBoardPage/pages/BoardEditor/components/SlideSetting/SettingItem/BasicSet/ImageUpload';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useEffect, useRef } from 'react';
@@ -25,17 +26,11 @@ import styled from 'styled-components/macro';
 import { Group, WithColorPicker } from '../../Basic/components/Group';
 import { ItemLayoutProps } from '../../types';
 
-type BackgroundType = {
-  color: string;
-  image: string;
-  repeat: string;
-  size: string;
-};
 export const Background: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange, ...rest }) => {
     const { value, options } = data;
     const gt = useI18NPrefix(`viz.board.setting`);
-    const valRef = useRef<BackgroundType>();
+    const valRef = useRef<BackgroundConfig>();
     useEffect(() => {
       valRef.current = value;
     }, [value]);

@@ -181,7 +181,7 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
         BeanUtils.copyProperties(updateParam, schedule);
         schedule.setUpdateBy(getCurrentUser().getId());
         schedule.setUpdateTime(new Date());
-        if (schedule.getIsFolder()) {
+        if (Objects.equals(schedule.getIsFolder(), Boolean.TRUE)) {
             schedule.setType(ResourceType.FOLDER.name());
         } else {
             schedule.setType(scheduleUpdateParam.getType().name());

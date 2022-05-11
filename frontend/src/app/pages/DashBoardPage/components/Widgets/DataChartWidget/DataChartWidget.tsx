@@ -24,6 +24,10 @@ import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
+import {
+  getWidgetBaseStyle,
+  getWidgetTitle,
+} from '../../WidgetManager/utils/utils';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { ToolBar } from './components/ToolBar';
 import { DataChartWidgetCore } from './DataChartWidgetCore';
@@ -40,16 +44,15 @@ export const DataChartWidget: React.FC<{ hideTitle: boolean }> = memo(
       rendered,
     );
     useWidgetAutoFetch(widget, renderMode, cacheWhRef, rendered);
-    const { background, border, padding } = widget.config;
+    const title = getWidgetTitle(widget.config.customConfig.props);
+    title.title = widget.config.name;
+    const { background, border, padding } = getWidgetBaseStyle(
+      widget.config.customConfig.props,
+    );
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
         <div ref={cacheWhRef} style={ZIndexStyle}>
-          {!hideTitle && (
-            <WidgetTitle
-              name={widget.config.name}
-              config={widget.config.nameConfig}
-            />
-          )}
+          {!hideTitle && <WidgetTitle title={title} />}
 
           <div style={FlexStyle}>
             <DataChartWidgetCore />

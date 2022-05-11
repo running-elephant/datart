@@ -26,22 +26,25 @@ import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar'
 import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
+import {
+  getWidgetBaseStyle,
+  getWidgetTitle,
+} from '../../WidgetManager/utils/utils';
 import { TimerWidgetCore } from './TimerWidgetCore';
 
 export const TimerWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
     const widget = useContext(WidgetContext);
     const { editing } = useContext(BoardContext);
-    const { background, border, padding } = widget.config;
+    const { background, border, padding } = getWidgetBaseStyle(
+      widget.config.customConfig.props,
+    );
+    const title = getWidgetTitle(widget.config.customConfig.props);
+    title.title = widget.config.name;
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
         <div style={ZIndexStyle}>
-          {hideTitle ? null : (
-            <WidgetTitle
-              name={widget.config.name}
-              config={widget.config.nameConfig}
-            />
-          )}
+          {hideTitle ? null : <WidgetTitle title={title} />}
           <div style={FlexStyle}>
             <TimerWidgetCore />
           </div>
