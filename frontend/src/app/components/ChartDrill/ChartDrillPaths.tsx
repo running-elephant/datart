@@ -28,11 +28,10 @@ import { SPACE_SM, SPACE_XS } from 'styles/StyleConstants';
 const ChartDrillPaths: FC<{ chartConfig?: ChartConfig }> = memo(
   ({ chartConfig }) => {
     const { drillOption, onDrillOptionChange } = useContext(ChartDrillContext);
-    if (
-      !drillOption ||
-      drillOption.mode === DrillMode.Normal ||
-      chartConfig?.datas?.filter(v => v.hiddenDrillable).length
-    ) {
+    const menuVisible = !!chartConfig?.datas?.filter(
+      v => v.drillContextMenuVisible,
+    ).length;
+    if (!drillOption || drillOption.mode === DrillMode.Normal || menuVisible) {
       return <div></div>;
     }
 

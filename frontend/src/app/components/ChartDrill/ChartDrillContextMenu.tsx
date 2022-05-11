@@ -116,11 +116,12 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       );
     }, [drillOption?.isSelectedDrill, t]);
 
+    const menuVisible = !!chartConfig?.datas?.filter(
+      v => v.drillContextMenuVisible,
+    ).length;
+
     const hasContextMenu =
-      chartConfig?.datas?.filter(v => v.hiddenDrillable).length ||
-      !chartConfig?.datas?.filter(v => v.drillable).length ||
-      drillOption?.isDrillable ||
-      runtimeDateLevelFields?.length;
+      menuVisible || drillOption?.isDrillable || runtimeDateLevelFields?.length;
 
     const contextMenu = useMemo(() => {
       if (!hasContextMenu) {

@@ -47,7 +47,7 @@ class PivotSheetChart extends ReactChart {
   config = Config;
   chart: any = null;
   updateOptions: any = {};
-  oldRowsConfig: ChartDataSectionField[] = [];
+  lastRowsConfig: ChartDataSectionField[] = [];
   hierarchyCollapse: boolean = true;
   drillLevel: number = 0;
   collapsedRows: Record<string, boolean> = {};
@@ -89,7 +89,7 @@ class PivotSheetChart extends ReactChart {
   }
 
   onUnMount(options: any, context?: any): void {
-    this.oldRowsConfig = [];
+    this.lastRowsConfig = [];
     this.hierarchyCollapse = true;
     this.drillLevel = 0;
     this.collapsedRows = {};
@@ -183,16 +183,19 @@ class PivotSheetChart extends ReactChart {
 
     if (!!enableExpandRow) {
       if (
-        JSON.stringify(this.oldRowsConfig) !==
-        JSON.stringify(rowSectionConfigRows)
+        this.lastRowsConfig.map(lrc => lrc.uid).join('-') !==
+        rowSectionConfigRows.map(lrc => lrc.uid).join('-')
       ) {
+        this.drillLevel = 0;
+        this.collapsedRows = {};
         this.getCollapsedRows(rowSectionConfigRows, chartDataSet, true);
-        this.oldRowsConfig = rowSectionConfigRows;
+        this.lastRowsConfig = rowSectionConfigRows;
+      } else {
+        this.getCollapsedRows(rowSectionConfigRows, chartDataSet);
       }
-      this.getCollapsedRows(rowSectionConfigRows, chartDataSet);
     } else {
       if (Object.keys(this.collapsedRows).length) {
-        this.oldRowsConfig = [];
+        this.lastRowsConfig = [];
         this.hierarchyCollapse = true;
         this.drillLevel = 0;
         this.collapsedRows = {};
@@ -319,18 +322,16 @@ class PivotSheetChart extends ReactChart {
           green: '#29A294',
         },
       },
-      eventConfig: {
-        onRowCellCollapseTreeRows: ({ isCollapsed, node }) => {
-          this.collapsedRows[node.id] = isCollapsed;
-          this.changeDrillConfig(rowSectionConfigRows, drillOption);
-        },
-        onCollapseRowsAll: hierarchyCollapse => {
-          this.hierarchyCollapse = !hierarchyCollapse;
-          Object.keys(this.collapsedRows).forEach(k => {
-            this.collapsedRows[k] = this.hierarchyCollapse;
-          });
-          this.changeDrillConfig(rowSectionConfigRows, drillOption);
-        },
+      onRowCellCollapseTreeRows: ({ isCollapsed, node }) => {
+        this.collapsedRows[node.id] = isCollapsed;
+        this.changeDrillConfig(rowSectionConfigRows, drillOption);
+      },
+      onCollapseRowsAll: hierarchyCollapse => {
+        this.hierarchyCollapse = !hierarchyCollapse;
+        Object.keys(this.collapsedRows).forEach(k => {
+          this.collapsedRows[k] = this.hierarchyCollapse;
+        });
+        this.changeDrillConfig(rowSectionConfigRows, drillOption);
       },
     };
   }

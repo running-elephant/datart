@@ -36,7 +36,7 @@ const config: ChartConfig = {
         sortable: { backendSort: false },
       },
       drillable: false,
-      hiddenDrillable: true,
+      drillContextMenuVisible: true,
     },
     {
       label: 'metrics',

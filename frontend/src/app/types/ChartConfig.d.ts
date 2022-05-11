@@ -173,7 +173,7 @@ export type ChartDataConfig = ChartConfigBase & {
   limit?: null | number | string | number[] | string[];
   disableAggregate?: boolean;
   drillable?: boolean;
-  hiddenDrillable?: boolean;
+  drillContextMenuVisible?: boolean;
   options?: {
     [key in ValueOf<typeof ChartDataSectionFieldActionType>]: {
       backendSort?: boolean;
@@ -223,8 +223,6 @@ export type ChartStyleSectionRowOption = {
   showLineHeight?: boolean;
   showFontStyle?: boolean;
   showFontColor?: boolean;
-
-  hiddenConditionalColumns?: string[];
 
   /**
    * Support Components: @see BasicRadio, @see BasicSelector and etc
