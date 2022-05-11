@@ -17,13 +17,11 @@
  */
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import type {
+  WidgetActionListItem,
+  widgetActionType,
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
-import {
-  WidgetActionListItem,
-  widgetActionType,
-} from '../../WidgetComponents/config';
 import {
   initAutoWidgetRect,
   initBackgroundTpl,

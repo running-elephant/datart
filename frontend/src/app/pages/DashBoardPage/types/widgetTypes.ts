@@ -65,7 +65,7 @@ export type WidgetTplProps = WidgetCreateProps & {
 export interface WidgetToolkit {
   create: (T: WidgetCreateProps) => Widget;
   getName: (local?: string) => string;
-  getDropDownList?: (
+  getDropDownList: (
     widgetConf: WidgetConf,
     supportTrigger?: boolean,
   ) => WidgetActionListItem<widgetActionType>[];

@@ -17,14 +17,12 @@
  */
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import type {
+  WidgetActionListItem,
+  widgetActionType,
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
-import {
-  WidgetActionListItem,
-  widgetActionType,
-} from '../../WidgetComponents/config';
 import {
   initAutoWidgetRect,
   initBackgroundTpl,
@@ -41,6 +39,7 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
+
 const initIframeTpl = () => {
   return {
     label: 'iframe.iframeGroup',

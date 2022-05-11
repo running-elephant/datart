@@ -18,13 +18,11 @@
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
+  WidgetActionListItem,
+  widgetActionType,
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
-import {
-  WidgetActionListItem,
-  widgetActionType,
-} from '../../WidgetComponents/config';
 import {
   initAutoWidgetRect,
   initBackgroundTpl,
@@ -40,6 +38,7 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
+
 const NameI18N = {
   zh: '图片',
   en: 'Image',

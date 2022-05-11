@@ -25,6 +25,8 @@ import { RelatedWidgetItem } from 'app/pages/DashBoardPage/pages/BoardEditor/com
 import { ControllerConfig } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import {
   Widget,
+  WidgetActionListItem,
+  widgetActionType,
   WidgetCreateProps,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getTheWidgetFiltersAndParams } from 'app/pages/DashBoardPage/utils';
@@ -32,10 +34,6 @@ import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import { uuidv4 } from 'utils/utils';
-import {
-  WidgetActionListItem,
-  widgetActionType,
-} from '../../../WidgetComponents/config';
 import widgetManagerInstance from '../../../WidgetManager';
 import { initTitleTpl, widgetTpl } from '../../../WidgetManager/utils/init';
 

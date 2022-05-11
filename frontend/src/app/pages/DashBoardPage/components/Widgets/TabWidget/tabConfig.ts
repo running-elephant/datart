@@ -18,14 +18,12 @@
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { TabWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
+  WidgetActionListItem,
+  widgetActionType,
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { uuidv4 } from 'utils/utils';
-import {
-  WidgetActionListItem,
-  widgetActionType,
-} from '../../WidgetComponents/config';
 import {
   initAutoWidgetRect,
   initBackgroundTpl,
@@ -43,6 +41,7 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
+
 const NameI18N = {
   zh: '标签卡',
   en: 'Tab',

@@ -26,11 +26,8 @@ import {
   LockOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
-import {
-  WidgetActionListItem,
-  widgetActionType,
-} from '../components/WidgetComponents/config';
 import { VizRenderMode } from '../pages/Board/slice/types';
+import { WidgetActionListItem, widgetActionType } from '../types/widgetTypes';
 
 export const useWidgetDropdownList = (
   renderMode: VizRenderMode,

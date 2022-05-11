@@ -17,13 +17,14 @@
  */
 
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
-import { WidgetToolkit } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
   WidgetActionListItem,
   widgetActionType,
-} from '../../WidgetComponents/config';
+  WidgetToolkit,
+} from 'app/pages/DashBoardPage/types/widgetTypes';
 import { initWidgetName } from '../../WidgetManager/utils/init';
 import { dataChartCreator, getMeta } from './config';
+
 const NameI18N = {
   zh: '自建数据图表',
   en: 'OwnedChart',
