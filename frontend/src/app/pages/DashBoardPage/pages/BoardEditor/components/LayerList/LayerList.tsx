@@ -25,7 +25,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { WidgetType } from '../../../Board/slice/types';
-import { editBoardStackActions, editWidgetInfoActions } from '../../slice';
+import { editBoardStackActions } from '../../slice';
 import { updateWidgetConf } from '../../slice/childSlice/stackSlice';
 import {
   selectAllWidgetInfoMap,
@@ -97,9 +97,6 @@ export const LayerList: React.FC<{}> = memo(() => {
       dispatch(editBoardStackActions.updateWidgetsConfig(newWidgets));
     }
   }, [cards, dispatch, sortLayoutWidgets]);
-  const clearSelectedWidgets = () => {
-    dispatch(editWidgetInfoActions.clearSelectedWidgets());
-  };
 
   const nameList = cards
     .sort((a, b) => b.index - a.index)
@@ -124,7 +121,7 @@ export const LayerList: React.FC<{}> = memo(() => {
   const t = useI18NPrefix(`viz.board.action`);
   return (
     <DndProvider backend={HTML5Backend}>
-      <Wrapper onClick={clearSelectedWidgets}>
+      <Wrapper>
         <h3 className="title">{t('widgetList')}</h3>
         <div className="nameList">{nameList}</div>
         <div className="bottom"></div>

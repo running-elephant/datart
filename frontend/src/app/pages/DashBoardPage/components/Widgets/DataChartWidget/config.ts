@@ -59,6 +59,7 @@ export const getMeta = (opt: {
     canWrapped: true,
     controllable: true,
     linkable: true,
+    canFullScreen: true,
     viewAction: {
       ...initWidgetViewActionTpl(),
     },

@@ -21,7 +21,7 @@ import {
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
-import { controlWidgetTpl } from '.';
+import { controlWidgetTpl, getControlDropDownList } from '.';
 import {
   initBackgroundTpl,
   initBorderTpl,
@@ -44,6 +44,7 @@ export const widgetMeta: WidgetMeta = {
   canWrapped: true,
   controllable: true,
   linkable: false,
+  canFullScreen: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -112,6 +113,9 @@ export const widgetToolkit: WidgetToolkit = {
   },
   getName(key) {
     return initWidgetName(NameI18N, key);
+  },
+  getDropDownList(...arg) {
+    return getControlDropDownList(false);
   },
   edit() {},
   save() {},

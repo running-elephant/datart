@@ -17,6 +17,8 @@
  */
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import type {
+  WidgetActionListItem,
+  widgetActionType,
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
@@ -37,6 +39,7 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
+
 const initIframeTpl = () => {
   return {
     label: 'iframe.iframeGroup',
@@ -46,7 +49,7 @@ const initIframeTpl = () => {
       {
         label: 'iframe.src',
         key: 'src',
-        value: '/', //https://www.oschina.net/p/datart, http://www.retech.cc/product/datart
+        value: '/login', //https://www.oschina.net/p/datart, http://www.retech.cc/product/datart
         comType: 'input',
       },
     ],
@@ -72,6 +75,7 @@ export const widgetMeta: WidgetMeta = {
   canWrapped: true,
   controllable: false,
   linkable: false,
+  canFullScreen: true,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -152,6 +156,23 @@ const widgetToolkit: IframeWidgetToolKit = {
   },
   edit() {},
   save() {},
+  getDropDownList(...arg) {
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+    ];
+    return list;
+  },
   getIframe(props) {
     const [src] = getJsonConfigs(props, ['iframeGroup'], ['src']);
     return {
