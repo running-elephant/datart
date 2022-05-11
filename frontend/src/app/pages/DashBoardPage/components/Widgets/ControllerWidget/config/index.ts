@@ -25,6 +25,8 @@ import { RelatedWidgetItem } from 'app/pages/DashBoardPage/pages/BoardEditor/com
 import { ControllerConfig } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import {
   Widget,
+  WidgetActionListItem,
+  widgetActionType,
   WidgetCreateProps,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getTheWidgetFiltersAndParams } from 'app/pages/DashBoardPage/utils';
@@ -189,4 +191,27 @@ export const getControlOptionQueryParams = (obj: {
     requestParams.params = variableParams;
   }
   return requestParams;
+};
+
+export const getControlDropDownList = (refresh: boolean) => {
+  const list: WidgetActionListItem<widgetActionType>[] = [
+    {
+      key: 'refresh',
+      renderMode: ['edit'],
+      show: refresh,
+    },
+    {
+      key: 'edit',
+      renderMode: ['edit'],
+    },
+    {
+      key: 'delete',
+      renderMode: ['edit'],
+    },
+    {
+      key: 'lock',
+      renderMode: ['edit'],
+    },
+  ];
+  return list;
 };

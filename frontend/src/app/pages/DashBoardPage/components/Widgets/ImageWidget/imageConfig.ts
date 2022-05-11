@@ -18,6 +18,8 @@
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
+  WidgetActionListItem,
+  widgetActionType,
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
@@ -36,6 +38,7 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
+
 const NameI18N = {
   zh: '图片',
   en: 'Image',
@@ -46,6 +49,7 @@ export const widgetMeta: WidgetMeta = {
   canWrapped: true,
   controllable: false,
   linkable: false,
+  canFullScreen: true,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -140,6 +144,23 @@ export const widgetToolkit: ImageToolkit = {
   },
   getName(key) {
     return initWidgetName(NameI18N, key);
+  },
+  getDropDownList(...arg) {
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+    ];
+    return list;
   },
   edit() {},
   save() {},

@@ -22,6 +22,8 @@ import {
 } from 'app/pages/DashBoardPage/constants';
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
+  WidgetActionListItem,
+  widgetActionType,
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
@@ -86,6 +88,7 @@ export const widgetMeta: WidgetMeta = {
   canWrapped: true,
   controllable: false,
   linkable: false,
+  canFullScreen: true,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -179,6 +182,23 @@ export const widgetToolkit: TimerWidgetToolKit = {
   },
   edit() {},
   save() {},
+  getDropDownList(...arg) {
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+    ];
+    return list;
+  },
   getTimer(props) {
     const [time, font] = getJsonConfigs(
       props,
