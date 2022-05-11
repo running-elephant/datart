@@ -21,7 +21,7 @@ import {
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
-import { controlWidgetTpl } from '.';
+import { controlWidgetTpl, getControlDropDownList } from '.';
 import {
   initBackgroundTpl,
   initBorderTpl,
@@ -44,6 +44,7 @@ export const widgetMeta: WidgetMeta = {
   icon: 'dropdownList',
   widgetTypeId: ORIGINAL_TYPE_MAP.dropdownList,
   canWrapped: true,
+  canFullScreen: false,
   controllable: true,
   linkable: false,
   viewAction: {
@@ -115,6 +116,9 @@ export const widgetToolkit: WidgetToolkit = {
   },
   getName(key) {
     return initWidgetName(NameI18N, key);
+  },
+  getDropDownList(...arg) {
+    return getControlDropDownList(true);
   },
   edit() {},
   save() {},

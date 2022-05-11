@@ -9,6 +9,7 @@ import {
   LinkageConfig,
   RectConfig,
   Relation,
+  VizRenderMode,
   WidgetType,
 } from '../pages/Board/slice/types';
 
@@ -64,6 +65,10 @@ export type WidgetTplProps = WidgetCreateProps & {
 export interface WidgetToolkit {
   create: (T: WidgetCreateProps) => Widget;
   getName: (local?: string) => string;
+  getDropDownList?: (
+    widgetConf: WidgetConf,
+    supportTrigger?: boolean,
+  ) => WidgetActionListItem<widgetActionType>[];
   edit?: () => void;
   save?: () => void;
 
@@ -88,6 +93,7 @@ export interface WidgetMeta {
   canWrapped: boolean; // 是否可以被包裹 被 widget container 包裹
   controllable: boolean; // 是否可以 被 controller 关联
   linkable: boolean; // 是否可以 被 widget 联动
+  canFullScreen: boolean; // 是否出现在全屏列表
   viewAction: Record<string, { label: string; icon: any; key: string }>;
   editAction: Record<string, { label: string; icon: any; key: string }>;
   i18ns: ChartI18NSectionConfig[];
@@ -97,7 +103,30 @@ export interface ITimeDefault {
   format: string;
   duration: number;
 }
-// {
-//           format: 'YYYY-MM-DD HH:mm:ss',
-//           duration: 1000,
-//         }
+export interface WidgetActionListItem<T> {
+  key: T;
+  label?: string;
+  icon?: React.ReactNode;
+  disabled?: boolean;
+  color?: string;
+  danger?: boolean;
+  divider?: boolean;
+  show?: boolean;
+  renderMode?: VizRenderMode[];
+}
+
+export const widgetActionTypes = [
+  'refresh',
+  'fullScreen',
+  'delete',
+  'info',
+  'edit',
+  'makeLinkage',
+  'clearLinkage',
+  'closeLinkage',
+  'makeJump',
+  'closeJump',
+  'lock',
+  'unlock',
+] as const;
+export type widgetActionType = typeof widgetActionTypes[number];

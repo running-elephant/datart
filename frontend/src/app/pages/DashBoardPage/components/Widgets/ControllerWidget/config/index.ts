@@ -32,6 +32,10 @@ import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import { uuidv4 } from 'utils/utils';
+import {
+  WidgetActionListItem,
+  widgetActionType,
+} from '../../../WidgetComponents/config';
 import widgetManagerInstance from '../../../WidgetManager';
 import { initTitleTpl, widgetTpl } from '../../../WidgetManager/utils/init';
 
@@ -189,4 +193,27 @@ export const getControlOptionQueryParams = (obj: {
     requestParams.params = variableParams;
   }
   return requestParams;
+};
+
+export const getControlDropDownList = (refresh: boolean) => {
+  const list: WidgetActionListItem<widgetActionType>[] = [
+    {
+      key: 'refresh',
+      renderMode: ['edit'],
+      show: refresh,
+    },
+    {
+      key: 'edit',
+      renderMode: ['edit'],
+    },
+    {
+      key: 'delete',
+      renderMode: ['edit'],
+    },
+    {
+      key: 'lock',
+      renderMode: ['edit'],
+    },
+  ];
+  return list;
 };

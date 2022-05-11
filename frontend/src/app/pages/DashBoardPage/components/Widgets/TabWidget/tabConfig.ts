@@ -23,6 +23,10 @@ import type {
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { uuidv4 } from 'utils/utils';
 import {
+  WidgetActionListItem,
+  widgetActionType,
+} from '../../WidgetComponents/config';
+import {
   initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
@@ -49,6 +53,7 @@ export const widgetMeta: WidgetMeta = {
   canWrapped: false,
   controllable: false,
   linkable: false,
+  canFullScreen: true,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -133,6 +138,23 @@ export const widgetToolkit: TabToolkit = {
   },
   getName(key) {
     return initWidgetName(NameI18N, key);
+  },
+  getDropDownList(...arg) {
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+    ];
+    return list;
   },
   edit() {},
   save() {},

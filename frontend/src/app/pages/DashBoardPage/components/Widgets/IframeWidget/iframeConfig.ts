@@ -22,6 +22,10 @@ import type {
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
 import {
+  WidgetActionListItem,
+  widgetActionType,
+} from '../../WidgetComponents/config';
+import {
   initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
@@ -46,7 +50,7 @@ const initIframeTpl = () => {
       {
         label: 'iframe.src',
         key: 'src',
-        value: '/', //https://www.oschina.net/p/datart, http://www.retech.cc/product/datart
+        value: '/login', //https://www.oschina.net/p/datart, http://www.retech.cc/product/datart
         comType: 'input',
       },
     ],
@@ -72,6 +76,7 @@ export const widgetMeta: WidgetMeta = {
   canWrapped: true,
   controllable: false,
   linkable: false,
+  canFullScreen: true,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -152,6 +157,23 @@ const widgetToolkit: IframeWidgetToolKit = {
   },
   edit() {},
   save() {},
+  getDropDownList(...arg) {
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+    ];
+    return list;
+  },
   getIframe(props) {
     const [src] = getJsonConfigs(props, ['iframeGroup'], ['src']);
     return {

@@ -29,6 +29,10 @@ import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
 import { IFontDefault } from '../../../../../../types';
 import { ITimeDefault } from '../../../types/widgetTypes';
 import {
+  WidgetActionListItem,
+  widgetActionType,
+} from '../../WidgetComponents/config';
+import {
   initBackgroundTpl,
   initBorderTpl,
   initPaddingTpl,
@@ -86,6 +90,7 @@ export const widgetMeta: WidgetMeta = {
   canWrapped: true,
   controllable: false,
   linkable: false,
+  canFullScreen: true,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -179,6 +184,23 @@ export const widgetToolkit: TimerWidgetToolKit = {
   },
   edit() {},
   save() {},
+  getDropDownList(...arg) {
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+    ];
+    return list;
+  },
   getTimer(props) {
     const [time, font] = getJsonConfigs(
       props,
