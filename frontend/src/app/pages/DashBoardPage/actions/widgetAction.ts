@@ -25,11 +25,7 @@ import {
   getChartWidgetDataAsync,
   getWidgetData,
 } from '../pages/Board/slice/thunk';
-import {
-  BoardLinkFilter,
-  VizRenderMode,
-  Widget,
-} from '../pages/Board/slice/types';
+import { BoardLinkFilter, VizRenderMode } from '../pages/Board/slice/types';
 import {
   editDashBoardInfoActions,
   editWidgetInfoActions,
@@ -42,6 +38,7 @@ import {
   getEditChartWidgetDataAsync,
   getEditWidgetData,
 } from '../pages/BoardEditor/slice/thunk';
+import { Widget } from '../types/widgetTypes';
 import { getValueByRowData } from '../utils/widget';
 
 export const toggleLinkageAction =

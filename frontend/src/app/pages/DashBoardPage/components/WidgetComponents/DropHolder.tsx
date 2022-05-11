@@ -15,14 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  CanDropToWidgetTypes,
-  CONTAINER_TAB,
-} from 'app/pages/DashBoardPage/constants';
+import { CONTAINER_TAB } from 'app/pages/DashBoardPage/constants';
 import { memo, useMemo } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
-import { ContainerItem } from '../../../../pages/Board/slice/types';
+import { ContainerItem } from '../../pages/Board/slice/types';
+import { editBoardStackActions } from '../../pages/BoardEditor/slice';
+import { DropItem } from './WidgetDndHandleMask';
 
 export interface DropHolderProps {
   tabItem: ContainerItem;
@@ -30,16 +30,25 @@ export interface DropHolderProps {
 }
 export const DropHolder: React.FC<DropHolderProps> = memo(
   ({ tabItem, parentId }) => {
+    const dispatch = useDispatch();
     const [{ isOver, canDrop }, refDrop] = useDrop(
       () => ({
         accept: CONTAINER_TAB,
         item: { tabItem, parentId },
-        drop: () => ({ tabItem, parentId }),
-        canDrop: (item: any) => {
-          if (CanDropToWidgetTypes.includes(item.type)) {
-            return true;
-          }
-          return false;
+        drop: (dropItem: DropItem) => {
+          dispatch(
+            editBoardStackActions.addWidgetToTabWidget({
+              parentId,
+              tabItem: {
+                ...tabItem,
+                childWidgetId: dropItem.childId,
+              },
+              sourceId: dropItem.childId,
+            }),
+          );
+        },
+        canDrop: (dropItem: DropItem) => {
+          return dropItem.canWrapped;
         },
         collect: (monitor: DropTargetMonitor) => ({
           isOver: monitor.isOver(),

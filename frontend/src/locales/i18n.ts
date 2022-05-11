@@ -58,7 +58,7 @@ export const antdLocales = {
   zh: antd_zh_CN,
 };
 
-function getInitialLocale() {
+export function getInitialLocale() {
   const storedLocale = localStorage.getItem(StorageKeys.Locale);
   if (!storedLocale) {
     const browserLocale = ['zh', 'zh-CN'].includes(navigator.language) // FIXME locale

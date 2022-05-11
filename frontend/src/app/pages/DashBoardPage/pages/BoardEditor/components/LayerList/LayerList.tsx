@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import produce from 'immer';
@@ -31,7 +32,6 @@ import {
   selectSortAllWidgets,
 } from '../../slice/selectors';
 import NameItem from './NameItem';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 
 export type NameCard = {
   index: number;
@@ -122,7 +122,6 @@ export const LayerList: React.FC<{}> = memo(() => {
       </WidgetWrapProvider>
     ));
   const t = useI18NPrefix(`viz.board.action`);
-  
   return (
     <DndProvider backend={HTML5Backend}>
       <Wrapper onClick={clearSelectedWidgets}>

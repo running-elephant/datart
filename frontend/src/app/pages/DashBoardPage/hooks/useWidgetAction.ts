@@ -18,7 +18,7 @@
 import { useCallback, useContext } from 'react';
 import { WidgetActionContext } from '../components/ActionProvider/WidgetActionProvider';
 import { widgetActionType } from '../components/WidgetComponents/config';
-import { Widget } from '../pages/Board/slice/types';
+import { Widget } from '../types/widgetTypes';
 
 export default function useWidgetAction() {
   const {

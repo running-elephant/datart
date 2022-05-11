@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { Tabs } from 'antd';
-import { ContainerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { TabWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { memo, useCallback, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -24,11 +24,11 @@ import { PRIMARY } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions } from '../../../pages/BoardEditor/slice';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { DropHolder } from '../../WidgetComponents/DropHolder';
+import { WidgetMapper } from '../../WidgetMapper/WidgetMapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { WidgetWrapProvider } from '../../WidgetProvider/WidgetWrapProvider';
-import { DropHolder } from './components/DropHolder';
-import { TabWidgetMapper } from './components/TabWidgetMapper';
 
 const { TabPane } = Tabs;
 
@@ -41,41 +41,46 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
     editing: boardEditing,
     boardId,
   } = useContext(BoardContext);
-  const { itemMap } = widget.config.content as ContainerWidgetContent;
-  const tabsCons = Object.values(itemMap);
-  const [activeKey, SetActiveKey] = useState(tabsCons[0]?.tabId || '');
+  const { itemMap } = widget.config.content as TabWidgetContent;
+  const tabsCons = Object.values(itemMap).sort((a, b) => a.index - b.index);
+  const [activeKey, SetActiveKey] = useState<string | number>(
+    tabsCons[0]?.index || 0,
+  );
   const onTabClick = useCallback((activeKey: string, event) => {
     SetActiveKey(activeKey);
   }, []);
 
   const tabAdd = useCallback(() => {
-    const newTabId = uuidv4();
+    const newTabId = `tab_${uuidv4()}`;
+    const nextIndex = Date.now();
     dispatch(
       editBoardStackActions.tabsWidgetAddTab({
         parentId: widget.id,
         tabItem: {
-          tabId: newTabId,
+          index: nextIndex,
           name: 'tab',
+          tabId: newTabId,
           childWidgetId: '',
-          config: {},
         },
       }),
     );
     setImmediate(() => {
-      SetActiveKey(newTabId);
+      SetActiveKey(nextIndex);
     });
   }, [dispatch, widget.id]);
   const tabRemove = useCallback(
     targetKey => {
+      const tabId =
+        tabsCons.find(tab => String(tab.index) === targetKey)?.tabId || '';
       dispatch(
         editBoardStackActions.tabsWidgetRemoveTab({
           parentId: widget.id,
-          sourceTabId: targetKey,
+          sourceTabId: tabId,
           mode: boardType,
         }),
       );
       setImmediate(() => {
-        SetActiveKey(tabsCons[0].tabId || '');
+        SetActiveKey(tabsCons[0].index);
       });
     },
 
@@ -92,7 +97,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
       <Tabs
         onTabClick={editing ? onTabClick : undefined}
         size="small"
-        activeKey={editing ? activeKey : undefined}
+        activeKey={editing ? String(activeKey) : undefined}
         centered
         tabBarStyle={{ fontSize: '16px' }}
         type={editing ? 'editable-card' : undefined}
@@ -102,7 +107,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
         {tabsCons.map(tab => (
           <TabPane
             tab={tab.name || 'tab'}
-            key={tab.tabId}
+            key={tab.index}
             className="TabPane"
             forceRender
           >
@@ -113,10 +118,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
                 boardId={boardId}
               >
                 <MapWrapper>
-                  <TabWidgetMapper
-                    boardEditing={boardEditing}
-                    boardType={boardType}
-                  />
+                  <WidgetMapper boardEditing={boardEditing} hideTitle={true} />
                 </MapWrapper>
               </WidgetWrapProvider>
             ) : (

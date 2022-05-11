@@ -15,67 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Form, Input } from 'antd';
-import { MediaWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
-import produce from 'immer';
-import { memo, useContext, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
-import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
-import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
+import { iframeWidgetToolKit } from './iframeConfig';
 
 export const IframeWidgetCore: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
-  const dispatch = useDispatch();
-  const { editing } = useContext(WidgetInfoContext);
-  const { onWidgetUpdate } = useContext(WidgetActionContext);
-  const src = (widget.config.content as MediaWidgetContent).iframeConfig?.src;
-  const [curSrc, setCurSrc] = useState<string | undefined>('');
-  useEffect(() => {
-    setCurSrc(src);
-  }, [src]);
-
-  const onFinish = () => {
-    const nextWidget = produce(widget, draft => {
-      (draft.config.content as MediaWidgetContent).iframeConfig = {
-        src: curSrc,
-      };
-    });
-    dispatch(editWidgetInfoActions.closeWidgetEditing(widget.id));
-    onWidgetUpdate(nextWidget);
-  };
-  const setter = (
-    <div className="wrap-form">
-      <Form
-        initialValues={{ videoSrc: src }}
-        onFinish={onFinish}
-        layout="inline"
-        autoComplete="off"
-      >
-        <Form.Item
-          label="网址"
-          name="videoSrc"
-          rules={[{ required: true, message: 'input video URL' }]}
-        >
-          <Input onChange={e => setCurSrc(e.target.value)} value={curSrc} />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            确认
-          </Button>
-        </Form.Item>
-      </Form>
-    </div>
+  // getWidgetIframe;
+  const iframeVal = iframeWidgetToolKit.getIframe(
+    widget.config.customConfig.props,
   );
 
   return (
     <Wrapper>
-      {editing && setter}
       <iframe
         title=" "
-        src={curSrc}
+        src={iframeVal.src}
         frameBorder="0"
         allow="autoplay"
         style={{ width: '100%', height: '100%' }}

@@ -888,7 +888,7 @@
     "board": {
       "action": {
         "dataChart": "数据图表",
-        "ImportExistingDataCharts": "引入已有数据图表",
+        "importExistingDataCharts": "引入已有数据图表",
         "createDataChartInBoard": "新建数据图表",
         "searchValue": "搜索名称关键字",
         "media": "媒体组件",
@@ -971,7 +971,9 @@
         "delPageTip": "确认删除此故事页？",
         "enterHere": "请输入",
         "storyName": "名称",
-        "storyDescription": "描述"
+        "storyDescription": "描述",
+        "format": "格式",
+        "interval": "间隔"
       }
     },
     "widget": {
@@ -986,8 +988,8 @@
         "media": "媒体",
         "container": "容器",
         "controller": "控制器",
-        "query": "查询",
-        "reset": "重置",
+        "queryBtn": "查询",
+        "resetBtn": "重置",
         "image": "图片",
         "richText": "富文本",
         "timer": "时间器",

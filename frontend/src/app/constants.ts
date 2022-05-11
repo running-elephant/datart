@@ -16,6 +16,10 @@
  * limitations under the License.
  */
 
+import { FONT_FAMILY } from '@antv/s2';
+import { G90 } from 'styles/StyleConstants';
+import { IFontDefault } from 'types';
+
 export enum TenantManagementMode {
   Team = 'TEAM',
   Platform = 'PLATFORM',
@@ -23,19 +27,23 @@ export enum TenantManagementMode {
 
 export enum ControllerFacadeTypes {
   DropdownList = 'dropdownList',
+  MultiDropdownList = 'multiDropdownList',
+
   RadioGroup = 'radioGroup',
   CheckboxGroup = 'checkboxGroup',
-  MultiDropdownList = 'multiDropdownList',
+  Text = 'text',
+
+  Value = 'value',
+  RangeValue = 'rangeValue',
+  Slider = 'slider',
+  RangeSlider = 'rangeSlider',
+
+  Time = 'time',
   RangeTime = 'rangeTime',
   RangeTimePicker = 'rangeTimePicker',
   RecommendTime = 'recommendTime',
-  RangeValue = 'rangeValue',
-  Text = 'text',
+
   Tree = 'tree',
-  Value = 'value',
-  Time = 'time',
-  Slider = 'slider',
-  RangeSlider = 'rangeSlider',
 }
 
 export enum ControllerRadioFacadeTypes {
@@ -207,7 +215,6 @@ export const ChartStyleSectionComponentType = {
   TEXT: 'text',
   CONDITIONALSTYLE: 'conditionalStylePanel',
   RADIO: 'radio',
-  BACKGROUND: 'background',
 
   // Customize Component
   FontAlignment: 'fontAlignment',
@@ -218,6 +225,9 @@ export const ChartStyleSectionComponentType = {
   ScorecardListTemplate: 'scorecardListTemplate',
   ScorecardConditionalStyle: 'scorecardConditionalStyle',
   PivotSheetTheme: 'pivotSheetTheme',
+  BACKGROUND: 'background',
+  WIDGET_BORDER: 'widgetBorder',
+  TIMER_FORMAT: 'timerFormat',
 };
 
 export enum DownloadFileType {
@@ -227,3 +237,11 @@ export enum DownloadFileType {
 }
 
 export const RUNTIME_DATE_LEVEL_KEY = Symbol('DateLevel');
+
+export const FONT_DEFAULT: IFontDefault = {
+  fontFamily: FONT_FAMILY,
+  fontSize: '14',
+  fontWeight: 'normal',
+  fontStyle: 'normal',
+  color: G90,
+};

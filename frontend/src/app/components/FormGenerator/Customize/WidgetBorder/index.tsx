@@ -15,22 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Checkbox, Form } from 'antd';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import React, { FC } from 'react';
-import NumberSet from './BasicSet/NumberSet';
-export const AutoUpdateSet: FC = () => {
-  const t = useI18NPrefix(`viz.board.setting`);
-  return (
-    <>
-      <Form.Item valuePropName="checked" name="autoUpdate">
-        <Checkbox>{t('openAutoUpdate')}</Checkbox>
-      </Form.Item>
-      <Form.Item preserve name="frequency">
-        <NumberSet label={t('frequency')} name={'frequency'} />
-      </Form.Item>
-    </>
-  );
-};
 
-export default AutoUpdateSet;
+import { WidgetBorder } from './WidgetBorder';
+
+export default WidgetBorder;

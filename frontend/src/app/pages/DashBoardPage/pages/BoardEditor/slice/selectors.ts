@@ -19,13 +19,13 @@ import { createSelector } from '@reduxjs/toolkit';
 import { DefaultWidgetData } from 'app/pages/DashBoardPage/constants';
 import {
   DeviceType,
-  Widget,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   EditBoardState,
   HistoryEditBoard,
 } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { StateWithHistory } from 'redux-undo';
 import { getLayoutWidgets } from './../../../utils/widget';
 import { EditBoardStack } from './types';

@@ -56,6 +56,7 @@ export const handleServerBoardAction =
     const { widgetMap, wrappedDataCharts, controllerWidgets } = getWidgetMap(
       migratedWidgets,
       dataCharts,
+      dashboard.config.type,
       filterSearchMap,
     );
     const widgetIds = Object.values(widgetMap).map(w => w.id);

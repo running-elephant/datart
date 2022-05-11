@@ -17,15 +17,14 @@
  */
 import { Form, InputNumber } from 'antd';
 import { NamePath } from 'rc-field-form/lib/interface';
-import React, { FC, memo } from 'react';
-export const NumberSet: FC<{ label: string; name: NamePath }> = memo(
-  ({ label, name }) => {
+import { FC, memo } from 'react';
+export const NumberSet: FC<{ label: string; name: NamePath; onChange: any }> =
+  memo(({ label, name, onChange }) => {
     return (
       <Form.Item label={label} name={name}>
-        <InputNumber className="datart-ant-input-number" />
+        <InputNumber className="datart-ant-input-number" onChange={onChange} />
       </Form.Item>
     );
-  },
-);
+  });
 
 export default NumberSet;

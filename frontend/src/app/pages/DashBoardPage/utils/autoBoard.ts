@@ -29,22 +29,17 @@ export const initAutoBoardConfig = () => {
           label: 'basic.basic',
           key: 'basic',
           comType: 'group',
-          options: {
-            expand: true,
-          },
           rows: [
             {
               label: 'basic.initialQuery',
               key: 'initialQuery',
-              default: true,
               value: true,
               comType: 'switch',
             },
             {
               label: 'basic.allowOverlap',
               key: 'allowOverlap',
-              default: false,
-              value: true,
+              value: false,
               comType: 'switch',
             },
           ],

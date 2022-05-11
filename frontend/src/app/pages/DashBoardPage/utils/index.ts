@@ -26,10 +26,7 @@ import {
 import { migrateChartConfig } from 'app/migration';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
-import {
-  RelatedView,
-  WidgetType,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
@@ -38,7 +35,6 @@ import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
 import { getStyles } from 'app/utils/chartHelper';
 import { getTime, splitRangerDateFilters } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
-import i18next from 'i18next';
 import moment from 'moment';
 import { CloneValueDeep } from 'utils/object';
 import { boardDrillManager } from '../components/BoardDrillManager/BoardDrillManager';
@@ -48,13 +44,13 @@ import {
   ControllerWidgetContent,
   DataChart,
   getDataOption,
-  Widget,
   WidgetInfo,
 } from '../pages/Board/slice/types';
 import {
   ControllerConfig,
   ControllerDate,
 } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { Widget } from '../types/widgetTypes';
 import { DateControllerTypes } from './../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
@@ -511,29 +507,6 @@ export const getDistinctFiltersByColumn = (
   });
 
   return Object.values(filterMap);
-};
-
-export const getDefaultWidgetName = (
-  widgetType: WidgetType,
-  subWidgetType: string,
-  index: number,
-) => {
-  const typeTitle = i18next.t(`viz.widget.type.${widgetType}`);
-  const subTypeTitle = i18next.t(`viz.widget.type.${subWidgetType}`);
-  const widgetTypes: WidgetType[] = [
-    'chart',
-    'container',
-    'controller',
-    'media',
-  ];
-  const BtnTypes: WidgetType[] = ['query', 'reset'];
-  if (widgetTypes.includes(widgetType)) {
-    return `${subTypeTitle}_${index}`;
-  } else if (BtnTypes.includes(widgetType)) {
-    return `${typeTitle}`;
-  } else {
-    return `xxx${index}`;
-  }
 };
 
 export const getJsonConfigs = getStyles;
