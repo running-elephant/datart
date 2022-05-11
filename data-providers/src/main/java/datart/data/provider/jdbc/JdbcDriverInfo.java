@@ -46,6 +46,8 @@ public class JdbcDriverInfo {
 
     private String identifierEndQuote;
 
+    private String identifierEscapedQuote;
+
     private String literalEndQuote;
 
     private String adapterClass;
