@@ -482,16 +482,14 @@ export function mergeChartDataConfigs<
   return (target || []).map(tEle => {
     const sEle = (source || []).find(s => s?.key === tEle?.key);
     if (sEle) {
-      const datas = Object.assign({}, tEle, {
-        rows: sEle?.rows,
-        drillable: sEle?.drillable,
-      });
-      return Object.keys(datas).reduce((acc, cur) => {
-        if (datas[cur] !== undefined || datas[cur] !== null) {
-          acc[cur] = datas[cur];
-        }
-        return acc;
-      }, {});
+      return Object.assign(
+        {},
+        tEle,
+        {
+          rows: sEle?.rows,
+        },
+        !isUndefined(sEle?.drillable) ? { drillable: sEle?.drillable } : {},
+      );
     }
     return tEle;
   });
