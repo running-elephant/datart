@@ -18,11 +18,13 @@
 
 import {
   AggregateFieldActionType,
+  ChartDataSectionFieldActionType,
   ChartDataSectionType,
   ChartDataViewFieldCategory,
   ChartStyleSectionComponentType,
   DataViewFieldType,
   FieldFormatType,
+  FilterConditionType,
 } from 'app/constants';
 import {
   ControllerFacadeTypes,
@@ -97,11 +99,6 @@ export type RelationFilterValue = {
 
 export type AggregateLimit = Pick<typeof AggregateFieldActionType, 'COUNT'>;
 
-export type ChartConfigBase = {
-  label?: string;
-  key: string;
-};
-
 export type ChartDataSectionField = {
   uid?: string;
   colName: string;
@@ -113,8 +110,8 @@ export type ChartDataSectionField = {
 
   sort?: SortFieldAction;
   alias?: AliasFieldAction;
-  format?: IFieldFormatConfig;
-  aggregate?: AggregateFieldActionType;
+  format?: FormatFieldAction;
+  aggregate?: AggregateFieldAction;
   filter?: FilterFieldAction;
   color?: ColorFieldAction;
   size?: number;
@@ -131,7 +128,7 @@ export type ColorFieldAction = {
   colors?: Array<{ key: string; value: string }>;
 };
 
-export interface IFieldFormatConfig {
+export type FormatFieldAction = {
   type: FieldFormatType;
   [FieldFormatType.NUMERIC]?: {
     decimalPlaces: number;
@@ -158,11 +155,16 @@ export interface IFieldFormatConfig {
   [FieldFormatType.CUSTOM]?: {
     format: string;
   };
-}
+};
 
 export type AliasFieldAction = {
   name?: string;
   desc?: string;
+};
+
+export type ChartConfigBase = {
+  label?: string;
+  key: string;
 };
 
 export type ChartDataConfig = ChartConfigBase & {

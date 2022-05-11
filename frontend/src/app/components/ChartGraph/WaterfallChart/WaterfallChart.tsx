@@ -21,7 +21,7 @@ import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
-  IFieldFormatConfig,
+  FormatFieldAction,
   LabelStyle,
   XAxis,
   XAxisColumns,
@@ -343,7 +343,7 @@ class WaterfallChart extends Chart {
 
   private getLabel(
     styles: ChartStyleConfig[],
-    format: IFieldFormatConfig | undefined,
+    format: FormatFieldAction | undefined,
   ): LabelStyle {
     const [show, position, font] = getStyles(
       styles,

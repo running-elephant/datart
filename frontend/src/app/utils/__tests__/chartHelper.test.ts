@@ -29,7 +29,7 @@ import {
   ChartDataConfig,
   ChartDataSectionField,
   ChartStyleConfig,
-  IFieldFormatConfig,
+  FormatFieldAction,
 } from '../../types/ChartConfig';
 import {
   clearRuntimeDateLevelFieldsInChartConfig,
@@ -757,7 +757,7 @@ describe('Chart Helper ', () => {
       ],
     ])('toFormattedValue Test - numeric', (value, format, expected) => {
       test(`format aggregate data`, () => {
-        expect(toFormattedValue(value, format as IFieldFormatConfig)).toEqual(
+        expect(toFormattedValue(value, format as FormatFieldAction)).toEqual(
           expected,
         );
       });
@@ -792,7 +792,7 @@ describe('Chart Helper ', () => {
       ],
     ])('toFormattedValue Test - currency', (value, format, expected) => {
       test(`format aggregate data`, () => {
-        expect(toFormattedValue(value, format as IFieldFormatConfig)).toEqual(
+        expect(toFormattedValue(value, format as FormatFieldAction)).toEqual(
           expected,
         );
       });
@@ -931,7 +931,7 @@ describe('Chart Helper ', () => {
       ],
     ])('toFormattedValue Test - other', (value, format, expected) => {
       test(`format aggregate data`, () => {
-        expect(toFormattedValue(value, format as IFieldFormatConfig)).toEqual(
+        expect(toFormattedValue(value, format as FormatFieldAction)).toEqual(
           expected,
         );
       });

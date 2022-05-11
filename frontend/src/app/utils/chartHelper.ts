@@ -35,7 +35,7 @@ import {
   ChartStyleSectionGroup,
   FontStyle,
   GridStyle,
-  IFieldFormatConfig,
+  FormatFieldAction,
   LineStyle,
   MarkArea,
   MarkDataConfig,
@@ -91,12 +91,12 @@ import {
  * console.log(formattedData); // '100.00%';
  * @export
  * @param {(number | string)} [value]
- * @param {IFieldFormatConfig} [format]
+ * @param {FormatFieldAction} [format]
  * @return {*}
  */
 export function toFormattedValue(
   value?: number | string,
-  format?: IFieldFormatConfig,
+  format?: FormatFieldAction,
 ) {
   if (value === null || value === undefined) {
     return '-';
@@ -129,7 +129,7 @@ export function toFormattedValue(
   switch (formatType) {
     case FieldFormatType.NUMERIC:
       const numericConfig =
-        config as IFieldFormatConfig[FieldFormatType.NUMERIC];
+        config as FormatFieldAction[FieldFormatType.NUMERIC];
       formattedValue = pipe(
         unitFormater,
         decimalPlacesFormater,
@@ -138,24 +138,24 @@ export function toFormattedValue(
       break;
     case FieldFormatType.CURRENCY:
       const currencyConfig =
-        config as IFieldFormatConfig[FieldFormatType.CURRENCY];
+        config as FormatFieldAction[FieldFormatType.CURRENCY];
       formattedValue = pipe(currencyFormater)(value, currencyConfig);
       break;
     case FieldFormatType.PERCENTAGE:
       const percentageConfig =
-        config as IFieldFormatConfig[FieldFormatType.PERCENTAGE];
+        config as FormatFieldAction[FieldFormatType.PERCENTAGE];
       formattedValue = pipe(percentageFormater)(value, percentageConfig);
       break;
     case FieldFormatType.SCIENTIFIC:
       const scientificNotationConfig =
-        config as IFieldFormatConfig[FieldFormatType.SCIENTIFIC];
+        config as FormatFieldAction[FieldFormatType.SCIENTIFIC];
       formattedValue = pipe(scientificNotationFormater)(
         value,
         scientificNotationConfig,
       );
       break;
     case FieldFormatType.DATE:
-      const dateConfig = config as IFieldFormatConfig[FieldFormatType.DATE];
+      const dateConfig = config as FormatFieldAction[FieldFormatType.DATE];
       formattedValue = pipe(dateFormater)(value, dateConfig);
       break;
     default:
@@ -169,8 +169,8 @@ export function toFormattedValue(
 function decimalPlacesFormater(
   value,
   config?:
-    | IFieldFormatConfig[FieldFormatType.NUMERIC]
-    | IFieldFormatConfig[FieldFormatType.CURRENCY],
+    | FormatFieldAction[FieldFormatType.NUMERIC]
+    | FormatFieldAction[FieldFormatType.CURRENCY],
 ) {
   if (isEmpty(config?.decimalPlaces)) {
     return value;
@@ -188,8 +188,8 @@ function decimalPlacesFormater(
 function unitFormater(
   value: any,
   config?:
-    | IFieldFormatConfig[FieldFormatType.NUMERIC]
-    | IFieldFormatConfig[FieldFormatType.CURRENCY],
+    | FormatFieldAction[FieldFormatType.NUMERIC]
+    | FormatFieldAction[FieldFormatType.CURRENCY],
 ) {
   if (isEmpty(config?.unitKey)) {
     return value;
@@ -204,7 +204,7 @@ function unitFormater(
 
 function numericFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.NUMERIC],
+  config?: FormatFieldAction[FieldFormatType.NUMERIC],
 ) {
   if (isNaN(+value)) {
     return value;
@@ -221,7 +221,7 @@ function numericFormater(
 
 function thousandSeperatorFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.NUMERIC],
+  config?: FormatFieldAction[FieldFormatType.NUMERIC],
 ) {
   if (isNaN(+value) || !config?.useThousandSeparator) {
     return value;
@@ -235,7 +235,7 @@ function thousandSeperatorFormater(
 
 function currencyFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.CURRENCY],
+  config?: FormatFieldAction[FieldFormatType.CURRENCY],
 ) {
   if (isNaN(+value)) {
     return value;
@@ -256,7 +256,7 @@ function currencyFormater(
 
 function percentageFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.PERCENTAGE],
+  config?: FormatFieldAction[FieldFormatType.PERCENTAGE],
 ) {
   if (isNaN(+value)) {
     return value;
@@ -275,7 +275,7 @@ function percentageFormater(
 
 function scientificNotationFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.SCIENTIFIC],
+  config?: FormatFieldAction[FieldFormatType.SCIENTIFIC],
 ) {
   if (isNaN(+value)) {
     return value;
@@ -293,7 +293,7 @@ function scientificNotationFormater(
 
 function dateFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.DATE],
+  config?: FormatFieldAction[FieldFormatType.DATE],
 ) {
   if (isNaN(+value) || isEmpty(config?.format)) {
     return value;
@@ -1334,8 +1334,8 @@ export function getExtraSeriesRowData(
   };
 }
 
-export function getExtraSeriesDataFormat(format?: IFieldFormatConfig): {
-  format: IFieldFormatConfig | undefined;
+export function getExtraSeriesDataFormat(format?: FormatFieldAction): {
+  format: FormatFieldAction | undefined;
 } {
   return {
     format,

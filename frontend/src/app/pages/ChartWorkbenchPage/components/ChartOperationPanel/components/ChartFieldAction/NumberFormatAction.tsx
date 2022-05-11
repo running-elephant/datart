@@ -31,7 +31,7 @@ import { FieldFormatType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ChartDataSectionField,
-  IFieldFormatConfig,
+  FormatFieldAction,
 } from 'app/types/ChartConfig';
 import { CURRENCIES } from 'app/utils/currency';
 import { updateBy } from 'app/utils/mutation';
@@ -44,7 +44,7 @@ import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_TIMES } from 'styles/StyleConstants';
 
-const DefaultFormatDetailConfig: IFieldFormatConfig = {
+const DefaultFormatDetailConfig: FormatFieldAction = {
   type: FieldFormatType.DEFAULT,
   [FieldFormatType.NUMERIC]: {
     decimalPlaces: 2,
