@@ -47,8 +47,6 @@ import {
   refreshDatasetAction,
   updateChartAction,
   updateChartConfigAndRefreshDatasetAction,
-  updatePivotSheetDrillableAction,
-  updateRichTextAction,
 } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useAddViz } from 'app/pages/MainPage/pages/VizPage/hooks/useAddViz';
 import { SaveForm } from 'app/pages/MainPage/pages/VizPage/SaveForm';
@@ -270,7 +268,26 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               return;
             }
             if (param.seriesName === 'richText') {
-              dispatch(updateRichTextAction(param.value));
+              dispatch(
+                updateChartConfigAndRefreshDatasetAction({
+                  type: ChartConfigReducerActionType.STYLE,
+                  payload: {
+                    ancestors: [1, 0],
+                    value: {
+                      ...chart.config.styles[1].rows[0],
+                      value: param.value,
+                    },
+                  },
+                  needRefresh: false,
+                  updateDrillOption: config => {
+                    drillOptionRef.current = getChartDrillOption(
+                      config?.datas,
+                      drillOptionRef.current,
+                    );
+                    return drillOptionRef.current;
+                  },
+                }),
+              );
               return;
             }
             if (param.seriesName === 'drillOptionChange') {
@@ -400,16 +417,28 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           );
         }
       }
-
       if (payload.value.key === 'enableExpandRow') {
         dispatch(
-          updatePivotSheetDrillableAction({
-            ...chartConfig?.datas?.[1]!,
-            drillable: payload.value.value as boolean,
+          updateChartConfigAndRefreshDatasetAction({
+            payload: {
+              ancestors: [1],
+              value: {
+                ...chartConfig?.datas?.[1]!,
+                drillable: payload.value.value as boolean,
+              },
+            },
+            type: ChartConfigReducerActionType.DATA,
+            needRefresh: true,
+            updateDrillOption: config => {
+              drillOptionRef.current = getChartDrillOption(
+                config?.datas,
+                drillOptionRef.current,
+                true,
+              );
+              return drillOptionRef.current;
+            },
           }),
         );
-        drillOptionRef.current?.clearAll();
-        handleDrillOptionChange(drillOptionRef.current!);
       }
 
       dispatch(
@@ -427,13 +456,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         }),
       );
     },
-    [
-      dispatch,
-      expensiveQuery,
-      dataview,
-      handleDrillOptionChange,
-      chartConfig?.datas,
-    ],
+    [dispatch, expensiveQuery, dataview, chartConfig?.datas],
   );
 
   const handleDataViewChanged = useCallback(() => {
