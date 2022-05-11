@@ -280,11 +280,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
                   },
                   needRefresh: false,
                   updateDrillOption: config => {
-                    drillOptionRef.current = getChartDrillOption(
-                      config?.datas,
-                      drillOptionRef.current,
-                    );
-                    return drillOptionRef.current;
+                    return undefined;
                   },
                 }),
               );
