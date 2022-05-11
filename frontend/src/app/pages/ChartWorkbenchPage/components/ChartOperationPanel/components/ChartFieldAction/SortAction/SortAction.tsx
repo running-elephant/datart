@@ -44,7 +44,7 @@ const SortAction: FC<{
     : Boolean(options?.backendSort);
   const t = useI18NPrefix(`viz.palette.data.actions`);
   const [direction, setDirection] = useState(
-    config?.sort?.type || SortActionType.NONE,
+    config?.sort?.type || SortActionType.None,
   );
   const [sortValue, setSortValue] = useState(() => {
     const objDataColumns = transformToDataSet(dataset?.rows, dataset?.columns);
@@ -57,7 +57,7 @@ const SortAction: FC<{
   const handleSortTypeChange = direction => {
     setDirection(direction);
 
-    if (SortActionType.CUSTOMIZE !== direction) {
+    if (SortActionType.Customize !== direction) {
       onConfigChange &&
         onConfigChange(
           updateBy(config, draft => {
@@ -73,7 +73,7 @@ const SortAction: FC<{
     onConfigChange &&
       onConfigChange(
         updateBy(config, draft => {
-          draft.sort = { type: SortActionType.CUSTOMIZE, value: values };
+          draft.sort = { type: SortActionType.Customize, value: values };
         }),
         !actionNeedNewRequest,
       );
@@ -82,7 +82,7 @@ const SortAction: FC<{
   const renderColumnsDataList = () => {
     if (
       !config.colName ||
-      SortActionType.CUSTOMIZE !== direction ||
+      SortActionType.Customize !== direction ||
       !Array.isArray(sortValue)
     ) {
       return null;
@@ -102,7 +102,7 @@ const SortAction: FC<{
     if (mode === 'menu') {
       return (
         <>
-          {[SortActionType.NONE, SortActionType.ASC, SortActionType.DESC].map(
+          {[SortActionType.None, SortActionType.ASC, SortActionType.DESC].map(
             sort => {
               return (
                 <Menu.Item
@@ -128,7 +128,7 @@ const SortAction: FC<{
             value={direction}
           >
             <Space direction="vertical">
-              <Radio key={SortActionType.NONE} value={SortActionType.NONE}>
+              <Radio key={SortActionType.None} value={SortActionType.None}>
                 {t('sort.none')}
               </Radio>
               <Radio key={SortActionType.ASC} value={SortActionType.ASC}>

@@ -130,29 +130,29 @@ export type ColorFieldAction = {
 
 export type FormatFieldAction = {
   type: FieldFormatType;
-  [FieldFormatType.NUMERIC]?: {
+  [FieldFormatType.Numeric]?: {
     decimalPlaces: number;
     unitKey?: NumberUnitKey;
     useThousandSeparator?: boolean;
     prefix?: string;
     suffix?: string;
   };
-  [FieldFormatType.CURRENCY]?: {
+  [FieldFormatType.Currency]?: {
     decimalPlaces: number;
     unitKey?: NumberUnitKey;
     useThousandSeparator?: boolean;
     currency?: string;
   };
-  [FieldFormatType.PERCENTAGE]?: {
+  [FieldFormatType.Percentage]?: {
     decimalPlaces: number;
   };
-  [FieldFormatType.SCIENTIFIC]?: {
+  [FieldFormatType.Scientific]?: {
     decimalPlaces: number;
   };
-  [FieldFormatType.DATE]?: {
+  [FieldFormatType.Date]?: {
     format: string;
   };
-  [FieldFormatType.CUSTOM]?: {
+  [FieldFormatType.Custom]?: {
     format: string;
   };
 };

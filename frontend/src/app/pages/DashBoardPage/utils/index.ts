@@ -126,7 +126,7 @@ export const getDataChartRequestParams = (obj: {
 export const getChartGroupColumns = (datas: ChartDataConfig[] | undefined) => {
   const chartDataConfigs = datas;
   if (!chartDataConfigs) return [] as ChartDataSectionField[];
-  const groupTypes = [ChartDataSectionType.GROUP, ChartDataSectionType.COLOR];
+  const groupTypes = [ChartDataSectionType.Group, ChartDataSectionType.Color];
   const groupColumns = chartDataConfigs.reduce<ChartDataSectionField[]>(
     (acc, cur) => {
       if (!cur.rows) {
@@ -135,7 +135,7 @@ export const getChartGroupColumns = (datas: ChartDataConfig[] | undefined) => {
       if (groupTypes.includes(cur.type as any)) {
         return acc.concat(cur.rows);
       }
-      if (cur.type === ChartDataSectionType.MIXED) {
+      if (cur.type === ChartDataSectionType.Mixed) {
         return acc.concat(
           cur.rows.filter(({ type }) => type === DataViewFieldType.STRING),
         );

@@ -42,7 +42,7 @@ const computedDataChartFilters = data => {
     data.config = JSON.parse(data.config);
     const chartConfig = data?.config?.chartConfig as ChartConfig;
     const newFilters = (chartConfig?.datas || [])
-      .filter(c => c.type === ChartDataSectionType.FILTER)
+      .filter(c => c.type === ChartDataSectionType.Filter)
       .flatMap(c => c.rows || [])
       .filter(item => FILTER_MENU.includes(item.type));
     const options = newFilters.map(v => {

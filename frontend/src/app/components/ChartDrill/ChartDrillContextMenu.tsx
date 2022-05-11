@@ -54,7 +54,7 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       }
       const allFields = drillOption.getAllFields();
       const groupSection = chartConfig?.datas?.find(
-        v => v.type === ChartDataSectionType.GROUP,
+        v => v.type === ChartDataSectionType.Group,
       );
       let rows: ChartDataSectionField[] | undefined = [];
 
@@ -71,7 +71,7 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
     const handleDateLevelChange = useCallback(
       (config: ChartDataSectionField) => {
         const groupData = chartConfig?.datas?.find(
-          v => v.type === ChartDataSectionType.GROUP,
+          v => v.type === ChartDataSectionType.Group,
         );
 
         if (groupData) {

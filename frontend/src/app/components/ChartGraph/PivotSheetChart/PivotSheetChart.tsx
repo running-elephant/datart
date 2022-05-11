@@ -102,21 +102,21 @@ class PivotSheetChart extends ReactChart {
     );
 
     const rowSectionConfigRows: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
+      .filter(c => c.type === ChartDataSectionType.Group)
       .filter(c => c.key === 'row')
       .flatMap(config => config.rows || []);
 
     const columnSectionConfigRows: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
+      .filter(c => c.type === ChartDataSectionType.Group)
       .filter(c => c.key === 'column')
       .flatMap(config => config.rows || []);
 
     const metricsSectionConfigRows: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
 
     const infoSectionConfigRows: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.INFO)
+      .filter(c => c.type === ChartDataSectionType.Info)
       .flatMap(config => config.rows || []);
 
     const [
@@ -349,7 +349,7 @@ class PivotSheetChart extends ReactChart {
   ): Array<SortParam> {
     return sectionConfigRows
       .map(config => {
-        if (!config?.sort?.type || config?.sort?.type === SortActionType.NONE) {
+        if (!config?.sort?.type || config?.sort?.type === SortActionType.None) {
           return null;
         }
         const isASC = config.sort.type === SortActionType.ASC;

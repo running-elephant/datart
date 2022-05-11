@@ -47,7 +47,7 @@ export const transferChartConfig = (
     const idKeys = Object.keys(params);
     chartConfig.datas = datas.map(item => {
       if (
-        item.type === ChartDataSectionType.FILTER &&
+        item.type === ChartDataSectionType.Filter &&
         item.rows &&
         item.rows?.length > 0
       ) {

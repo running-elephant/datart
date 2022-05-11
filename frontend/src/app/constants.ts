@@ -63,10 +63,10 @@ export enum ControllerVisibilityTypes {
 }
 
 export enum ChartLifecycle {
-  MOUNTED = 'mounted',
-  UPDATED = 'updated',
-  RESIZE = 'resize',
-  UNMOUNTED = 'unmount',
+  Mounted = 'mounted',
+  Updated = 'updated',
+  Resize = 'resize',
+  UnMount = 'unmount',
 }
 
 export enum DataViewFieldType {
@@ -93,40 +93,40 @@ export enum ChartDataViewFieldCategory {
 }
 
 export enum SortActionType {
-  NONE = 'NONE',
+  None = 'NONE',
   ASC = 'ASC',
   DESC = 'DESC',
-  CUSTOMIZE = 'CUSTOMIZE',
+  Customize = 'CUSTOMIZE',
 }
 
 export enum FieldFormatType {
-  DEFAULT = 'default',
-  NUMERIC = 'numeric',
-  CURRENCY = 'currency',
-  PERCENTAGE = 'percentage',
-  SCIENTIFIC = 'scientificNotation',
-  DATE = 'date',
-  CUSTOM = 'custom',
+  Defalut = 'default',
+  Numeric = 'numeric',
+  Currency = 'currency',
+  Percentage = 'percentage',
+  Scientific = 'scientificNotation',
+  Date = 'date',
+  Custom = 'custom',
 }
 
 export enum AggregateFieldActionType {
-  NONE = 'NONE',
-  SUM = 'SUM',
-  AVG = 'AVG',
-  COUNT = 'COUNT',
-  COUNT_DISTINCT = 'COUNT_DISTINCT',
-  MAX = 'MAX',
-  MIN = 'MIN',
+  None = 'NONE',
+  Sum = 'SUM',
+  Avg = 'AVG',
+  Count = 'COUNT',
+  Count_Distinct = 'COUNT_DISTINCT',
+  Max = 'MAX',
+  Min = 'MIN',
 }
 
 export enum ChartDataSectionType {
-  GROUP = 'group',
-  AGGREGATE = 'aggregate',
-  MIXED = 'mixed',
-  FILTER = 'filter',
-  COLOR = 'color',
-  INFO = 'info',
-  SIZE = 'size',
+  Group = 'group',
+  Aggregate = 'aggregate',
+  Mixed = 'mixed',
+  Filter = 'filter',
+  Color = 'color',
+  Info = 'info',
+  Size = 'size',
 }
 
 export enum FilterConditionType {
@@ -178,16 +178,16 @@ export const FilterRelationType = {
 
 export const AggregateFieldSubAggregateType = {
   [ChartDataSectionFieldActionType.Aggregate]: [
-    AggregateFieldActionType.SUM,
-    AggregateFieldActionType.AVG,
-    AggregateFieldActionType.COUNT,
-    AggregateFieldActionType.COUNT_DISTINCT,
-    AggregateFieldActionType.MAX,
-    AggregateFieldActionType.MIN,
+    AggregateFieldActionType.Sum,
+    AggregateFieldActionType.Avg,
+    AggregateFieldActionType.Count,
+    AggregateFieldActionType.Count_Distinct,
+    AggregateFieldActionType.Max,
+    AggregateFieldActionType.Min,
   ],
   [ChartDataSectionFieldActionType.AggregateLimit]: [
-    AggregateFieldActionType.COUNT,
-    AggregateFieldActionType.COUNT_DISTINCT,
+    AggregateFieldActionType.Count,
+    AggregateFieldActionType.Count_Distinct,
   ],
 };
 
@@ -232,9 +232,9 @@ export const ChartStyleSectionComponentType = {
 };
 
 export enum DownloadFileType {
-  'Pdf' = 'PDF',
-  'Excel' = 'EXCEL',
-  'Image' = 'IMAGE',
+  Pdf = 'PDF',
+  Excel = 'EXCEL',
+  Image = 'IMAGE',
 }
 
 export const RUNTIME_DATE_LEVEL_KEY = Symbol('DateLevel');

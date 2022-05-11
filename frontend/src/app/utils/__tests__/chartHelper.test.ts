@@ -2098,7 +2098,7 @@ describe('Chart Helper ', () => {
     test('should get group section rows when drill option is null', () => {
       const config = [
         {
-          type: ChartDataSectionType.GROUP,
+          type: ChartDataSectionType.Group,
           rows: [1, 2],
         },
       ] as any[];
@@ -2109,7 +2109,7 @@ describe('Chart Helper ', () => {
     test('should not get group section rows when is not group section', () => {
       const config = [
         {
-          type: ChartDataSectionType.AGGREGATE,
+          type: ChartDataSectionType.Aggregate,
           rows: [1, 2],
         },
       ] as any[];
@@ -2120,7 +2120,7 @@ describe('Chart Helper ', () => {
     test('should get group section rows when drillale is false and drillOption is not empty', () => {
       const config = [
         {
-          type: ChartDataSectionType.GROUP,
+          type: ChartDataSectionType.Group,
           key: 'col1',
           rows: [
             {
@@ -2149,7 +2149,7 @@ describe('Chart Helper ', () => {
     test('should get drillable group section rows with drillOption', () => {
       const config = [
         {
-          type: ChartDataSectionType.GROUP,
+          type: ChartDataSectionType.Group,
           key: 'col1',
           drillable: true,
           rows: [
@@ -2179,7 +2179,7 @@ describe('Chart Helper ', () => {
     test('should get drillable group section first row without drillOption', () => {
       const config = [
         {
-          type: ChartDataSectionType.GROUP,
+          type: ChartDataSectionType.Group,
           key: 'col1',
           drillable: true,
           rows: [
