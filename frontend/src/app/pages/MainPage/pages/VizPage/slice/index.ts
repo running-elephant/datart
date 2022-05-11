@@ -81,7 +81,7 @@ const slice = createSlice({
       );
       if (chartPreview) {
         const filterSection = chartPreview?.chartConfig?.datas?.find(
-          section => section.type === ChartDataSectionType.FILTER,
+          section => section.type === ChartDataSectionType.Filter,
         );
         if (filterSection) {
           const filterRowIndex = filterSection.rows?.findIndex(
@@ -111,7 +111,7 @@ const slice = createSlice({
 
       if (chartPreview) {
         const groupSection = chartPreview?.chartConfig?.datas?.find(
-          section => section.type === ChartDataSectionType.GROUP,
+          section => section.type === ChartDataSectionType.Group,
         );
         if (groupSection) {
           groupSection.rows = action.payload.payload?.value?.rows;

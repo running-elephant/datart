@@ -138,7 +138,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             );
             if (originItemIndex > -1) {
               const needRefreshData =
-                currentConfig?.type === ChartDataSectionType.GROUP;
+                currentConfig?.type === ChartDataSectionType.Group;
               needDelete = false;
               const currentColumns = updateBy(
                 currentConfig?.rows || [],
@@ -174,9 +174,9 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               monitor.getItemType() as any,
             ) &&
             ![
-              ChartDataSectionType.GROUP,
-              ChartDataSectionType.COLOR,
-              ChartDataSectionType.MIXED,
+              ChartDataSectionType.Group,
+              ChartDataSectionType.Color,
+              ChartDataSectionType.Mixed,
             ].includes(currentConfig.type as ChartDataSectionType)
           ) {
             return false;
@@ -240,10 +240,10 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
 
     const getDefaultAggregate = (item: ChartDataSectionField) => {
       if (
-        currentConfig?.type === ChartDataSectionType.AGGREGATE ||
-        currentConfig?.type === ChartDataSectionType.SIZE ||
-        currentConfig?.type === ChartDataSectionType.INFO ||
-        currentConfig?.type === ChartDataSectionType.MIXED
+        currentConfig?.type === ChartDataSectionType.Aggregate ||
+        currentConfig?.type === ChartDataSectionType.Size ||
+        currentConfig?.type === ChartDataSectionType.Info ||
+        currentConfig?.type === ChartDataSectionType.Mixed
       ) {
         if (
           currentConfig.disableAggregate ||
@@ -366,7 +366,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     };
 
     const renderDrillFilters = () => {
-      if (currentConfig?.type !== ChartDataSectionType.FILTER) {
+      if (currentConfig?.type !== ChartDataSectionType.Filter) {
         return;
       }
       return getDillConditions()?.map(drill => {

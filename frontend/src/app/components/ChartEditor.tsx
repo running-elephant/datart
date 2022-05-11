@@ -382,8 +382,8 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       }
       // generate runtime computed fields(date level)
       if (
-        payload.value.type === ChartDataSectionType.GROUP ||
-        payload.value.type === ChartDataSectionType.MIXED
+        payload.value.type === ChartDataSectionType.Group ||
+        payload.value.type === ChartDataSectionType.Mixed
       ) {
         const dateLevelComputedFields = payload.value.rows.filter(
           v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,

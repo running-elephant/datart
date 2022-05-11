@@ -93,18 +93,18 @@ export const transferChartDataConfig = (
 ): ChartConfig => {
   return pipe(
     ...[
-      ChartDataSectionType.GROUP,
-      ChartDataSectionType.AGGREGATE,
-      ChartDataSectionType.COLOR,
-      ChartDataSectionType.INFO,
-      ChartDataSectionType.MIXED,
-      ChartDataSectionType.SIZE,
-      ChartDataSectionType.FILTER,
+      ChartDataSectionType.Group,
+      ChartDataSectionType.Aggregate,
+      ChartDataSectionType.Color,
+      ChartDataSectionType.Info,
+      ChartDataSectionType.Mixed,
+      ChartDataSectionType.Size,
+      ChartDataSectionType.Filter,
     ].map(type => curry(transferDataConfigImpl)(type)),
-    ...[ChartDataSectionType.MIXED].map(type =>
+    ...[ChartDataSectionType.Mixed].map(type =>
       curry(transferMixedToNonMixed)(type),
     ),
-    ...[ChartDataSectionType.MIXED].map(type =>
+    ...[ChartDataSectionType.Mixed].map(type =>
       curry(transferNonMixedToMixed)(type),
     ),
   )(targetConfig, sourceConfig);
@@ -216,7 +216,7 @@ const transferMixedToNonMixed = (
 
     while (Boolean(dimensions?.length)) {
       const groupTypeSections = targetDataConfigs?.filter(
-        c => c.type === ChartDataSectionType.GROUP,
+        c => c.type === ChartDataSectionType.Group,
       );
 
       const row = dimensions.shift();
@@ -235,7 +235,7 @@ const transferMixedToNonMixed = (
 
     while (Boolean(metrics?.length)) {
       const aggTypeSections = targetDataConfigs?.filter(
-        c => c.type === ChartDataSectionType.AGGREGATE,
+        c => c.type === ChartDataSectionType.Aggregate,
       );
 
       const row = metrics.shift();
@@ -303,7 +303,7 @@ export function getColumnRenderOriginName(c?: ChartDataSectionField) {
   if (!c) {
     return '[unknown]';
   }
-  if (c.aggregate === AggregateFieldActionType.NONE) {
+  if (c.aggregate === AggregateFieldActionType.None) {
     return c.colName;
   }
   if (c.aggregate) {
@@ -500,8 +500,8 @@ export function getRequiredGroupedSections(dataConfig?) {
     dataConfig
       ?.filter(
         c =>
-          c.type === ChartDataSectionType.GROUP ||
-          c.type === ChartDataSectionType.COLOR,
+          c.type === ChartDataSectionType.Group ||
+          c.type === ChartDataSectionType.Color,
       )
       .filter(c => !!c.required) || []
   );
@@ -512,8 +512,8 @@ export function getRequiredAggregatedSections(dataConfigs?) {
     dataConfigs
       ?.filter(
         c =>
-          c.type === ChartDataSectionType.AGGREGATE ||
-          c.type === ChartDataSectionType.SIZE,
+          c.type === ChartDataSectionType.Aggregate ||
+          c.type === ChartDataSectionType.Size,
       )
       .filter(c => !!c.required) || []
   );
@@ -659,7 +659,7 @@ const getDrillPaths = (
   configs?: ChartDataConfig[],
 ): ChartDataSectionField[] => {
   return (configs || [])
-    ?.filter(c => c.type === ChartDataSectionType.GROUP)
+    ?.filter(c => c.type === ChartDataSectionType.Group)
     ?.filter(d => Boolean(d.drillable))
     ?.flatMap(r => r.rows || []);
 };

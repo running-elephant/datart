@@ -296,7 +296,7 @@ const boardSlice = createSlice({
 
       if (dataChart?.config) {
         const index = dataChart?.config?.chartConfig?.datas?.findIndex(
-          section => section.type === ChartDataSectionType.GROUP,
+          section => section.type === ChartDataSectionType.Group,
         );
         if (index !== undefined && dataChart.config.chartConfig.datas) {
           dataChart.config.chartConfig.datas[index].rows =

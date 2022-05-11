@@ -18,10 +18,13 @@
 
 import {
   AggregateFieldActionType,
+  ChartDataSectionFieldActionType,
   ChartDataSectionType,
   ChartDataViewFieldCategory,
+  ChartStyleSectionComponentType,
   DataViewFieldType,
   FieldFormatType,
+  FilterConditionType,
 } from 'app/constants';
 import {
   ControllerFacadeTypes,
@@ -96,11 +99,6 @@ export type RelationFilterValue = {
 
 export type AggregateLimit = Pick<typeof AggregateFieldActionType, 'COUNT'>;
 
-export type ChartConfigBase = {
-  label?: string;
-  key: string;
-};
-
 export type ChartDataSectionField = {
   uid?: string;
   colName: string;
@@ -112,8 +110,8 @@ export type ChartDataSectionField = {
 
   sort?: SortFieldAction;
   alias?: AliasFieldAction;
-  format?: IFieldFormatConfig;
-  aggregate?: AggregateFieldActionType;
+  format?: FormatFieldAction;
+  aggregate?: AggregateFieldAction;
   filter?: FilterFieldAction;
   color?: ColorFieldAction;
   size?: number;
@@ -130,38 +128,43 @@ export type ColorFieldAction = {
   colors?: Array<{ key: string; value: string }>;
 };
 
-export interface IFieldFormatConfig {
+export type FormatFieldAction = {
   type: FieldFormatType;
-  [FieldFormatType.NUMERIC]?: {
+  [FieldFormatType.Numeric]?: {
     decimalPlaces: number;
     unitKey?: NumberUnitKey;
     useThousandSeparator?: boolean;
     prefix?: string;
     suffix?: string;
   };
-  [FieldFormatType.CURRENCY]?: {
+  [FieldFormatType.Currency]?: {
     decimalPlaces: number;
     unitKey?: NumberUnitKey;
     useThousandSeparator?: boolean;
     currency?: string;
   };
-  [FieldFormatType.PERCENTAGE]?: {
+  [FieldFormatType.Percentage]?: {
     decimalPlaces: number;
   };
-  [FieldFormatType.SCIENTIFIC]?: {
+  [FieldFormatType.Scientific]?: {
     decimalPlaces: number;
   };
-  [FieldFormatType.DATE]?: {
+  [FieldFormatType.Date]?: {
     format: string;
   };
-  [FieldFormatType.CUSTOM]?: {
+  [FieldFormatType.Custom]?: {
     format: string;
   };
-}
+};
 
 export type AliasFieldAction = {
   name?: string;
   desc?: string;
+};
+
+export type ChartConfigBase = {
+  label?: string;
+  key: string;
 };
 
 export type ChartDataConfig = ChartConfigBase & {
@@ -251,6 +254,7 @@ export type ChartConfig = {
   datas?: ChartDataConfig[];
   styles?: ChartStyleConfig[];
   settings?: ChartStyleConfig[];
+  interactions?: ChartStyleConfig[];
   i18ns?: ChartI18NSectionConfig[];
 };
 

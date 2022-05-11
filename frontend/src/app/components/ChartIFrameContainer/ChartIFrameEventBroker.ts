@@ -41,13 +41,13 @@ class ChartIFrameEventBroker {
   > = new Map();
   private _chart?: IChart;
   private _eventActions = {
-    [ChartLifecycle.MOUNTED]: this.createImmediatelyAction(
-      ChartLifecycle.MOUNTED,
+    [ChartLifecycle.Mounted]: this.createImmediatelyAction(
+      ChartLifecycle.Mounted,
     ),
-    [ChartLifecycle.UPDATED]: this.createDebounceAction(ChartLifecycle.UPDATED),
-    [ChartLifecycle.RESIZE]: this.createDebounceAction(ChartLifecycle.RESIZE),
-    [ChartLifecycle.UNMOUNTED]: this.createImmediatelyAction(
-      ChartLifecycle.UNMOUNTED,
+    [ChartLifecycle.Updated]: this.createDebounceAction(ChartLifecycle.Updated),
+    [ChartLifecycle.Resize]: this.createDebounceAction(ChartLifecycle.Resize),
+    [ChartLifecycle.UnMount]: this.createImmediatelyAction(
+      ChartLifecycle.UnMount,
     ),
   };
 
@@ -107,23 +107,23 @@ class ChartIFrameEventBroker {
     }
 
     switch (event) {
-      case ChartLifecycle.MOUNTED:
+      case ChartLifecycle.Mounted:
         this._chart.state = 'mounting';
         this.safeInvoke(event, options, context);
         break;
-      case ChartLifecycle.UPDATED:
+      case ChartLifecycle.Updated:
         if (this._chart.state === 'ready') {
           this._chart.state = 'updating';
           this.safeInvoke(event, options, context);
         }
         break;
-      case ChartLifecycle.RESIZE:
+      case ChartLifecycle.Resize:
         if (this._chart.state === 'ready') {
           this._chart.state = 'updating';
           this.safeInvoke(event, options, context);
         }
         break;
-      case ChartLifecycle.UNMOUNTED:
+      case ChartLifecycle.UnMount:
         if (this._chart.state === 'ready') {
           this._chart.state = 'unmounting';
           this.safeInvoke(event, options, context);
@@ -151,10 +151,10 @@ class ChartIFrameEventBroker {
   }
 
   private registerListener(c: IChart): void {
-    this.subscribe(ChartLifecycle.MOUNTED, c?.onMount);
-    this.subscribe(ChartLifecycle.UPDATED, c?.onUpdated);
-    this.subscribe(ChartLifecycle.RESIZE, c?.onResize);
-    this.subscribe(ChartLifecycle.UNMOUNTED, c?.onUnMount);
+    this.subscribe(ChartLifecycle.Mounted, c?.onMount);
+    this.subscribe(ChartLifecycle.Updated, c?.onUpdated);
+    this.subscribe(ChartLifecycle.Resize, c?.onResize);
+    this.subscribe(ChartLifecycle.UnMount, c?.onUnMount);
   }
 }
 

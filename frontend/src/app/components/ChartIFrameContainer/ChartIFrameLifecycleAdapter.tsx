@@ -86,7 +86,7 @@ const ChartIFrameLifecycleAdapter: FC<{
           const newBrokerRef = new ChartIFrameEventBroker();
           newBrokerRef.register(chart);
           newBrokerRef.publish(
-            ChartLifecycle.MOUNTED,
+            ChartLifecycle.Mounted,
             { containerId, dataset, config, widgetSpecialConfig, drillOption },
             {
               document,
@@ -106,7 +106,7 @@ const ChartIFrameLifecycleAdapter: FC<{
 
     return function cleanup() {
       setContainerStatus(ContainerStatus.INIT);
-      eventBrokerRef?.current?.publish(ChartLifecycle.UNMOUNTED, {});
+      eventBrokerRef?.current?.publish(ChartLifecycle.UnMount, {});
       eventBrokerRef?.current?.dispose();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -129,7 +129,7 @@ const ChartIFrameLifecycleAdapter: FC<{
       return;
     }
     eventBrokerRef.current?.publish(
-      ChartLifecycle.UPDATED,
+      ChartLifecycle.Updated,
       {
         dataset,
         config,
@@ -174,7 +174,7 @@ const ChartIFrameLifecycleAdapter: FC<{
     }
 
     eventBrokerRef.current?.publish(
-      ChartLifecycle.RESIZE,
+      ChartLifecycle.Resize,
       {
         dataset,
         config,

@@ -18,7 +18,7 @@
 
 import {
   BorderStyle,
-  IFieldFormatConfig,
+  FormatFieldAction,
   LabelStyle,
   MarkArea,
   MarkLine,
@@ -46,6 +46,6 @@ export type Series = {
     name: string;
     value: number | string;
     total?: number;
-    format: IFieldFormatConfig | undefined;
+    format: FormatFieldAction | undefined;
   }>;
 } & BarSeriesImpl;
