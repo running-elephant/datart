@@ -45,8 +45,8 @@ export const controlWidgetTpl = (opt: WidgetCreateProps) => {
   widget.datachartId = opt.datachartId || '';
   widget.viewIds = opt.viewIds || [];
   widget.relations = opt.relations || [];
-
   widget.config.content = opt.content;
+  widget.config.name = opt.name || '';
   widget.config.type = 'controller';
   if (opt.boardType === 'auto') {
     const rect: RectConfig = {

@@ -94,7 +94,6 @@ export const widgetToolkit: WidgetToolkit = {
     widget.id = widgetMeta.widgetTypeId + widget.id;
     widget.config.originalType = widgetMeta.widgetTypeId;
     widget.config.name = opt.name || '';
-    widget.config.content = opt.name || '';
 
     const addProps = [
       { ...initBackgroundTpl('#fff') },
