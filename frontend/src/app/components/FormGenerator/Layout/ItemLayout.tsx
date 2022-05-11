@@ -198,7 +198,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <WidgetBorder {...props} />;
         case ChartStyleSectionComponentType.TIMER_FORMAT:
           return <TimerFormat {...props} />;
-        // TimerFormat
+        case ChartStyleSectionComponentType.CHECKBOX_MODAL:
+          return <div>Checkbox Modal</div>;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

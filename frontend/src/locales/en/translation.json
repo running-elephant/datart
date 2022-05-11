@@ -509,7 +509,8 @@
       "title": {
         "content": "Data",
         "design": "Style",
-        "setting": "Analysis"
+        "setting": "Analysis",
+        "interaction": "Interaction"
       },
       "style": {
         "font": "Font",

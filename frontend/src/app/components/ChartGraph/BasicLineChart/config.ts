@@ -454,6 +454,14 @@ const config: ChartConfig = {
       ],
     },
   ],
+  interactions: [
+    {
+      label: 'viz.palette.setting.jump.title',
+      key: 'jump',
+      comType: 'checkboxModal',
+      rows: [],
+    },
+  ],
   i18ns: [
     {
       lang: 'zh-CN',

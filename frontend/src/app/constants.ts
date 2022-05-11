@@ -228,6 +228,7 @@ export const ChartStyleSectionComponentType = {
   BACKGROUND: 'background',
   WIDGET_BORDER: 'widgetBorder',
   TIMER_FORMAT: 'timerFormat',
+  CHECKBOX_MODAL: 'checkboxModal',
 };
 
 export enum DownloadFileType {

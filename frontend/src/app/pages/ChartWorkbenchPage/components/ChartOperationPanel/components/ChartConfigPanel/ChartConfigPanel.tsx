@@ -17,6 +17,7 @@
  */
 
 import {
+  BlockOutlined,
   DashboardOutlined,
   DatabaseOutlined,
   SettingOutlined,
@@ -54,6 +55,7 @@ const CONFIG_PANEL_TABS = {
   DATA: 'data',
   STYLE: 'style',
   SETTING: 'setting',
+  INTERACTION: 'interaction',
 };
 
 const ChartConfigPanel: FC<{
@@ -73,6 +75,10 @@ const ChartConfigPanel: FC<{
           [
             config => !isEmptyArray(config?.settings),
             CONFIG_PANEL_TABS.SETTING,
+          ],
+          [
+            config => !isEmptyArray(config?.interactions),
+            CONFIG_PANEL_TABS.INTERACTION,
           ],
         )(chartConfig, CONFIG_PANEL_TABS.DATA);
       },
@@ -160,6 +166,17 @@ const ChartConfigPanel: FC<{
                     key={CONFIG_PANEL_TABS.SETTING}
                   />
                 )}
+                {!isEmptyArray(chartConfig?.interactions) && (
+                  <TabPane
+                    tab={
+                      <span>
+                        <BlockOutlined />
+                        {t('title.interaction')}
+                      </span>
+                    }
+                    key={CONFIG_PANEL_TABS.INTERACTION}
+                  />
+                )}
               </Tabs>
               <Pane selected={tabActiveKey === CONFIG_PANEL_TABS.DATA}>
                 <ChartDataConfigPanel
@@ -178,6 +195,13 @@ const ChartConfigPanel: FC<{
               <Pane selected={tabActiveKey === CONFIG_PANEL_TABS.SETTING}>
                 <ChartSettingConfigPanel
                   configs={chartConfig?.settings}
+                  dataConfigs={chartConfig?.datas}
+                  onChange={onSettingConfigChanged}
+                />
+              </Pane>
+              <Pane selected={tabActiveKey === CONFIG_PANEL_TABS.INTERACTION}>
+                <ChartSettingConfigPanel
+                  configs={chartConfig?.interactions}
                   dataConfigs={chartConfig?.datas}
                   onChange={onSettingConfigChanged}
                 />
@@ -217,6 +241,10 @@ const ConfigBlock = styled.div`
     padding: 0 ${SPACE_MD};
     font-weight: ${FONT_WEIGHT_MEDIUM};
     color: ${p => p.theme.textColorSnd};
+
+    .ant-tabs-tab + .ant-tabs-tab {
+      margin: 0 0 0 ${SPACE_MD};
+    }
   }
 `;
 

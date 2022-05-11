@@ -501,7 +501,8 @@
       "title": {
         "content": "数据",
         "design": "样式",
-        "setting": "分析"
+        "setting": "分析",
+        "interaction": "交互"
       },
       "style": {
         "font": "字体",

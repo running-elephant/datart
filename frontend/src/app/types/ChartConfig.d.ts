@@ -20,6 +20,7 @@ import {
   AggregateFieldActionType,
   ChartDataSectionType,
   ChartDataViewFieldCategory,
+  ChartStyleSectionComponentType,
   DataViewFieldType,
   FieldFormatType,
 } from 'app/constants';
@@ -250,6 +251,7 @@ export type ChartConfig = {
   datas?: ChartDataConfig[];
   styles?: ChartStyleConfig[];
   settings?: ChartStyleConfig[];
+  interactions?: ChartStyleConfig[];
   i18ns?: ChartI18NSectionConfig[];
 };
 

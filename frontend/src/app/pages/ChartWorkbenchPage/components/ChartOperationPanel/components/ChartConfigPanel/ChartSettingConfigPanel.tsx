@@ -17,7 +17,7 @@
  */
 
 import { Collapse } from 'antd';
-import { GroupLayout } from 'app/components';
+import { GroupLayout, ItemLayout } from 'app/components';
 import { FormGroupLayoutMode } from 'app/components/FormGenerator/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataConfig, ChartStyleConfig } from 'app/types/ChartConfig';
@@ -37,23 +37,37 @@ const ChartSettingConfigPanel: FC<{
 
     return (
       <Collapse className="datart-config-panel" ghost>
-        {configs?.map((c, index) => (
-          <Collapse.Panel header={t(c.label, true)} key={c.key}>
-            <GroupLayout
-              ancestors={[index]}
-              mode={
-                c.comType === 'group'
-                  ? FormGroupLayoutMode.INNER
-                  : FormGroupLayoutMode.OUTER
-              }
-              data={c}
-              translate={t}
-              dataConfigs={dataConfigs}
-              onChange={onChange}
-              flatten
-            />
-          </Collapse.Panel>
-        ))}
+        {configs?.map((c, index) => {
+          if (c.comType === 'group') {
+            return (
+              <Collapse.Panel header={t(c.label, true)} key={c.key}>
+                <GroupLayout
+                  ancestors={[index]}
+                  mode={
+                    c.comType === 'group'
+                      ? FormGroupLayoutMode.INNER
+                      : FormGroupLayoutMode.OUTER
+                  }
+                  data={c}
+                  translate={t}
+                  dataConfigs={dataConfigs}
+                  onChange={onChange}
+                  flatten
+                />
+              </Collapse.Panel>
+            );
+          } else {
+            return (
+              <ItemLayout
+                ancestors={[index]}
+                data={c}
+                translate={t}
+                dataConfigs={dataConfigs}
+                onChange={onChange}
+              />
+            );
+          }
+        })}
       </Collapse>
     );
   },
