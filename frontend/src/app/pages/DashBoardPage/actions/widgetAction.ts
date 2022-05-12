@@ -15,17 +15,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams } from 'app/types/Chart';
 import i18next from 'i18next';
 import { RootState } from 'types';
-import { jumpTypes } from '../constants';
+import { jumpTypes, ORIGINAL_TYPE_MAP } from '../constants';
 import { boardActions } from '../pages/Board/slice';
 import {
   getChartWidgetDataAsync,
+  getControllerOptions,
   getWidgetData,
 } from '../pages/Board/slice/thunk';
-import { BoardLinkFilter, VizRenderMode } from '../pages/Board/slice/types';
+import {
+  BoardLinkFilter,
+  BoardState,
+  VizRenderMode,
+} from '../pages/Board/slice/types';
 import {
   editDashBoardInfoActions,
   editWidgetInfoActions,
@@ -36,10 +43,16 @@ import {
 } from '../pages/BoardEditor/slice/actions/actions';
 import {
   getEditChartWidgetDataAsync,
+  getEditControllerOptions,
   getEditWidgetData,
 } from '../pages/BoardEditor/slice/thunk';
+import { HistoryEditBoard } from '../pages/BoardEditor/slice/types';
 import { Widget } from '../types/widgetTypes';
-import { getValueByRowData } from '../utils/widget';
+import {
+  getCascadeControllers,
+  getNeedRefreshWidgetsByController,
+  getValueByRowData,
+} from '../utils/widget';
 
 export const toggleLinkageAction =
   (boardEditing: boolean, boardId: string, widgetId: string, toggle: boolean) =>
@@ -328,4 +341,57 @@ export const showJumpErrorAction =
         }),
       );
     }
+  };
+export const refreshWidgetsByControllerAction =
+  (renderMode: VizRenderMode, widget: Widget) => (dispatch, getState) => {
+    const boardId = widget.dashboardId;
+    const controllerIds = getCascadeControllers(widget);
+    const rootState = getState() as RootState;
+    const editBoardState = (rootState.editBoard as unknown as HistoryEditBoard)
+      .stack.present;
+
+    const viewBoardState = rootState.board as BoardState;
+    const { widgetRecord: widgetMap } =
+      renderMode === 'edit' ? editBoardState : viewBoardState.widgetRecord;
+
+    const hasQueryBtn = Object.values(widgetMap).find(
+      item => item.config.originalType === ORIGINAL_TYPE_MAP.queryBtn,
+    );
+    // 获取级联选项
+    controllerIds.forEach(controlWidgetId => {
+      if (renderMode === 'edit') {
+        dispatch(getEditControllerOptions(controlWidgetId));
+      } else {
+        dispatch(
+          getControllerOptions({
+            boardId,
+            widgetId: controlWidgetId,
+            renderMode,
+          }),
+        );
+      }
+    });
+    // 如果有 hasQueryBtn 那么control不会立即触发查询
+    if (hasQueryBtn) return;
+    const pageInfo: Partial<PageInfo> = {
+      pageNo: 1,
+    };
+    const chartWidgetIds = getNeedRefreshWidgetsByController(widget);
+
+    chartWidgetIds.forEach(widgetId => {
+      if (renderMode === 'edit') {
+        dispatch(
+          getEditChartWidgetDataAsync({ widgetId, option: { pageInfo } }),
+        );
+      } else {
+        dispatch(
+          getChartWidgetDataAsync({
+            boardId,
+            widgetId,
+            renderMode,
+            option: { pageInfo },
+          }),
+        );
+      }
+    });
   };

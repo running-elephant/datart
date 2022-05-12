@@ -17,7 +17,6 @@
  */
 
 import { ControllerFacadeTypes } from 'app/constants';
-import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartMouseEventParams } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import debounce from 'lodash/debounce';
@@ -25,6 +24,7 @@ import { createContext, FC, memo, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {
+  refreshWidgetsByControllerAction,
   widgetChartClickAction,
   widgetGetDataAction,
   widgetToClearLinkageAction,
@@ -34,11 +34,7 @@ import {
   resetControllerAction,
   widgetsQueryAction,
 } from '../../pages/Board/slice/asyncActions';
-import {
-  getChartWidgetDataAsync,
-  getControllerOptions,
-  renderedWidgetAsync,
-} from '../../pages/Board/slice/thunk';
+import { renderedWidgetAsync } from '../../pages/Board/slice/thunk';
 import { VizRenderMode } from '../../pages/Board/slice/types';
 import {
   editBoardStackActions,
@@ -56,16 +52,8 @@ import {
   widgetsToPositionAction,
 } from '../../pages/BoardEditor/slice/actions/actions';
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
-import {
-  getEditChartWidgetDataAsync,
-  getEditControllerOptions,
-  renderedEditWidgetAsync,
-} from '../../pages/BoardEditor/slice/thunk';
+import { renderedEditWidgetAsync } from '../../pages/BoardEditor/slice/thunk';
 import { Widget, WidgetConf } from '../../types/widgetTypes';
-import {
-  getCascadeControllers,
-  getNeedRefreshWidgetsByController,
-} from '../../utils/widget';
 
 export const WidgetActionProvider: FC<{
   orgId: string;
@@ -125,42 +113,7 @@ export const WidgetActionProvider: FC<{
         }
       }, 500),
       onRefreshWidgetsByController: debounce((widget: Widget) => {
-        const controllerIds = getCascadeControllers(widget);
-        controllerIds.forEach(controlWidgetId => {
-          if (boardEditing) {
-            dispatch(getEditControllerOptions(controlWidgetId));
-          } else {
-            dispatch(
-              getControllerOptions({
-                boardId,
-                widgetId: controlWidgetId,
-                renderMode,
-              }),
-            );
-          }
-        });
-
-        const pageInfo: Partial<PageInfo> = {
-          pageNo: 1,
-        };
-        const chartWidgetIds = getNeedRefreshWidgetsByController(widget);
-
-        chartWidgetIds.forEach(widgetId => {
-          if (boardEditing) {
-            dispatch(
-              getEditChartWidgetDataAsync({ widgetId, option: { pageInfo } }),
-            );
-          } else {
-            dispatch(
-              getChartWidgetDataAsync({
-                boardId,
-                widgetId,
-                renderMode,
-                option: { pageInfo },
-              }),
-            );
-          }
-        });
+        dispatch(refreshWidgetsByControllerAction(renderMode, widget));
       }, 500),
       onUpdateWidgetConfig: (config: WidgetConf, wid: string) => {
         dispatch(editBoardStackActions.updateWidgetConfig({ wid, config }));
