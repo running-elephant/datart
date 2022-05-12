@@ -197,6 +197,10 @@ const ChartPreviewBoard: FC<{
               );
               return;
             }
+            if (param.seriesName === 'drillOptionChange') {
+              handleDrillOptionChange?.(param.value);
+              return;
+            }
           },
         },
       ]);
@@ -469,7 +473,7 @@ const ChartPreviewBoard: FC<{
               </Spin>
             </ChartWrapper>
             <StyledChartDrillPathsContainer>
-              <ChartDrillPaths />
+              <ChartDrillPaths chartConfig={chartPreview?.chartConfig} />
             </StyledChartDrillPathsContainer>
             <StyledChartDrillPathsContainer />
           </ChartDrillContext.Provider>

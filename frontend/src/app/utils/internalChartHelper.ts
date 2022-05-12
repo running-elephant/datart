@@ -471,7 +471,10 @@ export function mergeChartStyleConfigs(
 }
 
 export function mergeChartDataConfigs<
-  T extends { key?: string; rows?: ChartDataSectionField[] } | undefined | null,
+  T extends
+    | { key?: string; rows?: ChartDataSectionField[]; drillable?: boolean }
+    | undefined
+    | null,
 >(target?: T[], source?: T[]) {
   if (isEmptyArray(target) || isEmptyArray(source)) {
     return target;
@@ -479,7 +482,14 @@ export function mergeChartDataConfigs<
   return (target || []).map(tEle => {
     const sEle = (source || []).find(s => s?.key === tEle?.key);
     if (sEle) {
-      return Object.assign({}, tEle, { rows: sEle?.rows });
+      return Object.assign(
+        {},
+        tEle,
+        {
+          rows: sEle?.rows,
+        },
+        !isUndefined(sEle?.drillable) ? { drillable: sEle?.drillable } : {},
+      );
     }
     return tEle;
   });

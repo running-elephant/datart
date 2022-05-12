@@ -124,6 +124,10 @@ const ChartForShare: FC<{
             );
             return;
           }
+          if (param.seriesName === 'drillOptionChange') {
+            handleDrillOptionChange?.(param.value);
+            return;
+          }
         },
       },
     ]);
@@ -211,7 +215,7 @@ const ChartForShare: FC<{
             />
           </ChartDrillContextMenu>
         </div>
-        <ChartDrillPaths />
+        <ChartDrillPaths chartConfig={chartPreview?.chartConfig} />
       </ChartDrillContext.Provider>
       <HeadlessBrowserIdentifier
         renderSign={headlessBrowserRenderSign}

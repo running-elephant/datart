@@ -19,46 +19,51 @@
 import { Breadcrumb } from 'antd';
 import { DrillMode } from 'app/models/ChartDrillOption';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import { ChartConfig } from 'app/types/ChartConfig';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_SM, SPACE_XS } from 'styles/StyleConstants';
 
-const ChartDrillPaths: FC<{}> = memo(() => {
-  const { drillOption, onDrillOptionChange } = useContext(ChartDrillContext);
+const ChartDrillPaths: FC<{ chartConfig?: ChartConfig }> = memo(
+  ({ chartConfig }) => {
+    const { drillOption, onDrillOptionChange } = useContext(ChartDrillContext);
+    const menuHidden = !!chartConfig?.datas?.filter(
+      v => v.drillContextMenuVisible,
+    ).length;
+    if (!drillOption || drillOption.mode === DrillMode.Normal || menuHidden) {
+      return <div></div>;
+    }
 
-  if (!drillOption || drillOption.mode === DrillMode.Normal) {
-    return <div></div>;
-  }
-
-  const drilledFields = drillOption.getDrilledFields();
-  return (
-    <StyledChartDrillPaths>
-      <Breadcrumb>
-        {drilledFields.map(f => {
-          return (
-            <StyledDrillNode
-              key={f.uid}
-              isActive={Boolean(
-                drillOption?.getCurrentFields()?.some(df => df.uid === f.uid),
-              )}
-              onClick={() => {
-                if (drillOption.mode === DrillMode.Drill) {
-                  drillOption.drillUp(f);
-                } else if (drillOption.mode === DrillMode.Expand) {
-                  drillOption.expandUp(f);
-                }
-                onDrillOptionChange?.(drillOption);
-              }}
-            >
-              {getColumnRenderName(f)}
-            </StyledDrillNode>
-          );
-        })}
-      </Breadcrumb>
-    </StyledChartDrillPaths>
-  );
-});
+    const drilledFields = drillOption.getDrilledFields();
+    return (
+      <StyledChartDrillPaths>
+        <Breadcrumb>
+          {drilledFields.map(f => {
+            return (
+              <StyledDrillNode
+                key={f.uid}
+                isActive={Boolean(
+                  drillOption?.getCurrentFields()?.some(df => df.uid === f.uid),
+                )}
+                onClick={() => {
+                  if (drillOption.mode === DrillMode.Drill) {
+                    drillOption.drillUp(f);
+                  } else if (drillOption.mode === DrillMode.Expand) {
+                    drillOption.expandUp(f);
+                  }
+                  onDrillOptionChange?.(drillOption);
+                }}
+              >
+                {getColumnRenderName(f)}
+              </StyledDrillNode>
+            );
+          })}
+        </Breadcrumb>
+      </StyledChartDrillPaths>
+    );
+  },
+);
 
 export default ChartDrillPaths;
 
