@@ -164,6 +164,11 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         return;
       }
 
+      if (params.seriesName === 'drillOptionChange') {
+        handleDrillOptionChange?.(params.value);
+        return;
+      }
+
       onWidgetChartClick(widgetRef.current, params);
     },
     [handleDrillOptionChange, onWidgetChartClick],
