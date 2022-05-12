@@ -25,7 +25,7 @@ import type {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import type { ChartStyleConfig } from 'app/types/ChartConfig';
-import { getInitialLocale } from 'locales/i18n';
+import { getInitialLocale } from 'locales/utils';
 import { uuidv4 } from 'utils/utils';
 
 export const initTitleTpl = () => {
