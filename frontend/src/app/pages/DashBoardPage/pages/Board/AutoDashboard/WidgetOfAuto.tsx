@@ -22,7 +22,7 @@ import styled from 'styled-components/macro';
 export const WidgetOfAuto: React.FC = React.memo(() => {
   return (
     <Wrapper className="widget">
-      <WidgetMapper boardType={'auto'} boardEditing={false} />
+      <WidgetMapper boardEditing={false} hideTitle={false} />
     </Wrapper>
   );
 });

@@ -24,6 +24,7 @@ import {
   WidgetData,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import ChartDataView from 'app/types/ChartDataView';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
@@ -34,7 +35,7 @@ import {
   getChartWidgetDataAsync,
   getControllerOptions,
 } from './thunk';
-import { BoardInfo, BoardState, Widget } from './types';
+import { BoardInfo, BoardState } from './types';
 
 export const boardInit: BoardState = {
   boardRecord: {} as Record<string, Dashboard>,
@@ -122,6 +123,14 @@ const boardSlice = createSlice({
     updateWidget(state, action: PayloadAction<Widget>) {
       const widget = action.payload;
       state.widgetRecord[widget.dashboardId][widget.id] = widget;
+    },
+    updateWidgetConfigByKey(
+      state,
+      action: PayloadAction<{ boardId: string; wid: string; key: string; val }>,
+    ) {
+      const { boardId, wid, key, val } = action.payload;
+      if (!state.widgetRecord?.[boardId]?.[wid]?.config) return;
+      state.widgetRecord[boardId][wid].config[key] = val;
     },
 
     updateViewMap(state, action: PayloadAction<ChartDataView[]>) {
@@ -287,7 +296,7 @@ const boardSlice = createSlice({
 
       if (dataChart?.config) {
         const index = dataChart?.config?.chartConfig?.datas?.findIndex(
-          section => section.type === ChartDataSectionType.GROUP,
+          section => section.type === ChartDataSectionType.Group,
         );
         if (index !== undefined && dataChart.config.chartConfig.datas) {
           dataChart.config.chartConfig.datas[index].rows =

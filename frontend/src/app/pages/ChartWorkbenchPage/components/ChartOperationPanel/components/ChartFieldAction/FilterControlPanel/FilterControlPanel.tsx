@@ -79,7 +79,7 @@ const FilterControlPanel: FC<
     const [alias, setAlias] = useState(config.alias);
     const [aggregate, setAggregate] = useState(() => {
       if (Boolean(dataConfig?.disableAggregate) || aggregation === false) {
-        return AggregateFieldActionType.NONE;
+        return AggregateFieldActionType.None;
       }
       if (config.aggregate) {
         return config.aggregate;
@@ -87,9 +87,9 @@ const FilterControlPanel: FC<
         config.type === DataViewFieldType.STRING ||
         config.type === DataViewFieldType.DATE
       ) {
-        return AggregateFieldActionType.NONE;
+        return AggregateFieldActionType.None;
       } else if (config.type === DataViewFieldType.NUMERIC) {
-        return AggregateFieldActionType.SUM;
+        return AggregateFieldActionType.Sum;
       }
     });
 
@@ -188,7 +188,7 @@ const FilterControlPanel: FC<
       };
       if (
         config.type === DataViewFieldType.STRING &&
-        aggregate === AggregateFieldActionType.NONE
+        aggregate === AggregateFieldActionType.None
       ) {
         return (
           <CategoryConditionConfiguration
@@ -199,7 +199,7 @@ const FilterControlPanel: FC<
         );
       } else if (
         config.type === DataViewFieldType.STRING &&
-        aggregate !== AggregateFieldActionType.NONE
+        aggregate !== AggregateFieldActionType.None
       ) {
         return (
           <ValueConditionConfiguration

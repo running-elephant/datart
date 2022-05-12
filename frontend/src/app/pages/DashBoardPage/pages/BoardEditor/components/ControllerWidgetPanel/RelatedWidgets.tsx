@@ -17,7 +17,7 @@
  */
 import { Table } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import React, { memo, useEffect, useMemo, useState } from 'react';
 
 export type RelatedWidgetItem = {

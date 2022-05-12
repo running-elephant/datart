@@ -92,7 +92,7 @@ class Scorecard extends ReactChart {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const aggregateConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
 
     const chartDataSet = transformToDataSet(

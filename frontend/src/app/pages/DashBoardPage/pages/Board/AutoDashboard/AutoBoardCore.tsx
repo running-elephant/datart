@@ -43,7 +43,6 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
     const boardConfig = useContext(BoardConfigValContext);
     const { background, allowOverlap } = boardConfig;
     const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
-
     const { curMargin, curPadding } = useMemo(() => {
       return getBoardMarginPadding(boardConfig, colsKey);
     }, [boardConfig, colsKey]);

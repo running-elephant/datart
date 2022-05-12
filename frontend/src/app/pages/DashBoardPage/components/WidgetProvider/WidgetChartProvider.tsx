@@ -27,10 +27,37 @@ import {
 import { BoardState } from '../../pages/Board/slice/types';
 import { WidgetContext } from './WidgetProvider';
 
+// 支持作为 点击事件的 触发器的图表ID
+export const SupportTriggerChartIds: string[] = [
+  'cluster-column-chart',
+  'cluster-bar-chart',
+  'stack-column-chart',
+  'stack-bar-chart',
+  'percentage-stack-column-chart',
+  'percentage-stack-bar-chart',
+  'line-chart',
+  'area-chart',
+  'stack-area-chart',
+  'scatter',
+  'pie-chart',
+  'doughnut-chart',
+  'rose-chart',
+  'funnel-chart',
+  'double-y',
+  'normal-outline-map-chart',
+  'scatter-outline-map-chart',
+  'fenzu-table',
+  'mingxi-table',
+];
 export const WidgetChartContext = createContext<{
   dataChart: DataChart | undefined;
   availableSourceFunctions?: string[];
-}>({ dataChart: {} as DataChart, availableSourceFunctions: undefined });
+  supportTrigger: boolean;
+}>({
+  dataChart: {} as DataChart,
+  availableSourceFunctions: undefined,
+  supportTrigger: true,
+});
 
 export const WidgetChartProvider: FC = memo(({ children }) => {
   const { datachartId } = useContext(WidgetContext);
@@ -43,10 +70,12 @@ export const WidgetChartProvider: FC = memo(({ children }) => {
   const viewMap = useSelector(selectViewMap);
   const availableSourceFunctions =
     availableSourceFunctionsMap[viewMap[dataChart?.viewId]?.sourceId];
-
+  const supportTrigger = SupportTriggerChartIds.includes(
+    dataChart?.config?.chartGraphId,
+  );
   return (
     <WidgetChartContext.Provider
-      value={{ dataChart, availableSourceFunctions }}
+      value={{ dataChart, availableSourceFunctions, supportTrigger }}
     >
       {children}
     </WidgetChartContext.Provider>

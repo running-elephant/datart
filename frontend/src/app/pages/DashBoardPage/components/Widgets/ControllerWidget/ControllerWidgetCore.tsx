@@ -18,15 +18,13 @@
 
 import { Form } from 'antd';
 import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
-import {
-  ControllerWidgetContent,
-  Widget,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ControllerConfig,
   ControllerDate,
   ControlOption,
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getControllerDateValues } from 'app/pages/DashBoardPage/utils';
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import produce from 'immer';
@@ -34,8 +32,10 @@ import React, { memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
+import { getWidgetTitle } from '../../WidgetManager/utils/utils';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
+import { getControlQueryEnable } from './config';
 import { CheckboxGroupControllerForm } from './Controller/CheckboxGroupController';
 import { MultiSelectControllerForm } from './Controller/MultiSelectController';
 import { NumberControllerForm } from './Controller/NumberController';
@@ -49,11 +49,10 @@ import { TimeControllerForm } from './Controller/TimeController';
 
 export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
-  const { onWidgetUpdate, onRefreshWidgetsByController } =
+  const content = widget.config.content as ControllerWidgetContent;
+  const { onUpdateWidgetConfigByKey, onRefreshWidgetsByController } =
     useContext(WidgetActionContext);
-  // TODO(duo)
-  // const { hasQueryControl } = useContext(BoardConfigContext);
-  const hasQueryControl = false;
+  const emitQuery = getControlQueryEnable(widget.config.customConfig.props!);
   const [form] = Form.useForm();
 
   const {
@@ -62,15 +61,12 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
 
   const refreshLinkedWidgets = useCallback(
     (widget: Widget) => {
-      if (hasQueryControl) return;
+      if (!emitQuery) return;
       onRefreshWidgetsByController(widget);
     },
-    [onRefreshWidgetsByController, hasQueryControl],
+    [onRefreshWidgetsByController, emitQuery],
   );
-  const { config, type: facadeType } = useMemo(
-    () => widget.config.content as ControllerWidgetContent,
-    [widget],
-  );
+  const { config, type: facadeType } = useMemo(() => content, [content]);
 
   const {
     controllerDate,
@@ -79,36 +75,30 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     valueOptionType,
     // sqlOperator,
   } = useMemo(() => config as ControllerConfig, [config]);
+  const title = getWidgetTitle(widget.config.customConfig.props);
+  title.title = widget.config.name;
   const leftControlLabel = useMemo(() => {
-    if (!widget.config.nameConfig.show) {
+    if (!title.showTitle) {
       return null;
     }
-    if (widget.config.nameConfig?.textAlign === 'center') {
+    if (title.textAlign === 'center') {
       return null;
     }
-    return (
-      <WidgetTitle
-        name={widget.config.name}
-        config={widget.config.nameConfig}
-      />
-    );
-  }, [widget.config]);
+    return <WidgetTitle title={title} />;
+  }, [title]);
   const centerControlLabel = useMemo(() => {
-    if (!widget.config.nameConfig.show) {
+    if (!title.showTitle) {
       return null;
     }
-    if (widget.config.nameConfig?.textAlign === 'center') {
+    if (title.textAlign === 'center') {
       return (
         <div style={{ width: '100%', textAlign: 'center' }}>
-          <WidgetTitle
-            name={widget.config.name}
-            config={widget.config.nameConfig}
-          />
+          <WidgetTitle title={title} />
         </div>
       );
     }
     return null;
-  }, [widget.config]);
+  }, [title]);
   const optionRows = useMemo(() => {
     const dataRows = rows || [];
     if (valueOptionType === 'common') {
@@ -137,13 +127,15 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
       return;
     }
     const _values = values ? (Array.isArray(values) ? values : [values]) : [];
-    const nextWidget = produce(widget, draft => {
-      (
-        draft.config.content as ControllerWidgetContent
-      ).config.controllerValues = _values;
+    const nextContent = produce(content, draft => {
+      draft.config.controllerValues = _values;
     });
-    onWidgetUpdate(nextWidget);
-    refreshLinkedWidgets(nextWidget);
+    onUpdateWidgetConfigByKey({
+      wid: widget.id,
+      key: 'content',
+      val: nextContent,
+    });
+    refreshLinkedWidgets(widget);
   };
   // const onSqlOperatorAndValues = useCallback(
   //   (sql: FilterSqlOperator, values: any[]) => {
@@ -172,15 +164,23 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           exactValue: timeValues?.[1],
         },
       };
-      const nextWidget = produce(widget, draft => {
-        (
-          draft.config.content as ControllerWidgetContent
-        ).config.controllerDate = nextFilterDate;
+      const nextContent = produce(content, draft => {
+        draft.config.controllerDate = nextFilterDate;
       });
-      onWidgetUpdate(nextWidget);
-      refreshLinkedWidgets(nextWidget);
+      onUpdateWidgetConfigByKey({
+        wid: widget.id,
+        key: 'content',
+        val: nextContent,
+      });
+      refreshLinkedWidgets(widget);
     },
-    [controllerDate, refreshLinkedWidgets, widget, onWidgetUpdate],
+    [
+      controllerDate,
+      content,
+      onUpdateWidgetConfigByKey,
+      widget,
+      refreshLinkedWidgets,
+    ],
   );
 
   const onTimeChange = useCallback(
@@ -192,15 +192,24 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           exactValue: value,
         },
       };
-      const nextWidget = produce(widget, draft => {
-        (
-          draft.config.content as ControllerWidgetContent
-        ).config.controllerDate = nextFilterDate;
+
+      const nextContent = produce(content, draft => {
+        draft.config.controllerDate = nextFilterDate;
       });
-      onWidgetUpdate(nextWidget);
-      refreshLinkedWidgets(nextWidget);
+      onUpdateWidgetConfigByKey({
+        wid: widget.id,
+        key: 'content',
+        val: nextContent,
+      });
+      refreshLinkedWidgets(widget);
     },
-    [controllerDate, refreshLinkedWidgets, widget, onWidgetUpdate],
+    [
+      controllerDate,
+      content,
+      onUpdateWidgetConfigByKey,
+      widget,
+      refreshLinkedWidgets,
+    ],
   );
 
   const control = useMemo(() => {

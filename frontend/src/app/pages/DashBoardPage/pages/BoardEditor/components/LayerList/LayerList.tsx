@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import produce from 'immer';
@@ -24,14 +25,13 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { WidgetType } from '../../../Board/slice/types';
-import { editBoardStackActions, editWidgetInfoActions } from '../../slice';
+import { editBoardStackActions } from '../../slice';
 import { updateWidgetConf } from '../../slice/childSlice/stackSlice';
 import {
   selectAllWidgetInfoMap,
   selectSortAllWidgets,
 } from '../../slice/selectors';
 import NameItem from './NameItem';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 
 export type NameCard = {
   index: number;
@@ -97,9 +97,6 @@ export const LayerList: React.FC<{}> = memo(() => {
       dispatch(editBoardStackActions.updateWidgetsConfig(newWidgets));
     }
   }, [cards, dispatch, sortLayoutWidgets]);
-  const clearSelectedWidgets = () => {
-    dispatch(editWidgetInfoActions.clearSelectedWidgets());
-  };
 
   const nameList = cards
     .sort((a, b) => b.index - a.index)
@@ -122,10 +119,9 @@ export const LayerList: React.FC<{}> = memo(() => {
       </WidgetWrapProvider>
     ));
   const t = useI18NPrefix(`viz.board.action`);
-  
   return (
     <DndProvider backend={HTML5Backend}>
-      <Wrapper onClick={clearSelectedWidgets}>
+      <Wrapper>
         <h3 className="title">{t('widgetList')}</h3>
         <div className="nameList">{nameList}</div>
         <div className="bottom"></div>

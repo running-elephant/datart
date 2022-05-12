@@ -53,8 +53,9 @@ const getBoardQueryData = (dataStr: string) => {
   const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
   const migratedWidgets = migrateWidgets(serverWidgets);
   const { widgetMap, wrappedDataCharts } = getWidgetMap(
-    migratedWidgets,
+    migratedWidgets, // TODO
     dataCharts,
+    dashboard.config.type,
   );
 
   const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);

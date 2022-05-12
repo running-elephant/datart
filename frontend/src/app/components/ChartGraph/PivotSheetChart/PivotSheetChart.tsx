@@ -18,6 +18,7 @@
 
 import { Data, DefaultCellTheme, Meta, SortParam, Style } from '@antv/s2';
 import { ChartDataSectionType, SortActionType } from 'app/constants';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ReactChart from 'app/models/ReactChart';
 import {
   ChartConfig,
@@ -32,6 +33,7 @@ import {
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
+import { isUndefined } from 'utils/object';
 import { PIVOT_THEME_LIST } from '../../FormGenerator/Customize/PivotSheetTheme/theme';
 import AntVS2Wrapper from './AntVS2Wrapper';
 import Config from './config';
@@ -45,6 +47,10 @@ class PivotSheetChart extends ReactChart {
   config = Config;
   chart: any = null;
   updateOptions: any = {};
+  lastRowsConfig: ChartDataSectionField[] = [];
+  hierarchyCollapse: boolean = true;
+  drillLevel: number = 0;
+  collapsedRows: Record<string, boolean> = {};
 
   constructor() {
     super(AntVS2Wrapper, {
@@ -65,6 +71,7 @@ class PivotSheetChart extends ReactChart {
       context,
       options.dataset,
       options.config,
+      options.drillOption,
     );
     this.adapter?.updated(this.updateOptions);
   }
@@ -81,10 +88,19 @@ class PivotSheetChart extends ReactChart {
     }
   }
 
+  onUnMount(options: any, context?: any): void {
+    this.lastRowsConfig = [];
+    this.hierarchyCollapse = true;
+    this.drillLevel = 0;
+    this.collapsedRows = {};
+    this.adapter?.unmount();
+  }
+
   getOptions(
     context,
-    dataset?: ChartDataSetDTO,
-    config?: ChartConfig,
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    drillOption: ChartDrillOption,
   ): AndvS2Config {
     if (!dataset || !config) {
       return {
@@ -102,21 +118,21 @@ class PivotSheetChart extends ReactChart {
     );
 
     const rowSectionConfigRows: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
+      .filter(c => c.type === ChartDataSectionType.Group)
       .filter(c => c.key === 'row')
       .flatMap(config => config.rows || []);
 
     const columnSectionConfigRows: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
+      .filter(c => c.type === ChartDataSectionType.Group)
       .filter(c => c.key === 'column')
       .flatMap(config => config.rows || []);
 
     const metricsSectionConfigRows: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
 
     const infoSectionConfigRows: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.INFO)
+      .filter(c => c.type === ChartDataSectionType.Info)
       .flatMap(config => config.rows || []);
 
     const [
@@ -165,9 +181,31 @@ class PivotSheetChart extends ReactChart {
       ['enableTotal', 'totalPosition', 'enableSubTotal', 'subTotalPosition'],
     );
 
+    if (!!enableExpandRow) {
+      if (
+        this.lastRowsConfig.map(lrc => lrc.uid).join('-') !==
+        rowSectionConfigRows.map(lrc => lrc.uid).join('-')
+      ) {
+        this.drillLevel = 0;
+        this.collapsedRows = {};
+        this.getCollapsedRows(rowSectionConfigRows, chartDataSet, true);
+        this.lastRowsConfig = rowSectionConfigRows;
+      } else {
+        this.getCollapsedRows(rowSectionConfigRows, chartDataSet);
+      }
+    } else {
+      if (Object.keys(this.collapsedRows).length) {
+        this.lastRowsConfig = [];
+        this.hierarchyCollapse = true;
+        this.drillLevel = 0;
+        this.collapsedRows = {};
+      }
+    }
+
     return {
       options: {
         hierarchyType: enableExpandRow ? 'tree' : 'grid',
+        hierarchyCollapse: this.hierarchyCollapse,
         width: context?.width,
         height: context?.height,
         tooltip: {
@@ -238,7 +276,7 @@ class PivotSheetChart extends ReactChart {
           values: metricsSectionConfigRows.map(config =>
             chartDataSet.getFieldKey(config),
           ),
-          valueInCols: !!metricNameShowIn,
+          valueInCols: !!enableExpandRow || !!metricNameShowIn,
         },
         meta: rowSectionConfigRows
           .concat(columnSectionConfigRows)
@@ -284,7 +322,87 @@ class PivotSheetChart extends ReactChart {
           green: '#29A294',
         },
       },
+      onRowCellCollapseTreeRows: ({ isCollapsed, node }) => {
+        this.collapsedRows[node.id] = isCollapsed;
+        this.changeDrillConfig(rowSectionConfigRows, drillOption);
+      },
+      onCollapseRowsAll: hierarchyCollapse => {
+        this.hierarchyCollapse = !hierarchyCollapse;
+        Object.keys(this.collapsedRows).forEach(k => {
+          this.collapsedRows[k] = this.hierarchyCollapse;
+        });
+        this.changeDrillConfig(rowSectionConfigRows, drillOption);
+      },
     };
+  }
+
+  changeDrillConfig(
+    rowSectionConfigRows: ChartDataSectionField[],
+    drillOption: ChartDrillOption,
+  ) {
+    const collapsedConfig: Record<string, boolean[]> = {};
+    Object.keys(this.collapsedRows).forEach(k => {
+      const pathArr = k.split('[&]');
+      if (isUndefined(collapsedConfig[pathArr.length])) {
+        collapsedConfig[pathArr.length] = [this.collapsedRows[k]];
+      } else {
+        collapsedConfig[pathArr.length].push(this.collapsedRows[k]);
+      }
+    });
+    let level: number = 0;
+    while (level < rowSectionConfigRows.length) {
+      if (
+        collapsedConfig[level + 2] &&
+        collapsedConfig[level + 2].every(c => c)
+      ) {
+        break;
+      }
+      level++;
+    }
+    if (this.drillLevel < level) {
+      let index = 0;
+      while (level - this.drillLevel > index) {
+        drillOption?.expandDown();
+        index++;
+      }
+    } else if (this.drillLevel > level) {
+      drillOption?.expandUp(rowSectionConfigRows[level]);
+    }
+    this.drillLevel = level;
+    this.mouseEvents
+      ?.find(v => v.name === 'click')
+      ?.callback({
+        seriesName: 'drillOptionChange',
+        value: drillOption,
+      });
+  }
+
+  getCollapsedRows(
+    rowSectionConfigRows: ChartDataSectionField[],
+    chartDataSet: IChartDataSet<string>,
+    initState?: boolean,
+  ) {
+    chartDataSet.forEach(dc => {
+      let path = 'root';
+      rowSectionConfigRows.forEach((rc, index) => {
+        if (
+          !isUndefined(dc.getCell(rc)) &&
+          index < rowSectionConfigRows.length - 1
+        ) {
+          path = path + '[&]' + dc.getCell(rc);
+          this.collapsedRows[path] = !isUndefined(initState)
+            ? Boolean(initState)
+            : isUndefined(this.collapsedRows?.[path])
+            ? this.hierarchyCollapse
+            : this.collapsedRows[path];
+        }
+      });
+    });
+    if (Object.values(this.collapsedRows).every(v => v)) {
+      this.hierarchyCollapse = true;
+    } else if (Object.values(this.collapsedRows).every(v => !v)) {
+      this.hierarchyCollapse = false;
+    }
   }
 
   private getThemeColorList(style: ChartStyleConfig[]): Array<string> {
@@ -309,30 +427,30 @@ class PivotSheetChart extends ReactChart {
       ['tableHeaderStyle'],
       ['height', 'width'],
     );
-    const [metricNameShowIn] = getStyles(
+    const [enableExpandRow, metricNameShowIn] = getStyles(
       style,
       ['style'],
-      ['metricNameShowIn'],
+      ['enableExpandRow', 'metricNameShowIn'],
     );
-
     return {
       colCfg: {
         height: headerHeight || 30,
-        widthByFieldValue: metricNameShowIn
-          ? metricsSectionConfigRows.reduce((allConfig, config) => {
-              return {
-                ...allConfig,
-                [chartDataSet.getFieldKey(config)]: bodyWidth,
-              };
-            }, {})
-          : chartDataSet.reduce((dataSetAllConfig, dataSetConfig) => {
-              return {
-                ...dataSetAllConfig,
-                [dataSetConfig?.getCell(
-                  columnSectionConfigRows[columnSectionConfigRows.length - 1],
-                )]: bodyWidth,
-              };
-            }, {}),
+        widthByFieldValue:
+          !!enableExpandRow || !!metricNameShowIn
+            ? metricsSectionConfigRows.reduce((allConfig, config) => {
+                return {
+                  ...allConfig,
+                  [chartDataSet.getFieldKey(config)]: bodyWidth,
+                };
+              }, {})
+            : chartDataSet.reduce((dataSetAllConfig, dataSetConfig) => {
+                return {
+                  ...dataSetAllConfig,
+                  [dataSetConfig?.getCell(
+                    columnSectionConfigRows[columnSectionConfigRows.length - 1],
+                  )]: bodyWidth,
+                };
+              }, {}),
       },
       rowCfg: {
         width: headerWidth,
@@ -340,6 +458,7 @@ class PivotSheetChart extends ReactChart {
       cellCfg: {
         height: bodyHeight || 30,
       },
+      collapsedRows: enableExpandRow ? this.collapsedRows : {},
     };
   }
 
@@ -349,7 +468,7 @@ class PivotSheetChart extends ReactChart {
   ): Array<SortParam> {
     return sectionConfigRows
       .map(config => {
-        if (!config?.sort?.type || config?.sort?.type === SortActionType.NONE) {
+        if (!config?.sort?.type || config?.sort?.type === SortActionType.None) {
           return null;
         }
         const isASC = config.sort.type === SortActionType.ASC;

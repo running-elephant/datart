@@ -134,13 +134,13 @@ class BasicBarChart extends Chart {
       drillOption,
     );
     const aggregateConfigs: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
     const colorConfigs: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.COLOR)
+      .filter(c => c.type === ChartDataSectionType.Color)
       .flatMap(config => config.rows || []);
     const infoConfigs: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.INFO)
+      .filter(c => c.type === ChartDataSectionType.Info)
       .flatMap(config => config.rows || []);
 
     const chartDataSet = transformToDataSet(

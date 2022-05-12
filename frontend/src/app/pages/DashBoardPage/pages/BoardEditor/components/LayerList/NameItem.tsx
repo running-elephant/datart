@@ -15,12 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WidgetActionDropdown } from 'app/pages/DashBoardPage/components/WidgetComponents/WidgetActionDropdown';
+import { WidgetDropdownList } from 'app/pages/DashBoardPage/components/WidgetComponents/WidgetDropdownList';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import {
-  Widget,
-  WidgetType,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import classNames from 'classnames';
 import { XYCoord } from 'dnd-core';
 import { useCallback, useContext, useRef } from 'react';
@@ -176,7 +174,7 @@ const NameItem: React.FC<NameItemProps> = ({
           {card.name || 'untitled-widget'}
         </span>
 
-        <WidgetActionDropdown widget={widget} />
+        <WidgetDropdownList widget={widget} />
       </div>
     </ItemWrap>
   );

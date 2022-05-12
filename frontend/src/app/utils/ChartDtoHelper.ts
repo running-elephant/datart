@@ -17,7 +17,11 @@
  */
 
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
-import { ChartConfig, ChartStyleConfig } from 'app/types/ChartConfig';
+import {
+  ChartConfig,
+  ChartDataConfig,
+  ChartStyleConfig,
+} from 'app/types/ChartConfig';
 import { ChartConfigDTO, ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
@@ -101,10 +105,10 @@ export function mergeToChartConfig(
   if (!source) {
     return target;
   }
-  target.datas = mergeChartDataConfigs(
+  target.datas = mergeChartDataConfigs<ChartDataConfig>(
     target?.datas,
     source?.chartConfig?.datas,
-  );
+  ) as ChartDataConfig[];
   target.styles = mergeChartStyleConfigs(
     target?.styles,
     source?.chartConfig?.styles,

@@ -21,13 +21,10 @@ import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { useCallback } from 'react';
 
-type ChartWidgetDropdownProps = {
+export const ChartWidgetDropdown: React.FC<{
   onSelect: () => void;
   onCreate: () => void;
-};
-export const ChartWidgetDropdown: React.FC<
-  ChartWidgetDropdownProps
-> = props => {
+}> = props => {
   const t = useI18NPrefix(`viz.board.action`);
   const onChartWidget = useCallback(
     ({ key }) => {
@@ -42,7 +39,7 @@ export const ChartWidgetDropdown: React.FC<
   );
   const addChartTypes = [
     {
-      name: t('ImportExistingDataCharts'),
+      name: t('importExistingDataCharts'),
       icon: '',
       type: 'select',
     },

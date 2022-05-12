@@ -21,7 +21,7 @@ import {
   AxisLineStyle,
   ChartDataSectionField,
   FontStyle,
-  IFieldFormatConfig,
+  FormatFieldAction,
   LabelStyle,
   LineStyle,
   MarkArea,
@@ -66,7 +66,7 @@ export type Series = {
       rowData: { [key: string]: any };
       value: number | string;
       total?: number;
-      format: IFieldFormatConfig | undefined;
+      format: FormatFieldAction | undefined;
     } & ChartDataSectionField
   >;
   color?: string;

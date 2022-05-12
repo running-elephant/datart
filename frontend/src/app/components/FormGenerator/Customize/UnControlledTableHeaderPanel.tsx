@@ -46,9 +46,9 @@ const getFlattenHeaders = (dataConfigs: ChartDataConfig[] = []) => {
   return newDataConfigs
     .filter(
       c =>
-        ChartDataSectionType.AGGREGATE === c.type ||
-        ChartDataSectionType.GROUP === c.type ||
-        ChartDataSectionType.MIXED === c.type,
+        ChartDataSectionType.Aggregate === c.type ||
+        ChartDataSectionType.Group === c.type ||
+        ChartDataSectionType.Mixed === c.type,
     )
     .flatMap(config => config.rows || []);
 };

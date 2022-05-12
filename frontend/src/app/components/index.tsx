@@ -5,7 +5,7 @@ export { Configuration } from './Configuration';
 export { Confirm } from './Confirm';
 export { EmptyFiller } from './EmptyFiller';
 export { FormItemEx } from './Form';
-export { GroupLayout } from './FormGenerator';
+export { GroupLayout, ItemLayout } from './FormGenerator';
 export { IW } from './IconWrapper';
 export { ListItem } from './ListItem';
 export { ListNav, ListPane } from './ListNav';

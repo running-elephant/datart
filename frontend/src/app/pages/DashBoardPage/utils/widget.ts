@@ -18,7 +18,7 @@
 
 import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
 import {
-  ContainerItem,
+  TabWidgetContent,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
@@ -27,206 +27,69 @@ import ChartDataView from 'app/types/ChartDataView';
 import { formatTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
-import { DeltaStatic } from 'quill';
 import { CSSProperties } from 'react';
-import { FONT_FAMILY, G90, WHITE } from 'styles/StyleConstants';
-import { uuidv4 } from 'utils/utils';
-import { fillPx, getBackgroundImage } from '.';
-import {
-  AutoBoardWidgetBackgroundDefault,
-  BackgroundDefault,
-  BorderDefault,
-  ButtonBorderDefault,
-  LAYOUT_COLS_MAP,
-  QueryButtonWidgetBackgroundDefault,
-} from '../constants';
+import { adaptBoardImageUrl, fillPx, getBackgroundImage } from '.';
+import { LAYOUT_COLS_MAP } from '../constants';
 import {
   BackgroundConfig,
   BoardType,
   BorderConfig,
   ChartWidgetContent,
-  ContainerWidgetContent,
-  ContainerWidgetType,
   ControllerWidgetContent,
   DataChart,
-  MediaWidgetContent,
-  MediaWidgetType,
-  RectConfig,
-  RelatedView,
   Relation,
   ServerRelation,
   ServerWidget,
-  Widget,
-  WidgetConf,
-  WidgetContent,
   WidgetContentChartType,
   WidgetInfo,
   WidgetPadding,
 } from '../pages/Board/slice/types';
 import { StrControlTypes } from '../pages/BoardEditor/components/ControllerWidgetPanel/constants';
-import { ControllerConfig } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
-import { BtnActionParams } from '../pages/BoardEditor/slice/actions/controlActions';
+import { Widget } from '../types/widgetTypes';
 
 export const VALUE_SPLITTER = '###';
 
-export const createControllerWidget = (opt: {
-  boardId: string;
-  boardType: BoardType;
-  relations: Relation[];
-  name?: string;
-  controllerType: ControllerFacadeTypes;
-  views: RelatedView[];
-  config: ControllerConfig;
-  viewIds: string[];
-}) => {
-  const {
-    boardId,
-    boardType,
-    views,
-    config,
-    controllerType,
-    relations,
-    name = 'newController',
-  } = opt;
-  const content: ControllerWidgetContent = {
-    type: controllerType,
-    relatedViews: views,
-    name: name,
-    config: config,
-  };
-
-  const widgetConf = createInitWidgetConfig({
-    name: name,
-    type: 'controller',
-    content: content,
-    boardType: boardType,
-  });
-
-  const widgetId = relations[0]?.sourceId || uuidv4();
-  const widget: Widget = createWidget({
-    id: widgetId,
-    dashboardId: boardId,
-    config: widgetConf,
-    relations,
-  });
-  return widget;
-};
-export const createMediaWidget = (opt: {
-  dashboardId: string;
-  boardType: BoardType;
-  type: MediaWidgetType;
-}) => {
-  const content = createMediaContent(opt.type);
-  const widgetConf = createInitWidgetConfig({
-    type: 'media',
-    content: content,
-    boardType: opt.boardType,
-  });
-  const widget: Widget = createWidget({
-    dashboardId: opt.dashboardId,
-    config: widgetConf,
-  });
-  return widget;
-};
-export const createContainerWidget = (opt: {
-  dashboardId: string;
-  boardType: BoardType;
-  type: ContainerWidgetType;
-}) => {
-  const content = createContainerWidgetContent(opt.type);
-  const widgetConf = createInitWidgetConfig({
-    type: 'container',
-    content: content,
-    boardType: opt.boardType,
-  });
-  const widget: Widget = createWidget({
-    dashboardId: opt.dashboardId,
-    config: widgetConf,
-  });
-  return widget;
-};
-export const createControlBtn = (opt: BtnActionParams) => {
-  const content = { type: opt.type };
-  const widgetConf = createInitWidgetConfig({
-    name: '',
-    type: opt.type as WidgetType,
-    content: content,
-    boardType: opt.boardType,
-  });
-  const widget: Widget = createWidget({
-    dashboardId: opt.boardId,
-    config: widgetConf,
-  });
-  return widget;
-};
-export const createInitWidgetConfig = (opt: {
-  type: WidgetType;
-  content: WidgetContent;
-  boardType: BoardType;
-  index?: number;
-  name?: string;
-  autoUpdate?: boolean;
-  frequency?: number;
-}): WidgetConf => {
-  return {
-    version: '',
-    type: opt.type,
-    index: opt.index || 0,
-    name: opt.name || '',
-    linkageConfig: {
-      open: false,
-      chartGroupColumns: [],
-    },
-    autoUpdate: opt.autoUpdate || false,
-    lock: false,
-    frequency: opt.frequency || 60, // 60秒
-    rect: createWidgetRect(opt.boardType, opt.type),
-    background:
-      opt.boardType === 'auto'
-        ? opt.type === 'query'
-          ? QueryButtonWidgetBackgroundDefault
-          : AutoBoardWidgetBackgroundDefault
-        : BackgroundDefault,
-    border: ['query', 'reset'].includes(opt.type)
-      ? ButtonBorderDefault
-      : BorderDefault,
-    content: opt.content,
-    nameConfig: {
-      show: true,
-      textAlign: 'left',
-      ...fontDefault,
-      color: opt.type === 'query' ? WHITE : G90,
-    },
-    padding: createWidgetPadding(opt.type),
-  };
-};
-export const createWidget = (option: {
-  dashboardId: string;
-  config: WidgetConf;
-  datachartId?: string;
-  id?: string;
-  viewIds?: string[];
-  parentId?: string;
-  relations?: Relation[];
-}) => {
-  const widget: Widget = {
-    id: option.id || 'newWidget_' + uuidv4(),
-    dashboardId: option.dashboardId,
-    config: option.config,
-    datachartId: option.datachartId || '',
-    viewIds: option.viewIds || [],
-    parentId: option.parentId || '',
-    relations: option.relations || [],
-  };
-  return widget;
-};
-export const fontDefault = {
-  fontFamily: FONT_FAMILY,
-  fontSize: '14',
-  fontWeight: 'normal',
-  fontStyle: 'normal',
-  color: G90,
-};
+// export const createInitWidgetConfig = (opt: {
+//   type: WidgetType;
+//   content: WidgetContent;
+//   boardType: BoardType;
+//   index?: number;
+//   name?: string;
+//   autoUpdate?: boolean;
+//   frequency?: number;
+// }): WidgetConf => {
+//   return {
+//     version: '',
+//     type: opt.type,
+//     index: opt.index || 0,
+//     name: opt.name || '',
+//     linkageConfig: {
+//       open: false,
+//       chartGroupColumns: [],
+//     },
+//     autoUpdate: opt.autoUpdate || false,
+//     lock: false,
+//     frequency: opt.frequency || 60, // 60秒
+//     rect: createWidgetRect(opt.boardType, opt.type),
+//     background:
+//       opt.boardType === 'auto'
+//         ? opt.type === 'query'
+//           ? QueryButtonWidgetBackgroundDefault
+//           : AutoBoardWidgetBackgroundDefault
+//         : BackgroundDefault,
+//     border: ['query', 'reset'].includes(opt.type)
+//       ? ButtonBorderDefault
+//       : BorderDefault,
+//     content: opt.content,
+//     nameConfig: {
+//       show: true,
+//       textAlign: 'left',
+//       ...FontDefault,
+//       color: opt.type === 'query' ? WHITE : G90,
+//     } as any,
+//     padding: createWidgetPadding(opt.type),
+//   };
+// };
 
 export const createWidgetInfo = (id: string): WidgetInfo => {
   const widgetInfo: WidgetInfo = {
@@ -244,7 +107,7 @@ export const createWidgetInfo = (id: string): WidgetInfo => {
   return widgetInfo;
 };
 export const createWidgetPadding = (widgetType: WidgetType) => {
-  if (widgetType === 'query' || widgetType === 'reset') {
+  if (widgetType === 'button') {
     return {
       left: 0,
       right: 0,
@@ -266,137 +129,29 @@ export const createWidgetPadding = (widgetType: WidgetType) => {
     bottom: 8,
   };
 };
-export const createWidgetRect = (
-  boardType: BoardType,
-  widgetType: WidgetType,
-): RectConfig => {
-  if (widgetType === 'controller') {
-    return getInitControllerWidgetRect(boardType);
-  }
-  if (widgetType === 'query' || widgetType === 'reset') {
-    return getInitButtonWidgetRect(boardType);
-  }
-  if (boardType === 'auto') {
-    return {
-      x: 0,
-      y: 0,
-      width: 6,
-      height: 6,
-    };
-  } else {
-    // free
-    return {
-      x: 0,
-      y: 0,
-      width: 400,
-      height: 300,
-    };
-  }
-};
 
-export const getInitButtonWidgetRect = (boardType: BoardType): RectConfig => {
-  if (boardType === 'auto') {
-    return {
-      x: 0,
-      y: 0,
-      width: 1,
-      height: 1,
-    };
-  } else {
-    // free
-    return {
-      x: 0,
-      y: 0,
-      width: 128,
-      height: 32,
-    };
-  }
-};
-export const getInitControllerWidgetRect = (
-  boardType: BoardType,
-): RectConfig => {
-  if (boardType === 'auto') {
-    return {
-      x: 0,
-      y: 0,
-      width: 3,
-      height: 1,
-    };
-  } else {
-    // free
-    return {
-      x: 0,
-      y: 0,
-      width: 300,
-      height: 32,
-    };
-  }
-};
-export const createContainerWidgetContent = (type: ContainerWidgetType) => {
-  let content: ContainerWidgetContent = {
-    type: type,
-    itemMap: {},
-  };
-  switch (type) {
-    case 'tab':
-      content.tabConfig = {};
-      break;
-    case 'carousel':
-      content.carouselConfig = {};
-      break;
-    default:
-      break;
-  }
-  return content;
-};
+// export const createContainerWidgetContent = (type: ContainerWidgetType) => {
+//   let content: ContainerWidgetContent = {
+//     type: type,
+//     itemMap: {},
+//   };
+//   switch (type) {
+//     case 'tab':
+//       content.tabConfig = {};
+//       break;
+//     case 'carousel':
+//       content.carouselConfig = {};
+//       break;
+//     default:
+//       break;
+//   }
+//   return content;
+// };
 
 export const createChartWidgetContent = (subType: WidgetContentChartType) => {
   let content: ChartWidgetContent = {
     type: subType,
   };
-  return content;
-};
-
-export const createMediaContent = (type: MediaWidgetType) => {
-  let content: MediaWidgetContent = {
-    type: type,
-  };
-  switch (type) {
-    case 'richText':
-      content.richTextConfig = {
-        content: {
-          ops: [
-            {
-              insert: '\n',
-            },
-          ],
-        } as DeltaStatic,
-      };
-      break;
-    case 'image':
-      content.imageConfig = {
-        type: 'WIDGET_SIZE',
-        src: '',
-      };
-      break;
-    case 'iframe':
-      content.iframeConfig = {
-        src: '',
-      };
-      break;
-    case 'timer':
-      content.iframeConfig = {
-        src: '',
-      };
-      break;
-    case 'video':
-      content.videoConfig = {
-        src: '',
-      };
-      break;
-    default:
-      break;
-  }
   return content;
 };
 
@@ -533,7 +288,7 @@ export const convertWrapChartWidget = (params: {
 }) => {
   const { widgetMap, dataChartMap } = params;
   const widgets = Object.values(widgetMap).map(widget => {
-    if (widget.config.content.type !== 'widgetChart') {
+    if (widget.config.originalType !== 'ownedChart') {
       return widget;
     }
     // widgetChart wrapChartWidget
@@ -744,6 +499,7 @@ export const getLinkedColumn = (
 export const getWidgetMap = (
   widgets: Widget[],
   dataCharts: DataChart[],
+  boardType: BoardType,
   filterSearchParamsMap?: FilterSearchParamsWithMatch,
 ) => {
   const filterSearchParams = filterSearchParamsMap?.params,
@@ -772,23 +528,23 @@ export const getWidgetMap = (
     .filter(w => w.parentId)
     .forEach(widget => {
       const parentWidgetId = widget.parentId!;
-      const childTabId = widget.config.tabId as string;
-      const curItem = (
-        widgetMap[parentWidgetId].config.content as ContainerWidgetContent
-      ).itemMap[childTabId];
-      if (curItem) {
-        curItem.childWidgetId = widget.id;
-        curItem.name = widget.config.name;
-      } else {
-        let newItem: ContainerItem = {
-          tabId: childTabId,
-          name: widget.config.name,
-          childWidgetId: widget.id,
-        };
-        (
-          widgetMap[parentWidgetId].config.content as ContainerWidgetContent
-        ).itemMap[childTabId] = newItem;
+      const parentWidget = widgetMap[parentWidgetId];
+      if (!parentWidget) {
+        widget.parentId = '';
+        return;
       }
+      const tabContent = parentWidget.config.content as TabWidgetContent;
+      if (!tabContent.itemMap) {
+        widget.parentId = '';
+        return;
+      }
+
+      const targetTabItem = tabContent.itemMap?.[widget.config.clientId];
+      if (!targetTabItem) {
+        widget.parentId = '';
+        return;
+      }
+      targetTabItem.childWidgetId = widget.id;
     });
 
   // 处理 controller config visibility依赖关系 id, url参数修改filter
@@ -850,15 +606,33 @@ export const getWidgetMap = (
 
   // 处理 自有 chart widgetControl
   widgetList
-    .filter(w => w.config.content.type === 'widgetChart')
+    .filter(w => w.config.originalType === 'ownedChart')
     .forEach(widget => {
-      let content = widget.config.content as ChartWidgetContent;
+      let dataChart = (widget.config.content as any).dataChart as DataChart;
+
       const self_dataChartId = `widget_${widget.dashboardId}_${widget.id}`;
-      content.dataChart!.id = self_dataChartId;
+      if (dataChart) {
+        dataChart.id = self_dataChartId;
+        wrappedDataCharts.push(dataChart!);
+      }
       widget.datachartId = self_dataChartId;
-      wrappedDataCharts.push(content.dataChart!);
-      delete content.dataChart;
     });
+
+  // preprocess widget
+  widgetList.forEach(widget => {
+    widget.config.boardType = boardType;
+    widget.config.customConfig.props?.forEach(item => {
+      if (item.key === 'backgroundGroup') {
+        const rowsValue = item?.rows?.[0]?.value;
+        if (rowsValue?.image) {
+          rowsValue.image = adaptBoardImageUrl(
+            rowsValue.image,
+            widget.dashboardId,
+          );
+        }
+      }
+    });
+  });
 
   return {
     widgetMap,

@@ -21,7 +21,7 @@ import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
-  IFieldFormatConfig,
+  FormatFieldAction,
   LabelStyle,
   XAxis,
   XAxisColumns,
@@ -101,10 +101,10 @@ class WaterfallChart extends Chart {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
+      .filter(c => c.type === ChartDataSectionType.Group)
       .flatMap(config => config.rows || []);
     const aggregateConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
 
     const chartDataSet = transformToDataSet(
@@ -343,7 +343,7 @@ class WaterfallChart extends Chart {
 
   private getLabel(
     styles: ChartStyleConfig[],
-    format: IFieldFormatConfig | undefined,
+    format: FormatFieldAction | undefined,
   ): LabelStyle {
     const [show, position, font] = getStyles(
       styles,

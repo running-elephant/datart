@@ -23,9 +23,13 @@ import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
-import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
+import { WidgetDropdownList } from '../../WidgetComponents/WidgetDropdownList';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
+import {
+  getWidgetBaseStyle,
+  getWidgetTitle,
+} from '../../WidgetManager/utils/utils';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { RichTextWidgetCore } from './RichTextWidgetCore';
 
@@ -34,23 +38,16 @@ export const RichTextWidget: React.FC<{ hideTitle: boolean }> = memo(
     const widget = useContext(WidgetContext);
     const { editing } = useContext(BoardContext);
     const widgetInfo = useContext(WidgetInfoContext);
-
-    /**
-     * @param ''
-     * @description '在定时任务的模式 直接加载不做懒加载 ,其他模式下 如果是 free 类型直接加载 如果是 autoBoard 则由 autoBoard自己控制'
-     */
-
+    const title = getWidgetTitle(widget.config.customConfig.props);
+    title.title = widget.config.name;
     // 自动更新
-    const { background, border, padding } = widget.config;
+    const { background, border, padding } = getWidgetBaseStyle(
+      widget.config.customConfig.props,
+    );
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
         <div style={ZIndexStyle}>
-          {hideTitle ? null : (
-            <WidgetTitle
-              name={widget.config.name}
-              config={widget.config.nameConfig}
-            />
-          )}
+          {hideTitle ? null : <WidgetTitle title={title} />}
           <div style={FlexStyle}>
             <RichTextWidgetCore
               widget={widget}
@@ -67,7 +64,7 @@ export const RichTextWidget: React.FC<{ hideTitle: boolean }> = memo(
               wid={widget.id}
               lock={widget.config?.lock}
             />
-            <WidgetActionDropdown widget={widget} />
+            <WidgetDropdownList widget={widget} />
           </Space>
         </StyledWidgetToolBar>
       </WidgetWrapper>
