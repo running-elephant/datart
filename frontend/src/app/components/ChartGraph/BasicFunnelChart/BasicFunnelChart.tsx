@@ -18,8 +18,8 @@
 
 import { ChartDataSectionType } from 'app/constants';
 import {
-  ChartConfig,
-  ChartDataSectionField,
+  ChartConfig, ChartContext,
+  ChartDataSectionField, ChartOptions,
   ChartStyleConfig,
   LabelStyle,
   LegendStyle,
@@ -46,21 +46,20 @@ import { init } from 'echarts';
 import isEmpty from 'lodash/isEmpty';
 import Chart from '../../../models/Chart';
 import { ChartDrillOption } from '../../../models/ChartDrillOption';
+import { ChartSelectOption } from '../../../models/ChartSelectOption';
 import Config from './config';
 import { Series, SeriesData } from './types';
 
 class BasicFunnelChart extends Chart {
   config = Config;
   chart: any = null;
-
-  // todo(tianlei) 临时储存数据更新chart start
-  protected selectDataIndexList: Array<{
-    index: string;
-    data: any;
-  }> = [];
-  protected linshiOption = null;
-  protected linshiContext = null;
-  // todo(tianlei) 临时储存数据更新chart end
+  protected optionsAndContext: {
+    options?: ChartOptions;
+    context?: ChartContext;
+  } = {
+    options: undefined,
+    context: undefined,
+  };
 
   constructor() {
     super(
@@ -88,7 +87,9 @@ class BasicFunnelChart extends Chart {
     this.mouseEvents?.forEach(event => {
       if (event.name === 'click') {
         this.chart.on(event.name, params => {
-          initSelectEvent(params, this);
+          if (!this.optionsAndContext.options?.drillOption?.isSelectedDrill) {
+            initSelectEvent(params, this);
+          }
           event.callback(params);
         });
       } else {
@@ -102,10 +103,10 @@ class BasicFunnelChart extends Chart {
       return;
     }
 
-    // todo(tianlei) 临时储存数据更新chart start
-    this.linshiOption = options;
-    this.linshiContext = context;
-    // todo(tianlei) 临时储存数据更新chart end
+    this.optionsAndContext = {
+      options,
+      context,
+    };
 
     this.chart?.clear();
     if (!this.isMatchRequirement(options.config)) {
@@ -115,12 +116,12 @@ class BasicFunnelChart extends Chart {
       options.dataset,
       options.config,
       options.drillOption,
+      options.selectOption,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
   onUnMount(): void {
-    this.selectDataIndexList = [];
     this.chart?.dispose();
   }
 
@@ -132,6 +133,7 @@ class BasicFunnelChart extends Chart {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption: ChartDrillOption,
+    selectOption: ChartSelectOption,
   ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -172,6 +174,7 @@ class BasicFunnelChart extends Chart {
       groupConfigs,
       dataList,
       infoConfigs,
+      selectOption,
     );
 
     return {
@@ -305,6 +308,7 @@ class BasicFunnelChart extends Chart {
     groupConfigs: ChartDataSectionField[],
     dataList: IChartDataSet<string>,
     infoConfigs: ChartDataSectionField[],
+    selectOption: ChartSelectOption,
   ): Series {
     const [selectAll] = getStyles(styles, ['legend'], ['selectAll']);
     const [sort, funnelAlign, gap] = getStyles(
@@ -331,7 +335,7 @@ class BasicFunnelChart extends Chart {
           ...getSelectItemStyle(
             0,
             acIndex,
-            this.selectDataIndexList,
+            selectOption.getAllSelectConfig(),
             dataItemStyle,
           ),
           ...getExtraSeriesRowData(dc),
@@ -379,7 +383,7 @@ class BasicFunnelChart extends Chart {
           ...getSelectItemStyle(
             0,
             acIndex * dataList.length + dcIndex,
-            this.selectDataIndexList,
+            selectOption.getAllSelectConfig(),
             dataItemStyle,
           ),
           ...getExtraSeriesRowData(dc),

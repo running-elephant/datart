@@ -19,7 +19,9 @@
 import { ChartDataSectionType } from 'app/constants';
 import {
   ChartConfig,
+  ChartContext,
   ChartDataSectionField,
+  ChartOptions,
   ChartStyleConfig,
   LabelStyle,
   LegendStyle,
@@ -44,6 +46,7 @@ import {
 import { init } from 'echarts';
 import Chart from '../../../models/Chart';
 import { ChartDrillOption } from '../../../models/ChartDrillOption';
+import { ChartSelectOption } from '../../../models/ChartSelectOption';
 import Config from './config';
 import { PieSeries, PieSeriesImpl, PieSeriesStyle } from './types';
 
@@ -53,15 +56,13 @@ class BasicPieChart extends Chart {
 
   protected isCircle = false;
   protected isRose = false;
-
-  // todo(tianlei) 临时储存数据更新chart start
-  protected selectDataIndexList: Array<{
-    index: string;
-    data: any;
-  }> = [];
-  protected linshiOption = null;
-  protected linshiContext = null;
-  // todo(tianlei) 临时储存数据更新chart end
+  protected optionsAndContext: {
+    options?: ChartOptions;
+    context?: ChartContext;
+  } = {
+    options: undefined,
+    context: undefined,
+  };
 
   constructor(props?) {
     super(
@@ -86,7 +87,9 @@ class BasicPieChart extends Chart {
     this.mouseEvents?.forEach(event => {
       if (event.name === 'click') {
         this.chart.on(event.name, params => {
-          initSelectEvent(params, this);
+          if (!this.optionsAndContext.options?.drillOption?.isSelectedDrill) {
+            initSelectEvent(params, this);
+          }
           event.callback(params);
         });
       } else {
@@ -100,10 +103,10 @@ class BasicPieChart extends Chart {
       return;
     }
 
-    // todo(tianlei) 临时储存数据更新chart start
-    this.linshiOption = props;
-    this.linshiContext = context;
-    // todo(tianlei) 临时储存数据更新chart end
+    this.optionsAndContext = {
+      options: props,
+      context,
+    };
 
     if (!this.isMatchRequirement(props.config)) {
       this.chart?.clear();
@@ -113,12 +116,12 @@ class BasicPieChart extends Chart {
       props.dataset,
       props.config,
       props.drillOption,
+      props.selectOption,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
   onUnMount(): void {
-    this.selectDataIndexList = [];
     this.chart?.dispose();
   }
 
@@ -130,6 +133,7 @@ class BasicPieChart extends Chart {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption: ChartDrillOption,
+    selectOption: ChartSelectOption,
   ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -155,6 +159,7 @@ class BasicPieChart extends Chart {
       groupConfigs,
       aggregateConfigs,
       infoConfigs,
+      selectOption,
     );
 
     return {
@@ -177,6 +182,7 @@ class BasicPieChart extends Chart {
     groupConfigs: ChartDataSectionField[],
     aggregateConfigs: ChartDataSectionField[],
     infoConfigs: ChartDataSectionField[],
+    selectOption: ChartSelectOption,
   ): PieSeriesStyle[] | PieSeriesStyle {
     if (!groupConfigs?.length) {
       const row = chartDataSet?.[0];
@@ -192,7 +198,7 @@ class BasicPieChart extends Chart {
             ...getSelectItemStyle(
               0,
               dcIndex,
-              this.selectDataIndexList,
+              selectOption.getAllSelectConfig(),
               this.getDataItemStyle(config, groupConfigs, row),
             ),
             ...getExtraSeriesRowData(row),
@@ -214,7 +220,7 @@ class BasicPieChart extends Chart {
             ...getSelectItemStyle(
               acIndex,
               dcIndex,
-              this.selectDataIndexList,
+              selectOption.getAllSelectConfig(),
               this.getDataItemStyle(config, groupConfigs, row),
             ),
             ...getExtraSeriesRowData(row),

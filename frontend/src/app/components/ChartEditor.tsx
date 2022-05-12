@@ -65,6 +65,7 @@ import {
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import {
   getChartDrillOption,
+  getChartSelectOption,
   transferChartConfigs,
 } from 'app/utils/internalChartHelper';
 import { updateBy } from 'app/utils/mutation';
@@ -81,6 +82,7 @@ import {
   DataChartConfig,
   WidgetContentChartType,
 } from '../pages/DashBoardPage/pages/Board/slice/types';
+import { IChartSelectOption } from '../types/ChartSelectOption';
 
 const { confirm } = Modal;
 
@@ -136,6 +138,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
   const [chart, setChart] = useState<IChart>();
   const drillOptionRef = useRef<IChartDrillOption>();
+  const selectOptionRef = useRef<IChartSelectOption>();
 
   const [allowQuery, setAllowQuery] = useState<boolean>(false);
   const history = useHistory();
@@ -218,6 +221,12 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       drillOptionRef.current = getChartDrillOption(chartConfig?.datas);
     }
   }, [chartConfig?.datas, drillOptionRef]);
+
+  useEffect(() => {
+    if (!isEmptyArray(chartConfig?.datas) && !selectOptionRef.current) {
+      selectOptionRef.current = getChartSelectOption(selectOptionRef.current);
+    }
+  }, [chartConfig?.datas, selectOptionRef]);
 
   useEffect(() => {
     if (dataview?.sourceId) {
@@ -324,6 +333,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       chartConfig?.datas,
       drillOptionRef.current,
     );
+    selectOptionRef.current = getChartSelectOption(selectOptionRef.current);
   }, [dispatch, chart?.meta?.id, registerChartEvents, chartConfig?.datas]);
 
   const handleChartChange = (c: IChart) => {
@@ -358,6 +368,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     drillOptionRef.current = getChartDrillOption(
       finalChartConfig?.datas,
       drillOptionRef.current,
+      true,
+    );
+    selectOptionRef.current = getChartSelectOption(
+      selectOptionRef.current,
       true,
     );
     if (!expensiveQuery) {
@@ -436,6 +450,11 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           }),
         );
       }
+
+      selectOptionRef.current = getChartSelectOption(
+        selectOptionRef.current,
+        true,
+      );
 
       dispatch(
         updateChartConfigAndRefreshDatasetAction({
@@ -609,6 +628,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       refreshDatasetAction({ drillOption: drillOptionRef?.current }),
     );
     setAllowQuery(false);
+    selectOptionRef.current = getChartSelectOption(
+      selectOptionRef.current,
+      true,
+    );
   }, [dispatch, drillOptionRef]);
 
   const handleCreateDownloadDataTask = useCallback(async () => {
@@ -675,6 +698,11 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       ),
     );
 
+    selectOptionRef.current = getChartSelectOption(
+      selectOptionRef.current,
+      true,
+    );
+
     dispatch(
       updateChartConfigAndRefreshDatasetAction({
         type,
@@ -707,6 +735,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             onChangeAggregation: handleAggregationState,
           }}
           drillOption={drillOptionRef?.current}
+          selectOption={selectOptionRef?.current}
           aggregation={aggregation}
           chart={chart}
           dataset={dataset}

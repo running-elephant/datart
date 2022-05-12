@@ -36,6 +36,8 @@ import {
   RECOMMEND_TIME,
 } from 'globalConstants';
 import { ValueOf } from 'types';
+import { IChartDrillOption } from './ChartDrillOption';
+import { IChartSelectOption } from './ChartSelectOption';
 
 export type FilterFieldAction = {
   condition?: FilterCondition;
@@ -262,6 +264,8 @@ export interface ChartOptions {
   config: ChartConfig;
   dataset: ChartDataSetDTO;
   widgetSpecialConfig: { env: string | undefined; [x: string]: any };
+  drillOption?: IChartDrillOption;
+  selectOption?: IChartSelectOption;
 }
 
 export interface ChartContext {

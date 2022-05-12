@@ -27,6 +27,7 @@ import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
+import { IChartSelectOption } from '../../types/ChartSelectOption';
 import ChartIFrameEventBroker from './ChartIFrameEventBroker';
 import ChartIFrameResourceLoader from './ChartIFrameResourceLoader';
 
@@ -44,6 +45,7 @@ const ChartIFrameLifecycleAdapter: FC<{
   style: CSSProperties;
   isShown?: boolean;
   drillOption?: IChartDrillOption;
+  selectOption?: IChartSelectOption;
   widgetSpecialConfig?: any;
 }> = ({
   dataset,
@@ -52,6 +54,7 @@ const ChartIFrameLifecycleAdapter: FC<{
   style,
   isShown = true,
   drillOption,
+  selectOption,
   widgetSpecialConfig,
 }) => {
   const [chartResourceLoader] = useState(() => new ChartIFrameResourceLoader());
@@ -87,7 +90,14 @@ const ChartIFrameLifecycleAdapter: FC<{
           newBrokerRef.register(chart);
           newBrokerRef.publish(
             ChartLifecycle.Mounted,
-            { containerId, dataset, config, widgetSpecialConfig, drillOption },
+            {
+              containerId,
+              dataset,
+              config,
+              widgetSpecialConfig,
+              drillOption,
+              selectOption,
+            },
             {
               document,
               window,
@@ -115,7 +125,7 @@ const ChartIFrameLifecycleAdapter: FC<{
   /**
    * Chart Update Event
    * Dependency: 'config', 'dataset', 'widgetSpecialConfig',
-   * 'containerStatus', 'document', 'window', 'isShown', 'drillOption'
+   * 'containerStatus', 'document', 'window', 'isShown', 'drillOption', 'selectOption'
    */
   useEffect(() => {
     if (
@@ -135,6 +145,7 @@ const ChartIFrameLifecycleAdapter: FC<{
         config,
         widgetSpecialConfig,
         drillOption,
+        selectOption,
       },
       {
         document,
@@ -155,6 +166,7 @@ const ChartIFrameLifecycleAdapter: FC<{
     isShown,
     translator,
     drillOption,
+    selectOption,
   ]);
 
   /**
@@ -180,6 +192,7 @@ const ChartIFrameLifecycleAdapter: FC<{
         config,
         widgetSpecialConfig,
         drillOption,
+        selectOption,
       },
       {
         document,
@@ -198,6 +211,7 @@ const ChartIFrameLifecycleAdapter: FC<{
     isShown,
     translator,
     drillOption,
+    selectOption,
   ]);
 
   return (

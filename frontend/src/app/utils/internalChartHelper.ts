@@ -47,6 +47,8 @@ import {
   isUndefined,
   pipe,
 } from 'utils/object';
+import { ChartSelectOption } from '../models/ChartSelectOption';
+import { IChartSelectOption } from '../types/ChartSelectOption';
 
 export const transferChartConfigs = (
   targetConfig?: ChartConfig,
@@ -693,4 +695,22 @@ export const getChartDrillOption = (
     drillOption?.clearAll();
   }
   return drillOption;
+};
+
+/**
+ * Create or Update Chart Select Option
+ *
+ * @param {IChartSelectOption} [selectOption]
+ * @return {*}  {(IChartSelectOption | undefined)}
+ */
+export const getChartSelectOption = (
+  selectOption?: IChartSelectOption,
+  isClearAll?: boolean,
+): IChartSelectOption | undefined => {
+  if (isClearAll) {
+    selectOption?.clearAll();
+  } else if (!selectOption) {
+    return new ChartSelectOption();
+  }
+  return selectOption;
 };

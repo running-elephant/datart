@@ -26,6 +26,7 @@ import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { CloneValueDeep } from '../../../../utils/object';
 import { ChartMouseEvent } from '../../../types/Chart';
+import { ChartOptions } from '../../../types/ChartConfig';
 import { initSelectEvent } from '../../../utils/chartHelper';
 import { GeoInfo, MapOption } from './types';
 
@@ -34,14 +35,12 @@ interface MapWrapperProps {
   containerId?: string;
   mouseEvents?: ChartMouseEvent[];
   isNormalGeoMap: boolean;
-
-  // todo(tianlei) 临时储存数据更新chart start
+  props: ChartOptions;
   self: any;
-  // todo(tianlei) 临时储存数据更新chart end
 }
 
 const BasicMapWrapper: FC<MapWrapperProps> = memo(
-  ({ containerId, mouseEvents, option, isNormalGeoMap, self}) => {
+  ({ containerId, mouseEvents, option, isNormalGeoMap, self, props }) => {
     const [chart, setChart] = useState<ECharts>();
     const [geoConfig, setGeoConfig] = useState<GeoInfo>({
       center: undefined,
@@ -74,9 +73,9 @@ const BasicMapWrapper: FC<MapWrapperProps> = memo(
         if (event.name === 'click') {
           chart?.on(event.name, (params: any) => {
             if (params.componentType === 'series' || isNormalGeoMap) {
-              // todo(tianlei) 临时储存数据更新chart start
-              initSelectEvent(params, self, chart);
-              // todo(tianlei) 临时储存数据更新chart end
+              if (!props.drillOption?.isSelectedDrill) {
+                initSelectEvent(params, self);
+              }
             }
             event.callback(params);
           });
@@ -84,7 +83,7 @@ const BasicMapWrapper: FC<MapWrapperProps> = memo(
           chart?.on(event.name, event?.callback as any);
         }
       });
-    }, [mouseEvents, chart, isNormalGeoMap, self]);
+    }, [mouseEvents, chart, isNormalGeoMap, self, props]);
 
     useEffect(() => {
       if (option) {

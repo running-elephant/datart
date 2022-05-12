@@ -22,6 +22,7 @@ import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { CSSProperties } from 'react';
+import { IChartSelectOption } from '../../types/ChartSelectOption';
 
 const DEFAULT_CONTAINER_ID = 'frame-container-1';
 
@@ -31,7 +32,13 @@ class ChartIFrameContainerDispatcher {
   private chartContainerMap = new Map<string, Function>();
   private chartMetadataMap = new Map<
     string,
-    [IChart, any, any, IChartDrillOption | undefined]
+    [
+      IChart,
+      any,
+      any,
+      IChartDrillOption | undefined,
+      IChartSelectOption | undefined,
+    ]
   >();
   private editorEnv = { env: 'workbench' };
 
@@ -55,8 +62,16 @@ class ChartIFrameContainerDispatcher {
     config: ChartConfig,
     style?: CSSProperties,
     drillOption?: IChartDrillOption,
+    selectOption?: IChartSelectOption,
   ): Function[] {
-    this.switchContainer(containerId, chart, dataset, config, drillOption);
+    this.switchContainer(
+      containerId,
+      chart,
+      dataset,
+      config,
+      drillOption,
+      selectOption,
+    );
     const renders: Function[] = [];
     this.chartContainerMap.forEach((chartRenderer: Function, key) => {
       const isShown = key === this.currentContainerId;
@@ -79,12 +94,14 @@ class ChartIFrameContainerDispatcher {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption?: IChartDrillOption,
+    selectOption?: IChartSelectOption,
   ) {
     this.chartMetadataMap.set(containerId, [
       chart,
       dataset,
       config,
       drillOption,
+      selectOption,
     ]);
     this.createNewIfNotExist(containerId);
   }
@@ -92,7 +109,8 @@ class ChartIFrameContainerDispatcher {
   private createNewIfNotExist(containerId: string) {
     if (!this.chartContainerMap.has(containerId)) {
       const newContainer =
-        (style, isShown) => (chart, dataset, config, drillOption) => {
+        (style, isShown) =>
+        (chart, dataset, config, drillOption, selectOption) => {
           return (
             <div key={containerId} style={style}>
               <ChartIFrameContainer
@@ -100,6 +118,7 @@ class ChartIFrameContainerDispatcher {
                 chart={chart}
                 config={config}
                 drillOption={drillOption}
+                selectOption={selectOption}
                 containerId={containerId}
                 width={style?.width}
                 height={style?.height}

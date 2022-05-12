@@ -27,18 +27,23 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import ChartManager from 'app/models/ChartManager';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import ChartSelectContext from 'app/pages/ChartWorkbenchPage/contexts/ChartSelectContext';
 import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
 import { selectAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { fetchAvailableSourceFunctionsForChart } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import { IChartSelectOption } from 'app/types/ChartSelectOption';
 import {
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
-import { getChartDrillOption } from 'app/utils/internalChartHelper';
+import {
+  getChartDrillOption,
+  getChartSelectOption,
+} from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -102,6 +107,7 @@ const ChartPreviewBoard: FC<{
     const [chart, setChart] = useState<IChart>();
     const [loadingStatus, setLoadingStatus] = useState<boolean>(false);
     const drillOptionRef = useRef<IChartDrillOption>();
+    const selectOptionRef = useRef<IChartSelectOption>();
     const t = useI18NPrefix('viz.main');
     const tg = useI18NPrefix('global');
     const saveAsViz = useSaveAsViz();
@@ -140,6 +146,7 @@ const ChartPreviewBoard: FC<{
           newChartPreview?.chartConfig?.datas,
           drillOptionRef?.current,
         );
+        selectOptionRef.current = getChartSelectOption(selectOptionRef.current);
 
         if (
           !chart ||
@@ -440,43 +447,50 @@ const ChartPreviewBoard: FC<{
           backendChartId={backendChartId}
         />
         <PreviewBlock>
-          <ChartDrillContext.Provider
-            value={{
-              drillOption: drillOptionRef.current,
-              onDrillOptionChange: handleDrillOptionChange,
-              availableSourceFunctions,
-              onDateLevelChange: handleDateLevelChange,
-            }}
+          <ChartSelectContext.Provider
+            value={{ selectOption: selectOptionRef.current }}
           >
-            <div>
-              <ControllerPanel
-                viewId={chartPreview?.backendChart?.viewId}
-                view={chartPreview?.backendChart?.view}
-                chartConfig={chartPreview?.chartConfig}
-                onChange={handleFilterChange}
-              />
-            </div>
-            <ChartWrapper ref={ref}>
-              <Spin wrapperClassName="spinWrapper" spinning={loadingStatus}>
-                <ChartDrillContextMenu chartConfig={chartPreview?.chartConfig!}>
-                  <ChartIFrameContainer
-                    key={backendChartId}
-                    containerId={backendChartId}
-                    dataset={chartPreview?.dataset}
-                    chart={chart!}
-                    config={chartPreview?.chartConfig!}
-                    drillOption={drillOptionRef.current}
-                    width={cacheW}
-                    height={cacheH}
-                  />
-                </ChartDrillContextMenu>
-              </Spin>
-            </ChartWrapper>
-            <StyledChartDrillPathsContainer>
-              <ChartDrillPaths chartConfig={chartPreview?.chartConfig} />
-            </StyledChartDrillPathsContainer>
-            <StyledChartDrillPathsContainer />
-          </ChartDrillContext.Provider>
+            <ChartDrillContext.Provider
+              value={{
+                drillOption: drillOptionRef.current,
+                onDrillOptionChange: handleDrillOptionChange,
+                availableSourceFunctions,
+                onDateLevelChange: handleDateLevelChange,
+              }}
+            >
+              <div>
+                <ControllerPanel
+                  viewId={chartPreview?.backendChart?.viewId}
+                  view={chartPreview?.backendChart?.view}
+                  chartConfig={chartPreview?.chartConfig}
+                  onChange={handleFilterChange}
+                />
+              </div>
+              <ChartWrapper ref={ref}>
+                <Spin wrapperClassName="spinWrapper" spinning={loadingStatus}>
+                  <ChartDrillContextMenu
+                    chartConfig={chartPreview?.chartConfig!}
+                  >
+                    <ChartIFrameContainer
+                      key={backendChartId}
+                      containerId={backendChartId}
+                      dataset={chartPreview?.dataset}
+                      chart={chart!}
+                      config={chartPreview?.chartConfig!}
+                      drillOption={drillOptionRef.current}
+                      selectOption={selectOptionRef.current}
+                      width={cacheW}
+                      height={cacheH}
+                    />
+                  </ChartDrillContextMenu>
+                </Spin>
+              </ChartWrapper>
+              <StyledChartDrillPathsContainer>
+                <ChartDrillPaths chartConfig={chartPreview?.chartConfig!} />
+              </StyledChartDrillPathsContainer>
+              <StyledChartDrillPathsContainer />
+            </ChartDrillContext.Provider>
+          </ChartSelectContext.Provider>
         </PreviewBlock>
       </StyledChartPreviewBoard>
     );

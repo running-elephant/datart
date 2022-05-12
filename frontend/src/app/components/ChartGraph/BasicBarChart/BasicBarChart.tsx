@@ -20,8 +20,10 @@ import { ChartDataSectionType } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import {
   ChartConfig,
+  ChartContext,
   ChartDataConfig,
   ChartDataSectionField,
+  ChartOptions,
   ChartStyleConfig,
   LabelStyle,
   LegendStyle,
@@ -51,6 +53,7 @@ import { toPrecision } from 'app/utils/number';
 import { init } from 'echarts';
 import { UniqArray } from 'utils/object';
 import Chart from '../../../models/Chart';
+import { ChartSelectOption } from '../../../models/ChartSelectOption';
 import { ChartRequirement } from '../../../types/ChartMetadata';
 import Config from './config';
 import { BarBorderStyle, BarSeriesImpl, Series } from './types';
@@ -62,15 +65,13 @@ class BasicBarChart extends Chart {
   protected isHorizonDisplay = false;
   protected isStackMode = false;
   protected isPercentageYAxis = false;
-
-  // todo(tianlei) 临时储存数据更新chart start
-  protected selectDataIndexList: Array<{
-    index: string;
-    data: any;
-  }> = [];
-  protected linshiOption = null;
-  protected linshiContext = null;
-  // todo(tianlei) 临时储存数据更新chart end
+  protected optionsAndContext: {
+    options?: ChartOptions;
+    context?: ChartContext;
+  } = {
+    options: undefined,
+    context: undefined,
+  };
 
   constructor(props?: {
     id: string;
@@ -103,7 +104,9 @@ class BasicBarChart extends Chart {
     this.mouseEvents?.forEach(event => {
       if (event.name === 'click') {
         this.chart.on(event.name, params => {
-          initSelectEvent(params, this);
+          if (!this.optionsAndContext.options?.drillOption?.isSelectedDrill) {
+            initSelectEvent(params, this);
+          }
           event.callback(params);
         });
       } else {
@@ -117,10 +120,10 @@ class BasicBarChart extends Chart {
       return;
     }
 
-    // todo(tianlei) 临时储存数据更新chart start
-    this.linshiOption = options;
-    this.linshiContext = context;
-    // todo(tianlei) 临时储存数据更新chart end
+    this.optionsAndContext = {
+      options,
+      context,
+    };
 
     if (!this.isMatchRequirement(options.config)) {
       this.chart?.clear();
@@ -130,12 +133,12 @@ class BasicBarChart extends Chart {
       options.dataset,
       options.config,
       options.drillOption,
+      options.selectOption,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
   onUnMount(): void {
-    this.selectDataIndexList = [];
     this.chart?.dispose();
   }
 
@@ -149,6 +152,7 @@ class BasicBarChart extends Chart {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption: ChartDrillOption,
+    selectOption: ChartSelectOption,
   ) {
     const styleConfigs: ChartStyleConfig[] = config.styles || [];
     const dataConfigs: ChartDataConfig[] = config.datas || [];
@@ -199,6 +203,7 @@ class BasicBarChart extends Chart {
       aggregateConfigs,
       infoConfigs,
       xAxisColumns,
+      selectOption,
     );
 
     const axisInfo = {
@@ -266,6 +271,7 @@ class BasicBarChart extends Chart {
     aggregateConfigs: ChartDataSectionField[],
     infoConfigs: ChartDataSectionField[],
     xAxisColumns: XAxisColumns[],
+    selectOption: ChartSelectOption,
   ): Series[] {
     if (!colorConfigs.length) {
       return aggregateConfigs.map((aggConfig, sIndex) => {
@@ -281,7 +287,11 @@ class BasicBarChart extends Chart {
             return {
               ...getExtraSeriesRowData(dc),
               ...getExtraSeriesDataFormat(aggConfig?.format),
-              ...getSelectItemStyle(sIndex, dIndex, this.selectDataIndexList),
+              ...getSelectItemStyle(
+                sIndex,
+                dIndex,
+                selectOption.getAllSelectConfig(),
+              ),
               name: getColumnRenderName(aggConfig),
               value: dc.getCell(aggConfig),
             };
@@ -324,7 +334,7 @@ class BasicBarChart extends Chart {
                 ...getSelectItemStyle(
                   acIndex * secondGroupInfos.length + sgIndex,
                   dIndex,
-                  this.selectDataIndexList,
+                  selectOption.getAllSelectConfig(),
                 ),
               };
             }),

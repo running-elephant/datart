@@ -19,7 +19,9 @@
 import { ChartDataSectionType } from 'app/constants';
 import {
   ChartConfig,
+  ChartContext,
   ChartDataSectionField,
+  ChartOptions,
   ChartStyleConfig,
   LabelStyle,
   LegendStyle,
@@ -43,6 +45,7 @@ import {
 import { init } from 'echarts';
 import Chart from '../../../models/Chart';
 import { ChartDrillOption } from '../../../models/ChartDrillOption';
+import { ChartSelectOption } from '../../../models/ChartSelectOption';
 import Config from './config';
 import { ScatterMetricAndSizeSerie } from './types';
 
@@ -51,14 +54,13 @@ class BasicScatterChart extends Chart {
   config = Config;
   chart: any = null;
 
-  // todo(tianlei) 临时储存数据更新chart start
-  protected selectDataIndexList: Array<{
-    index: string;
-    data: any;
-  }> = [];
-  protected linshiOption = null;
-  protected linshiContext = null;
-  // todo(tianlei) 临时储存数据更新chart end
+  protected optionsAndContext: {
+    options?: ChartOptions;
+    context?: ChartContext;
+  } = {
+    options: undefined,
+    context: undefined,
+  };
 
   constructor() {
     super('scatter', 'viz.palette.graph.names.scatterChart', 'sandiantu');
@@ -82,7 +84,9 @@ class BasicScatterChart extends Chart {
     this.mouseEvents?.forEach(event => {
       if (event.name === 'click') {
         this.chart.on(event.name, params => {
-          initSelectEvent(params, this);
+          if (!this.optionsAndContext.options?.drillOption?.isSelectedDrill) {
+            initSelectEvent(params, this);
+          }
           event.callback(params);
         });
       } else {
@@ -96,10 +100,10 @@ class BasicScatterChart extends Chart {
       return;
     }
 
-    // todo(tianlei) 临时储存数据更新chart start
-    this.linshiOption = props;
-    this.linshiContext = context;
-    // todo(tianlei) 临时储存数据更新chart end
+    this.optionsAndContext = {
+      options: props,
+      context,
+    };
 
     if (!this.isMatchRequirement(props.config)) {
       this.chart?.clear();
@@ -109,12 +113,12 @@ class BasicScatterChart extends Chart {
       props.dataset,
       props.config,
       props.drillOption,
+      props.selectOption,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
   onUnMount(): void {
-    this.selectDataIndexList = [];
     this.chart?.dispose();
   }
 
@@ -126,6 +130,7 @@ class BasicScatterChart extends Chart {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption: ChartDrillOption,
+    selectOption: ChartSelectOption,
   ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -169,6 +174,7 @@ class BasicScatterChart extends Chart {
       infoConfigs,
       styleConfigs,
       settingConfigs,
+      selectOption,
     );
 
     return {
@@ -202,6 +208,7 @@ class BasicScatterChart extends Chart {
     infoConfigs: ChartDataSectionField[],
     styleConfigs: ChartStyleConfig[],
     settingConfigs: ChartStyleConfig[],
+    selectOption: ChartSelectOption,
   ): ScatterMetricAndSizeSerie[] {
     const { min, max } = getDataColumnMaxAndMin2(
       chartDataSetRows,
@@ -221,6 +228,7 @@ class BasicScatterChart extends Chart {
           infoConfigs,
           styleConfigs,
           settingConfigs,
+          selectOption,
         ),
       ];
     }
@@ -257,6 +265,7 @@ class BasicScatterChart extends Chart {
         infoConfigs,
         styleConfigs,
         settingConfigs,
+        selectOption,
         k,
         groupedObjDataColumns?.[k]?.color,
         gcIndex,
@@ -273,6 +282,7 @@ class BasicScatterChart extends Chart {
     infoConfigs: ChartDataSectionField[],
     styleConfigs: ChartStyleConfig[],
     settingConfigs: ChartStyleConfig[],
+    selectOption: ChartSelectOption,
     colorSeriesName?: string,
     color?: string,
     comIndex: number = 0,
@@ -288,7 +298,11 @@ class BasicScatterChart extends Chart {
         : defaultSizeValue;
       return {
         ...getExtraSeriesRowData(row),
-        ...getSelectItemStyle(comIndex, dcIndex, this.selectDataIndexList),
+        ...getSelectItemStyle(
+          comIndex,
+          dcIndex,
+          selectOption.getAllSelectConfig(),
+        ),
         name: groupConfigs?.map(row.getCell, row).join('-'),
         value: aggregateConfigs
           .map(row.getCell, row)

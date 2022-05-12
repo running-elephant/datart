@@ -28,6 +28,7 @@ import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
 import { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
+import { IChartSelectOption } from '../../types/ChartSelectOption';
 import ChartIFrameLifecycleAdapter from './ChartIFrameLifecycleAdapter';
 const ChartIFrameContainer: FC<{
   dataset: any;
@@ -38,6 +39,7 @@ const ChartIFrameContainer: FC<{
   height?: any;
   isShown?: boolean;
   drillOption?: IChartDrillOption;
+  selectOption?: IChartSelectOption;
   widgetSpecialConfig?: any;
   scale?: [number, number];
 }> = memo(props => {
@@ -80,6 +82,7 @@ const ChartIFrameContainer: FC<{
               widgetSpecialConfig={props.widgetSpecialConfig}
               isShown={props.isShown}
               drillOption={props?.drillOption}
+              selectOption={props?.selectOption}
             />
           </div>
         </div>
@@ -142,6 +145,7 @@ const ChartIFrameContainer: FC<{
                   widgetSpecialConfig={props.widgetSpecialConfig}
                   isShown={props.isShown}
                   drillOption={props.drillOption}
+                  selectOption={props.selectOption}
                 />
               </div>
             </StyleSheetManager>

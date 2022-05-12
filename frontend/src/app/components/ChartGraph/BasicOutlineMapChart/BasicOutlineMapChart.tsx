@@ -19,7 +19,9 @@
 import { ChartDataSectionType } from 'app/constants';
 import {
   ChartConfig,
+  ChartContext,
   ChartDataSectionField,
+  ChartOptions,
   ChartStyleConfig,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
@@ -34,6 +36,7 @@ import {
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { registerMap } from 'echarts';
+import { ChartSelectOption } from '../../../models/ChartSelectOption';
 import ReactChart from '../../../models/ReactChart';
 import BasicMapWrapper from './BasicMapWrapper';
 import Config from './config';
@@ -56,18 +59,16 @@ class BasicOutlineMapChart extends ReactChart {
   isISOContainer = 'react-map';
   config = Config;
 
-  // todo(tianlei) 临时储存数据更新chart start
-  protected selectDataIndexList: Array<{
-    index: string;
-    data: any;
-  }> = [];
-  protected linshiOption = null;
-  protected linshiContext = null;
-  // todo(tianlei) 临时储存数据更新chart end
-
   protected isNormalGeoMap = false;
   private geoMap;
   private option: any = null;
+  protected optionsAndContext: {
+    options?: ChartOptions;
+    context?: ChartContext;
+  } = {
+    options: undefined,
+    context: undefined,
+  };
 
   constructor(props?) {
     super(BasicMapWrapper, {
@@ -88,31 +89,29 @@ class BasicOutlineMapChart extends ReactChart {
       return;
     }
 
-    // todo(tianlei) 临时储存数据更新chart start
-    this.linshiOption = props;
-    this.linshiContext = context;
-    // todo(tianlei) 临时储存数据更新chart end
+    this.optionsAndContext = {
+      options: props,
+      context,
+    };
 
     if (!this.isMatchRequirement(props.config)) {
       this.adapter?.unmount();
       return;
     }
     this.option = {
-      option: this.getOptions(props.dataset, props.config),
+      option: this.getOptions(props.dataset, props.config, props.selectOption),
       containerId: props.containerId,
       mouseEvents: this.mouseEvents,
       isNormalGeoMap: this.isNormalGeoMap,
       context,
-
-      // todo(tianlei) 临时储存数据更新chart start
+      props,
       self: this,
-      // todo(tianlei) 临时储存数据更新chart end
     };
     this.adapter?.updated(this.option, context);
   }
 
   onUnMount(): void {
-    this.selectDataIndexList = [];
+    this.adapter?.onUnMount();
   }
 
   onResize(opt: any, context): void {
@@ -120,7 +119,11 @@ class BasicOutlineMapChart extends ReactChart {
     this.adapter?.updated(this.option, context);
   }
 
-  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig): MapOption {
+  private getOptions(
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    selectOption: ChartSelectOption,
+  ): MapOption {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
@@ -145,7 +148,12 @@ class BasicOutlineMapChart extends ReactChart {
     );
 
     return {
-      geo: this.getGeoInfo(styleConfigs, chartDataSet, groupConfigs),
+      geo: this.getGeoInfo(
+        styleConfigs,
+        chartDataSet,
+        groupConfigs,
+        selectOption,
+      ),
       visualMap: this.getVisualMap(
         chartDataSet,
         groupConfigs,
@@ -166,6 +174,7 @@ class BasicOutlineMapChart extends ReactChart {
           aggregateConfigs,
           sizeConfigs,
           styleConfigs,
+          selectOption,
         ) as any,
       ),
       tooltip: this.getTooltip(
@@ -187,6 +196,7 @@ class BasicOutlineMapChart extends ReactChart {
     styleConfigs: ChartStyleConfig[],
     chartDataSet: IChartDataSet<string>,
     groupConfigs: ChartDataSectionField[],
+    selectOption: ChartSelectOption,
   ): GeoInfo {
     const [show, position, font] = getStyles(
       styleConfigs,
@@ -238,7 +248,7 @@ class BasicOutlineMapChart extends ReactChart {
             name: this.mappingGeoName(row.getCell(groupConfigs[0])),
           },
           this.isNormalGeoMap
-            ? getSelectItemStyle(0, dcIndex, this.selectDataIndexList)
+            ? getSelectItemStyle(0, dcIndex, selectOption.getAllSelectConfig())
             : {},
         );
       }),
@@ -287,6 +297,7 @@ class BasicOutlineMapChart extends ReactChart {
     aggregateConfigs: ChartDataSectionField[],
     sizeConfigs: ChartDataSectionField[],
     styleConfigs: ChartStyleConfig[],
+    selectOption: ChartSelectOption,
   ): MetricAndSizeSeriesStyle[] {
     if (this.isNormalGeoMap) {
       return [];
@@ -314,7 +325,11 @@ class BasicOutlineMapChart extends ReactChart {
                 row.getCell(aggregateConfigs[0]) || defaultColorValue,
                 row.getCell(sizeConfigs[0]) || defaultSizeValue,
               ),
-              ...getSelectItemStyle(0, dcIndex, this.selectDataIndexList),
+              ...getSelectItemStyle(
+                0,
+                dcIndex,
+                selectOption.getAllSelectConfig(),
+              ),
             };
           })
           ?.filter(d => !!d.name && d.value !== undefined),

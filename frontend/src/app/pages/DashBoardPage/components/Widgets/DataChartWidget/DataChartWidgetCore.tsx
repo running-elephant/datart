@@ -24,6 +24,7 @@ import { migrateChartConfig } from 'app/migration';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import ChartSelectContext from 'app/pages/ChartWorkbenchPage/contexts/ChartSelectContext';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
@@ -34,7 +35,10 @@ import {
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
-import { getChartDrillOption } from 'app/utils/internalChartHelper';
+import {
+  getChartDrillOption,
+  getChartSelectOption,
+} from 'app/utils/internalChartHelper';
 import produce from 'immer';
 import React, {
   memo,
@@ -46,6 +50,7 @@ import React, {
 } from 'react';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
+import { IChartSelectOption } from '../../../../../types/ChartSelectOption';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import {
   boardDrillManager,
@@ -79,6 +84,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
   const widgetRef = useRef<Widget>(widget);
   const drillOptionRef = useRef<IChartDrillOption>();
+  const selectOptionRef = useRef<IChartSelectOption>();
   useEffect(() => {
     widgetRef.current = widget;
   }, [widget]);
@@ -214,6 +220,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       drillOptionRef.current,
     ) as ChartDrillOption;
     drillOptionRef.current = drillOption;
+    selectOptionRef.current = getChartSelectOption(selectOptionRef.current);
     boardDrillManager.setWidgetDrill({
       bid,
       wid,
@@ -241,6 +248,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     if (cacheH <= 1 || cacheW <= 1) return null;
     if (errText) return errText;
     const drillOption = drillOptionRef.current;
+    const selectOption = selectOptionRef.current;
     return (
       <ChartIFrameContainer
         dataset={dataset}
@@ -249,6 +257,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         width={cacheW}
         height={cacheH}
         drillOption={drillOption}
+        selectOption={selectOption}
         containerId={containerId}
         widgetSpecialConfig={widgetSpecialConfig}
         scale={scale}
@@ -272,15 +281,21 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     onDateLevelChange: handleDateLevelChange,
   };
 
+  const selectContextVal = {
+    selectOption: selectOptionRef.current,
+  };
+
   return (
-    <ChartDrillContext.Provider value={drillContextVal}>
-      <ChartDrillContextMenu chartConfig={dataChart?.config.chartConfig}>
-        <StyledWrapper>
-          <ChartFrameBox ref={cacheWhRef}>{chartFrame}</ChartFrameBox>
-          <ChartDrillPaths chartConfig={dataChart?.config.chartConfig} />
-        </StyledWrapper>
-      </ChartDrillContextMenu>
-    </ChartDrillContext.Provider>
+    <ChartSelectContext.Provider value={selectContextVal}>
+      <ChartDrillContext.Provider value={drillContextVal}>
+        <ChartDrillContextMenu chartConfig={dataChart?.config.chartConfig}>
+          <StyledWrapper>
+            <ChartFrameBox ref={cacheWhRef}>{chartFrame}</ChartFrameBox>
+            <ChartDrillPaths chartConfig={dataChart?.config.chartConfig} />
+          </StyledWrapper>
+        </ChartDrillContextMenu>
+      </ChartDrillContext.Provider>
+    </ChartSelectContext.Provider>
   );
 });
 const StyledWrapper = styled.div`

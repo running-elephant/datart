@@ -19,7 +19,9 @@
 import { ChartDataSectionType } from 'app/constants';
 import {
   ChartConfig,
+  ChartContext,
   ChartDataSectionField,
+  ChartOptions,
   ChartStyleConfig,
   LabelStyle,
   LegendStyle,
@@ -54,6 +56,7 @@ import { init } from 'echarts';
 import { UniqArray } from 'utils/object';
 import Chart from '../../../models/Chart';
 import { ChartDrillOption } from '../../../models/ChartDrillOption';
+import { ChartSelectOption } from '../../../models/ChartSelectOption';
 import Config from './config';
 import { Series } from './types';
 
@@ -63,15 +66,13 @@ class BasicLineChart extends Chart {
 
   protected isArea = false;
   protected isStack = false;
-
-  // todo(tianlei) 临时储存数据更新chart start
-  protected selectDataIndexList: Array<{
-    index: string;
-    data: any;
-  }> = [];
-  protected linshiOption = null;
-  protected linshiContext = null;
-  // todo(tianlei) 临时储存数据更新chart end
+  protected optionsAndContext: {
+    options?: ChartOptions;
+    context?: ChartContext;
+  } = {
+    options: undefined,
+    context: undefined,
+  };
 
   constructor(props?) {
     super(
@@ -99,7 +100,9 @@ class BasicLineChart extends Chart {
     this.mouseEvents?.forEach(event => {
       if (event.name === 'click') {
         this.chart.on(event.name, params => {
-          initSelectEvent(params, this);
+          if (!this.optionsAndContext.options?.drillOption?.isSelectedDrill) {
+            initSelectEvent(params, this);
+          }
           event.callback(params);
         });
       } else {
@@ -113,10 +116,10 @@ class BasicLineChart extends Chart {
       return;
     }
 
-    // todo(tianlei) 临时储存数据更新chart start
-    this.linshiOption = props;
-    this.linshiContext = context;
-    // todo(tianlei) 临时储存数据更新chart end
+    this.optionsAndContext = {
+      options: props,
+      context,
+    };
 
     if (!this.isMatchRequirement(props.config)) {
       this.chart?.clear();
@@ -126,6 +129,7 @@ class BasicLineChart extends Chart {
       props.dataset,
       props.config,
       props.drillOption,
+      props.selectOption,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
@@ -137,7 +141,6 @@ class BasicLineChart extends Chart {
   }
 
   onUnMount(): void {
-    this.selectDataIndexList = [];
     this.chart?.dispose();
   }
 
@@ -145,6 +148,7 @@ class BasicLineChart extends Chart {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption: ChartDrillOption,
+    selectOption: ChartSelectOption,
   ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -189,6 +193,7 @@ class BasicLineChart extends Chart {
       aggregateConfigs,
       infoConfigs,
       xAxisColumns,
+      selectOption,
     );
     const yAxisNames: string[] = aggregateConfigs.map(getColumnRenderName);
 
@@ -230,6 +235,7 @@ class BasicLineChart extends Chart {
     aggregateConfigs: ChartDataSectionField[],
     infoConfigs: ChartDataSectionField[],
     xAxisColumns: XAxisColumns[],
+    selectOption: ChartSelectOption,
   ): Series[] {
     if (!colorConfigs?.length) {
       return aggregateConfigs.map((aggConfig, acIndex) => {
@@ -241,7 +247,9 @@ class BasicLineChart extends Chart {
           areaStyle: this.isArea
             ? {
                 color,
-                opacity: this.selectDataIndexList.length ? 0.4 : undefined,
+                opacity: selectOption.getAllSelectConfig().length
+                  ? 0.4
+                  : undefined,
               }
             : undefined,
           stack: this.isStack ? 'total' : undefined,
@@ -251,7 +259,7 @@ class BasicLineChart extends Chart {
             ...this.getLineSelectItemStyle(
               acIndex,
               dcIndex,
-              this.selectDataIndexList,
+              selectOption.getAllSelectConfig(),
             ),
             value: dc.getCell(aggConfig),
           })),
@@ -259,7 +267,7 @@ class BasicLineChart extends Chart {
             color,
           },
           lineStyle: {
-            opacity: this.selectDataIndexList.length ? 0.5 : 1,
+            opacity: selectOption.getAllSelectConfig().length ? 0.5 : 1,
           },
           ...this.getLabelStyle(styleConfigs),
           ...this.getSeriesStyle(styleConfigs),
@@ -298,7 +306,7 @@ class BasicLineChart extends Chart {
               ...this.getLineSelectItemStyle(
                 sgcIndex,
                 acIndex * secondGroupInfos.length + dcIndex,
-                this.selectDataIndexList,
+                selectOption.getAllSelectConfig(),
               ),
               name: getColumnRenderName(aggConfig),
               value: row?.getCell(aggConfig),
