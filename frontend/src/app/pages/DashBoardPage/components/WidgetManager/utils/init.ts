@@ -181,6 +181,16 @@ export const LoopFetchI18N = {
     interval: 'Interval (s)',
   },
 };
+export const ImmediateQueryI18N = {
+  zh: {
+    immediateQueryGroup: '立即查询',
+    enable: '启用',
+  },
+  en: {
+    immediateQueryGroup: 'ImmediateQuery',
+    enable: 'Enable',
+  },
+};
 export const initBackgroundTpl = (color?: string) => {
   const backgroundTpl: ChartStyleConfig = {
     label: 'background.backgroundGroup',

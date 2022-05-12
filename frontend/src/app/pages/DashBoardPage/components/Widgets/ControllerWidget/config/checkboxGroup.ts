@@ -23,9 +23,9 @@ import {
   controlWidgetTpl,
   getControlDropDownList,
   getControlQueryEnable,
-  ImmediateQueryI18N,
 } from '.';
 import {
+  ImmediateQueryI18N,
   initBackgroundTpl,
   initBorderTpl,
   initLoopFetchTpl,

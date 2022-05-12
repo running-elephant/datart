@@ -21,12 +21,9 @@ import {
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { controlWidgetTpl, getControlDropDownList } from '.';
 import {
-  controlWidgetTpl,
-  getControlDropDownList,
   ImmediateQueryI18N,
-} from '.';
-import {
   initBackgroundTpl,
   initBorderTpl,
   initPaddingTpl,
