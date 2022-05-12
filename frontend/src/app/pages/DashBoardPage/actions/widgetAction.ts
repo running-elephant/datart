@@ -354,7 +354,7 @@ export const refreshWidgetsByControllerAction =
     const { widgetRecord: widgetMap } =
       renderMode === 'edit' ? editBoardState : viewBoardState.widgetRecord;
 
-    const hasQueryBtn = Object.values(widgetMap).find(
+    const hasQueryBtn = Object.values(widgetMap || {}).find(
       item => item.config.originalType === ORIGINAL_TYPE_MAP.queryBtn,
     );
     // 获取级联选项
