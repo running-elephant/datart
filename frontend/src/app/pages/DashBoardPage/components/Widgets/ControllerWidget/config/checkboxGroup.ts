@@ -17,11 +17,14 @@
  */
 
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
+import { WidgetMeta } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
-  WidgetMeta,
-  WidgetToolkit,
-} from 'app/pages/DashBoardPage/types/widgetTypes';
-import { controlWidgetTpl, getControlDropDownList } from '.';
+  ControlWidgetToolkit,
+  controlWidgetTpl,
+  getControlDropDownList,
+  getControlQueryEnable,
+  ImmediateQueryI18N,
+} from '.';
 import {
   initBackgroundTpl,
   initBorderTpl,
@@ -64,7 +67,9 @@ export const widgetMeta: WidgetMeta = {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
         },
+
         title: TitleI18N.zh,
+        immediateQuery: ImmediateQueryI18N.zh,
         background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
         loopFetch: LoopFetchI18N.zh,
@@ -80,6 +85,7 @@ export const widgetMeta: WidgetMeta = {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
         },
+        immediateQuery: ImmediateQueryI18N.en,
         title: TitleI18N.en,
         background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
@@ -90,7 +96,7 @@ export const widgetMeta: WidgetMeta = {
   ],
 };
 
-export const widgetToolkit: WidgetToolkit = {
+export const widgetToolkit: ControlWidgetToolkit = {
   create: opt => {
     const widget = controlWidgetTpl(opt);
     widget.id = widgetMeta.widgetTypeId + widget.id;
@@ -121,6 +127,9 @@ export const widgetToolkit: WidgetToolkit = {
   getDropDownList(...arg) {
     return getControlDropDownList(true);
   },
+  getQueryEnable(arg) {
+    return getControlQueryEnable(arg);
+  },
   edit() {},
   save() {},
 
@@ -134,7 +143,7 @@ export const widgetToolkit: WidgetToolkit = {
   // getWidgetName() {},
   // //
 };
-
+export const controlToolkit = widgetToolkit;
 const checkboxGroupProto = {
   widgetTypeId: widgetMeta.widgetTypeId,
   meta: widgetMeta,

@@ -21,7 +21,11 @@ import {
   WidgetMeta,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
-import { controlWidgetTpl, getControlDropDownList } from '.';
+import {
+  controlWidgetTpl,
+  getControlDropDownList,
+  ImmediateQueryI18N,
+} from '.';
 import {
   initBackgroundTpl,
   initBorderTpl,
@@ -65,6 +69,7 @@ export const widgetMeta: WidgetMeta = {
           ...WidgetEditActionI18N.zh,
         },
         title: TitleI18N.zh,
+        immediateQuery: ImmediateQueryI18N.zh,
         background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
         loopFetch: LoopFetchI18N.zh,
@@ -81,6 +86,7 @@ export const widgetMeta: WidgetMeta = {
           ...WidgetEditActionI18N.en,
         },
         title: TitleI18N.en,
+        immediateQuery: ImmediateQueryI18N.en,
         background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
         loopFetch: LoopFetchI18N.en,

@@ -28,8 +28,13 @@ import {
   WidgetActionListItem,
   widgetActionType,
   WidgetCreateProps,
+  WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
-import { getTheWidgetFiltersAndParams } from 'app/pages/DashBoardPage/utils';
+import {
+  getJsonConfigs,
+  getTheWidgetFiltersAndParams,
+} from 'app/pages/DashBoardPage/utils';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
@@ -37,6 +42,33 @@ import { uuidv4 } from 'utils/utils';
 import widgetManagerInstance from '../../../WidgetManager';
 import { initTitleTpl, widgetTpl } from '../../../WidgetManager/utils/init';
 
+// 是否开启立即查询
+export const ImmediateQuery: ChartStyleConfig = {
+  label: 'immediateQuery.immediateQueryGroup',
+  key: 'immediateQueryGroup',
+  comType: 'group',
+  rows: [
+    {
+      label: 'immediateQuery.enable',
+      key: 'enable',
+      value: true,
+      comType: 'switch',
+    },
+  ],
+};
+export const ImmediateQueryI18N = {
+  zh: {
+    immediateQueryGroup: '立即查询',
+    enable: '启用',
+  },
+  en: {
+    immediateQueryGroup: 'ImmediateQuery',
+    enable: 'Enable',
+  },
+};
+export interface ControlWidgetToolkit extends WidgetToolkit {
+  getQueryEnable: (args) => boolean;
+}
 export const controlWidgetTpl = (opt: WidgetCreateProps) => {
   const widget = widgetTpl();
   widget.id = opt.relations?.[0]?.sourceId || widget.id;
@@ -67,7 +99,10 @@ export const controlWidgetTpl = (opt: WidgetCreateProps) => {
     widget.config.rect = rect;
   }
   widget.config.content = opt.content; //controller
-  widget.config.customConfig.props = [{ ...initTitleTpl() }];
+  widget.config.customConfig.props = [
+    { ...initTitleTpl() },
+    { ...ImmediateQuery },
+  ];
 
   return widget;
 };
@@ -214,4 +249,13 @@ export const getControlDropDownList = (refresh: boolean) => {
     },
   ];
   return list;
+};
+
+export const getControlQueryEnable = props => {
+  const [enableQuery] = getJsonConfigs(
+    props,
+    ['immediateQueryGroup'],
+    ['enable'],
+  );
+  return enableQuery as boolean;
 };
