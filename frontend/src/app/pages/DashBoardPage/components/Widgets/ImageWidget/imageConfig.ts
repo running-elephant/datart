@@ -45,10 +45,11 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: 'img',
-  widgetTypeId: ORIGINAL_TYPE_MAP.image,
+  originalType: ORIGINAL_TYPE_MAP.image,
   canWrapped: true,
   controllable: false,
   linkable: false,
+  singleton: false,
   canFullScreen: true,
   viewAction: {
     ...initWidgetViewActionTpl(),
@@ -96,13 +97,13 @@ export type ImageToolkit = WidgetToolkit & {};
 export const widgetToolkit: ImageToolkit = {
   create: opt => {
     const widget = widgetTpl();
-    widget.id = widgetMeta.widgetTypeId + widget.id;
+    widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
     widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.originalType = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
@@ -176,7 +177,7 @@ export const widgetToolkit: ImageToolkit = {
 };
 
 const imageProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+  widgetTypeId: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

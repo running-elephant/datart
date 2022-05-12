@@ -48,11 +48,12 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: '',
-  widgetTypeId: ORIGINAL_TYPE_MAP.tab,
+  originalType: ORIGINAL_TYPE_MAP.tab,
   canWrapped: false,
   controllable: false,
   linkable: false,
   canFullScreen: true,
+  singleton: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -104,7 +105,7 @@ export const widgetToolkit: TabToolkit = {
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.originalType = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'container';
     widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
@@ -194,7 +195,7 @@ export const widgetToolkit: TabToolkit = {
 //     }
 // }
 const tabProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+  widgetTypeId: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

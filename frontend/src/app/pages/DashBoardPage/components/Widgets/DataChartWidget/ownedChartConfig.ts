@@ -46,7 +46,7 @@ const widgetToolkit: OwnedChartToolkit = {
   create: opt => {
     const widget = dataChartCreator({
       ...opt,
-      widgetTypeId: widgetMeta.widgetTypeId,
+      widgetTypeId: widgetMeta.originalType,
     });
     return widget;
   },
@@ -147,7 +147,7 @@ const widgetToolkit: OwnedChartToolkit = {
 //   }
 // }
 const ownedChartProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+  widgetTypeId: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

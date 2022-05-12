@@ -47,11 +47,12 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: '',
-  widgetTypeId: ORIGINAL_TYPE_MAP.multiDropdownList,
+  originalType: ORIGINAL_TYPE_MAP.multiDropdownList,
   canWrapped: true,
   controllable: true,
   linkable: false,
   canFullScreen: false,
+  singleton: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -99,8 +100,8 @@ export const widgetMeta: WidgetMeta = {
 export const widgetToolkit: WidgetToolkit = {
   create: opt => {
     const widget = controlWidgetTpl(opt);
-    widget.id = widgetMeta.widgetTypeId + widget.id;
-    widget.config.originalType = widgetMeta.widgetTypeId;
+    widget.id = widgetMeta.originalType + widget.id;
+    widget.config.originalType = widgetMeta.originalType;
 
     const addProps = [
       { ...initBackgroundTpl('#fff') },
@@ -141,7 +142,7 @@ export const widgetToolkit: WidgetToolkit = {
 };
 
 const multiDropdownListProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+  widgetTypeId: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

@@ -46,7 +46,7 @@ export const linkedChartToolkit: WidgetToolkit = {
   create: opt => {
     const widget = dataChartCreator({
       ...opt,
-      widgetTypeId: widgetMeta.widgetTypeId,
+      widgetTypeId: widgetMeta.originalType,
     });
     return widget;
   },
@@ -142,7 +142,7 @@ export const linkedChartToolkit: WidgetToolkit = {
 };
 
 const linkedChartProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+  widgetTypeId: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: linkedChartToolkit,
 };
