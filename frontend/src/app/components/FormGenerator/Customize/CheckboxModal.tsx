@@ -37,19 +37,6 @@ const CheckboxModal: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   }) => {
     const [openStateModal, contextHolder] = useStateModal({});
     const [enable, setEnable] = useState(data.value);
-    // const props = {
-    //   ancestors,
-    //   data: Object.assign({}, data, {
-    //     label: data?.label || template.label,
-    //     key: data?.key || template.key,
-    //     default: data?.default || template.default,
-    //     options: data?.options || template.options,
-    //     comType: 'select',
-    //   }),
-    //   translate: t,
-    //   onChange,
-    //   dataConfigs,
-    // };
 
     const handleCheckboxClick = (e: CheckboxChangeEvent) => {
       e.stopPropagation();

@@ -756,6 +756,9 @@
       "interaction": {
         "link": {
           "title": "联动设置"
+        },
+        "detail": {
+          "title": "查看明细设置"
         }
       },
       "present": {

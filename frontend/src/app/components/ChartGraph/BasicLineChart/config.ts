@@ -459,7 +459,7 @@ const config: ChartConfig = {
       label: 'link.title',
       key: 'link',
       comType: 'checkboxModal',
-      default: true,
+      default: false,
       rows: [
         {
           label: 'graph.smooth',
@@ -468,6 +468,13 @@ const config: ChartConfig = {
           comType: 'checkbox',
         },
       ],
+    },
+    {
+      label: 'detail.title',
+      key: 'detail',
+      comType: 'checkboxModal',
+      default: false,
+      rows: [],
     },
   ],
   i18ns: [
