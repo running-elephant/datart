@@ -151,16 +151,16 @@ public class DatabaseMigration {
 
     private boolean doMigration(Migration migration) {
         try {
-            File upgradeFile = migration.getUpgradeFile();
+            Resource upgradeFile = migration.getUpgradeFile();
             boolean success = runScript(upgradeFile, true);
             if (success) {
                 return success;
             }
             log.error("Migration failure! version: " + migration.getVersion() + ". A rollback is about to be performed");
-            File rollbackFile = migration.getRollbackFile();
+            Resource rollbackFile = migration.getRollbackFile();
             if (rollbackFile != null) {
                 runScript(rollbackFile, false);
-                log.info("The rollback script (" + rollbackFile.getName() + ") is successfully executed");
+                log.info("The rollback script (" + rollbackFile.getFilename() + ") is successfully executed");
             } else {
                 log.warn("The rollback script does not exist. Skip execution");
             }
@@ -179,7 +179,7 @@ public class DatabaseMigration {
             baseline.setSuccess(true);
         } else {
             log.info("Do baseline on an empty database...");
-            baseline.setSuccess(runScript(baseline.getUpgradeFile(), true));
+            runScript(baseline.getUpgradeFile(), true);
         }
         baseline.setExecuteUser(username);
         baseline.setExecuteDate(new Date());
@@ -189,21 +189,17 @@ public class DatabaseMigration {
 
     private void prepareMigrationTable() {
         List<String> tables = jdbcTemplate.queryForList("SHOW TABLES", String.class);
-        if (tables.contains(OLD_TABLE_NAME)) {
-            transferMigrationTable();
-        } else if (!tables.contains(MIGRATION_TABLE_NAME)) {
-            createMigrationTable();
+        if (!tables.contains(MIGRATION_TABLE_NAME)) {
+            jdbcTemplate.execute(TABLE_CREATE_SQL);
         }
-    }
-
-    private void transferMigrationTable() {
-        jdbcTemplate.batchUpdate(TABLE_CREATE_SQL);
-        jdbcTemplate.batchUpdate(HISTORY_TRANSFER_SQL);
-        jdbcTemplate.execute(DROP_OLD_TABLE_SQL);
-    }
-
-    private void createMigrationTable() {
-        jdbcTemplate.execute(TABLE_CREATE_SQL);
+        if (tables.contains(OLD_TABLE_NAME)) {
+            try {
+                jdbcTemplate.execute(HISTORY_TRANSFER_SQL);
+                jdbcTemplate.execute(DROP_OLD_TABLE_SQL);
+            } catch (Exception e) {
+                log.warn("Migration history transfer error : " + e.getMessage());
+            }
+        }
     }
 
     private TreeSet<Migration> getAllMigrations() throws IOException {
@@ -211,24 +207,17 @@ public class DatabaseMigration {
             if (CollectionUtils.isEmpty(allMigrations)) {
                 // load migration files
                 Resource[] resources = new PathMatchingResourcePatternResolver().getResources(ResourceUtils.CLASSPATH_URL_PREFIX + "db/migration/*.sql");
-                Map<String, List<File>> resourceMap = Arrays.stream(resources)
-                        .map(resource -> {
-                            try {
-                                return resource.getFile();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                return null;
-                            }
-                        }).filter(Migration::isMigrationFile)
-                        .collect(Collectors.groupingBy(file -> file.getName().substring(1)));
+                Map<String, List<Resource>> resourceMap = Arrays.stream(resources)
+                        .filter(Migration::isMigrationFile)
+                        .collect(Collectors.groupingBy(r -> r.getFilename().substring(1)));
 
-                for (List<File> files : resourceMap.values()) {
-                    File upgradeFile = null, rollbackFile = null;
-                    for (File file : files) {
-                        if (file.getName().startsWith(ScriptType.UPGRADE.getPrefix())) {
-                            upgradeFile = file;
-                        } else if (file.getName().startsWith(ScriptType.ROLLBACK.getPrefix())) {
-                            rollbackFile = file;
+                for (List<Resource> resourceList : resourceMap.values()) {
+                    Resource upgradeFile = null, rollbackFile = null;
+                    for (Resource resource : resourceList) {
+                        if (resource.getFilename().startsWith(ScriptType.UPGRADE.getPrefix())) {
+                            upgradeFile = resource;
+                        } else if (resource.getFilename().startsWith(ScriptType.ROLLBACK.getPrefix())) {
+                            rollbackFile = resource;
                         }
                     }
                     if (upgradeFile != null) {
@@ -266,7 +255,7 @@ public class DatabaseMigration {
         jdbcTemplate.execute(sql.toString());
     }
 
-    private boolean runScript(File file, boolean stopOnError) {
+    private boolean runScript(Resource resource, boolean stopOnError) {
         try (Connection connection = DriverManager.getConnection(url, username, password)) {
             ScriptRunner scriptRunner = new ScriptRunner(connection);
             scriptRunner.setAutoCommit(false);
@@ -277,10 +266,10 @@ public class DatabaseMigration {
                 scriptRunner.setErrorLogWriter(logWriter);
             }
             scriptRunner.setLogWriter(logWriter);
-            scriptRunner.runScript(new FileReader(file));
+            scriptRunner.runScript(new InputStreamReader(resource.getInputStream()));
             return true;
         } catch (Exception e) {
-            log.error("run script failed " + file.getName());
+            log.error("Script execute failed! " + resource.getFilename());
             return false;
         }
     }
