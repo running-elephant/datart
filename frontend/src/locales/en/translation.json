@@ -509,7 +509,7 @@
       "title": {
         "content": "Data",
         "design": "Style",
-        "setting": "Analysis",
+        "setting": "Analytics",
         "interaction": "Interaction"
       },
       "style": {
@@ -759,6 +759,11 @@
         "paging": {
           "title": "Common",
           "pageSize": "Limit"
+        }
+      },
+      "interaction": {
+        "link": {
+          "title": "Link Setting"
         }
       },
       "present": {

@@ -753,6 +753,11 @@
           "pageSize": "总行数"
         }
       },
+      "interaction": {
+        "link": {
+          "title": "联动设置"
+        }
+      },
       "present": {
         "graph": "图表",
         "raw": "原始数据",

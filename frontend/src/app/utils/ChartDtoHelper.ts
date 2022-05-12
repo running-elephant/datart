@@ -80,6 +80,7 @@ function extractChartConfigValueModel(config: ChartConfig): ChartConfigDTO {
     datas: config?.datas,
     styles: getStyleValueModel(config?.styles),
     settings: getStyleValueModel(config?.settings),
+    interactions: getStyleValueModel(config?.interactions),
   };
 }
 
@@ -117,6 +118,10 @@ export function mergeToChartConfig(
     target?.settings,
     source?.chartConfig?.settings,
   );
+  target.interactions = mergeChartStyleConfigs(
+    target?.interactions,
+    source?.chartConfig?.interactions,
+  );
   return target;
 }
 
@@ -127,5 +132,6 @@ export function convertToChartConfigDTO(
     datas: source?.chartConfig?.datas,
     styles: source?.chartConfig?.styles,
     settings: source?.chartConfig?.settings,
+    interactions: source?.chartConfig?.interactions,
   };
 }

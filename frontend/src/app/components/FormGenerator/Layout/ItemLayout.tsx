@@ -50,6 +50,7 @@ import {
 } from '../Basic';
 import {
   Background,
+  CheckboxModal,
   ConditionalStylePanel,
   DataReferencePanel,
   FontAlignment,
@@ -199,7 +200,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
         case ChartStyleSectionComponentType.TIMER_FORMAT:
           return <TimerFormat {...props} />;
         case ChartStyleSectionComponentType.CHECKBOX_MODAL:
-          return <div>Checkbox Modal</div>;
+          return <CheckboxModal {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

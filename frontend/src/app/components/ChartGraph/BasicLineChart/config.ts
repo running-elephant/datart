@@ -456,10 +456,18 @@ const config: ChartConfig = {
   ],
   interactions: [
     {
-      label: 'viz.palette.setting.jump.title',
-      key: 'jump',
+      label: 'link.title',
+      key: 'link',
       comType: 'checkboxModal',
-      rows: [],
+      default: true,
+      rows: [
+        {
+          label: 'graph.smooth',
+          key: 'smooth',
+          default: false,
+          comType: 'checkbox',
+        },
+      ],
     },
   ],
   i18ns: [

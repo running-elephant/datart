@@ -108,6 +108,14 @@ const workbenchSlice = createSlice({
                 value: action.payload.value,
               }),
             };
+          case ChartConfigReducerActionType.INTERACTION:
+            return {
+              ...state,
+              interactions: updateCollectionByAction(state.interactions || [], {
+                ancestors: action.payload.ancestors!,
+                value: action.payload.value,
+              }),
+            };
           case ChartConfigReducerActionType.I18N:
             return {
               ...state,
