@@ -754,8 +754,8 @@
         }
       },
       "interaction": {
-        "link": {
-          "title": "联动设置"
+        "jump": {
+          "title": "跳转设置"
         },
         "detail": {
           "title": "查看明细设置"

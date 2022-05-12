@@ -456,8 +456,8 @@ const config: ChartConfig = {
   ],
   interactions: [
     {
-      label: 'link.title',
-      key: 'link',
+      label: 'jump.title',
+      key: 'jump',
       comType: 'checkboxModal',
       default: false,
       rows: [

@@ -762,8 +762,8 @@
         }
       },
       "interaction": {
-        "link": {
-          "title": "Link Setting"
+        "jump": {
+          "title": "Jump Setting"
         },
         "detail": {
           "title": "Detail Setting"
