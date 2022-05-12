@@ -351,9 +351,10 @@ export const refreshWidgetsByControllerAction =
       .stack.present;
 
     const viewBoardState = rootState.board as BoardState;
-    const { widgetRecord: widgetMap } =
-      renderMode === 'edit' ? editBoardState : viewBoardState.widgetRecord;
-
+    const widgetMap =
+      renderMode === 'edit'
+        ? editBoardState.widgetRecord
+        : viewBoardState.widgetRecord[boardId];
     const hasQueryBtn = Object.values(widgetMap || {}).find(
       item => item.config.originalType === ORIGINAL_TYPE_MAP.queryBtn,
     );
