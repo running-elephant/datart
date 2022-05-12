@@ -56,16 +56,7 @@ export const ImmediateQuery: ChartStyleConfig = {
     },
   ],
 };
-export const ImmediateQueryI18N = {
-  zh: {
-    immediateQueryGroup: '立即查询',
-    enable: '启用',
-  },
-  en: {
-    immediateQueryGroup: 'ImmediateQuery',
-    enable: 'Enable',
-  },
-};
+
 export interface ControlWidgetToolkit extends WidgetToolkit {
   getQueryEnable: (args) => boolean;
 }
@@ -99,10 +90,7 @@ export const controlWidgetTpl = (opt: WidgetCreateProps) => {
     widget.config.rect = rect;
   }
   widget.config.content = opt.content; //controller
-  widget.config.customConfig.props = [
-    { ...initTitleTpl() },
-    { ...ImmediateQuery },
-  ];
+  widget.config.customConfig.props = [{ ...initTitleTpl() }];
 
   return widget;
 };

@@ -35,7 +35,6 @@ import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { getWidgetTitle } from '../../WidgetManager/utils/utils';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
-import { getControlQueryEnable } from './config';
 import { CheckboxGroupControllerForm } from './Controller/CheckboxGroupController';
 import { MultiSelectControllerForm } from './Controller/MultiSelectController';
 import { NumberControllerForm } from './Controller/NumberController';
@@ -52,7 +51,8 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   const content = widget.config.content as ControllerWidgetContent;
   const { onUpdateWidgetConfigByKey, onRefreshWidgetsByController } =
     useContext(WidgetActionContext);
-  const emitQuery = getControlQueryEnable(widget.config.customConfig.props!);
+  // TODO 由控制器自己控制 要不要触发查询
+  // const emitQuery = getControlQueryEnable(widget.config.customConfig.props!);
   const [form] = Form.useForm();
 
   const {
@@ -61,10 +61,10 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
 
   const refreshLinkedWidgets = useCallback(
     (widget: Widget) => {
-      if (!emitQuery) return;
+      // if (!emitQuery) return;
       onRefreshWidgetsByController(widget);
     },
-    [onRefreshWidgetsByController, emitQuery],
+    [onRefreshWidgetsByController],
   );
   const { config, type: facadeType } = useMemo(() => content, [content]);
 

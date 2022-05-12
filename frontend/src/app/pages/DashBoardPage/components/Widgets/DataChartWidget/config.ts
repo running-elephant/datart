@@ -55,10 +55,12 @@ export const getMeta = (opt: {
 }) => {
   const meta: WidgetMeta = {
     icon: opt.icon,
-    widgetTypeId: opt.widgetTypeId,
+    originalType: opt.widgetTypeId,
     canWrapped: true,
     controllable: true,
     linkable: true,
+    singleton: false,
+
     canFullScreen: true,
     viewAction: {
       ...initWidgetViewActionTpl(),

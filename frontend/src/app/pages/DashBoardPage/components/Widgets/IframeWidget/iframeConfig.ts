@@ -71,11 +71,12 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: 'embed',
-  widgetTypeId: ORIGINAL_TYPE_MAP.iframe,
+  originalType: ORIGINAL_TYPE_MAP.iframe,
   canWrapped: true,
   controllable: false,
   linkable: false,
   canFullScreen: true,
+  singleton: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -125,13 +126,13 @@ export interface IframeWidgetToolKit extends WidgetToolkit {
 const widgetToolkit: IframeWidgetToolKit = {
   create: opt => {
     const widget = widgetTpl();
-    widget.id = widgetMeta.widgetTypeId + widget.id;
+    widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
     widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.originalType = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
@@ -196,7 +197,7 @@ const widgetToolkit: IframeWidgetToolKit = {
 //   };
 // };
 const iframeProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+  widgetTypeId: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

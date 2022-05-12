@@ -45,11 +45,12 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: 'query',
-  widgetTypeId: ORIGINAL_TYPE_MAP.queryBtn,
+  originalType: ORIGINAL_TYPE_MAP.queryBtn,
   canWrapped: true,
   controllable: false,
   linkable: false,
   canFullScreen: false,
+  singleton: true,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -95,13 +96,13 @@ export const widgetMeta: WidgetMeta = {
 export const widgetToolkit: WidgetToolkit = {
   create: opt => {
     const widget = widgetTpl();
-    widget.id = widgetMeta.widgetTypeId + widget.id;
+    widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
     widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.originalType = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.originalType;
     widget.config.name = opt.name || '';
     widget.config.type = 'button';
     if (opt.boardType === 'auto') {
@@ -166,7 +167,7 @@ export const widgetToolkit: WidgetToolkit = {
 };
 
 const queryBtnProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+  widgetTypeId: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

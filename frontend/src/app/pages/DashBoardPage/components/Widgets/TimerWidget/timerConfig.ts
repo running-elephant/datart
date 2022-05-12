@@ -84,11 +84,12 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: 'timer',
-  widgetTypeId: ORIGINAL_TYPE_MAP.timer,
+  originalType: ORIGINAL_TYPE_MAP.timer,
   canWrapped: true,
   controllable: false,
   linkable: false,
   canFullScreen: true,
+  singleton: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -139,13 +140,13 @@ export interface TimerWidgetToolKit extends WidgetToolkit {
 export const widgetToolkit: TimerWidgetToolKit = {
   create: opt => {
     const widget = widgetTpl();
-    widget.id = widgetMeta.widgetTypeId + widget.id;
+    widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
     widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.originalType = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
@@ -222,7 +223,7 @@ export const widgetToolkit: TimerWidgetToolKit = {
 };
 
 const timerProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+  widgetTypeId: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

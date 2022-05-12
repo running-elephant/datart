@@ -16,7 +16,10 @@
  * limitations under the License.
  */
 import { createSelector } from '@reduxjs/toolkit';
-import { DefaultWidgetData } from 'app/pages/DashBoardPage/constants';
+import {
+  DefaultWidgetData,
+  ORIGINAL_TYPE_MAP,
+} from 'app/pages/DashBoardPage/constants';
 import {
   DeviceType,
   WidgetInfo,
@@ -71,7 +74,24 @@ export const selectSortAllWidgets = createSelector(
       return w1.config.index! - w2.config.index!;
     }),
 );
-
+export const selectHasQueryBtn = createSelector(
+  [selectSortAllWidgets],
+  allWidgets => {
+    let target = allWidgets.find(
+      it => it.config.originalType === ORIGINAL_TYPE_MAP.queryBtn,
+    );
+    return !!target;
+  },
+);
+export const selectHasResetBtn = createSelector(
+  [selectSortAllWidgets],
+  allWidgets => {
+    let target = allWidgets.find(
+      it => it.config.originalType === ORIGINAL_TYPE_MAP.resetBtn,
+    );
+    return !!target;
+  },
+);
 export const selectLayoutWidgetMap = createSelector(
   [selectWidgetRecord],
   allWidgetMap => {

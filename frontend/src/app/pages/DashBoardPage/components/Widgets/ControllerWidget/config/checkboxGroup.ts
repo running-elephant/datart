@@ -23,9 +23,9 @@ import {
   controlWidgetTpl,
   getControlDropDownList,
   getControlQueryEnable,
-  ImmediateQueryI18N,
 } from '.';
 import {
+  ImmediateQueryI18N,
   initBackgroundTpl,
   initBorderTpl,
   initLoopFetchTpl,
@@ -46,11 +46,12 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: '',
-  widgetTypeId: ORIGINAL_TYPE_MAP.checkboxGroup,
+  originalType: ORIGINAL_TYPE_MAP.checkboxGroup,
   canWrapped: true,
   controllable: true,
   linkable: false,
   canFullScreen: false,
+  singleton: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -99,8 +100,8 @@ export const widgetMeta: WidgetMeta = {
 export const widgetToolkit: ControlWidgetToolkit = {
   create: opt => {
     const widget = controlWidgetTpl(opt);
-    widget.id = widgetMeta.widgetTypeId + widget.id;
-    widget.config.originalType = widgetMeta.widgetTypeId;
+    widget.id = widgetMeta.originalType + widget.id;
+    widget.config.originalType = widgetMeta.originalType;
     const addProps = [
       { ...initBackgroundTpl('#fff') },
       { ...initPaddingTpl() },
@@ -145,7 +146,7 @@ export const widgetToolkit: ControlWidgetToolkit = {
 };
 export const controlToolkit = widgetToolkit;
 const checkboxGroupProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+  widgetTypeId: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };
