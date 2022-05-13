@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import {
   ITimeDefault,
   Widget,
@@ -114,12 +115,14 @@ export const convertChartWidgetToBeta4 = (widget: WidgetBeta3) => {
   let newWidget = {} as Widget;
   if (subType === 'dataChart') {
     newWidget = widgetManagerInstance
-      .toolkit('linkedChart')
+      .toolkit(ORIGINAL_TYPE_MAP.linkedChart)
       .create({ ...widget });
   } else {
-    newWidget = widgetManagerInstance.toolkit('ownedChart').create({
-      ...widget,
-    });
+    newWidget = widgetManagerInstance
+      .toolkit(ORIGINAL_TYPE_MAP.ownedChart)
+      .create({
+        ...widget,
+      });
   }
 
   newWidget = commonBeta4Convert(newWidget, widget);

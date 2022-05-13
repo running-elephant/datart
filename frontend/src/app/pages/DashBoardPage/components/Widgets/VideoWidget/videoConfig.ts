@@ -20,6 +20,7 @@ import type {
   WidgetActionListItem,
   widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
@@ -129,8 +130,6 @@ const widgetToolkit: VideoWidgetToolKit = {
     const widget = widgetTpl();
     widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
-    widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
     widget.config.originalType = widgetMeta.originalType;
@@ -191,8 +190,8 @@ const widgetToolkit: VideoWidgetToolKit = {
   // //
 };
 
-const videoProto = {
-  widgetTypeId: widgetMeta.originalType,
+const videoProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

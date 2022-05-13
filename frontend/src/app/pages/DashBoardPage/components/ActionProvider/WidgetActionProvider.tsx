@@ -29,6 +29,7 @@ import {
   widgetGetDataAction,
   widgetToClearLinkageAction,
 } from '../../actions/widgetAction';
+import { ORIGINAL_TYPE_MAP } from '../../constants';
 import { boardActions } from '../../pages/Board/slice';
 import {
   resetControllerAction,
@@ -48,6 +49,7 @@ import {
   copyWidgetsAction,
   deleteWidgetsAction,
   editChartInWidgetAction,
+  onComposeGroupAction,
   pasteWidgetsAction,
   widgetsToPositionAction,
 } from '../../pages/BoardEditor/slice/actions/actions';
@@ -164,9 +166,11 @@ export const WidgetActionProvider: FC<{
       },
 
       onEditChartWidget: (widget: Widget) => {
-        const widgetTypeId = widget.config.originalType;
+        const originalType = widget.config.originalType;
         const chartType =
-          widgetTypeId === 'ownedChart' ? 'widgetChart' : 'dataChart';
+          originalType === ORIGINAL_TYPE_MAP.ownedChart
+            ? 'widgetChart'
+            : 'dataChart';
         dispatch(
           editChartInWidgetAction({
             orgId,
@@ -233,6 +237,9 @@ export const WidgetActionProvider: FC<{
           }),
         );
       },
+      onEditComposeGroup: () => {
+        dispatch(onComposeGroupAction());
+      },
     };
     return contextValue;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -286,6 +293,7 @@ export interface WidgetActionContextProps {
   onEditLayerToBottom: () => void;
   onEditCopyWidgets: (ids?: string[]) => void;
   onEditPasteWidgets: () => void;
+  onEditComposeGroup: () => void;
   //
 }
 export const WidgetActionContext = createContext<WidgetActionContextProps>(

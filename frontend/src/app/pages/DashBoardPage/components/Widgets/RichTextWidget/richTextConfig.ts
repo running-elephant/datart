@@ -20,6 +20,7 @@ import type {
   WidgetActionListItem,
   widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
@@ -98,7 +99,6 @@ export const widgetToolkit: WidgetToolkit = {
     const widget = widgetTpl();
     widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
@@ -173,8 +173,8 @@ export const widgetToolkit: WidgetToolkit = {
   // //
 };
 
-const richTextProto = {
-  widgetTypeId: widgetMeta.originalType,
+const richTextProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

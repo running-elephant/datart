@@ -29,20 +29,19 @@ import { BoardToolBarContext } from '../context/BoardToolBarContext';
 export const AddContainer: React.FC<{}> = () => {
   const t = useI18NPrefix(`viz.board.action`);
   const dispatch = useDispatch();
-  const { boardId, boardType } = useContext(BoardToolBarContext);
+  const { boardType } = useContext(BoardToolBarContext);
   const onSelectContainerWidget = useCallback(
     ({ keyPath }) => {
       const [type] = keyPath;
       console.log('__ type', type);
 
       let widget = widgetManagerInstance.toolkit('tab').create({
-        dashboardId: boardId,
         boardType: boardType,
         relations: [],
       });
       dispatch(addWidgetsToEditBoard([widget]));
     },
-    [boardId, boardType, dispatch],
+    [boardType, dispatch],
   );
   type ContainerWidgetItems = {
     name: string;

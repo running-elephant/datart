@@ -305,6 +305,7 @@ export const WidgetTypes = [
   'container',
   'controller',
   'button',
+  'group',
 ] as const;
 export type WidgetType = typeof WidgetTypes[number];
 

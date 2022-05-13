@@ -21,6 +21,7 @@ import type {
   WidgetActionListItem,
   widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { uuidv4 } from 'utils/utils';
@@ -101,7 +102,6 @@ export const widgetToolkit: TabToolkit = {
   create: opt => {
     const widget = widgetTpl();
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
@@ -194,8 +194,8 @@ export const widgetToolkit: TabToolkit = {
 //         "tabConfig": {}
 //     }
 // }
-const tabProto = {
-  widgetTypeId: widgetMeta.originalType,
+const tabProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

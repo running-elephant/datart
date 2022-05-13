@@ -16,13 +16,8 @@
  * limitations under the License.
  */
 
-import type { WidgetMeta, WidgetToolkit } from '../../types/widgetTypes';
+import type { WidgetProto } from '../../types/widgetTypes';
 
-export interface WidgetProto {
-  id: string;
-  meta: WidgetMeta;
-  toolkit: WidgetToolkit;
-}
 class WidgetManager {
   private static _instance: WidgetManager;
   private widgetProtoMap: Record<string, WidgetProto> = {};
@@ -36,15 +31,15 @@ class WidgetManager {
   }
 
   public register(obj: {
-    widgetTypeId: string;
+    originalType: string;
     meta: WidgetProto['meta'];
     toolkit: WidgetProto['toolkit'];
   }) {
-    if (this.widgetProtoMap[obj.widgetTypeId]) {
-      console.warn(`Widget ${obj.widgetTypeId} already registered`);
+    if (this.widgetProtoMap[obj.originalType]) {
+      console.warn(`Widget ${obj.originalType} already registered`);
     }
-    this.widgetProtoMap[obj.widgetTypeId] = {
-      id: obj.widgetTypeId,
+    this.widgetProtoMap[obj.originalType] = {
+      originalType: obj.originalType,
       meta: obj.meta,
       toolkit: obj.toolkit,
     };
@@ -52,15 +47,15 @@ class WidgetManager {
   public allWidgetProto() {
     return this.widgetProtoMap;
   }
-  public widgetProto(widgetTypeId: string) {
-    return this.widgetProtoMap[widgetTypeId];
+  public widgetProto(originalType: string) {
+    return this.widgetProtoMap[originalType];
   }
-  public meta(widgetTypeId: string) {
-    return this.widgetProtoMap[widgetTypeId]?.meta;
+  public meta(originalType: string) {
+    return this.widgetProtoMap[originalType]?.meta;
   }
 
-  public toolkit(widgetTypeId: string) {
-    return this.widgetProtoMap[widgetTypeId]?.toolkit;
+  public toolkit(originalType: string) {
+    return this.widgetProtoMap[originalType]?.toolkit;
   }
 }
 export const widgetManagerInstance = WidgetManager.getInstance();

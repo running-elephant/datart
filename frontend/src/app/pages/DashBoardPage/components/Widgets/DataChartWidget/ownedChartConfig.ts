@@ -20,6 +20,7 @@ import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import {
   WidgetActionListItem,
   widgetActionType,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { initWidgetName } from '../../WidgetManager/utils/init';
@@ -46,7 +47,7 @@ const widgetToolkit: OwnedChartToolkit = {
   create: opt => {
     const widget = dataChartCreator({
       ...opt,
-      widgetTypeId: widgetMeta.originalType,
+      originalType: widgetMeta.originalType,
     });
     return widget;
   },
@@ -140,14 +141,9 @@ const widgetToolkit: OwnedChartToolkit = {
   // setJump() {},
   // closeJump() {},
 };
-// class OwnedChartProto{
-//   public widgetTypeId
-//   constructor(){
-//     return this;
-//   }
-// }
-const ownedChartProto = {
-  widgetTypeId: widgetMeta.originalType,
+
+const ownedChartProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

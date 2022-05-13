@@ -29,7 +29,7 @@ import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
 import { CSSProperties } from 'react';
 import { adaptBoardImageUrl, fillPx, getBackgroundImage } from '.';
-import { LAYOUT_COLS_MAP } from '../constants';
+import { LAYOUT_COLS_MAP, ORIGINAL_TYPE_MAP } from '../constants';
 import {
   BackgroundConfig,
   BoardType,
@@ -163,19 +163,35 @@ export const getWidgetInfoMapByServer = (widgetMap: Record<string, Widget>) => {
   return widgetInfoMap;
 };
 
-export const updateWidgetsRect = (
-  widgets: Widget[],
-  boardType: BoardType,
-  layouts?: ReactGridLayout.Layout[],
-) => {
+export const adjustWidgetsToBoard = (args: {
+  widgets: Widget[];
+  boardType: BoardType;
+  boardId: string;
+  layouts?: ReactGridLayout.Layout[];
+}) => {
+  const { widgets, boardType, layouts } = args;
+  let newWidgets = updateWidgetsForBoard(args);
   if (boardType === 'auto') {
-    return updateAutoWidgetsRect(widgets, layouts || []);
+    return updateAutoWidgetsRect(newWidgets, layouts || []);
   } else if (boardType === 'free') {
-    return updateFreeWidgetsRect(widgets);
+    return updateFreeWidgetsRect(newWidgets);
   }
   return widgets;
 };
-
+export const updateWidgetsForBoard = (args: {
+  widgets: Widget[];
+  boardType: BoardType;
+  boardId: string;
+}) => {
+  const { widgets, boardType, boardId } = args;
+  let newWidgets = widgets.map(widget => {
+    return produce(widget, draft => {
+      draft.dashboardId = boardId;
+      draft.config.boardType = boardType;
+    });
+  });
+  return newWidgets;
+};
 export const updateAutoWidgetsRect = (
   widgets: Widget[],
   layouts: ReactGridLayout.Layout[],
@@ -288,7 +304,7 @@ export const convertWrapChartWidget = (params: {
 }) => {
   const { widgetMap, dataChartMap } = params;
   const widgets = Object.values(widgetMap).map(widget => {
-    if (widget.config.originalType !== 'ownedChart') {
+    if (widget.config.originalType !== ORIGINAL_TYPE_MAP.ownedChart) {
       return widget;
     }
     // widgetChart wrapChartWidget
@@ -606,7 +622,7 @@ export const getWidgetMap = (
 
   // 处理 自有 chart widgetControl
   widgetList
-    .filter(w => w.config.originalType === 'ownedChart')
+    .filter(w => w.config.originalType === ORIGINAL_TYPE_MAP.ownedChart)
     .forEach(widget => {
       let dataChart = (widget.config.content as any).dataChart as DataChart;
 

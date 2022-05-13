@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { ChartEditorBaseProps } from 'app/components/ChartEditor';
+import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
@@ -39,6 +40,7 @@ import { RootState } from 'types';
 import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
+import { ORIGINAL_TYPE_MAP } from '../../../../constants';
 import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
 import { getEditChartWidgetDataAsync } from '../thunk';
 import { EditBoardState, HistoryEditBoard } from '../types';
@@ -241,59 +243,6 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
   }
 };
 
-// export const updateWidgetControllerAction =
-//   (params: {
-//     boardId: string;
-//     boardType: BoardType;
-//     relations: Relation[];
-//     name?: string;
-//     fieldValueType: DataViewFieldType;
-//     controllerFacadeType: ControllerFacadeTypes;
-//     views: RelatedView[];
-//     config: ControllerConfig;
-//   }) =>
-//   async (dispatch, getState) => {
-//     const {
-//       boardId,
-//       boardType,
-//       views,
-//       config,
-//       controllerFacadeType,
-//       relations,
-//       name,
-//     } = params;
-//     const content: ControllerWidgetContent = {
-//       type: controllerFacadeType,
-//       relatedViews: views,
-//       name: name || 'newController',
-//       config: config,
-//     };
-
-//     const widgetConf = createInitWidgetConfig({
-//       name: name || 'newController',
-//       type: 'controller',
-//       content: content,
-//       boardType: boardType,
-//     });
-
-//     const widgetId = relations[0]?.sourceId || uuidv4();
-//     const widget: Widget = createWidget({
-//       id: widgetId,
-//       dashboardId: boardId,
-//       config: widgetConf,
-//       relations,
-//     });
-//     dispatch(addWidgetsToEditBoard([widget]));
-//     dispatch(
-//       editDashBoardInfoActions.changeControllerPanel({
-//         type: 'hide',
-//         widgetId: '',
-//         controllerType: undefined,
-//       }),
-//     );
-//   };
-// changeChartEditorProps
-
 export const editChartInWidgetAction =
   (props: {
     orgId: string;
@@ -370,7 +319,24 @@ export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
     }),
   );
 };
-
+export const onComposeGroupAction = (wid?: string) => (dispatch, getState) => {
+  const rootState = getState() as RootState;
+  const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
+  const stackState = editBoardState.stack.present;
+  const widgetInfos = Object.values(editBoardState.widgetInfoRecord || {});
+  let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);
+  wid && selectedIds.push(wid);
+  selectedIds = [...new Set(selectedIds)];
+  // dashboardId: string;
+  // name?: string;
+  // boardType?: BoardType;
+  // datachartId?: string;
+  // relations?: Relation[];
+  // content?: any;
+  // viewIds?: string[];
+  // parentId?: string;
+  widgetManager.toolkit(ORIGINAL_TYPE_MAP.group).create({});
+};
 export const addVariablesToBoard =
   (variables: Variable[]) => (dispatch, getState) => {
     if (!variables?.length) return;

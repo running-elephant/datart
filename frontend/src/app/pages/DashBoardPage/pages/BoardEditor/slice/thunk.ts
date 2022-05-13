@@ -6,6 +6,7 @@ import {
 } from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
 import widgetManagerInstance from 'app/pages/DashBoardPage/components/WidgetManager';
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/components/Widgets/ControllerWidget/config';
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
@@ -46,7 +47,7 @@ import {
 } from '.';
 import { BoardInfo, BoardType, ServerDashboard } from '../../Board/slice/types';
 import { getDataChartMap } from './../../../utils/board';
-import { updateWidgetsRect } from './../../../utils/widget';
+import { adjustWidgetsToBoard } from './../../../utils/widget';
 import { addVariablesToBoard } from './actions/actions';
 import {
   boardInfoState,
@@ -194,8 +195,7 @@ export const toUpdateDashboard = createAsyncThunk<
  */
 export const addWidgetsToEditBoard = createAsyncThunk<
   null,
-  any,
-  // IWidget[],
+  Widget[],
   { state: RootState }
 >('editBoard/addWidgetsToEditBoard', (widgets, { getState, dispatch }) => {
   const { dashBoard } = editBoardStackState(
@@ -207,11 +207,12 @@ export const addWidgetsToEditBoard = createAsyncThunk<
     getState() as { editBoard: EditBoardState },
   );
   const widgetInfoMap = createWidgetInfoMap(widgets);
-  const updatedWidgets = updateWidgetsRect(
+  const updatedWidgets = adjustWidgetsToBoard({
     widgets,
-    dashBoard.config.type,
+    boardType: dashBoard.config.type,
+    boardId: dashBoard.id,
     layouts,
-  );
+  });
   // widgetInfoRecord
   dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
   // WidgetRecord
@@ -246,15 +247,16 @@ export const addDataChartWidgets = createAsyncThunk<
     const widgets = chartIds.map(dcId => {
       const dataChart = dataChartMap[dcId];
       const viewIds = dataChart.viewId ? [dataChart.viewId] : [];
-      let widget = widgetManagerInstance.toolkit('linkedChart').create({
-        dashboardId: boardId,
-        boardType: boardType,
-        datachartId: dcId,
-        relations: [],
-        name: dataChart.name,
-        content: dataChartMap[dcId],
-        viewIds: viewIds,
-      });
+      let widget = widgetManagerInstance
+        .toolkit(ORIGINAL_TYPE_MAP.linkedChart)
+        .create({
+          boardType: boardType,
+          datachartId: dcId,
+          relations: [],
+          name: dataChart.name,
+          content: dataChartMap[dcId],
+          viewIds: viewIds,
+        });
       return widget;
     });
     dispatch(addWidgetsToEditBoard(widgets));
@@ -287,15 +289,16 @@ export const addWrapChartWidget = createAsyncThunk<
     const viewViews = view ? [view] : [];
     dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
-    let widget = widgetManagerInstance.toolkit('ownedChart').create({
-      dashboardId: boardId,
-      boardType: boardType,
-      datachartId: chartId,
-      relations: [],
-      name: dataChart.name,
-      content: dataChart,
-      viewIds: view?.id ? [view.id] : [],
-    });
+    let widget = widgetManagerInstance
+      .toolkit(ORIGINAL_TYPE_MAP.ownedChart)
+      .create({
+        boardType: boardType,
+        datachartId: chartId,
+        relations: [],
+        name: dataChart.name,
+        content: dataChart,
+        viewIds: view?.id ? [view.id] : [],
+      });
     dispatch(addWidgetsToEditBoard([widget]));
     dispatch(addVariablesToBoard(view?.variables));
 
@@ -325,10 +328,12 @@ export const addChartWidget = createAsyncThunk<
     dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
 
-    const widgetTypeId = subType === 'dataChart' ? 'linkedChart' : 'ownedChart';
+    const originalType =
+      subType === 'dataChart'
+        ? ORIGINAL_TYPE_MAP.linkedChart
+        : ORIGINAL_TYPE_MAP.ownedChart;
 
-    let widget = widgetManagerInstance.toolkit(widgetTypeId).create({
-      dashboardId: boardId,
+    let widget = widgetManagerInstance.toolkit(originalType).create({
       boardType: boardType,
       datachartId: chartId,
       relations: [],

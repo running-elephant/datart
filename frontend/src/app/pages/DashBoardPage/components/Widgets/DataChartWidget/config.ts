@@ -137,13 +137,12 @@ export const getMeta = (opt: {
 
 export const dataChartCreator = (opt: WidgetTplProps) => {
   const widget = widgetTpl();
-  widget.id = opt.widgetTypeId + widget.id;
+  widget.id = opt.originalType + widget.id;
   widget.parentId = opt.parentId || '';
-  widget.dashboardId = opt.dashboardId || '';
   widget.datachartId = opt.datachartId || '';
   widget.viewIds = opt.viewIds || [];
   widget.relations = opt.relations || [];
-  widget.config.originalType = opt.widgetTypeId;
+  widget.config.originalType = opt.originalType;
   widget.config.type = 'chart';
 
   widget.config.content.dataChart = opt.content; // DataChart

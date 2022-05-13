@@ -222,7 +222,6 @@ const ControllerWidgetPanel: React.FC<WidgetControllerPanelParams> = memo(
           };
           const viewIds = getViewIdsInControlConfig(config);
           let newWidget = widgetManagerInstance.toolkit(controllerType).create({
-            dashboardId: boardId,
             boardType,
             name: name,
             relations: newRelations,

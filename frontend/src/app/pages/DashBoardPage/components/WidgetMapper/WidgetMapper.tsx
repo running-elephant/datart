@@ -15,8 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ControllerFacadeTypes } from 'app/constants';
 import { memo, useContext } from 'react';
+import { ORIGINAL_TYPE_MAP } from '../../constants';
 import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import { ControllerWidget } from '../Widgets/ControllerWidget/ControllerWidget';
@@ -35,11 +35,11 @@ export const WidgetMapper: React.FC<{
   hideTitle: boolean;
 }> = memo(({ boardEditing, hideTitle }) => {
   const widget = useContext(WidgetContext);
-  const widgetTypeId = widget.config.originalType;
-  switch (widgetTypeId) {
+  const originalType = widget.config.originalType;
+  switch (originalType) {
     // chart
-    case 'linkedChart':
-    case 'ownedChart':
+    case ORIGINAL_TYPE_MAP.linkedChart:
+    case ORIGINAL_TYPE_MAP.ownedChart:
       return (
         <WidgetDataProvider
           widgetId={widget.id}
@@ -50,37 +50,37 @@ export const WidgetMapper: React.FC<{
         </WidgetDataProvider>
       );
     // media
-    case 'richText':
+    case ORIGINAL_TYPE_MAP.richText:
       return <RichTextWidget hideTitle={hideTitle} />;
-    case 'image':
+    case ORIGINAL_TYPE_MAP.image:
       return <ImageWidget hideTitle={hideTitle} />;
-    case 'video':
+    case ORIGINAL_TYPE_MAP.video:
       return <VideoWidget hideTitle={hideTitle} />;
-    case 'iframe':
+    case ORIGINAL_TYPE_MAP.iframe:
       return <IframeWidget hideTitle={hideTitle} />;
-    case 'timer':
+    case ORIGINAL_TYPE_MAP.timer:
       return <TimerWidget hideTitle={hideTitle} />;
 
     // tab
-    case 'tab':
+    case ORIGINAL_TYPE_MAP.tab:
       return <TabWidget hideTitle={hideTitle} />;
 
     // btn
-    case 'queryBtn':
+    case ORIGINAL_TYPE_MAP.queryBtn:
       return <QueryBtnWidget />;
-    case 'resetBtn':
+    case ORIGINAL_TYPE_MAP.resetBtn:
       return <ResetBtnWidget />;
     // controller
-    case ControllerFacadeTypes.DropdownList:
-    case ControllerFacadeTypes.MultiDropdownList:
-    case ControllerFacadeTypes.CheckboxGroup:
-    case ControllerFacadeTypes.RadioGroup:
-    case ControllerFacadeTypes.Text:
-    case ControllerFacadeTypes.Time:
-    case ControllerFacadeTypes.RangeTime:
-    case ControllerFacadeTypes.RangeValue:
-    case ControllerFacadeTypes.Value:
-    case ControllerFacadeTypes.Slider:
+    case ORIGINAL_TYPE_MAP.dropdownList:
+    case ORIGINAL_TYPE_MAP.multiDropdownList:
+    case ORIGINAL_TYPE_MAP.checkboxGroup:
+    case ORIGINAL_TYPE_MAP.radioGroup:
+    case ORIGINAL_TYPE_MAP.text:
+    case ORIGINAL_TYPE_MAP.time:
+    case ORIGINAL_TYPE_MAP.rangeTime:
+    case ORIGINAL_TYPE_MAP.rangeValue:
+    case ORIGINAL_TYPE_MAP.value:
+    case ORIGINAL_TYPE_MAP.slider:
       return (
         <WidgetDataProvider
           widgetId={widget.id}
@@ -94,6 +94,6 @@ export const WidgetMapper: React.FC<{
     //Tree
     // unknown
     default:
-      return <div> unknown widget ?{widgetTypeId} </div>;
+      return <div> unknown widget ?{originalType} </div>;
   }
 });

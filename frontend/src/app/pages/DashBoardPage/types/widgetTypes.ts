@@ -13,6 +13,11 @@ import {
   WidgetType,
 } from '../pages/Board/slice/types';
 
+export interface WidgetProto {
+  originalType: string;
+  meta: WidgetMeta;
+  toolkit: WidgetToolkit;
+}
 export interface Widget {
   id: string;
   dashboardId: string;
@@ -50,7 +55,6 @@ export interface WidgetConf {
 }
 
 export interface WidgetCreateProps {
-  dashboardId: string;
   name?: string;
   boardType?: BoardType;
   datachartId?: string;
@@ -60,7 +64,7 @@ export interface WidgetCreateProps {
   parentId?: string;
 }
 export type WidgetTplProps = WidgetCreateProps & {
-  widgetTypeId: string;
+  originalType: string;
 };
 export interface WidgetToolkit {
   create: (T: WidgetCreateProps) => Widget;

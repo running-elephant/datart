@@ -26,10 +26,6 @@ import type {
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
   initAutoWidgetRect,
-  initBackgroundTpl,
-  initBorderTpl,
-  initPaddingTpl,
-  initTitleTpl,
   initWidgetEditActionTpl,
   initWidgetName,
   initWidgetViewActionTpl,
@@ -41,17 +37,17 @@ import {
 } from '../../WidgetManager/utils/init';
 
 const NameI18N = {
-  zh: '图片',
-  en: 'Image',
+  zh: '组容器',
+  en: 'Group',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'img',
-  originalType: ORIGINAL_TYPE_MAP.image,
-  canWrapped: true,
+  icon: 'group',
+  originalType: ORIGINAL_TYPE_MAP.group,
+  canWrapped: false, // TODO
   controllable: false,
   linkable: false,
   singleton: false,
-  canFullScreen: true,
+  canFullScreen: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -62,14 +58,14 @@ export const widgetMeta: WidgetMeta = {
     {
       lang: 'zh-CN',
       translation: {
-        desc: 'img',
+        desc: 'group',
         widgetName: NameI18N.zh,
         action: {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
         },
         title: TitleI18N.zh,
-        background: { backgroundGroup: '图片编辑' },
+        background: { backgroundGroup: '背景图片' },
         padding: PaddingI18N.zh,
 
         border: { borderGroup: '边框' },
@@ -94,17 +90,17 @@ export const widgetMeta: WidgetMeta = {
   ],
 };
 
-export type ImageToolkit = WidgetToolkit & {};
-export const widgetToolkit: ImageToolkit = {
+export type GroupToolkit = WidgetToolkit & {};
+export const widgetToolkit: GroupToolkit = {
   create: opt => {
     const widget = widgetTpl();
     widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.datachartId = opt.datachartId || '';
-    widget.viewIds = opt.viewIds || [];
+    widget.datachartId = '';
+    widget.viewIds = [];
     widget.relations = opt.relations || [];
     widget.config.originalType = widgetMeta.originalType;
-    widget.config.type = 'media';
+    widget.config.type = 'group';
     widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
       const rect: RectConfig = {
@@ -126,20 +122,11 @@ export const widgetToolkit: ImageToolkit = {
     }
 
     widget.config.customConfig.props = [
-      { ...initBackgroundTpl() },
-      { ...initTitleTpl() },
-      { ...initPaddingTpl() },
-      { ...initBorderTpl() },
+      //   { ...initBackgroundTpl() },
+      //   { ...initTitleTpl() },
+      //   { ...initPaddingTpl() },
+      //   { ...initBorderTpl() },
     ];
-    widget.config.customConfig.props?.forEach(ele => {
-      if (ele.key === 'backgroundGroup') {
-        ele.rows?.forEach(row => {
-          if (row.key === 'background') {
-            row.value.image = '/images/example.png';
-          }
-        });
-      }
-    });
 
     return widget;
   },
@@ -176,9 +163,9 @@ export const widgetToolkit: ImageToolkit = {
   // //
 };
 
-const imageProto: WidgetProto = {
+const groupProto: WidgetProto = {
   originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };
-export default imageProto;
+export default groupProto;
