@@ -229,6 +229,8 @@ export const ChartStyleSectionComponentType = {
   WIDGET_BORDER: 'widgetBorder',
   TIMER_FORMAT: 'timerFormat',
   CHECKBOX_MODAL: 'checkboxModal',
+  INTERACTION_JUMP_SETTING_PANEL: 'interaction.jump',
+  INTERACTION_DETAIL_SETTING_PANEL: 'interaction.detail',
 };
 
 export enum DownloadFileType {

@@ -54,6 +54,7 @@ import {
   ConditionalStylePanel,
   DataReferencePanel,
   FontAlignment,
+  JumpSettingPanel,
   LabelPosition,
   LegendPosition,
   LegendType,
@@ -201,6 +202,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <TimerFormat {...props} />;
         case ChartStyleSectionComponentType.CHECKBOX_MODAL:
           return <CheckboxModal {...props} />;
+        case ChartStyleSectionComponentType.INTERACTION_JUMP_SETTING_PANEL:
+          return <JumpSettingPanel {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

@@ -21,6 +21,7 @@ export { default as CheckboxModal } from './CheckboxModal';
 export { default as ConditionalStylePanel } from './ConditionalStyle';
 export { default as DataReferencePanel } from './DataReferencePanel';
 export { default as FontAlignment } from './FontAlignment';
+export { default as JumpSettingPanel } from './Interaction/JumpSettingPanel';
 export { default as LabelPosition } from './LabelPosition';
 export { default as LegendPosition } from './LegendPosition';
 export { default as LegendType } from './LegendType';

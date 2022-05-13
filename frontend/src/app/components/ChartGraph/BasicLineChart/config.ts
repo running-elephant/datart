@@ -462,10 +462,9 @@ const config: ChartConfig = {
       default: false,
       rows: [
         {
-          label: 'graph.smooth',
-          key: 'smooth',
-          default: false,
-          comType: 'checkbox',
+          label: 'jump.title',
+          key: 'setting',
+          comType: 'interaction.jump',
         },
       ],
     },
