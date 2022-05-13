@@ -16,33 +16,17 @@
  * limitations under the License.
  */
 
-export enum FormGroupLayoutMode {
-  INNER = 'inner',
-  OUTER = 'outter',
-}
+import { InteractionAction, InteractionCategory } from '../../constants';
 
-export enum FormItemComponentType {
-  MODAL = 'modal',
-}
+export type InteractionRule = {
+  category?: InteractionCategory;
+  action?: InteractionAction;
 
-export enum InteractionMouseEvent {
-  Left = 'left',
-  Right = 'right',
-}
-
-export enum InteractionCategory {
-  JumpToChart = 'jumpToChart',
-  JumpToDashboard = 'jumpToDashboard',
-  JumpToUrl = 'jumpToURL',
-}
-
-export enum InteractionAction {
-  Redirect = 'redirect',
-  Window = 'modal',
-  Dialog = 'dialog',
-}
-
-export enum InteractionFieldRelation {
-  Auto = 'auto',
-  Customize = 'customize',
-}
+  [InteractionCategory.JumpToChart]?: {
+    view: string;
+    relation: InteractionFieldRelation;
+    [InteractionFieldRelation.Customize]: any[];
+  };
+  [InteractionCategory.JumpToDashboard]?: any;
+  [InteractionCategory.JumpToUrl]?: any;
+};

@@ -16,18 +16,15 @@
  * limitations under the License.
  */
 
-import { Button, Col, Form, Radio, Row, Select, Space } from 'antd';
+import { Button, Form, Radio, Space } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
-import {
-  InteractionAction,
-  InteractionCategory,
-  InteractionMouseEvent,
-} from '../../constants';
+import { InteractionMouseEvent } from '../../constants';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
-import JumpToChart from './JumpToChart';
+import RuleList from './RuleList';
+import { InteractionRule } from './types';
 
 const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({
@@ -40,8 +37,16 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     const [drillThroughEvent, setDrillThroughEvent] = useState(
       data.value?.event,
     );
+    const [rules, setRules] = useState<InteractionRule[]>([]);
 
-    const handleDrillThroughEventChange = () => {};
+    const handleDrillThroughEventChange = e => {
+      const event = e.target.value;
+      setDrillThroughEvent(event);
+    };
+
+    const handleAddRule = () => {
+      setRules((rules || []).concat([{}]));
+    };
 
     return (
       <StyledDrillThroughPanel direction="vertical">
@@ -50,7 +55,6 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           wrapperCol={{ span: 18 }}
           layout="horizontal"
           size="middle"
-          initialValues={{}}
           // onValuesChange={onFormLayoutChange}
         >
           <Form.Item label={t('drillThrough.event')} name="event">
@@ -68,42 +72,10 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             </Radio.Group>
           </Form.Item>
           <Form.Item label={t('drillThrough.rule.title')} name="rule">
-            <Button type="link">{t('drillThrough.rule.addRule')}</Button>
-            <Row>
-              <Col>
-                <Select
-                  placeholder={t('drillThrough.rule.category.title')}
-                  // onChange={handleChange}
-                >
-                  <Select.Option value={InteractionCategory.JumpToChart}>
-                    {t('drillThrough.rule.category.jumpToChart')}
-                  </Select.Option>
-                  <Select.Option value={InteractionCategory.JumpToDashboard}>
-                    {t('drillThrough.rule.category.jumpToDashboard')}
-                  </Select.Option>
-                  <Select.Option value={InteractionCategory.JumpToUrl}>
-                    {t('drillThrough.rule.category.jumpToUrl')}
-                  </Select.Option>
-                </Select>
-              </Col>
-              <Col>
-                <Select
-                  placeholder={t('drillThrough.rule.action.title')}
-                  // onChange={handleChange}
-                >
-                  <Select.Option value={InteractionAction.Redirect}>
-                    {t('drillThrough.rule.action.redirect')}
-                  </Select.Option>
-                  <Select.Option value={InteractionAction.Window}>
-                    {t('drillThrough.rule.action.window')}
-                  </Select.Option>
-                  <Select.Option value={InteractionAction.Dialog}>
-                    {t('drillThrough.rule.action.dialog')}
-                  </Select.Option>
-                </Select>
-              </Col>
-              {<JumpToChart translate={t} />}
-            </Row>
+            <Button type="link" onClick={handleAddRule}>
+              {t('drillThrough.rule.addRule')}
+            </Button>
+            <RuleList translate={t} rules={rules} />
           </Form.Item>
         </Form>
       </StyledDrillThroughPanel>
