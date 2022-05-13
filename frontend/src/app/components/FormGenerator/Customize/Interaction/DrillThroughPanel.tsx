@@ -20,6 +20,11 @@ import { Button, Col, Form, Radio, Row, Select, Space } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
+import {
+  InteractionAction,
+  InteractionCategory,
+  InteractionMouseEvent,
+} from '../../constants';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
 import JumpToChart from './JumpToChart';
@@ -50,11 +55,16 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         >
           <Form.Item label={t('drillThrough.event')} name="event">
             <Radio.Group
+              defaultValue={InteractionMouseEvent.Left}
               onChange={handleDrillThroughEventChange}
               value={drillThroughEvent}
             >
-              <Radio value={'left'}>{t('drillThrough.leftClick')}</Radio>
-              <Radio value={'right'}>{t('drillThrough.rightClick')}</Radio>
+              <Radio value={InteractionMouseEvent.Left}>
+                {t('drillThrough.leftClick')}
+              </Radio>
+              <Radio value={InteractionMouseEvent.Right}>
+                {t('drillThrough.rightClick')}
+              </Radio>
             </Radio.Group>
           </Form.Item>
           <Form.Item label={t('drillThrough.rule.title')} name="rule">
@@ -65,34 +75,34 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
                   placeholder={t('drillThrough.rule.category.title')}
                   // onChange={handleChange}
                 >
-                  <Select.Option value="chart">
+                  <Select.Option value={InteractionCategory.JumpToChart}>
                     {t('drillThrough.rule.category.jumpToChart')}
                   </Select.Option>
-                  <Select.Option value="dashboard">
+                  <Select.Option value={InteractionCategory.JumpToDashboard}>
                     {t('drillThrough.rule.category.jumpToDashboard')}
                   </Select.Option>
-                  <Select.Option value="url">
+                  <Select.Option value={InteractionCategory.JumpToUrl}>
                     {t('drillThrough.rule.category.jumpToUrl')}
                   </Select.Option>
                 </Select>
               </Col>
               <Col>
                 <Select
-                  placeholder={t('drillThrough.rule.type.title')}
+                  placeholder={t('drillThrough.rule.action.title')}
                   // onChange={handleChange}
                 >
-                  <Select.Option value="chart">
-                    {t('drillThrough.rule.type.redirect')}
+                  <Select.Option value={InteractionAction.Redirect}>
+                    {t('drillThrough.rule.action.redirect')}
                   </Select.Option>
-                  <Select.Option value="dashboard">
-                    {t('drillThrough.rule.type.openNew')}
+                  <Select.Option value={InteractionAction.Window}>
+                    {t('drillThrough.rule.action.window')}
                   </Select.Option>
-                  <Select.Option value="url">
-                    {t('drillThrough.rule.type.openDialog')}
+                  <Select.Option value={InteractionAction.Dialog}>
+                    {t('drillThrough.rule.action.dialog')}
                   </Select.Option>
                 </Select>
               </Col>
-              {<JumpToChart translate={t}/>}
+              {<JumpToChart translate={t} />}
             </Row>
           </Form.Item>
         </Form>

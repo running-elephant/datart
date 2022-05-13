@@ -24,3 +24,20 @@ export enum FormGroupLayoutMode {
 export enum FormItemComponentType {
   MODAL = 'modal',
 }
+
+export enum InteractionMouseEvent {
+  Left = 'left',
+  Right = 'right',
+}
+
+export enum InteractionCategory {
+  JumpToChart = 'jumpToChart',
+  JumpToDashboard = 'jumpToDashboard',
+  JumpToUrl = 'jumpToURL',
+}
+
+export enum InteractionAction {
+  Redirect = 'redirect',
+  Window = 'modal',
+  Dialog = 'dialog',
+}

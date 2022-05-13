@@ -768,11 +768,11 @@
               "jumpToDashboard": "跳转到仪表板",
               "jumpToUrl": "跳转到URL"
             },
-            "type": {
+            "action": {
               "title": "打开方式",
               "redirect": "从当前页打开",
-              "openNew": "打开新窗口",
-              "openDialog": "打开对话框"
+              "window": "打开新窗口",
+              "dialog": "打开对话框"
             },
             "reference": {
               "title": "关联图表"

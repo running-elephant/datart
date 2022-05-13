@@ -776,11 +776,11 @@
               "jumpToDashboard": "Jump to Dashboard",
               "jumpToUrl": "Jump to URL"
             },
-            "type": {
+            "action": {
               "title": "Open",
               "redirect": "Redirect",
-              "openNew": "Open New",
-              "openDialog": "Open Dialog"
+              "window": "Open New",
+              "dialog": "Open Dialog"
             },
             "reference": {
               "title": "Reference View"
