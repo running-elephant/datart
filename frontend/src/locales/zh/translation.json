@@ -778,7 +778,10 @@
               "title": "关联图表"
             },
             "relation": {
-              "title": "字段关系"
+              "setting": "字段关系配置",
+              "title": "字段关系",
+              "auto": "自动",
+              "customize": "自定义"
             }
           }
         },

@@ -22,6 +22,7 @@ import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
+import JumpToChart from './JumpToChart';
 
 const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({
@@ -57,7 +58,7 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             </Radio.Group>
           </Form.Item>
           <Form.Item label={t('drillThrough.rule.title')} name="rule">
-            <Button>{t('drillThrough.rule.addRule')}</Button>
+            <Button type="link">{t('drillThrough.rule.addRule')}</Button>
             <Row>
               <Col>
                 <Select
@@ -91,38 +92,7 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
                   </Select.Option>
                 </Select>
               </Col>
-              <Col>
-                <Select
-                  placeholder={t('drillThrough.rule.reference.title')}
-                  // onChange={handleChange}
-                >
-                  <Select.Option value="chart">
-                    {t('drillThrough.rule.type.redirect')}
-                  </Select.Option>
-                  <Select.Option value="dashboard">
-                    {t('drillThrough.rule.type.openNew')}
-                  </Select.Option>
-                  <Select.Option value="url">
-                    {t('drillThrough.rule.type.openDialog')}
-                  </Select.Option>
-                </Select>
-              </Col>
-              <Col>
-                <Select
-                  placeholder={t('drillThrough.rule.relation.title')}
-                  // onChange={handleChange}
-                >
-                  <Select.Option value="chart">
-                    {t('drillThrough.rule.type.redirect')}
-                  </Select.Option>
-                  <Select.Option value="dashboard">
-                    {t('drillThrough.rule.type.openNew')}
-                  </Select.Option>
-                  <Select.Option value="url">
-                    {t('drillThrough.rule.type.openDialog')}
-                  </Select.Option>
-                </Select>
-              </Col>
+              {<JumpToChart translate={t}/>}
             </Row>
           </Form.Item>
         </Form>

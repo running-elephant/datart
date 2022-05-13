@@ -786,7 +786,10 @@
               "title": "Reference View"
             },
             "relation": {
-              "title": "Field Relation"
+              "setting": "Field Relation Setting",
+              "title": "Field Relation",
+              "auto": "Auto",
+              "customize": "Customize"
             }
           }
         },
