@@ -237,6 +237,10 @@ public class JdbcDataProvider extends DataProvider {
                 Exceptions.msg("Duplicated dbType " + prop.getDbType());
             }
             JdbcDriverInfo driverInfo = driverInfos.get(0);
+
+            if (StringUtils.isNotBlank(prop.getDriverClass())) {
+                driverInfo.setDriverClass(prop.getDriverClass());
+            }
             JdbcDataProviderAdapter adapter = null;
             try {
                 if (StringUtils.isNotBlank(driverInfo.getAdapterClass())) {
