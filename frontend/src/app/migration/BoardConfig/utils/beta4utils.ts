@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-import { WidgetBeta3 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ITimeDefault,
   Widget,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { IFontDefault } from 'types';
 import widgetManagerInstance from '../../../pages/DashBoardPage/components/WidgetManager';
+import { WidgetBeta3 } from '../types';
 
 const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
   newWidget.id = oldW.id;

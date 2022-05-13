@@ -4,7 +4,6 @@ import {
   Relation,
   ServerRelation,
   ServerWidget,
-  WidgetBeta3,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { VALUE_SPLITTER } from 'app/pages/DashBoardPage/utils/widget';
@@ -14,6 +13,7 @@ import {
   APP_VERSION_BETA_2,
   APP_VERSION_BETA_4,
 } from './../constants';
+import { WidgetBeta3 } from './types';
 import { convertWidgetToBeta4 } from './utils/beta4utils';
 
 /**
@@ -91,10 +91,10 @@ export const beta4 = (widget?: Widget | WidgetBeta3) => {
     let newWidget = convertWidgetToBeta4(widget as WidgetBeta3);
     return newWidget;
   } else {
-    if ((widget.config as any).background) {
-      let newWidget = convertWidgetToBeta4(widget as WidgetBeta3);
-      return newWidget;
-    }
+    // if ((widget.config as any).background) {
+    //   let newWidget = convertWidgetToBeta4(widget as WidgetBeta3);
+    //   return newWidget;
+    // }
     return widget;
   }
 };
