@@ -763,7 +763,32 @@
       },
       "interaction": {
         "drillThrough": {
-          "title": "Drill Through"
+          "title": "Drill Through",
+          "event": "Ineraction Event",
+          "leftClick": "Left Click",
+          "rightClick": "Right Click",
+          "rule": {
+            "title": "Rule",
+            "addRule": "+ Add New",
+            "category": {
+              "title": "Categroy",
+              "jumpToChart": "Jump to Chart",
+              "jumpToDashboard": "Jump to Dashboard",
+              "jumpToUrl": "Jump to URL"
+            },
+            "type": {
+              "title": "Open",
+              "redirect": "Redirect",
+              "openNew": "Open New",
+              "openDialog": "Open Dialog"
+            },
+            "reference": {
+              "title": "Reference View"
+            },
+            "relation": {
+              "title": "Field Relation"
+            }
+          }
         },
         "viewData": {
           "title": "View Data"

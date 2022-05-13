@@ -47,7 +47,7 @@ const CheckboxModal: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
 
     const handleOpenModal = (e: any) => {
       return (openStateModal as Function)({
-        modalSize: StateModalSize.SMALL,
+        modalSize: data?.options?.modalSize || StateModalSize.SMALL,
         onOk: handleConfirmModalDialogOrDataUpdate,
         content: onChangeEvent => {
           return renderCollectionComponents(data, onChangeEvent);
@@ -81,7 +81,7 @@ const CheckboxModal: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         <Button
           block
           disabled={!enable}
-          size="middle"
+          size={'middle'}
           type="link"
           onClick={handleOpenModal}
         >

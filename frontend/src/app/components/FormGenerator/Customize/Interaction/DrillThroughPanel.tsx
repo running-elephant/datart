@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-import { Col, Row } from 'antd';
+import { Button, Col, Form, Radio, Row, Select, Space } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { FC, memo } from 'react';
+import { FC, memo, useState } from 'react';
+import styled from 'styled-components/macro';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
 
@@ -30,20 +31,109 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     dataConfigs,
     onChange,
   }) => {
+    const [drillThroughEvent, setDrillThroughEvent] = useState(
+      data.value?.event,
+    );
+
+    const handleDrillThroughEventChange = () => {};
+
     return (
-      <>
-        <Row gutter={24}>
-          <Col span={4}>交互事件</Col>
-          <Col span={20}></Col>
-        </Row>
-        <Row gutter={24}>
-          <Col span={4}>规则设置</Col>
-          <Col span={20}></Col>
-        </Row>
-      </>
+      <StyledDrillThroughPanel direction="vertical">
+        <Form
+          labelCol={{ offset: 2, span: 2 }}
+          wrapperCol={{ span: 18 }}
+          layout="horizontal"
+          size="middle"
+          initialValues={{}}
+          // onValuesChange={onFormLayoutChange}
+        >
+          <Form.Item label={t('drillThrough.event')} name="event">
+            <Radio.Group
+              onChange={handleDrillThroughEventChange}
+              value={drillThroughEvent}
+            >
+              <Radio value={'left'}>{t('drillThrough.leftClick')}</Radio>
+              <Radio value={'right'}>{t('drillThrough.rightClick')}</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item label={t('drillThrough.rule.title')} name="rule">
+            <Button>{t('drillThrough.rule.addRule')}</Button>
+            <Row>
+              <Col>
+                <Select
+                  placeholder={t('drillThrough.rule.category.title')}
+                  // onChange={handleChange}
+                >
+                  <Select.Option value="chart">
+                    {t('drillThrough.rule.category.jumpToChart')}
+                  </Select.Option>
+                  <Select.Option value="dashboard">
+                    {t('drillThrough.rule.category.jumpToDashboard')}
+                  </Select.Option>
+                  <Select.Option value="url">
+                    {t('drillThrough.rule.category.jumpToUrl')}
+                  </Select.Option>
+                </Select>
+              </Col>
+              <Col>
+                <Select
+                  placeholder={t('drillThrough.rule.type.title')}
+                  // onChange={handleChange}
+                >
+                  <Select.Option value="chart">
+                    {t('drillThrough.rule.type.redirect')}
+                  </Select.Option>
+                  <Select.Option value="dashboard">
+                    {t('drillThrough.rule.type.openNew')}
+                  </Select.Option>
+                  <Select.Option value="url">
+                    {t('drillThrough.rule.type.openDialog')}
+                  </Select.Option>
+                </Select>
+              </Col>
+              <Col>
+                <Select
+                  placeholder={t('drillThrough.rule.reference.title')}
+                  // onChange={handleChange}
+                >
+                  <Select.Option value="chart">
+                    {t('drillThrough.rule.type.redirect')}
+                  </Select.Option>
+                  <Select.Option value="dashboard">
+                    {t('drillThrough.rule.type.openNew')}
+                  </Select.Option>
+                  <Select.Option value="url">
+                    {t('drillThrough.rule.type.openDialog')}
+                  </Select.Option>
+                </Select>
+              </Col>
+              <Col>
+                <Select
+                  placeholder={t('drillThrough.rule.relation.title')}
+                  // onChange={handleChange}
+                >
+                  <Select.Option value="chart">
+                    {t('drillThrough.rule.type.redirect')}
+                  </Select.Option>
+                  <Select.Option value="dashboard">
+                    {t('drillThrough.rule.type.openNew')}
+                  </Select.Option>
+                  <Select.Option value="url">
+                    {t('drillThrough.rule.type.openDialog')}
+                  </Select.Option>
+                </Select>
+              </Col>
+            </Row>
+          </Form.Item>
+        </Form>
+      </StyledDrillThroughPanel>
     );
   },
   itemLayoutComparer,
 );
 
 export default DrillThroughPanel;
+
+const StyledDrillThroughPanel = styled(Space)`
+  width: 100%;
+`;
