@@ -754,11 +754,11 @@
         }
       },
       "interaction": {
-        "jump": {
+        "drillThrough": {
           "title": "跳转设置"
         },
-        "detail": {
-          "title": "查看明细设置"
+        "viewData": {
+          "title": "查看数据"
         }
       },
       "present": {

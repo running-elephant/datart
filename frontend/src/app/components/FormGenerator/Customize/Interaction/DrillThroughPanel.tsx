@@ -22,7 +22,7 @@ import { FC, memo } from 'react';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
 
-const JumpSettingPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
+const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({
     ancestors,
     translate: t = title => title,
@@ -46,4 +46,4 @@ const JumpSettingPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   itemLayoutComparer,
 );
 
-export default JumpSettingPanel;
+export default DrillThroughPanel;

@@ -762,11 +762,11 @@
         }
       },
       "interaction": {
-        "jump": {
-          "title": "Jump Setting"
+        "drillThrough": {
+          "title": "Drill Through"
         },
-        "detail": {
-          "title": "Detail Setting"
+        "viewData": {
+          "title": "View Data"
         }
       },
       "present": {

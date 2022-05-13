@@ -456,21 +456,21 @@ const config: ChartConfig = {
   ],
   interactions: [
     {
-      label: 'jump.title',
-      key: 'jump',
+      label: 'drillThrough.title',
+      key: 'drillThrough',
       comType: 'checkboxModal',
       default: false,
       rows: [
         {
-          label: 'jump.title',
+          label: 'drillThrough.title',
           key: 'setting',
-          comType: 'interaction.jump',
+          comType: 'interaction.drillThrough',
         },
       ],
     },
     {
-      label: 'detail.title',
-      key: 'detail',
+      label: 'viewData.title',
+      key: 'viewData',
       comType: 'checkboxModal',
       default: false,
       rows: [],
