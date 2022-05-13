@@ -21,6 +21,7 @@ import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import { ControllerWidget } from '../Widgets/ControllerWidget/ControllerWidget';
 import { DataChartWidget } from '../Widgets/DataChartWidget/DataChartWidget';
+import { GroupWidget } from '../Widgets/GroupWidget/groupWidget';
 import { IframeWidget } from '../Widgets/IframeWidget/IframeWidget';
 import { ImageWidget } from '../Widgets/ImageWidget/ImageWidget';
 import { QueryBtnWidget } from '../Widgets/QueryBtnWidget/QueryBtnWidget';
@@ -37,6 +38,8 @@ export const WidgetMapper: React.FC<{
   const widget = useContext(WidgetContext);
   const originalType = widget.config.originalType;
   switch (originalType) {
+    case ORIGINAL_TYPE_MAP.group:
+      return <GroupWidget />;
     // chart
     case ORIGINAL_TYPE_MAP.linkedChart:
     case ORIGINAL_TYPE_MAP.ownedChart:

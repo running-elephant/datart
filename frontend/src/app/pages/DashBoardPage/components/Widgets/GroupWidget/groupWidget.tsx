@@ -24,38 +24,33 @@ import { EditMask } from '../../WidgetComponents/EditMask';
 import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetDropdownList } from '../../WidgetComponents/WidgetDropdownList';
-import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { getWidgetTitle } from '../../WidgetManager/utils/utils';
 
-export const ImageWidget: React.FC<{ hideTitle: boolean }> = memo(
-  ({ hideTitle }) => {
-    const widget = useContext(WidgetContext);
-    const { editing } = useContext(BoardContext);
-    const title = getWidgetTitle(widget.config.customConfig.props);
-    title.title = widget.config.name;
+export const GroupWidget: React.FC<{}> = memo(() => {
+  const widget = useContext(WidgetContext);
+  const { editing } = useContext(BoardContext);
+  const title = getWidgetTitle(widget.config.customConfig.props);
+  title.title = widget.config.name;
 
-    return (
-      <div>
-        <div style={ZIndexStyle}>
-          {!hideTitle && <WidgetTitle title={title} />}
-
-          <div style={FlexStyle}>
-            123456 group
-            {/* <ImageWidgetCore /> */}
-          </div>
+  return (
+    <div>
+      <div style={ZIndexStyle}>
+        <div style={FlexStyle}>
+          123456 group
+          {/* <GroupWidgetCore /> */}
         </div>
-        {editing && <EditMask />}
-        <StyledWidgetToolBar>
-          <Space size={0}>
-            <LockIconFn
-              boardEditing={editing}
-              wid={widget.id}
-              lock={widget.config?.lock}
-            />
-            <WidgetDropdownList widget={widget} />
-          </Space>
-        </StyledWidgetToolBar>
       </div>
-    );
-  },
-);
+      {editing && <EditMask />}
+      <StyledWidgetToolBar>
+        <Space size={0}>
+          <LockIconFn
+            boardEditing={editing}
+            wid={widget.id}
+            lock={widget.config?.lock}
+          />
+          <WidgetDropdownList widget={widget} />
+        </Space>
+      </StyledWidgetToolBar>
+    </div>
+  );
+});
