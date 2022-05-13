@@ -179,7 +179,7 @@ public class DatabaseMigration {
             baseline.setSuccess(true);
         } else {
             log.info("Do baseline on an empty database...");
-            runScript(baseline.getUpgradeFile(), true);
+            baseline.setSuccess(runScript(baseline.getUpgradeFile(), true));
         }
         baseline.setExecuteUser(username);
         baseline.setExecuteDate(new Date());
