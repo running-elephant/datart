@@ -23,6 +23,7 @@ import datart.core.base.exception.Exceptions;
 import datart.core.common.DateUtils;
 import datart.core.data.provider.*;
 import datart.data.provider.calcite.SqlParserUtils;
+import datart.data.provider.calcite.ViewSqlBuilder;
 import datart.data.provider.local.LocalDB;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.math.NumberUtils;
@@ -123,6 +124,11 @@ public abstract class DefaultDataProvider extends DataProvider {
         if (persistent) {
             expire = getExpireTime(config);
         }
+        if (queryScript.isViewScript()) {
+            String viewSql = ViewSqlBuilder.builder().withScript(queryScript.getScript()).withDialect(LocalDB.SQL_DIALECT).build();
+            queryScript.setScript(viewSql);
+        }
+
         // 如果自定义了schema,执行分两部完成。1、执行view sql，取得中间结果。2、使用中间结果，修改schema，加入执行参数，完成执行。
         if (queryScript != null && !CollectionUtils.isEmpty(queryScript.getSchema())) {
             Dataframe temp = LocalDB.executeLocalQuery(queryScript, ExecuteParam.empty(), dataframes, persistent, expire);

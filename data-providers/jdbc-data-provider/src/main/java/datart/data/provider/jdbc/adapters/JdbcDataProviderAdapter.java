@@ -297,9 +297,14 @@ public class JdbcDataProviderAdapter implements Closeable {
             if (StringUtils.isNotBlank(driverInfo.getIdentifierQuote())) {
                 fieldValues.put("identifierQuoteString", driverInfo.getIdentifierQuote());
                 fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierQuote());
+                fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierQuote()+driverInfo.getIdentifierQuote());
             }
             if (StringUtils.isNotBlank(driverInfo.getIdentifierEndQuote())) {
                 fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierEndQuote());
+                fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierEndQuote()+driverInfo.getIdentifierEndQuote());
+            }
+            if (StringUtils.isNotBlank(driverInfo.getIdentifierEscapedQuote())) {
+                fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierEscapedQuote());
             }
             // set default casing UNCHANGED
             fieldValues.put("unquotedCasing", Casing.UNCHANGED);

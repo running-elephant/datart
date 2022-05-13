@@ -241,6 +241,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         QueryScript queryScript = QueryScript.builder()
                 .test(false)
                 .sourceId(source.getId())
+                .isViewScript(isSimpleView(view))
                 .script(view.getScript())
                 .variables(variables)
                 .schema(parseSchema(view.getModel()))
@@ -449,6 +450,10 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
             log.error("view model parse error", e);
         }
         return schema;
+    }
+
+    private boolean isSimpleView(View view) {
+        return "SIMPLE".equals(view.getType());
     }
 
 }

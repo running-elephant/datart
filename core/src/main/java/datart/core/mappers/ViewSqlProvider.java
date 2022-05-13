@@ -31,6 +31,10 @@ public class ViewSqlProvider {
         if (record.getScript() != null) {
             sql.VALUES("script", "#{script,jdbcType=VARCHAR}");
         }
+
+        if (record.getType() != null) {
+            sql.VALUES("`type`", "#{type,jdbcType=VARCHAR}");
+        }
         
         if (record.getModel() != null) {
             sql.VALUES("model", "#{model,jdbcType=VARCHAR}");
@@ -97,6 +101,10 @@ public class ViewSqlProvider {
         
         if (record.getScript() != null) {
             sql.SET("script = #{script,jdbcType=VARCHAR}");
+        }
+
+        if (record.getType() != null) {
+            sql.SET("`type` = #{type,jdbcType=VARCHAR}");
         }
         
         if (record.getModel() != null) {

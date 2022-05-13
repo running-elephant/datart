@@ -15,7 +15,7 @@ public interface ViewMapperExt extends ViewMapper {
 
 
     @Select({
-            "SELECT id,`name`,org_id,`index`,is_folder,parent_id,source_id,description FROM view WHERE org_id=#{orgId} AND `status`=1 ORDER BY create_time ASC "
+            "SELECT id,`name`,org_id,`index`,`type`, is_folder,parent_id,source_id,description FROM view WHERE org_id=#{orgId} AND `status`=1 ORDER BY create_time ASC "
     })
     List<View> listByOrgId(String orgId);
 
