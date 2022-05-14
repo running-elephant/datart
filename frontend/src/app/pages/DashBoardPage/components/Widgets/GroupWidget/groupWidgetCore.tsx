@@ -15,16 +15,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useContext } from 'react';
 import styled from 'styled-components/macro';
+import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { WidgetMapper } from '../../WidgetMapper/WidgetMapper';
+import { WidgetWrapProvider } from '../../WidgetProvider/WidgetWrapProvider';
 
-export const ImageWidgetCore: React.FC<{}> = () => {
-  return <Wrapper></Wrapper>;
+export const GroupWidgetCore: React.FC<{ widgetIds: string[] }> = ({
+  widgetIds,
+}) => {
+  const { editing, boardId } = useContext(BoardContext);
+  return (
+    <>
+      {widgetIds.map(wid => {
+        return (
+          <Wrapper>
+            <WidgetWrapProvider
+              id={wid}
+              boardEditing={editing}
+              boardId={boardId}
+            >
+              <MapWrapper>
+                <WidgetMapper boardEditing={editing} hideTitle={false} />
+              </MapWrapper>
+            </WidgetWrapProvider>
+          </Wrapper>
+        );
+      })}
+    </>
+  );
 };
 
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  height: 100%;
+`;
+const MapWrapper = styled.div`
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
   width: 100%;
   height: 100%;
 `;

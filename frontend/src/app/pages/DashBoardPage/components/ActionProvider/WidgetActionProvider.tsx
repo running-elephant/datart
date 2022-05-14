@@ -36,7 +36,7 @@ import {
   widgetsQueryAction,
 } from '../../pages/Board/slice/asyncActions';
 import { renderedWidgetAsync } from '../../pages/Board/slice/thunk';
-import { VizRenderMode } from '../../pages/Board/slice/types';
+import { BoardType, VizRenderMode } from '../../pages/Board/slice/types';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
@@ -62,195 +62,204 @@ export const WidgetActionProvider: FC<{
   boardId: string;
   boardEditing: boolean;
   renderMode: VizRenderMode;
-}> = memo(({ boardEditing, boardId, orgId, renderMode, children }) => {
-  const dispatch = useDispatch();
-  const history = useHistory<any>();
-  const methods = useMemo(() => {
-    const contextValue: WidgetActionContextProps = {
-      onEditLayerToTop: () => {
-        dispatch(widgetsToPositionAction('top'));
-      },
-      onEditLayerToBottom: () => {
-        dispatch(widgetsToPositionAction('bottom'));
-      },
-      onEditCopyWidgets: (ids?: string[]) => {
-        dispatch(copyWidgetsAction());
-      },
-      onEditPasteWidgets: () => {
-        dispatch(pasteWidgetsAction());
-      },
-      onEditDeleteActiveWidgets: debounce((ids?: string[]) => {
-        dispatch(deleteWidgetsAction(ids));
-      }, 200),
-      onRenderedWidgetById: (wid: string) => {
-        if (boardEditing) {
+  boardType: BoardType;
+}> = memo(
+  ({ boardEditing, boardId, orgId, boardType, renderMode, children }) => {
+    const dispatch = useDispatch();
+    const history = useHistory<any>();
+    const methods = useMemo(() => {
+      const contextValue: WidgetActionContextProps = {
+        onEditLayerToTop: () => {
+          dispatch(widgetsToPositionAction('top'));
+        },
+        onEditLayerToBottom: () => {
+          dispatch(widgetsToPositionAction('bottom'));
+        },
+        onEditCopyWidgets: (ids?: string[]) => {
+          dispatch(copyWidgetsAction());
+        },
+        onEditPasteWidgets: () => {
+          dispatch(pasteWidgetsAction());
+        },
+        onEditDeleteActiveWidgets: debounce((ids?: string[]) => {
+          dispatch(deleteWidgetsAction(ids));
+        }, 200),
+        onRenderedWidgetById: (wid: string) => {
+          if (boardEditing) {
+            dispatch(
+              renderedEditWidgetAsync({ boardId: boardId, widgetId: wid }),
+            );
+          } else {
+            dispatch(
+              renderedWidgetAsync({
+                boardId: boardId,
+                widgetId: wid,
+                renderMode: renderMode,
+              }),
+            );
+          }
+        },
+        onEditClearActiveWidgets: () => {
+          dispatch(clearActiveWidgets());
+        },
+        onWidgetsQuery: debounce(() => {
+          if (boardEditing) {
+            dispatch(editWidgetsQueryAction());
+          } else {
+            dispatch(widgetsQueryAction({ boardId, renderMode }));
+          }
+        }, 500),
+        onWidgetsReset: debounce(() => {
+          if (boardEditing) {
+            return;
+          } else {
+            dispatch(resetControllerAction({ boardId, renderMode }));
+          }
+        }, 500),
+        onRefreshWidgetsByController: debounce((widget: Widget) => {
+          dispatch(refreshWidgetsByControllerAction(renderMode, widget));
+        }, 500),
+        onUpdateWidgetConfig: (config: WidgetConf, wid: string) => {
+          dispatch(editBoardStackActions.updateWidgetConfig({ wid, config }));
+        },
+        onUpdateWidgetConfigByKey: ops => {
+          if (boardEditing) {
+            dispatch(editBoardStackActions.updateWidgetConfigByKey(ops));
+          } else {
+            dispatch(boardActions.updateWidgetConfigByKey({ ...ops, boardId }));
+          }
+          dispatch(editBoardStackActions.updateWidgetConfigByKey(ops));
+        },
+
+        onWidgetUpdate: (widget: Widget) => {
+          if (boardEditing) {
+            dispatch(editBoardStackActions.updateWidget(widget));
+          } else {
+            dispatch(boardActions.updateWidget(widget));
+          }
+        },
+        //
+        onWidgetChartClick: (widget: Widget, params: ChartMouseEventParams) => {
           dispatch(
-            renderedEditWidgetAsync({ boardId: boardId, widgetId: wid }),
-          );
-        } else {
-          dispatch(
-            renderedWidgetAsync({
-              boardId: boardId,
-              widgetId: wid,
-              renderMode: renderMode,
+            widgetChartClickAction({
+              boardId,
+              editing: boardEditing,
+              renderMode,
+              widget,
+              params,
+              history,
             }),
           );
-        }
-      },
-      onEditClearActiveWidgets: () => {
-        dispatch(clearActiveWidgets());
-      },
-      onWidgetsQuery: debounce(() => {
-        if (boardEditing) {
-          dispatch(editWidgetsQueryAction());
-        } else {
-          dispatch(widgetsQueryAction({ boardId, renderMode }));
-        }
-      }, 500),
-      onWidgetsReset: debounce(() => {
-        if (boardEditing) {
-          return;
-        } else {
-          dispatch(resetControllerAction({ boardId, renderMode }));
-        }
-      }, 500),
-      onRefreshWidgetsByController: debounce((widget: Widget) => {
-        dispatch(refreshWidgetsByControllerAction(renderMode, widget));
-      }, 500),
-      onUpdateWidgetConfig: (config: WidgetConf, wid: string) => {
-        dispatch(editBoardStackActions.updateWidgetConfig({ wid, config }));
-      },
-      onUpdateWidgetConfigByKey: ops => {
-        if (boardEditing) {
-          dispatch(editBoardStackActions.updateWidgetConfigByKey(ops));
-        } else {
-          dispatch(boardActions.updateWidgetConfigByKey({ ...ops, boardId }));
-        }
-        dispatch(editBoardStackActions.updateWidgetConfigByKey(ops));
-      },
+        },
 
-      onWidgetUpdate: (widget: Widget) => {
-        if (boardEditing) {
-          dispatch(editBoardStackActions.updateWidget(widget));
-        } else {
-          dispatch(boardActions.updateWidget(widget));
-        }
-      },
-      //
-      onWidgetChartClick: (widget: Widget, params: ChartMouseEventParams) => {
-        dispatch(
-          widgetChartClickAction({
-            boardId,
-            editing: boardEditing,
-            renderMode,
-            widget,
-            params,
-            history,
-          }),
-        );
-      },
+        onWidgetClearLinkage: (widget: Widget) => {
+          dispatch(
+            widgetToClearLinkageAction(boardEditing, widget, renderMode),
+          );
+        },
+        onWidgetFullScreen: (itemId: string) => {
+          dispatch(
+            boardActions.updateFullScreenPanel({
+              boardId,
+              itemId,
+            }),
+          );
+        },
+        onWidgetGetData: (widget: Widget) => {
+          dispatch(widgetGetDataAction(boardEditing, widget, renderMode));
+        },
 
-      onWidgetClearLinkage: (widget: Widget) => {
-        dispatch(widgetToClearLinkageAction(boardEditing, widget, renderMode));
-      },
-      onWidgetFullScreen: (itemId: string) => {
-        dispatch(
-          boardActions.updateFullScreenPanel({
-            boardId,
-            itemId,
-          }),
-        );
-      },
-      onWidgetGetData: (widget: Widget) => {
-        dispatch(widgetGetDataAction(boardEditing, widget, renderMode));
-      },
+        onEditChartWidget: (widget: Widget) => {
+          const originalType = widget.config.originalType;
+          const chartType =
+            originalType === ORIGINAL_TYPE_MAP.ownedChart
+              ? 'widgetChart'
+              : 'dataChart';
+          dispatch(
+            editChartInWidgetAction({
+              orgId,
+              widgetId: widget.id,
+              chartName: widget.config.name,
+              dataChartId: widget.datachartId,
+              chartType: chartType,
+            }),
+          );
+        },
+        onEditMediaWidget: (id: string) => {
+          dispatch(editWidgetInfoActions.openWidgetEditing({ id }));
+        },
+        onEditContainerWidget: (id: string) => {
+          dispatch(editWidgetInfoActions.openWidgetEditing({ id }));
+          dispatch(editDashBoardInfoActions.changeShowBlockMask(false));
+        },
+        onEditControllerWidget: (widget: Widget) => {
+          dispatch(
+            editDashBoardInfoActions.changeControllerPanel({
+              type: 'edit',
+              widgetId: widget.id,
+              controllerType: widget.config.content
+                .type as ControllerFacadeTypes,
+            }),
+          );
+        },
+        onEditWidgetLinkage: (widgetId: string) => {
+          dispatch(
+            editDashBoardInfoActions.changeLinkagePanel({
+              type: 'add',
+              widgetId,
+            }),
+          );
+        },
+        onEditWidgetJump: (widgetId: string) => {
+          dispatch(
+            editDashBoardInfoActions.changeJumpPanel({
+              visible: true,
+              widgetId,
+            }),
+          );
+        },
+        onEditWidgetCloseLinkage: (widget: Widget) => {
+          dispatch(closeLinkageAction(widget));
+        },
+        onEditWidgetCloseJump: (widget: Widget) => {
+          dispatch(closeJumpAction(widget));
+        },
+        onEditWidgetLock: (id: string) => {
+          dispatch(editBoardStackActions.toggleLockWidget({ id, lock: true }));
+        },
+        onEditWidgetUnLock: (id: string) => {
+          dispatch(editBoardStackActions.toggleLockWidget({ id, lock: false }));
+        },
+        onWidgetDataUpdate: ({ computedFields, payload, widgetId }) => {
+          dispatch(
+            boardActions.updateDataChartGroup({
+              id: widgetId,
+              payload,
+            }),
+          );
 
-      onEditChartWidget: (widget: Widget) => {
-        const originalType = widget.config.originalType;
-        const chartType =
-          originalType === ORIGINAL_TYPE_MAP.ownedChart
-            ? 'widgetChart'
-            : 'dataChart';
-        dispatch(
-          editChartInWidgetAction({
-            orgId,
-            widgetId: widget.id,
-            chartName: widget.config.name,
-            dataChartId: widget.datachartId,
-            chartType: chartType,
-          }),
-        );
-      },
-      onEditMediaWidget: (id: string) => {
-        dispatch(editWidgetInfoActions.openWidgetEditing({ id }));
-      },
-      onEditContainerWidget: (id: string) => {
-        dispatch(editWidgetInfoActions.openWidgetEditing({ id }));
-        dispatch(editDashBoardInfoActions.changeShowBlockMask(false));
-      },
-      onEditControllerWidget: (widget: Widget) => {
-        dispatch(
-          editDashBoardInfoActions.changeControllerPanel({
-            type: 'edit',
-            widgetId: widget.id,
-            controllerType: widget.config.content.type as ControllerFacadeTypes,
-          }),
-        );
-      },
-      onEditWidgetLinkage: (widgetId: string) => {
-        dispatch(
-          editDashBoardInfoActions.changeLinkagePanel({
-            type: 'add',
-            widgetId,
-          }),
-        );
-      },
-      onEditWidgetJump: (widgetId: string) => {
-        dispatch(
-          editDashBoardInfoActions.changeJumpPanel({ visible: true, widgetId }),
-        );
-      },
-      onEditWidgetCloseLinkage: (widget: Widget) => {
-        dispatch(closeLinkageAction(widget));
-      },
-      onEditWidgetCloseJump: (widget: Widget) => {
-        dispatch(closeJumpAction(widget));
-      },
-      onEditWidgetLock: (id: string) => {
-        dispatch(editBoardStackActions.toggleLockWidget({ id, lock: true }));
-      },
-      onEditWidgetUnLock: (id: string) => {
-        dispatch(editBoardStackActions.toggleLockWidget({ id, lock: false }));
-      },
-      onWidgetDataUpdate: ({ computedFields, payload, widgetId }) => {
-        dispatch(
-          boardActions.updateDataChartGroup({
-            id: widgetId,
-            payload,
-          }),
-        );
+          dispatch(
+            boardActions.updateDataChartComputedFields({
+              id: widgetId,
+              computedFields,
+            }),
+          );
+        },
+        onEditComposeGroup: () => {
+          dispatch(onComposeGroupAction(boardType));
+        },
+      };
+      return contextValue;
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [boardEditing, boardId, boardType, dispatch, orgId, renderMode]);
 
-        dispatch(
-          boardActions.updateDataChartComputedFields({
-            id: widgetId,
-            computedFields,
-          }),
-        );
-      },
-      onEditComposeGroup: () => {
-        dispatch(onComposeGroupAction());
-      },
-    };
-    return contextValue;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [boardEditing, boardId, dispatch, orgId, renderMode]);
-
-  return (
-    <WidgetActionContext.Provider value={methods}>
-      {children}
-    </WidgetActionContext.Provider>
-  );
-});
+    return (
+      <WidgetActionContext.Provider value={methods}>
+        {children}
+      </WidgetActionContext.Provider>
+    );
+  },
+);
 export interface WidgetActionContextProps {
   // all
   onWidgetChartClick: (widget: Widget, params: ChartMouseEventParams) => void;

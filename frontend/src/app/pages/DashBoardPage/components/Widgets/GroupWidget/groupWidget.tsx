@@ -18,26 +18,25 @@
 import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { memo, useContext } from 'react';
+import styled from 'styled-components/macro';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
 import { WidgetDropdownList } from '../../WidgetComponents/WidgetDropdownList';
-import { getWidgetTitle } from '../../WidgetManager/utils/utils';
+import { GroupWidgetCore } from './groupWidgetCore';
 
 export const GroupWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const { editing } = useContext(BoardContext);
-  const title = getWidgetTitle(widget.config.customConfig.props);
-  title.title = widget.config.name;
 
   return (
-    <div>
+    <StyleWrapper>
       <div style={ZIndexStyle}>
         <div style={FlexStyle}>
           123456 group
-          {/* <GroupWidgetCore /> */}
+          <GroupWidgetCore widgetIds={widget.config.children || []} />
         </div>
       </div>
       {editing && <EditMask />}
@@ -51,6 +50,13 @@ export const GroupWidget: React.FC<{}> = memo(() => {
           <WidgetDropdownList widget={widget} />
         </Space>
       </StyledWidgetToolBar>
-    </div>
+    </StyleWrapper>
   );
 });
+const StyleWrapper = styled.div`
+  flex: 1;
+  background-color: pink;
+  &:hover .widget-tool-dropdown {
+    visibility: visible;
+  }
+`;

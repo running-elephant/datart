@@ -45,10 +45,9 @@ const widgetMeta = getMeta({
 export type OwnedChartToolkit = WidgetToolkit & {};
 const widgetToolkit: OwnedChartToolkit = {
   create: opt => {
-    const widget = dataChartCreator({
-      ...opt,
-      originalType: widgetMeta.originalType,
-    });
+    const widget = dataChartCreator(opt);
+    widget.config.originalType = ORIGINAL_TYPE_MAP.ownedChart;
+    widget.id = widget.config.originalType + widget.id;
     return widget;
   },
   getName(key) {

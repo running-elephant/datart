@@ -85,6 +85,7 @@ export const BoardInitProvider: FC<BoardInitContextProps> = memo(
           boardEditing={editing}
           renderMode={renderMode}
           orgId={board.orgId}
+          boardType={board.config.type}
         >
           <BoardProvider {...boardContextProps}>
             <BoardConfigProvider config={board.config} boardId={board.id}>

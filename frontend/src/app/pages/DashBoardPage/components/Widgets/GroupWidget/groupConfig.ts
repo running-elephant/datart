@@ -43,7 +43,7 @@ const NameI18N = {
 export const widgetMeta: WidgetMeta = {
   icon: 'group',
   originalType: ORIGINAL_TYPE_MAP.group,
-  canWrapped: false, // TODO
+  canWrapped: true, // TODO
   controllable: false,
   linkable: false,
   singleton: false,
@@ -102,6 +102,7 @@ export const widgetToolkit: GroupToolkit = {
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'group';
     widget.config.name = opt.name || '';
+    widget.config.children = opt.children;
     if (opt.boardType === 'auto') {
       const rect: RectConfig = {
         x: 0,

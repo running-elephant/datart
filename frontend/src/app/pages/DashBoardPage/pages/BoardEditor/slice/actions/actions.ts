@@ -20,6 +20,7 @@ import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
+  BoardType,
   Dashboard,
   DataChart,
   TabWidgetContent,
@@ -42,7 +43,7 @@ import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { ORIGINAL_TYPE_MAP } from '../../../../constants';
 import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
-import { getEditChartWidgetDataAsync } from '../thunk';
+import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from '../thunk';
 import { EditBoardState, HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
 
@@ -319,24 +320,21 @@ export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
     }),
   );
 };
-export const onComposeGroupAction = (wid?: string) => (dispatch, getState) => {
-  const rootState = getState() as RootState;
-  const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
-  const stackState = editBoardState.stack.present;
-  const widgetInfos = Object.values(editBoardState.widgetInfoRecord || {});
-  let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);
-  wid && selectedIds.push(wid);
-  selectedIds = [...new Set(selectedIds)];
-  // dashboardId: string;
-  // name?: string;
-  // boardType?: BoardType;
-  // datachartId?: string;
-  // relations?: Relation[];
-  // content?: any;
-  // viewIds?: string[];
-  // parentId?: string;
-  widgetManager.toolkit(ORIGINAL_TYPE_MAP.group).create({});
-};
+export const onComposeGroupAction =
+  (boardType: BoardType, wid?: string) => (dispatch, getState) => {
+    const rootState = getState() as RootState;
+    const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
+    const stackState = editBoardState.stack.present;
+    const widgetInfos = Object.values(editBoardState.widgetInfoRecord || {});
+    let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);
+    wid && selectedIds.push(wid);
+    selectedIds = [...new Set(selectedIds)];
+    let group = widgetManager.toolkit(ORIGINAL_TYPE_MAP.group).create({
+      boardType,
+      children: selectedIds,
+    });
+    dispatch(addWidgetsToEditBoard([group]));
+  };
 export const addVariablesToBoard =
   (variables: Variable[]) => (dispatch, getState) => {
     if (!variables?.length) return;

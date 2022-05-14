@@ -45,10 +45,9 @@ export const widgetMeta = getMeta({
 
 export const linkedChartToolkit: WidgetToolkit = {
   create: opt => {
-    const widget = dataChartCreator({
-      ...opt,
-      originalType: widgetMeta.originalType,
-    });
+    const widget = dataChartCreator(opt);
+    widget.config.originalType = ORIGINAL_TYPE_MAP.linkedChart;
+    widget.id = widget.config.originalType + widget.id;
     return widget;
   },
   getName(key) {

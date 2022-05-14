@@ -62,10 +62,9 @@ export interface WidgetCreateProps {
   content?: any;
   viewIds?: string[];
   parentId?: string;
+  children?: string[];
 }
-export type WidgetTplProps = WidgetCreateProps & {
-  originalType: string;
-};
+
 export interface WidgetToolkit {
   create: (T: WidgetCreateProps) => Widget;
   getName: (local?: string) => string;

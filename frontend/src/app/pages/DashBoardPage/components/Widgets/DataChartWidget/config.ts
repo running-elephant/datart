@@ -18,8 +18,8 @@
 
 import {
   Widget,
+  WidgetCreateProps,
   WidgetMeta,
-  WidgetTplProps,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import widgetManagerInstance from '../../WidgetManager';
 import {
@@ -135,14 +135,13 @@ export const getMeta = (opt: {
   return meta;
 };
 
-export const dataChartCreator = (opt: WidgetTplProps) => {
+export const dataChartCreator = (opt: WidgetCreateProps) => {
   const widget = widgetTpl();
-  widget.id = opt.originalType + widget.id;
   widget.parentId = opt.parentId || '';
   widget.datachartId = opt.datachartId || '';
   widget.viewIds = opt.viewIds || [];
   widget.relations = opt.relations || [];
-  widget.config.originalType = opt.originalType;
+
   widget.config.type = 'chart';
 
   widget.config.content.dataChart = opt.content; // DataChart
