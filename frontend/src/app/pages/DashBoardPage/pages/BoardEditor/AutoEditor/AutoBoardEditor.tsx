@@ -27,6 +27,7 @@ import {
   WIDGET_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
 import useBoardScroll from 'app/pages/DashBoardPage/hooks/useBoardScroll';
+import useEditAutoLayoutMap from 'app/pages/DashBoardPage/hooks/useEditAutoLayoutMap';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
 import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getBoardMarginPadding } from 'app/pages/DashBoardPage/utils/board';
@@ -42,7 +43,7 @@ import {
 } from 'react';
 import RGL, { Layout, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
 import {
@@ -54,7 +55,6 @@ import {
 import StyledBackground from '../../Board/components/StyledBackground';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
-import { selectLayoutWidgetMap } from '../slice/selectors';
 import { WidgetOfAutoEditor } from './WidgetOfAutoEditor';
 
 const ReactGridLayout = WidthProvider(RGL);
@@ -66,8 +66,6 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const { background, allowOverlap } = boardConfig;
   const { deviceType } = useContext(BoardInfoContext);
 
-  const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
-  const layoutMap = useGridLayoutMap(layoutWidgetMap);
   const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
 
   const { curMargin, curPadding } = useMemo(() => {
@@ -87,14 +85,8 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     });
   }, []);
 
-  const sortedLayoutWidgets = useMemo(
-    () =>
-      Object.values(layoutWidgetMap).sort(
-        (a, b) => a.config.index - b.config.index,
-      ),
-
-    [layoutWidgetMap],
-  );
+  const sortedLayoutWidgets = useEditAutoLayoutMap(boardId);
+  const layoutMap = useGridLayoutMap(sortedLayoutWidgets);
 
   const changeWidgetLayouts = debounce((layouts: Layout[]) => {
     dispatch(
