@@ -81,7 +81,7 @@ export function removeSomeObjectConfigByKey(
       } else {
         return {
           ...data,
-          key: obj?.[key],
+          [key]: obj?.[key],
         };
       }
     }, {})
