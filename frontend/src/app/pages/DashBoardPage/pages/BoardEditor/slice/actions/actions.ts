@@ -329,11 +329,18 @@ export const onComposeGroupAction =
     let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);
     wid && selectedIds.push(wid);
     selectedIds = [...new Set(selectedIds)];
-    let group = widgetManager.toolkit(ORIGINAL_TYPE_MAP.group).create({
+    let groupWidget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.group).create({
       boardType,
       children: selectedIds,
     });
-    dispatch(addWidgetsToEditBoard([group]));
+    dispatch(addWidgetsToEditBoard([groupWidget]));
+    dispatch(
+      editBoardStackActions.changeWidgetsParentId({
+        wIds: selectedIds,
+        parentId: groupWidget.id,
+      }),
+    );
+    // changeWidgetsParentId
   };
 export const addVariablesToBoard =
   (variables: Variable[]) => (dispatch, getState) => {

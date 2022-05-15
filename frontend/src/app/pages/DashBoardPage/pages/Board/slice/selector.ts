@@ -80,7 +80,7 @@ export const selectLayoutWidgetMapById = () =>
     if (!widgetRecord[id]) return DefaultObject;
     const allWidgetMap = widgetRecord[id];
     const layoutWidgets = getLayoutWidgets(allWidgetMap);
-    const LayoutWidgetMap: Record<string, Widget> = DefaultObject;
+    const LayoutWidgetMap: Record<string, Widget> = {};
     layoutWidgets.forEach(w => {
       LayoutWidgetMap[w.id] = allWidgetMap[w.id];
     });

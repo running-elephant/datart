@@ -118,6 +118,17 @@ export const editBoardStackSlice = createSlice({
         state.widgetRecord[id].config.lock = lock;
       }
     },
+    changeWidgetsParentId(
+      state,
+      action: PayloadAction<{ wIds: string[]; parentId: string }>,
+    ) {
+      const { wIds, parentId } = action.payload;
+      wIds.forEach(wid => {
+        if (state.widgetRecord?.[wid]?.config) {
+          state.widgetRecord[wid].parentId = parentId;
+        }
+      });
+    },
     deleteWidgets(state, action: PayloadAction<string[]>) {
       const ids = action.payload;
       if (!ids?.length) return;
@@ -125,6 +136,7 @@ export const editBoardStackSlice = createSlice({
         delete state.widgetRecord[id];
       });
     },
+
     updateWidget(state, action: PayloadAction<Widget>) {
       const widget = action.payload;
       state.widgetRecord[widget.id] = widget;
