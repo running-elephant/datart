@@ -40,6 +40,8 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     );
     const [rules, setRules] = useState<InteractionRule[]>([]);
 
+    console.log('rules ----> ', rules);
+
     const handleDrillThroughEventChange = e => {
       const event = e.target.value;
       setDrillThroughEvent(event);

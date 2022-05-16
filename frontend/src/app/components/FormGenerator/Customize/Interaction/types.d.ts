@@ -18,16 +18,18 @@
 
 import { InteractionAction, InteractionCategory } from '../../constants';
 
+export type JumpToChartRule = {
+  view: string;
+  relation: InteractionFieldRelation;
+  [InteractionFieldRelation.Customize]: any[];
+};
+
 export type InteractionRule = {
   id: string;
   category?: InteractionCategory;
   action?: InteractionAction;
 
-  [InteractionCategory.JumpToChart]?: {
-    view: string;
-    relation: InteractionFieldRelation;
-    [InteractionFieldRelation.Customize]: any[];
-  };
+  [InteractionCategory.JumpToChart]?: JumpToChartRule;
   [InteractionCategory.JumpToDashboard]?: any;
   [InteractionCategory.JumpToUrl]?: any;
 };

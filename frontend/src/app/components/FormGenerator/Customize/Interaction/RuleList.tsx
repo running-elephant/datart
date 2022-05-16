@@ -80,9 +80,15 @@ const RuleList: FC<{
       title: t('drillThrough.rule.header.relation'),
       dataIndex: 'relation',
       key: 'relation',
-      render: (value, record) => {
+      render: (_, record) => {
+        if (!record.category) {
+          return <></>;
+        }
         const props = {
           translate: t,
+          value: record?.[record.category],
+          onValueChange: value =>
+            onRuleChange(record.id, record.category, value),
         };
         switch (record.category) {
           case InteractionCategory.JumpToChart:
