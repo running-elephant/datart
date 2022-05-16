@@ -19,24 +19,34 @@
 import { Button, Select, Space } from 'antd';
 import { FC, memo } from 'react';
 import { InteractionFieldRelation } from '../../constants';
-import { I18nTransator, JumpToChartRule } from './types';
+import { I18nTransator, JumpToChartRule, VizType } from './types';
 
 const JumpToChart: FC<
   {
+    vizs: VizType[];
     value?: JumpToChartRule;
     onValueChange: (value) => void;
   } & I18nTransator
-> = memo(({ value, onValueChange, translate: t }) => {
+> = memo(({ vizs, value, onValueChange, translate: t }) => {
+  const getRelatedCharts = () => vizs?.filter(v => v.relType === 'DATACHART');
+
   return (
     <Space>
       <Select
+        value={value?.relId}
         placeholder={t('drillThrough.rule.reference.title')}
-        onChange={view => onValueChange({ ...value, ...{ view } })}
+        onChange={relId => onValueChange({ ...value, ...{ relId } })}
       >
-        <Select.Option value="table-1">Table A</Select.Option>
-        <Select.Option value="table-2">Table B</Select.Option>
+        {getRelatedCharts().map(c => {
+          return (
+            <Select.Option key={c.relId} value={c.relId}>
+              {c.name}
+            </Select.Option>
+          );
+        })}
       </Select>
       <Select
+        value={value?.relation}
         placeholder={t('drillThrough.rule.relation.title')}
         onChange={relation => onValueChange({ ...value, ...{ relation } })}
       >
@@ -47,7 +57,12 @@ const JumpToChart: FC<
           {t('drillThrough.rule.relation.customize')}
         </Select.Option>
       </Select>
-      <Button type="link">{t('drillThrough.rule.relation.setting')}</Button>
+      <Button
+        disabled={value?.relation === InteractionFieldRelation.Auto}
+        type="link"
+      >
+        {t('drillThrough.rule.relation.setting')}
+      </Button>
     </Space>
   );
 });

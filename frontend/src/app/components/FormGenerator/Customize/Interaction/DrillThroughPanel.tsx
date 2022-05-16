@@ -17,8 +17,10 @@
  */
 
 import { Button, Form, Radio, Space } from 'antd';
+import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
 import { InteractionMouseEvent } from '../../constants';
@@ -35,12 +37,11 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     dataConfigs,
     onChange,
   }) => {
+    const vizs = useSelector(selectVizs);
     const [drillThroughEvent, setDrillThroughEvent] = useState(
       data.value?.event,
     );
     const [rules, setRules] = useState<InteractionRule[]>([]);
-
-    console.log('rules ----> ', rules);
 
     const handleDrillThroughEventChange = e => {
       const event = e.target.value;
@@ -98,10 +99,11 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
               {t('drillThrough.rule.addRule')}
             </Button>
             <RuleList
-              translate={t}
+              vizs={vizs}
               rules={rules}
               onRuleChange={handleUpdateRule}
               onDeleteRule={handleDeleteRule}
+              translate={t}
             />
           </Form.Item>
         </Form>

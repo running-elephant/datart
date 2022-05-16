@@ -18,12 +18,18 @@
 
 import { InteractionAction, InteractionCategory } from '../../constants';
 
+export type VizType = {
+  relId: string;
+  name: string;
+  relType: string;
+};
+
 export type I18nTransator = {
   translate: (title: string, disablePrefix?: boolean, options?: any) => string;
 };
 
 export type JumpToChartRule = {
-  view: string;
+  relId: string;
   relation: InteractionFieldRelation;
   [InteractionFieldRelation.Customize]: any[];
 };

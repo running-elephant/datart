@@ -23,15 +23,16 @@ import { InteractionAction, InteractionCategory } from '../../constants';
 import JumpToChart from './JumpToChart';
 import JumpToDashboard from './JumpToDashboard';
 import JumpToUrl from './JumpToUrl';
-import { I18nTransator, InteractionRule } from './types';
+import { I18nTransator, InteractionRule, VizType } from './types';
 
 const RuleList: FC<
   {
     rules: InteractionRule[];
+    vizs: VizType[];
     onRuleChange: (id, prop, value) => void;
     onDeleteRule: (id) => void;
   } & I18nTransator
-> = ({ rules, onRuleChange, onDeleteRule, translate: t }) => {
+> = ({ rules, vizs, onRuleChange, onDeleteRule, translate: t }) => {
   const columns: ColumnsType<InteractionRule> = [
     {
       title: t('drillThrough.rule.header.category'),
@@ -87,6 +88,7 @@ const RuleList: FC<
         }
         const props = {
           translate: t,
+          vizs: vizs,
           value: record?.[record.category],
           onValueChange: value =>
             onRuleChange(record.id, record.category, value),
