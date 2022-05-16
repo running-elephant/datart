@@ -19,15 +19,15 @@
 import { Button, Input, Space } from 'antd';
 import { FC, memo } from 'react';
 
-const JumpToUrl: FC<{
-  translate?: (title: string, disablePrefix?: boolean, options?: any) => string;
-}> = memo(({ translate: t = title => title }) => {
-  return (
-    <Space>
-      <Input />
-      <Button type="link">{t('drillThrough.rule.relation.setting')}</Button>
-    </Space>
-  );
-});
+const JumpToUrl: FC<{} & I18nTransator> = memo(
+  ({ translate: t = title => title }) => {
+    return (
+      <Space>
+        <Input />
+        <Button type="link">{t('drillThrough.rule.relation.setting')}</Button>
+      </Space>
+    );
+  },
+);
 
 export default JumpToUrl;

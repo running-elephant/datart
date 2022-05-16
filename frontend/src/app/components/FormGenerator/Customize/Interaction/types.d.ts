@@ -18,6 +18,10 @@
 
 import { InteractionAction, InteractionCategory } from '../../constants';
 
+export type I18nTransator = {
+  translate: (title: string, disablePrefix?: boolean, options?: any) => string;
+};
+
 export type JumpToChartRule = {
   view: string;
   relation: InteractionFieldRelation;

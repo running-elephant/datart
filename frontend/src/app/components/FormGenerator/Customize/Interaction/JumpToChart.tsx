@@ -19,18 +19,19 @@
 import { Button, Select, Space } from 'antd';
 import { FC, memo } from 'react';
 import { InteractionFieldRelation } from '../../constants';
-import { JumpToChartRule } from './types';
+import { I18nTransator, JumpToChartRule } from './types';
 
-const JumpToChart: FC<{
-  value?: JumpToChartRule;
-  onValueChange: (value) => void;
-  translate?: (title: string, disablePrefix?: boolean, options?: any) => string;
-}> = memo(({ value, onValueChange, translate: t = title => title }) => {
+const JumpToChart: FC<
+  {
+    value?: JumpToChartRule;
+    onValueChange: (value) => void;
+  } & I18nTransator
+> = memo(({ value, onValueChange, translate: t }) => {
   return (
     <Space>
       <Select
         placeholder={t('drillThrough.rule.reference.title')}
-        onChange={viewId => onValueChange({ ...value, ...{ view: viewId } })}
+        onChange={view => onValueChange({ ...value, ...{ view } })}
       >
         <Select.Option value="table-1">Table A</Select.Option>
         <Select.Option value="table-2">Table B</Select.Option>

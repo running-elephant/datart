@@ -23,14 +23,15 @@ import { InteractionAction, InteractionCategory } from '../../constants';
 import JumpToChart from './JumpToChart';
 import JumpToDashboard from './JumpToDashboard';
 import JumpToUrl from './JumpToUrl';
-import { InteractionRule } from './types';
+import { I18nTransator, InteractionRule } from './types';
 
-const RuleList: FC<{
-  rules: InteractionRule[];
-  onRuleChange: (id, prop, value) => void;
-  onDeleteRule: (id) => void;
-  translate?: (title: string, disablePrefix?: boolean, options?: any) => string;
-}> = ({ rules, onRuleChange, onDeleteRule, translate: t = title => title }) => {
+const RuleList: FC<
+  {
+    rules: InteractionRule[];
+    onRuleChange: (id, prop, value) => void;
+    onDeleteRule: (id) => void;
+  } & I18nTransator
+> = ({ rules, onRuleChange, onDeleteRule, translate: t }) => {
   const columns: ColumnsType<InteractionRule> = [
     {
       title: t('drillThrough.rule.header.category'),

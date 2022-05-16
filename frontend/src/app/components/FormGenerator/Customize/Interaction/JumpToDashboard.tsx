@@ -18,22 +18,23 @@
 
 import { Button, Select, Space } from 'antd';
 import { FC, memo } from 'react';
+import { I18nTransator } from './types';
 
-const JumpToDashboard: FC<{
-  translate?: (title: string, disablePrefix?: boolean, options?: any) => string;
-}> = memo(({ translate: t = title => title }) => {
-  return (
-    <Space>
-      <Select
-        placeholder={t('drillThrough.rule.reference.title')}
-        // onChange={handleChange}
-      >
-        <Select.Option value="table-1">Table A</Select.Option>
-        <Select.Option value="table-2">Table B</Select.Option>
-      </Select>
-      <Button type="link">{t('drillThrough.rule.relation.setting')}</Button>
-    </Space>
-  );
-});
+const JumpToDashboard: FC<{} & I18nTransator> = memo(
+  ({ translate: t = title => title }) => {
+    return (
+      <Space>
+        <Select
+          placeholder={t('drillThrough.rule.reference.title')}
+          // onChange={handleChange}
+        >
+          <Select.Option value="table-1">Table A</Select.Option>
+          <Select.Option value="table-2">Table B</Select.Option>
+        </Select>
+        <Button type="link">{t('drillThrough.rule.relation.setting')}</Button>
+      </Space>
+    );
+  },
+);
 
 export default JumpToDashboard;
