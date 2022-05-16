@@ -16,27 +16,17 @@
  * limitations under the License.
  */
 
-import { Button, Col, Select } from 'antd';
+import { Button, Input, Space } from 'antd';
 import { FC, memo } from 'react';
 
 const JumpToUrl: FC<{
   translate?: (title: string, disablePrefix?: boolean, options?: any) => string;
 }> = memo(({ translate: t = title => title }) => {
   return (
-    <>
-      <Col>
-        <Select
-          placeholder={t('drillThrough.rule.reference.title')}
-          // onChange={handleChange}
-        >
-          <Select.Option value="table-1">Table A</Select.Option>
-          <Select.Option value="table-2">Table B</Select.Option>
-        </Select>
-      </Col>
-      <Col>
-        <Button type="link">{t('drillThrough.rule.relation.setting')}</Button>
-      </Col>
-    </>
+    <Space>
+      <Input />
+      <Button type="link">{t('drillThrough.rule.relation.setting')}</Button>
+    </Space>
   );
 });
 

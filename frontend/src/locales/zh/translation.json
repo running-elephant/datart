@@ -762,6 +762,12 @@
           "rule": {
             "title": "规则设置",
             "addRule": "+ 点击新建",
+            "header": {
+              "category": "类型",
+              "open": "打开方式",
+              "relation": "关系设置",
+              "operation": "操作"
+            },
             "category": {
               "title": "类型",
               "jumpToChart": "跳转到图表",
@@ -782,6 +788,9 @@
               "title": "字段关系",
               "auto": "自动",
               "customize": "自定义"
+            },
+            "operation": {
+              "delete": "删除"
             }
           }
         },

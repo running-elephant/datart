@@ -16,23 +16,32 @@
  * limitations under the License.
  */
 
-import { Select, Table } from 'antd';
+import { Button, Select, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { FC, memo } from 'react';
+import { FC } from 'react';
 import { InteractionAction, InteractionCategory } from '../../constants';
+import JumpToChart from './JumpToChart';
+import JumpToDashboard from './JumpToDashboard';
+import JumpToUrl from './JumpToUrl';
 import { InteractionRule } from './types';
 
 const RuleList: FC<{
   rules: InteractionRule[];
+  onRuleChange: (id, prop, value) => void;
+  onDeleteRule: (id) => void;
   translate?: (title: string, disablePrefix?: boolean, options?: any) => string;
-}> = memo(({ rules, translate: t = title => title }) => {
+}> = ({ rules, onRuleChange, onDeleteRule, translate: t = title => title }) => {
   const columns: ColumnsType<InteractionRule> = [
     {
-      title: t('drillThrough.rule.category.title'),
+      title: t('drillThrough.rule.header.category'),
       dataIndex: 'categroy',
       key: 'categroy',
-      render: value => (
-        <Select value={value}>
+      render: (value, record) => (
+        <Select
+          style={{ width: '150px' }}
+          defaultValue={value}
+          onChange={value => onRuleChange(record.id, 'category', value)}
+        >
           <Select.Option value={InteractionCategory.JumpToChart}>
             {t('drillThrough.rule.category.jumpToChart')}
           </Select.Option>
@@ -46,11 +55,15 @@ const RuleList: FC<{
       ),
     },
     {
-      title: t('drillThrough.rule.action.title'),
+      title: t('drillThrough.rule.header.open'),
       dataIndex: 'action',
       key: 'action',
-      render: value => (
-        <Select value={value}>
+      render: (value, record) => (
+        <Select
+          style={{ width: '150px' }}
+          defaultValue={value}
+          onChange={value => onRuleChange(record.id, 'action', value)}
+        >
           <Select.Option value={InteractionAction.Redirect}>
             {t('drillThrough.rule.action.redirect')}
           </Select.Option>
@@ -64,15 +77,46 @@ const RuleList: FC<{
       ),
     },
     {
-      title: 'Operation',
+      title: t('drillThrough.rule.header.relation'),
+      dataIndex: 'relation',
+      key: 'relation',
+      render: (value, record) => {
+        const props = {
+          translate: t,
+        };
+        switch (record.category) {
+          case InteractionCategory.JumpToChart:
+            return <JumpToChart {...props} />;
+          case InteractionCategory.JumpToDashboard:
+            return <JumpToDashboard {...props} />;
+          case InteractionCategory.JumpToUrl:
+            return <JumpToUrl {...props} />;
+          default:
+            return <></>;
+        }
+      },
+    },
+    {
+      title: t('drillThrough.rule.header.operation'),
       key: 'operation',
-      fixed: 'right',
-      width: 100,
-      render: () => <a>action</a>,
+      width: 50,
+      render: (_, record) => (
+        <Button type="link" onClick={() => onDeleteRule(record.id)}>
+          {t('drillThrough.rule.operation.delete')}
+        </Button>
+      ),
     },
   ];
 
-  return <Table columns={columns} dataSource={rules} />;
-});
+  return (
+    <Table
+      style={{ height: 400, overflow: 'auto' }}
+      rowKey="id"
+      columns={columns}
+      dataSource={rules}
+      pagination={{ hideOnSinglePage: true, pageSize: 5 }}
+    />
+  );
+};
 
 export default RuleList;

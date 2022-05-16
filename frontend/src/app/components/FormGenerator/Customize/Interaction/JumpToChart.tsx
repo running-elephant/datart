@@ -16,40 +16,34 @@
  * limitations under the License.
  */
 
-import { Button, Col, Select } from 'antd';
+import { Button, Select, Space } from 'antd';
 import { FC, memo } from 'react';
 
 const JumpToChart: FC<{
   translate?: (title: string, disablePrefix?: boolean, options?: any) => string;
 }> = memo(({ translate: t = title => title }) => {
   return (
-    <>
-      <Col>
-        <Select
-          placeholder={t('drillThrough.rule.reference.title')}
-          // onChange={handleChange}
-        >
-          <Select.Option value="table-1">Table A</Select.Option>
-          <Select.Option value="table-2">Table B</Select.Option>
-        </Select>
-      </Col>
-      <Col>
-        <Select
-          placeholder={t('drillThrough.rule.relation.title')}
-          // onChange={handleChange}
-        >
-          <Select.Option value="auto">
-            {t('drillThrough.rule.relation.auto')}
-          </Select.Option>
-          <Select.Option value="customize">
-            {t('drillThrough.rule.relation.customize')}
-          </Select.Option>
-        </Select>
-      </Col>
-      <Col>
-        <Button type="link">{t('drillThrough.rule.relation.setting')}</Button>
-      </Col>
-    </>
+    <Space>
+      <Select
+        placeholder={t('drillThrough.rule.reference.title')}
+        // onChange={handleChange}
+      >
+        <Select.Option value="table-1">Table A</Select.Option>
+        <Select.Option value="table-2">Table B</Select.Option>
+      </Select>
+      <Select
+        placeholder={t('drillThrough.rule.relation.title')}
+        // onChange={handleChange}
+      >
+        <Select.Option value="auto">
+          {t('drillThrough.rule.relation.auto')}
+        </Select.Option>
+        <Select.Option value="customize">
+          {t('drillThrough.rule.relation.customize')}
+        </Select.Option>
+      </Select>
+      <Button type="link">{t('drillThrough.rule.relation.setting')}</Button>
+    </Space>
   );
 });
 

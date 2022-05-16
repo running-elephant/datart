@@ -19,6 +19,7 @@
 import { InteractionAction, InteractionCategory } from '../../constants';
 
 export type InteractionRule = {
+  id: string;
   category?: InteractionCategory;
   action?: InteractionAction;
 

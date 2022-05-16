@@ -20,6 +20,7 @@ import { Button, Form, Radio, Space } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
+import { uuidv4 } from 'utils/utils';
 import { InteractionMouseEvent } from '../../constants';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
@@ -45,7 +46,26 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     };
 
     const handleAddRule = () => {
-      setRules((rules || []).concat([{}]));
+      setRules(
+        (rules || []).concat([
+          {
+            id: uuidv4(),
+          },
+        ]),
+      );
+    };
+
+    const handleDeleteRule = (id: string) => {
+      const newRules = rules?.filter(r => r.id !== id);
+      setRules(newRules);
+    };
+
+    const handleUpdateRule = (id: string, prop: string, value: any) => {
+      const currentRule = rules?.find(r => r.id === id);
+      if (currentRule) {
+        currentRule[prop] = value;
+        setRules([...rules]);
+      }
     };
 
     return (
@@ -75,7 +95,12 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             <Button type="link" onClick={handleAddRule}>
               {t('drillThrough.rule.addRule')}
             </Button>
-            <RuleList translate={t} rules={rules} />
+            <RuleList
+              translate={t}
+              rules={rules}
+              onRuleChange={handleUpdateRule}
+              onDeleteRule={handleDeleteRule}
+            />
           </Form.Item>
         </Form>
       </StyledDrillThroughPanel>

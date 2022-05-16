@@ -770,6 +770,12 @@
           "rule": {
             "title": "Rule",
             "addRule": "+ Add New",
+            "header": {
+              "category": "Category",
+              "open": "Open",
+              "relation": "Relation",
+              "operation": "Operation"
+            },
             "category": {
               "title": "Categroy",
               "jumpToChart": "Jump to Chart",
@@ -790,6 +796,9 @@
               "title": "Field Relation",
               "auto": "Auto",
               "customize": "Customize"
+            },
+            "operation": {
+              "delete": "Delete"
             }
           }
         },
