@@ -90,7 +90,8 @@ export const editBoardStackSlice = createSlice({
     // Widget
     addWidgets(state, action: PayloadAction<Widget[]>) {
       const widgets = action.payload;
-      let { maxWidgetIndex, type } = state.dashBoard.config;
+      const board = state.dashBoard;
+      let { maxWidgetIndex, type } = board.config;
 
       widgets.forEach(ele => {
         maxWidgetIndex++;
@@ -98,6 +99,7 @@ export const editBoardStackSlice = createSlice({
           .toolkit(ele.config.originalType)
           .getName();
         const newEle = produce(ele, draft => {
+          draft.dashboardId = board.id;
           draft.config.index = maxWidgetIndex;
           draft.config.name =
             draft.config.name || `${newName}_${maxWidgetIndex}`;
@@ -162,16 +164,16 @@ export const editBoardStackSlice = createSlice({
       // const title = getWidgetTitle(newProps);
       // state.widgetRecord[wid].config.name = title.title;
     },
-    updateWidgetRect(
+    changeFreeWidgetRect(
       state,
       action: PayloadAction<{
         wid: string;
-        newRect: RectConfig;
+        rect: RectConfig;
       }>,
     ) {
-      const { wid, newRect } = action.payload;
+      const { wid, rect } = action.payload;
       if (!state.widgetRecord[wid]) return;
-      state.widgetRecord[wid].config.rect = newRect;
+      state.widgetRecord[wid].config.rect = rect;
     },
     updateWidgetConfig(
       state,
@@ -228,14 +230,7 @@ export const editBoardStackSlice = createSlice({
       });
     },
     // free
-    resizeWidgetEnd(
-      state,
-      action: PayloadAction<{ id: string; width: number; height: number }>,
-    ) {
-      const { id, width, height } = action.payload;
-      const { rect } = state.widgetRecord[id].config;
-      state.widgetRecord[id].config.rect = { ...rect, width, height };
-    },
+
     changeWidgetsIndex(
       state,
       action: PayloadAction<{ id: string; index: number }[]>,

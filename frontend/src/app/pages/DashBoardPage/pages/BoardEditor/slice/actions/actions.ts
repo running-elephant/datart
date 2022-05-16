@@ -17,6 +17,7 @@
  */
 import { ChartEditorBaseProps } from 'app/components/ChartEditor';
 import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
+import { getParentRect } from 'app/pages/DashBoardPage/components/Widgets/GroupWidget/utils';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
@@ -32,7 +33,10 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
-import { createWidgetInfo } from 'app/pages/DashBoardPage/utils/widget';
+import {
+  createWidgetInfo,
+  createWidgetInfoMap,
+} from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import produce from 'immer';
@@ -43,7 +47,7 @@ import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { ORIGINAL_TYPE_MAP } from '../../../../constants';
 import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
-import { addWidgetsToEditBoard, getEditChartWidgetDataAsync } from '../thunk';
+import { getEditChartWidgetDataAsync } from '../thunk';
 import { EditBoardState, HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
 
@@ -325,22 +329,31 @@ export const onComposeGroupAction =
     const rootState = getState() as RootState;
     const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
     const stackState = editBoardState.stack.present;
+    const curBoard = stackState.dashBoard;
+    const widgetMap = stackState.widgetRecord;
     const widgetInfos = Object.values(editBoardState.widgetInfoRecord || {});
     let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);
     wid && selectedIds.push(wid);
     selectedIds = [...new Set(selectedIds)];
     let groupWidget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.group).create({
-      boardType,
+      boardType: curBoard.config.type,
       children: selectedIds,
     });
-    dispatch(addWidgetsToEditBoard([groupWidget]));
+    groupWidget.config.rect = getParentRect({
+      childIds: selectedIds,
+      widgetMap,
+    });
+    const widgetInfoMap = createWidgetInfoMap([groupWidget]);
+    dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
+    dispatch(editBoardStackActions.addWidgets([groupWidget]));
+    //  dispatch(addWidgetsToEditBoard([groupWidget]));
+
     dispatch(
       editBoardStackActions.changeWidgetsParentId({
         wIds: selectedIds,
         parentId: groupWidget.id,
       }),
     );
-    // changeWidgetsParentId
   };
 export const addVariablesToBoard =
   (variables: Variable[]) => (dispatch, getState) => {

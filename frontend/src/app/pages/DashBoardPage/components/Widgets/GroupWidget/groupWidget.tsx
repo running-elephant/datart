@@ -15,16 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
+import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
-import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
-import { LockIconFn } from '../../WidgetComponents/StatusIcon';
-import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
-import { WidgetDropdownList } from '../../WidgetComponents/WidgetDropdownList';
 import { GroupWidgetCore } from './groupWidgetCore';
 
 export const GroupWidget: React.FC<{}> = memo(() => {
@@ -32,30 +28,31 @@ export const GroupWidget: React.FC<{}> = memo(() => {
   const { editing } = useContext(BoardContext);
 
   return (
-    <StyleWrapper>
-      <div style={ZIndexStyle}>
-        <div style={FlexStyle}>
-          123456 group
+    <StyleWrapper className="111">
+      <AbsoluteWrapper className="aaaaa" rect={widget.config.rect}>
+        <RelativeWrapper className="rrrrr">
           <GroupWidgetCore widgetIds={widget.config.children || []} />
-        </div>
-      </div>
+        </RelativeWrapper>
+      </AbsoluteWrapper>
+
       {editing && <EditMask />}
-      <StyledWidgetToolBar>
-        <Space size={0}>
-          <LockIconFn
-            boardEditing={editing}
-            wid={widget.id}
-            lock={widget.config?.lock}
-          />
-          <WidgetDropdownList widget={widget} />
-        </Space>
-      </StyledWidgetToolBar>
     </StyleWrapper>
   );
 });
+// relative
+const AbsoluteWrapper = styled.div<{ rect: RectConfig }>`
+  position: absolute;
+  top: ${p => -p.rect.y + 'px'};
+  left: ${p => -p.rect.x + 'px'};
+  flex: 1;
+`;
+const RelativeWrapper = styled.div`
+  position: relative;
+  flex: 1;
+`;
 const StyleWrapper = styled.div`
   flex: 1;
-  background-color: pink;
+  background-color: #7ab1d63e;
   &:hover .widget-tool-dropdown {
     visibility: visible;
   }

@@ -36,7 +36,11 @@ import {
   widgetsQueryAction,
 } from '../../pages/Board/slice/asyncActions';
 import { renderedWidgetAsync } from '../../pages/Board/slice/thunk';
-import { BoardType, VizRenderMode } from '../../pages/Board/slice/types';
+import {
+  BoardType,
+  RectConfig,
+  VizRenderMode,
+} from '../../pages/Board/slice/types';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
@@ -121,6 +125,9 @@ export const WidgetActionProvider: FC<{
         }, 500),
         onUpdateWidgetConfig: (config: WidgetConf, wid: string) => {
           dispatch(editBoardStackActions.updateWidgetConfig({ wid, config }));
+        },
+        onEditFreeWidgetRect: (rect, wid) => {
+          dispatch(editBoardStackActions.changeFreeWidgetRect({ rect, wid }));
         },
         onUpdateWidgetConfigByKey: ops => {
           if (boardEditing) {
@@ -303,6 +310,7 @@ export interface WidgetActionContextProps {
   onEditCopyWidgets: (ids?: string[]) => void;
   onEditPasteWidgets: () => void;
   onEditComposeGroup: () => void;
+  onEditFreeWidgetRect: (rect: RectConfig, wid: string) => void;
   //
 }
 export const WidgetActionContext = createContext<WidgetActionContextProps>(

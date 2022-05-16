@@ -23,6 +23,7 @@ import widgetManagerInstance from 'app/pages/DashBoardPage/components/WidgetMana
 import { LightWidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
+import { ORIGINAL_TYPE_MAP } from '../../../../../constants';
 import { addWidgetsToEditBoard } from '../../../slice/thunk';
 import { BoardToolBarContext } from '../context/BoardToolBarContext';
 
@@ -32,12 +33,8 @@ export const AddContainer: React.FC<{}> = () => {
   const { boardType } = useContext(BoardToolBarContext);
   const onSelectContainerWidget = useCallback(
     ({ keyPath }) => {
-      const [type] = keyPath;
-      console.log('__ type', type);
-
-      let widget = widgetManagerInstance.toolkit('tab').create({
+      let widget = widgetManagerInstance.toolkit(ORIGINAL_TYPE_MAP.tab).create({
         boardType: boardType,
-        relations: [],
       });
       dispatch(addWidgetsToEditBoard([widget]));
     },

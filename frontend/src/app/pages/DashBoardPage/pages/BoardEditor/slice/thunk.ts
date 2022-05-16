@@ -220,6 +220,32 @@ export const addWidgetsToEditBoard = createAsyncThunk<
   return null;
 });
 
+export const addGroupWidgetToEditBoard = createAsyncThunk<
+  null,
+  Widget[],
+  { state: RootState }
+>('editBoard/addGroupWidgetToEditBoard', (widgets, { getState, dispatch }) => {
+  const { dashBoard } = editBoardStackState(
+    getState() as unknown as {
+      editBoard: HistoryEditBoard;
+    },
+  );
+  const { layouts } = boardInfoState(
+    getState() as { editBoard: EditBoardState },
+  );
+  const widgetInfoMap = createWidgetInfoMap(widgets);
+  const updatedWidgets = adjustWidgetsToBoard({
+    widgets,
+    boardType: dashBoard.config.type,
+    boardId: dashBoard.id,
+    layouts,
+  });
+  // widgetInfoRecord
+  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
+  // WidgetRecord
+  dispatch(editBoardStackActions.addWidgets(updatedWidgets));
+  return null;
+});
 // addDataChartWidgets
 export const addDataChartWidgets = createAsyncThunk<
   null,

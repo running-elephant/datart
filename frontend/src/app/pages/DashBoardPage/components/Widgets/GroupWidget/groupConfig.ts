@@ -131,6 +131,7 @@ export const widgetToolkit: GroupToolkit = {
 
     return widget;
   },
+
   getName(key) {
     return initWidgetName(NameI18N, key);
   },
@@ -163,7 +164,7 @@ export const widgetToolkit: GroupToolkit = {
   // getWidgetName() {},
   // //
 };
-
+export const groupToolkit = widgetToolkit;
 const groupProto: WidgetProto = {
   originalType: widgetMeta.originalType,
   meta: widgetMeta,

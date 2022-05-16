@@ -170,28 +170,15 @@ export const adjustWidgetsToBoard = (args: {
   layouts?: ReactGridLayout.Layout[];
 }) => {
   const { widgets, boardType, layouts } = args;
-  let newWidgets = updateWidgetsForBoard(args);
+
   if (boardType === 'auto') {
-    return updateAutoWidgetsRect(newWidgets, layouts || []);
+    return updateAutoWidgetsRect(widgets, layouts || []);
   } else if (boardType === 'free') {
-    return updateFreeWidgetsRect(newWidgets);
+    return updateFreeWidgetsRect(widgets);
   }
   return widgets;
 };
-export const updateWidgetsForBoard = (args: {
-  widgets: Widget[];
-  boardType: BoardType;
-  boardId: string;
-}) => {
-  const { widgets, boardType, boardId } = args;
-  let newWidgets = widgets.map(widget => {
-    return produce(widget, draft => {
-      draft.dashboardId = boardId;
-      draft.config.boardType = boardType;
-    });
-  });
-  return newWidgets;
-};
+
 export const updateAutoWidgetsRect = (
   widgets: Widget[],
   layouts: ReactGridLayout.Layout[],
