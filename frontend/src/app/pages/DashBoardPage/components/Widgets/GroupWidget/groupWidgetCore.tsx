@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import WidgetOfFree from 'app/pages/DashBoardPage/pages/Board/FreeDashboard/WidgetOfFree';
 import WidgetOfFreeEdit from 'app/pages/DashBoardPage/pages/BoardEditor/FreeEditor/WidgetOfFreeEdit';
 import { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
@@ -34,7 +35,7 @@ export const GroupWidgetCore: React.FC<{ widgetIds: string[] }> = memo(
                 boardEditing={editing}
                 boardId={boardId}
               >
-                <WidgetOfFreeEdit />
+                {editing ? <WidgetOfFreeEdit /> : <WidgetOfFree />}
               </WidgetWrapProvider>
             </Wrapper>
           );

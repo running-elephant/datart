@@ -18,6 +18,7 @@
 
 import { PayloadAction } from '@reduxjs/toolkit';
 import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
+import { getParentRect } from 'app/pages/DashBoardPage/components/Widgets/GroupWidget/utils';
 import {
   ContainerItem,
   Dashboard,
@@ -33,6 +34,7 @@ import { updateCollectionByAction } from 'app/utils/mutation';
 import produce from 'immer';
 import { Layout } from 'react-grid-layout';
 import { createSlice } from 'utils/@reduxjs/toolkit';
+import { ORIGINAL_TYPE_MAP } from '../../../../constants';
 import { EditBoardStack } from '../types';
 
 export type updateWidgetConf = {
@@ -161,8 +163,6 @@ export const editBoardStackSlice = createSlice({
         },
       );
       state.widgetRecord[wid].config.customConfig.props = newProps;
-      // const title = getWidgetTitle(newProps);
-      // state.widgetRecord[wid].config.name = title.title;
     },
     changeFreeWidgetRect(
       state,
@@ -171,9 +171,81 @@ export const editBoardStackSlice = createSlice({
         rect: RectConfig;
       }>,
     ) {
-      const { wid, rect } = action.payload;
-      if (!state.widgetRecord[wid]) return;
-      state.widgetRecord[wid].config.rect = rect;
+      const { wid, rect: newRect } = action.payload;
+      const widgetMap = state.widgetRecord;
+      const targetWidget = widgetMap[wid];
+      if (!targetWidget) return;
+      const oldRect = targetWidget.config.rect;
+      const diffRect: RectConfig = {
+        x: newRect.x - oldRect.x,
+        y: newRect.y - oldRect.y,
+        width: newRect.width - oldRect.width,
+        height: newRect.height - oldRect.height,
+      };
+      targetWidget.config.rect = newRect;
+      const hasMoveEvent = diffRect.x !== 0 || diffRect.y !== 0;
+      const hasResizeEvent = diffRect.width !== 0 || diffRect.height !== 0;
+
+      if (hasMoveEvent) {
+        // 1.emit children 找到所有子元素 并move
+        const childIds: string[] = [];
+        findChildIds({ widget: targetWidget, widgetMap, childIds });
+        childIds.forEach(id => {
+          const curWidget = widgetMap[id];
+          if (!curWidget) return;
+          const oldRect = curWidget.config.rect;
+
+          curWidget.config.rect = {
+            ...oldRect,
+            x: oldRect.x + diffRect.x,
+            y: oldRect.y + diffRect.y,
+          };
+        });
+        // 2 emit 所有 parent resize 或者 move
+        const parentIds: string[] = [];
+        findParentIds({ widget: targetWidget, widgetMap, parentIds });
+        parentIds.forEach(id => {
+          const curWidget = widgetMap[id];
+          curWidget.config.rect = getParentRect({
+            childIds: curWidget.config.children,
+            widgetMap,
+            preRect: curWidget.config.rect,
+          });
+        });
+      }
+      if (hasResizeEvent) {
+        // 1.emit children 找到所有子元素 并resize
+        // 1.emit children 找到所有子元素 并resize
+      }
+
+      function findChildIds(args: {
+        widget: Widget;
+        widgetMap: Record<string, Widget>;
+        childIds: string[];
+      }) {
+        const { widget, widgetMap, childIds } = args;
+        if (!widget) return;
+        if (widget.config.originalType !== ORIGINAL_TYPE_MAP.group) return;
+        widget.config.children?.forEach(id => {
+          childIds.push(id);
+          findChildIds({ widget: widgetMap[id], widgetMap, childIds });
+        });
+      }
+      function findParentIds(args: {
+        widget: Widget;
+        widgetMap: Record<string, Widget>;
+        parentIds: string[];
+      }) {
+        const { widget, widgetMap, parentIds } = args;
+        if (!widget) return;
+        if (!widget.parentId) return;
+        if (!widgetMap[widget.parentId]) return;
+        const parentWidget = widgetMap[widget.parentId];
+        if (parentWidget.config.originalType === ORIGINAL_TYPE_MAP.group) {
+          parentIds.push(parentWidget.id);
+          findParentIds({ widget: parentWidget, widgetMap, parentIds });
+        }
+      }
     },
     updateWidgetConfig(
       state,

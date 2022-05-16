@@ -29,7 +29,7 @@ import React, {
   useState,
 } from 'react';
 import { DraggableCore, DraggableEventHandler } from 'react-draggable';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
@@ -44,9 +44,8 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const selectedIds = useSelector(selectSelectedIds);
   const widget = useContext(WidgetContext);
   const { onEditFreeWidgetRect } = useContext(WidgetActionContext);
-
-  const dispatch = useDispatch();
   const scale = useContext(BoardScaleContext);
+
   const { x, y, width, height } = widget.config.rect;
   const [curXY, setCurXY] = useState<[number, number]>([
     widget.config.rect.x,

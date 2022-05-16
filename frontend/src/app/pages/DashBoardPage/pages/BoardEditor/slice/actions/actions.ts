@@ -335,6 +335,7 @@ export const onComposeGroupAction =
     let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);
     wid && selectedIds.push(wid);
     selectedIds = [...new Set(selectedIds)];
+    if (!selectedIds.length) return;
     let groupWidget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.group).create({
       boardType: curBoard.config.type,
       children: selectedIds,
@@ -342,6 +343,7 @@ export const onComposeGroupAction =
     groupWidget.config.rect = getParentRect({
       childIds: selectedIds,
       widgetMap,
+      preRect: groupWidget.config.rect,
     });
     const widgetInfoMap = createWidgetInfoMap([groupWidget]);
     dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));

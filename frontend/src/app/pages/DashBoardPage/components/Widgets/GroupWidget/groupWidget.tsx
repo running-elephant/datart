@@ -19,6 +19,7 @@ import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
+import { LEVEL_10 } from 'styles/StyleConstants';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { GroupWidgetCore } from './groupWidgetCore';
@@ -44,6 +45,7 @@ const AbsoluteWrapper = styled.div<{ rect: RectConfig }>`
   position: absolute;
   top: ${p => -p.rect.y + 'px'};
   left: ${p => -p.rect.x + 'px'};
+  z-index: ${LEVEL_10};
   flex: 1;
 `;
 const RelativeWrapper = styled.div`
@@ -51,6 +53,7 @@ const RelativeWrapper = styled.div`
   flex: 1;
 `;
 const StyleWrapper = styled.div`
+  display: flex;
   flex: 1;
   background-color: #7ab1d63e;
   &:hover .widget-tool-dropdown {

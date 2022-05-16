@@ -18,13 +18,18 @@ import { Widget } from '../../../types/widgetTypes';
  * limitations under the License.
  */
 export const getParentRect = (args: {
-  childIds: string[];
+  childIds: string[] | undefined;
   widgetMap: Record<string, Widget>;
+  preRect: RectConfig;
 }) => {
-  const { childIds, widgetMap } = args;
+  const { childIds, widgetMap, preRect } = args;
+  if (!Array.isArray(childIds)) return preRect;
+
   const rectList = Object.values(widgetMap)
     .filter(w => childIds.includes(w.id))
     .map(t => t.config.rect);
+
+  if (!rectList.length) return preRect;
   let left;
   let top;
   let right;
@@ -41,10 +46,10 @@ export const getParentRect = (args: {
     if (bottom === undefined || bottom < rectBottom) bottom = rectBottom;
   });
   const newRect: RectConfig = {
-    x: left,
-    y: top,
-    width: right - left,
-    height: bottom - top,
+    x: left || 0,
+    y: top || 0,
+    width: right - left || 0,
+    height: bottom - top || 0,
   };
   return newRect;
 };

@@ -526,30 +526,6 @@ export const getWidgetMap = (
   const controllerWidgets: Widget[] = []; // use for reset button
   const widgetList = Object.values(widgetMap);
 
-  // 处理 widget包含关系 containerWidget 被包含的 widget.parentId 不为空
-  widgetList
-    .filter(w => w.parentId)
-    .forEach(widget => {
-      const parentWidgetId = widget.parentId!;
-      const parentWidget = widgetMap[parentWidgetId];
-      if (!parentWidget) {
-        widget.parentId = '';
-        return;
-      }
-      const tabContent = parentWidget.config.content as TabWidgetContent;
-      if (!tabContent.itemMap) {
-        widget.parentId = '';
-        return;
-      }
-
-      const targetTabItem = tabContent.itemMap?.[widget.config.clientId];
-      if (!targetTabItem) {
-        widget.parentId = '';
-        return;
-      }
-      targetTabItem.childWidgetId = widget.id;
-    });
-
   // 处理 controller config visibility依赖关系 id, url参数修改filter
   widgetList
     .filter(w => w.config.type === 'controller')
@@ -613,14 +589,64 @@ export const getWidgetMap = (
     .forEach(widget => {
       let dataChart = (widget.config.content as any).dataChart as DataChart;
 
-      const self_dataChartId = `widget_${widget.dashboardId}_${widget.id}`;
+      const ownedDataChartId = `widget_${widget.dashboardId}_${widget.id}`;
       if (dataChart) {
-        dataChart.id = self_dataChartId;
+        dataChart.id = ownedDataChartId;
         wrappedDataCharts.push(dataChart!);
       }
-      widget.datachartId = self_dataChartId;
+      widget.datachartId = ownedDataChartId;
     });
 
+  // 处理 widget包含关系 tab Widget 被包含的 widget.parentId 不为空
+  widgetList
+    .filter(w => w.parentId)
+    .forEach(widget => {
+      const parentWidgetId = widget.parentId!;
+      const parentWidget = widgetMap[parentWidgetId];
+      if (!parentWidget) {
+        widget.parentId = '';
+        return;
+      }
+      if (parentWidget.config.originalType !== ORIGINAL_TYPE_MAP.tab) {
+        return;
+      }
+      const tabContent = parentWidget.config.content as TabWidgetContent;
+      if (!tabContent.itemMap) {
+        widget.parentId = '';
+        return;
+      }
+
+      const targetTabItem = tabContent.itemMap?.[widget.config.clientId];
+      if (!targetTabItem) {
+        widget.parentId = '';
+        return;
+      }
+      targetTabItem.childWidgetId = widget.id;
+    });
+  // clear Group children
+  widgetList
+    .filter(w => w.config.originalType === ORIGINAL_TYPE_MAP.group)
+    .forEach(widget => {
+      widget.config.children = [];
+    });
+  // set Group children
+  widgetList
+    .filter(w => w.parentId)
+    .forEach(widget => {
+      const parentWidgetId = widget.parentId!;
+      const parentWidget = widgetMap[parentWidgetId];
+      if (!parentWidget) {
+        widget.parentId = '';
+        return;
+      }
+      if (parentWidget.config.originalType !== ORIGINAL_TYPE_MAP.group) {
+        return;
+      }
+      if (!Array.isArray(parentWidget.config.children)) {
+        parentWidget.config.children = [];
+      }
+      parentWidget.config.children.push(widget.id);
+    });
   // preprocess widget
   widgetList.forEach(widget => {
     widget.config.boardType = boardType;
