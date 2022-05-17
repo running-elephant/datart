@@ -34,6 +34,7 @@ import {
   TabWidgetContent,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget, WidgetConf } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { deleteEffect } from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { updateCollectionByAction } from 'app/utils/mutation';
@@ -144,6 +145,7 @@ export const editBoardStackSlice = createSlice({
       ids.forEach(id => {
         delete state.widgetRecord[id];
       });
+      deleteEffect(state.widgetRecord);
     },
 
     updateWidget(state, action: PayloadAction<Widget>) {

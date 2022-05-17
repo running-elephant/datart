@@ -21,7 +21,7 @@ import { memo } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
-import { LayerList } from '../components/LayerList/LayerList';
+import { LayerTreePanel } from '../components/LayerList/LayerTreePanel';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
 import { FreeBoardEditor } from './FreeBoardEditor';
@@ -39,7 +39,8 @@ export const FreeEditor: React.FC = memo(() => {
       <Wrapper>
         <BoardToolBar />
         <Editor>
-          <LayerList />
+          {/* <LayerList /> */}
+          <LayerTreePanel />
           <FreeBoardEditor />
           <SlideSetting />
         </Editor>

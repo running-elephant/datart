@@ -29,6 +29,7 @@ import { GroupWidgetCore } from './groupWidgetCore';
 export const GroupWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const wid = widget.id;
+
   const { editing } = useContext(BoardContext);
   const { onChangeGroupRect } = useContext(WidgetActionContext);
   // changeGroupRectAction
