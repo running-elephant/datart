@@ -33,4 +33,6 @@ public class SystemInfo {
 
     private boolean registerEnable;
 
+    private boolean initialized;
+
 }
