@@ -30,9 +30,10 @@ import {
   transformToViewConfig,
 } from 'app/utils/internalChartHelper';
 import { saveAs } from 'file-saver';
+import i18next from 'i18next';
 import { request, request2, requestWithHeader } from 'utils/request';
 import { errorHandle } from 'utils/utils';
-import i18next from 'i18next';
+import { convertToChartDto } from './ChartDtoHelper';
 
 export const getDistinctFields = async (
   viewId: string,
@@ -277,4 +278,9 @@ export async function fetchCheckName(url, data: any) {
     method: 'POST',
     data: data,
   });
+}
+
+export async function fetchDataChart(id: string) {
+  const response = await request2<ChartDTO>(`/viz/datacharts/${id}`);
+  return convertToChartDto(response?.data);
 }

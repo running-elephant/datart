@@ -28,10 +28,15 @@ export type I18nTransator = {
   translate: (title: string, disablePrefix?: boolean, options?: any) => string;
 };
 
+export type CustomizeRelation = {
+  source?: string;
+  target?: string;
+};
+
 export type JumpToChartRule = {
   relId: string;
   relation: InteractionFieldRelation;
-  [InteractionFieldRelation.Customize]: any[];
+  [InteractionFieldRelation.Customize]: CustomizeRelation[];
 };
 
 export type InteractionRule = {

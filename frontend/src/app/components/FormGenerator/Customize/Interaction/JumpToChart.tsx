@@ -16,19 +16,33 @@
  * limitations under the License.
  */
 
-import { Button, Select, Space } from 'antd';
-import { FC, memo } from 'react';
+import { Button, Dropdown, Select, Space } from 'antd';
+import ChartDataView from 'app/types/ChartDataView';
+import { FC, memo, useState } from 'react';
 import { InteractionFieldRelation } from '../../constants';
+import RelationList from './RalationList';
 import { I18nTransator, JumpToChartRule, VizType } from './types';
 
 const JumpToChart: FC<
   {
     vizs: VizType[];
+    dataview?: ChartDataView;
     value?: JumpToChartRule;
     onValueChange: (value) => void;
   } & I18nTransator
-> = memo(({ vizs, value, onValueChange, translate: t }) => {
-  const getRelatedCharts = () => vizs?.filter(v => v.relType === 'DATACHART');
+> = memo(({ vizs, dataview, value, onValueChange, translate: t }) => {
+  const [relations, setRelations] = useState(
+    value?.[InteractionFieldRelation.Customize] || [],
+  );
+
+  const handleUpdateRelations = relations => {
+    const newRelations = [...relations];
+    setRelations(newRelations);
+    onValueChange({
+      ...value,
+      ...{ [InteractionFieldRelation.Customize]: newRelations },
+    });
+  };
 
   return (
     <Space>
@@ -37,13 +51,15 @@ const JumpToChart: FC<
         placeholder={t('drillThrough.rule.reference.title')}
         onChange={relId => onValueChange({ ...value, ...{ relId } })}
       >
-        {getRelatedCharts().map(c => {
-          return (
-            <Select.Option key={c.relId} value={c.relId}>
-              {c.name}
-            </Select.Option>
-          );
-        })}
+        {vizs
+          ?.filter(v => v.relType === 'DATACHART')
+          ?.map(c => {
+            return (
+              <Select.Option key={c.relId} value={c.relId}>
+                {c.name}
+              </Select.Option>
+            );
+          })}
       </Select>
       <Select
         value={value?.relation}
@@ -57,12 +73,32 @@ const JumpToChart: FC<
           {t('drillThrough.rule.relation.customize')}
         </Select.Option>
       </Select>
-      <Button
-        disabled={value?.relation === InteractionFieldRelation.Auto}
-        type="link"
+      <Dropdown
+        destroyPopupOnHide
+        overlayStyle={{ margin: 4 }}
+        overlay={() => (
+          <RelationList
+            translate={t}
+            targetRelId={value?.relId}
+            sourceFields={
+              dataview?.meta?.concat(dataview?.computedFields || []) || []
+            }
+            sourceVariables={[]}
+            relations={relations}
+            onRelationChange={handleUpdateRelations}
+          />
+        )}
+        placement="bottomLeft"
+        trigger={['click']}
+        arrow
       >
-        {t('drillThrough.rule.relation.setting')}
-      </Button>
+        <Button
+          disabled={value?.relation === InteractionFieldRelation.Auto}
+          type="link"
+        >
+          {t('drillThrough.rule.relation.setting')}
+        </Button>
+      </Dropdown>
     </Space>
   );
 });

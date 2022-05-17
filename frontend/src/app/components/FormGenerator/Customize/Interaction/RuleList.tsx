@@ -18,6 +18,7 @@
 
 import { Button, Select, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
+import ChartDataView from 'app/types/ChartDataView';
 import { FC } from 'react';
 import { InteractionAction, InteractionCategory } from '../../constants';
 import JumpToChart from './JumpToChart';
@@ -29,10 +30,11 @@ const RuleList: FC<
   {
     rules: InteractionRule[];
     vizs: VizType[];
+    dataview?: ChartDataView;
     onRuleChange: (id, prop, value) => void;
     onDeleteRule: (id) => void;
   } & I18nTransator
-> = ({ rules, vizs, onRuleChange, onDeleteRule, translate: t }) => {
+> = ({ rules, vizs, dataview, onRuleChange, onDeleteRule, translate: t }) => {
   const columns: ColumnsType<InteractionRule> = [
     {
       title: t('drillThrough.rule.header.category'),
@@ -89,6 +91,7 @@ const RuleList: FC<
         const props = {
           translate: t,
           vizs: vizs,
+          dataview: dataview,
           value: record?.[record.category],
           onValueChange: value =>
             onRuleChange(record.id, record.category, value),

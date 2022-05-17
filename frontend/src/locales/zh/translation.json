@@ -787,7 +787,10 @@
               "setting": "字段关系配置",
               "title": "字段关系",
               "auto": "自动",
-              "customize": "自定义"
+              "customize": "自定义",
+              "source": "源字段/变量",
+              "target": "目标字段/变量",
+              "addRelation": "+ 点击新建"
             },
             "operation": {
               "delete": "删除"

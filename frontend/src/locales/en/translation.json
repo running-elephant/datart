@@ -795,7 +795,10 @@
               "setting": "Field Relation Setting",
               "title": "Field Relation",
               "auto": "Auto",
-              "customize": "Customize"
+              "customize": "Customize",
+              "source": "Source Field/Variable",
+              "target": "Target Field/Variable",
+              "addRelation": "+ Add"
             },
             "operation": {
               "delete": "Delete"

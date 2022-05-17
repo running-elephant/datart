@@ -17,6 +17,7 @@
  */
 
 import { Button, Form, Radio, Space } from 'antd';
+import { currentDataViewSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
@@ -38,6 +39,7 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     onChange,
   }) => {
     const vizs = useSelector(selectVizs);
+    const dataview = useSelector(currentDataViewSelector);
     const [drillThroughEvent, setDrillThroughEvent] = useState(
       data.value?.event,
     );
@@ -100,6 +102,7 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             </Button>
             <RuleList
               vizs={vizs}
+              dataview={dataview}
               rules={rules}
               onRuleChange={handleUpdateRule}
               onDeleteRule={handleDeleteRule}
