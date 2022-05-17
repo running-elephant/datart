@@ -1,3 +1,4 @@
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget } from '../../../types/widgetTypes';
 /**
@@ -52,4 +53,87 @@ export const getParentRect = (args: {
     height: bottom - top || 0,
   };
   return newRect;
+};
+
+export const findChildIds = (args: {
+  widget: Widget;
+  widgetMap: Record<string, Widget>;
+  childIds: string[];
+}) => {
+  const { widget, widgetMap, childIds } = args;
+  if (!widget) return;
+  if (widget.config.originalType !== ORIGINAL_TYPE_MAP.group) return;
+  widget.config.children?.forEach(id => {
+    childIds.push(id);
+    findChildIds({ widget: widgetMap[id], widgetMap, childIds });
+  });
+};
+
+export const findParentIds = (args: {
+  widget: Widget;
+  widgetMap: Record<string, Widget>;
+  parentIds: string[];
+}) => {
+  const { widget, widgetMap, parentIds } = args;
+  if (!widget) return;
+  if (!widget.parentId) return;
+  if (!widgetMap[widget.parentId]) return;
+  const parentWidget = widgetMap[widget.parentId];
+  if (parentWidget.config.originalType === ORIGINAL_TYPE_MAP.group) {
+    parentIds.push(parentWidget.id);
+    findParentIds({ widget: parentWidget, widgetMap, parentIds });
+  }
+};
+
+export const resetParentsRect = (args: {
+  parentIds: string[];
+  widgetMap: Record<string, Widget>;
+}) => {
+  const { parentIds, widgetMap } = args;
+  parentIds.forEach(id => {
+    const curWidget = widgetMap[id];
+    if (!curWidget) return;
+    curWidget.config.rect = getParentRect({
+      childIds: curWidget.config.children,
+      widgetMap,
+      preRect: curWidget.config.rect,
+    });
+  });
+};
+
+export const moveGroupAllChildren = (args: {
+  childIds: string[];
+  widgetMap: Record<string, Widget>;
+  diffRect: RectConfig;
+}) => {
+  const { childIds, widgetMap, diffRect } = args;
+  childIds.forEach(id => {
+    const curWidget = widgetMap[id];
+    if (!curWidget) return;
+    const oldRect = curWidget.config.rect;
+    curWidget.config.rect.x = oldRect.x + diffRect.x;
+    curWidget.config.rect.y = oldRect.y + diffRect.y;
+  });
+};
+export const resetGroupAllChildrenRect = (args: {
+  childIds: string[];
+  widgetMap: Record<string, Widget>;
+  oldRect: RectConfig;
+  newRect: RectConfig;
+}) => {
+  const { childIds, widgetMap, newRect, oldRect } = args;
+  const scaleW = newRect.width / oldRect.width;
+  const scaleH = newRect.height / oldRect.height;
+  childIds?.forEach(id => {
+    const curWidget = widgetMap[id];
+    if (!curWidget) return;
+    const preRect = curWidget.config.rect;
+    const nextRect: RectConfig = {
+      x: (preRect.x - oldRect.x) * scaleW + oldRect.x,
+      y: (preRect.y - oldRect.y) * scaleH + oldRect.y,
+      width: preRect.width * scaleW,
+      height: preRect.height * scaleH,
+    };
+    curWidget.config.rect = nextRect;
+  });
 };
