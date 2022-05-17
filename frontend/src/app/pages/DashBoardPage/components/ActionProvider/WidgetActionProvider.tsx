@@ -24,6 +24,7 @@ import { createContext, FC, memo, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {
+  changeGroupRectAction,
   refreshWidgetsByControllerAction,
   widgetChartClickAction,
   widgetGetDataAction,
@@ -85,6 +86,13 @@ export const WidgetActionProvider: FC<{
         onEditPasteWidgets: () => {
           dispatch(pasteWidgetsAction());
         },
+        onChangeGroupRect: debounce(
+          (args: { wid: string; w: number; h: number }) => {
+            const { wid, w, h } = args;
+            dispatch(changeGroupRectAction({ renderMode, boardId, wid, w, h }));
+          },
+          500,
+        ),
         onEditDeleteActiveWidgets: debounce((ids?: string[]) => {
           dispatch(deleteWidgetsAction(ids));
         }, 200),
@@ -278,6 +286,7 @@ export interface WidgetActionContextProps {
   onRefreshWidgetsByController: (widget: Widget) => void;
   onWidgetsQuery: () => void;
   onRenderedWidgetById: (wid: string) => void;
+  onChangeGroupRect: (args: { wid: string; w: number; h: number }) => void;
   onWidgetDataUpdate: ({
     computedFields,
     payload,

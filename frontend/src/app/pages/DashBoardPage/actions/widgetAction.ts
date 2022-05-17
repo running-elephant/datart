@@ -31,9 +31,11 @@ import {
 import {
   BoardLinkFilter,
   BoardState,
+  RectConfig,
   VizRenderMode,
 } from '../pages/Board/slice/types';
 import {
+  editBoardStackActions,
   editDashBoardInfoActions,
   editWidgetInfoActions,
 } from '../pages/BoardEditor/slice';
@@ -395,4 +397,57 @@ export const refreshWidgetsByControllerAction =
         );
       }
     });
+  };
+
+export const changeGroupRectAction =
+  (args: {
+    renderMode: VizRenderMode;
+    boardId: string;
+    wid: string;
+    w: number;
+    h: number;
+  }) =>
+  (dispatch, getState) => {
+    const { renderMode, boardId, wid, w, h } = args;
+
+    if (renderMode === 'edit') {
+      dispatch(changeEditGroupRectAction(args));
+    }
+  };
+export const changeViewGroupRectAction = (args: {
+  renderMode: VizRenderMode;
+  boardId: string;
+  wid: string;
+  w: number;
+  h: number;
+}) => {};
+export const changeEditGroupRectAction =
+  (args: {
+    renderMode: VizRenderMode;
+    boardId: string;
+    wid: string;
+    w: number;
+    h: number;
+  }) =>
+  (dispatch, getState) => {
+    const { wid, w, h } = args;
+    const rootState = getState() as RootState;
+    const editBoardState = (rootState.editBoard as unknown as HistoryEditBoard)
+      .stack.present;
+    const widgetMap = editBoardState.widgetRecord;
+    if (!wid) return;
+    const widget = widgetMap[wid];
+    if (!widget) return;
+    if (!widget.parentId) return;
+    const parentWidget = widgetMap[widget.parentId];
+    if (!parentWidget) return;
+
+    if (parentWidget.config.originalType !== ORIGINAL_TYPE_MAP.tab) return;
+    const rect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: w,
+      height: h,
+    };
+    dispatch(editBoardStackActions.changeFreeWidgetRect({ wid, rect }));
   };

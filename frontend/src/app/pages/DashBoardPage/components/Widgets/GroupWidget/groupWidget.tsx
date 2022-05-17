@@ -15,23 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { memo, useContext } from 'react';
+import { memo, useContext, useEffect } from 'react';
 import styled from 'styled-components/macro';
 import { LEVEL_10 } from 'styles/StyleConstants';
+import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { GroupWidgetCore } from './groupWidgetCore';
 
 export const GroupWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
+  const wid = widget.id;
   const { editing } = useContext(BoardContext);
-
+  const { onChangeGroupRect } = useContext(WidgetActionContext);
+  // changeGroupRectAction
+  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
+  useEffect(() => {
+    onChangeGroupRect({ wid, w: cacheW, h: cacheH });
+  }, [cacheW, cacheH, wid, onChangeGroupRect]);
   return (
-    <StyleWrapper className="111">
-      <AbsoluteWrapper className="aaaaa" rect={widget.config.rect}>
-        <RelativeWrapper className="rrrrr">
+    <StyleWrapper className="group-wrapper" ref={cacheWhRef}>
+      <AbsoluteWrapper className="group-absolute" rect={widget.config.rect}>
+        <RelativeWrapper className="group-relative">
           <GroupWidgetCore widgetIds={widget.config.children || []} />
         </RelativeWrapper>
       </AbsoluteWrapper>

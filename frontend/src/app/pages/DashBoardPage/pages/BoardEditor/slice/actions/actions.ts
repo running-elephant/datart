@@ -326,6 +326,7 @@ export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
 };
 export const onComposeGroupAction =
   (boardType: BoardType, wid?: string) => (dispatch, getState) => {
+    if (boardType === 'auto') return;
     const rootState = getState() as RootState;
     const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
     const stackState = editBoardState.stack.present;

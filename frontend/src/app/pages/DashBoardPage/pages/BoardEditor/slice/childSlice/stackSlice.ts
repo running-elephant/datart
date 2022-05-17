@@ -284,13 +284,13 @@ export const editBoardStackSlice = createSlice({
     addWidgetToTabWidget(
       state,
       action: PayloadAction<{
-        parentId: string;
+        tabWidgetId: string;
         tabItem: ContainerItem;
         sourceId: string;
       }>,
     ) {
-      const { parentId, tabItem, sourceId } = action.payload;
-      const tabContent = state.widgetRecord[parentId].config
+      const { tabWidgetId, tabItem, sourceId } = action.payload;
+      const tabContent = state.widgetRecord[tabWidgetId].config
         .content as TabWidgetContent;
       const sourceWidget = state.widgetRecord[sourceId];
       tabContent.itemMap[sourceWidget.config.clientId] = {
@@ -299,9 +299,11 @@ export const editBoardStackSlice = createSlice({
         tabId: sourceWidget.config.clientId,
         childWidgetId: sourceWidget.id,
       };
-      delete state.widgetRecord[parentId].config.content.itemMap[tabItem.tabId];
-      state.widgetRecord[parentId].config.content = tabContent;
-      state.widgetRecord[sourceId].parentId = parentId;
+      delete state.widgetRecord[tabWidgetId].config.content.itemMap[
+        tabItem.tabId
+      ];
+      state.widgetRecord[tabWidgetId].config.content = tabContent;
+      state.widgetRecord[sourceId].parentId = tabWidgetId;
     },
     /* tabs widget */
     tabsWidgetAddTab(

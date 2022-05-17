@@ -59,9 +59,7 @@ export const TabWidget: React.FC<{ hideTitle: boolean }> = memo(
             <TabWidgetCore />
           </div>
         </div>
-        {editing && (
-          <BlockMaskLayer widgetConfig={widget} widgetInfo={widgetInfo} />
-        )}
+        {editing && <BlockMaskLayer widget={widget} widgetInfo={widgetInfo} />}
         <StyledWidgetToolBar>
           <Space size={0}>
             <LockIconFn
