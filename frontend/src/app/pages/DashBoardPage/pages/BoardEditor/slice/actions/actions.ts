@@ -86,12 +86,12 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
     if (!curWidget) continue;
 
     const widgetType = curWidget.config.type;
-
+    const originalType = curWidget.config.originalType;
     shouldDeleteIds.push(id);
     effectTypes.push(widgetType);
 
     // delete 递归删除所子节点;
-    if (widgetType === 'container') {
+    if (originalType === ORIGINAL_TYPE_MAP.tab) {
       const content = curWidget.config.content as TabWidgetContent;
       Object.values(content.itemMap).forEach(item => {
         if (item.childWidgetId) {
@@ -99,8 +99,11 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
         }
       });
     }
-    // TODO groupWidget need recursively delete 递归删除所子节点
-    // if (curWidget.children.length > 0) {}
+    if (originalType === ORIGINAL_TYPE_MAP.group) {
+      (curWidget.config.children || []).forEach(id => {
+        selectedIds.push(id);
+      });
+    }
   }
 
   dispatch(editBoardStackActions.deleteWidgets(shouldDeleteIds));
