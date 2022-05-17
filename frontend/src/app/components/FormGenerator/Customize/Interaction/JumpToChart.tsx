@@ -19,6 +19,7 @@
 import { Button, Dropdown, Select, Space } from 'antd';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo, useState } from 'react';
+import { isEmpty } from 'utils/object';
 import { InteractionFieldRelation } from '../../constants';
 import RelationList from './RalationList';
 import { I18nTransator, JumpToChartRule, VizType } from './types';
@@ -76,6 +77,10 @@ const JumpToChart: FC<
       <Dropdown
         destroyPopupOnHide
         overlayStyle={{ margin: 4 }}
+        disabled={
+          value?.relation !== InteractionFieldRelation.Customize ||
+          isEmpty(value?.relId)
+        }
         overlay={() => (
           <RelationList
             translate={t}
@@ -92,12 +97,7 @@ const JumpToChart: FC<
         trigger={['click']}
         arrow
       >
-        <Button
-          disabled={value?.relation === InteractionFieldRelation.Auto}
-          type="link"
-        >
-          {t('drillThrough.rule.relation.setting')}
-        </Button>
+        <Button type="link">{t('drillThrough.rule.relation.setting')}</Button>
       </Dropdown>
     </Space>
   );

@@ -144,8 +144,6 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   });
   const tg = useI18NPrefix('global');
 
-  console.log('chartConfig ----> ', chartConfig);
-
   const expensiveQuery = useMemo(() => {
     try {
       return dataview?.config
