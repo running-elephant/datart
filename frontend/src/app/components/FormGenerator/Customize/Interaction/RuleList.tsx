@@ -28,8 +28,8 @@ import { I18nTransator, InteractionRule, VizType } from './types';
 
 const RuleList: FC<
   {
-    rules: InteractionRule[];
-    vizs: VizType[];
+    rules?: InteractionRule[];
+    vizs?: VizType[];
     dataview?: ChartDataView;
     onRuleChange: (id, prop, value) => void;
     onDeleteRule: (id) => void;
@@ -38,8 +38,8 @@ const RuleList: FC<
   const columns: ColumnsType<InteractionRule> = [
     {
       title: t('drillThrough.rule.header.category'),
-      dataIndex: 'categroy',
-      key: 'categroy',
+      dataIndex: 'category',
+      key: 'category',
       render: (value, record) => (
         <Select
           style={{ width: '150px' }}

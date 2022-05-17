@@ -21,6 +21,7 @@ import { ColumnsType } from 'antd/lib/table';
 import useMount from 'app/hooks/useMount';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { fetchDataChart } from 'app/utils/fetch';
+import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
 import { CustomizeRelation, I18nTransator } from './types';
@@ -55,15 +56,20 @@ const RelationList: FC<
   };
 
   const handleDeleteRelation = index => {
-    relations?.splice(index, 1);
-    onRelationChange(relations);
+    if (index > -1) {
+      const newRelations = updateBy(relations, draft => {
+        draft?.splice(index, 1);
+      });
+      onRelationChange(newRelations);
+    }
   };
 
   const handleRelationChange = (index, key, value) => {
-    const current = relations?.[index];
-    if (current) {
-      current[key] = value;
-      onRelationChange(relations);
+    if (index > -1) {
+      const newRelations = updateBy(relations, draft => {
+        draft![index][key] = value;
+      });
+      onRelationChange(newRelations);
     }
   };
 

@@ -18,6 +18,7 @@
 
 import { Button, Input, Space } from 'antd';
 import { FC, memo } from 'react';
+import { I18nTransator } from './types';
 
 const JumpToUrl: FC<{} & I18nTransator> = memo(
   ({ translate: t = title => title }) => {

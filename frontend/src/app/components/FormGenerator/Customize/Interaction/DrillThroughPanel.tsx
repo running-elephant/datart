@@ -20,6 +20,7 @@ import { Button, Form, Radio, Space } from 'antd';
 import { currentDataViewSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
+import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -28,49 +29,67 @@ import { InteractionMouseEvent } from '../../constants';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
 import RuleList from './RuleList';
-import { InteractionRule } from './types';
+import { DrillThroughSetting, InteractionRule } from './types';
 
 const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
-  ({
-    ancestors,
-    translate: t = title => title,
-    data,
-    dataConfigs,
-    onChange,
-  }) => {
+  ({ ancestors, translate: t = title => title, data, onChange }) => {
     const vizs = useSelector(selectVizs);
     const dataview = useSelector(currentDataViewSelector);
-    const [drillThroughEvent, setDrillThroughEvent] = useState(
-      data.value?.event,
-    );
-    const [rules, setRules] = useState<InteractionRule[]>([]);
+    const [drillThroughEvent, setDrillThroughEvent] = useState<
+      DrillThroughSetting['event']
+    >(data.value?.event || InteractionMouseEvent.Left);
+    const [drillThroughRules, setDrillThroughRules] = useState<
+      DrillThroughSetting['rules']
+    >(data.value?.rules || []);
 
     const handleDrillThroughEventChange = e => {
       const event = e.target.value;
-      setDrillThroughEvent(event);
+      handleDrillThroughSettingChange(event);
     };
 
     const handleAddRule = () => {
-      setRules(
-        (rules || []).concat([
-          {
-            id: uuidv4(),
-          },
-        ]),
-      );
+      const newRules = (drillThroughRules || []).concat([
+        {
+          id: uuidv4(),
+        },
+      ]);
+      handleDrillThroughSettingChange(undefined, newRules);
     };
 
     const handleDeleteRule = (id: string) => {
-      const newRules = rules?.filter(r => r.id !== id);
-      setRules(newRules);
+      const newRules = drillThroughRules?.filter(r => r.id !== id);
+      handleDrillThroughSettingChange(undefined, newRules);
     };
 
     const handleUpdateRule = (id: string, prop: string, value: any) => {
-      const currentRule = rules?.find(r => r.id === id);
-      if (currentRule) {
-        currentRule[prop] = value;
-        setRules([...rules]);
+      const updatorIndex = (drillThroughRules || []).findIndex(
+        r => r.id === id,
+      );
+      if (updatorIndex > -1) {
+        const newRules = updateBy(drillThroughRules, draft => {
+          draft![updatorIndex][prop] = value;
+        });
+        handleDrillThroughSettingChange(undefined, newRules);
       }
+    };
+
+    const handleDrillThroughSettingChange = (
+      newEvent?: string,
+      newRules?: InteractionRule[],
+    ) => {
+      let newSetting: DrillThroughSetting = {
+        event: drillThroughEvent,
+        rules: drillThroughRules,
+      };
+      if (newEvent) {
+        newSetting.event = newEvent;
+        setDrillThroughEvent(newEvent);
+      }
+      if (newRules) {
+        newSetting.rules = [...newRules];
+        setDrillThroughRules([...newRules]);
+      }
+      onChange?.(ancestors, newSetting, false);
     };
 
     return (
@@ -103,7 +122,7 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             <RuleList
               vizs={vizs}
               dataview={dataview}
-              rules={rules}
+              rules={drillThroughRules}
               onRuleChange={handleUpdateRule}
               onDeleteRule={handleDeleteRule}
               translate={t}

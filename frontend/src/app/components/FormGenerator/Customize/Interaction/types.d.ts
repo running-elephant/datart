@@ -43,8 +43,12 @@ export type InteractionRule = {
   id: string;
   category?: InteractionCategory;
   action?: InteractionAction;
-
   [InteractionCategory.JumpToChart]?: JumpToChartRule;
   [InteractionCategory.JumpToDashboard]?: any;
   [InteractionCategory.JumpToUrl]?: any;
+};
+
+export type DrillThroughSetting = {
+  event: string;
+  rules?: InteractionRule[];
 };

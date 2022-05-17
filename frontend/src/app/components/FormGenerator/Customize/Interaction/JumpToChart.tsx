@@ -25,7 +25,7 @@ import { I18nTransator, JumpToChartRule, VizType } from './types';
 
 const JumpToChart: FC<
   {
-    vizs: VizType[];
+    vizs?: VizType[];
     dataview?: ChartDataView;
     value?: JumpToChartRule;
     onValueChange: (value) => void;
