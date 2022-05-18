@@ -33,6 +33,7 @@ export type I18nTransator = {
 };
 
 export type CustomizeRelation = {
+  id: string;
   type: InteractionRelationType;
   source?: string;
   target?: string;

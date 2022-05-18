@@ -24,6 +24,7 @@ import { fetchDataChart } from 'app/utils/fetch';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
+import { uuidv4 } from 'utils/utils';
 import { InteractionRelationType } from '../../constants';
 import { CustomizeRelation, I18nTransator } from './types';
 
@@ -60,7 +61,7 @@ const RelationList: FC<
 
   const handleAddRelation = () => {
     onRelationChange(
-      relations?.concat({ type: InteractionRelationType.Field }),
+      relations?.concat({ id: uuidv4(), type: InteractionRelationType.Field }),
     );
   };
 
@@ -171,7 +172,7 @@ const RelationList: FC<
       <Table
         size="small"
         style={{ overflow: 'auto' }}
-        rowKey={r => `${r?.source}+${r?.target}`}
+        rowKey={'id'}
         columns={columns}
         dataSource={relations}
         pagination={{ hideOnSinglePage: true, pageSize: 3 }}
