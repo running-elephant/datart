@@ -46,3 +46,8 @@ export enum InteractionFieldRelation {
   Auto = 'auto',
   Customize = 'customize',
 }
+
+export enum InteractionRelationType {
+  Field = 'field',
+  Variable = 'variable',
+}

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Button, Select, Table } from 'antd';
+import { Button, Radio, Select, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import useMount from 'app/hooks/useMount';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
@@ -24,6 +24,7 @@ import { fetchDataChart } from 'app/utils/fetch';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
+import { InteractionRelationType } from '../../constants';
 import { CustomizeRelation, I18nTransator } from './types';
 
 const RelationList: FC<
@@ -31,7 +32,7 @@ const RelationList: FC<
     targetRelId?: string;
     relations?: CustomizeRelation[];
     sourceFields?: ChartDataViewMeta[];
-    sourceVariables?: [];
+    sourceVariables?: Array<{ id: string; name: string }>;
     onRelationChange: (relations?: CustomizeRelation[]) => void;
   } & I18nTransator
 > = ({
@@ -43,16 +44,24 @@ const RelationList: FC<
   translate: t,
 }) => {
   const [targetFields, setTargetFields] = useState<ChartDataViewMeta[]>([]);
+  const [targetVariables, setTargetVariables] = useState<ChartDataViewMeta[]>(
+    [],
+  );
 
   useMount(async () => {
     if (targetRelId) {
       const data = await fetchDataChart(targetRelId);
-      setTargetFields(data?.view?.meta || []);
+      setTargetFields(
+        data?.view?.meta?.concat(data?.config?.computedFields || []) || [],
+      );
+      setTargetVariables(data?.queryVariables || []);
     }
   });
 
   const handleAddRelation = () => {
-    onRelationChange(relations?.concat({}));
+    onRelationChange(
+      relations?.concat({ type: InteractionRelationType.Field }),
+    );
   };
 
   const handleDeleteRelation = index => {
@@ -73,18 +82,51 @@ const RelationList: FC<
     }
   };
 
+  const handleRelationTypeChange = (index, value) => {
+    if (index > -1) {
+      const newRelations = updateBy(relations, draft => {
+        draft![index] = { type: value };
+      });
+      onRelationChange(newRelations);
+    }
+  };
+
+  const isFieldType = (relation: CustomizeRelation) => {
+    return relation?.type === InteractionRelationType.Field;
+  };
+
   const columns: ColumnsType<CustomizeRelation> = [
+    {
+      title: t('drillThrough.rule.relation.type'),
+      dataIndex: 'type',
+      key: 'type',
+      render: (value, _, index) => (
+        <Radio.Group
+          size="small"
+          style={{ width: '100px' }}
+          value={value}
+          onChange={e => handleRelationTypeChange(index, e.target.value)}
+        >
+          <Radio value={InteractionRelationType.Field}>
+            {t('drillThrough.rule.relation.field')}
+          </Radio>
+          <Radio value={InteractionRelationType.Variable}>
+            {t('drillThrough.rule.relation.variable')}
+          </Radio>
+        </Radio.Group>
+      ),
+    },
     {
       title: t('drillThrough.rule.relation.source'),
       dataIndex: 'source',
       key: 'source',
-      render: (value, _, index) => (
+      render: (value, record, index) => (
         <Select
           style={{ width: '150px' }}
-          defaultValue={value}
+          value={value}
           onChange={value => handleRelationChange(index, 'source', value)}
         >
-          {sourceFields?.map(sf => {
+          {(isFieldType(record) ? sourceFields : sourceVariables)?.map(sf => {
             return (
               <Select.Option value={sf?.id}>{sf?.name || sf.id}</Select.Option>
             );
@@ -96,13 +138,13 @@ const RelationList: FC<
       title: t('drillThrough.rule.relation.target'),
       dataIndex: 'target',
       key: 'target',
-      render: (value, _, index) => (
+      render: (value, record, index) => (
         <Select
           style={{ width: '150px' }}
-          defaultValue={value}
+          value={value}
           onChange={value => handleRelationChange(index, 'target', value)}
         >
-          {targetFields?.map(sf => {
+          {(isFieldType(record) ? targetFields : targetVariables)?.map(sf => {
             return (
               <Select.Option value={sf?.id}>{sf?.name || sf.id}</Select.Option>
             );

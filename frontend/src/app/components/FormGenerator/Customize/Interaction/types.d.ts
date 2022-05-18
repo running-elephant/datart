@@ -16,7 +16,11 @@
  * limitations under the License.
  */
 
-import { InteractionAction, InteractionCategory } from '../../constants';
+import {
+  InteractionAction,
+  InteractionCategory,
+  InteractionRelationType,
+} from '../../constants';
 
 export type VizType = {
   relId: string;
@@ -29,6 +33,7 @@ export type I18nTransator = {
 };
 
 export type CustomizeRelation = {
+  type: InteractionRelationType;
   source?: string;
   target?: string;
 };

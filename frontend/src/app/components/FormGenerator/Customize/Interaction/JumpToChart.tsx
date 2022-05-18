@@ -88,7 +88,7 @@ const JumpToChart: FC<
             sourceFields={
               dataview?.meta?.concat(dataview?.computedFields || []) || []
             }
-            sourceVariables={[]}
+            sourceVariables={dataview?.variables || []}
             relations={relations}
             onRelationChange={handleUpdateRelations}
           />

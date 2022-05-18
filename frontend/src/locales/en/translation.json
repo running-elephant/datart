@@ -796,9 +796,12 @@
               "title": "Field Relation",
               "auto": "Auto",
               "customize": "Customize",
+              "type": "Type",
               "source": "Source Field/Variable",
               "target": "Target Field/Variable",
-              "addRelation": "+ Add"
+              "addRelation": "+ Add",
+              "field": "Field",
+              "variable": "Variable"
             },
             "operation": {
               "delete": "Delete"
