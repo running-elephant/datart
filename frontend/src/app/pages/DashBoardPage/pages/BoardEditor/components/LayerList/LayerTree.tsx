@@ -39,8 +39,16 @@ export const LayerTreeRoot: FC<{}> = memo(() => {
   );
   return (
     <StyledWrapper>
-      {sortedLayoutWidgets.map(widget => {
-        return <LayerItem wid={widget.id} boardId={boardId} />;
+      {sortedLayoutWidgets.map((widget, index) => {
+        return (
+          <LayerItem
+            index={index}
+            parentId={''}
+            key={widget.id}
+            wid={widget.id}
+            boardId={boardId}
+          />
+        );
       })}
     </StyledWrapper>
   );
