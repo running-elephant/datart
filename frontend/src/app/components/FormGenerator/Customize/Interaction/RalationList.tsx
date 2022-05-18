@@ -86,7 +86,7 @@ const RelationList: FC<
   const handleRelationTypeChange = (index, value) => {
     if (index > -1) {
       const newRelations = updateBy(relations, draft => {
-        draft![index] = { type: value };
+        draft![index] = { id: uuidv4(), type: value };
       });
       onRelationChange(newRelations);
     }
