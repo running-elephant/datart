@@ -2,15 +2,6 @@ spring:
   application:
     name: datart-server
 
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-    baseline-description: BASE_LINE
-    baseline-version: "2022.02.18"
-    clean-disabled: true
-    clean-on-validation-error: false
-    validate-on-migrate: false
-
   main:
     banner-mode: off
 
@@ -85,6 +76,8 @@ datart:
 
   admin-id: datart-admin
 
+  migration:
+    enable: true
 
 server:
   port: 8080

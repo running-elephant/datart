@@ -28,8 +28,13 @@ import {
   WidgetActionListItem,
   widgetActionType,
   WidgetCreateProps,
+  WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
-import { getTheWidgetFiltersAndParams } from 'app/pages/DashBoardPage/utils';
+import {
+  getJsonConfigs,
+  getTheWidgetFiltersAndParams,
+} from 'app/pages/DashBoardPage/utils';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
@@ -37,6 +42,24 @@ import { uuidv4 } from 'utils/utils';
 import widgetManagerInstance from '../../../WidgetManager';
 import { initTitleTpl, widgetTpl } from '../../../WidgetManager/utils/init';
 
+// 是否开启立即查询
+export const ImmediateQuery: ChartStyleConfig = {
+  label: 'immediateQuery.immediateQueryGroup',
+  key: 'immediateQueryGroup',
+  comType: 'group',
+  rows: [
+    {
+      label: 'immediateQuery.enable',
+      key: 'enable',
+      value: true,
+      comType: 'switch',
+    },
+  ],
+};
+
+export interface ControlWidgetToolkit extends WidgetToolkit {
+  getQueryEnable: (args) => boolean;
+}
 export const controlWidgetTpl = (opt: WidgetCreateProps) => {
   const widget = widgetTpl();
   widget.id = opt.relations?.[0]?.sourceId || widget.id;
@@ -45,8 +68,8 @@ export const controlWidgetTpl = (opt: WidgetCreateProps) => {
   widget.datachartId = opt.datachartId || '';
   widget.viewIds = opt.viewIds || [];
   widget.relations = opt.relations || [];
-
   widget.config.content = opt.content;
+  widget.config.name = opt.name || '';
   widget.config.type = 'controller';
   if (opt.boardType === 'auto') {
     const rect: RectConfig = {
@@ -214,4 +237,13 @@ export const getControlDropDownList = (refresh: boolean) => {
     },
   ];
   return list;
+};
+
+export const getControlQueryEnable = props => {
+  const [enableQuery] = getJsonConfigs(
+    props,
+    ['immediateQueryGroup'],
+    ['enable'],
+  );
+  return enableQuery as boolean;
 };

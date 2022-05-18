@@ -145,6 +145,7 @@ POSTGRESQL:
   name: POSTGRESQL
   driver-class: org.postgresql.Driver
   url-prefix: jdbc:postgresql://
+  sql-dialect: datart.data.provider.calcite.dialect.PostgresqlSqlDialectSupport
 
 PRESTO:
   db-type: PRESTO

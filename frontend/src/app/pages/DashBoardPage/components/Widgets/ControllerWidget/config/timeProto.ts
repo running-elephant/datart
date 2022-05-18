@@ -23,6 +23,7 @@ import {
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { controlWidgetTpl, getControlDropDownList } from '.';
 import {
+  ImmediateQueryI18N,
   initBackgroundTpl,
   initBorderTpl,
   initPaddingTpl,
@@ -41,11 +42,12 @@ const NameI18N = {
 };
 export const widgetMeta: WidgetMeta = {
   icon: '',
-  widgetTypeId: ORIGINAL_TYPE_MAP.time,
+  originalType: ORIGINAL_TYPE_MAP.time,
   canWrapped: true,
   controllable: true,
   linkable: false,
   canFullScreen: false,
+  singleton: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -63,6 +65,7 @@ export const widgetMeta: WidgetMeta = {
           ...WidgetEditActionI18N.zh,
         },
         title: TitleI18N.zh,
+        immediateQuery: ImmediateQueryI18N.zh,
         background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
 
@@ -79,6 +82,7 @@ export const widgetMeta: WidgetMeta = {
           ...WidgetEditActionI18N.en,
         },
         title: TitleI18N.en,
+        immediateQuery: ImmediateQueryI18N.en,
         background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
 
@@ -91,9 +95,9 @@ export const widgetMeta: WidgetMeta = {
 export const widgetToolkit: WidgetToolkit = {
   create: opt => {
     const widget = controlWidgetTpl(opt);
-    widget.id = widgetMeta.widgetTypeId + widget.id;
-    widget.config.originalType = widgetMeta.widgetTypeId;
-    widget.config.name = opt.name || '';
+    widget.id = widgetMeta.originalType + widget.id;
+    widget.config.originalType = widgetMeta.originalType;
+
     const addProps = [
       { ...initBackgroundTpl('#fff') },
       { ...initPaddingTpl() },
@@ -132,7 +136,7 @@ export const widgetToolkit: WidgetToolkit = {
 };
 
 const timeProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+  widgetTypeId: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

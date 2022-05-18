@@ -25,7 +25,7 @@ import type {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import type { ChartStyleConfig } from 'app/types/ChartConfig';
-import { getInitialLocale } from 'locales/i18n';
+import { getInitialLocale } from 'locales/utils';
 import { uuidv4 } from 'utils/utils';
 
 export const initTitleTpl = () => {
@@ -179,6 +179,16 @@ export const LoopFetchI18N = {
     loopFetchGroup: 'Loop Fetch',
     enable: 'Enable',
     interval: 'Interval (s)',
+  },
+};
+export const ImmediateQueryI18N = {
+  zh: {
+    immediateQueryGroup: '立即查询',
+    enable: '启用',
+  },
+  en: {
+    immediateQueryGroup: 'ImmediateQuery',
+    enable: 'Enable',
   },
 };
 export const initBackgroundTpl = (color?: string) => {

@@ -21,6 +21,7 @@ package datart.server.config;
 import datart.core.migration.DatabaseMigration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.Ordered;
@@ -30,8 +31,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class DatabaseMigrationAware implements ApplicationContextAware, Ordered {
 
+    @Value("${datart.migration.enable:true}")
+    private boolean migrationEnable;
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        if (!migrationEnable) {
+            return;
+        }
         DatabaseMigration databaseMigration = applicationContext.getBean(DatabaseMigration.class);
         try {
             databaseMigration.migration();

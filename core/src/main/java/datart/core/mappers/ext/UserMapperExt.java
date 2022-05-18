@@ -43,6 +43,14 @@ public interface UserMapperExt extends UserMapper {
     User selectByNameOrEmail(@Param("username") String username);
 
     @Select({
+            "SELECT ",
+            "	COUNT(*)  ",
+            "FROM ",
+            "	`user` u  "
+    })
+    int selectUserCount();
+
+    @Select({
             "SELECT " +
                     "	u.*  " +
                     "FROM " +

@@ -89,11 +89,12 @@ export interface WidgetToolkit {
 
 export interface WidgetMeta {
   icon: any;
-  widgetTypeId: string;
+  originalType: string;
   canWrapped: boolean; // 是否可以被包裹 被 widget container 包裹
   controllable: boolean; // 是否可以 被 controller 关联
   linkable: boolean; // 是否可以 被 widget 联动
   canFullScreen: boolean; // 是否出现在全屏列表
+  singleton: boolean; // 是否是单例 一个仪表板只能有一个 同类型的 widget
   viewAction: Record<string, { label: string; icon: any; key: string }>;
   editAction: Record<string, { label: string; icon: any; key: string }>;
   i18ns: ChartI18NSectionConfig[];
