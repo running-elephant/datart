@@ -24,7 +24,7 @@ import {
 import { BoardConfig } from 'app/pages/DashBoardPage/types/boardTypes';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, ISelectionConfig } from 'app/types/ChartConfig';
 import { ChartDatasetMeta } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { DeltaStatic } from 'quill';
@@ -199,6 +199,7 @@ export interface WidgetInfo {
   rendered: boolean;
   inLinking: boolean; //是否在触发联动
   selected: boolean;
+  selectionOption: ISelectionConfig[];
   pageInfo: Partial<PageInfo>;
   errInfo: Record<WidgetErrorType, string>;
   parameters?: any;

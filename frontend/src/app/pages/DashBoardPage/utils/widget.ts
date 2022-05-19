@@ -98,6 +98,7 @@ export const createWidgetInfo = (id: string): WidgetInfo => {
     editing: false,
     inLinking: false,
     selected: false,
+    selectionOption: [],
     errInfo: {} as WidgetInfo['errInfo'],
     rendered: false,
     pageInfo: {

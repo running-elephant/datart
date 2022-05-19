@@ -21,6 +21,7 @@ import {
   VizType,
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
+import { ISelectionConfig } from 'app/types/ChartConfig';
 import { ChartDTO } from 'app/types/ChartDTO';
 
 export interface SharePageState {
@@ -38,6 +39,7 @@ export interface SharePageState {
   loginLoading: boolean;
   oauth2Clients: Array<{ name: string; value: string }>;
   availableSourceFunctions?: string[];
+  selectionOption: ISelectionConfig[];
 }
 export interface ShareVizInfo {
   vizType: VizType | undefined;

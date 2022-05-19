@@ -39,6 +39,7 @@ import {
   currentDataViewSelector,
   datasetsSelector,
   selectAvailableSourceFunctions,
+  selectionOptionSelector,
   shadowChartConfigSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import {
@@ -81,6 +82,7 @@ import {
   DataChartConfig,
   WidgetContentChartType,
 } from '../pages/DashBoardPage/pages/Board/slice/types';
+import { LastSelectionAndDatasetConfig } from '../types/ChartConfig';
 
 const { confirm } = Modal;
 
@@ -134,9 +136,9 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
   const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
+  const selectionOption = useSelector(selectionOptionSelector);
   const [chart, setChart] = useState<IChart>();
   const drillOptionRef = useRef<IChartDrillOption>();
-
   const [allowQuery, setAllowQuery] = useState<boolean>(false);
   const history = useHistory();
   const addVizFn = useAddViz({
@@ -233,6 +235,29 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     [dispatch],
   );
 
+  const [lastConfig, setLastConfig] = useState<LastSelectionAndDatasetConfig>({
+    dataset,
+    selectionOption,
+  });
+
+  useEffect(() => {
+    if (selectionOption.length) {
+      dispatch(workbenchSlice.actions.clearAllSelectionOption());
+    } else {
+      setLastConfig({
+        dataset,
+        selectionOption,
+      });
+    }
+  }, [dispatch, dataset]);
+
+  useEffect(() => {
+    setLastConfig({
+      dataset,
+      selectionOption,
+    });
+  }, [selectionOption]);
+
   const registerChartEvents = useCallback(
     chart => {
       chart?.registerMouseEvents([
@@ -288,6 +313,23 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             }
             if (param.seriesName === 'drillOptionChange') {
               handleDrillOptionChange?.(param.value);
+              return;
+            }
+
+            if (
+              !drillOptionRef.current?.isSelectedDrill &&
+              chart.useSelection
+            ) {
+              const {
+                dataIndex,
+                componentIndex,
+              }: { dataIndex: number; componentIndex: number } = param;
+              dispatch(
+                workbenchSlice.actions.singleSelectionOption({
+                  index: componentIndex + ',' + dataIndex,
+                  data: param.data,
+                }),
+              );
               return;
             }
           },
@@ -360,6 +402,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       drillOptionRef.current,
       true,
     );
+
+    if (selectionOption.length) {
+      dispatch(workbenchSlice.actions.clearAllSelectionOption());
+    }
     if (!expensiveQuery) {
       dispatch(refreshDatasetAction({ drillOption: drillOptionRef?.current }));
     } else {
@@ -707,9 +753,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             onChangeAggregation: handleAggregationState,
           }}
           drillOption={drillOptionRef?.current}
+          selectionOption={lastConfig.selectionOption}
           aggregation={aggregation}
           chart={chart}
-          dataset={dataset}
+          dataset={lastConfig.dataset}
           dataview={dataview}
           chartConfig={chartConfig}
           defaultViewId={defaultViewId}

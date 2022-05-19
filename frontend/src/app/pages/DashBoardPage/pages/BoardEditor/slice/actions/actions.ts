@@ -452,3 +452,42 @@ export const editorWidgetClearLinkageAction = (widget: Widget) => dispatch => {
     );
   });
 };
+
+export const boardSelectionOptionOnchange = (
+  dispatch,
+  type: VizRenderMode,
+  params,
+  wid,
+  bid,
+) => {
+  const {
+    dataIndex,
+    componentIndex,
+  }: { dataIndex: number; componentIndex: number } = params;
+  const option = {
+    wid,
+    bid,
+    data: {
+      index: componentIndex + ',' + dataIndex,
+      data: params.data,
+    },
+  };
+  if (type === 'edit') {
+    dispatch(editWidgetInfoActions.boardEditorSingleSelectionOption(option));
+  } else {
+    dispatch(boardActions.boardSingleSelectionOption(option));
+  }
+};
+
+export const clearBoardSelectionOption = (
+  dispatch,
+  type: VizRenderMode,
+  wid,
+  bid,
+) => {
+  if (type === 'edit') {
+    dispatch(editWidgetInfoActions.clearEditorSelectionOption({ wid, bid }));
+  } else {
+    dispatch(boardActions.clearBoardSelectionOption({ wid, bid }));
+  }
+};

@@ -19,6 +19,7 @@ import { Layout } from 'react-grid-layout';
 import undoable, { includeAction } from 'redux-undo';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
+import { isUndefined } from 'utils/object';
 import { WidgetControllerPanelParams } from './../../Board/slice/types';
 import { editBoardStackSlice } from './childSlice/stackSlice';
 import {
@@ -256,6 +257,31 @@ const widgetInfoRecordSlice = createSlice({
       } else {
         delete WidgetRrrInfo[errorType];
       }
+    },
+    boardEditorSingleSelectionOption(
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        wid: string;
+        bid: string;
+        data: { index: string; data: any };
+      }>,
+    ) {
+      const findDataIndex = state[payload.wid].selectionOption?.find(
+        v => v.index === payload.data.index,
+      );
+      if (!isUndefined(findDataIndex)) {
+        state[payload.wid].selectionOption = [];
+      } else {
+        state[payload.wid].selectionOption = [payload.data];
+      }
+    },
+    clearEditorSelectionOption(
+      state,
+      { payload }: PayloadAction<{ wid: string; bid: string }>,
+    ) {
+      state[payload.wid].selectionOption = [];
     },
   },
   extraReducers: builder => {
