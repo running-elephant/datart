@@ -21,6 +21,7 @@ import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
+  ISelectionConfig,
   LabelStyle,
   LegendStyle,
   YAxis,
@@ -34,6 +35,7 @@ import {
   getGridStyle,
   getReference2,
   getScatterSymbolSizeFn,
+  getSelectItemStyle,
   getSeriesTooltips4Polar2,
   getStyles,
   transformToDataSet,
@@ -48,6 +50,7 @@ class BasicScatterChart extends Chart {
   dependency = [];
   config = Config;
   chart: any = null;
+  useSelection = true;
 
   constructor() {
     super('scatter', 'viz.palette.graph.names.scatterChart', 'sandiantu');
@@ -86,6 +89,7 @@ class BasicScatterChart extends Chart {
       props.dataset,
       props.config,
       props.drillOption,
+      props.selectionOption,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
@@ -101,7 +105,8 @@ class BasicScatterChart extends Chart {
   private getOptions(
     dataset: ChartDataSetDTO,
     config: ChartConfig,
-    drillOption: ChartDrillOption,
+    drillOption?: ChartDrillOption,
+    selectionOption?: ISelectionConfig[],
   ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -145,6 +150,7 @@ class BasicScatterChart extends Chart {
       infoConfigs,
       styleConfigs,
       settingConfigs,
+      selectionOption,
     );
 
     return {
@@ -178,6 +184,7 @@ class BasicScatterChart extends Chart {
     infoConfigs: ChartDataSectionField[],
     styleConfigs: ChartStyleConfig[],
     settingConfigs: ChartStyleConfig[],
+    selectionOption?: ISelectionConfig[],
   ): ScatterMetricAndSizeSerie[] {
     const { min, max } = getDataColumnMaxAndMin2(
       chartDataSetRows,
@@ -197,6 +204,7 @@ class BasicScatterChart extends Chart {
           infoConfigs,
           styleConfigs,
           settingConfigs,
+          selectionOption,
         ),
       ];
     }
@@ -220,7 +228,7 @@ class BasicScatterChart extends Chart {
       return acc;
     }, {});
 
-    return Object.keys(groupedObjDataColumns).map(k => {
+    return Object.keys(groupedObjDataColumns).map((k, gcIndex) => {
       return this.getMetricAndSizeSerie(
         {
           max,
@@ -233,8 +241,10 @@ class BasicScatterChart extends Chart {
         infoConfigs,
         styleConfigs,
         settingConfigs,
+        selectionOption,
         k,
         groupedObjDataColumns?.[k]?.color,
+        gcIndex,
       );
     });
   }
@@ -248,8 +258,10 @@ class BasicScatterChart extends Chart {
     infoConfigs: ChartDataSectionField[],
     styleConfigs: ChartStyleConfig[],
     settingConfigs: ChartStyleConfig[],
+    selectionOption?: ISelectionConfig[],
     colorSeriesName?: string,
     color?: string,
+    comIndex: number = 0,
   ): ScatterMetricAndSizeSerie {
     const [cycleRatio] = getStyles(styleConfigs, ['scatter'], ['cycleRatio']);
     const seriesName = groupConfigs
@@ -262,6 +274,7 @@ class BasicScatterChart extends Chart {
         : defaultSizeValue;
       return {
         ...getExtraSeriesRowData(row),
+        ...getSelectItemStyle(comIndex, dcIndex, selectionOption || []),
         name: groupConfigs?.map(row.getCell, row).join('-'),
         value: aggregateConfigs
           .map(row.getCell, row)

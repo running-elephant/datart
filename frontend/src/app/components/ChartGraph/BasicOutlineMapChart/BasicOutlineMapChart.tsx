@@ -21,19 +21,22 @@ import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
+  ISelectionConfig,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getDataColumnMaxAndMin2,
   getExtraSeriesRowData,
   getScatterSymbolSizeFn,
+  getSelectItemStyle,
   getSeriesTooltips4Polar2,
   getStyles,
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { init, registerMap } from 'echarts';
-import Chart from '../../../models/Chart';
+import { registerMap } from 'echarts';
+import ReactChart from '../../../models/ReactChart';
+import BasicMapWrapper from './BasicMapWrapper';
 import Config from './config';
 import geoChinaCity from './geo-china-city.map.json';
 import geoChina from './geo-china.map.json';
@@ -41,6 +44,7 @@ import {
   GeoInfo,
   GeoSeries,
   GeoVisualMapStyle,
+  MapOption,
   MetricAndSizeSeriesStyle,
 } from './types';
 
@@ -48,19 +52,21 @@ import {
 registerMap('china', geoChina as any);
 registerMap('china-city', geoChinaCity as any);
 
-class BasicOutlineMapChart extends Chart {
-  chart: any = null;
+class BasicOutlineMapChart extends ReactChart {
+  useIFrame = false;
   config = Config;
+  useSelection = true;
 
   protected isNormalGeoMap = false;
   private geoMap;
+  private option: any = null;
 
   constructor(props?) {
-    super(
-      props?.id || 'outline-map',
-      props?.name || 'viz.palette.graph.names.outlineMap',
-      props?.icon || 'china',
-    );
+    super(BasicMapWrapper, {
+      id: props?.id || 'outline-map',
+      name: props?.name || 'viz.palette.graph.names.outlineMap',
+      icon: props?.icon || 'china',
+    });
     this.meta.requirements = props?.requirements || [
       {
         group: 1,
@@ -69,41 +75,52 @@ class BasicOutlineMapChart extends Chart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options, context?) {
     if (options.containerId === undefined || !context.document) {
       return;
     }
-
-    this.chart = init(
+    this.adapter?.mounted(
       context.document.getElementById(options.containerId),
-      'default',
+      options,
+      context,
     );
-    this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
-    });
   }
 
-  onUpdated(props): void {
+  onUpdated(props, context): void {
     if (!props.dataset || !props.dataset.columns || !props.config) {
       return;
     }
     if (!this.isMatchRequirement(props.config)) {
-      this.chart?.clear();
+      this.adapter?.unmount();
       return;
     }
-    const newOptions = this.getOptions(props.dataset, props.config);
-    this.chart?.setOption(Object.assign({}, newOptions), true);
+    this.option = {
+      option: this.getOptions(
+        props.dataset,
+        props.config,
+        props.selectionOption,
+      ),
+      containerId: props.containerId,
+      mouseEvents: this.mouseEvents,
+      isNormalGeoMap: this.isNormalGeoMap,
+    };
+    this.adapter?.updated(this.option, context);
   }
 
   onUnMount(): void {
-    this.chart?.dispose();
+    this.adapter?.onUnMount();
   }
 
   onResize(opt: any, context): void {
-    this.chart?.resize(context);
+    this.option.context = context;
+    this.adapter?.updated(this.option, context);
   }
 
-  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
+  private getOptions(
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    selectionOption?: ISelectionConfig[],
+  ): MapOption {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
@@ -128,7 +145,12 @@ class BasicOutlineMapChart extends Chart {
     );
 
     return {
-      geo: this.getGeoInfo(styleConfigs),
+      geo: this.getGeoInfo(
+        styleConfigs,
+        chartDataSet,
+        groupConfigs,
+        selectionOption,
+      ),
       visualMap: this.getVisualMap(
         chartDataSet,
         groupConfigs,
@@ -149,6 +171,7 @@ class BasicOutlineMapChart extends Chart {
           aggregateConfigs,
           sizeConfigs,
           styleConfigs,
+          selectionOption,
         ) as any,
       ),
       tooltip: this.getTooltip(
@@ -166,7 +189,12 @@ class BasicOutlineMapChart extends Chart {
     this.geoMap = mapLevelName === 'china' ? geoChina : geoChinaCity;
   }
 
-  private getGeoInfo(styleConfigs: ChartStyleConfig[]): GeoInfo {
+  private getGeoInfo(
+    styleConfigs: ChartStyleConfig[],
+    chartDataSet: IChartDataSet<string>,
+    groupConfigs: ChartDataSectionField[],
+    selectionOption?: ISelectionConfig[],
+  ): GeoInfo {
     const [show, position, font] = getStyles(
       styleConfigs,
       ['label'],
@@ -174,7 +202,6 @@ class BasicOutlineMapChart extends Chart {
     );
     const [
       mapLevelName,
-      enableZoom,
       areaColor,
       areaEmphasisColor,
       enableFocus,
@@ -191,10 +218,9 @@ class BasicOutlineMapChart extends Chart {
         'borderStyle',
       ],
     );
-
     return {
       map: mapLevelName,
-      roam: enableZoom,
+      roam: 'move',
       emphasis: {
         focus: enableFocus ? 'self' : 'none',
         itemStyle: {
@@ -213,6 +239,16 @@ class BasicOutlineMapChart extends Chart {
         ...font,
       },
       labelLayout: { hideOverlap: true },
+      regions: chartDataSet?.map((row, dcIndex) => {
+        return Object.assign(
+          {
+            name: this.mappingGeoName(row.getCell(groupConfigs[0])),
+          },
+          this.isNormalGeoMap
+            ? getSelectItemStyle(0, dcIndex, selectionOption || [])
+            : {},
+        );
+      }),
     };
   }
 
@@ -224,21 +260,19 @@ class BasicOutlineMapChart extends Chart {
     styleConfigs: ChartStyleConfig[],
   ): GeoSeries[] {
     const [show] = getStyles(styleConfigs, ['visualMap'], ['show']);
-    const [mapLevelName, enableZoom] = getStyles(
-      styleConfigs,
-      ['map'],
-      ['level', 'enableZoom'],
-    );
+    const [mapLevelName] = getStyles(styleConfigs, ['map'], ['level']);
     return [
       {
         type: 'map',
-        roam: enableZoom ? true : false,
         map: mapLevelName,
         geoIndex: 0,
         emphasis: {
           label: {
             show: true,
           },
+        },
+        select: {
+          disabled: true,
         },
         data: chartDataSet
           ?.map(row => {
@@ -260,6 +294,7 @@ class BasicOutlineMapChart extends Chart {
     aggregateConfigs: ChartDataSectionField[],
     sizeConfigs: ChartDataSectionField[],
     styleConfigs: ChartStyleConfig[],
+    selectionOption?: ISelectionConfig[],
   ): MetricAndSizeSeriesStyle[] {
     if (this.isNormalGeoMap) {
       return [];
@@ -278,7 +313,7 @@ class BasicOutlineMapChart extends Chart {
         coordinateSystem: 'geo',
         symbol: 'circle',
         data: chartDataSet
-          ?.map(row => {
+          ?.map((row, dcIndex) => {
             return {
               ...getExtraSeriesRowData(row),
               name: this.mappingGeoName(row.getCell(groupConfigs[0])),
@@ -287,6 +322,7 @@ class BasicOutlineMapChart extends Chart {
                 row.getCell(aggregateConfigs[0]) || defaultColorValue,
                 row.getCell(sizeConfigs[0]) || defaultSizeValue,
               ),
+              ...getSelectItemStyle(0, dcIndex, selectionOption || []),
             };
           })
           ?.filter(d => !!d.name && d.value !== undefined),
@@ -358,11 +394,20 @@ class BasicOutlineMapChart extends Chart {
     sizeConfigs: ChartDataSectionField[],
     styleConfigs: ChartStyleConfig[],
   ): GeoVisualMapStyle[] {
-    const [show, orient, align, itemWidth, itemHeight, font] = getStyles(
-      styleConfigs,
-      ['visualMap'],
-      ['show', 'orient', 'align', 'itemWidth', 'itemHeight', 'font'],
-    );
+    const [show, orient, align, itemWidth, itemHeight, font, position] =
+      getStyles(
+        styleConfigs,
+        ['visualMap'],
+        [
+          'show',
+          'orient',
+          'align',
+          'itemWidth',
+          'itemHeight',
+          'font',
+          'position',
+        ],
+      );
     if (!aggregateConfigs?.length) {
       return [];
     }
@@ -378,6 +423,7 @@ class BasicOutlineMapChart extends Chart {
         aggregateConfigs?.[0]?.color?.end || '#FA8C15',
       ],
     };
+    const positionConfig = position?.split(',');
     return [
       {
         type: 'continuous',
@@ -386,6 +432,13 @@ class BasicOutlineMapChart extends Chart {
         show,
         orient,
         align,
+
+        //处理 visualMap position  旧数据中没有 position 数据  beta.2版本之后是 string 类型 后续版本稳定之后 可以移除兼容逻辑
+        // TODO migration start
+        left: positionConfig?.[0] || 'right',
+        top: positionConfig?.[1] || 'bottom',
+        // TODO migration end --tl
+
         itemWidth,
         itemHeight,
         inRange,
