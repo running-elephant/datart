@@ -27,11 +27,13 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import ChartManager from 'app/models/ChartManager';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import ChartSelectContext from 'app/pages/ChartWorkbenchPage/contexts/ChartSelectContext';
 import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
 import { selectAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { fetchAvailableSourceFunctionsForChart } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
+import { LastSelectionAndDatasetConfig } from 'app/types/ChartConfig';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
   getRuntimeComputedFields,
@@ -107,6 +109,12 @@ const ChartPreviewBoard: FC<{
     const saveAsViz = useSaveAsViz();
     const history = useHistory();
     const vizs = useSelector(selectVizs);
+    const [lastConfig, setLastConfig] = useState<LastSelectionAndDatasetConfig>(
+      {
+        dataset: undefined,
+        selectionOption: undefined,
+      },
+    );
 
     useEffect(() => {
       const filterSearchParams = filterSearchUrl
@@ -122,6 +130,24 @@ const ChartPreviewBoard: FC<{
     }, [dispatch, orgId, backendChartId, filterSearchUrl]);
 
     useEffect(() => {
+      if (chartPreview?.selectionOption?.length) {
+        dispatch(vizAction.clearChartPreviewsSelectionOption(backendChartId));
+      } else {
+        setLastConfig({
+          dataset: chartPreview?.dataset,
+          selectionOption: chartPreview?.selectionOption,
+        });
+      }
+    }, [chartPreview?.dataset, backendChartId, dispatch, dispatch, vizAction]);
+
+    useEffect(() => {
+      setLastConfig({
+        dataset: chartPreview?.dataset,
+        selectionOption: chartPreview?.selectionOption,
+      });
+    }, [chartPreview?.selectionOption]);
+
+    useEffect(() => {
       const sourceId = chartPreview?.backendChart?.view.sourceId;
       if (sourceId) {
         dispatch(fetchAvailableSourceFunctionsForChart(sourceId));
@@ -132,6 +158,12 @@ const ChartPreviewBoard: FC<{
       const newChartPreview = previewCharts.find(
         c => c.backendChartId === backendChartId,
       );
+      if (newChartPreview) {
+        setLastConfig({
+          dataset: newChartPreview.dataset,
+          selectionOption: newChartPreview.selectionOption,
+        });
+      }
       if (newChartPreview && newChartPreview.version !== version) {
         setVersion(newChartPreview.version);
         setChartPreview(newChartPreview);
@@ -199,6 +231,26 @@ const ChartPreviewBoard: FC<{
             }
             if (param.seriesName === 'drillOptionChange') {
               handleDrillOptionChange?.(param.value);
+              return;
+            }
+
+            if (
+              !drillOptionRef.current?.isSelectedDrill &&
+              chart.useSelection
+            ) {
+              const {
+                dataIndex,
+                componentIndex,
+              }: { dataIndex: number; componentIndex: number } = param;
+              dispatch(
+                vizAction.chartPreviewsSingleSelectionOption({
+                  backendChartId,
+                  data: {
+                    index: componentIndex + ',' + dataIndex,
+                    data: param.data,
+                  },
+                }),
+              );
               return;
             }
           },
@@ -440,43 +492,50 @@ const ChartPreviewBoard: FC<{
           backendChartId={backendChartId}
         />
         <PreviewBlock>
-          <ChartDrillContext.Provider
-            value={{
-              drillOption: drillOptionRef.current,
-              onDrillOptionChange: handleDrillOptionChange,
-              availableSourceFunctions,
-              onDateLevelChange: handleDateLevelChange,
-            }}
+          <ChartSelectContext.Provider
+            value={{ selectionOption: lastConfig?.selectionOption }}
           >
-            <div>
-              <ControllerPanel
-                viewId={chartPreview?.backendChart?.viewId}
-                view={chartPreview?.backendChart?.view}
-                chartConfig={chartPreview?.chartConfig}
-                onChange={handleFilterChange}
-              />
-            </div>
-            <ChartWrapper ref={ref}>
-              <Spin wrapperClassName="spinWrapper" spinning={loadingStatus}>
-                <ChartDrillContextMenu chartConfig={chartPreview?.chartConfig!}>
-                  <ChartIFrameContainer
-                    key={backendChartId}
-                    containerId={backendChartId}
-                    dataset={chartPreview?.dataset}
-                    chart={chart!}
-                    config={chartPreview?.chartConfig!}
-                    drillOption={drillOptionRef.current}
-                    width={cacheW}
-                    height={cacheH}
-                  />
-                </ChartDrillContextMenu>
-              </Spin>
-            </ChartWrapper>
-            <StyledChartDrillPathsContainer>
-              <ChartDrillPaths chartConfig={chartPreview?.chartConfig} />
-            </StyledChartDrillPathsContainer>
-            <StyledChartDrillPathsContainer />
-          </ChartDrillContext.Provider>
+            <ChartDrillContext.Provider
+              value={{
+                drillOption: drillOptionRef.current,
+                onDrillOptionChange: handleDrillOptionChange,
+                availableSourceFunctions,
+                onDateLevelChange: handleDateLevelChange,
+              }}
+            >
+              <div>
+                <ControllerPanel
+                  viewId={chartPreview?.backendChart?.viewId}
+                  view={chartPreview?.backendChart?.view}
+                  chartConfig={chartPreview?.chartConfig}
+                  onChange={handleFilterChange}
+                />
+              </div>
+              <ChartWrapper ref={ref}>
+                <Spin wrapperClassName="spinWrapper" spinning={loadingStatus}>
+                  <ChartDrillContextMenu
+                    chartConfig={chartPreview?.chartConfig!}
+                  >
+                    <ChartIFrameContainer
+                      key={backendChartId}
+                      containerId={backendChartId}
+                      dataset={lastConfig?.dataset}
+                      chart={chart!}
+                      config={chartPreview?.chartConfig!}
+                      drillOption={drillOptionRef.current}
+                      selectionOption={lastConfig?.selectionOption}
+                      width={cacheW}
+                      height={cacheH}
+                    />
+                  </ChartDrillContextMenu>
+                </Spin>
+              </ChartWrapper>
+              <StyledChartDrillPathsContainer>
+                <ChartDrillPaths chartConfig={chartPreview?.chartConfig!} />
+              </StyledChartDrillPathsContainer>
+              <StyledChartDrillPathsContainer />
+            </ChartDrillContext.Provider>
+          </ChartSelectContext.Provider>
         </PreviewBlock>
       </StyledChartPreviewBoard>
     );

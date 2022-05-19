@@ -4,7 +4,7 @@ import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/models/ChartManager';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { CloneValueDeep } from 'utils/object';
+import { CloneValueDeep, isUndefined } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import {
   addStoryboard,
@@ -138,6 +138,41 @@ const slice = createSlice({
       Object.entries(initialState).forEach(([key, value]) => {
         state[key] = value;
       });
+    },
+
+    chartPreviewsSingleSelectionOption(
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        backendChartId: string;
+        data: { index: string; data: any };
+      }>,
+    ) {
+      const previewConfig = state.chartPreviews?.find(
+        v => v.backendChartId === payload.backendChartId,
+      );
+      if (previewConfig) {
+        const selectionConfig = previewConfig?.selectionOption?.find(
+          v => v.index === payload.data.index,
+        );
+        if (!isUndefined(selectionConfig)) {
+          previewConfig.selectionOption = [];
+        } else {
+          previewConfig.selectionOption = [payload.data];
+        }
+      }
+    },
+    clearChartPreviewsSelectionOption(
+      state,
+      { payload }: PayloadAction<string>,
+    ) {
+      const previewConfig = state.chartPreviews?.find(
+        v => v.backendChartId === payload,
+      );
+      if (previewConfig && previewConfig?.selectionOption) {
+        previewConfig.selectionOption = [];
+      }
     },
   },
   extraReducers: builder => {

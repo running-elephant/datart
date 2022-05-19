@@ -94,3 +94,8 @@ export const selectAvailableSourceFunctions = createSelector(
   workbenchSelector,
   wb => wb.availableSourceFunctions,
 );
+
+export const selectionOptionSelector = createSelector(
+  workbenchSelector,
+  wb => wb.selectionOption,
+);

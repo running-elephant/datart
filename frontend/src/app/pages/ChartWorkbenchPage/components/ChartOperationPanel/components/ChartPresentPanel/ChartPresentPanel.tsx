@@ -24,6 +24,7 @@ import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContai
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import ChartSelectContext from 'app/pages/ChartWorkbenchPage/contexts/ChartSelectContext';
 import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
@@ -75,6 +76,7 @@ const ChartPresentPanel: FC<{
     const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
     const datasetLoadingStatus = useSelector(datasetLoadingSelector);
     const { drillOption } = useContext(ChartDrillContext);
+    const { selectionOption } = useContext(ChartSelectContext);
 
     useMount(undefined, () => {
       Debugger.instance.measure(`ChartPresentPanel | Dispose Event`, () => {
@@ -96,6 +98,7 @@ const ChartPresentPanel: FC<{
           chartConfig!,
           style,
           drillOption,
+          selectionOption,
         )
       );
     };

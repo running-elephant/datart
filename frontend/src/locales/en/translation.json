@@ -633,7 +633,11 @@
           "insideTopLeft": "Inside Top Left",
           "insideBottomLeft": "Inside Bottom Left",
           "insideTopRight": "Inside Top Right",
-          "insideBottomRight": "Inside Bottom Right"
+          "insideBottomRight": "Inside Bottom Right",
+          "leftTop": "Left Top",
+          "leftBottom": "Left Bottom",
+          "rightTop": "Right Top",
+          "rightBottom": "Right Bottom"
         }
       },
       "data": {

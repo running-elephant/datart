@@ -28,6 +28,7 @@ import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import ChartDataView from 'app/types/ChartDataView';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
+import { isUndefined } from 'utils/object';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import { createWidgetInfo } from '../../../utils/widget';
 import {
@@ -318,6 +319,34 @@ const boardSlice = createSlice({
         dataChart.config.computedFields = action.payload.computedFields;
         state.dataChartMap[action.payload.id] = dataChart;
       }
+    },
+
+    boardSingleSelectionOption(
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        wid: string;
+        bid: string;
+        data: { index: string; data: any };
+      }>,
+    ) {
+      const findDataIndex = state.widgetInfoRecord[payload.bid][
+        payload.wid
+      ].selectionOption?.find(v => v.index === payload.data.index);
+      if (!isUndefined(findDataIndex)) {
+        state.widgetInfoRecord[payload.bid][payload.wid].selectionOption = [];
+      } else {
+        state.widgetInfoRecord[payload.bid][payload.wid].selectionOption = [
+          payload.data,
+        ];
+      }
+    },
+    clearBoardSelectionOption(
+      state,
+      { payload }: PayloadAction<{ wid: string; bid: string }>,
+    ) {
+      state.widgetInfoRecord[payload.bid][payload.wid].selectionOption = [];
     },
   },
   extraReducers: builder => {
