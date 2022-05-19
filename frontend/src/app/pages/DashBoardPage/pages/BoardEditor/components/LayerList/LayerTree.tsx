@@ -15,47 +15,89 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Tree, TreeDataNode } from 'antd';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { FC, memo, useContext } from 'react';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useSelector } from 'react-redux';
+import classNames from 'classnames';
+import { FC, memo, useCallback, useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { selectLayoutWidgetMap } from '../../slice/selectors';
-import { LayerItem } from './LayerItem';
-export const LayerTree: FC<{}> = memo(() => {
-  return (
-    <DndProvider backend={HTML5Backend}>
-      <LayerTreeRoot />
-    </DndProvider>
-  );
-});
+import { PRIMARY } from 'styles/StyleConstants';
+import { editWidgetInfoActions } from '../../slice';
+import { dropLayerNodeAction } from '../../slice/actions/actions';
+import { selectLayerTree } from '../../slice/selectors';
+export interface LayerNode extends TreeDataNode {
+  key: string;
+  parentId: string;
+  selected: boolean;
+  children: LayerNode[];
+  content: any;
+  widgetIndex: number;
+  originalType: string;
+}
 
-export const LayerTreeRoot: FC<{}> = memo(() => {
+export const LayerTree: FC<{}> = memo(() => {
+  const dispatch = useDispatch();
   const { boardId } = useContext(BoardContext);
-  const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
-  const sortedLayoutWidgets = Object.values(layoutWidgetMap).sort(
-    (a, b) => a.config.index - b.config.index,
+  const treeData = useSelector(selectLayerTree);
+
+  const menuSelect = useCallback(
+    (node: LayerNode) => e => {
+      e.stopPropagation();
+      dispatch(
+        editWidgetInfoActions.selectWidget({
+          multipleKey: e.shiftKey,
+          id: node.key as string,
+          selected: true,
+        }),
+      );
+    },
+    [dispatch],
+  );
+
+  const renderTreeTitle = useCallback(
+    treeNode => {
+      const node = treeNode as LayerNode;
+      const { title, selected } = node;
+      return (
+        <div
+          onClick={menuSelect(node)}
+          className={classNames('layer-item', { selected: selected })}
+        >
+          {title}
+        </div>
+      );
+    },
+    [menuSelect],
+  );
+  const onDrop = useCallback(
+    info => dispatch(dropLayerNodeAction(info)),
+    [dispatch],
   );
   return (
-    <StyledWrapper>
-      {sortedLayoutWidgets.map((widget, index) => {
-        return (
-          <LayerItem
-            index={index}
-            parentId={''}
-            key={widget.id}
-            wid={widget.id}
-            boardId={boardId}
-          />
-        );
-      })}
+    <StyledWrapper className="" onClick={e => e.stopPropagation()}>
+      <Tree
+        onClick={e => e.stopPropagation()}
+        className="widget-tree"
+        draggable
+        blockNode
+        titleRender={renderTreeTitle}
+        onDrop={onDrop}
+        treeData={treeData}
+      />
     </StyledWrapper>
   );
 });
 const StyledWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: 2000px;
-  background-color: pink;
+
+  .widget-tree.ant-tree .ant-tree-node-content-wrapper:hover {
+    background-color: ${p => p.theme.componentBackground};
+  }
+  .widget-tree.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected {
+    background-color: ${p => p.theme.componentBackground};
+  }
+  .layer-item.selected {
+    background-color: ${PRIMARY};
+  }
 `;

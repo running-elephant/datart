@@ -29,7 +29,7 @@ import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
 import { CSSProperties } from 'react';
 import { adaptBoardImageUrl, fillPx, getBackgroundImage } from '.';
-import { resetParentsRect } from '../components/Widgets/GroupWidget/utils';
+import { adjustGroupWidgets } from '../components/Widgets/GroupWidget/utils';
 import { LAYOUT_COLS_MAP, ORIGINAL_TYPE_MAP } from '../constants';
 import {
   BackgroundConfig,
@@ -683,18 +683,11 @@ export const deleteEffect = (widgetMap: Record<string, Widget>) => {
   let groupIds: string[] = [];
   Object.values(widgetMap).forEach(widget => {
     if (widget.config.originalType === ORIGINAL_TYPE_MAP.group) {
-      if (!widget.config.children?.length) {
-        delete widgetMap[widget.id];
-      }
-      const newChildren = widget.config.children?.filter(id => widgetMap[id]);
-      if (!newChildren?.length) {
-        delete widgetMap[widget.id];
-      }
       if (widgetMap[widget.id]) {
         groupIds.push(widget.id);
       }
     }
   });
 
-  resetParentsRect({ parentIds: groupIds, widgetMap });
+  adjustGroupWidgets({ groupIds: groupIds, widgetMap });
 };

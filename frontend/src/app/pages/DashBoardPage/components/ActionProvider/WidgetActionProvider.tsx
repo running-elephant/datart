@@ -93,6 +93,9 @@ export const WidgetActionProvider: FC<{
           },
           500,
         ),
+        onAdjustGroupWidget: (wid: string) => {
+          dispatch(editBoardStackActions.adjustGroupWidget({ wid }));
+        },
         onEditDeleteActiveWidgets: debounce((ids?: string[]) => {
           dispatch(deleteWidgetsAction(ids));
         }, 200),
@@ -287,6 +290,7 @@ export interface WidgetActionContextProps {
   onWidgetsQuery: () => void;
   onRenderedWidgetById: (wid: string) => void;
   onChangeGroupRect: (args: { wid: string; w: number; h: number }) => void;
+
   onWidgetDataUpdate: ({
     computedFields,
     payload,
@@ -302,6 +306,7 @@ export interface WidgetActionContextProps {
   onWidgetsReset: () => void;
 
   // editor
+  onAdjustGroupWidget: (wid: string) => void;
   onEditChartWidget: (widget: Widget) => void;
   onEditContainerWidget: (wid: string) => void;
   onEditMediaWidget: (wid: string) => void;

@@ -19,11 +19,11 @@
 import { PayloadAction } from '@reduxjs/toolkit';
 import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import {
+  adjustGroupWidgets,
   findChildIds,
   findParentIds,
   moveGroupAllChildren,
   resetGroupAllChildrenRect,
-  resetParentsRect,
 } from 'app/pages/DashBoardPage/components/Widgets/GroupWidget/utils';
 import {
   ContainerItem,
@@ -41,6 +41,7 @@ import { updateCollectionByAction } from 'app/utils/mutation';
 import produce from 'immer';
 import { Layout } from 'react-grid-layout';
 import { createSlice } from 'utils/@reduxjs/toolkit';
+import { ORIGINAL_TYPE_MAP } from '../../../../constants';
 import { EditBoardStack } from '../types';
 
 export type updateWidgetConf = {
@@ -134,8 +135,29 @@ export const editBoardStackSlice = createSlice({
     ) {
       const { wIds, parentId } = action.payload;
       wIds.forEach(wid => {
-        if (state.widgetRecord?.[wid]?.config) {
+        const prePId = state.widgetRecord[wid].parentId;
+        if (prePId && state.widgetRecord[prePId]) {
+          const preParent = state.widgetRecord[prePId];
+          const oldChildren = preParent.config.children;
+          preParent.config.children = oldChildren?.filter(id => id !== wid);
+          adjustGroupWidgets({
+            groupIds: [prePId],
+            widgetMap: state.widgetRecord,
+          });
+        }
+        if (state.widgetRecord?.[wid]) {
           state.widgetRecord[wid].parentId = parentId;
+        }
+        const nextParent = state.widgetRecord[parentId];
+        if (nextParent) {
+          let pChildren = nextParent.config.children;
+          if (!pChildren?.includes(wid)) {
+            pChildren?.push(wid);
+          }
+          adjustGroupWidgets({
+            groupIds: [nextParent.id],
+            widgetMap: state.widgetRecord,
+          });
         }
       });
     },
@@ -171,51 +193,7 @@ export const editBoardStackSlice = createSlice({
       );
       state.widgetRecord[wid].config.customConfig.props = newProps;
     },
-    changeFreeWidgetRect(
-      state,
-      action: PayloadAction<{
-        wid: string;
-        rect: RectConfig;
-      }>,
-    ) {
-      const { wid, rect: newRect } = action.payload;
-      const widgetMap = state.widgetRecord;
-      const targetWidget = widgetMap[wid];
-      if (!targetWidget) return;
-      const oldRect = targetWidget.config.rect;
-      const diffRect: RectConfig = {
-        x: newRect.x - oldRect.x,
-        y: newRect.y - oldRect.y,
-        width: newRect.width - oldRect.width,
-        height: newRect.height - oldRect.height,
-      };
 
-      targetWidget.config.rect = newRect;
-
-      const hasMoveEvent = diffRect.x !== 0 || diffRect.y !== 0;
-      const hasResizeEvent = diffRect.width !== 0 || diffRect.height !== 0;
-
-      if (hasMoveEvent) {
-        // handle children : collect all children and move them
-        const childIds: string[] = [];
-        findChildIds({ widget: targetWidget, widgetMap, childIds });
-        moveGroupAllChildren({ childIds, widgetMap, diffRect });
-        // handle parents : collect all parents and resetParentsRect
-        const parentIds: string[] = [];
-        findParentIds({ widget: targetWidget, widgetMap, parentIds });
-        resetParentsRect({ parentIds, widgetMap });
-      }
-      if (hasResizeEvent) {
-        // handle children : collect all children and resize them
-        const childIds: string[] = [];
-        findChildIds({ widget: targetWidget, widgetMap, childIds });
-        resetGroupAllChildrenRect({ childIds, widgetMap, oldRect, newRect });
-        // handle parents : collect all parents and resetParentsRect
-        const parentIds: string[] = [];
-        findParentIds({ widget: targetWidget, widgetMap, parentIds });
-        resetParentsRect({ parentIds, widgetMap });
-      }
-    },
     updateWidgetConfig(
       state,
       action: PayloadAction<{ wid: string; config: WidgetConf }>,
@@ -282,7 +260,79 @@ export const editBoardStackSlice = createSlice({
         state.widgetRecord[id].config.index = index;
       });
     },
+    // group
+    changeFreeWidgetRect(
+      state,
+      action: PayloadAction<{
+        wid: string;
+        rect: RectConfig;
+      }>,
+    ) {
+      const { wid, rect: newRect } = action.payload;
+      const widgetMap = state.widgetRecord;
+      const targetWidget = widgetMap[wid];
+      if (!targetWidget) return;
+      const oldRect = targetWidget.config.rect;
+      const diffRect: RectConfig = {
+        x: newRect.x - oldRect.x,
+        y: newRect.y - oldRect.y,
+        width: newRect.width - oldRect.width,
+        height: newRect.height - oldRect.height,
+      };
+      targetWidget.config.rect = newRect;
 
+      if (
+        !targetWidget.parentId &&
+        targetWidget.config.originalType !== ORIGINAL_TYPE_MAP.group
+      ) {
+        return;
+      }
+
+      const hasMoveEvent = diffRect.x !== 0 || diffRect.y !== 0;
+      const hasResizeEvent = diffRect.width !== 0 || diffRect.height !== 0;
+
+      if (hasMoveEvent) {
+        // handle children : collect all children and move them
+        const childIds: string[] = [];
+        findChildIds({ widget: targetWidget, widgetMap, childIds });
+        moveGroupAllChildren({ childIds, widgetMap, diffRect });
+        // handle parents : collect all parents and resetParentsRect
+        const parentIds: string[] = [];
+        findParentIds({ widget: targetWidget, widgetMap, parentIds });
+        adjustGroupWidgets({ groupIds: parentIds, widgetMap });
+      }
+      if (hasResizeEvent) {
+        // handle children : collect all children and resize them
+        const childIds: string[] = [];
+        findChildIds({ widget: targetWidget, widgetMap, childIds });
+        resetGroupAllChildrenRect({ childIds, widgetMap, oldRect, newRect });
+        // handle parents : collect all parents and resetParentsRect
+        const parentIds: string[] = [];
+        findParentIds({ widget: targetWidget, widgetMap, parentIds });
+        adjustGroupWidgets({ groupIds: parentIds, widgetMap });
+      }
+    },
+    adjustGroupWidget(state, action: PayloadAction<{ wid: string }>) {
+      const { wid } = action.payload;
+      adjustGroupWidgets({
+        groupIds: [wid],
+        widgetMap: state.widgetRecord,
+      });
+    },
+
+    // changeWidgetGroup(
+    //   state,
+    //   action: PayloadAction<{
+    //     preWId: string;
+    //     preParentId: string;
+    //     newParentId: string;
+    //   }>,
+    // ) {
+    //   const { preWId, preParentId, newParentId } = action.payload;
+    //   state.widgetRecord[preWId].parentId = newParentId;
+
+    // },
+    /* tabs widget */
     addWidgetToTabWidget(
       state,
       action: PayloadAction<{
@@ -307,7 +357,7 @@ export const editBoardStackSlice = createSlice({
       state.widgetRecord[tabWidgetId].config.content = tabContent;
       state.widgetRecord[sourceId].parentId = tabWidgetId;
     },
-    /* tabs widget */
+
     tabsWidgetAddTab(
       state,
       action: PayloadAction<{

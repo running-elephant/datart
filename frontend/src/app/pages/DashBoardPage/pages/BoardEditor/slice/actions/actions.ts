@@ -47,6 +47,7 @@ import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { ORIGINAL_TYPE_MAP } from '../../../../constants';
 import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
+import { LayerNode } from '../../components/LayerList/LayerTree';
 import { getEditChartWidgetDataAsync } from '../thunk';
 import { EditBoardState, HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
@@ -441,4 +442,65 @@ export const editorWidgetClearLinkageAction = (widget: Widget) => dispatch => {
       }),
     );
   });
+};
+
+export type EventLayerNode = LayerNode & {
+  dragOver: boolean;
+  dragOverGapTop: boolean;
+  dragOverGapBottom: boolean;
+};
+export const dropLayerNodeAction = info => (dispatch, getState) => {
+  const dragNode = info.dragNode as EventLayerNode;
+  const targetNode = info.node as EventLayerNode;
+  const editBoard = getState().editBoard as HistoryEditBoard;
+  const widgetMap = editBoard.stack.present.widgetRecord;
+  // 1 如果 两个 node parentId 一样 哪呢就只交换他们的index 顺序
+
+  // 2如果他们的 parentId 不一样 那么就说明他们来自不同的层级 ，
+  //2.1 移动他们的组关系并调整 他们的index
+  // 2.2; 遇到 tab 组件另行处理
+
+  // console.log('onDrop.info', info);
+  console.log('dragOver', targetNode.dragOver);
+  console.log('dragOverGapBottom', targetNode.dragOverGapBottom);
+  console.log('dragOverGapTop', targetNode.dragOverGapTop);
+  //相同树的层级
+  if (dragNode.parentId === targetNode.parentId) {
+    if (!targetNode.dragOver) {
+      let nextIndex = 0;
+      if (targetNode.dragOverGapBottom) {
+        nextIndex =
+          targetNode.widgetIndex - parseFloat(Math.random().toFixed(5));
+        dispatch(
+          editBoardStackActions.changeWidgetsIndex([
+            { id: dragNode.key, index: nextIndex },
+          ]),
+        );
+      }
+      if (targetNode.dragOverGapTop) {
+        nextIndex = targetNode.widgetIndex + 1;
+        dispatch(
+          editBoardStackActions.changeWidgetsIndex([
+            { id: dragNode.key, index: nextIndex },
+          ]),
+        );
+      }
+    }
+  } else {
+    // 不同的层级之间移动
+    dispatch(
+      editBoardStackActions.changeWidgetsParentId({
+        wIds: [dragNode.key],
+        parentId: targetNode.parentId,
+      }),
+    );
+    if (!targetNode.parentId) {
+      // changeWidgetsParentId;
+    }
+  }
+
+  //    else if (!targetNode.parentId && dragNode.parentId) {
+  //   // 从其他的组里面拖到最外层 从某组脱离
+  // }
+  // editBoardStackActions.updateWidgetsConfig; changeWidgetsIndex
 };

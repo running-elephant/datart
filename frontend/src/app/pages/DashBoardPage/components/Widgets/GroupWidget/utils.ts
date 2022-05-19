@@ -85,18 +85,28 @@ export const findParentIds = (args: {
   }
 };
 
-export const resetParentsRect = (args: {
-  parentIds: string[];
+export const adjustGroupWidgets = (args: {
+  groupIds: string[];
   widgetMap: Record<string, Widget>;
 }) => {
-  const { parentIds, widgetMap } = args;
-  parentIds.forEach(id => {
-    const curWidget = widgetMap[id];
-    if (!curWidget) return;
-    curWidget.config.rect = getParentRect({
-      childIds: curWidget.config.children,
+  const { groupIds, widgetMap } = args;
+  groupIds.forEach(gid => {
+    const curGroup = widgetMap[gid];
+    if (!curGroup) return;
+    if (curGroup.config.originalType !== ORIGINAL_TYPE_MAP.group) return;
+    if (!curGroup.config.children) {
+      delete widgetMap[gid];
+      return;
+    }
+    const newChildren = curGroup.config.children?.filter(id => widgetMap[id]);
+    if (!newChildren?.length) {
+      delete widgetMap[curGroup.id];
+      return;
+    }
+    curGroup.config.rect = getParentRect({
+      childIds: curGroup.config.children,
       widgetMap,
-      preRect: curWidget.config.rect,
+      preRect: curGroup.config.rect,
     });
   });
 };

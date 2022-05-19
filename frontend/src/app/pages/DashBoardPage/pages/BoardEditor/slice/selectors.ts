@@ -30,6 +30,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { StateWithHistory } from 'redux-undo';
+import { widgetMapToTree } from '../components/LayerList/utils';
 import { getLayoutWidgets } from './../../../utils/widget';
 import { EditBoardStack } from './types';
 
@@ -106,7 +107,7 @@ export const selectLayoutWidgetMap = createSelector(
 
 // widgetsInfo
 export const selectAllWidgetInfoMap = (state: { editBoard: EditBoardState }) =>
-  state.editBoard.widgetInfoRecord || {};
+  state.editBoard.widgetInfoRecord || undefined;
 
 export const selectWidgetInfoById = createSelector(
   [selectAllWidgetInfoMap, (_, widgetId: string) => widgetId],
@@ -140,6 +141,17 @@ export const selectWidgetInfoDatachartId = createSelector(
     }) || [],
 );
 
+export const selectLayerTree = createSelector(
+  [selectAllWidgetMap, selectAllWidgetInfoMap],
+  (widgetMap, widgetInfoMap) => {
+    return widgetMapToTree({
+      widgetMap,
+      widgetInfoMap,
+      parentId: '',
+      tree: [],
+    });
+  },
+);
 // boardInfo
 export const boardInfoState = (state: { editBoard: EditBoardState }) =>
   state.editBoard.boardInfo;

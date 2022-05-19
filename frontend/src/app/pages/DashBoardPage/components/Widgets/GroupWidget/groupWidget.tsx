@@ -31,8 +31,12 @@ export const GroupWidget: React.FC<{}> = memo(() => {
   const wid = widget.id;
 
   const { editing } = useContext(BoardContext);
-  const { onChangeGroupRect } = useContext(WidgetActionContext);
-  // changeGroupRectAction
+  const { onChangeGroupRect, onAdjustGroupWidget } =
+    useContext(WidgetActionContext);
+
+  // useEffect(() => {
+  //   onAdjustGroupWidget(wid);
+  // }, [onAdjustGroupWidget, wid, widget.config.children?.length]);
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
   useEffect(() => {
     onChangeGroupRect({ wid, w: cacheW, h: cacheH });
