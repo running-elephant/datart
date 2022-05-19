@@ -15,72 +15,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Tree, TreeDataNode } from 'antd';
-import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import classNames from 'classnames';
-import { FC, memo, useCallback, useContext } from 'react';
+import { Tree } from 'antd';
+import { FC, memo, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { PRIMARY } from 'styles/StyleConstants';
-import { editWidgetInfoActions } from '../../slice';
 import { dropLayerNodeAction } from '../../slice/actions/actions';
 import { selectLayerTree } from '../../slice/selectors';
-export interface LayerNode extends TreeDataNode {
-  key: string;
-  parentId: string;
-  selected: boolean;
-  children: LayerNode[];
-  content: any;
-  widgetIndex: number;
-  originalType: string;
-}
+import { LayerTreeItem } from './LayerTreeItem';
 
 export const LayerTree: FC<{}> = memo(() => {
   const dispatch = useDispatch();
-  const { boardId } = useContext(BoardContext);
   const treeData = useSelector(selectLayerTree);
-
-  const menuSelect = useCallback(
-    (node: LayerNode) => e => {
-      e.stopPropagation();
-      dispatch(
-        editWidgetInfoActions.selectWidget({
-          multipleKey: e.shiftKey,
-          id: node.key as string,
-          selected: true,
-        }),
-      );
-    },
-    [dispatch],
-  );
-
-  const renderTreeTitle = useCallback(
-    treeNode => {
-      const node = treeNode as LayerNode;
-      const { title, selected } = node;
-      return (
-        <div
-          onClick={menuSelect(node)}
-          className={classNames('layer-item', { selected: selected })}
-        >
-          {title}
-        </div>
-      );
-    },
-    [menuSelect],
-  );
+  const renderTreeItem = useCallback(n => <LayerTreeItem node={n} />, []);
   const onDrop = useCallback(
     info => dispatch(dropLayerNodeAction(info)),
     [dispatch],
   );
   return (
-    <StyledWrapper className="" onClick={e => e.stopPropagation()}>
+    <StyledWrapper onClick={e => e.stopPropagation()}>
       <Tree
         onClick={e => e.stopPropagation()}
         className="widget-tree"
         draggable
         blockNode
-        titleRender={renderTreeTitle}
+        titleRender={renderTreeItem}
         onDrop={onDrop}
         treeData={treeData}
       />
@@ -88,16 +46,10 @@ export const LayerTree: FC<{}> = memo(() => {
   );
 });
 const StyledWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-
   .widget-tree.ant-tree .ant-tree-node-content-wrapper:hover {
     background-color: ${p => p.theme.componentBackground};
   }
   .widget-tree.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected {
     background-color: ${p => p.theme.componentBackground};
-  }
-  .layer-item.selected {
-    background-color: ${PRIMARY};
   }
 `;

@@ -18,7 +18,7 @@
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { WidgetInfo } from '../../../Board/slice/types';
-import { LayerNode } from './LayerTree';
+import { LayerNode } from './LayerTreeItem';
 
 export const widgetMapToTree = (args: {
   widgetMap: Record<string, Widget>;
@@ -40,6 +40,7 @@ export const widgetMapToTree = (args: {
       title: widget.config.name,
       isLeaf: true,
       children: [],
+      boardId: widget.dashboardId,
       content: widget.config.content,
       originalType: widget.config.originalType,
       selected: widgetInfoMap[widget.id].selected,

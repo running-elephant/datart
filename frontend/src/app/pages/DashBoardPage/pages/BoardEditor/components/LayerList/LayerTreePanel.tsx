@@ -36,17 +36,15 @@ const StyledWrapper = styled.div`
   flex-direction: column;
   width: 190px;
   min-width: 190px;
+  max-width: 190px;
   overflow-y: auto;
   background-color: ${p => p.theme.componentBackground};
   box-shadow: ${p => p.theme.shadowSider};
-
   & .title {
-    padding: 5px;
     text-align: center;
   }
   & .layerTree-box {
     min-height: 0;
-    padding: 0 10px;
     overflow-y: auto;
   }
   & .bottom {
