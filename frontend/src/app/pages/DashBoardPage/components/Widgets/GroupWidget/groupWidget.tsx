@@ -68,7 +68,6 @@ const RelativeWrapper = styled.div`
 const StyleWrapper = styled.div`
   display: flex;
   flex: 1;
-  background-color: #7ab1d63e;
   &:hover .widget-tool-dropdown {
     visibility: visible;
   }
