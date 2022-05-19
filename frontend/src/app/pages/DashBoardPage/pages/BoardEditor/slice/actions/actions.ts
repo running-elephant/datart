@@ -350,6 +350,12 @@ export const onComposeGroupAction =
       widgetMap,
       preRect: groupWidget.config.rect,
     });
+    const items = selectedIds.map(id => {
+      return {
+        wid: id,
+        nextIndex: widgetMap[id].config.index,
+      };
+    });
     const widgetInfoMap = createWidgetInfoMap([groupWidget]);
     dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
     dispatch(editBoardStackActions.addWidgets([groupWidget]));
@@ -357,7 +363,7 @@ export const onComposeGroupAction =
 
     dispatch(
       editBoardStackActions.changeWidgetsParentId({
-        wIds: selectedIds,
+        items,
         parentId: groupWidget.id,
       }),
     );
@@ -454,53 +460,145 @@ export const dropLayerNodeAction = info => (dispatch, getState) => {
   const targetNode = info.node as EventLayerNode;
   const editBoard = getState().editBoard as HistoryEditBoard;
   const widgetMap = editBoard.stack.present.widgetRecord;
-  // 1 如果 两个 node parentId 一样 哪呢就只交换他们的index 顺序
-
-  // 2如果他们的 parentId 不一样 那么就说明他们来自不同的层级 ，
-  //2.1 移动他们的组关系并调整 他们的index
-  // 2.2; 遇到 tab 组件另行处理
-
-  // console.log('onDrop.info', info);
+  function parentIsContainer(node: EventLayerNode) {
+    if (!node.parentId) return false;
+    if (
+      widgetMap[node.parentId] &&
+      widgetMap[node.parentId].config.originalType !== ORIGINAL_TYPE_MAP.group
+    ) {
+      return true;
+    }
+    return false;
+  }
   console.log('dragOver', targetNode.dragOver);
   console.log('dragOverGapBottom', targetNode.dragOverGapBottom);
   console.log('dragOverGapTop', targetNode.dragOverGapTop);
-  //相同树的层级
-  if (dragNode.parentId === targetNode.parentId) {
-    if (!targetNode.dragOver) {
-      let nextIndex = 0;
-      if (targetNode.dragOverGapBottom) {
-        nextIndex =
-          targetNode.widgetIndex - parseFloat(Math.random().toFixed(5));
-        dispatch(
-          editBoardStackActions.changeWidgetsIndex([
-            { id: dragNode.key, index: nextIndex },
-          ]),
-        );
-      }
-      if (targetNode.dragOverGapTop) {
-        nextIndex = targetNode.widgetIndex + 1;
-        dispatch(
-          editBoardStackActions.changeWidgetsIndex([
-            { id: dragNode.key, index: nextIndex },
-          ]),
-        );
-      }
-    }
-  } else {
-    // 不同的层级之间移动
-    dispatch(
-      editBoardStackActions.changeWidgetsParentId({
-        wIds: [dragNode.key],
-        parentId: targetNode.parentId,
-      }),
-    );
-    if (!targetNode.parentId) {
-      // changeWidgetsParentId;
-    }
+  /*
+  1 group -> group
+  2 group -> container
+  3 container -> group
+  4 container -> container
+  */
+  // 1 group -> group
+  if (!parentIsContainer(dragNode) && !parentIsContainer(targetNode)) {
+    moveNodeGroupToGroup({ dispatch, targetNode, dragNode });
+    return;
   }
+  //  2 group -> container
+  if (!parentIsContainer(dragNode) && parentIsContainer(targetNode)) {
+    moveNodeGroupToContainer({ dispatch, targetNode, dragNode });
+    return;
+  }
+  // 3 container -> group
+  if (parentIsContainer(dragNode) && !parentIsContainer(targetNode)) {
+    // moveNodeGroupToGroup({ dispatch, targetNode, dragNode });
+    moveNodeContainerToGroup({ dispatch, targetNode, dragNode });
+    return;
+  }
+  // 4 container -> container
+  if (parentIsContainer(dragNode) && parentIsContainer(targetNode)) {
+    moveNodeContainerToContainer({ dispatch, targetNode, dragNode });
+    return;
+  }
+  return;
+};
 
-  //    else if (!targetNode.parentId && dragNode.parentId) {
-  //   // 从其他的组里面拖到最外层 从某组脱离
-  // }
-  // editBoardStackActions.updateWidgetsConfig; changeWidgetsIndex
+export const moveNodeGroupToGroup = (args: {
+  dispatch;
+  dragNode: EventLayerNode;
+  targetNode: EventLayerNode;
+}) => {
+  const { dragNode, targetNode } = args;
+  if (dragNode.parentId === targetNode.parentId) {
+    // only change index
+    moveNodeInSameGroup(args);
+  } else {
+    //change parentId and index
+    moveNodeToOtherGroup(args);
+  }
+};
+
+export const moveNodeInSameGroup = (args: {
+  dispatch;
+  dragNode: EventLayerNode;
+  targetNode: EventLayerNode;
+}) => {
+  const { dispatch, dragNode, targetNode } = args;
+  if (targetNode.dragOver) return; //todo to group first
+  let nextIndex = 0;
+  if (targetNode.dragOverGapBottom) {
+    nextIndex = targetNode.widgetIndex - parseFloat(Math.random().toFixed(5));
+  }
+  if (targetNode.dragOverGapTop) {
+    nextIndex = targetNode.widgetIndex + 1;
+  }
+  dispatch(
+    editBoardStackActions.changeWidgetsIndex([
+      { id: dragNode.key, index: nextIndex },
+    ]),
+  );
+};
+
+export const moveNodeToOtherGroup = (args: {
+  dispatch;
+  dragNode: EventLayerNode;
+  targetNode: EventLayerNode;
+}) => {
+  const { dispatch, dragNode, targetNode } = args;
+  if (targetNode.dragOver) return; //todo to group first
+  let nextIndex = 0;
+  if (targetNode.dragOverGapBottom) {
+    nextIndex = targetNode.widgetIndex - parseFloat(Math.random().toFixed(5));
+  }
+  if (targetNode.dragOverGapTop) {
+    nextIndex = targetNode.widgetIndex + 1;
+  }
+  dispatch(
+    editBoardStackActions.changeWidgetsParentId({
+      items: [
+        {
+          wid: dragNode.key,
+          nextIndex,
+        },
+      ],
+      parentId: targetNode.parentId,
+    }),
+  );
+};
+
+export const moveNodeContainerToGroup = (args: {
+  dispatch;
+  dragNode: EventLayerNode;
+  targetNode: EventLayerNode;
+}) => {
+  const { dispatch, dragNode, targetNode } = args;
+  if (targetNode.dragOver) return;
+  dispatch(editBoardStackActions.dropTabToGroup({ dragNode, targetNode }));
+};
+export const moveNodeGroupToContainer = (args: {
+  dispatch;
+  dragNode: EventLayerNode;
+  targetNode: EventLayerNode;
+}) => {
+  const { dispatch, dragNode, targetNode } = args;
+  if (targetNode.dragOver) return;
+  dispatch(editBoardStackActions.dropGroupToTab({ dragNode, targetNode }));
+  // dropGroupToTab
+};
+export const moveNodeContainerToContainer = (args: {
+  dispatch;
+  dragNode: EventLayerNode;
+  targetNode: EventLayerNode;
+}) => {
+  const { dispatch, dragNode, targetNode } = args;
+  if (targetNode.dragOver) return;
+  if (dragNode.parentId === targetNode.parentId) {
+    // only change index
+    dispatch(
+      editBoardStackActions.changeTabItemIndex({ dragNode, targetNode }),
+    );
+  } else {
+    //change parentId and index
+    dispatch(editBoardStackActions.dropTabToOtherTab({ dragNode, targetNode }));
+  }
 };

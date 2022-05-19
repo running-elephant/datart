@@ -17,7 +17,7 @@
  */
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
-import { WidgetInfo } from '../../../Board/slice/types';
+import { TabWidgetContent, WidgetInfo } from '../../../Board/slice/types';
 import { LayerNode } from './LayerTreeItem';
 
 export const widgetMapToTree = (args: {
@@ -27,11 +27,29 @@ export const widgetMapToTree = (args: {
   tree: LayerNode[] | undefined;
 }) => {
   const { widgetMap, widgetInfoMap, parentId, tree } = args;
-  const sortedWidgets = Object.values(widgetMap)
-    .sort((a, b) => b.config.index - a.config.index)
-    .filter(widget => {
-      return widget.parentId === parentId;
+
+  const widgets = Object.values(widgetMap).filter(widget => {
+    return widget.parentId === parentId;
+  });
+  let sortedWidgets = widgets;
+
+  if (
+    widgetMap[parentId] &&
+    widgetMap[parentId].config.originalType === ORIGINAL_TYPE_MAP.tab
+  ) {
+    const itemMap = (widgetMap[parentId].config.content as TabWidgetContent)
+      .itemMap;
+    const items = Object.values(itemMap).sort((a, b) => a.index - b.index);
+
+    sortedWidgets = items.map(item => {
+      return widgetMap[item.childWidgetId];
     });
+  } else {
+    sortedWidgets = widgets.sort((a, b) => {
+      return b.config.index - a.config.index;
+    });
+  }
+
   sortedWidgets.forEach(widget => {
     const treeNode: LayerNode = {
       key: widget.id,

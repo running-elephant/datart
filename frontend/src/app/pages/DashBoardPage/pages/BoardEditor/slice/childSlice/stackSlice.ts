@@ -42,6 +42,7 @@ import produce from 'immer';
 import { Layout } from 'react-grid-layout';
 import { createSlice } from 'utils/@reduxjs/toolkit';
 import { ORIGINAL_TYPE_MAP } from '../../../../constants';
+import { EventLayerNode } from '../actions/actions';
 import { EditBoardStack } from '../types';
 
 export type updateWidgetConf = {
@@ -131,10 +132,16 @@ export const editBoardStackSlice = createSlice({
     },
     changeWidgetsParentId(
       state,
-      action: PayloadAction<{ wIds: string[]; parentId: string }>,
+      action: PayloadAction<{
+        items: {
+          wid: string;
+          nextIndex: number;
+        }[];
+        parentId: string;
+      }>,
     ) {
-      const { wIds, parentId } = action.payload;
-      wIds.forEach(wid => {
+      const { items, parentId } = action.payload;
+      items.forEach(({ wid, nextIndex }) => {
         const prePId = state.widgetRecord[wid].parentId;
         if (prePId && state.widgetRecord[prePId]) {
           const preParent = state.widgetRecord[prePId];
@@ -147,6 +154,7 @@ export const editBoardStackSlice = createSlice({
         }
         if (state.widgetRecord?.[wid]) {
           state.widgetRecord[wid].parentId = parentId;
+          state.widgetRecord[wid].config.index = nextIndex;
         }
         const nextParent = state.widgetRecord[parentId];
         if (nextParent) {
@@ -380,27 +388,128 @@ export const editBoardStackSlice = createSlice({
       }>,
     ) {
       const { parentId, sourceTabId, mode } = action.payload;
-      const tabContent = state.widgetRecord[parentId].config
-        .content as TabWidgetContent;
+      const tabWidget = state.widgetRecord[parentId];
+      const tabContent = tabWidget.config.content as TabWidgetContent;
 
       const tabItem = tabContent.itemMap[sourceTabId];
 
-      const rt = state.widgetRecord[parentId].config.rect;
+      const rt = tabWidget.config.rect;
       delete tabContent.itemMap[sourceTabId];
-      if (state.widgetRecord[tabItem.childWidgetId]) {
-        if (mode === 'auto') {
-          state.widgetRecord[tabItem.childWidgetId].config.rect = rt;
-        }
-        if (mode === 'free') {
-          state.widgetRecord[tabItem.childWidgetId].config.rect = {
-            ...rt,
-            x: rt.x + 30,
-            y: rt.y + 30,
-          };
-        }
-
-        state.widgetRecord[tabItem.childWidgetId].parentId = '';
+      const itemWidget = state.widgetRecord[tabItem.childWidgetId];
+      if (itemWidget) {
+        itemWidget.config.rect = rt;
+        itemWidget.config.index =
+          tabWidget.config.index + parseFloat(Math.random().toFixed(5));
+        itemWidget.parentId = '';
       }
+    },
+    dropTabToOtherTab(
+      state,
+      action: PayloadAction<{
+        dragNode: EventLayerNode;
+        targetNode: EventLayerNode;
+      }>,
+    ) {
+      const widgetMap = state.widgetRecord;
+      const { dragNode, targetNode } = action.payload;
+      const srcTabWidget = widgetMap[dragNode.parentId];
+      const srcTabItemMap = (srcTabWidget.config.content as TabWidgetContent)
+        .itemMap;
+
+      const srcItem = Object.values(srcTabItemMap).find(
+        item => item.childWidgetId === dragNode.key,
+      );
+      if (srcItem) {
+        delete srcTabItemMap[srcItem.tabId];
+      }
+      const dragWidget = widgetMap[dragNode.key];
+      dragWidget.parentId = '';
+      //
+      const targetTabWidget = widgetMap[targetNode.parentId];
+      const targetTabItemMap = (
+        targetTabWidget.config.content as TabWidgetContent
+      ).itemMap;
+      dragWidget.parentId = targetTabWidget.id;
+
+      const newItem: ContainerItem = {
+        index: Number(Date.now()),
+        name: dragWidget.config.name,
+        tabId: dragWidget.config.clientId,
+        childWidgetId: dragWidget.id,
+      };
+      targetTabItemMap[dragWidget.config.clientId] = newItem;
+    },
+    changeTabItemIndex(
+      state,
+      action: PayloadAction<{
+        dragNode: EventLayerNode;
+        targetNode: EventLayerNode;
+      }>,
+    ) {
+      const widgetMap = state.widgetRecord;
+      const { dragNode, targetNode } = action.payload;
+      const tabWidget = widgetMap[dragNode.parentId];
+      const itemMap = (tabWidget.config.content as TabWidgetContent).itemMap;
+
+      const srcItem = Object.values(itemMap).find(
+        item => item.childWidgetId === dragNode.key,
+      );
+      const targetItem = Object.values(itemMap).find(
+        item => item.childWidgetId === targetNode.key,
+      );
+      srcItem!.index = targetItem!.index + parseFloat(Math.random().toFixed(5));
+    },
+    dropTabToGroup(
+      state,
+      action: PayloadAction<{
+        dragNode: EventLayerNode;
+        targetNode: EventLayerNode;
+      }>,
+    ) {
+      const widgetMap = state.widgetRecord;
+      const { dragNode, targetNode } = action.payload;
+      const srcTabWidget = widgetMap[dragNode.parentId];
+      const srcTabItemMap = (srcTabWidget.config.content as TabWidgetContent)
+        .itemMap;
+
+      const srcItem = Object.values(srcTabItemMap).find(
+        item => item.childWidgetId === dragNode.key,
+      );
+      if (srcItem) {
+        delete srcTabItemMap[srcItem.tabId];
+      }
+      const dragWidget = widgetMap[dragNode.key];
+      //
+      dragWidget.parentId = targetNode.parentId;
+
+      //
+    },
+    dropGroupToTab(
+      state,
+      action: PayloadAction<{
+        dragNode: EventLayerNode;
+        targetNode: EventLayerNode;
+      }>,
+    ) {
+      const widgetMap = state.widgetRecord;
+      const { dragNode, targetNode } = action.payload;
+      const dragWidget = widgetMap[dragNode.key];
+      //
+      const targetTabWidget = widgetMap[targetNode.parentId];
+      const targetTabItemMap = (
+        targetTabWidget.config.content as TabWidgetContent
+      ).itemMap;
+      dragWidget.parentId = targetTabWidget.id;
+
+      const newItem: ContainerItem = {
+        index: Number(Date.now()),
+        name: dragWidget.config.name,
+        tabId: dragWidget.config.clientId,
+        childWidgetId: dragWidget.id,
+      };
+      targetTabItemMap[dragWidget.config.clientId] = newItem;
+
+      //
     },
     /* MediaWidgetConfig */
     changeMediaWidgetConfig(
