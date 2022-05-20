@@ -111,7 +111,7 @@ const ChartPreviewBoard: FC<{
     const saveAsViz = useSaveAsViz();
     const history = useHistory();
     const vizs = useSelector(selectVizs);
-    const [openNewTab] = useDrillThrough();
+    const [openNewTab, openBrowserTab] = useDrillThrough();
 
     useEffect(() => {
       const filterSearchParams = filterSearchUrl
@@ -189,11 +189,19 @@ const ChartPreviewBoard: FC<{
       )?.[0] as DrillThroughSetting;
       if (setting?.event === 'left') {
         const rule = setting?.rules?.[0];
-        if (rule?.action === InteractionAction.Window) {
+        if (rule?.action === InteractionAction.Redirect) {
           openNewTab(orgId, rule?.jumpToChart?.relId);
         }
+        if (rule?.action === InteractionAction.Window) {
+          openBrowserTab(orgId, rule?.jumpToChart?.relId);
+        }
       }
-    }, [chartPreview?.chartConfig?.interactions, openNewTab, orgId]);
+    }, [
+      chartPreview?.chartConfig?.interactions,
+      openBrowserTab,
+      openNewTab,
+      orgId,
+    ]);
 
     const registerChartEvents = useCallback(
       (chart, backendChartId) => {

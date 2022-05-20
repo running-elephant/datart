@@ -25,7 +25,11 @@ const useDrillThrough = () => {
     history.push(`/organizations/${orgId}/vizs/${relId}`);
   };
 
-  return [openNewTab];
+  const openBrowserTab = (orgId, relId) => {
+    window.open(`/organizations/${orgId}/vizs/${relId}`, '_blank');
+  };
+
+  return [openNewTab, openBrowserTab];
 };
 
 export default useDrillThrough;
