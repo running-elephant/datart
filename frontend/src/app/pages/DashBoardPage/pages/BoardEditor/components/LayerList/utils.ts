@@ -42,16 +42,17 @@ export const widgetMapToTree = (args: {
       .itemMap;
     const items = Object.values(itemMap).sort((a, b) => a.index - b.index);
 
-    sortedWidgets = items.map(item => {
-      return widgetMap[item.childWidgetId];
-    });
+    sortedWidgets = items
+      .map(item => {
+        return widgetMap[item.childWidgetId];
+      })
+      .filter(item => !!item);
   } else {
     sortedWidgets = widgets.sort((a, b) => {
       return b.config.index - a.config.index;
     });
   }
   if (!sortedWidgets.length) return [];
-
   sortedWidgets.forEach(widget => {
     const treeNode: LayerNode = {
       key: widget.id,
