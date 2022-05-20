@@ -31,6 +31,7 @@ export const widgetMapToTree = (args: {
   const widgets = Object.values(widgetMap).filter(widget => {
     return widget.parentId === parentId;
   });
+  if (!widgets.length) return [];
   let sortedWidgets = widgets;
 
   if (
@@ -49,6 +50,7 @@ export const widgetMapToTree = (args: {
       return b.config.index - a.config.index;
     });
   }
+  if (!sortedWidgets.length) return [];
 
   sortedWidgets.forEach(widget => {
     const treeNode: LayerNode = {
