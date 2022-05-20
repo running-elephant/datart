@@ -19,15 +19,13 @@ import { useMemo } from 'react';
 import { Layouts } from 'react-grid-layout';
 import { Widget } from '../types/widgetTypes';
 
-export default function useGridLayoutMap(
-  layoutWidgetMap: Record<string, Widget>,
-) {
+export default function useGridLayoutMap(layoutWidgets: Widget[]) {
   const layoutMap = useMemo(() => {
     const layoutMap: Layouts = {
       lg: [],
       sm: [],
     };
-    Object.values(layoutWidgetMap).forEach(widget => {
+    layoutWidgets.forEach(widget => {
       const lg = widget.config.rect || widget.config.mRect || {};
       const sm = widget.config.mRect || widget.config.rect || {};
       const lock = widget.config.lock;
@@ -49,6 +47,6 @@ export default function useGridLayoutMap(
       });
     });
     return layoutMap;
-  }, [layoutWidgetMap]);
+  }, [layoutWidgets]);
   return layoutMap;
 }

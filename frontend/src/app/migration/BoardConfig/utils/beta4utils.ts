@@ -16,13 +16,14 @@
  * limitations under the License.
  */
 
-import { WidgetBeta3 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import {
   ITimeDefault,
   Widget,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { IFontDefault } from 'types';
 import widgetManagerInstance from '../../../pages/DashBoardPage/components/WidgetManager';
+import { WidgetBeta3 } from '../types';
 
 const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
   newWidget.id = oldW.id;
@@ -114,12 +115,14 @@ export const convertChartWidgetToBeta4 = (widget: WidgetBeta3) => {
   let newWidget = {} as Widget;
   if (subType === 'dataChart') {
     newWidget = widgetManagerInstance
-      .toolkit('linkedChart')
+      .toolkit(ORIGINAL_TYPE_MAP.linkedChart)
       .create({ ...widget });
   } else {
-    newWidget = widgetManagerInstance.toolkit('ownedChart').create({
-      ...widget,
-    });
+    newWidget = widgetManagerInstance
+      .toolkit(ORIGINAL_TYPE_MAP.ownedChart)
+      .create({
+        ...widget,
+      });
   }
 
   newWidget = commonBeta4Convert(newWidget, widget);

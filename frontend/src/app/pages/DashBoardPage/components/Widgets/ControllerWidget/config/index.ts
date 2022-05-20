@@ -64,7 +64,6 @@ export const controlWidgetTpl = (opt: WidgetCreateProps) => {
   const widget = widgetTpl();
   widget.id = opt.relations?.[0]?.sourceId || widget.id;
   widget.parentId = opt.parentId || '';
-  widget.dashboardId = opt.dashboardId || '';
   widget.datachartId = opt.datachartId || '';
   widget.viewIds = opt.viewIds || [];
   widget.relations = opt.relations || [];

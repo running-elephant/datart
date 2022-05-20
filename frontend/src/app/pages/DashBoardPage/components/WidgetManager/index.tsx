@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { WidgetProto } from '../../types/widgetTypes';
 import checkboxGroupProto from '../Widgets/ControllerWidget/config/checkboxGroup';
 import dropdownListProto from '../Widgets/ControllerWidget/config/dropdownList';
 import multiDropdownListProto from '../Widgets/ControllerWidget/config/multiDropdownList';
@@ -27,6 +28,7 @@ import timeProto from '../Widgets/ControllerWidget/config/timeProto';
 import valueProto from '../Widgets/ControllerWidget/config/valueProto';
 import linkedChartProto from '../Widgets/DataChartWidget/linkedChartConfig';
 import ownedChartProto from '../Widgets/DataChartWidget/ownedChartConfig';
+import groupProto from '../Widgets/GroupWidget/groupConfig';
 import iframeProto from '../Widgets/IframeWidget/iframeConfig';
 import imageProto from '../Widgets/ImageWidget/imageConfig';
 import queryBtnProto from '../Widgets/QueryBtnWidget/queryBtnConfig';
@@ -37,47 +39,32 @@ import timerProto from '../Widgets/TimerWidget/timerConfig';
 import videoProto from '../Widgets/VideoWidget/videoConfig';
 import { widgetManagerInstance as widgetManager } from './WidgetManager';
 
-// -- chart
+const protoList: WidgetProto[] = [
+  linkedChartProto, // chart
+  ownedChartProto,
+  tabProto, //  container
+  imageProto, //   media
+  videoProto,
+  richTextProto,
+  iframeProto,
+  timerProto,
+  queryBtnProto, //   button
+  resetBtnProto,
+  dropdownListProto, //controller
+  multiDropdownListProto,
+  checkboxGroupProto,
+  radioGroupProto,
+  textProto,
+  timeProto,
+  rangeTimeProto,
+  rangeValueProto,
+  valueProto,
+  sliderProto,
+  groupProto, //   group
+];
 
-widgetManager.register(linkedChartProto);
-widgetManager.register(ownedChartProto);
-
-// -- container
-widgetManager.register(tabProto);
-// TODO 轮播容器
-
-// media
-widgetManager.register(imageProto);
-widgetManager.register(videoProto);
-widgetManager.register(richTextProto);
-widgetManager.register(iframeProto);
-widgetManager.register(timerProto);
-
-// buttons
-widgetManager.register(queryBtnProto);
-widgetManager.register(resetBtnProto);
-
-// other buttons
-// TODO 素材 或者边框等
-
-// controller
-widgetManager.register(dropdownListProto);
-widgetManager.register(multiDropdownListProto);
-widgetManager.register(checkboxGroupProto);
-widgetManager.register(radioGroupProto);
-widgetManager.register(textProto);
-
-widgetManager.register(timeProto);
-widgetManager.register(rangeTimeProto);
-
-widgetManager.register(rangeValueProto);
-widgetManager.register(valueProto);
-widgetManager.register(sliderProto);
-
-// checkboxGroupProto
-// dropdownListProto
-
-// Group
-// TODO Group 组容器
+protoList.forEach(item => {
+  widgetManager.register(item);
+});
 
 export default widgetManager;

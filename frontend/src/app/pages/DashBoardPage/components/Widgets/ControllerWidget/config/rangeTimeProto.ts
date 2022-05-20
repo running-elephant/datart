@@ -19,6 +19,7 @@
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import {
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { controlWidgetTpl, getControlDropDownList } from '.';
@@ -136,8 +137,8 @@ export const widgetToolkit: WidgetToolkit = {
   // //
 };
 
-const rangeTimeProto = {
-  widgetTypeId: widgetMeta.originalType,
+const rangeTimeProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

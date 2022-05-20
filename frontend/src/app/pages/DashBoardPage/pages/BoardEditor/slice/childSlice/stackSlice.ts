@@ -19,6 +19,13 @@
 import { PayloadAction } from '@reduxjs/toolkit';
 import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import {
+  adjustGroupWidgets,
+  findChildIds,
+  findParentIds,
+  moveGroupAllChildren,
+  resetGroupAllChildrenRect,
+} from 'app/pages/DashBoardPage/components/Widgets/GroupWidget/utils';
+import {
   ContainerItem,
   Dashboard,
   DeviceType,
@@ -27,12 +34,15 @@ import {
   TabWidgetContent,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget, WidgetConf } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { deleteEffect } from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import produce from 'immer';
 import { Layout } from 'react-grid-layout';
 import { createSlice } from 'utils/@reduxjs/toolkit';
+import { ORIGINAL_TYPE_MAP } from '../../../../constants';
+import { EventLayerNode } from '../actions/actions';
 import { EditBoardStack } from '../types';
 
 export type updateWidgetConf = {
@@ -90,7 +100,8 @@ export const editBoardStackSlice = createSlice({
     // Widget
     addWidgets(state, action: PayloadAction<Widget[]>) {
       const widgets = action.payload;
-      let { maxWidgetIndex, type } = state.dashBoard.config;
+      const board = state.dashBoard;
+      let { maxWidgetIndex, type } = board.config;
 
       widgets.forEach(ele => {
         maxWidgetIndex++;
@@ -98,6 +109,7 @@ export const editBoardStackSlice = createSlice({
           .toolkit(ele.config.originalType)
           .getName();
         const newEle = produce(ele, draft => {
+          draft.dashboardId = board.id;
           draft.config.index = maxWidgetIndex;
           draft.config.name =
             draft.config.name || `${newName}_${maxWidgetIndex}`;
@@ -118,13 +130,54 @@ export const editBoardStackSlice = createSlice({
         state.widgetRecord[id].config.lock = lock;
       }
     },
+    changeWidgetsParentId(
+      state,
+      action: PayloadAction<{
+        items: {
+          wid: string;
+          nextIndex: number;
+        }[];
+        parentId: string;
+      }>,
+    ) {
+      const { items, parentId } = action.payload;
+      items.forEach(({ wid, nextIndex }) => {
+        const prePId = state.widgetRecord[wid].parentId;
+        if (prePId && state.widgetRecord[prePId]) {
+          const preParent = state.widgetRecord[prePId];
+          const oldChildren = preParent.config.children;
+          preParent.config.children = oldChildren?.filter(id => id !== wid);
+          adjustGroupWidgets({
+            groupIds: [prePId],
+            widgetMap: state.widgetRecord,
+          });
+        }
+        if (state.widgetRecord?.[wid]) {
+          state.widgetRecord[wid].parentId = parentId;
+          state.widgetRecord[wid].config.index = nextIndex;
+        }
+        const nextParent = state.widgetRecord[parentId];
+        if (nextParent) {
+          let pChildren = nextParent.config.children;
+          if (!pChildren?.includes(wid)) {
+            pChildren?.push(wid);
+          }
+          adjustGroupWidgets({
+            groupIds: [nextParent.id],
+            widgetMap: state.widgetRecord,
+          });
+        }
+      });
+    },
     deleteWidgets(state, action: PayloadAction<string[]>) {
       const ids = action.payload;
       if (!ids?.length) return;
       ids.forEach(id => {
         delete state.widgetRecord[id];
       });
+      deleteEffect(state.widgetRecord);
     },
+
     updateWidget(state, action: PayloadAction<Widget>) {
       const widget = action.payload;
       state.widgetRecord[widget.id] = widget;
@@ -147,20 +200,8 @@ export const editBoardStackSlice = createSlice({
         },
       );
       state.widgetRecord[wid].config.customConfig.props = newProps;
-      // const title = getWidgetTitle(newProps);
-      // state.widgetRecord[wid].config.name = title.title;
     },
-    updateWidgetRect(
-      state,
-      action: PayloadAction<{
-        wid: string;
-        newRect: RectConfig;
-      }>,
-    ) {
-      const { wid, newRect } = action.payload;
-      if (!state.widgetRecord[wid]) return;
-      state.widgetRecord[wid].config.rect = newRect;
-    },
+
     updateWidgetConfig(
       state,
       action: PayloadAction<{ wid: string; config: WidgetConf }>,
@@ -216,14 +257,7 @@ export const editBoardStackSlice = createSlice({
       });
     },
     // free
-    resizeWidgetEnd(
-      state,
-      action: PayloadAction<{ id: string; width: number; height: number }>,
-    ) {
-      const { id, width, height } = action.payload;
-      const { rect } = state.widgetRecord[id].config;
-      state.widgetRecord[id].config.rect = { ...rect, width, height };
-    },
+
     changeWidgetsIndex(
       state,
       action: PayloadAction<{ id: string; index: number }[]>,
@@ -234,17 +268,89 @@ export const editBoardStackSlice = createSlice({
         state.widgetRecord[id].config.index = index;
       });
     },
+    // group
+    changeFreeWidgetRect(
+      state,
+      action: PayloadAction<{
+        wid: string;
+        rect: RectConfig;
+      }>,
+    ) {
+      const { wid, rect: newRect } = action.payload;
+      const widgetMap = state.widgetRecord;
+      const targetWidget = widgetMap[wid];
+      if (!targetWidget) return;
+      const oldRect = targetWidget.config.rect;
+      const diffRect: RectConfig = {
+        x: newRect.x - oldRect.x,
+        y: newRect.y - oldRect.y,
+        width: newRect.width - oldRect.width,
+        height: newRect.height - oldRect.height,
+      };
+      targetWidget.config.rect = newRect;
 
+      if (
+        !targetWidget.parentId &&
+        targetWidget.config.originalType !== ORIGINAL_TYPE_MAP.group
+      ) {
+        return;
+      }
+
+      const hasMoveEvent = diffRect.x !== 0 || diffRect.y !== 0;
+      const hasResizeEvent = diffRect.width !== 0 || diffRect.height !== 0;
+
+      if (hasMoveEvent) {
+        // handle children : collect all children and move them
+        const childIds: string[] = [];
+        findChildIds({ widget: targetWidget, widgetMap, childIds });
+        moveGroupAllChildren({ childIds, widgetMap, diffRect });
+        // handle parents : collect all parents and resetParentsRect
+        const parentIds: string[] = [];
+        findParentIds({ widget: targetWidget, widgetMap, parentIds });
+        adjustGroupWidgets({ groupIds: parentIds, widgetMap });
+      }
+      if (hasResizeEvent) {
+        // handle children : collect all children and resize them
+        const childIds: string[] = [];
+        findChildIds({ widget: targetWidget, widgetMap, childIds });
+        resetGroupAllChildrenRect({ childIds, widgetMap, oldRect, newRect });
+        // handle parents : collect all parents and resetParentsRect
+        const parentIds: string[] = [];
+        findParentIds({ widget: targetWidget, widgetMap, parentIds });
+        adjustGroupWidgets({ groupIds: parentIds, widgetMap });
+      }
+    },
+    adjustGroupWidget(state, action: PayloadAction<{ wid: string }>) {
+      const { wid } = action.payload;
+      adjustGroupWidgets({
+        groupIds: [wid],
+        widgetMap: state.widgetRecord,
+      });
+    },
+
+    // changeWidgetGroup(
+    //   state,
+    //   action: PayloadAction<{
+    //     preWId: string;
+    //     preParentId: string;
+    //     newParentId: string;
+    //   }>,
+    // ) {
+    //   const { preWId, preParentId, newParentId } = action.payload;
+    //   state.widgetRecord[preWId].parentId = newParentId;
+
+    // },
+    /* tabs widget */
     addWidgetToTabWidget(
       state,
       action: PayloadAction<{
-        parentId: string;
+        tabWidgetId: string;
         tabItem: ContainerItem;
         sourceId: string;
       }>,
     ) {
-      const { parentId, tabItem, sourceId } = action.payload;
-      const tabContent = state.widgetRecord[parentId].config
+      const { tabWidgetId, tabItem, sourceId } = action.payload;
+      const tabContent = state.widgetRecord[tabWidgetId].config
         .content as TabWidgetContent;
       const sourceWidget = state.widgetRecord[sourceId];
       tabContent.itemMap[sourceWidget.config.clientId] = {
@@ -253,11 +359,13 @@ export const editBoardStackSlice = createSlice({
         tabId: sourceWidget.config.clientId,
         childWidgetId: sourceWidget.id,
       };
-      delete state.widgetRecord[parentId].config.content.itemMap[tabItem.tabId];
-      state.widgetRecord[parentId].config.content = tabContent;
-      state.widgetRecord[sourceId].parentId = parentId;
+      delete state.widgetRecord[tabWidgetId].config.content.itemMap[
+        tabItem.tabId
+      ];
+      state.widgetRecord[tabWidgetId].config.content = tabContent;
+      state.widgetRecord[sourceId].parentId = tabWidgetId;
     },
-    /* tabs widget */
+
     tabsWidgetAddTab(
       state,
       action: PayloadAction<{
@@ -280,27 +388,128 @@ export const editBoardStackSlice = createSlice({
       }>,
     ) {
       const { parentId, sourceTabId, mode } = action.payload;
-      const tabContent = state.widgetRecord[parentId].config
-        .content as TabWidgetContent;
+      const tabWidget = state.widgetRecord[parentId];
+      const tabContent = tabWidget.config.content as TabWidgetContent;
 
       const tabItem = tabContent.itemMap[sourceTabId];
 
-      const rt = state.widgetRecord[parentId].config.rect;
+      const rt = tabWidget.config.rect;
       delete tabContent.itemMap[sourceTabId];
-      if (state.widgetRecord[tabItem.childWidgetId]) {
-        if (mode === 'auto') {
-          state.widgetRecord[tabItem.childWidgetId].config.rect = rt;
-        }
-        if (mode === 'free') {
-          state.widgetRecord[tabItem.childWidgetId].config.rect = {
-            ...rt,
-            x: rt.x + 30,
-            y: rt.y + 30,
-          };
-        }
-
-        state.widgetRecord[tabItem.childWidgetId].parentId = '';
+      const itemWidget = state.widgetRecord[tabItem.childWidgetId];
+      if (itemWidget) {
+        itemWidget.config.rect = rt;
+        itemWidget.config.index =
+          tabWidget.config.index + parseFloat(Math.random().toFixed(5));
+        itemWidget.parentId = '';
       }
+    },
+    dropTabToOtherTab(
+      state,
+      action: PayloadAction<{
+        dragNode: EventLayerNode;
+        targetNode: EventLayerNode;
+      }>,
+    ) {
+      const widgetMap = state.widgetRecord;
+      const { dragNode, targetNode } = action.payload;
+      const srcTabWidget = widgetMap[dragNode.parentId];
+      const srcTabItemMap = (srcTabWidget.config.content as TabWidgetContent)
+        .itemMap;
+
+      const srcItem = Object.values(srcTabItemMap).find(
+        item => item.childWidgetId === dragNode.key,
+      );
+      if (srcItem) {
+        delete srcTabItemMap[srcItem.tabId];
+      }
+      const dragWidget = widgetMap[dragNode.key];
+      dragWidget.parentId = '';
+      //
+      const targetTabWidget = widgetMap[targetNode.parentId];
+      const targetTabItemMap = (
+        targetTabWidget.config.content as TabWidgetContent
+      ).itemMap;
+      dragWidget.parentId = targetTabWidget.id;
+
+      const newItem: ContainerItem = {
+        index: Number(Date.now()),
+        name: dragWidget.config.name,
+        tabId: dragWidget.config.clientId,
+        childWidgetId: dragWidget.id,
+      };
+      targetTabItemMap[dragWidget.config.clientId] = newItem;
+    },
+    changeTabItemIndex(
+      state,
+      action: PayloadAction<{
+        dragNode: EventLayerNode;
+        targetNode: EventLayerNode;
+      }>,
+    ) {
+      const widgetMap = state.widgetRecord;
+      const { dragNode, targetNode } = action.payload;
+      const tabWidget = widgetMap[dragNode.parentId];
+      const itemMap = (tabWidget.config.content as TabWidgetContent).itemMap;
+
+      const srcItem = Object.values(itemMap).find(
+        item => item.childWidgetId === dragNode.key,
+      );
+      const targetItem = Object.values(itemMap).find(
+        item => item.childWidgetId === targetNode.key,
+      );
+      srcItem!.index = targetItem!.index + parseFloat(Math.random().toFixed(5));
+    },
+    dropTabToGroup(
+      state,
+      action: PayloadAction<{
+        dragNode: EventLayerNode;
+        targetNode: EventLayerNode;
+      }>,
+    ) {
+      const widgetMap = state.widgetRecord;
+      const { dragNode, targetNode } = action.payload;
+      const srcTabWidget = widgetMap[dragNode.parentId];
+      const srcTabItemMap = (srcTabWidget.config.content as TabWidgetContent)
+        .itemMap;
+
+      const srcItem = Object.values(srcTabItemMap).find(
+        item => item.childWidgetId === dragNode.key,
+      );
+      if (srcItem) {
+        delete srcTabItemMap[srcItem.tabId];
+      }
+      const dragWidget = widgetMap[dragNode.key];
+      //
+      dragWidget.parentId = targetNode.parentId;
+
+      //
+    },
+    dropGroupToTab(
+      state,
+      action: PayloadAction<{
+        dragNode: EventLayerNode;
+        targetNode: EventLayerNode;
+      }>,
+    ) {
+      const widgetMap = state.widgetRecord;
+      const { dragNode, targetNode } = action.payload;
+      const dragWidget = widgetMap[dragNode.key];
+      //
+      const targetTabWidget = widgetMap[targetNode.parentId];
+      const targetTabItemMap = (
+        targetTabWidget.config.content as TabWidgetContent
+      ).itemMap;
+      dragWidget.parentId = targetTabWidget.id;
+
+      const newItem: ContainerItem = {
+        index: Number(Date.now()),
+        name: dragWidget.config.name,
+        tabId: dragWidget.config.clientId,
+        childWidgetId: dragWidget.id,
+      };
+      targetTabItemMap[dragWidget.config.clientId] = newItem;
+
+      //
     },
     /* MediaWidgetConfig */
     changeMediaWidgetConfig(

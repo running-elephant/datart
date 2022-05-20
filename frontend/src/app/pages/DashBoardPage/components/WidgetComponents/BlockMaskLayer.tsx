@@ -29,11 +29,11 @@ import { selectShowBlockMask } from '../../pages/BoardEditor/slice/selectors';
 import { Widget } from '../../types/widgetTypes';
 
 export interface BlockMaskLayerProps {
-  widgetConfig: Widget;
+  widget: Widget;
   widgetInfo: WidgetInfo;
 }
 export const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
-  ({ widgetConfig, widgetInfo }) => {
+  ({ widget, widgetInfo }) => {
     const dispatch = useDispatch();
     const showBlockMask = useSelector(selectShowBlockMask);
     const onMouseDown = useCallback(
@@ -45,25 +45,25 @@ export const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
         dispatch(
           editWidgetInfoActions.selectWidget({
             multipleKey: e.shiftKey,
-            id: widgetConfig.id,
+            id: widget.id,
             selected: newSelected,
           }),
         );
       },
-      [dispatch, widgetConfig.id, widgetInfo.selected],
+      [dispatch, widget.id, widgetInfo.selected],
     );
 
     const doubleClick = useCallback(() => {
-      if (widgetConfig.config.type === 'container') {
+      if (widget.config.type === 'container') {
         dispatch(editDashBoardInfoActions.changeShowBlockMask(false));
       }
 
       dispatch(
         editWidgetInfoActions.openWidgetEditing({
-          id: widgetConfig.id,
+          id: widget.id,
         }),
       );
-    }, [dispatch, widgetConfig.id, widgetConfig.config.type]);
+    }, [dispatch, widget.id, widget.config.type]);
     const border = useMemo(() => {
       let border = '';
       if (widgetInfo.selected) {

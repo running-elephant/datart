@@ -22,7 +22,7 @@ import { RootState } from 'types';
 import { boardInit } from '.';
 import { getLayoutWidgets } from '../../../utils/widget';
 import { WidgetInfo } from './types';
-
+const DefaultObject = {};
 export const selectPropsId = (_: unknown, id: string) => id;
 
 export const boardState = (state: RootState) => state.board || boardInit;
@@ -59,7 +59,7 @@ export const selectBoardById = createSelector(
 export const selectBoardWidgetMapById = createSelector(
   selectBoardWidgetMap,
   selectPropsId,
-  (widgetRecord, id) => widgetRecord[id] || {},
+  (widgetRecord, id) => widgetRecord[id] || DefaultObject,
 );
 
 export const selectWidgetBy2Id = createSelector(
@@ -77,7 +77,7 @@ export const selectWidgetBy2Id = createSelector(
 
 export const selectLayoutWidgetMapById = () =>
   createSelector(selectBoardWidgetMap, selectPropsId, (widgetRecord, id) => {
-    if (!widgetRecord[id]) return {};
+    if (!widgetRecord[id]) return DefaultObject;
     const allWidgetMap = widgetRecord[id];
     const layoutWidgets = getLayoutWidgets(allWidgetMap);
     const LayoutWidgetMap: Record<string, Widget> = {};
@@ -90,7 +90,7 @@ export const selectLayoutWidgetMapById = () =>
 export const selectWidgetInfoMap = createSelector(
   selectWidgetInfoGroupMap,
   selectPropsId,
-  (widgetInfoGroupMap, id) => widgetInfoGroupMap[id] || {},
+  (widgetInfoGroupMap, id) => widgetInfoGroupMap[id] || DefaultObject,
 );
 
 export const selectWidgetInfoBy2Id = createSelector(
@@ -110,12 +110,12 @@ export const selectLayoutWidgetInfoMapById = createSelector(
   selectWidgetInfoGroupMap,
   selectPropsId,
   (allWidgetMap, allWidgetInfoMap, id) => {
-    if (!allWidgetMap[id]) return {};
-    if (!allWidgetInfoMap[id]) return {};
+    if (!allWidgetMap[id]) return DefaultObject;
+    if (!allWidgetInfoMap[id]) return DefaultObject;
 
     const layoutWidgets = getLayoutWidgets(allWidgetMap[id]);
     const widgetInfoMap = allWidgetInfoMap[id];
-    const layoutWidgetsInfo: Record<string, WidgetInfo> = {};
+    const layoutWidgetsInfo: Record<string, WidgetInfo> = DefaultObject;
 
     layoutWidgets.forEach(w => {
       layoutWidgetsInfo[w.id] = widgetInfoMap[w.id];

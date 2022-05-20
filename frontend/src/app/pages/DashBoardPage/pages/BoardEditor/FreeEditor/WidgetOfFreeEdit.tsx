@@ -21,7 +21,6 @@ import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider
 import { WIDGET_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
 import { fillPx } from 'app/pages/DashBoardPage/utils';
 import { getFreeWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
-import produce from 'immer';
 import React, {
   useCallback,
   useContext,
@@ -30,12 +29,11 @@ import React, {
   useState,
 } from 'react';
 import { DraggableCore, DraggableEventHandler } from 'react-draggable';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
 import { BoardScaleContext } from '../../../components/FreeBoardBackground';
-import { editBoardStackActions } from '../slice';
 import { widgetMove, widgetMoveEnd } from '../slice/events';
 import { selectSelectedIds } from '../slice/selectors';
 export enum DragTriggerTypes {
@@ -45,10 +43,9 @@ export enum DragTriggerTypes {
 export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const selectedIds = useSelector(selectSelectedIds);
   const widget = useContext(WidgetContext);
-  const { onUpdateWidgetConfig } = useContext(WidgetActionContext);
-
-  const dispatch = useDispatch();
+  const { onEditFreeWidgetRect } = useContext(WidgetActionContext);
   const scale = useContext(BoardScaleContext);
+
   const { x, y, width, height } = widget.config.rect;
   const [curXY, setCurXY] = useState<[number, number]>([
     widget.config.rect.x,
@@ -72,12 +69,13 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
     [widget.id],
   );
   const moveEnd = useCallback(() => {
-    const nextConf = produce(widget.config, draft => {
-      draft.rect.x = curXY[0];
-      draft.rect.y = curXY[1];
-    });
-    onUpdateWidgetConfig(nextConf, widget.id);
-  }, [curXY, onUpdateWidgetConfig, widget.config, widget.id]);
+    const nextRect = {
+      ...widget.config.rect,
+      x: Number(curXY[0].toFixed(1)),
+      y: Number(curXY[1].toFixed(1)),
+    };
+    onEditFreeWidgetRect(nextRect, widget.id);
+  }, [curXY, onEditFreeWidgetRect, widget.config, widget.id]);
   useEffect(() => {
     widgetMove.on(move);
     widgetMoveEnd.on(moveEnd);
@@ -127,15 +125,14 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const resizeStop = useCallback(
     (e: React.SyntheticEvent, { size }: ResizeCallbackData) => {
       e.stopPropagation();
-      dispatch(
-        editBoardStackActions.resizeWidgetEnd({
-          id: widget.id,
-          width: Number(size.width.toFixed(1)),
-          height: Number(size.height.toFixed(1)),
-        }),
-      );
+      const nextRect = {
+        ...widget.config.rect,
+        width: Number(size.width.toFixed(1)),
+        height: Number(size.height.toFixed(1)),
+      };
+      onEditFreeWidgetRect(nextRect, widget.id);
     },
-    [dispatch, widget.id],
+    [onEditFreeWidgetRect, widget.config.rect, widget.id],
   );
   const widgetStyle = getFreeWidgetStyle(widget);
   const style: React.CSSProperties = {

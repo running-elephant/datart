@@ -17,7 +17,10 @@
  */
 
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
-import { WidgetMeta } from 'app/pages/DashBoardPage/types/widgetTypes';
+import {
+  WidgetMeta,
+  WidgetProto,
+} from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
   ControlWidgetToolkit,
   controlWidgetTpl,
@@ -145,8 +148,8 @@ export const widgetToolkit: ControlWidgetToolkit = {
   // //
 };
 export const controlToolkit = widgetToolkit;
-const checkboxGroupProto = {
-  widgetTypeId: widgetMeta.originalType,
+const checkboxGroupProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

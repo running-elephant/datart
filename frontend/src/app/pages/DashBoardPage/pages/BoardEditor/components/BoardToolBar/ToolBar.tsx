@@ -85,7 +85,6 @@ export const ToolBar = () => {
             <DeviceSwitcher />
           </>
         )}
-        {/*  */}
       </Space>
 
       <BoardToolRights />

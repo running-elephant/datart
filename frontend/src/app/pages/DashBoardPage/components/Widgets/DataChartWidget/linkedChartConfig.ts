@@ -20,6 +20,7 @@ import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import {
   WidgetActionListItem,
   widgetActionType,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { initWidgetName } from '../../WidgetManager/utils/init';
@@ -30,7 +31,7 @@ const NameI18N = {
   en: 'LinkedChart',
 };
 export const widgetMeta = getMeta({
-  icon: 'linkedChart',
+  icon: 'linked',
   widgetTypeId: ORIGINAL_TYPE_MAP.linkedChart,
   zh: {
     desc: '引入图表部件的内部是一个引用的数据图表,原有数据图表有改动时,引入图表部件也会跟着改变',
@@ -44,10 +45,9 @@ export const widgetMeta = getMeta({
 
 export const linkedChartToolkit: WidgetToolkit = {
   create: opt => {
-    const widget = dataChartCreator({
-      ...opt,
-      widgetTypeId: widgetMeta.originalType,
-    });
+    const widget = dataChartCreator(opt);
+    widget.config.originalType = ORIGINAL_TYPE_MAP.linkedChart;
+    widget.id = widget.config.originalType + widget.id;
     return widget;
   },
   getName(key) {
@@ -141,8 +141,8 @@ export const linkedChartToolkit: WidgetToolkit = {
   // closeJump() {},
 };
 
-const linkedChartProto = {
-  widgetTypeId: widgetMeta.originalType,
+const linkedChartProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: linkedChartToolkit,
 };

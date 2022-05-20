@@ -16,9 +16,12 @@
  * limitations under the License.
  */
 import { ChartEditorBaseProps } from 'app/components/ChartEditor';
+import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
+import { getParentRect } from 'app/pages/DashBoardPage/components/Widgets/GroupWidget/utils';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
+  BoardType,
   Dashboard,
   DataChart,
   TabWidgetContent,
@@ -30,7 +33,10 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
-import { createWidgetInfo } from 'app/pages/DashBoardPage/utils/widget';
+import {
+  createWidgetInfo,
+  createWidgetInfoMap,
+} from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import produce from 'immer';
@@ -39,7 +45,9 @@ import { RootState } from 'types';
 import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
+import { ORIGINAL_TYPE_MAP } from '../../../../constants';
 import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
+import { LayerNode } from '../../components/LayerList/LayerTreeItem';
 import { getEditChartWidgetDataAsync } from '../thunk';
 import { EditBoardState, HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
@@ -79,12 +87,12 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
     if (!curWidget) continue;
 
     const widgetType = curWidget.config.type;
-
+    const originalType = curWidget.config.originalType;
     shouldDeleteIds.push(id);
     effectTypes.push(widgetType);
 
     // delete 递归删除所子节点;
-    if (widgetType === 'container') {
+    if (originalType === ORIGINAL_TYPE_MAP.tab) {
       const content = curWidget.config.content as TabWidgetContent;
       Object.values(content.itemMap).forEach(item => {
         if (item.childWidgetId) {
@@ -92,8 +100,11 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
         }
       });
     }
-    // TODO groupWidget need recursively delete 递归删除所子节点
-    // if (curWidget.children.length > 0) {}
+    if (originalType === ORIGINAL_TYPE_MAP.group) {
+      (curWidget.config.children || []).forEach(id => {
+        selectedIds.push(id);
+      });
+    }
   }
 
   dispatch(editBoardStackActions.deleteWidgets(shouldDeleteIds));
@@ -241,59 +252,6 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
   }
 };
 
-// export const updateWidgetControllerAction =
-//   (params: {
-//     boardId: string;
-//     boardType: BoardType;
-//     relations: Relation[];
-//     name?: string;
-//     fieldValueType: DataViewFieldType;
-//     controllerFacadeType: ControllerFacadeTypes;
-//     views: RelatedView[];
-//     config: ControllerConfig;
-//   }) =>
-//   async (dispatch, getState) => {
-//     const {
-//       boardId,
-//       boardType,
-//       views,
-//       config,
-//       controllerFacadeType,
-//       relations,
-//       name,
-//     } = params;
-//     const content: ControllerWidgetContent = {
-//       type: controllerFacadeType,
-//       relatedViews: views,
-//       name: name || 'newController',
-//       config: config,
-//     };
-
-//     const widgetConf = createInitWidgetConfig({
-//       name: name || 'newController',
-//       type: 'controller',
-//       content: content,
-//       boardType: boardType,
-//     });
-
-//     const widgetId = relations[0]?.sourceId || uuidv4();
-//     const widget: Widget = createWidget({
-//       id: widgetId,
-//       dashboardId: boardId,
-//       config: widgetConf,
-//       relations,
-//     });
-//     dispatch(addWidgetsToEditBoard([widget]));
-//     dispatch(
-//       editDashBoardInfoActions.changeControllerPanel({
-//         type: 'hide',
-//         widgetId: '',
-//         controllerType: undefined,
-//       }),
-//     );
-//   };
-// changeChartEditorProps
-
 export const editChartInWidgetAction =
   (props: {
     orgId: string;
@@ -370,7 +328,46 @@ export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
     }),
   );
 };
+export const onComposeGroupAction =
+  (boardType: BoardType, wid?: string) => (dispatch, getState) => {
+    if (boardType === 'auto') return;
+    const rootState = getState() as RootState;
+    const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
+    const stackState = editBoardState.stack.present;
+    const curBoard = stackState.dashBoard;
+    const widgetMap = stackState.widgetRecord;
+    const widgetInfos = Object.values(editBoardState.widgetInfoRecord || {});
+    let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);
+    wid && selectedIds.push(wid);
+    selectedIds = [...new Set(selectedIds)];
+    if (!selectedIds.length) return;
+    let groupWidget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.group).create({
+      boardType: curBoard.config.type,
+      children: selectedIds,
+    });
+    groupWidget.config.rect = getParentRect({
+      childIds: selectedIds,
+      widgetMap,
+      preRect: groupWidget.config.rect,
+    });
+    const items = selectedIds.map(id => {
+      return {
+        wid: id,
+        nextIndex: widgetMap[id].config.index,
+      };
+    });
+    const widgetInfoMap = createWidgetInfoMap([groupWidget]);
+    dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
+    dispatch(editBoardStackActions.addWidgets([groupWidget]));
+    //  dispatch(addWidgetsToEditBoard([groupWidget]));
 
+    dispatch(
+      editBoardStackActions.changeWidgetsParentId({
+        items,
+        parentId: groupWidget.id,
+      }),
+    );
+  };
 export const addVariablesToBoard =
   (variables: Variable[]) => (dispatch, getState) => {
     if (!variables?.length) return;
@@ -451,4 +448,157 @@ export const editorWidgetClearLinkageAction = (widget: Widget) => dispatch => {
       }),
     );
   });
+};
+
+export type EventLayerNode = LayerNode & {
+  dragOver: boolean;
+  dragOverGapTop: boolean;
+  dragOverGapBottom: boolean;
+};
+export const dropLayerNodeAction = info => (dispatch, getState) => {
+  const dragNode = info.dragNode as EventLayerNode;
+  const targetNode = info.node as EventLayerNode;
+  const editBoard = getState().editBoard as HistoryEditBoard;
+  const widgetMap = editBoard.stack.present.widgetRecord;
+  function parentIsContainer(node: EventLayerNode) {
+    if (!node.parentId) return false;
+    if (
+      widgetMap[node.parentId] &&
+      widgetMap[node.parentId].config.originalType !== ORIGINAL_TYPE_MAP.group
+    ) {
+      return true;
+    }
+    return false;
+  }
+  console.log('dragOver', targetNode.dragOver);
+  console.log('dragOverGapBottom', targetNode.dragOverGapBottom);
+  console.log('dragOverGapTop', targetNode.dragOverGapTop);
+  /*
+  1 group -> group
+  2 group -> container
+  3 container -> group
+  4 container -> container
+  */
+  // 1 group -> group
+  if (!parentIsContainer(dragNode) && !parentIsContainer(targetNode)) {
+    moveNodeGroupToGroup({ dispatch, targetNode, dragNode });
+    return;
+  }
+  //  2 group -> container
+  if (!parentIsContainer(dragNode) && parentIsContainer(targetNode)) {
+    moveNodeGroupToContainer({ dispatch, targetNode, dragNode });
+    return;
+  }
+  // 3 container -> group
+  if (parentIsContainer(dragNode) && !parentIsContainer(targetNode)) {
+    // moveNodeGroupToGroup({ dispatch, targetNode, dragNode });
+    moveNodeContainerToGroup({ dispatch, targetNode, dragNode });
+    return;
+  }
+  // 4 container -> container
+  if (parentIsContainer(dragNode) && parentIsContainer(targetNode)) {
+    moveNodeContainerToContainer({ dispatch, targetNode, dragNode });
+    return;
+  }
+  return;
+};
+
+export const moveNodeGroupToGroup = (args: {
+  dispatch;
+  dragNode: EventLayerNode;
+  targetNode: EventLayerNode;
+}) => {
+  const { dragNode, targetNode } = args;
+  if (dragNode.parentId === targetNode.parentId) {
+    // only change index
+    moveNodeInSameGroup(args);
+  } else {
+    //change parentId and index
+    moveNodeToOtherGroup(args);
+  }
+};
+
+export const moveNodeInSameGroup = (args: {
+  dispatch;
+  dragNode: EventLayerNode;
+  targetNode: EventLayerNode;
+}) => {
+  const { dispatch, dragNode, targetNode } = args;
+  if (targetNode.dragOver) return; //todo to group first
+  let nextIndex = 0;
+  if (targetNode.dragOverGapBottom) {
+    nextIndex = targetNode.widgetIndex - parseFloat(Math.random().toFixed(5));
+  }
+  if (targetNode.dragOverGapTop) {
+    nextIndex = targetNode.widgetIndex + 1;
+  }
+  dispatch(
+    editBoardStackActions.changeWidgetsIndex([
+      { id: dragNode.key, index: nextIndex },
+    ]),
+  );
+};
+
+export const moveNodeToOtherGroup = (args: {
+  dispatch;
+  dragNode: EventLayerNode;
+  targetNode: EventLayerNode;
+}) => {
+  const { dispatch, dragNode, targetNode } = args;
+  if (targetNode.dragOver) return; //todo to group first
+  let nextIndex = 0;
+  if (targetNode.dragOverGapBottom) {
+    nextIndex = targetNode.widgetIndex - parseFloat(Math.random().toFixed(5));
+  }
+  if (targetNode.dragOverGapTop) {
+    nextIndex = targetNode.widgetIndex + 1;
+  }
+  dispatch(
+    editBoardStackActions.changeWidgetsParentId({
+      items: [
+        {
+          wid: dragNode.key,
+          nextIndex,
+        },
+      ],
+      parentId: targetNode.parentId,
+    }),
+  );
+};
+
+export const moveNodeContainerToGroup = (args: {
+  dispatch;
+  dragNode: EventLayerNode;
+  targetNode: EventLayerNode;
+}) => {
+  const { dispatch, dragNode, targetNode } = args;
+  if (targetNode.dragOver) return;
+  dispatch(editBoardStackActions.dropTabToGroup({ dragNode, targetNode }));
+};
+export const moveNodeGroupToContainer = (args: {
+  dispatch;
+  dragNode: EventLayerNode;
+  targetNode: EventLayerNode;
+}) => {
+  const { dispatch, dragNode, targetNode } = args;
+  if (targetNode.dragOver) return;
+  dispatch(editBoardStackActions.dropGroupToTab({ dragNode, targetNode }));
+  // dropGroupToTab
+};
+export const moveNodeContainerToContainer = (args: {
+  dispatch;
+  dragNode: EventLayerNode;
+  targetNode: EventLayerNode;
+}) => {
+  const { dispatch, dragNode, targetNode } = args;
+  if (targetNode.dragOver) return;
+  if (dragNode.parentId === targetNode.parentId) {
+    // only change index
+    dispatch(
+      editBoardStackActions.changeTabItemIndex({ dragNode, targetNode }),
+    );
+  } else {
+    //change parentId and index
+    dispatch(editBoardStackActions.dropTabToOtherTab({ dragNode, targetNode }));
+  }
 };

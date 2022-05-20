@@ -320,7 +320,6 @@ const filterActions = [
   editBoardStackActions.addWidgets,
   editBoardStackActions.deleteWidgets,
   editBoardStackActions.changeAutoBoardWidgetsRect,
-  editBoardStackActions.resizeWidgetEnd,
 
   editBoardStackActions.tabsWidgetAddTab,
   editBoardStackActions.tabsWidgetRemoveTab,
@@ -331,7 +330,7 @@ const filterActions = [
   editBoardStackActions.toggleLockWidget,
   editBoardStackActions.updateBoardConfigByKey,
   editBoardStackActions.updateWidgetConfigByPath,
-  editBoardStackActions.updateWidgetRect,
+  editBoardStackActions.changeFreeWidgetRect,
 ].map(ele => ele.toString());
 const editBoardStackReducer = undoable(editBoardStackSlice.reducer, {
   undoType: BOARD_UNDO.undo,

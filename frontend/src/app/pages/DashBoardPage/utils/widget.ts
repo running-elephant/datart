@@ -29,7 +29,8 @@ import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
 import { CSSProperties } from 'react';
 import { adaptBoardImageUrl, fillPx, getBackgroundImage } from '.';
-import { LAYOUT_COLS_MAP } from '../constants';
+import { adjustGroupWidgets } from '../components/Widgets/GroupWidget/utils';
+import { LAYOUT_COLS_MAP, ORIGINAL_TYPE_MAP } from '../constants';
 import {
   BackgroundConfig,
   BoardType,
@@ -163,11 +164,14 @@ export const getWidgetInfoMapByServer = (widgetMap: Record<string, Widget>) => {
   return widgetInfoMap;
 };
 
-export const updateWidgetsRect = (
-  widgets: Widget[],
-  boardType: BoardType,
-  layouts?: ReactGridLayout.Layout[],
-) => {
+export const adjustWidgetsToBoard = (args: {
+  widgets: Widget[];
+  boardType: BoardType;
+  boardId: string;
+  layouts?: ReactGridLayout.Layout[];
+}) => {
+  const { widgets, boardType, layouts } = args;
+
   if (boardType === 'auto') {
     return updateAutoWidgetsRect(widgets, layouts || []);
   } else if (boardType === 'free') {
@@ -288,7 +292,7 @@ export const convertWrapChartWidget = (params: {
 }) => {
   const { widgetMap, dataChartMap } = params;
   const widgets = Object.values(widgetMap).map(widget => {
-    if (widget.config.originalType !== 'ownedChart') {
+    if (widget.config.originalType !== ORIGINAL_TYPE_MAP.ownedChart) {
       return widget;
     }
     // widgetChart wrapChartWidget
@@ -523,30 +527,6 @@ export const getWidgetMap = (
   const controllerWidgets: Widget[] = []; // use for reset button
   const widgetList = Object.values(widgetMap);
 
-  // 处理 widget包含关系 containerWidget 被包含的 widget.parentId 不为空
-  widgetList
-    .filter(w => w.parentId)
-    .forEach(widget => {
-      const parentWidgetId = widget.parentId!;
-      const parentWidget = widgetMap[parentWidgetId];
-      if (!parentWidget) {
-        widget.parentId = '';
-        return;
-      }
-      const tabContent = parentWidget.config.content as TabWidgetContent;
-      if (!tabContent.itemMap) {
-        widget.parentId = '';
-        return;
-      }
-
-      const targetTabItem = tabContent.itemMap?.[widget.config.clientId];
-      if (!targetTabItem) {
-        widget.parentId = '';
-        return;
-      }
-      targetTabItem.childWidgetId = widget.id;
-    });
-
   // 处理 controller config visibility依赖关系 id, url参数修改filter
   widgetList
     .filter(w => w.config.type === 'controller')
@@ -606,18 +586,68 @@ export const getWidgetMap = (
 
   // 处理 自有 chart widgetControl
   widgetList
-    .filter(w => w.config.originalType === 'ownedChart')
+    .filter(w => w.config.originalType === ORIGINAL_TYPE_MAP.ownedChart)
     .forEach(widget => {
       let dataChart = (widget.config.content as any).dataChart as DataChart;
 
-      const self_dataChartId = `widget_${widget.dashboardId}_${widget.id}`;
+      const ownedDataChartId = `widget_${widget.dashboardId}_${widget.id}`;
       if (dataChart) {
-        dataChart.id = self_dataChartId;
+        dataChart.id = ownedDataChartId;
         wrappedDataCharts.push(dataChart!);
       }
-      widget.datachartId = self_dataChartId;
+      widget.datachartId = ownedDataChartId;
     });
 
+  // 处理 widget包含关系 tab Widget 被包含的 widget.parentId 不为空
+  widgetList
+    .filter(w => w.parentId)
+    .forEach(widget => {
+      const parentWidgetId = widget.parentId!;
+      const parentWidget = widgetMap[parentWidgetId];
+      if (!parentWidget) {
+        widget.parentId = '';
+        return;
+      }
+      if (parentWidget.config.originalType !== ORIGINAL_TYPE_MAP.tab) {
+        return;
+      }
+      const tabContent = parentWidget.config.content as TabWidgetContent;
+      if (!tabContent.itemMap) {
+        widget.parentId = '';
+        return;
+      }
+
+      const targetTabItem = tabContent.itemMap?.[widget.config.clientId];
+      if (!targetTabItem) {
+        widget.parentId = '';
+        return;
+      }
+      targetTabItem.childWidgetId = widget.id;
+    });
+  // clear Group children
+  widgetList
+    .filter(w => w.config.originalType === ORIGINAL_TYPE_MAP.group)
+    .forEach(widget => {
+      widget.config.children = [];
+    });
+  // set Group children
+  widgetList
+    .filter(w => w.parentId)
+    .forEach(widget => {
+      const parentWidgetId = widget.parentId!;
+      const parentWidget = widgetMap[parentWidgetId];
+      if (!parentWidget) {
+        widget.parentId = '';
+        return;
+      }
+      if (parentWidget.config.originalType !== ORIGINAL_TYPE_MAP.group) {
+        return;
+      }
+      if (!Array.isArray(parentWidget.config.children)) {
+        parentWidget.config.children = [];
+      }
+      parentWidget.config.children.push(widget.id);
+    });
   // preprocess widget
   widgetList.forEach(widget => {
     widget.config.boardType = boardType;
@@ -647,4 +677,17 @@ export const getValueByRowData = (
 ) => {
   let toCaseField = fieldName;
   return data?.rowData[toCaseField];
+};
+
+export const deleteEffect = (widgetMap: Record<string, Widget>) => {
+  let groupIds: string[] = [];
+  Object.values(widgetMap).forEach(widget => {
+    if (widget.config.originalType === ORIGINAL_TYPE_MAP.group) {
+      if (widgetMap[widget.id]) {
+        groupIds.push(widget.id);
+      }
+    }
+  });
+
+  adjustGroupWidgets({ groupIds: groupIds, widgetMap });
 };
