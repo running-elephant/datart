@@ -37,7 +37,7 @@ import {
 } from '../../WidgetManager/utils/init';
 
 const NameI18N = {
-  zh: '组容器',
+  zh: '分组',
   en: 'Group',
 };
 export const widgetMeta: WidgetMeta = {

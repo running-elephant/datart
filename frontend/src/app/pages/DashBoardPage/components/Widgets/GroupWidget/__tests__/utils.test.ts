@@ -33,7 +33,11 @@ describe('getParentRect Test', () => {
     };
     const ids = ['a1', 'b2'];
 
-    const res = getParentRect({ childIds: ids, widgetMap: widgetMap as any });
+    const res = getParentRect({
+      childIds: ids,
+      widgetMap: widgetMap as any,
+      preRect: { x: 0, y: 0, width: 5, height: 6 },
+    });
     expect(res).toEqual({
       x: 1,
       y: 1,

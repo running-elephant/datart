@@ -46,8 +46,10 @@ export interface WidgetConf {
   // visible: boolean; // 是否可见 TODO: 后续考虑
   customConfig: CustomConfig;
   content?: any;
-  rect: RectConfig;
-  mRect?: RectConfig;
+  rect: RectConfig; // rect of freeBoard
+  mRect?: RectConfig; // mobile rect of autoBoard
+  pRect: RectConfig; // pc rect of autoBoard
+  // tRect?: RectConfig; // tablet rect of autoBoard
   parentId?: string;
   children?: string[];
   linkageConfig?: LinkageConfig; //联动设置 TODO: in selfConfig
