@@ -18,9 +18,18 @@
 import { PayloadAction } from '@reduxjs/toolkit';
 import { ChartDataSectionType } from 'app/constants';
 import {
+  adjustGroupWidgets,
+  findChildIds,
+  findParentIds,
+  moveGroupAllChildren,
+  resetGroupAllChildrenRect,
+} from 'app/pages/DashBoardPage/components/Widgets/GroupWidget/utils';
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
+import {
   BoardLinkFilter,
   Dashboard,
   DataChart,
+  RectConfig,
   WidgetData,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -151,6 +160,59 @@ const boardSlice = createSlice({
           state.widgetInfoRecord[groupId][wid].rendered = true;
         } catch (error) {}
       });
+    },
+    changeFreeWidgetRect(
+      state,
+      action: PayloadAction<{
+        boardId: string;
+        wid: string;
+        rect: RectConfig;
+      }>,
+    ) {
+      const { wid, boardId, rect: newRect } = action.payload;
+      const widgetMap = state.widgetRecord[boardId];
+      if (!widgetMap) return;
+      const targetWidget = widgetMap[wid];
+      if (!targetWidget) return;
+      const oldRect = targetWidget.config.rect;
+      const diffRect: RectConfig = {
+        x: newRect.x - oldRect.x,
+        y: newRect.y - oldRect.y,
+        width: newRect.width - oldRect.width,
+        height: newRect.height - oldRect.height,
+      };
+      targetWidget.config.rect = newRect;
+
+      if (
+        !targetWidget.parentId &&
+        targetWidget.config.originalType !== ORIGINAL_TYPE_MAP.group
+      ) {
+        return;
+      }
+
+      const hasMoveEvent = diffRect.x !== 0 || diffRect.y !== 0;
+      const hasResizeEvent = diffRect.width !== 0 || diffRect.height !== 0;
+
+      if (hasMoveEvent) {
+        // handle children : collect all children and move them
+        const childIds: string[] = [];
+        findChildIds({ widget: targetWidget, widgetMap, childIds });
+        moveGroupAllChildren({ childIds, widgetMap, diffRect });
+        // handle parents : collect all parents and resetParentsRect
+        const parentIds: string[] = [];
+        findParentIds({ widget: targetWidget, widgetMap, parentIds });
+        adjustGroupWidgets({ groupIds: parentIds, widgetMap });
+      }
+      if (hasResizeEvent) {
+        // handle children : collect all children and resize them
+        const childIds: string[] = [];
+        findChildIds({ widget: targetWidget, widgetMap, childIds });
+        resetGroupAllChildrenRect({ childIds, widgetMap, oldRect, newRect });
+        // handle parents : collect all parents and resetParentsRect
+        const parentIds: string[] = [];
+        findParentIds({ widget: targetWidget, widgetMap, parentIds });
+        adjustGroupWidgets({ groupIds: parentIds, widgetMap });
+      }
     },
     updateFullScreenPanel(
       state,

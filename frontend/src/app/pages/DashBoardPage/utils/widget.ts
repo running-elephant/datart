@@ -190,15 +190,15 @@ export const updateAutoWidgetsRect = (
   let itemYs = [...dashWidgetRectYs];
   widgets.forEach(widget => {
     const itemX =
-      (widgetsCount * widget.config.rect.width) % LAYOUT_COLS_MAP.lg;
+      (widgetsCount * widget.config.pRect.width) % LAYOUT_COLS_MAP.lg;
     const itemY = Math.max(...itemYs, 0);
     const nextRect = {
-      ...widget.config.rect,
+      ...widget.config.pRect,
       x: itemX,
       y: itemY,
     };
     widget = produce(widget, draft => {
-      draft.config.rect = nextRect;
+      draft.config.pRect = nextRect;
     });
     upDatedWidgets.push(widget);
     widgetsCount++;

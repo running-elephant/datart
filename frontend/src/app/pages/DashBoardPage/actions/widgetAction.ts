@@ -407,20 +407,67 @@ export const changeGroupRectAction =
     w: number;
     h: number;
   }) =>
-  (dispatch, getState) => {
-    const { renderMode, boardId, wid, w, h } = args;
-
+  dispatch => {
+    const { renderMode } = args;
     if (renderMode === 'edit') {
       dispatch(changeEditGroupRectAction(args));
+    } else {
+      dispatch(changeViewGroupRectAction(args));
     }
   };
-export const changeViewGroupRectAction = (args: {
-  renderMode: VizRenderMode;
-  boardId: string;
-  wid: string;
-  w: number;
-  h: number;
-}) => {};
+
+export const changeViewGroupRectAction =
+  (args: {
+    renderMode: VizRenderMode;
+    boardId: string;
+    wid: string;
+    w: number;
+    h: number;
+  }) =>
+  (dispatch, getState) => {
+    const { wid, w, h, boardId } = args;
+    const rootState = getState() as RootState;
+    const viewBoardState = rootState.board as BoardState;
+    const widgetMap = viewBoardState.widgetRecord[boardId];
+    if (!wid) return;
+    const widget = widgetMap[wid];
+    if (!widget) return;
+    const parentWidget = widgetMap[widget.parentId || ''];
+    const rect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: w,
+      height: h,
+    };
+    // 如果 group的直接父容器 是 tab容器
+    if (
+      parentWidget &&
+      parentWidget.config.originalType === ORIGINAL_TYPE_MAP.tab
+    ) {
+      dispatch(
+        boardActions.changeFreeWidgetRect({
+          boardId: widget.dashboardId,
+          wid,
+          rect,
+        }),
+      );
+      return;
+    }
+    // 如果 group的直接父容器 是 autoBoard
+    if (widget.config.boardType === 'auto') {
+      // autoBoard 第一层
+      if (!widget.parentId) {
+        dispatch(
+          boardActions.changeFreeWidgetRect({
+            boardId: widget.dashboardId,
+            wid,
+            rect,
+          }),
+        );
+        return;
+      }
+    }
+  };
 export const changeEditGroupRectAction =
   (args: {
     renderMode: VizRenderMode;
@@ -438,16 +485,37 @@ export const changeEditGroupRectAction =
     if (!wid) return;
     const widget = widgetMap[wid];
     if (!widget) return;
-    if (!widget.parentId) return;
-    const parentWidget = widgetMap[widget.parentId];
-    if (!parentWidget) return;
-
-    if (parentWidget.config.originalType !== ORIGINAL_TYPE_MAP.tab) return;
+    const parentWidget = widgetMap[widget.parentId || ''];
     const rect: RectConfig = {
       x: 0,
       y: 0,
       width: w,
       height: h,
     };
-    dispatch(editBoardStackActions.changeFreeWidgetRect({ wid, rect }));
+    // 如果 group的直接父容器 是 tab容器
+    if (
+      parentWidget &&
+      parentWidget.config.originalType === ORIGINAL_TYPE_MAP.tab
+    ) {
+      dispatch(
+        editBoardStackActions.changeFreeWidgetRect({
+          wid,
+          rect,
+        }),
+      );
+      return;
+    }
+    // 如果 group的直接父容器 是 autoBoard
+    if (widget.config.boardType === 'auto') {
+      // autoBoard 第一层
+      if (!widget.parentId) {
+        dispatch(
+          editBoardStackActions.changeFreeWidgetRect({
+            wid,
+            rect,
+          }),
+        );
+        return;
+      }
+    }
   };

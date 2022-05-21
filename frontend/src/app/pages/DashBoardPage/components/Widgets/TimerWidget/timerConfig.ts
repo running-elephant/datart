@@ -155,8 +155,8 @@ export const widgetToolkit: TimerWidgetToolKit = {
         width: 6,
         height: 2,
       };
-      widget.config.rect = { ...rect };
-      widget.config.mRect = { ...rect };
+      widget.config.pRect = { ...rect };
+      widget.config.mRect = undefined;
     } else {
       const rect: RectConfig = {
         x: 0,

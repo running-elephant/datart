@@ -17,7 +17,6 @@
  */
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { memo, useContext, useEffect } from 'react';
 import styled from 'styled-components/macro';
 import { LEVEL_10 } from 'styles/StyleConstants';
@@ -28,22 +27,27 @@ import { GroupWidgetCore } from './groupWidgetCore';
 
 export const GroupWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
+  const boardType = widget.config.boardType;
+  if (boardType === 'auto' && !widget.parentId) {
+    return <AutoGroupWidget />;
+  } else {
+    return <FreeGroupWidget />;
+  }
+});
+export const FreeGroupWidget: React.FC<{}> = memo(() => {
+  const widget = useContext(WidgetContext);
   const wid = widget.id;
-
   const { editing } = useContext(BoardContext);
-  const { onChangeGroupRect, onAdjustGroupWidget } =
-    useContext(WidgetActionContext);
+  const rect = widget.config.rect;
+  const { onChangeGroupRect } = useContext(WidgetActionContext);
 
-  // useEffect(() => {
-  //   onAdjustGroupWidget(wid);
-  // }, [onAdjustGroupWidget, wid, widget.config.children?.length]);
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
   useEffect(() => {
     onChangeGroupRect({ wid, w: cacheW, h: cacheH });
   }, [cacheW, cacheH, wid, onChangeGroupRect]);
   return (
     <StyleWrapper className="group-wrapper" ref={cacheWhRef}>
-      <AbsoluteWrapper className="group-absolute" rect={widget.config.rect}>
+      <AbsoluteWrapper className="group-absolute" x={rect.x} y={rect.y}>
         <RelativeWrapper className="group-relative">
           <GroupWidgetCore widgetIds={widget.config.children || []} />
         </RelativeWrapper>
@@ -53,11 +57,32 @@ export const GroupWidget: React.FC<{}> = memo(() => {
     </StyleWrapper>
   );
 });
-// relative
-const AbsoluteWrapper = styled.div<{ rect: RectConfig }>`
+
+export const AutoGroupWidget: React.FC<{}> = memo(() => {
+  const widget = useContext(WidgetContext);
+  const wid = widget.id;
+  const { editing } = useContext(BoardContext);
+  const { onChangeGroupRect } = useContext(WidgetActionContext);
+  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
+  useEffect(() => {
+    onChangeGroupRect({ wid, w: cacheW, h: cacheH });
+  }, [cacheW, cacheH, wid, onChangeGroupRect]);
+  return (
+    <StyleWrapper className="group-wrapper" ref={cacheWhRef}>
+      <AbsoluteWrapper className="group-absolute" x={0} y={0}>
+        <RelativeWrapper className="group-relative">
+          <GroupWidgetCore widgetIds={widget.config.children || []} />
+        </RelativeWrapper>
+      </AbsoluteWrapper>
+
+      {editing && <EditMask />}
+    </StyleWrapper>
+  );
+});
+const AbsoluteWrapper = styled.div<{ x: number; y: number }>`
   position: absolute;
-  top: ${p => -p.rect.y + 'px'};
-  left: ${p => -p.rect.x + 'px'};
+  top: ${p => -p.y + 'px'};
+  left: ${p => -p.x + 'px'};
   z-index: ${LEVEL_10};
   flex: 1;
 `;

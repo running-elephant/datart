@@ -135,12 +135,10 @@ const widgetToolkit: IframeWidgetToolKit = {
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      widget.config.rect = { ...initAutoWidgetRect() };
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      widget.config.rect = { ...initFreeWidgetRect() };
-    }
+
+    widget.config.rect = { ...initFreeWidgetRect() };
+    widget.config.pRect = { ...initAutoWidgetRect() };
+    widget.config.mRect = undefined;
 
     widget.config.customConfig.props = [
       { ...initIframeTpl() },
