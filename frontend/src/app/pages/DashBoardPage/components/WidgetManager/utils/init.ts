@@ -335,8 +335,8 @@ export const widgetTpl = (): Widget => {
       // visible: true,
       lock: false,
       content: {} as any,
-      rect: { x: 0, y: 0, width: 0, height: 0 },
-      pRect: { x: 0, y: 0, width: 0, height: 0 },
+      rect: { x: 0, y: 0, width: 1, height: 1 },
+      pRect: { x: 0, y: 0, width: 1, height: 1 },
       customConfig: {
         props: [],
       },
