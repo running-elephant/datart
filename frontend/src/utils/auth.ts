@@ -16,7 +16,10 @@ export function getToken() {
 
 export function setToken(token: string) {
   Cookies.set(StorageKeys.AuthorizationToken, token, {
-    expires: new Date(new Date().getTime() + tokenExpiration),
+    expires:
+      tokenExpiration <= 0
+        ? 0
+        : new Date(new Date().getTime() + tokenExpiration),
   });
 }
 
