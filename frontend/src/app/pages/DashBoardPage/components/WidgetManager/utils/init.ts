@@ -336,6 +336,7 @@ export const widgetTpl = (): Widget => {
       lock: false,
       content: {} as any,
       rect: { x: 0, y: 0, width: 0, height: 0 },
+      pRect: { x: 0, y: 0, width: 0, height: 0 },
       customConfig: {
         props: [],
       },

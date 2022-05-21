@@ -110,7 +110,7 @@ export const widgetToolkit: GroupToolkit = {
         width: 6,
         height: 9,
       };
-      widget.config.rect = rect;
+      widget.config.pRect = rect;
       widget.config.mRect = { ...initAutoWidgetRect() };
     } else {
       const rect: RectConfig = {

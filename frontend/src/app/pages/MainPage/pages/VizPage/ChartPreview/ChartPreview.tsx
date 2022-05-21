@@ -86,7 +86,10 @@ const ChartPreviewBoard: FC<{
       cacheWhRef: ref,
       cacheW,
       cacheH,
-    } = useCacheWidthHeight(defaultChartContainerWH, defaultChartContainerWH);
+    } = useCacheWidthHeight({
+      initH: defaultChartContainerWH,
+      initW: defaultChartContainerWH,
+    });
     useWorkbenchSlice();
     const { actions: vizAction } = useVizSlice();
     const { actions } = useMainSlice();

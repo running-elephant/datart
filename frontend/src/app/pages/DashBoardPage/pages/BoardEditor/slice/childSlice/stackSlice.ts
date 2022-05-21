@@ -241,21 +241,14 @@ export const editBoardStackSlice = createSlice({
         if (!state.widgetRecord?.[i]?.config) return;
         const rectItem = { x, y, width: w, height: h };
         if (deviceType === DeviceType.Desktop) {
-          state.widgetRecord[i].config.rect = rectItem;
+          state.widgetRecord[i].config.pRect = rectItem;
         }
         if (deviceType === DeviceType.Mobile) {
           state.widgetRecord[i].config.mRect = rectItem;
         }
       });
     },
-    // auto
-    adjustWidgetsRect(state, action: PayloadAction<Layout[]>) {
-      action.payload.forEach(it => {
-        const { i, x, y, w, h } = it;
-        const rectItem = { x, y, width: w, height: h };
-        state.widgetRecord[i].config.rect = rectItem;
-      });
-    },
+
     // free
 
     changeWidgetsIndex(
@@ -272,6 +265,7 @@ export const editBoardStackSlice = createSlice({
     changeFreeWidgetRect(
       state,
       action: PayloadAction<{
+        boardId?: string;
         wid: string;
         rect: RectConfig;
       }>,
@@ -320,26 +314,7 @@ export const editBoardStackSlice = createSlice({
         adjustGroupWidgets({ groupIds: parentIds, widgetMap });
       }
     },
-    adjustGroupWidget(state, action: PayloadAction<{ wid: string }>) {
-      const { wid } = action.payload;
-      adjustGroupWidgets({
-        groupIds: [wid],
-        widgetMap: state.widgetRecord,
-      });
-    },
 
-    // changeWidgetGroup(
-    //   state,
-    //   action: PayloadAction<{
-    //     preWId: string;
-    //     preParentId: string;
-    //     newParentId: string;
-    //   }>,
-    // ) {
-    //   const { preWId, preParentId, newParentId } = action.payload;
-    //   state.widgetRecord[preWId].parentId = newParentId;
-
-    // },
     /* tabs widget */
     addWidgetToTabWidget(
       state,
