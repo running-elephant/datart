@@ -22,6 +22,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
+@Deprecated
 @EqualsAndHashCode(callSuper = true)
 public class PasswordToken extends JwtToken {
 

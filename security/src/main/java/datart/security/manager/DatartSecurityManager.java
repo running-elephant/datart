@@ -2,6 +2,7 @@
 package datart.security.manager;
 
 import datart.core.entity.*;
+import datart.security.base.JwtToken;
 import datart.security.base.Permission;
 import datart.security.exception.AuthException;
 import datart.security.exception.PermissionDeniedException;
@@ -9,7 +10,7 @@ import datart.security.base.PasswordToken;
 
 public interface DatartSecurityManager {
 
-    void login(PasswordToken token) throws AuthException;
+    void login(JwtToken token) throws AuthException;
 
     boolean validateUser(String username,String password) throws AuthException;
 

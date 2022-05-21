@@ -86,23 +86,6 @@ public class JwtUtils {
         return jwtToken;
     }
 
-    public static PasswordToken toPasswordToken(String jwtString) {
-        try {
-            jwtString = URLDecoder.decode(jwtString, StandardCharsets.UTF_8.displayName());
-        } catch (Exception ignored) {
-        }
-        if (jwtString == null || !jwtString.startsWith(Const.TOKEN_HEADER_PREFIX)) {
-            return null;
-        }
-        jwtString = StringUtils.removeStart(jwtString, Const.TOKEN_HEADER_PREFIX);
-        Claims claims = getClaims(jwtString);
-        PasswordToken passwordToken = new PasswordToken();
-        passwordToken.setSubject(claims.getSubject());
-        passwordToken.setPassword(claims.get(PASSWORD, String.class));
-        passwordToken.setExp(claims.getExpiration());
-        return passwordToken;
-    }
-
 
     public static InviteToken toInviteToken(String token) {
         token = StringUtils.removeStart(token, Const.TOKEN_HEADER_PREFIX);

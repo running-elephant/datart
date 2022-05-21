@@ -24,6 +24,7 @@ import datart.core.base.exception.Exceptions;
 import datart.core.common.MessageResolver;
 import datart.core.entity.User;
 import datart.core.mappers.ext.UserMapperExt;
+import datart.security.base.JwtToken;
 import datart.security.base.PasswordToken;
 import datart.security.base.Permission;
 import datart.security.base.RoleType;
@@ -68,7 +69,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
     }
 
     @Override
-    public void login(PasswordToken token) throws RuntimeException {
+    public void login(JwtToken token) throws RuntimeException {
         logoutCurrent();
         User user = userMapper.selectByNameOrEmail(token.getSubject());
         if (user == null) {
@@ -78,11 +79,11 @@ public class ShiroSecurityManager implements DatartSecurityManager {
             Exceptions.tr(BaseException.class, "message.user.not.active");
         }
         Subject subject = SecurityUtils.getSubject();
-        UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(token.getSubject(), token.getPassword());
+        UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(token.getSubject(), user.getPassword());
         try {
             subject.login(usernamePasswordToken);
         } catch (Exception e) {
-            log.error("Login error ({} {})", token.getSubject(), token.getPassword());
+            log.error("Login error ({})", token.getSubject());
             Exceptions.msg("login.fail");
         }
     }
@@ -99,20 +100,19 @@ public class ShiroSecurityManager implements DatartSecurityManager {
     @Override
     public String login(String jwtToken) throws AuthException {
         logoutCurrent();
-        PasswordToken passwordToken = JwtUtils.toPasswordToken(jwtToken);
-        if (!JwtUtils.validTimeout(passwordToken)) {
+        JwtToken token = JwtUtils.toJwtToken(jwtToken);
+        if (!JwtUtils.validTimeout(token)) {
             Exceptions.tr(AuthException.class, "login.session.timeout");
         }
-        User user = userMapper.selectByNameOrEmail(passwordToken.getSubject());
+        User user = userMapper.selectByNameOrEmail(token.getSubject());
         if (user == null) {
             Exceptions.tr(AuthException.class, "login.session.timeout");
         }
         if (!user.getActive()) {
             Exceptions.tr(BaseException.class, "message.user.not.active");
         }
-        passwordToken = new PasswordToken(user.getUsername(), user.getPassword(), System.currentTimeMillis());
-        login(passwordToken);
-        return JwtUtils.toJwtString(passwordToken);
+        login(token);
+        return jwtToken;
     }
 
     @Override

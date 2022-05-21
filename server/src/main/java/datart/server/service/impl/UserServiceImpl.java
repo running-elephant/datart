@@ -36,6 +36,7 @@ import datart.core.entity.ext.UserBaseInfo;
 import datart.core.mappers.ext.OrganizationMapperExt;
 import datart.core.mappers.ext.RelRoleUserMapperExt;
 import datart.core.mappers.ext.UserMapperExt;
+import datart.security.base.JwtToken;
 import datart.security.base.PasswordToken;
 import datart.security.base.RoleType;
 import datart.security.util.JwtUtils;
@@ -171,13 +172,13 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Override
     @Transactional
     public String activeUser(String activeString) {
-        PasswordToken passwordToken = null;
+        JwtToken jwtToken = null;
         try {
-            passwordToken = JwtUtils.toPasswordToken(activeString);
+            jwtToken = JwtUtils.toJwtToken(activeString);
         } catch (ExpiredJwtException e) {
             Exceptions.msg("message.user.confirm.mail.timeout");
         }
-        User user = userMapper.selectByUsername(passwordToken.getSubject());
+        User user = userMapper.selectByUsername(jwtToken.getSubject());
         if (user == null) {
             Exceptions.notFound("resource.not-exist", "resource.user");
         }
@@ -188,10 +189,9 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
         initUser(user);
         log.info("User({}) activation success", user.getUsername());
-        passwordToken.setPassword(null);
-        passwordToken.setExp(null);
-        passwordToken.setCreateTime(System.currentTimeMillis());
-        return JwtUtils.toJwtString(passwordToken);
+        jwtToken.setExp(null);
+        jwtToken.setCreateTime(System.currentTimeMillis());
+        return activeString;
     }
 
     @Override
@@ -344,12 +344,9 @@ public class UserServiceImpl extends BaseService implements UserService {
         if (!valid) {
             Exceptions.tr(ParamException.class, "message.user.verify.code.timeout");
         }
-        PasswordToken passwordToken = JwtUtils.toPasswordToken(passwordParam.getToken());
-        if (!passwordToken.getPassword().equals(passwordParam.getVerifyCode())) {
-            Exceptions.tr(ParamException.class, "message.user.verify.code.error");
+        JwtToken jwtToken = JwtUtils.toJwtToken(passwordParam.getToken());
 
-        }
-        User user = userMapper.selectByUsername(passwordToken.getSubject());
+        User user = userMapper.selectByUsername(jwtToken.getSubject());
         if (user == null) {
             Exceptions.notFound("resource.not-exist", "resource.user");
         }
