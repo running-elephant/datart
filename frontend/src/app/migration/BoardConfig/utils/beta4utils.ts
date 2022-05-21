@@ -17,6 +17,7 @@
  */
 
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
+import { BoardType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ITimeDefault,
   Widget,
@@ -361,6 +362,17 @@ export const convertControllerToBeta4 = (widget: WidgetBeta3) => {
   newWidget = widgetManagerInstance.toolkit(subType).create({ ...widget });
   newWidget = commonBeta4Convert(newWidget, widget);
   return newWidget;
+};
+export const convertToBeta4AutoWidget = (
+  boardType: BoardType,
+  widget?: Widget,
+) => {
+  if (!widget) return undefined;
+  if (boardType === 'free') return widget;
+  if (!widget.config.pRect) {
+    widget.config.pRect = widget.config.rect;
+  }
+  return widget;
 };
 /**
  *
