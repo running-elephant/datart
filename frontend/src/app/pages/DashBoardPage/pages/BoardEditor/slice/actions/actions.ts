@@ -47,7 +47,7 @@ import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { ORIGINAL_TYPE_MAP } from '../../../../constants';
 import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
-import { LayerNode } from '../../components/LayerList/LayerTreeItem';
+import { LayerNode } from '../../components/LayerPanel/LayerTreeItem';
 import { getEditChartWidgetDataAsync } from '../thunk';
 import { EditBoardState, HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
