@@ -24,6 +24,7 @@ import {
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { IFontDefault } from 'types';
 import widgetManagerInstance from '../../../pages/DashBoardPage/components/WidgetManager';
+import { RectConfig } from '../../../pages/DashBoardPage/pages/Board/slice/types';
 import { WidgetBeta3 } from '../types';
 
 const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
@@ -374,6 +375,13 @@ export const convertToBeta4AutoWidget = (
   if (boardType === 'free') return widget;
   if (!widget.config.pRect) {
     widget.config.pRect = widget.config.rect;
+    const newRect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: 400,
+      height: 300,
+    };
+    widget.config.rect = newRect;
   }
   return widget;
 };

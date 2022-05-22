@@ -21,7 +21,6 @@ import { getParentRect } from 'app/pages/DashBoardPage/components/Widgets/GroupW
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
-  BoardType,
   Dashboard,
   DataChart,
   TabWidgetContent,
@@ -328,46 +327,44 @@ export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
     }),
   );
 };
-export const onComposeGroupAction =
-  (boardType: BoardType, wid?: string) => (dispatch, getState) => {
-    // if (boardType === 'auto') return;
-    const rootState = getState() as RootState;
-    const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
-    const stackState = editBoardState.stack.present;
-    const curBoard = stackState.dashBoard;
-    const widgetMap = stackState.widgetRecord;
-    const widgetInfos = Object.values(editBoardState.widgetInfoRecord || {});
-    let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);
-    wid && selectedIds.push(wid);
-    selectedIds = [...new Set(selectedIds)];
-    if (!selectedIds.length) return;
-    let groupWidget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.group).create({
-      boardType: curBoard.config.type,
-      children: selectedIds,
-    });
-    groupWidget.config.rect = getParentRect({
-      childIds: selectedIds,
-      widgetMap,
-      preRect: groupWidget.config.rect,
-    });
-    const items = selectedIds.map(id => {
-      return {
-        wid: id,
-        nextIndex: widgetMap[id].config.index,
-      };
-    });
-    const widgetInfoMap = createWidgetInfoMap([groupWidget]);
-    dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
-    dispatch(editBoardStackActions.addWidgets([groupWidget]));
-    //  dispatch(addWidgetsToEditBoard([groupWidget]));
+export const onComposeGroupAction = (wid?: string) => (dispatch, getState) => {
+  const rootState = getState() as RootState;
+  const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
+  const stackState = editBoardState.stack.present;
+  const curBoard = stackState.dashBoard;
+  const cutBoardType = curBoard.config.type;
+  const widgetMap = stackState.widgetRecord;
+  const widgetInfos = Object.values(editBoardState.widgetInfoRecord || {});
+  let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);
+  wid && selectedIds.push(wid);
+  selectedIds = [...new Set(selectedIds)];
+  if (!selectedIds.length) return;
+  let groupWidget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.group).create({
+    boardType: curBoard.config.type,
+    children: selectedIds,
+  });
+  groupWidget.config.rect = getParentRect({
+    childIds: selectedIds,
+    widgetMap,
+    preRect: groupWidget.config.rect,
+  });
+  const items = selectedIds.map(id => {
+    return {
+      wid: id,
+      nextIndex: widgetMap[id].config.index,
+    };
+  });
+  const widgetInfoMap = createWidgetInfoMap([groupWidget]);
+  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
+  dispatch(editBoardStackActions.addWidgets([groupWidget]));
 
-    dispatch(
-      editBoardStackActions.changeWidgetsParentId({
-        items,
-        parentId: groupWidget.id,
-      }),
-    );
-  };
+  dispatch(
+    editBoardStackActions.changeWidgetsParentId({
+      items,
+      parentId: groupWidget.id,
+    }),
+  );
+};
 export const addVariablesToBoard =
   (variables: Variable[]) => (dispatch, getState) => {
     if (!variables?.length) return;

@@ -262,8 +262,8 @@ export const WidgetActionProvider: FC<{
             }),
           );
         },
-        onEditComposeGroup: () => {
-          dispatch(onComposeGroupAction(boardType));
+        onEditComposeGroup: wid => {
+          dispatch(onComposeGroupAction(wid));
         },
       };
       return contextValue;
@@ -322,7 +322,7 @@ export interface WidgetActionContextProps {
   onEditLayerToBottom: () => void;
   onEditCopyWidgets: (ids?: string[]) => void;
   onEditPasteWidgets: () => void;
-  onEditComposeGroup: () => void;
+  onEditComposeGroup: (wid?: string) => void;
   onEditFreeWidgetRect: (rect: RectConfig, wid: string) => void;
   //
 }

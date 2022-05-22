@@ -41,7 +41,10 @@ export const FreeGroupWidget: React.FC<{}> = memo(() => {
   const rect = widget.config.rect;
   const { onChangeGroupRect } = useContext(WidgetActionContext);
 
-  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
+  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
+    refreshRate: 1,
+  });
+
   useEffect(() => {
     onChangeGroupRect({ wid, w: cacheW, h: cacheH });
   }, [cacheW, cacheH, wid, onChangeGroupRect]);
@@ -63,7 +66,10 @@ export const AutoGroupWidget: React.FC<{}> = memo(() => {
   const wid = widget.id;
   const { editing } = useContext(BoardContext);
   const { onChangeGroupRect } = useContext(WidgetActionContext);
-  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
+  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
+    refreshRate: 1,
+  });
+
   useEffect(() => {
     onChangeGroupRect({ wid, w: cacheW, h: cacheH });
   }, [cacheW, cacheH, wid, onChangeGroupRect]);
