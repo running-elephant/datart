@@ -15,12 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WIDGET_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
 import { WidgetInfo } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import React, { memo, useCallback, useMemo } from 'react';
+import classnames from 'classnames';
+import React, { memo, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { INFO, LEVEL_20, LEVEL_5, SUCCESS } from 'styles/StyleConstants';
+import { LEVEL_20, LEVEL_5 } from 'styles/StyleConstants';
+import { ORIGINAL_TYPE_MAP, WIDGET_DRAG_HANDLE } from '../../constants';
 import {
   editDashBoardInfoActions,
   editWidgetInfoActions,
@@ -38,49 +39,37 @@ export const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
     const showBlockMask = useSelector(selectShowBlockMask);
     const onMouseDown = useCallback(
       (e: React.MouseEvent<HTMLDivElement>) => {
-        let newSelected = !widgetInfo.selected;
-        if (widgetInfo.selected) {
-          newSelected = widgetInfo.selected;
-        }
         dispatch(
           editWidgetInfoActions.selectWidget({
             multipleKey: e.shiftKey,
             id: widget.id,
-            selected: newSelected,
+            selected: true,
           }),
         );
       },
-      [dispatch, widget.id, widgetInfo.selected],
+      [dispatch, widget.id],
     );
 
     const doubleClick = useCallback(() => {
       if (widget.config.type === 'container') {
         dispatch(editDashBoardInfoActions.changeShowBlockMask(false));
       }
-
       dispatch(
         editWidgetInfoActions.openWidgetEditing({
           id: widget.id,
         }),
       );
     }, [dispatch, widget.id, widget.config.type]);
-    const border = useMemo(() => {
-      let border = '';
-      if (widgetInfo.selected) {
-        border = `2px solid ${INFO}`;
-      }
-      if (widgetInfo.editing) {
-        border = `2px solid ${SUCCESS}`;
-      }
-      return border;
-    }, [widgetInfo.editing, widgetInfo.selected]);
 
     return (
       <MaskLayer
         front={showBlockMask && !widgetInfo.editing}
-        border={border}
-        selected={widgetInfo.selected}
-        className={showBlockMask ? WIDGET_DRAG_HANDLE : ''}
+        group={widget.config.originalType === ORIGINAL_TYPE_MAP.group}
+        className={classnames({
+          [WIDGET_DRAG_HANDLE]: showBlockMask,
+          selected: widgetInfo.selected,
+          editing: widgetInfo.editing,
+        })}
         onDoubleClick={doubleClick}
         onMouseDown={onMouseDown}
       ></MaskLayer>
@@ -88,17 +77,31 @@ export const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
   },
 );
 
-interface MaskLayerProps {
-  front: boolean;
-  selected: boolean;
-  border: string;
-}
-const MaskLayer = styled.div<MaskLayerProps>`
+const MaskLayer = styled.div<{ front: boolean; group: boolean }>`
   &:hover,
   &:active {
-    border: 2px ${p => (p.selected ? 'solid ' : 'dotted ')}${p => p.theme.primary};
+    border-color: ${p => p.theme.primary};
+    border-style: dotted;
+    border-width: 2px;
   }
-
+  &.selected {
+    border-color: ${p => p.theme.primary};
+    border-style: solid;
+    border-width: 2px;
+    &:hover,
+    &:active {
+      border-style: solid;
+    }
+  }
+  &.editing {
+    border-color: ${p => (p.group ? 'transparent' : p.theme.success)};
+    border-style: solid;
+    border-width: 2px;
+    &:hover,
+    &:active {
+      border-width: ${p => (p.group ? 0 : '2px')};
+    }
+  }
   position: absolute;
   top: -5px;
   left: -5px;
@@ -106,5 +109,4 @@ const MaskLayer = styled.div<MaskLayerProps>`
   width: calc(100% + 10px);
   height: calc(100% + 10px);
   cursor: move;
-  border: ${p => p.border};
 `;
