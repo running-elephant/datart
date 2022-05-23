@@ -29,7 +29,6 @@ import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
 import { CSSProperties } from 'react';
 import { adaptBoardImageUrl, fillPx, getBackgroundImage } from '.';
-import { adjustGroupWidgets } from '../components/Widgets/GroupWidget/utils';
 import { LAYOUT_COLS_MAP, ORIGINAL_TYPE_MAP } from '../constants';
 import {
   BackgroundConfig,
@@ -677,17 +676,4 @@ export const getValueByRowData = (
 ) => {
   let toCaseField = fieldName;
   return data?.rowData[toCaseField];
-};
-
-export const deleteEffect = (widgetMap: Record<string, Widget>) => {
-  let groupIds: string[] = [];
-  Object.values(widgetMap).forEach(widget => {
-    if (widget.config.originalType === ORIGINAL_TYPE_MAP.group) {
-      if (widgetMap[widget.id]) {
-        groupIds.push(widget.id);
-      }
-    }
-  });
-
-  adjustGroupWidgets({ groupIds: groupIds, widgetMap });
 };

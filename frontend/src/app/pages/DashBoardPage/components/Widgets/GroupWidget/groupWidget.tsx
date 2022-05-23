@@ -27,7 +27,15 @@ import { GroupWidgetCore } from './groupWidgetCore';
 
 export const GroupWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
+  const { onEditDeleteActiveWidgets } = useContext(WidgetActionContext);
   const boardType = widget.config.boardType;
+
+  useEffect(() => {
+    if (!widget.config.children?.length) {
+      onEditDeleteActiveWidgets([widget.id]);
+    }
+  }, [onEditDeleteActiveWidgets, widget.config.children?.length, widget.id]);
+
   if (boardType === 'auto' && !widget.parentId) {
     return <AutoGroupWidget />;
   } else {
