@@ -2,6 +2,7 @@ package datart.data.provider.jdbc.adapters;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -17,7 +18,7 @@ public class HiveDataProviderAdapter extends JdbcDataProviderAdapter {
         Set<String> schemas = new HashSet<>();
         try (Connection conn = getConn()) {
             String schema = conn.getSchema();
-            if (StringUtils.isNotBlank(schema)) {
+            if (StringUtils.isNotBlank(getSchemaFromUrl()) && StringUtils.isNotBlank(schema)) {
                 return Collections.singleton(schema);
             }
             DatabaseMetaData metadata = conn.getMetaData();
@@ -29,5 +30,12 @@ public class HiveDataProviderAdapter extends JdbcDataProviderAdapter {
             }
             return schemas;
         }
+    }
+
+    private String getSchemaFromUrl() {
+        String url = jdbcProperties.getUrl().replaceFirst(".*://", "jdbc://");
+        url = StringUtils.split(url, ";")[0];
+        URI uri = URI.create(url);
+        return uri.getPath().replace("/", "");
     }
 }
