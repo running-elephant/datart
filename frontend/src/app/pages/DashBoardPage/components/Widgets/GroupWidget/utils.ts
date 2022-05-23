@@ -98,8 +98,9 @@ export const adjustGroupWidgets = (args: {
       delete widgetMap[gid];
       return;
     }
+
     const newChildren = curGroup.config.children?.filter(id => widgetMap[id]);
-    if (!newChildren?.length) {
+    if (!newChildren.length) {
       delete widgetMap[curGroup.id];
       return;
     }

@@ -21,6 +21,7 @@ import { getParentRect } from 'app/pages/DashBoardPage/components/Widgets/GroupW
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
+  ContainerItem,
   Dashboard,
   DataChart,
   TabWidgetContent,
@@ -46,7 +47,8 @@ import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { ORIGINAL_TYPE_MAP } from '../../../../constants';
 import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
-import { LayerNode } from '../../components/LayerPanel/LayerTreeItem';
+import { EventLayerNode } from '../../components/LayerPanel/LayerTreeItem';
+import { getNewDragNodeValue } from '../../components/LayerPanel/utils';
 import { getEditChartWidgetDataAsync } from '../thunk';
 import { EditBoardState, HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
@@ -459,155 +461,46 @@ export const editorWidgetClearLinkageAction = (widget: Widget) => dispatch => {
   });
 };
 
-export type EventLayerNode = LayerNode & {
-  dragOver: boolean;
-  dragOverGapTop: boolean;
-  dragOverGapBottom: boolean;
-};
 export const dropLayerNodeAction = info => (dispatch, getState) => {
   const dragNode = info.dragNode as EventLayerNode;
   const targetNode = info.node as EventLayerNode;
   const editBoard = getState().editBoard as HistoryEditBoard;
   const widgetMap = editBoard.stack.present.widgetRecord;
-  function parentIsContainer(node: EventLayerNode) {
-    if (!node.parentId) return false;
-    if (
-      widgetMap[node.parentId] &&
-      widgetMap[node.parentId].config.originalType !== ORIGINAL_TYPE_MAP.group
-    ) {
-      return true;
-    }
-    return false;
-  }
+
   console.log('dragOver', targetNode.dragOver);
   console.log('dragOverGapBottom', targetNode.dragOverGapBottom);
   console.log('dragOverGapTop', targetNode.dragOverGapTop);
+
   /*
-  1 group -> group
-  2 group -> container
-  3 container -> group
-  4 container -> container
+  1 -> group
+  2 -> container
   */
-  // 1 group -> group
-  if (!parentIsContainer(dragNode) && !parentIsContainer(targetNode)) {
-    moveNodeGroupToGroup({ dispatch, targetNode, dragNode });
-    return;
-  }
-  //  2 group -> container
-  if (!parentIsContainer(dragNode) && parentIsContainer(targetNode)) {
-    moveNodeGroupToContainer({ dispatch, targetNode, dragNode });
-    return;
-  }
-  // 3 container -> group
-  if (parentIsContainer(dragNode) && !parentIsContainer(targetNode)) {
-    // moveNodeGroupToGroup({ dispatch, targetNode, dragNode });
-    moveNodeContainerToGroup({ dispatch, targetNode, dragNode });
-    return;
-  }
-  // 4 container -> container
-  if (parentIsContainer(dragNode) && parentIsContainer(targetNode)) {
-    moveNodeContainerToContainer({ dispatch, targetNode, dragNode });
-    return;
-  }
-  return;
-};
-
-export const moveNodeGroupToGroup = (args: {
-  dispatch;
-  dragNode: EventLayerNode;
-  targetNode: EventLayerNode;
-}) => {
-  const { dragNode, targetNode } = args;
-  if (dragNode.parentId === targetNode.parentId) {
-    // only change index
-    moveNodeInSameGroup(args);
-  } else {
-    //change parentId and index
-    moveNodeToOtherGroup(args);
-  }
-};
-
-export const moveNodeInSameGroup = (args: {
-  dispatch;
-  dragNode: EventLayerNode;
-  targetNode: EventLayerNode;
-}) => {
-  const { dispatch, dragNode, targetNode } = args;
-  if (targetNode.dragOver) return; //todo to group first
-  let nextIndex = 0;
-  if (targetNode.dragOverGapBottom) {
-    nextIndex = targetNode.widgetIndex - parseFloat(Math.random().toFixed(5));
-  }
-  if (targetNode.dragOverGapTop) {
-    nextIndex = targetNode.widgetIndex + 1;
-  }
-  dispatch(
-    editBoardStackActions.changeWidgetsIndex([
-      { id: dragNode.key, index: nextIndex },
-    ]),
-  );
-};
-
-export const moveNodeToOtherGroup = (args: {
-  dispatch;
-  dragNode: EventLayerNode;
-  targetNode: EventLayerNode;
-}) => {
-  const { dispatch, dragNode, targetNode } = args;
-  if (targetNode.dragOver) return; //todo to group first
-  let nextIndex = 0;
-  if (targetNode.dragOverGapBottom) {
-    nextIndex = targetNode.widgetIndex - parseFloat(Math.random().toFixed(5));
-  }
-  if (targetNode.dragOverGapTop) {
-    nextIndex = targetNode.widgetIndex + 1;
-  }
-  dispatch(
-    editBoardStackActions.changeWidgetsParentId({
-      items: [
-        {
-          wid: dragNode.key,
-          nextIndex,
-        },
-      ],
-      parentId: targetNode.parentId,
-    }),
-  );
-};
-
-export const moveNodeContainerToGroup = (args: {
-  dispatch;
-  dragNode: EventLayerNode;
-  targetNode: EventLayerNode;
-}) => {
-  const { dispatch, dragNode, targetNode } = args;
-  if (targetNode.dragOver) return;
-  dispatch(editBoardStackActions.dropTabToGroup({ dragNode, targetNode }));
-};
-export const moveNodeGroupToContainer = (args: {
-  dispatch;
-  dragNode: EventLayerNode;
-  targetNode: EventLayerNode;
-}) => {
-  const { dispatch, dragNode, targetNode } = args;
-  if (targetNode.dragOver) return;
-  dispatch(editBoardStackActions.dropGroupToTab({ dragNode, targetNode }));
-  // dropGroupToTab
-};
-export const moveNodeContainerToContainer = (args: {
-  dispatch;
-  dragNode: EventLayerNode;
-  targetNode: EventLayerNode;
-}) => {
-  const { dispatch, dragNode, targetNode } = args;
-  if (targetNode.dragOver) return;
-  if (dragNode.parentId === targetNode.parentId) {
-    // only change index
+  //拖拽节点来自 group
+  const newDragVal = getNewDragNodeValue({ widgetMap, dragNode, targetNode });
+  if (newDragVal.parentIsGroup) {
+    // 拖进 group
     dispatch(
-      editBoardStackActions.changeTabItemIndex({ dragNode, targetNode }),
+      editBoardStackActions.dropWidgetToGroup({
+        sourceId: dragNode.key,
+        newIndex: newDragVal.index,
+        targetId: newDragVal.parentId,
+      }),
     );
   } else {
-    //change parentId and index
-    dispatch(editBoardStackActions.dropTabToOtherTab({ dragNode, targetNode }));
+    // 拖进 tab
+    const dragWidget = widgetMap[dragNode.key];
+    const newItem: ContainerItem = {
+      index: newDragVal.index,
+      name: dragWidget.config.name,
+      tabId: dragWidget.config.clientId,
+      childWidgetId: dragWidget.id,
+    };
+    dispatch(
+      editBoardStackActions.dropWidgetToTab({
+        newItem,
+        targetId: newDragVal.parentId,
+      }),
+    );
+    return;
   }
 };

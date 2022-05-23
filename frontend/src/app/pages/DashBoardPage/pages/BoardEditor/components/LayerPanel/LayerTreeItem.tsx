@@ -36,6 +36,11 @@ export interface LayerNode extends TreeDataNode {
   originalType: string;
   boardId: string;
 }
+export type EventLayerNode = LayerNode & {
+  dragOver: boolean;
+  dragOverGapTop: boolean;
+  dragOverGapBottom: boolean;
+};
 export const LayerTreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
   return (
     <WidgetWrapProvider

@@ -18,7 +18,7 @@
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { TabWidgetContent, WidgetInfo } from '../../../Board/slice/types';
-import { LayerNode } from './LayerTreeItem';
+import { EventLayerNode, LayerNode } from './LayerTreeItem';
 
 export const widgetMapToTree = (args: {
   widgetMap: Record<string, Widget>;
@@ -38,9 +38,10 @@ export const widgetMapToTree = (args: {
     widgetMap[parentId] &&
     widgetMap[parentId].config.originalType === ORIGINAL_TYPE_MAP.tab
   ) {
+    // tab
     const itemMap = (widgetMap[parentId].config.content as TabWidgetContent)
       .itemMap;
-    const items = Object.values(itemMap).sort((a, b) => a.index - b.index);
+    const items = Object.values(itemMap).sort((b, a) => a.index - b.index);
 
     sortedWidgets = items
       .map(item => {
@@ -48,6 +49,7 @@ export const widgetMapToTree = (args: {
       })
       .filter(item => !!item);
   } else {
+    // 普通group
     sortedWidgets = widgets.sort((a, b) => {
       return b.config.index - a.config.index;
     });
@@ -88,3 +90,106 @@ export const widgetMapToTree = (args: {
   });
   return tree as LayerNode[];
 };
+
+export function parentIsGroup(
+  widgetMap: Record<string, Widget>,
+  parentId?: string,
+) {
+  if (!parentId) return true;
+  if (
+    widgetMap[parentId] &&
+    widgetMap[parentId].config.originalType !== ORIGINAL_TYPE_MAP.group
+  ) {
+    return false;
+  }
+  return true;
+}
+
+export function getChildrenValList(
+  widgetMap: Record<string, Widget>,
+  pid: string,
+) {
+  const widgetList = Object.values(widgetMap).filter(
+    widget => widget.parentId === pid,
+  );
+
+  if (parentIsGroup(widgetMap, pid)) {
+    // group
+    return widgetList
+      .map(widget => ({
+        id: widget.id,
+        index: widget.config.index,
+      }))
+      .sort((b, a) => a.index - b.index);
+  } else {
+    // container
+    const container = widgetMap[pid];
+    const childItemMap = (container.config.content as TabWidgetContent).itemMap;
+    return Object.values(childItemMap || {})
+      .map(item => ({
+        id: item.childWidgetId,
+        index: item.index,
+      }))
+      .sort((b, a) => a.index - b.index);
+  }
+}
+export function getNewDragNodeValue(args: {
+  widgetMap: Record<string, Widget>;
+  dragNode: EventLayerNode;
+  targetNode: EventLayerNode;
+}) {
+  const { widgetMap, dragNode, targetNode } = args;
+  const newVal = {
+    index: 0,
+    parentId: targetNode.parentId,
+    parentIsGroup: true,
+  };
+  if (targetNode.dragOverGapTop) {
+    const indexList = getChildrenValList(widgetMap, targetNode.parentId);
+    newVal.index = indexList[0].index + 1;
+
+    return newVal;
+  }
+  if (targetNode.dragOver) {
+    if (targetNode.isLeaf) {
+      // dragOver Leaf
+      const indexList = getChildrenValList(widgetMap, targetNode.parentId);
+      const targetIndex = indexList.findIndex(t => t.id === targetNode.key);
+      if (targetIndex < indexList.length - 1) {
+        let indexA = indexList[targetIndex].index;
+        let indexC = indexList[targetIndex + 1].index;
+        newVal.index = (indexA + indexC) / 2;
+      } else {
+        newVal.index = indexList[targetIndex].index - 1;
+      }
+      newVal.parentId = targetNode.parentId;
+      newVal.parentIsGroup = parentIsGroup(widgetMap, targetNode.parentId);
+      return newVal;
+    } else {
+      // dragOver folder
+      const indexList = getChildrenValList(widgetMap, targetNode.key);
+      if (indexList.length < 1) {
+        newVal.index = dragNode.widgetIndex;
+      } else {
+        newVal.index = indexList[0].index + 1;
+      }
+      newVal.parentId = targetNode.key;
+      newVal.parentIsGroup = parentIsGroup(widgetMap, targetNode.key);
+      return newVal;
+    }
+  } else if (!targetNode.dragOver) {
+    const indexList = getChildrenValList(widgetMap, targetNode.parentId);
+    const targetIndex = indexList.findIndex(t => t.id === targetNode.key);
+    if (targetIndex < indexList.length - 1) {
+      let indexA = indexList[targetIndex].index;
+      let indexC = indexList[targetIndex + 1].index;
+      newVal.index = (indexA + indexC) / 2;
+    } else {
+      newVal.index = indexList[targetIndex].index - 1;
+    }
+    newVal.parentId = targetNode.parentId;
+    newVal.parentIsGroup = parentIsGroup(widgetMap, targetNode.parentId);
+    return newVal;
+  }
+  return newVal;
+}
