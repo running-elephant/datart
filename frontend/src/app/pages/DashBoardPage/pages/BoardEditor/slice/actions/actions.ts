@@ -339,9 +339,21 @@ export const onComposeGroupAction = (wid?: string) => (dispatch, getState) => {
   wid && selectedIds.push(wid);
   selectedIds = [...new Set(selectedIds)];
   if (!selectedIds.length) return;
+  const selectedItemParentIds: string[] = [];
+  selectedIds.forEach(id => {
+    if (widgetMap[id]) {
+      const pid = widgetMap[id].parentId || '';
+      if (!selectedItemParentIds.includes(pid)) {
+        selectedItemParentIds.push(pid);
+      }
+    }
+  });
+  // 只可以同层级的widget 成组 来自不同层级的 不可以成组
+  if (selectedItemParentIds.length > 1) return;
   let groupWidget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.group).create({
     boardType: curBoard.config.type,
     children: selectedIds,
+    parentId: selectedItemParentIds[0],
   });
   groupWidget.config.rect = getParentRect({
     childIds: selectedIds,
