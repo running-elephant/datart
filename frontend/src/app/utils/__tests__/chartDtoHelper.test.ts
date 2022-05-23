@@ -56,6 +56,7 @@ describe('chartDtoHelper Test', () => {
         datas: [],
         styles: [],
         settings: [],
+        interactions: [],
       },
       graphId: 2,
       index: 0,
@@ -72,7 +73,7 @@ describe('chartDtoHelper Test', () => {
       name: 'a-chart',
       viewId: '1',
       config:
-        '{"aggregation":"AVG","chartConfig":{"datas":[],"styles":[],"settings":[]},"chartGraphId":2,"computedFields":[]}',
+        '{"aggregation":"AVG","chartConfig":{"datas":[],"styles":[],"settings":[],"interactions":[]},"chartGraphId":2,"computedFields":[]}',
       permissions: [],
       avatar: 2,
     });

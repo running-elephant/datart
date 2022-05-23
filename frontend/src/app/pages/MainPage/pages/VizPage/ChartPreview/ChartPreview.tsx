@@ -20,6 +20,8 @@ import { message, Spin } from 'antd';
 import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
+import { InteractionAction } from 'app/components/FormGenerator/constants';
+import { DrillThroughSetting } from 'app/components/FormGenerator/Customize/Interaction/types';
 import { VizHeader } from 'app/components/VizHeader';
 import { ChartDataViewFieldCategory } from 'app/constants';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
@@ -36,6 +38,7 @@ import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
+  getStyles,
 } from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
@@ -44,6 +47,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
+import useDrillThrough from '../hooks/useDrillThrough';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import { useVizSlice } from '../slice';
 import {
@@ -107,6 +111,7 @@ const ChartPreviewBoard: FC<{
     const saveAsViz = useSaveAsViz();
     const history = useHistory();
     const vizs = useSelector(selectVizs);
+    const [openNewTab, openBrowserTab] = useDrillThrough();
 
     useEffect(() => {
       const filterSearchParams = filterSearchUrl
@@ -149,11 +154,9 @@ const ChartPreviewBoard: FC<{
           const newChart = chartManager.getById(
             newChartPreview?.backendChart?.config?.chartGraphId,
           );
-          registerChartEvents(newChart, backendChartId);
           setChart(newChart);
         }
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
       backendChartId,
       chart,
@@ -163,48 +166,93 @@ const ChartPreviewBoard: FC<{
       version,
     ]);
 
-    const registerChartEvents = (chart, backendChartId) => {
-      chart?.registerMouseEvents([
-        {
-          name: 'click',
-          callback: param => {
-            if (
-              drillOptionRef.current?.isSelectedDrill &&
-              !drillOptionRef.current.isBottomLevel
-            ) {
-              const option = drillOptionRef.current;
-              option.drillDown(param.data.rowData);
-              drillOptionRef.current = option;
-              handleDrillOptionChange(option);
-              return;
-            }
-            if (
-              param.componentType === 'table' &&
-              param.seriesType === 'paging-sort-filter'
-            ) {
-              dispatch(
-                fetchDataSetByPreviewChartAction({
-                  backendChartId,
-                  sorter: {
-                    column: param?.seriesName!,
-                    operator: param?.value?.direction,
-                    aggOperator: param?.value?.aggOperator,
-                  },
-                  pageInfo: {
-                    pageNo: param?.value?.pageNo,
-                  },
-                }),
-              );
-              return;
-            }
-            if (param.seriesName === 'drillOptionChange') {
-              handleDrillOptionChange?.(param.value);
-              return;
-            }
+    const handleDrillOptionChange = useCallback(
+      (option: IChartDrillOption) => {
+        drillOptionRef.current = option;
+        dispatch(
+          updateFilterAndFetchDataset({
+            backendChartId,
+            chartPreview,
+            payload: null,
+            drillOption: drillOptionRef?.current,
+          }),
+        );
+      },
+      [backendChartId, chartPreview, dispatch],
+    );
+
+    const handleDrillThroughEvent = useCallback(() => {
+      const setting = getStyles(
+        chartPreview?.chartConfig?.interactions || [],
+        ['drillThrough'],
+        ['setting'],
+      )?.[0] as DrillThroughSetting;
+      if (setting?.event === 'left') {
+        const rule = setting?.rules?.[0];
+        if (rule?.action === InteractionAction.Redirect) {
+          openNewTab(orgId, rule?.jumpToChart?.relId);
+        }
+        if (rule?.action === InteractionAction.Window) {
+          openBrowserTab(orgId, rule?.jumpToChart?.relId);
+        }
+      }
+    }, [
+      chartPreview?.chartConfig?.interactions,
+      openBrowserTab,
+      openNewTab,
+      orgId,
+    ]);
+
+    const registerChartEvents = useCallback(
+      (chart, backendChartId) => {
+        chart?.registerMouseEvents([
+          {
+            name: 'click',
+            callback: param => {
+              handleDrillThroughEvent();
+              if (
+                drillOptionRef.current?.isSelectedDrill &&
+                !drillOptionRef.current.isBottomLevel
+              ) {
+                const option = drillOptionRef.current;
+                option.drillDown(param.data.rowData);
+                drillOptionRef.current = option;
+                handleDrillOptionChange(option);
+                return;
+              }
+              if (
+                param.componentType === 'table' &&
+                param.seriesType === 'paging-sort-filter'
+              ) {
+                dispatch(
+                  fetchDataSetByPreviewChartAction({
+                    backendChartId,
+                    sorter: {
+                      column: param?.seriesName!,
+                      operator: param?.value?.direction,
+                      aggOperator: param?.value?.aggOperator,
+                    },
+                    pageInfo: {
+                      pageNo: param?.value?.pageNo,
+                    },
+                  }),
+                );
+                return;
+              }
+              if (param.seriesName === 'drillOptionChange') {
+                handleDrillOptionChange?.(param.value);
+                return;
+              }
+            },
           },
-        },
-      ]);
-    };
+        ]);
+      },
+      [dispatch, handleDrillOptionChange, handleDrillThroughEvent],
+    );
+
+    useEffect(() => {
+      registerChartEvents(chart, backendChartId);
+    }, [backendChartId, chart, registerChartEvents]);
 
     const handleGotoWorkbenchPage = () => {
       history.push({
@@ -378,18 +426,6 @@ const ChartPreviewBoard: FC<{
         }),
       );
     }, [backendChartId, dispatch, redirect, tg]);
-
-    const handleDrillOptionChange = (option: IChartDrillOption) => {
-      drillOptionRef.current = option;
-      dispatch(
-        updateFilterAndFetchDataset({
-          backendChartId,
-          chartPreview,
-          payload: null,
-          drillOption: drillOptionRef?.current,
-        }),
-      );
-    };
 
     const handleDateLevelChange = (type, payload) => {
       const rows = getRuntimeDateLevelFields(payload.value?.rows);

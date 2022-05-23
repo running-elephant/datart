@@ -16,17 +16,19 @@
  * limitations under the License.
  */
 
-import ChartDataView from 'app/types/ChartDataView';
-import { ChartDetailConfigDTO } from './ChartConfigDTO';
+import { Button, Input, Space } from 'antd';
+import { FC, memo } from 'react';
+import { I18nTransator } from './types';
 
-export type ChartDTO = {
-  id: string;
-  name: string;
-  orgId: string;
-  status: number;
-  updateTime?: string;
-  viewId: string;
-  view: ChartDataView;
-  config: ChartDetailConfigDTO;
-  queryVariables?: any[];
-};
+const JumpToUrl: FC<{} & I18nTransator> = memo(
+  ({ translate: t = title => title }) => {
+    return (
+      <Space>
+        <Input />
+        <Button type="link">{t('drillThrough.rule.relation.setting')}</Button>
+      </Space>
+    );
+  },
+);
+
+export default JumpToUrl;

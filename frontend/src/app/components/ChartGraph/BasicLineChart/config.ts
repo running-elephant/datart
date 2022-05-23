@@ -456,9 +456,24 @@ const config: ChartConfig = {
   ],
   interactions: [
     {
-      label: 'viz.palette.setting.jump.title',
-      key: 'jump',
+      label: 'drillThrough.title',
+      key: 'drillThrough',
       comType: 'checkboxModal',
+      default: false,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'drillThrough.title',
+          key: 'setting',
+          comType: 'interaction.drillThrough',
+        },
+      ],
+    },
+    {
+      label: 'viewData.title',
+      key: 'viewData',
+      comType: 'checkboxModal',
+      default: false,
       rows: [],
     },
   ],

@@ -16,17 +16,20 @@
  * limitations under the License.
  */
 
-import ChartDataView from 'app/types/ChartDataView';
-import { ChartDetailConfigDTO } from './ChartConfigDTO';
+import { useHistory } from 'react-router-dom';
 
-export type ChartDTO = {
-  id: string;
-  name: string;
-  orgId: string;
-  status: number;
-  updateTime?: string;
-  viewId: string;
-  view: ChartDataView;
-  config: ChartDetailConfigDTO;
-  queryVariables?: any[];
+const useDrillThrough = () => {
+  const history = useHistory();
+
+  const openNewTab = (orgId, relId) => {
+    history.push(`/organizations/${orgId}/vizs/${relId}`);
+  };
+
+  const openBrowserTab = (orgId, relId) => {
+    window.open(`/organizations/${orgId}/vizs/${relId}`, '_blank');
+  };
+
+  return [openNewTab, openBrowserTab];
 };
+
+export default useDrillThrough;

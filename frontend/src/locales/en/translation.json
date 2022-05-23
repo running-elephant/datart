@@ -509,7 +509,7 @@
       "title": {
         "content": "Data",
         "design": "Style",
-        "setting": "Analysis",
+        "setting": "Analytics",
         "interaction": "Interaction"
       },
       "style": {
@@ -759,6 +759,57 @@
         "paging": {
           "title": "Common",
           "pageSize": "Limit"
+        }
+      },
+      "interaction": {
+        "drillThrough": {
+          "title": "Drill Through",
+          "event": "Ineraction Event",
+          "leftClick": "Left Click",
+          "rightClick": "Right Click",
+          "rule": {
+            "title": "Rule",
+            "addRule": "+ Add New",
+            "header": {
+              "category": "Category",
+              "open": "Open",
+              "relation": "Relation",
+              "operation": "Operation"
+            },
+            "category": {
+              "title": "Categroy",
+              "jumpToChart": "Jump to Chart",
+              "jumpToDashboard": "Jump to Dashboard",
+              "jumpToUrl": "Jump to URL"
+            },
+            "action": {
+              "title": "Open",
+              "redirect": "Redirect",
+              "window": "Open New",
+              "dialog": "Open Dialog"
+            },
+            "reference": {
+              "title": "Reference View"
+            },
+            "relation": {
+              "setting": "Field Relation Setting",
+              "title": "Field Relation",
+              "auto": "Auto",
+              "customize": "Customize",
+              "type": "Type",
+              "source": "Source Field/Variable",
+              "target": "Target Field/Variable",
+              "addRelation": "+ Add",
+              "field": "Field",
+              "variable": "Variable"
+            },
+            "operation": {
+              "delete": "Delete"
+            }
+          }
+        },
+        "viewData": {
+          "title": "View Data"
         }
       },
       "present": {

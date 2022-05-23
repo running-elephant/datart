@@ -753,6 +753,57 @@
           "pageSize": "总行数"
         }
       },
+      "interaction": {
+        "drillThrough": {
+          "title": "跳转设置",
+          "event": "交互事件",
+          "leftClick": "左键单击",
+          "rightClick": "右键菜单",
+          "rule": {
+            "title": "规则设置",
+            "addRule": "+ 点击新建",
+            "header": {
+              "category": "类型",
+              "open": "打开方式",
+              "relation": "关系设置",
+              "operation": "操作"
+            },
+            "category": {
+              "title": "类型",
+              "jumpToChart": "跳转到图表",
+              "jumpToDashboard": "跳转到仪表板",
+              "jumpToUrl": "跳转到URL"
+            },
+            "action": {
+              "title": "打开方式",
+              "redirect": "从当前页打开",
+              "window": "打开新窗口",
+              "dialog": "打开对话框"
+            },
+            "reference": {
+              "title": "关联图表"
+            },
+            "relation": {
+              "setting": "字段关系配置",
+              "title": "字段关系",
+              "auto": "自动",
+              "customize": "自定义",
+              "type": "类型",
+              "source": "源字段/变量",
+              "target": "目标字段/变量",
+              "addRelation": "+ 点击新建",
+              "field": "字段",
+              "variable": "变量"
+            },
+            "operation": {
+              "delete": "删除"
+            }
+          }
+        },
+        "viewData": {
+          "title": "查看数据"
+        }
+      },
       "present": {
         "graph": "图表",
         "raw": "原始数据",

@@ -50,8 +50,10 @@ import {
 } from '../Basic';
 import {
   Background,
+  CheckboxModal,
   ConditionalStylePanel,
   DataReferencePanel,
+  DrillThroughPanel,
   FontAlignment,
   LabelPosition,
   LegendPosition,
@@ -199,7 +201,9 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
         case ChartStyleSectionComponentType.TIMER_FORMAT:
           return <TimerFormat {...props} />;
         case ChartStyleSectionComponentType.CHECKBOX_MODAL:
-          return <div>Checkbox Modal</div>;
+          return <CheckboxModal {...props} />;
+        case ChartStyleSectionComponentType.INTERACTION_DRILL_THROUGH_PANEL:
+          return <DrillThroughPanel {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }
