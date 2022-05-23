@@ -53,7 +53,8 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
 
   const tabAdd = useCallback(() => {
     const newTabId = `tab_${uuidv4()}`;
-    const nextIndex = tabsCons[tabsCons.length - 1].index + 1;
+    const maxIndex = tabsCons[tabsCons.length - 1]?.index || 0;
+    const nextIndex = maxIndex + 1;
     dispatch(
       editBoardStackActions.tabsWidgetAddTab({
         parentId: widget.id,
