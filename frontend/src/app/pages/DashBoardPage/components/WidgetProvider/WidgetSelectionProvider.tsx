@@ -33,16 +33,17 @@ export const WidgetSelectionProvider: FC<{
   widgetId: string;
 }> = memo(({ widgetId, boardEditing, children }) => {
   // 浏览模式
-  const readWidgetInfo = useSelector((state: { board: BoardState }) =>
+  const readWidgetSelectionInfo = useSelector((state: { board: BoardState }) =>
     selectionOptionList(state, widgetId),
   );
   // 编辑模式
-  const editWidgetInfo = useSelector((state: { editBoard: EditBoardState }) =>
-    editorSelectionOptionList(state, widgetId),
+  const editWidgetSelectionInfo = useSelector(
+    (state: { editBoard: EditBoardState }) =>
+      editorSelectionOptionList(state, widgetId),
   );
   const selectionOption = useMemo(
-    () => (boardEditing ? editWidgetInfo : readWidgetInfo),
-    [boardEditing, editWidgetInfo, readWidgetInfo],
+    () => (boardEditing ? editWidgetSelectionInfo : readWidgetSelectionInfo),
+    [boardEditing, editWidgetSelectionInfo, readWidgetSelectionInfo],
   );
   return (
     <WidgetSelectionContext.Provider value={selectionOption}>

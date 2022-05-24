@@ -107,10 +107,6 @@ class BasicOutlineMapChart extends ReactChart {
     this.adapter?.updated(this.option, context);
   }
 
-  onUnMount(): void {
-    this.adapter?.unmount();
-  }
-
   onResize(opt: any, context): void {
     this.option.context = context;
     this.adapter?.updated(this.option, context);

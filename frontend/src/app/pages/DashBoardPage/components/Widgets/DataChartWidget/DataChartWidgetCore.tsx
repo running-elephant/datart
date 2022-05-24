@@ -150,7 +150,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
 
   const dataset = useMemo(
     () => ({
-      id: data.id,
       columns: data.columns,
       rows: data.rows,
       pageInfo: data.pageInfo || {},
