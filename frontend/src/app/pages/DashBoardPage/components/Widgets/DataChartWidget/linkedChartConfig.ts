@@ -96,7 +96,10 @@ export const linkedChartToolkit: WidgetToolkit = {
         key: 'lock',
         renderMode: ['edit'],
       },
-
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
       {
         key: 'makeLinkage',
         label: 'makeLinkage',

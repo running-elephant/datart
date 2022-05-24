@@ -31,7 +31,7 @@ import RGL, { Layout, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
-import StyledBackground from '../components/StyledBackground';
+import StyledBackground from '../../../components/WidgetComponents/StyledBackground';
 import { WidgetOfAuto } from './WidgetOfAuto';
 
 const ReactGridLayout = WidthProvider(RGL);

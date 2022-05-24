@@ -34,6 +34,7 @@ export default function useWidgetAction() {
     onEditWidgetLock,
     onEditWidgetUnLock,
     onEditDeleteActiveWidgets,
+    onEditComposeGroup,
   } = useContext(WidgetActionContext);
 
   const onWidgetEdit = useCallback(
@@ -89,6 +90,12 @@ export default function useWidgetAction() {
         onEditWidgetLock(widget.id);
         break;
       case 'unlock':
+        onEditWidgetUnLock(widget.id);
+        break;
+      case 'group':
+        onEditComposeGroup(widget.id);
+        break;
+      case 'unGroup':
         onEditWidgetUnLock(widget.id);
         break;
       default:

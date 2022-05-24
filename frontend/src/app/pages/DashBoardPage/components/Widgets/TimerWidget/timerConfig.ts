@@ -196,6 +196,10 @@ export const widgetToolkit: TimerWidgetToolKit = {
         key: 'lock',
         renderMode: ['edit'],
       },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
     ];
     return list;
   },

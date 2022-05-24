@@ -134,5 +134,7 @@ export const widgetActionTypes = [
   'closeJump',
   'lock',
   'unlock',
+  'group',
+  'unGroup',
 ] as const;
 export type widgetActionType = typeof widgetActionTypes[number];
