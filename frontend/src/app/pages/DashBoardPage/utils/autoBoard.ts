@@ -22,7 +22,7 @@ export const initAutoBoardConfig = () => {
   const config: BoardConfig = {
     type: 'auto',
     version: APP_CURRENT_VERSION,
-    maxWidgetIndex: 0,
+
     jsonConfig: {
       props: [
         {
