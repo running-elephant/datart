@@ -64,6 +64,7 @@ import {
   ScorecardConditionalStylePanel,
   TimerFormat,
   UnControlledTableHeaderPanel,
+  ViewDetailPanel,
   WidgetBorder,
 } from '../Customize';
 import { FormGeneratorLayoutProps } from '../types';
@@ -204,6 +205,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <CheckboxModal {...props} />;
         case ChartStyleSectionComponentType.INTERACTION_DRILL_THROUGH_PANEL:
           return <DrillThroughPanel {...props} />;
+        case ChartStyleSectionComponentType.INTERACTION_VIEW_DETAIL_PANEL:
+          return <ViewDetailPanel {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }
