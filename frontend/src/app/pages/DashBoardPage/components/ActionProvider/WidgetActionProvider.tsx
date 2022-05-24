@@ -55,6 +55,7 @@ import {
   deleteWidgetsAction,
   editChartInWidgetAction,
   onComposeGroupAction,
+  onUnGroupAction,
   pasteWidgetsAction,
   widgetsToPositionAction,
 } from '../../pages/BoardEditor/slice/actions/actions';
@@ -265,6 +266,9 @@ export const WidgetActionProvider: FC<{
         onEditComposeGroup: wid => {
           dispatch(onComposeGroupAction(wid));
         },
+        onEditUnGroupAction: wid => {
+          dispatch(onUnGroupAction(wid));
+        },
       };
       return contextValue;
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -323,6 +327,7 @@ export interface WidgetActionContextProps {
   onEditCopyWidgets: (ids?: string[]) => void;
   onEditPasteWidgets: () => void;
   onEditComposeGroup: (wid?: string) => void;
+  onEditUnGroupAction: (wid?: string) => void;
   onEditFreeWidgetRect: (rect: RectConfig, wid: string) => void;
   //
 }

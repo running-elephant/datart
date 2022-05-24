@@ -25,7 +25,7 @@ export interface Widget {
   relations: Relation[];
   viewIds: string[];
   config: WidgetConf;
-  parentId?: string;
+  parentId: string;
 }
 export type CustomConfig = {
   datas?: ChartDataConfig[];

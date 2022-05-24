@@ -35,6 +35,7 @@ export default function useWidgetAction() {
     onEditWidgetUnLock,
     onEditDeleteActiveWidgets,
     onEditComposeGroup,
+    onEditUnGroupAction,
   } = useContext(WidgetActionContext);
 
   const onWidgetEdit = useCallback(
@@ -96,7 +97,7 @@ export default function useWidgetAction() {
         onEditComposeGroup(widget.id);
         break;
       case 'unGroup':
-        onEditWidgetUnLock(widget.id);
+        onEditUnGroupAction(widget.id);
         break;
       default:
         console.log('__ not found __ action', key);

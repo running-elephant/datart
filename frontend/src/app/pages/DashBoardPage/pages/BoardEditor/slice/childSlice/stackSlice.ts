@@ -139,12 +139,12 @@ export const editBoardStackSlice = createSlice({
         items: {
           wid: string;
           nextIndex: number;
+          parentId: string;
         }[];
-        parentId: string;
       }>,
     ) {
-      const { items, parentId } = action.payload;
-      items.forEach(({ wid, nextIndex }) => {
+      const { items } = action.payload;
+      items.forEach(({ wid, nextIndex, parentId }) => {
         const prePId = state.widgetRecord[wid].parentId;
         if (prePId && state.widgetRecord[prePId]) {
           const preParent = state.widgetRecord[prePId];
