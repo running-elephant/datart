@@ -96,6 +96,10 @@ const widgetToolkit: OwnedChartToolkit = {
         key: 'lock',
         renderMode: ['edit'],
       },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
 
       {
         key: 'makeLinkage',

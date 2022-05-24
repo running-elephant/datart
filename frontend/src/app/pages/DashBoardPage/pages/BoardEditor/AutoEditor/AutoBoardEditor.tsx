@@ -21,6 +21,7 @@ import { useGridWidgetHeight } from 'app/hooks/useGridWidgetHeight';
 import { BoardConfigValContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
+import StyledBackground from 'app/pages/DashBoardPage/components/WidgetComponents/StyledBackground';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import {
   LAYOUT_COLS_MAP,
@@ -52,7 +53,6 @@ import {
   SPACE_MD,
   SPACE_XS,
 } from 'styles/StyleConstants';
-import StyledBackground from '../../Board/components/StyledBackground';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
 import { WidgetOfAutoEditor } from './WidgetOfAutoEditor';

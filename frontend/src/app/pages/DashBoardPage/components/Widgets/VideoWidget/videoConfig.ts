@@ -168,6 +168,10 @@ const widgetToolkit: VideoWidgetToolKit = {
         key: 'lock',
         renderMode: ['edit'],
       },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
     ];
     return list;
   },

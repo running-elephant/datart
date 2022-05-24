@@ -139,6 +139,14 @@ export const widgetToolkit: GroupToolkit = {
         key: 'lock',
         renderMode: ['edit'],
       },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'unGroup',
+        renderMode: ['edit'],
+      },
     ];
     return list;
   },

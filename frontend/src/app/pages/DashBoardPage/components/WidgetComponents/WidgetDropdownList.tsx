@@ -51,6 +51,7 @@ export const WidgetDropdownList: React.FC<{
 
   const dropdownList = useMemo(() => {
     const menuItems = actionList.map(item => {
+      debugger;
       return (
         <React.Fragment key={item.key}>
           {item.divider && <Menu.Divider />}
