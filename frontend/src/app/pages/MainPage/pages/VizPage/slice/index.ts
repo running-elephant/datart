@@ -6,6 +6,7 @@ import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { CloneValueDeep, isUndefined } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
+import { ISelectionConfig } from '../../../../../types/ChartConfig';
 import {
   addStoryboard,
   addViz,
@@ -47,6 +48,7 @@ export const initialState: VizState = {
   selectedTab: '',
   dataChartListLoading: false,
   chartPreviews: [],
+  selectionOption: {} as Record<string, ISelectionConfig[]>,
 };
 
 const slice = createSlice({
@@ -149,29 +151,13 @@ const slice = createSlice({
         data: { index: string; data: any };
       }>,
     ) {
-      const previewConfig = state.chartPreviews?.find(
-        v => v.backendChartId === payload.backendChartId,
-      );
-      if (previewConfig) {
-        const selectionConfig = previewConfig?.selectionOption?.find(
-          v => v.index === payload.data.index,
-        );
-        if (!isUndefined(selectionConfig)) {
-          previewConfig.selectionOption = [];
-        } else {
-          previewConfig.selectionOption = [payload.data];
-        }
-      }
-    },
-    clearChartPreviewsSelectionOption(
-      state,
-      { payload }: PayloadAction<string>,
-    ) {
-      const previewConfig = state.chartPreviews?.find(
-        v => v.backendChartId === payload,
-      );
-      if (previewConfig && previewConfig?.selectionOption) {
-        previewConfig.selectionOption = [];
+      const selectionConfig = state.selectionOption?.[
+        payload.backendChartId
+      ]?.find(v => payload.data.index === v.index);
+      if (!isUndefined(selectionConfig)) {
+        state.selectionOption[payload.backendChartId] = [];
+      } else {
+        state.selectionOption[payload.backendChartId] = [payload.data];
       }
     },
   },
@@ -599,6 +585,7 @@ const slice = createSlice({
         const index = state.chartPreviews?.findIndex(
           c => c.backendChartId === action.payload?.backendChartId,
         );
+        state.selectionOption[action.payload?.backendChartId] = [];
         if (index < 0) {
           state.chartPreviews.push({
             backendChartId: action.payload?.backendChartId,

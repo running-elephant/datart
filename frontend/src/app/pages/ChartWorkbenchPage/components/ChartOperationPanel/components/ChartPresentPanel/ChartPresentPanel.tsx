@@ -24,10 +24,9 @@ import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContai
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
-import ChartSelectContext from 'app/pages/ChartWorkbenchPage/contexts/ChartSelectContext';
 import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, ISelectionConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
 import { FC, memo, useContext, useState } from 'react';
@@ -59,6 +58,7 @@ const ChartPresentPanel: FC<{
   allowQuery: boolean;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
+  selectionOption?: ISelectionConfig[];
 }> = memo(
   ({
     containerHeight,
@@ -70,13 +70,13 @@ const ChartPresentPanel: FC<{
     allowQuery,
     onRefreshDataset,
     onCreateDownloadDataTask,
+    selectionOption,
   }) => {
     const translate = useI18NPrefix(`viz.palette.present`);
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
     const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
     const datasetLoadingStatus = useSelector(datasetLoadingSelector);
     const { drillOption } = useContext(ChartDrillContext);
-    const { selectionOption } = useContext(ChartSelectContext);
 
     useMount(undefined, () => {
       Debugger.instance.measure(`ChartPresentPanel | Dispose Event`, () => {

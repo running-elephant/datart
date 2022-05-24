@@ -21,7 +21,7 @@ import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartData
 import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, ISelectionConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
@@ -29,7 +29,6 @@ import { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import ChartDrillContext from '../../contexts/ChartDrillContext';
-import ChartSelectContext from '../../contexts/ChartSelectContext';
 import { dateFormatSelector, languageSelector } from '../../slice/selectors';
 import ChartHeaderPanel from '../ChartHeaderPanel';
 import ChartOperationPanel from '../ChartOperationPanel';
@@ -41,7 +40,7 @@ const ChartWorkbench: FC<{
   chart?: IChart;
   aggregation?: boolean;
   drillOption?: IChartDrillOption;
-  selectionOption?: any[];
+  selectionOption?: ISelectionConfig[];
   defaultViewId?: string;
   expensiveQuery: boolean;
   allowQuery: boolean;
@@ -94,60 +93,59 @@ const ChartWorkbench: FC<{
           onChangeAggregation: header?.onChangeAggregation,
         }}
       >
-        <ChartSelectContext.Provider value={{ selectionOption }}>
-          <ChartDrillContext.Provider
+        <ChartDrillContext.Provider
+          value={{
+            drillOption: drillOption,
+            onDrillOptionChange: onChartDrillOptionChange,
+            availableSourceFunctions,
+            onDateLevelChange,
+          }}
+        >
+          <ChartDatasetContext.Provider
             value={{
-              drillOption: drillOption,
-              onDrillOptionChange: onChartDrillOptionChange,
-              availableSourceFunctions,
-              onDateLevelChange,
+              dataset: dataset,
+              onRefreshDataset: onRefreshDataset,
             }}
           >
-            <ChartDatasetContext.Provider
+            <ChartDataViewContext.Provider
               value={{
-                dataset: dataset,
-                onRefreshDataset: onRefreshDataset,
+                dataView: dataview,
+                availableSourceFunctions,
+                expensiveQuery: expensiveQuery,
               }}
             >
-              <ChartDataViewContext.Provider
-                value={{
-                  dataView: dataview,
-                  availableSourceFunctions,
-                  expensiveQuery: expensiveQuery,
-                }}
+              <TimeConfigContext.Provider
+                value={{ locale: language, format: dateFormat }}
               >
-                <TimeConfigContext.Provider
-                  value={{ locale: language, format: dateFormat }}
-                >
-                  <StyledChartWorkbench>
-                    {header && (
-                      <ChartHeaderPanel
-                        chartName={header?.name}
-                        orgId={header?.orgId}
-                        container={header?.container}
-                        onGoBack={header?.onGoBack}
-                        onSaveChart={header?.onSaveChart}
-                        onSaveChartToDashBoard={header?.onSaveChartToDashBoard}
-                      />
-                    )}
-                    <StyledChartOperationPanel>
-                      <ChartOperationPanel
-                        chart={chart}
-                        defaultViewId={defaultViewId}
-                        chartConfig={chartConfig}
-                        allowQuery={allowQuery}
-                        onChartChange={onChartChange}
-                        onChartConfigChange={onChartConfigChange}
-                        onDataViewChange={onDataViewChange}
-                        onCreateDownloadDataTask={onCreateDownloadDataTask}
-                      />
-                    </StyledChartOperationPanel>
-                  </StyledChartWorkbench>
-                </TimeConfigContext.Provider>
-              </ChartDataViewContext.Provider>
-            </ChartDatasetContext.Provider>
-          </ChartDrillContext.Provider>
-        </ChartSelectContext.Provider>
+                <StyledChartWorkbench>
+                  {header && (
+                    <ChartHeaderPanel
+                      chartName={header?.name}
+                      orgId={header?.orgId}
+                      container={header?.container}
+                      onGoBack={header?.onGoBack}
+                      onSaveChart={header?.onSaveChart}
+                      onSaveChartToDashBoard={header?.onSaveChartToDashBoard}
+                    />
+                  )}
+                  <StyledChartOperationPanel>
+                    <ChartOperationPanel
+                      chart={chart}
+                      defaultViewId={defaultViewId}
+                      chartConfig={chartConfig}
+                      allowQuery={allowQuery}
+                      onChartChange={onChartChange}
+                      onChartConfigChange={onChartConfigChange}
+                      onDataViewChange={onDataViewChange}
+                      onCreateDownloadDataTask={onCreateDownloadDataTask}
+                      selectionOption={selectionOption}
+                    />
+                  </StyledChartOperationPanel>
+                </StyledChartWorkbench>
+              </TimeConfigContext.Provider>
+            </ChartDataViewContext.Provider>
+          </ChartDatasetContext.Provider>
+        </ChartDrillContext.Provider>
       </ChartAggregationContext.Provider>
     );
   },

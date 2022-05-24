@@ -190,9 +190,6 @@ export const slice = createSlice({
         state.selectionOption = [payload];
       }
     },
-    clearShareSelectionOption(state) {
-      state.selectionOption = [];
-    },
   },
   extraReducers: builder => {
     builder
@@ -212,6 +209,7 @@ export const slice = createSlice({
             ...state.chartPreview,
             dataset: payload as any,
           };
+          state.selectionOption = [];
           state.headlessBrowserRenderSign = true;
         },
       )

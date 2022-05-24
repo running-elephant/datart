@@ -489,6 +489,10 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
           rows: [],
         } as WidgetData),
       );
+    } finally {
+      dispatch(
+        editWidgetInfoActions.clearEditorSelectionOption({ wid: widgetId }),
+      );
     }
     return null;
   },

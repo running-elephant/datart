@@ -30,12 +30,10 @@ import {
   getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
-import { FC, memo, useEffect, useRef, useState } from 'react';
+import { FC, memo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { LastSelectionAndDatasetConfig } from '../../types/ChartConfig';
 import ChartDrillContext from '../ChartWorkbenchPage/contexts/ChartDrillContext';
-import ChartSelectContext from '../ChartWorkbenchPage/contexts/ChartSelectContext';
 import ControllerPanel from '../MainPage/pages/VizPage/ChartPreview/components/ControllerPanel';
 import {
   ChartPreview,
@@ -96,29 +94,6 @@ const ChartForShare: FC<{
     dispatch(fetchShareDataSetByPreviewChartAction({ preview: chartPreview }));
     registerChartEvents(chart);
   });
-
-  const [lastConfig, setLastConfig] = useState<LastSelectionAndDatasetConfig>({
-    dataset: chartPreview?.dataset,
-    selectionOption,
-  });
-
-  useEffect(() => {
-    if (selectionOption.length) {
-      dispatch(shareActions.clearShareSelectionOption());
-    } else {
-      setLastConfig({
-        dataset: chartPreview?.dataset,
-        selectionOption,
-      });
-    }
-  }, [chartPreview?.dataset, dispatch]);
-
-  useEffect(() => {
-    setLastConfig({
-      dataset: chartPreview?.dataset,
-      selectionOption,
-    });
-  }, [selectionOption]);
 
   const registerChartEvents = chart => {
     chart?.registerMouseEvents([
@@ -237,37 +212,31 @@ const ChartForShare: FC<{
           onChange={handleFilterChange}
         />
       </div>
-      <ChartSelectContext.Provider
+      <ChartDrillContext.Provider
         value={{
-          selectionOption: lastConfig.selectionOption,
+          drillOption: drillOptionRef.current,
+          availableSourceFunctions,
+          onDrillOptionChange: handleDrillOptionChange,
+          onDateLevelChange: handleDateLevelChange,
         }}
       >
-        <ChartDrillContext.Provider
-          value={{
-            drillOption: drillOptionRef.current,
-            availableSourceFunctions,
-            onDrillOptionChange: handleDrillOptionChange,
-            onDateLevelChange: handleDateLevelChange,
-          }}
-        >
-          <div style={{ width: '100%', height: '100%' }} ref={ref}>
-            <ChartDrillContextMenu chartConfig={chartPreview?.chartConfig}>
-              <ChartIFrameContainer
-                key={chartPreview?.backendChart?.id!}
-                containerId={chartPreview?.backendChart?.id!}
-                dataset={lastConfig?.dataset}
-                chart={chart!}
-                config={chartPreview?.chartConfig!}
-                drillOption={drillOptionRef.current}
-                selectionOption={lastConfig.selectionOption}
-                width={width}
-                height={height}
-              />
-            </ChartDrillContextMenu>
-          </div>
-          <ChartDrillPaths chartConfig={chartPreview?.chartConfig} />
-        </ChartDrillContext.Provider>
-      </ChartSelectContext.Provider>
+        <div style={{ width: '100%', height: '100%' }} ref={ref}>
+          <ChartDrillContextMenu chartConfig={chartPreview?.chartConfig}>
+            <ChartIFrameContainer
+              key={chartPreview?.backendChart?.id!}
+              containerId={chartPreview?.backendChart?.id!}
+              dataset={chartPreview?.dataset}
+              chart={chart!}
+              config={chartPreview?.chartConfig!}
+              drillOption={drillOptionRef.current}
+              selectionOption={selectionOption}
+              width={width}
+              height={height}
+            />
+          </ChartDrillContextMenu>
+        </div>
+        <ChartDrillPaths chartConfig={chartPreview?.chartConfig} />
+      </ChartDrillContext.Provider>
       <HeadlessBrowserIdentifier
         renderSign={headlessBrowserRenderSign}
         width={Number(width) || 0}

@@ -185,6 +185,7 @@ const workbenchSlice = createSlice({
         state.dataset = initState.dataset;
       })
       .addCase(fetchDataSetAction.fulfilled, (state, { payload }) => {
+        state.selectionOption = [];
         state.dataset = payload as any;
         state.datasetLoading = false;
       })

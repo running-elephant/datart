@@ -24,13 +24,9 @@ import { migrateChartConfig } from 'app/migration';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
-import ChartSelectContext from 'app/pages/ChartWorkbenchPage/contexts/ChartSelectContext';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { IChart } from 'app/types/Chart';
-import {
-  ChartConfig,
-  LastSelectionAndDatasetConfig,
-} from 'app/types/ChartConfig';
+import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
@@ -47,15 +43,11 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
-import {
-  boardSelectionOptionOnchange,
-  clearBoardSelectionOption,
-} from '../../../pages/BoardEditor/slice/actions/actions';
+import { boardSelectionOptionOnchange } from '../../../pages/BoardEditor/slice/actions/actions';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import {
   boardDrillManager,
@@ -65,8 +57,8 @@ import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { BoardScaleContext } from '../../FreeBoardBackground';
 import { WidgetChartContext } from '../../WidgetProvider/WidgetChartProvider';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
-import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
+import { WidgetSelectionContext } from '../../WidgetProvider/WidgetSelectionProvider';
 
 export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const { dataChart, availableSourceFunctions } =
@@ -74,7 +66,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const scale = useContext(BoardScaleContext);
   const { data } = useContext(WidgetDataContext);
   const { renderMode } = useContext(BoardContext);
-  const { selectionOption } = useContext(WidgetInfoContext);
+  const selectionOption = useContext(WidgetSelectionContext);
   const widget = useContext(WidgetContext);
   const { dashboardId, id: wid } = widget;
   const bid = useMemo(() => {
@@ -165,28 +157,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     }),
     [data],
   );
-  const [lastConfig, setLastConfig] = useState<LastSelectionAndDatasetConfig>({
-    dataset,
-    selectionOption,
-  });
-
-  useEffect(() => {
-    if (selectionOption.length) {
-      clearBoardSelectionOption(dispatch, renderMode, wid, bid);
-    } else {
-      setLastConfig({
-        dataset,
-        selectionOption,
-      });
-    }
-  }, [dataset, wid, bid, dispatch, renderMode]);
-
-  useEffect(() => {
-    setLastConfig({
-      dataset,
-      selectionOption,
-    });
-  }, [selectionOption]);
 
   const chart = useMemo(() => {
     if (!dataChart) {
@@ -225,7 +195,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                     renderMode,
                     params,
                     wid,
-                    bid,
                   );
                   return;
                 }
@@ -247,7 +216,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     onWidgetChartClick,
     dispatch,
     wid,
-    bid,
     renderMode,
   ]);
   const config = useMemo(() => {
@@ -299,13 +267,13 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     const drillOption = drillOptionRef.current;
     return (
       <ChartIFrameContainer
-        dataset={lastConfig?.dataset}
+        dataset={dataset}
         chart={chart!}
         config={config}
         width={cacheW}
         height={cacheH}
         drillOption={drillOption}
-        selectionOption={lastConfig?.selectionOption}
+        selectionOption={selectionOption}
         containerId={containerId}
         widgetSpecialConfig={widgetSpecialConfig}
         scale={scale}
@@ -316,7 +284,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     cacheH,
     cacheW,
     errText,
-    lastConfig,
+    dataset,
+    selectionOption,
     chart,
     containerId,
     widgetSpecialConfig,
@@ -329,21 +298,15 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     onDateLevelChange: handleDateLevelChange,
   };
 
-  const selectContextVal = {
-    selectionOption: lastConfig.selectionOption,
-  };
-
   return (
-    <ChartSelectContext.Provider value={selectContextVal}>
-      <ChartDrillContext.Provider value={drillContextVal}>
-        <ChartDrillContextMenu chartConfig={dataChart?.config.chartConfig}>
-          <StyledWrapper>
-            <ChartFrameBox ref={cacheWhRef}>{chartFrame}</ChartFrameBox>
-            <ChartDrillPaths chartConfig={dataChart?.config.chartConfig} />
-          </StyledWrapper>
-        </ChartDrillContextMenu>
-      </ChartDrillContext.Provider>
-    </ChartSelectContext.Provider>
+    <ChartDrillContext.Provider value={drillContextVal}>
+      <ChartDrillContextMenu chartConfig={dataChart?.config.chartConfig}>
+        <StyledWrapper>
+          <ChartFrameBox ref={cacheWhRef}>{chartFrame}</ChartFrameBox>
+          <ChartDrillPaths chartConfig={dataChart?.config.chartConfig} />
+        </StyledWrapper>
+      </ChartDrillContextMenu>
+    </ChartDrillContext.Provider>
   );
 });
 const StyledWrapper = styled.div`

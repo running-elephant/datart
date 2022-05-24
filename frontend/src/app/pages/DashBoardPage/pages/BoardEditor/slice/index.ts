@@ -264,7 +264,6 @@ const widgetInfoRecordSlice = createSlice({
         payload,
       }: PayloadAction<{
         wid: string;
-        bid: string;
         data: { index: string; data: any };
       }>,
     ) {
@@ -279,7 +278,7 @@ const widgetInfoRecordSlice = createSlice({
     },
     clearEditorSelectionOption(
       state,
-      { payload }: PayloadAction<{ wid: string; bid: string }>,
+      { payload }: PayloadAction<{ wid: string }>,
     ) {
       state[payload.wid].selectionOption = [];
     },

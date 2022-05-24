@@ -421,8 +421,3 @@ export interface ISelectionConfig {
   index: string;
   data: any;
 }
-
-export interface LastSelectionAndDatasetConfig {
-  dataset?: ChartDataSetDTO;
-  selectionOption?: ISelectionConfig[];
-}

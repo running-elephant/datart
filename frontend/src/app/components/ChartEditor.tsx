@@ -82,7 +82,6 @@ import {
   DataChartConfig,
   WidgetContentChartType,
 } from '../pages/DashBoardPage/pages/Board/slice/types';
-import { LastSelectionAndDatasetConfig } from '../types/ChartConfig';
 
 const { confirm } = Modal;
 
@@ -234,29 +233,6 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     },
     [dispatch],
   );
-
-  const [lastConfig, setLastConfig] = useState<LastSelectionAndDatasetConfig>({
-    dataset,
-    selectionOption,
-  });
-
-  useEffect(() => {
-    if (selectionOption.length) {
-      dispatch(workbenchSlice.actions.clearAllSelectionOption());
-    } else {
-      setLastConfig({
-        dataset,
-        selectionOption,
-      });
-    }
-  }, [dispatch, dataset]);
-
-  useEffect(() => {
-    setLastConfig({
-      dataset,
-      selectionOption,
-    });
-  }, [selectionOption]);
 
   const registerChartEvents = useCallback(
     chart => {
@@ -753,10 +729,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             onChangeAggregation: handleAggregationState,
           }}
           drillOption={drillOptionRef?.current}
-          selectionOption={lastConfig.selectionOption}
+          selectionOption={selectionOption}
           aggregation={aggregation}
           chart={chart}
-          dataset={lastConfig.dataset}
+          dataset={dataset}
           dataview={dataview}
           chartConfig={chartConfig}
           defaultViewId={defaultViewId}

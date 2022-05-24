@@ -30,6 +30,7 @@ export interface VizState {
   selectedTab: string;
   dataChartListLoading: boolean;
   chartPreviews: ChartPreview[];
+  selectionOption: Record<string, ISelectionConfig[]>;
 }
 
 export interface Folder {
@@ -81,7 +82,6 @@ export interface ChartPreview {
   backendChart?: ChartDTO;
   dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
-  selectionOption?: ISelectionConfig[];
 }
 
 export interface VizTab {

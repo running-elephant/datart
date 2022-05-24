@@ -108,7 +108,7 @@ class BasicOutlineMapChart extends ReactChart {
   }
 
   onUnMount(): void {
-    this.adapter?.onUnMount();
+    this.adapter?.unmount();
   }
 
   onResize(opt: any, context): void {

@@ -20,10 +20,8 @@ import { ChartDataSectionType } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import {
   ChartConfig,
-  ChartContext,
   ChartDataConfig,
   ChartDataSectionField,
-  ChartOptions,
   ChartStyleConfig,
   ISelectionConfig,
   LabelStyle,
@@ -65,13 +63,6 @@ class BasicBarChart extends Chart {
   protected isHorizonDisplay = false;
   protected isStackMode = false;
   protected isPercentageYAxis = false;
-  protected optionsAndContext: {
-    options?: ChartOptions;
-    context?: ChartContext;
-  } = {
-    options: undefined,
-    context: undefined,
-  };
 
   constructor(props?: {
     id: string;
@@ -110,11 +101,6 @@ class BasicBarChart extends Chart {
     if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
-
-    this.optionsAndContext = {
-      options,
-      context,
-    };
 
     if (!this.isMatchRequirement(options.config)) {
       this.chart?.clear();

@@ -17,7 +17,7 @@
  */
 
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, ISelectionConfig } from 'app/types/ChartConfig';
 import FlexLayout, { Model } from 'flexlayout-react';
 import 'flexlayout-react/style/light.css';
 import { FC, memo, useContext, useState } from 'react';
@@ -40,6 +40,7 @@ const ChartOperationPanel: FC<{
   onChartConfigChange: (type, payload) => void;
   onDataViewChange?: () => void;
   onCreateDownloadDataTask?: () => void;
+  selectionOption?: ISelectionConfig[];
 }> = memo(
   ({
     chart,
@@ -50,6 +51,7 @@ const ChartOperationPanel: FC<{
     onChartConfigChange,
     onDataViewChange,
     onCreateDownloadDataTask,
+    selectionOption,
   }) => {
     const { dataset, onRefreshDataset } = useContext(ChartDatasetContext);
     const { dataView, expensiveQuery } = useContext(ChartDataViewContext);
@@ -98,6 +100,7 @@ const ChartOperationPanel: FC<{
             onChartChange={onChartChange}
             onRefreshDataset={onRefreshDataset}
             onCreateDownloadDataTask={onCreateDownloadDataTask}
+            selectionOption={selectionOption}
           />
         );
       }
