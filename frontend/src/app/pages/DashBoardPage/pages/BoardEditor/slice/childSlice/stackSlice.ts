@@ -99,8 +99,14 @@ export const editBoardStackSlice = createSlice({
     addWidgets(state, action: PayloadAction<Widget[]>) {
       const widgets = action.payload;
       const board = state.dashBoard;
-      let { maxWidgetIndex, type } = board.config;
-
+      const { type } = board.config;
+      let maxWidgetIndex = 0;
+      const widgetList = Object.values(state.widgetRecord || {});
+      if (widgetList.length) {
+        maxWidgetIndex = widgetList
+          .map(w => w.config.index)
+          .sort((b, a) => a - b)[0];
+      }
       widgets.forEach(ele => {
         maxWidgetIndex++;
         const newName = widgetManager
@@ -116,7 +122,6 @@ export const editBoardStackSlice = createSlice({
 
         state.widgetRecord[newEle.id] = newEle;
       });
-      state.dashBoard.config.maxWidgetIndex = maxWidgetIndex;
     },
     //
     toggleLockWidget(

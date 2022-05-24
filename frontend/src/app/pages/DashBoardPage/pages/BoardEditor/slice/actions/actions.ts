@@ -26,17 +26,13 @@ import {
   DataChart,
   TabWidgetContent,
   VizRenderMode,
-  WidgetInfo,
   WidgetOfCopy,
   WidgetType,
   WidgetTypes,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
-import {
-  createWidgetInfo,
-  createWidgetInfoMap,
-} from 'app/pages/DashBoardPage/utils/widget';
+import { createWidgetInfo } from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import produce from 'immer';
@@ -231,13 +227,12 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
       newWidgets.push(newWidget);
     }
   });
-  const widgetInfoMap: Record<string, WidgetInfo> = {};
-  newWidgets.forEach(widget => {
+  const widgetInfos = newWidgets.map(widget => {
     const widgetInfo = createWidgetInfo(widget.id);
-    widgetInfoMap[widget.id] = widgetInfo;
+    return widgetInfo;
   });
 
-  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
+  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfos));
   dispatch(editBoardStackActions.addWidgets(newWidgets));
 
   //
@@ -368,8 +363,9 @@ export const onComposeGroupAction = (wid?: string) => (dispatch, getState) => {
       nextIndex: widgetMap[id].config.index,
     };
   });
-  const widgetInfoMap = createWidgetInfoMap([groupWidget]);
-  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
+  const widgetInfo = createWidgetInfo(groupWidget.id);
+  widgetInfo.selected = true;
+  dispatch(editWidgetInfoActions.addWidgetInfos([widgetInfo]));
   dispatch(editBoardStackActions.addWidgets([groupWidget]));
 
   dispatch(

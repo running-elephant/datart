@@ -204,11 +204,11 @@ const widgetInfoRecordSlice = createSlice({
         }
       }
     },
-    addWidgetInfos(state, action: PayloadAction<Record<string, WidgetInfo>>) {
-      const widgetInfoMap = action.payload;
-      const widgetIds = Object.keys(widgetInfoMap);
-      widgetIds.forEach(id => {
-        state[id] = widgetInfoMap[id];
+    addWidgetInfos(state, action: PayloadAction<WidgetInfo[]>) {
+      const widgetInfos = action.payload;
+
+      widgetInfos.forEach(info => {
+        state[info.id] = info;
       });
     },
     clearWidgetInfo(state) {
