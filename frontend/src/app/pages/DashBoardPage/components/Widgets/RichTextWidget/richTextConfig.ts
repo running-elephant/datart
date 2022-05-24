@@ -44,7 +44,7 @@ const NameI18N = {
   en: 'RichText',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'richText',
+  icon: '<svg t="1653390671960" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14078" width="200" height="200"><path d="M307.2 409.6h153.6v307.2h102.4V409.6h153.6v-102.4H307.2zM76.8 460.8h102.4v102.4H76.8zM844.8 460.8h102.4v102.4h-102.4z" fill="#525C6A" p-id="14079"></path><path d="M102.4 102.4v307.2h51.2V153.6h716.8v256h51.2V102.4zM870.4 870.4H153.6V614.4H102.4v307.2h819.2V614.4h-51.2z" fill="#858E9E" p-id="14080"></path></svg>',
 
   originalType: ORIGINAL_TYPE_MAP.richText,
   canWrapped: true,

@@ -31,7 +31,7 @@ const NameI18N = {
   en: 'OwnedChart',
 };
 const widgetMeta = getMeta({
-  icon: 'ownedChart',
+  icon: '<svg t="1653391790607" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="36021" width="200" height="200"><path d="M888 792H200V168c0-4.4-3.6-8-8-8h-56c-4.4 0-8 3.6-8 8v688c0 4.4 3.6 8 8 8h752c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8z m-616-64h536c4.4 0 8-3.6 8-8V284c0-7.2-8.7-10.7-13.7-5.7L592 488.6l-125.4-124c-3.1-3.1-8.2-3.1-11.3 0l-189 189.6c-1.5 1.5-2.3 3.5-2.3 5.6V720c0 4.4 3.6 8 8 8z" p-id="36022"></path></svg>',
   widgetTypeId: ORIGINAL_TYPE_MAP.ownedChart,
   zh: {
     desc: '自建数据图表的内部是一个独立的数据图表 ',
