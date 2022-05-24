@@ -41,7 +41,10 @@ import {
 } from '../MainPage/pages/VizPage/slice/types';
 import { HeadlessBrowserIdentifier } from './HeadlessBrowserIdentifier';
 import { shareActions } from './slice';
-import { selectHeadlessBrowserRenderSign } from './slice/selectors';
+import {
+  selectHeadlessBrowserRenderSign,
+  selectSelectionOptionList,
+} from './slice/selectors';
 import {
   fetchShareDataSetByPreviewChartAction,
   updateFilterAndFetchDatasetForShare,
@@ -78,6 +81,8 @@ const ChartForShare: FC<{
   const headlessBrowserRenderSign = useSelector(
     selectHeadlessBrowserRenderSign,
   );
+  const selectionOption = useSelector(selectSelectionOptionList);
+
   useMount(() => {
     if (!chartPreview) {
       return;
@@ -126,6 +131,20 @@ const ChartForShare: FC<{
           }
           if (param.seriesName === 'drillOptionChange') {
             handleDrillOptionChange?.(param.value);
+            return;
+          }
+
+          if (!drillOptionRef.current?.isSelectedDrill && chart.useSelection) {
+            const {
+              dataIndex,
+              componentIndex,
+            }: { dataIndex: number; componentIndex: number } = param;
+            dispatch(
+              shareActions.shareSingleSelectionOption({
+                index: componentIndex + ',' + dataIndex,
+                data: param.data,
+              }),
+            );
             return;
           }
         },
@@ -210,6 +229,7 @@ const ChartForShare: FC<{
               chart={chart!}
               config={chartPreview?.chartConfig!}
               drillOption={drillOptionRef.current}
+              selectionOption={selectionOption}
               width={width}
               height={height}
             />

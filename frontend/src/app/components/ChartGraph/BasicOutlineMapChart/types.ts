@@ -1,17 +1,20 @@
 import { BorderStyle, FontStyle, LabelStyle } from '../../../types/ChartConfig';
 
 export type GeoInfo = {
-  map: string;
-  roam: boolean;
-  emphasis: {
-    focus: string;
-    itemStyle: {
+  map?: string;
+  roam?: boolean | 'move' | 'scale';
+  emphasis?: {
+    focus?: string;
+    itemStyle?: {
       areaColor: string;
     };
   };
-  itemStyle: {
+  itemStyle?: {
     areaColor: string;
   } & BorderStyle;
+  regions?: { name?: string; itemStyle?: { [x: string]: any } }[];
+  zoom?: number;
+  center?: number[] | undefined;
 } & LabelStyle;
 
 export interface GeoVisualMapStyle {
@@ -31,26 +34,32 @@ export interface GeoVisualMapStyle {
   max: number;
   textStyle: FontStyle;
   formatter: (value) => string;
+  bottom?: number | string;
+  right?: number | string;
+  top?: number | string;
+  left?: number | string;
 }
 
 export interface GeoSeries {
   type: string;
-  roam: boolean;
-  map: string;
-  geoIndex: number;
-  emphasis: {
-    label: {
-      show: boolean;
+  roam?: boolean;
+  map?: string;
+  geoIndex?: number;
+  emphasis?: {
+    label?: {
+      show?: boolean;
     };
+    disabled?: boolean;
   };
-  data:
-    | Array<{
-        rowData: { [key: string]: any };
-        name: string;
-        value: string;
-        visualMap: boolean;
-      }>
-    | undefined;
+  select?: {
+    disabled?: boolean;
+  };
+  data: Array<{
+    rowData: { [key: string]: any };
+    name: string;
+    value: string;
+    visualMap?: boolean;
+  }>;
 }
 
 export type MetricAndSizeSeriesStyle = {
@@ -70,3 +79,10 @@ export type MetricAndSizeSeriesStyle = {
     };
   };
 } & LabelStyle;
+
+export interface MapOption {
+  geo: GeoInfo;
+  visualMap: GeoVisualMapStyle[];
+  series: GeoSeries[];
+  tooltip: { trigger: string; formatter: (params: any) => string };
+}

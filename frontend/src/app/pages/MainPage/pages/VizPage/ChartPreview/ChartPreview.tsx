@@ -52,6 +52,7 @@ import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import { useVizSlice } from '../slice';
 import {
   selectPreviewCharts,
+  selectPreviewSelectionOption,
   selectPublishLoading,
   selectVizs,
 } from '../slice/selectors';
@@ -99,6 +100,7 @@ const ChartPreviewBoard: FC<{
     const [version, setVersion] = useState<string>();
     const previewCharts = useSelector(selectPreviewCharts);
     const publishLoading = useSelector(selectPublishLoading);
+    const selectionOption = useSelector(selectPreviewSelectionOption);
     const availableSourceFunctions = useSelector(
       selectAvailableSourceFunctions,
     );
@@ -243,11 +245,30 @@ const ChartPreviewBoard: FC<{
                 handleDrillOptionChange?.(param.value);
                 return;
               }
+              if (
+                !drillOptionRef.current?.isSelectedDrill &&
+                chart.useSelection
+              ) {
+                const {
+                  dataIndex,
+                  componentIndex,
+                }: { dataIndex: number; componentIndex: number } = param;
+                dispatch(
+                  vizAction.chartPreviewsSingleSelectionOption({
+                    backendChartId,
+                    data: {
+                      index: componentIndex + ',' + dataIndex,
+                      data: param.data,
+                    },
+                  }),
+                );
+                return;
+              }
             },
           },
         ]);
       },
-      [dispatch, handleDrillOptionChange, handleDrillThroughEvent],
+      [dispatch, handleDrillOptionChange, handleDrillThroughEvent, vizAction],
     );
 
     useEffect(() => {
@@ -502,6 +523,7 @@ const ChartPreviewBoard: FC<{
                     chart={chart!}
                     config={chartPreview?.chartConfig!}
                     drillOption={drillOptionRef.current}
+                    selectionOption={selectionOption[backendChartId]}
                     width={cacheW}
                     height={cacheH}
                   />
@@ -509,7 +531,7 @@ const ChartPreviewBoard: FC<{
               </Spin>
             </ChartWrapper>
             <StyledChartDrillPathsContainer>
-              <ChartDrillPaths chartConfig={chartPreview?.chartConfig} />
+              <ChartDrillPaths chartConfig={chartPreview?.chartConfig!} />
             </StyledChartDrillPathsContainer>
             <StyledChartDrillPathsContainer />
           </ChartDrillContext.Provider>

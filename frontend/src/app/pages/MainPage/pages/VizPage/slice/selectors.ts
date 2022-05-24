@@ -125,3 +125,8 @@ export const selectHasVizFetched = createSelector(
   [selectDomain],
   vizState => vizState.hasVizFetched,
 );
+
+export const selectPreviewSelectionOption = createSelector(
+  [selectDomain],
+  vizState => vizState.selectionOption,
+);

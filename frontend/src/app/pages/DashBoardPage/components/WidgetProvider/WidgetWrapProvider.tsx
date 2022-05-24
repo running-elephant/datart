@@ -20,6 +20,7 @@ import { FC, memo } from 'react';
 import { WidgetChartProvider } from './WidgetChartProvider';
 import { WidgetInfoProvider } from './WidgetInfoProvider';
 import { WidgetProvider } from './WidgetProvider';
+import { WidgetSelectionProvider } from './WidgetSelectionProvider';
 
 export const WidgetWrapProvider: FC<{
   id: string;
@@ -33,7 +34,9 @@ export const WidgetWrapProvider: FC<{
         boardEditing={boardEditing}
         widgetId={id}
       >
-        <WidgetChartProvider>{children}</WidgetChartProvider>
+        <WidgetSelectionProvider boardEditing={boardEditing} widgetId={id}>
+          <WidgetChartProvider>{children}</WidgetChartProvider>
+        </WidgetSelectionProvider>
       </WidgetInfoProvider>
     </WidgetProvider>
   );

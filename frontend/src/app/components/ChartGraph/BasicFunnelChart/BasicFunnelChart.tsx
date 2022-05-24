@@ -21,6 +21,7 @@ import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
+  ISelectionConfig,
   LabelStyle,
   LegendStyle,
 } from 'app/types/ChartConfig';
@@ -35,6 +36,7 @@ import {
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
+  getSelectItemStyle,
   getSeriesTooltips4Scatter,
   getStyles,
   toFormattedValue,
@@ -50,6 +52,7 @@ import { Series, SeriesData } from './types';
 class BasicFunnelChart extends Chart {
   config = Config;
   chart: any = null;
+  useSelection = true;
 
   constructor() {
     super(
@@ -79,19 +82,20 @@ class BasicFunnelChart extends Chart {
     });
   }
 
-  onUpdated(props): void {
-    if (!props.dataset || !props.dataset.columns || !props.config) {
+  onUpdated(options, context): void {
+    if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
 
     this.chart?.clear();
-    if (!this.isMatchRequirement(props.config)) {
+    if (!this.isMatchRequirement(options.config)) {
       return;
     }
     const newOptions = this.getOptions(
-      props.dataset,
-      props.config,
-      props.drillOption,
+      options.dataset,
+      options.config,
+      options.drillOption,
+      options.selectionOption,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
@@ -107,7 +111,8 @@ class BasicFunnelChart extends Chart {
   private getOptions(
     dataset: ChartDataSetDTO,
     config: ChartConfig,
-    drillOption: ChartDrillOption,
+    drillOption?: ChartDrillOption,
+    selectionOption?: ISelectionConfig[],
   ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -148,6 +153,7 @@ class BasicFunnelChart extends Chart {
       groupConfigs,
       dataList,
       infoConfigs,
+      selectionOption,
     );
 
     return {
@@ -157,6 +163,7 @@ class BasicFunnelChart extends Chart {
         infoConfigs,
       ),
       legend: this.getLegendStyle(styleConfigs, series.sort),
+      animation: false,
       series,
     };
   }
@@ -268,6 +275,9 @@ class BasicFunnelChart extends Chart {
       type,
       orient,
       textStyle: font,
+      itemStyle: {
+        opacity: 1,
+      },
     };
   }
 
@@ -277,6 +287,7 @@ class BasicFunnelChart extends Chart {
     groupConfigs: ChartDataSectionField[],
     dataList: IChartDataSet<string>,
     infoConfigs: ChartDataSectionField[],
+    selectionOption?: ISelectionConfig[],
   ): Series {
     const [selectAll] = getStyles(styles, ['legend'], ['selectAll']);
     const [sort, funnelAlign, gap] = getStyles(
@@ -287,7 +298,12 @@ class BasicFunnelChart extends Chart {
 
     if (!groupConfigs.length) {
       const dc = dataList?.[0];
-      const datas: SeriesData[] = aggregateConfigs.map(aggConfig => {
+      const datas: SeriesData[] = aggregateConfigs.map((aggConfig, acIndex) => {
+        const dataItemStyle = this.getDataItemStyle(
+          aggConfig,
+          groupConfigs,
+          dc,
+        );
         return {
           ...aggConfig,
           select: selectAll,
@@ -295,7 +311,12 @@ class BasicFunnelChart extends Chart {
             .concat(infoConfigs)
             .map(config => dc?.getCell(config)),
           name: getColumnRenderName(aggConfig),
-          itemStyle: this.getDataItemStyle(aggConfig, groupConfigs, dc),
+          ...getSelectItemStyle(
+            0,
+            acIndex,
+            selectionOption || [],
+            dataItemStyle,
+          ),
           ...getExtraSeriesRowData(dc),
           ...getExtraSeriesDataFormat(aggConfig?.format),
         };
@@ -324,8 +345,13 @@ class BasicFunnelChart extends Chart {
       };
     }
 
-    const flattenedDatas = aggregateConfigs.flatMap(aggConfig => {
-      const ormalizeSerieDatas: SeriesData[] = dataList.map(dc => {
+    const flattenedDatas = aggregateConfigs.flatMap((aggConfig, acIndex) => {
+      const ormalizeSerieDatas: SeriesData[] = dataList.map((dc, dcIndex) => {
+        const dataItemStyle = this.getDataItemStyle(
+          aggConfig,
+          groupConfigs,
+          dc,
+        );
         return {
           ...aggConfig,
           select: selectAll,
@@ -333,7 +359,12 @@ class BasicFunnelChart extends Chart {
             .concat(infoConfigs)
             .map(config => dc?.getCell(config)),
           name: groupConfigs.map(config => dc.getCell(config)).join('-'),
-          itemStyle: this.getDataItemStyle(aggConfig, groupConfigs, dc),
+          ...getSelectItemStyle(
+            0,
+            acIndex * dataList.length + dcIndex,
+            selectionOption || [],
+            dataItemStyle,
+          ),
           ...getExtraSeriesRowData(dc),
           ...getExtraSeriesDataFormat(aggConfig?.format),
         };

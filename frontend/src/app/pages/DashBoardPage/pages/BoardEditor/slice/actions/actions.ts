@@ -602,3 +602,26 @@ export const moveNodeContainerToContainer = (args: {
     dispatch(editBoardStackActions.dropTabToOtherTab({ dragNode, targetNode }));
   }
 };
+export const boardSelectionOptionOnchange = (
+  dispatch,
+  type: VizRenderMode,
+  params,
+  wid,
+) => {
+  const {
+    dataIndex,
+    componentIndex,
+  }: { dataIndex: number; componentIndex: number } = params;
+  const option = {
+    wid,
+    data: {
+      index: componentIndex + ',' + dataIndex,
+      data: params.data,
+    },
+  };
+  if (type === 'edit') {
+    dispatch(editWidgetInfoActions.boardEditorSingleSelectionOption(option));
+  } else {
+    dispatch(boardActions.boardSingleSelectionOption(option));
+  }
+};
