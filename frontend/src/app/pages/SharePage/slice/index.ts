@@ -28,6 +28,7 @@ import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
+import { isUndefined } from 'utils/object';
 import {
   fetchAvailableSourceFunctions,
   fetchShareDataSetByPreviewChartAction,
@@ -51,6 +52,7 @@ export const initialState: SharePageState = {
   loginLoading: false,
   oauth2Clients: [],
   availableSourceFunctions: [],
+  selectionOption: [],
 };
 
 export const slice = createSlice({
@@ -174,6 +176,20 @@ export const slice = createSlice({
           action.payload.computedFields;
       }
     },
+
+    shareSingleSelectionOption(
+      state,
+      { payload }: PayloadAction<{ index: string; data: any }>,
+    ) {
+      const findDataIndex = state.selectionOption?.find(
+        v => v.index === payload.index,
+      );
+      if (!isUndefined(findDataIndex)) {
+        state.selectionOption = [];
+      } else {
+        state.selectionOption = [payload];
+      }
+    },
   },
   extraReducers: builder => {
     builder
@@ -193,6 +209,7 @@ export const slice = createSlice({
             ...state.chartPreview,
             dataset: payload as any,
           };
+          state.selectionOption = [];
           state.headlessBrowserRenderSign = true;
         },
       )

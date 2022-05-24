@@ -21,7 +21,7 @@ import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartData
 import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, ISelectionConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
@@ -40,6 +40,7 @@ const ChartWorkbench: FC<{
   chart?: IChart;
   aggregation?: boolean;
   drillOption?: IChartDrillOption;
+  selectionOption?: ISelectionConfig[];
   defaultViewId?: string;
   expensiveQuery: boolean;
   allowQuery: boolean;
@@ -68,6 +69,7 @@ const ChartWorkbench: FC<{
     chart,
     aggregation,
     drillOption,
+    selectionOption,
     header,
     defaultViewId,
     expensiveQuery,
@@ -136,6 +138,7 @@ const ChartWorkbench: FC<{
                       onChartConfigChange={onChartConfigChange}
                       onDataViewChange={onDataViewChange}
                       onCreateDownloadDataTask={onCreateDownloadDataTask}
+                      selectionOption={selectionOption}
                     />
                   </StyledChartOperationPanel>
                 </StyledChartWorkbench>

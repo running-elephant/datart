@@ -4,8 +4,9 @@ import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/models/ChartManager';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { CloneValueDeep } from 'utils/object';
+import { CloneValueDeep, isUndefined } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
+import { ISelectionConfig } from '../../../../../types/ChartConfig';
 import {
   addStoryboard,
   addViz,
@@ -47,6 +48,7 @@ export const initialState: VizState = {
   selectedTab: '',
   dataChartListLoading: false,
   chartPreviews: [],
+  selectionOption: {} as Record<string, ISelectionConfig[]>,
 };
 
 const slice = createSlice({
@@ -138,6 +140,25 @@ const slice = createSlice({
       Object.entries(initialState).forEach(([key, value]) => {
         state[key] = value;
       });
+    },
+
+    chartPreviewsSingleSelectionOption(
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        backendChartId: string;
+        data: { index: string; data: any };
+      }>,
+    ) {
+      const selectionConfig = state.selectionOption?.[
+        payload.backendChartId
+      ]?.find(v => payload.data.index === v.index);
+      if (!isUndefined(selectionConfig)) {
+        state.selectionOption[payload.backendChartId] = [];
+      } else {
+        state.selectionOption[payload.backendChartId] = [payload.data];
+      }
     },
   },
   extraReducers: builder => {
@@ -564,6 +585,7 @@ const slice = createSlice({
         const index = state.chartPreviews?.findIndex(
           c => c.backendChartId === action.payload?.backendChartId,
         );
+        state.selectionOption[action.payload?.backendChartId] = [];
         if (index < 0) {
           state.chartPreviews.push({
             backendChartId: action.payload?.backendChartId,

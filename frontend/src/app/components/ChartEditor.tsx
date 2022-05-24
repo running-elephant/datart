@@ -39,6 +39,7 @@ import {
   currentDataViewSelector,
   datasetsSelector,
   selectAvailableSourceFunctions,
+  selectionOptionSelector,
   shadowChartConfigSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import {
@@ -134,9 +135,9 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
   const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
+  const selectionOption = useSelector(selectionOptionSelector);
   const [chart, setChart] = useState<IChart>();
   const drillOptionRef = useRef<IChartDrillOption>();
-
   const [allowQuery, setAllowQuery] = useState<boolean>(false);
   const history = useHistory();
   const addVizFn = useAddViz({
@@ -290,6 +291,23 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               handleDrillOptionChange?.(param.value);
               return;
             }
+
+            if (
+              !drillOptionRef.current?.isSelectedDrill &&
+              chart.useSelection
+            ) {
+              const {
+                dataIndex,
+                componentIndex,
+              }: { dataIndex: number; componentIndex: number } = param;
+              dispatch(
+                workbenchSlice.actions.singleSelectionOption({
+                  index: componentIndex + ',' + dataIndex,
+                  data: param.data,
+                }),
+              );
+              return;
+            }
           },
         },
       ]);
@@ -360,6 +378,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       drillOptionRef.current,
       true,
     );
+
+    if (selectionOption.length) {
+      dispatch(workbenchSlice.actions.clearAllSelectionOption());
+    }
     if (!expensiveQuery) {
       dispatch(refreshDatasetAction({ drillOption: drillOptionRef?.current }));
     } else {
@@ -707,6 +729,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             onChangeAggregation: handleAggregationState,
           }}
           drillOption={drillOptionRef?.current}
+          selectionOption={selectionOption}
           aggregation={aggregation}
           chart={chart}
           dataset={dataset}

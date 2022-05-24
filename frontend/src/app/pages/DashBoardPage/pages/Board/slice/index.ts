@@ -28,6 +28,8 @@ import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import ChartDataView from 'app/types/ChartDataView';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
+import { isUndefined } from 'utils/object';
+import { ISelectionConfig } from '../../../../../types/ChartConfig';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import { createWidgetInfo } from '../../../utils/widget';
 import {
@@ -46,6 +48,7 @@ export const boardInit: BoardState = {
   dataChartMap: {} as Record<string, DataChart>,
   viewMap: {} as Record<string, ChartDataView>, // View
   availableSourceFunctionsMap: {} as Record<string, string[]>,
+  selectionOption: {} as Record<string, ISelectionConfig[]>,
 };
 // boardActions
 const boardSlice = createSlice({
@@ -163,6 +166,7 @@ const boardSlice = createSlice({
     setWidgetData(state, action: PayloadAction<WidgetData>) {
       const widgetData = action.payload;
       state.widgetDataMap[widgetData.id] = widgetData;
+      state.selectionOption[widgetData.id] = [];
     },
     changeBoardVisible(
       state,
@@ -318,6 +322,31 @@ const boardSlice = createSlice({
         dataChart.config.computedFields = action.payload.computedFields;
         state.dataChartMap[action.payload.id] = dataChart;
       }
+    },
+
+    boardSingleSelectionOption(
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        wid: string;
+        data: { index: string; data: any };
+      }>,
+    ) {
+      const findDataIndex = state.selectionOption[payload.wid]?.find(
+        v => v.index === payload.data.index,
+      );
+      if (!isUndefined(findDataIndex)) {
+        state.selectionOption[payload.wid] = [];
+      } else {
+        state.selectionOption[payload.wid] = [payload.data];
+      }
+    },
+    clearBoardSelectionOption(
+      state,
+      { payload }: PayloadAction<{ wid: string; bid: string }>,
+    ) {
+      state.selectionOption[payload.wid] = [];
     },
   },
   extraReducers: builder => {

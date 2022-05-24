@@ -34,8 +34,9 @@ import {
   ChartStyleConfig,
   ChartStyleSectionGroup,
   FontStyle,
-  GridStyle,
   FormatFieldAction,
+  GridStyle,
+  ISelectionConfig,
   LineStyle,
   MarkArea,
   MarkDataConfig,
@@ -291,10 +292,7 @@ function scientificNotationFormater(
   return (+value).toExponential(fractionDigits);
 }
 
-function dateFormater(
-  value,
-  config?: FormatFieldAction[FieldFormatType.Date],
-) {
+function dateFormater(value, config?: FormatFieldAction[FieldFormatType.Date]) {
   if (isNaN(+value) || isEmpty(config?.format)) {
     return value;
   }
@@ -1685,4 +1683,26 @@ export const setRuntimeDateLevelFieldsInChartConfig = (config: ChartConfig) => {
       });
     }
   });
+};
+
+export const getSelectItemStyle = (
+  comIndex: string | number,
+  dcIndex: string | number,
+  selectionList: ISelectionConfig[],
+  itemStyle: { [x: string]: any } = {},
+): { itemStyle: { opacity?: number; [x: string]: any } } => {
+  if (selectionList.length) {
+    const selectionConfig = selectionList.find(
+      v => v.index === comIndex + ',' + dcIndex,
+    );
+    return {
+      itemStyle: Object.assign(
+        itemStyle,
+        selectionConfig ? {} : { opacity: 0.5 },
+      ),
+    };
+  }
+  return {
+    itemStyle,
+  };
 };
