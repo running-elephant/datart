@@ -1072,7 +1072,7 @@
         "makeJump": "Set Jump",
         "closeJump": "Close Jump",
         "group": "Group",
-        "ungroup": "Ungroup"
+        "unGroup": "Ungroup"
       },
       "tips": {
         "unlock": "Locking drag and click to unlock",

@@ -1064,7 +1064,7 @@
         "makeJump": "跳转设置",
         "closeJump": "关闭跳转",
         "group": "成组",
-        "ungroup": "取消成组"
+        "unGroup": "取消成组"
       },
       "tips": {
         "unlock": "已锁定拖拽,点击解锁",

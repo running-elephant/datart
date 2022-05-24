@@ -349,6 +349,7 @@ export const onComposeGroupAction = (wid?: string) => (dispatch, getState) => {
     return {
       wid: id,
       nextIndex: widgetMap[id].config.index,
+      parentId: groupWidget.id,
     };
   });
   const widgetInfo = createWidgetInfo(groupWidget.id);
@@ -356,12 +357,48 @@ export const onComposeGroupAction = (wid?: string) => (dispatch, getState) => {
   dispatch(editWidgetInfoActions.addWidgetInfos([widgetInfo]));
   dispatch(editBoardStackActions.addWidgets([groupWidget]));
 
-  dispatch(
-    editBoardStackActions.changeWidgetsParentId({
-      items,
-      parentId: groupWidget.id,
-    }),
-  );
+  dispatch(editBoardStackActions.changeWidgetsParentId({ items }));
+};
+export const onUnGroupAction = (wid?: string) => (dispatch, getState) => {
+  const rootState = getState() as RootState;
+  const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
+  const stackState = editBoardState.stack.present;
+  const curBoard = stackState.dashBoard;
+  const cutBoardType = curBoard.config.type;
+  const widgetMap = stackState.widgetRecord;
+  const widgetInfos = Object.values(editBoardState.widgetInfoRecord || {});
+  let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);
+  wid && selectedIds.push(wid);
+  selectedIds = [...new Set(selectedIds)];
+  if (!selectedIds.length) return;
+
+  selectedIds = selectedIds.filter(id => {
+    if (widgetMap[id]) {
+      const pw = widgetMap[id];
+      return pw.config.originalType === ORIGINAL_TYPE_MAP.group;
+    }
+    return false;
+  });
+
+  let childIdList: {
+    wid: string;
+    nextIndex: number;
+    parentId: string;
+  }[] = [];
+  selectedIds.forEach(pid => {
+    const pw = widgetMap[pid];
+    (pw.config.children || [])
+      .filter(id => widgetMap[id])
+      .forEach(id => {
+        childIdList.push({
+          wid: id,
+          nextIndex: widgetMap[id].config.index,
+          parentId: pw.parentId,
+        });
+      });
+  });
+
+  dispatch(editBoardStackActions.changeWidgetsParentId({ items: childIdList }));
 };
 export const addVariablesToBoard =
   (variables: Variable[]) => (dispatch, getState) => {
