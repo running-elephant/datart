@@ -47,6 +47,7 @@ import {
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 import { DrillMode } from './ChartDrillOption';
+
 export class ChartDataRequestBuilder {
   extraSorters: ChartDataRequest['orders'] = [];
   chartDataConfigs: ChartDataConfig[];
@@ -460,5 +461,9 @@ export class ChartDataRequestBuilder {
       columns: this.buildSelectColumns(),
       script: this.script,
     };
+  }
+
+  public buildAllFilters() {
+    return this.buildFilters();
   }
 }

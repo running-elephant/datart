@@ -44,11 +44,12 @@ import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
 import useDrillThrough from '../hooks/useDrillThrough';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
+import useUrlParams from '../hooks/useUrlParams';
 import { useVizSlice } from '../slice';
 import {
   selectPreviewCharts,
@@ -112,8 +113,16 @@ const ChartPreviewBoard: FC<{
     const history = useHistory();
     const vizs = useSelector(selectVizs);
     const [openNewTab, openBrowserTab] = useDrillThrough();
+    const location = useLocation();
+    const { parse } = useUrlParams();
 
     useEffect(() => {
+      console.log('etra filters ---->1 ', parse(location.search));
+      console.log(
+        'etra filters ---->2 ',
+        urlSearchTransfer.toParams(location.search),
+      );
+
       const filterSearchParams = filterSearchUrl
         ? urlSearchTransfer.toParams(filterSearchUrl)
         : undefined;
@@ -124,7 +133,14 @@ const ChartPreviewBoard: FC<{
           filterSearchParams,
         }),
       );
-    }, [dispatch, orgId, backendChartId, filterSearchUrl]);
+    }, [
+      dispatch,
+      orgId,
+      backendChartId,
+      filterSearchUrl,
+      parse,
+      location.search,
+    ]);
 
     useEffect(() => {
       const sourceId = chartPreview?.backendChart?.view.sourceId;
@@ -187,17 +203,44 @@ const ChartPreviewBoard: FC<{
         ['drillThrough'],
         ['setting'],
       )?.[0] as DrillThroughSetting;
+
+      const jumpFilters = new ChartDataRequestBuilder(
+        {
+          id: chartPreview?.backendChart?.view?.id || '',
+          config: chartPreview?.backendChart?.view.config || {},
+          computedFields:
+            chartPreview?.backendChart?.config.computedFields || [],
+        },
+        chartPreview?.chartConfig?.datas,
+        chartPreview?.chartConfig?.settings,
+        {},
+        false,
+        chartPreview?.backendChart?.config?.aggregation,
+      )
+        .addDrillOption(drillOptionRef?.current)
+        .buildAllFilters();
+
+      // TODO: user selected filter
+      // TODO: mapper by custom if exist
+      console.log(' filter ---> ', jumpFilters);
+
       if (setting?.event === 'left') {
         const rule = setting?.rules?.[0];
         if (rule?.action === InteractionAction.Redirect) {
-          openNewTab(orgId, rule?.jumpToChart?.relId);
+          openNewTab(orgId, rule?.jumpToChart?.relId, jumpFilters);
         }
         if (rule?.action === InteractionAction.Window) {
-          openBrowserTab(orgId, rule?.jumpToChart?.relId);
+          openBrowserTab(orgId, rule?.jumpToChart?.relId, jumpFilters);
         }
       }
     }, [
+      chartPreview?.backendChart?.config?.aggregation,
+      chartPreview?.backendChart?.config.computedFields,
+      chartPreview?.backendChart?.view.config,
+      chartPreview?.backendChart?.view?.id,
+      chartPreview?.chartConfig?.datas,
       chartPreview?.chartConfig?.interactions,
+      chartPreview?.chartConfig?.settings,
       openBrowserTab,
       openNewTab,
       orgId,

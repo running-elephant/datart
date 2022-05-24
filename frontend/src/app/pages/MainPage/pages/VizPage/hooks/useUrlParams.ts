@@ -16,25 +16,16 @@
  * limitations under the License.
  */
 
-import { useHistory } from 'react-router-dom';
-import useUrlParams from './useUrlParams';
+import qs from 'qs';
 
-const useDrillThrough = () => {
-  const history = useHistory();
-  const { stringify } = useUrlParams();
+const useUrlParams = () => {
+  const parse = qs.parse;
+  const stringify = qs.stringify;
 
-  const openNewTab = (orgId, relId, params?: object) => {
-    history.push(`/organizations/${orgId}/vizs/${relId}?${stringify(params)}`);
+  return {
+    parse,
+    stringify,
   };
-
-  const openBrowserTab = (orgId, relId, params?: object) => {
-    window.open(
-      `/organizations/${orgId}/vizs/${relId}?${stringify(params)}`,
-      '_blank',
-    );
-  };
-
-  return [openNewTab, openBrowserTab];
 };
 
-export default useDrillThrough;
+export default useUrlParams;
