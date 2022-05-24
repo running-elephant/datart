@@ -51,3 +51,8 @@ export enum InteractionRelationType {
   Field = 'field',
   Variable = 'variable',
 }
+
+export enum InteractionFieldMapper {
+  All = 'all',
+  Customize = 'customize',
+}

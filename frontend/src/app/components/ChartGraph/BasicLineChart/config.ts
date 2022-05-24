@@ -470,14 +470,14 @@ const config: ChartConfig = {
       ],
     },
     {
-      label: 'viewData.title',
-      key: 'viewData',
+      label: 'viewDetail.title',
+      key: 'viewDetail',
       comType: 'checkboxModal',
       default: true,
       options: { modalSize: 'middle' },
       rows: [
         {
-          label: 'viewData.title',
+          label: 'viewDetail.title',
           key: 'detail',
           comType: 'interaction.viewDetail',
         },

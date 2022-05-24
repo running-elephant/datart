@@ -19,6 +19,7 @@
 import {
   InteractionAction,
   InteractionCategory,
+  InteractionFieldMapper,
   InteractionRelationType,
 } from '../../constants';
 
@@ -55,6 +56,12 @@ export type InteractionRule = {
 };
 
 export type DrillThroughSetting = {
-  event: string;
+  event: InteractionMouseEvent;
   rules?: InteractionRule[];
+};
+
+export type ViewDetailSetting = {
+  event: InteractionMouseEvent;
+  mapper?: InteractionFieldMapper;
+  [InteractionFieldMapper.Customize]?: any[];
 };

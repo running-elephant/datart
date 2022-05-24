@@ -800,8 +800,14 @@
             }
           }
         },
-        "viewData": {
-          "title": "查看数据"
+        "viewDetail": {
+          "title": "查看数据",
+          "event": "交互事件",
+          "leftClick": "左键单击",
+          "rightClick": "右键菜单",
+          "field": "选择字段",
+          "all": "全部",
+          "customize": "自定义"
         }
       },
       "present": {

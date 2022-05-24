@@ -16,78 +16,63 @@
  * limitations under the License.
  */
 
-import { Button, Form, Radio, Space } from 'antd';
+import { Form, Radio, Select, Space } from 'antd';
 import { currentDataViewSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
-import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { uuidv4 } from 'utils/utils';
-import { InteractionMouseEvent } from '../../constants';
+import { isEmptyArray } from 'utils/object';
+import { InteractionFieldMapper, InteractionMouseEvent } from '../../constants';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
-import RuleList from './RuleList';
-import { DrillThroughSetting, InteractionRule } from './types';
+import { ViewDetailSetting } from './types';
 
 const ViewDetailPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
-    const vizs = useSelector(selectVizs);
     const dataview = useSelector(currentDataViewSelector);
-    const [drillThroughEvent, setDrillThroughEvent] = useState<
-      DrillThroughSetting['event']
-    >(data.value?.event || InteractionMouseEvent.Left);
-    const [drillThroughRules, setDrillThroughRules] = useState<
-      DrillThroughSetting['rules']
-    >(data.value?.rules || []);
+    const [event, setEvent] = useState<ViewDetailSetting['event']>(
+      data.value?.event || InteractionMouseEvent.Left,
+    );
+    const [mapper, setMapper] = useState<ViewDetailSetting['mapper']>(
+      data?.value?.mapper || InteractionFieldMapper.All,
+    );
+    const [customFields, setCustomFields] = useState<string[]>(
+      data?.value?.[InteractionFieldMapper.Customize] || [],
+    );
 
-    const handleDrillThroughEventChange = e => {
+    const handleViewDetailEventChange = e => {
       const event = e.target.value;
-      handleDrillThroughSettingChange(event);
+      handleViewDetailSettingChange(event);
     };
 
-    const handleAddRule = () => {
-      const newRules = (drillThroughRules || []).concat([
-        {
-          id: uuidv4(),
-        },
-      ]);
-      handleDrillThroughSettingChange(undefined, newRules);
+    const handleViewDetailMapperChange = e => {
+      const mapper = e.target.value;
+      handleViewDetailSettingChange(undefined, mapper);
     };
 
-    const handleDeleteRule = (id: string) => {
-      const newRules = drillThroughRules?.filter(r => r.id !== id);
-      handleDrillThroughSettingChange(undefined, newRules);
+    const handleViewDetailCustomFieldsChange = values => {
+      handleViewDetailSettingChange(undefined, undefined, values);
     };
 
-    const handleUpdateRule = (id: string, prop: string, value: any) => {
-      const updatorIndex = (drillThroughRules || []).findIndex(
-        r => r.id === id,
-      );
-      if (updatorIndex > -1) {
-        const newRules = updateBy(drillThroughRules, draft => {
-          draft![updatorIndex][prop] = value;
-        });
-        handleDrillThroughSettingChange(undefined, newRules);
-      }
-    };
-
-    const handleDrillThroughSettingChange = (
+    const handleViewDetailSettingChange = (
       newEvent?: string,
-      newRules?: InteractionRule[],
+      newMapper?: InteractionFieldMapper,
+      customFields?: string[],
     ) => {
-      let newSetting: DrillThroughSetting = {
-        event: drillThroughEvent,
-        rules: drillThroughRules,
+      let newSetting: ViewDetailSetting = {
+        event: newEvent || event,
+        mapper: newMapper || mapper,
+        [InteractionFieldMapper.Customize]: customFields,
       };
       if (newEvent) {
-        newSetting.event = newEvent;
-        setDrillThroughEvent(newEvent);
+        setEvent(newEvent);
       }
-      if (newRules) {
-        newSetting.rules = [...newRules];
-        setDrillThroughRules([...newRules]);
+      if (newMapper) {
+        setMapper(newMapper);
+      }
+      if (!isEmptyArray(customFields)) {
+        setCustomFields(customFields!);
       }
       onChange?.(ancestors, newSetting, false);
     };
@@ -99,35 +84,51 @@ const ViewDetailPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           wrapperCol={{ span: 18 }}
           layout="horizontal"
           size="middle"
-          // onValuesChange={onFormLayoutChange}
+          initialValues={{ event, mapper, custom: customFields }}
         >
-          <Form.Item label={t('drillThrough.event')} name="event">
+          <Form.Item label={t('viewDetail.event')} name="event">
             <Radio.Group
               defaultValue={InteractionMouseEvent.Left}
-              onChange={handleDrillThroughEventChange}
-              value={drillThroughEvent}
+              onChange={handleViewDetailEventChange}
             >
               <Radio value={InteractionMouseEvent.Left}>
-                {t('drillThrough.leftClick')}
+                {t('viewDetail.leftClick')}
               </Radio>
               <Radio value={InteractionMouseEvent.Right}>
-                {t('drillThrough.rightClick')}
+                {t('viewDetail.rightClick')}
               </Radio>
             </Radio.Group>
           </Form.Item>
-          <Form.Item label={t('drillThrough.rule.title')} name="rule">
-            <Button type="link" onClick={handleAddRule}>
-              {t('drillThrough.rule.addRule')}
-            </Button>
-            <RuleList
-              vizs={vizs}
-              dataview={dataview}
-              rules={drillThroughRules}
-              onRuleChange={handleUpdateRule}
-              onDeleteRule={handleDeleteRule}
-              translate={t}
-            />
+          <Form.Item label={t('viewDetail.field')} name="mapper">
+            <Radio.Group
+              defaultValue={InteractionFieldMapper.All}
+              onChange={handleViewDetailMapperChange}
+            >
+              <Radio value={InteractionFieldMapper.All}>
+                {t('viewDetail.all')}
+              </Radio>
+              <Radio value={InteractionFieldMapper.Customize}>
+                {t('viewDetail.customize')}
+              </Radio>
+            </Radio.Group>
           </Form.Item>
+          {mapper === InteractionFieldMapper.Customize && (
+            <Form.Item label=" " colon={false} name="custom">
+              <Select
+                mode="multiple"
+                allowClear
+                onChange={handleViewDetailCustomFieldsChange}
+              >
+                {dataview?.meta?.map(f => {
+                  return (
+                    <Select.Option key={f.id} value={f.name}>
+                      {f.name}
+                    </Select.Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          )}
         </Form>
       </StyledDrillThroughPanel>
     );

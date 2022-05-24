@@ -99,7 +99,7 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           wrapperCol={{ span: 18 }}
           layout="horizontal"
           size="middle"
-          // onValuesChange={onFormLayoutChange}
+          initialValues={{ event: drillThroughEvent }}
         >
           <Form.Item label={t('drillThrough.event')} name="event">
             <Radio.Group

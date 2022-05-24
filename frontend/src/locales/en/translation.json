@@ -808,8 +808,14 @@
             }
           }
         },
-        "viewData": {
-          "title": "View Data"
+        "viewDetail": {
+          "title": "View Detail",
+          "event": "Ineraction Event",
+          "leftClick": "Left Click",
+          "rightClick": "Right Click",
+          "field": "Selected Fields",
+          "all": "All",
+          "customize": "Customize"
         }
       },
       "present": {
