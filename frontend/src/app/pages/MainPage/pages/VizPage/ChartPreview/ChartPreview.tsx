@@ -20,8 +20,14 @@ import { message, Spin } from 'antd';
 import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
-import { InteractionAction } from 'app/components/FormGenerator/constants';
-import { DrillThroughSetting } from 'app/components/FormGenerator/Customize/Interaction/types';
+import {
+  InteractionAction,
+  InteractionMouseEvent,
+} from 'app/components/FormGenerator/constants';
+import {
+  DrillThroughSetting,
+  ViewDetailSetting,
+} from 'app/components/FormGenerator/Customize/Interaction/types';
 import { VizHeader } from 'app/components/VizHeader';
 import { ChartDataViewFieldCategory } from 'app/constants';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
@@ -47,6 +53,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
+import useDisplayViewDetail from '../hooks/useDisplayViewDetail';
 import useDrillThrough from '../hooks/useDrillThrough';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import useUrlParams from '../hooks/useUrlParams';
@@ -113,15 +120,17 @@ const ChartPreviewBoard: FC<{
     const history = useHistory();
     const vizs = useSelector(selectVizs);
     const [openNewTab, openBrowserTab] = useDrillThrough();
+    const [openViewDetailPanel, viewDetailPanelContextHolder] =
+      useDisplayViewDetail();
     const location = useLocation();
     const { parse } = useUrlParams();
 
     useEffect(() => {
-      console.log('etra filters ---->1 ', parse(location.search));
-      console.log(
-        'etra filters ---->2 ',
-        urlSearchTransfer.toParams(location.search),
-      );
+      // console.log('etra filters ---->1 ', parse(location.search));
+      // console.log(
+      //   'etra filters ---->2 ',
+      //   urlSearchTransfer.toParams(location.search),
+      // );
 
       const filterSearchParams = filterSearchUrl
         ? urlSearchTransfer.toParams(filterSearchUrl)
@@ -198,11 +207,16 @@ const ChartPreviewBoard: FC<{
     );
 
     const handleDrillThroughEvent = useCallback(() => {
-      const setting = getStyles(
+      const drillThroughSetting = getStyles(
         chartPreview?.chartConfig?.interactions || [],
         ['drillThrough'],
         ['setting'],
       )?.[0] as DrillThroughSetting;
+      const viewDetailSetting = getStyles(
+        chartPreview?.chartConfig?.interactions || [],
+        ['viewDetail'],
+        ['setting'],
+      )?.[0] as ViewDetailSetting;
 
       const jumpFilters = new ChartDataRequestBuilder(
         {
@@ -222,16 +236,18 @@ const ChartPreviewBoard: FC<{
 
       // TODO: user selected filter
       // TODO: mapper by custom if exist
-      console.log(' filter ---> ', jumpFilters);
 
-      if (setting?.event === 'left') {
-        const rule = setting?.rules?.[0];
+      if (drillThroughSetting?.event === InteractionMouseEvent.Left) {
+        const rule = drillThroughSetting?.rules?.[0];
         if (rule?.action === InteractionAction.Redirect) {
           openNewTab(orgId, rule?.jumpToChart?.relId, jumpFilters);
         }
         if (rule?.action === InteractionAction.Window) {
           openBrowserTab(orgId, rule?.jumpToChart?.relId, jumpFilters);
         }
+      }
+      if (viewDetailSetting?.event === InteractionMouseEvent.Left) {
+        (openViewDetailPanel as VoidFunction)();
       }
     }, [
       chartPreview?.backendChart?.config?.aggregation,
@@ -241,6 +257,7 @@ const ChartPreviewBoard: FC<{
       chartPreview?.chartConfig?.datas,
       chartPreview?.chartConfig?.interactions,
       chartPreview?.chartConfig?.settings,
+      openViewDetailPanel,
       openBrowserTab,
       openNewTab,
       orgId,
@@ -557,6 +574,7 @@ const ChartPreviewBoard: FC<{
             <StyledChartDrillPathsContainer />
           </ChartDrillContext.Provider>
         </PreviewBlock>
+        {viewDetailPanelContextHolder}
       </StyledChartPreviewBoard>
     );
   },

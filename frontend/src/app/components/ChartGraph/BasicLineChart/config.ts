@@ -478,7 +478,7 @@ const config: ChartConfig = {
       rows: [
         {
           label: 'viewDetail.title',
-          key: 'detail',
+          key: 'setting',
           comType: 'interaction.viewDetail',
         },
       ],
