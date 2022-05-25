@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { TabWidgetContent, WidgetInfo } from '../../../Board/slice/types';
