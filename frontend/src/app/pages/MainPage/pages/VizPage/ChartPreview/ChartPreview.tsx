@@ -45,6 +45,7 @@ import {
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
   getStyles,
+  getValue,
 } from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
@@ -207,37 +208,48 @@ const ChartPreviewBoard: FC<{
     );
 
     const handleDrillThroughEvent = useCallback(() => {
+      const enableDrillThrough = getValue(
+        chartPreview?.chartConfig?.interactions || [],
+        ['drillThrough'],
+      );
       const drillThroughSetting = getStyles(
         chartPreview?.chartConfig?.interactions || [],
         ['drillThrough'],
         ['setting'],
       )?.[0] as DrillThroughSetting;
+      const enableViewDetail = getValue(
+        chartPreview?.chartConfig?.interactions || [],
+        ['viewDetail'],
+      );
       const viewDetailSetting = getStyles(
         chartPreview?.chartConfig?.interactions || [],
         ['viewDetail'],
         ['setting'],
       )?.[0] as ViewDetailSetting;
 
-      const jumpFilters = new ChartDataRequestBuilder(
-        {
-          id: chartPreview?.backendChart?.view?.id || '',
-          config: chartPreview?.backendChart?.view.config || {},
-          computedFields:
-            chartPreview?.backendChart?.config.computedFields || [],
-        },
-        chartPreview?.chartConfig?.datas,
-        chartPreview?.chartConfig?.settings,
-        {},
-        false,
-        chartPreview?.backendChart?.config?.aggregation,
-      )
-        .addDrillOption(drillOptionRef?.current)
-        .buildAllFilters();
+      if (
+        enableDrillThrough &&
+        drillThroughSetting?.event === InteractionMouseEvent.Left
+      ) {
+        const jumpFilters = new ChartDataRequestBuilder(
+          {
+            id: chartPreview?.backendChart?.view?.id || '',
+            config: chartPreview?.backendChart?.view.config || {},
+            computedFields:
+              chartPreview?.backendChart?.config.computedFields || [],
+          },
+          chartPreview?.chartConfig?.datas,
+          chartPreview?.chartConfig?.settings,
+          {},
+          false,
+          chartPreview?.backendChart?.config?.aggregation,
+        )
+          .addDrillOption(drillOptionRef?.current)
+          .buildAllFilters();
 
-      // TODO: user selected filter
-      // TODO: mapper by custom if exist
+        // TODO: user selected filter
+        // TODO: mapper by custom if exist
 
-      if (drillThroughSetting?.event === InteractionMouseEvent.Left) {
         const rule = drillThroughSetting?.rules?.[0];
         if (rule?.action === InteractionAction.Redirect) {
           openNewTab(orgId, rule?.jumpToChart?.relId, jumpFilters);
@@ -246,7 +258,10 @@ const ChartPreviewBoard: FC<{
           openBrowserTab(orgId, rule?.jumpToChart?.relId, jumpFilters);
         }
       }
-      if (viewDetailSetting?.event === InteractionMouseEvent.Left) {
+      if (
+        enableViewDetail &&
+        viewDetailSetting?.event === InteractionMouseEvent.Left
+      ) {
         (openViewDetailPanel as VoidFunction)();
       }
     }, [
