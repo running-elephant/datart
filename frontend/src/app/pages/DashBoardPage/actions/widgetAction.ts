@@ -430,7 +430,7 @@ export const changeViewGroupRectAction =
     const viewBoardState = rootState.board as BoardState;
     const widgetMap = viewBoardState.widgetRecord[boardId];
     if (!wid) return;
-    const widget = widgetMap[wid];
+    const widget = widgetMap?.[wid];
     if (!widget) return;
     const parentWidget = widgetMap[widget.parentId || ''];
     const rect: RectConfig = {
@@ -483,7 +483,7 @@ export const changeEditGroupRectAction =
       .stack.present;
     const widgetMap = editBoardState.widgetRecord;
     if (!wid) return;
-    const widget = widgetMap[wid];
+    const widget = widgetMap?.[wid];
     if (!widget) return;
     const parentWidget = widgetMap[widget.parentId || ''];
     const rect: RectConfig = {

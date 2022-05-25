@@ -175,10 +175,17 @@ export const editBoardStackSlice = createSlice({
     deleteWidgets(state, action: PayloadAction<string[]>) {
       const ids = action.payload;
       if (!ids?.length) return;
+
       ids.forEach(id => {
+        const targetWidget = state.widgetRecord?.[id];
+        const parent = state.widgetRecord?.[targetWidget.parentId];
+        if (parent) {
+          parent.config.children = parent.config.children?.filter(
+            t => t !== targetWidget.id,
+          );
+        }
         delete state.widgetRecord[id];
       });
-      // deleteEffect(state.widgetRecord);
     },
 
     updateWidget(state, action: PayloadAction<Widget>) {
@@ -317,7 +324,16 @@ export const editBoardStackSlice = createSlice({
         adjustGroupWidgets({ groupIds: parentIds, widgetMap });
       }
     },
-
+    adjustGroupWidgets(
+      state,
+      action: PayloadAction<{
+        groupIds: string[];
+      }>,
+    ) {
+      const { groupIds } = action.payload;
+      const widgetMap = state.widgetRecord;
+      adjustGroupWidgets({ groupIds: groupIds, widgetMap });
+    },
     /* tabs widget */
     addWidgetToTabWidget(
       state,
@@ -397,6 +413,7 @@ export const editBoardStackSlice = createSlice({
         dragParent.config.children = dragParent.config.children?.filter(
           t => t !== dragWidget.id,
         );
+
         if (dragParent.config.originalType === ORIGINAL_TYPE_MAP.tab) {
           const srcTabItemMap = (dragParent.config.content as TabWidgetContent)
             .itemMap;
@@ -412,7 +429,9 @@ export const editBoardStackSlice = createSlice({
       //
       dragWidget.config.index = newIndex;
       dragWidget.parentId = targetId;
-
+      if (widgetMap[targetId]) {
+        widgetMap[targetId].config.children?.push(dragWidget.id);
+      }
       //
     },
 

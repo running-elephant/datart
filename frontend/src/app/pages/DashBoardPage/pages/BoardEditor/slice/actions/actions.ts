@@ -192,7 +192,9 @@ export const copyWidgetsAction = (wIds?: string[]) => (dispatch, getState) => {
       Object.values(content.itemMap).forEach(item => {
         if (item.childWidgetId) {
           const subWidget = widgetMap[item.childWidgetId];
-          newWidgets[subWidget.id] = subWidget;
+          if (subWidget) {
+            newWidgets[subWidget.id] = subWidget;
+          }
         }
       });
     }
@@ -265,7 +267,6 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
           };
           return acc;
         }, {} as Record<string, ContainerItem>);
-        debugger;
         content.itemMap = newItemMap;
       }
       //chart
