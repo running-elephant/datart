@@ -105,7 +105,7 @@ export const getInitBoardInfo = (obj: {
     fullScreenItemId: '',
     layouts: [],
     isDroppable: false,
-    clipboardWidgets: {},
+    clipboardWidgetMap: {},
     widgetIds: obj.widgetIds || [],
     controllerPanel: {
       type: 'hide',
