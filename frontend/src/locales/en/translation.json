@@ -353,14 +353,6 @@
           "selectController": "Select ..",
           "textController": "Enter text"
         },
-        "controllerPlaceHolders": {
-          "multiSelectController": "Select ..",
-          "numberController": "Enter a number",
-          "rangeNumberControllerMin": "Min",
-          "rangeNumberControllerMax": "Max",
-          "selectController": "Select ..",
-          "textController": "Enter text"
-        },
         "controllerVisibilityTypes": {
           "hide": "Hide",
           "show": "Show",
