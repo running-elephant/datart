@@ -18,6 +18,7 @@
 import { TreeDataNode } from 'antd';
 import { renderIcon } from 'app/hooks/useGetVizIcon';
 import { WidgetDropdownList } from 'app/pages/DashBoardPage/components/WidgetComponents/WidgetDropdownList';
+import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import classNames from 'classnames';
@@ -25,7 +26,6 @@ import { FC, memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { G30, PRIMARY } from 'styles/StyleConstants';
-import widgetManager from '../../../../components/WidgetManager/index';
 import { editWidgetInfoActions } from '../../slice';
 
 export interface LayerNode extends TreeDataNode {
@@ -73,7 +73,8 @@ export const TreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
     [dispatch],
   );
   const icon = useMemo(() => {
-    return widgetManager.meta(widget.config.originalType).icon;
+    const iconStr = widgetManager.meta(widget.config.originalType).icon;
+    return renderIcon(iconStr);
   }, [widget.config.originalType]);
   return (
     <StyledWrapper>
@@ -82,7 +83,7 @@ export const TreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
         className={classNames('layer-item', { selected: selected })}
       >
         <span className="widget-name" title={title as string}>
-          <span className="widget-icon"> {renderIcon(icon)}</span>
+          <span className="widget-icon">{icon}</span>
           {String(title) || 'untitled-widget'}
         </span>
 

@@ -1,17 +1,72 @@
 @font-face {
   font-family: "iconfont"; /* Project id 2869064 */
-  src: url('iconfont.woff2?t=1645528895434') format('woff2'),
-       url('iconfont.woff?t=1645528895434') format('woff'),
-       url('iconfont.ttf?t=1645528895434') format('truetype');
+  src: url('iconfont.woff2?t=1653452426739') format('woff2'),
+       url('iconfont.woff?t=1653452426739') format('woff'),
+       url('iconfont.ttf?t=1653452426739') format('truetype');
 }
 
 .iconfont {
   font-family: "iconfont" !important;
-  font-size: 20px;
-  line-height: 20px;
+  font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-group-widget:before {
+  content: "\e8b6";
+}
+
+.icon-image-widget:before {
+  content: "\e7de";
+}
+
+.icon-reset-widget:before {
+  content: "\e7fe";
+}
+
+.icon-time-widget:before {
+  content: "\eb2a";
+}
+
+.icon-video-widget:before {
+  content: "\e76d";
+}
+
+.icon-control-widget:before {
+  content: "\e6eb";
+}
+
+.icon-query-widget:before {
+  content: "\e828";
+}
+
+.icon-embed-widget:before {
+  content: "\e991";
+}
+
+.icon-tab-widget:before {
+  content: "\e7d2";
+}
+
+.icon-ownedChart-widget:before {
+  content: "\e61a";
+}
+
+.icon-linkedChart-widget:before {
+  content: "\e61b";
+}
+
+.icon-join_inner:before {
+  content: "\e609";
+}
+
+.icon-join_right:before {
+  content: "\e612";
+}
+
+.icon-join_left:before {
+  content: "\e619";
 }
 
 .icon-CombinedShape:before {
@@ -76,6 +131,10 @@
 
 .icon-areachart:before {
   content: "\ebc7";
+}
+
+.icon-areachart2:before {
+  content: "\e7af";
 }
 
 .icon-fsux_tubiao_ditu:before {
