@@ -123,6 +123,7 @@ export const widgetToolkit: WidgetToolkit = {
             {
               attributes: {
                 size: '24px',
+                color: '#448aff',
                 italic: true,
               },
               insert: 'ABCDEFG...',
