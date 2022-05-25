@@ -17,7 +17,9 @@
  */
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
+import { editBoardStackActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import { memo, useContext, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { LEVEL_10 } from 'styles/StyleConstants';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
@@ -29,13 +31,21 @@ export const GroupWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const { onEditDeleteActiveWidgets } = useContext(WidgetActionContext);
   const boardType = widget.config.boardType;
-
+  const dispatch = useDispatch();
+  // adjustGroupWidgets
   useEffect(() => {
+    dispatch(
+      editBoardStackActions.adjustGroupWidgets({ groupIds: [widget.id] }),
+    );
     if (!widget.config.children?.length) {
       onEditDeleteActiveWidgets([widget.id]);
     }
-  }, [onEditDeleteActiveWidgets, widget.config.children?.length, widget.id]);
-
+  }, [
+    dispatch,
+    onEditDeleteActiveWidgets,
+    widget.config.children?.length,
+    widget.id,
+  ]);
   if (boardType === 'auto' && !widget.parentId) {
     return <AutoGroupWidget />;
   } else {
