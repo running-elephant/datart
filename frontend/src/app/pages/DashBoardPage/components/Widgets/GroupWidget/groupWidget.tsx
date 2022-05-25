@@ -32,7 +32,7 @@ export const GroupWidget: React.FC<{}> = memo(() => {
   const { onEditDeleteActiveWidgets } = useContext(WidgetActionContext);
   const boardType = widget.config.boardType;
   const dispatch = useDispatch();
-  // adjustGroupWidgets
+
   useEffect(() => {
     dispatch(
       editBoardStackActions.adjustGroupWidgets({ groupIds: [widget.id] }),
@@ -60,7 +60,7 @@ export const FreeGroupWidget: React.FC<{}> = memo(() => {
   const { onChangeGroupRect } = useContext(WidgetActionContext);
 
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
-    refreshRate: 1,
+    refreshRate: 20,
   });
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export const AutoGroupWidget: React.FC<{}> = memo(() => {
   const { editing } = useContext(BoardContext);
   const { onChangeGroupRect } = useContext(WidgetActionContext);
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
-    refreshRate: 1,
+    refreshRate: 20,
   });
 
   useEffect(() => {
