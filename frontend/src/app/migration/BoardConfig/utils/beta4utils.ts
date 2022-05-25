@@ -323,8 +323,10 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
     newWidget = commonBeta4Convert(newWidget, widget);
 
     const oldConf = widget.config.content.timerConfig;
+
     newWidget.config.customConfig.props?.forEach(prop => {
       // timerGroup
+      if (!oldConf) return;
       if (prop.key === 'timerGroup') {
         prop.rows?.forEach(row => {
           if (row.key === 'time') {
