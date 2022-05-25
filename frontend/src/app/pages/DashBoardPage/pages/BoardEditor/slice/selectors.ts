@@ -192,7 +192,7 @@ export const selectShowBlockMask = createSelector(
 // record Clipboard
 export const selectClipboardWidgets = createSelector(
   [boardInfoState],
-  boardInfo => boardInfo.clipboardWidgets || [],
+  boardInfo => boardInfo.clipboardWidgetMap || [],
 );
 // editWidgetData
 export const editWidgetDataState = (state: { editBoard: EditBoardState }) =>

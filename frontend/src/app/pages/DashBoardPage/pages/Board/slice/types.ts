@@ -393,7 +393,7 @@ export interface BoardInfo {
   fullScreenItemId: string; // 全屏状态
   showBlockMask: boolean; //?
   isDroppable: boolean;
-  clipboardWidgets: Record<string, WidgetOfCopy>;
+  clipboardWidgetMap: Record<string, WidgetOfCopy>;
   layouts: Layout[];
   deviceType: DeviceType; // deviceType for autoBoard defaultValue = desktop
   widgetIds: string[]; // board保存的时候 区分那些是删除的，哪些是新增的

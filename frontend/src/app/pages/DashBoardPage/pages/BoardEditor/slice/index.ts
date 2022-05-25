@@ -77,12 +77,12 @@ const editDashBoardInfoSlice = createSlice({
     },
     addClipboardWidgets(
       state,
-      action: PayloadAction<BoardInfo['clipboardWidgets']>,
+      action: PayloadAction<BoardInfo['clipboardWidgetMap']>,
     ) {
-      state.clipboardWidgets = action.payload;
+      state.clipboardWidgetMap = action.payload;
     },
     clearClipboardWidgets(state) {
-      state.clipboardWidgets = {};
+      state.clipboardWidgetMap = {};
     },
     changeChartEditorProps(
       state,
