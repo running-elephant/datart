@@ -32,7 +32,6 @@ export const GroupWidget: React.FC<{}> = memo(() => {
   const { onEditDeleteActiveWidgets } = useContext(WidgetActionContext);
   const boardType = widget.config.boardType;
   const dispatch = useDispatch();
-
   useEffect(() => {
     dispatch(
       editBoardStackActions.adjustGroupWidgets({ groupIds: [widget.id] }),
