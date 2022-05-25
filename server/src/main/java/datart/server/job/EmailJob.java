@@ -37,7 +37,7 @@ public class EmailJob extends ScheduleJob {
 
     private final MailService mailService;
 
-    private final String imageHtml = "<image src='cid:$CID$' style='width:100%;height:auto;max-width:100%;display:block'>";
+    private final String imageHtml = "<img src='cid:$CID$' style='width:100%;height:auto;max-width:100%;display:block'>";
 
     public EmailJob() {
         mailService = Application.getBean(MailService.class);
