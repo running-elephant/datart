@@ -974,7 +974,9 @@
         "multiSelect": "MultiSelect",
         "zoomIn": "Zoom Out",
         "zoomOut": "Zoom In",
-        "widgetList": "Widget List"
+        "widgetList": "Widget List",
+        "group": "Group",
+        "unGroup": "Ungroup"
       },
       "controlTypes": {
         "common": "Common",

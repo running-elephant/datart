@@ -57,6 +57,7 @@ import {
   onComposeGroupAction,
   onUnGroupAction,
   pasteWidgetsAction,
+  selectWidgetAction,
   widgetsToPositionAction,
 } from '../../pages/BoardEditor/slice/actions/actions';
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
@@ -81,6 +82,9 @@ export const WidgetActionProvider: FC<{
         onEditLayerToBottom: () => {
           dispatch(widgetsToPositionAction('bottom'));
         },
+        onEditSelectWidget: args => {
+          dispatch(selectWidgetAction(args));
+        },
         onEditCopyWidgets: (ids?: string[]) => {
           dispatch(copyWidgetsAction());
         },
@@ -93,7 +97,6 @@ export const WidgetActionProvider: FC<{
             dispatch(changeGroupRectAction({ renderMode, boardId, wid, w, h }));
           },
           60,
-          { trailing: true },
         ),
 
         onEditDeleteActiveWidgets: debounce((ids?: string[]) => {
@@ -309,7 +312,12 @@ export interface WidgetActionContextProps {
   onWidgetsReset: () => void;
 
   // editor
-
+  // selectWidget
+  onEditSelectWidget: (args: {
+    multipleKey: boolean;
+    id: string;
+    selected: boolean;
+  }) => void;
   onEditChartWidget: (widget: Widget) => void;
   onEditContainerWidget: (wid: string) => void;
   onEditMediaWidget: (wid: string) => void;

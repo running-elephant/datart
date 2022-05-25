@@ -17,7 +17,7 @@
  */
 import { WidgetInfo } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import classnames from 'classnames';
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { LEVEL_20, LEVEL_5 } from 'styles/StyleConstants';
@@ -28,6 +28,7 @@ import {
 } from '../../pages/BoardEditor/slice';
 import { selectShowBlockMask } from '../../pages/BoardEditor/slice/selectors';
 import { Widget } from '../../types/widgetTypes';
+import { WidgetActionContext } from '../ActionProvider/WidgetActionProvider';
 
 export interface BlockMaskLayerProps {
   widget: Widget;
@@ -36,18 +37,17 @@ export interface BlockMaskLayerProps {
 export const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
   ({ widget, widgetInfo }) => {
     const dispatch = useDispatch();
+    const { onEditSelectWidget } = useContext(WidgetActionContext);
     const showBlockMask = useSelector(selectShowBlockMask);
     const onMouseDown = useCallback(
       (e: React.MouseEvent<HTMLDivElement>) => {
-        dispatch(
-          editWidgetInfoActions.selectWidget({
-            multipleKey: e.shiftKey,
-            id: widget.id,
-            selected: true,
-          }),
-        );
+        onEditSelectWidget({
+          multipleKey: e.shiftKey,
+          id: widget.id,
+          selected: true,
+        });
       },
-      [dispatch, widget.id],
+      [onEditSelectWidget, widget.id],
     );
 
     const doubleClick = useCallback(() => {

@@ -18,7 +18,10 @@
 import { ChartEditorBaseProps } from 'app/components/ChartEditor';
 import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import { initClientId } from 'app/pages/DashBoardPage/components/WidgetManager/utils/init';
-import { getParentRect } from 'app/pages/DashBoardPage/components/Widgets/GroupWidget/utils';
+import {
+  findParentIds,
+  getParentRect,
+} from 'app/pages/DashBoardPage/components/Widgets/GroupWidget/utils';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
@@ -290,35 +293,6 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
     dataChartMap,
     newWidgetMapping,
   });
-  // clipboardWidgetList.forEach(widget => {
-  //   if (widget.selectedCopy) {
-  //     const newWidget = cloneWidget(widget);
-
-  //     if (newWidget.config.type === 'container') {
-  //       const content = newWidget.config.content as TabWidgetContent;
-  //       Object.values(content.itemMap).forEach(item => {
-  //         if (item.childWidgetId) {
-  //           const subWidget = clipboardWidgetMap[item.childWidgetId];
-  //           const newSubWidget = cloneWidget(subWidget, newWidget.id);
-  //           item.childWidgetId = newSubWidget.id;
-  //           newWidgets.push(newSubWidget);
-  //         }
-  //       });
-  //     } else if (newWidget.config.type === 'group') {
-  //     } else if (newWidget.config.type === 'chart') {
-  //       // #issue #588
-  //       let dataChart = dataChartMap[newWidget.datachartId];
-  //       const newDataChart: DataChart = CloneValueDeep({
-  //         ...dataChart,
-  //         id: dataChart.id + Date.now() + '_copy',
-  //       });
-  //       newWidget.config.originalType = ORIGINAL_TYPE_MAP.ownedChart;
-  //       newWidget.datachartId = newDataChart.id;
-  //       dispatch(boardActions.setDataChartToMap([newDataChart]));
-  //     }
-  //     newWidgets.push(newWidget);
-  //   }
-  // });
   const widgetInfos = newWidgets.map(widget => {
     const widgetInfo = createWidgetInfo(widget.id);
     return widgetInfo;
@@ -617,3 +591,21 @@ export const dropLayerNodeAction = info => (dispatch, getState) => {
     return;
   }
 };
+
+export const selectWidgetAction =
+  (args: { multipleKey: boolean; id: string; selected: boolean }) =>
+  (dispatch, getState) => {
+    const { multipleKey, id, selected } = args;
+    const editBoard = getState().editBoard as HistoryEditBoard;
+    const widgetMap = editBoard.stack.present.widgetRecord;
+    const parentIds: string[] = [];
+    findParentIds({ widget: widgetMap[id], widgetMap, parentIds });
+    dispatch(
+      editWidgetInfoActions.selectWidget({
+        multipleKey,
+        id,
+        selected,
+        parentIds,
+      }),
+    );
+  };

@@ -85,7 +85,7 @@ export const AutoGroupWidget: React.FC<{}> = memo(() => {
   const { editing } = useContext(BoardContext);
   const { onChangeGroupRect } = useContext(WidgetActionContext);
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
-    refreshRate: 20,
+    refreshRate: 100,
   });
 
   useEffect(() => {

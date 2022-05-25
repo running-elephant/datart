@@ -148,9 +148,10 @@ const widgetInfoRecordSlice = createSlice({
         multipleKey: boolean;
         id: string;
         selected: boolean;
+        parentIds: string[];
       }>,
     ) {
-      const { multipleKey, id, selected } = action.payload;
+      const { multipleKey, id, selected, parentIds } = action.payload;
       if (multipleKey) {
         state[id].selected = selected;
       } else {
@@ -161,6 +162,11 @@ const widgetInfoRecordSlice = createSlice({
             state[key].selected = false;
           }
         }
+        parentIds.forEach(id => {
+          if (state[id]) {
+            state[id].editing = true;
+          }
+        });
       }
     },
     selectSubWidget(state, action: PayloadAction<string>) {

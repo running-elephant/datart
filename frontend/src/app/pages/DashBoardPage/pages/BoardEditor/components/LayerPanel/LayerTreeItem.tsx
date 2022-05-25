@@ -23,10 +23,9 @@ import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import classNames from 'classnames';
 import { FC, memo, useCallback, useContext, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { G30, PRIMARY } from 'styles/StyleConstants';
-import { editWidgetInfoActions } from '../../slice';
+import { WidgetActionContext } from '../../../../components/ActionProvider/WidgetActionProvider';
 
 export interface LayerNode extends TreeDataNode {
   key: string;
@@ -58,19 +57,18 @@ export const LayerTreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
 export const TreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
   const { title, selected } = node;
   const widget = useContext(WidgetContext);
-  const dispatch = useDispatch();
+  const { onEditSelectWidget } = useContext(WidgetActionContext);
   const menuSelect = useCallback(
     (node: LayerNode) => e => {
       e.stopPropagation();
-      dispatch(
-        editWidgetInfoActions.selectWidget({
-          multipleKey: e.shiftKey,
-          id: node.key as string,
-          selected: true,
-        }),
-      );
+
+      onEditSelectWidget({
+        multipleKey: e.shiftKey,
+        id: node.key as string,
+        selected: true,
+      });
     },
-    [dispatch],
+    [onEditSelectWidget],
   );
   const icon = useMemo(() => {
     const iconStr = widgetManager.meta(widget.config.originalType).icon;
