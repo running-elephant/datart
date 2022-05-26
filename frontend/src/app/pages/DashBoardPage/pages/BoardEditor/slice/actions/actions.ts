@@ -554,10 +554,6 @@ export const dropLayerNodeAction = info => (dispatch, getState) => {
   const editBoard = getState().editBoard as HistoryEditBoard;
   const widgetMap = editBoard.stack.present.widgetRecord;
 
-  console.log('dragOver', targetNode.dragOver);
-  console.log('dragOverGapBottom', targetNode.dragOverGapBottom);
-  console.log('dragOverGapTop', targetNode.dragOverGapTop);
-
   /*
   1 -> group
   2 -> container
