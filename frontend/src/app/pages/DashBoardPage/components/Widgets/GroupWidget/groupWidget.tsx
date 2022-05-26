@@ -18,7 +18,7 @@
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { editBoardStackActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
-import { memo, useContext, useEffect } from 'react';
+import { memo, useContext, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { LEVEL_10 } from 'styles/StyleConstants';
@@ -58,13 +58,30 @@ export const FreeGroupWidget: React.FC<{}> = memo(() => {
   const rect = widget.config.rect;
   const { onChangeGroupRect } = useContext(WidgetActionContext);
 
-  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
-    refreshRate: 20,
+  const whRef = useRef<any>({
+    w: 0,
+    h: 0,
   });
-
+  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
+    refreshRate: 60,
+  });
   useEffect(() => {
+    whRef.current = {
+      w: cacheW,
+      h: cacheH,
+    };
     onChangeGroupRect({ wid, w: cacheW, h: cacheH });
   }, [cacheW, cacheH, wid, onChangeGroupRect]);
+
+  useEffect(() => {
+    const { w, h } = whRef.current;
+    let timer = setTimeout(() => {
+      onChangeGroupRect({ wid, w: w, h: h });
+    }, 0);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [onChangeGroupRect, wid]);
   return (
     <StyleWrapper className="group-wrapper" ref={cacheWhRef}>
       <AbsoluteWrapper className="group-absolute" x={rect.x} y={rect.y}>
@@ -83,13 +100,31 @@ export const AutoGroupWidget: React.FC<{}> = memo(() => {
   const wid = widget.id;
   const { editing } = useContext(BoardContext);
   const { onChangeGroupRect } = useContext(WidgetActionContext);
-  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
-    refreshRate: 100,
+  const whRef = useRef<any>({
+    w: 0,
+    h: 0,
   });
-
+  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
+    refreshRate: 60,
+  });
   useEffect(() => {
+    whRef.current = {
+      w: cacheW,
+      h: cacheH,
+    };
     onChangeGroupRect({ wid, w: cacheW, h: cacheH });
   }, [cacheW, cacheH, wid, onChangeGroupRect]);
+
+  useEffect(() => {
+    const { w, h } = whRef.current;
+    let timer = setTimeout(() => {
+      onChangeGroupRect({ wid, w: w, h: h });
+    }, 0);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [onChangeGroupRect, wid]);
+
   return (
     <StyleWrapper className="group-wrapper" ref={cacheWhRef}>
       <AbsoluteWrapper className="group-absolute" x={0} y={0}>

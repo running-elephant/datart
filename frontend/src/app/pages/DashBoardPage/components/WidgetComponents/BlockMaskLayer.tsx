@@ -17,7 +17,7 @@
  */
 import { WidgetInfo } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import classnames from 'classnames';
-import React, { memo, useCallback, useContext } from 'react';
+import { memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { LEVEL_20, LEVEL_5 } from 'styles/StyleConstants';
@@ -60,11 +60,19 @@ export const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
         }),
       );
     }, [dispatch, widget.id, widget.config.type]);
-
+    const hideBorder = useMemo(() => {
+      if (widget.config.originalType === ORIGINAL_TYPE_MAP.group) {
+        if (widget.config.boardType === 'auto' && !widget.parentId) {
+          return false;
+        }
+        return true;
+      }
+      return false;
+    }, [widget.config.boardType, widget.config.originalType, widget.parentId]);
     return (
       <MaskLayer
         front={showBlockMask && !widgetInfo.editing}
-        group={widget.config.originalType === ORIGINAL_TYPE_MAP.group}
+        hideBorder={hideBorder}
         className={classnames({
           [WIDGET_DRAG_HANDLE]: showBlockMask,
           selected: widgetInfo.selected,
@@ -77,7 +85,7 @@ export const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
   },
 );
 
-const MaskLayer = styled.div<{ front: boolean; group: boolean }>`
+const MaskLayer = styled.div<{ front: boolean; hideBorder: boolean }>`
   &:hover,
   &:active {
     border-color: ${p => p.theme.primary};
@@ -94,12 +102,12 @@ const MaskLayer = styled.div<{ front: boolean; group: boolean }>`
     }
   }
   &.editing {
-    border-color: ${p => (p.group ? 'transparent' : p.theme.success)};
+    border-color: ${p => (p.hideBorder ? 'transparent' : p.theme.success)};
     border-style: solid;
     border-width: 2px;
     &:hover,
     &:active {
-      border-width: ${p => (p.group ? 0 : '2px')};
+      border-width: ${p => (p.hideBorder ? 0 : '2px')};
     }
   }
   position: absolute;
