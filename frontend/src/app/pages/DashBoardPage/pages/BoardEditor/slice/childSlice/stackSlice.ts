@@ -116,7 +116,8 @@ export const editBoardStackSlice = createSlice({
           draft.dashboardId = board.id;
           draft.config.index = maxWidgetIndex;
           draft.config.name =
-            draft.config.name || `${newName}_${maxWidgetIndex}`;
+            draft.config.name ||
+            `${newName}_${Number(maxWidgetIndex.toFixed(4)) * 1000}`;
           draft.config.boardType = type;
         });
 
