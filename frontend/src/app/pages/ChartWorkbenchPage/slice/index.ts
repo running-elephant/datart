@@ -20,14 +20,13 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { migrateChartConfig } from 'app/migration';
 import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailConfig';
 import ChartManager from 'app/models/ChartManager';
-import { ChartConfig, ISelectionConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { transformHierarchyMeta } from 'app/utils/internalChartHelper';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { isUndefined } from '../../../../utils/object';
 import { ChartConfigReducerActionType } from './constant';
 import {
   fetchAvailableSourceFunctionsForChart,
@@ -46,7 +45,8 @@ export const initState: WorkbenchState = {
   aggregation: true,
   datasetLoading: false,
   chartEditorDownloadPolling: false,
-  selectionOption: [],
+  selectedItems: [],
+  multipleSelected: false,
 };
 
 // Reducers
@@ -154,18 +154,29 @@ const workbenchSlice = createSlice({
     setChartEditorDownloadPolling(state, { payload }: PayloadAction<boolean>) {
       state.chartEditorDownloadPolling = payload;
     },
-    singleSelectionOption(state, { payload }: PayloadAction<ISelectionConfig>) {
-      const findDataIndex = state.selectionOption?.find(
+    normalSelect(state, { payload }: PayloadAction<SelectedItem>) {
+      const index = state.selectedItems?.findIndex(
         v => v.index === payload.index,
       );
-      if (!isUndefined(findDataIndex)) {
-        state.selectionOption = [];
+      if (state.multipleSelected) {
+        if (index < 0) {
+          state.selectedItems.push(payload);
+        } else {
+          state.selectedItems.splice(index, 1);
+        }
       } else {
-        state.selectionOption = [payload];
+        if (index < 0 || state.selectedItems.length > 1) {
+          state.selectedItems = [payload];
+        } else {
+          state.selectedItems = [];
+        }
       }
     },
-    clearAllSelectionOption(state) {
-      state.selectionOption = [];
+    clearSelectedItems(state) {
+      state.selectedItems = [];
+    },
+    updateMultipleSelectedState(state, { payload }: PayloadAction<boolean>) {
+      state.multipleSelected = payload;
     },
   },
   extraReducers: builder => {
@@ -193,7 +204,7 @@ const workbenchSlice = createSlice({
         state.dataset = initState.dataset;
       })
       .addCase(fetchDataSetAction.fulfilled, (state, { payload }) => {
-        state.selectionOption = [];
+        state.selectedItems = [];
         state.dataset = payload as any;
         state.datasetLoading = false;
       })

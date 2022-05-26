@@ -21,9 +21,9 @@ import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
-  ISelectionConfig,
   LabelStyle,
   LegendStyle,
+  SelectedItem,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, {
   IChartDataSet,
@@ -36,7 +36,7 @@ import {
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
-  getSelectItemStyle,
+  getSelectedItemStyles,
   getSeriesTooltips4Scatter,
   getStyles,
   toFormattedValue,
@@ -52,7 +52,7 @@ import { Series, SeriesData } from './types';
 class BasicFunnelChart extends Chart {
   config = Config;
   chart: any = null;
-  useSelection = true;
+  selectable = true;
 
   constructor() {
     super(
@@ -95,7 +95,7 @@ class BasicFunnelChart extends Chart {
       options.dataset,
       options.config,
       options.drillOption,
-      options.selectionOption,
+      options.selectedItems,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
@@ -112,7 +112,7 @@ class BasicFunnelChart extends Chart {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption?: ChartDrillOption,
-    selectionOption?: ISelectionConfig[],
+    selectedItems?: SelectedItem[],
   ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -153,7 +153,7 @@ class BasicFunnelChart extends Chart {
       groupConfigs,
       dataList,
       infoConfigs,
-      selectionOption,
+      selectedItems,
     );
 
     return {
@@ -287,7 +287,7 @@ class BasicFunnelChart extends Chart {
     groupConfigs: ChartDataSectionField[],
     dataList: IChartDataSet<string>,
     infoConfigs: ChartDataSectionField[],
-    selectionOption?: ISelectionConfig[],
+    selectedItems?: SelectedItem[],
   ): Series {
     const [selectAll] = getStyles(styles, ['legend'], ['selectAll']);
     const [sort, funnelAlign, gap] = getStyles(
@@ -311,10 +311,10 @@ class BasicFunnelChart extends Chart {
             .concat(infoConfigs)
             .map(config => dc?.getCell(config)),
           name: getColumnRenderName(aggConfig),
-          ...getSelectItemStyle(
+          ...getSelectedItemStyles(
             0,
             acIndex,
-            selectionOption || [],
+            selectedItems || [],
             dataItemStyle,
           ),
           ...getExtraSeriesRowData(dc),
@@ -359,10 +359,10 @@ class BasicFunnelChart extends Chart {
             .concat(infoConfigs)
             .map(config => dc?.getCell(config)),
           name: groupConfigs.map(config => dc.getCell(config)).join('-'),
-          ...getSelectItemStyle(
+          ...getSelectedItemStyles(
             0,
             acIndex * dataList.length + dcIndex,
-            selectionOption || [],
+            selectedItems || [],
             dataItemStyle,
           ),
           ...getExtraSeriesRowData(dc),

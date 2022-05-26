@@ -95,7 +95,12 @@ export const selectAvailableSourceFunctions = createSelector(
   wb => wb.availableSourceFunctions,
 );
 
-export const selectionOptionSelector = createSelector(
+export const selectSelectedItems = createSelector(
   workbenchSelector,
-  wb => wb.selectionOption,
+  wb => wb.selectedItems,
+);
+
+export const selectMultipleSelectedState = createSelector(
+  workbenchSelector,
+  wb => wb.multipleSelected,
 );

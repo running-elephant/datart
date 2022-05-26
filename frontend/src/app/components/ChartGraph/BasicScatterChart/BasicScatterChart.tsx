@@ -21,9 +21,9 @@ import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
-  ISelectionConfig,
   LabelStyle,
   LegendStyle,
+  SelectedItem,
   YAxis,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
@@ -35,7 +35,7 @@ import {
   getGridStyle,
   getReference2,
   getScatterSymbolSizeFn,
-  getSelectItemStyle,
+  getSelectedItemStyles,
   getSeriesTooltips4Polar2,
   getStyles,
   transformToDataSet,
@@ -50,7 +50,7 @@ class BasicScatterChart extends Chart {
   dependency = [];
   config = Config;
   chart: any = null;
-  useSelection = true;
+  selectable = true;
 
   constructor() {
     super('scatter', 'viz.palette.graph.names.scatterChart', 'sandiantu');
@@ -89,7 +89,7 @@ class BasicScatterChart extends Chart {
       props.dataset,
       props.config,
       props.drillOption,
-      props.selectionOption,
+      props.selectedItems,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
@@ -106,7 +106,7 @@ class BasicScatterChart extends Chart {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption?: ChartDrillOption,
-    selectionOption?: ISelectionConfig[],
+    selectedItems?: SelectedItem[],
   ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -150,7 +150,7 @@ class BasicScatterChart extends Chart {
       infoConfigs,
       styleConfigs,
       settingConfigs,
-      selectionOption,
+      selectedItems,
     );
 
     return {
@@ -184,7 +184,7 @@ class BasicScatterChart extends Chart {
     infoConfigs: ChartDataSectionField[],
     styleConfigs: ChartStyleConfig[],
     settingConfigs: ChartStyleConfig[],
-    selectionOption?: ISelectionConfig[],
+    selectedItems?: SelectedItem[],
   ): ScatterMetricAndSizeSerie[] {
     const { min, max } = getDataColumnMaxAndMin2(
       chartDataSetRows,
@@ -204,7 +204,7 @@ class BasicScatterChart extends Chart {
           infoConfigs,
           styleConfigs,
           settingConfigs,
-          selectionOption,
+          selectedItems,
         ),
       ];
     }
@@ -241,7 +241,7 @@ class BasicScatterChart extends Chart {
         infoConfigs,
         styleConfigs,
         settingConfigs,
-        selectionOption,
+        selectedItems,
         k,
         groupedObjDataColumns?.[k]?.color,
         gcIndex,
@@ -258,7 +258,7 @@ class BasicScatterChart extends Chart {
     infoConfigs: ChartDataSectionField[],
     styleConfigs: ChartStyleConfig[],
     settingConfigs: ChartStyleConfig[],
-    selectionOption?: ISelectionConfig[],
+    selectedItems?: SelectedItem[],
     colorSeriesName?: string,
     color?: string,
     comIndex: number = 0,
@@ -274,7 +274,7 @@ class BasicScatterChart extends Chart {
         : defaultSizeValue;
       return {
         ...getExtraSeriesRowData(row),
-        ...getSelectItemStyle(comIndex, dcIndex, selectionOption || []),
+        ...getSelectedItemStyles(comIndex, dcIndex, selectedItems || []),
         name: groupConfigs?.map(row.getCell, row).join('-'),
         value: aggregateConfigs
           .map(row.getCell, row)

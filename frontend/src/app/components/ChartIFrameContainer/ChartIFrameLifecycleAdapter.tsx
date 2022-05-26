@@ -22,7 +22,7 @@ import { useFrame } from 'app/components/ReactFrameComponent';
 import { ChartLifecycle } from 'app/constants';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig, ISelectionConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -44,7 +44,8 @@ const ChartIFrameLifecycleAdapter: FC<{
   style: CSSProperties;
   isShown?: boolean;
   drillOption?: IChartDrillOption;
-  selectionOption?: ISelectionConfig[];
+  selectedItems?: SelectedItem[];
+  KeyboardEventListenerFun?: (event: KeyboardEvent) => void;
   widgetSpecialConfig?: any;
 }> = ({
   dataset,
@@ -53,8 +54,9 @@ const ChartIFrameLifecycleAdapter: FC<{
   style,
   isShown = true,
   drillOption,
-  selectionOption,
+  selectedItems,
   widgetSpecialConfig,
+  KeyboardEventListenerFun,
 }) => {
   const [chartResourceLoader] = useState(() => new ChartIFrameResourceLoader());
   const [containerStatus, setContainerStatus] = useState(ContainerStatus.INIT);
@@ -62,6 +64,19 @@ const ChartIFrameLifecycleAdapter: FC<{
   const [containerId] = useState(() => uuidv4());
   const eventBrokerRef = useRef<ChartIFrameEventBroker>();
   const translator = usePrefixI18N();
+
+  useEffect(() => {
+    if (KeyboardEventListenerFun) {
+      window?.addEventListener('keydown', KeyboardEventListenerFun);
+      window?.addEventListener('keyup', KeyboardEventListenerFun);
+    }
+    return () => {
+      if (KeyboardEventListenerFun) {
+        window?.removeEventListener('keydown', KeyboardEventListenerFun);
+        window?.removeEventListener('keyup', KeyboardEventListenerFun);
+      }
+    };
+  }, [window, KeyboardEventListenerFun]);
 
   /**
    * Chart Mount Event
@@ -95,7 +110,7 @@ const ChartIFrameLifecycleAdapter: FC<{
               config,
               widgetSpecialConfig,
               drillOption,
-              selectionOption,
+              selectedItems,
             },
             {
               document,
@@ -124,7 +139,7 @@ const ChartIFrameLifecycleAdapter: FC<{
   /**
    * Chart Update Event
    * Dependency: 'config', 'dataset', 'widgetSpecialConfig',
-   * 'containerStatus', 'document', 'window', 'isShown', 'drillOption', 'selectionOption'
+   * 'containerStatus', 'document', 'window', 'isShown', 'drillOption', 'selectedItems'
    */
   useEffect(() => {
     if (
@@ -144,7 +159,7 @@ const ChartIFrameLifecycleAdapter: FC<{
         config,
         widgetSpecialConfig,
         drillOption,
-        selectionOption,
+        selectedItems,
       },
       {
         document,
@@ -165,7 +180,7 @@ const ChartIFrameLifecycleAdapter: FC<{
     isShown,
     translator,
     drillOption,
-    selectionOption,
+    selectedItems,
   ]);
 
   /**
@@ -191,7 +206,7 @@ const ChartIFrameLifecycleAdapter: FC<{
         config,
         widgetSpecialConfig,
         drillOption,
-        selectionOption,
+        selectedItems,
       },
       {
         document,

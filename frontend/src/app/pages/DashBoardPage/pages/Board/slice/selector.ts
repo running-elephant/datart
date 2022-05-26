@@ -47,9 +47,13 @@ export const selectWidgetInfoGroupMap = createSelector(
   [boardState],
   state => state.widgetInfoRecord,
 );
-export const selectSelectionOption = createSelector(
+export const selectWidgetSelectedItemMap = createSelector(
   [boardState],
-  state => state.selectionOption,
+  state => state.selectedItems,
+);
+export const selectMultipleSelectedState = createSelector(
+  [boardState],
+  state => state.multipleSelected,
 );
 
 export const selectBoardById = createSelector(
@@ -97,17 +101,15 @@ export const selectWidgetInfoMap = createSelector(
   (widgetInfoGroupMap, id) => widgetInfoGroupMap[id] || DefaultObject,
 );
 
-export const selectionOptionList = createSelector(
-  selectSelectionOption,
-  selectPropsId,
-  (widgetInfoGroupMap, widgetId) => {
-    try {
-      return widgetInfoGroupMap?.[widgetId];
-    } catch (error) {
-      return [];
-    }
-  },
-);
+export const makeSelectSelectedItems = () => {
+  return createSelector(
+    selectWidgetSelectedItemMap,
+    selectPropsId,
+    (widgetInfoGroupMap, widgetId) => {
+      return widgetInfoGroupMap?.[widgetId] || [];
+    },
+  );
+};
 
 export const selectWidgetInfoBy2Id = createSelector(
   selectWidgetInfoGroupMap,

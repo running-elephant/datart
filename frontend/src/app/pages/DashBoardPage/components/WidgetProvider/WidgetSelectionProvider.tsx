@@ -16,37 +16,75 @@
  * limitations under the License.
  */
 
+import { SelectedItem } from 'app/types/ChartConfig';
 import { createContext, FC, memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ISelectionConfig } from '../../../../types/ChartConfig';
-import { selectionOptionList } from '../../pages/Board/slice/selector';
+import {
+  makeSelectSelectedItems,
+  selectMultipleSelectedState,
+} from '../../pages/Board/slice/selector';
 import { BoardState } from '../../pages/Board/slice/types';
-import { editorSelectionOptionList } from '../../pages/BoardEditor/slice/selectors';
+import {
+  makeSelectSelectedItemsInEditor,
+  selectMultipleSelectedStateInEditor,
+} from '../../pages/BoardEditor/slice/selectors';
 import { EditBoardState } from '../../pages/BoardEditor/slice/types';
 
-export const WidgetSelectionContext = createContext<ISelectionConfig[]>(
-  [] as ISelectionConfig[],
-);
+export const WidgetSelectionContext = createContext<{
+  selectedItems: SelectedItem[];
+  multipleSelected: boolean;
+}>({ selectedItems: [] as SelectedItem[], multipleSelected: false });
 
 export const WidgetSelectionProvider: FC<{
   boardEditing: boolean;
   widgetId: string;
 }> = memo(({ widgetId, boardEditing, children }) => {
   // 浏览模式
-  const readWidgetSelectionInfo = useSelector((state: { board: BoardState }) =>
-    selectionOptionList(state, widgetId),
+  const selectSelectedItems = useMemo(makeSelectSelectedItems, []);
+  const selectedItemsInBoard = useSelector((state: { board: BoardState }) =>
+    selectSelectedItems(state, widgetId),
   );
+  const multipleSelectedStateInBoard = useSelector(selectMultipleSelectedState);
+
   // 编辑模式
-  const editWidgetSelectionInfo = useSelector(
-    (state: { editBoard: EditBoardState }) =>
-      editorSelectionOptionList(state, widgetId),
+  const selectSelectedItemsInEditor = useMemo(
+    makeSelectSelectedItemsInEditor,
+    [],
   );
-  const selectionOption = useMemo(
-    () => (boardEditing ? editWidgetSelectionInfo : readWidgetSelectionInfo),
-    [boardEditing, editWidgetSelectionInfo, readWidgetSelectionInfo],
+  const selectedItemsInBoardEditor = useSelector(
+    (state: { editBoard: EditBoardState }) =>
+      selectSelectedItemsInEditor(state, widgetId),
+  );
+  const multipleSelectedStateInBoardEditor = useSelector(
+    (state: { editBoard: EditBoardState }) =>
+      selectMultipleSelectedStateInEditor(state),
+  );
+
+  const selectedItems = useMemo(
+    () => (boardEditing ? selectedItemsInBoardEditor : selectedItemsInBoard),
+    [boardEditing, selectedItemsInBoard, selectedItemsInBoardEditor],
+  );
+  const multipleSelected = useMemo(
+    () =>
+      boardEditing
+        ? multipleSelectedStateInBoardEditor
+        : multipleSelectedStateInBoard,
+    [
+      boardEditing,
+      multipleSelectedStateInBoard,
+      multipleSelectedStateInBoardEditor,
+    ],
+  );
+
+  const selectedConfig = useMemo(
+    () => ({
+      selectedItems,
+      multipleSelected,
+    }),
+    [selectedItems, multipleSelected],
   );
   return (
-    <WidgetSelectionContext.Provider value={selectionOption}>
+    <WidgetSelectionContext.Provider value={selectedConfig}>
       {children}
     </WidgetSelectionContext.Provider>
   );

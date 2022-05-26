@@ -23,9 +23,9 @@ import {
   ChartDataConfig,
   ChartDataSectionField,
   ChartStyleConfig,
-  ISelectionConfig,
   LabelStyle,
   LegendStyle,
+  SelectedItem,
   XAxis,
   XAxisColumns,
   YAxis,
@@ -39,7 +39,7 @@ import {
   getExtraSeriesRowData,
   getGridStyle,
   getReference2,
-  getSelectItemStyle,
+  getSelectedItemStyles,
   getSeriesTooltips4Rectangular2,
   getStyles,
   hadAxisLabelOverflowConfig,
@@ -58,7 +58,7 @@ import { BarBorderStyle, BarSeriesImpl, Series } from './types';
 class BasicBarChart extends Chart {
   config = Config;
   chart: any = null;
-  useSelection = true;
+  selectable = true;
 
   protected isHorizonDisplay = false;
   protected isStackMode = false;
@@ -110,7 +110,7 @@ class BasicBarChart extends Chart {
       options.dataset,
       options.config,
       options.drillOption,
-      options.selectionOption,
+      options.selectedItems,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
@@ -129,7 +129,7 @@ class BasicBarChart extends Chart {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption?: ChartDrillOption,
-    selectionOption?: ISelectionConfig[],
+    selectedItems?: SelectedItem[],
   ) {
     const styleConfigs: ChartStyleConfig[] = config.styles || [];
     const dataConfigs: ChartDataConfig[] = config.datas || [];
@@ -180,7 +180,7 @@ class BasicBarChart extends Chart {
       aggregateConfigs,
       infoConfigs,
       xAxisColumns,
-      selectionOption,
+      selectedItems,
     );
 
     const axisInfo = {
@@ -248,7 +248,7 @@ class BasicBarChart extends Chart {
     aggregateConfigs: ChartDataSectionField[],
     infoConfigs: ChartDataSectionField[],
     xAxisColumns: XAxisColumns[],
-    selectionOption?,
+    selectedItems?: SelectedItem[],
   ): Series[] {
     if (!colorConfigs.length) {
       return aggregateConfigs.map((aggConfig, sIndex) => {
@@ -264,7 +264,7 @@ class BasicBarChart extends Chart {
             return {
               ...getExtraSeriesRowData(dc),
               ...getExtraSeriesDataFormat(aggConfig?.format),
-              ...getSelectItemStyle(sIndex, dIndex, selectionOption || []),
+              ...getSelectedItemStyles(sIndex, dIndex, selectedItems || []),
               name: getColumnRenderName(aggConfig),
               value: dc.getCell(aggConfig),
             };
@@ -304,10 +304,10 @@ class BasicBarChart extends Chart {
                 ...getExtraSeriesDataFormat(aggConfig?.format),
                 name: getColumnRenderName(aggConfig),
                 value: row?.getCell(aggConfig),
-                ...getSelectItemStyle(
+                ...getSelectedItemStyles(
                   acIndex * secondGroupInfos.length + sgIndex,
                   dIndex,
-                  selectionOption || [],
+                  selectedItems || [],
                 ),
               };
             }),

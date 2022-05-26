@@ -36,11 +36,11 @@ import {
   FontStyle,
   FormatFieldAction,
   GridStyle,
-  ISelectionConfig,
   LineStyle,
   MarkArea,
   MarkDataConfig,
   MarkLine,
+  SelectedItem,
   XAxis,
 } from 'app/types/ChartConfig';
 import {
@@ -1685,10 +1685,10 @@ export const setRuntimeDateLevelFieldsInChartConfig = (config: ChartConfig) => {
   });
 };
 
-export const getSelectItemStyle = (
+export const getSelectedItemStyles = (
   comIndex: string | number,
   dcIndex: string | number,
-  selectionList: ISelectionConfig[],
+  selectionList: SelectedItem[],
   itemStyle: { [x: string]: any } = {},
 ): { itemStyle: { opacity?: number; [x: string]: any } } => {
   if (selectionList.length) {

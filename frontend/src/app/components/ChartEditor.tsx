@@ -28,9 +28,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import ChartManager from 'app/models/ChartManager';
-import workbenchSlice, {
-  useWorkbenchSlice,
-} from 'app/pages/ChartWorkbenchPage/slice';
+import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
 import { ChartConfigReducerActionType } from 'app/pages/ChartWorkbenchPage/slice/constant';
 import {
   aggregationSelector,
@@ -39,7 +37,8 @@ import {
   currentDataViewSelector,
   datasetsSelector,
   selectAvailableSourceFunctions,
-  selectionOptionSelector,
+  selectMultipleSelectedState,
+  selectSelectedItems,
   shadowChartConfigSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import {
@@ -69,7 +68,7 @@ import {
   transferChartConfigs,
 } from 'app/utils/internalChartHelper';
 import { updateBy } from 'app/utils/mutation';
-import { CommonFormTypes } from 'globalConstants';
+import { CommonFormTypes, KEYBOARD_EVENT_NAME } from 'globalConstants';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
@@ -135,7 +134,8 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
   const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
-  const selectionOption = useSelector(selectionOptionSelector);
+  const selectedItems = useSelector(selectSelectedItems);
+  const multipleSelectedState = useSelector(selectMultipleSelectedState);
   const [chart, setChart] = useState<IChart>();
   const drillOptionRef = useRef<IChartDrillOption>();
   const [allowQuery, setAllowQuery] = useState<boolean>(false);
@@ -144,6 +144,26 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     showSaveForm: saveFormContextValue.showSaveForm,
   });
   const tg = useI18NPrefix('global');
+  const KeyboardEventListenerFun = useCallback(
+    (e: KeyboardEvent) => {
+      if (
+        (e.key === KEYBOARD_EVENT_NAME.CTRL ||
+          e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
+        e.type === 'keydown' &&
+        !multipleSelectedState
+      ) {
+        dispatch(actions.updateMultipleSelectedState(true));
+      } else if (
+        (e.key === KEYBOARD_EVENT_NAME.CTRL ||
+          e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
+        e.type === 'keyup' &&
+        multipleSelectedState
+      ) {
+        dispatch(actions.updateMultipleSelectedState(false));
+      }
+    },
+    [dispatch, multipleSelectedState, actions],
+  );
 
   const expensiveQuery = useMemo(() => {
     try {
@@ -292,16 +312,13 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               return;
             }
 
-            if (
-              !drillOptionRef.current?.isSelectedDrill &&
-              chart.useSelection
-            ) {
+            if (!drillOptionRef.current?.isSelectedDrill && chart.selectable) {
               const {
                 dataIndex,
                 componentIndex,
               }: { dataIndex: number; componentIndex: number } = param;
               dispatch(
-                workbenchSlice.actions.singleSelectionOption({
+                actions.normalSelect({
                   index: componentIndex + ',' + dataIndex,
                   data: param.data,
                 }),
@@ -312,7 +329,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         },
       ]);
     },
-    [dispatch, handleDrillOptionChange],
+    [dispatch, handleDrillOptionChange, actions],
   );
 
   const clearDataConfig = useCallback(() => {
@@ -328,10 +345,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       targetChartConfig,
     );
 
-    dispatch(workbenchSlice.actions.updateCurrentDataViewComputedFields([]));
-    dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
+    dispatch(actions.updateCurrentDataViewComputedFields([]));
+    dispatch(actions.updateShadowChartConfig({}));
     dispatch(
-      workbenchSlice.actions.updateChartConfig({
+      actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
         payload: {
           init: finalChartConfig,
@@ -342,7 +359,13 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       chartConfig?.datas,
       drillOptionRef.current,
     );
-  }, [dispatch, chart?.meta?.id, registerChartEvents, chartConfig?.datas]);
+  }, [
+    dispatch,
+    chart?.meta?.id,
+    registerChartEvents,
+    chartConfig?.datas,
+    actions,
+  ]);
 
   const handleChartChange = (c: IChart) => {
     registerChartEvents(c);
@@ -359,14 +382,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       });
     });
 
-    dispatch(
-      workbenchSlice.actions.updateCurrentDataViewComputedFields(
-        computedFields,
-      ),
-    );
+    dispatch(actions.updateCurrentDataViewComputedFields(computedFields));
 
     dispatch(
-      workbenchSlice.actions.updateChartConfig({
+      actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
         payload: {
           init: finalChartConfig,
@@ -379,8 +398,8 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       true,
     );
 
-    if (selectionOption.length) {
-      dispatch(workbenchSlice.actions.clearAllSelectionOption());
+    if (selectedItems.length) {
+      dispatch(actions.clearSelectedItems());
     }
     if (!expensiveQuery) {
       dispatch(refreshDatasetAction({ drillOption: drillOptionRef?.current }));
@@ -393,12 +412,12 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     (type, payload) => {
       if (expensiveQuery) {
         dispatch(
-          workbenchSlice.actions.updateChartConfig({
+          actions.updateChartConfig({
             type,
             payload: payload,
           }),
         );
-        dispatch(workbenchSlice.actions.updateShadowChartConfig(null));
+        dispatch(actions.updateShadowChartConfig(null));
         setAllowQuery(payload.needRefresh);
         return true;
       }
@@ -428,11 +447,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           JSON.stringify(computedFields) !==
           JSON.stringify(dataview?.computedFields)
         ) {
-          dispatch(
-            workbenchSlice.actions.updateCurrentDataViewComputedFields(
-              computedFields,
-            ),
-          );
+          dispatch(actions.updateCurrentDataViewComputedFields(computedFields));
         }
       }
       if (payload.value.key === 'enableExpandRow') {
@@ -474,7 +489,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         }),
       );
     },
-    [dispatch, expensiveQuery, dataview, chartConfig?.datas],
+    [dispatch, expensiveQuery, dataview, chartConfig?.datas, actions],
   );
 
   const handleDataViewChanged = useCallback(() => {
@@ -691,11 +706,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       true,
     );
 
-    dispatch(
-      workbenchSlice.actions.updateCurrentDataViewComputedFields(
-        computedFields,
-      ),
-    );
+    dispatch(actions.updateCurrentDataViewComputedFields(computedFields));
 
     dispatch(
       updateChartConfigAndRefreshDatasetAction({
@@ -729,7 +740,8 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             onChangeAggregation: handleAggregationState,
           }}
           drillOption={drillOptionRef?.current}
-          selectionOption={selectionOption}
+          selectedItems={selectedItems}
+          KeyboardEventListenerFun={KeyboardEventListenerFun}
           aggregation={aggregation}
           chart={chart}
           dataset={dataset}

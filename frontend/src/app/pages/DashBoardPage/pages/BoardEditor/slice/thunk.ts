@@ -44,6 +44,7 @@ import {
   editDashBoardInfoActions,
   editWidgetDataActions,
   editWidgetInfoActions,
+  editWidgetSelectedItemsActions,
 } from '.';
 import { BoardInfo, BoardType, ServerDashboard } from '../../Board/slice/types';
 import { getDataChartMap } from './../../../utils/board';
@@ -522,7 +523,9 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
       );
     } finally {
       dispatch(
-        editWidgetInfoActions.clearEditorSelectionOption({ wid: widgetId }),
+        editWidgetSelectedItemsActions.clearSelectedItemsInEditor({
+          wid: widgetId,
+        }),
       );
     }
     return null;

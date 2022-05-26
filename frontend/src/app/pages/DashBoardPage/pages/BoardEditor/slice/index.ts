@@ -19,7 +19,6 @@ import { Layout } from 'react-grid-layout';
 import undoable, { includeAction } from 'redux-undo';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
-import { isUndefined } from 'utils/object';
 import { WidgetControllerPanelParams } from './../../Board/slice/types';
 import { editBoardStackSlice } from './childSlice/stackSlice';
 import {
@@ -258,30 +257,6 @@ const widgetInfoRecordSlice = createSlice({
         delete WidgetRrrInfo[errorType];
       }
     },
-    boardEditorSingleSelectionOption(
-      state,
-      {
-        payload,
-      }: PayloadAction<{
-        wid: string;
-        data: { index: string; data: any };
-      }>,
-    ) {
-      const findDataIndex = state[payload.wid].selectionOption?.find(
-        v => v.index === payload.data.index,
-      );
-      if (!isUndefined(findDataIndex)) {
-        state[payload.wid].selectionOption = [];
-      } else {
-        state[payload.wid].selectionOption = [payload.data];
-      }
-    },
-    clearEditorSelectionOption(
-      state,
-      { payload }: PayloadAction<{ wid: string }>,
-    ) {
-      state[payload.wid].selectionOption = [];
-    },
   },
   extraReducers: builder => {
     try {
@@ -333,10 +308,59 @@ const editWidgetDataSlice = createSlice({
     },
   },
 });
+const editWidgetSelectedItemsSlice = createSlice({
+  name: 'editBoard',
+  initialState: {
+    multipleSelected: false,
+    selectedItems: {},
+  } as EditBoardState['selectedItemsMap'],
+  reducers: {
+    updateMultipleSelectedStateInEditor(
+      state,
+      { payload }: PayloadAction<boolean>,
+    ) {
+      state.multipleSelected = payload;
+    },
+    normalSelectInEditor(
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        wid: string;
+        data: { index: string; data: any };
+      }>,
+    ) {
+      const index = state.selectedItems[payload.wid].findIndex(
+        v => v.index === payload.data.index,
+      );
+      if (state.multipleSelected) {
+        if (index < 0) {
+          state.selectedItems[payload.wid].push(payload.data);
+        } else {
+          state.selectedItems[payload.wid].splice(index, 1);
+        }
+      } else {
+        if (index < 0 || state.selectedItems[payload.wid].length > 1) {
+          state.selectedItems[payload.wid] = [payload.data];
+        } else {
+          state.selectedItems[payload.wid] = [];
+        }
+      }
+    },
+    clearSelectedItemsInEditor(
+      state,
+      { payload }: PayloadAction<{ wid: string }>,
+    ) {
+      state.selectedItems[payload.wid] = [];
+    },
+  },
+});
 export const { actions: editBoardStackActions } = editBoardStackSlice;
 export const { actions: editDashBoardInfoActions } = editDashBoardInfoSlice;
 export const { actions: editWidgetInfoActions } = widgetInfoRecordSlice;
 export const { actions: editWidgetDataActions } = editWidgetDataSlice;
+export const { actions: editWidgetSelectedItemsActions } =
+  editWidgetSelectedItemsSlice;
 const filterActions = [
   editBoardStackActions.setBoardToEditStack,
   editBoardStackActions.updateBoard,
@@ -371,6 +395,7 @@ const editBoardReducer = combineReducers({
   boardInfo: editDashBoardInfoSlice.reducer,
   widgetInfoRecord: widgetInfoRecordSlice.reducer,
   widgetDataMap: editWidgetDataSlice.reducer,
+  selectedItemsMap: editWidgetSelectedItemsSlice.reducer,
 });
 
 export const useEditBoardSlice = () => {

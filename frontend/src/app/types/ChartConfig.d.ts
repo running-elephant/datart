@@ -265,7 +265,7 @@ export interface ChartOptions {
   dataset: ChartDataSetDTO;
   widgetSpecialConfig: { env: string | undefined; [x: string]: any };
   drillOption?: IChartDrillOption;
-  selectionOption?: ISelectionConfig[];
+  selectedItems?: SelectedItem[];
 }
 
 export interface ChartContext {
@@ -417,7 +417,7 @@ export interface GridStyle {
   containLabel?: boolean;
 }
 
-export interface ISelectionConfig {
+export interface SelectedItem {
   index: string;
   data: any;
 }

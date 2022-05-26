@@ -86,7 +86,12 @@ export const selectAvailableSourceFunctions = createSelector(
   shareState => shareState.availableSourceFunctions,
 );
 
-export const selectSelectionOptionList = createSelector(
+export const selectSelectedItems = createSelector(
   [selectDomain],
-  shareState => shareState.selectionOption,
+  shareState => shareState.selectedItems,
+);
+
+export const selectMultipleSelectedState = createSelector(
+  [selectDomain],
+  shareState => shareState.multipleSelected,
 );

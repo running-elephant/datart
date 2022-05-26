@@ -18,7 +18,7 @@
 
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig, ISelectionConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { CSSProperties } from 'react';
@@ -36,7 +36,8 @@ class ChartIFrameContainerDispatcher {
       any,
       any,
       IChartDrillOption | undefined,
-      ISelectionConfig[] | undefined,
+      SelectedItem[] | undefined,
+      ((event: KeyboardEvent) => void) | undefined,
     ]
   >();
   private editorEnv = { env: 'workbench' };
@@ -61,7 +62,8 @@ class ChartIFrameContainerDispatcher {
     config: ChartConfig,
     style?: CSSProperties,
     drillOption?: IChartDrillOption,
-    selectionOption?: ISelectionConfig[],
+    selectedItems?: SelectedItem[],
+    KeyboardEventListenerFun?: (event: KeyboardEvent) => void,
   ): Function[] {
     this.switchContainer(
       containerId,
@@ -69,7 +71,8 @@ class ChartIFrameContainerDispatcher {
       dataset,
       config,
       drillOption,
-      selectionOption,
+      selectedItems,
+      KeyboardEventListenerFun,
     );
     const renders: Function[] = [];
     this.chartContainerMap.forEach((chartRenderer: Function, key) => {
@@ -93,14 +96,16 @@ class ChartIFrameContainerDispatcher {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption?: IChartDrillOption,
-    selectionOption?: ISelectionConfig[],
+    selectedItems?: SelectedItem[],
+    KeyboardEventListenerFun?: (event: KeyboardEvent) => void,
   ) {
     this.chartMetadataMap.set(containerId, [
       chart,
       dataset,
       config,
       drillOption,
-      selectionOption,
+      selectedItems,
+      KeyboardEventListenerFun,
     ]);
     this.createNewIfNotExist(containerId);
   }
@@ -114,7 +119,8 @@ class ChartIFrameContainerDispatcher {
           dataset,
           config,
           drillOption,
-          selectionOption?: ISelectionConfig[],
+          selectedItems?: SelectedItem[],
+          KeyboardEventListenerFun?: (event: KeyboardEvent) => void,
         ) => {
           return (
             <div key={containerId} style={style}>
@@ -123,7 +129,8 @@ class ChartIFrameContainerDispatcher {
                 chart={chart}
                 config={config}
                 drillOption={drillOption}
-                selectionOption={selectionOption}
+                selectedItems={selectedItems}
+                KeyboardEventListenerFun={KeyboardEventListenerFun}
                 containerId={containerId}
                 width={style?.width}
                 height={style?.height}

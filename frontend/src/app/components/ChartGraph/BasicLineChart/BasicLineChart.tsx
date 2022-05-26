@@ -21,9 +21,9 @@ import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
-  ISelectionConfig,
   LabelStyle,
   LegendStyle,
+  SelectedItem,
   SeriesStyle,
   XAxis,
   XAxisColumns,
@@ -60,7 +60,7 @@ import { Series } from './types';
 class BasicLineChart extends Chart {
   config = Config;
   chart: any = null;
-  useSelection = true;
+  selectable = true;
 
   protected isArea = false;
   protected isStack = false;
@@ -105,7 +105,7 @@ class BasicLineChart extends Chart {
       props.dataset,
       props.config,
       props.drillOption,
-      props.selectionOption,
+      props.selectedItems,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
@@ -124,7 +124,7 @@ class BasicLineChart extends Chart {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption?: ChartDrillOption,
-    selectionOption?: ISelectionConfig[],
+    selectedItems?: SelectedItem[],
   ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -169,7 +169,7 @@ class BasicLineChart extends Chart {
       aggregateConfigs,
       infoConfigs,
       xAxisColumns,
-      selectionOption,
+      selectedItems,
     );
     const yAxisNames: string[] = aggregateConfigs.map(getColumnRenderName);
 
@@ -211,7 +211,7 @@ class BasicLineChart extends Chart {
     aggregateConfigs: ChartDataSectionField[],
     infoConfigs: ChartDataSectionField[],
     xAxisColumns: XAxisColumns[],
-    selectionOption?: ISelectionConfig[],
+    selectedItems?: SelectedItem[],
   ): Series[] {
     if (!colorConfigs?.length) {
       return aggregateConfigs.map((aggConfig, acIndex) => {
@@ -223,7 +223,7 @@ class BasicLineChart extends Chart {
           areaStyle: this.isArea
             ? {
                 color,
-                opacity: selectionOption?.length ? 0.4 : undefined,
+                opacity: selectedItems?.length ? 0.4 : undefined,
               }
             : undefined,
           stack: this.isStack ? 'total' : undefined,
@@ -233,7 +233,7 @@ class BasicLineChart extends Chart {
             ...this.getLineSelectItemStyle(
               acIndex,
               dcIndex,
-              selectionOption || [],
+              selectedItems || [],
             ),
             value: dc.getCell(aggConfig),
           })),
@@ -241,7 +241,7 @@ class BasicLineChart extends Chart {
             color,
           },
           lineStyle: {
-            opacity: selectionOption?.length ? 0.5 : 1,
+            opacity: selectedItems?.length ? 0.5 : 1,
           },
           ...this.getLabelStyle(styleConfigs),
           ...this.getSeriesStyle(styleConfigs),
@@ -280,7 +280,7 @@ class BasicLineChart extends Chart {
               ...this.getLineSelectItemStyle(
                 sgcIndex,
                 acIndex * secondGroupInfos.length + dcIndex,
-                selectionOption || [],
+                selectedItems || [],
               ),
               name: getColumnRenderName(aggConfig),
               value: row?.getCell(aggConfig),

@@ -21,14 +21,14 @@ import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
-  ISelectionConfig,
+  SelectedItem,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   getDataColumnMaxAndMin2,
   getExtraSeriesRowData,
   getScatterSymbolSizeFn,
-  getSelectItemStyle,
+  getSelectedItemStyles,
   getSeriesTooltips4Polar2,
   getStyles,
   toFormattedValue,
@@ -55,7 +55,7 @@ registerMap('china-city', geoChinaCity as any);
 class BasicOutlineMapChart extends ReactChart {
   useIFrame = false;
   config = Config;
-  useSelection = true;
+  selectable = true;
 
   protected isNormalGeoMap = false;
   private geoMap;
@@ -95,11 +95,7 @@ class BasicOutlineMapChart extends ReactChart {
       return;
     }
     this.option = {
-      option: this.getOptions(
-        props.dataset,
-        props.config,
-        props.selectionOption,
-      ),
+      option: this.getOptions(props.dataset, props.config, props.selectedItems),
       containerId: props.containerId,
       mouseEvents: this.mouseEvents,
       isNormalGeoMap: this.isNormalGeoMap,
@@ -115,7 +111,7 @@ class BasicOutlineMapChart extends ReactChart {
   private getOptions(
     dataset: ChartDataSetDTO,
     config: ChartConfig,
-    selectionOption?: ISelectionConfig[],
+    selectedItems?: SelectedItem[],
   ): MapOption {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -145,7 +141,7 @@ class BasicOutlineMapChart extends ReactChart {
         styleConfigs,
         chartDataSet,
         groupConfigs,
-        selectionOption,
+        selectedItems,
       ),
       visualMap: this.getVisualMap(
         chartDataSet,
@@ -167,7 +163,7 @@ class BasicOutlineMapChart extends ReactChart {
           aggregateConfigs,
           sizeConfigs,
           styleConfigs,
-          selectionOption,
+          selectedItems,
         ) as any,
       ),
       tooltip: this.getTooltip(
@@ -189,7 +185,7 @@ class BasicOutlineMapChart extends ReactChart {
     styleConfigs: ChartStyleConfig[],
     chartDataSet: IChartDataSet<string>,
     groupConfigs: ChartDataSectionField[],
-    selectionOption?: ISelectionConfig[],
+    selectedItems?: SelectedItem[],
   ): GeoInfo {
     const [show, position, font] = getStyles(
       styleConfigs,
@@ -241,7 +237,7 @@ class BasicOutlineMapChart extends ReactChart {
             name: this.mappingGeoName(row.getCell(groupConfigs[0])),
           },
           this.isNormalGeoMap
-            ? getSelectItemStyle(0, dcIndex, selectionOption || [])
+            ? getSelectedItemStyles(0, dcIndex, selectedItems || [])
             : {},
         );
       }),
@@ -290,7 +286,7 @@ class BasicOutlineMapChart extends ReactChart {
     aggregateConfigs: ChartDataSectionField[],
     sizeConfigs: ChartDataSectionField[],
     styleConfigs: ChartStyleConfig[],
-    selectionOption?: ISelectionConfig[],
+    selectedItems?: SelectedItem[],
   ): MetricAndSizeSeriesStyle[] {
     if (this.isNormalGeoMap) {
       return [];
@@ -318,7 +314,7 @@ class BasicOutlineMapChart extends ReactChart {
                 row.getCell(aggregateConfigs[0]) || defaultColorValue,
                 row.getCell(sizeConfigs[0]) || defaultSizeValue,
               ),
-              ...getSelectItemStyle(0, dcIndex, selectionOption || []),
+              ...getSelectedItemStyles(0, dcIndex, selectedItems || []),
             };
           })
           ?.filter(d => !!d.name && d.value !== undefined),

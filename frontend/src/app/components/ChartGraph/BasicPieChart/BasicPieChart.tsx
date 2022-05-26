@@ -21,9 +21,9 @@ import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
-  ISelectionConfig,
   LabelStyle,
   LegendStyle,
+  SelectedItem,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, {
   IChartDataSet,
@@ -35,7 +35,7 @@ import {
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
-  getSelectItemStyle,
+  getSelectedItemStyles,
   getStyles,
   toFormattedValue,
   transformToDataSet,
@@ -50,7 +50,7 @@ import { PieSeries, PieSeriesImpl, PieSeriesStyle } from './types';
 class BasicPieChart extends Chart {
   config = Config;
   chart: any = null;
-  useSelection = true;
+  selectable = true;
 
   protected isCircle = false;
   protected isRose = false;
@@ -92,7 +92,7 @@ class BasicPieChart extends Chart {
       props.dataset,
       props.config,
       props.drillOption,
-      props.selectionOption,
+      props.selectedItems,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
@@ -109,7 +109,7 @@ class BasicPieChart extends Chart {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption?: ChartDrillOption,
-    selectionOption?: ISelectionConfig[],
+    selectedItems?: SelectedItem[],
   ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -135,7 +135,7 @@ class BasicPieChart extends Chart {
       groupConfigs,
       aggregateConfigs,
       infoConfigs,
-      selectionOption,
+      selectedItems,
     );
 
     return {
@@ -158,7 +158,7 @@ class BasicPieChart extends Chart {
     groupConfigs: ChartDataSectionField[],
     aggregateConfigs: ChartDataSectionField[],
     infoConfigs: ChartDataSectionField[],
-    selectionOption?,
+    selectedItems?: SelectedItem[],
   ): PieSeriesStyle[] | PieSeriesStyle {
     if (!groupConfigs?.length) {
       const row = chartDataSet?.[0];
@@ -171,10 +171,10 @@ class BasicPieChart extends Chart {
             value: [config]
               .concat(infoConfigs)
               .map(config => row?.getCell(config)),
-            ...getSelectItemStyle(
+            ...getSelectedItemStyles(
               0,
               dcIndex,
-              selectionOption || [],
+              selectedItems || [],
               this.getDataItemStyle(config, groupConfigs, row),
             ),
             ...getExtraSeriesRowData(row),
@@ -193,10 +193,10 @@ class BasicPieChart extends Chart {
             ...config,
             name: groupConfigs.map(row.getCell, row).join('-'),
             value: aggregateConfigs.concat(infoConfigs).map(row.getCell, row),
-            ...getSelectItemStyle(
+            ...getSelectedItemStyles(
               acIndex,
               dcIndex,
-              selectionOption || [],
+              selectedItems || [],
               this.getDataItemStyle(config, groupConfigs, row),
             ),
             ...getExtraSeriesRowData(row),

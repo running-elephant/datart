@@ -28,7 +28,6 @@ import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { isUndefined } from 'utils/object';
 import {
   fetchAvailableSourceFunctions,
   fetchShareDataSetByPreviewChartAction,
@@ -52,7 +51,8 @@ export const initialState: SharePageState = {
   loginLoading: false,
   oauth2Clients: [],
   availableSourceFunctions: [],
-  selectionOption: [],
+  selectedItems: [],
+  multipleSelected: false,
 };
 
 export const slice = createSlice({
@@ -176,19 +176,29 @@ export const slice = createSlice({
           action.payload.computedFields;
       }
     },
-
-    shareSingleSelectionOption(
+    normalSelect(
       state,
       { payload }: PayloadAction<{ index: string; data: any }>,
     ) {
-      const findDataIndex = state.selectionOption?.find(
-        v => v.index === payload.index,
+      const index = state.selectedItems?.findIndex(
+        v => payload.index === v.index,
       );
-      if (!isUndefined(findDataIndex)) {
-        state.selectionOption = [];
+      if (state.multipleSelected) {
+        if (index < 0) {
+          state.selectedItems.push(payload);
+        } else {
+          state.selectedItems.splice(index, 1);
+        }
       } else {
-        state.selectionOption = [payload];
+        if (index < 0 || state.selectedItems.length > 1) {
+          state.selectedItems = [payload];
+        } else {
+          state.selectedItems = [];
+        }
       }
+    },
+    updateMultipleSelectedState(state, { payload }: PayloadAction<boolean>) {
+      state.multipleSelected = payload;
     },
   },
   extraReducers: builder => {
@@ -209,7 +219,7 @@ export const slice = createSlice({
             ...state.chartPreview,
             dataset: payload as any,
           };
-          state.selectionOption = [];
+          state.selectedItems = [];
           state.headlessBrowserRenderSign = true;
         },
       )

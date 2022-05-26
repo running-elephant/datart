@@ -42,6 +42,7 @@ import {
 } from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
+import { KEYBOARD_EVENT_NAME } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -51,9 +52,10 @@ import useDrillThrough from '../hooks/useDrillThrough';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import { useVizSlice } from '../slice';
 import {
+  selectMultipleSelectedState,
   selectPreviewCharts,
-  selectPreviewSelectionOption,
   selectPublishLoading,
+  selectSelectedItems,
   selectVizs,
 } from '../slice/selectors';
 import {
@@ -100,7 +102,8 @@ const ChartPreviewBoard: FC<{
     const [version, setVersion] = useState<string>();
     const previewCharts = useSelector(selectPreviewCharts);
     const publishLoading = useSelector(selectPublishLoading);
-    const selectionOption = useSelector(selectPreviewSelectionOption);
+    const selectedItems = useSelector(selectSelectedItems);
+    const multipleSelectedState = useSelector(selectMultipleSelectedState);
     const availableSourceFunctions = useSelector(
       selectAvailableSourceFunctions,
     );
@@ -114,6 +117,27 @@ const ChartPreviewBoard: FC<{
     const history = useHistory();
     const vizs = useSelector(selectVizs);
     const [openNewTab, openBrowserTab] = useDrillThrough();
+
+    const KeyboardEventListenerFun = useCallback(
+      (e: KeyboardEvent) => {
+        if (
+          (e.key === KEYBOARD_EVENT_NAME.CTRL ||
+            e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
+          e.type === 'keydown' &&
+          !multipleSelectedState
+        ) {
+          dispatch(vizAction.updateMultipleSelectedState(true));
+        } else if (
+          (e.key === KEYBOARD_EVENT_NAME.CTRL ||
+            e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
+          e.type === 'keyup' &&
+          multipleSelectedState
+        ) {
+          dispatch(vizAction.updateMultipleSelectedState(false));
+        }
+      },
+      [dispatch, multipleSelectedState, vizAction],
+    );
 
     useEffect(() => {
       const filterSearchParams = filterSearchUrl
@@ -247,14 +271,14 @@ const ChartPreviewBoard: FC<{
               }
               if (
                 !drillOptionRef.current?.isSelectedDrill &&
-                chart.useSelection
+                chart.selectable
               ) {
                 const {
                   dataIndex,
                   componentIndex,
                 }: { dataIndex: number; componentIndex: number } = param;
                 dispatch(
-                  vizAction.chartPreviewsSingleSelectionOption({
+                  vizAction.normalSelect({
                     backendChartId,
                     data: {
                       index: componentIndex + ',' + dataIndex,
@@ -523,7 +547,8 @@ const ChartPreviewBoard: FC<{
                     chart={chart!}
                     config={chartPreview?.chartConfig!}
                     drillOption={drillOptionRef.current}
-                    selectionOption={selectionOption[backendChartId]}
+                    selectedItems={selectedItems[backendChartId]}
+                    KeyboardEventListenerFun={KeyboardEventListenerFun}
                     width={cacheW}
                     height={cacheH}
                   />

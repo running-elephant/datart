@@ -2,11 +2,11 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ChartDataSectionType } from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/models/ChartManager';
+import { SelectedItem } from 'app/types/ChartConfig';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
-import { CloneValueDeep, isUndefined } from 'utils/object';
+import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
-import { ISelectionConfig } from '../../../../../types/ChartConfig';
 import {
   addStoryboard,
   addViz,
@@ -48,7 +48,8 @@ export const initialState: VizState = {
   selectedTab: '',
   dataChartListLoading: false,
   chartPreviews: [],
-  selectionOption: {} as Record<string, ISelectionConfig[]>,
+  selectedItems: {} as Record<string, SelectedItem[]>,
+  multipleSelected: false,
 };
 
 const slice = createSlice({
@@ -142,7 +143,7 @@ const slice = createSlice({
       });
     },
 
-    chartPreviewsSingleSelectionOption(
+    normalSelect(
       state,
       {
         payload,
@@ -151,14 +152,28 @@ const slice = createSlice({
         data: { index: string; data: any };
       }>,
     ) {
-      const selectionConfig = state.selectionOption?.[
-        payload.backendChartId
-      ]?.find(v => payload.data.index === v.index);
-      if (!isUndefined(selectionConfig)) {
-        state.selectionOption[payload.backendChartId] = [];
+      const index = state.selectedItems?.[payload.backendChartId]?.findIndex(
+        v => payload.data.index === v.index,
+      );
+      if (state.multipleSelected) {
+        if (index < 0) {
+          state.selectedItems[payload.backendChartId].push(payload.data);
+        } else {
+          state.selectedItems[payload.backendChartId].splice(index, 1);
+        }
       } else {
-        state.selectionOption[payload.backendChartId] = [payload.data];
+        if (
+          index < 0 ||
+          state.selectedItems[payload.backendChartId].length > 1
+        ) {
+          state.selectedItems[payload.backendChartId] = [payload.data];
+        } else {
+          state.selectedItems[payload.backendChartId] = [];
+        }
       }
+    },
+    updateMultipleSelectedState(state, { payload }: PayloadAction<boolean>) {
+      state.multipleSelected = payload;
     },
   },
   extraReducers: builder => {
@@ -585,7 +600,7 @@ const slice = createSlice({
         const index = state.chartPreviews?.findIndex(
           c => c.backendChartId === action.payload?.backendChartId,
         );
-        state.selectionOption[action.payload?.backendChartId] = [];
+        state.selectedItems[action.payload?.backendChartId] = [];
         if (index < 0) {
           state.chartPreviews.push({
             backendChartId: action.payload?.backendChartId,

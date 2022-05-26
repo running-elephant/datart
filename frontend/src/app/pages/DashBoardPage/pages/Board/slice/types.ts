@@ -24,7 +24,7 @@ import {
 import { BoardConfig } from 'app/pages/DashBoardPage/types/boardTypes';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
-import { ChartConfig, ISelectionConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { ChartDatasetMeta } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { DeltaStatic } from 'quill';
@@ -51,7 +51,8 @@ export interface BoardState {
   viewMap: Record<string, ChartDataView>; // View
   widgetDataMap: Record<string, WidgetData>;
   availableSourceFunctionsMap: Record<string, string[]>;
-  selectionOption: Record<string, ISelectionConfig[]>;
+  selectedItems: Record<string, SelectedItem[]>;
+  multipleSelected: boolean;
 }
 // 应用内浏览，分享页模式，定时任务模式，编辑模式
 export type VizRenderMode = 'read' | 'share' | 'schedule' | 'edit';
@@ -171,7 +172,6 @@ export interface WidgetInfo {
   rendered: boolean;
   inLinking: boolean; //是否在触发联动
   selected: boolean;
-  selectionOption: ISelectionConfig[];
   pageInfo: Partial<PageInfo>;
   errInfo: Record<WidgetErrorType, string>;
   parameters?: any;

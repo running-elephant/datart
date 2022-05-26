@@ -126,7 +126,12 @@ export const selectHasVizFetched = createSelector(
   vizState => vizState.hasVizFetched,
 );
 
-export const selectPreviewSelectionOption = createSelector(
+export const selectSelectedItems = createSelector(
   [selectDomain],
-  vizState => vizState.selectionOption,
+  vizState => vizState.selectedItems,
+);
+
+export const selectMultipleSelectedState = createSelector(
+  [selectDomain],
+  vizState => vizState.multipleSelected,
 );

@@ -39,12 +39,17 @@ import {
 } from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
+import { KEYBOARD_EVENT_NAME } from 'globalConstants';
 import produce from 'immer';
 import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
 import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
-import { editBoardStackActions, editDashBoardInfoActions } from '..';
+import {
+  editBoardStackActions,
+  editDashBoardInfoActions,
+  editWidgetSelectedItemsActions,
+} from '..';
 import { ORIGINAL_TYPE_MAP } from '../../../../constants';
 import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
 import { LayerNode } from '../../components/LayerList/LayerTreeItem';
@@ -602,7 +607,7 @@ export const moveNodeContainerToContainer = (args: {
     dispatch(editBoardStackActions.dropTabToOtherTab({ dragNode, targetNode }));
   }
 };
-export const boardSelectionOptionOnchange = (
+export const selectedItemChange = (
   dispatch,
   type: VizRenderMode,
   params,
@@ -620,8 +625,47 @@ export const boardSelectionOptionOnchange = (
     },
   };
   if (type === 'edit') {
-    dispatch(editWidgetInfoActions.boardEditorSingleSelectionOption(option));
+    dispatch(editWidgetSelectedItemsActions.normalSelectInEditor(option));
   } else {
-    dispatch(boardActions.boardSingleSelectionOption(option));
+    dispatch(boardActions.normalSelect(option));
+  }
+};
+
+export const multipleSelectedStateChange = (
+  dispatch,
+  type: VizRenderMode,
+  state: boolean,
+  e: KeyboardEvent,
+) => {
+  if (
+    (e.key === KEYBOARD_EVENT_NAME.CTRL ||
+      e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
+    e.type === 'keydown' &&
+    !state
+  ) {
+    if (type === 'edit') {
+      dispatch(
+        editWidgetSelectedItemsActions.updateMultipleSelectedStateInEditor(
+          true,
+        ),
+      );
+    } else {
+      dispatch(boardActions.updateMultipleSelectedState(true));
+    }
+  } else if (
+    (e.key === KEYBOARD_EVENT_NAME.CTRL ||
+      e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
+    e.type === 'keyup' &&
+    state
+  ) {
+    if (type === 'edit') {
+      dispatch(
+        editWidgetSelectedItemsActions.updateMultipleSelectedStateInEditor(
+          false,
+        ),
+      );
+    } else {
+      dispatch(boardActions.updateMultipleSelectedState(false));
+    }
   }
 };
