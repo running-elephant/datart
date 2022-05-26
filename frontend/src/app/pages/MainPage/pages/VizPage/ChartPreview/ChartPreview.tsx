@@ -262,20 +262,22 @@ const ChartPreviewBoard: FC<{
         enableViewDetail &&
         viewDetailSetting?.event === InteractionMouseEvent.Left
       ) {
-        (openViewDetailPanel as VoidFunction)();
+        (openViewDetailPanel as any)({
+          currentDataView: chartPreview?.backendChart?.view,
+          chartConfig: chartPreview?.chartConfig,
+          drillOption: drillOptionRef?.current,
+          pageInfo: {},
+        });
       }
     }, [
-      chartPreview?.backendChart?.config?.aggregation,
+      chartPreview?.chartConfig,
+      chartPreview?.backendChart?.view,
       chartPreview?.backendChart?.config.computedFields,
-      chartPreview?.backendChart?.view.config,
-      chartPreview?.backendChart?.view?.id,
-      chartPreview?.chartConfig?.datas,
-      chartPreview?.chartConfig?.interactions,
-      chartPreview?.chartConfig?.settings,
-      openViewDetailPanel,
-      openBrowserTab,
+      chartPreview?.backendChart?.config?.aggregation,
       openNewTab,
       orgId,
+      openBrowserTab,
+      openViewDetailPanel,
     ]);
 
     const registerChartEvents = useCallback(

@@ -807,7 +807,9 @@
           "rightClick": "Right Click",
           "field": "Selected Fields",
           "all": "All",
-          "customize": "Customize"
+          "customize": "Customize",
+          "summary": "Summary",
+          "details": "Details"
         }
       },
       "present": {

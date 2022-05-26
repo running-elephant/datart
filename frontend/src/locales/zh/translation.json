@@ -807,7 +807,9 @@
           "rightClick": "右键菜单",
           "field": "选择字段",
           "all": "全部",
-          "customize": "自定义"
+          "customize": "自定义",
+          "summary": "汇总",
+          "details": "明细"
         }
       },
       "present": {

@@ -436,6 +436,34 @@ export class ChartDataRequestBuilder {
     return selectColumns.map(col => col.colName);
   }
 
+  private buildDetailColumns() {
+    const selectColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
+      (acc, cur) => {
+        if (!cur.rows) {
+          return acc;
+        }
+        if (cur.drillable) {
+          if (this.isInValidDrillOption()) {
+            return acc.concat(cur.rows?.[0] || []);
+          }
+          return acc.concat(
+            cur.rows?.filter(field => {
+              return Boolean(
+                this.drillOption
+                  ?.getCurrentFields()
+                  ?.some(df => df.uid === field.uid),
+              );
+            }) || [],
+          );
+        } else {
+          return acc.concat(cur.rows);
+        }
+      },
+      [],
+    );
+    return selectColumns.map(col => col.colName);
+  }
+
   private buildViewConfigs() {
     return transformToViewConfig(this.dataView?.config);
   }
@@ -465,5 +493,20 @@ export class ChartDataRequestBuilder {
 
   public buildAllFilters() {
     return this.buildFilters();
+  }
+
+  public buildDetails(): ChartDataRequest {
+    return {
+      ...this.buildViewConfigs(),
+      viewId: this.dataView?.id,
+      aggregators: [],
+      groups: [],
+      filters: this.buildFilters(),
+      orders: [],
+      pageInfo: this.buildPageInfo(),
+      functionColumns: this.buildFunctionColumns(),
+      columns: this.buildDetailColumns(),
+      script: this.script,
+    };
   }
 }
