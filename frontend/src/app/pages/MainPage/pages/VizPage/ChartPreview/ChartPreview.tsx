@@ -22,6 +22,7 @@ import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import {
   InteractionAction,
+  InteractionCategory,
   InteractionMouseEvent,
 } from 'app/components/FormGenerator/constants';
 import {
@@ -227,10 +228,7 @@ const ChartPreviewBoard: FC<{
         ['setting'],
       )?.[0] as ViewDetailSetting;
 
-      if (
-        enableDrillThrough
-        // drillThroughSetting?.event === InteractionMouseEvent.Left
-      ) {
+      if (enableDrillThrough) {
         const jumpFilters = new ChartDataRequestBuilder(
           {
             id: chartPreview?.backendChart?.view?.id || '',
@@ -250,13 +248,27 @@ const ChartPreviewBoard: FC<{
         // TODO: user selected filter
         // TODO: mapper by custom if exist
 
-        const rule = drillThroughSetting?.rules?.[0];
-        if (rule?.action === InteractionAction.Redirect) {
-          openNewTab(orgId, rule?.jumpToChart?.relId, jumpFilters);
-        }
-        if (rule?.action === InteractionAction.Window) {
-          openBrowserTab(orgId, rule?.jumpToChart?.relId, jumpFilters);
-        }
+        (drillThroughSetting?.rules || []).forEach(rule => {
+          if (rule.event === InteractionMouseEvent.Left) {
+            if (
+              rule.category === InteractionCategory.JumpToChart ||
+              rule.category === InteractionCategory.JumpToDashboard
+            ) {
+              const relId = rule?.[rule.category]?.relId;
+              if (rule?.action === InteractionAction.Redirect) {
+                openNewTab(orgId, relId, jumpFilters);
+              }
+              if (rule?.action === InteractionAction.Window) {
+                openBrowserTab(orgId, relId, jumpFilters);
+              }
+              if (rule?.action === InteractionAction.Dialog) {
+                // TODO:
+              }
+            } else if (rule.category === InteractionCategory.JumpToUrl) {
+              // TODO:
+            }
+          }
+        });
       }
       if (
         enableViewDetail &&
