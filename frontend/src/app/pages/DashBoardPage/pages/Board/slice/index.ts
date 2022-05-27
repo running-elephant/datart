@@ -34,6 +34,7 @@ import {
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { SelectedItem } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
@@ -55,6 +56,8 @@ export const boardInit: BoardState = {
   dataChartMap: {} as Record<string, DataChart>,
   viewMap: {} as Record<string, ChartDataView>, // View
   availableSourceFunctionsMap: {} as Record<string, string[]>,
+  selectedItems: {} as Record<string, SelectedItem[]>,
+  multipleSelect: false,
 };
 // boardActions
 const boardSlice = createSlice({
@@ -225,6 +228,7 @@ const boardSlice = createSlice({
     setWidgetData(state, action: PayloadAction<WidgetData>) {
       const widgetData = action.payload;
       state.widgetDataMap[widgetData.id] = widgetData;
+      state.selectedItems[widgetData.id] = [];
     },
     changeBoardVisible(
       state,
@@ -380,6 +384,36 @@ const boardSlice = createSlice({
         dataChart.config.computedFields = action.payload.computedFields;
         state.dataChartMap[action.payload.id] = dataChart;
       }
+    },
+
+    normalSelect(
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        wid: string;
+        data: { index: string; data: any };
+      }>,
+    ) {
+      const index = state.selectedItems[payload.wid]?.findIndex(
+        v => v.index === payload.data.index,
+      );
+      if (state.multipleSelect) {
+        if (index < 0) {
+          state.selectedItems[payload.wid].push(payload.data);
+        } else {
+          state.selectedItems[payload.wid].splice(index, 1);
+        }
+      } else {
+        if (index < 0 || state.selectedItems[payload.wid].length > 1) {
+          state.selectedItems[payload.wid] = [payload.data];
+        } else {
+          state.selectedItems[payload.wid] = [];
+        }
+      }
+    },
+    updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
+      state.multipleSelect = payload;
     },
   },
   extraReducers: builder => {

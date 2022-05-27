@@ -30,7 +30,8 @@ import {
   getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
-import { FC, memo, useRef, useState } from 'react';
+import { KEYBOARD_EVENT_NAME } from 'globalConstants';
+import { FC, memo, useCallback, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import ChartDrillContext from '../ChartWorkbenchPage/contexts/ChartDrillContext';
@@ -41,7 +42,11 @@ import {
 } from '../MainPage/pages/VizPage/slice/types';
 import { HeadlessBrowserIdentifier } from './HeadlessBrowserIdentifier';
 import { shareActions } from './slice';
-import { selectHeadlessBrowserRenderSign } from './slice/selectors';
+import {
+  selectHeadlessBrowserRenderSign,
+  selectMultipleSelect,
+  selectSelectedItems,
+} from './slice/selectors';
 import {
   fetchShareDataSetByPreviewChartAction,
   updateFilterAndFetchDatasetForShare,
@@ -78,6 +83,30 @@ const ChartForShare: FC<{
   const headlessBrowserRenderSign = useSelector(
     selectHeadlessBrowserRenderSign,
   );
+  const selectedItems = useSelector(selectSelectedItems);
+  const multipleSelect = useSelector(selectMultipleSelect);
+
+  const chartIframeKeyboardListener = useCallback(
+    (e: KeyboardEvent) => {
+      if (
+        (e.key === KEYBOARD_EVENT_NAME.CTRL ||
+          e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
+        e.type === 'keydown' &&
+        !multipleSelect
+      ) {
+        dispatch(shareActions.updateMultipleSelect(true));
+      } else if (
+        (e.key === KEYBOARD_EVENT_NAME.CTRL ||
+          e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
+        e.type === 'keyup' &&
+        multipleSelect
+      ) {
+        dispatch(shareActions.updateMultipleSelect(false));
+      }
+    },
+    [dispatch, multipleSelect],
+  );
+
   useMount(() => {
     if (!chartPreview) {
       return;
@@ -126,6 +155,20 @@ const ChartForShare: FC<{
           }
           if (param.seriesName === 'drillOptionChange') {
             handleDrillOptionChange?.(param.value);
+            return;
+          }
+
+          if (!drillOptionRef.current?.isSelectedDrill && chart.selectable) {
+            const {
+              dataIndex,
+              componentIndex,
+            }: { dataIndex: number; componentIndex: number } = param;
+            dispatch(
+              shareActions.normalSelect({
+                index: componentIndex + ',' + dataIndex,
+                data: param.data,
+              }),
+            );
             return;
           }
         },
@@ -210,6 +253,8 @@ const ChartForShare: FC<{
               chart={chart!}
               config={chartPreview?.chartConfig!}
               drillOption={drillOptionRef.current}
+              selectedItems={selectedItems}
+              onKeyboardPress={chartIframeKeyboardListener}
               width={width}
               height={height}
             />

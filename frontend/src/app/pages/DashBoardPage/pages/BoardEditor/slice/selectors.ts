@@ -223,3 +223,18 @@ export const selectFutureState = createSelector(
   [recordFutureState],
   state => state,
 );
+
+// SelectedItems
+export const selectEditSelectedItems = (state: { editBoard: EditBoardState }) =>
+  state.editBoard.selectedItemsMap;
+export const selectMultipleSelectInEditor = createSelector(
+  [selectEditSelectedItems],
+  state => state.multipleSelect,
+);
+export const makeSelectSelectedItemsInEditor = () => {
+  return createSelector(
+    selectEditSelectedItems,
+    (_, widgetId: string) => widgetId,
+    (selectedItemsMap, wId) => selectedItemsMap.selectedItems?.[wId] || [],
+  );
+};
