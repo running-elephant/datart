@@ -42,7 +42,7 @@ const NameI18N = {
   en: 'RangeTime',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: '',
+  icon: 'control-widget',
   originalType: ORIGINAL_TYPE_MAP.rangeTime,
   canWrapped: true,
   controllable: true,

@@ -25,7 +25,6 @@ import type {
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
-  initAutoWidgetRect,
   initWidgetEditActionTpl,
   initWidgetName,
   initWidgetViewActionTpl,
@@ -37,11 +36,11 @@ import {
 } from '../../WidgetManager/utils/init';
 
 const NameI18N = {
-  zh: '组容器',
+  zh: '分组',
   en: 'Group',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'group',
+  icon: 'group-widget',
   originalType: ORIGINAL_TYPE_MAP.group,
   canWrapped: true, // TODO
   controllable: false,
@@ -96,39 +95,30 @@ export const widgetToolkit: GroupToolkit = {
     const widget = widgetTpl();
     widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.datachartId = '';
     widget.viewIds = [];
     widget.relations = opt.relations || [];
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'group';
     widget.config.name = opt.name || '';
     widget.config.children = opt.children;
-    if (opt.boardType === 'auto') {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 6,
-        height: 9,
-      };
-      widget.config.rect = rect;
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 500,
-        height: 400,
-      };
-      widget.config.rect = rect;
-    }
 
-    widget.config.customConfig.props = [
-      //   { ...initBackgroundTpl() },
-      //   { ...initTitleTpl() },
-      //   { ...initPaddingTpl() },
-      //   { ...initBorderTpl() },
-    ];
+    const pRect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: 6,
+      height: 9,
+    };
+    widget.config.pRect = pRect;
+    widget.config.mRect = undefined;
+    const rect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: 500,
+      height: 400,
+    };
+    widget.config.rect = rect;
 
+    widget.config.customConfig.props = [];
     return widget;
   },
 
@@ -147,6 +137,14 @@ export const widgetToolkit: GroupToolkit = {
       },
       {
         key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'unGroup',
         renderMode: ['edit'],
       },
     ];

@@ -23,6 +23,7 @@ import { G20 } from 'styles/StyleConstants';
 // to see useHotkeys in function useBoardEditorHotkeys
 export const Hotkeys = [
   { key: 'shift + click', text: 'multiSelect' },
+  { key: 'ctrl + g', text: 'group' },
   { key: 'delete', text: 'delete' },
   { key: 'ctrl + Z', text: 'undo' },
   { key: 'ctrl + shift + Z', text: 'redo' },

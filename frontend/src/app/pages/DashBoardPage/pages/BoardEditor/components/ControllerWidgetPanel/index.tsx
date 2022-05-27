@@ -260,7 +260,6 @@ const ControllerWidgetPanel: React.FC<WidgetControllerPanelParams> = memo(
         }
       },
       [
-        boardId,
         boardType,
         controllerType,
         curFilterWidget,

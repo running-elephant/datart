@@ -84,7 +84,7 @@ const NameI18N = {
   en: 'Timer',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'timer',
+  icon: 'time-widget',
   originalType: ORIGINAL_TYPE_MAP.timer,
   canWrapped: true,
   controllable: false,
@@ -155,8 +155,8 @@ export const widgetToolkit: TimerWidgetToolKit = {
         width: 6,
         height: 2,
       };
-      widget.config.rect = { ...rect };
-      widget.config.mRect = { ...rect };
+      widget.config.pRect = { ...rect };
+      widget.config.mRect = undefined;
     } else {
       const rect: RectConfig = {
         x: 0,
@@ -194,6 +194,10 @@ export const widgetToolkit: TimerWidgetToolKit = {
       },
       {
         key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
         renderMode: ['edit'],
       },
     ];

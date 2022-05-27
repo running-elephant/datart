@@ -43,7 +43,7 @@ const NameI18N = {
   en: 'ResetBtn',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'reset',
+  icon: 'reset-widget',
   originalType: ORIGINAL_TYPE_MAP.resetBtn,
   canWrapped: true,
   controllable: false,
@@ -146,6 +146,10 @@ export const widgetToolkit: WidgetToolkit = {
       },
       {
         key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
         renderMode: ['edit'],
       },
     ];

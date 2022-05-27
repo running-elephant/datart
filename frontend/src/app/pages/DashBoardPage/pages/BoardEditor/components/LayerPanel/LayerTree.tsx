@@ -41,6 +41,7 @@ export const LayerTree: FC<{}> = memo(() => {
         titleRender={renderTreeItem}
         onDrop={onDrop}
         treeData={treeData}
+        defaultExpandAll
       />
     </StyledWrapper>
   );

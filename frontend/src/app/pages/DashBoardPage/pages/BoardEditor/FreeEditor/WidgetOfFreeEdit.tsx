@@ -25,6 +25,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -34,6 +35,8 @@ import { Resizable, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
 import { BoardScaleContext } from '../../../components/FreeBoardBackground';
+import { WidgetInfoContext } from '../../../components/WidgetProvider/WidgetInfoProvider';
+import { ORIGINAL_TYPE_MAP } from '../../../constants';
 import { widgetMove, widgetMoveEnd } from '../slice/events';
 import { selectSelectedIds } from '../slice/selectors';
 export enum DragTriggerTypes {
@@ -43,9 +46,14 @@ export enum DragTriggerTypes {
 export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const selectedIds = useSelector(selectSelectedIds);
   const widget = useContext(WidgetContext);
+  const { editing: widgetEditing } = useContext(WidgetInfoContext);
   const { onEditFreeWidgetRect } = useContext(WidgetActionContext);
   const scale = useContext(BoardScaleContext);
-
+  const hideHandle = useMemo(() => {
+    return (
+      widgetEditing && widget.config.originalType === ORIGINAL_TYPE_MAP.group
+    );
+  }, [widget.config.originalType, widgetEditing]);
   const { x, y, width, height } = widget.config.rect;
   const [curXY, setCurXY] = useState<[number, number]>([
     widget.config.rect.x,
@@ -171,7 +179,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
         // resizeHandles={['se']}
         lockAspectRatio={false}
       >
-        <ItemWrap style={style} onClick={ssp}>
+        <ItemWrap style={style} onClick={ssp} hideHandle={hideHandle}>
           <WidgetMapper boardEditing={true} hideTitle={false} />
         </ItemWrap>
       </Resizable>
@@ -181,7 +189,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
 
 export default WidgetOfFreeEdit;
 
-const ItemWrap = styled.div`
+const ItemWrap = styled.div<{ hideHandle?: boolean }>`
   box-sizing: border-box;
 
   & > span:last-child {
@@ -194,9 +202,10 @@ const ItemWrap = styled.div`
     position: relative;
   }
 
-  .react-resizable-handle {
+  & > .react-resizable-handle {
     position: absolute;
     box-sizing: border-box;
+    display: ${p => (p.hideHandle ? 'none' : 'block')};
     width: 20px;
     height: 20px;
     padding: 0 3px 3px 0;
@@ -206,9 +215,11 @@ const ItemWrap = styled.div`
     background-position: bottom right;
     background-origin: content-box;
   }
+
   &:hover .react-resizable-handle {
     background-color: #fff;
   }
+
   .react-resizable-handle-se {
     right: 0;
     bottom: 0;

@@ -42,7 +42,7 @@ const NameI18N = {
   en: 'Text',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: '',
+  icon: 'control-widget',
   originalType: ORIGINAL_TYPE_MAP.text,
   canWrapped: true,
   controllable: true,

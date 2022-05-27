@@ -31,7 +31,7 @@ const NameI18N = {
   en: 'OwnedChart',
 };
 const widgetMeta = getMeta({
-  icon: 'ownedChart',
+  icon: 'ownedChart-widget',
   widgetTypeId: ORIGINAL_TYPE_MAP.ownedChart,
   zh: {
     desc: '自建数据图表的内部是一个独立的数据图表 ',
@@ -94,6 +94,10 @@ const widgetToolkit: OwnedChartToolkit = {
       },
       {
         key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
         renderMode: ['edit'],
       },
 

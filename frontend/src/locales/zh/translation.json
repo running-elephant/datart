@@ -966,7 +966,9 @@
         "multiSelect": "多选",
         "zoomIn": "缩小视图",
         "zoomOut": "放大视图",
-        "widgetList": "组件"
+        "widgetList": "组件",
+        "group": "成组",
+        "unGroup": "取消成组"
       },
       "controlTypes": {
         "common": "常规",
@@ -1062,7 +1064,9 @@
         "makeLinkage": "联动设置",
         "closeLinkage": "关闭联动",
         "makeJump": "跳转设置",
-        "closeJump": "关闭跳转"
+        "closeJump": "关闭跳转",
+        "group": "成组",
+        "unGroup": "取消成组"
       },
       "tips": {
         "unlock": "已锁定拖拽,点击解锁",

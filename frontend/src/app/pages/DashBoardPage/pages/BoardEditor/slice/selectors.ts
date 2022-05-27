@@ -30,7 +30,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { StateWithHistory } from 'redux-undo';
-import { widgetMapToTree } from '../components/LayerList/utils';
+import { widgetMapToTree } from '../components/LayerPanel/utils';
 import { getLayoutWidgets } from './../../../utils/widget';
 import { EditBoardStack } from './types';
 
@@ -192,7 +192,7 @@ export const selectShowBlockMask = createSelector(
 // record Clipboard
 export const selectClipboardWidgets = createSelector(
   [boardInfoState],
-  boardInfo => boardInfo.clipboardWidgets || [],
+  boardInfo => boardInfo.clipboardWidgetMap || [],
 );
 // editWidgetData
 export const editWidgetDataState = (state: { editBoard: EditBoardState }) =>

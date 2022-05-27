@@ -43,7 +43,7 @@ const NameI18N = {
   en: 'DropdownList',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'dropdownList',
+  icon: 'control-widget',
   originalType: ORIGINAL_TYPE_MAP.dropdownList,
   canWrapped: true,
   canFullScreen: false,

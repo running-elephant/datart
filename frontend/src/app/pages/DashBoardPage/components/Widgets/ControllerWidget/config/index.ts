@@ -222,6 +222,7 @@ export const getControlDropDownList = (refresh: boolean) => {
       renderMode: ['edit'],
       show: refresh,
     },
+
     {
       key: 'edit',
       renderMode: ['edit'],
@@ -232,6 +233,10 @@ export const getControlDropDownList = (refresh: boolean) => {
     },
     {
       key: 'lock',
+      renderMode: ['edit'],
+    },
+    {
+      key: 'group',
       renderMode: ['edit'],
     },
   ];

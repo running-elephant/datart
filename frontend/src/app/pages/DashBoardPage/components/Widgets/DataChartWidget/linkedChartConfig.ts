@@ -31,7 +31,7 @@ const NameI18N = {
   en: 'LinkedChart',
 };
 export const widgetMeta = getMeta({
-  icon: 'linked',
+  icon: 'linkedChart-widget',
   widgetTypeId: ORIGINAL_TYPE_MAP.linkedChart,
   zh: {
     desc: '引入图表部件的内部是一个引用的数据图表,原有数据图表有改动时,引入图表部件也会跟着改变',
@@ -96,7 +96,10 @@ export const linkedChartToolkit: WidgetToolkit = {
         key: 'lock',
         renderMode: ['edit'],
       },
-
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
       {
         key: 'makeLinkage',
         label: 'makeLinkage',

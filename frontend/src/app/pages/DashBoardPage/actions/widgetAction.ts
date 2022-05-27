@@ -407,20 +407,56 @@ export const changeGroupRectAction =
     w: number;
     h: number;
   }) =>
-  (dispatch, getState) => {
-    const { renderMode, boardId, wid, w, h } = args;
-
+  dispatch => {
+    const { renderMode } = args;
     if (renderMode === 'edit') {
       dispatch(changeEditGroupRectAction(args));
+    } else {
+      dispatch(changeViewGroupRectAction(args));
     }
   };
-export const changeViewGroupRectAction = (args: {
-  renderMode: VizRenderMode;
-  boardId: string;
-  wid: string;
-  w: number;
-  h: number;
-}) => {};
+
+export const changeViewGroupRectAction =
+  (args: {
+    renderMode: VizRenderMode;
+    boardId: string;
+    wid: string;
+    w: number;
+    h: number;
+  }) =>
+  (dispatch, getState) => {
+    const { wid, w, h, boardId } = args;
+    const rootState = getState() as RootState;
+    const viewBoardState = rootState.board as BoardState;
+    const widgetMap = viewBoardState.widgetRecord[boardId];
+    if (!wid) return;
+    const widget = widgetMap?.[wid];
+    if (!widget) return;
+    const parentWidget = widgetMap[widget.parentId || ''];
+    const rect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: w,
+      height: h,
+    };
+
+    const parentIsContainer =
+      parentWidget && parentWidget.config.type === 'container';
+
+    const parentIsAutoBoard =
+      parentWidget.config.type === 'container' && !widget.parentId;
+
+    if (parentIsContainer || parentIsAutoBoard) {
+      dispatch(
+        boardActions.changeFreeWidgetRect({
+          boardId: widget.dashboardId,
+          wid,
+          rect,
+        }),
+      );
+      return;
+    }
+  };
 export const changeEditGroupRectAction =
   (args: {
     renderMode: VizRenderMode;
@@ -436,18 +472,27 @@ export const changeEditGroupRectAction =
       .stack.present;
     const widgetMap = editBoardState.widgetRecord;
     if (!wid) return;
-    const widget = widgetMap[wid];
+    const widget = widgetMap?.[wid];
     if (!widget) return;
-    if (!widget.parentId) return;
-    const parentWidget = widgetMap[widget.parentId];
-    if (!parentWidget) return;
-
-    if (parentWidget.config.originalType !== ORIGINAL_TYPE_MAP.tab) return;
+    const parentWidget = widgetMap[widget.parentId || ''];
     const rect: RectConfig = {
       x: 0,
       y: 0,
       width: w,
       height: h,
     };
-    dispatch(editBoardStackActions.changeFreeWidgetRect({ wid, rect }));
+    const parentIsContainer =
+      parentWidget && parentWidget.config.type === 'container';
+
+    const parentIsAutoBoard =
+      parentWidget.config.type === 'container' && !widget.parentId;
+
+    if (parentIsContainer || parentIsAutoBoard) {
+      dispatch(
+        editBoardStackActions.changeFreeWidgetRect({
+          wid,
+          rect,
+        }),
+      );
+    }
   };

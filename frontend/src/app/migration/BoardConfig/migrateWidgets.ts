@@ -1,5 +1,6 @@
 import { FONT_DEFAULT } from 'app/constants';
 import {
+  BoardType,
   ControllerWidgetContent,
   Relation,
   ServerRelation,
@@ -14,7 +15,10 @@ import {
   APP_VERSION_BETA_4,
 } from './../constants';
 import { WidgetBeta3 } from './types';
-import { convertWidgetToBeta4 } from './utils/beta4utils';
+import {
+  convertToBeta4AutoWidget,
+  convertWidgetToBeta4,
+} from './utils/beta4utils';
 
 /**
  *
@@ -82,21 +86,20 @@ export const beta2 = (widget?: WidgetBeta3) => {
   widget.config.version = APP_VERSION_BETA_2;
   return widget;
 };
+// beta3 没有变动
 
-export const beta4 = (widget?: Widget | WidgetBeta3) => {
+// beta4 widget 重构 支持group
+export const beta4 = (boardType: BoardType, widget?: Widget | WidgetBeta3) => {
   if (!widget) return undefined;
   if (!versionCanDo(APP_VERSION_BETA_4, widget?.config.version))
     return widget as Widget;
+  let beta4Widget = widget as any;
+  beta4Widget = convertToBeta4AutoWidget(boardType, beta4Widget);
   if (widget.config.version !== APP_VERSION_BETA_4) {
-    let newWidget = convertWidgetToBeta4(widget as WidgetBeta3);
-    return newWidget;
-  } else {
-    // if ((widget.config as any).background) {
-    //   let newWidget = convertWidgetToBeta4(widget as WidgetBeta3);
-    //   return newWidget;
-    // }
-    return widget;
+    beta4Widget = convertWidgetToBeta4(beta4Widget as WidgetBeta3);
   }
+
+  return beta4Widget as Widget;
 };
 const finaleWidget = (widget?: Widget) => {
   if (!widget) return undefined;
@@ -120,7 +123,10 @@ export const parseServerWidget = (sWidget: ServerWidget) => {
  * @param {ServerWidget[]} widgets
  * @return {*}
  */
-export const migrateWidgets = (widgets: ServerWidget[]) => {
+export const migrateWidgets = (
+  widgets: ServerWidget[],
+  boardType: BoardType,
+) => {
   if (!Array.isArray(widgets)) {
     return [];
   }
@@ -135,7 +141,7 @@ export const migrateWidgets = (widgets: ServerWidget[]) => {
 
       resWidget = beta2(resWidget);
 
-      let beta4Widget = beta4(resWidget);
+      let beta4Widget = beta4(boardType, resWidget);
 
       beta4Widget = finaleWidget(beta4Widget as Widget);
 

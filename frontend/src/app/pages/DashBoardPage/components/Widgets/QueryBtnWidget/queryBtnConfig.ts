@@ -45,7 +45,7 @@ const NameI18N = {
   en: 'queryBtn',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'query',
+  icon: 'query-widget',
   originalType: ORIGINAL_TYPE_MAP.queryBtn,
   canWrapped: true,
   controllable: false,
@@ -148,6 +148,10 @@ export const widgetToolkit: WidgetToolkit = {
       },
       {
         key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
         renderMode: ['edit'],
       },
     ];

@@ -28,8 +28,7 @@ import {
 import {
   convertWrapChartWidget,
   createToSaveWidgetGroup,
-  createWidgetInfoMap,
-  getWidgetInfoMapByServer,
+  createWidgetInfo,
   getWidgetMap,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
@@ -108,13 +107,13 @@ export const fetchEditBoardDetail = createAsyncThunk<
     } = data;
     // TODO
     const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
-    const migratedWidgets = migrateWidgets(serverWidgets);
+    const migratedWidgets = migrateWidgets(serverWidgets, boardType);
     const { widgetMap, wrappedDataCharts } = getWidgetMap(
       migratedWidgets, //todo
       dataCharts,
       boardType,
     );
-    const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
+    const widgetInfos = Object.keys(widgetMap).map(id => createWidgetInfo(id));
     // TODO xld migration about filter
 
     const widgetIds = serverWidgets.map(w => w.id);
@@ -132,7 +131,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
     // BoardInfo
     dispatch(editDashBoardInfoActions.initEditBoardInfo(boardInfo));
     // widgetInfoRecord
-    dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
+    dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfos));
     //dashBoard,widgetRecord
     dispatch(
       editBoardStackActions.setBoardToEditStack({
@@ -206,7 +205,7 @@ export const addWidgetsToEditBoard = createAsyncThunk<
   const { layouts } = boardInfoState(
     getState() as { editBoard: EditBoardState },
   );
-  const widgetInfoMap = createWidgetInfoMap(widgets);
+  const widgetInfos = widgets.map(item => createWidgetInfo(item.id));
   const updatedWidgets = adjustWidgetsToBoard({
     widgets,
     boardType: dashBoard.config.type,
@@ -214,7 +213,7 @@ export const addWidgetsToEditBoard = createAsyncThunk<
     layouts,
   });
   // widgetInfoRecord
-  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
+  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfos));
   // WidgetRecord
   dispatch(editBoardStackActions.addWidgets(updatedWidgets));
   return null;
@@ -233,7 +232,7 @@ export const addGroupWidgetToEditBoard = createAsyncThunk<
   const { layouts } = boardInfoState(
     getState() as { editBoard: EditBoardState },
   );
-  const widgetInfoMap = createWidgetInfoMap(widgets);
+  const widgetInfos = widgets.map(t => createWidgetInfo(t.id));
   const updatedWidgets = adjustWidgetsToBoard({
     widgets,
     boardType: dashBoard.config.type,
@@ -241,7 +240,7 @@ export const addGroupWidgetToEditBoard = createAsyncThunk<
     layouts,
   });
   // widgetInfoRecord
-  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
+  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfos));
   // WidgetRecord
   dispatch(editBoardStackActions.addWidgets(updatedWidgets));
   return null;

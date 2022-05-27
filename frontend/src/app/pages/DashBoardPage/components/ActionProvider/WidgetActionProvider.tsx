@@ -55,7 +55,9 @@ import {
   deleteWidgetsAction,
   editChartInWidgetAction,
   onComposeGroupAction,
+  onUnGroupAction,
   pasteWidgetsAction,
+  selectWidgetAction,
   widgetsToPositionAction,
 } from '../../pages/BoardEditor/slice/actions/actions';
 import { editWidgetsQueryAction } from '../../pages/BoardEditor/slice/actions/controlActions';
@@ -80,6 +82,9 @@ export const WidgetActionProvider: FC<{
         onEditLayerToBottom: () => {
           dispatch(widgetsToPositionAction('bottom'));
         },
+        onEditSelectWidget: args => {
+          dispatch(selectWidgetAction(args));
+        },
         onEditCopyWidgets: (ids?: string[]) => {
           dispatch(copyWidgetsAction());
         },
@@ -91,11 +96,9 @@ export const WidgetActionProvider: FC<{
             const { wid, w, h } = args;
             dispatch(changeGroupRectAction({ renderMode, boardId, wid, w, h }));
           },
-          500,
+          60,
         ),
-        onAdjustGroupWidget: (wid: string) => {
-          dispatch(editBoardStackActions.adjustGroupWidget({ wid }));
-        },
+
         onEditDeleteActiveWidgets: debounce((ids?: string[]) => {
           dispatch(deleteWidgetsAction(ids));
         }, 200),
@@ -263,8 +266,11 @@ export const WidgetActionProvider: FC<{
             }),
           );
         },
-        onEditComposeGroup: () => {
-          dispatch(onComposeGroupAction(boardType));
+        onEditComposeGroup: wid => {
+          dispatch(onComposeGroupAction(wid));
+        },
+        onEditUnGroupAction: wid => {
+          dispatch(onUnGroupAction(wid));
         },
       };
       return contextValue;
@@ -306,7 +312,12 @@ export interface WidgetActionContextProps {
   onWidgetsReset: () => void;
 
   // editor
-  onAdjustGroupWidget: (wid: string) => void;
+  // selectWidget
+  onEditSelectWidget: (args: {
+    multipleKey: boolean;
+    id: string;
+    selected: boolean;
+  }) => void;
   onEditChartWidget: (widget: Widget) => void;
   onEditContainerWidget: (wid: string) => void;
   onEditMediaWidget: (wid: string) => void;
@@ -323,7 +334,8 @@ export interface WidgetActionContextProps {
   onEditLayerToBottom: () => void;
   onEditCopyWidgets: (ids?: string[]) => void;
   onEditPasteWidgets: () => void;
-  onEditComposeGroup: () => void;
+  onEditComposeGroup: (wid?: string) => void;
+  onEditUnGroupAction: (wid?: string) => void;
   onEditFreeWidgetRect: (rect: RectConfig, wid: string) => void;
   //
 }

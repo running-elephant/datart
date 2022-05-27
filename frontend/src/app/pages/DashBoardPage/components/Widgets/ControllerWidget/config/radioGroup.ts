@@ -44,7 +44,7 @@ const NameI18N = {
   en: 'RadioGroup',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: '',
+  icon: 'control-widget',
   originalType: ORIGINAL_TYPE_MAP.radioGroup,
   canWrapped: true,
   controllable: true,

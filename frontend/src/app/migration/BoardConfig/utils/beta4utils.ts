@@ -17,12 +17,14 @@
  */
 
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
+import { BoardType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ITimeDefault,
   Widget,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { IFontDefault } from 'types';
 import widgetManagerInstance from '../../../pages/DashBoardPage/components/WidgetManager';
+import { RectConfig } from '../../../pages/DashBoardPage/pages/Board/slice/types';
 import { WidgetBeta3 } from '../types';
 
 const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
@@ -30,6 +32,9 @@ const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
   newWidget.config.index = oldW.config.index;
   newWidget.config.lock = oldW.config.lock;
   newWidget.config.rect = oldW.config.rect;
+  newWidget.dashboardId = oldW.dashboardId;
+  // @ts-ignore
+  newWidget.config.pRect = oldW.config.pRect;
   newWidget.config.content = oldW.config.content; //Todo
   newWidget.config.name = oldW.config.name;
   const oldConf = oldW.config;
@@ -318,8 +323,10 @@ export const convertMediaWidgetToBeta4 = (widget: WidgetBeta3) => {
     newWidget = commonBeta4Convert(newWidget, widget);
 
     const oldConf = widget.config.content.timerConfig;
+
     newWidget.config.customConfig.props?.forEach(prop => {
       // timerGroup
+      if (!oldConf) return;
       if (prop.key === 'timerGroup') {
         prop.rows?.forEach(row => {
           if (row.key === 'time') {
@@ -361,6 +368,24 @@ export const convertControllerToBeta4 = (widget: WidgetBeta3) => {
   newWidget = widgetManagerInstance.toolkit(subType).create({ ...widget });
   newWidget = commonBeta4Convert(newWidget, widget);
   return newWidget;
+};
+export const convertToBeta4AutoWidget = (
+  boardType: BoardType,
+  widget?: Widget,
+) => {
+  if (!widget) return undefined;
+  if (boardType === 'free') return widget;
+  if (!widget.config.pRect) {
+    widget.config.pRect = widget.config.rect;
+    const newRect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: 400,
+      height: 300,
+    };
+    widget.config.rect = newRect;
+  }
+  return widget;
 };
 /**
  *

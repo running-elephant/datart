@@ -974,7 +974,9 @@
         "multiSelect": "MultiSelect",
         "zoomIn": "Zoom Out",
         "zoomOut": "Zoom In",
-        "widgetList": "Widget List"
+        "widgetList": "Widget List",
+        "group": "Group",
+        "unGroup": "Ungroup"
       },
       "controlTypes": {
         "common": "Common",
@@ -1070,7 +1072,9 @@
         "makeLinkage": "Set Linkage",
         "closeLinkage": "Close Linkage",
         "makeJump": "Set Jump",
-        "closeJump": "Close Jump"
+        "closeJump": "Close Jump",
+        "group": "Group",
+        "unGroup": "Ungroup"
       },
       "tips": {
         "unlock": "Locking drag and click to unlock",

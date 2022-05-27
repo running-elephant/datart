@@ -25,7 +25,7 @@ export interface Widget {
   relations: Relation[];
   viewIds: string[];
   config: WidgetConf;
-  parentId?: string;
+  parentId: string;
 }
 export type CustomConfig = {
   datas?: ChartDataConfig[];
@@ -46,8 +46,10 @@ export interface WidgetConf {
   // visible: boolean; // 是否可见 TODO: 后续考虑
   customConfig: CustomConfig;
   content?: any;
-  rect: RectConfig;
-  mRect?: RectConfig;
+  rect: RectConfig; // rect of freeBoard
+  mRect?: RectConfig; // mobile rect of autoBoard
+  pRect: RectConfig; // pc rect of autoBoard
+  // tRect?: RectConfig; // tablet rect of autoBoard
   parentId?: string;
   children?: string[];
   linkageConfig?: LinkageConfig; //联动设置 TODO: in selfConfig
@@ -132,5 +134,16 @@ export const widgetActionTypes = [
   'closeJump',
   'lock',
   'unlock',
+  'group',
+  'unGroup',
 ] as const;
 export type widgetActionType = typeof widgetActionTypes[number];
+
+export type WidgetMapping = Record<
+  string,
+  {
+    oldId: string;
+    newId: string;
+    newClientId: string;
+  }
+>;

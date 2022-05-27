@@ -72,7 +72,7 @@ const NameI18N = {
   en: 'Video',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'video',
+  icon: 'video-widget',
   originalType: ORIGINAL_TYPE_MAP.video,
   canWrapped: true,
   controllable: false,
@@ -135,12 +135,10 @@ const widgetToolkit: VideoWidgetToolKit = {
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      widget.config.rect = { ...initAutoWidgetRect() };
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      widget.config.rect = { ...initFreeWidgetRect() };
-    }
+
+    widget.config.rect = { ...initFreeWidgetRect() };
+    widget.config.pRect = { ...initAutoWidgetRect() };
+    widget.config.mRect = undefined;
 
     widget.config.customConfig.props = [
       { ...initVideoTpl() },
@@ -168,6 +166,10 @@ const widgetToolkit: VideoWidgetToolKit = {
       },
       {
         key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
         renderMode: ['edit'],
       },
     ];

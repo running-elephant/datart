@@ -26,8 +26,8 @@ export default function useGridLayoutMap(layoutWidgets: Widget[]) {
       sm: [],
     };
     layoutWidgets.forEach(widget => {
-      const lg = widget.config.rect || widget.config.mRect || {};
-      const sm = widget.config.mRect || widget.config.rect || {};
+      const lg = widget.config.pRect || widget.config.mRect || {};
+      const sm = widget.config.mRect || widget.config.pRect || {};
       const lock = widget.config.lock;
       layoutMap.lg.push({
         i: widget.id,

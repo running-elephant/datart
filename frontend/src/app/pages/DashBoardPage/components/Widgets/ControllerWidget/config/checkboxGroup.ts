@@ -48,7 +48,7 @@ const NameI18N = {
   en: 'Checkbox',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: '',
+  icon: 'control-widget',
   originalType: ORIGINAL_TYPE_MAP.checkboxGroup,
   canWrapped: true,
   controllable: true,

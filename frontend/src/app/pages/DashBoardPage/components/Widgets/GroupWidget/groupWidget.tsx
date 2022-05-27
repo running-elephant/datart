@@ -17,8 +17,9 @@
  */
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { editBoardStackActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import { memo, useContext, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { LEVEL_10 } from 'styles/StyleConstants';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
@@ -28,22 +29,46 @@ import { GroupWidgetCore } from './groupWidgetCore';
 
 export const GroupWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
-  const wid = widget.id;
-
-  const { editing } = useContext(BoardContext);
-  const { onChangeGroupRect, onAdjustGroupWidget } =
-    useContext(WidgetActionContext);
-
-  // useEffect(() => {
-  //   onAdjustGroupWidget(wid);
-  // }, [onAdjustGroupWidget, wid, widget.config.children?.length]);
-  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
+  const { onEditDeleteActiveWidgets } = useContext(WidgetActionContext);
+  const boardType = widget.config.boardType;
+  const dispatch = useDispatch();
   useEffect(() => {
-    onChangeGroupRect({ wid, w: cacheW, h: cacheH });
+    dispatch(
+      editBoardStackActions.adjustGroupWidgets({ groupIds: [widget.id] }),
+    );
+    if (!widget.config.children?.length) {
+      onEditDeleteActiveWidgets([widget.id]);
+    }
+  }, [
+    dispatch,
+    onEditDeleteActiveWidgets,
+    widget.config.children?.length,
+    widget.id,
+  ]);
+  if (boardType === 'auto' && !widget.parentId) {
+    return <AutoGroupWidget />;
+  } else {
+    return <FreeGroupWidget />;
+  }
+});
+export const FreeGroupWidget: React.FC<{}> = memo(() => {
+  const widget = useContext(WidgetContext);
+  const wid = widget.id;
+  const { editing } = useContext(BoardContext);
+  const rect = widget.config.rect;
+  const { onChangeGroupRect } = useContext(WidgetActionContext);
+  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
+    refreshRate: 60,
+  });
+  useEffect(() => {
+    if (cacheW > 1 && cacheH > 1) {
+      onChangeGroupRect({ wid, w: cacheW, h: cacheH });
+    }
   }, [cacheW, cacheH, wid, onChangeGroupRect]);
+
   return (
     <StyleWrapper className="group-wrapper" ref={cacheWhRef}>
-      <AbsoluteWrapper className="group-absolute" rect={widget.config.rect}>
+      <AbsoluteWrapper className="group-absolute" x={rect.x} y={rect.y}>
         <RelativeWrapper className="group-relative">
           <GroupWidgetCore widgetIds={widget.config.children || []} />
         </RelativeWrapper>
@@ -53,11 +78,38 @@ export const GroupWidget: React.FC<{}> = memo(() => {
     </StyleWrapper>
   );
 });
-// relative
-const AbsoluteWrapper = styled.div<{ rect: RectConfig }>`
+
+export const AutoGroupWidget: React.FC<{}> = memo(() => {
+  const widget = useContext(WidgetContext);
+  const wid = widget.id;
+  const { editing } = useContext(BoardContext);
+  const { onChangeGroupRect } = useContext(WidgetActionContext);
+
+  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
+    refreshRate: 60,
+  });
+  useEffect(() => {
+    if (cacheW > 1 && cacheH > 1) {
+      onChangeGroupRect({ wid, w: cacheW, h: cacheH });
+    }
+  }, [cacheW, cacheH, wid, onChangeGroupRect, editing]);
+
+  return (
+    <StyleWrapper className="group-wrapper" ref={cacheWhRef}>
+      <AbsoluteWrapper className="group-absolute" x={0} y={0}>
+        <RelativeWrapper className="group-relative">
+          <GroupWidgetCore widgetIds={widget.config.children || []} />
+        </RelativeWrapper>
+      </AbsoluteWrapper>
+
+      {editing && <EditMask />}
+    </StyleWrapper>
+  );
+});
+const AbsoluteWrapper = styled.div<{ x: number; y: number }>`
   position: absolute;
-  top: ${p => -p.rect.y + 'px'};
-  left: ${p => -p.rect.x + 'px'};
+  top: ${p => -p.y + 'px'};
+  left: ${p => -p.x + 'px'};
   z-index: ${LEVEL_10};
   flex: 1;
 `;

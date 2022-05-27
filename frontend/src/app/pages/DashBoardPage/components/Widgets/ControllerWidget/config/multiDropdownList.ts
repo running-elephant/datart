@@ -44,7 +44,7 @@ const NameI18N = {
   en: 'MultiDropdownList',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: '',
+  icon: 'control-widget',
   originalType: ORIGINAL_TYPE_MAP.multiDropdownList,
   canWrapped: true,
   controllable: true,

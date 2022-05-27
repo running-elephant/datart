@@ -25,7 +25,6 @@ import type {
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
   initPaddingTpl,
@@ -45,7 +44,7 @@ const NameI18N = {
   en: 'Image',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'img',
+  icon: 'image-widget',
   originalType: ORIGINAL_TYPE_MAP.image,
   canWrapped: true,
   controllable: false,
@@ -106,24 +105,22 @@ export const widgetToolkit: ImageToolkit = {
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 6,
-        height: 9,
-      };
-      widget.config.rect = rect;
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 500,
-        height: 400,
-      };
-      widget.config.rect = rect;
-    }
+
+    const rect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: 500,
+      height: 400,
+    };
+    widget.config.rect = rect;
+    const pRect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: 6,
+      height: 9,
+    };
+    widget.config.pRect = pRect;
+    widget.config.mRect = undefined;
 
     widget.config.customConfig.props = [
       { ...initBackgroundTpl() },
@@ -158,6 +155,10 @@ export const widgetToolkit: ImageToolkit = {
       },
       {
         key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
         renderMode: ['edit'],
       },
     ];

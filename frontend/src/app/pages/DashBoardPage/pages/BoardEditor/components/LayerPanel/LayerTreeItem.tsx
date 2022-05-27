@@ -16,15 +16,16 @@
  * limitations under the License.
  */
 import { TreeDataNode } from 'antd';
+import { renderIcon } from 'app/hooks/useGetVizIcon';
 import { WidgetDropdownList } from 'app/pages/DashBoardPage/components/WidgetComponents/WidgetDropdownList';
+import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import classNames from 'classnames';
-import { FC, memo, useCallback, useContext } from 'react';
-import { useDispatch } from 'react-redux';
+import { FC, memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { G30, PRIMARY } from 'styles/StyleConstants';
-import { editWidgetInfoActions } from '../../slice';
+import { WidgetActionContext } from '../../../../components/ActionProvider/WidgetActionProvider';
 
 export interface LayerNode extends TreeDataNode {
   key: string;
@@ -36,6 +37,11 @@ export interface LayerNode extends TreeDataNode {
   originalType: string;
   boardId: string;
 }
+export type EventLayerNode = LayerNode & {
+  dragOver: boolean;
+  dragOverGapTop: boolean;
+  dragOverGapBottom: boolean;
+};
 export const LayerTreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
   return (
     <WidgetWrapProvider
@@ -51,20 +57,23 @@ export const LayerTreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
 export const TreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
   const { title, selected } = node;
   const widget = useContext(WidgetContext);
-  const dispatch = useDispatch();
+  const { onEditSelectWidget } = useContext(WidgetActionContext);
   const menuSelect = useCallback(
     (node: LayerNode) => e => {
       e.stopPropagation();
-      dispatch(
-        editWidgetInfoActions.selectWidget({
-          multipleKey: e.shiftKey,
-          id: node.key as string,
-          selected: true,
-        }),
-      );
+
+      onEditSelectWidget({
+        multipleKey: e.shiftKey,
+        id: node.key as string,
+        selected: true,
+      });
     },
-    [dispatch],
+    [onEditSelectWidget],
   );
+  const icon = useMemo(() => {
+    const iconStr = widgetManager.meta(widget.config.originalType).icon;
+    return renderIcon(iconStr);
+  }, [widget.config.originalType]);
   return (
     <StyledWrapper>
       <div
@@ -72,6 +81,7 @@ export const TreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
         className={classNames('layer-item', { selected: selected })}
       >
         <span className="widget-name" title={title as string}>
+          <span className="widget-icon">{icon}</span>
           {String(title) || 'untitled-widget'}
         </span>
 
@@ -100,6 +110,10 @@ const StyledWrapper = styled.div`
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+    .widget-icon {
+      display: inline-block;
+      width: 20px;
     }
   }
 

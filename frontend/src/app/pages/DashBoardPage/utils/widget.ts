@@ -18,7 +18,9 @@
 
 import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
 import {
+  ContainerItem,
   TabWidgetContent,
+  WidgetOfCopy,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
@@ -28,8 +30,9 @@ import { formatTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
 import { CSSProperties } from 'react';
+import { CloneValueDeep } from 'utils/object';
 import { adaptBoardImageUrl, fillPx, getBackgroundImage } from '.';
-import { adjustGroupWidgets } from '../components/Widgets/GroupWidget/utils';
+import { initClientId } from '../components/WidgetManager/utils/init';
 import { LAYOUT_COLS_MAP, ORIGINAL_TYPE_MAP } from '../constants';
 import {
   BackgroundConfig,
@@ -46,7 +49,7 @@ import {
   WidgetPadding,
 } from '../pages/Board/slice/types';
 import { StrControlTypes } from '../pages/BoardEditor/components/ControllerWidgetPanel/constants';
-import { Widget } from '../types/widgetTypes';
+import { Widget, WidgetMapping } from '../types/widgetTypes';
 
 export const VALUE_SPLITTER = '###';
 
@@ -190,15 +193,15 @@ export const updateAutoWidgetsRect = (
   let itemYs = [...dashWidgetRectYs];
   widgets.forEach(widget => {
     const itemX =
-      (widgetsCount * widget.config.rect.width) % LAYOUT_COLS_MAP.lg;
+      (widgetsCount * widget.config.pRect.width) % LAYOUT_COLS_MAP.lg;
     const itemY = Math.max(...itemYs, 0);
     const nextRect = {
-      ...widget.config.rect,
+      ...widget.config.pRect,
       x: itemX,
       y: itemY,
     };
     widget = produce(widget, draft => {
-      draft.config.rect = nextRect;
+      draft.config.pRect = nextRect;
     });
     upDatedWidgets.push(widget);
     widgetsCount++;
@@ -679,15 +682,62 @@ export const getValueByRowData = (
   return data?.rowData[toCaseField];
 };
 
-export const deleteEffect = (widgetMap: Record<string, Widget>) => {
-  let groupIds: string[] = [];
-  Object.values(widgetMap).forEach(widget => {
-    if (widget.config.originalType === ORIGINAL_TYPE_MAP.group) {
-      if (widgetMap[widget.id]) {
-        groupIds.push(widget.id);
-      }
+export function cloneWidgets(args: {
+  widgets: WidgetOfCopy[];
+  dataChartMap: Record<string, DataChart>;
+  newWidgetMapping: WidgetMapping;
+}) {
+  const newDataCharts: DataChart[] = [];
+  const newWidgets: Widget[] = [];
+  const { widgets, dataChartMap, newWidgetMapping } = args;
+  widgets.forEach(widget => {
+    const newWidget = CloneValueDeep(widget);
+    delete newWidget.selectedCopy;
+    newWidget.id = newWidgetMapping[newWidget.id]?.newId;
+    newWidget.parentId = newWidgetMapping[widget.parentId]?.newId || '';
+    newWidget.config.clientId =
+      newWidgetMapping[widget.id]?.newClientId || initClientId();
+    newWidget.relations = [];
+    newWidget.config.name += '_copy';
+    // group
+    newWidget.config.children = newWidget.config.children?.map(id => {
+      return newWidgetMapping[id].newId;
+    });
+    // tab
+    if (newWidget.config.type === 'container') {
+      const content = newWidget.config.content as TabWidgetContent;
+      const itemList = Object.values(content.itemMap);
+      const newItemMap = itemList.reduce((acc, cur) => {
+        const newTabId =
+          newWidgetMapping[cur.childWidgetId]?.newClientId || initClientId();
+        acc[newTabId] = {
+          index: cur.index,
+          name: cur.name,
+          tabId: newTabId,
+          childWidgetId: newWidgetMapping[cur.childWidgetId]?.newId || '',
+        };
+        return acc;
+      }, {} as Record<string, ContainerItem>);
+      content.itemMap = newItemMap;
     }
-  });
+    //chart
+    if (newWidget.config.type === 'chart') {
+      let dataChart = dataChartMap[newWidget.datachartId];
+      const newDataChart: DataChart = CloneValueDeep({
+        ...dataChart,
+        id: dataChart.id + Date.now() + '_copy',
+      });
+      newWidget.config.originalType = ORIGINAL_TYPE_MAP.ownedChart;
+      newWidget.datachartId = newDataChart.id;
+      newDataCharts.push(newDataChart);
+      // TODO fix
 
-  adjustGroupWidgets({ groupIds: groupIds, widgetMap });
-};
+      // dispatch(boardActions.setDataChartToMap([newDataChart]));
+    }
+    newWidgets.push(newWidget);
+  });
+  return {
+    newDataCharts,
+    newWidgets,
+  };
+}

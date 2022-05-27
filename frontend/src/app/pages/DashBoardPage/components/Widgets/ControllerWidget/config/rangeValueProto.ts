@@ -41,7 +41,7 @@ const NameI18N = {
   en: 'RangeValue',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: '',
+  icon: 'control-widget',
   originalType: ORIGINAL_TYPE_MAP.rangeValue,
   canWrapped: true,
   controllable: true,

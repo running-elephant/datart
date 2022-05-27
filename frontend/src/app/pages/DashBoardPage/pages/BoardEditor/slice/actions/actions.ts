@@ -17,37 +17,43 @@
  */
 import { ChartEditorBaseProps } from 'app/components/ChartEditor';
 import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
-import { getParentRect } from 'app/pages/DashBoardPage/components/Widgets/GroupWidget/utils';
+import { initClientId } from 'app/pages/DashBoardPage/components/WidgetManager/utils/init';
+import {
+  findParentIds,
+  getParentRect,
+} from 'app/pages/DashBoardPage/components/Widgets/GroupWidget/utils';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
-  BoardType,
+  ContainerItem,
   Dashboard,
   DataChart,
   TabWidgetContent,
   VizRenderMode,
-  WidgetInfo,
   WidgetOfCopy,
   WidgetType,
   WidgetTypes,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
-import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
+  Widget,
+  WidgetMapping,
+} from 'app/pages/DashBoardPage/types/widgetTypes';
+import {
+  cloneWidgets,
   createWidgetInfo,
-  createWidgetInfoMap,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import produce from 'immer';
 import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
-import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { ORIGINAL_TYPE_MAP } from '../../../../constants';
 import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
-import { LayerNode } from '../../components/LayerList/LayerTreeItem';
+import { EventLayerNode } from '../../components/LayerPanel/LayerTreeItem';
+import { getNewDragNodeValue } from '../../components/LayerPanel/utils';
 import { getEditChartWidgetDataAsync } from '../thunk';
 import { EditBoardState, HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
@@ -87,24 +93,12 @@ export const deleteWidgetsAction = (ids?: string[]) => (dispatch, getState) => {
     if (!curWidget) continue;
 
     const widgetType = curWidget.config.type;
-    const originalType = curWidget.config.originalType;
     shouldDeleteIds.push(id);
     effectTypes.push(widgetType);
-
-    // delete 递归删除所子节点;
-    if (originalType === ORIGINAL_TYPE_MAP.tab) {
-      const content = curWidget.config.content as TabWidgetContent;
-      Object.values(content.itemMap).forEach(item => {
-        if (item.childWidgetId) {
-          selectedIds.push(item.childWidgetId);
-        }
-      });
-    }
-    if (originalType === ORIGINAL_TYPE_MAP.group) {
-      (curWidget.config.children || []).forEach(id => {
-        selectedIds.push(id);
-      });
-    }
+    // 删除子节点
+    (curWidget.config.children || []).forEach(id => {
+      selectedIds.push(id);
+    });
   }
 
   dispatch(editBoardStackActions.deleteWidgets(shouldDeleteIds));
@@ -157,7 +151,7 @@ export const widgetsToPositionAction =
 export const copyWidgetsAction = (wIds?: string[]) => (dispatch, getState) => {
   const { editBoard } = getState();
   const { widgetInfoRecord } = editBoard as EditBoardState;
-  const { widgetRecord } = (editBoard as HistoryEditBoard).stack.present;
+  const widgetMap = (editBoard as HistoryEditBoard).stack.present.widgetRecord;
   let selectedIds: string[] = [];
 
   if (wIds) {
@@ -169,87 +163,86 @@ export const copyWidgetsAction = (wIds?: string[]) => (dispatch, getState) => {
         .map(widgetInfo => widgetInfo.id) || [];
   }
   if (!selectedIds.length) return;
+  const selectedItemParentIds: string[] = [];
+  selectedIds.forEach(id => {
+    if (widgetMap[id]) {
+      const pid = widgetMap[id].parentId || '';
+      if (!selectedItemParentIds.includes(pid)) {
+        selectedItemParentIds.push(pid);
+      }
+    }
+  });
+  // 只可以同层级的widget可以复制 来自不同层级的 不可以同时复制
+  /*
+  a:{
+    id:a,
+    children:[b,c],
+    parentId:''
+  }
+  **/
+  //  复制 a 的时候以及复制了b和c ,不会再单独复制 b,c了
+  if (selectedItemParentIds.length > 1) return;
   // 新复制前先清空
   dispatch(editDashBoardInfoActions.clearClipboardWidgets());
   const newWidgets: Record<string, WidgetOfCopy> = {};
-  selectedIds.forEach(wid => {
-    const widget = widgetRecord[wid];
-    newWidgets[wid] = { ...widget, selectedCopy: true };
+  let needCopyWidgetIds = selectedIds;
+  while (needCopyWidgetIds.length > 0) {
+    const id = needCopyWidgetIds.pop();
+    if (!id) continue;
+    const widget = widgetMap[id];
+    newWidgets[id] = { ...widget, selectedCopy: true };
+    // group
+    if (widget.config.children?.length) {
+      needCopyWidgetIds = needCopyWidgetIds.concat(widget.config.children);
+    }
     if (widget.config.type === 'container') {
       const content = widget.config.content as TabWidgetContent;
       Object.values(content.itemMap).forEach(item => {
         if (item.childWidgetId) {
-          const subWidget = widgetRecord[item.childWidgetId];
-          newWidgets[subWidget.id] = subWidget;
+          const subWidget = widgetMap[item.childWidgetId];
+          if (subWidget) {
+            newWidgets[subWidget.id] = subWidget;
+          }
         }
       });
     }
-  });
+  }
   dispatch(editDashBoardInfoActions.addClipboardWidgets(newWidgets));
 };
+
 // 粘贴 widgets
 export const pasteWidgetsAction = () => (dispatch, getState) => {
   const state = getState();
   const {
-    boardInfo: { clipboardWidgets },
+    boardInfo: { clipboardWidgetMap },
   } = state.editBoard as EditBoardState;
   const boardState = state.board as BoardState;
 
-  const clipboardWidgetList = Object.values(clipboardWidgets);
+  const clipboardWidgetList = Object.values(clipboardWidgetMap);
   if (!clipboardWidgetList?.length) return;
 
+  const newWidgetMapping = clipboardWidgetList.reduce((acc, cur) => {
+    acc[cur.id] = {
+      oldId: cur.id,
+      newId: cur.config.originalType + '_' + uuidv4(),
+      newClientId: initClientId(),
+    };
+    return acc;
+  }, {} as WidgetMapping);
   const dataChartMap = boardState.dataChartMap;
 
-  const newWidgets: Widget[] = [];
-
-  clipboardWidgetList.forEach(widget => {
-    if (widget.selectedCopy) {
-      const newWidget = cloneWidget(widget);
-
-      if (newWidget.config.type === 'container') {
-        const content = newWidget.config.content as TabWidgetContent;
-        Object.values(content.itemMap).forEach(item => {
-          if (item.childWidgetId) {
-            const subWidget = clipboardWidgets[item.childWidgetId];
-            const newSubWidget = cloneWidget(subWidget, newWidget.id);
-            item.childWidgetId = newSubWidget.id;
-            newWidgets.push(newSubWidget);
-          }
-        });
-      } else if (newWidget.config.type === 'chart') {
-        // #issue #588
-        let dataChart = dataChartMap[newWidget.datachartId];
-        const newDataChart: DataChart = CloneValueDeep({
-          ...dataChart,
-          id: dataChart.id + Date.now() + '_copy',
-        });
-        newWidget.config.originalType = 'ownedChart';
-        newWidget.datachartId = newDataChart.id;
-        dispatch(boardActions.setDataChartToMap([newDataChart]));
-      }
-      newWidgets.push(newWidget);
-    }
+  const { newDataCharts, newWidgets } = cloneWidgets({
+    widgets: clipboardWidgetList,
+    dataChartMap,
+    newWidgetMapping,
   });
-  const widgetInfoMap: Record<string, WidgetInfo> = {};
-  newWidgets.forEach(widget => {
+  const widgetInfos = newWidgets.map(widget => {
     const widgetInfo = createWidgetInfo(widget.id);
-    widgetInfoMap[widget.id] = widgetInfo;
+    return widgetInfo;
   });
-
-  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
+  dispatch(boardActions.setDataChartToMap(newDataCharts));
+  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfos));
   dispatch(editBoardStackActions.addWidgets(newWidgets));
-
-  //
-  function cloneWidget(widget: WidgetOfCopy, pId?: string) {
-    const newWidget = CloneValueDeep(widget);
-    newWidget.id = newWidget.config.originalType + '_' + uuidv4();
-    newWidget.parentId = pId || '';
-    newWidget.relations = [];
-    newWidget.config.name += '_copy';
-
-    delete newWidget.selectedCopy;
-    return newWidget as Widget;
-  }
 };
 
 export const editChartInWidgetAction =
@@ -328,46 +321,94 @@ export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
     }),
   );
 };
-export const onComposeGroupAction =
-  (boardType: BoardType, wid?: string) => (dispatch, getState) => {
-    if (boardType === 'auto') return;
-    const rootState = getState() as RootState;
-    const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
-    const stackState = editBoardState.stack.present;
-    const curBoard = stackState.dashBoard;
-    const widgetMap = stackState.widgetRecord;
-    const widgetInfos = Object.values(editBoardState.widgetInfoRecord || {});
-    let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);
-    wid && selectedIds.push(wid);
-    selectedIds = [...new Set(selectedIds)];
-    if (!selectedIds.length) return;
-    let groupWidget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.group).create({
-      boardType: curBoard.config.type,
-      children: selectedIds,
-    });
-    groupWidget.config.rect = getParentRect({
-      childIds: selectedIds,
-      widgetMap,
-      preRect: groupWidget.config.rect,
-    });
-    const items = selectedIds.map(id => {
-      return {
-        wid: id,
-        nextIndex: widgetMap[id].config.index,
-      };
-    });
-    const widgetInfoMap = createWidgetInfoMap([groupWidget]);
-    dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
-    dispatch(editBoardStackActions.addWidgets([groupWidget]));
-    //  dispatch(addWidgetsToEditBoard([groupWidget]));
+export const onComposeGroupAction = (wid?: string) => (dispatch, getState) => {
+  const rootState = getState() as RootState;
+  const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
+  const stackState = editBoardState.stack.present;
+  const curBoard = stackState.dashBoard;
+  const cutBoardType = curBoard.config.type;
+  const widgetMap = stackState.widgetRecord;
+  const widgetInfos = Object.values(editBoardState.widgetInfoRecord || {});
+  let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);
+  wid && selectedIds.push(wid);
+  selectedIds = [...new Set(selectedIds)];
+  if (!selectedIds.length) return;
+  const selectedItemParentIds: string[] = [];
+  selectedIds.forEach(id => {
+    if (widgetMap[id]) {
+      const pid = widgetMap[id].parentId || '';
+      if (!selectedItemParentIds.includes(pid)) {
+        selectedItemParentIds.push(pid);
+      }
+    }
+  });
+  // 只可以同层级的widget 成组 来自不同层级的 不可以成组
+  if (selectedItemParentIds.length > 1) return;
+  let groupWidget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.group).create({
+    boardType: curBoard.config.type,
+    children: selectedIds,
+    parentId: selectedItemParentIds[0],
+  });
+  groupWidget.config.rect = getParentRect({
+    childIds: selectedIds,
+    widgetMap,
+    preRect: groupWidget.config.rect,
+  });
+  const items = selectedIds.map(id => {
+    return {
+      wid: id,
+      nextIndex: widgetMap[id].config.index,
+      parentId: groupWidget.id,
+    };
+  });
+  const widgetInfo = createWidgetInfo(groupWidget.id);
+  widgetInfo.selected = true;
+  dispatch(editWidgetInfoActions.addWidgetInfos([widgetInfo]));
+  dispatch(editBoardStackActions.addWidgets([groupWidget]));
 
-    dispatch(
-      editBoardStackActions.changeWidgetsParentId({
-        items,
-        parentId: groupWidget.id,
-      }),
-    );
-  };
+  dispatch(editBoardStackActions.changeWidgetsParentId({ items }));
+};
+export const onUnGroupAction = (wid?: string) => (dispatch, getState) => {
+  const rootState = getState() as RootState;
+  const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
+  const stackState = editBoardState.stack.present;
+  const curBoard = stackState.dashBoard;
+  const cutBoardType = curBoard.config.type;
+  const widgetMap = stackState.widgetRecord;
+  const widgetInfos = Object.values(editBoardState.widgetInfoRecord || {});
+  let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);
+  wid && selectedIds.push(wid);
+  selectedIds = [...new Set(selectedIds)];
+  if (!selectedIds.length) return;
+
+  selectedIds = selectedIds.filter(id => {
+    if (widgetMap[id]) {
+      const pw = widgetMap[id];
+      return pw.config.originalType === ORIGINAL_TYPE_MAP.group;
+    }
+    return false;
+  });
+
+  let childIdList: {
+    wid: string;
+    nextIndex: number;
+    parentId: string;
+  }[] = [];
+  selectedIds.forEach(pid => {
+    const pw = widgetMap[pid];
+    (pw.config.children || [])
+      .filter(id => widgetMap[id])
+      .forEach(id => {
+        childIdList.push({
+          wid: id,
+          nextIndex: widgetMap[id].config.index,
+          parentId: pw.parentId,
+        });
+      });
+  });
+
+  dispatch(editBoardStackActions.changeWidgetsParentId({ items: childIdList }));
+};
 export const addVariablesToBoard =
   (variables: Variable[]) => (dispatch, getState) => {
     if (!variables?.length) return;
@@ -450,155 +491,60 @@ export const editorWidgetClearLinkageAction = (widget: Widget) => dispatch => {
   });
 };
 
-export type EventLayerNode = LayerNode & {
-  dragOver: boolean;
-  dragOverGapTop: boolean;
-  dragOverGapBottom: boolean;
-};
 export const dropLayerNodeAction = info => (dispatch, getState) => {
   const dragNode = info.dragNode as EventLayerNode;
   const targetNode = info.node as EventLayerNode;
   const editBoard = getState().editBoard as HistoryEditBoard;
   const widgetMap = editBoard.stack.present.widgetRecord;
-  function parentIsContainer(node: EventLayerNode) {
-    if (!node.parentId) return false;
-    if (
-      widgetMap[node.parentId] &&
-      widgetMap[node.parentId].config.originalType !== ORIGINAL_TYPE_MAP.group
-    ) {
-      return true;
-    }
-    return false;
-  }
-  console.log('dragOver', targetNode.dragOver);
-  console.log('dragOverGapBottom', targetNode.dragOverGapBottom);
-  console.log('dragOverGapTop', targetNode.dragOverGapTop);
+
   /*
-  1 group -> group
-  2 group -> container
-  3 container -> group
-  4 container -> container
+  1 -> group
+  2 -> container
   */
-  // 1 group -> group
-  if (!parentIsContainer(dragNode) && !parentIsContainer(targetNode)) {
-    moveNodeGroupToGroup({ dispatch, targetNode, dragNode });
-    return;
-  }
-  //  2 group -> container
-  if (!parentIsContainer(dragNode) && parentIsContainer(targetNode)) {
-    moveNodeGroupToContainer({ dispatch, targetNode, dragNode });
-    return;
-  }
-  // 3 container -> group
-  if (parentIsContainer(dragNode) && !parentIsContainer(targetNode)) {
-    // moveNodeGroupToGroup({ dispatch, targetNode, dragNode });
-    moveNodeContainerToGroup({ dispatch, targetNode, dragNode });
-    return;
-  }
-  // 4 container -> container
-  if (parentIsContainer(dragNode) && parentIsContainer(targetNode)) {
-    moveNodeContainerToContainer({ dispatch, targetNode, dragNode });
-    return;
-  }
-  return;
-};
-
-export const moveNodeGroupToGroup = (args: {
-  dispatch;
-  dragNode: EventLayerNode;
-  targetNode: EventLayerNode;
-}) => {
-  const { dragNode, targetNode } = args;
-  if (dragNode.parentId === targetNode.parentId) {
-    // only change index
-    moveNodeInSameGroup(args);
-  } else {
-    //change parentId and index
-    moveNodeToOtherGroup(args);
-  }
-};
-
-export const moveNodeInSameGroup = (args: {
-  dispatch;
-  dragNode: EventLayerNode;
-  targetNode: EventLayerNode;
-}) => {
-  const { dispatch, dragNode, targetNode } = args;
-  if (targetNode.dragOver) return; //todo to group first
-  let nextIndex = 0;
-  if (targetNode.dragOverGapBottom) {
-    nextIndex = targetNode.widgetIndex - parseFloat(Math.random().toFixed(5));
-  }
-  if (targetNode.dragOverGapTop) {
-    nextIndex = targetNode.widgetIndex + 1;
-  }
-  dispatch(
-    editBoardStackActions.changeWidgetsIndex([
-      { id: dragNode.key, index: nextIndex },
-    ]),
-  );
-};
-
-export const moveNodeToOtherGroup = (args: {
-  dispatch;
-  dragNode: EventLayerNode;
-  targetNode: EventLayerNode;
-}) => {
-  const { dispatch, dragNode, targetNode } = args;
-  if (targetNode.dragOver) return; //todo to group first
-  let nextIndex = 0;
-  if (targetNode.dragOverGapBottom) {
-    nextIndex = targetNode.widgetIndex - parseFloat(Math.random().toFixed(5));
-  }
-  if (targetNode.dragOverGapTop) {
-    nextIndex = targetNode.widgetIndex + 1;
-  }
-  dispatch(
-    editBoardStackActions.changeWidgetsParentId({
-      items: [
-        {
-          wid: dragNode.key,
-          nextIndex,
-        },
-      ],
-      parentId: targetNode.parentId,
-    }),
-  );
-};
-
-export const moveNodeContainerToGroup = (args: {
-  dispatch;
-  dragNode: EventLayerNode;
-  targetNode: EventLayerNode;
-}) => {
-  const { dispatch, dragNode, targetNode } = args;
-  if (targetNode.dragOver) return;
-  dispatch(editBoardStackActions.dropTabToGroup({ dragNode, targetNode }));
-};
-export const moveNodeGroupToContainer = (args: {
-  dispatch;
-  dragNode: EventLayerNode;
-  targetNode: EventLayerNode;
-}) => {
-  const { dispatch, dragNode, targetNode } = args;
-  if (targetNode.dragOver) return;
-  dispatch(editBoardStackActions.dropGroupToTab({ dragNode, targetNode }));
-  // dropGroupToTab
-};
-export const moveNodeContainerToContainer = (args: {
-  dispatch;
-  dragNode: EventLayerNode;
-  targetNode: EventLayerNode;
-}) => {
-  const { dispatch, dragNode, targetNode } = args;
-  if (targetNode.dragOver) return;
-  if (dragNode.parentId === targetNode.parentId) {
-    // only change index
+  //拖拽节点来自 group
+  const newDragVal = getNewDragNodeValue({ widgetMap, dragNode, targetNode });
+  if (newDragVal.parentIsGroup) {
+    // 拖进 group
     dispatch(
-      editBoardStackActions.changeTabItemIndex({ dragNode, targetNode }),
+      editBoardStackActions.dropWidgetToGroup({
+        sourceId: dragNode.key,
+        newIndex: newDragVal.index,
+        targetId: newDragVal.parentId,
+      }),
     );
   } else {
-    //change parentId and index
-    dispatch(editBoardStackActions.dropTabToOtherTab({ dragNode, targetNode }));
+    // 拖进 tab
+    const dragWidget = widgetMap[dragNode.key];
+    const newItem: ContainerItem = {
+      index: newDragVal.index,
+      name: dragWidget.config.name,
+      tabId: dragWidget.config.clientId,
+      childWidgetId: dragWidget.id,
+    };
+    dispatch(
+      editBoardStackActions.dropWidgetToTab({
+        newItem,
+        targetId: newDragVal.parentId,
+      }),
+    );
+    return;
   }
 };
+
+export const selectWidgetAction =
+  (args: { multipleKey: boolean; id: string; selected: boolean }) =>
+  (dispatch, getState) => {
+    const { multipleKey, id, selected } = args;
+    const editBoard = getState().editBoard as HistoryEditBoard;
+    const widgetMap = editBoard.stack.present.widgetRecord;
+    const parentIds: string[] = [];
+    findParentIds({ widget: widgetMap[id], widgetMap, parentIds });
+    dispatch(
+      editWidgetInfoActions.selectWidget({
+        multipleKey,
+        id,
+        selected,
+        parentIds,
+      }),
+    );
+  };

@@ -44,8 +44,7 @@ const NameI18N = {
   en: 'RichText',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'richText',
-
+  icon: 'rich-text',
   originalType: ORIGINAL_TYPE_MAP.richText,
   canWrapped: true,
   controllable: false,
@@ -105,12 +104,10 @@ export const widgetToolkit: WidgetToolkit = {
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      widget.config.rect = { ...initAutoWidgetRect() };
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      widget.config.rect = { ...initFreeWidgetRect() };
-    }
+
+    widget.config.rect = { ...initFreeWidgetRect() };
+    widget.config.pRect = { ...initAutoWidgetRect() };
+    widget.config.mRect = undefined;
 
     widget.config.customConfig.props = [
       { ...initTitleTpl() },
@@ -126,6 +123,7 @@ export const widgetToolkit: WidgetToolkit = {
             {
               attributes: {
                 size: '24px',
+                color: '#448aff',
                 italic: true,
               },
               insert: 'ABCDEFG...',
@@ -155,6 +153,10 @@ export const widgetToolkit: WidgetToolkit = {
       },
       {
         key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
         renderMode: ['edit'],
       },
     ];
