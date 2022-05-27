@@ -1,5 +1,5 @@
 import { TreeNodeProps } from 'antd';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { ReactElement } from 'react';
@@ -30,6 +30,8 @@ export interface VizState {
   selectedTab: string;
   dataChartListLoading: boolean;
   chartPreviews: ChartPreview[];
+  selectedItems: Record<string, SelectedItem[]>;
+  multipleSelected: boolean;
 }
 
 export interface Folder {

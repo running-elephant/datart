@@ -18,7 +18,7 @@
 
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { CSSProperties } from 'react';
@@ -31,7 +31,14 @@ class ChartIFrameContainerDispatcher {
   private chartContainerMap = new Map<string, Function>();
   private chartMetadataMap = new Map<
     string,
-    [IChart, any, any, IChartDrillOption | undefined]
+    [
+      IChart,
+      any,
+      any,
+      IChartDrillOption | undefined,
+      SelectedItem[] | undefined,
+      ((event: KeyboardEvent) => void) | undefined,
+    ]
   >();
   private editorEnv = { env: 'workbench' };
 
@@ -55,8 +62,18 @@ class ChartIFrameContainerDispatcher {
     config: ChartConfig,
     style?: CSSProperties,
     drillOption?: IChartDrillOption,
+    selectedItems?: SelectedItem[],
+    KeyboardEventListenerFun?: (event: KeyboardEvent) => void,
   ): Function[] {
-    this.switchContainer(containerId, chart, dataset, config, drillOption);
+    this.switchContainer(
+      containerId,
+      chart,
+      dataset,
+      config,
+      drillOption,
+      selectedItems,
+      KeyboardEventListenerFun,
+    );
     const renders: Function[] = [];
     this.chartContainerMap.forEach((chartRenderer: Function, key) => {
       const isShown = key === this.currentContainerId;
@@ -79,12 +96,16 @@ class ChartIFrameContainerDispatcher {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption?: IChartDrillOption,
+    selectedItems?: SelectedItem[],
+    KeyboardEventListenerFun?: (event: KeyboardEvent) => void,
   ) {
     this.chartMetadataMap.set(containerId, [
       chart,
       dataset,
       config,
       drillOption,
+      selectedItems,
+      KeyboardEventListenerFun,
     ]);
     this.createNewIfNotExist(containerId);
   }
@@ -92,7 +113,15 @@ class ChartIFrameContainerDispatcher {
   private createNewIfNotExist(containerId: string) {
     if (!this.chartContainerMap.has(containerId)) {
       const newContainer =
-        (style, isShown) => (chart, dataset, config, drillOption) => {
+        (style, isShown) =>
+        (
+          chart,
+          dataset,
+          config,
+          drillOption,
+          selectedItems?: SelectedItem[],
+          KeyboardEventListenerFun?: (event: KeyboardEvent) => void,
+        ) => {
           return (
             <div key={containerId} style={style}>
               <ChartIFrameContainer
@@ -100,6 +129,8 @@ class ChartIFrameContainerDispatcher {
                 chart={chart}
                 config={config}
                 drillOption={drillOption}
+                selectedItems={selectedItems}
+                KeyboardEventListenerFun={KeyboardEventListenerFun}
                 containerId={containerId}
                 width={style?.width}
                 height={style?.height}

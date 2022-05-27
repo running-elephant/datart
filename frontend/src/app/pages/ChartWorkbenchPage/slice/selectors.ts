@@ -94,3 +94,13 @@ export const selectAvailableSourceFunctions = createSelector(
   workbenchSelector,
   wb => wb.availableSourceFunctions,
 );
+
+export const selectSelectedItems = createSelector(
+  workbenchSelector,
+  wb => wb.selectedItems,
+);
+
+export const selectMultipleSelectedState = createSelector(
+  workbenchSelector,
+  wb => wb.multipleSelected,
+);

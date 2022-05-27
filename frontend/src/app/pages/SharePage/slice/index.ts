@@ -51,6 +51,8 @@ export const initialState: SharePageState = {
   loginLoading: false,
   oauth2Clients: [],
   availableSourceFunctions: [],
+  selectedItems: [],
+  multipleSelected: false,
 };
 
 export const slice = createSlice({
@@ -174,6 +176,30 @@ export const slice = createSlice({
           action.payload.computedFields;
       }
     },
+    normalSelect(
+      state,
+      { payload }: PayloadAction<{ index: string; data: any }>,
+    ) {
+      const index = state.selectedItems?.findIndex(
+        v => payload.index === v.index,
+      );
+      if (state.multipleSelected) {
+        if (index < 0) {
+          state.selectedItems.push(payload);
+        } else {
+          state.selectedItems.splice(index, 1);
+        }
+      } else {
+        if (index < 0 || state.selectedItems.length > 1) {
+          state.selectedItems = [payload];
+        } else {
+          state.selectedItems = [];
+        }
+      }
+    },
+    updateMultipleSelectedState(state, { payload }: PayloadAction<boolean>) {
+      state.multipleSelected = payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -193,6 +219,7 @@ export const slice = createSlice({
             ...state.chartPreview,
             dataset: payload as any,
           };
+          state.selectedItems = [];
           state.headlessBrowserRenderSign = true;
         },
       )

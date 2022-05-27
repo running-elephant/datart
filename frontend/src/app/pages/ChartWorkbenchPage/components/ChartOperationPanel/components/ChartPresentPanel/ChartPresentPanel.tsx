@@ -26,7 +26,7 @@ import useMount from 'app/hooks/useMount';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
 import { FC, memo, useContext, useState } from 'react';
@@ -58,6 +58,8 @@ const ChartPresentPanel: FC<{
   allowQuery: boolean;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
+  selectedItems?: SelectedItem[];
+  KeyboardEventListenerFun?: (event: KeyboardEvent) => void;
 }> = memo(
   ({
     containerHeight,
@@ -69,6 +71,8 @@ const ChartPresentPanel: FC<{
     allowQuery,
     onRefreshDataset,
     onCreateDownloadDataTask,
+    selectedItems,
+    KeyboardEventListenerFun,
   }) => {
     const translate = useI18NPrefix(`viz.palette.present`);
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
@@ -96,6 +100,8 @@ const ChartPresentPanel: FC<{
           chartConfig!,
           style,
           drillOption,
+          selectedItems,
+          KeyboardEventListenerFun,
         )
       );
     };
