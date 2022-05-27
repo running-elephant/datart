@@ -31,7 +31,7 @@ export const useCacheWidthHeight = (arg?: {
   const {
     ref,
     width = initW ?? 1,
-    height = initW ?? 1,
+    height = initH ?? 1,
   } = useResizeObserver<HTMLDivElement>({
     refreshMode: refreshMode ?? 'debounce',
     refreshRate: refreshRate ?? 20,

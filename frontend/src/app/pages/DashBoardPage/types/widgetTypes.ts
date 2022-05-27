@@ -138,3 +138,12 @@ export const widgetActionTypes = [
   'unGroup',
 ] as const;
 export type widgetActionType = typeof widgetActionTypes[number];
+
+export type WidgetMapping = Record<
+  string,
+  {
+    oldId: string;
+    newId: string;
+    newClientId: string;
+  }
+>;

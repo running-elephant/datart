@@ -439,11 +439,14 @@ export const changeViewGroupRectAction =
       width: w,
       height: h,
     };
-    // 如果 group的直接父容器 是 tab容器
-    if (
-      parentWidget &&
-      parentWidget.config.originalType === ORIGINAL_TYPE_MAP.tab
-    ) {
+
+    const parentIsContainer =
+      parentWidget && parentWidget.config.type === 'container';
+
+    const parentIsAutoBoard =
+      parentWidget.config.type === 'container' && !widget.parentId;
+
+    if (parentIsContainer || parentIsAutoBoard) {
       dispatch(
         boardActions.changeFreeWidgetRect({
           boardId: widget.dashboardId,
@@ -452,20 +455,6 @@ export const changeViewGroupRectAction =
         }),
       );
       return;
-    }
-    // 如果 group的直接父容器 是 autoBoard
-    if (widget.config.boardType === 'auto') {
-      // autoBoard 第一层
-      if (!widget.parentId) {
-        dispatch(
-          boardActions.changeFreeWidgetRect({
-            boardId: widget.dashboardId,
-            wid,
-            rect,
-          }),
-        );
-        return;
-      }
     }
   };
 export const changeEditGroupRectAction =
@@ -492,30 +481,18 @@ export const changeEditGroupRectAction =
       width: w,
       height: h,
     };
-    // 如果 group的直接父容器 是 tab容器
-    if (
-      parentWidget &&
-      parentWidget.config.originalType === ORIGINAL_TYPE_MAP.tab
-    ) {
+    const parentIsContainer =
+      parentWidget && parentWidget.config.type === 'container';
+
+    const parentIsAutoBoard =
+      parentWidget.config.type === 'container' && !widget.parentId;
+
+    if (parentIsContainer || parentIsAutoBoard) {
       dispatch(
         editBoardStackActions.changeFreeWidgetRect({
           wid,
           rect,
         }),
       );
-      return;
-    }
-    // 如果 group的直接父容器 是 autoBoard
-    if (widget.config.boardType === 'auto') {
-      // autoBoard 第一层
-      if (!widget.parentId) {
-        dispatch(
-          editBoardStackActions.changeFreeWidgetRect({
-            wid,
-            rect,
-          }),
-        );
-        return;
-      }
     }
   };

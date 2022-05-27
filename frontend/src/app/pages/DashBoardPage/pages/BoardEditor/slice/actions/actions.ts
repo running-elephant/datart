@@ -35,14 +35,19 @@ import {
   WidgetTypes,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editWidgetInfoActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
-import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
-import { createWidgetInfo } from 'app/pages/DashBoardPage/utils/widget';
+import {
+  Widget,
+  WidgetMapping,
+} from 'app/pages/DashBoardPage/types/widgetTypes';
+import {
+  cloneWidgets,
+  createWidgetInfo,
+} from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import produce from 'immer';
 import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
-import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { ORIGINAL_TYPE_MAP } from '../../../../constants';
@@ -204,14 +209,7 @@ export const copyWidgetsAction = (wIds?: string[]) => (dispatch, getState) => {
   }
   dispatch(editDashBoardInfoActions.addClipboardWidgets(newWidgets));
 };
-export type WidgetMapping = Record<
-  string,
-  {
-    oldId: string;
-    newId: string;
-    newClientId: string;
-  }
->;
+
 // 粘贴 widgets
 export const pasteWidgetsAction = () => (dispatch, getState) => {
   const state = getState();
@@ -233,63 +231,8 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
   }, {} as WidgetMapping);
   const dataChartMap = boardState.dataChartMap;
 
-  const newWidgets: Widget[] = [];
-
-  function cloneWidgets(args: {
-    widgets: WidgetOfCopy[];
-    newWidgets: Widget[];
-    dataChartMap: Record<string, DataChart>;
-    newWidgetMapping: WidgetMapping;
-  }) {
-    const { widgets, dataChartMap } = args;
-    widgets.forEach(widget => {
-      const newWidget = CloneValueDeep(widget);
-      delete newWidget.selectedCopy;
-      newWidget.id = newWidgetMapping[newWidget.id]?.newId;
-      newWidget.parentId = newWidgetMapping[widget.parentId]?.newId || '';
-      newWidget.config.clientId =
-        newWidgetMapping[widget.id]?.newClientId || initClientId();
-      newWidget.relations = [];
-      newWidget.config.name += '_copy';
-      // group
-      newWidget.config.children = newWidget.config.children?.map(id => {
-        return newWidgetMapping[id].newId;
-      });
-      // tab
-      if (newWidget.config.type === 'container') {
-        const content = newWidget.config.content as TabWidgetContent;
-        const itemList = Object.values(content.itemMap);
-        const newItemMap = itemList.reduce((acc, cur) => {
-          const newTabId =
-            newWidgetMapping[cur.childWidgetId]?.newClientId || initClientId();
-          acc[newTabId] = {
-            index: cur.index,
-            name: cur.name,
-            tabId: newTabId,
-            childWidgetId: newWidgetMapping[cur.childWidgetId]?.newId || '',
-          };
-          return acc;
-        }, {} as Record<string, ContainerItem>);
-        content.itemMap = newItemMap;
-      }
-      //chart
-      if (newWidget.config.type === 'chart') {
-        let dataChart = dataChartMap[newWidget.datachartId];
-        const newDataChart: DataChart = CloneValueDeep({
-          ...dataChart,
-          id: dataChart.id + Date.now() + '_copy',
-        });
-        newWidget.config.originalType = ORIGINAL_TYPE_MAP.ownedChart;
-        newWidget.datachartId = newDataChart.id;
-        // TODO fix
-        dispatch(boardActions.setDataChartToMap([newDataChart]));
-      }
-      newWidgets.push(newWidget);
-    });
-  }
-  cloneWidgets({
+  const { newDataCharts, newWidgets } = cloneWidgets({
     widgets: clipboardWidgetList,
-    newWidgets,
     dataChartMap,
     newWidgetMapping,
   });
@@ -297,7 +240,7 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
     const widgetInfo = createWidgetInfo(widget.id);
     return widgetInfo;
   });
-
+  dispatch(boardActions.setDataChartToMap(newDataCharts));
   dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfos));
   dispatch(editBoardStackActions.addWidgets(newWidgets));
 };
