@@ -179,6 +179,8 @@ public class JdbcDataProviderAdapter implements Closeable {
                 foreignKey.setColumn(importedKeys.getString(PKCOLUMN_NAME));
                 keyMap.computeIfAbsent(importedKeys.getString(FKCOLUMN_NAME), key -> new ArrayList<>()).add(foreignKey);
             }
+        } catch (SQLFeatureNotSupportedException e) {
+            log.warn(e.getMessage());
         }
         return keyMap;
     }
