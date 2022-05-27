@@ -756,9 +756,6 @@
       "interaction": {
         "drillThrough": {
           "title": "Drill Through",
-          "event": "Ineraction Event",
-          "leftClick": "Left Click",
-          "rightClick": "Right Click",
           "rule": {
             "title": "Rule",
             "addRule": "+ Add New",
@@ -766,7 +763,13 @@
               "category": "Category",
               "open": "Open",
               "relation": "Relation",
-              "operation": "Operation"
+              "operation": "Operation",
+              "event": "Event"
+            },
+            "event": {
+              "title": "Event",
+              "left": "Left",
+              "right": "Right"
             },
             "category": {
               "title": "Categroy",

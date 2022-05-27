@@ -756,9 +756,6 @@
       "interaction": {
         "drillThrough": {
           "title": "跳转设置",
-          "event": "交互事件",
-          "leftClick": "左键单击",
-          "rightClick": "右键菜单",
           "rule": {
             "title": "规则设置",
             "addRule": "+ 点击新建",
@@ -766,7 +763,13 @@
               "category": "类型",
               "open": "打开方式",
               "relation": "关系设置",
-              "operation": "操作"
+              "operation": "操作",
+              "event": "交互事件"
+            },
+            "event": {
+              "title": "交互事件",
+              "left": "左键单击",
+              "right": "右键菜单"
             },
             "category": {
               "title": "类型",

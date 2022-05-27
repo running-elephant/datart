@@ -48,6 +48,7 @@ export type JumpToChartRule = {
 
 export type InteractionRule = {
   id: string;
+  event?: InteractionMouseEvent;
   category?: InteractionCategory;
   action?: InteractionAction;
   [InteractionCategory.JumpToChart]?: JumpToChartRule;
@@ -56,7 +57,6 @@ export type InteractionRule = {
 };
 
 export type DrillThroughSetting = {
-  event: InteractionMouseEvent;
   rules?: InteractionRule[];
 };
 

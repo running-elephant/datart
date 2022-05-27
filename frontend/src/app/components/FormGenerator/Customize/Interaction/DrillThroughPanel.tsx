@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Button, Form, Radio, Space } from 'antd';
+import { Button, Form, Space } from 'antd';
 import { currentDataViewSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
@@ -25,7 +25,6 @@ import { FC, memo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
-import { InteractionMouseEvent } from '../../constants';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
 import RuleList from './RuleList';
@@ -35,17 +34,9 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
     const vizs = useSelector(selectVizs);
     const dataview = useSelector(currentDataViewSelector);
-    const [drillThroughEvent, setDrillThroughEvent] = useState<
-      DrillThroughSetting['event']
-    >(data.value?.event || InteractionMouseEvent.Left);
     const [drillThroughRules, setDrillThroughRules] = useState<
       DrillThroughSetting['rules']
     >(data.value?.rules || []);
-
-    const handleDrillThroughEventChange = e => {
-      const event = e.target.value;
-      handleDrillThroughSettingChange(event);
-    };
 
     const handleAddRule = () => {
       const newRules = (drillThroughRules || []).concat([
@@ -53,12 +44,12 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           id: uuidv4(),
         },
       ]);
-      handleDrillThroughSettingChange(undefined, newRules);
+      handleDrillThroughSettingChange(newRules);
     };
 
     const handleDeleteRule = (id: string) => {
       const newRules = drillThroughRules?.filter(r => r.id !== id);
-      handleDrillThroughSettingChange(undefined, newRules);
+      handleDrillThroughSettingChange(newRules);
     };
 
     const handleUpdateRule = (id: string, prop: string, value: any) => {
@@ -69,22 +60,14 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         const newRules = updateBy(drillThroughRules, draft => {
           draft![updatorIndex][prop] = value;
         });
-        handleDrillThroughSettingChange(undefined, newRules);
+        handleDrillThroughSettingChange(newRules);
       }
     };
 
-    const handleDrillThroughSettingChange = (
-      newEvent?: string,
-      newRules?: InteractionRule[],
-    ) => {
+    const handleDrillThroughSettingChange = (newRules?: InteractionRule[]) => {
       let newSetting: DrillThroughSetting = {
-        event: drillThroughEvent,
         rules: drillThroughRules,
       };
-      if (newEvent) {
-        newSetting.event = newEvent;
-        setDrillThroughEvent(newEvent);
-      }
       if (newRules) {
         newSetting.rules = [...newRules];
         setDrillThroughRules([...newRules]);
@@ -99,22 +82,7 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           wrapperCol={{ span: 18 }}
           layout="horizontal"
           size="middle"
-          initialValues={{ event: drillThroughEvent }}
         >
-          <Form.Item label={t('drillThrough.event')} name="event">
-            <Radio.Group
-              defaultValue={InteractionMouseEvent.Left}
-              onChange={handleDrillThroughEventChange}
-              value={drillThroughEvent}
-            >
-              <Radio value={InteractionMouseEvent.Left}>
-                {t('drillThrough.leftClick')}
-              </Radio>
-              <Radio value={InteractionMouseEvent.Right}>
-                {t('drillThrough.rightClick')}
-              </Radio>
-            </Radio.Group>
-          </Form.Item>
           <Form.Item label={t('drillThrough.rule.title')} name="rule">
             <Button type="link" onClick={handleAddRule}>
               {t('drillThrough.rule.addRule')}

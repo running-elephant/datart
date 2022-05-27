@@ -228,8 +228,8 @@ const ChartPreviewBoard: FC<{
       )?.[0] as ViewDetailSetting;
 
       if (
-        enableDrillThrough &&
-        drillThroughSetting?.event === InteractionMouseEvent.Left
+        enableDrillThrough
+        // drillThroughSetting?.event === InteractionMouseEvent.Left
       ) {
         const jumpFilters = new ChartDataRequestBuilder(
           {
