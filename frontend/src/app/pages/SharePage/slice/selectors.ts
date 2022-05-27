@@ -91,7 +91,7 @@ export const selectSelectedItems = createSelector(
   shareState => shareState.selectedItems,
 );
 
-export const selectMultipleSelectedState = createSelector(
+export const selectMultipleSelect = createSelector(
   [selectDomain],
-  shareState => shareState.multipleSelected,
+  shareState => shareState.multipleSelect,
 );

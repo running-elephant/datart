@@ -227,9 +227,9 @@ export const selectFutureState = createSelector(
 // SelectedItems
 export const selectEditSelectedItems = (state: { editBoard: EditBoardState }) =>
   state.editBoard.selectedItemsMap;
-export const selectMultipleSelectedStateInEditor = createSelector(
+export const selectMultipleSelectInEditor = createSelector(
   [selectEditSelectedItems],
-  state => state.multipleSelected,
+  state => state.multipleSelect,
 );
 export const makeSelectSelectedItemsInEditor = () => {
   return createSelector(

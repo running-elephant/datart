@@ -131,7 +131,7 @@ export const selectSelectedItems = createSelector(
   vizState => vizState.selectedItems,
 );
 
-export const selectMultipleSelectedState = createSelector(
+export const selectMultipleSelect = createSelector(
   [selectDomain],
-  vizState => vizState.multipleSelected,
+  vizState => vizState.multipleSelect,
 );

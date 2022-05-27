@@ -48,7 +48,7 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
 import {
-  multipleSelectedStateChange,
+  multipleSelectChange,
   selectedItemChange,
 } from '../../../pages/BoardEditor/slice/actions/actions';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
@@ -69,9 +69,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const scale = useContext(BoardScaleContext);
   const { data } = useContext(WidgetDataContext);
   const { renderMode } = useContext(BoardContext);
-  const { selectedItems, multipleSelected } = useContext(
-    WidgetSelectionContext,
-  );
+  const { selectedItems, multipleSelect } = useContext(WidgetSelectionContext);
   const widget = useContext(WidgetContext);
   const { dashboardId, id: wid } = widget;
   const bid = useMemo(() => {
@@ -162,11 +160,11 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     [data],
   );
 
-  const KeyboardEventListenerFun = useCallback(
+  const chartIframeKeyboardListener = useCallback(
     (e: KeyboardEvent) => {
-      multipleSelectedStateChange(dispatch, renderMode, multipleSelected, e);
+      multipleSelectChange(dispatch, renderMode, multipleSelect, e);
     },
-    [dispatch, renderMode, multipleSelected],
+    [dispatch, renderMode, multipleSelect],
   );
 
   const chart = useMemo(() => {
@@ -280,7 +278,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         height={cacheH}
         drillOption={drillOption}
         selectedItems={selectedItems}
-        KeyboardEventListenerFun={KeyboardEventListenerFun}
+        onKeyboardPress={chartIframeKeyboardListener}
         containerId={containerId}
         widgetSpecialConfig={widgetSpecialConfig}
         scale={scale}
@@ -297,7 +295,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     containerId,
     widgetSpecialConfig,
     scale,
-    KeyboardEventListenerFun,
+    chartIframeKeyboardListener,
   ]);
   const drillContextVal = {
     drillOption: drillOptionRef.current,

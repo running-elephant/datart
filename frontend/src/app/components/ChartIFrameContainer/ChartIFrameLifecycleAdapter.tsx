@@ -45,7 +45,7 @@ const ChartIFrameLifecycleAdapter: FC<{
   isShown?: boolean;
   drillOption?: IChartDrillOption;
   selectedItems?: SelectedItem[];
-  KeyboardEventListenerFun?: (event: KeyboardEvent) => void;
+  onKeyboardPress?: (event: KeyboardEvent) => void;
   widgetSpecialConfig?: any;
 }> = ({
   dataset,
@@ -56,7 +56,7 @@ const ChartIFrameLifecycleAdapter: FC<{
   drillOption,
   selectedItems,
   widgetSpecialConfig,
-  KeyboardEventListenerFun,
+  onKeyboardPress,
 }) => {
   const [chartResourceLoader] = useState(() => new ChartIFrameResourceLoader());
   const [containerStatus, setContainerStatus] = useState(ContainerStatus.INIT);
@@ -66,17 +66,17 @@ const ChartIFrameLifecycleAdapter: FC<{
   const translator = usePrefixI18N();
 
   useEffect(() => {
-    if (KeyboardEventListenerFun) {
-      window?.addEventListener('keydown', KeyboardEventListenerFun);
-      window?.addEventListener('keyup', KeyboardEventListenerFun);
+    if (onKeyboardPress) {
+      window?.addEventListener('keydown', onKeyboardPress);
+      window?.addEventListener('keyup', onKeyboardPress);
     }
     return () => {
-      if (KeyboardEventListenerFun) {
-        window?.removeEventListener('keydown', KeyboardEventListenerFun);
-        window?.removeEventListener('keyup', KeyboardEventListenerFun);
+      if (onKeyboardPress) {
+        window?.removeEventListener('keydown', onKeyboardPress);
+        window?.removeEventListener('keyup', onKeyboardPress);
       }
     };
-  }, [window, KeyboardEventListenerFun]);
+  }, [window, onKeyboardPress]);
 
   /**
    * Chart Mount Event

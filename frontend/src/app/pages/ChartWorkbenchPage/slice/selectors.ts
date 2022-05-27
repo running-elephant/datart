@@ -100,7 +100,7 @@ export const selectSelectedItems = createSelector(
   wb => wb.selectedItems,
 );
 
-export const selectMultipleSelectedState = createSelector(
+export const selectMultipleSelect = createSelector(
   workbenchSelector,
-  wb => wb.multipleSelected,
+  wb => wb.multipleSelect,
 );

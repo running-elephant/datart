@@ -44,7 +44,7 @@ import { HeadlessBrowserIdentifier } from './HeadlessBrowserIdentifier';
 import { shareActions } from './slice';
 import {
   selectHeadlessBrowserRenderSign,
-  selectMultipleSelectedState,
+  selectMultipleSelect,
   selectSelectedItems,
 } from './slice/selectors';
 import {
@@ -84,27 +84,27 @@ const ChartForShare: FC<{
     selectHeadlessBrowserRenderSign,
   );
   const selectedItems = useSelector(selectSelectedItems);
-  const multipleSelectedState = useSelector(selectMultipleSelectedState);
+  const multipleSelect = useSelector(selectMultipleSelect);
 
-  const KeyboardEventListenerFun = useCallback(
+  const chartIframeKeyboardListener = useCallback(
     (e: KeyboardEvent) => {
       if (
         (e.key === KEYBOARD_EVENT_NAME.CTRL ||
           e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
         e.type === 'keydown' &&
-        !multipleSelectedState
+        !multipleSelect
       ) {
-        dispatch(shareActions.updateMultipleSelectedState(true));
+        dispatch(shareActions.updateMultipleSelect(true));
       } else if (
         (e.key === KEYBOARD_EVENT_NAME.CTRL ||
           e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
         e.type === 'keyup' &&
-        multipleSelectedState
+        multipleSelect
       ) {
-        dispatch(shareActions.updateMultipleSelectedState(false));
+        dispatch(shareActions.updateMultipleSelect(false));
       }
     },
-    [dispatch, multipleSelectedState],
+    [dispatch, multipleSelect],
   );
 
   useMount(() => {
@@ -254,7 +254,7 @@ const ChartForShare: FC<{
               config={chartPreview?.chartConfig!}
               drillOption={drillOptionRef.current}
               selectedItems={selectedItems}
-              KeyboardEventListenerFun={KeyboardEventListenerFun}
+              onKeyboardPress={chartIframeKeyboardListener}
               width={width}
               height={height}
             />

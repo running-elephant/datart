@@ -41,7 +41,7 @@ const ChartOperationPanel: FC<{
   onDataViewChange?: () => void;
   onCreateDownloadDataTask?: () => void;
   selectedItems?: SelectedItem[];
-  KeyboardEventListenerFun?: (event: KeyboardEvent) => void;
+  onKeyboardPress?: (event: KeyboardEvent) => void;
 }> = memo(
   ({
     chart,
@@ -53,7 +53,7 @@ const ChartOperationPanel: FC<{
     onDataViewChange,
     onCreateDownloadDataTask,
     selectedItems,
-    KeyboardEventListenerFun,
+    onKeyboardPress,
   }) => {
     const { dataset, onRefreshDataset } = useContext(ChartDatasetContext);
     const { dataView, expensiveQuery } = useContext(ChartDataViewContext);
@@ -103,7 +103,7 @@ const ChartOperationPanel: FC<{
             onRefreshDataset={onRefreshDataset}
             onCreateDownloadDataTask={onCreateDownloadDataTask}
             selectedItems={selectedItems}
-            KeyboardEventListenerFun={KeyboardEventListenerFun}
+            onKeyboardPress={onKeyboardPress}
           />
         );
       }

@@ -59,7 +59,7 @@ const ChartPresentPanel: FC<{
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
   selectedItems?: SelectedItem[];
-  KeyboardEventListenerFun?: (event: KeyboardEvent) => void;
+  onKeyboardPress?: (event: KeyboardEvent) => void;
 }> = memo(
   ({
     containerHeight,
@@ -72,7 +72,7 @@ const ChartPresentPanel: FC<{
     onRefreshDataset,
     onCreateDownloadDataTask,
     selectedItems,
-    KeyboardEventListenerFun,
+    onKeyboardPress,
   }) => {
     const translate = useI18NPrefix(`viz.palette.present`);
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
@@ -101,7 +101,7 @@ const ChartPresentPanel: FC<{
           style,
           drillOption,
           selectedItems,
-          KeyboardEventListenerFun,
+          onKeyboardPress,
         )
       );
     };

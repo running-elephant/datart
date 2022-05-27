@@ -52,7 +52,7 @@ export interface BoardState {
   widgetDataMap: Record<string, WidgetData>;
   availableSourceFunctionsMap: Record<string, string[]>;
   selectedItems: Record<string, SelectedItem[]>;
-  multipleSelected: boolean;
+  multipleSelect: boolean;
 }
 // 应用内浏览，分享页模式，定时任务模式，编辑模式
 export type VizRenderMode = 'read' | 'share' | 'schedule' | 'edit';

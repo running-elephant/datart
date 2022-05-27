@@ -37,7 +37,7 @@ import {
   currentDataViewSelector,
   datasetsSelector,
   selectAvailableSourceFunctions,
-  selectMultipleSelectedState,
+  selectMultipleSelect,
   selectSelectedItems,
   shadowChartConfigSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/selectors';
@@ -135,7 +135,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const aggregation = useSelector(aggregationSelector);
   const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
   const selectedItems = useSelector(selectSelectedItems);
-  const multipleSelectedState = useSelector(selectMultipleSelectedState);
+  const multipleSelect = useSelector(selectMultipleSelect);
   const [chart, setChart] = useState<IChart>();
   const drillOptionRef = useRef<IChartDrillOption>();
   const [allowQuery, setAllowQuery] = useState<boolean>(false);
@@ -144,25 +144,25 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     showSaveForm: saveFormContextValue.showSaveForm,
   });
   const tg = useI18NPrefix('global');
-  const KeyboardEventListenerFun = useCallback(
+  const chartIframeKeyboardListener = useCallback(
     (e: KeyboardEvent) => {
       if (
         (e.key === KEYBOARD_EVENT_NAME.CTRL ||
           e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
         e.type === 'keydown' &&
-        !multipleSelectedState
+        !multipleSelect
       ) {
-        dispatch(actions.updateMultipleSelectedState(true));
+        dispatch(actions.updateMultipleSelect(true));
       } else if (
         (e.key === KEYBOARD_EVENT_NAME.CTRL ||
           e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
         e.type === 'keyup' &&
-        multipleSelectedState
+        multipleSelect
       ) {
-        dispatch(actions.updateMultipleSelectedState(false));
+        dispatch(actions.updateMultipleSelect(false));
       }
     },
-    [dispatch, multipleSelectedState, actions],
+    [dispatch, multipleSelect, actions],
   );
 
   const expensiveQuery = useMemo(() => {
@@ -741,7 +741,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           }}
           drillOption={drillOptionRef?.current}
           selectedItems={selectedItems}
-          KeyboardEventListenerFun={KeyboardEventListenerFun}
+          onKeyboardPress={chartIframeKeyboardListener}
           aggregation={aggregation}
           chart={chart}
           dataset={dataset}

@@ -39,7 +39,7 @@ const ChartPresentWrapper: FC<{
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
   selectedItems?: SelectedItem[];
-  KeyboardEventListenerFun?: (event: KeyboardEvent) => void;
+  onKeyboardPress?: (event: KeyboardEvent) => void;
 }> = memo(
   ({
     containerHeight,
@@ -53,7 +53,7 @@ const ChartPresentWrapper: FC<{
     onRefreshDataset,
     onCreateDownloadDataTask,
     selectedItems,
-    KeyboardEventListenerFun,
+    onKeyboardPress,
   }) => {
     const { ref: ChartGraphPanelRef } = useResizeObserver<any>({
       refreshMode: 'debounce',
@@ -89,7 +89,7 @@ const ChartPresentWrapper: FC<{
             onRefreshDataset={onRefreshDataset}
             onCreateDownloadDataTask={onCreateDownloadDataTask}
             selectedItems={selectedItems}
-            KeyboardEventListenerFun={KeyboardEventListenerFun}
+            onKeyboardPress={onKeyboardPress}
           />
         </ChartI18NContext.Provider>
       </StyledChartPresentWrapper>

@@ -43,5 +43,5 @@ export type WorkbenchState = {
   chartEditorDownloadPolling: boolean;
   availableSourceFunctions?: string[];
   selectedItems: SelectedItem[];
-  multipleSelected: boolean;
+  multipleSelect: boolean;
 };

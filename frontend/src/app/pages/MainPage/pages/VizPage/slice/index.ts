@@ -49,7 +49,7 @@ export const initialState: VizState = {
   dataChartListLoading: false,
   chartPreviews: [],
   selectedItems: {} as Record<string, SelectedItem[]>,
-  multipleSelected: false,
+  multipleSelect: false,
 };
 
 const slice = createSlice({
@@ -155,7 +155,7 @@ const slice = createSlice({
       const index = state.selectedItems?.[payload.backendChartId]?.findIndex(
         v => payload.data.index === v.index,
       );
-      if (state.multipleSelected) {
+      if (state.multipleSelect) {
         if (index < 0) {
           state.selectedItems[payload.backendChartId].push(payload.data);
         } else {
@@ -172,8 +172,8 @@ const slice = createSlice({
         }
       }
     },
-    updateMultipleSelectedState(state, { payload }: PayloadAction<boolean>) {
-      state.multipleSelected = payload;
+    updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
+      state.multipleSelect = payload;
     },
   },
   extraReducers: builder => {

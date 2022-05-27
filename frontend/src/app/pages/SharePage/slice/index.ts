@@ -52,7 +52,7 @@ export const initialState: SharePageState = {
   oauth2Clients: [],
   availableSourceFunctions: [],
   selectedItems: [],
-  multipleSelected: false,
+  multipleSelect: false,
 };
 
 export const slice = createSlice({
@@ -183,7 +183,7 @@ export const slice = createSlice({
       const index = state.selectedItems?.findIndex(
         v => payload.index === v.index,
       );
-      if (state.multipleSelected) {
+      if (state.multipleSelect) {
         if (index < 0) {
           state.selectedItems.push(payload);
         } else {
@@ -197,8 +197,8 @@ export const slice = createSlice({
         }
       }
     },
-    updateMultipleSelectedState(state, { payload }: PayloadAction<boolean>) {
-      state.multipleSelected = payload;
+    updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
+      state.multipleSelect = payload;
     },
   },
   extraReducers: builder => {

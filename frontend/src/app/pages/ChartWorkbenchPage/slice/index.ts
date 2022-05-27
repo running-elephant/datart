@@ -46,7 +46,7 @@ export const initState: WorkbenchState = {
   datasetLoading: false,
   chartEditorDownloadPolling: false,
   selectedItems: [],
-  multipleSelected: false,
+  multipleSelect: false,
 };
 
 // Reducers
@@ -158,7 +158,7 @@ const workbenchSlice = createSlice({
       const index = state.selectedItems?.findIndex(
         v => v.index === payload.index,
       );
-      if (state.multipleSelected) {
+      if (state.multipleSelect) {
         if (index < 0) {
           state.selectedItems.push(payload);
         } else {
@@ -175,8 +175,8 @@ const workbenchSlice = createSlice({
     clearSelectedItems(state) {
       state.selectedItems = [];
     },
-    updateMultipleSelectedState(state, { payload }: PayloadAction<boolean>) {
-      state.multipleSelected = payload;
+    updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
+      state.multipleSelect = payload;
     },
   },
   extraReducers: builder => {

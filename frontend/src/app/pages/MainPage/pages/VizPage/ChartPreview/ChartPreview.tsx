@@ -52,7 +52,7 @@ import useDrillThrough from '../hooks/useDrillThrough';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import { useVizSlice } from '../slice';
 import {
-  selectMultipleSelectedState,
+  selectMultipleSelect,
   selectPreviewCharts,
   selectPublishLoading,
   selectSelectedItems,
@@ -106,7 +106,7 @@ const ChartPreviewBoard: FC<{
     const previewCharts = useSelector(selectPreviewCharts);
     const publishLoading = useSelector(selectPublishLoading);
     const selectedItems = useSelector(selectSelectedItems);
-    const multipleSelectedState = useSelector(selectMultipleSelectedState);
+    const multipleSelect = useSelector(selectMultipleSelect);
     const availableSourceFunctions = useSelector(
       selectAvailableSourceFunctions,
     );
@@ -121,25 +121,25 @@ const ChartPreviewBoard: FC<{
     const vizs = useSelector(selectVizs);
     const [openNewTab, openBrowserTab] = useDrillThrough();
 
-    const KeyboardEventListenerFun = useCallback(
+    const chartIframeKeyboardListener = useCallback(
       (e: KeyboardEvent) => {
         if (
           (e.key === KEYBOARD_EVENT_NAME.CTRL ||
             e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
           e.type === 'keydown' &&
-          !multipleSelectedState
+          !multipleSelect
         ) {
-          dispatch(vizAction.updateMultipleSelectedState(true));
+          dispatch(vizAction.updateMultipleSelect(true));
         } else if (
           (e.key === KEYBOARD_EVENT_NAME.CTRL ||
             e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
           e.type === 'keyup' &&
-          multipleSelectedState
+          multipleSelect
         ) {
-          dispatch(vizAction.updateMultipleSelectedState(false));
+          dispatch(vizAction.updateMultipleSelect(false));
         }
       },
-      [dispatch, multipleSelectedState, vizAction],
+      [dispatch, multipleSelect, vizAction],
     );
 
     useEffect(() => {
@@ -551,7 +551,7 @@ const ChartPreviewBoard: FC<{
                     config={chartPreview?.chartConfig!}
                     drillOption={drillOptionRef.current}
                     selectedItems={selectedItems[backendChartId]}
-                    KeyboardEventListenerFun={KeyboardEventListenerFun}
+                    onKeyboardPress={chartIframeKeyboardListener}
                     width={cacheW}
                     height={cacheH}
                   />

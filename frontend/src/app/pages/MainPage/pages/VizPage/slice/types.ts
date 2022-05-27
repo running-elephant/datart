@@ -31,7 +31,7 @@ export interface VizState {
   dataChartListLoading: boolean;
   chartPreviews: ChartPreview[];
   selectedItems: Record<string, SelectedItem[]>;
-  multipleSelected: boolean;
+  multipleSelect: boolean;
 }
 
 export interface Folder {

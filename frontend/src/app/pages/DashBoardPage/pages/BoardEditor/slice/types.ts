@@ -32,7 +32,7 @@ export interface EditBoardState {
   widgetInfoRecord: Record<string, WidgetInfo>;
   widgetDataMap: Record<string, WidgetData>;
   selectedItemsMap: {
-    multipleSelected: boolean;
+    multipleSelect: boolean;
     selectedItems: Record<string, SelectedItem[]>;
   };
 }

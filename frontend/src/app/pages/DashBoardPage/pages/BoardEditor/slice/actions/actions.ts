@@ -577,7 +577,7 @@ export const selectedItemChange = (
   }
 };
 
-export const multipleSelectedStateChange = (
+export const multipleSelectChange = (
   dispatch,
   type: VizRenderMode,
   state: boolean,
@@ -591,12 +591,10 @@ export const multipleSelectedStateChange = (
   ) {
     if (type === 'edit') {
       dispatch(
-        editWidgetSelectedItemsActions.updateMultipleSelectedStateInEditor(
-          true,
-        ),
+        editWidgetSelectedItemsActions.updateMultipleSelectInEditor(true),
       );
     } else {
-      dispatch(boardActions.updateMultipleSelectedState(true));
+      dispatch(boardActions.updateMultipleSelect(true));
     }
   } else if (
     (e.key === KEYBOARD_EVENT_NAME.CTRL ||
@@ -606,12 +604,10 @@ export const multipleSelectedStateChange = (
   ) {
     if (type === 'edit') {
       dispatch(
-        editWidgetSelectedItemsActions.updateMultipleSelectedStateInEditor(
-          false,
-        ),
+        editWidgetSelectedItemsActions.updateMultipleSelectInEditor(false),
       );
     } else {
-      dispatch(boardActions.updateMultipleSelectedState(false));
+      dispatch(boardActions.updateMultipleSelect(false));
     }
   }
 };

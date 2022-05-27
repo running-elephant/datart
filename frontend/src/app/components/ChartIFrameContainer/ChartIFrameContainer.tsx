@@ -39,7 +39,7 @@ const ChartIFrameContainer: FC<{
   isShown?: boolean;
   drillOption?: IChartDrillOption;
   selectedItems?: SelectedItem[];
-  KeyboardEventListenerFun?: (event: KeyboardEvent) => void;
+  onKeyboardPress?: (event: KeyboardEvent) => void;
   widgetSpecialConfig?: any;
   scale?: [number, number];
 }> = memo(props => {
@@ -83,7 +83,7 @@ const ChartIFrameContainer: FC<{
               isShown={props.isShown}
               drillOption={props?.drillOption}
               selectedItems={props?.selectedItems}
-              KeyboardEventListenerFun={props?.KeyboardEventListenerFun}
+              onKeyboardPress={props?.onKeyboardPress}
             />
           </div>
         </div>
@@ -147,7 +147,7 @@ const ChartIFrameContainer: FC<{
                   isShown={props.isShown}
                   drillOption={props.drillOption}
                   selectedItems={props?.selectedItems}
-                  KeyboardEventListenerFun={props?.KeyboardEventListenerFun}
+                  onKeyboardPress={props?.onKeyboardPress}
                 />
               </div>
             </StyleSheetManager>
