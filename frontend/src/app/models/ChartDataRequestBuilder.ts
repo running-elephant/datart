@@ -491,10 +491,6 @@ export class ChartDataRequestBuilder {
     };
   }
 
-  public buildAllFilters() {
-    return this.buildFilters();
-  }
-
   public buildDetails(): ChartDataRequest {
     return {
       ...this.buildViewConfigs(),

@@ -208,89 +208,101 @@ const ChartPreviewBoard: FC<{
       [backendChartId, chartPreview, dispatch],
     );
 
-    const handleDrillThroughEvent = useCallback(() => {
-      const enableDrillThrough = getValue(
-        chartPreview?.chartConfig?.interactions || [],
-        ['drillThrough'],
-      );
-      const drillThroughSetting = getStyles(
-        chartPreview?.chartConfig?.interactions || [],
-        ['drillThrough'],
-        ['setting'],
-      )?.[0] as DrillThroughSetting;
-      const enableViewDetail = getValue(
-        chartPreview?.chartConfig?.interactions || [],
-        ['viewDetail'],
-      );
-      const viewDetailSetting = getStyles(
-        chartPreview?.chartConfig?.interactions || [],
-        ['viewDetail'],
-        ['setting'],
-      )?.[0] as ViewDetailSetting;
+    const handleDrillThroughEvent = useCallback(
+      param => {
+        const enableDrillThrough = getValue(
+          chartPreview?.chartConfig?.interactions || [],
+          ['drillThrough'],
+        );
+        const drillThroughSetting = getStyles(
+          chartPreview?.chartConfig?.interactions || [],
+          ['drillThrough'],
+          ['setting'],
+        )?.[0] as DrillThroughSetting;
+        const enableViewDetail = getValue(
+          chartPreview?.chartConfig?.interactions || [],
+          ['viewDetail'],
+        );
+        const viewDetailSetting = getStyles(
+          chartPreview?.chartConfig?.interactions || [],
+          ['viewDetail'],
+          ['setting'],
+        )?.[0] as ViewDetailSetting;
 
-      if (enableDrillThrough) {
-        const jumpFilters = new ChartDataRequestBuilder(
-          {
-            id: chartPreview?.backendChart?.view?.id || '',
-            config: chartPreview?.backendChart?.view.config || {},
-            computedFields:
-              chartPreview?.backendChart?.config.computedFields || [],
-          },
-          chartPreview?.chartConfig?.datas,
-          chartPreview?.chartConfig?.settings,
-          {},
-          false,
-          chartPreview?.backendChart?.config?.aggregation,
-        )
-          .addDrillOption(drillOptionRef?.current)
-          .buildAllFilters();
+        if (enableDrillThrough) {
+          let jumpFilters = new ChartDataRequestBuilder(
+            {
+              id: chartPreview?.backendChart?.view?.id || '',
+              config: chartPreview?.backendChart?.view.config || {},
+              computedFields:
+                chartPreview?.backendChart?.config.computedFields || [],
+            },
+            chartPreview?.chartConfig?.datas,
+            chartPreview?.chartConfig?.settings,
+            {},
+            false,
+            chartPreview?.backendChart?.config?.aggregation,
+          )
+            .addDrillOption(drillOptionRef?.current)
+            .build()?.filters;
 
-        // TODO: user selected filter
-        // TODO: mapper by custom if exist
+          // remove aggregate filters and remove aggregate function filters
+          jumpFilters = jumpFilters?.filter(f => !Boolean(f.aggOperator));
 
-        (drillThroughSetting?.rules || []).forEach(rule => {
-          if (rule.event === InteractionMouseEvent.Left) {
-            if (
-              rule.category === InteractionCategory.JumpToChart ||
-              rule.category === InteractionCategory.JumpToDashboard
-            ) {
-              const relId = rule?.[rule.category]?.relId;
-              if (rule?.action === InteractionAction.Redirect) {
-                openNewTab(orgId, relId, jumpFilters);
-              }
-              if (rule?.action === InteractionAction.Window) {
-                openBrowserTab(orgId, relId, jumpFilters);
-              }
-              if (rule?.action === InteractionAction.Dialog) {
+          console.log(
+            'jumpFilters --->',
+            param?.data?.rowData?.['USER_Name'],
+            jumpFilters,
+          );
+
+          // TODO: user selected filter
+          // TODO: mapper by custom if exist
+
+          (drillThroughSetting?.rules || []).forEach(rule => {
+            if (rule.event === InteractionMouseEvent.Left) {
+              if (
+                rule.category === InteractionCategory.JumpToChart ||
+                rule.category === InteractionCategory.JumpToDashboard
+              ) {
+                const relId = rule?.[rule.category]?.relId;
+                if (rule?.action === InteractionAction.Redirect) {
+                  openNewTab(orgId, relId, jumpFilters);
+                }
+                if (rule?.action === InteractionAction.Window) {
+                  openBrowserTab(orgId, relId, jumpFilters);
+                }
+                if (rule?.action === InteractionAction.Dialog) {
+                  // TODO:
+                }
+              } else if (rule.category === InteractionCategory.JumpToUrl) {
                 // TODO:
               }
-            } else if (rule.category === InteractionCategory.JumpToUrl) {
-              // TODO:
             }
-          }
-        });
-      }
-      if (
-        enableViewDetail &&
-        viewDetailSetting?.event === InteractionMouseEvent.Left
-      ) {
-        (openViewDetailPanel as any)({
-          currentDataView: chartPreview?.backendChart?.view,
-          chartConfig: chartPreview?.chartConfig,
-          drillOption: drillOptionRef?.current,
-          pageInfo: {},
-        });
-      }
-    }, [
-      chartPreview?.chartConfig,
-      chartPreview?.backendChart?.view,
-      chartPreview?.backendChart?.config.computedFields,
-      chartPreview?.backendChart?.config?.aggregation,
-      openNewTab,
-      orgId,
-      openBrowserTab,
-      openViewDetailPanel,
-    ]);
+          });
+        }
+        if (
+          enableViewDetail &&
+          viewDetailSetting?.event === InteractionMouseEvent.Left
+        ) {
+          (openViewDetailPanel as any)({
+            currentDataView: chartPreview?.backendChart?.view,
+            chartConfig: chartPreview?.chartConfig,
+            drillOption: drillOptionRef?.current,
+            pageInfo: {},
+          });
+        }
+      },
+      [
+        chartPreview?.chartConfig,
+        chartPreview?.backendChart?.view,
+        chartPreview?.backendChart?.config.computedFields,
+        chartPreview?.backendChart?.config?.aggregation,
+        openNewTab,
+        orgId,
+        openBrowserTab,
+        openViewDetailPanel,
+      ],
+    );
 
     const registerChartEvents = useCallback(
       (chart, backendChartId) => {
@@ -298,7 +310,7 @@ const ChartPreviewBoard: FC<{
           {
             name: 'click',
             callback: param => {
-              handleDrillThroughEvent();
+              handleDrillThroughEvent(param);
               if (
                 drillOptionRef.current?.isSelectedDrill &&
                 !drillOptionRef.current.isBottomLevel
