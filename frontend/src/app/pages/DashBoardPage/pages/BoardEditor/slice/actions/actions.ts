@@ -201,14 +201,16 @@ export const copyWidgetsAction = (wIds?: string[]) => (dispatch, getState) => {
     }
     if (widget.config.type === 'container') {
       const content = widget.config.content as TabWidgetContent;
-      Object.values(content.itemMap).forEach(item => {
-        if (item.childWidgetId) {
-          const subWidget = widgetMap[item.childWidgetId];
-          if (subWidget) {
-            newWidgets[subWidget.id] = subWidget;
+      const needCopyIds = Object.values(content.itemMap)
+        .map(item => {
+          if (item.childWidgetId) {
+            const subWidget = widgetMap[item.childWidgetId];
+            if (subWidget) return subWidget.id;
           }
-        }
-      });
+          return undefined;
+        })
+        .filter(id => !!id);
+      needCopyWidgetIds = needCopyWidgetIds.concat(needCopyIds as string[]);
     }
   }
   dispatch(editDashBoardInfoActions.addClipboardWidgets(newWidgets));
