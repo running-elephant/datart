@@ -18,12 +18,14 @@
 
 import { TreeDataNode, TreeNodeProps } from 'antd';
 import { DataViewFieldType } from 'app/constants';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { ReactElement } from 'react';
 import { View } from '../../../../../types/View';
 import { SubjectTypes } from '../../PermissionPage/constants';
 import { RowPermissionRaw, Variable } from '../../VariablePage/slice/types';
 import {
   ColumnCategories,
+  SimpleViewJoinType,
   ViewStatus,
   ViewViewModelStages,
 } from '../constants';
@@ -100,6 +102,7 @@ export interface ViewViewModel<T = object>
   fragment: string;
   isSaveAs?: Boolean;
   warnings?: string[] | null;
+  type?: string;
 }
 
 export interface QueryResult {
@@ -206,4 +209,18 @@ export interface SelectViewTreeProps {
 export interface SelectViewFolderTreeProps {
   id?: string;
   getDisabled: (o: ViewSimpleViewModel, path: string[]) => boolean;
+}
+
+export interface SimpleViewQueryProps {
+  table: Array<string>;
+  columns: Array<string>;
+  joins: Array<JoinTableProps>;
+  computedFields: Array<ChartDataViewMeta>;
+}
+
+export interface JoinTableProps {
+  table?: Array<string>;
+  joinType?: SimpleViewJoinType;
+  columns?: Array<string>;
+  conditions?: Array<{ left: Array<string>; right: Array<string> }>;
 }

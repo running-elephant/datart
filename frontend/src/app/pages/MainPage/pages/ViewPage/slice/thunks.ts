@@ -89,11 +89,11 @@ export const getArchivedViews = createAsyncThunk<ViewSimple[], string>(
 
 export const getViewDetail = createAsyncThunk<
   ViewViewModel,
-  string,
+  { viewId: string },
   { state: RootState }
 >(
   'view/getViewDetail',
-  async (viewId, { dispatch, getState, rejectWithValue }) => {
+  async ({ viewId }, { dispatch, getState, rejectWithValue }) => {
     const views = selectViews(getState());
     const editingViews = selectEditingViews(getState());
     const selected = editingViews.find(v => v.id === viewId);
@@ -160,14 +160,15 @@ export const runSql = createAsyncThunk<
   const currentEditingView = selectCurrentEditingView(
     getState(),
   ) as ViewViewModel;
-  const { script, sourceId, size, fragment, variables } = currentEditingView;
+  const { script, sourceId, size, fragment, variables, type } =
+    currentEditingView;
 
   try {
     if (!sourceId) {
       throw Error(i18n.t('view.selectSource'));
     }
 
-    if (!script.trim()) {
+    if (type === 'SQL' && typeof script === 'string' && !script.trim()) {
       throw Error(i18n.t('view.sqlRequired'));
     }
 
@@ -178,6 +179,7 @@ export const runSql = createAsyncThunk<
         script: fragment || script,
         sourceId,
         size,
+        type: type || 'SQL',
         variables: variables.map(
           ({ name, type, valueType, defaultValue, expression }) => ({
             name,

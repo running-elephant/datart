@@ -56,6 +56,7 @@ export const Tabs = memo(() => {
   const id = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'id' }),
   ) as string;
+
   const t = useI18NPrefix('view.tabs');
 
   const redirect = useCallback(
@@ -71,11 +72,15 @@ export const Tabs = memo(() => {
 
   const tabChange = useCallback(
     activeKey => {
+      const currentEditingView = editingViews.find(v => v.id === activeKey);
+
       if (id !== activeKey) {
-        history.push(`/organizations/${orgId}/views/${activeKey}`);
+        history.push(
+          `/organizations/${orgId}/views/${activeKey}/${currentEditingView?.type}`,
+        );
       }
     },
-    [history, id, orgId],
+    [history, id, orgId, editingViews],
   );
 
   const tabEdit = useCallback(

@@ -18,7 +18,7 @@
 
 import { EmptyFiller } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import React, { memo, useEffect } from 'react';
+import React, { memo, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
@@ -27,7 +27,13 @@ import { useMemberSlice } from '../../MemberPage/slice';
 import { useSourceSlice } from '../../SourcePage/slice';
 import { getSources } from '../../SourcePage/slice/thunks';
 import { useVariableSlice } from '../../VariablePage/slice';
-import { selectEditingViews } from '../slice/selectors';
+import SelectView from '../components/SelectViewType';
+import { UNPERSISTED_ID_PREFIX } from '../constants';
+import { useViewSlice } from '../slice';
+import {
+  selectCurrentEditingViewAttr,
+  selectEditingViews,
+} from '../slice/selectors';
 import { getViewDetail } from '../slice/thunks';
 import { Tabs } from './Tabs';
 import { Workbench } from './Workbench';
@@ -36,13 +42,30 @@ export const Main = memo(({ sliderVisible }: { sliderVisible: boolean }) => {
   useSourceSlice();
   useMemberSlice();
   useVariableSlice();
+  const { actions } = useViewSlice();
   const dispatch = useDispatch();
   const {
     params: { viewId },
   } = useRouteMatch<{ viewId: string }>();
+  const unpersistedNewView = viewId?.includes(UNPERSISTED_ID_PREFIX);
+
   const orgId = useSelector(selectOrgId);
   const editingViews = useSelector(selectEditingViews);
+  const viewType = useSelector(state =>
+    selectCurrentEditingViewAttr(state, { name: 'type' }),
+  ) as string;
   const t = useI18NPrefix('view');
+
+  const handleSelectViewType = useCallback(
+    type => {
+      dispatch(
+        actions.changeCurrentEditingView({
+          type: type,
+        }),
+      );
+    },
+    [dispatch, actions],
+  );
 
   useEffect(() => {
     dispatch(getSources(orgId));
@@ -50,16 +73,18 @@ export const Main = memo(({ sliderVisible }: { sliderVisible: boolean }) => {
 
   useEffect(() => {
     if (viewId) {
-      dispatch(getViewDetail(viewId));
+      dispatch(getViewDetail({ viewId }));
     }
   }, [dispatch, viewId, orgId]);
 
-  return (
+  return !viewType && unpersistedNewView ? (
+    <SelectView selectViewType={handleSelectViewType} />
+  ) : (
     <Container className={sliderVisible ? 'close' : ''}>
       {editingViews.length > 0 ? (
         <>
           <Tabs />
-          <Workbench />
+          <Workbench viewType={viewType} />
         </>
       ) : (
         <EmptyFiller title={t('empty')} />

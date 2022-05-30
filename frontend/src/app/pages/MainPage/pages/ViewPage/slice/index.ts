@@ -192,7 +192,9 @@ const slice = createSlice({
 
     // getViewDetail
     builder.addCase(getViewDetail.fulfilled, (state, action) => {
-      const index = state.editingViews.findIndex(v => v.id === action.meta.arg);
+      const index = state.editingViews.findIndex(
+        v => v.id === action.meta.arg.viewId,
+      );
       const loadedEditingView: ViewViewModel = {
         ...action.payload,
         stage:
@@ -204,7 +206,7 @@ const slice = createSlice({
     });
     builder.addCase(getViewDetail.rejected, (state, action) => {
       const view = state.editingViews.find(
-        v => v.id === action.meta.arg,
+        v => v.id === action.meta.arg.viewId,
       ) as ViewViewModel;
       view.stage = ViewViewModelStages.NotLoaded;
       view.error = action.payload as string;

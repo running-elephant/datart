@@ -40,10 +40,12 @@ import { getSchemaBySourceId } from '../slice/thunks';
 import { Editor } from './Editor';
 import { Outputs } from './Outputs';
 import { Properties } from './Properties';
+import { SimpleView } from './SimpleView/index';
 
-export const Workbench = memo(() => {
+export const Workbench = memo(({ viewType }: { viewType: string }) => {
   const dispatch = useDispatch();
   const { editorInstance } = useContext(EditorContext);
+
   const views = useSelector(selectViews);
   const id = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'id' }),
@@ -119,10 +121,18 @@ export const Workbench = memo(() => {
         className="datart-split"
         onDrag={editorResize}
       >
-        <Editor allowManage={allowManage} allowEnableViz={allowEnableViz} />
+        {viewType === 'STRUCT' ? (
+          <SimpleView
+            allowManage={allowManage}
+            allowEnableViz={allowEnableViz}
+          />
+        ) : (
+          <Editor allowManage={allowManage} allowEnableViz={allowEnableViz} />
+        )}
+
         <Outputs />
       </Development>
-      <Properties allowManage={allowManage} />
+      <Properties viewType={viewType} allowManage={allowManage} />
     </Wrapper>
   );
 });
