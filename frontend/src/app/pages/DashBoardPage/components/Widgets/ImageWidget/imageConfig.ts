@@ -97,6 +97,10 @@ export const widgetToolkit: ImageToolkit = {
       width: 500,
       height: 400,
     };
+    if (opt.boardType === 'auto') {
+      rect.x += Math.ceil(Math.random() * 200);
+      rect.y += Math.ceil(Math.random() * 200);
+    }
     widget.config.rect = rect;
     const pRect: RectConfig = {
       x: 0,
