@@ -20,8 +20,8 @@ package datart.core.mappers.ext;
 
 import com.google.common.base.CaseFormat;
 import datart.core.common.ReflectUtils;
+import datart.core.common.SQLUtils;
 import datart.core.entity.BaseEntity;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.ibatis.jdbc.SQL;
 import org.springframework.util.CollectionUtils;
 
@@ -45,7 +45,7 @@ public interface CRUDMapper extends BaseMapper {
 
     default boolean exists(String id) {
         SQL sql = new SQL();
-        sql.SELECT("COUNT(*)").FROM(getTableName()).WHERE("id='" + StringEscapeUtils.escapeSql(id) + "'");
+        sql.SELECT("COUNT(*)").FROM(getTableName()).WHERE(SQLUtils.escapeSql("id=", id));
         Long count = executeQuery(sql.toString());
         return count > 0;
     }
@@ -56,8 +56,8 @@ public interface CRUDMapper extends BaseMapper {
         Map<Field, Object> fields = ReflectUtils.getNotNullFields(entity);
         if (CollectionUtils.isEmpty(fields)) return false;
         for (Map.Entry<Field, Object> entry : fields.entrySet()) {
-            sql.WHERE(String.format("`%s` = '%s'", format(entry.getKey().getName()),
-                    StringEscapeUtils.escapeSql(entry.getValue().toString())));
+            sql.WHERE(SQLUtils.escapeSql(String.format("`%s` = ", format(entry.getKey().getName())),
+                    entry.getValue().toString()));
         }
         long count = executeQuery(sql.toString());
         return count == 0;
@@ -70,7 +70,7 @@ public interface CRUDMapper extends BaseMapper {
         SQL sql = new SQL();
         StringJoiner stringJoiner = new StringJoiner(",", "(", ")");
         for (String id : ids) {
-            stringJoiner.add("'" + StringEscapeUtils.escapeSql(id) + "'");
+            stringJoiner.add(SQLUtils.escapeSql(id));
         }
         sql.DELETE_FROM(format(c.getSimpleName()))
                 .WHERE("`id` IN " + stringJoiner);
