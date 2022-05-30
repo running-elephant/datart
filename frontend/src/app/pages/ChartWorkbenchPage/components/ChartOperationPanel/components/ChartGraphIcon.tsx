@@ -68,7 +68,7 @@ const ChartGraphIcon: FC<{
 
   const renderChartRequirements = requirements => {
     const lintMessages = requirements?.flatMap((requirement, index) => {
-      return [ChartDataSectionType.GROUP, ChartDataSectionType.AGGREGATE].map(
+      return [ChartDataSectionType.Group, ChartDataSectionType.Aggregate].map(
         type => {
           const limit = requirement[type.toLocaleLowerCase()];
           const getMaxValueStr = limit =>

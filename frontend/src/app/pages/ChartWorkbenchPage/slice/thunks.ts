@@ -185,36 +185,6 @@ export const refreshDatasetAction = createAsyncThunk(
   },
 );
 
-export const updateRichTextAction = createAsyncThunk(
-  'workbench/updateRichTextAction',
-  async (delta: string | undefined, thunkAPI) => {
-    try {
-      const state = thunkAPI.getState() as any;
-      const workbenchState = state.workbench as typeof initState;
-      if (!workbenchState.currentDataView?.id) {
-        return;
-      }
-      await thunkAPI.dispatch(
-        workbenchSlice.actions.updateChartConfig({
-          type: 'style',
-          payload: {
-            ancestors: [1, 0],
-            value: {
-              label: 'delta.richText',
-              key: 'richText',
-              default: '',
-              comType: 'text',
-              value: delta,
-            },
-          },
-        }),
-      );
-    } catch (error) {
-      return rejectHandle(error, thunkAPI.rejectWithValue);
-    }
-  },
-);
-
 export const fetchChartAction = createAsyncThunk<
   ChartDTO,
   { chartId?: string; backendChart?: ChartDTO },

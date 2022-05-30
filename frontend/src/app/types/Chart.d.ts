@@ -125,6 +125,7 @@ export interface IChart extends IChartLifecycle {
   dependency: string[];
   isISOContainer: boolean | string;
   useIFrame?: boolean;
+  selectable?: boolean;
 
   set state(state: ChartStatus);
   get state();

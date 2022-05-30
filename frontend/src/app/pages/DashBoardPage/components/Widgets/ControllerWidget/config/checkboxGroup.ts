@@ -19,10 +19,16 @@
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import {
   WidgetMeta,
-  WidgetToolkit,
+  WidgetProto,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
-import { controlWidgetTpl } from '.';
 import {
+  ControlWidgetToolkit,
+  controlWidgetTpl,
+  getControlDropDownList,
+  getControlQueryEnable,
+} from '.';
+import {
+  ImmediateQueryI18N,
   initBackgroundTpl,
   initBorderTpl,
   initLoopFetchTpl,
@@ -42,11 +48,13 @@ const NameI18N = {
   en: 'Checkbox',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: '',
-  widgetTypeId: ORIGINAL_TYPE_MAP.checkboxGroup,
+  icon: 'control-widget',
+  originalType: ORIGINAL_TYPE_MAP.checkboxGroup,
   canWrapped: true,
   controllable: true,
   linkable: false,
+  canFullScreen: false,
+  singleton: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -63,7 +71,9 @@ export const widgetMeta: WidgetMeta = {
           ...WidgetViewActionI18N.zh,
           ...WidgetEditActionI18N.zh,
         },
+
         title: TitleI18N.zh,
+        immediateQuery: ImmediateQueryI18N.zh,
         background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
         loopFetch: LoopFetchI18N.zh,
@@ -79,6 +89,7 @@ export const widgetMeta: WidgetMeta = {
           ...WidgetViewActionI18N.en,
           ...WidgetEditActionI18N.en,
         },
+        immediateQuery: ImmediateQueryI18N.en,
         title: TitleI18N.en,
         background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
@@ -89,12 +100,11 @@ export const widgetMeta: WidgetMeta = {
   ],
 };
 
-export const widgetToolkit: WidgetToolkit = {
+export const widgetToolkit: ControlWidgetToolkit = {
   create: opt => {
     const widget = controlWidgetTpl(opt);
-    widget.id = widgetMeta.widgetTypeId + widget.id;
-    widget.config.originalType = widgetMeta.widgetTypeId;
-    widget.config.name = opt.name || '';
+    widget.id = widgetMeta.originalType + widget.id;
+    widget.config.originalType = widgetMeta.originalType;
     const addProps = [
       { ...initBackgroundTpl('#fff') },
       { ...initPaddingTpl() },
@@ -118,6 +128,12 @@ export const widgetToolkit: WidgetToolkit = {
   getName(key) {
     return initWidgetName(NameI18N, key);
   },
+  getDropDownList(...arg) {
+    return getControlDropDownList(true);
+  },
+  getQueryEnable(arg) {
+    return getControlQueryEnable(arg);
+  },
   edit() {},
   save() {},
 
@@ -131,9 +147,9 @@ export const widgetToolkit: WidgetToolkit = {
   // getWidgetName() {},
   // //
 };
-
-const checkboxGroupProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+export const controlToolkit = widgetToolkit;
+const checkboxGroupProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

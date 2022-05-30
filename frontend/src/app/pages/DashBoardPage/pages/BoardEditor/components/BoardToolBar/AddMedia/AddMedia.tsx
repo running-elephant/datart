@@ -30,17 +30,16 @@ import { BoardToolBarContext } from '../context/BoardToolBarContext';
 export const AddMedia: React.FC<{}> = () => {
   const t = useI18NPrefix(`viz.board.action`);
   const dispatch = useDispatch();
-  const { boardId, boardType } = useContext(BoardToolBarContext);
+  const { boardType } = useContext(BoardToolBarContext);
   const onSelectMediaWidget = useCallback(
     ({ keyPath }) => {
       const [mediaType] = keyPath;
       const widget = widgetManagerInstance.toolkit(mediaType).create({
-        dashboardId: boardId,
         boardType,
       });
       dispatch(addWidgetsToEditBoard([widget]));
     },
-    [boardId, boardType, dispatch],
+    [boardType, dispatch],
   );
   type TinyWidgetItems = {
     name: string;

@@ -17,7 +17,10 @@
  */
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import type {
+  WidgetActionListItem,
+  widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
@@ -37,6 +40,7 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
+
 const initIframeTpl = () => {
   return {
     label: 'iframe.iframeGroup',
@@ -46,7 +50,7 @@ const initIframeTpl = () => {
       {
         label: 'iframe.src',
         key: 'src',
-        value: '/', //https://www.oschina.net/p/datart, http://www.retech.cc/product/datart
+        value: '/login', //https://www.oschina.net/p/datart, http://www.retech.cc/product/datart
         comType: 'input',
       },
     ],
@@ -67,11 +71,13 @@ const NameI18N = {
   en: 'Embed',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'embed',
-  widgetTypeId: ORIGINAL_TYPE_MAP.iframe,
+  icon: 'embed-widget',
+  originalType: ORIGINAL_TYPE_MAP.iframe,
   canWrapped: true,
   controllable: false,
   linkable: false,
+  canFullScreen: true,
+  singleton: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -121,21 +127,18 @@ export interface IframeWidgetToolKit extends WidgetToolkit {
 const widgetToolkit: IframeWidgetToolKit = {
   create: opt => {
     const widget = widgetTpl();
-    widget.id = widgetMeta.widgetTypeId + widget.id;
+    widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.originalType = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      widget.config.rect = { ...initAutoWidgetRect() };
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      widget.config.rect = { ...initFreeWidgetRect() };
-    }
+
+    widget.config.rect = { ...initFreeWidgetRect() };
+    widget.config.pRect = { ...initAutoWidgetRect() };
+    widget.config.mRect = undefined;
 
     widget.config.customConfig.props = [
       { ...initIframeTpl() },
@@ -152,6 +155,27 @@ const widgetToolkit: IframeWidgetToolKit = {
   },
   edit() {},
   save() {},
+  getDropDownList(...arg) {
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
+    ];
+    return list;
+  },
   getIframe(props) {
     const [src] = getJsonConfigs(props, ['iframeGroup'], ['src']);
     return {
@@ -174,8 +198,8 @@ const widgetToolkit: IframeWidgetToolKit = {
 //     src,
 //   };
 // };
-const iframeProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+const iframeProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

@@ -18,7 +18,10 @@
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { TabWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
+  WidgetActionListItem,
+  widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { uuidv4 } from 'utils/utils';
@@ -39,16 +42,19 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
+
 const NameI18N = {
   zh: '标签卡',
   en: 'Tab',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: '',
-  widgetTypeId: ORIGINAL_TYPE_MAP.tab,
+  icon: 'tab-widget',
+  originalType: ORIGINAL_TYPE_MAP.tab,
   canWrapped: false,
   controllable: false,
   linkable: false,
+  canFullScreen: true,
+  singleton: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -96,19 +102,16 @@ export const widgetToolkit: TabToolkit = {
   create: opt => {
     const widget = widgetTpl();
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.originalType = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'container';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      widget.config.rect = { ...initAutoWidgetRect() };
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      widget.config.rect = { ...initFreeWidgetRect() };
-    }
+
+    widget.config.rect = { ...initFreeWidgetRect() };
+    widget.config.pRect = { ...initAutoWidgetRect() };
+    widget.config.mRect = undefined;
 
     widget.config.customConfig.props = [
       { ...initTitleTpl() },
@@ -133,6 +136,27 @@ export const widgetToolkit: TabToolkit = {
   },
   getName(key) {
     return initWidgetName(NameI18N, key);
+  },
+  getDropDownList(...arg) {
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
+    ];
+    return list;
   },
   edit() {},
   save() {},
@@ -172,8 +196,8 @@ export const widgetToolkit: TabToolkit = {
 //         "tabConfig": {}
 //     }
 // }
-const tabProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+const tabProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

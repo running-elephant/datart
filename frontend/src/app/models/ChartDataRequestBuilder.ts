@@ -98,15 +98,15 @@ export class ChartDataRequestBuilder {
           return acc;
         }
         if (
-          cur.type === ChartDataSectionType.AGGREGATE ||
-          cur.type === ChartDataSectionType.SIZE ||
-          cur.type === ChartDataSectionType.INFO
+          cur.type === ChartDataSectionType.Aggregate ||
+          cur.type === ChartDataSectionType.Size ||
+          cur.type === ChartDataSectionType.Info
         ) {
           return acc.concat(cur.rows);
         }
 
         if (
-          cur.type === ChartDataSectionType.MIXED &&
+          cur.type === ChartDataSectionType.Mixed &&
           cur.rows?.findIndex(v => v.type === DataViewFieldType.NUMERIC) !== -1
         ) {
           return acc.concat(
@@ -139,10 +139,10 @@ export class ChartDataRequestBuilder {
         if (isEmptyArray(cur.rows)) {
           return acc;
         }
-        if (cur.type === ChartDataSectionType.COLOR) {
+        if (cur.type === ChartDataSectionType.Color) {
           return acc.concat(cur.rows || []);
         }
-        if (cur.type === ChartDataSectionType.GROUP) {
+        if (cur.type === ChartDataSectionType.Group) {
           const rows = getRuntimeDateLevelFields(cur.rows);
 
           if (cur.drillable) {
@@ -161,7 +161,7 @@ export class ChartDataRequestBuilder {
           }
           return acc.concat(rows || []);
         }
-        if (cur.type === ChartDataSectionType.MIXED) {
+        if (cur.type === ChartDataSectionType.Mixed) {
           const dateAndStringFields = cur.rows?.filter(v =>
             [DataViewFieldType.DATE, DataViewFieldType.STRING].includes(v.type),
           );
@@ -180,7 +180,7 @@ export class ChartDataRequestBuilder {
   private buildFilters(): ChartDataRequestFilter[] {
     const fields: ChartDataSectionField[] = this.chartDataConfigs
       .reduce<ChartDataSectionField[]>((acc, cur) => {
-        if (!cur.rows || cur.type !== ChartDataSectionType.FILTER) {
+        if (!cur.rows || cur.type !== ChartDataSectionType.Filter) {
           return acc;
         }
         return acc.concat(cur.rows);
@@ -273,7 +273,7 @@ export class ChartDataRequestBuilder {
         }
         return {
           aggOperator:
-            field.aggregate === AggregateFieldActionType.NONE
+            field.aggregate === AggregateFieldActionType.None
               ? null
               : field.aggregate,
           column: field.colName,
@@ -308,12 +308,12 @@ export class ChartDataRequestBuilder {
           return acc;
         }
         if (
-          cur.type === ChartDataSectionType.AGGREGATE ||
-          cur.type === ChartDataSectionType.MIXED
+          cur.type === ChartDataSectionType.Aggregate ||
+          cur.type === ChartDataSectionType.Mixed
         ) {
           return acc.concat(cur.rows);
         }
-        if (cur.type === ChartDataSectionType.GROUP) {
+        if (cur.type === ChartDataSectionType.Group) {
           const rows = getRuntimeDateLevelFields(cur.rows);
 
           if (cur.drillable) {
@@ -401,14 +401,14 @@ export class ChartDataRequestBuilder {
 
         if (this.aggregation === false) {
           if (
-            cur.type === ChartDataSectionType.COLOR ||
-            cur.type === ChartDataSectionType.AGGREGATE ||
-            cur.type === ChartDataSectionType.SIZE ||
-            cur.type === ChartDataSectionType.INFO ||
-            cur.type === ChartDataSectionType.MIXED
+            cur.type === ChartDataSectionType.Color ||
+            cur.type === ChartDataSectionType.Aggregate ||
+            cur.type === ChartDataSectionType.Size ||
+            cur.type === ChartDataSectionType.Info ||
+            cur.type === ChartDataSectionType.Mixed
           ) {
             return acc.concat(cur.rows);
-          } else if (cur.type === ChartDataSectionType.GROUP) {
+          } else if (cur.type === ChartDataSectionType.Group) {
             if (cur.drillable) {
               if (this.isInValidDrillOption()) {
                 return acc.concat(cur.rows?.[0] || []);

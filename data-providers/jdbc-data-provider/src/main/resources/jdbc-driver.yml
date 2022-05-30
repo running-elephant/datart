@@ -145,12 +145,14 @@ POSTGRESQL:
   name: POSTGRESQL
   driver-class: org.postgresql.Driver
   url-prefix: jdbc:postgresql://
+  sql-dialect: datart.data.provider.calcite.dialect.PostgresqlSqlDialectSupport
 
 PRESTO:
   db-type: PRESTO
   name: PRESTO
   driver-class: io.prestosql.jdbc.PrestoDriver
   url-prefix: jdbc:presto://
+  adapter-class: datart.data.provider.jdbc.adapters.PrestoDataProviderAdapter
 
 SPARK:
   db-type: SPARK

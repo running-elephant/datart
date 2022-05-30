@@ -23,7 +23,7 @@ import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
-import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
+import { WidgetDropdownList } from '../../WidgetComponents/WidgetDropdownList';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
 import {
@@ -58,7 +58,7 @@ export const ImageWidget: React.FC<{ hideTitle: boolean }> = memo(
               wid={widget.id}
               lock={widget.config?.lock}
             />
-            <WidgetActionDropdown widget={widget} />
+            <WidgetDropdownList widget={widget} />
           </Space>
         </StyledWidgetToolBar>
       </WidgetWrapper>

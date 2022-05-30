@@ -15,21 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { EllipsisOutlined } from '@ant-design/icons';
-import { Button, Dropdown } from 'antd';
-import { memo, ReactElement } from 'react';
-export const WidgetDropdown: React.FC<{ overlay: ReactElement }> = memo(
-  ({ overlay }) => {
-    return (
-      <Dropdown
-        className="widget-tool-dropdown"
-        overlay={overlay}
-        placement="bottomCenter"
-        trigger={['click']}
-        arrow
-      >
-        <Button icon={<EllipsisOutlined />} type="link" />
-      </Dropdown>
-    );
-  },
-);
+import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { selectLayoutWidgetMap } from '../pages/BoardEditor/slice/selectors';
+
+export default function useEditAutoLayoutMap(boardId: string) {
+  const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
+
+  const sortedLayoutWidgets = useMemo(
+    () =>
+      Object.values(layoutWidgetMap).sort(
+        (a, b) => a.config.index - b.config.index,
+      ),
+    [layoutWidgetMap],
+  );
+  return sortedLayoutWidgets;
+}

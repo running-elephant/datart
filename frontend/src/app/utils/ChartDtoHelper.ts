@@ -17,7 +17,11 @@
  */
 
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
-import { ChartConfig, ChartStyleConfig } from 'app/types/ChartConfig';
+import {
+  ChartConfig,
+  ChartDataConfig,
+  ChartStyleConfig,
+} from 'app/types/ChartConfig';
 import { ChartConfigDTO, ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
@@ -76,6 +80,7 @@ function extractChartConfigValueModel(config: ChartConfig): ChartConfigDTO {
     datas: config?.datas,
     styles: getStyleValueModel(config?.styles),
     settings: getStyleValueModel(config?.settings),
+    interactions: getStyleValueModel(config?.interactions),
   };
 }
 
@@ -101,10 +106,10 @@ export function mergeToChartConfig(
   if (!source) {
     return target;
   }
-  target.datas = mergeChartDataConfigs(
+  target.datas = mergeChartDataConfigs<ChartDataConfig>(
     target?.datas,
     source?.chartConfig?.datas,
-  );
+  ) as ChartDataConfig[];
   target.styles = mergeChartStyleConfigs(
     target?.styles,
     source?.chartConfig?.styles,
@@ -112,6 +117,10 @@ export function mergeToChartConfig(
   target.settings = mergeChartStyleConfigs(
     target?.settings,
     source?.chartConfig?.settings,
+  );
+  target.interactions = mergeChartStyleConfigs(
+    target?.interactions,
+    source?.chartConfig?.interactions,
   );
   return target;
 }
@@ -123,5 +132,6 @@ export function convertToChartConfigDTO(
     datas: source?.chartConfig?.datas,
     styles: source?.chartConfig?.styles,
     settings: source?.chartConfig?.settings,
+    interactions: source?.chartConfig?.interactions,
   };
 }

@@ -44,8 +44,13 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
+import {
+  multipleSelectChange,
+  selectedItemChange,
+} from '../../../pages/BoardEditor/slice/actions/actions';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import {
   boardDrillManager,
@@ -56,6 +61,7 @@ import { BoardScaleContext } from '../../FreeBoardBackground';
 import { WidgetChartContext } from '../../WidgetProvider/WidgetChartProvider';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
+import { WidgetSelectionContext } from '../../WidgetProvider/WidgetSelectionProvider';
 
 export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const { dataChart, availableSourceFunctions } =
@@ -63,6 +69,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const scale = useContext(BoardScaleContext);
   const { data } = useContext(WidgetDataContext);
   const { renderMode } = useContext(BoardContext);
+  const { selectedItems, multipleSelect } = useContext(WidgetSelectionContext);
   const widget = useContext(WidgetContext);
   const { dashboardId, id: wid } = widget;
   const bid = useMemo(() => {
@@ -82,7 +89,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   useEffect(() => {
     widgetRef.current = widget;
   }, [widget]);
-
+  const dispatch = useDispatch();
   const handleDateLevelChange = useCallback(
     (type, payload) => {
       const rows = getRuntimeDateLevelFields(payload.value?.rows);
@@ -152,22 +159,14 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     }),
     [data],
   );
-  const chartClick = useCallback(
-    params => {
-      if (!params) {
-        return;
-      }
-      if (drillOptionRef.current?.isSelectedDrill) {
-        const option = drillOptionRef.current;
-        option.drillDown(params.data.rowData);
-        handleDrillOptionChange(option);
-        return;
-      }
 
-      onWidgetChartClick(widgetRef.current, params);
+  const chartIframeKeyboardListener = useCallback(
+    (e: KeyboardEvent) => {
+      multipleSelectChange(dispatch, renderMode, multipleSelect, e);
     },
-    [handleDrillOptionChange, onWidgetChartClick],
+    [dispatch, renderMode, multipleSelect],
   );
+
   const chart = useMemo(() => {
     if (!dataChart) {
       return null;
@@ -182,7 +181,29 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
           chartInstance.registerMouseEvents([
             {
               name: 'click',
-              callback: chartClick,
+              callback: (params: any) => {
+                if (!params) {
+                  return;
+                }
+                if (drillOptionRef.current?.isSelectedDrill) {
+                  const option = drillOptionRef.current;
+                  option.drillDown(params.data.rowData);
+                  handleDrillOptionChange(option);
+                  return;
+                }
+                if (params.seriesName === 'drillOptionChange') {
+                  handleDrillOptionChange?.(params.value);
+                  return;
+                }
+                if (
+                  !drillOptionRef.current?.isSelectedDrill &&
+                  chartInstance.selectable
+                ) {
+                  selectedItemChange(dispatch, renderMode, params, wid);
+                  return;
+                }
+                onWidgetChartClick(widgetRef.current, params);
+              },
             },
           ]);
         }
@@ -193,7 +214,14 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     } else {
       return null;
     }
-  }, [chartClick, dataChart]);
+  }, [
+    dataChart,
+    handleDrillOptionChange,
+    onWidgetChartClick,
+    dispatch,
+    wid,
+    renderMode,
+  ]);
   const config = useMemo(() => {
     if (!chart?.config) return undefined;
     if (!dataChart?.config) return undefined;
@@ -249,6 +277,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         width={cacheW}
         height={cacheH}
         drillOption={drillOption}
+        selectedItems={selectedItems}
+        onKeyboardPress={chartIframeKeyboardListener}
         containerId={containerId}
         widgetSpecialConfig={widgetSpecialConfig}
         scale={scale}
@@ -260,10 +290,12 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     cacheW,
     errText,
     dataset,
+    selectedItems,
     chart,
     containerId,
     widgetSpecialConfig,
     scale,
+    chartIframeKeyboardListener,
   ]);
   const drillContextVal = {
     drillOption: drillOptionRef.current,
@@ -277,7 +309,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       <ChartDrillContextMenu chartConfig={dataChart?.config.chartConfig}>
         <StyledWrapper>
           <ChartFrameBox ref={cacheWhRef}>{chartFrame}</ChartFrameBox>
-          <ChartDrillPaths />
+          <ChartDrillPaths chartConfig={dataChart?.config.chartConfig} />
         </StyledWrapper>
       </ChartDrillContextMenu>
     </ChartDrillContext.Provider>

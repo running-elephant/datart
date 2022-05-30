@@ -16,10 +16,8 @@
  * limitations under the License.
  */
 
-import {
-  AggregateFieldActionType,
-  SortActionType,
-} from 'app/types/ChartConfig';
+import { AggregateFieldActionType } from 'app/constants';
+import { SortActionType } from 'app/types/ChartConfig';
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 
 export type ChartDataRequestFilter = {

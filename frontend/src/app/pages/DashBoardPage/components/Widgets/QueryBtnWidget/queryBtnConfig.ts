@@ -18,7 +18,10 @@
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
+  WidgetActionListItem,
+  widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { PRIMARY } from 'styles/StyleConstants';
@@ -36,16 +39,19 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
+
 const NameI18N = {
   zh: '查询按钮',
   en: 'queryBtn',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'query',
-  widgetTypeId: ORIGINAL_TYPE_MAP.queryBtn,
+  icon: 'query-widget',
+  originalType: ORIGINAL_TYPE_MAP.queryBtn,
   canWrapped: true,
   controllable: false,
   linkable: false,
+  canFullScreen: false,
+  singleton: true,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -91,13 +97,12 @@ export const widgetMeta: WidgetMeta = {
 export const widgetToolkit: WidgetToolkit = {
   create: opt => {
     const widget = widgetTpl();
-    widget.id = widgetMeta.widgetTypeId + widget.id;
+    widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.originalType = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.originalType;
     widget.config.name = opt.name || '';
     widget.config.type = 'button';
     if (opt.boardType === 'auto') {
@@ -131,6 +136,27 @@ export const widgetToolkit: WidgetToolkit = {
   getName(key) {
     return initWidgetName(NameI18N, key);
   },
+  getDropDownList(...arg) {
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
+    ];
+    return list;
+  },
   edit() {},
   save() {},
   // lock() {},
@@ -144,8 +170,8 @@ export const widgetToolkit: WidgetToolkit = {
   // //
 };
 
-const queryBtnProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+const queryBtnProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

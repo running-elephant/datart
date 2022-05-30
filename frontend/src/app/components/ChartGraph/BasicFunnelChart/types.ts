@@ -1,4 +1,8 @@
-import { ChartDataSectionField, LabelStyle } from 'app/types/ChartConfig';
+import {
+  ChartDataSectionField,
+  GridStyle,
+  LabelStyle,
+} from 'app/types/ChartConfig';
 
 export type SeriesData = {
   itemStyle?: {
@@ -10,22 +14,17 @@ export type SeriesData = {
   value: string[];
 } & ChartDataSectionField;
 
-export interface Series {
-  top: string;
-  left: string;
-  right: string;
-  bottom: string;
-  containLabel: boolean;
+export type Series = {
   data: SeriesData[];
   funnelAlign: string;
   gap: number;
-  itemStyle: {
+  itemStyle?: {
     shadowBlur: number;
     shadowColor: string;
     shadowOffsetX: number;
   };
   label: LabelStyle;
-  labelLine: {
+  labelLine?: {
     length: number;
     lineStyle: {
       width: number;
@@ -35,4 +34,4 @@ export interface Series {
   labelLayout?: { hideOverlap: true };
   sort: string;
   type: string;
-}
+} & GridStyle;

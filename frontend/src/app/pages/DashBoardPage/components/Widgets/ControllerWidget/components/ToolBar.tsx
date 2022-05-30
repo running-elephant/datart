@@ -25,7 +25,7 @@ import {
   WaitIconFn,
 } from '../../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../../WidgetComponents/StyledWidgetToolBar';
-import { WidgetActionDropdown } from '../../../WidgetComponents/WidgetActionDropdown';
+import { WidgetDropdownList } from '../../../WidgetComponents/WidgetDropdownList';
 import { WidgetInfoContext } from '../../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../../WidgetProvider/WidgetProvider';
 
@@ -44,7 +44,7 @@ export const ToolBar: FC = memo(() => {
           lock={widget.config.lock}
           wid={widget.id}
         />
-        <WidgetActionDropdown widget={widget} />
+        <WidgetDropdownList widget={widget} />
       </Space>
     </StyledWidgetToolBar>
   );

@@ -43,6 +43,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
   } = useContext(BoardContext);
   const { itemMap } = widget.config.content as TabWidgetContent;
   const tabsCons = Object.values(itemMap).sort((a, b) => a.index - b.index);
+
   const [activeKey, SetActiveKey] = useState<string | number>(
     tabsCons[0]?.index || 0,
   );
@@ -52,7 +53,8 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
 
   const tabAdd = useCallback(() => {
     const newTabId = `tab_${uuidv4()}`;
-    const nextIndex = Date.now();
+    const maxIndex = tabsCons[tabsCons.length - 1]?.index || 0;
+    const nextIndex = maxIndex + 1;
     dispatch(
       editBoardStackActions.tabsWidgetAddTab({
         parentId: widget.id,
@@ -67,7 +69,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
     setImmediate(() => {
       SetActiveKey(nextIndex);
     });
-  }, [dispatch, widget.id]);
+  }, [dispatch, tabsCons, widget.id]);
   const tabRemove = useCallback(
     targetKey => {
       const tabId =
@@ -122,7 +124,9 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
                 </MapWrapper>
               </WidgetWrapProvider>
             ) : (
-              boardEditing && <DropHolder tabItem={tab} parentId={widget.id} />
+              boardEditing && (
+                <DropHolder tabItem={tab} tabWidgetId={widget.id} />
+              )
             )}
           </TabPane>
         ))}

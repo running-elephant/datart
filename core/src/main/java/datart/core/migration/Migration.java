@@ -20,15 +20,11 @@ package datart.core.migration;
 
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.io.Resource;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Data
 public class Migration implements Comparable<Migration> {
@@ -45,27 +41,21 @@ public class Migration implements Comparable<Migration> {
 
     private boolean success;
 
-    private File upgradeFile;
+    private Resource upgradeFile;
 
-    private File rollbackFile;
+    private Resource rollbackFile;
 
     private final static String split = "__";
 
     private final static String fileSuffix = ".sql";
 
-    public String getScript() throws FileNotFoundException {
-        return new BufferedReader(new FileReader(upgradeFile))
-                .lines()
-                .collect(Collectors.joining());
-    }
-
     public Migration() {
 
     }
 
-    public Migration(File upgradeFile, File rollbackFile) {
-        String fileName = upgradeFile.getName();
-        String[] extractName = extractName(upgradeFile.getName());
+    public Migration(Resource upgradeFile, Resource rollbackFile) {
+        String fileName = upgradeFile.getFilename();
+        String[] extractName = extractName(upgradeFile.getFilename());
         setId(extractName[0]);
         this.setVersion(extractName[1]);
         this.fileName = fileName;
@@ -93,11 +83,11 @@ public class Migration implements Comparable<Migration> {
         return new String[]{split[0].substring(1), split[1].replace(fileSuffix, "")};
     }
 
-    public static boolean isMigrationFile(File file) {
-        if (file == null) {
+    public static boolean isMigrationFile(Resource resource) {
+        if (resource == null) {
             return false;
         }
-        String name = file.getName();
+        String name = resource.getFilename();
         if (!StringUtils.endsWithIgnoreCase(name, fileSuffix)) {
             return false;
         }

@@ -52,19 +52,19 @@ const ChartDataConfigPanel: FC<{
       };
 
       switch (props.config?.type) {
-        case ChartDataSectionType.GROUP:
+        case ChartDataSectionType.Group:
           return <PaletteDataConfig.GroupTypeSection {...props} />;
-        case ChartDataSectionType.AGGREGATE:
+        case ChartDataSectionType.Aggregate:
           return <PaletteDataConfig.AggregateTypeSection {...props} />;
-        case ChartDataSectionType.MIXED:
+        case ChartDataSectionType.Mixed:
           return <PaletteDataConfig.MixedTypeSection {...props} />;
-        case ChartDataSectionType.FILTER:
+        case ChartDataSectionType.Filter:
           return <PaletteDataConfig.FilterTypeSection {...props} />;
-        case ChartDataSectionType.INFO:
+        case ChartDataSectionType.Info:
           return <PaletteDataConfig.InfoTypeSection {...props} />;
-        case ChartDataSectionType.COLOR:
+        case ChartDataSectionType.Color:
           return <PaletteDataConfig.ColorTypeSection {...props} />;
-        case ChartDataSectionType.SIZE:
+        case ChartDataSectionType.Size:
           return <PaletteDataConfig.SizeTypeSection {...props} />;
         default:
           return <PaletteDataConfig.BaseDataConfigSection {...props} />;

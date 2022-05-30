@@ -1,7 +1,7 @@
 import {
   ChartDataSectionField,
+  FormatFieldAction,
   GridStyle,
-  IFieldFormatConfig,
   LabelStyle,
 } from 'app/types/ChartConfig';
 
@@ -22,10 +22,10 @@ export type PieSeriesStyle = {
   name?: string;
   data: Array<
     {
-      format: IFieldFormatConfig | undefined;
+      format: FormatFieldAction | undefined;
       name: string;
       value: any[];
-      itemStyle: { color: string | undefined } | undefined;
+      itemStyle: { [x: string]: any } | undefined;
       rowData: { [key: string]: any };
     } & ChartDataSectionField
   >;

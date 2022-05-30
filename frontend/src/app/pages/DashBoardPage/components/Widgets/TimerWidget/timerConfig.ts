@@ -22,7 +22,10 @@ import {
 } from 'app/pages/DashBoardPage/constants';
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
+  WidgetActionListItem,
+  widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
@@ -81,11 +84,13 @@ const NameI18N = {
   en: 'Timer',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'timer',
-  widgetTypeId: ORIGINAL_TYPE_MAP.timer,
+  icon: 'time-widget',
+  originalType: ORIGINAL_TYPE_MAP.timer,
   canWrapped: true,
   controllable: false,
   linkable: false,
+  canFullScreen: true,
+  singleton: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -136,13 +141,11 @@ export interface TimerWidgetToolKit extends WidgetToolkit {
 export const widgetToolkit: TimerWidgetToolKit = {
   create: opt => {
     const widget = widgetTpl();
-    widget.id = widgetMeta.widgetTypeId + widget.id;
+    widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
-    widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.originalType = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
     if (opt.boardType === 'auto') {
@@ -152,8 +155,8 @@ export const widgetToolkit: TimerWidgetToolKit = {
         width: 6,
         height: 2,
       };
-      widget.config.rect = { ...rect };
-      widget.config.mRect = { ...rect };
+      widget.config.pRect = { ...rect };
+      widget.config.mRect = undefined;
     } else {
       const rect: RectConfig = {
         x: 0,
@@ -179,6 +182,27 @@ export const widgetToolkit: TimerWidgetToolKit = {
   },
   edit() {},
   save() {},
+  getDropDownList(...arg) {
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
+    ];
+    return list;
+  },
   getTimer(props) {
     const [time, font] = getJsonConfigs(
       props,
@@ -201,8 +225,8 @@ export const widgetToolkit: TimerWidgetToolKit = {
   // //
 };
 
-const timerProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+const timerProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

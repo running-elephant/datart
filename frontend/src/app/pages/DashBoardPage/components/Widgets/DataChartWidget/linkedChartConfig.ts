@@ -17,7 +17,12 @@
  */
 
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
-import { WidgetToolkit } from 'app/pages/DashBoardPage/types/widgetTypes';
+import {
+  WidgetActionListItem,
+  widgetActionType,
+  WidgetProto,
+  WidgetToolkit,
+} from 'app/pages/DashBoardPage/types/widgetTypes';
 import { initWidgetName } from '../../WidgetManager/utils/init';
 import { dataChartCreator, getMeta } from './config';
 
@@ -26,7 +31,7 @@ const NameI18N = {
   en: 'LinkedChart',
 };
 export const widgetMeta = getMeta({
-  icon: 'linkedChart',
+  icon: 'linkedChart-widget',
   widgetTypeId: ORIGINAL_TYPE_MAP.linkedChart,
   zh: {
     desc: '引入图表部件的内部是一个引用的数据图表,原有数据图表有改动时,引入图表部件也会跟着改变',
@@ -40,14 +45,87 @@ export const widgetMeta = getMeta({
 
 export const linkedChartToolkit: WidgetToolkit = {
   create: opt => {
-    const widget = dataChartCreator({
-      ...opt,
-      widgetTypeId: widgetMeta.widgetTypeId,
-    });
+    const widget = dataChartCreator(opt);
+    widget.config.originalType = ORIGINAL_TYPE_MAP.linkedChart;
+    widget.id = widget.config.originalType + widget.id;
     return widget;
   },
   getName(key) {
     return initWidgetName(NameI18N, key);
+  },
+  getDropDownList(widgetConf, supportTrigger?) {
+    let disabledMakeLinkage = false;
+    let showCloseLinkage = false;
+    let disabledMakeJump = false;
+    let showCloseJump = false;
+    if (supportTrigger) {
+      if (widgetConf.jumpConfig?.open) {
+        showCloseJump = true;
+        disabledMakeLinkage = true;
+      } else {
+        showCloseJump = false;
+        disabledMakeLinkage = false;
+      }
+
+      if (widgetConf.linkageConfig?.open) {
+        showCloseLinkage = true;
+        disabledMakeJump = true;
+      } else {
+        showCloseLinkage = false;
+        disabledMakeJump = false;
+      }
+    }
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'refresh',
+        renderMode: ['edit', 'read', 'share', 'schedule'],
+      },
+      {
+        key: 'fullScreen',
+        renderMode: ['read', 'share', 'schedule'],
+      },
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'makeLinkage',
+        label: 'makeLinkage',
+        renderMode: ['edit'],
+        show: supportTrigger,
+        disabled: disabledMakeLinkage,
+      },
+      {
+        key: 'closeLinkage',
+        renderMode: ['edit'],
+        show: supportTrigger && showCloseLinkage,
+      },
+      {
+        key: 'makeJump',
+        label: 'makeJump',
+        renderMode: ['edit'],
+        show: supportTrigger,
+        disabled: disabledMakeJump,
+      },
+      {
+        key: 'closeJump',
+        renderMode: ['edit'],
+        show: supportTrigger && showCloseJump,
+      },
+    ];
+    return list;
   },
   edit() {},
   save() {},
@@ -66,8 +144,8 @@ export const linkedChartToolkit: WidgetToolkit = {
   // closeJump() {},
 };
 
-const linkedChartProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+const linkedChartProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: linkedChartToolkit,
 };

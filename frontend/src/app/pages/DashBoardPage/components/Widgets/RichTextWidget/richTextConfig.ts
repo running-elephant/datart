@@ -17,7 +17,10 @@
  */
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import type {
+  WidgetActionListItem,
+  widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
@@ -41,11 +44,13 @@ const NameI18N = {
   en: 'RichText',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'richText',
-  widgetTypeId: ORIGINAL_TYPE_MAP.richText,
+  icon: 'rich-text',
+  originalType: ORIGINAL_TYPE_MAP.richText,
   canWrapped: true,
   controllable: false,
   linkable: false,
+  canFullScreen: true,
+  singleton: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -91,21 +96,18 @@ export const widgetMeta: WidgetMeta = {
 export const widgetToolkit: WidgetToolkit = {
   create: opt => {
     const widget = widgetTpl();
-    widget.id = widgetMeta.widgetTypeId + widget.id;
+    widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.originalType = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      widget.config.rect = { ...initAutoWidgetRect() };
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      widget.config.rect = { ...initFreeWidgetRect() };
-    }
+
+    widget.config.rect = { ...initFreeWidgetRect() };
+    widget.config.pRect = { ...initAutoWidgetRect() };
+    widget.config.mRect = undefined;
 
     widget.config.customConfig.props = [
       { ...initTitleTpl() },
@@ -121,6 +123,7 @@ export const widgetToolkit: WidgetToolkit = {
             {
               attributes: {
                 size: '24px',
+                color: '#448aff',
                 italic: true,
               },
               insert: 'ABCDEFG...',
@@ -138,6 +141,27 @@ export const widgetToolkit: WidgetToolkit = {
   getName(key) {
     return initWidgetName(NameI18N, key);
   },
+  getDropDownList(...arg) {
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
+    ];
+    return list;
+  },
   edit() {},
   save() {},
   // lock() {},
@@ -151,8 +175,8 @@ export const widgetToolkit: WidgetToolkit = {
   // //
 };
 
-const richTextProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+const richTextProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

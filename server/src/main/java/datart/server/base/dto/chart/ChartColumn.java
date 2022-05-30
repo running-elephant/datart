@@ -2,11 +2,7 @@ package datart.server.base.dto.chart;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import datart.core.entity.poi.format.PoiNumFormat;
-import datart.core.entity.poi.format.CurrencyFormat;
-import datart.core.entity.poi.format.NumericFormat;
-import datart.core.entity.poi.format.PercentageFormat;
-import datart.core.entity.poi.format.ScientificNotationFormat;
+import datart.core.entity.poi.format.*;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -80,7 +76,7 @@ public class ChartColumn {
 
     public List<ChartColumn> getLeafNodes(){
         List<ChartColumn> leafNodes = new ArrayList<>();
-        if (this.leafNum == 1 && !this.isGroup){
+        if (this.leafNum == 0 && !this.isGroup){
             leafNodes.add(this);
         }
         for (ChartColumn child : children) {
@@ -92,7 +88,11 @@ public class ChartColumn {
     private int calLeafNum() {
         int num = 0;
         for (ChartColumn child : children) {
-            num += child.getLeafNum();
+            if (child.getLeafNum()==0) {
+                num++;
+            } else {
+                num += child.getLeafNum();
+            }
         }
         return num;
     }

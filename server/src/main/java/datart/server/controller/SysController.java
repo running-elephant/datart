@@ -21,9 +21,14 @@ package datart.server.controller;
 import datart.core.base.annotations.SkipLogin;
 import datart.server.base.dto.ResponseData;
 import datart.server.base.dto.SystemInfo;
+import datart.server.base.params.SetupParams;
 import datart.server.service.SysService;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 
 @RestController
 @RequestMapping(value = "/sys")
@@ -40,6 +45,13 @@ public class SysController extends BaseController {
     @GetMapping("/info")
     public ResponseData<SystemInfo> getSysInfo() {
         return ResponseData.success(sysService.getSysInfo());
+    }
+
+    @SkipLogin
+    @ApiOperation(value = "initialized user info")
+    @PostMapping("/setup")
+    public ResponseData<Boolean> setup(@Validated @RequestBody SetupParams setupParams) throws MessagingException, UnsupportedEncodingException {
+        return ResponseData.success(sysService.setup(setupParams));
     }
 
 }

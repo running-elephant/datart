@@ -26,19 +26,19 @@ import { DropItem } from './WidgetDndHandleMask';
 
 export interface DropHolderProps {
   tabItem: ContainerItem;
-  parentId: string;
+  tabWidgetId: string;
 }
 export const DropHolder: React.FC<DropHolderProps> = memo(
-  ({ tabItem, parentId }) => {
+  ({ tabItem, tabWidgetId }) => {
     const dispatch = useDispatch();
     const [{ isOver, canDrop }, refDrop] = useDrop(
       () => ({
         accept: CONTAINER_TAB,
-        item: { tabItem, parentId },
+        item: { tabItem, parentId: tabWidgetId },
         drop: (dropItem: DropItem) => {
           dispatch(
             editBoardStackActions.addWidgetToTabWidget({
-              parentId,
+              tabWidgetId,
               tabItem: {
                 ...tabItem,
                 childWidgetId: dropItem.childId,

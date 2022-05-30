@@ -17,15 +17,21 @@
  */
 
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
-import { WidgetToolkit } from 'app/pages/DashBoardPage/types/widgetTypes';
+import {
+  WidgetActionListItem,
+  widgetActionType,
+  WidgetProto,
+  WidgetToolkit,
+} from 'app/pages/DashBoardPage/types/widgetTypes';
 import { initWidgetName } from '../../WidgetManager/utils/init';
 import { dataChartCreator, getMeta } from './config';
+
 const NameI18N = {
   zh: '自建数据图表',
   en: 'OwnedChart',
 };
 const widgetMeta = getMeta({
-  icon: 'ownedChart',
+  icon: 'ownedChart-widget',
   widgetTypeId: ORIGINAL_TYPE_MAP.ownedChart,
   zh: {
     desc: '自建数据图表的内部是一个独立的数据图表 ',
@@ -39,14 +45,88 @@ const widgetMeta = getMeta({
 export type OwnedChartToolkit = WidgetToolkit & {};
 const widgetToolkit: OwnedChartToolkit = {
   create: opt => {
-    const widget = dataChartCreator({
-      ...opt,
-      widgetTypeId: widgetMeta.widgetTypeId,
-    });
+    const widget = dataChartCreator(opt);
+    widget.config.originalType = ORIGINAL_TYPE_MAP.ownedChart;
+    widget.id = widget.config.originalType + widget.id;
     return widget;
   },
   getName(key) {
     return initWidgetName(NameI18N, key);
+  },
+  getDropDownList(widgetConf, supportTrigger?) {
+    let disabledMakeLinkage = false;
+    let showCloseLinkage = false;
+    let disabledMakeJump = false;
+    let showCloseJump = false;
+    if (supportTrigger) {
+      if (widgetConf.jumpConfig?.open) {
+        showCloseJump = true;
+        disabledMakeLinkage = true;
+      } else {
+        showCloseJump = false;
+        disabledMakeLinkage = false;
+      }
+
+      if (widgetConf.linkageConfig?.open) {
+        showCloseLinkage = true;
+        disabledMakeJump = true;
+      } else {
+        showCloseLinkage = false;
+        disabledMakeJump = false;
+      }
+    }
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'refresh',
+        renderMode: ['edit', 'read', 'share', 'schedule'],
+      },
+      {
+        key: 'fullScreen',
+        renderMode: ['read', 'share', 'schedule'],
+      },
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
+
+      {
+        key: 'makeLinkage',
+        label: 'makeLinkage',
+        renderMode: ['edit'],
+        show: supportTrigger,
+        disabled: disabledMakeLinkage,
+      },
+      {
+        key: 'closeLinkage',
+        renderMode: ['edit'],
+        show: supportTrigger && showCloseLinkage,
+      },
+      {
+        key: 'makeJump',
+        label: 'makeJump',
+        renderMode: ['edit'],
+        show: supportTrigger,
+        disabled: disabledMakeJump,
+      },
+      {
+        key: 'closeJump',
+        renderMode: ['edit'],
+        show: supportTrigger && showCloseJump,
+      },
+    ];
+    return list;
   },
   edit() {},
   save() {},
@@ -64,14 +144,9 @@ const widgetToolkit: OwnedChartToolkit = {
   // setJump() {},
   // closeJump() {},
 };
-// class OwnedChartProto{
-//   public widgetTypeId
-//   constructor(){
-//     return this;
-//   }
-// }
-const ownedChartProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+
+const ownedChartProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

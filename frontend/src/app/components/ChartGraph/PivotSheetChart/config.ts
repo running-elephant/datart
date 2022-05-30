@@ -35,6 +35,8 @@ const config: ChartConfig = {
       options: {
         sortable: { backendSort: false },
       },
+      drillable: false,
+      drillContextMenuVisible: true,
     },
     {
       label: 'metrics',
@@ -60,59 +62,6 @@ const config: ChartConfig = {
     },
   ],
   styles: [
-    // {
-    //   label: 'column.title',
-    //   key: 'column',
-    //   comType: 'group',
-    //   rows: [
-    //     {
-    //       label: 'column.open',
-    //       key: 'modal',
-    //       comType: 'group',
-    //       options: { type: 'modal', modalSize: 'middle' },
-    //       rows: [
-    //         {
-    //           label: 'column.list',
-    //           key: 'list',
-    //           comType: 'listTemplate',
-    //           rows: [],
-    //           options: {
-    //             getItems: cols => {
-    //               const columns = (cols || [])
-    //                 .filter(col =>
-    //                   ['aggregate', 'group', 'mixed'].includes(col.type),
-    //                 )
-    //                 .reduce((acc, cur) => acc.concat(cur.rows || []), [])
-    //                 .map(c => ({
-    //                   key: c.uid,
-    //                   value: c.uid,
-    //                   label:
-    //                     c.label || c.aggregate
-    //                       ? `${c.aggregate}(${c.colName})`
-    //                       : c.colName,
-    //                 }));
-    //               return columns;
-    //             },
-    //           },
-    //           template: {
-    //             label: 'column.listItem',
-    //             key: 'listItem',
-    //             comType: 'group',
-    //             rows: [
-    //               {
-    //                 label: 'column.conditionalStyle',
-    //                 key: 'conditionalStyle',
-    //                 comType: 'group',
-    //                 options: { expand: true },
-    //                 rows: [],
-    //               },
-    //             ],
-    //           },
-    //         },
-    //       ],
-    //     },
-    //   ],
-    // },
     {
       label: 'style.title',
       key: 'style',
@@ -141,6 +90,14 @@ const config: ChartConfig = {
           key: 'metricNameShowIn',
           default: true,
           comType: 'radio',
+          watcher: {
+            deps: ['enableExpandRow'],
+            action: props => {
+              return {
+                disabled: props.enableExpandRow,
+              };
+            },
+          },
           options: {
             translateItemLabel: true,
             items: [

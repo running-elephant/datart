@@ -47,4 +47,6 @@ public interface OrgService extends BaseCRUDService<Organization, OrganizationMa
 
     void addUserToOrg(String userId, String orgId);
 
+    Organization checkTeamOrg();
+
 }

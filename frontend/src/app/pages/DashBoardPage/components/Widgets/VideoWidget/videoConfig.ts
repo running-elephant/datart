@@ -17,7 +17,10 @@
  */
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import type {
+  WidgetActionListItem,
+  widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
@@ -37,6 +40,7 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
+
 const initVideoTpl = () => {
   return {
     label: 'video.videoGroup',
@@ -68,11 +72,13 @@ const NameI18N = {
   en: 'Video',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'video',
-  widgetTypeId: ORIGINAL_TYPE_MAP.video,
+  icon: 'video-widget',
+  originalType: ORIGINAL_TYPE_MAP.video,
   canWrapped: true,
   controllable: false,
   linkable: false,
+  canFullScreen: true,
+  singleton: false,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -122,21 +128,17 @@ export interface VideoWidgetToolKit extends WidgetToolkit {
 const widgetToolkit: VideoWidgetToolKit = {
   create: opt => {
     const widget = widgetTpl();
-    widget.id = widgetMeta.widgetTypeId + widget.id;
+    widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
-    widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.originalType = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      widget.config.rect = { ...initAutoWidgetRect() };
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      widget.config.rect = { ...initFreeWidgetRect() };
-    }
+
+    widget.config.rect = { ...initFreeWidgetRect() };
+    widget.config.pRect = { ...initAutoWidgetRect() };
+    widget.config.mRect = undefined;
 
     widget.config.customConfig.props = [
       { ...initVideoTpl() },
@@ -152,6 +154,27 @@ const widgetToolkit: VideoWidgetToolKit = {
   },
   edit() {},
   save() {},
+  getDropDownList(...arg) {
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
+    ];
+    return list;
+  },
   getVideo(props) {
     const [src] = getJsonConfigs(props, ['videoGroup'], ['src']);
     return {
@@ -169,8 +192,8 @@ const widgetToolkit: VideoWidgetToolKit = {
   // //
 };
 
-const videoProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+const videoProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

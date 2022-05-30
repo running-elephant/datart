@@ -32,7 +32,8 @@ export const WidgetSetting: FC = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
   const { boardType } = useContext(BoardContext);
 
-  const { onUpdateWidgetConfigByKey } = useContext(WidgetActionContext);
+  const { onUpdateWidgetConfigByKey, onEditFreeWidgetRect } =
+    useContext(WidgetActionContext);
   const widget = useContext(WidgetContext);
   const { name, rect } = widget.config;
 
@@ -40,12 +41,16 @@ export const WidgetSetting: FC = memo(() => {
     () => throttle(onUpdateWidgetConfigByKey, 300),
     [onUpdateWidgetConfigByKey],
   );
+  const throttledUpdateRect = useMemo(
+    () => throttle(onEditFreeWidgetRect, 300),
+    [onEditFreeWidgetRect],
+  );
   const changeRect = useCallback(
     (key: string, value) => {
       const newRect = { ...rect!, [key]: value };
-      throttledUpdate({ wid: widget.id, key: 'rect', val: newRect });
+      throttledUpdateRect(newRect, widget.id);
     },
-    [rect, throttledUpdate, widget.id],
+    [rect, throttledUpdateRect, widget.id],
   );
   const changeX = useCallback(val => changeRect('x', val), [changeRect]);
   const changeY = useCallback(val => changeRect('y', val), [changeRect]);

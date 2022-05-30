@@ -34,12 +34,13 @@ import {
   ChartStyleConfig,
   ChartStyleSectionGroup,
   FontStyle,
+  FormatFieldAction,
   GridStyle,
-  IFieldFormatConfig,
   LineStyle,
   MarkArea,
   MarkDataConfig,
   MarkLine,
+  SelectedItem,
   XAxis,
 } from 'app/types/ChartConfig';
 import {
@@ -91,18 +92,18 @@ import {
  * console.log(formattedData); // '100.00%';
  * @export
  * @param {(number | string)} [value]
- * @param {IFieldFormatConfig} [format]
+ * @param {FormatFieldAction} [format]
  * @return {*}
  */
 export function toFormattedValue(
   value?: number | string,
-  format?: IFieldFormatConfig,
+  format?: FormatFieldAction,
 ) {
   if (value === null || value === undefined) {
     return '-';
   }
 
-  if (!format || format.type === FieldFormatType.DEFAULT) {
+  if (!format || format.type === FieldFormatType.Defalut) {
     return value;
   }
 
@@ -114,7 +115,7 @@ export function toFormattedValue(
 
   if (
     typeof value === 'string' &&
-    formatType !== FieldFormatType.DATE &&
+    formatType !== FieldFormatType.Date &&
     (!value || isNaN(+value))
   ) {
     return value;
@@ -127,35 +128,35 @@ export function toFormattedValue(
 
   let formattedValue;
   switch (formatType) {
-    case FieldFormatType.NUMERIC:
+    case FieldFormatType.Numeric:
       const numericConfig =
-        config as IFieldFormatConfig[FieldFormatType.NUMERIC];
+        config as FormatFieldAction[FieldFormatType.Numeric];
       formattedValue = pipe(
         unitFormater,
         decimalPlacesFormater,
         numericFormater,
       )(value, numericConfig);
       break;
-    case FieldFormatType.CURRENCY:
+    case FieldFormatType.Currency:
       const currencyConfig =
-        config as IFieldFormatConfig[FieldFormatType.CURRENCY];
+        config as FormatFieldAction[FieldFormatType.Currency];
       formattedValue = pipe(currencyFormater)(value, currencyConfig);
       break;
-    case FieldFormatType.PERCENTAGE:
+    case FieldFormatType.Percentage:
       const percentageConfig =
-        config as IFieldFormatConfig[FieldFormatType.PERCENTAGE];
+        config as FormatFieldAction[FieldFormatType.Percentage];
       formattedValue = pipe(percentageFormater)(value, percentageConfig);
       break;
-    case FieldFormatType.SCIENTIFIC:
+    case FieldFormatType.Scientific:
       const scientificNotationConfig =
-        config as IFieldFormatConfig[FieldFormatType.SCIENTIFIC];
+        config as FormatFieldAction[FieldFormatType.Scientific];
       formattedValue = pipe(scientificNotationFormater)(
         value,
         scientificNotationConfig,
       );
       break;
-    case FieldFormatType.DATE:
-      const dateConfig = config as IFieldFormatConfig[FieldFormatType.DATE];
+    case FieldFormatType.Date:
+      const dateConfig = config as FormatFieldAction[FieldFormatType.Date];
       formattedValue = pipe(dateFormater)(value, dateConfig);
       break;
     default:
@@ -169,8 +170,8 @@ export function toFormattedValue(
 function decimalPlacesFormater(
   value,
   config?:
-    | IFieldFormatConfig[FieldFormatType.NUMERIC]
-    | IFieldFormatConfig[FieldFormatType.CURRENCY],
+    | FormatFieldAction[FieldFormatType.Numeric]
+    | FormatFieldAction[FieldFormatType.Currency],
 ) {
   if (isEmpty(config?.decimalPlaces)) {
     return value;
@@ -188,8 +189,8 @@ function decimalPlacesFormater(
 function unitFormater(
   value: any,
   config?:
-    | IFieldFormatConfig[FieldFormatType.NUMERIC]
-    | IFieldFormatConfig[FieldFormatType.CURRENCY],
+    | FormatFieldAction[FieldFormatType.Numeric]
+    | FormatFieldAction[FieldFormatType.Currency],
 ) {
   if (isEmpty(config?.unitKey)) {
     return value;
@@ -204,7 +205,7 @@ function unitFormater(
 
 function numericFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.NUMERIC],
+  config?: FormatFieldAction[FieldFormatType.Numeric],
 ) {
   if (isNaN(+value)) {
     return value;
@@ -221,7 +222,7 @@ function numericFormater(
 
 function thousandSeperatorFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.NUMERIC],
+  config?: FormatFieldAction[FieldFormatType.Numeric],
 ) {
   if (isNaN(+value) || !config?.useThousandSeparator) {
     return value;
@@ -235,7 +236,7 @@ function thousandSeperatorFormater(
 
 function currencyFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.CURRENCY],
+  config?: FormatFieldAction[FieldFormatType.Currency],
 ) {
   if (isNaN(+value)) {
     return value;
@@ -256,7 +257,7 @@ function currencyFormater(
 
 function percentageFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.PERCENTAGE],
+  config?: FormatFieldAction[FieldFormatType.Percentage],
 ) {
   if (isNaN(+value)) {
     return value;
@@ -275,7 +276,7 @@ function percentageFormater(
 
 function scientificNotationFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.SCIENTIFIC],
+  config?: FormatFieldAction[FieldFormatType.Scientific],
 ) {
   if (isNaN(+value)) {
     return value;
@@ -291,10 +292,7 @@ function scientificNotationFormater(
   return (+value).toExponential(fractionDigits);
 }
 
-function dateFormater(
-  value,
-  config?: IFieldFormatConfig[FieldFormatType.DATE],
-) {
+function dateFormater(value, config?: FormatFieldAction[FieldFormatType.Date]) {
   if (isNaN(+value) || isEmpty(config?.format)) {
     return value;
   }
@@ -1334,8 +1332,8 @@ export function getExtraSeriesRowData(
   };
 }
 
-export function getExtraSeriesDataFormat(format?: IFieldFormatConfig): {
-  format: IFieldFormatConfig | undefined;
+export function getExtraSeriesDataFormat(format?: FormatFieldAction): {
+  format: FormatFieldAction | undefined;
 } {
   return {
     format,
@@ -1411,8 +1409,8 @@ export function isMatchRequirement(
   ).flatMap(config => config.rows || []);
   const requirements = meta.requirements || [];
   return requirements.some(r => {
-    const group = r?.[ChartDataSectionType.GROUP];
-    const aggregate = r?.[ChartDataSectionType.AGGREGATE];
+    const group = r?.[ChartDataSectionType.Group];
+    const aggregate = r?.[ChartDataSectionType.Aggregate];
     return (
       isInRange(group, groupedFieldConfigs.length) &&
       isInRange(aggregate, aggregateFieldConfigs.length)
@@ -1555,7 +1553,7 @@ export const getDrillableRows = (
   option?: ChartDrillOption,
 ): ChartDataSectionField[] => {
   return configs
-    ?.filter(c => c.type === ChartDataSectionType.GROUP)
+    ?.filter(c => c.type === ChartDataSectionType.Group)
     .flatMap(config => {
       if (Boolean(config.drillable)) {
         if (
@@ -1658,7 +1656,7 @@ export const clearRuntimeDateLevelFieldsInChartConfig = (
   return updateBy(config, draft => {
     if (draft?.datas) {
       const index = draft.datas.findIndex(
-        v => v.type === ChartDataSectionType.GROUP,
+        v => v.type === ChartDataSectionType.Group,
       );
       const groupRows = draft.datas[index]?.rows;
       groupRows?.forEach((v, i) => {
@@ -1674,7 +1672,7 @@ export const setRuntimeDateLevelFieldsInChartConfig = (config: ChartConfig) => {
   return updateBy(config, draft => {
     if (draft?.datas) {
       const index = draft.datas.findIndex(
-        v => v.type === ChartDataSectionType.GROUP,
+        v => v.type === ChartDataSectionType.Group,
       );
       const groupRows = draft.datas[index]?.rows;
       groupRows?.forEach((v, i) => {
@@ -1685,4 +1683,26 @@ export const setRuntimeDateLevelFieldsInChartConfig = (config: ChartConfig) => {
       });
     }
   });
+};
+
+export const getSelectedItemStyles = (
+  comIndex: string | number,
+  dcIndex: string | number,
+  selectionList: SelectedItem[],
+  itemStyle: { [x: string]: any } = {},
+): { itemStyle: { opacity?: number; [x: string]: any } } => {
+  if (selectionList.length) {
+    const selectionConfig = selectionList.find(
+      v => v.index === comIndex + ',' + dcIndex,
+    );
+    return {
+      itemStyle: Object.assign(
+        itemStyle,
+        selectionConfig ? {} : { opacity: 0.5 },
+      ),
+    };
+  }
+  return {
+    itemStyle,
+  };
 };

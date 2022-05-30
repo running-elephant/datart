@@ -18,11 +18,13 @@
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
+  WidgetActionListItem,
+  widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
   initPaddingTpl,
@@ -36,16 +38,19 @@ import {
   widgetTpl,
   WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
+
 const NameI18N = {
   zh: '图片',
   en: 'Image',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'img',
-  widgetTypeId: ORIGINAL_TYPE_MAP.image,
+  icon: 'image-widget',
+  originalType: ORIGINAL_TYPE_MAP.image,
   canWrapped: true,
   controllable: false,
   linkable: false,
+  singleton: false,
+  canFullScreen: true,
   viewAction: {
     ...initWidgetViewActionTpl(),
   },
@@ -92,33 +97,30 @@ export type ImageToolkit = WidgetToolkit & {};
 export const widgetToolkit: ImageToolkit = {
   create: opt => {
     const widget = widgetTpl();
-    widget.id = widgetMeta.widgetTypeId + widget.id;
+    widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
-    widget.config.originalType = widgetMeta.widgetTypeId;
+    widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 6,
-        height: 9,
-      };
-      widget.config.rect = rect;
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 500,
-        height: 400,
-      };
-      widget.config.rect = rect;
-    }
+
+    const rect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: 500,
+      height: 400,
+    };
+    widget.config.rect = rect;
+    const pRect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: 6,
+      height: 9,
+    };
+    widget.config.pRect = pRect;
+    widget.config.mRect = undefined;
 
     widget.config.customConfig.props = [
       { ...initBackgroundTpl() },
@@ -141,6 +143,27 @@ export const widgetToolkit: ImageToolkit = {
   getName(key) {
     return initWidgetName(NameI18N, key);
   },
+  getDropDownList(...arg) {
+    const list: WidgetActionListItem<widgetActionType>[] = [
+      {
+        key: 'edit',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'delete',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
+    ];
+    return list;
+  },
   edit() {},
   save() {},
   // lock() {},
@@ -154,8 +177,8 @@ export const widgetToolkit: ImageToolkit = {
   // //
 };
 
-const imageProto = {
-  widgetTypeId: widgetMeta.widgetTypeId,
+const imageProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };
