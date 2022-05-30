@@ -371,7 +371,6 @@ export const onComposeGroupAction = (wid?: string) => (dispatch, getState) => {
   widgetInfo.selected = true;
   dispatch(editWidgetInfoActions.addWidgetInfos([widgetInfo]));
   dispatch(editBoardStackActions.addWidgets([groupWidget]));
-
   dispatch(editBoardStackActions.changeWidgetsParentId({ items }));
 };
 export const onUnGroupAction = (wid?: string) => (dispatch, getState) => {

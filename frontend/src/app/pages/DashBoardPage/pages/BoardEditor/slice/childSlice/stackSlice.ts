@@ -122,6 +122,17 @@ export const editBoardStackSlice = createSlice({
         });
 
         state.widgetRecord[newEle.id] = newEle;
+        if (newEle.parentId && state.widgetRecord[newEle.parentId]) {
+          if (
+            !state.widgetRecord[newEle.parentId].config.children?.includes(
+              newEle.id,
+            )
+          ) {
+            state.widgetRecord[newEle.parentId].config.children?.push(
+              newEle.id,
+            );
+          }
+        }
       });
     },
     //
