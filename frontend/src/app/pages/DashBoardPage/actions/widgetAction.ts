@@ -444,7 +444,7 @@ export const changeViewGroupRectAction =
       parentWidget && parentWidget.config.type === 'container';
 
     const parentIsAutoBoard =
-      parentWidget?.config?.type === 'container' && !widget.parentId;
+      widget.config.boardType === 'auto' && !widget.parentId;
 
     if (parentIsContainer || parentIsAutoBoard) {
       dispatch(
@@ -485,7 +485,7 @@ export const changeEditGroupRectAction =
       parentWidget && parentWidget.config.type === 'container';
 
     const parentIsAutoBoard =
-      parentWidget?.config?.type === 'container' && !widget.parentId;
+      widget.config.boardType === 'auto' && !widget.parentId;
 
     if (parentIsContainer || parentIsAutoBoard) {
       dispatch(
