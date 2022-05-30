@@ -61,6 +61,15 @@ export const Main = memo(({ sliderVisible }: { sliderVisible: boolean }) => {
       dispatch(
         actions.changeCurrentEditingView({
           type: type,
+          script:
+            type === 'STRUCT'
+              ? {
+                  table: [],
+                  columns: [],
+                  joins: [],
+                  computedFields: [],
+                }
+              : '',
         }),
       );
     },
