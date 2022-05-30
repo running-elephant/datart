@@ -28,13 +28,9 @@ import {
   initBackgroundTpl,
   initBorderTpl,
   initPaddingTpl,
-  initWidgetEditActionTpl,
   initWidgetName,
-  initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
-  WidgetEditActionI18N,
-  WidgetViewActionI18N,
 } from '../../../WidgetManager/utils/init';
 
 const NameI18N = {
@@ -49,22 +45,14 @@ export const widgetMeta: WidgetMeta = {
   linkable: false,
   canFullScreen: false,
   singleton: false,
-  viewAction: {
-    ...initWidgetViewActionTpl(),
-  },
-  editAction: {
-    ...initWidgetEditActionTpl(),
-  },
+
   i18ns: [
     {
       lang: 'zh-CN',
       translation: {
         desc: '',
         widgetName: NameI18N.zh,
-        action: {
-          ...WidgetViewActionI18N.zh,
-          ...WidgetEditActionI18N.zh,
-        },
+        action: {},
         title: TitleI18N.zh,
         immediateQuery: ImmediateQueryI18N.zh,
         background: { backgroundGroup: '背景' },
@@ -78,10 +66,7 @@ export const widgetMeta: WidgetMeta = {
       translation: {
         desc: '',
         widgetName: NameI18N.en,
-        action: {
-          ...WidgetViewActionI18N.en,
-          ...WidgetEditActionI18N.en,
-        },
+        action: {},
         title: TitleI18N.en,
         immediateQuery: ImmediateQueryI18N.en,
         background: { backgroundGroup: 'Background' },
