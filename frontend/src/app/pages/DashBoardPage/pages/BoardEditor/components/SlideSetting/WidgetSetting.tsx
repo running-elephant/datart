@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Collapse, Input, InputNumber } from 'antd';
+import { Collapse, InputNumber } from 'antd';
 import { BW } from 'app/components/FormGenerator/Basic/components/BasicWrapper';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
@@ -24,6 +24,7 @@ import throttle from 'lodash/throttle';
 import { FC, memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../../../components/ActionProvider/WidgetActionProvider';
+import { NameSet } from './SettingItem/NameSet';
 import { Group, SettingPanel } from './SettingPanel';
 import { WidgetConfigPanel } from './WidgetConfigPanel';
 
@@ -31,16 +32,11 @@ const { Panel } = Collapse;
 export const WidgetSetting: FC = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
   const { boardType } = useContext(BoardContext);
-
-  const { onUpdateWidgetConfigByKey, onEditFreeWidgetRect } =
-    useContext(WidgetActionContext);
   const widget = useContext(WidgetContext);
+  const { onEditFreeWidgetRect } = useContext(WidgetActionContext);
+
   const { name, rect } = widget.config;
 
-  const throttledUpdate = useMemo(
-    () => throttle(onUpdateWidgetConfigByKey, 300),
-    [onUpdateWidgetConfigByKey],
-  );
   const throttledUpdateRect = useMemo(
     () => throttle(onEditFreeWidgetRect, 300),
     [onEditFreeWidgetRect],
@@ -56,27 +52,11 @@ export const WidgetSetting: FC = memo(() => {
   const changeY = useCallback(val => changeRect('y', val), [changeRect]);
   const changeW = useCallback(val => changeRect('width', val), [changeRect]);
   const changeH = useCallback(val => changeRect('height', val), [changeRect]);
-  const changeName = useCallback(
-    e => {
-      throttledUpdate({ wid: widget.id, key: 'name', val: e.target.value });
-    },
-    [throttledUpdate, widget.id],
-  );
+
   return (
     <SettingPanel title={`${t('widget')}${t('setting')}`}>
       <>
-        <Group>
-          <BW label={t('widget') + t('title')}>
-            <StyledFlex>
-              <Input
-                value={name}
-                className="datart-ant-input"
-                onChange={changeName}
-              />
-            </StyledFlex>
-          </BW>
-        </Group>
-
+        <NameSet wid={widget.id} name={widget.config.name} />
         {boardType === 'free' && (
           <Collapse className="datart-config-panel" ghost>
             <Panel
