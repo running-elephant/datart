@@ -613,3 +613,14 @@ export const multipleSelectChange = (
     }
   }
 };
+
+export const showRectAction = (widget: Widget) => (dispatch, getState) => {
+  if (widget.config.boardType === 'free') return true;
+  if (!widget.parentId) return false;
+  const editBoard = getState().editBoard as HistoryEditBoard;
+  const widgetMap = editBoard.stack.present.widgetRecord;
+  if (widget.parentId && widgetMap[widget.parentId]) {
+    return widgetMap[widget.parentId].config.type === 'group';
+  }
+  return false;
+};

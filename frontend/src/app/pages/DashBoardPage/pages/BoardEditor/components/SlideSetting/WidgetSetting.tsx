@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { FC, memo, useContext } from 'react';
+import { useDispatch } from 'react-redux';
+import { showRectAction } from '../../slice/actions/actions';
 import { NameSet } from './SettingItem/NameSet';
 import { RectSet } from './SettingItem/RectSet';
 import { SettingPanel } from './SettingPanel';
@@ -26,17 +27,14 @@ import { WidgetConfigPanel } from './WidgetConfigPanel';
 
 export const WidgetSetting: FC = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
-  const { boardType } = useContext(BoardContext);
   const widget = useContext(WidgetContext);
-
+  const dispatch = useDispatch();
+  const showRect = dispatch(showRectAction(widget)) as unknown as boolean;
   return (
     <SettingPanel title={`${t('widget')}${t('setting')}`}>
       <>
         <NameSet wid={widget.id} name={widget.config.name} />
-        {boardType === 'free' && (
-          <RectSet wid={widget.id} rect={widget.config.rect} />
-        )}
-
+        {showRect && <RectSet wid={widget.id} rect={widget.config.rect} />}
         <WidgetConfigPanel />
       </>
     </SettingPanel>
