@@ -97,7 +97,6 @@ export const dataChartCreator = (opt: WidgetCreateProps) => {
   widget.datachartId = opt.datachartId || '';
   widget.viewIds = opt.viewIds || [];
   widget.relations = opt.relations || [];
-
   widget.config.type = 'chart';
 
   widget.config.content.dataChart = opt.content; // DataChart
@@ -106,7 +105,7 @@ export const dataChartCreator = (opt: WidgetCreateProps) => {
     { ...initTitleTpl() },
     { ...initLoopFetchTpl() },
     { ...initPaddingTpl() },
-    { ...initBackgroundTpl() },
+    { ...initBackgroundTpl(opt.boardType === 'auto' ? '#fff' : '') },
     { ...initBorderTpl() },
   ];
   widget.config.customConfig.props.forEach(ele => {
