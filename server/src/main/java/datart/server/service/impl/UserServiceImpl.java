@@ -276,11 +276,37 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     @Override
     public String login(PasswordToken passwordToken) {
-        securityManager.login(passwordToken);
+        try {
+            securityManager.login(passwordToken);
+        } catch (Exception e) {
+            String tokenStr = ldapLogin(passwordToken);
+            if (StringUtils.isNotBlank(tokenStr)) {
+                return tokenStr;
+            }
+            log.error("Login error ({} {})", passwordToken.getSubject(), passwordToken.getPassword());
+            Exceptions.msg("login.fail");
+            return null;
+        }
         User user = userMapper.selectByNameOrEmail(passwordToken.getSubject());
         passwordToken.setPassword(user.getPassword());
         return JwtUtils.toJwtString(passwordToken);
     }
+
+    private String ldapLogin(PasswordToken passwordToken) {
+        String token = "";
+        try {
+            log.info("try to login with ldap ({}).", passwordToken.getSubject());
+            ExternalRegisterService externalRegisterService = Application.getBean(ExternalRegisterService.class);
+            token = externalRegisterService.ldapRegister(passwordToken.getSubject(), passwordToken.getPassword());
+            if (StringUtils.isNotBlank(token)) {
+                securityManager.login(token);
+            }
+        } catch (Exception e) {
+            Exceptions.e(e);
+        }
+        return token;
+    }
+
 
     @Override
     public String forgetPassword(UserIdentityType type, String principal) {

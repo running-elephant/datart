@@ -40,7 +40,7 @@ export function getTime(
   amount?: number | string,
   unit?: unitOfTime.DurationConstructor,
 ): (unitTime, isStart?: boolean) => Moment {
-  return (unitOfTime: unitOfTime.StartOf, isStart) => {
+  return (unitOfTime: unitOfTime.StartOf, isStart?: boolean) => {
     if (!!isStart) {
       return moment().add(amount, unit).startOf(unitOfTime);
     }
