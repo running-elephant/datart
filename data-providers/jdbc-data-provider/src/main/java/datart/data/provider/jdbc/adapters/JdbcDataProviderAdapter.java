@@ -46,6 +46,7 @@ import javax.sql.DataSource;
 import java.io.Closeable;
 import java.lang.reflect.Constructor;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -411,6 +412,8 @@ public class JdbcDataProviderAdapter implements Closeable {
         Object obj = rs.getObject(columnIndex);
         if (obj instanceof Boolean) {
             obj = rs.getInt(columnIndex);
+        } else if (obj instanceof LocalDateTime ) {
+            obj = rs.getTimestamp(columnIndex);
         }
         return obj;
     }
