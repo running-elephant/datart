@@ -37,6 +37,8 @@ spring:
 #   base: xxx
 #   username: {username}
 #   password: {password}
+#   attribute-mapping:
+#     username: cn # 自定义登录用户名对应属性名
 
 # mail config
 
@@ -83,10 +85,6 @@ datart:
 
   # 租户管理模式：platform-平台(默认)，team-团队
   tenant-management-mode: platform
-  # 团队管理员用户名/密码: 仅team模式且两者都不为空时重置
-  admin:
-    username:
-    password:
 
   user:
     register: true # 是否允许注册

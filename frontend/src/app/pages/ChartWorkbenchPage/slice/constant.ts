@@ -22,6 +22,7 @@ export const ChartConfigReducerActionType = {
   STYLE: 'style',
   DATA: 'data',
   SETTING: 'setting',
+  INTERACTION: 'interaction',
   I18N: 'i18n',
 };
 

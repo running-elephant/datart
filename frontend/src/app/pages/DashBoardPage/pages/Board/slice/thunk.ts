@@ -17,11 +17,13 @@
  */
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { boardDrillManager } from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
-import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
+import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/components/Widgets/ControllerWidget/config';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { shareActions } from 'app/pages/SharePage/slice';
 import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
+import { fetchAvailableSourceFunctionsAsync } from 'app/utils/fetch';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
 import { request2 } from 'utils/request';
@@ -36,9 +38,9 @@ import {
   getDataOption,
   ServerDashboard,
   VizRenderMode,
-  Widget,
   WidgetData,
 } from './types';
+
 /**
  * @param ''
  * @description '先拿本地缓存，没有缓存再去服务端拉数据'
@@ -396,3 +398,22 @@ export const getControllerOptions = createAsyncThunk<
     return null;
   },
 );
+
+export const fetchAvailableSourceFunctions = createAsyncThunk<
+  { value: string[]; sourceId: string } | false,
+  string,
+  { state: RootState }
+>('workbench/fetchAvailableSourceFunctions', async (sourceId, { getState }) => {
+  const boardState = getState() as { board: BoardState };
+  const availableSourceFunctionsMap =
+    boardState.board.availableSourceFunctionsMap;
+  if (!availableSourceFunctionsMap[sourceId]) {
+    try {
+      const functions = await fetchAvailableSourceFunctionsAsync(sourceId);
+      return { value: functions, sourceId: sourceId };
+    } catch (err) {
+      throw err;
+    }
+  }
+  return false;
+});

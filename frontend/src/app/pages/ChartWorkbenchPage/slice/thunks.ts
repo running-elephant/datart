@@ -185,36 +185,6 @@ export const refreshDatasetAction = createAsyncThunk(
   },
 );
 
-export const updateRichTextAction = createAsyncThunk(
-  'workbench/updateRichTextAction',
-  async (delta: string | undefined, thunkAPI) => {
-    try {
-      const state = thunkAPI.getState() as any;
-      const workbenchState = state.workbench as typeof initState;
-      if (!workbenchState.currentDataView?.id) {
-        return;
-      }
-      await thunkAPI.dispatch(
-        workbenchSlice.actions.updateChartConfig({
-          type: 'style',
-          payload: {
-            ancestors: [1, 0],
-            value: {
-              label: 'delta.richText',
-              key: 'richText',
-              default: '',
-              comType: 'text',
-              value: delta,
-            },
-          },
-        }),
-      );
-    } catch (error) {
-      return rejectHandle(error, thunkAPI.rejectWithValue);
-    }
-  },
-);
-
 export const fetchChartAction = createAsyncThunk<
   ChartDTO,
   { chartId?: string; backendChart?: ChartDTO },
@@ -264,12 +234,13 @@ export const updateChartAction = createAsyncThunk(
   },
 );
 
-export const fetchAvailableSourceFunctions = createAsyncThunk<
+export const fetchAvailableSourceFunctionsForChart = createAsyncThunk<
   string[],
-  { sourceId: string }
->('workbench/fetchAvailableSourceFunctions', async arg => {
+  string
+>('workbench/fetchAvailableSourceFunctionsForChart', async sourceId => {
   try {
-    return await fetchAvailableSourceFunctionsAsync(arg.sourceId);
+    const data = await fetchAvailableSourceFunctionsAsync(sourceId);
+    return data;
   } catch (err) {
     throw err;
   }

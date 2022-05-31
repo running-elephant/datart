@@ -15,160 +15,143 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Collapse, Form } from 'antd';
+import { Collapse, Input, InputNumber } from 'antd';
+import { BW } from 'app/components/FormGenerator/Basic/components/BasicWrapper';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { getRGBAColor } from 'app/pages/DashBoardPage/utils';
-import produce from 'immer';
 import throttle from 'lodash/throttle';
-import React, {
-  FC,
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import { FC, memo, useCallback, useContext, useMemo } from 'react';
+import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../../../components/ActionProvider/WidgetActionProvider';
-import AutoUpdateSet from './SettingItem/AutoUpdateSet';
-import BackgroundSet from './SettingItem/BackgroundSet';
-import NumberSet from './SettingItem/BasicSet/NumberSet';
-import BorderSet from './SettingItem/BorderSet';
-import NameSet from './SettingItem/NameSet';
-import PaddingSet from './SettingItem/PaddingSet';
 import { Group, SettingPanel } from './SettingPanel';
+import { WidgetConfigPanel } from './WidgetConfigPanel';
 
 const { Panel } = Collapse;
 export const WidgetSetting: FC = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
   const { boardType } = useContext(BoardContext);
-  const { onUpdateWidgetConfig } = useContext(WidgetActionContext);
+
+  const { onUpdateWidgetConfigByKey, onEditFreeWidgetRect } =
+    useContext(WidgetActionContext);
   const widget = useContext(WidgetContext);
-  const [form] = Form.useForm();
-  const { config } = widget;
-  const cacheValue = useRef<any>({});
-  useEffect(() => {
-    cacheValue.current = {
-      name: config.name,
-      nameConfig: config.nameConfig,
-      backgroundColor: config.background.color,
-      backgroundImage: config.background.image,
-      border: config.border,
-      rect: config.rect,
-      autoUpdate: config.autoUpdate || false,
-      frequency: config.frequency || 60,
-      padding: config.padding,
-    };
-    form.setFieldsValue({ ...cacheValue.current });
-  }, [config, form]);
+  const { name, rect } = widget.config;
 
-  const onUpdate = useCallback(
-    (newValues, widget: Widget) => {
-      const value = { ...cacheValue.current, ...newValues };
-
-      value.border.color = getRGBAColor(value.border.color);
-      value.nameConfig = {
-        ...value.nameConfig,
-        color: getRGBAColor(value.nameConfig.color),
-      };
-      // value.nameConfig.color = getRGBAColor(value.nameConfig.color);
-
-      const nextConf = produce(widget.config, draft => {
-        draft.name = value.name;
-        draft.nameConfig = value.nameConfig;
-        draft.background.color = getRGBAColor(value.backgroundColor);
-        draft.background.image = value.backgroundImage;
-        draft.border = value.border;
-        draft.rect = value.rect;
-        draft.padding = value.padding;
-        draft.autoUpdate = value.autoUpdate;
-        draft.frequency = value.frequency;
-      });
-      onUpdateWidgetConfig(nextConf, widget.id);
-    },
-    [onUpdateWidgetConfig],
+  const throttledUpdate = useMemo(
+    () => throttle(onUpdateWidgetConfigByKey, 300),
+    [onUpdateWidgetConfigByKey],
   );
-  const throttledUpdate = useMemo(() => throttle(onUpdate, 1000), [onUpdate]);
-  const onValuesChange = useCallback(
-    (_, allValue) => {
-      throttledUpdate(allValue, widget);
-    },
-    [throttledUpdate, widget],
+  const throttledUpdateRect = useMemo(
+    () => throttle(onEditFreeWidgetRect, 300),
+    [onEditFreeWidgetRect],
   );
-
+  const changeRect = useCallback(
+    (key: string, value) => {
+      const newRect = { ...rect!, [key]: value };
+      throttledUpdateRect(newRect, widget.id);
+    },
+    [rect, throttledUpdateRect, widget.id],
+  );
+  const changeX = useCallback(val => changeRect('x', val), [changeRect]);
+  const changeY = useCallback(val => changeRect('y', val), [changeRect]);
+  const changeW = useCallback(val => changeRect('width', val), [changeRect]);
+  const changeH = useCallback(val => changeRect('height', val), [changeRect]);
+  const changeName = useCallback(
+    e => {
+      throttledUpdate({ wid: widget.id, key: 'name', val: e.target.value });
+    },
+    [throttledUpdate, widget.id],
+  );
   return (
-    <SettingPanel title={`${t('widget')} ${t('setting')}`}>
-      <Form
-        form={form}
-        layout="vertical"
-        onValuesChange={onValuesChange}
-        preserve
-      >
-        <Collapse
-          defaultActiveKey={['name', 'background']}
-          className="datart-config-panel"
-          ghost
-        >
-          <Panel header={t('title')} key="name" forceRender>
-            <Group>
-              <NameSet config={config.nameConfig} />
-            </Group>
-          </Panel>
-          {boardType === 'free' && (
-            <>
-              <Panel header={t('position')} key="position" forceRender>
-                <Group>
-                  <NumberSet
-                    label={t('xAxis') + ` (${t('px')})`}
-                    name={['rect', 'x']}
-                  />
-                  <NumberSet
-                    label={t('yAxis') + ` (${t('px')})`}
-                    name={['rect', 'y']}
-                  />
-                </Group>
-              </Panel>
-              <Panel header={t('size')} key="size" forceRender>
-                <Group>
-                  <NumberSet
-                    label={t('width') + ` (${t('px')})`}
-                    name={['rect', 'width']}
-                  />
-                  <NumberSet
-                    label={t('height') + ` (${t('px')})`}
-                    name={['rect', 'height']}
-                  />
-                </Group>
-              </Panel>
-            </>
-          )}
-          <Panel header={t('background')} key="background" forceRender>
-            <Group>
-              <BackgroundSet background={config.background} />
-            </Group>
-          </Panel>
-          <Panel header={t('padding')} key="padding" forceRender>
-            <Group>
-              <PaddingSet />
-            </Group>
-          </Panel>
-          <Panel header={t('border')} key="border" forceRender>
-            <Group>
-              <BorderSet border={config.border} />
-            </Group>
-          </Panel>
-          <Panel header={t('autoUpdate')} key="autoUpdate" forceRender>
-            <Group>
-              <AutoUpdateSet />
-            </Group>
-          </Panel>
-        </Collapse>
-      </Form>
+    <SettingPanel title={`${t('widget')}${t('setting')}`}>
+      <>
+        <Group>
+          <BW label={t('widget') + t('title')}>
+            <StyledFlex>
+              <Input
+                value={name}
+                className="datart-ant-input"
+                onChange={changeName}
+              />
+            </StyledFlex>
+          </BW>
+        </Group>
+
+        {boardType === 'free' && (
+          <Collapse className="datart-config-panel" ghost>
+            <Panel
+              header={t('position') + '&' + t('size')}
+              key="position"
+              forceRender
+            >
+              <Group>
+                <BW label={t('position')}>
+                  <StyledFlex>
+                    <StyledPadding>
+                      <label>X</label>
+                      <InputNumber
+                        value={rect.x?.toFixed(1)}
+                        className="datart-ant-input-number"
+                        onChange={changeX}
+                      />
+                    </StyledPadding>
+
+                    <StyledPadding>
+                      <label>Y</label>
+                      <InputNumber
+                        value={rect.y?.toFixed(1)}
+                        className="datart-ant-input-number"
+                        onChange={changeY}
+                      />
+                    </StyledPadding>
+                  </StyledFlex>
+                </BW>
+              </Group>
+
+              <Group>
+                <BW label={t('size')}>
+                  <StyledFlex>
+                    <StyledPadding>
+                      <label>W</label>
+                      <InputNumber
+                        value={rect.width?.toFixed(1)}
+                        className="datart-ant-input-number"
+                        onChange={changeW}
+                      />
+                    </StyledPadding>
+                    <StyledFlex>
+                      <StyledPadding>
+                        <label>H</label>
+                        <InputNumber
+                          value={rect.height?.toFixed(1)}
+                          className="datart-ant-input-number"
+                          onChange={changeH}
+                        />
+                      </StyledPadding>
+                    </StyledFlex>
+                  </StyledFlex>
+                </BW>
+              </Group>
+            </Panel>
+          </Collapse>
+        )}
+
+        <WidgetConfigPanel />
+      </>
     </SettingPanel>
   );
 });
 
 export default WidgetSetting;
+const StyledFlex = styled.div`
+  display: flex;
+`;
+const StyledPadding = styled.div`
+  display: flex;
+  min-height: 0;
+  padding: 0 4px;
+  margin: 0 4px;
+  overflow-y: auto;
+  line-height: 30px;
+  background-color: ${p => p.theme.bodyBackground};
+`;

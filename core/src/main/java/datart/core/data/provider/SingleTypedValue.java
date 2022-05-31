@@ -28,6 +28,8 @@ public class SingleTypedValue extends TypedValue {
 
     private Object value;
 
+    private String tablePrefix;
+
     private String format;
 
     public SingleTypedValue(Object value, ValueType valueType) {

@@ -35,6 +35,8 @@ const config: ChartConfig = {
       options: {
         sortable: { backendSort: false },
       },
+      drillable: false,
+      drillContextMenuVisible: true,
     },
     {
       label: 'metrics',
@@ -60,59 +62,6 @@ const config: ChartConfig = {
     },
   ],
   styles: [
-    // {
-    //   label: 'column.title',
-    //   key: 'column',
-    //   comType: 'group',
-    //   rows: [
-    //     {
-    //       label: 'column.open',
-    //       key: 'modal',
-    //       comType: 'group',
-    //       options: { type: 'modal', modalSize: 'middle' },
-    //       rows: [
-    //         {
-    //           label: 'column.list',
-    //           key: 'list',
-    //           comType: 'listTemplate',
-    //           rows: [],
-    //           options: {
-    //             getItems: cols => {
-    //               const columns = (cols || [])
-    //                 .filter(col =>
-    //                   ['aggregate', 'group', 'mixed'].includes(col.type),
-    //                 )
-    //                 .reduce((acc, cur) => acc.concat(cur.rows || []), [])
-    //                 .map(c => ({
-    //                   key: c.uid,
-    //                   value: c.uid,
-    //                   label:
-    //                     c.label || c.aggregate
-    //                       ? `${c.aggregate}(${c.colName})`
-    //                       : c.colName,
-    //                 }));
-    //               return columns;
-    //             },
-    //           },
-    //           template: {
-    //             label: 'column.listItem',
-    //             key: 'listItem',
-    //             comType: 'group',
-    //             rows: [
-    //               {
-    //                 label: 'column.conditionalStyle',
-    //                 key: 'conditionalStyle',
-    //                 comType: 'group',
-    //                 options: { expand: true },
-    //                 rows: [],
-    //               },
-    //             ],
-    //           },
-    //         },
-    //       ],
-    //     },
-    //   ],
-    // },
     {
       label: 'style.title',
       key: 'style',
@@ -141,6 +90,14 @@ const config: ChartConfig = {
           key: 'metricNameShowIn',
           default: true,
           comType: 'radio',
+          watcher: {
+            deps: ['enableExpandRow'],
+            action: props => {
+              return {
+                disabled: props.enableExpandRow,
+              };
+            },
+          },
           options: {
             translateItemLabel: true,
             items: [
@@ -318,6 +275,28 @@ const config: ChartConfig = {
       ],
     },
     {
+      label: 'summary.calcSubAggregation',
+      key: 'calcSubAggregation',
+      comType: 'group',
+      rows: [
+        {
+          label: 'summary.aggregation',
+          key: 'aggregation',
+          default: 'SUM',
+          comType: 'select',
+          options: {
+            translateItemLabel: true,
+            items: [
+              { label: '@global@.summary.aggregations.sum', value: 'SUM' },
+              { label: '@global@.summary.aggregations.min', value: 'MIN' },
+              { label: '@global@.summary.aggregations.max', value: 'MAX' },
+              { label: '@global@.summary.aggregations.avg', value: 'AVG' },
+            ],
+          },
+        },
+      ],
+    },
+    {
       label: 'summary.rowSummary',
       key: 'rowSummary',
       comType: 'group',
@@ -469,7 +448,7 @@ const config: ChartConfig = {
             default: '默认',
             gray: '简约灰',
             colorful: '多彩蓝',
-          }
+          },
         },
         summary: {
           title: '数据汇总',
@@ -485,6 +464,7 @@ const config: ChartConfig = {
           subTotalPositionBottom: '底部',
           aggregateFields: '汇总列',
           summaryAggregation: '总计聚合',
+          calcSubAggregation: '小计聚合',
           aggregation: '聚合方式',
           aggregations: {
             sum: '求和',
@@ -498,7 +478,7 @@ const config: ChartConfig = {
             left: '左侧',
             right: '右侧',
           },
-          subTotal: '小记',
+          subTotal: '小计',
           total: '总计',
         },
       },
@@ -551,7 +531,7 @@ const config: ChartConfig = {
             default: 'Default',
             gray: 'Gray',
             colorful: 'Colorful',
-          }
+          },
         },
         summary: {
           title: 'Summary',
@@ -567,6 +547,7 @@ const config: ChartConfig = {
           subTotalPositionBottom: 'Bottom',
           aggregateFields: 'Summary Fields',
           summaryAggregation: 'Summary Aggregation',
+          calcSubAggregation: 'Calc Sub Aggregation',
           aggregation: 'Aggregation Type',
           aggregations: {
             sum: 'Sum',

@@ -28,7 +28,8 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useCallback, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { ERROR, PRIMARY } from 'styles/StyleConstants';
-import { Widget, WidgetErrorType } from '../../pages/Board/slice/types';
+import { WidgetErrorType } from '../../pages/Board/slice/types';
+import { Widget } from '../../types/widgetTypes';
 import { WidgetActionContext } from '../ActionProvider/WidgetActionProvider';
 
 export const LockIconFn: React.FC<{
@@ -125,23 +126,25 @@ export const CanLinkageIcon: React.FC<{
     </Tooltip>
   );
 };
-export const LinkageIconFn: React.FC<{ inLinking: boolean; widget: Widget }> =
-  memo(({ inLinking, widget }) => {
-    const { onWidgetClearLinkage } = useContext(WidgetActionContext);
-    const t = useI18NPrefix(`viz.widget.tips`);
-    if (inLinking) {
-      return (
-        <CancelLinkageIcon
-          title={t('cancelLinkage')}
-          onClick={() => onWidgetClearLinkage(widget)}
-        />
-      );
-    } else {
-      return widget.config?.linkageConfig?.open ? (
-        <CanLinkageIcon title={t('canLinkage')} />
-      ) : null;
-    }
-  });
+export const LinkageIconFn: React.FC<{
+  inLinking: boolean;
+  widget: Widget;
+}> = memo(({ inLinking, widget }) => {
+  const { onWidgetClearLinkage } = useContext(WidgetActionContext);
+  const t = useI18NPrefix(`viz.widget.tips`);
+  if (inLinking) {
+    return (
+      <CancelLinkageIcon
+        title={t('cancelLinkage')}
+        onClick={() => onWidgetClearLinkage(widget)}
+      />
+    );
+  } else {
+    return widget.config?.linkageConfig?.open ? (
+      <CanLinkageIcon title={t('canLinkage')} />
+    ) : null;
+  }
+});
 const StyledErrorIcon = styled(Button)`
   background: ${p => p.theme.componentBackground};
   &:hover,

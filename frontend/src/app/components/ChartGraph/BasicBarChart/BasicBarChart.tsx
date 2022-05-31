@@ -25,6 +25,7 @@ import {
   ChartStyleConfig,
   LabelStyle,
   LegendStyle,
+  SelectedItem,
   XAxis,
   XAxisColumns,
   YAxis,
@@ -38,6 +39,7 @@ import {
   getExtraSeriesRowData,
   getGridStyle,
   getReference2,
+  getSelectedItemStyles,
   getSeriesTooltips4Rectangular2,
   getStyles,
   hadAxisLabelOverflowConfig,
@@ -56,6 +58,7 @@ import { BarBorderStyle, BarSeriesImpl, Series } from './types';
 class BasicBarChart extends Chart {
   config = Config;
   chart: any = null;
+  selectable = true;
 
   protected isHorizonDisplay = false;
   protected isStackMode = false;
@@ -98,6 +101,7 @@ class BasicBarChart extends Chart {
     if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
+
     if (!this.isMatchRequirement(options.config)) {
       this.chart?.clear();
       return;
@@ -106,6 +110,7 @@ class BasicBarChart extends Chart {
       options.dataset,
       options.config,
       options.drillOption,
+      options.selectedItems,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
@@ -123,7 +128,8 @@ class BasicBarChart extends Chart {
   getOptions(
     dataset: ChartDataSetDTO,
     config: ChartConfig,
-    drillOption: ChartDrillOption,
+    drillOption?: ChartDrillOption,
+    selectedItems?: SelectedItem[],
   ) {
     const styleConfigs: ChartStyleConfig[] = config.styles || [];
     const dataConfigs: ChartDataConfig[] = config.datas || [];
@@ -134,13 +140,13 @@ class BasicBarChart extends Chart {
       drillOption,
     );
     const aggregateConfigs: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
     const colorConfigs: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.COLOR)
+      .filter(c => c.type === ChartDataSectionType.Color)
       .flatMap(config => config.rows || []);
     const infoConfigs: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.INFO)
+      .filter(c => c.type === ChartDataSectionType.Info)
       .flatMap(config => config.rows || []);
 
     const chartDataSet = transformToDataSet(
@@ -174,6 +180,7 @@ class BasicBarChart extends Chart {
       aggregateConfigs,
       infoConfigs,
       xAxisColumns,
+      selectedItems,
     );
 
     const axisInfo = {
@@ -241,9 +248,10 @@ class BasicBarChart extends Chart {
     aggregateConfigs: ChartDataSectionField[],
     infoConfigs: ChartDataSectionField[],
     xAxisColumns: XAxisColumns[],
+    selectedItems?: SelectedItem[],
   ): Series[] {
     if (!colorConfigs.length) {
-      return aggregateConfigs.map(aggConfig => {
+      return aggregateConfigs.map((aggConfig, sIndex) => {
         return {
           ...this.getBarSeriesImpl(
             styleConfigs,
@@ -252,12 +260,15 @@ class BasicBarChart extends Chart {
             aggConfig,
           ),
           name: getColumnRenderName(aggConfig),
-          data: chartDataSet?.map(dc => ({
-            ...getExtraSeriesRowData(dc),
-            ...getExtraSeriesDataFormat(aggConfig?.format),
-            name: getColumnRenderName(aggConfig),
-            value: dc.getCell(aggConfig),
-          })),
+          data: chartDataSet?.map((dc, dIndex) => {
+            return {
+              ...getExtraSeriesRowData(dc),
+              ...getExtraSeriesDataFormat(aggConfig?.format),
+              ...getSelectedItemStyles(sIndex, dIndex, selectedItems || []),
+              name: getColumnRenderName(aggConfig),
+              value: dc.getCell(aggConfig),
+            };
+          }),
         };
       });
     }
@@ -267,40 +278,46 @@ class BasicBarChart extends Chart {
       colorConfigs[0],
     );
 
-    const colorizeGroupedSeries = aggregateConfigs.flatMap(aggConfig => {
-      return secondGroupInfos.map(sgCol => {
-        const k = Object.keys(sgCol)[0];
-        const dataSet = sgCol[k];
+    const xAxisConfig = groupConfigs?.[0];
+    const colorizeGroupedSeries = aggregateConfigs.flatMap(
+      (aggConfig, acIndex) => {
+        return secondGroupInfos.map((sgCol, sgIndex) => {
+          const k = Object.keys(sgCol)[0];
+          const dataSet = sgCol[k];
 
-        const itemStyleColor = colorConfigs?.[0]?.color?.colors?.find(
-          c => c.key === k,
-        );
+          const itemStyleColor = colorConfigs?.[0]?.color?.colors?.find(
+            c => c.key === k,
+          );
 
-        return {
-          ...this.getBarSeriesImpl(
-            styleConfigs,
-            settingConfigs,
-            chartDataSet,
-            aggConfig,
-          ),
-          name: k,
-          data: xAxisColumns?.[0]?.data?.map(d => {
-            const row = dataSet.find(
-              r => r.getMultiCell(...groupConfigs) === d,
-            )!;
-            return {
-              ...getExtraSeriesRowData(row),
-              ...getExtraSeriesDataFormat(aggConfig?.format),
-              name: getColumnRenderName(aggConfig),
-              value: row?.getCell(aggConfig),
-            };
-          }),
-          itemStyle: this.getSeriesItemStyle(styleConfigs, {
-            color: itemStyleColor?.value,
-          }),
-        };
-      });
-    });
+          return {
+            ...this.getBarSeriesImpl(
+              styleConfigs,
+              settingConfigs,
+              chartDataSet,
+              aggConfig,
+            ),
+            name: k,
+            data: xAxisColumns?.[0]?.data?.map((d, dIndex) => {
+              const row = dataSet.find(r => r.getCell(xAxisConfig) === d)!;
+              return {
+                ...getExtraSeriesRowData(row),
+                ...getExtraSeriesDataFormat(aggConfig?.format),
+                name: getColumnRenderName(aggConfig),
+                value: row?.getCell(aggConfig),
+                ...getSelectedItemStyles(
+                  acIndex * secondGroupInfos.length + sgIndex,
+                  dIndex,
+                  selectedItems || [],
+                ),
+              };
+            }),
+            itemStyle: this.getSeriesItemStyle(styleConfigs, {
+              color: itemStyleColor?.value,
+            }),
+          };
+        });
+      },
+    );
     return colorizeGroupedSeries;
   }
 

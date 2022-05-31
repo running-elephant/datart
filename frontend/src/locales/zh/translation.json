@@ -501,7 +501,8 @@
       "title": {
         "content": "数据",
         "design": "样式",
-        "setting": "分析"
+        "setting": "分析",
+        "interaction": "交互"
       },
       "style": {
         "font": "字体",
@@ -624,7 +625,11 @@
           "insideTopLeft": "内左上",
           "insideBottomLeft": "内左下",
           "insideTopRight": "内右上",
-          "insideBottomRight": "内右下"
+          "insideBottomRight": "内右下",
+          "leftTop": "左上",
+          "leftBottom": "左下",
+          "rightTop": "右上",
+          "rightBottom": "右下"
         }
       },
       "data": {
@@ -750,6 +755,57 @@
         "paging": {
           "title": "常规",
           "pageSize": "总行数"
+        }
+      },
+      "interaction": {
+        "drillThrough": {
+          "title": "跳转设置",
+          "event": "交互事件",
+          "leftClick": "左键单击",
+          "rightClick": "右键菜单",
+          "rule": {
+            "title": "规则设置",
+            "addRule": "+ 点击新建",
+            "header": {
+              "category": "类型",
+              "open": "打开方式",
+              "relation": "关系设置",
+              "operation": "操作"
+            },
+            "category": {
+              "title": "类型",
+              "jumpToChart": "跳转到图表",
+              "jumpToDashboard": "跳转到仪表板",
+              "jumpToUrl": "跳转到URL"
+            },
+            "action": {
+              "title": "打开方式",
+              "redirect": "从当前页打开",
+              "window": "打开新窗口",
+              "dialog": "打开对话框"
+            },
+            "reference": {
+              "title": "关联图表"
+            },
+            "relation": {
+              "setting": "字段关系配置",
+              "title": "字段关系",
+              "auto": "自动",
+              "customize": "自定义",
+              "type": "类型",
+              "source": "源字段/变量",
+              "target": "目标字段/变量",
+              "addRelation": "+ 点击新建",
+              "field": "字段",
+              "variable": "变量"
+            },
+            "operation": {
+              "delete": "删除"
+            }
+          }
+        },
+        "viewData": {
+          "title": "查看数据"
         }
       },
       "present": {
@@ -888,7 +944,7 @@
     "board": {
       "action": {
         "dataChart": "数据图表",
-        "ImportExistingDataCharts": "引入已有数据图表",
+        "importExistingDataCharts": "引入已有数据图表",
         "createDataChartInBoard": "新建数据图表",
         "searchValue": "搜索名称关键字",
         "media": "媒体组件",
@@ -914,7 +970,9 @@
         "multiSelect": "多选",
         "zoomIn": "缩小视图",
         "zoomOut": "放大视图",
-        "widgetList": "组件"
+        "widgetList": "组件",
+        "group": "成组",
+        "unGroup": "取消成组"
       },
       "controlTypes": {
         "common": "常规",
@@ -971,7 +1029,9 @@
         "delPageTip": "确认删除此故事页？",
         "enterHere": "请输入",
         "storyName": "名称",
-        "storyDescription": "描述"
+        "storyDescription": "描述",
+        "format": "格式",
+        "interval": "间隔"
       }
     },
     "widget": {
@@ -986,8 +1046,8 @@
         "media": "媒体",
         "container": "容器",
         "controller": "控制器",
-        "query": "查询",
-        "reset": "重置",
+        "queryBtn": "查询",
+        "resetBtn": "重置",
         "image": "图片",
         "richText": "富文本",
         "timer": "时间器",
@@ -1008,7 +1068,9 @@
         "makeLinkage": "联动设置",
         "closeLinkage": "关闭联动",
         "makeJump": "跳转设置",
-        "closeJump": "关闭跳转"
+        "closeJump": "关闭跳转",
+        "group": "成组",
+        "unGroup": "取消成组"
       },
       "tips": {
         "unlock": "已锁定拖拽,点击解锁",

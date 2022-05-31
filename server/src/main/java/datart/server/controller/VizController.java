@@ -178,6 +178,14 @@ public class VizController extends BaseController {
         return ResponseData.success(vizService.updateStoryboard(updateParam));
     }
 
+    @ApiOperation(value = "update a storyboard base info")
+    @PutMapping(value = "/{storyboardId}/base")
+    public ResponseData<Boolean> updateStoryboardBaseInfo(@PathVariable String storyboardId,
+                                                      @Validated @RequestBody StoryboardBaseUpdateParam updateParam) {
+        checkBlank(storyboardId, "storyboardId");
+        return ResponseData.success(vizService.updateStoryboardBase(updateParam));
+    }
+
     @ApiOperation(value = "update a story")
     @PutMapping(value = "/storypages/{storyId}")
     public ResponseData<Boolean> updateStory(@PathVariable String storyId, @Validated @RequestBody StorypageUpdateParam updateParam) {

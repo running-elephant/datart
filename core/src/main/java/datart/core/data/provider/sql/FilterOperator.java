@@ -28,6 +28,8 @@ public class FilterOperator implements Operator {
 
     private String column;
 
+    private String tablePrefix;
+
     private AggregateOperator.SqlOperator aggOperator;
 
     private SqlOperator sqlOperator;

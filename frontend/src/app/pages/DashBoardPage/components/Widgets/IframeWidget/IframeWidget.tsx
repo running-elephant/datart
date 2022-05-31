@@ -23,25 +23,28 @@ import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
-import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
+import { WidgetDropdownList } from '../../WidgetComponents/WidgetDropdownList';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
+import {
+  getWidgetBaseStyle,
+  getWidgetTitle,
+} from '../../WidgetManager/utils/utils';
 import { IframeWidgetCore } from './IframeWidgetCore';
 
 export const IframeWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
     const widget = useContext(WidgetContext);
     const { editing } = useContext(BoardContext);
-    const { background, border, padding } = widget.config;
+    const title = getWidgetTitle(widget.config.customConfig.props);
+    title.title = widget.config.name;
+    const { background, border, padding } = getWidgetBaseStyle(
+      widget.config.customConfig.props,
+    );
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
         <div style={ZIndexStyle}>
-          {hideTitle ? null : (
-            <WidgetTitle
-              name={widget.config.name}
-              config={widget.config.nameConfig}
-            />
-          )}
+          {hideTitle ? null : <WidgetTitle title={title} />}
 
           <div style={FlexStyle}>
             <IframeWidgetCore />
@@ -55,7 +58,7 @@ export const IframeWidget: React.FC<{ hideTitle: boolean }> = memo(
               wid={widget.id}
               lock={widget.config?.lock}
             />
-            <WidgetActionDropdown widget={widget} />
+            <WidgetDropdownList widget={widget} />
           </Space>
         </StyledWidgetToolBar>
       </WidgetWrapper>

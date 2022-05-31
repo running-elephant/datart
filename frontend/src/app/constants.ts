@@ -16,6 +16,10 @@
  * limitations under the License.
  */
 
+import { FONT_FAMILY } from '@antv/s2';
+import { G90 } from 'styles/StyleConstants';
+import { IFontDefault } from 'types';
+
 export enum TenantManagementMode {
   Team = 'TEAM',
   Platform = 'PLATFORM',
@@ -23,19 +27,23 @@ export enum TenantManagementMode {
 
 export enum ControllerFacadeTypes {
   DropdownList = 'dropdownList',
+  MultiDropdownList = 'multiDropdownList',
+
   RadioGroup = 'radioGroup',
   CheckboxGroup = 'checkboxGroup',
-  MultiDropdownList = 'multiDropdownList',
+  Text = 'text',
+
+  Value = 'value',
+  RangeValue = 'rangeValue',
+  Slider = 'slider',
+  RangeSlider = 'rangeSlider',
+
+  Time = 'time',
   RangeTime = 'rangeTime',
   RangeTimePicker = 'rangeTimePicker',
   RecommendTime = 'recommendTime',
-  RangeValue = 'rangeValue',
-  Text = 'text',
+
   Tree = 'tree',
-  Value = 'value',
-  Time = 'time',
-  Slider = 'slider',
-  RangeSlider = 'rangeSlider',
 }
 
 export enum ControllerRadioFacadeTypes {
@@ -55,10 +63,10 @@ export enum ControllerVisibilityTypes {
 }
 
 export enum ChartLifecycle {
-  MOUNTED = 'mounted',
-  UPDATED = 'updated',
-  RESIZE = 'resize',
-  UNMOUNTED = 'unmount',
+  Mounted = 'mounted',
+  Updated = 'updated',
+  Resize = 'resize',
+  UnMount = 'unmount',
 }
 
 export enum DataViewFieldType {
@@ -85,40 +93,40 @@ export enum ChartDataViewFieldCategory {
 }
 
 export enum SortActionType {
-  NONE = 'NONE',
+  None = 'NONE',
   ASC = 'ASC',
   DESC = 'DESC',
-  CUSTOMIZE = 'CUSTOMIZE',
+  Customize = 'CUSTOMIZE',
 }
 
 export enum FieldFormatType {
-  DEFAULT = 'default',
-  NUMERIC = 'numeric',
-  CURRENCY = 'currency',
-  PERCENTAGE = 'percentage',
-  SCIENTIFIC = 'scientificNotation',
-  DATE = 'date',
-  CUSTOM = 'custom',
+  Defalut = 'default',
+  Numeric = 'numeric',
+  Currency = 'currency',
+  Percentage = 'percentage',
+  Scientific = 'scientificNotation',
+  Date = 'date',
+  Custom = 'custom',
 }
 
 export enum AggregateFieldActionType {
-  NONE = 'NONE',
-  SUM = 'SUM',
-  AVG = 'AVG',
-  COUNT = 'COUNT',
-  COUNT_DISTINCT = 'COUNT_DISTINCT',
-  MAX = 'MAX',
-  MIN = 'MIN',
+  None = 'NONE',
+  Sum = 'SUM',
+  Avg = 'AVG',
+  Count = 'COUNT',
+  Count_Distinct = 'COUNT_DISTINCT',
+  Max = 'MAX',
+  Min = 'MIN',
 }
 
 export enum ChartDataSectionType {
-  GROUP = 'group',
-  AGGREGATE = 'aggregate',
-  MIXED = 'mixed',
-  FILTER = 'filter',
-  COLOR = 'color',
-  INFO = 'info',
-  SIZE = 'size',
+  Group = 'group',
+  Aggregate = 'aggregate',
+  Mixed = 'mixed',
+  Filter = 'filter',
+  Color = 'color',
+  Info = 'info',
+  Size = 'size',
 }
 
 export enum FilterConditionType {
@@ -170,16 +178,16 @@ export const FilterRelationType = {
 
 export const AggregateFieldSubAggregateType = {
   [ChartDataSectionFieldActionType.Aggregate]: [
-    AggregateFieldActionType.SUM,
-    AggregateFieldActionType.AVG,
-    AggregateFieldActionType.COUNT,
-    AggregateFieldActionType.COUNT_DISTINCT,
-    AggregateFieldActionType.MAX,
-    AggregateFieldActionType.MIN,
+    AggregateFieldActionType.Sum,
+    AggregateFieldActionType.Avg,
+    AggregateFieldActionType.Count,
+    AggregateFieldActionType.Count_Distinct,
+    AggregateFieldActionType.Max,
+    AggregateFieldActionType.Min,
   ],
   [ChartDataSectionFieldActionType.AggregateLimit]: [
-    AggregateFieldActionType.COUNT,
-    AggregateFieldActionType.COUNT_DISTINCT,
+    AggregateFieldActionType.Count,
+    AggregateFieldActionType.Count_Distinct,
   ],
 };
 
@@ -189,40 +197,54 @@ export const ChartStyleSectionComponentType = {
   SWITCH: 'switch',
   SELECT: 'select',
   FONT: 'font',
-  FONTFAMILY: 'fontFamily',
-  FONTSIZE: 'fontSize',
-  FONTCOLOR: 'fontColor',
-  FONTSTYLE: 'fontStyle',
-  FONTWEIGHT: 'fontWeight',
-  INPUTNUMBER: 'inputNumber',
-  INPUTPERCENTAGE: 'inputPercentage',
+  FONT_FAMILY: 'fontFamily',
+  FONT_SIZE: 'fontSize',
+  FONT_COLOR: 'fontColor',
+  FONT_STYLE: 'fontStyle',
+  FONT_WEIGHT: 'fontWeight',
+  INPUT_NUMBER: 'inputNumber',
+  INPUT_PERCENTAGE: 'inputPercentage',
   SLIDER: 'slider',
   GROUP: 'group',
   REFERENCE: 'reference',
   TABS: 'tabs',
-  LISTTEMPLATE: 'listTemplate',
-  TABLEHEADER: 'tableHeader',
+  LIST_TEMPLATE: 'listTemplate',
+  TABLE_HEADER: 'tableHeader',
   LINE: 'line',
   MARGIN_WIDTH: 'marginWidth',
   TEXT: 'text',
-  CONDITIONALSTYLE: 'conditionalStylePanel',
+  CONDITIONAL_STYLE: 'conditionalStylePanel',
   RADIO: 'radio',
 
   // Customize Component
-  FontAlignment: 'fontAlignment',
-  NameLocation: 'nameLocation',
-  LabelPosition: 'labelPosition',
-  LegendType: 'legendType',
-  LegendPosition: 'legendPosition',
-  ScorecardListTemplate: 'scorecardListTemplate',
-  ScorecardConditionalStyle: 'scorecardConditionalStyle',
-  PivotSheetTheme: 'pivotSheetTheme',
+  FONT_ALIGNMENT: 'fontAlignment',
+  NAME_LOCATION: 'nameLocation',
+  LABEL_POSITION: 'labelPosition',
+  LEGEND_TYPE: 'legendType',
+  LEGEND_POSITION: 'legendPosition',
+  SCORECARD_LIST_TEMPLATE: 'scorecardListTemplate',
+  SCORECARD_CONDITIONAL_SYTLE: 'scorecardConditionalStyle',
+  PIOVTSHEET_THEME: 'pivotSheetTheme',
+  BACKGROUND: 'background',
+  WIDGET_BORDER: 'widgetBorder',
+  TIMER_FORMAT: 'timerFormat',
+  CHECKBOX_MODAL: 'checkboxModal',
+  INTERACTION_DRILL_THROUGH_PANEL: 'interaction.drillThrough',
+  INTERACTION_VIEW_DATA_PANEL: 'interaction.viewData',
 };
 
 export enum DownloadFileType {
-  'Pdf' = 'PDF',
-  'Excel' = 'EXCEL',
-  'Image' = 'IMAGE',
+  Pdf = 'PDF',
+  Excel = 'EXCEL',
+  Image = 'IMAGE',
 }
 
 export const RUNTIME_DATE_LEVEL_KEY = Symbol('DateLevel');
+
+export const FONT_DEFAULT: IFontDefault = {
+  fontFamily: FONT_FAMILY,
+  fontSize: '14',
+  fontWeight: 'normal',
+  fontStyle: 'normal',
+  color: G90,
+};

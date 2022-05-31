@@ -21,8 +21,8 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { BoardContext } from '../../../../components/BoardProvider/BoardProvider';
 import { selectSelectedIds } from '../../slice/selectors';
-import BoardSetting from './BoardSetting';
-import { WidgetSetting } from './WidgetSetting';
+import { BoardConfigPanel } from './BoardConfigPanel';
+import WidgetSetting from './WidgetSetting';
 
 export const SlideSetting: FC<{}> = memo(() => {
   const { boardId } = useContext(BoardContext);
@@ -33,7 +33,7 @@ export const SlideSetting: FC<{}> = memo(() => {
   );
   return (
     <Wrapper>
-      {setType === 'board' && <BoardSetting />}
+      {setType === 'board' && <BoardConfigPanel />}
       {setType === 'widget' && (
         <WidgetWrapProvider
           id={selectedIds[0]}
@@ -51,8 +51,9 @@ export default SlideSetting;
 
 const Wrapper = styled.div<{}>`
   display: flex;
-  width: 320px;
-  min-width: 320px;
+  flex-direction: column;
+  width: 330px;
+  min-width: 330px;
   min-height: 0;
   background-color: ${p => p.theme.componentBackground};
   box-shadow: ${p => p.theme.shadowSider};

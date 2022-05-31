@@ -120,7 +120,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
         E instance = getEntityInstance();
         instance.setId(id);
         try {
-            Method setStatus = entity.getClass().getDeclaredMethod("setStatus", Byte.class);
+            Method setStatus = entity.getClass().getMethod("setStatus", Byte.class);
             setStatus.invoke(instance, Const.DATA_STATUS_ACTIVE);
             getDefaultMapper().updateByPrimaryKeySelective(instance);
         } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {

@@ -26,7 +26,7 @@ public class ClassTransformer {
 
     public static void transform() {
         transformSqlWriter();
-        transformFlyway();
+//        transformFlyway();
     }
 
     private static void transformSqlWriter() {
@@ -45,22 +45,22 @@ public class ClassTransformer {
             e.printStackTrace();
         }
     }
-
-    private static void transformFlyway() {
-        try {
-            ClassPool classPool = ClassPool.getDefault();
-            CtClass ctClass = classPool.get("org.flywaydb.core.internal.database.mysql.MySQLConnection");
-            CtMethod getIntVariableValue = ctClass.getDeclaredMethod("getIntVariableValue");
-            getIntVariableValue.setBody("return 0;");
-
-            CtMethod doRestoreOriginalState = ctClass.getDeclaredMethod("doRestoreOriginalState");
-            doRestoreOriginalState.setBody("return;");
-
-            CtMethod hasUserVariableResetCapability = ctClass.getDeclaredMethod("hasUserVariableResetCapability");
-            hasUserVariableResetCapability.setBody("{return false;}");
-            ctClass.toClass();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//
+//    private static void transformFlyway() {
+//        try {
+//            ClassPool classPool = ClassPool.getDefault();
+//            CtClass ctClass = classPool.get("org.flywaydb.core.internal.database.mysql.MySQLConnection");
+//            CtMethod getIntVariableValue = ctClass.getDeclaredMethod("getIntVariableValue");
+//            getIntVariableValue.setBody("return 0;");
+//
+//            CtMethod doRestoreOriginalState = ctClass.getDeclaredMethod("doRestoreOriginalState");
+//            doRestoreOriginalState.setBody("return;");
+//
+//            CtMethod hasUserVariableResetCapability = ctClass.getDeclaredMethod("hasUserVariableResetCapability");
+//            hasUserVariableResetCapability.setBody("{return false;}");
+//            ctClass.toClass();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

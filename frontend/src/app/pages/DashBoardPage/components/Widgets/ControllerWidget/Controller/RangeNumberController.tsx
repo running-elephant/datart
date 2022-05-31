@@ -20,6 +20,7 @@ import { valueType } from 'antd/lib/statistic/utils';
 import { rangeNumberValidator } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/utils';
 import React, { memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 
 export interface NumberControllerFormProps {
   value?: any;
@@ -73,6 +74,7 @@ export const RangeNumberController: React.FC<RangeNumberSetProps> = memo(
         onChange?.([startVal, endVal]);
       }
     };
+    const t = useI18NPrefix(`viz.common.enum.controllerPlaceHolders`);
 
     useEffect(() => {
       setStartVal(value?.[0]);
@@ -86,7 +88,7 @@ export const RangeNumberController: React.FC<RangeNumberSetProps> = memo(
               style={{ width: '100%' }}
               value={startVal}
               onChange={onStartChange}
-              placeholder="最小值"
+              placeholder={t('rangeNumberControllerMin')}
               onPressEnter={_onStartValEnter}
               onBlur={_onBlur}
               className="control-number-input"
@@ -99,7 +101,7 @@ export const RangeNumberController: React.FC<RangeNumberSetProps> = memo(
               style={{ width: '100%' }}
               value={endVal}
               onChange={onEndChange}
-              placeholder="最大值"
+              placeholder={t('rangeNumberControllerMax')}
               onPressEnter={_onEndValEnter}
               onBlur={_onBlur}
               className="control-number-input"

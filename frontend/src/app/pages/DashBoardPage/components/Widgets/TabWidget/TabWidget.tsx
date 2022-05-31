@@ -23,9 +23,13 @@ import { BlockMaskLayer } from '../../WidgetComponents/BlockMaskLayer';
 import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { LockIconFn } from '../../WidgetComponents/StatusIcon';
 import { StyledWidgetToolBar } from '../../WidgetComponents/StyledWidgetToolBar';
-import { WidgetActionDropdown } from '../../WidgetComponents/WidgetActionDropdown';
+import { WidgetDropdownList } from '../../WidgetComponents/WidgetDropdownList';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
+import {
+  getWidgetBaseStyle,
+  getWidgetTitle,
+} from '../../WidgetManager/utils/utils';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { TabWidgetCore } from './TabWidgetCore';
 
@@ -42,24 +46,20 @@ export const TabWidget: React.FC<{ hideTitle: boolean }> = memo(
      */
 
     // 自动更新
-    const { background, border, padding } = widget.config;
-
+    const { background, border, padding } = getWidgetBaseStyle(
+      widget.config.customConfig.props,
+    );
+    const title = getWidgetTitle(widget.config.customConfig.props);
+    title.title = widget.config.name;
     return (
       <WidgetWrapper background={background} border={border} padding={padding}>
         <div style={ZIndexStyle}>
-          {hideTitle ? null : (
-            <WidgetTitle
-              name={widget.config.name}
-              config={widget.config.nameConfig}
-            />
-          )}
+          {hideTitle ? null : <WidgetTitle title={title} />}
           <div style={FlexStyle}>
             <TabWidgetCore />
           </div>
         </div>
-        {editing && (
-          <BlockMaskLayer widgetConfig={widget} widgetInfo={widgetInfo} />
-        )}
+        {editing && <BlockMaskLayer widget={widget} widgetInfo={widgetInfo} />}
         <StyledWidgetToolBar>
           <Space size={0}>
             <LockIconFn
@@ -67,7 +67,7 @@ export const TabWidget: React.FC<{ hideTitle: boolean }> = memo(
               wid={widget.id}
               lock={widget.config?.lock}
             />
-            <WidgetActionDropdown widget={widget} />
+            <WidgetDropdownList widget={widget} />
           </Space>
         </StyledWidgetToolBar>
       </WidgetWrapper>

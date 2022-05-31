@@ -16,4 +16,4 @@
  * limitations under the License.
  */
 
-export { CollapseHeader, GroupLayout } from './Layout';
+export { CollapseHeader, GroupLayout, ItemLayout } from './Layout';

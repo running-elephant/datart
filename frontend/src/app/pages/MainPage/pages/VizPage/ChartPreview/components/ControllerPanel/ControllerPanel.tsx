@@ -56,7 +56,7 @@ const ControllerPanel: FC<{
   const [filters, setFilters] = useState<ChartDataSectionField[]>([]);
   useEffect(() => {
     const newFilters = (chartConfig?.datas || [])
-      .filter(c => c.type === ChartDataSectionType.FILTER)
+      .filter(c => c.type === ChartDataSectionType.Filter)
       .flatMap(c => c.rows || []);
     setFilters(newFilters);
   }, [chartConfig?.datas]);

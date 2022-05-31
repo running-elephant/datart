@@ -33,6 +33,7 @@ export type ChartConfigDTO = {
   datas?: ChartDataConfigDTO[];
   styles?: ChartStyleConfigDTO[];
   settings?: ChartStyleConfigDTO[];
+  interactions?: ChartStyleConfigDTO[];
 };
 
 export type ChartDetailConfigDTO = {

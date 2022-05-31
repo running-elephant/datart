@@ -9,6 +9,7 @@ import { initReactI18next } from 'react-i18next';
 import { instance as requestInstance } from 'utils/request';
 import en from './en/translation.json';
 import { convertLanguageJsonToObject } from './translations';
+import { getInitialLocale } from './utils';
 import zh from './zh/translation.json';
 
 export const translationsJson = {
@@ -58,15 +59,4 @@ export const antdLocales = {
   zh: antd_zh_CN,
 };
 
-function getInitialLocale() {
-  const storedLocale = localStorage.getItem(StorageKeys.Locale);
-  if (!storedLocale) {
-    const browserLocale = ['zh', 'zh-CN'].includes(navigator.language) // FIXME locale
-      ? 'zh'
-      : 'en';
-    localStorage.setItem(StorageKeys.Locale, browserLocale);
-    return browserLocale;
-  } else {
-    return storedLocale;
-  }
-}
+
