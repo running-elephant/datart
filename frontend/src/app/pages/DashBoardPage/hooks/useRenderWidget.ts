@@ -18,9 +18,10 @@
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { useCallback, useContext, useEffect } from 'react';
 import { WidgetActionContext } from '../components/ActionProvider/WidgetActionProvider';
-import { BoardConfigContext } from '../components/BoardProvider/BoardConfigProvider';
-import { BoardType, VizRenderMode, Widget } from '../pages/Board/slice/types';
+import { BoardConfigValContext } from '../components/BoardProvider/BoardConfigProvider';
+import { BoardType, VizRenderMode } from '../pages/Board/slice/types';
 import { boardScroll } from '../pages/BoardEditor/slice/events';
+import { Widget } from '../types/widgetTypes';
 import { isElView } from '../utils/board';
 
 export default function useRenderWidget(
@@ -29,7 +30,7 @@ export default function useRenderWidget(
   boardType: BoardType,
   rendered: boolean,
 ) {
-  const { initialQuery } = useContext(BoardConfigContext);
+  const { initialQuery } = useContext(BoardConfigValContext);
   const { onRenderedWidgetById } = useContext(WidgetActionContext);
   const { cacheWhRef, cacheW } = useCacheWidthHeight();
 

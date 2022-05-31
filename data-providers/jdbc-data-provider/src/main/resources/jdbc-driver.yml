@@ -152,6 +152,7 @@ PRESTO:
   name: PRESTO
   driver-class: io.prestosql.jdbc.PrestoDriver
   url-prefix: jdbc:presto://
+  adapter-class: datart.data.provider.jdbc.adapters.PrestoDataProviderAdapter
 
 SPARK:
   db-type: SPARK

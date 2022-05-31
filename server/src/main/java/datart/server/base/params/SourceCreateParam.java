@@ -17,4 +17,10 @@ public class SourceCreateParam extends BaseCreateParam{
 
     private String description;
 
+    private String parentId;
+
+    private Boolean isFolder;
+
+    private Double index;
+
 }

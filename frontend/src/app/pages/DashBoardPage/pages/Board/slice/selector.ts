@@ -17,11 +17,12 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 import { DefaultWidgetData } from 'app/pages/DashBoardPage/constants';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { RootState } from 'types';
 import { boardInit } from '.';
 import { getLayoutWidgets } from '../../../utils/widget';
-import { Widget, WidgetInfo } from './types';
-
+import { WidgetInfo } from './types';
+const DefaultObject = {};
 export const selectPropsId = (_: unknown, id: string) => id;
 
 export const boardState = (state: RootState) => state.board || boardInit;
@@ -46,6 +47,14 @@ export const selectWidgetInfoGroupMap = createSelector(
   [boardState],
   state => state.widgetInfoRecord,
 );
+export const selectWidgetSelectedItemMap = createSelector(
+  [boardState],
+  state => state.selectedItems,
+);
+export const selectMultipleSelect = createSelector(
+  [boardState],
+  state => state.multipleSelect,
+);
 
 export const selectBoardById = createSelector(
   selectBoardRecord,
@@ -58,7 +67,7 @@ export const selectBoardById = createSelector(
 export const selectBoardWidgetMapById = createSelector(
   selectBoardWidgetMap,
   selectPropsId,
-  (widgetRecord, id) => widgetRecord[id] || {},
+  (widgetRecord, id) => widgetRecord[id] || DefaultObject,
 );
 
 export const selectWidgetBy2Id = createSelector(
@@ -76,7 +85,7 @@ export const selectWidgetBy2Id = createSelector(
 
 export const selectLayoutWidgetMapById = () =>
   createSelector(selectBoardWidgetMap, selectPropsId, (widgetRecord, id) => {
-    if (!widgetRecord[id]) return {};
+    if (!widgetRecord[id]) return DefaultObject;
     const allWidgetMap = widgetRecord[id];
     const layoutWidgets = getLayoutWidgets(allWidgetMap);
     const LayoutWidgetMap: Record<string, Widget> = {};
@@ -89,8 +98,18 @@ export const selectLayoutWidgetMapById = () =>
 export const selectWidgetInfoMap = createSelector(
   selectWidgetInfoGroupMap,
   selectPropsId,
-  (widgetInfoGroupMap, id) => widgetInfoGroupMap[id] || {},
+  (widgetInfoGroupMap, id) => widgetInfoGroupMap[id] || DefaultObject,
 );
+
+export const makeSelectSelectedItems = () => {
+  return createSelector(
+    selectWidgetSelectedItemMap,
+    selectPropsId,
+    (widgetInfoGroupMap, widgetId) => {
+      return widgetInfoGroupMap?.[widgetId] || [];
+    },
+  );
+};
 
 export const selectWidgetInfoBy2Id = createSelector(
   selectWidgetInfoGroupMap,
@@ -109,12 +128,12 @@ export const selectLayoutWidgetInfoMapById = createSelector(
   selectWidgetInfoGroupMap,
   selectPropsId,
   (allWidgetMap, allWidgetInfoMap, id) => {
-    if (!allWidgetMap[id]) return {};
-    if (!allWidgetInfoMap[id]) return {};
+    if (!allWidgetMap[id]) return DefaultObject;
+    if (!allWidgetInfoMap[id]) return DefaultObject;
 
     const layoutWidgets = getLayoutWidgets(allWidgetMap[id]);
     const widgetInfoMap = allWidgetInfoMap[id];
-    const layoutWidgetsInfo: Record<string, WidgetInfo> = {};
+    const layoutWidgetsInfo: Record<string, WidgetInfo> = DefaultObject;
 
     layoutWidgets.forEach(w => {
       layoutWidgetsInfo[w.id] = widgetInfoMap[w.id];
@@ -152,6 +171,11 @@ export const selectDataChartById = createSelector(
 export const selectViewMap = createSelector(
   [boardState],
   state => state.viewMap,
+);
+
+export const selectAvailableSourceFunctionsMap = createSelector(
+  [boardState],
+  state => state.availableSourceFunctionsMap,
 );
 
 // dataChartMap

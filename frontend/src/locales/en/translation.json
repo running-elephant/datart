@@ -353,6 +353,14 @@
           "selectController": "Select ..",
           "textController": "Enter text"
         },
+        "controllerPlaceHolders": {
+          "multiSelectController": "Select ..",
+          "numberController": "Enter a number",
+          "rangeNumberControllerMin": "Min",
+          "rangeNumberControllerMax": "Max",
+          "selectController": "Select ..",
+          "textController": "Enter text"
+        },
         "controllerVisibilityTypes": {
           "hide": "Hide",
           "show": "Show",
@@ -501,7 +509,8 @@
       "title": {
         "content": "Data",
         "design": "Style",
-        "setting": "Analysis"
+        "setting": "Analytics",
+        "interaction": "Interaction"
       },
       "style": {
         "font": "Font",
@@ -624,7 +633,11 @@
           "insideTopLeft": "Inside Top Left",
           "insideBottomLeft": "Inside Bottom Left",
           "insideTopRight": "Inside Top Right",
-          "insideBottomRight": "Inside Bottom Right"
+          "insideBottomRight": "Inside Bottom Right",
+          "leftTop": "Left Top",
+          "leftBottom": "Left Bottom",
+          "rightTop": "Right Top",
+          "rightBottom": "Right Bottom"
         }
       },
       "data": {
@@ -750,6 +763,57 @@
         "paging": {
           "title": "Common",
           "pageSize": "Limit"
+        }
+      },
+      "interaction": {
+        "drillThrough": {
+          "title": "Drill Through",
+          "event": "Ineraction Event",
+          "leftClick": "Left Click",
+          "rightClick": "Right Click",
+          "rule": {
+            "title": "Rule",
+            "addRule": "+ Add New",
+            "header": {
+              "category": "Category",
+              "open": "Open",
+              "relation": "Relation",
+              "operation": "Operation"
+            },
+            "category": {
+              "title": "Categroy",
+              "jumpToChart": "Jump to Chart",
+              "jumpToDashboard": "Jump to Dashboard",
+              "jumpToUrl": "Jump to URL"
+            },
+            "action": {
+              "title": "Open",
+              "redirect": "Redirect",
+              "window": "Open New",
+              "dialog": "Open Dialog"
+            },
+            "reference": {
+              "title": "Reference View"
+            },
+            "relation": {
+              "setting": "Field Relation Setting",
+              "title": "Field Relation",
+              "auto": "Auto",
+              "customize": "Customize",
+              "type": "Type",
+              "source": "Source Field/Variable",
+              "target": "Target Field/Variable",
+              "addRelation": "+ Add",
+              "field": "Field",
+              "variable": "Variable"
+            },
+            "operation": {
+              "delete": "Delete"
+            }
+          }
+        },
+        "viewData": {
+          "title": "View Data"
         }
       },
       "present": {
@@ -888,7 +952,7 @@
     "board": {
       "action": {
         "dataChart": "DataChart",
-        "ImportExistingDataCharts": "Import Existing DataCharts",
+        "importExistingDataCharts": "Import Existing DataCharts",
         "createDataChartInBoard": "Create DataChart In Board",
         "searchValue": "Search keywords",
         "media": "Media",
@@ -914,7 +978,9 @@
         "multiSelect": "MultiSelect",
         "zoomIn": "Zoom Out",
         "zoomOut": "Zoom In",
-        "widgetList": "Widget List"
+        "widgetList": "Widget List",
+        "group": "Group",
+        "unGroup": "Ungroup"
       },
       "controlTypes": {
         "common": "Common",
@@ -971,7 +1037,9 @@
         "delPageTip": "Confirm to delete this story page?",
         "enterHere": "Enter here",
         "storyName": "Name",
-        "storyDescription": "Description"
+        "storyDescription": "Description",
+        "format": "Format",
+        "interval": "Interval"
       }
     },
     "widget": {
@@ -981,13 +1049,13 @@
       "widgetType": "Widget Type",
       "type": {
         "chart": "Chart",
-        "widgetChart": "privateChart",
+        "widgetChart": "Private Chart",
         "dataChart": "Public Chart",
         "media": "Media",
         "container": "Container",
         "controller": "Controller",
-        "query": "Query",
-        "reset": "Reset",
+        "queryBtn": "Query",
+        "resetBtn": "Reset",
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",
@@ -1008,7 +1076,9 @@
         "makeLinkage": "Set Linkage",
         "closeLinkage": "Close Linkage",
         "makeJump": "Set Jump",
-        "closeJump": "Close Jump"
+        "closeJump": "Close Jump",
+        "group": "Group",
+        "unGroup": "Ungroup"
       },
       "tips": {
         "unlock": "Locking drag and click to unlock",

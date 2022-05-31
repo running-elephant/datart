@@ -3,8 +3,6 @@ package datart.server.base.params;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.PositiveOrZero;
-
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class SourceUpdateParam extends BaseUpdateParam {
@@ -18,5 +16,11 @@ public class SourceUpdateParam extends BaseUpdateParam {
     private String config;
 
     private String description;
+
+    private String parentId;
+
+    private Boolean isFolder;
+
+    private Double index;
 
 }

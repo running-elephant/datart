@@ -23,6 +23,7 @@ import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
 import { WidgetWrapper } from '../../WidgetComponents/WidgetWrapper';
+import { getWidgetBaseStyle } from '../../WidgetManager/utils/utils';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { ToolBar } from './components/ToolBar';
 import { ControllerWidgetCore } from './ControllerWidgetCore';
@@ -40,7 +41,9 @@ export const ControllerWidget: React.FC<{}> = memo(() => {
   useWidgetAutoFetch(widget, renderMode, cacheWhRef, rendered);
   // 自动更新
 
-  const { background, border, padding } = widget.config;
+  const { background, border, padding } = getWidgetBaseStyle(
+    widget.config.customConfig.props,
+  );
   return (
     <WidgetWrapper background={background} border={border} padding={padding}>
       <div ref={cacheWhRef} style={ZIndexStyle}>

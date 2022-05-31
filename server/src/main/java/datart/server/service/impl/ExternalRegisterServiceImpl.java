@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jayway.jsonpath.JsonPath;
 import datart.core.base.exception.Exceptions;
 import datart.core.base.exception.ParamException;
+import datart.core.common.Application;
 import datart.core.entity.User;
 import datart.core.mappers.ext.UserMapperExt;
 import datart.security.base.PasswordToken;
@@ -68,8 +69,9 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
 
     @Override
     public String ldapRegister(String filter, String password) throws MessagingException, UnsupportedEncodingException {
+        String usernameAttr = getLdapUsernameAttr();
         try {
-            ldapTemplate.authenticate(LdapQueryBuilder.query().filter(String.format("(|(uid=%s)(cn=%s))", filter, filter)), password);
+            ldapTemplate.authenticate(LdapQueryBuilder.query().filter(String.format("(|(uid=%s)("+usernameAttr+"=%s))", filter, filter)), password);
         } catch (Exception e) {
             return null;
         }
@@ -85,7 +87,7 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
         String email = null;
 
         try {
-            email = ldapTemplate.searchForContext(LdapQueryBuilder.query().where("uid").is(filter).or("cn").is(filter))
+            email = ldapTemplate.searchForContext(LdapQueryBuilder.query().where("uid").is(filter).or(usernameAttr).is(filter))
                     .getAttributes().get("mail").get().toString();
         } catch (Exception ignored) {
         }
@@ -141,5 +143,9 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
         }
         return null;
 
+    }
+
+    private String getLdapUsernameAttr() {
+        return Application.getProperty("spring.ldap.attribute-mapping.username", "cn");
     }
 }

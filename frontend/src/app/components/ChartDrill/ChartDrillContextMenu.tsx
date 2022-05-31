@@ -46,15 +46,15 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
     } = useContext(ChartDrillContext);
 
     const currentDrillLevel = drillOption?.getCurrentDrillLevel();
+    const currentFields = drillOption?.getCurrentFields();
 
     const runtimeDateLevelFields = useMemo(() => {
       if (!drillOption) {
         return;
       }
       const allFields = drillOption.getAllFields();
-      const currentFields = drillOption.getCurrentFields();
       const groupSection = chartConfig?.datas?.find(
-        v => v.type === ChartDataSectionType.GROUP,
+        v => v.type === ChartDataSectionType.Group,
       );
       let rows: ChartDataSectionField[] | undefined = [];
 
@@ -66,12 +66,12 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
         rows = groupSection?.rows?.filter(v => v.uid === allFields[0].uid);
       }
       return getRuntimeDateLevelFields(rows);
-    }, [drillOption, chartConfig?.datas]);
+    }, [drillOption, chartConfig?.datas, currentFields]);
 
     const handleDateLevelChange = useCallback(
       (config: ChartDataSectionField) => {
         const groupData = chartConfig?.datas?.find(
-          v => v.type === ChartDataSectionType.GROUP,
+          v => v.type === ChartDataSectionType.Group,
         );
 
         if (groupData) {
@@ -80,12 +80,12 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
               const index = draft.rows.findIndex(v => v.uid === config.uid);
               const runtimeDateLevel =
                 draft.rows[index][RUNTIME_DATE_LEVEL_KEY];
-              const replacedColName = runtimeDateLevel
-                ? runtimeDateLevel.colName
-                : draft.rows[index].colName;
+              const replacedConfig = runtimeDateLevel
+                ? runtimeDateLevel
+                : draft.rows[index];
 
               draft.rows[index][RUNTIME_DATE_LEVEL_KEY] = config;
-              draft.replacedColName = replacedColName;
+              draft.replacedConfig = replacedConfig;
             }
           });
 
@@ -116,7 +116,18 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       );
     }, [drillOption?.isSelectedDrill, t]);
 
+    const menuVisible = !chartConfig?.datas?.filter(
+      v => v.drillContextMenuVisible,
+    ).length;
+
+    const hasContextMenu =
+      (menuVisible && drillOption?.isDrillable) ||
+      runtimeDateLevelFields?.length;
+
     const contextMenu = useMemo(() => {
+      if (!hasContextMenu) {
+        return <></>;
+      }
       return (
         <StyledChartDrillMenu
           onClick={({ key }) => {
@@ -160,7 +171,7 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
                   <DateLevelMenuItems
                     availableSourceFunctions={availableSourceFunctions}
                     config={v[RUNTIME_DATE_LEVEL_KEY] || v}
-                    onChange={config => handleDateLevelChange(config)}
+                    onChange={handleDateLevelChange}
                   />
                 </Menu.SubMenu>
               );
@@ -178,25 +189,19 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       onDrillOptionChange,
       handleDateLevelChange,
       availableSourceFunctions,
+      hasContextMenu,
     ]);
-
-    const hasContextMenu =
-      drillOption?.isDrillable || runtimeDateLevelFields?.length;
 
     return (
       <StyledChartDrill className="chart-drill-menu-container">
-        {hasContextMenu ? (
-          <Dropdown
-            disabled={!drillOption}
-            overlay={contextMenu}
-            destroyPopupOnHide={true}
-            trigger={['contextMenu']}
-          >
-            <div style={{ height: '100%' }}>{children}</div>
-          </Dropdown>
-        ) : (
+        <Dropdown
+          disabled={!drillOption}
+          overlay={contextMenu}
+          destroyPopupOnHide={true}
+          trigger={['contextMenu']}
+        >
           <div style={{ height: '100%' }}>{children}</div>
-        )}
+        </Dropdown>
       </StyledChartDrill>
     );
   },

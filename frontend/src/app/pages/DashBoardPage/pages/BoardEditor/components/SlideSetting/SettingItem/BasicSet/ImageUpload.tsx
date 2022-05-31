@@ -16,40 +16,20 @@
  * limitations under the License.
  */
 import { DeleteOutlined } from '@ant-design/icons';
-import { Form, Upload } from 'antd';
+import { Upload } from 'antd';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { convertImageUrl } from 'app/pages/DashBoardPage/utils';
-import React, { useCallback, useContext } from 'react';
+import { memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
 import { uploadBoardImage } from '../../../../slice/thunk';
 
-export interface ImageUploadProps {
-  filedName: string;
-  value: string;
-  label: string;
-  placeholder: string;
-}
-export const ImageUpload: React.FC<ImageUploadProps> = ({
-  filedName,
-  value,
-  label,
-  placeholder,
-}) => {
-  return (
-    <Wrapper>
-      <Form.Item name={filedName} label={label} preserve>
-        <UploadDragger value={value} placeholder={placeholder} />
-      </Form.Item>
-    </Wrapper>
-  );
-};
 export const UploadDragger: React.FC<{
   value: string;
   onChange?: any;
   placeholder: string;
-}> = ({ value, onChange, placeholder }) => {
+}> = memo(({ value, onChange, placeholder }) => {
   const dispatch = useDispatch();
   const { boardId } = useContext(BoardContext);
 
@@ -57,7 +37,7 @@ export const UploadDragger: React.FC<{
     async info => {
       const formData = new FormData();
       formData.append('file', info);
-      await dispatch(
+      dispatch(
         uploadBoardImage({
           boardId,
           fileName: info.name,
@@ -70,8 +50,8 @@ export const UploadDragger: React.FC<{
     [boardId, dispatch, onChange],
   );
   const getImageError = useCallback(() => {
-    onChange('');
-  }, [onChange]);
+    console.warn('get BackgroundImageError');
+  }, []);
   const delImageUrl = useCallback(
     e => {
       e.stopPropagation();
@@ -79,6 +59,7 @@ export const UploadDragger: React.FC<{
     },
     [onChange],
   );
+  const imgUrl = useMemo(() => convertImageUrl(value), [value]);
   return (
     <StyleUpload
       name={'upload-image'}
@@ -88,12 +69,7 @@ export const UploadDragger: React.FC<{
     >
       {value ? (
         <div className="image-box">
-          <img
-            className="image"
-            src={convertImageUrl(value)}
-            alt=""
-            onError={getImageError}
-          />
+          <img className="image" src={imgUrl} alt="" onError={getImageError} />
           <DeleteOutlined className="del-button" onClick={delImageUrl} />
         </div>
       ) : (
@@ -101,7 +77,7 @@ export const UploadDragger: React.FC<{
       )}
     </StyleUpload>
   );
-};
+});
 const StyleUpload = styled(Upload.Dragger)`
   .image-box {
     position: relative;
@@ -127,11 +103,6 @@ const StyleUpload = styled(Upload.Dragger)`
   .image {
     width: 100%;
     height: auto;
-  }
-`;
-const Wrapper = styled.div`
-  .ant-upload-list {
-    display: none;
   }
 `;
 

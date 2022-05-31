@@ -20,7 +20,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BORDER_STYLES } from 'app/pages/DashBoardPage/constants';
 import { BorderConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { FC, memo } from 'react';
-import ColorSet from './BasicSet/ColorSet';
+
 export const BorderSet: FC<{
   border: BorderConfig;
 }> = memo(({ border }) => {
@@ -28,9 +28,9 @@ export const BorderSet: FC<{
   const tLine = useI18NPrefix(`viz.lineOptions`);
   return (
     <>
-      <Form.Item label={t('color')} name={['border', 'color']}>
+      {/* <Form.Item label={t('color')} name={['border', 'color']}>
         <ColorSet filedName={['border', 'color']} filedValue={border.color} />
-      </Form.Item>
+      </Form.Item> */}
 
       <Form.Item label={t('width')} name={['border', 'width']}>
         <InputNumber className="datart-ant-input-number" />

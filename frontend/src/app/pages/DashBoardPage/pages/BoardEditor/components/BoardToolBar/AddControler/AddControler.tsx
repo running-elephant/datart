@@ -20,12 +20,12 @@ import { Dropdown, Menu, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
-import { WidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useContext } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { G60 } from 'styles/StyleConstants';
+import { ORIGINAL_TYPE_MAP } from '../../../../../constants';
 import { addControllerAction } from '../../../slice/actions/controlActions';
+import { selectHasQueryBtn, selectHasResetBtn } from '../../../slice/selectors';
 import { BoardToolBarContext } from '../context/BoardToolBarContext';
 
 export interface AddControlBtnProps {}
@@ -42,8 +42,8 @@ export const AddController: React.FC<AddControlBtnProps> = () => {
   const tWt = useI18NPrefix(`viz.widget.type`);
   const { boardId, boardType } = useContext(BoardToolBarContext);
   const dispatch = useDispatch();
-  const { hasQueryControl, hasResetControl } = useContext(BoardConfigContext);
-
+  const hasQueryBtn = useSelector(selectHasQueryBtn);
+  const hasResetBtn = useSelector(selectHasResetBtn);
   const onAddController = (info: { key: any }) => {
     dispatch(
       addControllerAction({
@@ -116,16 +116,16 @@ export const AddController: React.FC<AddControlBtnProps> = () => {
       disabled: true,
     },
   ];
-  const buttonControllers: ButtonItemType<WidgetType>[] = [
+  const buttons: ButtonItemType<any>[] = [
     {
       icon: '',
-      type: 'query',
-      disabled: !!hasQueryControl,
+      type: ORIGINAL_TYPE_MAP.queryBtn,
+      disabled: hasQueryBtn,
     },
     {
       icon: '',
-      type: 'reset',
-      disabled: !!hasResetControl,
+      type: ORIGINAL_TYPE_MAP.resetBtn,
+      disabled: hasResetBtn,
     },
   ];
   const renderTitle = (text: string) => {
@@ -160,11 +160,8 @@ export const AddController: React.FC<AddControlBtnProps> = () => {
           </Menu.Item>
         ))}
       </Menu.ItemGroup>
-      <Menu.ItemGroup
-        key="buttonControllers"
-        title={renderTitle(tType('button'))}
-      >
-        {buttonControllers.map(({ icon, type, disabled }) => (
+      <Menu.ItemGroup key="buttons" title={renderTitle(tType('button'))}>
+        {buttons.map(({ icon, type, disabled }) => (
           <Menu.Item key={type} icon={icon} disabled={disabled}>
             {tWt(type)}
           </Menu.Item>

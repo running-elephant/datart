@@ -30,8 +30,10 @@ import {
   transformToViewConfig,
 } from 'app/utils/internalChartHelper';
 import { saveAs } from 'file-saver';
+import i18next from 'i18next';
 import { request, request2, requestWithHeader } from 'utils/request';
 import { errorHandle } from 'utils/utils';
+import { convertToChartDto } from './ChartDtoHelper';
 
 export const getDistinctFields = async (
   viewId: string,
@@ -97,7 +99,7 @@ export const makeDownloadDataTask =
       },
     });
     if (res?.success) {
-      message.success('下载任务创建成功');
+      message.success(i18next.t('viz.action.downloadTaskSuccess'));
     }
     resolve();
   };
@@ -137,7 +139,7 @@ export const makeShareDownloadDataTask =
       },
     });
     if (success) {
-      message.success('下载任务创建成功');
+      message.success(i18next.t('viz.action.downloadTaskSuccess'));
     }
     resolve();
   };
@@ -276,4 +278,9 @@ export async function fetchCheckName(url, data: any) {
     method: 'POST',
     data: data,
   });
+}
+
+export async function fetchDataChart(id: string) {
+  const response = await request2<ChartDTO>(`/viz/datacharts/${id}`);
+  return convertToChartDto(response?.data);
 }

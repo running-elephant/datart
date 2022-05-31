@@ -21,12 +21,15 @@ import {
   ControllerFacadeTypes,
   DataViewFieldType,
 } from 'app/constants';
+import { BoardConfig } from 'app/pages/DashBoardPage/types/boardTypes';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { ChartDatasetMeta } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { DeltaStatic } from 'quill';
 import { Layout } from 'react-grid-layout';
+import { IFontDefault } from '../../../../../../types';
 import { ChartDataSectionField } from '../../../../../types/ChartConfig';
 import { View } from '../../../../../types/View';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
@@ -47,6 +50,9 @@ export interface BoardState {
   dataChartMap: Record<string, DataChart>;
   viewMap: Record<string, ChartDataView>; // View
   widgetDataMap: Record<string, WidgetData>;
+  availableSourceFunctionsMap: Record<string, string[]>;
+  selectedItems: Record<string, SelectedItem[]>;
+  multipleSelect: boolean;
 }
 // 应用内浏览，分享页模式，定时任务模式，编辑模式
 export type VizRenderMode = 'read' | 'share' | 'schedule' | 'edit';
@@ -59,7 +65,7 @@ export interface Dashboard {
   status: number;
   thumbnail: string;
   index?: number;
-  config: DashboardConfig;
+  config: BoardConfig;
   permissions?: any;
   queryVariables: Variable[];
 }
@@ -75,7 +81,7 @@ export interface ServerDashboard extends Omit<Dashboard, 'config'> {
   datacharts: ServerDatachart[];
   widgets: ServerWidget[];
 }
-export interface DashboardConfig {
+export interface DashboardConfigBeta3 {
   version: string;
   background: BackgroundConfig;
   widgetDefaultSettings: {
@@ -101,21 +107,12 @@ export interface DashboardConfig {
   gridStep: [number, number];
   scaleMode: ScaleModeType;
 }
+
 export type ColsKeyType = typeof LAYOUT_COLS_KEYS[number];
 export const BoardTypes = ['auto', 'free'] as const;
 BoardTypes.includes('auto');
 export type BoardType = typeof BoardTypes[number];
 
-export interface Chart {}
-export interface Widget {
-  id: string;
-  dashboardId: string;
-  datachartId: string;
-  relations: Relation[];
-  viewIds: string[];
-  config: WidgetConf;
-  parentId?: string;
-}
 export interface WidgetOfCopy extends Widget {
   selectedCopy?: boolean;
 }
@@ -123,29 +120,12 @@ export interface ServerWidget extends Omit<Widget, 'config' | 'relations'> {
   config: string;
   relations: ServerRelation[];
 }
-export interface WidgetConf {
-  version: string;
-  index: number;
-  tabId?: string; //记录在父容器tab的位置
-  name: string;
-  nameConfig: WidgetNameConfig;
-  padding: WidgetPadding;
-  type: WidgetType;
-  autoUpdate: boolean;
-  frequency: number; // 定时同步频率
-  rect: RectConfig; //desktop_rect
-  lock: boolean; //Locking forbids dragging resizing
-  mobileRect?: RectConfig; //mobile_rect 移动端适配
-  background: BackgroundConfig;
-  border: BorderConfig;
-  content: WidgetContent;
-  tabIndex?: number; // 在tab 等容器widget里面的排序索引
-  linkageConfig?: LinkageConfig; //联动设置
-  jumpConfig?: JumpConfig; // 跳转 设置
-}
-export interface WidgetNameConfig extends FontConfig {
-  show: boolean;
+
+export interface WidgetTitleConfig {
+  title: string;
+  showTitle: boolean;
   textAlign?: TextAlignType;
+  font: IFontDefault;
 }
 export interface LinkageConfig {
   open: boolean;
@@ -258,14 +238,6 @@ export interface ServerRelation extends Omit<Relation, 'config'> {
 /*
  * 通用
  */
-// 组件配置
-// TODO xld migration about filter xld
-export type WidgetContent =
-  | MediaWidgetContent
-  | ContainerWidgetContent
-  | ControllerWidgetContent
-  | ChartWidgetContent
-  | BoardBtnContent;
 
 export interface ChartWidgetContent {
   type: WidgetContentChartType;
@@ -305,18 +277,21 @@ export type MediaWidgetContent = {
   };
 };
 // 容器组件配置
-export type ContainerWidgetContent = {
-  type: ContainerWidgetType;
+// export type ContainerWidgetContent = {
+//   type: ContainerWidgetType;
+//   itemMap: Record<string, ContainerItem>;
+//   tabConfig?: any;
+//   carouselConfig?: any;
+// };
+export type TabWidgetContent = {
   itemMap: Record<string, ContainerItem>;
-  tabConfig?: any;
-  carouselConfig?: any;
 };
 
 export interface ContainerItem {
-  tabId: string;
+  index: number;
   name: string;
+  tabId: string;
   childWidgetId: string;
-  config?: any;
 }
 // 控制器组件配置
 export interface ControllerWidgetContent {
@@ -331,10 +306,11 @@ export const WidgetTypes = [
   'media',
   'container',
   'controller',
-  'query',
-  'reset',
+  'button',
+  'group',
 ] as const;
 export type WidgetType = typeof WidgetTypes[number];
+
 export declare const ContainerWidgetTypes: ['tab', 'carousel'];
 
 export type LightWidgetType =
@@ -384,14 +360,6 @@ export interface BorderConfig extends LineConfig {
   radius: number;
 }
 
-export interface FontConfig {
-  fontFamily: string;
-  fontSize: string;
-  fontWeight: string;
-  fontStyle: string;
-  color: string;
-}
-
 //
 
 export interface DataChart {
@@ -427,7 +395,7 @@ export interface BoardInfo {
   fullScreenItemId: string; // 全屏状态
   showBlockMask: boolean; //?
   isDroppable: boolean;
-  clipboardWidgets: Record<string, WidgetOfCopy>;
+  clipboardWidgetMap: Record<string, WidgetOfCopy>;
   layouts: Layout[];
   deviceType: DeviceType; // deviceType for autoBoard defaultValue = desktop
   widgetIds: string[]; // board保存的时候 区分那些是删除的，哪些是新增的

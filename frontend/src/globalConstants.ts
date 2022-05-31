@@ -214,3 +214,8 @@ export const NumericUnitDescriptions = new Map<NumberUnitKey, [number, string]>(
     [NumberUnitKey.Yi, [10 ** 8, '亿']],
   ],
 );
+
+export const KEYBOARD_EVENT_NAME = {
+  CTRL: 'Control',
+  COMMAND: 'Meta',
+};

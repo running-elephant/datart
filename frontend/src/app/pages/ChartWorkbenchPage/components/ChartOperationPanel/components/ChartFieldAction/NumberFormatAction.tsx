@@ -31,7 +31,7 @@ import { FieldFormatType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ChartDataSectionField,
-  IFieldFormatConfig,
+  FormatFieldAction,
 } from 'app/types/ChartConfig';
 import { CURRENCIES } from 'app/utils/currency';
 import { updateBy } from 'app/utils/mutation';
@@ -44,31 +44,31 @@ import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_TIMES } from 'styles/StyleConstants';
 
-const DefaultFormatDetailConfig: IFieldFormatConfig = {
-  type: FieldFormatType.DEFAULT,
-  [FieldFormatType.NUMERIC]: {
+const DefaultFormatDetailConfig: FormatFieldAction = {
+  type: FieldFormatType.Defalut,
+  [FieldFormatType.Numeric]: {
     decimalPlaces: 2,
     unitKey: NumberUnitKey.None,
     useThousandSeparator: true,
     prefix: '',
     suffix: '',
   },
-  [FieldFormatType.CURRENCY]: {
+  [FieldFormatType.Currency]: {
     decimalPlaces: 2,
     unitKey: NumberUnitKey.None,
     useThousandSeparator: true,
     currency: '',
   },
-  [FieldFormatType.PERCENTAGE]: {
+  [FieldFormatType.Percentage]: {
     decimalPlaces: 2,
   },
-  [FieldFormatType.SCIENTIFIC]: {
+  [FieldFormatType.Scientific]: {
     decimalPlaces: 2,
   },
-  [FieldFormatType.DATE]: {
+  [FieldFormatType.Date]: {
     format: DATE_FORMATTER,
   },
-  [FieldFormatType.CUSTOM]: {
+  [FieldFormatType.Custom]: {
     format: '',
   },
 };
@@ -119,7 +119,7 @@ const NumberFormatAction: FC<{
   };
 
   const renderFieldFormatExtendSetting = () => {
-    if (FieldFormatType.DEFAULT === type) {
+    if (FieldFormatType.Defalut === type) {
       return null;
     } else {
       return (
@@ -138,7 +138,7 @@ const NumberFormatAction: FC<{
             />
           </FormItemEx>
 
-          {FieldFormatType.CURRENCY === type && (
+          {FieldFormatType.Currency === type && (
             <>
               <FormItemEx {...formItemLayout} label={t('format.unit')}>
                 <Select
@@ -179,7 +179,7 @@ const NumberFormatAction: FC<{
               </FormItemEx>
             </>
           )}
-          {FieldFormatType.NUMERIC === type && (
+          {FieldFormatType.Numeric === type && (
             <>
               <FormItemEx {...formItemLayout} label={t('format.unit')}>
                 <Select
@@ -251,15 +251,15 @@ const NumberFormatAction: FC<{
           value={type}
         >
           <Space direction="vertical">
-            <Radio value={FieldFormatType.DEFAULT}>{t('format.default')}</Radio>
-            <Radio value={FieldFormatType.NUMERIC}>{t('format.numeric')}</Radio>
-            <Radio value={FieldFormatType.CURRENCY}>
+            <Radio value={FieldFormatType.Defalut}>{t('format.default')}</Radio>
+            <Radio value={FieldFormatType.Numeric}>{t('format.numeric')}</Radio>
+            <Radio value={FieldFormatType.Currency}>
               {t('format.currency')}
             </Radio>
-            <Radio value={FieldFormatType.PERCENTAGE}>
+            <Radio value={FieldFormatType.Percentage}>
               {t('format.percentage')}
             </Radio>
-            <Radio value={FieldFormatType.SCIENTIFIC}>
+            <Radio value={FieldFormatType.Scientific}>
               {t('format.scientific')}
             </Radio>
           </Space>

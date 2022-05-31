@@ -16,34 +16,71 @@
  * limitations under the License.
  */
 
-import produce from 'immer';
-import { createContext, FC, memo, useMemo } from 'react';
-import { DashboardConfig } from '../../pages/Board/slice/types';
-import { adaptBoardImageUrl } from '../../utils';
-
-export const BoardConfigContext = createContext<DashboardConfig>(
-  {} as DashboardConfig,
+import { createContext, FC, memo } from 'react';
+import { ScaleModeType } from '../../constants';
+import { BackgroundConfig, BoardType } from '../../pages/Board/slice/types';
+import { BoardConfig } from '../../types/boardTypes';
+import { getJsonConfigs } from '../../utils';
+export interface BoardConfigValue {
+  boardType: BoardType;
+  initialQuery: boolean;
+  background: BackgroundConfig;
+  // free
+  width: number;
+  height: number;
+  scaleMode: ScaleModeType;
+  // auto
+  allowOverlap: boolean;
+  margin: [number, number];
+  padding: [number, number];
+  mMargin: [number, number];
+  mPadding: [number, number];
+}
+export const BoardConfigContext = createContext<BoardConfig>({} as BoardConfig);
+export const BoardConfigValContext = createContext<BoardConfigValue>(
+  {} as BoardConfigValue,
 );
 
 export const BoardConfigProvider: FC<{
-  config: DashboardConfig;
+  config: BoardConfig;
   boardId: string;
 }> = memo(({ config, boardId, children }) => {
-  const adaptConfig = useMemo(() => {
-    if (config) {
-      const nextConfig = produce(config, draft => {
-        draft.background.image = adaptBoardImageUrl(
-          config.background.image,
-          boardId,
-        );
-      });
-      return nextConfig;
-    }
-    return config;
-  }, [config, boardId]);
+  const props = config.jsonConfig.props;
+  const [initialQuery, allowOverlap, scaleMode] = getJsonConfigs(
+    props,
+    ['basic'],
+    ['initialQuery', 'allowOverlap', 'scaleMode'],
+  );
+  const [background] = getJsonConfigs(props, ['background'], ['background']);
+  const [width, height] = getJsonConfigs(props, ['size'], ['width', 'height']);
+  const [paddingTB, paddingLR, marginTB, marginLR] = getJsonConfigs(
+    props,
+    ['space'],
+    ['paddingTB', 'paddingLR', 'marginTB', 'marginLR'],
+  );
+  const [mPaddingTB, mPaddingLR, mMarginTB, mMarginLR] = getJsonConfigs(
+    props,
+    ['space'],
+    ['paddingTB', 'paddingLR', 'marginTB', 'marginLR'],
+  );
+  const configVal: BoardConfigValue = {
+    boardType: config.type,
+    initialQuery,
+    background,
+    width,
+    height,
+    scaleMode,
+    allowOverlap,
+    margin: [marginLR, marginTB],
+    padding: [paddingLR, paddingTB],
+    mMargin: [mMarginLR, mMarginTB],
+    mPadding: [mPaddingLR, mPaddingTB],
+  };
   return (
-    <BoardConfigContext.Provider value={adaptConfig}>
-      {children}
+    <BoardConfigContext.Provider value={config}>
+      <BoardConfigValContext.Provider value={configVal}>
+        {children}
+      </BoardConfigValContext.Provider>
     </BoardConfigContext.Provider>
   );
 });

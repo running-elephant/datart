@@ -51,6 +51,8 @@ export const initialState: SharePageState = {
   loginLoading: false,
   oauth2Clients: [],
   availableSourceFunctions: [],
+  selectedItems: [],
+  multipleSelect: false,
 };
 
 export const slice = createSlice({
@@ -129,7 +131,7 @@ export const slice = createSlice({
       const chartPreview = state.chartPreview;
       if (chartPreview) {
         const filterSection = chartPreview?.chartConfig?.datas?.find(
-          section => section.type === ChartDataSectionType.FILTER,
+          section => section.type === ChartDataSectionType.Filter,
         );
         if (filterSection) {
           const filterRowIndex = filterSection.rows?.findIndex(
@@ -155,7 +157,7 @@ export const slice = createSlice({
     ) {
       if (state.chartPreview) {
         const groupSection = state.chartPreview?.chartConfig?.datas?.find(
-          section => section.type === ChartDataSectionType.GROUP,
+          section => section.type === ChartDataSectionType.Group,
         );
         if (groupSection) {
           groupSection.rows = action.payload.payload?.value?.rows;
@@ -173,6 +175,30 @@ export const slice = createSlice({
         state.chartPreview.backendChart.config.computedFields =
           action.payload.computedFields;
       }
+    },
+    normalSelect(
+      state,
+      { payload }: PayloadAction<{ index: string; data: any }>,
+    ) {
+      const index = state.selectedItems?.findIndex(
+        v => payload.index === v.index,
+      );
+      if (state.multipleSelect) {
+        if (index < 0) {
+          state.selectedItems.push(payload);
+        } else {
+          state.selectedItems.splice(index, 1);
+        }
+      } else {
+        if (index < 0 || state.selectedItems.length > 1) {
+          state.selectedItems = [payload];
+        } else {
+          state.selectedItems = [];
+        }
+      }
+    },
+    updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
+      state.multipleSelect = payload;
     },
   },
   extraReducers: builder => {
@@ -193,6 +219,7 @@ export const slice = createSlice({
             ...state.chartPreview,
             dataset: payload as any,
           };
+          state.selectedItems = [];
           state.headlessBrowserRenderSign = true;
         },
       )

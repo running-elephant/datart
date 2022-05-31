@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 import { memo, useContext } from 'react';
-import { BoardType, MediaWidgetType } from '../../pages/Board/slice/types';
+import { ORIGINAL_TYPE_MAP } from '../../constants';
 import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import { ControllerWidget } from '../Widgets/ControllerWidget/ControllerWidget';
 import { DataChartWidget } from '../Widgets/DataChartWidget/DataChartWidget';
+import { GroupWidget } from '../Widgets/GroupWidget/groupWidget';
 import { IframeWidget } from '../Widgets/IframeWidget/IframeWidget';
 import { ImageWidget } from '../Widgets/ImageWidget/ImageWidget';
 import { QueryBtnWidget } from '../Widgets/QueryBtnWidget/QueryBtnWidget';
@@ -31,30 +32,58 @@ import { TimerWidget } from '../Widgets/TimerWidget/TimerWidget';
 import { VideoWidget } from '../Widgets/VideoWidget/VideoWidget';
 
 export const WidgetMapper: React.FC<{
-  boardType: BoardType;
   boardEditing: boolean;
-}> = memo(({ boardEditing }) => {
+  hideTitle: boolean;
+}> = memo(({ boardEditing, hideTitle }) => {
   const widget = useContext(WidgetContext);
-  const widgetType = widget.config.type;
-
-  switch (widgetType) {
-    case 'chart':
+  const originalType = widget.config.originalType;
+  switch (originalType) {
+    case ORIGINAL_TYPE_MAP.group:
+      return <GroupWidget />;
+    // chart
+    case ORIGINAL_TYPE_MAP.linkedChart:
+    case ORIGINAL_TYPE_MAP.ownedChart:
       return (
         <WidgetDataProvider
           widgetId={widget.id}
           boardId={widget.dashboardId}
           boardEditing={boardEditing}
         >
-          <DataChartWidget hideTitle={false} />
+          <DataChartWidget hideTitle={hideTitle} />
         </WidgetDataProvider>
       );
-    case 'media':
-      const mediaSubType: MediaWidgetType = widget.config.content.type;
-      return <MediaWidgetMapper subType={mediaSubType} />;
-    case 'container':
-      // const containerSubType: MediaWidgetType = widget.config.content.type;
-      return <TabWidget hideTitle={false} />;
-    case 'controller':
+    // media
+    case ORIGINAL_TYPE_MAP.richText:
+      return <RichTextWidget hideTitle={hideTitle} />;
+    case ORIGINAL_TYPE_MAP.image:
+      return <ImageWidget hideTitle={hideTitle} />;
+    case ORIGINAL_TYPE_MAP.video:
+      return <VideoWidget hideTitle={hideTitle} />;
+    case ORIGINAL_TYPE_MAP.iframe:
+      return <IframeWidget hideTitle={hideTitle} />;
+    case ORIGINAL_TYPE_MAP.timer:
+      return <TimerWidget hideTitle={hideTitle} />;
+
+    // tab
+    case ORIGINAL_TYPE_MAP.tab:
+      return <TabWidget hideTitle={hideTitle} />;
+
+    // btn
+    case ORIGINAL_TYPE_MAP.queryBtn:
+      return <QueryBtnWidget />;
+    case ORIGINAL_TYPE_MAP.resetBtn:
+      return <ResetBtnWidget />;
+    // controller
+    case ORIGINAL_TYPE_MAP.dropdownList:
+    case ORIGINAL_TYPE_MAP.multiDropdownList:
+    case ORIGINAL_TYPE_MAP.checkboxGroup:
+    case ORIGINAL_TYPE_MAP.radioGroup:
+    case ORIGINAL_TYPE_MAP.text:
+    case ORIGINAL_TYPE_MAP.time:
+    case ORIGINAL_TYPE_MAP.rangeTime:
+    case ORIGINAL_TYPE_MAP.rangeValue:
+    case ORIGINAL_TYPE_MAP.value:
+    case ORIGINAL_TYPE_MAP.slider:
       return (
         <WidgetDataProvider
           widgetId={widget.id}
@@ -64,30 +93,10 @@ export const WidgetMapper: React.FC<{
           <ControllerWidget />
         </WidgetDataProvider>
       );
-    case 'query':
-      return <QueryBtnWidget />;
-    case 'reset':
-      return <ResetBtnWidget />;
+    //RangeSlider
+    //Tree
+    // unknown
     default:
-      return <div>default widget</div>;
-  }
-});
-
-export const MediaWidgetMapper: React.FC<{
-  subType: MediaWidgetType;
-}> = memo(({ subType }) => {
-  switch (subType) {
-    case 'richText':
-      return <RichTextWidget hideTitle={false} />;
-    case 'image':
-      return <ImageWidget hideTitle={false} />;
-    case 'video':
-      return <VideoWidget hideTitle={false} />;
-    case 'iframe':
-      return <IframeWidget hideTitle={false} />;
-    case 'timer':
-      return <TimerWidget hideTitle={false} />;
-    default:
-      return <div>default media</div>;
+      return <div> unknown widget ?{originalType} </div>;
   }
 });

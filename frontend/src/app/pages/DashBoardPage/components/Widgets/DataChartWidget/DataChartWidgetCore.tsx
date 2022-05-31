@@ -18,17 +18,22 @@
 import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
+import { ChartDataViewFieldCategory } from 'app/constants';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { migrateChartConfig } from 'app/migration';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
-import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import {
+  getRuntimeComputedFields,
+  getRuntimeDateLevelFields,
+} from 'app/utils/chartHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import produce from 'immer';
 import React, {
@@ -39,8 +44,13 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
+import {
+  multipleSelectChange,
+  selectedItemChange,
+} from '../../../pages/BoardEditor/slice/actions/actions';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import {
   boardDrillManager,
@@ -51,12 +61,15 @@ import { BoardScaleContext } from '../../FreeBoardBackground';
 import { WidgetChartContext } from '../../WidgetProvider/WidgetChartProvider';
 import { WidgetDataContext } from '../../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
+import { WidgetSelectionContext } from '../../WidgetProvider/WidgetSelectionProvider';
 
 export const DataChartWidgetCore: React.FC<{}> = memo(() => {
-  const dataChart = useContext(WidgetChartContext);
+  const { dataChart, availableSourceFunctions } =
+    useContext(WidgetChartContext);
   const scale = useContext(BoardScaleContext);
   const { data } = useContext(WidgetDataContext);
   const { renderMode } = useContext(BoardContext);
+  const { selectedItems, multipleSelect } = useContext(WidgetSelectionContext);
   const widget = useContext(WidgetContext);
   const { dashboardId, id: wid } = widget;
   const bid = useMemo(() => {
@@ -68,14 +81,44 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const containerId = useMemo(() => {
     return `${wid}_${uuidv4()}`;
   }, [wid]);
-  const { onWidgetChartClick } = useContext(WidgetActionContext);
+  const { onWidgetChartClick, onWidgetGetData, onWidgetDataUpdate } =
+    useContext(WidgetActionContext);
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
-  const { onWidgetGetData } = useContext(WidgetActionContext);
   const widgetRef = useRef<Widget>(widget);
   const drillOptionRef = useRef<IChartDrillOption>();
   useEffect(() => {
     widgetRef.current = widget;
   }, [widget]);
+  const dispatch = useDispatch();
+  const handleDateLevelChange = useCallback(
+    (type, payload) => {
+      const rows = getRuntimeDateLevelFields(payload.value?.rows);
+      const dateLevelComputedFields = rows.filter(
+        v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
+      );
+      const replacedConfig = payload.value.replacedConfig;
+      const computedFields = getRuntimeComputedFields(
+        dateLevelComputedFields,
+        replacedConfig,
+        dataChart?.config?.computedFields,
+        true,
+      );
+      if (dataChart?.id) {
+        onWidgetDataUpdate({
+          computedFields,
+          payload,
+          widgetId: dataChart.id,
+        });
+      }
+      onWidgetGetData(widgetRef.current);
+    },
+    [
+      onWidgetDataUpdate,
+      dataChart?.config?.computedFields,
+      dataChart?.id,
+      onWidgetGetData,
+    ],
+  );
 
   const handleDrillOptionChange = useCallback(
     (option: IChartDrillOption) => {
@@ -116,22 +159,14 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     }),
     [data],
   );
-  const chartClick = useCallback(
-    params => {
-      if (!params) {
-        return;
-      }
-      if (drillOptionRef.current?.isSelectedDrill) {
-        const option = drillOptionRef.current;
-        option.drillDown(params.data.rowData);
-        handleDrillOptionChange(option);
-        return;
-      }
 
-      onWidgetChartClick(widgetRef.current, params);
+  const chartIframeKeyboardListener = useCallback(
+    (e: KeyboardEvent) => {
+      multipleSelectChange(dispatch, renderMode, multipleSelect, e);
     },
-    [handleDrillOptionChange, onWidgetChartClick],
+    [dispatch, renderMode, multipleSelect],
   );
+
   const chart = useMemo(() => {
     if (!dataChart) {
       return null;
@@ -146,7 +181,29 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
           chartInstance.registerMouseEvents([
             {
               name: 'click',
-              callback: chartClick,
+              callback: (params: any) => {
+                if (!params) {
+                  return;
+                }
+                if (drillOptionRef.current?.isSelectedDrill) {
+                  const option = drillOptionRef.current;
+                  option.drillDown(params.data.rowData);
+                  handleDrillOptionChange(option);
+                  return;
+                }
+                if (params.seriesName === 'drillOptionChange') {
+                  handleDrillOptionChange?.(params.value);
+                  return;
+                }
+                if (
+                  !drillOptionRef.current?.isSelectedDrill &&
+                  chartInstance.selectable
+                ) {
+                  selectedItemChange(dispatch, renderMode, params, wid);
+                  return;
+                }
+                onWidgetChartClick(widgetRef.current, params);
+              },
             },
           ]);
         }
@@ -157,7 +214,14 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     } else {
       return null;
     }
-  }, [chartClick, dataChart]);
+  }, [
+    dataChart,
+    handleDrillOptionChange,
+    onWidgetChartClick,
+    dispatch,
+    wid,
+    renderMode,
+  ]);
   const config = useMemo(() => {
     if (!chart?.config) return undefined;
     if (!dataChart?.config) return undefined;
@@ -213,6 +277,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         width={cacheW}
         height={cacheH}
         drillOption={drillOption}
+        selectedItems={selectedItems}
+        onKeyboardPress={chartIframeKeyboardListener}
         containerId={containerId}
         widgetSpecialConfig={widgetSpecialConfig}
         scale={scale}
@@ -224,21 +290,26 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     cacheW,
     errText,
     dataset,
+    selectedItems,
     chart,
     containerId,
     widgetSpecialConfig,
     scale,
+    chartIframeKeyboardListener,
   ]);
   const drillContextVal = {
     drillOption: drillOptionRef.current,
     onDrillOptionChange: handleDrillOptionChange,
+    availableSourceFunctions,
+    onDateLevelChange: handleDateLevelChange,
   };
+
   return (
     <ChartDrillContext.Provider value={drillContextVal}>
-      <ChartDrillContextMenu>
+      <ChartDrillContextMenu chartConfig={dataChart?.config.chartConfig}>
         <StyledWrapper>
           <ChartFrameBox ref={cacheWhRef}>{chartFrame}</ChartFrameBox>
-          <ChartDrillPaths />
+          <ChartDrillPaths chartConfig={dataChart?.config.chartConfig} />
         </StyledWrapper>
       </ChartDrillContextMenu>
     </ChartDrillContext.Provider>

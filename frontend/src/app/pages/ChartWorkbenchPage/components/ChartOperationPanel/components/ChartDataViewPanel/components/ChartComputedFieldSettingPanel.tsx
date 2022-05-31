@@ -69,12 +69,12 @@ const ChartComputedFieldSettingPanel: FC<{
 
   const hasAggregationFunction = (exp?: string) => {
     return [
-      AggregateFieldActionType.AVG,
-      AggregateFieldActionType.COUNT,
-      AggregateFieldActionType.COUNT_DISTINCT,
-      AggregateFieldActionType.MAX,
-      AggregateFieldActionType.MIN,
-      AggregateFieldActionType.SUM,
+      AggregateFieldActionType.Avg,
+      AggregateFieldActionType.Count,
+      AggregateFieldActionType.Count_Distinct,
+      AggregateFieldActionType.Max,
+      AggregateFieldActionType.Min,
+      AggregateFieldActionType.Sum,
     ].some(agg => exp?.includes(agg));
   };
 

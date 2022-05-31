@@ -23,6 +23,7 @@ import {
   diffHeaderRows,
   flattenHeaderRowsWithoutGroupRow,
   getColumnRenderOriginName,
+  getUpdatedChartStyleValue,
   isInRange,
   isUnderUpperBound,
   mergeChartDataConfigs,
@@ -372,7 +373,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'group',
-            type: ChartDataSectionType.GROUP,
+            type: ChartDataSectionType.Group,
             rows: [],
           },
         ],
@@ -381,7 +382,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'group',
-            type: ChartDataSectionType.GROUP,
+            type: ChartDataSectionType.Group,
             rows: [
               {
                 colName: 'label',
@@ -402,7 +403,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'group',
-            type: ChartDataSectionType.GROUP,
+            type: ChartDataSectionType.Group,
             limit: 1,
             rows: [],
           },
@@ -412,7 +413,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'group',
-            type: ChartDataSectionType.GROUP,
+            type: ChartDataSectionType.Group,
             rows: [
               {
                 colName: 'label',
@@ -443,13 +444,13 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'group1',
-            type: ChartDataSectionType.GROUP,
+            type: ChartDataSectionType.Group,
             limit: [0, 1],
             rows: [],
           },
           {
             key: 'group2',
-            type: ChartDataSectionType.GROUP,
+            type: ChartDataSectionType.Group,
             limit: [1, 2],
             rows: [],
           },
@@ -459,7 +460,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'group',
-            type: ChartDataSectionType.GROUP,
+            type: ChartDataSectionType.Group,
             rows: [
               {
                 colName: 'label1',
@@ -519,32 +520,32 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'aggregate',
-            type: ChartDataSectionType.AGGREGATE,
+            type: ChartDataSectionType.Aggregate,
             rows: [],
           },
           {
             key: 'color',
-            type: ChartDataSectionType.COLOR,
+            type: ChartDataSectionType.Color,
             rows: [],
           },
           {
             key: 'info',
-            type: ChartDataSectionType.INFO,
+            type: ChartDataSectionType.Info,
             rows: [],
           },
           {
             key: 'size',
-            type: ChartDataSectionType.SIZE,
+            type: ChartDataSectionType.Size,
             rows: [],
           },
           {
             key: 'filter',
-            type: ChartDataSectionType.FILTER,
+            type: ChartDataSectionType.Filter,
             rows: [],
           },
           {
             key: 'mixed',
-            type: ChartDataSectionType.MIXED,
+            type: ChartDataSectionType.Mixed,
             rows: [],
           },
         ],
@@ -553,7 +554,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'aggregate',
-            type: ChartDataSectionType.AGGREGATE,
+            type: ChartDataSectionType.Aggregate,
             rows: [
               {
                 colName: 'label1',
@@ -564,7 +565,7 @@ describe('Internal Chart Helper ', () => {
           },
           {
             key: 'color',
-            type: ChartDataSectionType.COLOR,
+            type: ChartDataSectionType.Color,
             rows: [
               {
                 colName: 'label2',
@@ -575,7 +576,7 @@ describe('Internal Chart Helper ', () => {
           },
           {
             key: 'info',
-            type: ChartDataSectionType.INFO,
+            type: ChartDataSectionType.Info,
             rows: [
               {
                 colName: 'label3',
@@ -586,7 +587,7 @@ describe('Internal Chart Helper ', () => {
           },
           {
             key: 'size',
-            type: ChartDataSectionType.SIZE,
+            type: ChartDataSectionType.Size,
             rows: [
               {
                 colName: 'label4',
@@ -597,7 +598,7 @@ describe('Internal Chart Helper ', () => {
           },
           {
             key: 'filter',
-            type: ChartDataSectionType.FILTER,
+            type: ChartDataSectionType.Filter,
             rows: [
               {
                 colName: 'label5',
@@ -608,7 +609,7 @@ describe('Internal Chart Helper ', () => {
           },
           {
             key: 'mixed',
-            type: ChartDataSectionType.MIXED,
+            type: ChartDataSectionType.Mixed,
             rows: [
               {
                 colName: 'label6',
@@ -628,13 +629,13 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'group',
-            type: ChartDataSectionType.GROUP,
+            type: ChartDataSectionType.Group,
             limit: [0, 2],
             rows: [],
           },
           {
             key: 'aggregate',
-            type: ChartDataSectionType.AGGREGATE,
+            type: ChartDataSectionType.Aggregate,
             limit: [0, 1],
             rows: [],
           },
@@ -644,7 +645,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'mixed',
-            type: ChartDataSectionType.MIXED,
+            type: ChartDataSectionType.Mixed,
             rows: [
               {
                 colName: 'label1',
@@ -680,7 +681,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'group',
-            type: ChartDataSectionType.GROUP,
+            type: ChartDataSectionType.Group,
             limit: [0, 2],
             rows: [
               {
@@ -697,7 +698,7 @@ describe('Internal Chart Helper ', () => {
           },
           {
             key: 'aggregate',
-            type: ChartDataSectionType.AGGREGATE,
+            type: ChartDataSectionType.Aggregate,
             limit: [0, 1],
             rows: [
               {
@@ -716,7 +717,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'mixed',
-            type: ChartDataSectionType.MIXED,
+            type: ChartDataSectionType.Mixed,
             limit: [0, 3],
             rows: [],
           },
@@ -726,7 +727,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'group',
-            type: ChartDataSectionType.GROUP,
+            type: ChartDataSectionType.Group,
             rows: [
               {
                 colName: 'label1',
@@ -742,7 +743,7 @@ describe('Internal Chart Helper ', () => {
           },
           {
             key: 'aggregate',
-            type: ChartDataSectionType.AGGREGATE,
+            type: ChartDataSectionType.Aggregate,
             rows: [
               {
                 colName: 'label3',
@@ -763,7 +764,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'mixed',
-            type: ChartDataSectionType.MIXED,
+            type: ChartDataSectionType.Mixed,
             limit: [0, 3],
             rows: [
               {
@@ -792,13 +793,13 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'mixed1',
-            type: ChartDataSectionType.MIXED,
+            type: ChartDataSectionType.Mixed,
             limit: 1,
             rows: [],
           },
           {
             key: 'mixed2',
-            type: ChartDataSectionType.MIXED,
+            type: ChartDataSectionType.Mixed,
             limit: [0, 2],
             rows: [],
           },
@@ -808,7 +809,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'group',
-            type: ChartDataSectionType.GROUP,
+            type: ChartDataSectionType.Group,
             rows: [
               {
                 colName: 'label1',
@@ -824,7 +825,7 @@ describe('Internal Chart Helper ', () => {
           },
           {
             key: 'aggregate',
-            type: ChartDataSectionType.AGGREGATE,
+            type: ChartDataSectionType.Aggregate,
             rows: [
               {
                 colName: 'label3',
@@ -845,7 +846,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'mixed1',
-            type: ChartDataSectionType.MIXED,
+            type: ChartDataSectionType.Mixed,
             limit: 1,
             rows: [
               {
@@ -857,7 +858,7 @@ describe('Internal Chart Helper ', () => {
           },
           {
             key: 'mixed2',
-            type: ChartDataSectionType.MIXED,
+            type: ChartDataSectionType.Mixed,
             limit: [0, 2],
             rows: [
               {
@@ -881,19 +882,19 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'group',
-            type: ChartDataSectionType.GROUP,
+            type: ChartDataSectionType.Group,
             limit: [0, 1],
             rows: [],
           },
           {
             key: 'aggregate',
-            type: ChartDataSectionType.AGGREGATE,
+            type: ChartDataSectionType.Aggregate,
             limit: 1,
             rows: [],
           },
           {
             key: 'mixed',
-            type: ChartDataSectionType.MIXED,
+            type: ChartDataSectionType.Mixed,
             limit: [0, 3],
             rows: [],
           },
@@ -903,7 +904,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'group',
-            type: ChartDataSectionType.GROUP,
+            type: ChartDataSectionType.Group,
             limit: [1, 2],
             rows: [
               {
@@ -922,7 +923,7 @@ describe('Internal Chart Helper ', () => {
           },
           {
             key: 'aggregate',
-            type: ChartDataSectionType.AGGREGATE,
+            type: ChartDataSectionType.Aggregate,
             rows: [
               {
                 uid: '3',
@@ -946,7 +947,7 @@ describe('Internal Chart Helper ', () => {
         datas: [
           {
             key: 'group',
-            type: ChartDataSectionType.GROUP,
+            type: ChartDataSectionType.Group,
             limit: [0, 1],
             rows: [
               {
@@ -959,7 +960,7 @@ describe('Internal Chart Helper ', () => {
           },
           {
             key: 'aggregate',
-            type: ChartDataSectionType.AGGREGATE,
+            type: ChartDataSectionType.Aggregate,
             limit: 1,
             rows: [
               {
@@ -972,7 +973,7 @@ describe('Internal Chart Helper ', () => {
           },
           {
             key: 'mixed',
-            type: ChartDataSectionType.MIXED,
+            type: ChartDataSectionType.Mixed,
             limit: [0, 3],
             rows: [
               {
@@ -1558,6 +1559,47 @@ describe('Internal Chart Helper ', () => {
           children: undefined,
         },
       ]);
+    });
+  });
+
+  describe.each([
+    [false, 0, false],
+    [false, true, true],
+
+    [0, '11', '11'],
+    ['0', 12, 12],
+    [0, 13, 13],
+    ['0', '14', '14'],
+
+    [{ font: 'default1' }, { font: 'Ping Fang1' }, { font: 'Ping Fang1' }],
+    [{ font: 'default2' }, { font: 'Ping Fang2' }, { font: 'Ping Fang2' }],
+    [[1, 2, 3], { font: 'Ping Fang' }, [1, 2, 3]],
+    [{ font: 'default3' }, [4, 5, 6], { font: 'default3' }],
+    [{ font: 'default4' }, '[4,5,6]', { font: 'default4' }],
+    [[7, 8, 9], '789', [7, 8, 9]],
+
+    [null, '111', '111'],
+    [null, 123, 123],
+    [null, [10, 11, 12], [10, 11, 12]],
+    [null, { abc: 'abc' }, { abc: 'abc' }],
+    [null, false, false],
+    [null, undefined, undefined],
+    [null, null, null],
+
+    [undefined, undefined, undefined],
+    [undefined, null, null],
+    [undefined, 'abcd', 'abcd'],
+    [undefined, 54321, 54321],
+    [undefined, [21, 22, 23], [21, 22, 23]],
+    [undefined, { esc: 'esc' }, { esc: 'esc' }],
+  ])('determineCanUpdateValueByType Test - ', (target, source, expected) => {
+    test(`deep merge target: ${JSON.stringify(
+      target,
+    )} from source: ${JSON.stringify(source)} result is ${JSON.stringify(
+      expected,
+    )}`, () => {
+      const result = getUpdatedChartStyleValue(target, source);
+      expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
     });
   });
 });

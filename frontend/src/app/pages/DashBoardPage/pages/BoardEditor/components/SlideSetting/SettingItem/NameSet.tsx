@@ -15,66 +15,65 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Checkbox, Form, Input } from 'antd';
-import BasicFont from 'app/components/FormGenerator/Basic/BasicFont';
+import { Input } from 'antd';
+import { BW } from 'app/components/FormGenerator/Basic/components/BasicWrapper';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { WIDGET_TITLE_ALIGN_OPTIONS } from 'app/pages/DashBoardPage/constants';
-import { WidgetNameConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { fontDefault } from 'app/pages/DashBoardPage/utils/widget';
-import React, { FC, memo, useMemo } from 'react';
-import SelectSet from './BasicSet/SelectSet';
+import { WidgetActionContext } from 'app/pages/DashBoardPage/components/ActionProvider/WidgetActionProvider';
+import debounce from 'lodash/debounce';
+import {
+  FC,
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import styled from 'styled-components/macro';
+import { Group } from '../SettingPanel';
+export const NameSet: FC<{ wid: string; name: string }> = memo(
+  ({ wid, name }) => {
+    const { onUpdateWidgetConfigByKey } = useContext(WidgetActionContext);
+    const t = useI18NPrefix(`viz.board.setting`);
+    const [nameVal, setNameVal] = useState('');
+    useEffect(() => {
+      setNameVal(name);
+    }, [name]);
 
-const FONT_DATA = {
-  comType: 'font',
-  default: fontDefault,
-  disabled: undefined,
-  key: 'font',
-  label: '字体',
-};
+    const debounceSetName = useMemo(
+      () =>
+        debounce(value => {
+          onUpdateWidgetConfigByKey({
+            wid: wid,
+            key: 'name',
+            val: value,
+          });
+        }, 300),
+      [onUpdateWidgetConfigByKey, wid],
+    );
 
-export const NameSet: FC<{
-  config: WidgetNameConfig;
-}> = memo(({ config }) => {
-  const t = useI18NPrefix(`viz.board.setting`);
-  const fontData = useMemo(() => {
-    const data = {
-      ...FONT_DATA,
-      value: config,
-    };
-    return data;
-  }, [config]);
-
-  const normFontData = (ancestors, data) => {
-    const nameConfig = { ...config, ...data.value };
-    return nameConfig;
-  };
-
-  return (
-    <>
-      <Form.Item preserve name="name">
-        <Input className="datart-ant-input" placeholder="fill a name" />
-      </Form.Item>
-      <Form.Item valuePropName="checked" name={['nameConfig', 'show']}>
-        <Checkbox>{t('showTitle')} </Checkbox>
-      </Form.Item>
-      <Form.Item label={t('align')}>
-        <SelectSet
-          name={['nameConfig', 'textAlign']}
-          options={WIDGET_TITLE_ALIGN_OPTIONS}
-          value={config.textAlign}
-          defaultValue="left"
-        />
-      </Form.Item>
-      <Form.Item
-        getValueFromEvent={normFontData}
-        label=""
-        name={['nameConfig']}
-        preserve
-      >
-        <BasicFont translate={t} ancestors={[]} data={fontData} />
-      </Form.Item>
-    </>
-  );
-});
-
-export default NameSet;
+    const changeName = useCallback(
+      e => {
+        setNameVal(e.target.value);
+        debounceSetName(e.target.value);
+      },
+      [debounceSetName],
+    );
+    return (
+      <Group>
+        <BW label={t('widget') + t('title')}>
+          <StyledFlex>
+            <Input
+              value={nameVal}
+              className="datart-ant-input"
+              onChange={changeName}
+            />
+          </StyledFlex>
+        </BW>
+      </Group>
+    );
+  },
+);
+const StyledFlex = styled.div`
+  display: flex;
+`;

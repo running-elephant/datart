@@ -18,21 +18,23 @@
 
 import { Empty } from 'antd';
 import { useGridWidgetHeight } from 'app/hooks/useGridWidgetHeight';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
+import { BoardConfigValContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
+import StyledBackground from 'app/pages/DashBoardPage/components/WidgetComponents/StyledBackground';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import {
   LAYOUT_COLS_MAP,
   WIDGET_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
 import useBoardScroll from 'app/pages/DashBoardPage/hooks/useBoardScroll';
+import useEditAutoLayoutMap from 'app/pages/DashBoardPage/hooks/useEditAutoLayoutMap';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
 import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getBoardMarginPadding } from 'app/pages/DashBoardPage/utils/board';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import debounce from 'lodash/debounce';
-import React, {
+import {
   memo,
   useCallback,
   useContext,
@@ -42,7 +44,7 @@ import React, {
 } from 'react';
 import RGL, { Layout, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
 import {
@@ -51,10 +53,8 @@ import {
   SPACE_MD,
   SPACE_XS,
 } from 'styles/StyleConstants';
-import StyledBackground from '../../Board/components/StyledBackground';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
-import { selectLayoutWidgetMap } from '../slice/selectors';
 import { WidgetOfAutoEditor } from './WidgetOfAutoEditor';
 
 const ReactGridLayout = WidthProvider(RGL);
@@ -62,12 +62,10 @@ const ReactGridLayout = WidthProvider(RGL);
 export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const { boardId } = useContext(BoardContext);
-  const boardConfig = useContext(BoardConfigContext);
+  const boardConfig = useContext(BoardConfigValContext);
   const { background, allowOverlap } = boardConfig;
   const { deviceType } = useContext(BoardInfoContext);
 
-  const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
-  const layoutMap = useGridLayoutMap(layoutWidgetMap);
   const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
 
   const { curMargin, curPadding } = useMemo(() => {
@@ -87,14 +85,8 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     });
   }, []);
 
-  const sortedLayoutWidgets = useMemo(
-    () =>
-      Object.values(layoutWidgetMap).sort(
-        (a, b) => a.config.index - b.config.index,
-      ),
-
-    [layoutWidgetMap],
-  );
+  const sortedLayoutWidgets = useEditAutoLayoutMap(boardId);
+  const layoutMap = useGridLayoutMap(sortedLayoutWidgets);
 
   const changeWidgetLayouts = debounce((layouts: Layout[]) => {
     dispatch(

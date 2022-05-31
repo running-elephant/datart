@@ -65,6 +65,7 @@ export const Board: FC<BoardProps> = memo(
     const boardId = id;
     const dispatch = useDispatch();
     const editingBoard = useSelector(selectEditBoard);
+
     const readBoardHide = useMemo(
       () => editingBoard?.id === boardId,
       [boardId, editingBoard.id],
@@ -99,13 +100,20 @@ export const Board: FC<BoardProps> = memo(
               allowManage={allowManage}
             >
               {!hideTitle && <TitleHeader />}
-              {boardType === 'auto' && <AutoBoardCore boardId={dashboard.id} />}
-              {boardType === 'free' && (
-                <FreeBoardCore
-                  boardId={dashboard.id}
-                  showZoomCtrl={showZoomCtrl}
-                />
+              {!readBoardHide && (
+                <>
+                  {boardType === 'auto' && (
+                    <AutoBoardCore boardId={dashboard.id} />
+                  )}
+                  {boardType === 'free' && (
+                    <FreeBoardCore
+                      boardId={dashboard.id}
+                      showZoomCtrl={showZoomCtrl}
+                    />
+                  )}
+                </>
               )}
+
               <FullScreenPanel />
             </BoardInitProvider>
           </div>
@@ -121,6 +129,7 @@ export const Board: FC<BoardProps> = memo(
       allowShare,
       allowManage,
       hideTitle,
+      readBoardHide,
       showZoomCtrl,
     ]);
 

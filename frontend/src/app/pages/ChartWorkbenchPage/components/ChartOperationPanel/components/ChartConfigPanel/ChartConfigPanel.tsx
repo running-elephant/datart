@@ -17,6 +17,7 @@
  */
 
 import {
+  BlockOutlined,
   DashboardOutlined,
   DatabaseOutlined,
   SettingOutlined,
@@ -45,7 +46,6 @@ import {
 import { cond, isEmptyArray } from 'utils/object';
 import ChartToolbar from '../ChartToolbar';
 import ChartDataConfigPanel from './ChartDataConfigPanel';
-import ChartSettingConfigPanel from './ChartSettingConfigPanel';
 import ChartStyleConfigPanel from './ChartStyleConfigPanel';
 
 const { TabPane } = Tabs;
@@ -54,6 +54,7 @@ const CONFIG_PANEL_TABS = {
   DATA: 'data',
   STYLE: 'style',
   SETTING: 'setting',
+  INTERACTION: 'interaction',
 };
 
 const ChartConfigPanel: FC<{
@@ -74,6 +75,10 @@ const ChartConfigPanel: FC<{
             config => !isEmptyArray(config?.settings),
             CONFIG_PANEL_TABS.SETTING,
           ],
+          [
+            config => !isEmptyArray(config?.interactions),
+            CONFIG_PANEL_TABS.INTERACTION,
+          ],
         )(chartConfig, CONFIG_PANEL_TABS.DATA);
       },
       (prev, next) => prev !== next,
@@ -92,29 +97,19 @@ const ChartConfigPanel: FC<{
       });
     };
 
-    const onStyleConfigChanged = (
-      ancestors: number[],
-      config: ChartStyleConfig,
-      needRefresh?: boolean,
-    ) => {
-      onChange?.(ChartConfigReducerActionType.STYLE, {
-        ancestors: ancestors,
-        value: config,
-        needRefresh,
-      });
-    };
-
-    const onSettingConfigChanged = (
-      ancestors: number[],
-      config: ChartStyleConfig,
-      needRefresh?: boolean,
-    ) => {
-      onChange?.(ChartConfigReducerActionType.SETTING, {
-        ancestors: ancestors,
-        value: config,
-        needRefresh,
-      });
-    };
+    const handleConfigChangeByAction =
+      (actionType: string) =>
+      (
+        ancestors: number[],
+        config: ChartStyleConfig,
+        needRefresh?: boolean,
+      ) => {
+        onChange?.(actionType, {
+          ancestors: ancestors,
+          value: config,
+          needRefresh,
+        });
+      };
 
     return (
       <ChartI18NContext.Provider value={{ i18NConfigs: chartConfig?.i18ns }}>
@@ -160,6 +155,17 @@ const ChartConfigPanel: FC<{
                     key={CONFIG_PANEL_TABS.SETTING}
                   />
                 )}
+                {!isEmptyArray(chartConfig?.interactions) && (
+                  <TabPane
+                    tab={
+                      <span>
+                        <BlockOutlined />
+                        {t('title.interaction')}
+                      </span>
+                    }
+                    key={CONFIG_PANEL_TABS.INTERACTION}
+                  />
+                )}
               </Tabs>
               <Pane selected={tabActiveKey === CONFIG_PANEL_TABS.DATA}>
                 <ChartDataConfigPanel
@@ -170,16 +176,32 @@ const ChartConfigPanel: FC<{
               </Pane>
               <Pane selected={tabActiveKey === CONFIG_PANEL_TABS.STYLE}>
                 <ChartStyleConfigPanel
+                  i18nPrefix="viz.palette.style"
                   configs={chartConfig?.styles}
                   dataConfigs={chartConfig?.datas}
-                  onChange={onStyleConfigChanged}
+                  onChange={handleConfigChangeByAction(
+                    ChartConfigReducerActionType.STYLE,
+                  )}
                 />
               </Pane>
               <Pane selected={tabActiveKey === CONFIG_PANEL_TABS.SETTING}>
-                <ChartSettingConfigPanel
+                <ChartStyleConfigPanel
+                  i18nPrefix="viz.palette.setting"
                   configs={chartConfig?.settings}
                   dataConfigs={chartConfig?.datas}
-                  onChange={onSettingConfigChanged}
+                  onChange={handleConfigChangeByAction(
+                    ChartConfigReducerActionType.SETTING,
+                  )}
+                />
+              </Pane>
+              <Pane selected={tabActiveKey === CONFIG_PANEL_TABS.INTERACTION}>
+                <ChartStyleConfigPanel
+                  i18nPrefix="viz.palette.interaction"
+                  configs={chartConfig?.interactions}
+                  dataConfigs={chartConfig?.datas}
+                  onChange={handleConfigChangeByAction(
+                    ChartConfigReducerActionType.INTERACTION,
+                  )}
                 />
               </Pane>
             </ConfigBlock>
@@ -217,6 +239,10 @@ const ConfigBlock = styled.div`
     padding: 0 ${SPACE_MD};
     font-weight: ${FONT_WEIGHT_MEDIUM};
     color: ${p => p.theme.textColorSnd};
+
+    .ant-tabs-tab + .ant-tabs-tab {
+      margin: 0 0 0 ${SPACE_MD};
+    }
   }
 `;
 

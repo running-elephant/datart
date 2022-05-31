@@ -21,12 +21,9 @@ import {
   QuillPalette,
 } from 'app/components/ChartGraph/BasicRichText/RichTextPluginLoader/CustomColor';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import {
-  MediaWidgetContent,
-  Widget,
-  WidgetInfo,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { WidgetInfo } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { editBoardStackActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import produce from 'immer';
 import { DeltaStatic } from 'quill';
 import { ImageDrop } from 'quill-image-drop-module'; // 拖动加载图片组件。
@@ -72,8 +69,7 @@ export const RichTextWidgetCore: React.FC<RichTextWidgetProps> = ({
 
   const { onEditClearActiveWidgets } = useContext(WidgetActionContext);
   const initContent = useMemo(() => {
-    return (widget.config.content as MediaWidgetContent).richTextConfig
-      ?.content;
+    return (widget.config.content as any).richText?.content;
   }, [widget.config.content]);
   const [quillValue, setQuillValue] = useState<DeltaStatic | undefined>(
     initContent,
@@ -106,11 +102,11 @@ export const RichTextWidgetCore: React.FC<RichTextWidgetProps> = ({
           const nextMediaWidgetContent = produce(
             widget.config.content,
             draft => {
-              (draft as MediaWidgetContent).richTextConfig = {
+              (draft as any).richText = {
                 content: JSON.parse(strContents),
               };
             },
-          ) as MediaWidgetContent;
+          ) as any;
 
           dispatch(
             editBoardStackActions.changeMediaWidgetConfig({

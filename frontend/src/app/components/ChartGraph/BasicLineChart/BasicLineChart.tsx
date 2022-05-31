@@ -23,6 +23,7 @@ import {
   ChartStyleConfig,
   LabelStyle,
   LegendStyle,
+  SelectedItem,
   SeriesStyle,
   XAxis,
   XAxisColumns,
@@ -59,6 +60,7 @@ import { Series } from './types';
 class BasicLineChart extends Chart {
   config = Config;
   chart: any = null;
+  selectable = true;
 
   protected isArea = false;
   protected isStack = false;
@@ -91,7 +93,7 @@ class BasicLineChart extends Chart {
     });
   }
 
-  onUpdated(props): void {
+  onUpdated(props, context): void {
     if (!props.dataset || !props.dataset.columns || !props.config) {
       return;
     }
@@ -103,13 +105,15 @@ class BasicLineChart extends Chart {
       props.dataset,
       props.config,
       props.drillOption,
+      props.selectedItems,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
   onResize(opt: any, context): void {
     this.chart?.resize({ width: context?.width, height: context?.height });
-    hadAxisLabelOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
+    hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
+      this.onUpdated(opt, context);
   }
 
   onUnMount(): void {
@@ -119,7 +123,8 @@ class BasicLineChart extends Chart {
   private getOptions(
     dataset: ChartDataSetDTO,
     config: ChartConfig,
-    drillOption: ChartDrillOption,
+    drillOption?: ChartDrillOption,
+    selectedItems?: SelectedItem[],
   ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -129,13 +134,13 @@ class BasicLineChart extends Chart {
       drillOption,
     );
     const aggregateConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
     const colorConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.COLOR)
+      .filter(c => c.type === ChartDataSectionType.Color)
       .flatMap(config => config.rows || []);
     const infoConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.INFO)
+      .filter(c => c.type === ChartDataSectionType.Info)
       .flatMap(config => config.rows || []);
 
     const chartDataSet = transformToDataSet(
@@ -164,6 +169,7 @@ class BasicLineChart extends Chart {
       aggregateConfigs,
       infoConfigs,
       xAxisColumns,
+      selectedItems,
     );
     const yAxisNames: string[] = aggregateConfigs.map(getColumnRenderName);
 
@@ -205,23 +211,37 @@ class BasicLineChart extends Chart {
     aggregateConfigs: ChartDataSectionField[],
     infoConfigs: ChartDataSectionField[],
     xAxisColumns: XAxisColumns[],
+    selectedItems?: SelectedItem[],
   ): Series[] {
     if (!colorConfigs?.length) {
-      return aggregateConfigs.map(aggConfig => {
+      return aggregateConfigs.map((aggConfig, acIndex) => {
         const color = aggConfig?.color?.start;
         return {
           name: getColumnRenderName(aggConfig),
           type: 'line',
           sampling: 'average',
-          areaStyle: this.isArea ? { color } : undefined,
+          areaStyle: this.isArea
+            ? {
+                color,
+                opacity: selectedItems?.length ? 0.4 : undefined,
+              }
+            : undefined,
           stack: this.isStack ? 'total' : undefined,
-          data: chartDataSet.map(dc => ({
+          data: chartDataSet.map((dc, dcIndex) => ({
             ...getExtraSeriesRowData(dc),
             ...getExtraSeriesDataFormat(aggConfig?.format),
+            ...this.getLineSelectItemStyle(
+              acIndex,
+              dcIndex,
+              selectedItems || [],
+            ),
             value: dc.getCell(aggConfig),
           })),
           itemStyle: {
             color,
+          },
+          lineStyle: {
+            opacity: selectedItems?.length ? 0.5 : 1,
           },
           ...this.getLabelStyle(styleConfigs),
           ...this.getSeriesStyle(styleConfigs),
@@ -234,9 +254,9 @@ class BasicLineChart extends Chart {
       chartDataSet,
       colorConfigs[0],
     );
-
-    return aggregateConfigs.flatMap(aggConfig => {
-      return secondGroupInfos.map(sgCol => {
+    const xAxisConfig = groupConfigs?.[0];
+    return aggregateConfigs.flatMap((aggConfig, acIndex) => {
+      return secondGroupInfos.map((sgCol, sgcIndex) => {
         const k = Object.keys(sgCol)[0];
         const dataSet = sgCol[k];
 
@@ -252,13 +272,16 @@ class BasicLineChart extends Chart {
           itemStyle: {
             normal: { color: itemStyleColor?.value },
           },
-          data: xAxisColumns[0].data.map(d => {
-            const row = dataSet.find(
-              r => r.getMultiCell(...groupConfigs) === d,
-            )!;
+          data: xAxisColumns[0].data.map((d, dcIndex) => {
+            const row = dataSet.find(r => r.getCell(xAxisConfig) === d)!;
             return {
               ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),
+              ...this.getLineSelectItemStyle(
+                sgcIndex,
+                acIndex * secondGroupInfos.length + dcIndex,
+                selectedItems || [],
+              ),
               name: getColumnRenderName(aggConfig),
               value: row?.getCell(aggConfig),
             };
@@ -268,6 +291,17 @@ class BasicLineChart extends Chart {
         };
       });
     });
+  }
+
+  getLineSelectItemStyle(
+    comIndex: string | number,
+    dcIndex: string | number,
+    selectList: { index: string; data: any }[],
+  ) {
+    const findIndex = selectList.findIndex(
+      v => v.index === comIndex + ',' + dcIndex,
+    );
+    return findIndex >= 0 ? { symbol: 'circle', symbolSize: 10 } : {};
   }
 
   private getYAxis(styles, yAxisNames): YAxis {
@@ -423,6 +457,12 @@ class BasicLineChart extends Chart {
       selected,
       data: seriesNames,
       textStyle: font,
+      itemStyle: {
+        opacity: 1,
+      },
+      lineStyle: {
+        opacity: 1,
+      },
     };
   }
 
