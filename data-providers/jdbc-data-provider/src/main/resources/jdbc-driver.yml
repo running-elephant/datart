@@ -36,6 +36,15 @@ DB2:
   driver-class: com.ibm.db2.jdbc.jcc.DB2Driver
   url-prefix: jdbc:db2://
 
+DM:
+  db-type: "dm"
+  name: "dm"
+  driver-class: "dm.jdbc.driver.DmDriver"
+  literal-quote: "'"
+  identifier-quote: "\""
+  url-prefix: "jdbc:dm://"
+  adapter-class: "datart.data.provider.jdbc.adapters.DmDataProviderAdapter"
+
 FIREBIRD:
   db-type: FIREBIRD
   name: FIREBIRD
