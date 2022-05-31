@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetActionListItem,
   widgetActionType,
@@ -90,26 +89,6 @@ export const widgetToolkit: ImageToolkit = {
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-
-    const rect: RectConfig = {
-      x: 0,
-      y: 0,
-      width: 500,
-      height: 400,
-    };
-    if (opt.boardType === 'auto') {
-      rect.x += Math.ceil(Math.random() * 200);
-      rect.y += Math.ceil(Math.random() * 200);
-    }
-    widget.config.rect = rect;
-    const pRect: RectConfig = {
-      x: 0,
-      y: 0,
-      width: 6,
-      height: 9,
-    };
-    widget.config.pRect = pRect;
-    widget.config.mRect = undefined;
 
     widget.config.customConfig.props = [
       { ...initBackgroundTpl() },

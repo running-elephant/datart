@@ -241,8 +241,8 @@ export const initAutoWidgetRect = (): RectConfig => ({
   height: 6,
 });
 export const initFreeWidgetRect = (): RectConfig => ({
-  x: 0,
-  y: 0,
+  x: Math.ceil(Math.random() * 200),
+  y: Math.ceil(Math.random() * 200),
   width: 400,
   height: 300,
 });
@@ -267,8 +267,10 @@ export const widgetTpl = (): Widget => {
       // visible: true,
       lock: false,
       content: {} as any,
-      rect: { x: 0, y: 0, width: 1, height: 1 },
-      pRect: { x: 0, y: 0, width: 1, height: 1 },
+      //
+      rect: initFreeWidgetRect(),
+      pRect: initAutoWidgetRect(),
+      mRect: undefined,
       customConfig: {
         props: [],
       },

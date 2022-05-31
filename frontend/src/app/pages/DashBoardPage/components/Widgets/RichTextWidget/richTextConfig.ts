@@ -24,10 +24,8 @@ import type {
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
-  initFreeWidgetRect,
   initPaddingTpl,
   initTitleTpl,
   initWidgetName,
@@ -90,9 +88,7 @@ export const widgetToolkit: WidgetToolkit = {
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
 
-    widget.config.rect = { ...initFreeWidgetRect() };
-    widget.config.pRect = { ...initAutoWidgetRect() };
-    widget.config.mRect = undefined;
+    widget.config.pRect.height = 3;
 
     widget.config.customConfig.props = [
       { ...initTitleTpl() },

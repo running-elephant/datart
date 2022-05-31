@@ -82,7 +82,7 @@ export const widgetToolkit: WidgetToolkit = {
     const widget = controlWidgetTpl(opt);
     widget.id = widgetMeta.originalType + widget.id;
     widget.config.originalType = widgetMeta.originalType;
-
+    widget.config.rect.height = 60;
     const addProps = [
       { ...initBackgroundTpl('#fff') },
       { ...initPaddingTpl() },

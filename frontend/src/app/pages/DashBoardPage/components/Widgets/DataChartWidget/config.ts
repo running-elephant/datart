@@ -23,10 +23,8 @@ import {
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import widgetManagerInstance from '../../WidgetManager';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
-  initFreeWidgetRect,
   initLoopFetchTpl,
   initPaddingTpl,
   initTitleTpl,
@@ -117,9 +115,7 @@ export const dataChartCreator = (opt: WidgetCreateProps) => {
       });
     }
   });
-  widget.config.rect = { ...initFreeWidgetRect() };
-  widget.config.pRect = { ...initAutoWidgetRect() };
-  widget.config.mRect = undefined;
+
   return widget;
 };
 export const getCanLinkageWidgets = (widgets: Widget[]) => {

@@ -25,10 +25,8 @@ import type {
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
-  initFreeWidgetRect,
   initPaddingTpl,
   initTitleTpl,
   initWidgetName,
@@ -120,10 +118,6 @@ const widgetToolkit: IframeWidgetToolKit = {
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-
-    widget.config.rect = { ...initFreeWidgetRect() };
-    widget.config.pRect = { ...initAutoWidgetRect() };
-    widget.config.mRect = undefined;
 
     widget.config.customConfig.props = [
       { ...initIframeTpl() },

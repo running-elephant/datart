@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetActionListItem,
   widgetActionType,
@@ -87,25 +86,12 @@ export const widgetToolkit: WidgetToolkit = {
     widget.relations = opt.relations || [];
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'button';
-    widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 2,
-        height: 1,
-      };
-      widget.config.rect = rect;
-      widget.config.mRect = rect;
-    } else {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 128,
-        height: 32,
-      };
-      widget.config.rect = rect;
-    }
+    widget.config.name = opt.name || initWidgetName(NameI18N);
+
+    widget.config.rect.width = 100;
+    widget.config.rect.height = 60;
+    widget.config.pRect.width = 2;
+    widget.config.pRect.height = 1;
 
     widget.config.customConfig.props = [
       { ...initTitleTpl() },

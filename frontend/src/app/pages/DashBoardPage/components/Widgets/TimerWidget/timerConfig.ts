@@ -20,7 +20,6 @@ import {
   ORIGINAL_TYPE_MAP,
   TimeDefault,
 } from 'app/pages/DashBoardPage/constants';
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetActionListItem,
   widgetActionType,
@@ -133,24 +132,8 @@ export const widgetToolkit: TimerWidgetToolKit = {
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 6,
-        height: 2,
-      };
-      widget.config.pRect = { ...rect };
-      widget.config.mRect = undefined;
-    } else {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 400,
-        height: 200,
-      };
-      widget.config.rect = { ...rect };
-    }
+    widget.config.rect.height = 100;
+    widget.config.pRect.height = 3;
 
     widget.config.customConfig.props = [
       { ...initTimerTpl() },

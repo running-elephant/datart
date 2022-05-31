@@ -96,6 +96,7 @@ export const widgetToolkit: ControlWidgetToolkit = {
       { ...initBorderTpl() },
       { ...initLoopFetchTpl() },
     ];
+    widget.config.rect.height = 200;
     widget.config.customConfig.props =
       widget.config.customConfig.props?.concat(addProps);
 

@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetActionListItem,
   widgetActionType,
@@ -87,21 +86,8 @@ export const widgetToolkit: GroupToolkit = {
     widget.config.name = opt.name || '';
     widget.config.children = opt.children;
 
-    const pRect: RectConfig = {
-      x: 0,
-      y: 0,
-      width: 6,
-      height: 9,
-    };
-    widget.config.pRect = pRect;
-    widget.config.mRect = undefined;
-    const rect: RectConfig = {
-      x: 0,
-      y: 0,
-      width: 500,
-      height: 400,
-    };
-    widget.config.rect = rect;
+    widget.config.pRect.width = 8;
+    widget.config.pRect.height = 8;
 
     widget.config.customConfig.props = [];
     return widget;

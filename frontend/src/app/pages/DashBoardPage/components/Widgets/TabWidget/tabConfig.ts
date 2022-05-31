@@ -26,10 +26,8 @@ import type {
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { uuidv4 } from 'utils/utils';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
-  initFreeWidgetRect,
   initPaddingTpl,
   initTitleTpl,
   initWidgetName,
@@ -93,10 +91,6 @@ export const widgetToolkit: TabToolkit = {
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'container';
     widget.config.name = opt.name || '';
-
-    widget.config.rect = { ...initFreeWidgetRect() };
-    widget.config.pRect = { ...initAutoWidgetRect() };
-    widget.config.mRect = undefined;
 
     widget.config.customConfig.props = [
       { ...initTitleTpl() },
