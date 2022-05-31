@@ -33,14 +33,10 @@ import {
   initBorderTpl,
   initLoopFetchTpl,
   initPaddingTpl,
-  initWidgetEditActionTpl,
   initWidgetName,
-  initWidgetViewActionTpl,
   LoopFetchI18N,
   PaddingI18N,
   TitleI18N,
-  WidgetEditActionI18N,
-  WidgetViewActionI18N,
 } from '../../../WidgetManager/utils/init';
 
 const NameI18N = {
@@ -55,22 +51,14 @@ export const widgetMeta: WidgetMeta = {
   linkable: false,
   canFullScreen: false,
   singleton: false,
-  viewAction: {
-    ...initWidgetViewActionTpl(),
-  },
-  editAction: {
-    ...initWidgetEditActionTpl(),
-  },
+
   i18ns: [
     {
       lang: 'zh-CN',
       translation: {
         desc: NameI18N.zh,
         widgetName: NameI18N.zh,
-        action: {
-          ...WidgetViewActionI18N.zh,
-          ...WidgetEditActionI18N.zh,
-        },
+        action: {},
 
         title: TitleI18N.zh,
         immediateQuery: ImmediateQueryI18N.zh,
@@ -85,10 +73,7 @@ export const widgetMeta: WidgetMeta = {
       translation: {
         desc: NameI18N.en,
         widgetName: NameI18N.en,
-        action: {
-          ...WidgetViewActionI18N.en,
-          ...WidgetEditActionI18N.en,
-        },
+        action: {},
         immediateQuery: ImmediateQueryI18N.en,
         title: TitleI18N.en,
         background: { backgroundGroup: 'Background' },
@@ -111,6 +96,7 @@ export const widgetToolkit: ControlWidgetToolkit = {
       { ...initBorderTpl() },
       { ...initLoopFetchTpl() },
     ];
+    widget.config.rect.height = 200;
     widget.config.customConfig.props =
       widget.config.customConfig.props?.concat(addProps);
 

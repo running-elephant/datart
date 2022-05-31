@@ -378,8 +378,8 @@ export const convertToBeta4AutoWidget = (
   if (!widget.config.pRect) {
     widget.config.pRect = widget.config.rect;
     const newRect: RectConfig = {
-      x: 0,
-      y: 0,
+      x: Math.ceil(Math.random() * 200),
+      y: Math.ceil(Math.random() * 200),
       width: 400,
       height: 300,
     };

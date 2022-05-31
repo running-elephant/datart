@@ -20,7 +20,6 @@ import {
   ORIGINAL_TYPE_MAP,
   TimeDefault,
 } from 'app/pages/DashBoardPage/constants';
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetActionListItem,
   widgetActionType,
@@ -36,14 +35,10 @@ import {
   initBorderTpl,
   initPaddingTpl,
   initTitleTpl,
-  initWidgetEditActionTpl,
   initWidgetName,
-  initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
-  WidgetEditActionI18N,
   widgetTpl,
-  WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
 
 const initTimerTpl = () => {
@@ -91,22 +86,14 @@ export const widgetMeta: WidgetMeta = {
   linkable: false,
   canFullScreen: true,
   singleton: false,
-  viewAction: {
-    ...initWidgetViewActionTpl(),
-  },
-  editAction: {
-    ...initWidgetEditActionTpl(),
-  },
+
   i18ns: [
     {
       lang: 'zh-CN',
       translation: {
         desc: 'timer',
         widgetName: NameI18N.zh,
-        action: {
-          ...WidgetViewActionI18N.zh,
-          ...WidgetEditActionI18N.zh,
-        },
+        action: {},
         title: TitleI18N.zh,
         background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
@@ -119,10 +106,7 @@ export const widgetMeta: WidgetMeta = {
       translation: {
         desc: 'timer',
         widgetName: NameI18N.en,
-        action: {
-          ...WidgetViewActionI18N.en,
-          ...WidgetEditActionI18N.en,
-        },
+        action: {},
         title: TitleI18N.en,
         background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
@@ -148,24 +132,8 @@ export const widgetToolkit: TimerWidgetToolKit = {
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 6,
-        height: 2,
-      };
-      widget.config.pRect = { ...rect };
-      widget.config.mRect = undefined;
-    } else {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 400,
-        height: 200,
-      };
-      widget.config.rect = { ...rect };
-    }
+    widget.config.rect.height = 100;
+    widget.config.pRect.height = 3;
 
     widget.config.customConfig.props = [
       { ...initTimerTpl() },

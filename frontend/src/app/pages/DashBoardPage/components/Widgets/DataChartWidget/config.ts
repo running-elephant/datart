@@ -23,21 +23,15 @@ import {
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import widgetManagerInstance from '../../WidgetManager';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
-  initFreeWidgetRect,
   initLoopFetchTpl,
   initPaddingTpl,
   initTitleTpl,
-  initWidgetEditActionTpl,
-  initWidgetViewActionTpl,
   LoopFetchI18N,
   PaddingI18N,
   TitleI18N,
-  WidgetEditActionI18N,
   widgetTpl,
-  WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
 
 export const getMeta = (opt: {
@@ -62,47 +56,14 @@ export const getMeta = (opt: {
     singleton: false,
 
     canFullScreen: true,
-    viewAction: {
-      ...initWidgetViewActionTpl(),
-    },
-    editAction: {
-      ...initWidgetEditActionTpl(),
-      setLinkage: {
-        label: 'action.setLinkage',
-        icon: 'linkage',
-        key: 'setLinkage',
-      },
-      closeLinkage: {
-        label: 'action.closeLinkage',
-        icon: 'closeLinkage',
-        key: 'closeLinkage',
-      },
-      setJump: {
-        label: 'action.setJump',
-        icon: 'jump',
-        key: 'setJump',
-      },
-      closeJump: {
-        label: 'action.closeJump',
-        icon: 'closeJump',
-        key: 'closeJump',
-      },
-    },
+
     i18ns: [
       {
         lang: 'zh-CN',
         translation: {
           desc: opt.zh.desc,
           widgetName: opt.zh.widgetName,
-          action: {
-            ...WidgetViewActionI18N.zh,
-            ...WidgetEditActionI18N.zh,
-
-            setLinkage: '设置联动',
-            closeLinkage: '关闭联动',
-            setJump: '设置跳转',
-            closeJump: '关闭跳转',
-          },
+          action: {},
           title: TitleI18N.zh,
           background: { backgroundGroup: '背景' },
           padding: PaddingI18N.zh,
@@ -115,14 +76,7 @@ export const getMeta = (opt: {
         translation: {
           desc: opt.en.desc,
           widgetName: opt.en.widgetName,
-          action: {
-            ...WidgetViewActionI18N.en,
-            ...WidgetEditActionI18N.en,
-            setLinkage: 'Set Linkage',
-            closeLinkage: 'Close Linkage',
-            setJump: 'Set Jump',
-            closeJump: 'Close Jump',
-          },
+          action: {},
           title: TitleI18N.en,
           background: { backgroundGroup: 'Background' },
           padding: PaddingI18N.en,
@@ -141,7 +95,6 @@ export const dataChartCreator = (opt: WidgetCreateProps) => {
   widget.datachartId = opt.datachartId || '';
   widget.viewIds = opt.viewIds || [];
   widget.relations = opt.relations || [];
-
   widget.config.type = 'chart';
 
   widget.config.content.dataChart = opt.content; // DataChart
@@ -150,7 +103,7 @@ export const dataChartCreator = (opt: WidgetCreateProps) => {
     { ...initTitleTpl() },
     { ...initLoopFetchTpl() },
     { ...initPaddingTpl() },
-    { ...initBackgroundTpl() },
+    { ...initBackgroundTpl(opt.boardType === 'auto' ? '#fff' : '') },
     { ...initBorderTpl() },
   ];
   widget.config.customConfig.props.forEach(ele => {
@@ -162,9 +115,7 @@ export const dataChartCreator = (opt: WidgetCreateProps) => {
       });
     }
   });
-  widget.config.rect = { ...initFreeWidgetRect() };
-  widget.config.pRect = { ...initAutoWidgetRect() };
-  widget.config.mRect = {} as any;
+
   return widget;
 };
 export const getCanLinkageWidgets = (widgets: Widget[]) => {
