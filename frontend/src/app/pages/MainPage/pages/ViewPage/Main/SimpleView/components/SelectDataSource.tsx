@@ -43,6 +43,7 @@ interface SelectDataSourceProps {
   callbackFn?: (data: any, type) => void;
   renderType?: 'READ' | 'OPERATE';
   tableJSON?: SimpleViewQueryProps;
+  sourceId?: string;
 }
 
 const SelectDataSource = memo(
@@ -51,6 +52,7 @@ const SelectDataSource = memo(
     callbackFn,
     renderType = 'OPERATE',
     tableJSON,
+    sourceId,
   }: SelectDataSourceProps) => {
     const dispatch = useDispatch();
     const propsSources = useSelector(selectSources);
@@ -175,10 +177,14 @@ const SelectDataSource = memo(
         const nodeList = node.value;
         const sheetName = node.value[node.value.length - 1];
         const columns = node.columns.map(v => v.name);
-        const dataSheet = {
-          table: databaseSchemas.length === 1 ? sheetName : nodeList,
+        const dataSheet: any = {
+          table: databaseSchemas.length === 1 ? [sheetName] : nodeList,
           columns: columns,
+          sourceId: currentSources!.id,
         };
+        if (type === 'JOINS') {
+          delete dataSheet.sourceId;
+        }
         setSelectDataSheet(dataSheet);
         callbackFn?.(dataSheet, type);
         onCheckAllDataSheet(true, dataSheet);
@@ -210,6 +216,12 @@ const SelectDataSource = memo(
       }
     }, [tableJSON, renderType]);
 
+    useEffect(() => {
+      if (type === 'JOINS') {
+        setCurrentSources(sources.find(v => v.id === sourceId) || null);
+      }
+    }, [sourceId, sources, type]);
+
     return (
       <SelectDataSourceWrapper>
         <Popover
@@ -224,9 +236,9 @@ const SelectDataSource = memo(
               <PopoverBody>
                 <DatabaseListHeader>
                   <ArrowLeftOutlined
-                    onClick={() => {
-                      setCurrentSources(null);
-                    }}
+                    onClick={() =>
+                      type === 'JOINS' ? null : setCurrentSources(null)
+                    }
                   />
                   <i>{currentSources.name}</i>
                 </DatabaseListHeader>

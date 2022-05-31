@@ -36,6 +36,7 @@ import { SimpleViewJoinType } from '../../constants';
 import { Toolbar } from '../../Main/Editor/Toolbar';
 import { useViewSlice } from '../../slice';
 import { selectCurrentEditingViewAttr } from '../../slice/selectors';
+import { runSql } from '../../slice/thunks';
 import { SimpleViewQueryProps } from '../../slice/types';
 import AddComputedField from './components/AddComputedField';
 import SelectDataSource from './components/SelectDataSource';
@@ -50,13 +51,20 @@ interface SimpleViewProps {
 export const SimpleView = memo(
   ({ allowManage, allowEnableViz }: SimpleViewProps) => {
     const { actions } = useViewSlice();
+    const dispatch = useDispatch();
+
     const tableJSON = useSelector(state =>
       selectCurrentEditingViewAttr(state, { name: 'script' }),
     ) as SimpleViewQueryProps;
+    const id = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'id' }),
+    ) as string;
+    const sourceId = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'sourceId' }),
+    ) as string;
 
     const [isShowComputersField, setIsShowComputersField] =
       useState<Boolean>(false);
-    const dispatch = useDispatch();
 
     const handleTableJSON = useCallback(
       (table: any, type: 'MAIN' | 'JOINS', index?: number) => {
@@ -65,15 +73,23 @@ export const SimpleView = memo(
             script:
               type === 'MAIN'
                 ? {
-                    ...tableJSON,
                     table: table.table,
                     columns: table.columns,
+                    joins: [],
+                    computedFields: [],
                   }
                 : produce(tableJSON, draft => {
                     draft.joins[index!] = table;
                   }),
           }),
         );
+        if (type === 'MAIN') {
+          dispatch(
+            actions.changeCurrentEditingView({
+              sourceId: table.sourceId,
+            }),
+          );
+        }
       },
       [tableJSON, dispatch, actions],
     );
@@ -120,14 +136,14 @@ export const SimpleView = memo(
 
     const handleTableJoinColumns = useCallback(
       (
-        columnName: string,
+        columnName: [string],
         type: 'left' | 'right',
         joinIndex: number,
         joinConditionIndex: number,
       ) => {
         handleTableJSON(
           produce(tableJSON.joins[joinIndex], draft => {
-            draft.conditions![joinConditionIndex][type] = [columnName];
+            draft.conditions![joinConditionIndex][type] = columnName;
           }),
           'JOINS',
           joinIndex,
@@ -182,18 +198,9 @@ export const SimpleView = memo(
       setIsShowComputersField(false);
     }, [tableJSON, dispatch, actions]);
 
-    //test
-    // const handleFetchData = useCallback(async () => {
-    //   const { data, warnings } = await request2({
-    //     url: '/data-provider/execute/test',
-    //     method: 'POST',
-    //     data: {
-    //       sourceId: '999fe34223be4626b3062f56f831a555',
-    //       script: JSON.stringify(tableJSON),
-    //       scriptType: 'STRUCT',
-    //     },
-    //   });
-    // }, [tableJSON]);
+    const handleInterimRunSql = useCallback(() => {
+      dispatch(runSql({ id, isFragment: true }));
+    }, [dispatch, id]);
 
     return (
       <SimpleViewWrapper>
@@ -210,7 +217,7 @@ export const SimpleView = memo(
           <Button
             className="runBtn"
             icon={<CaretRightOutlined />}
-            // onClick={handleFetchData}
+            onClick={handleInterimRunSql}
           />
         </SelectTableMainWrapper>
         {tableJSON.joins.map((join, i) => {
@@ -234,6 +241,7 @@ export const SimpleView = memo(
                   />
                   <SelectDataSource
                     type="JOINS"
+                    sourceId={sourceId}
                     callbackFn={(table, type) =>
                       handleTableJoin(table, type, i)
                     }

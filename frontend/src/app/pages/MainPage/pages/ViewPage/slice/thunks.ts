@@ -176,10 +176,10 @@ export const runSql = createAsyncThunk<
       url: '/data-provider/execute/test',
       method: 'POST',
       data: {
-        script: fragment || script,
+        script: type === 'SQL' ? fragment || script : JSON.stringify(script),
         sourceId,
         size,
-        type: type || 'SQL',
+        scriptType: type || 'SQL',
         variables: variables.map(
           ({ name, type, valueType, defaultValue, expression }) => ({
             name,
