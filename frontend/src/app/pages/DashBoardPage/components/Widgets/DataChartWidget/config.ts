@@ -21,6 +21,7 @@ import {
   WidgetCreateProps,
   WidgetMeta,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { WHITE } from 'styles/StyleConstants';
 import widgetManagerInstance from '../../WidgetManager';
 import {
   initBackgroundTpl,
@@ -103,7 +104,7 @@ export const dataChartCreator = (opt: WidgetCreateProps) => {
     { ...initTitleTpl() },
     { ...initLoopFetchTpl() },
     { ...initPaddingTpl() },
-    { ...initBackgroundTpl(opt.boardType === 'auto' ? '#fff' : '') },
+    { ...initBackgroundTpl(opt.boardType === 'auto' ? WHITE : '') },
     { ...initBorderTpl() },
   ];
   widget.config.customConfig.props.forEach(ele => {

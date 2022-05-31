@@ -33,6 +33,7 @@ import { DraggableCore, DraggableEventHandler } from 'react-draggable';
 import { useSelector } from 'react-redux';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components/macro';
+import { WHITE } from 'styles/StyleConstants';
 import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
 import { BoardScaleContext } from '../../../components/FreeBoardBackground';
 import { WidgetInfoContext } from '../../../components/WidgetProvider/WidgetInfoProvider';
@@ -217,7 +218,7 @@ const ItemWrap = styled.div<{ hideHandle?: boolean }>`
   }
 
   &:hover .react-resizable-handle {
-    background-color: #fff;
+    background-color: ${WHITE};
   }
 
   .react-resizable-handle-se {
