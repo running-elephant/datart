@@ -346,22 +346,13 @@ export class ChartDataRequestBuilder {
       aggOperator: aggCol.aggregate,
     }));
 
-    return originalSorters
-      .reduce<ChartDataRequest['orders']>((acc, cur) => {
-        const uniqSorter = sorter =>
-          `${sorter.column}-${
-            sorter.aggOperator?.length > 0 ? sorter.aggOperator : ''
-          }`;
-        const newSorter = this.extraSorters?.find(
-          extraSorter => uniqSorter(extraSorter) === uniqSorter(cur),
-        );
-        if (newSorter) {
-          return acc;
-        }
-        return acc.concat([cur]);
-      }, [])
-      .concat(this.extraSorters as [])
-      .filter(sorter => Boolean(sorter?.operator));
+    const _extraSorters = this.extraSorters?.filter(
+      ({ column, operator }) => column && operator,
+    );
+    if (_extraSorters.length) {
+      return _extraSorters;
+    }
+    return originalSorters.filter(sorter => Boolean(sorter?.operator));
   }
 
   private buildPageInfo() {
