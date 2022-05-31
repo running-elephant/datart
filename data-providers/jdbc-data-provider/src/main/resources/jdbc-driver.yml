@@ -22,6 +22,7 @@ CLICKHOUSE:
   driver-class: com.clickhouse.jdbc.ClickHouseDriver
   url-prefix: jdbc:clickhouse://
   sql-dialect: datart.data.provider.calcite.dialect.ClickHouseSqlDialectSupport
+  adapter-class: datart.data.provider.jdbc.adapters.ClickHouseDataProviderAdapter
 
 DERBY:
   db-type: DERBY
