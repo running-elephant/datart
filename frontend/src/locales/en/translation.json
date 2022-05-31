@@ -981,7 +981,7 @@
       "widgetType": "Widget Type",
       "type": {
         "chart": "Chart",
-        "widgetChart": "Private Chart",
+        "widgetChart": "privateChart",
         "dataChart": "Public Chart",
         "media": "Media",
         "container": "Container",
@@ -1195,7 +1195,8 @@
       "permission": "Column Permissions",
       "newHierarchy": "New Hierarchy",
       "addToHierarchy": "Add To Hierarchy",
-      "hierarchyName": "Hierarchy Name"
+      "hierarchyName": "Hierarchy Name",
+      "duplicateName": "Name already exists!"
     },
     "columnPermission": {
       "title": "Column permissions",

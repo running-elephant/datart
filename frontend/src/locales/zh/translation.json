@@ -345,6 +345,14 @@
           "slider": "滑块",
           "rangeSlider": "范围滑块"
         },
+        "controllerPlaceHolders": {
+          "multiSelectController": "请选择",
+          "numberController": "请输入数值",
+          "rangeNumberControllerMin": "最小值",
+          "rangeNumberControllerMax": "最大值",
+          "selectController": "请选择",
+          "textController": "请输入"
+        },
         "controllerVisibilityTypes": {
           "hide": "隐藏",
           "show": "显示",
@@ -826,6 +834,7 @@
         "cancel": "取消",
         "save": "保存"
       },
+      "downloadTaskSuccess": "下载任务创建成功",
       "edit": "编辑",
       "run": "运行",
       "publish": "发布",
@@ -902,7 +911,10 @@
         "deviceSwitch": "设备切换",
         "allowOverlap": "允许组件重叠",
         "forbidOverlap": "禁止组件重叠",
-        "multiSelect": "多选"
+        "multiSelect": "多选",
+        "zoomIn": "缩小视图",
+        "zoomOut": "放大视图",
+        "widgetList": "组件"
       },
       "controlTypes": {
         "common": "常规",
@@ -925,6 +937,7 @@
         "px": "像素",
         "width": "宽",
         "height": "高",
+        "font": "字体",
         "background": "背景",
         "color": "颜色",
         "image": "图片",
@@ -956,7 +969,9 @@
         "duration": "停留时间(秒)",
         "delPagesTip": "确认删除所有选中的故事页",
         "delPageTip": "确认删除此故事页？",
-        "enterHere": "请输入"
+        "enterHere": "请输入",
+        "storyName": "名称",
+        "storyDescription": "描述"
       }
     },
     "widget": {
@@ -983,6 +998,7 @@
       "action": {
         "refresh": "同步数据",
         "fullScreen": "全屏",
+        "exitFullScreen": "取消全屏",
         "lock": "锁定拖拽",
         "edit": "编辑",
         "delete": "删除",
@@ -1179,7 +1195,8 @@
       "permission": "列权限",
       "newHierarchy": "新建层次结构",
       "addToHierarchy": "添加到层次结构",
-      "hierarchyName": "层级名称"
+      "hierarchyName": "层级名称",
+      "duplicateName": "名称重复，请检查!"
     },
     "columnPermission": {
       "title": "列权限",
