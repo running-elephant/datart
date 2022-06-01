@@ -17,6 +17,7 @@
  */
 
 import { message, Spin } from 'antd';
+import useModal from 'antd/lib/modal/useModal';
 import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
@@ -125,11 +126,11 @@ const ChartPreviewBoard: FC<{
     const saveAsViz = useSaveAsViz();
     const history = useHistory();
     const vizs = useSelector(selectVizs);
-    const [openNewTab, openBrowserTab] = useDrillThrough();
+    const [openNewTab, openBrowserTab, getDialogContent] = useDrillThrough();
     const [openViewDetailPanel, viewDetailPanelContextHolder] =
       useDisplayViewDetail();
     const { parse } = useQSLibUrlHelper();
-
+    const [modal, jumpDialogContextHolder] = useModal();
     useEffect(() => {
       const jumpFilterParams: ChartDataRequestFilter[] =
         parse(filterSearchUrl)?.filters || [];
@@ -269,7 +270,12 @@ const ChartPreviewBoard: FC<{
                   );
                 }
                 if (rule?.action === InteractionAction.Dialog) {
-                  // TODO:
+                  const modalContent = getDialogContent(
+                    orgId,
+                    relId,
+                    nonAggJumpFilters.concat(clickFilters),
+                  );
+                  modal.info(modalContent as any);
                 }
               } else if (rule.category === InteractionCategory.JumpToUrl) {
                 // TODO:
@@ -297,6 +303,8 @@ const ChartPreviewBoard: FC<{
         openNewTab,
         orgId,
         openBrowserTab,
+        getDialogContent,
+        modal,
         openViewDetailPanel,
       ],
     );
@@ -613,6 +621,7 @@ const ChartPreviewBoard: FC<{
           </ChartDrillContext.Provider>
         </PreviewBlock>
         {viewDetailPanelContextHolder}
+        {jumpDialogContextHolder}
       </StyledChartPreviewBoard>
     );
   },

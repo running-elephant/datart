@@ -33,7 +33,22 @@ const useDrillThrough = () => {
     window.open(`/organizations/${orgId}/vizs/${relId}?${urlParmas}`, '_blank');
   };
 
-  return [openNewTab, openBrowserTab];
+  const getDialogContent = (orgId, relId, params?: object) => {
+    const urlParmas = stringify({ filters: params });
+    return {
+      width: 1000,
+      content: (
+        <iframe
+          height={600}
+          width="100%"
+          frameBorder="none"
+          src={`/organizations/${orgId}/vizs/${relId}?${urlParmas}`}
+        />
+      ),
+    };
+  };
+
+  return [openNewTab, openBrowserTab, getDialogContent];
 };
 
 export default useDrillThrough;
