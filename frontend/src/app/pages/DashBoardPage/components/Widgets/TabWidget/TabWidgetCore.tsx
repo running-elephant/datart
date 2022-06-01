@@ -173,7 +173,7 @@ const TabsBoxWrap = styled.div<{}>`
     height: 100%;
   }
   & .ant-tabs-tab-remove {
-    background-color: #fff;
+    background-color: ${PRIMARY};
   }
 
   & .ant-tabs > .ant-tabs-nav .ant-tabs-nav-add {

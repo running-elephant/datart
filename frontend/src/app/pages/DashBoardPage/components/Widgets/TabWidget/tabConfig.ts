@@ -24,6 +24,7 @@ import type {
   WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { WHITE } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import {
   initBackgroundTpl,
@@ -95,7 +96,7 @@ export const widgetToolkit: TabToolkit = {
     widget.config.customConfig.props = [
       { ...initTitleTpl() },
       { ...initPaddingTpl() },
-      { ...initBackgroundTpl('#fff') },
+      { ...initBackgroundTpl(WHITE) },
       { ...initBorderTpl() },
     ];
 

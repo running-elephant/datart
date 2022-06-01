@@ -23,6 +23,7 @@ import type {
   WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { WHITE } from 'styles/StyleConstants';
 import {
   initBackgroundTpl,
   initBorderTpl,
@@ -92,7 +93,7 @@ export const widgetToolkit: WidgetToolkit = {
 
     widget.config.customConfig.props = [
       { ...initTitleTpl() },
-      { ...initBackgroundTpl('#fff') },
+      { ...initBackgroundTpl(WHITE) },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
     ];

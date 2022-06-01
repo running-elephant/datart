@@ -28,6 +28,7 @@ import type {
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
+import { WHITE } from 'styles/StyleConstants';
 import { IFontDefault } from '../../../../../../types';
 import { ITimeDefault } from '../../../types/widgetTypes';
 import {
@@ -138,7 +139,7 @@ export const widgetToolkit: TimerWidgetToolKit = {
     widget.config.customConfig.props = [
       { ...initTimerTpl() },
       { ...initTitleTpl() },
-      { ...initBackgroundTpl('#fff') },
+      { ...initBackgroundTpl(WHITE) },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
     ];
