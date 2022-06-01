@@ -51,6 +51,7 @@ import {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { updateBy } from 'app/utils/mutation';
 import { ECharts } from 'echarts';
@@ -1552,7 +1553,7 @@ export const getAutoFunnelTopPosition = (config: {
  */
 export const getDrillableRows = (
   configs: ChartDataConfig[],
-  option?: ChartDrillOption,
+  option?: IChartDrillOption,
 ): ChartDataSectionField[] => {
   return configs
     ?.filter(c => c.type === ChartDataSectionType.Group)

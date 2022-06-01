@@ -49,7 +49,10 @@ import {
   getValue,
 } from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
-import { getChartDrillOption } from 'app/utils/internalChartHelper';
+import {
+  getChartDrillOption,
+  getClickEventDimensionFilters,
+} from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -230,7 +233,7 @@ const ChartPreviewBoard: FC<{
         )?.[0] as ViewDetailSetting;
 
         if (enableDrillThrough) {
-          let jumpFilters = new ChartDataRequestBuilder(
+          let nonAggJumpFilters = new ChartDataRequestBuilder(
             {
               id: chartPreview?.backendChart?.view?.id || '',
               config: chartPreview?.backendChart?.view.config || {},
@@ -244,21 +247,17 @@ const ChartPreviewBoard: FC<{
             chartPreview?.backendChart?.config?.aggregation,
           )
             .addDrillOption(drillOptionRef?.current)
-            .build()?.filters;
-
-          // remove aggregate filters and remove aggregate function filters
-          jumpFilters = jumpFilters?.filter(f => !Boolean(f.aggOperator));
-
-          console.log(
-            'jumpFilters --->',
-            param?.data?.rowData?.['USER_Name'],
-            jumpFilters,
-          );
-
-          // TODO: user selected filter
-          // TODO: mapper by custom if exist
+            .build()
+            ?.filters?.filter(f => !Boolean(f.aggOperator));
 
           (drillThroughSetting?.rules || []).forEach(rule => {
+            const clickFilters = getClickEventDimensionFilters(
+              param?.data?.rowData,
+              rule,
+              drillOptionRef?.current,
+              chartPreview?.chartConfig?.datas,
+            );
+
             if (rule.event === InteractionMouseEvent.Left) {
               if (
                 rule.category === InteractionCategory.JumpToChart ||
@@ -266,10 +265,18 @@ const ChartPreviewBoard: FC<{
               ) {
                 const relId = rule?.[rule.category]?.relId;
                 if (rule?.action === InteractionAction.Redirect) {
-                  openNewTab(orgId, relId, jumpFilters);
+                  openNewTab(
+                    orgId,
+                    relId,
+                    nonAggJumpFilters.concat(clickFilters),
+                  );
                 }
                 if (rule?.action === InteractionAction.Window) {
-                  openBrowserTab(orgId, relId, jumpFilters);
+                  openBrowserTab(
+                    orgId,
+                    relId,
+                    nonAggJumpFilters.concat(clickFilters),
+                  );
                 }
                 if (rule?.action === InteractionAction.Dialog) {
                   // TODO:

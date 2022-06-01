@@ -17,6 +17,15 @@
  */
 
 import {
+  InteractionCategory,
+  InteractionFieldRelation,
+} from 'app/components/FormGenerator/constants';
+import {
+  CustomizeRelation,
+  InteractionRule,
+  JumpToChartRule,
+} from 'app/components/FormGenerator/Customize/Interaction/types';
+import {
   AggregateFieldActionType,
   ChartDataSectionType,
   ChartDataViewFieldCategory,
@@ -33,6 +42,7 @@ import {
   ChartCommonConfig,
   ChartStyleConfigDTO,
 } from 'app/types/ChartConfigDTO';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
@@ -47,6 +57,7 @@ import {
   isUndefined,
   pipe,
 } from 'utils/object';
+import { getDrillableRows } from './chartHelper';
 
 export const transferChartConfigs = (
   targetConfig?: ChartConfig,
@@ -693,4 +704,58 @@ export const getChartDrillOption = (
     drillOption?.clearAll();
   }
   return drillOption;
+};
+
+export const getClickEventDimensionFilters = (
+  rawData?: Record<string, any>,
+  rule?: InteractionRule,
+  drillOption?: IChartDrillOption,
+  dataConfigs?: ChartDataConfig[],
+): ChartDataRequestFilter[] => {
+  const groupConfigs: ChartDataSectionField[] = getDrillableRows(
+    dataConfigs || [],
+    drillOption,
+  );
+
+  const groupFilters = groupConfigs
+    .map(c => {
+      const value = rawData?.[c.colName];
+      if (isEmpty(value) || isEmpty(c.colName)) {
+        return null;
+      }
+      return {
+        aggOperator: null,
+        column: c.colName,
+        values: [{ value, valueType: c.type }],
+        [c.colName]: value,
+      };
+    })
+    .map(f => {
+      if (isEmpty(f)) {
+        return null;
+      }
+      const jumpToChartRule = rule?.[
+        InteractionCategory.JumpToChart
+      ] as JumpToChartRule;
+      if (isEmpty(jumpToChartRule)) {
+        return null;
+      }
+      if (jumpToChartRule.relation !== InteractionFieldRelation.Auto) {
+        const customizeRelations: CustomizeRelation[] =
+          jumpToChartRule?.[InteractionFieldRelation.Customize];
+        if (isEmptyArray(customizeRelations)) {
+          return null;
+        }
+        const targetRelation = customizeRelations?.find(
+          r => r.source === f?.column,
+        );
+        if (isEmpty(targetRelation)) {
+          return null;
+        }
+        return Object.assign({}, f, { column: targetRelation?.target });
+      }
+      return f;
+    })
+    .filter(Boolean);
+  return groupFilters as ChartDataRequestFilter[];
 };
