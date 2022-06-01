@@ -41,6 +41,7 @@ import { selectAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/sli
 import { fetchAvailableSourceFunctionsForChart } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
   getRuntimeComputedFields,
@@ -55,13 +56,13 @@ import {
 } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
 import useDisplayViewDetail from '../hooks/useDisplayViewDetail';
 import useDrillThrough from '../hooks/useDrillThrough';
+import useQSLibUrlHelper from '../hooks/useQSLibUrlHelper';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
-import useUrlParams from '../hooks/useUrlParams';
 import { useVizSlice } from '../slice';
 import {
   selectPreviewCharts,
@@ -127,15 +128,11 @@ const ChartPreviewBoard: FC<{
     const [openNewTab, openBrowserTab] = useDrillThrough();
     const [openViewDetailPanel, viewDetailPanelContextHolder] =
       useDisplayViewDetail();
-    const location = useLocation();
-    const { parse } = useUrlParams();
+    const { parse } = useQSLibUrlHelper();
 
     useEffect(() => {
-      // console.log('etra filters ---->1 ', parse(location.search));
-      // console.log(
-      //   'etra filters ---->2 ',
-      //   urlSearchTransfer.toParams(location.search),
-      // );
+      const jumpFilterParams: ChartDataRequestFilter[] =
+        parse(filterSearchUrl)?.filters || [];
 
       const filterSearchParams = filterSearchUrl
         ? urlSearchTransfer.toParams(filterSearchUrl)
@@ -145,16 +142,10 @@ const ChartPreviewBoard: FC<{
           backendChartId,
           orgId,
           filterSearchParams,
+          jumpFilterParams,
         }),
       );
-    }, [
-      dispatch,
-      orgId,
-      backendChartId,
-      filterSearchUrl,
-      parse,
-      location.search,
-    ]);
+    }, [dispatch, orgId, backendChartId, filterSearchUrl, parse]);
 
     useEffect(() => {
       const sourceId = chartPreview?.backendChart?.view.sourceId;
@@ -257,7 +248,6 @@ const ChartPreviewBoard: FC<{
               drillOptionRef?.current,
               chartPreview?.chartConfig?.datas,
             );
-
             if (rule.event === InteractionMouseEvent.Left) {
               if (
                 rule.category === InteractionCategory.JumpToChart ||

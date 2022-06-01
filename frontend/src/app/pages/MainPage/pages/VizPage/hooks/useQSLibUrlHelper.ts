@@ -18,7 +18,7 @@
 
 import qs from 'qs';
 
-const useUrlParams = () => {
+const useQSLibUrlHelper = () => {
   const parse = qs.parse;
   const stringify = qs.stringify;
 
@@ -28,4 +28,4 @@ const useUrlParams = () => {
   };
 };
 
-export default useUrlParams;
+export default useQSLibUrlHelper;

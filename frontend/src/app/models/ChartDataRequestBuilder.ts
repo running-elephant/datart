@@ -44,7 +44,11 @@ import {
   recommendTimeRangeConverter,
   splitRangerDateFilters,
 } from 'app/utils/time';
-import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
+import {
+  FilterSqlOperator,
+  RUNTIME_FILTER_KEY,
+  TIME_FORMATTER,
+} from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 import { DrillMode } from './ChartDrillOption';
 
@@ -199,7 +203,9 @@ export class ChartDataRequestBuilder {
         return true;
       })
       .map(col => col);
-    return this.normalizeFilters(fields).concat(this.normalizeDrillFilters());
+    return this.normalizeFilters(fields)
+      .concat(this.normalizeDrillFilters())
+      .concat(this.normalizeRuntimeFilters());
   }
 
   private normalizeFilters = (fields: ChartDataSectionField[]) => {
@@ -300,6 +306,16 @@ export class ChartDataRequestBuilder {
           ],
         };
       }) || []) as ChartDataRequestFilter[];
+  }
+
+  private normalizeRuntimeFilters(): ChartDataRequestFilter[] {
+    return (
+      this.chartDataConfigs
+        ?.filter(c => c.type === ChartDataSectionType.Filter)
+        ?.flatMap(c => {
+          return c[RUNTIME_FILTER_KEY] || [];
+        }) || []
+    );
   }
 
   private buildOrders() {

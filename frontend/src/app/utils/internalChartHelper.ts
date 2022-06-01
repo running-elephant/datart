@@ -45,6 +45,7 @@ import {
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import { FilterSqlOperator } from 'globalConstants';
 import {
   cond,
   curry,
@@ -725,9 +726,9 @@ export const getClickEventDimensionFilters = (
       }
       return {
         aggOperator: null,
+        sqlOperator: FilterSqlOperator.In,
         column: c.colName,
         values: [{ value, valueType: c.type }],
-        [c.colName]: value,
       };
     })
     .map(f => {

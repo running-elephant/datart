@@ -17,21 +17,20 @@
  */
 
 import { useHistory } from 'react-router-dom';
-import useUrlParams from './useUrlParams';
+import useQSLibUrlHelper from './useQSLibUrlHelper';
 
 const useDrillThrough = () => {
   const history = useHistory();
-  const { stringify } = useUrlParams();
+  const { stringify } = useQSLibUrlHelper();
 
-  const openNewTab = (orgId, relId, params?: object) => {
-    history.push(`/organizations/${orgId}/vizs/${relId}?${stringify(params)}`);
+  const openNewTab = (orgId, relId, params?: any[]) => {
+    const urlParmas = stringify({ filters: params });
+    history.push(`/organizations/${orgId}/vizs/${relId}?${urlParmas}`);
   };
 
   const openBrowserTab = (orgId, relId, params?: object) => {
-    window.open(
-      `/organizations/${orgId}/vizs/${relId}?${stringify(params)}`,
-      '_blank',
-    );
+    const urlParmas = stringify({ filters: params });
+    window.open(`/organizations/${orgId}/vizs/${relId}?${urlParmas}`, '_blank');
   };
 
   return [openNewTab, openBrowserTab];
