@@ -717,8 +717,12 @@ export const getClickEventDimensionFilters = (
     dataConfigs || [],
     drillOption,
   );
+  const colorConfigs = (dataConfigs || [])
+    .filter(c => c.type === ChartDataSectionType.Color)
+    .flatMap(config => config.rows || []);
 
   const groupFilters = groupConfigs
+    .concat(colorConfigs)
     .map(c => {
       const value = rawData?.[c.colName];
       if (isEmpty(value) || isEmpty(c.colName)) {
