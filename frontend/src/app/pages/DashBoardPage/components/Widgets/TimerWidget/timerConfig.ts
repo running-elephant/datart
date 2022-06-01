@@ -20,11 +20,11 @@ import {
   ORIGINAL_TYPE_MAP,
   TimeDefault,
 } from 'app/pages/DashBoardPage/constants';
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetActionListItem,
   widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
@@ -35,14 +35,10 @@ import {
   initBorderTpl,
   initPaddingTpl,
   initTitleTpl,
-  initWidgetEditActionTpl,
   initWidgetName,
-  initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
-  WidgetEditActionI18N,
   widgetTpl,
-  WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
 
 const initTimerTpl = () => {
@@ -83,29 +79,21 @@ const NameI18N = {
   en: 'Timer',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'timer',
+  icon: 'time-widget',
   originalType: ORIGINAL_TYPE_MAP.timer,
   canWrapped: true,
   controllable: false,
   linkable: false,
   canFullScreen: true,
   singleton: false,
-  viewAction: {
-    ...initWidgetViewActionTpl(),
-  },
-  editAction: {
-    ...initWidgetEditActionTpl(),
-  },
+
   i18ns: [
     {
       lang: 'zh-CN',
       translation: {
         desc: 'timer',
         widgetName: NameI18N.zh,
-        action: {
-          ...WidgetViewActionI18N.zh,
-          ...WidgetEditActionI18N.zh,
-        },
+        action: {},
         title: TitleI18N.zh,
         background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
@@ -118,10 +106,7 @@ export const widgetMeta: WidgetMeta = {
       translation: {
         desc: 'timer',
         widgetName: NameI18N.en,
-        action: {
-          ...WidgetViewActionI18N.en,
-          ...WidgetEditActionI18N.en,
-        },
+        action: {},
         title: TitleI18N.en,
         background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
@@ -142,31 +127,13 @@ export const widgetToolkit: TimerWidgetToolKit = {
     const widget = widgetTpl();
     widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
-    widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 6,
-        height: 2,
-      };
-      widget.config.rect = { ...rect };
-      widget.config.mRect = { ...rect };
-    } else {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 400,
-        height: 200,
-      };
-      widget.config.rect = { ...rect };
-    }
+    widget.config.rect.height = 100;
+    widget.config.pRect.height = 3;
 
     widget.config.customConfig.props = [
       { ...initTimerTpl() },
@@ -197,6 +164,10 @@ export const widgetToolkit: TimerWidgetToolKit = {
         key: 'lock',
         renderMode: ['edit'],
       },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
     ];
     return list;
   },
@@ -222,8 +193,8 @@ export const widgetToolkit: TimerWidgetToolKit = {
   // //
 };
 
-const timerProto = {
-  widgetTypeId: widgetMeta.originalType,
+const timerProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

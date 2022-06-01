@@ -55,6 +55,7 @@ import {
   getChartDrillOption,
   getClickEventDimensionFilters,
 } from 'app/utils/internalChartHelper';
+import { KEYBOARD_EVENT_NAME } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -66,8 +67,10 @@ import useQSLibUrlHelper from '../hooks/useQSLibUrlHelper';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import { useVizSlice } from '../slice';
 import {
+  selectMultipleSelect,
   selectPreviewCharts,
   selectPublishLoading,
+  selectSelectedItems,
   selectVizs,
 } from '../slice/selectors';
 import {
@@ -105,7 +108,10 @@ const ChartPreviewBoard: FC<{
       cacheWhRef: ref,
       cacheW,
       cacheH,
-    } = useCacheWidthHeight(defaultChartContainerWH, defaultChartContainerWH);
+    } = useCacheWidthHeight({
+      initH: defaultChartContainerWH,
+      initW: defaultChartContainerWH,
+    });
     useWorkbenchSlice();
     const { actions: vizAction } = useVizSlice();
     const { actions } = useMainSlice();
@@ -114,6 +120,8 @@ const ChartPreviewBoard: FC<{
     const [version, setVersion] = useState<string>();
     const previewCharts = useSelector(selectPreviewCharts);
     const publishLoading = useSelector(selectPublishLoading);
+    const selectedItems = useSelector(selectSelectedItems);
+    const multipleSelect = useSelector(selectMultipleSelect);
     const availableSourceFunctions = useSelector(
       selectAvailableSourceFunctions,
     );
@@ -131,6 +139,28 @@ const ChartPreviewBoard: FC<{
       useDisplayViewDetail();
     const { parse } = useQSLibUrlHelper();
     const [modal, jumpDialogContextHolder] = useModal();
+
+    const chartIframeKeyboardListener = useCallback(
+      (e: KeyboardEvent) => {
+        if (
+          (e.key === KEYBOARD_EVENT_NAME.CTRL ||
+            e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
+          e.type === 'keydown' &&
+          !multipleSelect
+        ) {
+          dispatch(vizAction.updateMultipleSelect(true));
+        } else if (
+          (e.key === KEYBOARD_EVENT_NAME.CTRL ||
+            e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
+          e.type === 'keyup' &&
+          multipleSelect
+        ) {
+          dispatch(vizAction.updateMultipleSelect(false));
+        }
+      },
+      [dispatch, multipleSelect, vizAction],
+    );
+
     useEffect(() => {
       const jumpFilterParams: ChartDataRequestFilter[] =
         parse(filterSearchUrl)?.filters || [];
@@ -349,11 +379,30 @@ const ChartPreviewBoard: FC<{
                 handleDrillOptionChange?.(param.value);
                 return;
               }
+              if (
+                !drillOptionRef.current?.isSelectedDrill &&
+                chart.selectable
+              ) {
+                const {
+                  dataIndex,
+                  componentIndex,
+                }: { dataIndex: number; componentIndex: number } = param;
+                dispatch(
+                  vizAction.normalSelect({
+                    backendChartId,
+                    data: {
+                      index: componentIndex + ',' + dataIndex,
+                      data: param.data,
+                    },
+                  }),
+                );
+                return;
+              }
             },
           },
         ]);
       },
-      [dispatch, handleDrillOptionChange, handleDrillThroughEvent],
+      [dispatch, handleDrillOptionChange, handleDrillThroughEvent, vizAction],
     );
 
     useEffect(() => {
@@ -608,6 +657,8 @@ const ChartPreviewBoard: FC<{
                     chart={chart!}
                     config={chartPreview?.chartConfig!}
                     drillOption={drillOptionRef.current}
+                    selectedItems={selectedItems[backendChartId]}
+                    onKeyboardPress={chartIframeKeyboardListener}
                     width={cacheW}
                     height={cacheH}
                   />
@@ -615,7 +666,7 @@ const ChartPreviewBoard: FC<{
               </Spin>
             </ChartWrapper>
             <StyledChartDrillPathsContainer>
-              <ChartDrillPaths chartConfig={chartPreview?.chartConfig} />
+              <ChartDrillPaths chartConfig={chartPreview?.chartConfig!} />
             </StyledChartDrillPathsContainer>
             <StyledChartDrillPathsContainer />
           </ChartDrillContext.Provider>

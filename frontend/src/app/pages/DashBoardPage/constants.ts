@@ -73,6 +73,7 @@ export const BOARD_UNDO = {
 };
 
 export const ORIGINAL_TYPE_MAP = {
+  group: 'group',
   linkedChart: 'linkedChart',
   ownedChart: 'ownedChart',
 

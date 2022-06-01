@@ -27,6 +27,7 @@ import {
   RUNTIME_FILTER_KEY,
 } from 'app/constants';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,
@@ -37,6 +38,7 @@ import {
   RECOMMEND_TIME,
 } from 'globalConstants';
 import { ValueOf } from 'types';
+import { IChartDrillOption } from './ChartDrillOption';
 
 export type FilterFieldAction = {
   condition?: FilterCondition;
@@ -265,6 +267,8 @@ export interface ChartOptions {
   config: ChartConfig;
   dataset: ChartDataSetDTO;
   widgetSpecialConfig: { env: string | undefined; [x: string]: any };
+  drillOption?: IChartDrillOption;
+  selectedItems?: SelectedItem[];
 }
 
 export interface ChartContext {
@@ -306,7 +310,7 @@ export type AxisLabel = {
 } & FontStyle;
 
 export type LabelStyle = {
-  label: {
+  label?: {
     position?: string;
     show: boolean;
     font?: FontStyle;
@@ -330,6 +334,12 @@ export interface LegendStyle {
     [x: string]: boolean;
   };
   data?: string[];
+  itemStyle?: {
+    [x: string]: any;
+  };
+  lineStyle?: {
+    [x: string]: any;
+  };
 }
 
 export type MarkDataConfig = {
@@ -397,15 +407,20 @@ export type XAxis = {
 };
 
 export interface BorderStyle {
-  borderType: string;
-  borderWidth: number;
-  borderColor: string;
+  borderType?: string;
+  borderWidth?: number;
+  borderColor?: string;
 }
 
 export interface GridStyle {
-  left: string;
-  right: string;
-  bottom: string;
-  top: string;
-  containLabel: boolean;
+  left?: string;
+  right?: string;
+  bottom?: string;
+  top?: string;
+  containLabel?: boolean;
+}
+
+export interface SelectedItem {
+  index: string;
+  data: any;
 }

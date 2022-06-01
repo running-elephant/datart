@@ -33,7 +33,6 @@ export const addControllerAction =
     switch (opt.type) {
       case 'queryBtn':
         const queryWidget = widgetManagerInstance.toolkit('queryBtn').create({
-          dashboardId: opt.boardId,
           boardType: opt.boardType,
         });
         dispatch(addWidgetsToEditBoard([queryWidget]));
@@ -41,7 +40,6 @@ export const addControllerAction =
         break;
       case 'resetBtn':
         const resetWidget = widgetManagerInstance.toolkit('resetBtn').create({
-          dashboardId: opt.boardId,
           boardType: opt.boardType,
         });
 

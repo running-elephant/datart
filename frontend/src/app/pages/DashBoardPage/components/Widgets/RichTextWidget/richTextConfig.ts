@@ -20,53 +20,39 @@ import type {
   WidgetActionListItem,
   widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
-  initFreeWidgetRect,
   initPaddingTpl,
   initTitleTpl,
-  initWidgetEditActionTpl,
   initWidgetName,
-  initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
-  WidgetEditActionI18N,
   widgetTpl,
-  WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
 const NameI18N = {
   zh: '富文本',
   en: 'RichText',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'richText',
-
+  icon: 'rich-text',
   originalType: ORIGINAL_TYPE_MAP.richText,
   canWrapped: true,
   controllable: false,
   linkable: false,
   canFullScreen: true,
   singleton: false,
-  viewAction: {
-    ...initWidgetViewActionTpl(),
-  },
-  editAction: {
-    ...initWidgetEditActionTpl(),
-  },
+
   i18ns: [
     {
       lang: 'zh-CN',
       translation: {
         desc: 'richText',
         widgetName: NameI18N.zh,
-        action: {
-          ...WidgetViewActionI18N.zh,
-          ...WidgetEditActionI18N.zh,
-        },
+        action: {},
         title: TitleI18N.zh,
         background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
@@ -79,10 +65,7 @@ export const widgetMeta: WidgetMeta = {
       translation: {
         desc: NameI18N,
         widgetName: NameI18N.en,
-        action: {
-          ...WidgetViewActionI18N.en,
-          ...WidgetEditActionI18N.en,
-        },
+        action: {},
         title: TitleI18N.en,
         background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
@@ -98,19 +81,14 @@ export const widgetToolkit: WidgetToolkit = {
     const widget = widgetTpl();
     widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      widget.config.rect = { ...initAutoWidgetRect() };
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      widget.config.rect = { ...initFreeWidgetRect() };
-    }
+
+    widget.config.pRect.height = 3;
 
     widget.config.customConfig.props = [
       { ...initTitleTpl() },
@@ -126,6 +104,7 @@ export const widgetToolkit: WidgetToolkit = {
             {
               attributes: {
                 size: '24px',
+                color: '#448aff',
                 italic: true,
               },
               insert: 'ABCDEFG...',
@@ -157,6 +136,10 @@ export const widgetToolkit: WidgetToolkit = {
         key: 'lock',
         renderMode: ['edit'],
       },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
     ];
     return list;
   },
@@ -173,8 +156,8 @@ export const widgetToolkit: WidgetToolkit = {
   // //
 };
 
-const richTextProto = {
-  widgetTypeId: widgetMeta.originalType,
+const richTextProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

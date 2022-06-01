@@ -166,8 +166,8 @@ const Title = styled.div`
 
   h3 {
     flex: 1;
-    overflow: hidden;
     padding: ${SPACE_MD} 0;
+    overflow: hidden;
     font-size: ${FONT_SIZE_TITLE};
     font-weight: ${FONT_WEIGHT_MEDIUM};
     text-overflow: ellipsis;
@@ -176,8 +176,8 @@ const Title = styled.div`
 
   h5 {
     flex: 1;
-    overflow: hidden;
     padding: ${SPACE_XS} 0;
+    overflow: hidden;
     font-size: ${FONT_SIZE_SUBTITLE};
     font-weight: ${FONT_WEIGHT_MEDIUM};
     color: ${p => p.theme.textColorLight};

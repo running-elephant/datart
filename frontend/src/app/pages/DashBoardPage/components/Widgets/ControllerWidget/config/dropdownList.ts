@@ -19,6 +19,7 @@
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import {
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { controlWidgetTpl, getControlDropDownList } from '.';
@@ -28,43 +29,31 @@ import {
   initBorderTpl,
   initLoopFetchTpl,
   initPaddingTpl,
-  initWidgetEditActionTpl,
   initWidgetName,
-  initWidgetViewActionTpl,
   LoopFetchI18N,
   PaddingI18N,
   TitleI18N,
-  WidgetEditActionI18N,
-  WidgetViewActionI18N,
 } from '../../../WidgetManager/utils/init';
 const NameI18N = {
   zh: '下拉列表',
   en: 'DropdownList',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'dropdownList',
+  icon: 'control-widget',
   originalType: ORIGINAL_TYPE_MAP.dropdownList,
   canWrapped: true,
   canFullScreen: false,
   controllable: true,
   linkable: false,
   singleton: false,
-  viewAction: {
-    ...initWidgetViewActionTpl(),
-  },
-  editAction: {
-    ...initWidgetEditActionTpl(),
-  },
+
   i18ns: [
     {
       lang: 'zh-CN',
       translation: {
         desc: NameI18N.zh,
         widgetName: NameI18N.zh,
-        action: {
-          ...WidgetViewActionI18N.zh,
-          ...WidgetEditActionI18N.zh,
-        },
+        action: {},
         title: TitleI18N.zh,
         immediateQuery: ImmediateQueryI18N.zh,
         background: { backgroundGroup: '背景' },
@@ -78,10 +67,7 @@ export const widgetMeta: WidgetMeta = {
       translation: {
         desc: 'dropdownList',
         widgetName: NameI18N.en,
-        action: {
-          ...WidgetViewActionI18N.en,
-          ...WidgetEditActionI18N.en,
-        },
+        action: {},
         title: TitleI18N.en,
         immediateQuery: ImmediateQueryI18N.en,
         background: { backgroundGroup: 'Background' },
@@ -98,7 +84,7 @@ export const widgetToolkit: WidgetToolkit = {
     const widget = controlWidgetTpl(opt);
     widget.id = widgetMeta.originalType + widget.id;
     widget.config.originalType = widgetMeta.originalType;
-
+    widget.config.rect.height = 40;
     const addProps = [
       { ...initBackgroundTpl('#fff') },
       { ...initPaddingTpl() },
@@ -137,8 +123,8 @@ export const widgetToolkit: WidgetToolkit = {
   // //
 };
 
-const dropdownListProto = {
-  widgetTypeId: widgetMeta.originalType,
+const dropdownListProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };
