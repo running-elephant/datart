@@ -62,4 +62,7 @@ WHERE id IN
 ALTER TABLE `source_schemas`
     ADD UNIQUE INDEX `source_id`(`source_id`) USING BTREE;
 
+ALTER TABLE `view`
+    ADD COLUMN `type` varchar(32) NULL AFTER `script`;
+
 SET FOREIGN_KEY_CHECKS = 1;
