@@ -16,14 +16,12 @@
  * limitations under the License.
  */
 
-import {
-  InteractionCategory,
-  InteractionFieldRelation,
-} from 'app/components/FormGenerator/constants';
+import { InteractionFieldRelation } from 'app/components/FormGenerator/constants';
 import {
   CustomizeRelation,
   InteractionRule,
   JumpToChartRule,
+  JumpToUrlRule,
 } from 'app/components/FormGenerator/Customize/Interaction/types';
 import {
   AggregateFieldActionType,
@@ -739,15 +737,15 @@ export const getClickEventDimensionFilters = (
       if (isEmpty(f)) {
         return null;
       }
-      const jumpToChartRule = rule?.[
-        InteractionCategory.JumpToChart
-      ] as JumpToChartRule;
-      if (isEmpty(jumpToChartRule)) {
+      const jumpRule = rule?.[rule.category!] as
+        | JumpToChartRule
+        | JumpToUrlRule;
+      if (isEmpty(jumpRule)) {
         return null;
       }
-      if (jumpToChartRule.relation !== InteractionFieldRelation.Auto) {
+      if (jumpRule?.['relation'] !== InteractionFieldRelation.Auto) {
         const customizeRelations: CustomizeRelation[] =
-          jumpToChartRule?.[InteractionFieldRelation.Customize];
+          jumpRule?.[InteractionFieldRelation.Customize];
         if (isEmptyArray(customizeRelations)) {
           return null;
         }

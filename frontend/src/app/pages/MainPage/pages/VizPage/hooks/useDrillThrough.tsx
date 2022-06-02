@@ -48,7 +48,51 @@ const useDrillThrough = () => {
     };
   };
 
-  return [openNewTab, openBrowserTab, getDialogContent];
+  const redirectByUrl = (url, params?: any[]) => {
+    const urlParmas = stringify({ filters: params });
+    let urlWithScheme = url;
+    if (!/^http(s)?/.test(url)) {
+      urlWithScheme = `http://${urlWithScheme}`;
+    }
+    window.location.href = `${urlWithScheme}?${urlParmas}`;
+  };
+
+  const openNewByUrl = (url, params?: any[]) => {
+    const urlParmas = stringify({ filters: params });
+    let urlWithScheme = url;
+    if (!/^http(s)?/.test(url)) {
+      urlWithScheme = `http://${urlWithScheme}`;
+    }
+    window.open(`${urlWithScheme}?${urlParmas}`, '_blank');
+  };
+
+  const getDialogContentByUrl = (url, params?: object) => {
+    const urlParmas = stringify({ filters: params });
+    let urlWithScheme = url;
+    if (!/^http(s)?/.test(url)) {
+      urlWithScheme = `http://${urlWithScheme}`;
+    }
+    return {
+      width: 1000,
+      content: (
+        <iframe
+          height={600}
+          width="100%"
+          frameBorder="none"
+          src={`${urlWithScheme}?${urlParmas}`}
+        />
+      ),
+    };
+  };
+
+  return [
+    openNewTab,
+    openBrowserTab,
+    getDialogContent,
+    redirectByUrl,
+    openNewByUrl,
+    getDialogContentByUrl,
+  ];
 };
 
 export default useDrillThrough;

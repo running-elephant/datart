@@ -134,7 +134,14 @@ const ChartPreviewBoard: FC<{
     const saveAsViz = useSaveAsViz();
     const history = useHistory();
     const vizs = useSelector(selectVizs);
-    const [openNewTab, openBrowserTab, getDialogContent] = useDrillThrough();
+    const [
+      openNewTab,
+      openBrowserTab,
+      getDialogContent,
+      redirectByUrl,
+      openNewByUrl,
+      getDialogContentByUrl,
+    ] = useDrillThrough();
     const [openViewDetailPanel, viewDetailPanelContextHolder] =
       useDisplayViewDetail();
     const { parse } = useQSLibUrlHelper();
@@ -280,11 +287,11 @@ const ChartPreviewBoard: FC<{
               chartPreview?.chartConfig?.datas,
             );
             if (rule.event === InteractionMouseEvent.Left) {
+              const relId = rule?.[rule.category!]?.relId;
               if (
                 rule.category === InteractionCategory.JumpToChart ||
                 rule.category === InteractionCategory.JumpToDashboard
               ) {
-                const relId = rule?.[rule.category]?.relId;
                 if (rule?.action === InteractionAction.Redirect) {
                   openNewTab(
                     orgId,
@@ -308,7 +315,20 @@ const ChartPreviewBoard: FC<{
                   modal.info(modalContent as any);
                 }
               } else if (rule.category === InteractionCategory.JumpToUrl) {
-                // TODO:
+                const url = rule?.[rule.category!]?.url;
+                if (rule?.action === InteractionAction.Redirect) {
+                  redirectByUrl(url, nonAggJumpFilters.concat(clickFilters));
+                }
+                if (rule?.action === InteractionAction.Window) {
+                  openNewByUrl(url, nonAggJumpFilters.concat(clickFilters));
+                }
+                if (rule?.action === InteractionAction.Dialog) {
+                  const modalContent = getDialogContentByUrl(
+                    url,
+                    nonAggJumpFilters.concat(clickFilters),
+                  );
+                  modal.info(modalContent as any);
+                }
               }
             }
           });
