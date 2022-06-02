@@ -23,18 +23,30 @@ const useDrillThrough = () => {
   const history = useHistory();
   const { stringify } = useQSLibUrlHelper();
 
+  const stringifyParams = (filters?: any[]) =>
+    stringify({ filters: filters || [] });
+
+  const urlSchemeCheck = (url: string) => {
+    if (!/^http(s)?/.test(url)) {
+      return `http://${url}`;
+    }
+    return url;
+  };
+
   const openNewTab = (orgId, relId, params?: any[]) => {
-    const urlParmas = stringify({ filters: params });
-    history.push(`/organizations/${orgId}/vizs/${relId}?${urlParmas}`);
+    history.push(
+      `/organizations/${orgId}/vizs/${relId}?${stringifyParams(params)}`,
+    );
   };
 
-  const openBrowserTab = (orgId, relId, params?: object) => {
-    const urlParmas = stringify({ filters: params });
-    window.open(`/organizations/${orgId}/vizs/${relId}?${urlParmas}`, '_blank');
+  const openBrowserTab = (orgId, relId, params?: any[]) => {
+    window.open(
+      `/organizations/${orgId}/vizs/${relId}?${stringifyParams(params)}`,
+      '_blank',
+    );
   };
 
-  const getDialogContent = (orgId, relId, params?: object) => {
-    const urlParmas = stringify({ filters: params });
+  const getDialogContent = (orgId, relId, params?: any[]) => {
     return {
       width: 1000,
       content: (
@@ -43,36 +55,23 @@ const useDrillThrough = () => {
           height={600}
           width="100%"
           frameBorder="none"
-          src={`/organizations/${orgId}/vizs/${relId}?${urlParmas}`}
+          src={`/organizations/${orgId}/vizs/${relId}?${stringifyParams(
+            params,
+          )}`}
         />
       ),
     };
   };
 
   const redirectByUrl = (url, params?: any[]) => {
-    const urlParmas = stringify({ filters: params });
-    let urlWithScheme = url;
-    if (!/^http(s)?/.test(url)) {
-      urlWithScheme = `http://${urlWithScheme}`;
-    }
-    window.location.href = `${urlWithScheme}?${urlParmas}`;
+    window.location.href = `${urlSchemeCheck(url)}?${stringifyParams(params)}`;
   };
 
   const openNewByUrl = (url, params?: any[]) => {
-    const urlParmas = stringify({ filters: params });
-    let urlWithScheme = url;
-    if (!/^http(s)?/.test(url)) {
-      urlWithScheme = `http://${urlWithScheme}`;
-    }
-    window.open(`${urlWithScheme}?${urlParmas}`, '_blank');
+    window.open(`${urlSchemeCheck(url)}?${stringifyParams(params)}`, '_blank');
   };
 
-  const getDialogContentByUrl = (url, params?: object) => {
-    const urlParmas = stringify({ filters: params });
-    let urlWithScheme = url;
-    if (!/^http(s)?/.test(url)) {
-      urlWithScheme = `http://${urlWithScheme}`;
-    }
+  const getDialogContentByUrl = (url, params?: any[]) => {
     return {
       width: 1000,
       content: (
@@ -81,7 +80,7 @@ const useDrillThrough = () => {
           height={600}
           width="100%"
           frameBorder="none"
-          src={`${urlWithScheme}?${urlParmas}`}
+          src={`${urlSchemeCheck(url)}?${stringifyParams(params)}`}
         />
       ),
     };

@@ -286,6 +286,7 @@ const ChartPreviewBoard: FC<{
               drillOptionRef?.current,
               chartPreview?.chartConfig?.datas,
             );
+            const urlFilters = nonAggJumpFilters.concat(clickFilters);
             if (rule.event === InteractionMouseEvent.Left) {
               const relId = rule?.[rule.category!]?.relId;
               if (
@@ -293,40 +294,29 @@ const ChartPreviewBoard: FC<{
                 rule.category === InteractionCategory.JumpToDashboard
               ) {
                 if (rule?.action === InteractionAction.Redirect) {
-                  openNewTab(
-                    orgId,
-                    relId,
-                    nonAggJumpFilters.concat(clickFilters),
-                  );
+                  openNewTab(orgId, relId, urlFilters);
                 }
                 if (rule?.action === InteractionAction.Window) {
-                  openBrowserTab(
-                    orgId,
-                    relId,
-                    nonAggJumpFilters.concat(clickFilters),
-                  );
+                  openBrowserTab(orgId, relId, urlFilters);
                 }
                 if (rule?.action === InteractionAction.Dialog) {
                   const modalContent = getDialogContent(
                     orgId,
                     relId,
-                    nonAggJumpFilters.concat(clickFilters),
+                    urlFilters,
                   );
                   modal.info(modalContent as any);
                 }
               } else if (rule.category === InteractionCategory.JumpToUrl) {
                 const url = rule?.[rule.category!]?.url;
                 if (rule?.action === InteractionAction.Redirect) {
-                  redirectByUrl(url, nonAggJumpFilters.concat(clickFilters));
+                  redirectByUrl(url, urlFilters);
                 }
                 if (rule?.action === InteractionAction.Window) {
-                  openNewByUrl(url, nonAggJumpFilters.concat(clickFilters));
+                  openNewByUrl(url, urlFilters);
                 }
                 if (rule?.action === InteractionAction.Dialog) {
-                  const modalContent = getDialogContentByUrl(
-                    url,
-                    nonAggJumpFilters.concat(clickFilters),
-                  );
+                  const modalContent = getDialogContentByUrl(url, urlFilters);
                   modal.info(modalContent as any);
                 }
               }
@@ -355,6 +345,9 @@ const ChartPreviewBoard: FC<{
         openBrowserTab,
         getDialogContent,
         modal,
+        redirectByUrl,
+        openNewByUrl,
+        getDialogContentByUrl,
         openViewDetailPanel,
       ],
     );
