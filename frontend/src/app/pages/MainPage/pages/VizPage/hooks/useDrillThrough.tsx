@@ -39,6 +39,7 @@ const useDrillThrough = () => {
       width: 1000,
       content: (
         <iframe
+          title="Datart Iframe Window"
           height={600}
           width="100%"
           frameBorder="none"
@@ -76,6 +77,7 @@ const useDrillThrough = () => {
       width: 1000,
       content: (
         <iframe
+          title="Datart Iframe Window"
           height={600}
           width="100%"
           frameBorder="none"
