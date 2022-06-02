@@ -763,6 +763,7 @@
           "rule": {
             "title": "规则设置",
             "addRule": "+ 点击新建",
+            "inputUrl": "请输入URL",
             "header": {
               "category": "类型",
               "open": "打开方式",

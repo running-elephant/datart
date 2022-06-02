@@ -46,6 +46,12 @@ export type JumpToChartRule = {
   [InteractionFieldRelation.Customize]: CustomizeRelation[];
 };
 
+export type JumpToUrlRule = {
+  relId: string;
+  url: string;
+  [InteractionFieldRelation.Customize]: CustomizeRelation[];
+};
+
 export type InteractionRule = {
   id: string;
   event?: InteractionMouseEvent;
@@ -53,7 +59,7 @@ export type InteractionRule = {
   action?: InteractionAction;
   [InteractionCategory.JumpToChart]?: JumpToChartRule;
   [InteractionCategory.JumpToDashboard]?: any;
-  [InteractionCategory.JumpToUrl]?: any;
+  [InteractionCategory.JumpToUrl]?: JumpToUrlRule;
 };
 
 export type DrillThroughSetting = {

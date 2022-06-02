@@ -272,7 +272,7 @@ const ChartPreviewBoard: FC<{
             .build()
             ?.filters?.filter(f => !Boolean(f.aggOperator));
 
-          (drillThroughSetting?.rules || []).forEach(rule => {
+          drillThroughSetting?.rules?.forEach(rule => {
             const clickFilters = getClickEventDimensionFilters(
               param?.data?.rowData,
               rule,
