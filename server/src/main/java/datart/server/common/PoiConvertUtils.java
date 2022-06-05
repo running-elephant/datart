@@ -182,12 +182,14 @@ public class PoiConvertUtils {
         POISettings poiSettings = new POISettings();
         Map<Integer, List<Column>> headerRowMap = new HashMap<>();
         List<CellRangeAddress> mergeCells = new ArrayList<>();
+        // 记录已使用Column uid
+        Set<String> hadUsedColumnNameSet = new HashSet<>(groupColumns.size());
         if (!CollectionUtils.isEmpty(groupColumns)) { //分组表头
             int deep = groupColumns.stream().map(ChartColumn::getDeepNum).max(Integer::compareTo).get();
             for (int i = 1; i < deep; i++) {
                 headerRowMap.put(i, new ArrayList<>());
             }
-            convertGroupHeaderData(groupColumns, headerRowMap, 0, mergeCells);
+            convertGroupHeaderData(groupColumns, headerRowMap, 0, mergeCells, hadUsedColumnNameSet);
         } else {
             for (ChartColumn column : columns) {
                 putDataIntoColumnMap(headerRowMap, 0, column);
@@ -198,25 +200,41 @@ public class PoiConvertUtils {
         return poiSettings;
     }
 
-    private static void convertGroupHeaderData(List<ChartColumn> dataStyles, Map<Integer, List<Column>> rowMap, int rowNum, List<CellRangeAddress> cellRangeAddresses){
+    private static void convertGroupHeaderData(List<ChartColumn> dataStyles, Map<Integer, List<Column>> rowMap, int rowNum, List<CellRangeAddress> cellRangeAddresses, Set<String> hadUsedColumnNameSet){
         for (ChartColumn dataStyle : dataStyles) {
+            if (hadUsedColumnNameSet.contains(dataStyle.getColName())) {
+                continue;
+            }
+            hadUsedColumnNameSet.add(dataStyle.getColName());
             int columnNum = putDataIntoColumnMap(rowMap, rowNum, dataStyle);
-            if (dataStyle.getLeafNum()==0 && !dataStyle.isGroup()){//纵向合并
+            // 纵向合并
+            if (dataStyle.getLeafNum() == 0 && !dataStyle.isGroup()) {
                 for (int i = rowNum+1; i < rowMap.size(); i++) {
                     putDataIntoColumnMap(rowMap, i, new ChartColumn());
                 }
                 if (rowMap.size()-1 > rowNum){
                     cellRangeAddresses.add(new CellRangeAddress(rowNum, rowMap.size()-1, columnNum, columnNum));
                 }
-            } else if (dataStyle.getLeafNum()>1){//横向合并
+            } else if (dataStyle.getLeafNum() > 1) {
+                // 横向合并
                 for (int i = 1; i < dataStyle.getLeafNum(); i++) {
                     putDataIntoColumnMap(rowMap, rowNum, new ChartColumn());
                 }
                 cellRangeAddresses.add(new CellRangeAddress(rowNum, rowNum, columnNum, columnNum+dataStyle.getLeafNum()-1));
             }
-            if (dataStyle.getChildren().size()>0){//递归遍历所有节点
+            if (dataStyle.getChildren().size() > 0){
                 int row = rowNum+1;
-                convertGroupHeaderData(dataStyle.getChildren(), rowMap, row, cellRangeAddresses);
+                //递归遍历所有节点
+                convertGroupHeaderData(dataStyle.getChildren(), rowMap, row, cellRangeAddresses, hadUsedColumnNameSet);
+
+                // 尾递归法，补充完善本轮合并单元格 columnNum, 当前列序号，子元素列序号
+                for (int j = columnNum + 1; j < rowMap.get(row).size(); j++) {
+                    putDataIntoColumnMap(rowMap, rowNum, new ChartColumn());
+                }
+                // 若子单元格列大于当前单元格列，则合并
+                if (columnNum + 1 < rowMap.get(rowNum).size()) {
+                    cellRangeAddresses.add(new CellRangeAddress(rowNum, rowNum, columnNum, rowMap.get(rowNum).size() - 1));
+                }
             }
         }
     }

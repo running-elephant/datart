@@ -76,7 +76,7 @@ public class POIUtils {
         Sheet sheet = workbook.createSheet(sheetName);
         int rowNum = writeHeaderRows(sheet, poiSettings.getHeaderRows());
         fillSheetWithSetting(sheet, sheetData, poiSettings.getColumnSetting(), rowNum+1);
-        mergeSheetCell(sheet, poiSettings.getMergeCells());
+        mergeSheetCell(workbook, sheet, poiSettings.getMergeCells());
         setColumnWidth(sheet, poiSettings.getColumnSetting());
     }
 
@@ -150,9 +150,16 @@ public class POIUtils {
         }
     }
 
-    private static void mergeSheetCell(Sheet sheet, List<CellRangeAddress> mergeCells) {
+    private static void mergeSheetCell(Workbook workbook, Sheet sheet, List<CellRangeAddress> mergeCells) {
+        CellStyle cellstyle = workbook.createCellStyle();
+        cellstyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellstyle.setAlignment(HorizontalAlignment.CENTER);
         for (CellRangeAddress cellRangeAddress : mergeCells) {
+            //合并操作
             sheet.addMergedRegion(cellRangeAddress);
+            // 设置合并后的style
+            Cell cell = sheet.getRow(cellRangeAddress.getFirstRow()).getCell(cellRangeAddress.getFirstColumn());
+            cell.setCellStyle(cellstyle);
         }
     }
 
