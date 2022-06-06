@@ -349,7 +349,7 @@ export class ChartDataRequestBuilder {
     const _extraSorters = this.extraSorters?.filter(
       ({ column, operator }) => column && operator,
     );
-    if (_extraSorters.length) {
+    if (!isEmptyArray(_extraSorters)) {
       return _extraSorters;
     }
     return originalSorters.filter(sorter => Boolean(sorter?.operator));
