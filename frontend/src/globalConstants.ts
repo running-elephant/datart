@@ -22,6 +22,7 @@ export const DATARTSEPERATOR = '@datart@';
 export const CHARTCONFIG_FIELD_PLACEHOLDER_UID = '@placeholder@';
 export const DATART_TRANSLATE_HOLDER = '@global@';
 export const EVENT_ACTION_DELAY_MS = 200;
+export const RUNTIME_FILTER_KEY = Symbol('@filters@');
 
 export enum StorageKeys {
   AuthorizationToken = 'AUTHORIZATION_TOKEN',
@@ -209,7 +210,7 @@ export const NumericUnitDescriptions = new Map<NumberUnitKey, [number, string]>(
     [NumberUnitKey.None, [1, '']],
     [NumberUnitKey.Thousand, [10 ** 3, 'K']],
     [NumberUnitKey.Million, [10 ** 6, 'M']],
-    [NumberUnitKey.Billion, [10 ** 10, 'B']],
+    [NumberUnitKey.Billion, [10 ** 9, 'B']],
     [NumberUnitKey.Wan, [10 ** 4, '万']],
     [NumberUnitKey.Yi, [10 ** 8, '亿']],
   ],

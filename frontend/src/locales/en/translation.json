@@ -353,14 +353,6 @@
           "selectController": "Select ..",
           "textController": "Enter text"
         },
-        "controllerPlaceHolders": {
-          "multiSelectController": "Select ..",
-          "numberController": "Enter a number",
-          "rangeNumberControllerMin": "Min",
-          "rangeNumberControllerMax": "Max",
-          "selectController": "Select ..",
-          "textController": "Enter text"
-        },
         "controllerVisibilityTypes": {
           "hide": "Hide",
           "show": "Show",
@@ -768,17 +760,21 @@
       "interaction": {
         "drillThrough": {
           "title": "Drill Through",
-          "event": "Ineraction Event",
-          "leftClick": "Left Click",
-          "rightClick": "Right Click",
           "rule": {
             "title": "Rule",
             "addRule": "+ Add New",
+            "inputUrl": "Please input url",
             "header": {
               "category": "Category",
               "open": "Open",
               "relation": "Relation",
-              "operation": "Operation"
+              "operation": "Operation",
+              "event": "Event"
+            },
+            "event": {
+              "title": "Event",
+              "left": "Left",
+              "right": "Right"
             },
             "category": {
               "title": "Categroy",
@@ -812,8 +808,16 @@
             }
           }
         },
-        "viewData": {
-          "title": "View Data"
+        "viewDetail": {
+          "title": "View Detail",
+          "event": "Ineraction Event",
+          "leftClick": "Left Click",
+          "rightClick": "Right Click",
+          "field": "Selected Fields",
+          "all": "All",
+          "customize": "Customize",
+          "summary": "Summary",
+          "details": "Details"
         }
       },
       "present": {

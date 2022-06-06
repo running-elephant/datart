@@ -19,6 +19,7 @@
 import {
   InteractionAction,
   InteractionCategory,
+  InteractionFieldMapper,
   InteractionRelationType,
 } from '../../constants';
 
@@ -45,16 +46,28 @@ export type JumpToChartRule = {
   [InteractionFieldRelation.Customize]: CustomizeRelation[];
 };
 
+export type JumpToUrlRule = {
+  relId: string;
+  url: string;
+  [InteractionFieldRelation.Customize]: CustomizeRelation[];
+};
+
 export type InteractionRule = {
   id: string;
+  event?: InteractionMouseEvent;
   category?: InteractionCategory;
   action?: InteractionAction;
   [InteractionCategory.JumpToChart]?: JumpToChartRule;
   [InteractionCategory.JumpToDashboard]?: any;
-  [InteractionCategory.JumpToUrl]?: any;
+  [InteractionCategory.JumpToUrl]?: JumpToUrlRule;
 };
 
 export type DrillThroughSetting = {
-  event: string;
   rules?: InteractionRule[];
+};
+
+export type ViewDetailSetting = {
+  event: InteractionMouseEvent;
+  mapper?: InteractionFieldMapper;
+  [InteractionFieldMapper.Customize]?: any[];
 };

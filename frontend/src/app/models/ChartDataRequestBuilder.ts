@@ -44,9 +44,14 @@ import {
   recommendTimeRangeConverter,
   splitRangerDateFilters,
 } from 'app/utils/time';
-import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
+import {
+  FilterSqlOperator,
+  RUNTIME_FILTER_KEY,
+  TIME_FORMATTER,
+} from 'globalConstants';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 import { DrillMode } from './ChartDrillOption';
+
 export class ChartDataRequestBuilder {
   extraSorters: ChartDataRequest['orders'] = [];
   chartDataConfigs: ChartDataConfig[];
@@ -198,7 +203,9 @@ export class ChartDataRequestBuilder {
         return true;
       })
       .map(col => col);
-    return this.normalizeFilters(fields).concat(this.normalizeDrillFilters());
+    return this.normalizeFilters(fields)
+      .concat(this.normalizeDrillFilters())
+      .concat(this.normalizeRuntimeFilters());
   }
 
   private normalizeFilters = (fields: ChartDataSectionField[]) => {
@@ -299,6 +306,16 @@ export class ChartDataRequestBuilder {
           ],
         };
       }) || []) as ChartDataRequestFilter[];
+  }
+
+  private normalizeRuntimeFilters(): ChartDataRequestFilter[] {
+    return (
+      this.chartDataConfigs
+        ?.filter(c => c.type === ChartDataSectionType.Filter)
+        ?.flatMap(c => {
+          return c[RUNTIME_FILTER_KEY] || [];
+        }) || []
+    );
   }
 
   private buildOrders() {
@@ -435,6 +452,34 @@ export class ChartDataRequestBuilder {
     return selectColumns.map(col => col.colName);
   }
 
+  private buildDetailColumns() {
+    const selectColumns = this.chartDataConfigs.reduce<ChartDataSectionField[]>(
+      (acc, cur) => {
+        if (!cur.rows) {
+          return acc;
+        }
+        if (cur.drillable) {
+          if (this.isInValidDrillOption()) {
+            return acc.concat(cur.rows?.[0] || []);
+          }
+          return acc.concat(
+            cur.rows?.filter(field => {
+              return Boolean(
+                this.drillOption
+                  ?.getCurrentFields()
+                  ?.some(df => df.uid === field.uid),
+              );
+            }) || [],
+          );
+        } else {
+          return acc.concat(cur.rows);
+        }
+      },
+      [],
+    );
+    return selectColumns.map(col => col.colName);
+  }
+
   private buildViewConfigs() {
     return transformToViewConfig(this.dataView?.config);
   }
@@ -458,6 +503,21 @@ export class ChartDataRequestBuilder {
       pageInfo: this.buildPageInfo(),
       functionColumns: this.buildFunctionColumns(),
       columns: this.buildSelectColumns(),
+      script: this.script,
+    };
+  }
+
+  public buildDetails(): ChartDataRequest {
+    return {
+      ...this.buildViewConfigs(),
+      viewId: this.dataView?.id,
+      aggregators: [],
+      groups: [],
+      filters: this.buildFilters(),
+      orders: [],
+      pageInfo: this.buildPageInfo(),
+      functionColumns: this.buildFunctionColumns(),
+      columns: this.buildDetailColumns(),
       script: this.script,
     };
   }

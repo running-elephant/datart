@@ -22,6 +22,7 @@ export { default as ConditionalStylePanel } from './ConditionalStyle';
 export { default as DataReferencePanel } from './DataReferencePanel';
 export { default as FontAlignment } from './FontAlignment';
 export { default as DrillThroughPanel } from './Interaction/DrillThroughPanel';
+export { default as ViewDetailPanel } from './Interaction/ViewDetailPanel';
 export { default as LabelPosition } from './LabelPosition';
 export { default as LegendPosition } from './LegendPosition';
 export { default as LegendType } from './LegendType';

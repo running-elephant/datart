@@ -16,20 +16,16 @@
  * limitations under the License.
  */
 
-import { useHistory } from 'react-router-dom';
+import qs from 'qs';
 
-const useDrillThrough = () => {
-  const history = useHistory();
+const useQSLibUrlHelper = () => {
+  const parse = qs.parse;
+  const stringify = qs.stringify;
 
-  const openNewTab = (orgId, relId) => {
-    history.push(`/organizations/${orgId}/vizs/${relId}`);
+  return {
+    parse,
+    stringify,
   };
-
-  const openBrowserTab = (orgId, relId) => {
-    window.open(`/organizations/${orgId}/vizs/${relId}`, '_blank');
-  };
-
-  return [openNewTab, openBrowserTab];
 };
 
-export default useDrillThrough;
+export default useQSLibUrlHelper;

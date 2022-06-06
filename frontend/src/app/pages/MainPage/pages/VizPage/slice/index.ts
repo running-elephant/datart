@@ -557,7 +557,7 @@ const slice = createSlice({
     });
     builder.addCase(fetchVizChartAction.fulfilled, (state, action) => {
       const newChartDto = CloneValueDeep(action.payload.data);
-
+      const jumpFilterParams = action.payload.jumpFilterParams;
       const filterSearchParams = action.payload.filterSearchParams;
       const index = state.chartPreviews?.findIndex(
         c => c.backendChartId === newChartDto?.id,
@@ -576,6 +576,8 @@ const slice = createSlice({
                   migrateChartConfig(newChartDto?.config),
                 ),
                 filterSearchParams,
+                false,
+                jumpFilterParams,
               )
             : undefined,
         });
@@ -590,6 +592,8 @@ const slice = createSlice({
               migrateChartConfig(newChartDto?.config),
             ),
             filterSearchParams,
+            false,
+            jumpFilterParams,
           ),
         };
       }
