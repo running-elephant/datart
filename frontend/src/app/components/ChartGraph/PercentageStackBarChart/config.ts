@@ -460,7 +460,7 @@ const config: ChartConfig = {
       label: 'drillThrough.title',
       key: 'drillThrough',
       comType: 'checkboxModal',
-      default: true,
+      default: false,
       options: { modalSize: 'middle' },
       rows: [
         {
@@ -474,7 +474,7 @@ const config: ChartConfig = {
       label: 'viewDetail.title',
       key: 'viewDetail',
       comType: 'checkboxModal',
-      default: true,
+      default: false,
       options: { modalSize: 'middle' },
       rows: [
         {
