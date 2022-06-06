@@ -53,7 +53,8 @@ import {
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import {
   getChartDrillOption,
-  getClickEventDimensionFilters,
+  getClickEventJumpFilters,
+  getClickEventViewDetailFilters,
 } from 'app/utils/internalChartHelper';
 import { KEYBOARD_EVENT_NAME } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -280,7 +281,7 @@ const ChartPreviewBoard: FC<{
             ?.filters?.filter(f => !Boolean(f.aggOperator));
 
           drillThroughSetting?.rules?.forEach(rule => {
-            const clickFilters = getClickEventDimensionFilters(
+            const clickFilters = getClickEventJumpFilters(
               param?.data?.rowData,
               rule,
               drillOptionRef?.current,
@@ -327,11 +328,17 @@ const ChartPreviewBoard: FC<{
           enableViewDetail &&
           viewDetailSetting?.event === InteractionMouseEvent.Left
         ) {
+          const clickFilters = getClickEventViewDetailFilters(
+            param?.data?.rowData,
+            drillOptionRef?.current,
+            chartPreview?.chartConfig?.datas,
+          );
           (openViewDetailPanel as any)({
             currentDataView: chartPreview?.backendChart?.view,
             chartConfig: chartPreview?.chartConfig,
             drillOption: drillOptionRef?.current,
-            pageInfo: {},
+            viewDetailSetting: viewDetailSetting,
+            clickFilters: clickFilters,
           });
         }
       },
