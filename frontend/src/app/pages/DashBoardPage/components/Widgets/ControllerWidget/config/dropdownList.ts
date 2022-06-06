@@ -22,6 +22,7 @@ import {
   WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { WHITE } from 'styles/StyleConstants';
 import { controlWidgetTpl, getControlDropDownList } from '.';
 import {
   ImmediateQueryI18N,
@@ -86,7 +87,7 @@ export const widgetToolkit: WidgetToolkit = {
     widget.config.originalType = widgetMeta.originalType;
     widget.config.rect.height = 40;
     const addProps = [
-      { ...initBackgroundTpl('#fff') },
+      { ...initBackgroundTpl(WHITE) },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
       { ...initLoopFetchTpl() },

@@ -21,6 +21,7 @@ import {
   WidgetMeta,
   WidgetProto,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { WHITE } from 'styles/StyleConstants';
 import {
   ControlWidgetToolkit,
   controlWidgetTpl,
@@ -91,7 +92,7 @@ export const widgetToolkit: ControlWidgetToolkit = {
     widget.id = widgetMeta.originalType + widget.id;
     widget.config.originalType = widgetMeta.originalType;
     const addProps = [
-      { ...initBackgroundTpl('#fff') },
+      { ...initBackgroundTpl(WHITE) },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
       { ...initLoopFetchTpl() },

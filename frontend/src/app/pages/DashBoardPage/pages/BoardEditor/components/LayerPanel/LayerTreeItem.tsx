@@ -24,7 +24,7 @@ import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetPro
 import classNames from 'classnames';
 import { FC, memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
-import { G30, PRIMARY } from 'styles/StyleConstants';
+import { PRIMARY } from 'styles/StyleConstants';
 import { WidgetActionContext } from '../../../../components/ActionProvider/WidgetActionProvider';
 
 export interface LayerNode extends TreeDataNode {
@@ -81,8 +81,10 @@ export const TreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
         className={classNames('layer-item', { selected: selected })}
       >
         <span className="widget-name" title={title as string}>
-          <span className="widget-icon">{icon}</span>
-          {String(title) || 'untitled-widget'}
+          <span className="widget-name-icon">{icon}</span>
+          <span className="widget-name-text">
+            {String(title) || 'untitled-widget'}
+          </span>
         </span>
 
         <WidgetDropdownList widget={widget} />
@@ -96,24 +98,27 @@ const StyledWrapper = styled.div`
   .layer-item {
     display: flex;
     flex: 1;
-    align-items: center;
-    justify-content: space-between;
     padding: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: move;
 
     .widget-name {
+      display: flex;
+      flex: 1;
+      flex-direction: row;
+      width: 0px;
+    }
+    .widget-name-icon {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 20px;
+      cursor: move;
+    }
+    .widget-name-text {
       flex: 1;
       width: 0px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-    }
-    .widget-icon {
-      display: inline-block;
-      width: 20px;
     }
   }
 
@@ -125,9 +130,10 @@ const StyledWrapper = styled.div`
     display: block;
   }
   .layer-item.selected {
+    color: ${p => p.theme.componentBackground};
     background-color: ${PRIMARY};
   }
   &:hover {
-    background-color: ${G30};
+    color: ${PRIMARY};
   }
 `;
