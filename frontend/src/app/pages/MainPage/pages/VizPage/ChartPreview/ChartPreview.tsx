@@ -129,6 +129,9 @@ const ChartPreviewBoard: FC<{
     const [chartPreview, setChartPreview] = useState<ChartPreview>();
     const [chart, setChart] = useState<IChart>();
     const [loadingStatus, setLoadingStatus] = useState<boolean>(false);
+    const [chartContextMenuEvent, setChartContextMenuEvent] = useState<{
+      data?: any;
+    }>();
     const drillOptionRef = useRef<IChartDrillOption>();
     const t = useI18NPrefix('viz.main');
     const tg = useI18NPrefix('global');
@@ -241,7 +244,164 @@ const ChartPreviewBoard: FC<{
       [backendChartId, chartPreview, dispatch],
     );
 
-    const handleDrillThroughEvent = useCallback(
+    const enableRightClickDrillThrough = () => {
+      const enableDrillThrough = getValue(
+        chartPreview?.chartConfig?.interactions || [],
+        ['drillThrough'],
+      );
+      const drillThroughSetting = getStyles(
+        chartPreview?.chartConfig?.interactions || [],
+        ['drillThrough'],
+        ['setting'],
+      )?.[0] as DrillThroughSetting;
+      const hasRightClickEvent = drillThroughSetting?.rules?.some(
+        r => r.event === InteractionMouseEvent.Right,
+      );
+      return enableDrillThrough && hasRightClickEvent;
+    };
+
+    const enableRightClickViewData = () => {
+      const enableViewDetail = getValue(
+        chartPreview?.chartConfig?.interactions || [],
+        ['viewDetail'],
+      );
+      const viewDetailSetting = getStyles(
+        chartPreview?.chartConfig?.interactions || [],
+        ['viewDetail'],
+        ['setting'],
+      )?.[0] as ViewDetailSetting;
+      return (
+        enableViewDetail &&
+        viewDetailSetting?.event === InteractionMouseEvent.Right
+      );
+    };
+
+    const handleRightClickDrillThroughEvent = useCallback(() => {
+      const param = chartContextMenuEvent;
+      const enableDrillThrough = getValue(
+        chartPreview?.chartConfig?.interactions || [],
+        ['drillThrough'],
+      );
+      const drillThroughSetting = getStyles(
+        chartPreview?.chartConfig?.interactions || [],
+        ['drillThrough'],
+        ['setting'],
+      )?.[0] as DrillThroughSetting;
+
+      if (enableDrillThrough) {
+        let nonAggJumpFilters = new ChartDataRequestBuilder(
+          {
+            id: chartPreview?.backendChart?.view?.id || '',
+            config: chartPreview?.backendChart?.view.config || {},
+            computedFields:
+              chartPreview?.backendChart?.config.computedFields || [],
+          },
+          chartPreview?.chartConfig?.datas,
+          chartPreview?.chartConfig?.settings,
+          {},
+          false,
+          chartPreview?.backendChart?.config?.aggregation,
+        )
+          .addDrillOption(drillOptionRef?.current)
+          .build()
+          ?.filters?.filter(f => !Boolean(f.aggOperator));
+
+        drillThroughSetting?.rules?.forEach(rule => {
+          const clickFilters = getClickEventJumpFilters(
+            param?.data?.rowData,
+            rule,
+            drillOptionRef?.current,
+            chartPreview?.chartConfig?.datas,
+          );
+          const urlFilters = nonAggJumpFilters.concat(clickFilters);
+          if (rule.event === InteractionMouseEvent.Right) {
+            const relId = rule?.[rule.category!]?.relId;
+            if (
+              rule.category === InteractionCategory.JumpToChart ||
+              rule.category === InteractionCategory.JumpToDashboard
+            ) {
+              if (rule?.action === InteractionAction.Redirect) {
+                openNewTab(orgId, relId, urlFilters);
+              }
+              if (rule?.action === InteractionAction.Window) {
+                openBrowserTab(orgId, relId, urlFilters);
+              }
+              if (rule?.action === InteractionAction.Dialog) {
+                const modalContent = getDialogContent(orgId, relId, urlFilters);
+                modal.info(modalContent as any);
+              }
+            } else if (rule.category === InteractionCategory.JumpToUrl) {
+              const url = rule?.[rule.category!]?.url;
+              if (rule?.action === InteractionAction.Redirect) {
+                redirectByUrl(url, urlFilters);
+              }
+              if (rule?.action === InteractionAction.Window) {
+                openNewByUrl(url, urlFilters);
+              }
+              if (rule?.action === InteractionAction.Dialog) {
+                const modalContent = getDialogContentByUrl(url, urlFilters);
+                modal.info(modalContent as any);
+              }
+            }
+          }
+        });
+      }
+    }, [
+      chartContextMenuEvent,
+      chartPreview?.chartConfig?.interactions,
+      chartPreview?.chartConfig?.datas,
+      chartPreview?.chartConfig?.settings,
+      chartPreview?.backendChart?.view?.id,
+      chartPreview?.backendChart?.view.config,
+      chartPreview?.backendChart?.config.computedFields,
+      chartPreview?.backendChart?.config?.aggregation,
+      openNewTab,
+      orgId,
+      openBrowserTab,
+      getDialogContent,
+      modal,
+      redirectByUrl,
+      openNewByUrl,
+      getDialogContentByUrl,
+    ]);
+
+    const handleRightClickViewDataEvent = useCallback(() => {
+      const param = chartContextMenuEvent;
+      const enableViewDetail = getValue(
+        chartPreview?.chartConfig?.interactions || [],
+        ['viewDetail'],
+      );
+      const viewDetailSetting = getStyles(
+        chartPreview?.chartConfig?.interactions || [],
+        ['viewDetail'],
+        ['setting'],
+      )?.[0] as ViewDetailSetting;
+
+      if (
+        enableViewDetail &&
+        viewDetailSetting?.event === InteractionMouseEvent.Right
+      ) {
+        const clickFilters = getClickEventViewDetailFilters(
+          param?.data?.rowData,
+          drillOptionRef?.current,
+          chartPreview?.chartConfig?.datas,
+        );
+        (openViewDetailPanel as any)({
+          currentDataView: chartPreview?.backendChart?.view,
+          chartConfig: chartPreview?.chartConfig,
+          drillOption: drillOptionRef?.current,
+          viewDetailSetting: viewDetailSetting,
+          clickFilters: clickFilters,
+        });
+      }
+    }, [
+      chartContextMenuEvent,
+      chartPreview?.chartConfig,
+      chartPreview?.backendChart?.view,
+      openViewDetailPanel,
+    ]);
+
+    const handleLeftClickInteractionEvent = useCallback(
       param => {
         const enableDrillThrough = getValue(
           chartPreview?.chartConfig?.interactions || [],
@@ -365,7 +525,7 @@ const ChartPreviewBoard: FC<{
           {
             name: 'click',
             callback: param => {
-              handleDrillThroughEvent(param);
+              handleLeftClickInteractionEvent(param);
               if (
                 drillOptionRef.current?.isSelectedDrill &&
                 !drillOptionRef.current.isBottomLevel
@@ -420,9 +580,20 @@ const ChartPreviewBoard: FC<{
               }
             },
           },
+          {
+            name: 'contextmenu',
+            callback: param => {
+              setChartContextMenuEvent(param);
+            },
+          },
         ]);
       },
-      [dispatch, handleDrillOptionChange, handleDrillThroughEvent, vizAction],
+      [
+        dispatch,
+        handleDrillOptionChange,
+        handleLeftClickInteractionEvent,
+        vizAction,
+      ],
     );
 
     useEffect(() => {
@@ -657,6 +828,12 @@ const ChartPreviewBoard: FC<{
               onDrillOptionChange: handleDrillOptionChange,
               availableSourceFunctions,
               onDateLevelChange: handleDateLevelChange,
+              onDrillThroughChange: enableRightClickDrillThrough()
+                ? handleRightClickDrillThroughEvent
+                : undefined,
+              onViewDataChange: enableRightClickViewData()
+                ? handleRightClickViewDataEvent
+                : undefined,
             }}
           >
             <div>

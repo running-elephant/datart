@@ -891,7 +891,9 @@
         "expandNextLevel": "Expand to Next Level",
         "selectDrillOn": "\"Click to drill down\" is on",
         "selectDrillOff": "Turn on \"Click to drill down\"",
-        "rollUp": "Roll Up"
+        "rollUp": "Roll Up",
+        "drillThrough": "Drill Through",
+        "viewData": "View Data"
       }
     },
     "action": {

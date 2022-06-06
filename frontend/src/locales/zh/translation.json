@@ -891,7 +891,9 @@
         "expandNextLevel": "展开下一层级",
         "selectDrillOn": "已开启“点击下钻”",
         "selectDrillOff": "开启“点击下钻”",
-        "rollUp": "上卷"
+        "rollUp": "上卷",
+        "drillThrough": "跳转",
+        "viewData": "查看数据"
       }
     },
     "action": {
