@@ -16,29 +16,27 @@
  * limitations under the License.
  */
 
-package datart.core.data.provider.sql;
+package datart.data.provider.script;
 
+import com.alibaba.fastjson.JSON;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class OrderOperator extends ColumnOperator {
+public class StructScript {
 
-    private AggregateOperator.SqlOperator aggOperator;
+    private String[] table;
 
-    private SqlOperator operator;
+    private List<String> columns;
 
-    public enum SqlOperator {
-        ASC,
-        DESC
-    }
+    private List<TableJoin> joins;
 
-    @Override
-    public String toString() {
-        return "OrderOperator{" +
-                "column='" + getColumnKey() + '\'' +
-                ", operator=" + operator +
-                '}';
+    public static StructScript ofScript(String script) {
+        if (StringUtils.isBlank(script)) {
+            return null;
+        }
+        return JSON.parseObject(script, StructScript.class);
     }
 }

@@ -16,29 +16,26 @@
  * limitations under the License.
  */
 
-package datart.core.data.provider.sql;
+package datart.data.provider.script;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import org.apache.calcite.sql.JoinType;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class OrderOperator extends ColumnOperator {
+public class TableJoin {
 
-    private AggregateOperator.SqlOperator aggOperator;
+    @NotBlank
+    private String[] table;
 
-    private SqlOperator operator;
+    private List<String> columns;
 
-    public enum SqlOperator {
-        ASC,
-        DESC
-    }
+    @NotNull
+    private JoinType joinType;
 
-    @Override
-    public String toString() {
-        return "OrderOperator{" +
-                "column='" + getColumnKey() + '\'' +
-                ", operator=" + operator +
-                '}';
-    }
+    private List<JoinCondition> conditions;
+
 }

@@ -16,29 +16,15 @@
  * limitations under the License.
  */
 
-package datart.core.data.provider.sql;
+package datart.data.provider.script;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class OrderOperator extends ColumnOperator {
+public class JoinCondition {
 
-    private AggregateOperator.SqlOperator aggOperator;
+    private String[] left;
 
-    private SqlOperator operator;
+    private String[] right;
 
-    public enum SqlOperator {
-        ASC,
-        DESC
-    }
-
-    @Override
-    public String toString() {
-        return "OrderOperator{" +
-                "column='" + getColumnKey() + '\'' +
-                ", operator=" + operator +
-                '}';
-    }
 }

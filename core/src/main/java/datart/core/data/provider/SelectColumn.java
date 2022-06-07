@@ -16,29 +16,26 @@
  * limitations under the License.
  */
 
-package datart.core.data.provider.sql;
+package datart.core.data.provider;
 
+import datart.core.data.provider.sql.Alias;
+import datart.core.data.provider.sql.ColumnOperator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class OrderOperator extends ColumnOperator {
+public class SelectColumn extends ColumnOperator implements Alias {
 
-    private AggregateOperator.SqlOperator aggOperator;
+    private String alias;
 
-    private SqlOperator operator;
-
-    public enum SqlOperator {
-        ASC,
-        DESC
+    public static SelectColumn of(String alias, String... names) {
+        SelectColumn selectColumn = new SelectColumn();
+        selectColumn.setAlias(alias);
+        selectColumn.setColumn(names);
+        return selectColumn;
     }
 
-    @Override
-    public String toString() {
-        return "OrderOperator{" +
-                "column='" + getColumnKey() + '\'' +
-                ", operator=" + operator +
-                '}';
-    }
+
+
 }
