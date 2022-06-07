@@ -55,6 +55,7 @@ import {
   useSaveFormContext,
 } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { IChart } from 'app/types/Chart';
+import { SelectedItem } from 'app/types/ChartConfig';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
@@ -312,16 +313,27 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               return;
             }
 
+            if (param.seriesName === 'changeSelectedItems') {
+              dispatch(actions.changeSelectedItems(param.data));
+              return;
+            }
+
             if (!drillOptionRef.current?.isSelectedDrill && chart.selectable) {
               const {
                 dataIndex,
                 componentIndex,
-              }: { dataIndex: number; componentIndex: number } = param;
+                data,
+              }: {
+                dataIndex?: number;
+                componentIndex?: number;
+                data: { rowData: { [p: string]: any } };
+                seriesName?: string;
+              } = param;
               dispatch(
                 actions.normalSelect({
                   index: componentIndex + ',' + dataIndex,
-                  data: param.data,
-                }),
+                  data,
+                } as SelectedItem),
               );
               return;
             }
@@ -399,7 +411,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     );
 
     if (selectedItems.length) {
-      dispatch(actions.clearSelectedItems());
+      dispatch(actions.changeSelectedItems([]));
     }
     if (!expensiveQuery) {
       dispatch(refreshDatasetAction({ drillOption: drillOptionRef?.current }));

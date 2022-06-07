@@ -158,15 +158,21 @@ const ChartForShare: FC<{
             return;
           }
 
+          if (param.seriesName === 'changeSelectedItems') {
+            dispatch(shareActions.changeSelectedItems(param.data));
+            return;
+          }
+
           if (!drillOptionRef.current?.isSelectedDrill && chart.selectable) {
             const {
               dataIndex,
               componentIndex,
-            }: { dataIndex: number; componentIndex: number } = param;
+              data,
+            }: { dataIndex: number; componentIndex: number; data: any } = param;
             dispatch(
               shareActions.normalSelect({
                 index: componentIndex + ',' + dataIndex,
-                data: param.data,
+                data,
               }),
             );
             return;

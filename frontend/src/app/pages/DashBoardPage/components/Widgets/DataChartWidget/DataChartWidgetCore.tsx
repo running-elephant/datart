@@ -48,6 +48,7 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
 import {
+  changeAllSelectedItems,
   multipleSelectChange,
   selectedItemChange,
 } from '../../../pages/BoardEditor/slice/actions/actions';
@@ -195,6 +196,17 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                   handleDrillOptionChange?.(params.value);
                   return;
                 }
+
+                if (params.seriesName === 'changeSelectedItems') {
+                  changeAllSelectedItems(
+                    dispatch,
+                    renderMode,
+                    params.data,
+                    wid,
+                  );
+                  return;
+                }
+
                 if (
                   !drillOptionRef.current?.isSelectedDrill &&
                   chartInstance.selectable

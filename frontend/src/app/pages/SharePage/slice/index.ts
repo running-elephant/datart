@@ -24,9 +24,10 @@ import {
   VizType,
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transferChartConfig } from 'app/pages/MainPage/pages/VizPage/slice/utils';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import { contrastSelectedItems } from 'app/utils/chartHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import {
   fetchAvailableSourceFunctions,
@@ -176,10 +177,7 @@ export const slice = createSlice({
           action.payload.computedFields;
       }
     },
-    normalSelect(
-      state,
-      { payload }: PayloadAction<{ index: string; data: any }>,
-    ) {
+    normalSelect(state, { payload }: PayloadAction<SelectedItem>) {
       const index = state.selectedItems?.findIndex(
         v => payload.index === v.index,
       );
@@ -196,6 +194,10 @@ export const slice = createSlice({
           state.selectedItems = [];
         }
       }
+    },
+    changeSelectedItems(state, { payload }: PayloadAction<SelectedItem[]>) {
+      const onOff = contrastSelectedItems(payload, state.selectedItems);
+      onOff && (state.selectedItems = payload);
     },
     updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
       state.multipleSelect = payload;

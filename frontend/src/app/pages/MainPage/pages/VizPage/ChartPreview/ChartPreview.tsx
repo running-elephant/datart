@@ -399,6 +399,17 @@ const ChartPreviewBoard: FC<{
                 handleDrillOptionChange?.(param.value);
                 return;
               }
+
+              if (param.seriesName === 'changeSelectedItems') {
+                dispatch(
+                  vizAction.changeSelectedItems({
+                    backendChartId,
+                    data: param.data,
+                  }),
+                );
+                return;
+              }
+
               if (
                 !drillOptionRef.current?.isSelectedDrill &&
                 chart.selectable
@@ -406,13 +417,15 @@ const ChartPreviewBoard: FC<{
                 const {
                   dataIndex,
                   componentIndex,
-                }: { dataIndex: number; componentIndex: number } = param;
+                  data,
+                }: { dataIndex: number; componentIndex?: number; data: any } =
+                  param;
                 dispatch(
                   vizAction.normalSelect({
                     backendChartId,
                     data: {
                       index: componentIndex + ',' + dataIndex,
-                      data: param.data,
+                      data,
                     },
                   }),
                 );

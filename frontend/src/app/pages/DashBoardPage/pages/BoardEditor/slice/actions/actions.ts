@@ -563,18 +563,34 @@ export const selectedItemChange = (
   const {
     dataIndex,
     componentIndex,
-  }: { dataIndex: number; componentIndex: number } = params;
+    data,
+  }: { dataIndex: number; componentIndex?: number; data: any } = params;
   const option = {
     wid,
     data: {
       index: componentIndex + ',' + dataIndex,
-      data: params.data,
+      data,
     },
   };
   if (type === 'edit') {
     dispatch(editWidgetSelectedItemsActions.normalSelectInEditor(option));
   } else {
     dispatch(boardActions.normalSelect(option));
+  }
+};
+
+export const changeAllSelectedItems = (
+  dispatch,
+  type: VizRenderMode,
+  data,
+  wid,
+) => {
+  if (type === 'edit') {
+    dispatch(
+      editWidgetSelectedItemsActions.changeSelectedItemsInEditor({ wid, data }),
+    );
+  } else {
+    dispatch(boardActions.changeSelectedItems({ wid, data }));
   }
 };
 

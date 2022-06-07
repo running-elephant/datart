@@ -16,7 +16,18 @@
  * limitations under the License.
  */
 
-import { Data, DefaultCellTheme, Meta, SortParam, Style } from '@antv/s2';
+import {
+  Data,
+  DataCell,
+  DefaultCellTheme,
+  Meta,
+  S2CellType,
+  SortParam,
+  SpreadSheet,
+  Style,
+  TargetCellInfo,
+  ViewMeta,
+} from '@antv/s2';
 import { ChartDataSectionType, SortActionType } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ReactChart from 'app/models/ReactChart';
@@ -25,6 +36,7 @@ import {
   ChartDataConfig,
   ChartDataSectionField,
   ChartStyleConfig,
+  SelectedItem,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
@@ -45,7 +57,7 @@ class PivotSheetChart extends ReactChart {
   useIFrame = false;
   isISOContainer = 'piovt-sheet';
   config = Config;
-  chart: any = null;
+  chart: null | SpreadSheet = null;
   updateOptions: any = {};
   lastRowsConfig: ChartDataSectionField[] = [];
   hierarchyCollapse: boolean = true;
@@ -72,6 +84,7 @@ class PivotSheetChart extends ReactChart {
       options.dataset,
       options.config,
       options.drillOption,
+      options.selectedItems,
     );
     this.adapter?.updated(this.updateOptions);
   }
@@ -101,11 +114,15 @@ class PivotSheetChart extends ReactChart {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption: ChartDrillOption,
+    selectedItems?: SelectedItem[],
   ): AndvS2Config {
     if (!dataset || !config) {
       return {
         options: {},
       };
+    }
+    if (!selectedItems?.length && this.chart) {
+      this.chart.interaction.reset();
     }
 
     const dataConfigs: ChartDataConfig[] = config.datas || [];
@@ -333,7 +350,50 @@ class PivotSheetChart extends ReactChart {
         });
         this.changeDrillConfig(rowSectionConfigRows, drillOption);
       },
+      onSelected: (cells: DataCell[]) => {
+        const state = this.chart?.interaction.getState();
+        this.changeSelectedItems(state?.interactedCells || []);
+      },
+      onDataCellClick: (cell: TargetCellInfo) => {
+        const state = this.chart?.interaction.getState();
+        this.changeSelectedItems(state?.interactedCells || []);
+      },
+      getSpreadSheet: getSpreadSheet => {
+        this.chart = getSpreadSheet;
+      },
+      onReset: () => {
+        this.changeSelectedItems([]);
+      },
     };
+  }
+
+  changeSelectedItems(cells: S2CellType<ViewMeta>[]) {
+    const selectedItems: SelectedItem[] = [];
+    cells.forEach(v => {
+      const { rowIndex, data } = v.getMeta();
+      if (!selectedItems.find(v => v.index === rowIndex) && data) {
+        selectedItems.push({
+          index: rowIndex,
+          data: {
+            rowData: Object.keys(data)?.reduce((pre, cur) => {
+              if (cur === '$$extra$$' || cur === '$$value$$') {
+                return pre;
+              }
+              return {
+                ...pre,
+                [cur]: data[cur],
+              };
+            }, {}),
+          },
+        });
+      }
+    });
+    this.mouseEvents
+      ?.find(v => v.name === 'click')
+      ?.callback({
+        data: selectedItems,
+        seriesName: 'changeSelectedItems',
+      } as any);
   }
 
   changeDrillConfig(
@@ -493,6 +553,12 @@ class PivotSheetChart extends ReactChart {
     );
     return {
       text: {
+        fontFamily: bodyFont?.fontFamily,
+        fontSize: bodyFont?.fontSize,
+        fontWeight: bodyFont?.fontWeight,
+        textAlign: bodyTextAlign,
+      },
+      bolderText: {
         fontFamily: bodyFont?.fontFamily,
         fontSize: bodyFont?.fontSize,
         fontWeight: bodyFont?.fontWeight,

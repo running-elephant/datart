@@ -216,7 +216,7 @@ export const NumericUnitDescriptions = new Map<NumberUnitKey, [number, string]>(
   ],
 );
 
-export const KEYBOARD_EVENT_NAME = {
-  CTRL: 'Control',
-  COMMAND: 'Meta',
-};
+export enum KEYBOARD_EVENT_NAME {
+  CTRL = 'Control',
+  COMMAND = 'Meta',
+}
