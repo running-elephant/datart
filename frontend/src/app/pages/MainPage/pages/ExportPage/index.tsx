@@ -15,15 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { FC, memo } from 'react';
-import styled from 'styled-components/macro';
-import { SPACE_LG } from 'styles/StyleConstants';
+import { FC, memo, useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { listToTree } from 'utils/utils';
+import { selectOrgId } from '../../slice/selectors';
+import { usePermissionSlice } from '../PermissionPage/slice';
+import { selectFolders } from '../PermissionPage/slice/selectors';
+import { DataSourceTreeNode } from '../PermissionPage/slice/types';
+import { getFolders } from '../VizPage/slice/thunks';
+import { ExportSelector } from './ExportSelector';
+
 export const ExportPage: FC<{}> = memo(() => {
-  return <StyledWrapper>init ExportPage </StyledWrapper>;
+  usePermissionSlice();
+  const orgId = useSelector(selectOrgId);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (orgId) {
+      dispatch(getFolders(orgId));
+    }
+  }, [dispatch, orgId]);
+  const folders = useSelector(selectFolders);
+  const treeData = useMemo(
+    () => listToTree(folders, null, []) as DataSourceTreeNode[],
+    [folders],
+  );
+  return <ExportSelector treeData={treeData} />;
 });
-const StyledWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  padding: ${SPACE_LG};
-  overflow-y: auto;
-`;
