@@ -689,7 +689,7 @@ class BasicTableChart extends ReactChart {
       },
       body: {
         cell: props => {
-          const { style, key, rowData, ...rest } = props;
+          const { style, key, rowData, sensitiveFieldName, ...rest } = props;
           const uid = props.uid;
           const [conditionalStyle] = getStyles(
             getAllColumnListInfo,
@@ -705,7 +705,6 @@ class BasicTableChart extends ReactChart {
             props?.cellValue,
             conditionalStyle,
           );
-          const sensitiveFieldName = Object.keys(rowData || {})?.[0];
           const useColumnWidth =
             this.dataColumnWidths?.[props.dataIndex]?.getUseColumnWidth;
           const _getBodyTextAlignStyle = alignValue => {
@@ -941,6 +940,7 @@ class BasicTableChart extends ReactChart {
             uid: c.uid,
             cellValue,
             dataIndex: row.getFieldKey(c),
+            sensitiveFieldName: chartDataSet.getFieldOriginKey(c),
             rowData,
             rowIndex,
             ...this.registerTableCellEvents(
