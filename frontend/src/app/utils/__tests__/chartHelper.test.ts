@@ -33,6 +33,7 @@ import {
 } from '../../types/ChartConfig';
 import {
   clearRuntimeDateLevelFieldsInChartConfig,
+  compareWhetherUpdateSelected,
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getDataColumnMaxAndMin2,
@@ -42,6 +43,7 @@ import {
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
   getScatterSymbolSizeFn,
+  getSelectedItemStyles,
   getSeriesTooltips4Polar2,
   getSeriesTooltips4Rectangular2,
   getSettingValue,
@@ -52,11 +54,11 @@ import {
   getValue,
   getValueByColumnKey,
   isMatchRequirement,
+  setRuntimeDateLevelFieldsInChartConfig,
   toFormattedValue,
   transformToDataSet,
   transformToObjectArray,
   valueFormatter,
-  setRuntimeDateLevelFieldsInChartConfig,
 } from '../chartHelper';
 
 describe('Chart Helper ', () => {
@@ -2691,4 +2693,205 @@ describe('Chart Helper ', () => {
       });
     });
   });
+
+  describe.each([
+    [
+      1,
+      1,
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: {} },
+    ],
+    [
+      1,
+      1,
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: { color: '#FFF' } },
+      {
+        color: '#FFF',
+      },
+    ],
+    [
+      1,
+      'name_level1',
+      [
+        {
+          index: '1,name_level1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: {} },
+    ],
+    [
+      1,
+      'name_level1',
+      [
+        {
+          index: '1,name_level1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: { color: '#FFF' } },
+      {
+        color: '#FFF',
+      },
+    ],
+    [
+      0,
+      1,
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: { opacity: 0.5 } },
+    ],
+    [
+      0,
+      1,
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: { color: '#FFF', opacity: 0.5 } },
+      {
+        color: '#FFF',
+      },
+    ],
+    [
+      0,
+      'name_level1',
+      [
+        {
+          index: '1,name_level1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: { opacity: 0.5 } },
+    ],
+    [
+      0,
+      'name_level1',
+      [
+        {
+          index: '1,name_level1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: { color: '#FFF', opacity: 0.5 } },
+      {
+        color: '#FFF',
+      },
+    ],
+  ])(
+    'getSelectedItemStyles Test - ',
+    (comIndex, dcIndex, selectionList, expected, itemStyle?) => {
+      test(`Get select style`, () => {
+        expect(
+          JSON.stringify(
+            getSelectedItemStyles(comIndex, dcIndex, selectionList, itemStyle),
+          ),
+        ).toEqual(JSON.stringify(expected));
+      });
+    },
+  );
+
+  describe.each([
+    [[], [], false],
+    [
+      [
+        {
+          index: '1,2',
+          data: { rowData: {} },
+        },
+      ],
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      true,
+    ],
+    [
+      [
+        {
+          index: '1,2',
+          data: { rowData: {} },
+        },
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+        {
+          index: '1,2',
+          data: { rowData: {} },
+        },
+      ],
+      false,
+    ],
+    [
+      [
+        {
+          index: '1,2',
+          data: { rowData: {} },
+        },
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      true,
+    ],
+    [
+      [
+        {
+          index: '1,2',
+          data: { rowData: {} },
+        },
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      undefined,
+      true,
+    ],
+    [[], undefined, true],
+  ])(
+    'compareWhetherUpdateSelected Test - ',
+    (newSelectedItems, oldSelectedItems, expected) => {
+      test(`Get compare whether update`, () => {
+        expect(
+          JSON.stringify(
+            compareWhetherUpdateSelected(newSelectedItems, oldSelectedItems),
+          ),
+        ).toEqual(JSON.stringify(expected));
+      });
+    },
+  );
 });
