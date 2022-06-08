@@ -229,6 +229,27 @@ export const removeTab = createAsyncThunk<
   return null;
 });
 
+export const closeAllTabs = createAsyncThunk<
+  null,
+  { resolve: (selectedTab: string) => void },
+  { state: RootState }
+>('viz/closeAllTabs', async ({ resolve }, { getState, dispatch }) => {
+  dispatch(vizActions.closeAllTabs());
+  resolve('');
+  return null;
+});
+
+export const closeOtherTabs = createAsyncThunk<
+  null,
+  { id: string; resolve: (selectedTab: string) => void },
+  { state: RootState }
+>('viz/closeOtherTabs', async ({ id, resolve }, { getState, dispatch }) => {
+  dispatch(vizActions.closeOtherTabs(id));
+  const selectedTab = selectSelectedTab(getState());
+  resolve(selectedTab ? selectedTab.id : '');
+  return null;
+});
+
 export const initChartPreviewData = createAsyncThunk<
   { backendChartId: string },
   {

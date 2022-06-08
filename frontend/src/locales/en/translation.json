@@ -1116,7 +1116,9 @@
     "main": {
       "publishSuccess": "Publish success",
       "unpublishSuccess": "Unpublish success",
-      "empty": "Select vizs in the sidebar"
+      "empty": "Select vizs in the sidebar",
+      "closeOther": "close Other Tabs",
+      "closeAll": "close All Tabs"
     }
   },
   "view": {
@@ -1135,7 +1137,9 @@
       "discard": "Discard",
       "cancel": "Cancel",
       "execute": "Execute",
-      "warning": "There are unexecuted changes, still execute?"
+      "warning": "There are unexecuted changes, still execute?",
+      "closeOther": "close Other Tabs",
+      "closeAll": "close All Tabs"
     },
     "editor": {
       "startAnalysis": "Start Analysis",

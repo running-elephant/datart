@@ -72,6 +72,15 @@ const slice = createSlice({
             : '';
       }
     },
+    closeOtherTabs(state: VizState, action: PayloadAction<string>) {
+      const currentTab = state.tabs.find(t => t.id === action.payload);
+      state.tabs = state.tabs.filter(t => t.id === action.payload);
+      state.selectedTab = currentTab?.id || '';
+    },
+    closeAllTabs(state) {
+      state.tabs = [];
+      state.selectedTab = '';
+    },
     updateChartPreviewFilter(
       state,
       action: PayloadAction<{ backendChartId: string; payload }>,

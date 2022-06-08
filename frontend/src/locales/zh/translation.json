@@ -1116,7 +1116,9 @@
     "main": {
       "publishSuccess": "发布成功",
       "unpublishSuccess": "取消发布成功",
-      "empty": "请在左侧列表选择可视化"
+      "empty": "请在左侧列表选择可视化",
+      "closeOther": "关闭其他",
+      "closeAll": "关闭所有"
     }
   },
   "view": {
@@ -1135,7 +1137,9 @@
       "discard": "放弃",
       "cancel": "取消",
       "execute": "执行",
-      "warning": "有未执行的修改，是否执行？"
+      "warning": "有未执行的修改，是否执行？",
+      "closeOther": "关闭其他",
+      "closeAll": "关闭所有"
     },
     "editor": {
       "startAnalysis": "开始分析",
