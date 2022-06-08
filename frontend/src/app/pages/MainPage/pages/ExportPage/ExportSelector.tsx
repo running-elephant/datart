@@ -15,51 +15,77 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Card, TreeSelect } from 'antd';
+import { Button, Card, message, TreeSelect } from 'antd';
 import { DataNode } from 'antd/lib/tree';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
+import { mainActions } from '../../slice';
+import { Folder } from '../VizPage/slice/types';
+import { onExport } from './utils';
 
-export const ExportSelector: FC<{ treeData: DataNode[] }> = memo(
-  ({ treeData }) => {
-    const t = useI18NPrefix('main.subNavs');
-    const [value, setValue] = useState<string>();
-
-    const onChange = (newValue: string, label, extra) => {
-      console.log(newValue);
-      console.log(label);
-      console.log(extra);
-      setValue(newValue);
-    };
-    return (
-      <StyledWrapper>
-        <Card title={t('export.title')}>
-          <div className="export-box">
-            <TreeSelect
-              showSearch
-              autoClearSearchValue
-              className="export-tree"
-              treeCheckable={true}
-              value={value}
-              dropdownStyle={{ maxHeight: 1000, overflow: 'auto' }}
-              placeholder="Please select"
-              allowClear
-              multiple
-              treeData={treeData}
-              treeDefaultExpandAll
-              onChange={onChange}
-            ></TreeSelect>
-            <Button className="export-btn" type="primary">
-              export
-            </Button>
-          </div>
-        </Card>
-      </StyledWrapper>
-    );
-  },
-);
+export const ExportSelector: FC<{
+  treeData: DataNode[];
+  folders: Folder[];
+}> = memo(({ treeData, folders }) => {
+  const t = useI18NPrefix('main.subNavs');
+  const dispatch = useDispatch();
+  const [selectedIds, setIds] = useState<string[]>();
+  const onChange = (ids: string[], label, extra) => {
+    setIds(ids);
+  };
+  const onSubmit = async () => {
+    const idList = selectedIds
+      ?.map(id => {
+        // 文件数 id 而不是 relId
+        const target = folders?.find(item => item.id === id);
+        if (target) {
+          return {
+            vizId: target.relId,
+            vizType: target.relType,
+          };
+        }
+        return null;
+      })
+      .filter(item => !!item);
+    console.log('idList', idList);
+    const resData = await onExport(idList);
+    if (resData === true) {
+      message.success('success');
+      setIds([]);
+      dispatch(mainActions.setDownloadPolling(true));
+    } else {
+      message.warn('warn');
+    }
+  };
+  return (
+    <StyledWrapper>
+      <Card title={t('export.title')}>
+        <div className="export-box">
+          <TreeSelect
+            showSearch
+            autoClearSearchValue
+            className="export-tree"
+            treeCheckable={true}
+            value={selectedIds}
+            dropdownStyle={{ maxHeight: 1000, overflow: 'auto' }}
+            placeholder="Please select"
+            allowClear
+            multiple
+            treeData={treeData}
+            treeDefaultExpandAll
+            onChange={onChange}
+          ></TreeSelect>
+          <Button className="export-btn" type="primary" onClick={onSubmit}>
+            export
+          </Button>
+        </div>
+      </Card>
+    </StyledWrapper>
+  );
+});
 const StyledWrapper = styled.div`
   flex: 1;
   padding: ${SPACE_LG};

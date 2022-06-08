@@ -23,6 +23,7 @@ import { usePermissionSlice } from '../PermissionPage/slice';
 import { selectFolders } from '../PermissionPage/slice/selectors';
 import { DataSourceTreeNode } from '../PermissionPage/slice/types';
 import { getFolders } from '../VizPage/slice/thunks';
+import { Folder } from '../VizPage/slice/types';
 import { ExportSelector } from './ExportSelector';
 
 export const ExportPage: FC<{}> = memo(() => {
@@ -39,5 +40,10 @@ export const ExportPage: FC<{}> = memo(() => {
     () => listToTree(folders, null, []) as DataSourceTreeNode[],
     [folders],
   );
-  return <ExportSelector treeData={treeData} />;
+  return (
+    <ExportSelector
+      treeData={treeData}
+      folders={(folders || []) as unknown as Folder[]}
+    />
+  );
 });
