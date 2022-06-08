@@ -720,12 +720,12 @@ export const getChartDrillOption = (
   return drillOption;
 };
 
-const buildClickEventBaseFilters = (
+export const buildClickEventBaseFilters = (
   rawData?: Record<string, any>,
   rule?: InteractionRule,
   drillOption?: IChartDrillOption,
   dataConfigs?: ChartDataConfig[],
-) => {
+): ChartDataRequestFilter[] => {
   const groupConfigs: ChartDataSectionField[] = getDrillableRows(
     dataConfigs || [],
     drillOption,
@@ -736,73 +736,56 @@ const buildClickEventBaseFilters = (
 
   return groupConfigs
     .concat(colorConfigs)
-    .map(c => {
+    .reduce<ChartDataRequestFilter[]>((acc, c) => {
       const value = rawData?.[c.colName];
       if (isEmpty(value) || isEmpty(c.colName)) {
-        return null;
+        return acc;
       }
-      return {
+      const filter = {
         aggOperator: null,
         sqlOperator: FilterSqlOperator.In,
         column: c.colName,
         values: [{ value, valueType: c.type }],
       };
-    })
-    .filter(Boolean);
+      acc.push(filter);
+      return acc;
+    }, []);
 };
 
-export const getClickEventViewDetailFilters = (
-  rawData?: Record<string, any>,
-  drillOption?: IChartDrillOption,
-  dataConfigs?: ChartDataConfig[],
-) => {
-  const baseFilters = buildClickEventBaseFilters(
-    rawData,
-    undefined,
-    drillOption,
-    dataConfigs,
-  );
-  return baseFilters as ChartDataRequestFilter[];
-};
-
-export const getClickEventJumpFilters = (
-  rawData?: Record<string, any>,
+export const getJumpFiltersByInteractionRule = (
   rule?: InteractionRule,
-  drillOption?: IChartDrillOption,
-  dataConfigs?: ChartDataConfig[],
+  clickEventFilters?: any[],
+  chartFilters?: any[],
 ): ChartDataRequestFilter[] => {
-  const baseFilters = buildClickEventBaseFilters(
-    rawData,
-    rule,
-    drillOption,
-    dataConfigs,
+  return (
+    clickEventFilters
+      ?.concat(chartFilters || [])
+      ?.map(f => {
+        if (isEmpty(f)) {
+          return null;
+        }
+        const jumpRule = rule?.[rule.category!] as
+          | JumpToChartRule
+          | JumpToUrlRule;
+        if (isEmpty(jumpRule)) {
+          return null;
+        }
+        if (jumpRule?.['relation'] !== InteractionFieldRelation.Auto) {
+          const customizeRelations: CustomizeRelation[] =
+            jumpRule?.[InteractionFieldRelation.Customize];
+          if (isEmptyArray(customizeRelations)) {
+            return null;
+          }
+          const targetRelation = customizeRelations?.find(
+            r => r.source === f?.column,
+          );
+          if (isEmpty(targetRelation)) {
+            return null;
+          }
+          return Object.assign({}, f, { column: targetRelation?.target });
+        }
+        return null;
+      })
+      .filter(Boolean) || []
   );
-  return baseFilters
-    .map(f => {
-      if (isEmpty(f)) {
-        return null;
-      }
-      const jumpRule = rule?.[rule.category!] as
-        | JumpToChartRule
-        | JumpToUrlRule;
-      if (isEmpty(jumpRule)) {
-        return null;
-      }
-      if (jumpRule?.['relation'] !== InteractionFieldRelation.Auto) {
-        const customizeRelations: CustomizeRelation[] =
-          jumpRule?.[InteractionFieldRelation.Customize];
-        if (isEmptyArray(customizeRelations)) {
-          return null;
-        }
-        const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column,
-        );
-        if (isEmpty(targetRelation)) {
-          return null;
-        }
-        return Object.assign({}, f, { column: targetRelation?.target });
-      }
-      return null;
-    })
-    .filter(Boolean) as ChartDataRequestFilter[];
 };

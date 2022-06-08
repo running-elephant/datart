@@ -52,9 +52,9 @@ import {
 } from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import {
+  buildClickEventBaseFilters,
   getChartDrillOption,
-  getClickEventJumpFilters,
-  getClickEventViewDetailFilters,
+  getJumpFiltersByInteractionRule,
 } from 'app/utils/internalChartHelper';
 import { KEYBOARD_EVENT_NAME } from 'globalConstants';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -289,7 +289,7 @@ const ChartPreviewBoard: FC<{
         )?.[0] as DrillThroughSetting;
 
         if (enableDrillThrough) {
-          let nonAggJumpFilters = new ChartDataRequestBuilder(
+          let nonAggChartFilters = new ChartDataRequestBuilder(
             {
               id: chartPreview?.backendChart?.view?.id || '',
               config: chartPreview?.backendChart?.view.config || {},
@@ -307,13 +307,17 @@ const ChartPreviewBoard: FC<{
             ?.filters?.filter(f => !Boolean(f.aggOperator));
 
           drillThroughSetting?.rules?.forEach(rule => {
-            const clickFilters = getClickEventJumpFilters(
+            const clickFilters = buildClickEventBaseFilters(
               param?.data?.rowData,
               rule,
               drillOptionRef?.current,
               chartPreview?.chartConfig?.datas,
             );
-            const urlFilters = nonAggJumpFilters.concat(clickFilters);
+            const urlFilters = getJumpFiltersByInteractionRule(
+              rule,
+              clickFilters,
+              nonAggChartFilters,
+            );
             if (rule.event === targetEvent) {
               const relId = rule?.[rule.category!]?.relId;
               if (
@@ -383,8 +387,9 @@ const ChartPreviewBoard: FC<{
         )?.[0] as ViewDetailSetting;
 
         if (enableViewDetail && viewDetailSetting?.event === targetEvent) {
-          const clickFilters = getClickEventViewDetailFilters(
+          const clickFilters = buildClickEventBaseFilters(
             param?.data?.rowData,
+            undefined,
             drillOptionRef?.current,
             chartPreview?.chartConfig?.datas,
           );
