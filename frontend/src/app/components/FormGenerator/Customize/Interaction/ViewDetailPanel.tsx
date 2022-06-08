@@ -32,10 +32,10 @@ const ViewDetailPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange }) => {
     const dataview = useSelector(currentDataViewSelector);
     const [event, setEvent] = useState<ViewDetailSetting['event']>(
-      data.value?.event || InteractionMouseEvent.Left,
+      data.value?.event,
     );
     const [mapper, setMapper] = useState<ViewDetailSetting['mapper']>(
-      data?.value?.mapper || InteractionFieldMapper.All,
+      data?.value?.mapper,
     );
     const [customFields, setCustomFields] = useState<string[]>(
       data?.value?.[InteractionFieldMapper.Customize] || [],
