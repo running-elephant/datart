@@ -777,28 +777,32 @@ export const getClickEventJumpFilters = (
     drillOption,
     dataConfigs,
   );
-  return baseFilters.map(f => {
-    if (isEmpty(f)) {
-      return null;
-    }
-    const jumpRule = rule?.[rule.category!] as JumpToChartRule | JumpToUrlRule;
-    if (isEmpty(jumpRule)) {
-      return null;
-    }
-    if (jumpRule?.['relation'] !== InteractionFieldRelation.Auto) {
-      const customizeRelations: CustomizeRelation[] =
-        jumpRule?.[InteractionFieldRelation.Customize];
-      if (isEmptyArray(customizeRelations)) {
+  return baseFilters
+    .map(f => {
+      if (isEmpty(f)) {
         return null;
       }
-      const targetRelation = customizeRelations?.find(
-        r => r.source === f?.column,
-      );
-      if (isEmpty(targetRelation)) {
+      const jumpRule = rule?.[rule.category!] as
+        | JumpToChartRule
+        | JumpToUrlRule;
+      if (isEmpty(jumpRule)) {
         return null;
       }
-      return Object.assign({}, f, { column: targetRelation?.target });
-    }
-    return f;
-  }) as ChartDataRequestFilter[];
+      if (jumpRule?.['relation'] !== InteractionFieldRelation.Auto) {
+        const customizeRelations: CustomizeRelation[] =
+          jumpRule?.[InteractionFieldRelation.Customize];
+        if (isEmptyArray(customizeRelations)) {
+          return null;
+        }
+        const targetRelation = customizeRelations?.find(
+          r => r.source === f?.column,
+        );
+        if (isEmpty(targetRelation)) {
+          return null;
+        }
+        return Object.assign({}, f, { column: targetRelation?.target });
+      }
+      return null;
+    })
+    .filter(Boolean) as ChartDataRequestFilter[];
 };
