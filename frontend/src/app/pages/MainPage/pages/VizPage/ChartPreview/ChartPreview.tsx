@@ -55,8 +55,10 @@ import {
   buildClickEventBaseFilters,
   getChartDrillOption,
   getJumpFiltersByInteractionRule,
+  getJumpOperationFiltersByInteractionRule,
 } from 'app/utils/internalChartHelper';
 import { KEYBOARD_EVENT_NAME } from 'globalConstants';
+import qs from 'qs';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -175,7 +177,6 @@ const ChartPreviewBoard: FC<{
     useEffect(() => {
       const jumpFilterParams: ChartDataRequestFilter[] =
         parse(filterSearchUrl)?.filters || [];
-
       const filterSearchParams = filterSearchUrl
         ? urlSearchTransfer.toParams(filterSearchUrl)
         : undefined;
@@ -313,41 +314,76 @@ const ChartPreviewBoard: FC<{
               drillOptionRef?.current,
               chartPreview?.chartConfig?.datas,
             );
-            const urlFilters = getJumpFiltersByInteractionRule(
-              rule,
-              clickFilters,
-              nonAggChartFilters,
-            );
+
             if (rule.event === targetEvent) {
               const relId = rule?.[rule.category!]?.relId;
-              if (
-                rule.category === InteractionCategory.JumpToChart ||
-                rule.category === InteractionCategory.JumpToDashboard
-              ) {
+              if (rule.category === InteractionCategory.JumpToChart) {
+                const urlFilters = getJumpOperationFiltersByInteractionRule(
+                  clickFilters,
+                  nonAggChartFilters,
+                  rule,
+                );
+                const urlFiltersStr: string = qs.stringify({
+                  filters: urlFilters || [],
+                });
                 if (rule?.action === InteractionAction.Redirect) {
-                  openNewTab(orgId, relId, urlFilters);
+                  openNewTab(orgId, relId, urlFiltersStr);
                 }
                 if (rule?.action === InteractionAction.Window) {
-                  openBrowserTab(orgId, relId, urlFilters);
+                  openBrowserTab(orgId, relId, urlFiltersStr);
                 }
                 if (rule?.action === InteractionAction.Dialog) {
                   const modalContent = getDialogContent(
                     orgId,
                     relId,
-                    urlFilters,
+                    urlFiltersStr,
+                  );
+                  modal.info(modalContent as any);
+                }
+              } else if (
+                rule.category === InteractionCategory.JumpToDashboard
+              ) {
+                const urlFilters = getJumpFiltersByInteractionRule(
+                  clickFilters,
+                  nonAggChartFilters,
+                  rule,
+                );
+                const urlFiltersStr: string =
+                  urlSearchTransfer.toUrlString(urlFilters);
+                if (rule?.action === InteractionAction.Redirect) {
+                  openNewTab(orgId, relId, urlFiltersStr);
+                }
+                if (rule?.action === InteractionAction.Window) {
+                  openBrowserTab(orgId, relId, urlFiltersStr);
+                }
+                if (rule?.action === InteractionAction.Dialog) {
+                  const modalContent = getDialogContent(
+                    orgId,
+                    relId,
+                    urlFiltersStr,
                   );
                   modal.info(modalContent as any);
                 }
               } else if (rule.category === InteractionCategory.JumpToUrl) {
+                const urlFilters = getJumpFiltersByInteractionRule(
+                  clickFilters,
+                  nonAggChartFilters,
+                  rule,
+                );
+                const urlFiltersStr: string =
+                  urlSearchTransfer.toUrlString(urlFilters);
                 const url = rule?.[rule.category!]?.url;
                 if (rule?.action === InteractionAction.Redirect) {
-                  redirectByUrl(url, urlFilters);
+                  redirectByUrl(url, urlFiltersStr);
                 }
                 if (rule?.action === InteractionAction.Window) {
-                  openNewByUrl(url, urlFilters);
+                  openNewByUrl(url, urlFiltersStr);
                 }
                 if (rule?.action === InteractionAction.Dialog) {
-                  const modalContent = getDialogContentByUrl(url, urlFilters);
+                  const modalContent = getDialogContentByUrl(
+                    url,
+                    urlFiltersStr,
+                  );
                   modal.info(modalContent as any);
                 }
               }

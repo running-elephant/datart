@@ -33,20 +33,15 @@ const useDrillThrough = () => {
     return url;
   };
 
-  const openNewTab = (orgId, relId, params?: any[]) => {
-    history.push(
-      `/organizations/${orgId}/vizs/${relId}?${stringifyParams(params)}`,
-    );
+  const openNewTab = (orgId, relId, params?: string) => {
+    history.push(`/organizations/${orgId}/vizs/${relId}?${params}`);
   };
 
-  const openBrowserTab = (orgId, relId, params?: any[]) => {
-    window.open(
-      `/organizations/${orgId}/vizs/${relId}?${stringifyParams(params)}`,
-      '_blank',
-    );
+  const openBrowserTab = (orgId, relId, params?: string) => {
+    window.open(`/organizations/${orgId}/vizs/${relId}?${params}`, '_blank');
   };
 
-  const getDialogContent = (orgId, relId, params?: any[]) => {
+  const getDialogContent = (orgId, relId, params?: string) => {
     return {
       width: 1000,
       content: (
@@ -55,23 +50,21 @@ const useDrillThrough = () => {
           height={600}
           width="100%"
           frameBorder="none"
-          src={`/organizations/${orgId}/vizs/${relId}?${stringifyParams(
-            params,
-          )}`}
+          src={`/organizations/${orgId}/vizs/${relId}?${params}`}
         />
       ),
     };
   };
 
-  const redirectByUrl = (url, params?: any[]) => {
-    window.location.href = `${urlSchemeCheck(url)}?${stringifyParams(params)}`;
+  const redirectByUrl = (url, params?: string) => {
+    window.location.href = `${urlSchemeCheck(url)}?${params}`;
   };
 
-  const openNewByUrl = (url, params?: any[]) => {
-    window.open(`${urlSchemeCheck(url)}?${stringifyParams(params)}`, '_blank');
+  const openNewByUrl = (url, params?: string) => {
+    window.open(`${urlSchemeCheck(url)}?${params}`, '_blank');
   };
 
-  const getDialogContentByUrl = (url, params?: any[]) => {
+  const getDialogContentByUrl = (url, params?: string) => {
     return {
       width: 1000,
       content: (
@@ -80,7 +73,7 @@ const useDrillThrough = () => {
           height={600}
           width="100%"
           frameBorder="none"
-          src={`${urlSchemeCheck(url)}?${stringifyParams(params)}`}
+          src={`${urlSchemeCheck(url)}?${params}`}
         />
       ),
     };

@@ -753,39 +753,84 @@ export const buildClickEventBaseFilters = (
 };
 
 export const getJumpFiltersByInteractionRule = (
+  clickEventFilters: ChartDataRequestFilter[] = [],
+  chartFilters: ChartDataRequestFilter[] = [],
   rule?: InteractionRule,
-  clickEventFilters?: any[],
-  chartFilters?: any[],
-): ChartDataRequestFilter[] => {
-  return (
-    clickEventFilters
-      ?.concat(chartFilters || [])
-      ?.map(f => {
-        if (isEmpty(f)) {
-          return null;
-        }
-        const jumpRule = rule?.[rule.category!] as
-          | JumpToChartRule
-          | JumpToUrlRule;
-        if (isEmpty(jumpRule)) {
-          return null;
-        }
-        if (jumpRule?.['relation'] !== InteractionFieldRelation.Auto) {
-          const customizeRelations: CustomizeRelation[] =
-            jumpRule?.[InteractionFieldRelation.Customize];
-          if (isEmptyArray(customizeRelations)) {
-            return null;
-          }
-          const targetRelation = customizeRelations?.find(
-            r => r.source === f?.column,
-          );
-          if (isEmpty(targetRelation)) {
-            return null;
-          }
-          return Object.assign({}, f, { column: targetRelation?.target });
-        }
+): Record<string, string | any> => {
+  return clickEventFilters
+    .concat(chartFilters)
+    .map(f => {
+      if (isEmpty(f)) {
         return null;
-      })
-      .filter(Boolean) || []
-  );
+      }
+      const jumpRule = rule?.[rule.category!] as
+        | JumpToChartRule
+        | JumpToUrlRule;
+      if (isEmpty(jumpRule)) {
+        return null;
+      }
+      if (jumpRule?.['relation'] === InteractionFieldRelation.Auto) {
+        return f;
+      } else {
+        const customizeRelations: CustomizeRelation[] =
+          jumpRule?.[InteractionFieldRelation.Customize];
+        if (isEmptyArray(customizeRelations)) {
+          return null;
+        }
+        const targetRelation = customizeRelations?.find(
+          r => r.source === f?.column,
+        );
+        if (isEmpty(targetRelation)) {
+          return null;
+        }
+        return Object.assign({}, f, {
+          column: targetRelation?.target,
+        }) as ChartDataRequestFilter;
+      }
+    })
+    .filter(Boolean)
+    .reduce((acc, cur) => {
+      if (cur?.column) {
+        acc[cur.column!] = cur?.values?.map(v => v.value);
+      }
+      return acc;
+    }, {});
+};
+
+export const getJumpOperationFiltersByInteractionRule = (
+  clickEventFilters: ChartDataRequestFilter[] = [],
+  chartFilters: ChartDataRequestFilter[] = [],
+  rule?: InteractionRule,
+): ChartDataRequestFilter[] => {
+  return clickEventFilters
+    .concat(chartFilters)
+    .reduce<ChartDataRequestFilter[]>((acc, f) => {
+      if (isEmpty(f)) {
+        return acc;
+      }
+      const jumpRule = rule?.[rule.category!] as
+        | JumpToChartRule
+        | JumpToUrlRule;
+      if (isEmpty(jumpRule)) {
+        return acc;
+      }
+      if (jumpRule?.['relation'] === InteractionFieldRelation.Auto) {
+        return acc.concat(f);
+      } else {
+        const customizeRelations: CustomizeRelation[] =
+          jumpRule?.[InteractionFieldRelation.Customize];
+        if (isEmptyArray(customizeRelations)) {
+          return acc;
+        }
+        const targetRelation = customizeRelations?.find(
+          r => r.source === f?.column,
+        );
+        if (isEmpty(targetRelation)) {
+          return acc;
+        }
+        return acc.concat(
+          Object.assign({}, f, { column: targetRelation?.target }),
+        );
+      }
+    }, []);
 };
