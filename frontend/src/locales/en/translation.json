@@ -801,7 +801,8 @@
               "target": "Target Field/Variable",
               "addRelation": "+ Add",
               "field": "Field",
-              "variable": "Variable"
+              "variable": "Variable",
+              "controller": "Controller"
             },
             "operation": {
               "delete": "Delete"

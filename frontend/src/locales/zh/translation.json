@@ -801,7 +801,8 @@
               "target": "目标字段/变量",
               "addRelation": "+ 点击新建",
               "field": "字段",
-              "variable": "变量"
+              "variable": "变量",
+              "controller": "控制器"
             },
             "operation": {
               "delete": "删除"

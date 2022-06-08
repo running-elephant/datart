@@ -46,6 +46,11 @@ export type JumpToChartRule = {
   [InteractionFieldRelation.Customize]: CustomizeRelation[];
 };
 
+export type JumpToDashboardRule = {
+  relId: string;
+  [InteractionFieldRelation.Customize]: CustomizeRelation[];
+};
+
 export type JumpToUrlRule = {
   relId: string;
   url: string;
@@ -58,7 +63,7 @@ export type InteractionRule = {
   category?: InteractionCategory;
   action?: InteractionAction;
   [InteractionCategory.JumpToChart]?: JumpToChartRule;
-  [InteractionCategory.JumpToDashboard]?: any;
+  [InteractionCategory.JumpToDashboard]?: JumpToDashboardRule;
   [InteractionCategory.JumpToUrl]?: JumpToUrlRule;
 };
 

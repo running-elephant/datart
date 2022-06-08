@@ -115,7 +115,7 @@ const RuleList: FC<
           translate: t,
           vizs: vizs,
           dataview: dataview,
-          value: record?.[record.category],
+          value: record?.[record.category] as any,
           onValueChange: value =>
             onRuleChange(record.id, record.category, value),
         };
