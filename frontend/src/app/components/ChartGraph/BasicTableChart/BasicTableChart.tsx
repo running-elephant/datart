@@ -30,7 +30,7 @@ import {
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
-  contrastSelectedItems,
+  compareWhetherUpdateSelected,
   getColumnRenderName,
   getStyles,
   getUnusedHeaderRows,
@@ -1295,7 +1295,10 @@ class BasicTableChart extends ReactChart {
       },
       [] as SelectedItem[],
     );
-    const onOff = contrastSelectedItems(newSelectedItems, this.selectedItems);
+    const onOff = compareWhetherUpdateSelected(
+      newSelectedItems,
+      this.selectedItems,
+    );
     if (onOff) {
       this.selectedItems = newSelectedItems;
       this.mouseEvents

@@ -36,7 +36,7 @@ import {
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { SelectedItem } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
-import { contrastSelectedItems } from 'app/utils/chartHelper';
+import { compareWhetherUpdateSelected } from 'app/utils/chartHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
@@ -422,7 +422,7 @@ const boardSlice = createSlice({
         data: SelectedItem[];
       }>,
     ) {
-      const onOff = contrastSelectedItems(
+      const onOff = compareWhetherUpdateSelected(
         payload.data,
         state.selectedItems[payload.wid],
       );

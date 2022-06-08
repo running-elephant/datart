@@ -410,10 +410,7 @@ const ChartPreviewBoard: FC<{
                 return;
               }
 
-              if (
-                !drillOptionRef.current?.isSelectedDrill &&
-                chart.selectable
-              ) {
+              if (chart.selectable) {
                 const {
                   dataIndex,
                   componentIndex,
@@ -429,7 +426,6 @@ const ChartPreviewBoard: FC<{
                     },
                   }),
                 );
-                return;
               }
             },
           },

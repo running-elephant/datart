@@ -27,7 +27,7 @@ import { transferChartConfig } from 'app/pages/MainPage/pages/VizPage/slice/util
 import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
-import { contrastSelectedItems } from 'app/utils/chartHelper';
+import { compareWhetherUpdateSelected } from 'app/utils/chartHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import {
   fetchAvailableSourceFunctions,
@@ -196,7 +196,7 @@ export const slice = createSlice({
       }
     },
     changeSelectedItems(state, { payload }: PayloadAction<SelectedItem[]>) {
-      const onOff = contrastSelectedItems(payload, state.selectedItems);
+      const onOff = compareWhetherUpdateSelected(payload, state.selectedItems);
       onOff && (state.selectedItems = payload);
     },
     updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {

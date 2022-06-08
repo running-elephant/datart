@@ -163,7 +163,7 @@ const ChartForShare: FC<{
             return;
           }
 
-          if (!drillOptionRef.current?.isSelectedDrill && chart.selectable) {
+          if (chart.selectable) {
             const {
               dataIndex,
               componentIndex,
@@ -175,7 +175,6 @@ const ChartForShare: FC<{
                 data,
               }),
             );
-            return;
           }
         },
       },

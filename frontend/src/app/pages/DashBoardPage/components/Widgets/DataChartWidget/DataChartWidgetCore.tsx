@@ -186,7 +186,10 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                 if (!params) {
                   return;
                 }
-                if (drillOptionRef.current?.isSelectedDrill) {
+                if (
+                  drillOptionRef.current?.isSelectedDrill &&
+                  !drillOptionRef.current.isBottomLevel
+                ) {
                   const option = drillOptionRef.current;
                   option.drillDown(params.data.rowData);
                   handleDrillOptionChange(option);
@@ -206,13 +209,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                   );
                   return;
                 }
-
-                if (
-                  !drillOptionRef.current?.isSelectedDrill &&
-                  chartInstance.selectable
-                ) {
+                if (chartInstance.selectable) {
                   selectedItemChange(dispatch, renderMode, params, wid);
-                  return;
                 }
                 onWidgetChartClick(widgetRef.current, params);
               },

@@ -317,8 +317,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               dispatch(actions.changeSelectedItems(param.data));
               return;
             }
-
-            if (!drillOptionRef.current?.isSelectedDrill && chart.selectable) {
+            if (chart.selectable) {
               const {
                 dataIndex,
                 componentIndex,
@@ -335,7 +334,6 @@ export const ChartEditor: FC<ChartEditorProps> = ({
                   data,
                 } as SelectedItem),
               );
-              return;
             }
           },
         },

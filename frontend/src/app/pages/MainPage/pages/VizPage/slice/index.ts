@@ -4,7 +4,7 @@ import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/models/ChartManager';
 import { SelectedItem } from 'app/types/ChartConfig';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
-import { contrastSelectedItems } from 'app/utils/chartHelper';
+import { compareWhetherUpdateSelected } from 'app/utils/chartHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
@@ -179,7 +179,7 @@ const slice = createSlice({
         payload,
       }: PayloadAction<{ backendChartId: string; data: SelectedItem[] }>,
     ) {
-      const onOff = contrastSelectedItems(
+      const onOff = compareWhetherUpdateSelected(
         payload.data,
         state.selectedItems[payload.backendChartId],
       );
