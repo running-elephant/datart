@@ -66,6 +66,7 @@ export const transferChartConfigs = (
     transferChartDataConfig,
     transferChartStyleConfig,
     transferChartSettingConfig,
+    transferChartInteractionConfig,
   )(targetConfig, sourceConfig);
 };
 
@@ -79,6 +80,20 @@ const transferChartStyleConfig = (
   targetConfig.styles = mergeChartStyleConfigs(
     targetConfig?.styles,
     sourceConfig?.styles,
+  );
+  return targetConfig;
+};
+
+const transferChartInteractionConfig = (
+  targetConfig?: ChartConfig,
+  sourceConfig?: ChartConfig,
+): ChartConfig => {
+  if (!targetConfig) {
+    return sourceConfig!;
+  }
+  targetConfig.interactions = mergeChartStyleConfigs(
+    targetConfig?.interactions,
+    sourceConfig?.interactions,
   );
   return targetConfig;
 };
