@@ -15,122 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Collapse, Input, InputNumber } from 'antd';
-import { BW } from 'app/components/FormGenerator/Basic/components/BasicWrapper';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import throttle from 'lodash/throttle';
-import { FC, memo, useCallback, useContext, useMemo } from 'react';
-import styled from 'styled-components/macro';
-import { WidgetActionContext } from '../../../../components/ActionProvider/WidgetActionProvider';
-import { Group, SettingPanel } from './SettingPanel';
+import { FC, memo, useContext } from 'react';
+import { useDispatch } from 'react-redux';
+import { showRectAction } from '../../slice/actions/actions';
+import { NameSet } from './SettingItem/NameSet';
+import { RectSet } from './SettingItem/RectSet';
+import { SettingPanel } from './SettingPanel';
 import { WidgetConfigPanel } from './WidgetConfigPanel';
 
-const { Panel } = Collapse;
 export const WidgetSetting: FC = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
-  const { boardType } = useContext(BoardContext);
-
-  const { onUpdateWidgetConfigByKey } = useContext(WidgetActionContext);
   const widget = useContext(WidgetContext);
-  const { name, rect } = widget.config;
-
-  const throttledUpdate = useMemo(
-    () => throttle(onUpdateWidgetConfigByKey, 300),
-    [onUpdateWidgetConfigByKey],
-  );
-  const changeRect = useCallback(
-    (key: string, value) => {
-      const newRect = { ...rect!, [key]: value };
-      throttledUpdate({ wid: widget.id, key: 'rect', val: newRect });
-    },
-    [rect, throttledUpdate, widget.id],
-  );
-  const changeX = useCallback(val => changeRect('x', val), [changeRect]);
-  const changeY = useCallback(val => changeRect('y', val), [changeRect]);
-  const changeW = useCallback(val => changeRect('width', val), [changeRect]);
-  const changeH = useCallback(val => changeRect('height', val), [changeRect]);
-  const changeName = useCallback(
-    e => {
-      throttledUpdate({ wid: widget.id, key: 'name', val: e.target.value });
-    },
-    [throttledUpdate, widget.id],
-  );
+  const dispatch = useDispatch();
+  const showRect = dispatch(showRectAction(widget)) as unknown as boolean;
   return (
     <SettingPanel title={`${t('widget')}${t('setting')}`}>
       <>
-        <Group>
-          <BW label={t('widget') + t('title')}>
-            <StyledFlex>
-              <Input
-                value={name}
-                className="datart-ant-input"
-                onChange={changeName}
-              />
-            </StyledFlex>
-          </BW>
-        </Group>
-
-        {boardType === 'free' && (
-          <Collapse className="datart-config-panel" ghost>
-            <Panel
-              header={t('position') + '&' + t('size')}
-              key="position"
-              forceRender
-            >
-              <Group>
-                <BW label={t('position')}>
-                  <StyledFlex>
-                    <StyledPadding>
-                      <label>X</label>
-                      <InputNumber
-                        value={rect.x?.toFixed(1)}
-                        className="datart-ant-input-number"
-                        onChange={changeX}
-                      />
-                    </StyledPadding>
-
-                    <StyledPadding>
-                      <label>Y</label>
-                      <InputNumber
-                        value={rect.y?.toFixed(1)}
-                        className="datart-ant-input-number"
-                        onChange={changeY}
-                      />
-                    </StyledPadding>
-                  </StyledFlex>
-                </BW>
-              </Group>
-
-              <Group>
-                <BW label={t('size')}>
-                  <StyledFlex>
-                    <StyledPadding>
-                      <label>W</label>
-                      <InputNumber
-                        value={rect.width?.toFixed(1)}
-                        className="datart-ant-input-number"
-                        onChange={changeW}
-                      />
-                    </StyledPadding>
-                    <StyledFlex>
-                      <StyledPadding>
-                        <label>H</label>
-                        <InputNumber
-                          value={rect.height?.toFixed(1)}
-                          className="datart-ant-input-number"
-                          onChange={changeH}
-                        />
-                      </StyledPadding>
-                    </StyledFlex>
-                  </StyledFlex>
-                </BW>
-              </Group>
-            </Panel>
-          </Collapse>
-        )}
-
+        <NameSet wid={widget.id} name={widget.config.name} />
+        {showRect && <RectSet wid={widget.id} rect={widget.config.rect} />}
         <WidgetConfigPanel />
       </>
     </SettingPanel>
@@ -138,15 +42,3 @@ export const WidgetSetting: FC = memo(() => {
 });
 
 export default WidgetSetting;
-const StyledFlex = styled.div`
-  display: flex;
-`;
-const StyledPadding = styled.div`
-  display: flex;
-  min-height: 0;
-  padding: 0 4px;
-  margin: 0 4px;
-  overflow-y: auto;
-  line-height: 30px;
-  background-color: ${p => p.theme.bodyBackground};
-`;

@@ -214,9 +214,7 @@ public class POIUtils {
         if (StringUtils.isNotBlank(fmt)){
             cellStyle.setDataFormat(dataFormat.getFormat(fmt));
         } else if (val instanceof Number){
-            cellStyle.setDataFormat(dataFormat.getFormat("0"));
         } else if (val instanceof Date){
-            cellStyle.setDataFormat(dataFormat.getFormat(DateUtils.inferDateFormat(val.toString())));
         } else {
             cellStyle.setDataFormat(dataFormat.getFormat("General"));
         }

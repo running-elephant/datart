@@ -20,24 +20,19 @@ import type {
   WidgetActionListItem,
   widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
-  initFreeWidgetRect,
   initPaddingTpl,
   initTitleTpl,
-  initWidgetEditActionTpl,
   initWidgetName,
-  initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
-  WidgetEditActionI18N,
   widgetTpl,
-  WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
 
 const initIframeTpl = () => {
@@ -70,29 +65,21 @@ const NameI18N = {
   en: 'Embed',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'embed',
+  icon: 'embed-widget',
   originalType: ORIGINAL_TYPE_MAP.iframe,
   canWrapped: true,
   controllable: false,
   linkable: false,
   canFullScreen: true,
   singleton: false,
-  viewAction: {
-    ...initWidgetViewActionTpl(),
-  },
-  editAction: {
-    ...initWidgetEditActionTpl(),
-  },
+
   i18ns: [
     {
       lang: 'zh-CN',
       translation: {
         desc: 'iframe',
         widgetName: NameI18N.zh,
-        action: {
-          ...WidgetViewActionI18N.zh,
-          ...WidgetEditActionI18N.zh,
-        },
+        action: {},
         title: TitleI18N.zh,
         iframe: iframeI18N.zh,
         background: { backgroundGroup: '背景' },
@@ -105,10 +92,7 @@ export const widgetMeta: WidgetMeta = {
       translation: {
         desc: 'iframe',
         widgetName: NameI18N.en,
-        action: {
-          ...WidgetViewActionI18N.en,
-          ...WidgetEditActionI18N.en,
-        },
+        action: {},
         title: TitleI18N.en,
         iframe: iframeI18N.en,
         background: { backgroundGroup: 'Background' },
@@ -128,19 +112,12 @@ const widgetToolkit: IframeWidgetToolKit = {
     const widget = widgetTpl();
     widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      widget.config.rect = { ...initAutoWidgetRect() };
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      widget.config.rect = { ...initFreeWidgetRect() };
-    }
 
     widget.config.customConfig.props = [
       { ...initIframeTpl() },
@@ -171,6 +148,10 @@ const widgetToolkit: IframeWidgetToolKit = {
         key: 'lock',
         renderMode: ['edit'],
       },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
     ];
     return list;
   },
@@ -196,8 +177,8 @@ const widgetToolkit: IframeWidgetToolKit = {
 //     src,
 //   };
 // };
-const iframeProto = {
-  widgetTypeId: widgetMeta.originalType,
+const iframeProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

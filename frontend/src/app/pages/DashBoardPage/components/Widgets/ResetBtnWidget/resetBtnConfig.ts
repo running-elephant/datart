@@ -16,55 +16,44 @@
  * limitations under the License.
  */
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetActionListItem,
   widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { WHITE } from 'styles/StyleConstants';
 import {
   initBackgroundTpl,
   initBorderTpl,
   initPaddingTpl,
   initTitleTpl,
-  initWidgetEditActionTpl,
   initWidgetName,
-  initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
-  WidgetEditActionI18N,
   widgetTpl,
-  WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
 const NameI18N = {
   zh: '重置按钮',
   en: 'ResetBtn',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'reset',
+  icon: 'reset-widget',
   originalType: ORIGINAL_TYPE_MAP.resetBtn,
   canWrapped: true,
   controllable: false,
   linkable: false,
   canFullScreen: false,
   singleton: true,
-  viewAction: {
-    ...initWidgetViewActionTpl(),
-  },
-  editAction: {
-    ...initWidgetEditActionTpl(),
-  },
+
   i18ns: [
     {
       lang: 'zh-CN',
       translation: {
         desc: '重置按钮',
         widgetName: '重置',
-        action: {
-          ...WidgetViewActionI18N.zh,
-          ...WidgetEditActionI18N.zh,
-        },
+        action: {},
         title: TitleI18N.zh,
         background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
@@ -77,10 +66,7 @@ export const widgetMeta: WidgetMeta = {
       translation: {
         desc: 'resetBtn',
         widgetName: 'reset',
-        action: {
-          ...WidgetViewActionI18N.en,
-          ...WidgetEditActionI18N.en,
-        },
+        action: {},
         title: TitleI18N.en,
         background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
@@ -96,37 +82,23 @@ export const widgetToolkit: WidgetToolkit = {
     const widget = widgetTpl();
     widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'button';
-    widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 2,
-        height: 1,
-      };
-      widget.config.rect = rect;
-      widget.config.mRect = rect;
-    } else {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 128,
-        height: 32,
-      };
-      widget.config.rect = rect;
-    }
+    widget.config.name = opt.name || initWidgetName(NameI18N);
+
+    widget.config.rect.width = 100;
+    widget.config.rect.height = 60;
+    widget.config.pRect.width = 2;
+    widget.config.pRect.height = 1;
 
     widget.config.customConfig.props = [
       { ...initTitleTpl() },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
-      { ...initBackgroundTpl('#fff') },
+      { ...initBackgroundTpl(WHITE) },
     ];
 
     return widget;
@@ -148,6 +120,10 @@ export const widgetToolkit: WidgetToolkit = {
         key: 'lock',
         renderMode: ['edit'],
       },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
     ];
     return list;
   },
@@ -164,8 +140,8 @@ export const widgetToolkit: WidgetToolkit = {
   // //
 };
 
-const resetBtnProto = {
-  widgetTypeId: widgetMeta.originalType,
+const resetBtnProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

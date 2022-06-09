@@ -44,14 +44,14 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
     } = useContext(BoardConfigValContext);
     const { editing, autoFit } = useContext(BoardContext);
 
-    const widgetConfigRecords = useSelector((state: { board: BoardState }) =>
+    const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
       selectLayoutWidgetMapById()(state, boardId),
     );
-    const widgetConfigs = useMemo(() => {
-      return Object.values(widgetConfigRecords).sort((w1, w2) => {
+    const layoutWidgets = useMemo(() => {
+      return Object.values(layoutWidgetMap).sort((w1, w2) => {
         return w1.config.index - w2.config.index;
       });
-    }, [widgetConfigRecords]);
+    }, [layoutWidgetMap]);
 
     const [rect, refGridBackground] = useClientRect<HTMLDivElement>();
     const {
@@ -71,7 +71,7 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
       scaleMode,
     );
     const boardChildren = useMemo(() => {
-      return widgetConfigs.map(item => {
+      return layoutWidgets.map(item => {
         return (
           <WidgetWrapProvider
             key={item.id}
@@ -83,7 +83,7 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
           </WidgetWrapProvider>
         );
       });
-    }, [widgetConfigs, editing, boardId]);
+    }, [layoutWidgets, editing, boardId]);
     const { gridRef } = useBoardWidthHeight();
 
     return (
@@ -95,7 +95,7 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
             ref={refGridBackground}
           >
             <SlideBackground scale={scale} slideTranslate={slideTranslate}>
-              {widgetConfigs.length ? (
+              {layoutWidgets.length ? (
                 boardChildren
               ) : (
                 <div className="empty">

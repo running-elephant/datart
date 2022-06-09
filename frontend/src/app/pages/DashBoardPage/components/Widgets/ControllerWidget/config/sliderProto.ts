@@ -19,21 +19,19 @@
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import {
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { WHITE } from 'styles/StyleConstants';
 import { controlWidgetTpl, getControlDropDownList } from '.';
 import {
   ImmediateQueryI18N,
   initBackgroundTpl,
   initBorderTpl,
   initPaddingTpl,
-  initWidgetEditActionTpl,
   initWidgetName,
-  initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
-  WidgetEditActionI18N,
-  WidgetViewActionI18N,
 } from '../../../WidgetManager/utils/init';
 
 const NameI18N = {
@@ -41,29 +39,21 @@ const NameI18N = {
   en: 'Slider',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: '',
+  icon: 'control-widget',
   originalType: ORIGINAL_TYPE_MAP.slider,
   canWrapped: true,
   controllable: true,
   linkable: false,
   canFullScreen: false,
   singleton: false,
-  viewAction: {
-    ...initWidgetViewActionTpl(),
-  },
-  editAction: {
-    ...initWidgetEditActionTpl(),
-  },
+
   i18ns: [
     {
       lang: 'zh-CN',
       translation: {
         desc: '',
         widgetName: NameI18N.zh,
-        action: {
-          ...WidgetViewActionI18N.zh,
-          ...WidgetEditActionI18N.zh,
-        },
+        action: {},
         title: TitleI18N.zh,
         immediateQuery: ImmediateQueryI18N.zh,
         background: { backgroundGroup: '背景' },
@@ -77,10 +67,7 @@ export const widgetMeta: WidgetMeta = {
       translation: {
         desc: '',
         widgetName: NameI18N.en,
-        action: {
-          ...WidgetViewActionI18N.en,
-          ...WidgetEditActionI18N.en,
-        },
+        action: {},
         title: TitleI18N.en,
         immediateQuery: ImmediateQueryI18N.en,
         background: { backgroundGroup: 'Background' },
@@ -97,9 +84,9 @@ export const widgetToolkit: WidgetToolkit = {
     const widget = controlWidgetTpl(opt);
     widget.id = widgetMeta.originalType + widget.id;
     widget.config.originalType = widgetMeta.originalType;
-
+    widget.config.rect.height = 60;
     const addProps = [
-      { ...initBackgroundTpl('#fff') },
+      { ...initBackgroundTpl(WHITE) },
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
     ];
@@ -135,8 +122,8 @@ export const widgetToolkit: WidgetToolkit = {
   // //
 };
 
-const sliderProto = {
-  widgetTypeId: widgetMeta.originalType,
+const sliderProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

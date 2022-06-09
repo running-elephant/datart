@@ -19,7 +19,12 @@
 package datart.core.common;
 
 import datart.core.base.consts.TenantManagementMode;
+import datart.core.entity.Organization;
+import datart.core.entity.User;
+import datart.core.mappers.ext.OrganizationMapperExt;
+import datart.core.mappers.ext.UserMapperExt;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -27,6 +32,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 import static datart.core.base.consts.TenantManagementMode.PLATFORM;
 
@@ -37,6 +44,8 @@ public class Application implements ApplicationContextAware {
     private static ApplicationContext context;
 
     private static TenantManagementMode currMode;
+
+    private static Boolean initialized;
 
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
@@ -116,6 +125,28 @@ public class Application implements ApplicationContextAware {
             currMode = PLATFORM;
         }
         return currMode;
+    }
+
+    public static Boolean isInitialized() {
+        if (initialized != null) {
+            return initialized;
+        }
+        UserMapperExt userMapper = getBean(UserMapperExt.class);
+        if (getCurrMode().equals(PLATFORM)) {
+            initialized = userMapper.selectUserCount()>0;
+            return initialized;
+        }
+        OrganizationMapperExt orgMapper = getBean(OrganizationMapperExt.class);
+        List<Organization> organizations = orgMapper.list();
+        int orgCount = CollectionUtils.size(organizations);
+        if (orgCount==0) {
+            initialized = false;
+            return initialized;
+        } else if (orgCount==1) {
+            List<User> users = orgMapper.listOrgMembers(organizations.get(0).getId());
+            initialized = users.stream().anyMatch(item -> getAdminId().equals(item.getId()));
+        }
+        return initialized;
     }
 
 }

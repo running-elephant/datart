@@ -142,8 +142,7 @@ public abstract class ScheduleJob implements Job, Closeable {
 
             for (AttachmentType type : config.getAttachments()) {
                 DownloadCreateParam param = setVizId(downloadCreateParam, folder, type);
-                String beanName = type.name().toLowerCase() + "AttachmentService";
-                AttachmentService attachmentService = Application.getBean(beanName, AttachmentService.class);
+                AttachmentService attachmentService = AttachmentService.matchAttachmentService(type);
                 JobFile jobFile = new JobFile();
                 File file = attachmentService.getFile(param, path, downloadCreateParam.getFileName());
                 jobFile.setFile(file);

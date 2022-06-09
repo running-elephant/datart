@@ -77,12 +77,12 @@ const editDashBoardInfoSlice = createSlice({
     },
     addClipboardWidgets(
       state,
-      action: PayloadAction<BoardInfo['clipboardWidgets']>,
+      action: PayloadAction<BoardInfo['clipboardWidgetMap']>,
     ) {
-      state.clipboardWidgets = action.payload;
+      state.clipboardWidgetMap = action.payload;
     },
     clearClipboardWidgets(state) {
-      state.clipboardWidgets = {};
+      state.clipboardWidgetMap = {};
     },
     changeChartEditorProps(
       state,
@@ -148,9 +148,10 @@ const widgetInfoRecordSlice = createSlice({
         multipleKey: boolean;
         id: string;
         selected: boolean;
+        parentIds: string[];
       }>,
     ) {
-      const { multipleKey, id, selected } = action.payload;
+      const { multipleKey, id, selected, parentIds } = action.payload;
       if (multipleKey) {
         state[id].selected = selected;
       } else {
@@ -161,6 +162,11 @@ const widgetInfoRecordSlice = createSlice({
             state[key].selected = false;
           }
         }
+        parentIds.forEach(id => {
+          if (state[id]) {
+            state[id].editing = true;
+          }
+        });
       }
     },
     selectSubWidget(state, action: PayloadAction<string>) {
@@ -204,11 +210,11 @@ const widgetInfoRecordSlice = createSlice({
         }
       }
     },
-    addWidgetInfos(state, action: PayloadAction<Record<string, WidgetInfo>>) {
-      const widgetInfoMap = action.payload;
-      const widgetIds = Object.keys(widgetInfoMap);
-      widgetIds.forEach(id => {
-        state[id] = widgetInfoMap[id];
+    addWidgetInfos(state, action: PayloadAction<WidgetInfo[]>) {
+      const widgetInfos = action.payload;
+
+      widgetInfos.forEach(info => {
+        state[info.id] = info;
       });
     },
     clearWidgetInfo(state) {
@@ -308,10 +314,56 @@ const editWidgetDataSlice = createSlice({
     },
   },
 });
+const editWidgetSelectedItemsSlice = createSlice({
+  name: 'editBoard',
+  initialState: {
+    multipleSelect: false,
+    selectedItems: {},
+  } as EditBoardState['selectedItemsMap'],
+  reducers: {
+    updateMultipleSelectInEditor(state, { payload }: PayloadAction<boolean>) {
+      state.multipleSelect = payload;
+    },
+    normalSelectInEditor(
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        wid: string;
+        data: { index: string; data: any };
+      }>,
+    ) {
+      const index = state.selectedItems[payload.wid].findIndex(
+        v => v.index === payload.data.index,
+      );
+      if (state.multipleSelect) {
+        if (index < 0) {
+          state.selectedItems[payload.wid].push(payload.data);
+        } else {
+          state.selectedItems[payload.wid].splice(index, 1);
+        }
+      } else {
+        if (index < 0 || state.selectedItems[payload.wid].length > 1) {
+          state.selectedItems[payload.wid] = [payload.data];
+        } else {
+          state.selectedItems[payload.wid] = [];
+        }
+      }
+    },
+    clearSelectedItemsInEditor(
+      state,
+      { payload }: PayloadAction<{ wid: string }>,
+    ) {
+      state.selectedItems[payload.wid] = [];
+    },
+  },
+});
 export const { actions: editBoardStackActions } = editBoardStackSlice;
 export const { actions: editDashBoardInfoActions } = editDashBoardInfoSlice;
 export const { actions: editWidgetInfoActions } = widgetInfoRecordSlice;
 export const { actions: editWidgetDataActions } = editWidgetDataSlice;
+export const { actions: editWidgetSelectedItemsActions } =
+  editWidgetSelectedItemsSlice;
 const filterActions = [
   editBoardStackActions.setBoardToEditStack,
   editBoardStackActions.updateBoard,
@@ -320,7 +372,6 @@ const filterActions = [
   editBoardStackActions.addWidgets,
   editBoardStackActions.deleteWidgets,
   editBoardStackActions.changeAutoBoardWidgetsRect,
-  editBoardStackActions.resizeWidgetEnd,
 
   editBoardStackActions.tabsWidgetAddTab,
   editBoardStackActions.tabsWidgetRemoveTab,
@@ -331,7 +382,9 @@ const filterActions = [
   editBoardStackActions.toggleLockWidget,
   editBoardStackActions.updateBoardConfigByKey,
   editBoardStackActions.updateWidgetConfigByPath,
-  editBoardStackActions.updateWidgetRect,
+  editBoardStackActions.changeFreeWidgetRect,
+  editBoardStackActions.dropWidgetToTab,
+  editBoardStackActions.dropWidgetToGroup,
 ].map(ele => ele.toString());
 const editBoardStackReducer = undoable(editBoardStackSlice.reducer, {
   undoType: BOARD_UNDO.undo,
@@ -347,6 +400,7 @@ const editBoardReducer = combineReducers({
   boardInfo: editDashBoardInfoSlice.reducer,
   widgetInfoRecord: widgetInfoRecordSlice.reducer,
   widgetDataMap: editWidgetDataSlice.reducer,
+  selectedItemsMap: editWidgetSelectedItemsSlice.reducer,
 });
 
 export const useEditBoardSlice = () => {

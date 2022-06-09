@@ -24,7 +24,7 @@ import {
 import { BoardConfig } from 'app/pages/DashBoardPage/types/boardTypes';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { ChartDatasetMeta } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { DeltaStatic } from 'quill';
@@ -51,6 +51,8 @@ export interface BoardState {
   viewMap: Record<string, ChartDataView>; // View
   widgetDataMap: Record<string, WidgetData>;
   availableSourceFunctionsMap: Record<string, string[]>;
+  selectedItems: Record<string, SelectedItem[]>;
+  multipleSelect: boolean;
 }
 // 应用内浏览，分享页模式，定时任务模式，编辑模式
 export type VizRenderMode = 'read' | 'share' | 'schedule' | 'edit';
@@ -111,15 +113,6 @@ export const BoardTypes = ['auto', 'free'] as const;
 BoardTypes.includes('auto');
 export type BoardType = typeof BoardTypes[number];
 
-export interface WidgetBeta3 {
-  id: string;
-  dashboardId: string;
-  datachartId: string;
-  relations: Relation[];
-  viewIds: string[];
-  config: WidgetConfBeta3;
-  parentId?: string;
-}
 export interface WidgetOfCopy extends Widget {
   selectedCopy?: boolean;
 }
@@ -127,27 +120,7 @@ export interface ServerWidget extends Omit<Widget, 'config' | 'relations'> {
   config: string;
   relations: ServerRelation[];
 }
-export interface WidgetConfBeta3 {
-  version: string;
-  index: number;
-  tabId?: string; //记录在父容器tab的位置
-  name: string;
-  nameConfig: WidgetTitleConfig;
-  padding: WidgetPadding;
-  type: WidgetTypeBeta3;
-  autoUpdate: boolean;
-  frequency: number; // 定时同步频率
-  rect: RectConfig; //desktop_rect
-  lock: boolean; //Locking forbids dragging resizing
-  mobileRect?: RectConfig; //mobile_rect 移动端适配
-  background: BackgroundConfig;
-  border: BorderConfig;
-  // content: WidgetContent;
-  content: any;
-  tabIndex?: number; // 在tab 等容器widget里面的排序索引
-  linkageConfig?: LinkageConfig; //联动设置
-  jumpConfig?: JumpConfig; // 跳转 设置
-}
+
 export interface WidgetTitleConfig {
   title: string;
   showTitle: boolean;
@@ -265,15 +238,6 @@ export interface ServerRelation extends Omit<Relation, 'config'> {
 /*
  * 通用
  */
-// 组件配置
-// TODO xld migration about filter xld
-export type WidgetContent =
-  | MediaWidgetContent
-  // | ContainerWidgetContent
-  | TabWidgetContent
-  | ControllerWidgetContent
-  | ChartWidgetContent
-  | BoardBtnContent;
 
 export interface ChartWidgetContent {
   type: WidgetContentChartType;
@@ -337,22 +301,13 @@ export interface ControllerWidgetContent {
   config: ControllerConfig;
 }
 
-export const WidgetTypesBeta3 = [
-  'chart',
-  'media',
-  'container',
-  'controller',
-  'query',
-  'reset',
-] as const;
-export type WidgetTypeBeta3 = typeof WidgetTypesBeta3[number];
-
 export const WidgetTypes = [
   'chart',
   'media',
   'container',
   'controller',
   'button',
+  'group',
 ] as const;
 export type WidgetType = typeof WidgetTypes[number];
 
@@ -440,7 +395,7 @@ export interface BoardInfo {
   fullScreenItemId: string; // 全屏状态
   showBlockMask: boolean; //?
   isDroppable: boolean;
-  clipboardWidgets: Record<string, WidgetOfCopy>;
+  clipboardWidgetMap: Record<string, WidgetOfCopy>;
   layouts: Layout[];
   deviceType: DeviceType; // deviceType for autoBoard defaultValue = desktop
   widgetIds: string[]; // board保存的时候 区分那些是删除的，哪些是新增的

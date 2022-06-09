@@ -33,9 +33,13 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class SqlNodeUtils {
+
+    public static final String REG_WITH_SQL_FRAGMENT = "((?i)WITH[\\s\\S]+(?i)AS?\\s*\\([\\s\\S]+\\))\\s*(?i)SELECT";
 
     public static SqlBasicCall createSqlBasicCall(SqlOperator sqlOperator, List<SqlNode> sqlNodes) {
         if (sqlNodes == null) {
@@ -155,6 +159,26 @@ public class SqlNodeUtils {
                         .withSelectListItemsOnSeparateLines(false)
                         .withUpdateSetListNewline(false)
                         .withIndentation(0)).getSql();
+    }
+
+    public static String rebuildSqlWithFragment(String sql) {
+        if (!sql.toLowerCase().startsWith("with")) {
+            Matcher matcher = Pattern.compile(REG_WITH_SQL_FRAGMENT).matcher(sql);
+            if (matcher.find()) {
+                String withFragment = matcher.group();
+                if (!StringUtils.isEmpty(withFragment)) {
+                    if (withFragment.length() > 6) {
+                        int lastSelectIndex = withFragment.length() - 6;
+                        sql = sql.replace(withFragment, withFragment.substring(lastSelectIndex));
+                        withFragment = withFragment.substring(0, lastSelectIndex);
+                    }
+                    String space = " ";
+                    sql = withFragment + space + sql;
+                    sql = sql.replaceAll(space + "{2,}", space);
+                }
+            }
+        }
+        return sql;
     }
 
 }

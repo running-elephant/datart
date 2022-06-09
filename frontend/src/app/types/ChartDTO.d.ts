@@ -28,4 +28,5 @@ export type ChartDTO = {
   viewId: string;
   view: ChartDataView;
   config: ChartDetailConfigDTO;
+  queryVariables?: any[];
 };

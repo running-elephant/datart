@@ -16,27 +16,22 @@
  * limitations under the License.
  */
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetActionListItem,
   widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
   initPaddingTpl,
   initTitleTpl,
-  initWidgetEditActionTpl,
   initWidgetName,
-  initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
-  WidgetEditActionI18N,
   widgetTpl,
-  WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
 
 const NameI18N = {
@@ -44,29 +39,21 @@ const NameI18N = {
   en: 'Image',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'img',
+  icon: 'image-widget',
   originalType: ORIGINAL_TYPE_MAP.image,
   canWrapped: true,
   controllable: false,
   linkable: false,
   singleton: false,
   canFullScreen: true,
-  viewAction: {
-    ...initWidgetViewActionTpl(),
-  },
-  editAction: {
-    ...initWidgetEditActionTpl(),
-  },
+
   i18ns: [
     {
       lang: 'zh-CN',
       translation: {
         desc: 'img',
         widgetName: NameI18N.zh,
-        action: {
-          ...WidgetViewActionI18N.zh,
-          ...WidgetEditActionI18N.zh,
-        },
+        action: {},
         title: TitleI18N.zh,
         background: { backgroundGroup: '图片编辑' },
         padding: PaddingI18N.zh,
@@ -79,10 +66,7 @@ export const widgetMeta: WidgetMeta = {
       translation: {
         desc: 'img',
         widgetName: NameI18N.en,
-        action: {
-          ...WidgetViewActionI18N.en,
-          ...WidgetEditActionI18N.en,
-        },
+        action: {},
         title: TitleI18N.en,
         background: { backgroundGroup: 'Image Setting' },
         padding: PaddingI18N.en,
@@ -99,31 +83,12 @@ export const widgetToolkit: ImageToolkit = {
     const widget = widgetTpl();
     widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 6,
-        height: 9,
-      };
-      widget.config.rect = rect;
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      const rect: RectConfig = {
-        x: 0,
-        y: 0,
-        width: 500,
-        height: 400,
-      };
-      widget.config.rect = rect;
-    }
 
     widget.config.customConfig.props = [
       { ...initBackgroundTpl() },
@@ -160,6 +125,10 @@ export const widgetToolkit: ImageToolkit = {
         key: 'lock',
         renderMode: ['edit'],
       },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
     ];
     return list;
   },
@@ -176,8 +145,8 @@ export const widgetToolkit: ImageToolkit = {
   // //
 };
 
-const imageProto = {
-  widgetTypeId: widgetMeta.originalType,
+const imageProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

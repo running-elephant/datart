@@ -76,14 +76,10 @@ export function removeSomeObjectConfigByKey(
   return (
     obj &&
     Object.keys(obj).reduce((data, key) => {
-      if (removeKeyList.includes(key)) {
-        return data;
-      } else {
-        return {
-          ...data,
-          key: obj?.[key],
-        };
+      if (!removeKeyList.includes(key)) {
+        data[key] = obj[key];
       }
+      return data;
     }, {})
   );
 }

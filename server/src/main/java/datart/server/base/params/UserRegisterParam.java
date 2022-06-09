@@ -36,6 +36,8 @@ public class UserRegisterParam {
     @Pattern(regexp = Const.REG_USER_PASSWORD, message = "Password length should be 6-20 characters")
     private String password;
 
+    private String name;
+
     @NotBlank(message = "email can not be empty")
     @Pattern(regexp = Const.REG_EMAIL, message = "Invalid email format")
     private String email;

@@ -2,7 +2,6 @@ package datart.server.config;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.mysql.cj.conf.ConnectionUrl;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.FileUtils;
 import datart.core.common.UrlUtils;
@@ -111,7 +110,7 @@ public class CustomPropertiesValidate implements EnvironmentPostProcessor {
 
     private String processDBUrl(ConfigurableEnvironment environment){
         String jdbcUrl = environment.getProperty(DATABASE_URL);
-        if (!ConnectionUrl.acceptsUrl(jdbcUrl)) {
+        if (!StringUtils.startsWith(jdbcUrl, "jdbc:mysql")) {
             return "";
         }
         Boolean isModify = false;

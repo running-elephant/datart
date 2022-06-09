@@ -18,11 +18,13 @@
 
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { View } from 'app/types/View';
+import { Variable } from '../pages/MainPage/pages/VariablePage/slice/types';
 
 export type ChartDataView = Omit<View, 'model'> & {
   meta?: ChartDataViewMeta[];
-  computedFields?: ChartDataViewMeta[];
   orgId?: string;
+  computedFields?: ChartDataViewMeta[];
+  variables?: Variable[];
 };
 
 export default ChartDataView;

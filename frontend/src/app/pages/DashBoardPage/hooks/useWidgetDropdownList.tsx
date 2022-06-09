@@ -21,10 +21,12 @@ import {
   DeleteOutlined,
   EditOutlined,
   FullscreenOutlined,
+  GroupOutlined,
   InfoOutlined,
   LinkOutlined,
   LockOutlined,
   SyncOutlined,
+  UngroupOutlined,
 } from '@ant-design/icons';
 import { VizRenderMode } from '../pages/Board/slice/types';
 import { WidgetActionListItem, widgetActionType } from '../types/widgetTypes';
@@ -91,6 +93,16 @@ export const useWidgetDropdownList = (
       label: 'closeJump',
       icon: <CloseCircleOutlined />,
       danger: true,
+    },
+    {
+      key: 'group',
+      label: 'group',
+      icon: <GroupOutlined />,
+    },
+    {
+      key: 'unGroup',
+      label: 'unGroup',
+      icon: <UngroupOutlined />,
     },
   ];
   const widgetDropdownList = allWidgetActionList

@@ -20,6 +20,7 @@ import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import {
   WidgetActionListItem,
   widgetActionType,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { initWidgetName } from '../../WidgetManager/utils/init';
@@ -30,7 +31,7 @@ const NameI18N = {
   en: 'OwnedChart',
 };
 const widgetMeta = getMeta({
-  icon: 'ownedChart',
+  icon: 'ownedChart-widget',
   widgetTypeId: ORIGINAL_TYPE_MAP.ownedChart,
   zh: {
     desc: '自建数据图表的内部是一个独立的数据图表 ',
@@ -44,10 +45,9 @@ const widgetMeta = getMeta({
 export type OwnedChartToolkit = WidgetToolkit & {};
 const widgetToolkit: OwnedChartToolkit = {
   create: opt => {
-    const widget = dataChartCreator({
-      ...opt,
-      widgetTypeId: widgetMeta.originalType,
-    });
+    const widget = dataChartCreator(opt);
+    widget.config.originalType = ORIGINAL_TYPE_MAP.ownedChart;
+    widget.id = widget.config.originalType + widget.id;
     return widget;
   },
   getName(key) {
@@ -96,6 +96,10 @@ const widgetToolkit: OwnedChartToolkit = {
         key: 'lock',
         renderMode: ['edit'],
       },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
 
       {
         key: 'makeLinkage',
@@ -140,14 +144,9 @@ const widgetToolkit: OwnedChartToolkit = {
   // setJump() {},
   // closeJump() {},
 };
-// class OwnedChartProto{
-//   public widgetTypeId
-//   constructor(){
-//     return this;
-//   }
-// }
-const ownedChartProto = {
-  widgetTypeId: widgetMeta.originalType,
+
+const ownedChartProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };
