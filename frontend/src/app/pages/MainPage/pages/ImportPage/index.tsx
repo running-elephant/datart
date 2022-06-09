@@ -24,7 +24,7 @@ import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
 import { selectOrgId } from '../../slice/selectors';
 import { FileUpload } from './FileUpload';
 import { onImport } from './utils';
-const options = ['NEW', 'IGNORE', 'OVERWRITE', 'ROLLBACK'];
+const options = ['NEW', 'OVERWRITE', 'ROLLBACK'];
 export const ImportPage: FC<{}> = memo(() => {
   const orgId = useSelector(selectOrgId);
   const t = useI18NPrefix('main.subNavs');
