@@ -58,7 +58,7 @@ const ChartForShare: FC<{
   chartPreview?: ChartPreview;
   filterSearchParams?: FilterSearchParams;
   availableSourceFunctions?: string[];
-}> = memo(({ chartPreview, availableSourceFunctions }) => {
+}> = memo(({ chartPreview, filterSearchParams, availableSourceFunctions }) => {
   const dispatch = useDispatch();
   const drillOptionRef = useRef<IChartDrillOption>();
   const [chart] = useState<IChart | undefined>(() => {
@@ -115,7 +115,12 @@ const ChartForShare: FC<{
       chartPreview?.chartConfig?.datas,
       drillOptionRef?.current,
     );
-    dispatch(fetchShareDataSetByPreviewChartAction({ preview: chartPreview }));
+    dispatch(
+      fetchShareDataSetByPreviewChartAction({
+        preview: chartPreview,
+        filterSearchParams,
+      }),
+    );
     registerChartEvents(chart);
   });
 
@@ -149,6 +154,7 @@ const ChartForShare: FC<{
                 pageInfo: {
                   pageNo: param?.value?.pageNo,
                 },
+                filterSearchParams,
               }),
             );
             return;
