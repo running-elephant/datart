@@ -223,6 +223,6 @@ export const KEYBOARD_EVENT_NAME = {
 // .drt = datart template file
 // .drr = datart resources file
 export enum DatartFileSuffixes {
-  Tpl = '.drt',
-  Src = '.drr',
+  Template = '.drt',
+  Resource = '.drr',
 }

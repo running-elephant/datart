@@ -32,7 +32,7 @@ export const FileUpload: FC<{ value?: any; onChange?: any }> = memo(
       <>
         <Upload
           // accept=".jpg,.jpeg,.png,.gif"
-          accept={DatartFileSuffixes.Src}
+          accept={DatartFileSuffixes.Resource}
           showUploadList={false}
           beforeUpload={fileChange}
         >
