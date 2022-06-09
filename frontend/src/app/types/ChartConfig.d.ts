@@ -421,6 +421,11 @@ export interface GridStyle {
 }
 
 export interface SelectedItem {
-  index: string;
-  data: any;
+  index: string | number;
+  data: {
+    rowData: {
+      [p: string]: any;
+    };
+    [p: string]: any;
+  };
 }

@@ -518,8 +518,9 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
       );
     } finally {
       dispatch(
-        editWidgetSelectedItemsActions.clearSelectedItemsInEditor({
+        editWidgetSelectedItemsActions.changeSelectedItemsInEditor({
           wid: widgetId,
+          data: [],
         }),
       );
     }

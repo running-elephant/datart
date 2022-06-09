@@ -75,6 +75,7 @@ class BasicPieChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
+    this.chart.getZr().on('click', this.clearAllSelectedItems.bind(this));
     this.mouseEvents?.forEach(event => {
       this.chart.on(event.name, event.callback);
     });
@@ -98,11 +99,23 @@ class BasicPieChart extends Chart {
   }
 
   onUnMount(): void {
+    this.chart.getZr().off('click', this.clearAllSelectedItems.bind(this));
     this.chart?.dispose();
   }
 
   onResize(opt: any, context): void {
     this.chart?.resize(context);
+  }
+
+  clearAllSelectedItems(e: Event) {
+    if (!e.target) {
+      this.mouseEvents
+        ?.find(v => v.name === 'click')
+        ?.callback({
+          data: [],
+          seriesName: 'changeSelectedItems',
+        } as any);
+    }
   }
 
   private getOptions(

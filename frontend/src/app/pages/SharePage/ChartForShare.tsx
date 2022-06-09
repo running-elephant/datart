@@ -158,18 +158,24 @@ const ChartForShare: FC<{
             return;
           }
 
-          if (!drillOptionRef.current?.isSelectedDrill && chart.selectable) {
+          // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法
+          if (param.seriesName === 'changeSelectedItems') {
+            dispatch(shareActions.changeSelectedItems(param.data));
+            return;
+          }
+
+          if (chart.selectable) {
             const {
               dataIndex,
               componentIndex,
-            }: { dataIndex: number; componentIndex: number } = param;
+              data,
+            }: { dataIndex: number; componentIndex: number; data: any } = param;
             dispatch(
               shareActions.normalSelect({
                 index: componentIndex + ',' + dataIndex,
-                data: param.data,
+                data,
               }),
             );
-            return;
           }
         },
       },
