@@ -51,7 +51,7 @@ import AntVS2Wrapper from './AntVS2Wrapper';
 import Config from './config';
 import { AndvS2Config } from './types';
 
-enum BOLDER_FONT_WEIGHT {
+enum BolderFontWeight {
   lighter = 'normal',
   normal = 'bold',
   bold = 'bolder',
@@ -559,9 +559,9 @@ class PivotSheetChart extends ReactChart {
 
     const _getBolderFontWeight = (
       weightName: string,
-    ): number | BOLDER_FONT_WEIGHT => {
-      return BOLDER_FONT_WEIGHT[weightName]
-        ? BOLDER_FONT_WEIGHT[weightName]
+    ): number | BolderFontWeight => {
+      return BolderFontWeight[weightName]
+        ? BolderFontWeight[weightName]
         : parseInt(weightName) + 100;
     };
 
