@@ -17,20 +17,25 @@
  */
 
 import { useHistory } from 'react-router-dom';
-import useQSLibUrlHelper from './useQSLibUrlHelper';
 
 const useDrillThrough = () => {
   const history = useHistory();
-  const { stringify } = useQSLibUrlHelper();
-
-  const stringifyParams = (filters?: any[]) =>
-    stringify({ filters: filters || [] });
 
   const urlSchemeCheck = (url: string) => {
     if (!/^http(s)?/.test(url)) {
       return `http://${url}`;
     }
     return url;
+  };
+
+  const appendUrlParams = (url, params) => {
+    let urlParams = '';
+    if (/\?.*/.test(url)) {
+      urlParams = `&${params}`;
+    } else {
+      urlParams = `?${params}`;
+    }
+    return `${urlSchemeCheck(url)}${urlParams}`;
   };
 
   const openNewTab = (orgId, relId, params?: string) => {
@@ -57,11 +62,11 @@ const useDrillThrough = () => {
   };
 
   const redirectByUrl = (url, params?: string) => {
-    window.location.href = `${urlSchemeCheck(url)}?${params}`;
+    window.location.href = appendUrlParams(url, params);
   };
 
   const openNewByUrl = (url, params?: string) => {
-    window.open(`${urlSchemeCheck(url)}?${params}`, '_blank');
+    window.open(appendUrlParams(url, params), '_blank');
   };
 
   const getDialogContentByUrl = (url, params?: string) => {
