@@ -348,6 +348,7 @@ const ChartPreviewBoard: FC<{
                   nonAggChartFilters,
                   rule,
                 );
+                Object.assign(urlFilters, { isMatchByName: true });
                 const urlFiltersStr: string =
                   urlSearchTransfer.toUrlString(urlFilters);
                 if (rule?.action === InteractionAction.Redirect) {
@@ -370,6 +371,7 @@ const ChartPreviewBoard: FC<{
                   nonAggChartFilters,
                   rule,
                 );
+                Object.assign(urlFilters, { isMatchByName: true });
                 const urlFiltersStr: string =
                   urlSearchTransfer.toUrlString(urlFilters);
                 const url = rule?.[rule.category!]?.url;
