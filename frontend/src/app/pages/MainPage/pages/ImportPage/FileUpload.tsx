@@ -17,9 +17,8 @@
  */
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Upload } from 'antd';
-import { DrFile } from 'globalConstants';
+import { DatartFileSuffixes } from 'globalConstants';
 import { FC, memo, useState } from 'react';
-import { getToken } from 'utils/auth';
 
 export const FileUpload: FC<{ value?: any; onChange?: any }> = memo(
   ({ value, onChange }) => {
@@ -33,9 +32,7 @@ export const FileUpload: FC<{ value?: any; onChange?: any }> = memo(
       <>
         <Upload
           // accept=".jpg,.jpeg,.png,.gif"
-          accept={DrFile.Src}
-          method="post"
-          headers={{ authorization: getToken()! }}
+          accept={DatartFileSuffixes.Src}
           showUploadList={false}
           beforeUpload={fileChange}
         >

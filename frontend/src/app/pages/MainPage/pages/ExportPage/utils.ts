@@ -18,12 +18,16 @@ import { request2 } from 'utils/request';
  * limitations under the License.
  */
 export async function onExport(idList) {
-  const response = await request2<any>({
-    method: 'POST',
-    url: `viz/export`,
-    data: {
-      resources: idList,
-    },
-  });
-  return response?.data;
+  try {
+    const response = await request2<any>({
+      method: 'POST',
+      url: `viz/export`,
+      data: {
+        resources: idList,
+      },
+    });
+    return true;
+  } catch (error) {
+    return error;
+  }
 }

@@ -222,7 +222,7 @@ export const KEYBOARD_EVENT_NAME = {
 
 // .drt = datart template file
 // .drr = datart resources file
-export enum DrFile {
+export enum DatartFileSuffixes {
   Tpl = '.drt',
   Src = '.drr',
 }

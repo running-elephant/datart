@@ -22,10 +22,14 @@ export async function onImport(args: {
   orgId: string;
 }) {
   const { file, strategy, orgId } = args;
-  const response = await request2<any>({
-    method: 'POST',
-    url: `viz/import?strategy=${strategy}&orgId=${orgId}`,
-    data: file,
-  });
-  return response?.data;
+  try {
+    const response = await request2<any>({
+      method: 'POST',
+      url: `viz/import?strategy=${strategy}&orgId=${orgId}`,
+      data: file,
+    });
+    return true;
+  } catch (error) {
+    return error;
+  }
 }

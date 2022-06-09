@@ -41,7 +41,7 @@ export const ImportPage: FC<{}> = memo(() => {
       strategy: value.strategy,
       orgId,
     });
-    if (resData) {
+    if (resData === true) {
       message.success('success');
       form.resetFields(['file']);
     } else {

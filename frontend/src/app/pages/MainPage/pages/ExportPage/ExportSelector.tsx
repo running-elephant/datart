@@ -39,7 +39,7 @@ export const ExportSelector: FC<{
   const onSubmit = async () => {
     const idList = selectedIds
       ?.map(id => {
-        // 文件数 id 而不是 relId
+        // 文件树id 而不是 relId
         const target = folders?.find(item => item.id === id);
         if (target) {
           return {
@@ -50,9 +50,8 @@ export const ExportSelector: FC<{
         return null;
       })
       .filter(item => !!item);
-    console.log('idList', idList);
     const resData = await onExport(idList);
-    if (resData) {
+    if (resData === true) {
       message.success('success');
       setIds([]);
       dispatch(mainActions.setDownloadPolling(true));
