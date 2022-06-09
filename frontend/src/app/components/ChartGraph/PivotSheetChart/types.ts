@@ -20,5 +20,4 @@ export interface AndvS2Config {
   onSelected?: (cells: any[]) => void;
   onDataCellClick?: (data: TargetCellInfo) => void;
   getSpreadSheet?: (spreadsheet: SpreadSheet) => void;
-  onReset?: () => void;
 }

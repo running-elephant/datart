@@ -34,7 +34,6 @@ const AntVS2Wrapper: FC<AndvS2Config> = memo(
     onSelected,
     getSpreadSheet,
     onDataCellClick,
-    onReset,
   }) => {
     if (!dataCfg) {
       return <div></div>;
@@ -67,7 +66,6 @@ const AntVS2Wrapper: FC<AndvS2Config> = memo(
         onSelected={onSelected}
         getSpreadSheet={getSpreadSheet}
         onDataCellClick={onDataCellClick}
-        onReset={onReset}
       />
     );
   },
