@@ -33,7 +33,7 @@ import {
 } from '../../types/ChartConfig';
 import {
   clearRuntimeDateLevelFieldsInChartConfig,
-  compareWhetherUpdateSelected,
+  compareSelectedItems,
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getDataColumnMaxAndMin2,
@@ -2883,12 +2883,12 @@ describe('Chart Helper ', () => {
     ],
     [[], undefined, true],
   ])(
-    'compareWhetherUpdateSelected Test - ',
+    'compareSelectedItems Test - ',
     (newSelectedItems, oldSelectedItems, expected) => {
       test(`Get compare whether update`, () => {
         expect(
           JSON.stringify(
-            compareWhetherUpdateSelected(newSelectedItems, oldSelectedItems),
+            compareSelectedItems(newSelectedItems, oldSelectedItems),
           ),
         ).toEqual(JSON.stringify(expected));
       });

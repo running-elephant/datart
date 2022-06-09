@@ -579,7 +579,7 @@ export const selectedItemChange = (
   }
 };
 
-export const changeAllSelectedItems = (
+export const changeSelectedItems = (
   dispatch,
   type: VizRenderMode,
   data,

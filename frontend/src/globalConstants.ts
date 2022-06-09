@@ -32,6 +32,7 @@ export enum StorageKeys {
   Locale = 'LOCALE',
   Theme = 'THEME',
 }
+
 export const BASE_API_URL = '/api/v1';
 export const BASE_RESOURCE_URL = '/';
 // 1 hour
@@ -180,6 +181,7 @@ export enum FilterSqlOperator {
   LessThanOrEqual = 'LTE',
   GreaterThanOrEqual = 'GTE',
 }
+
 export const DATE_FORMATTER = 'YYYY-MM-DD';
 export const TIME_FORMATTER = 'YYYY-MM-DD HH:mm:ss';
 
@@ -216,7 +218,7 @@ export const NumericUnitDescriptions = new Map<NumberUnitKey, [number, string]>(
   ],
 );
 
-export enum KEYBOARD_EVENT_NAME {
-  CTRL = 'Control',
-  COMMAND = 'Meta',
-}
+export const KEYBOARD_EVENT_NAME = {
+  CTRL: 'Control',
+  COMMAND: 'Meta',
+};

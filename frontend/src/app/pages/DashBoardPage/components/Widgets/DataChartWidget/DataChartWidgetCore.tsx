@@ -48,7 +48,7 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
 import {
-  changeAllSelectedItems,
+  changeSelectedItems,
   multipleSelectChange,
   selectedItemChange,
 } from '../../../pages/BoardEditor/slice/actions/actions';
@@ -200,13 +200,9 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                   return;
                 }
 
+                // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法
                 if (params.seriesName === 'changeSelectedItems') {
-                  changeAllSelectedItems(
-                    dispatch,
-                    renderMode,
-                    params.data,
-                    wid,
-                  );
+                  changeSelectedItems(dispatch, renderMode, params.data, wid);
                   return;
                 }
                 if (chartInstance.selectable) {

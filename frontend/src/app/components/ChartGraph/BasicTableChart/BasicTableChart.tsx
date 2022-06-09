@@ -30,7 +30,7 @@ import {
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
-  compareWhetherUpdateSelected,
+  compareSelectedItems,
   getColumnRenderName,
   getStyles,
   getUnusedHeaderRows,
@@ -85,7 +85,7 @@ class BasicTableChart extends ReactChart {
     total: 0,
   };
   selectedItems: SelectedItem[] = [];
-  cellsSelectedItems: SelectedItem[] = [];
+  selectedCellItems: SelectedItem[] = [];
   multipleSelect: boolean = false;
 
   constructor(props?) {
@@ -218,7 +218,7 @@ class BasicTableChart extends ReactChart {
 
     if (!selectedItems?.length && this.selectedItems.length) {
       this.selectedItems = [];
-      this.cellsSelectedItems = [];
+      this.selectedCellItems = [];
     }
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
@@ -724,7 +724,7 @@ class BasicTableChart extends ReactChart {
           };
           let highlightStyle = {};
           if (
-            this.cellsSelectedItems.find(
+            this.selectedCellItems.find(
               v => v.index === rest.rowIndex + ',' + rest.dataIndex,
             )
           ) {
@@ -1254,20 +1254,20 @@ class BasicTableChart extends ReactChart {
       index: dataIndex + ',' + seriesName,
       data,
     };
-    const index = this.cellsSelectedItems.findIndex(
+    const index = this.selectedCellItems.findIndex(
       v => v.index === option.index,
     );
     if (this.multipleSelect) {
       if (index < 0) {
-        this.cellsSelectedItems.push(option);
+        this.selectedCellItems.push(option);
       } else {
-        this.cellsSelectedItems.splice(index, 1);
+        this.selectedCellItems.splice(index, 1);
       }
     } else {
-      if (index < 0 || this.cellsSelectedItems.length > 1) {
-        this.cellsSelectedItems = [option];
+      if (index < 0 || this.selectedCellItems.length > 1) {
+        this.selectedCellItems = [option];
       } else {
-        this.cellsSelectedItems = [];
+        this.selectedCellItems = [];
       }
     }
     this.updateSelectedItems(
@@ -1282,7 +1282,7 @@ class BasicTableChart extends ReactChart {
     widgetSpecialConfig: { env: string | undefined; [x: string]: any },
     mixedSectionConfigRows: ChartDataSectionField[],
   ) {
-    const newSelectedItems = this.cellsSelectedItems.reduce(
+    const newSelectedItems = this.selectedCellItems.reduce(
       (selectedItems, item) => {
         const dataIndex = item.index.toString().split(',')[0];
         if (!selectedItems.find(v => v.index === dataIndex)) {
@@ -1295,11 +1295,7 @@ class BasicTableChart extends ReactChart {
       },
       [] as SelectedItem[],
     );
-    const onOff = compareWhetherUpdateSelected(
-      newSelectedItems,
-      this.selectedItems,
-    );
-    if (onOff) {
+    if (compareSelectedItems(newSelectedItems, this.selectedItems)) {
       this.selectedItems = newSelectedItems;
       this.mouseEvents
         ?.find(v => v.name === 'click')

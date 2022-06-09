@@ -158,6 +158,7 @@ const ChartForShare: FC<{
             return;
           }
 
+          // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法
           if (param.seriesName === 'changeSelectedItems') {
             dispatch(shareActions.changeSelectedItems(param.data));
             return;

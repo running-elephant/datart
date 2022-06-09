@@ -1708,7 +1708,7 @@ export const getSelectedItemStyles = (
   };
 };
 
-export const compareWhetherUpdateSelected = (
+export const compareSelectedItems = (
   newSelectedItems: SelectedItem[],
   oldSelectedItems?: SelectedItem[],
 ): boolean => {
