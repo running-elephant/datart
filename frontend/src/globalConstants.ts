@@ -222,3 +222,10 @@ export const KEYBOARD_EVENT_NAME = {
   CTRL: 'Control',
   COMMAND: 'Meta',
 };
+
+// .drt = datart template file
+// .drr = datart resources file
+export enum DatartFileSuffixes {
+  Template = '.drt',
+  Resource = '.drr',
+}
