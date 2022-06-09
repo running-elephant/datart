@@ -43,8 +43,8 @@ export const ExportSelector: FC<{
         const target = folders?.find(item => item.id === id);
         if (target) {
           return {
-            vizId: target.relId,
-            vizType: target.relType,
+            resourceId: target.relId,
+            resourceType: target.relType,
           };
         }
         return null;
@@ -52,7 +52,7 @@ export const ExportSelector: FC<{
       .filter(item => !!item);
     console.log('idList', idList);
     const resData = await onExport(idList);
-    if (resData === true) {
+    if (resData) {
       message.success('success');
       setIds([]);
       dispatch(mainActions.setDownloadPolling(true));
@@ -78,7 +78,12 @@ export const ExportSelector: FC<{
             treeDefaultExpandAll
             onChange={onChange}
           ></TreeSelect>
-          <Button className="export-btn" type="primary" onClick={onSubmit}>
+          <Button
+            className="export-btn"
+            type="primary"
+            disabled={!selectedIds?.length}
+            onClick={onSubmit}
+          >
             export
           </Button>
         </div>
@@ -107,7 +112,7 @@ const StyledWrapper = styled.div`
     flex: 1;
   }
   .export-tree {
-    flex: 1;
+    width: 400px;
   }
   .export-btn {
     width: 160px;

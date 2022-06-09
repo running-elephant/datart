@@ -15,11 +15,100 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Button, Card, Form, message, Select } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, memo } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
+import { selectOrgId } from '../../slice/selectors';
+import { FileUpload } from './FileUpload';
+import { onImport } from './utils';
+const options = ['NEW', 'IGNORE', 'OVERWRITE', 'ROLLBACK'];
 export const ImportPage: FC<{}> = memo(() => {
-  return <StyledWrapper>init ImportPage </StyledWrapper>;
+  const orgId = useSelector(selectOrgId);
+  const t = useI18NPrefix('main.subNavs');
+  const [form] = Form.useForm();
+  const onSubmit = async value => {
+    if (!value.file) {
+      return;
+    }
+
+    let formData = new FormData();
+    formData.append('file', value.file);
+    const resData = await onImport({
+      file: formData,
+      strategy: value.strategy,
+      orgId,
+    });
+    if (resData) {
+      message.success('success');
+      form.resetFields(['file']);
+    } else {
+      message.warn('warn');
+    }
+  };
+
+  return (
+    <StyledWrapper>
+      <Card title={t('import.title')}>
+        <Form
+          form={form}
+          labelAlign="left"
+          labelCol={{ offset: 1, span: 2 }}
+          wrapperCol={{ span: 16 }}
+          onFinish={onSubmit}
+        >
+          <Form.Item
+            name="file"
+            label="file"
+            colon={false}
+            initialValue={undefined}
+            rules={[{ required: true }]}
+          >
+            <FileUpload />
+          </Form.Item>
+          <Form.Item
+            name="strategy"
+            label={'strategy'}
+            colon={false}
+            initialValue={'NEW'}
+          >
+            <Select showSearch style={{ width: '200px' }}>
+              {options.map(o => (
+                <Select.Option key={o} value={o}>
+                  {o}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item label=" " colon={false}>
+            <Button type="primary" htmlType="submit">
+              import
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </StyledWrapper>
+  );
 });
 const StyledWrapper = styled.div`
-  display: flex;
+  flex: 1;
+  padding: ${SPACE_LG};
+  overflow-y: auto;
+
+  .ant-card {
+    margin-top: ${SPACE_LG};
+    background-color: ${p => p.theme.componentBackground};
+    border-radius: ${BORDER_RADIUS};
+    box-shadow: ${p => p.theme.shadow1};
+
+    &:first-of-type {
+      margin-top: 0;
+    }
+  }
+
+  .title {
+    color: ${p => p.theme.info};
+  }
 `;

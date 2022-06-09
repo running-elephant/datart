@@ -1,5 +1,3 @@
-import { request2 } from 'utils/request';
-
 /**
  * Datart
  *
@@ -17,13 +15,17 @@ import { request2 } from 'utils/request';
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export async function onExport(idList) {
+import { request2 } from 'utils/request';
+export async function onImport(args: {
+  file: FormData;
+  strategy: string;
+  orgId: string;
+}) {
+  const { file, strategy, orgId } = args;
   const response = await request2<any>({
     method: 'POST',
-    url: `viz/export`,
-    data: {
-      resources: idList,
-    },
+    url: `viz/import?strategy=${strategy}&orgId=${orgId}`,
+    data: file,
   });
   return response?.data;
 }
