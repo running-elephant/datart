@@ -153,6 +153,8 @@ const ChartForShare: FC<{
             );
             return;
           }
+
+          // NOTE 透视表树形结构展开下钻特殊处理方法
           if (param.seriesName === 'drillOptionChange') {
             handleDrillOptionChange?.(param.value);
             return;

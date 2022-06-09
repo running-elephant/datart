@@ -238,6 +238,7 @@ class PivotSheetChart extends ReactChart {
         interaction: {
           hoverHighlight: Boolean(enableHoverHighlight),
           selectedCellsSpotlight: Boolean(enableSelectedHighlight),
+          autoResetSheetStyle: false,
         },
         totals: {
           row: {
@@ -367,9 +368,6 @@ class PivotSheetChart extends ReactChart {
       },
       getSpreadSheet: getSpreadSheet => {
         this.chart = getSpreadSheet;
-      },
-      onReset: () => {
-        this.changeSelectedItems([]);
       },
     };
   }
