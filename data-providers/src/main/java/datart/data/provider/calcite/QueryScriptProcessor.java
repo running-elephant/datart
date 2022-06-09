@@ -15,30 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package datart.data.provider.calcite;
 
-package datart.core.data.provider.sql;
+import datart.core.data.provider.QueryScript;
+import org.apache.calcite.sql.SqlNode;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+public interface QueryScriptProcessor {
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class OrderOperator extends ColumnOperator {
+    SqlNode process(QueryScript queryScript);
 
-    private AggregateOperator.SqlOperator aggOperator;
-
-    private SqlOperator operator;
-
-    public enum SqlOperator {
-        ASC,
-        DESC
-    }
-
-    @Override
-    public String toString() {
-        return "OrderOperator{" +
-                "column='" + getColumnKey() + '\'' +
-                ", operator=" + operator +
-                '}';
-    }
 }

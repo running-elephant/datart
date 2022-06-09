@@ -15,30 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package datart.core.data.provider;
 
-package datart.core.data.provider.sql;
+public enum ScriptType {
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+    SQL,
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class OrderOperator extends ColumnOperator {
+    STRUCT
 
-    private AggregateOperator.SqlOperator aggOperator;
-
-    private SqlOperator operator;
-
-    public enum SqlOperator {
-        ASC,
-        DESC
-    }
-
-    @Override
-    public String toString() {
-        return "OrderOperator{" +
-                "column='" + getColumnKey() + '\'' +
-                ", operator=" + operator +
-                '}';
-    }
 }

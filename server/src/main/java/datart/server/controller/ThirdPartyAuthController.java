@@ -1,11 +1,7 @@
 package datart.server.controller;
 
 import datart.core.base.annotations.SkipLogin;
-import datart.core.base.consts.Const;
-import datart.core.entity.User;
 import datart.core.entity.ext.UserBaseInfo;
-import datart.security.base.PasswordToken;
-import datart.security.util.JwtUtils;
 import datart.server.base.dto.ResponseData;
 import datart.server.service.UserService;
 import io.swagger.annotations.Api;
@@ -13,7 +9,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
@@ -66,18 +61,19 @@ public class ThirdPartyAuthController extends BaseController {
     @SkipLogin
     @PostMapping(value = "oauth2login", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseData<UserBaseInfo> externalLogin(Principal principal, HttpServletResponse response) {
-        if (principal instanceof OAuth2AuthenticationToken) {
-            User user = userService.externalRegist((OAuth2AuthenticationToken) principal);
-            PasswordToken passwordToken = new PasswordToken(user.getUsername(),
-                    null,
-                    System.currentTimeMillis());
 
-            passwordToken.setPassword(user.getPassword());
-            String token = JwtUtils.toJwtString(passwordToken);
-            response.setHeader(Const.TOKEN, token);
-            response.setStatus(200);
-            return ResponseData.success(new UserBaseInfo(user));
-        }
+//        if (principal instanceof OAuth2AuthenticationToken) {
+//            User user = userService.externalRegist((OAuth2AuthenticationToken) principal);
+//            PasswordToken passwordToken = new PasswordToken(user.getUsername(),
+//                    null,
+//                    System.currentTimeMillis());
+//
+//            passwordToken.setPassword(user.getPassword());
+//            String token = JwtUtils.toJwtString(passwordToken);
+//            response.setHeader(Const.TOKEN, token);
+//            response.setStatus(200);
+//            return ResponseData.success(new UserBaseInfo(user));
+//        }
         response.setStatus(401);
         return ResponseData.failure("oauth2登录失败");
     }

@@ -19,16 +19,18 @@
 package datart.core.data.provider.sql;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class GroupByOperator implements Operator {
+@EqualsAndHashCode(callSuper = true)
+public class GroupByOperator extends ColumnOperator implements Alias {
 
-    private String column;
+    private String alias;
 
     @Override
     public String toString() {
         return "GroupByOperator{" +
-                "column='" + column + '\'' +
+                "column='" + getColumnKey() + '\'' +
                 '}';
     }
 }
