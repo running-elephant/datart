@@ -43,7 +43,8 @@ const useDrillThrough = () => {
   };
 
   const openBrowserTab = (orgId, relId, params?: string) => {
-    window.open(`/organizations/${orgId}/vizs/${relId}?${params}`, '_blank');
+    const url = `/organizations/${orgId}/vizs/${relId}?${params}`;
+    window.open(url, url);
   };
 
   const getDialogContent = (orgId, relId, params?: string) => {
@@ -66,7 +67,8 @@ const useDrillThrough = () => {
   };
 
   const openNewByUrl = (url, params?: string) => {
-    window.open(appendUrlParams(url, params), '_blank');
+    const finnalUrl = appendUrlParams(url, params);
+    window.open(finnalUrl, finnalUrl);
   };
 
   const getDialogContentByUrl = (url, params?: string) => {

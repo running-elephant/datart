@@ -64,6 +64,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
+import { isEmpty } from 'utils/object';
 import useDisplayViewDetail from '../hooks/useDisplayViewDetail';
 import useDrillThrough from '../hooks/useDrillThrough';
 import useQSLibUrlHelper from '../hooks/useQSLibUrlHelper';
@@ -278,7 +279,7 @@ const ChartPreviewBoard: FC<{
     };
 
     const handleDrillThroughEvent = useCallback(
-      (param, targetEvent) => {
+      (param, targetEvent, ruleId?: string) => {
         const enableDrillThrough = getValue(
           chartPreview?.chartConfig?.interactions || [],
           ['drillThrough'],
@@ -307,15 +308,17 @@ const ChartPreviewBoard: FC<{
             .build()
             ?.filters?.filter(f => !Boolean(f.aggOperator));
 
-          drillThroughSetting?.rules?.forEach(rule => {
-            const clickFilters = buildClickEventBaseFilters(
-              param?.data?.rowData,
-              rule,
-              drillOptionRef?.current,
-              chartPreview?.chartConfig?.datas,
-            );
+          (drillThroughSetting?.rules || [])
+            .filter(rule => rule.event === targetEvent)
+            .filter(rule => isEmpty(ruleId) || rule.id === ruleId)
+            .forEach(rule => {
+              const clickFilters = buildClickEventBaseFilters(
+                param?.data?.rowData,
+                rule,
+                drillOptionRef?.current,
+                chartPreview?.chartConfig?.datas,
+              );
 
-            if (rule.event === targetEvent) {
               const relId = rule?.[rule.category!]?.relId;
               if (rule.category === InteractionCategory.JumpToChart) {
                 const urlFilters = getJumpOperationFiltersByInteractionRule(
@@ -389,8 +392,7 @@ const ChartPreviewBoard: FC<{
                   modal.info(modalContent as any);
                 }
               }
-            }
-          });
+            });
         }
       },
       [
@@ -759,10 +761,11 @@ const ChartPreviewBoard: FC<{
               availableSourceFunctions,
               onDateLevelChange: handleDateLevelChange,
               onDrillThroughChange: enableRightClickDrillThrough()
-                ? () =>
+                ? ruleId =>
                     handleDrillThroughEvent(
                       chartContextMenuEvent,
                       InteractionMouseEvent.Right,
+                      ruleId,
                     )
                 : undefined,
               onViewDataChange: enableRightClickViewData()

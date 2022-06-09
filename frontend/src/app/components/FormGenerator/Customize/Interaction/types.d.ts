@@ -59,6 +59,7 @@ export type JumpToUrlRule = {
 
 export type InteractionRule = {
   id: string;
+  name?: string;
   event?: InteractionMouseEvent;
   category?: InteractionCategory;
   action?: InteractionAction;
