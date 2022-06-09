@@ -20,7 +20,7 @@ import { Button, Radio, Select, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import useMount from 'app/hooks/useMount';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
-import { fetchDataChart } from 'app/utils/fetch';
+import { fetchDashboardDetail } from 'app/utils/fetch';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -44,19 +44,21 @@ const ControllerList: FC<
   onRelationChange,
   translate: t,
 }) => {
-  const [targetFields, setTargetFields] = useState<ChartDataViewMeta[]>([]);
-  const [targetVariables, setTargetVariables] = useState<ChartDataViewMeta[]>(
-    [],
-  );
+  const [controllerNames, setControllerNames] = useState<string[]>([]);
+
+  const getControllerNames = data => {
+    return (data?.widgets || [])
+      .map(w => JSON.parse(w.config))
+      .filter(c => c.type === 'controller')
+      .map(c => c.name);
+  };
 
   useMount(async () => {
-    // if (targetRelId) {
-    //   const data = await fetchDataChart(targetRelId);
-    //   setTargetFields(
-    //     data?.view?.meta?.concat(data?.config?.computedFields || []) || [],
-    //   );
-    //   setTargetVariables(data?.queryVariables || []);
-    // }
+    if (targetRelId) {
+      const data: any = await fetchDashboardDetail(targetRelId);
+      const names = getControllerNames(data);
+      setControllerNames(names);
+    }
   });
 
   const handleAddRelation = () => {
@@ -143,8 +145,8 @@ const ControllerList: FC<
           value={value}
           onChange={value => handleRelationChange(index, 'target', value)}
         >
-          {(isFieldType(record) ? targetFields : targetVariables)?.map(sf => {
-            return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;
+          {controllerNames?.map(name => {
+            return <Select.Option value={name}>{name}</Select.Option>;
           })}
         </Select>
       ),
