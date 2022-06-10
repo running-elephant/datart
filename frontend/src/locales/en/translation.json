@@ -765,6 +765,7 @@
             "addRule": "+ Add New",
             "inputUrl": "Please input url",
             "header": {
+              "name": "Name",
               "category": "Category",
               "open": "Open",
               "relation": "Relation",

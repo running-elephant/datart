@@ -765,6 +765,7 @@
             "addRule": "+ 点击新建",
             "inputUrl": "请输入URL",
             "header": {
+              "name": "名称",
               "category": "类型",
               "open": "打开方式",
               "relation": "关系设置",

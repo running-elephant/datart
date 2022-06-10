@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Button, Select, Table } from 'antd';
+import { Button, Input, Select, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC } from 'react';
@@ -39,14 +39,29 @@ const RuleList: FC<
     onDeleteRule: (id) => void;
   } & I18nTranslator
 > = ({ rules, vizs, dataview, onRuleChange, onDeleteRule, translate: t }) => {
+  const tableColumnStyle = { width: '150px' };
+
   const columns: ColumnsType<InteractionRule> = [
+    {
+      title: t('drillThrough.rule.header.name'),
+      dataIndex: 'name',
+      key: 'name',
+      render: (value, record) => (
+        <Input
+          style={tableColumnStyle}
+          value={value}
+          maxLength={100}
+          onChange={e => onRuleChange(record.id, 'name', e.target.value)}
+        />
+      ),
+    },
     {
       title: t('drillThrough.rule.header.category'),
       dataIndex: 'category',
       key: 'category',
       render: (value, record) => (
         <Select
-          style={{ width: '150px' }}
+          style={tableColumnStyle}
           value={value}
           onChange={value => onRuleChange(record.id, 'category', value)}
         >
@@ -68,7 +83,7 @@ const RuleList: FC<
       key: 'event',
       render: (value, record) => (
         <Select
-          style={{ width: '150px' }}
+          style={tableColumnStyle}
           value={value}
           onChange={value => onRuleChange(record.id, 'event', value)}
         >
@@ -87,7 +102,7 @@ const RuleList: FC<
       key: 'action',
       render: (value, record) => (
         <Select
-          style={{ width: '150px' }}
+          style={tableColumnStyle}
           value={value}
           onChange={value => onRuleChange(record.id, 'action', value)}
         >

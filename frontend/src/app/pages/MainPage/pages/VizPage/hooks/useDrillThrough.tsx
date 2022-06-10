@@ -67,8 +67,8 @@ const useDrillThrough = () => {
   };
 
   const openNewByUrl = (url, params?: string) => {
-    const finnalUrl = appendUrlParams(url, params);
-    window.open(finnalUrl, finnalUrl);
+    const finalUrl = appendUrlParams(url, params);
+    window.open(finalUrl, finalUrl);
   };
 
   const getDialogContentByUrl = (url, params?: string) => {
