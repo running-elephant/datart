@@ -1707,3 +1707,20 @@ export const getSelectedItemStyles = (
     itemStyle,
   };
 };
+
+export const compareSelectedItems = (
+  newSelectedItems: SelectedItem[],
+  oldSelectedItems?: SelectedItem[],
+): boolean => {
+  if (newSelectedItems.length !== oldSelectedItems?.length) {
+    return true;
+  } else if (
+    newSelectedItems.length === oldSelectedItems.length &&
+    newSelectedItems.length
+  ) {
+    const selectedIndexList = oldSelectedItems.map(v => v.index);
+    return !!newSelectedItems.filter(v => !selectedIndexList.includes(v.index))
+      .length;
+  }
+  return false;
+};

@@ -24,6 +24,7 @@ import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import { compareSelectedItems } from 'app/utils/chartHelper';
 import { transformHierarchyMeta } from 'app/utils/internalChartHelper';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
@@ -172,8 +173,13 @@ const workbenchSlice = createSlice({
         }
       }
     },
-    clearSelectedItems(state) {
-      state.selectedItems = [];
+    changeSelectedItems(
+      state,
+      { payload }: PayloadAction<Array<SelectedItem>>,
+    ) {
+      if (compareSelectedItems(payload, state.selectedItems)) {
+        state.selectedItems = payload;
+      }
     },
     updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
       state.multipleSelect = payload;

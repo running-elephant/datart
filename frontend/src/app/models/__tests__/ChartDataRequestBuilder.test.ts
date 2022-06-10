@@ -798,9 +798,6 @@ describe('ChartDataRequestBuild Test', () => {
     const requestParams = builder.build();
 
     expect(requestParams.orders).toEqual([
-      { column: 'first-name', operator: 'ASC', aggOperator: undefined },
-      { column: 'last-name', operator: 'DESC', aggOperator: undefined },
-      { column: 'address', operator: 'DESC', aggOperator: undefined },
       {
         column: 'age',
         aggOperator: 'AVG',
@@ -813,9 +810,6 @@ describe('ChartDataRequestBuild Test', () => {
     builder.addExtraSorters(extraSorters2);
 
     expect(requestParams.orders).toEqual([
-      { column: 'first-name', operator: 'ASC', aggOperator: undefined },
-      { column: 'last-name', operator: 'DESC', aggOperator: undefined },
-      { column: 'address', operator: 'DESC', aggOperator: undefined },
       {
         column: 'age',
         aggOperator: 'AVG',

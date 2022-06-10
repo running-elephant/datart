@@ -36,6 +36,8 @@ import { AccessRoute } from './AccessRoute';
 import { Background } from './Background';
 import { Navbar } from './Navbar';
 import { ConfirmInvitePage } from './pages/ConfirmInvitePage';
+import { ExportPage } from './pages/ExportPage';
+import { ImportPage } from './pages/ImportPage';
 import { MemberPage } from './pages/MemberPage';
 import { OrgSettingPage } from './pages/OrgSettingPage';
 import { PermissionPage } from './pages/PermissionPage';
@@ -224,6 +226,22 @@ export function MainPage() {
             render={() => (
               <AccessRoute module={ResourceTypes.Manager}>
                 <OrgSettingPage />
+              </AccessRoute>
+            )}
+          />
+          <Route
+            path="/organizations/:orgId/export"
+            render={() => (
+              <AccessRoute module={ResourceTypes.Manager}>
+                <ExportPage />
+              </AccessRoute>
+            )}
+          />
+          <Route
+            path="/organizations/:orgId/import"
+            render={() => (
+              <AccessRoute module={ResourceTypes.Manager}>
+                <ImportPage />
               </AccessRoute>
             )}
           />

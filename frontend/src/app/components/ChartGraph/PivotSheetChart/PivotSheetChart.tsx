@@ -16,7 +16,18 @@
  * limitations under the License.
  */
 
-import { Data, DefaultCellTheme, Meta, SortParam, Style } from '@antv/s2';
+import {
+  Data,
+  DataCell,
+  DefaultCellTheme,
+  Meta,
+  S2CellType,
+  SortParam,
+  SpreadSheet,
+  Style,
+  TargetCellInfo,
+  ViewMeta,
+} from '@antv/s2';
 import { ChartDataSectionType, SortActionType } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ReactChart from 'app/models/ReactChart';
@@ -25,6 +36,7 @@ import {
   ChartDataConfig,
   ChartDataSectionField,
   ChartStyleConfig,
+  SelectedItem,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
@@ -39,13 +51,20 @@ import AntVS2Wrapper from './AntVS2Wrapper';
 import Config from './config';
 import { AndvS2Config } from './types';
 
+enum BolderFontWeight {
+  lighter = 'normal',
+  normal = 'bold',
+  bold = 'bolder',
+  bolder = 'bolder',
+}
+
 class PivotSheetChart extends ReactChart {
   static icon = `<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' aria-hidden='true' role='img' width='1em' height='1em' preserveAspectRatio='xMidYMid meet' viewBox='0 0 24 24'><path d='M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z' fill='gray'/></svg>`;
 
   useIFrame = false;
   isISOContainer = 'piovt-sheet';
   config = Config;
-  chart: any = null;
+  chart: null | SpreadSheet = null;
   updateOptions: any = {};
   lastRowsConfig: ChartDataSectionField[] = [];
   hierarchyCollapse: boolean = true;
@@ -72,6 +91,7 @@ class PivotSheetChart extends ReactChart {
       options.dataset,
       options.config,
       options.drillOption,
+      options.selectedItems,
     );
     this.adapter?.updated(this.updateOptions);
   }
@@ -101,11 +121,15 @@ class PivotSheetChart extends ReactChart {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     drillOption: ChartDrillOption,
+    selectedItems?: SelectedItem[],
   ): AndvS2Config {
     if (!dataset || !config) {
       return {
         options: {},
       };
+    }
+    if (!selectedItems?.length && this.chart) {
+      this.chart.interaction.reset();
     }
 
     const dataConfigs: ChartDataConfig[] = config.datas || [];
@@ -214,6 +238,7 @@ class PivotSheetChart extends ReactChart {
         interaction: {
           hoverHighlight: Boolean(enableHoverHighlight),
           selectedCellsSpotlight: Boolean(enableSelectedHighlight),
+          autoResetSheetStyle: false,
         },
         totals: {
           row: {
@@ -333,7 +358,47 @@ class PivotSheetChart extends ReactChart {
         });
         this.changeDrillConfig(rowSectionConfigRows, drillOption);
       },
+      onSelected: (cells: DataCell[]) => {
+        const state = this.chart?.interaction.getState();
+        this.changeSelectedItems(state?.interactedCells || []);
+      },
+      onDataCellClick: (cell: TargetCellInfo) => {
+        const state = this.chart?.interaction.getState();
+        this.changeSelectedItems(state?.interactedCells || []);
+      },
+      getSpreadSheet: getSpreadSheet => {
+        this.chart = getSpreadSheet;
+      },
     };
+  }
+
+  changeSelectedItems(cells: S2CellType<ViewMeta>[]) {
+    const selectedItems: SelectedItem[] = [];
+    cells.forEach(v => {
+      const { rowIndex, data } = v.getMeta();
+      if (!selectedItems.find(v => v.index === rowIndex) && data) {
+        selectedItems.push({
+          index: rowIndex,
+          data: {
+            rowData: Object.keys(data)?.reduce((pre, cur) => {
+              if (cur === '$$extra$$' || cur === '$$value$$') {
+                return pre;
+              }
+              return {
+                ...pre,
+                [cur]: data[cur],
+              };
+            }, {}),
+          },
+        });
+      }
+    });
+    this.mouseEvents
+      ?.find(v => v.name === 'click')
+      ?.callback({
+        data: selectedItems,
+        seriesName: 'changeSelectedItems',
+      } as any);
   }
 
   changeDrillConfig(
@@ -491,11 +556,26 @@ class PivotSheetChart extends ReactChart {
       ['tableBodyStyle'],
       ['font', 'align'],
     );
+
+    const _getBolderFontWeight = (
+      weightName: string,
+    ): number | BolderFontWeight => {
+      return BolderFontWeight[weightName]
+        ? BolderFontWeight[weightName]
+        : parseInt(weightName) + 100;
+    };
+
     return {
       text: {
         fontFamily: bodyFont?.fontFamily,
         fontSize: bodyFont?.fontSize,
         fontWeight: bodyFont?.fontWeight,
+        textAlign: bodyTextAlign,
+      },
+      bolderText: {
+        fontFamily: bodyFont?.fontFamily,
+        fontSize: bodyFont?.fontSize,
+        fontWeight: _getBolderFontWeight(bodyFont?.fontWeight),
         textAlign: bodyTextAlign,
       },
     };

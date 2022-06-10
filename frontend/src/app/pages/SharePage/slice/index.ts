@@ -24,10 +24,11 @@ import {
   VizType,
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transferChartConfig } from 'app/pages/MainPage/pages/VizPage/slice/utils';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import { compareSelectedItems } from 'app/utils/chartHelper';
 import { FilterSqlOperator } from 'globalConstants';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { Omit } from 'utils/object';
@@ -194,10 +195,7 @@ export const slice = createSlice({
           action.payload.computedFields;
       }
     },
-    normalSelect(
-      state,
-      { payload }: PayloadAction<{ index: string; data: any }>,
-    ) {
+    normalSelect(state, { payload }: PayloadAction<SelectedItem>) {
       const index = state.selectedItems?.findIndex(
         v => payload.index === v.index,
       );
@@ -213,6 +211,11 @@ export const slice = createSlice({
         } else {
           state.selectedItems = [];
         }
+      }
+    },
+    changeSelectedItems(state, { payload }: PayloadAction<SelectedItem[]>) {
+      if (compareSelectedItems(payload, state.selectedItems)) {
+        state.selectedItems = payload;
       }
     },
     updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
