@@ -18,6 +18,7 @@
 
 package datart.security.oauth2;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesRegistrationAdapter;
 import org.springframework.context.annotation.Configuration;
@@ -31,14 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Configuration
 public class ClientRegistrationRepositoryImpl implements ClientRegistrationRepository, Iterable<ClientRegistration> {
 
-    private final Map<String, ClientRegistration> registrations;
-
-    public ClientRegistrationRepositoryImpl(OAuth2ClientProperties properties) {
-        addDefaultProviders(properties);
-        List<ClientRegistration> clientList = new ArrayList<>(
-                OAuth2ClientPropertiesRegistrationAdapter.getClientRegistrations(properties).values());
-        registrations = createRegistrationsMap(clientList);
-    }
+    private Map<String, ClientRegistration> registrations;
 
     @Override
     public ClientRegistration findByRegistrationId(String registrationId) {
@@ -68,4 +62,11 @@ public class ClientRegistrationRepositoryImpl implements ClientRegistrationRepos
         WeChartOauth2Client.addClientRegistration(properties);
     }
 
+    @Autowired(required = false)
+    public void setOAuth2ClientProperties(OAuth2ClientProperties oAuth2ClientProperties) {
+        addDefaultProviders(oAuth2ClientProperties);
+        List<ClientRegistration> clientList = new ArrayList<>(
+                OAuth2ClientPropertiesRegistrationAdapter.getClientRegistrations(oAuth2ClientProperties).values());
+        registrations = createRegistrationsMap(clientList);
+    }
 }
