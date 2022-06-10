@@ -25,10 +25,8 @@ import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NCont
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { ChartDataConfig, ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useContext } from 'react';
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import widgetManagerInstance from '../../../../components/WidgetManager';
-import { editBoardStackActions } from '../../slice';
 
 const StyledWrapper = styled.div`
   width: 100%;
@@ -38,25 +36,17 @@ const StyledWrapper = styled.div`
 export const WidgetConfigPanel: FC<{
   configs: ChartStyleConfig[];
   dataConfigs?: ChartDataConfig[];
-}> = memo(({ configs, dataConfigs }) => {
-  const dispatch = useDispatch();
+  onChange: (
+    ancestors: number[],
+    config: ChartStyleConfig,
+    needRefresh?: boolean,
+  ) => void;
+}> = memo(({ configs, dataConfigs, onChange }) => {
   const widget = useContext(WidgetContext);
 
   const widgetTypeId = widget.config.originalType;
   const i18ns = widgetManagerInstance.meta(widgetTypeId).i18ns;
-  const onChange = (
-    ancestors: number[],
-    configItem: ChartStyleConfig,
-    needRefresh?: boolean,
-  ) => {
-    dispatch(
-      editBoardStackActions.updateWidgetConfigByPath({
-        ancestors,
-        configItem,
-        wid: widget.id,
-      }),
-    );
-  };
+
   return (
     <ChartI18NContext.Provider value={{ i18NConfigs: i18ns }}>
       <StyledWrapper onClick={e => e.stopPropagation()}>

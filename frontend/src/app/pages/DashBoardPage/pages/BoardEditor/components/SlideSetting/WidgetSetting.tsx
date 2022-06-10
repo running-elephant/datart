@@ -18,8 +18,10 @@
 import { Tabs } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { editBoardStackActions } from '../../slice';
 import { showRectAction } from '../../slice/actions/actions';
 import { NameSet } from './SettingItem/NameSet';
 import { RectSet } from './SettingItem/RectSet';
@@ -35,6 +37,34 @@ export const WidgetSetting: FC = memo(() => {
   const showRect = dispatch(showRectAction(widget)) as unknown as boolean;
   const [currentTab, setCurrentTab] = useState<string>('style');
 
+  const handleStyleConfigChange = (
+    ancestors: number[],
+    configItem: ChartStyleConfig,
+    needRefresh?: boolean,
+  ) => {
+    dispatch(
+      editBoardStackActions.updateWidgetStyleConfigByPath({
+        ancestors,
+        configItem,
+        wid: widget.id,
+      }),
+    );
+  };
+
+  const handleInteractionConfigChange = (
+    ancestors: number[],
+    configItem: ChartStyleConfig,
+    needRefresh?: boolean,
+  ) => {
+    dispatch(
+      editBoardStackActions.updateWidgetInteractionConfigByPath({
+        ancestors,
+        configItem,
+        wid: widget.id,
+      }),
+    );
+  };
+
   return (
     <Tabs activeKey={currentTab} onChange={key => setCurrentTab(key)}>
       <TabPane tab={t('style')} key="style">
@@ -44,6 +74,7 @@ export const WidgetSetting: FC = memo(() => {
             {showRect && <RectSet wid={widget.id} rect={widget.config.rect} />}
             <WidgetConfigPanel
               configs={widget.config.customConfig.props || []}
+              onChange={handleStyleConfigChange}
             />
           </>
         </SettingPanel>
@@ -52,6 +83,7 @@ export const WidgetSetting: FC = memo(() => {
         <SettingPanel title={`${t('widget')}${t('setting')}`}>
           <WidgetConfigPanel
             configs={widget.config.customConfig.interactions || []}
+            onChange={handleInteractionConfigChange}
             dataConfigs={
               widget.config.content?.dataChart?.config?.chartConfig?.datas
             }
