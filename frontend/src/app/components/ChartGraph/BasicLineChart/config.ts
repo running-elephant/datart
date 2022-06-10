@@ -456,10 +456,32 @@ const config: ChartConfig = {
   ],
   interactions: [
     {
-      label: 'viz.palette.setting.jump.title',
-      key: 'jump',
+      label: 'drillThrough.title',
+      key: 'drillThrough',
       comType: 'checkboxModal',
-      rows: [],
+      default: true,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'drillThrough.title',
+          key: 'setting',
+          comType: 'interaction.drillThrough',
+        },
+      ],
+    },
+    {
+      label: 'viewDetail.title',
+      key: 'viewDetail',
+      comType: 'checkboxModal',
+      default: true,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'viewDetail.title',
+          key: 'setting',
+          comType: 'interaction.viewDetail',
+        },
+      ],
     },
   ],
   i18ns: [

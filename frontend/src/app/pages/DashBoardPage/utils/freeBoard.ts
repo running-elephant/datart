@@ -22,7 +22,7 @@ export const initFreeBoardConfig = () => {
   const config: BoardConfig = {
     type: 'free',
     version: APP_CURRENT_VERSION,
-    maxWidgetIndex: 0,
+
     jsonConfig: {
       props: [
         {

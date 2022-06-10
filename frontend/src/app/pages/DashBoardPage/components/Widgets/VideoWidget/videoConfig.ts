@@ -20,24 +20,19 @@ import type {
   WidgetActionListItem,
   widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
-  initFreeWidgetRect,
   initPaddingTpl,
   initTitleTpl,
-  initWidgetEditActionTpl,
   initWidgetName,
-  initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
-  WidgetEditActionI18N,
   widgetTpl,
-  WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
 
 const initVideoTpl = () => {
@@ -71,29 +66,21 @@ const NameI18N = {
   en: 'Video',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: 'video',
+  icon: 'video-widget',
   originalType: ORIGINAL_TYPE_MAP.video,
   canWrapped: true,
   controllable: false,
   linkable: false,
   canFullScreen: true,
   singleton: false,
-  viewAction: {
-    ...initWidgetViewActionTpl(),
-  },
-  editAction: {
-    ...initWidgetEditActionTpl(),
-  },
+
   i18ns: [
     {
       lang: 'zh-CN',
       translation: {
         desc: 'video',
         widgetName: NameI18N.zh,
-        action: {
-          ...WidgetViewActionI18N.zh,
-          ...WidgetEditActionI18N.zh,
-        },
+        action: {},
         title: TitleI18N.zh,
         background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
@@ -106,10 +93,7 @@ export const widgetMeta: WidgetMeta = {
       translation: {
         desc: 'video',
         widgetName: NameI18N.en,
-        action: {
-          ...WidgetViewActionI18N.en,
-          ...WidgetEditActionI18N.en,
-        },
+        action: {},
         title: TitleI18N.en,
         background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
@@ -129,19 +113,11 @@ const widgetToolkit: VideoWidgetToolKit = {
     const widget = widgetTpl();
     widget.id = widgetMeta.originalType + widget.id;
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
-    widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      widget.config.rect = { ...initAutoWidgetRect() };
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      widget.config.rect = { ...initFreeWidgetRect() };
-    }
 
     widget.config.customConfig.props = [
       { ...initVideoTpl() },
@@ -171,6 +147,10 @@ const widgetToolkit: VideoWidgetToolKit = {
         key: 'lock',
         renderMode: ['edit'],
       },
+      {
+        key: 'group',
+        renderMode: ['edit'],
+      },
     ];
     return list;
   },
@@ -191,8 +171,8 @@ const widgetToolkit: VideoWidgetToolKit = {
   // //
 };
 
-const videoProto = {
-  widgetTypeId: widgetMeta.originalType,
+const videoProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

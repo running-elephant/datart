@@ -13,6 +13,11 @@ import {
   WidgetType,
 } from '../pages/Board/slice/types';
 
+export interface WidgetProto {
+  originalType: string;
+  meta: WidgetMeta;
+  toolkit: WidgetToolkit;
+}
 export interface Widget {
   id: string;
   dashboardId: string;
@@ -20,7 +25,7 @@ export interface Widget {
   relations: Relation[];
   viewIds: string[];
   config: WidgetConf;
-  parentId?: string;
+  parentId: string;
 }
 export type CustomConfig = {
   datas?: ChartDataConfig[];
@@ -41,8 +46,10 @@ export interface WidgetConf {
   // visible: boolean; // 是否可见 TODO: 后续考虑
   customConfig: CustomConfig;
   content?: any;
-  rect: RectConfig;
-  mRect?: RectConfig;
+  rect: RectConfig; // rect of freeBoard
+  mRect?: RectConfig; // mobile rect of autoBoard
+  pRect: RectConfig; // pc rect of autoBoard
+  // tRect?: RectConfig; // tablet rect of autoBoard
   parentId?: string;
   children?: string[];
   linkageConfig?: LinkageConfig; //联动设置 TODO: in selfConfig
@@ -50,7 +57,6 @@ export interface WidgetConf {
 }
 
 export interface WidgetCreateProps {
-  dashboardId: string;
   name?: string;
   boardType?: BoardType;
   datachartId?: string;
@@ -58,10 +64,9 @@ export interface WidgetCreateProps {
   content?: any;
   viewIds?: string[];
   parentId?: string;
+  children?: string[];
 }
-export type WidgetTplProps = WidgetCreateProps & {
-  widgetTypeId: string;
-};
+
 export interface WidgetToolkit {
   create: (T: WidgetCreateProps) => Widget;
   getName: (local?: string) => string;
@@ -95,8 +100,6 @@ export interface WidgetMeta {
   linkable: boolean; // 是否可以 被 widget 联动
   canFullScreen: boolean; // 是否出现在全屏列表
   singleton: boolean; // 是否是单例 一个仪表板只能有一个 同类型的 widget
-  viewAction: Record<string, { label: string; icon: any; key: string }>;
-  editAction: Record<string, { label: string; icon: any; key: string }>;
   i18ns: ChartI18NSectionConfig[];
 }
 
@@ -129,5 +132,16 @@ export const widgetActionTypes = [
   'closeJump',
   'lock',
   'unlock',
+  'group',
+  'unGroup',
 ] as const;
 export type widgetActionType = typeof widgetActionTypes[number];
+
+export type WidgetMapping = Record<
+  string,
+  {
+    oldId: string;
+    newId: string;
+    newClientId: string;
+  }
+>;

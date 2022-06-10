@@ -23,26 +23,22 @@ import widgetManagerInstance from 'app/pages/DashBoardPage/components/WidgetMana
 import { LightWidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import React, { useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
+import { ORIGINAL_TYPE_MAP } from '../../../../../constants';
 import { addWidgetsToEditBoard } from '../../../slice/thunk';
 import { BoardToolBarContext } from '../context/BoardToolBarContext';
 
 export const AddContainer: React.FC<{}> = () => {
   const t = useI18NPrefix(`viz.board.action`);
   const dispatch = useDispatch();
-  const { boardId, boardType } = useContext(BoardToolBarContext);
+  const { boardType } = useContext(BoardToolBarContext);
   const onSelectContainerWidget = useCallback(
     ({ keyPath }) => {
-      const [type] = keyPath;
-      console.log('__ type', type);
-
-      let widget = widgetManagerInstance.toolkit('tab').create({
-        dashboardId: boardId,
+      let widget = widgetManagerInstance.toolkit(ORIGINAL_TYPE_MAP.tab).create({
         boardType: boardType,
-        relations: [],
       });
       dispatch(addWidgetsToEditBoard([widget]));
     },
-    [boardId, boardType, dispatch],
+    [boardType, dispatch],
   );
   type ContainerWidgetItems = {
     name: string;

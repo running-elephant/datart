@@ -196,12 +196,11 @@ const ChartConfigPanel: FC<{
               </Pane>
               <Pane selected={tabActiveKey === CONFIG_PANEL_TABS.INTERACTION}>
                 <ChartStyleConfigPanel
-                  i18nPrefix="viz.palette.setting" /** TODO: Inveractive */
+                  i18nPrefix="viz.palette.interaction"
                   configs={chartConfig?.interactions}
                   dataConfigs={chartConfig?.datas}
                   onChange={handleConfigChangeByAction(
-                    /** TODO: Inveractive */
-                    ChartConfigReducerActionType.SETTING,
+                    ChartConfigReducerActionType.INTERACTION,
                   )}
                 />
               </Pane>

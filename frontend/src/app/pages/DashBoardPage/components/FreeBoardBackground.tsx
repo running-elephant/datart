@@ -18,9 +18,9 @@
 
 import React, { createContext, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
-import StyledBackground from '../pages/Board/components/StyledBackground';
 import { BoardConfigValContext } from './BoardProvider/BoardConfigProvider';
 import { BoardContext } from './BoardProvider/BoardProvider';
+import StyledBackground from './WidgetComponents/StyledBackground';
 
 export const BoardScaleContext = createContext<[number, number]>([1, 1]);
 export interface IProps {

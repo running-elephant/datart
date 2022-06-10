@@ -84,7 +84,6 @@ export const beta4 = (config: any) => {
       ? config
       : getInitBoardConfig('auto');
     if (config.background || config.initialQuery) {
-      newConfig.maxWidgetIndex = config.maxWidgetIndex;
       newConfig.jsonConfig.props.forEach(item => {
         if (item.key === 'basic') {
           item!.rows!.forEach(row => {
@@ -141,7 +140,6 @@ export const beta4 = (config: any) => {
       ? config
       : getInitBoardConfig('free');
     if (config.background || config.initialQuery) {
-      newConfig.maxWidgetIndex = config.maxWidgetIndex;
       newConfig.jsonConfig.props.forEach(item => {
         if (item.key === 'basic') {
           item!.rows!.forEach(row => {

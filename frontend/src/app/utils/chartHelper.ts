@@ -34,12 +34,13 @@ import {
   ChartStyleConfig,
   ChartStyleSectionGroup,
   FontStyle,
-  GridStyle,
   FormatFieldAction,
+  GridStyle,
   LineStyle,
   MarkArea,
   MarkDataConfig,
   MarkLine,
+  SelectedItem,
   XAxis,
 } from 'app/types/ChartConfig';
 import {
@@ -51,6 +52,7 @@ import {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { updateBy } from 'app/utils/mutation';
 import { ECharts } from 'echarts';
@@ -291,10 +293,7 @@ function scientificNotationFormater(
   return (+value).toExponential(fractionDigits);
 }
 
-function dateFormater(
-  value,
-  config?: FormatFieldAction[FieldFormatType.Date],
-) {
+function dateFormater(value, config?: FormatFieldAction[FieldFormatType.Date]) {
   if (isNaN(+value) || isEmpty(config?.format)) {
     return value;
   }
@@ -1552,7 +1551,7 @@ export const getAutoFunnelTopPosition = (config: {
  */
 export const getDrillableRows = (
   configs: ChartDataConfig[],
-  option?: ChartDrillOption,
+  option?: IChartDrillOption,
 ): ChartDataSectionField[] => {
   return configs
     ?.filter(c => c.type === ChartDataSectionType.Group)
@@ -1685,4 +1684,26 @@ export const setRuntimeDateLevelFieldsInChartConfig = (config: ChartConfig) => {
       });
     }
   });
+};
+
+export const getSelectedItemStyles = (
+  comIndex: string | number,
+  dcIndex: string | number,
+  selectionList: SelectedItem[],
+  itemStyle: { [x: string]: any } = {},
+): { itemStyle: { opacity?: number; [x: string]: any } } => {
+  if (selectionList.length) {
+    const selectionConfig = selectionList.find(
+      v => v.index === comIndex + ',' + dcIndex,
+    );
+    return {
+      itemStyle: Object.assign(
+        itemStyle,
+        selectionConfig ? {} : { opacity: 0.5 },
+      ),
+    };
+  }
+  return {
+    itemStyle,
+  };
 };

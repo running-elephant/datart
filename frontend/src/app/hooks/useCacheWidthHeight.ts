@@ -19,19 +19,22 @@
 import { useLayoutEffect, useState } from 'react';
 import useResizeObserver from './useResizeObserver';
 
-export const useCacheWidthHeight = (
-  initWidth: number = 1,
-  initHeight: number = 1,
-) => {
-  const [cacheW, setCacheW] = useState(initWidth);
-  const [cacheH, setCacheH] = useState(initHeight);
+export const useCacheWidthHeight = (arg?: {
+  initW?: number;
+  initH?: number;
+  refreshMode?: 'throttle' | 'debounce';
+  refreshRate?: number;
+}) => {
+  const { initW, initH, refreshMode, refreshRate } = arg || {};
+  const [cacheW, setCacheW] = useState(initW ?? 1);
+  const [cacheH, setCacheH] = useState(initH ?? 1);
   const {
     ref,
-    width = initWidth,
-    height = initHeight,
+    width = initW ?? 1,
+    height = initH ?? 1,
   } = useResizeObserver<HTMLDivElement>({
-    refreshMode: 'debounce',
-    refreshRate: 20,
+    refreshMode: refreshMode ?? 'debounce',
+    refreshRate: refreshRate ?? 20,
   });
   useLayoutEffect(() => {
     if (width > 0) {

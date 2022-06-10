@@ -18,7 +18,9 @@
 
 import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
 import {
+  ContainerItem,
   TabWidgetContent,
+  WidgetOfCopy,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
@@ -28,8 +30,10 @@ import { formatTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
 import { CSSProperties } from 'react';
+import { CloneValueDeep } from 'utils/object';
 import { adaptBoardImageUrl, fillPx, getBackgroundImage } from '.';
-import { LAYOUT_COLS_MAP } from '../constants';
+import { initClientId } from '../components/WidgetManager/utils/init';
+import { LAYOUT_COLS_MAP, ORIGINAL_TYPE_MAP } from '../constants';
 import {
   BackgroundConfig,
   BoardType,
@@ -45,7 +49,7 @@ import {
   WidgetPadding,
 } from '../pages/Board/slice/types';
 import { StrControlTypes } from '../pages/BoardEditor/components/ControllerWidgetPanel/constants';
-import { Widget } from '../types/widgetTypes';
+import { Widget, WidgetMapping } from '../types/widgetTypes';
 
 export const VALUE_SPLITTER = '###';
 
@@ -163,11 +167,14 @@ export const getWidgetInfoMapByServer = (widgetMap: Record<string, Widget>) => {
   return widgetInfoMap;
 };
 
-export const updateWidgetsRect = (
-  widgets: Widget[],
-  boardType: BoardType,
-  layouts?: ReactGridLayout.Layout[],
-) => {
+export const adjustWidgetsToBoard = (args: {
+  widgets: Widget[];
+  boardType: BoardType;
+  boardId: string;
+  layouts?: ReactGridLayout.Layout[];
+}) => {
+  const { widgets, boardType, layouts } = args;
+
   if (boardType === 'auto') {
     return updateAutoWidgetsRect(widgets, layouts || []);
   } else if (boardType === 'free') {
@@ -186,15 +193,15 @@ export const updateAutoWidgetsRect = (
   let itemYs = [...dashWidgetRectYs];
   widgets.forEach(widget => {
     const itemX =
-      (widgetsCount * widget.config.rect.width) % LAYOUT_COLS_MAP.lg;
+      (widgetsCount * widget.config.pRect.width) % LAYOUT_COLS_MAP.lg;
     const itemY = Math.max(...itemYs, 0);
     const nextRect = {
-      ...widget.config.rect,
+      ...widget.config.pRect,
       x: itemX,
       y: itemY,
     };
     widget = produce(widget, draft => {
-      draft.config.rect = nextRect;
+      draft.config.pRect = nextRect;
     });
     upDatedWidgets.push(widget);
     widgetsCount++;
@@ -288,7 +295,7 @@ export const convertWrapChartWidget = (params: {
 }) => {
   const { widgetMap, dataChartMap } = params;
   const widgets = Object.values(widgetMap).map(widget => {
-    if (widget.config.originalType !== 'ownedChart') {
+    if (widget.config.originalType !== ORIGINAL_TYPE_MAP.ownedChart) {
       return widget;
     }
     // widgetChart wrapChartWidget
@@ -523,30 +530,6 @@ export const getWidgetMap = (
   const controllerWidgets: Widget[] = []; // use for reset button
   const widgetList = Object.values(widgetMap);
 
-  // 处理 widget包含关系 containerWidget 被包含的 widget.parentId 不为空
-  widgetList
-    .filter(w => w.parentId)
-    .forEach(widget => {
-      const parentWidgetId = widget.parentId!;
-      const parentWidget = widgetMap[parentWidgetId];
-      if (!parentWidget) {
-        widget.parentId = '';
-        return;
-      }
-      const tabContent = parentWidget.config.content as TabWidgetContent;
-      if (!tabContent.itemMap) {
-        widget.parentId = '';
-        return;
-      }
-
-      const targetTabItem = tabContent.itemMap?.[widget.config.clientId];
-      if (!targetTabItem) {
-        widget.parentId = '';
-        return;
-      }
-      targetTabItem.childWidgetId = widget.id;
-    });
-
   // 处理 controller config visibility依赖关系 id, url参数修改filter
   widgetList
     .filter(w => w.config.type === 'controller')
@@ -606,18 +589,68 @@ export const getWidgetMap = (
 
   // 处理 自有 chart widgetControl
   widgetList
-    .filter(w => w.config.originalType === 'ownedChart')
+    .filter(w => w.config.originalType === ORIGINAL_TYPE_MAP.ownedChart)
     .forEach(widget => {
       let dataChart = (widget.config.content as any).dataChart as DataChart;
 
-      const self_dataChartId = `widget_${widget.dashboardId}_${widget.id}`;
+      const ownedDataChartId = `widget_${widget.dashboardId}_${widget.id}`;
       if (dataChart) {
-        dataChart.id = self_dataChartId;
+        dataChart.id = ownedDataChartId;
         wrappedDataCharts.push(dataChart!);
       }
-      widget.datachartId = self_dataChartId;
+      widget.datachartId = ownedDataChartId;
     });
 
+  // 处理 widget包含关系 tab Widget 被包含的 widget.parentId 不为空
+  widgetList
+    .filter(w => w.parentId)
+    .forEach(widget => {
+      const parentWidgetId = widget.parentId!;
+      const parentWidget = widgetMap[parentWidgetId];
+      if (!parentWidget) {
+        widget.parentId = '';
+        return;
+      }
+      if (parentWidget.config.originalType !== ORIGINAL_TYPE_MAP.tab) {
+        return;
+      }
+      const tabContent = parentWidget.config.content as TabWidgetContent;
+      if (!tabContent.itemMap) {
+        widget.parentId = '';
+        return;
+      }
+
+      const targetTabItem = tabContent.itemMap?.[widget.config.clientId];
+      if (!targetTabItem) {
+        widget.parentId = '';
+        return;
+      }
+      targetTabItem.childWidgetId = widget.id;
+    });
+  // clear Group children
+  widgetList
+    .filter(w => w.config.originalType === ORIGINAL_TYPE_MAP.group)
+    .forEach(widget => {
+      widget.config.children = [];
+    });
+  // set Group children
+  widgetList
+    .filter(w => w.parentId)
+    .forEach(widget => {
+      const parentWidgetId = widget.parentId!;
+      const parentWidget = widgetMap[parentWidgetId];
+      if (!parentWidget) {
+        widget.parentId = '';
+        return;
+      }
+      if (parentWidget.config.originalType !== ORIGINAL_TYPE_MAP.group) {
+        return;
+      }
+      if (!Array.isArray(parentWidget.config.children)) {
+        parentWidget.config.children = [];
+      }
+      parentWidget.config.children.push(widget.id);
+    });
   // preprocess widget
   widgetList.forEach(widget => {
     widget.config.boardType = boardType;
@@ -648,3 +681,63 @@ export const getValueByRowData = (
   let toCaseField = fieldName;
   return data?.rowData[toCaseField];
 };
+
+export function cloneWidgets(args: {
+  widgets: WidgetOfCopy[];
+  dataChartMap: Record<string, DataChart>;
+  newWidgetMapping: WidgetMapping;
+}) {
+  const newDataCharts: DataChart[] = [];
+  const newWidgets: Widget[] = [];
+  const { widgets, dataChartMap, newWidgetMapping } = args;
+  widgets.forEach(widget => {
+    const newWidget = CloneValueDeep(widget);
+    delete newWidget.selectedCopy;
+    newWidget.id = newWidgetMapping[newWidget.id]?.newId;
+    newWidget.parentId = newWidgetMapping[widget.parentId]?.newId || '';
+    newWidget.config.clientId =
+      newWidgetMapping[widget.id]?.newClientId || initClientId();
+    newWidget.relations = [];
+    newWidget.config.name += '_copy';
+    // group
+    newWidget.config.children = newWidget.config.children?.map(id => {
+      return newWidgetMapping[id].newId;
+    });
+    // tab
+    if (newWidget.config.type === 'container') {
+      const content = newWidget.config.content as TabWidgetContent;
+      const itemList = Object.values(content.itemMap);
+      const newItemMap = itemList.reduce((acc, cur) => {
+        const newTabId =
+          newWidgetMapping[cur.childWidgetId]?.newClientId || initClientId();
+        acc[newTabId] = {
+          index: cur.index,
+          name: cur.name,
+          tabId: newTabId,
+          childWidgetId: newWidgetMapping[cur.childWidgetId]?.newId || '',
+        };
+        return acc;
+      }, {} as Record<string, ContainerItem>);
+      content.itemMap = newItemMap;
+    }
+    //chart
+    if (newWidget.config.type === 'chart') {
+      let dataChart = dataChartMap[newWidget.datachartId];
+      const newDataChart: DataChart = CloneValueDeep({
+        ...dataChart,
+        id: dataChart.id + Date.now() + '_copy',
+      });
+      newWidget.config.originalType = ORIGINAL_TYPE_MAP.ownedChart;
+      newWidget.datachartId = newDataChart.id;
+      newDataCharts.push(newDataChart);
+      // TODO fix
+
+      // dispatch(boardActions.setDataChartToMap([newDataChart]));
+    }
+    newWidgets.push(newWidget);
+  });
+  return {
+    newDataCharts,
+    newWidgets,
+  };
+}

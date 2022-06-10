@@ -20,7 +20,7 @@ import { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
 import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
-import { LayerList } from '../components/LayerList/LayerList';
+import { LayerTreePanel } from '../components/LayerPanel/LayerTreePanel';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { AutoBoardEditor } from './AutoBoardEditor';
 export const AutoEditor: React.FC<{}> = memo(() => {
@@ -29,7 +29,7 @@ export const AutoEditor: React.FC<{}> = memo(() => {
     <Wrapper onClick={onEditClearActiveWidgets}>
       <BoardToolBar />
       <Editor>
-        <LayerList />
+        <LayerTreePanel />
         <AutoBoardEditor />
         <SlideSetting />
       </Editor>

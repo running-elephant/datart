@@ -21,25 +21,21 @@ import type {
   WidgetActionListItem,
   widgetActionType,
   WidgetMeta,
+  WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { WHITE } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import {
-  initAutoWidgetRect,
   initBackgroundTpl,
   initBorderTpl,
-  initFreeWidgetRect,
   initPaddingTpl,
   initTitleTpl,
-  initWidgetEditActionTpl,
   initWidgetName,
-  initWidgetViewActionTpl,
   LoopFetchI18N,
   PaddingI18N,
   TitleI18N,
-  WidgetEditActionI18N,
   widgetTpl,
-  WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
 
 const NameI18N = {
@@ -47,29 +43,21 @@ const NameI18N = {
   en: 'Tab',
 };
 export const widgetMeta: WidgetMeta = {
-  icon: '',
+  icon: 'tab-widget',
   originalType: ORIGINAL_TYPE_MAP.tab,
   canWrapped: false,
   controllable: false,
   linkable: false,
   canFullScreen: true,
   singleton: false,
-  viewAction: {
-    ...initWidgetViewActionTpl(),
-  },
-  editAction: {
-    ...initWidgetEditActionTpl(),
-  },
+
   i18ns: [
     {
       lang: 'zh-CN',
       translation: {
         desc: '标签卡 容器组件可以切换',
         widgetName: NameI18N.zh,
-        action: {
-          ...WidgetViewActionI18N.zh,
-          ...WidgetEditActionI18N.zh,
-        },
+        action: {},
         title: TitleI18N.zh,
         background: { backgroundGroup: '背景' },
         padding: PaddingI18N.zh,
@@ -82,10 +70,7 @@ export const widgetMeta: WidgetMeta = {
       translation: {
         desc: 'Tab container',
         widgetName: NameI18N.en,
-        action: {
-          ...WidgetViewActionI18N.en,
-          ...WidgetEditActionI18N.en,
-        },
+        action: {},
         title: TitleI18N.en,
         background: { backgroundGroup: 'Background' },
         padding: PaddingI18N.en,
@@ -101,24 +86,17 @@ export const widgetToolkit: TabToolkit = {
   create: opt => {
     const widget = widgetTpl();
     widget.parentId = opt.parentId || '';
-    widget.dashboardId = opt.dashboardId || '';
     widget.datachartId = opt.datachartId || '';
     widget.viewIds = opt.viewIds || [];
     widget.relations = opt.relations || [];
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'container';
     widget.config.name = opt.name || '';
-    if (opt.boardType === 'auto') {
-      widget.config.rect = { ...initAutoWidgetRect() };
-      widget.config.mRect = { ...initAutoWidgetRect() };
-    } else {
-      widget.config.rect = { ...initFreeWidgetRect() };
-    }
 
     widget.config.customConfig.props = [
       { ...initTitleTpl() },
       { ...initPaddingTpl() },
-      { ...initBackgroundTpl('#fff') },
+      { ...initBackgroundTpl(WHITE) },
       { ...initBorderTpl() },
     ];
 
@@ -151,6 +129,10 @@ export const widgetToolkit: TabToolkit = {
       },
       {
         key: 'lock',
+        renderMode: ['edit'],
+      },
+      {
+        key: 'group',
         renderMode: ['edit'],
       },
     ];
@@ -194,8 +176,8 @@ export const widgetToolkit: TabToolkit = {
 //         "tabConfig": {}
 //     }
 // }
-const tabProto = {
-  widgetTypeId: widgetMeta.originalType,
+const tabProto: WidgetProto = {
+  originalType: widgetMeta.originalType,
   meta: widgetMeta,
   toolkit: widgetToolkit,
 };

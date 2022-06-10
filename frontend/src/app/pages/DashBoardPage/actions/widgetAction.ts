@@ -31,9 +31,11 @@ import {
 import {
   BoardLinkFilter,
   BoardState,
+  RectConfig,
   VizRenderMode,
 } from '../pages/Board/slice/types';
 import {
+  editBoardStackActions,
   editDashBoardInfoActions,
   editWidgetInfoActions,
 } from '../pages/BoardEditor/slice';
@@ -395,4 +397,102 @@ export const refreshWidgetsByControllerAction =
         );
       }
     });
+  };
+
+export const changeGroupRectAction =
+  (args: {
+    renderMode: VizRenderMode;
+    boardId: string;
+    wid: string;
+    w: number;
+    h: number;
+  }) =>
+  dispatch => {
+    const { renderMode } = args;
+    if (renderMode === 'edit') {
+      dispatch(changeEditGroupRectAction(args));
+    } else {
+      dispatch(changeViewGroupRectAction(args));
+    }
+  };
+
+export const changeViewGroupRectAction =
+  (args: {
+    renderMode: VizRenderMode;
+    boardId: string;
+    wid: string;
+    w: number;
+    h: number;
+  }) =>
+  (dispatch, getState) => {
+    const { wid, w, h, boardId } = args;
+    const rootState = getState() as RootState;
+    const viewBoardState = rootState.board as BoardState;
+    const widgetMap = viewBoardState.widgetRecord[boardId];
+    if (!wid) return;
+    const widget = widgetMap?.[wid];
+    if (!widget) return;
+    const parentWidget = widgetMap[widget.parentId || ''];
+    const rect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: w,
+      height: h,
+    };
+
+    const parentIsContainer =
+      parentWidget && parentWidget.config.type === 'container';
+
+    const parentIsAutoBoard =
+      widget.config.boardType === 'auto' && !widget.parentId;
+
+    if (parentIsContainer || parentIsAutoBoard) {
+      dispatch(
+        boardActions.changeFreeWidgetRect({
+          boardId: widget.dashboardId,
+          wid,
+          rect,
+        }),
+      );
+      return;
+    }
+  };
+export const changeEditGroupRectAction =
+  (args: {
+    renderMode: VizRenderMode;
+    boardId: string;
+    wid: string;
+    w: number;
+    h: number;
+  }) =>
+  (dispatch, getState) => {
+    const { wid, w, h } = args;
+    const rootState = getState() as RootState;
+    const editBoardState = (rootState.editBoard as unknown as HistoryEditBoard)
+      .stack.present;
+    const widgetMap = editBoardState.widgetRecord;
+    if (!wid) return;
+    const widget = widgetMap?.[wid];
+    if (!widget) return;
+    const parentWidget = widgetMap[widget.parentId || ''];
+    const rect: RectConfig = {
+      x: 0,
+      y: 0,
+      width: w,
+      height: h,
+    };
+    const parentIsContainer =
+      parentWidget && parentWidget.config.type === 'container';
+
+    const parentIsAutoBoard =
+      widget.config.boardType === 'auto' && !widget.parentId;
+
+    if (parentIsContainer || parentIsAutoBoard) {
+      dispatch(
+        editBoardStackActions.changeFreeWidgetRect({
+          wid,
+          rect,
+        }),
+      );
+    }
   };
