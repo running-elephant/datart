@@ -18,15 +18,9 @@
 
 package datart.server.base.transfer;
 
-import lombok.Builder;
 import lombok.Data;
 
-import java.io.Serializable;
-
 @Data
-@Builder
-public class TransferConfig implements Serializable {
-
-    private boolean withParents;
+public class TransferParam {
 
 }

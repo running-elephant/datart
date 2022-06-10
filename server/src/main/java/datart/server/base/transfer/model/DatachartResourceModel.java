@@ -18,23 +18,36 @@
 
 package datart.server.base.transfer.model;
 
-import datart.core.base.consts.FileOwner;
-import datart.core.common.Application;
-import datart.server.service.FileService;
+import datart.core.entity.Datachart;
+import datart.core.entity.Folder;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Data
-public abstract class ResourceTransferModel implements Serializable {
+public class DatachartResourceModel extends TransferModel {
 
-    private String orgId;
+    private List<MainModel> mainModels;
 
-    public String getFileName() {
-        return Application.getBean(FileService.class).getBasePath(FileOwner.EXPORT, null) + "/" + getVizName() + "-" + System.currentTimeMillis() + ".viz";
+    private List<Folder> parents;
 
+    private final Set<String> views = new HashSet<>();
+
+    @Override
+    public String getVizName() {
+        return mainModels.get(0).datachart.getName();
     }
 
-    public abstract String getVizName();
 
+    @Data
+    public static class MainModel implements Serializable {
+
+        private Datachart datachart;
+
+        private Folder folder;
+
+    }
 }

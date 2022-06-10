@@ -22,7 +22,7 @@ import datart.security.base.ResourceType;
 import datart.server.base.dto.*;
 import datart.server.base.params.*;
 import datart.server.base.transfer.ImportStrategy;
-import datart.server.base.transfer.model.ResourceTransferModel;
+import datart.server.base.transfer.ResourceTransferParam;
 import datart.server.service.VizService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,10 +31,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Set;
 
@@ -181,7 +178,7 @@ public class VizController extends BaseController {
     @ApiOperation(value = "update a storyboard base info")
     @PutMapping(value = "/{storyboardId}/base")
     public ResponseData<Boolean> updateStoryboardBaseInfo(@PathVariable String storyboardId,
-                                                      @Validated @RequestBody StoryboardBaseUpdateParam updateParam) {
+                                                          @Validated @RequestBody StoryboardBaseUpdateParam updateParam) {
         checkBlank(storyboardId, "storyboardId");
         return ResponseData.success(vizService.updateStoryboardBase(updateParam));
     }
@@ -271,23 +268,20 @@ public class VizController extends BaseController {
     }
 
     @ApiOperation(value = "export viz")
-    @GetMapping(value = "/export")
-    public void exportViz(@RequestParam Set<String> vizIds,
-                                            @RequestParam String vizType,
-                                            @RequestParam boolean onlyViz,
-                                            HttpServletResponse response) throws IOException {
-        response.setHeader("Content-Type", "application/octet-stream");
-        ResourceTransferModel model = vizService.exportViz(ResourceType.valueOf(vizType), onlyViz, vizIds.toArray(new String[0]));
-        response.setHeader("Content-Disposition", String.format("attachment;filename=\"%s\"", URLEncoder.encode(model.getFileName(), "utf-8")));
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(response.getOutputStream())) {
-            outputStream.writeObject(model);
-        }
+    @PostMapping(value = "/export")
+    public ResponseData<Download> exportViz(@RequestBody ResourceTransferParam param) throws IOException {
+        return ResponseData.success(vizService.exportResource(param));
+//        response.setHeader("Content-Type", "application/octet-stream");
+//        response.setHeader("Content-Disposition", String.format("attachment;filename=\"%s\"", URLEncoder.encode(model.getFileName(), "utf-8")));
+//        try (ObjectOutputStream outputStream = new ObjectOutputStream(response.getOutputStream())) {
+//            outputStream.writeObject(model);
+//        }
     }
 
     @ApiOperation(value = "import viz")
     @PostMapping(value = "/import")
     public ResponseData<Boolean> importViz(@RequestParam("file") MultipartFile file, ImportStrategy strategy, String orgId) throws IOException {
-        return ResponseData.success(vizService.importViz(file, strategy, orgId));
+        return ResponseData.success(vizService.importResource(file, strategy, orgId));
     }
 
 }

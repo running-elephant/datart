@@ -16,17 +16,30 @@
  * limitations under the License.
  */
 
-package datart.server.base.transfer;
+package datart.server.base.transfer.model;
 
-import lombok.Builder;
+import datart.core.entity.Source;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 @Data
-@Builder
-public class TransferConfig implements Serializable {
+public class SourceResourceModel extends TransferModel {
 
-    private boolean withParents;
+    private List<MainModel> mainModels;
 
+    private List<Source> parents;
+
+    @Override
+    public String getVizName() {
+        return mainModels.get(0).source.getName();
+    }
+
+    @Data
+    public static class MainModel implements Serializable {
+        private Source source;
+        private Map<String, byte[]> files;
+    }
 }

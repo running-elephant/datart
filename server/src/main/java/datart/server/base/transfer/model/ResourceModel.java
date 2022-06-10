@@ -16,17 +16,23 @@
  * limitations under the License.
  */
 
-package datart.server.base.transfer;
+package datart.server.base.transfer.model;
 
-import lombok.Builder;
 import lombok.Data;
 
-import java.io.Serializable;
-
 @Data
-@Builder
-public class TransferConfig implements Serializable {
+public class ResourceModel extends TransferModel {
 
-    private boolean withParents;
+    private DashboardResourceModel dashboardResourceModel;
 
+    private DatachartResourceModel datachartResourceModel;
+
+    private ViewResourceModel viewResourceModel;
+
+    private SourceResourceModel sourceResourceModel;
+
+    @Override
+    public String getVizName() {
+        return null;
+    }
 }
