@@ -818,7 +818,7 @@
         },
         "viewDetail": {
           "title": "View Detail",
-          "event": "Ineraction Event",
+          "event": "Interaction Event",
           "leftClick": "Left Click",
           "rightClick": "Right Click",
           "field": "Selected Fields",
@@ -1003,6 +1003,7 @@
         "button": "Button"
       },
       "setting": {
+        "interaction": "Interaction",
         "setting": "Setting",
         "board": "Board",
         "widget": "Widget",

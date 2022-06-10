@@ -1003,6 +1003,7 @@
         "button": "按钮"
       },
       "setting": {
+        "interaction": "交互",
         "setting": "设置",
         "board": "面板",
         "widget": "组件",

@@ -31,6 +31,7 @@ export type CustomConfig = {
   datas?: ChartDataConfig[];
   props?: ChartStyleConfig[];
   settings?: ChartStyleConfig[];
+  interactions?: ChartStyleConfig[];
   i18ns?: ChartI18NSectionConfig[];
 };
 export interface WidgetConf {

@@ -17,13 +17,13 @@
  */
 
 import { Collapse } from 'antd';
-import { CollapseHeader } from 'app/components/FormGenerator';
+import { CollapseHeader, ItemLayout } from 'app/components/FormGenerator';
 import { FormGroupLayoutMode } from 'app/components/FormGenerator/constants';
 import GroupLayout from 'app/components/FormGenerator/Layout/GroupLayout';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { ChartStyleConfig } from 'app/types/ChartConfig';
+import { ChartDataConfig, ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -35,10 +35,12 @@ const StyledWrapper = styled.div`
   min-height: 0;
   /* overflow-y: auto; */
 `;
-export const WidgetConfigPanel: FC<{}> = memo(() => {
+export const WidgetConfigPanel: FC<{
+  configs: ChartStyleConfig[];
+  dataConfigs?: ChartDataConfig[];
+}> = memo(({ configs, dataConfigs }) => {
   const dispatch = useDispatch();
   const widget = useContext(WidgetContext);
-  const configs = widget.config.customConfig.props;
 
   const widgetTypeId = widget.config.originalType;
   const i18ns = widgetManagerInstance.meta(widgetTypeId).i18ns;
@@ -58,44 +60,64 @@ export const WidgetConfigPanel: FC<{}> = memo(() => {
   return (
     <ChartI18NContext.Provider value={{ i18NConfigs: i18ns }}>
       <StyledWrapper onClick={e => e.stopPropagation()}>
-        <BoardConfigCollapse configs={configs || []} onChange={onChange} />
+        <BoardConfigCollapse
+          dataConfigs={dataConfigs}
+          configs={configs || []}
+          onChange={onChange}
+        />
       </StyledWrapper>
     </ChartI18NContext.Provider>
   );
 });
 
+// TODO: merge and extract logic with ChartStyleConfigPanel.tsx component
 export const BoardConfigCollapse: FC<{
   configs: ChartStyleConfig[];
+  dataConfigs?: ChartDataConfig[];
   onChange: (
     ancestors: number[],
     config: ChartStyleConfig,
     needRefresh?: boolean,
   ) => void;
-}> = memo(({ configs, onChange }) => {
+}> = memo(({ configs, dataConfigs, onChange }) => {
   const t = useI18NPrefix();
   return (
     <Collapse className="datart-config-panel" ghost>
       {configs
         ?.filter(c => !Boolean(c.hidden))
-        .map((c, index) => (
-          <Collapse.Panel
-            header={<CollapseHeader title={t(c.label, true)} />}
-            key={c.key}
-          >
-            <GroupLayout
-              ancestors={[index]}
-              mode={
-                c.comType === 'group'
-                  ? FormGroupLayoutMode.INNER
-                  : FormGroupLayoutMode.OUTER
-              }
-              data={c}
-              translate={t}
-              dataConfigs={[]}
-              onChange={onChange}
-            />
-          </Collapse.Panel>
-        ))}
+        .map((c, index) => {
+          if (c.comType === 'group') {
+            return (
+              <Collapse.Panel
+                header={<CollapseHeader title={t(c.label, true)} />}
+                key={c.key}
+              >
+                <GroupLayout
+                  ancestors={[index]}
+                  mode={
+                    c.comType === 'group'
+                      ? FormGroupLayoutMode.INNER
+                      : FormGroupLayoutMode.OUTER
+                  }
+                  data={c}
+                  translate={t}
+                  dataConfigs={[]}
+                  onChange={onChange}
+                />
+              </Collapse.Panel>
+            );
+          } else {
+            return (
+              <ItemLayout
+                ancestors={[index]}
+                data={c}
+                translate={t}
+                dataConfigs={dataConfigs}
+                onChange={onChange}
+              />
+            );
+          }
+        })}
     </Collapse>
   );
 });
