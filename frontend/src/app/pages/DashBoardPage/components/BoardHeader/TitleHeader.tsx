@@ -38,6 +38,7 @@ import { useStatusTitle } from '../../hooks/useStatusTitle';
 import { BoardActionContext } from '../ActionProvider/BoardActionProvider';
 import { BoardDropdownList } from '../BoardDropdownList/BoardDropdownList';
 import { BoardContext } from '../BoardProvider/BoardProvider';
+import { MockDataPanel } from '../MockDataPanel';
 import SaveToStoryBoard from '../SaveToStoryBoard';
 
 export const TitleHeader: FC = memo(() => {
@@ -45,6 +46,7 @@ export const TitleHeader: FC = memo(() => {
   const publishLoading = useSelector(selectPublishLoading);
   const history = useHistory();
   const [showShareLinkModal, setShowShareLinkModal] = useState(false);
+  const [mockDataModal, setMockDataModal] = useState(true);
   const [showSaveToStory, setShowSaveToStory] = useState<boolean>(false);
   const { name, status, allowManage, allowShare, boardId, orgId } =
     useContext(BoardContext);
@@ -104,6 +106,7 @@ export const TitleHeader: FC = memo(() => {
             <BoardDropdownList
               onOpenShareLink={onOpenShareLink}
               openStoryList={() => setShowSaveToStory(true)}
+              openMockData={() => setMockDataModal(true)}
             />
           }
           placement="bottomRight"
@@ -132,6 +135,9 @@ export const TitleHeader: FC = memo(() => {
           onCancel={() => setShowShareLinkModal(false)}
           onGenerateShareLink={onGenerateShareLink}
         />
+      )}
+      {mockDataModal && (
+        <MockDataPanel onClose={() => setMockDataModal(false)} />
       )}
     </Wrapper>
   );

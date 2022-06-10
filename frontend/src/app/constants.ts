@@ -237,6 +237,7 @@ export enum DownloadFileType {
   Pdf = 'PDF',
   Excel = 'EXCEL',
   Image = 'IMAGE',
+  Template = 'TEMPLATE',
 }
 
 export const RUNTIME_DATE_LEVEL_KEY = Symbol('DateLevel');

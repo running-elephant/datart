@@ -919,6 +919,7 @@
         "downloadData": "下载为 Excel",
         "downloadPDF": "下载为 PDF",
         "downloadPicture": "下载为 图片",
+        "exportTpl": "导出为 模版",
         "NONE": "无",
         "CODE": "口令",
         "LOGIN": "登录",

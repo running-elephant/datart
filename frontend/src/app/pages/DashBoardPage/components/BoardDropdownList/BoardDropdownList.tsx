@@ -38,9 +38,10 @@ import { BoardContext } from '../BoardProvider/BoardProvider';
 interface Props {
   onOpenShareLink: () => void;
   openStoryList: () => void;
+  openMockData: () => void;
 }
 export const BoardDropdownList: FC<Props> = memo(
-  ({ onOpenShareLink, openStoryList }) => {
+  ({ onOpenShareLink, openStoryList, openMockData }) => {
     const t = useI18NPrefix(`viz.action`);
     const tg = useI18NPrefix(`global`);
     const dispatch = useDispatch();
@@ -121,6 +122,19 @@ export const BoardDropdownList: FC<Props> = memo(
                 }}
               >
                 {t('share.downloadPicture')}
+              </Popconfirm>
+            </Menu.Item>
+            <Menu.Item key={'exportTpl'} icon={<CloudDownloadOutlined />}>
+              <Popconfirm
+                placement="left"
+                title={t('common.confirm')}
+                okText={t('common.ok')}
+                cancelText={t('common.cancel')}
+                onConfirm={() => {
+                  openMockData();
+                }}
+              >
+                {t('share.exportTpl')}
               </Popconfirm>
             </Menu.Item>
           </>

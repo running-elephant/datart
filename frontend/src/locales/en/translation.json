@@ -927,6 +927,7 @@
         "downloadData": "Download Excel",
         "downloadPDF": "Download PDF",
         "downloadPicture": "Download Picture",
+        "exportTpl": "Export Template",
         "NONE": "None",
         "CODE": "Code",
         "LOGIN": "Login",
