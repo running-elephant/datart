@@ -21,8 +21,8 @@ import { FormItemEx } from 'app/components';
 import {
   AggregateFieldActionType,
   ChartDataViewFieldCategory,
-  DataViewFieldType,
   ControllerVisibilityTypes,
+  DataViewFieldType,
 } from 'app/constants';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { ConditionBuilder } from 'app/models/ChartFilterCondition';
@@ -79,6 +79,12 @@ const FilterControlPanel: FC<
     const [alias, setAlias] = useState(config.alias);
     const [aggregate, setAggregate] = useState(() => {
       if (Boolean(dataConfig?.disableAggregate) || aggregation === false) {
+        return AggregateFieldActionType.None;
+      }
+      if (
+        config.category === ChartDataViewFieldCategory.AggregateComputedField ||
+        config.category === ChartDataViewFieldCategory.ComputedField
+      ) {
         return AggregateFieldActionType.None;
       }
       if (config.aggregate) {
