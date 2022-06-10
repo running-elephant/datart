@@ -16,26 +16,19 @@
  * limitations under the License.
  */
 
-package datart.data.provider.script;
+package datart.data.provider.calcite;
+
 
 import lombok.Data;
-import org.apache.calcite.sql.JoinType;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.List;
+import org.apache.calcite.sql.SqlNode;
 
 @Data
-public class TableJoin {
+public class QueryScriptProcessResult {
 
-    @NotBlank
-    private String[] table;
+    private SqlNode from;
 
-    private String columns;
+    private String tablePrefix;
 
-    @NotNull
-    private JoinType joinType;
-
-    private List<JoinCondition> conditions;
+    private boolean withDefaultPrefix;
 
 }

@@ -33,7 +33,6 @@ import datart.data.provider.script.VariablePlaceholder;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlDialect;
-import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
@@ -80,19 +79,21 @@ public class SqlScriptRender extends ScriptRender {
 
     public String render(boolean withExecuteParam, boolean withPage, boolean onlySelectStatement) throws SqlParseException {
 
-        SqlNode selectSqlNode = getScriptProcessor().process(queryScript);
+        QueryScriptProcessResult result = getScriptProcessor().process(queryScript);
         String selectSql;
         // build with execute params
         if (withExecuteParam) {
             selectSql = SqlBuilder.builder()
                     .withExecuteParam(executeParam)
                     .withDialect(sqlDialect)
-                    .withFrom(selectSqlNode)
+                    .withFrom(result.getFrom())
+                    .withAddDefaultNamePrefix(result.isWithDefaultPrefix())
+                    .withDefaultNamePrefix(result.getTablePrefix())
                     .withPage(withPage)
                     .withQuoteIdentifiers(quoteIdentifiers)
                     .build();
         } else {
-            selectSql = SqlNodeUtils.toSql(selectSqlNode, sqlDialect, quoteIdentifiers);
+            selectSql = SqlNodeUtils.toSql(result.getFrom(), sqlDialect, quoteIdentifiers);
         }
         selectSql = SqlStringUtils.replaceFragmentVariables(selectSql, queryScript.getVariables());
 

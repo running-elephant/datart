@@ -51,7 +51,7 @@ public class SqlBuilder {
 
     private boolean quoteIdentifiers;
 
-    private boolean addNamePrefix;
+    private boolean withNamePrefix;
 
     private String namePrefix;
 
@@ -63,13 +63,13 @@ public class SqlBuilder {
     }
 
 
-    public SqlBuilder withAddDefaultNamePrefix(boolean addDefaultNamePrefix) {
-        this.addNamePrefix = addDefaultNamePrefix;
+    public SqlBuilder withAddDefaultNamePrefix(boolean withDefaultNamePrefix) {
+        this.withNamePrefix = withDefaultNamePrefix;
         return this;
     }
 
-    public SqlBuilder withDefaultNamePrefix(SqlBuilder defaultNamePrefix) {
-        this.namePrefix = namePrefix;
+    public SqlBuilder withDefaultNamePrefix(String defaultNamePrefix) {
+        this.namePrefix = defaultNamePrefix;
         return this;
     }
 
@@ -136,7 +136,7 @@ public class SqlBuilder {
                 if (functionColumnMap.containsKey(column.getColumnKey())) {
                     selectList.add(SqlNodeUtils.createAliasNode(functionColumnMap.get(column.getColumnKey()), column.getAlias()));
                 } else {
-                    selectList.add(SqlNodeUtils.createAliasNode(SqlNodeUtils.createSqlIdentifier(column.getColumnNames(addNamePrefix, namePrefix)), column.getAlias()));
+                    selectList.add(SqlNodeUtils.createAliasNode(SqlNodeUtils.createSqlIdentifier(column.getColumnNames(withNamePrefix, namePrefix)), column.getAlias()));
                 }
             }
         }
@@ -169,8 +169,8 @@ public class SqlBuilder {
                     sqlNode = functionColumnMap.get(group.getColumnKey());
                     selectList.add(SqlNodeUtils.createAliasNode(sqlNode, group.getAlias()));
                 } else {
-                    sqlNode = SqlNodeUtils.createSqlIdentifier(group.getColumnNames(addNamePrefix, namePrefix));
-                    selectList.add(sqlNode);
+                    sqlNode = SqlNodeUtils.createSqlIdentifier(group.getColumnNames(withNamePrefix, namePrefix));
+                    selectList.add(SqlNodeUtils.createAliasNode(sqlNode, group.getAlias()));
                 }
                 groupBy.add(sqlNode);
             }
@@ -240,7 +240,7 @@ public class SqlBuilder {
         if (functionColumnMap.containsKey(columnKey)) {
             sqlNode = functionColumnMap.get(columnKey);
         } else {
-            sqlNode = SqlNodeUtils.createSqlIdentifier(operator.getColumnNames(addNamePrefix, namePrefix));
+            sqlNode = SqlNodeUtils.createSqlIdentifier(operator.getColumnNames(withNamePrefix, namePrefix));
         }
         SqlOperator sqlOp = mappingSqlAggFunction(operator.getSqlOperator());
         SqlNode aggCall;
@@ -270,7 +270,7 @@ public class SqlBuilder {
             if (operator.getColumnKey() == null) {
                 sqlNode = SqlLiteral.createNull(SqlParserPos.ZERO);
             } else {
-                sqlNode = SqlNodeUtils.createSqlIdentifier(operator.getColumnNames(addNamePrefix, namePrefix));
+                sqlNode = SqlNodeUtils.createSqlIdentifier(operator.getColumnNames(withNamePrefix, namePrefix));
             }
         }
         if (operator.getAggOperator() != null) {
@@ -292,10 +292,13 @@ public class SqlBuilder {
         if (operator.getAggOperator() != null) {
             AggregateOperator agg = new AggregateOperator();
             agg.setSqlOperator(operator.getAggOperator());
-            agg.setColumn(operator.getColumnNames(addNamePrefix, namePrefix));
+            agg.setColumn(operator.getColumnNames(withNamePrefix, namePrefix));
             column = createAggNode(agg);
         } else {
-            column = SqlNodeUtils.createSqlIdentifier(operator.getColumnNames(addNamePrefix, namePrefix));
+            if (functionColumnMap.containsKey(operator.getColumnKey())) {
+
+            }
+            column = SqlNodeUtils.createSqlIdentifier(operator.getColumnNames(withNamePrefix, namePrefix));
         }
         List<SqlNode> nodes = Arrays.stream(operator.getValues())
                 .map(this::convertTypedValue)
@@ -408,7 +411,9 @@ public class SqlBuilder {
         if (!(sqlNode instanceof SqlCall)) {
             return sqlNode;
         }
-        completionIdentifier((SqlCall) sqlNode, tableName);
+        if (withNamePrefix && StringUtils.isNotBlank(tableName)) {
+            completionIdentifier((SqlCall) sqlNode, tableName);
+        }
         if (register) {
             SqlFunctionRegisterVisitor visitor = new SqlFunctionRegisterVisitor();
             visitor.visit((SqlCall) sqlNode);
@@ -423,7 +428,7 @@ public class SqlBuilder {
             if (sqlNode instanceof SqlIdentifier) {
                 SqlIdentifier identifier = (SqlIdentifier) sqlNode;
                 if (identifier.names.size() == 1) {
-                    call.setOperand(i, SqlNodeUtils.createSqlIdentifier(identifier.names.get(0), tableName));
+                    call.setOperand(i, SqlNodeUtils.createSqlIdentifier(tableName, identifier.names.get(0)));
                 }
             } else if (sqlNode instanceof SqlCall) {
                 completionIdentifier((SqlCall) sqlNode, tableName);
