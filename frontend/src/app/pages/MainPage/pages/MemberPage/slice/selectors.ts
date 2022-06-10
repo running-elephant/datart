@@ -62,6 +62,11 @@ export const selectSaveMemberLoading = createSelector(
   memberState => memberState.saveMemberLoading,
 );
 
+export const selectRemoveMemberLoading = createSelector(
+  [selectDomain],
+  memberState => memberState.removeMemberLoading,
+);
+
 export const selectRoleListLoading = createSelector(
   [selectDomain],
   memberState => memberState.roleListLoading,

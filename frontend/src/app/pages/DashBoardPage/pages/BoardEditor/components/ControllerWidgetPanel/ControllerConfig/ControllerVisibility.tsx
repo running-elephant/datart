@@ -22,7 +22,7 @@ import {
   ALL_SQL_OPERATOR_OPTIONS,
   VISIBILITY_TYPE_OPTION,
 } from 'app/pages/DashBoardPage/constants';
-import { Widget } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { FilterSqlOperator } from 'globalConstants';
 import { FC, memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
@@ -71,7 +71,7 @@ const ControllerVisibility: FC<{
             </Form.Item>
             {showVisibilityCondition() && (
               <Form.Item noStyle>
-                <StyledWarp>
+                <StyledWrapper>
                   <Form.Item
                     name={[
                       'config',
@@ -124,7 +124,7 @@ const ControllerVisibility: FC<{
                   >
                     <Input style={{ width: '140px' }} />
                   </Form.Item>
-                </StyledWarp>
+                </StyledWrapper>
               </Form.Item>
             )}
           </>
@@ -135,7 +135,7 @@ const ControllerVisibility: FC<{
 });
 
 export default ControllerVisibility;
-const StyledWarp = styled(Form.Item)`
+const StyledWrapper = styled(Form.Item)`
   display: block;
   margin-top: 6px;
   &.ant-form-item {

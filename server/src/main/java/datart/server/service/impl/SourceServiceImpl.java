@@ -46,10 +46,7 @@ import datart.security.exception.PermissionDeniedException;
 import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.AESUtil;
 import datart.security.util.PermissionHelper;
-import datart.server.base.params.BaseCreateParam;
-import datart.server.base.params.BaseUpdateParam;
-import datart.server.base.params.SourceCreateParam;
-import datart.server.base.params.SourceUpdateParam;
+import datart.server.base.params.*;
 import datart.server.base.transfer.ImportStrategy;
 import datart.server.base.transfer.TransferConfig;
 import datart.server.base.transfer.model.SourceTransferModel;
@@ -240,13 +237,20 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         if (source.getId() == null || rrrMapper.countRolePermission(source.getId(), role.getId()) == 0) {
             Source parent = sourceMapper.selectByPrimaryKey(source.getParentId());
             if (parent == null) {
-                return securityManager.hasPermission(PermissionHelper.viewPermission(source.getOrgId(), role.getId(), ResourceType.SOURCE.name(), permission));
+                return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), ResourceType.SOURCE.name(), permission));
             } else {
                 return hasPermission(role, parent, permission);
             }
         } else {
             return securityManager.hasPermission(PermissionHelper.sourcePermission(source.getOrgId(), role.getId(), source.getId(), permission));
         }
+    }
+
+    @Override
+    public Source createSource(SourceCreateParam createParam) {
+        Source source = create(createParam);
+        updateJdbcSourceSyncJob(source);
+        return source;
     }
 
     @Override
@@ -260,12 +264,54 @@ public class SourceServiceImpl extends BaseService implements SourceService {
             Exceptions.e(e);
         }
 
+        if (Objects.equals(sourceCreateParam.getIsFolder(), Boolean.TRUE)) {
+            sourceCreateParam.setType(ResourceType.FOLDER.name());
+        } else {
+            sourceCreateParam.setIsFolder(Boolean.FALSE);
+        }
+
         Source source = SourceService.super.create(createParam);
 
         grantDefaultPermission(source);
-        updateJdbcSourceSyncJob(source);
         return source;
 
+    }
+
+    @Override
+    public boolean updateSource(SourceUpdateParam updateParam) {
+        boolean success = update(updateParam);
+        if (success) {
+            Source source = retrieve(updateParam.getId());
+            getDataProviderService().updateSource(source);
+            updateJdbcSourceSyncJob(source);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean updateBase(SourceBaseUpdateParam updateParam) {
+        Source source = retrieve(updateParam.getId());
+        requirePermission(source, Const.MANAGE);
+        if (!source.getName().equals(updateParam.getName())) {
+            //check name
+            Source check = new Source();
+            check.setParentId(updateParam.getParentId());
+            check.setOrgId(source.getOrgId());
+            check.setName(updateParam.getName());
+            checkUnique(check);
+        }
+
+        // update base info
+        if (source.getIsFolder()) {
+            source.setType(ResourceType.FOLDER.name());
+        }
+        source.setId(updateParam.getId());
+        source.setUpdateBy(getCurrentUser().getId());
+        source.setUpdateTime(new Date());
+        source.setName(updateParam.getName());
+        source.setParentId(updateParam.getParentId());
+        source.setIndex(updateParam.getIndex());
+        return 1 == sourceMapper.updateByPrimaryKey(source);
     }
 
     @Override
@@ -278,13 +324,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         } catch (Exception e) {
             Exceptions.e(e);
         }
-        boolean success = SourceService.super.update(updateParam);
-        if (success) {
-            Source source = retrieve(updateParam.getId());
-            getDataProviderService().updateSource(source);
-            updateJdbcSourceSyncJob(source);
-        }
-        return success;
+        return SourceService.super.update(updateParam);
     }
 
     @Override
@@ -337,6 +377,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     @Override
     public void deleteReference(Source source) {
         deleteJdbcSourceSyncJob(source);
+        sourceSchemasMapper.deleteBySource(source.getId());
     }
 
     @Override

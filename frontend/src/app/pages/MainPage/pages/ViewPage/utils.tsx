@@ -108,6 +108,7 @@ export function transformQueryResultToModelAndDataSource(
     return {
       ...obj,
       [name]: {
+        name,
         type: hierarchyColumn?.type || type,
         primaryKey,
         category: hierarchyColumn?.category || ColumnCategories.Uncategorized, // FIXME: model 重构时一起改

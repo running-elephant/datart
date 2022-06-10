@@ -39,9 +39,11 @@ public class ScheduleUpdateParam extends BaseUpdateParam {
     private Date endDate;
 
     private String config;
-//
-//    private String parentId;
-//
-//    private Integer index;
+
+    private String parentId;
+
+    private Boolean isFolder;
+
+    private Double index;
 
 }

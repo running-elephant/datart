@@ -4,12 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.FileUtils;
+import datart.core.common.UrlUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.boot.env.YamlPropertySourceLoader;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.*;
 
-@Order(Integer.MIN_VALUE)
 public class CustomPropertiesValidate implements EnvironmentPostProcessor {
 
     private static final String CONFIG_HOME = "config/datart.conf";
@@ -44,6 +43,11 @@ public class CustomPropertiesValidate implements EnvironmentPostProcessor {
         //this.validateConfig(properties);
         propertySources.addFirst(new PropertiesPropertySource("datartConfig", properties));
         switchProfile(environment);
+        String jdbcUrl = processDBUrl(environment);
+        if (StringUtils.isNotBlank(jdbcUrl)) {
+            properties.setProperty(DATABASE_URL, jdbcUrl);
+            propertySources.addFirst(new PropertiesPropertySource("datartConfig", properties));
+        }
     }
 
     private Properties loadCustomProperties() {
@@ -104,6 +108,34 @@ public class CustomPropertiesValidate implements EnvironmentPostProcessor {
         }
     }
 
+    private String processDBUrl(ConfigurableEnvironment environment){
+        String jdbcUrl = environment.getProperty(DATABASE_URL);
+        if (!StringUtils.startsWith(jdbcUrl, "jdbc:mysql")) {
+            return "";
+        }
+        Boolean isModify = false;
+        String[] split = StringUtils.split(jdbcUrl, "?");
+        if (split.length>1) {
+            Map<String, Object> urlParams = UrlUtils.getParamsMap(split[1]);
+            if (!"true".equals(urlParams.getOrDefault("allowMultiQueries", "false"))) {
+                isModify = true;
+                urlParams.put("allowMultiQueries", "true");
+            }
+            if (!urlParams.containsKey("characterEncoding")) {
+                isModify = true;
+                urlParams.put("characterEncoding", "utf-8");
+            }
+            jdbcUrl = split[0] + "?" + UrlUtils.covertMapToUrlParams(urlParams);
+        } else {
+            isModify = true;
+            jdbcUrl = jdbcUrl+"?allowMultiQueries=true&characterEncoding=utf-8";
+        }
+        if (isModify) {
+            return jdbcUrl;
+        }
+        return "";
+    }
+
     private String getDefaultDBUrl(ConfigurableEnvironment environment) {
         List<String> activeProfiles = Arrays.asList(environment.getActiveProfiles());
         if (activeProfiles.size() > 0 && !Arrays.asList("demo", "config").containsAll(activeProfiles)) {
@@ -118,6 +150,7 @@ public class CustomPropertiesValidate implements EnvironmentPostProcessor {
             }
             return (String) propertySources.get(0).getProperty(DATABASE_URL);
         } catch (Exception e) {
+            e.printStackTrace();
             System.err.println("Default config application-config not found ");
         }
         return null;

@@ -189,7 +189,7 @@ public abstract class DefaultDataProvider extends DataProvider {
     @Override
     public void resetSource(DataProviderSource source) {
         try {
-            LocalDB.clearCache(source.getSourceId());
+            LocalDB.clearCache("DB" + source.getSourceId());
         } catch (Exception e) {
             log.error("reset datasource error ", e);
         }

@@ -32,11 +32,6 @@ export const selectSystemInfo = createSelector(
   appState => appState.systemInfo,
 );
 
-export const selectVersion = createSelector(
-  [selectSystemInfo],
-  systemInfo => systemInfo?.version,
-);
-
 export const selectLoginLoading = createSelector(
   [selectDomain],
   appState => appState.loginLoading,

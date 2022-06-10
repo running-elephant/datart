@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDTO } from 'app/types/ChartDTO';
@@ -41,4 +41,7 @@ export type WorkbenchState = {
   aggregation?: boolean;
   datasetLoading: boolean;
   chartEditorDownloadPolling: boolean;
+  availableSourceFunctions?: string[];
+  selectedItems: SelectedItem[];
+  multipleSelect: boolean;
 };

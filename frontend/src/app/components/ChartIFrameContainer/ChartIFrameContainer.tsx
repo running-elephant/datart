@@ -22,12 +22,13 @@ import {
 } from 'app/components/ReactFrameComponent';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
-import styled, { StyleSheetManager } from 'styled-components/macro';
+import { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
 import ChartIFrameLifecycleAdapter from './ChartIFrameLifecycleAdapter';
-
 const ChartIFrameContainer: FC<{
   dataset: any;
   chart: IChart;
@@ -36,8 +37,15 @@ const ChartIFrameContainer: FC<{
   width?: any;
   height?: any;
   isShown?: boolean;
+  drillOption?: IChartDrillOption;
+  selectedItems?: SelectedItem[];
+  onKeyboardPress?: (event: KeyboardEvent) => void;
   widgetSpecialConfig?: any;
+  scale?: [number, number];
 }> = memo(props => {
+  const iframeContainerId = `chart-iframe-root-${props.containerId}`;
+  const config = setRuntimeDateLevelFieldsInChartConfig(props.config);
+
   const transformToSafeCSSProps = (width, height) => {
     let newStyle = { width, height };
     if (isNaN(newStyle?.width) || isEmpty(newStyle?.width)) {
@@ -69,10 +77,13 @@ const ChartIFrameContainer: FC<{
             <ChartIFrameLifecycleAdapter
               dataset={props.dataset}
               chart={props.chart}
-              config={props.config}
+              config={config}
               style={transformToSafeCSSProps(props?.width, props?.height)}
               widgetSpecialConfig={props.widgetSpecialConfig}
               isShown={props.isShown}
+              drillOption={props?.drillOption}
+              selectedItems={props?.selectedItems}
+              onKeyboardPress={props?.onKeyboardPress}
             />
           </div>
         </div>
@@ -81,7 +92,7 @@ const ChartIFrameContainer: FC<{
 
     return (
       <Frame
-        id={`chart-iframe-root-${props.containerId}`}
+        id={iframeContainerId}
         key={props.containerId}
         frameBorder={0}
         style={{ width: '100%', height: '100%' }}
@@ -103,16 +114,42 @@ const ChartIFrameContainer: FC<{
         <FrameContextConsumer>
           {frameContext => (
             <StyleSheetManager target={frameContext.document?.head}>
-              <StyledChartLifecycleAdapter>
+              <div
+                onContextMenu={event => {
+                  event.stopPropagation();
+                  event.preventDefault();
+
+                  var iframe = document.getElementById(iframeContainerId);
+                  if (iframe) {
+                    const [scaleX = 1, scaleY = 1] = props.scale || [];
+                    var boundingClientRect = iframe.getBoundingClientRect();
+                    var evt = new CustomEvent('contextmenu', {
+                      bubbles: true,
+                      cancelable: false,
+                    }) as any;
+                    evt.clientX =
+                      event.clientX * scaleX + boundingClientRect.left;
+                    evt.pageX =
+                      event.clientX * scaleX + boundingClientRect.left;
+                    evt.clientY =
+                      event.clientY * scaleY + boundingClientRect.top;
+                    evt.pageY = event.clientY * scaleY + boundingClientRect.top;
+                    iframe.dispatchEvent(evt);
+                  }
+                }}
+              >
                 <ChartIFrameLifecycleAdapter
                   dataset={props.dataset}
                   chart={props.chart}
-                  config={props.config}
+                  config={config}
                   style={transformToSafeCSSProps(props?.width, props?.height)}
                   widgetSpecialConfig={props.widgetSpecialConfig}
                   isShown={props.isShown}
+                  drillOption={props.drillOption}
+                  selectedItems={props?.selectedItems}
+                  onKeyboardPress={props?.onKeyboardPress}
                 />
-              </StyledChartLifecycleAdapter>
+              </div>
             </StyleSheetManager>
           )}
         </FrameContextConsumer>
@@ -128,5 +165,3 @@ const ChartIFrameContainer: FC<{
 });
 
 export default ChartIFrameContainer;
-
-const StyledChartLifecycleAdapter = styled.div``;

@@ -19,10 +19,11 @@
 import {
   BoardInfo,
   Dashboard,
-  Widget,
   WidgetData,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { SelectedItem } from 'app/types/ChartConfig';
 import { StateWithHistory } from 'redux-undo';
 
 export interface EditBoardState {
@@ -30,6 +31,10 @@ export interface EditBoardState {
   boardInfo: BoardInfo;
   widgetInfoRecord: Record<string, WidgetInfo>;
   widgetDataMap: Record<string, WidgetData>;
+  selectedItemsMap: {
+    multipleSelect: boolean;
+    selectedItems: Record<string, SelectedItem[]>;
+  };
 }
 export interface HistoryEditBoard extends Omit<EditBoardState, 'stack'> {
   stack: StateWithHistory<EditBoardStack>;

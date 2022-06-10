@@ -17,8 +17,7 @@
  */
 import { useCallback, useContext } from 'react';
 import { WidgetActionContext } from '../components/ActionProvider/WidgetActionProvider';
-import { widgetActionType } from '../components/WidgetToolBar/config';
-import { Widget } from '../pages/Board/slice/types';
+import { Widget, widgetActionType } from '../types/widgetTypes';
 
 export default function useWidgetAction() {
   const {
@@ -35,6 +34,8 @@ export default function useWidgetAction() {
     onEditWidgetLock,
     onEditWidgetUnLock,
     onEditDeleteActiveWidgets,
+    onEditComposeGroup,
+    onEditUnGroupAction,
   } = useContext(WidgetActionContext);
 
   const onWidgetEdit = useCallback(
@@ -45,10 +46,10 @@ export default function useWidgetAction() {
           onEditChartWidget(widget);
           break;
         case 'controller':
-          onEditContainerWidget(widget.id);
+          onEditControllerWidget(widget);
           break;
         case 'container':
-          onEditControllerWidget(widget);
+          onEditContainerWidget(widget.id);
           break;
         case 'media':
           onEditMediaWidget(widget.id);
@@ -87,10 +88,16 @@ export default function useWidgetAction() {
         onEditWidgetCloseJump(widget);
         break;
       case 'lock':
-        onEditWidgetLock(widget);
+        onEditWidgetLock(widget.id);
         break;
       case 'unlock':
-        onEditWidgetUnLock(widget);
+        onEditWidgetUnLock(widget.id);
+        break;
+      case 'group':
+        onEditComposeGroup(widget.id);
+        break;
+      case 'unGroup':
+        onEditUnGroupAction(widget.id);
         break;
       default:
         console.log('__ not found __ action', key);

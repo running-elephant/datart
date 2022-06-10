@@ -201,20 +201,3 @@ export const getOauth2Clients = createAsyncThunk<[]>(
     }
   },
 );
-
-export const tryOauth = createAsyncThunk<User>('app/tryOauth', async () => {
-  try {
-    const { data } = await request<User>({
-      url: '/tpa/oauth2login',
-      method: 'POST',
-    });
-    localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(data));
-    setTimeout(() => {
-      window.location.href = '/';
-    });
-    return data;
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
-});

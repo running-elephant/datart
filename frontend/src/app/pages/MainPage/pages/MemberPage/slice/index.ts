@@ -20,8 +20,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import {
   addRole,
+  deleteMember,
   deleteRole,
-  editMember,
   editRole,
   getMemberRoles,
   getMembers,
@@ -31,6 +31,7 @@ import {
   inviteMember,
   removeMember,
   revokeOwner,
+  saveMember,
 } from './thunks';
 import { MemberState } from './types';
 
@@ -113,14 +114,22 @@ const slice = createSlice({
       state.getMemberRolesLoading = false;
     });
 
-    // editMember
-    builder.addCase(editMember.pending, state => {
+    // saveMember
+    builder.addCase(saveMember.pending, state => {
       state.saveMemberLoading = true;
     });
-    builder.addCase(editMember.fulfilled, (state, action) => {
+    builder.addCase(saveMember.fulfilled, (state, action) => {
       state.saveMemberLoading = false;
+      if (action.payload) {
+        const index = state.members.findIndex(m => m.id === action.payload!.id);
+        if (index >= 0) {
+          state.members[index] = action.payload;
+        } else {
+          state.members.push(action.payload);
+        }
+      }
     });
-    builder.addCase(editMember.rejected, state => {
+    builder.addCase(saveMember.rejected, state => {
       state.saveMemberLoading = false;
     });
 
@@ -133,6 +142,18 @@ const slice = createSlice({
       state.members = state.members.filter(m => m.id !== action.meta.arg.id);
     });
     builder.addCase(removeMember.rejected, state => {
+      state.removeMemberLoading = false;
+    });
+
+    // deleteMember
+    builder.addCase(deleteMember.pending, state => {
+      state.removeMemberLoading = true;
+    });
+    builder.addCase(deleteMember.fulfilled, (state, action) => {
+      state.removeMemberLoading = false;
+      state.members = state.members.filter(m => m.id !== action.meta.arg.id);
+    });
+    builder.addCase(deleteMember.rejected, state => {
       state.removeMemberLoading = false;
     });
 

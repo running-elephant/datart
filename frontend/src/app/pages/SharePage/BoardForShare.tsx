@@ -16,15 +16,15 @@
  * limitations under the License.
  */
 
-import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { LEVEL_50 } from 'styles/StyleConstants';
 import { BoardInitProvider } from '../DashBoardPage/components/BoardProvider/BoardInitProvider';
-import { FullScreenPanel } from '../DashBoardPage/components/FullScreenPanel';
+import { FullScreenPanel } from '../DashBoardPage/components/FullScreenPanel/FullScreenPanel';
 import { AutoBoardCore } from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
 import { FreeBoardCore } from '../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
 import { getBoardDownloadParams } from '../DashBoardPage/pages/Board/slice/asyncActions';
@@ -33,6 +33,7 @@ import {
   Dashboard,
   VizRenderMode,
 } from '../DashBoardPage/pages/Board/slice/types';
+import { getJsonConfigs } from '../DashBoardPage/utils';
 import { OnLoadTasksType } from '../MainPage/Navbar/DownloadListPopup';
 import { DownloadTask } from '../MainPage/slice/types';
 import { DownloadTaskContainer } from './DownloadTaskContainer';
@@ -70,6 +71,7 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
     const { needFetchItems, hasFetchItems, boardWidthHeight } = shareBoardInfo;
 
     const [allItemFetched, setAllItemFetched] = useState(false);
+
     useEffect(() => {
       if (needFetchItems.length === hasFetchItems.length) {
         setAllItemFetched(true);
@@ -84,7 +86,12 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
       };
       if (dashboard) {
         if (dashboard?.config?.type === 'free') {
-          const { width, height } = dashboard.config;
+          const props = dashboard.config.jsonConfig.props;
+          const [width, height] = getJsonConfigs(
+            props,
+            ['size'],
+            ['width', 'height'],
+          );
           const ratio = width / (height || 1) || 1;
           const targetHeight = taskWH.taskW / ratio;
           taskWH.taskH = targetHeight;
@@ -92,6 +99,7 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
       }
       return taskWH;
     }, [boardWidthHeight, dashboard]);
+
     const boardDownLoadAction = useCallback(
       (params: { boardId: string }) => async dispatch => {
         const { boardId } = params;
@@ -102,12 +110,6 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
       },
       [onMakeShareDownloadDataTask],
     );
-
-    const searchParams = useMemo(() => {
-      return filterSearchUrl
-        ? urlSearchTransfer.toParams(filterSearchUrl)
-        : undefined;
-    }, [filterSearchUrl]);
 
     const onShareDownloadData = useCallback(() => {
       dispatch(boardDownLoadAction({ boardId: dashboard.id }));
@@ -126,7 +128,6 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
         >
           <Wrapper>
             <TitleForShare
-              name={dashboard.name}
               onShareDownloadData={onShareDownloadData}
               loadVizData={loadVizData}
             >
@@ -171,7 +172,7 @@ const Wrapper = styled.div<{}>`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 50;
+  z-index: ${LEVEL_50};
   display: flex;
   flex-direction: column;
 

@@ -15,8 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { AggregateFieldActionType, FieldFormatType } from 'app/constants';
+import {
+  AggregateFieldActionType,
+  ChartDataSectionFieldActionType,
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+  ChartStyleSectionComponentType,
+  DataViewFieldType,
+  FieldFormatType,
+  FilterConditionType,
+  RUNTIME_FILTER_KEY,
+} from 'app/constants';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,
@@ -27,10 +38,7 @@ import {
   RECOMMEND_TIME,
 } from 'globalConstants';
 import { ValueOf } from 'types';
-import {
-  ChartDataViewFieldCategory,
-  ChartDataViewFieldType,
-} from './ChartDataView';
+import { IChartDrillOption } from './ChartDrillOption';
 
 export type FilterFieldAction = {
   condition?: FilterCondition;
@@ -94,22 +102,19 @@ export type RelationFilterValue = {
 
 export type AggregateLimit = Pick<typeof AggregateFieldActionType, 'COUNT'>;
 
-export type ChartConfigBase = {
-  label?: string;
-  key: string;
-};
-
 export type ChartDataSectionField = {
   uid?: string;
   colName: string;
   desc?: string;
-  type: ChartDataViewFieldType;
-  category: Lowercase<keyof typeof ChartDataViewFieldCategory>;
+  type: DataViewFieldType;
+  category: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
+  expression?: string;
+  field?: string;
 
   sort?: SortFieldAction;
   alias?: AliasFieldAction;
-  format?: IFieldFormatConfig;
-  aggregate?: AggregateFieldActionType;
+  format?: FormatFieldAction;
+  aggregate?: AggregateFieldAction;
   filter?: FilterFieldAction;
   color?: ColorFieldAction;
   size?: number;
@@ -126,38 +131,43 @@ export type ColorFieldAction = {
   colors?: Array<{ key: string; value: string }>;
 };
 
-export interface IFieldFormatConfig {
+export type FormatFieldAction = {
   type: FieldFormatType;
-  [FieldFormatType.NUMERIC]?: {
+  [FieldFormatType.Numeric]?: {
     decimalPlaces: number;
     unitKey?: NumberUnitKey;
     useThousandSeparator?: boolean;
     prefix?: string;
     suffix?: string;
   };
-  [FieldFormatType.CURRENCY]?: {
+  [FieldFormatType.Currency]?: {
     decimalPlaces: number;
     unitKey?: NumberUnitKey;
     useThousandSeparator?: boolean;
     currency?: string;
   };
-  [FieldFormatType.PERCENTAGE]?: {
+  [FieldFormatType.Percentage]?: {
     decimalPlaces: number;
   };
-  [FieldFormatType.SCIENTIFIC]?: {
+  [FieldFormatType.Scientific]?: {
     decimalPlaces: number;
   };
-  [FieldFormatType.DATE]?: {
+  [FieldFormatType.Date]?: {
     format: string;
   };
-  [FieldFormatType.CUSTOM]?: {
+  [FieldFormatType.Custom]?: {
     format: string;
   };
-}
+};
 
 export type AliasFieldAction = {
   name?: string;
   desc?: string;
+};
+
+export type ChartConfigBase = {
+  label?: string;
+  key: string;
 };
 
 export type ChartDataConfig = ChartConfigBase & {
@@ -168,14 +178,18 @@ export type ChartDataConfig = ChartConfigBase & {
   actions?: Array<ValueOf<typeof ChartDataSectionFieldActionType>> | object;
   limit?: null | number | string | number[] | string[];
   disableAggregate?: boolean;
+  drillable?: boolean;
+  drillContextMenuVisible?: boolean;
   options?: {
     [key in ValueOf<typeof ChartDataSectionFieldActionType>]: {
       backendSort?: boolean;
     };
   };
-
+  replacedConfig?: ChartDataSectionField;
   // NOTE: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
+  // Runtime filters
+  [RUNTIME_FILTER_KEY]?: ChartDataRequestFilter[];
 };
 
 export type ChartStyleConfig = ChartConfigBase & ChartStyleSectionGroup & {};
@@ -245,6 +259,7 @@ export type ChartConfig = {
   datas?: ChartDataConfig[];
   styles?: ChartStyleConfig[];
   settings?: ChartStyleConfig[];
+  interactions?: ChartStyleConfig[];
   i18ns?: ChartI18NSectionConfig[];
 };
 
@@ -252,6 +267,8 @@ export interface ChartOptions {
   config: ChartConfig;
   dataset: ChartDataSetDTO;
   widgetSpecialConfig: { env: string | undefined; [x: string]: any };
+  drillOption?: IChartDrillOption;
+  selectedItems?: SelectedItem[];
 }
 
 export interface ChartContext {
@@ -293,7 +310,7 @@ export type AxisLabel = {
 } & FontStyle;
 
 export type LabelStyle = {
-  label: {
+  label?: {
     position?: string;
     show: boolean;
     font?: FontStyle;
@@ -317,6 +334,12 @@ export interface LegendStyle {
     [x: string]: boolean;
   };
   data?: string[];
+  itemStyle?: {
+    [x: string]: any;
+  };
+  lineStyle?: {
+    [x: string]: any;
+  };
 }
 
 export type MarkDataConfig = {
@@ -384,15 +407,25 @@ export type XAxis = {
 };
 
 export interface BorderStyle {
-  borderType: string;
-  borderWidth: number;
-  borderColor: string;
+  borderType?: string;
+  borderWidth?: number;
+  borderColor?: string;
 }
 
 export interface GridStyle {
-  left: string;
-  right: string;
-  bottom: string;
-  top: string;
-  containLabel: boolean;
+  left?: string;
+  right?: string;
+  bottom?: string;
+  top?: string;
+  containLabel?: boolean;
+}
+
+export interface SelectedItem {
+  index: string | number;
+  data: {
+    rowData: {
+      [p: string]: any;
+    };
+    [p: string]: any;
+  };
 }

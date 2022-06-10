@@ -35,7 +35,7 @@ import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { NAV_LEVEL, SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
+import { LEVEL_10, SPACE_TIMES, SPACE_XS, WHITE } from 'styles/StyleConstants';
 import { getInsertedNodeIndex, uuidv4 } from 'utils/utils';
 import { UNPERSISTED_ID_PREFIX } from '../constants';
 import { SaveFormContext } from '../SaveFormContext';
@@ -234,7 +234,7 @@ const Wrapper = styled.div<{
     position: absolute;
     width: ${SPACE_TIMES(7.5)} !important;
     height: 100%;
-    background: #fff;
+    background: ${WHITE};
     border-right: 1px solid #e9ecef;
     .menuUnfoldOutlined {
       position: absolute;
@@ -261,7 +261,7 @@ const Wrapper = styled.div<{
 `;
 const ListNavWrapper = styled(ListNav)`
   position: relative;
-  z-index: ${NAV_LEVEL};
+  z-index: ${LEVEL_10};
   display: flex;
   flex-direction: column;
   flex-shrink: 0;

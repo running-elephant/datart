@@ -23,17 +23,22 @@ import org.apache.calcite.sql.SqlWriter;
 import org.apache.calcite.sql.dialect.MssqlSqlDialect;
 
 import java.util.EnumSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import static datart.core.data.provider.StdSqlOperator.*;
 import static datart.core.data.provider.StdSqlOperator.COALESCE;
 
 public class MsSqlStdOperatorSupport extends MssqlSqlDialect implements SqlStdOperatorSupport {
 
+    static ConcurrentSkipListSet<StdSqlOperator> OWN_SUPPORTED = new ConcurrentSkipListSet<>(
+            EnumSet.of(STDDEV, ABS, MEDIAN, ABS, CEILING, FLOOR, POWER, ROUND, SQRT,
+                    EXP, LN, MOD, TRUNC, SIGN, ACOS, ASIN, ATAN, ATAN2, SIN, COS, TAN,
+                    LENGTH, CONCAT, REPLACE, SUBSTRING, LOWER, UPPER, LTRIM, RTRIM, TRIM,
+                    NOW, COALESCE, AGG_DATE_YEAR, AGG_DATE_QUARTER, AGG_DATE_MONTH, AGG_DATE_WEEK, AGG_DATE_DAY));
+
     static {
-        SUPPORTED.addAll(EnumSet.of(STDDEV, ABS, MEDIAN, ABS, CEILING, FLOOR, POWER, ROUND, SQRT,
-                EXP, LN, MOD, TRUNC, SIGN, ACOS, ASIN, ATAN, ATAN2, SIN, COS, TAN,
-                LENGTH, CONCAT, REPLACE, SUBSTRING, LOWER, UPPER, LTRIM, RTRIM, TRIM,
-                NOW, COALESCE));
+        OWN_SUPPORTED.addAll(SUPPORTED);
     }
 
     public MsSqlStdOperatorSupport() {
@@ -55,31 +60,34 @@ public class MsSqlStdOperatorSupport extends MssqlSqlDialect implements SqlStdOp
     @Override
     public boolean unparseStdSqlOperator(SqlWriter writer, SqlCall call, int leftPrec, int rightPrec) {
         StdSqlOperator operator = symbolOf(call.getOperator().getName());
-        String column = "";
         switch (operator) {
             case AGG_DATE_YEAR:
-                column = call.getOperandList().get(0).toString();
-                writer.print("YEAR(" + column + ")");
+                writer.print("YEAR(" + call.getOperandList().get(0).toString() + ")");
                 return true;
-            case AGG_DATE_QUARTER:
-                column = call.getOperandList().get(0).toString();
-                writer.print("CONCAT_WS('-',YEAR("+column+"),(month("+column+")+2)/3)");
+            case AGG_DATE_QUARTER: {
+                String columnName = call.getOperandList().get(0).toString();
+                writer.print("CONCAT_WS('-',YEAR("+columnName+"),(month("+columnName+")+2)/3)");
                 return true;
+            }
             case AGG_DATE_MONTH:
-                column = call.getOperandList().get(0).toString();
-                writer.print("FORMAT(" + column + ",'yyyy-MM')");
+                writer.print("FORMAT(" + call.getOperandList().get(0).toString() + ",'yyyy-MM')");
                 return true;
-            case AGG_DATE_WEEK:
-                column = call.getOperandList().get(0).toString();
-                writer.print("CONCAT_WS('-', YEAR("+column+"), RIGHT(100+DATEPART(ww,"+column+"),2))");
+            case AGG_DATE_WEEK: {
+                String columnName = call.getOperandList().get(0).toString();
+                writer.print("CONCAT_WS('-', YEAR("+columnName+"), RIGHT(100+DATEPART(ww,"+columnName+"),2))");
                 return true;
+            }
             case AGG_DATE_DAY:
-                column = call.getOperandList().get(0).toString();
-                writer.print("FORMAT(" + column + ",'yyyy-MM-dd')");
+                writer.print("FORMAT(" + call.getOperandList().get(0).toString() + ",'yyyy-MM-dd')");
                 return true;
             default:
                 break;
         }
         return false;
+    }
+
+    @Override
+    public Set<StdSqlOperator> supportedOperators() {
+        return OWN_SUPPORTED;
     }
 }

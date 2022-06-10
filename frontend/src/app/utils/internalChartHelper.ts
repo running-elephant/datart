@@ -16,12 +16,20 @@
  * limitations under the License.
  */
 
+import { InteractionFieldRelation } from 'app/components/FormGenerator/constants';
+import {
+  CustomizeRelation,
+  InteractionRule,
+  JumpToChartRule,
+  JumpToUrlRule,
+} from 'app/components/FormGenerator/Customize/Interaction/types';
 import {
   AggregateFieldActionType,
   ChartDataSectionType,
   ChartDataViewFieldCategory,
   DataViewFieldType,
 } from 'app/constants';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -32,7 +40,10 @@ import {
   ChartCommonConfig,
   ChartStyleConfigDTO,
 } from 'app/types/ChartConfigDTO';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import { FilterSqlOperator } from 'globalConstants';
 import {
   cond,
   curry,
@@ -45,6 +56,7 @@ import {
   isUndefined,
   pipe,
 } from 'utils/object';
+import { getDrillableRows } from './chartHelper';
 
 export const transferChartConfigs = (
   targetConfig?: ChartConfig,
@@ -91,18 +103,18 @@ export const transferChartDataConfig = (
 ): ChartConfig => {
   return pipe(
     ...[
-      ChartDataSectionType.GROUP,
-      ChartDataSectionType.AGGREGATE,
-      ChartDataSectionType.COLOR,
-      ChartDataSectionType.INFO,
-      ChartDataSectionType.MIXED,
-      ChartDataSectionType.SIZE,
-      ChartDataSectionType.FILTER,
+      ChartDataSectionType.Group,
+      ChartDataSectionType.Aggregate,
+      ChartDataSectionType.Color,
+      ChartDataSectionType.Info,
+      ChartDataSectionType.Mixed,
+      ChartDataSectionType.Size,
+      ChartDataSectionType.Filter,
     ].map(type => curry(transferDataConfigImpl)(type)),
-    ...[ChartDataSectionType.MIXED].map(type =>
+    ...[ChartDataSectionType.Mixed].map(type =>
       curry(transferMixedToNonMixed)(type),
     ),
-    ...[ChartDataSectionType.MIXED].map(type =>
+    ...[ChartDataSectionType.Mixed].map(type =>
       curry(transferNonMixedToMixed)(type),
     ),
   )(targetConfig, sourceConfig);
@@ -214,7 +226,7 @@ const transferMixedToNonMixed = (
 
     while (Boolean(dimensions?.length)) {
       const groupTypeSections = targetDataConfigs?.filter(
-        c => c.type === ChartDataSectionType.GROUP,
+        c => c.type === ChartDataSectionType.Group,
       );
 
       const row = dimensions.shift();
@@ -233,7 +245,7 @@ const transferMixedToNonMixed = (
 
     while (Boolean(metrics?.length)) {
       const aggTypeSections = targetDataConfigs?.filter(
-        c => c.type === ChartDataSectionType.AGGREGATE,
+        c => c.type === ChartDataSectionType.Aggregate,
       );
 
       const row = metrics.shift();
@@ -301,7 +313,7 @@ export function getColumnRenderOriginName(c?: ChartDataSectionField) {
   if (!c) {
     return '[unknown]';
   }
-  if (c.aggregate === AggregateFieldActionType.NONE) {
+  if (c.aggregate === AggregateFieldActionType.None) {
     return c.colName;
   }
   if (c.aggregate) {
@@ -379,7 +391,9 @@ export function transformHierarchyMeta(model?: string): ChartDataViewMeta[] {
 
 function getMeta(key, column) {
   let children;
+  let isHierarchy = false;
   if (!isEmptyArray(column?.children)) {
+    isHierarchy = true;
     children = column?.children.map(child => getMeta(child?.name, child));
   }
 
@@ -387,9 +401,45 @@ function getMeta(key, column) {
     ...column,
     id: key,
     subType: column?.category,
-    category: ChartDataViewFieldCategory.Field,
+    category: isHierarchy
+      ? ChartDataViewFieldCategory.Hierarchy
+      : ChartDataViewFieldCategory.Field,
     children: children,
   };
+}
+
+export function getUpdatedChartStyleValue(tEle: any, sEle: any) {
+  switch (typeof tEle) {
+    /*case 'bigint':
+      if (typeof sEle === 'bigint') return sEle;
+      break;*/
+    case 'boolean':
+      if (typeof sEle === 'boolean') return sEle;
+      break;
+    case 'number':
+    case 'string':
+      if (typeof sEle === 'number' || typeof sEle === 'string') return sEle;
+      break;
+    case 'object':
+      if (tEle === null) {
+        return sEle;
+      } else if (Array.isArray(tEle) && Array.isArray(sEle)) {
+        return sEle;
+      } else if (
+        Object.prototype.toString.call(tEle) === '[object Object]' &&
+        Object.prototype.toString.call(sEle) === '[object Object]'
+      ) {
+        return sEle;
+      }
+      break;
+    case 'undefined':
+      return sEle;
+    default:
+      if (typeof tEle === typeof sEle) {
+        return sEle;
+      }
+  }
+  return tEle;
 }
 
 export function mergeChartStyleConfigs(
@@ -418,7 +468,7 @@ export function mergeChartStyleConfigs(
       'key' in tEle ? source?.find(s => s?.key === tEle.key) : source?.[index];
 
     if (!isUndefined(sEle?.['value'])) {
-      tEle['value'] = sEle?.['value'];
+      tEle['value'] = getUpdatedChartStyleValue(tEle['value'], sEle?.['value']);
     }
     if (!isEmptyArray(tEle?.rows)) {
       tEle['rows'] = mergeChartStyleConfigs(tEle.rows, sEle?.rows, options);
@@ -431,7 +481,10 @@ export function mergeChartStyleConfigs(
 }
 
 export function mergeChartDataConfigs<
-  T extends { key?: string; rows?: ChartDataSectionField[] } | undefined | null,
+  T extends
+    | { key?: string; rows?: ChartDataSectionField[]; drillable?: boolean }
+    | undefined
+    | null,
 >(target?: T[], source?: T[]) {
   if (isEmptyArray(target) || isEmptyArray(source)) {
     return target;
@@ -439,7 +492,14 @@ export function mergeChartDataConfigs<
   return (target || []).map(tEle => {
     const sEle = (source || []).find(s => s?.key === tEle?.key);
     if (sEle) {
-      return Object.assign({}, tEle, { rows: sEle?.rows });
+      return Object.assign(
+        {},
+        tEle,
+        {
+          rows: sEle?.rows,
+        },
+        !isUndefined(sEle?.drillable) ? { drillable: sEle?.drillable } : {},
+      );
     }
     return tEle;
   });
@@ -450,8 +510,8 @@ export function getRequiredGroupedSections(dataConfig?) {
     dataConfig
       ?.filter(
         c =>
-          c.type === ChartDataSectionType.GROUP ||
-          c.type === ChartDataSectionType.COLOR,
+          c.type === ChartDataSectionType.Group ||
+          c.type === ChartDataSectionType.Color,
       )
       .filter(c => !!c.required) || []
   );
@@ -462,8 +522,8 @@ export function getRequiredAggregatedSections(dataConfigs?) {
     dataConfigs
       ?.filter(
         c =>
-          c.type === ChartDataSectionType.AGGREGATE ||
-          c.type === ChartDataSectionType.SIZE,
+          c.type === ChartDataSectionType.Aggregate ||
+          c.type === ChartDataSectionType.Size,
       )
       .filter(c => !!c.required) || []
   );
@@ -587,4 +647,143 @@ export const transformToViewConfig = (
     acc[cur] = viewConfigMap?.[cur];
     return acc;
   }, {});
+};
+
+export const buildDragItem = (item, children: any[] = []) => {
+  return {
+    colName: item?.id,
+    type: item?.type,
+    subType: item?.subType,
+    category: item?.category,
+    children: children.map(c => buildDragItem(c)),
+  };
+};
+
+/**
+ * Get all Drill Paths
+ *
+ * @param {ChartDataConfig[]} configs
+ * @return {*}  {ChartDataSectionField[]}
+ */
+const getDrillPaths = (
+  configs?: ChartDataConfig[],
+): ChartDataSectionField[] => {
+  return (configs || [])
+    ?.filter(c => c.type === ChartDataSectionType.Group)
+    ?.filter(d => Boolean(d.drillable))
+    ?.flatMap(r => r.rows || []);
+};
+
+/**
+ * Create or Update Chart Drill Option
+ *
+ * @param {ChartDataConfig[]} [datas]
+ * @param {IChartDrillOption} [drillOption]
+ * @return {*}  {(IChartDrillOption | undefined)}
+ */
+export const getChartDrillOption = (
+  datas?: ChartDataConfig[],
+  drillOption?: IChartDrillOption,
+  isClearAll?: boolean,
+): IChartDrillOption | undefined => {
+  const newDrillPaths = getDrillPaths(datas);
+  if (isEmptyArray(newDrillPaths)) {
+    return undefined;
+  }
+  if (
+    !isEmptyArray(newDrillPaths) &&
+    drillOption
+      ?.getAllFields()
+      ?.map(p => p.uid)
+      .join('-') !== newDrillPaths.map(p => p.uid).join('-')
+  ) {
+    return new ChartDrillOption(newDrillPaths);
+  }
+  if (isClearAll) {
+    drillOption?.clearAll();
+  }
+  return drillOption;
+};
+
+const buildClickEventBaseFilters = (
+  rawData?: Record<string, any>,
+  rule?: InteractionRule,
+  drillOption?: IChartDrillOption,
+  dataConfigs?: ChartDataConfig[],
+) => {
+  const groupConfigs: ChartDataSectionField[] = getDrillableRows(
+    dataConfigs || [],
+    drillOption,
+  );
+  const colorConfigs = (dataConfigs || [])
+    .filter(c => c.type === ChartDataSectionType.Color)
+    .flatMap(config => config.rows || []);
+
+  return groupConfigs
+    .concat(colorConfigs)
+    .map(c => {
+      const value = rawData?.[c.colName];
+      if (isEmpty(value) || isEmpty(c.colName)) {
+        return null;
+      }
+      return {
+        aggOperator: null,
+        sqlOperator: FilterSqlOperator.In,
+        column: c.colName,
+        values: [{ value, valueType: c.type }],
+      };
+    })
+    .filter(Boolean);
+};
+
+export const getClickEventViewDetailFilters = (
+  rawData?: Record<string, any>,
+  drillOption?: IChartDrillOption,
+  dataConfigs?: ChartDataConfig[],
+) => {
+  const baseFilters = buildClickEventBaseFilters(
+    rawData,
+    undefined,
+    drillOption,
+    dataConfigs,
+  );
+  return baseFilters as ChartDataRequestFilter[];
+};
+
+export const getClickEventJumpFilters = (
+  rawData?: Record<string, any>,
+  rule?: InteractionRule,
+  drillOption?: IChartDrillOption,
+  dataConfigs?: ChartDataConfig[],
+): ChartDataRequestFilter[] => {
+  const baseFilters = buildClickEventBaseFilters(
+    rawData,
+    rule,
+    drillOption,
+    dataConfigs,
+  );
+  return baseFilters.map(f => {
+    if (isEmpty(f)) {
+      return null;
+    }
+    const jumpRule = rule?.[rule.category!] as JumpToChartRule | JumpToUrlRule;
+    if (isEmpty(jumpRule)) {
+      return null;
+    }
+    if (jumpRule?.['relation'] !== InteractionFieldRelation.Auto) {
+      const customizeRelations: CustomizeRelation[] =
+        jumpRule?.[InteractionFieldRelation.Customize];
+      if (isEmptyArray(customizeRelations)) {
+        return null;
+      }
+      const targetRelation = customizeRelations?.find(
+        r => r.source === f?.column,
+      );
+      if (isEmpty(targetRelation)) {
+        return null;
+      }
+      return Object.assign({}, f, { column: targetRelation?.target });
+    }
+    return f;
+  }) as ChartDataRequestFilter[];
 };

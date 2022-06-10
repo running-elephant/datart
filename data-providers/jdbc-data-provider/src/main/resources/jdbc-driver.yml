@@ -22,6 +22,7 @@ CLICKHOUSE:
   driver-class: com.clickhouse.jdbc.ClickHouseDriver
   url-prefix: jdbc:clickhouse://
   sql-dialect: datart.data.provider.calcite.dialect.ClickHouseSqlDialectSupport
+  adapter-class: datart.data.provider.jdbc.adapters.ClickHouseDataProviderAdapter
 
 DERBY:
   db-type: DERBY
@@ -34,6 +35,15 @@ DB2:
   name: DB2
   driver-class: com.ibm.db2.jdbc.jcc.DB2Driver
   url-prefix: jdbc:db2://
+
+DM:
+  db-type: "dm"
+  name: "dm"
+  driver-class: "dm.jdbc.driver.DmDriver"
+  literal-quote: "'"
+  identifier-quote: "\""
+  url-prefix: "jdbc:dm://"
+  adapter-class: "datart.data.provider.jdbc.adapters.DmDataProviderAdapter"
 
 FIREBIRD:
   db-type: FIREBIRD
@@ -52,6 +62,7 @@ HIVE:
   db-type: HIVE
   name: HIVE
   driver-class: org.apache.hive.jdbc.HiveDriver
+  adapter-class: datart.data.provider.jdbc.adapters.HiveDataProviderAdapter
   url-prefix: jdbc:hive2://
   identifier-quote: "`"
   identifier-end-quote: "`"
@@ -144,12 +155,14 @@ POSTGRESQL:
   name: POSTGRESQL
   driver-class: org.postgresql.Driver
   url-prefix: jdbc:postgresql://
+  sql-dialect: datart.data.provider.calcite.dialect.PostgresqlSqlDialectSupport
 
 PRESTO:
   db-type: PRESTO
   name: PRESTO
   driver-class: io.prestosql.jdbc.PrestoDriver
   url-prefix: jdbc:presto://
+  adapter-class: datart.data.provider.jdbc.adapters.PrestoDataProviderAdapter
 
 SPARK:
   db-type: SPARK

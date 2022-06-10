@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { message } from 'antd';
+import { DownloadFileType } from 'app/constants';
 import {
   DownloadTask,
   DownloadTaskState,
@@ -29,8 +30,10 @@ import {
   transformToViewConfig,
 } from 'app/utils/internalChartHelper';
 import { saveAs } from 'file-saver';
+import i18next from 'i18next';
 import { request, request2, requestWithHeader } from 'utils/request';
 import { errorHandle } from 'utils/utils';
+import { convertToChartDto } from './ChartDtoHelper';
 
 export const getDistinctFields = async (
   viewId: string,
@@ -57,10 +60,9 @@ export const getDistinctFields = async (
   if (executeToken) {
     const { data } = await request2<ChartDataSetDTO>({
       method: 'POST',
-      url: `share/execute`,
+      url: `shares/execute`,
       params: {
-        executeToken: executeToken?.token,
-        password: executeToken?.password,
+        executeToken: executeToken?.authorizedToken,
       },
       data: requestParams,
     });
@@ -79,20 +81,25 @@ export const makeDownloadDataTask =
   (params: {
     downloadParams: ChartDataRequest[];
     fileName: string;
+    downloadType: DownloadFileType;
+    imageWidth?: number;
     resolve: () => void;
   }) =>
   async () => {
-    const { downloadParams, fileName, resolve } = params;
+    const { downloadParams, fileName, resolve, downloadType, imageWidth } =
+      params;
     const res = await request<{}>({
       url: `download/submit/task`,
       method: 'POST',
       data: {
         downloadParams: downloadParams,
         fileName: fileName,
+        downloadType,
+        imageWidth,
       },
     });
     if (res?.success) {
-      message.success('下载任务创建成功');
+      message.success(i18next.t('viz.action.downloadTaskSuccess'));
     }
     resolve();
   };
@@ -118,21 +125,21 @@ export const makeShareDownloadDataTask =
       shareToken,
     } = params;
     const { success } = await request<{}>({
-      url: `share/download`,
+      url: `shares/download`,
       method: 'POST',
       data: {
         downloadParams,
         fileName: fileName,
         executeToken,
-        password,
         shareToken,
       },
       params: {
+        password,
         clientId,
       },
     });
     if (success) {
-      message.success('下载任务创建成功');
+      message.success(i18next.t('viz.action.downloadTaskSuccess'));
     }
     resolve();
   };
@@ -155,23 +162,37 @@ export async function checkComputedFieldAsync(sourceId, expression) {
   return !!response?.data;
 }
 
-export async function generateShareLinkAsync(
+export async function fetchAvailableSourceFunctionsAsync(sourceId) {
+  const response = await request<string[]>({
+    method: 'POST',
+    url: `data-provider/function/support/${sourceId}`,
+  });
+  return response?.data;
+}
+
+export async function generateShareLinkAsync({
   expiryDate,
-  usePassword,
   vizId,
   vizType,
-) {
+  authenticationMode,
+  roles,
+  users,
+  rowPermissionBy,
+}) {
   const response = await request2<{
-    data: { password: string; token: string; usePassword: boolean };
+    data: any;
     errCode: number;
     message: string;
     success: boolean;
   }>({
     method: 'POST',
-    url: `share`,
+    url: `shares`,
     data: {
       expiryDate: expiryDate,
-      usePassword: usePassword,
+      authenticationMode,
+      roles,
+      users,
+      rowPermissionBy,
       vizId: vizId,
       vizType,
     },
@@ -218,7 +239,7 @@ export async function getChartPluginPaths() {
 export async function loadShareTask(params) {
   try {
     const { data } = await request2<DownloadTask[]>({
-      url: `/share/download/task`,
+      url: `/shares/download/task`,
       method: 'GET',
       params,
     });
@@ -243,7 +264,7 @@ export async function downloadShareDataChartFile(
   params: DownloadShareDashChartFileParams,
 ) {
   const [data, headers] = (await requestWithHeader({
-    url: `share/download`,
+    url: `shares/download`,
     method: 'GET',
     responseType: 'blob',
     params,
@@ -257,4 +278,18 @@ export async function fetchCheckName(url, data: any) {
     method: 'POST',
     data: data,
   });
+}
+
+export async function fetchDataChart(id: string) {
+  const response = await request2<ChartDTO>(`/viz/datacharts/${id}`);
+  return convertToChartDto(response?.data);
+}
+
+export async function fetchChartDataSet(requestParams) {
+  const { data } = await request2<ChartDataSetDTO>({
+    method: 'POST',
+    url: `data-provider/execute`,
+    data: requestParams,
+  });
+  return data;
 }

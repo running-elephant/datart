@@ -23,6 +23,7 @@ import {
   DataViewFieldType,
   FilterConditionType,
 } from 'app/constants';
+import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import { FilterSqlOperator, RECOMMEND_TIME } from 'globalConstants';
 import moment from 'moment';
 import { ChartDataRequestBuilder } from '../ChartDataRequestBuilder';
@@ -64,41 +65,41 @@ describe('ChartDataRequestBuild Test', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
-        type: ChartDataSectionType.AGGREGATE,
+        type: ChartDataSectionType.Aggregate,
         key: 'aggregation',
         rows: [
           {
             colName: 'amount',
-            aggregate: AggregateFieldActionType.AVG,
+            aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
           },
           {
             colName: 'sub-amount',
-            aggregate: AggregateFieldActionType.SUM,
+            aggregate: AggregateFieldActionType.Sum,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.ComputedField as any,
           },
         ],
       },
       {
-        type: ChartDataSectionType.AGGREGATE,
+        type: ChartDataSectionType.Aggregate,
         key: 'aggregation',
       },
       {
-        type: ChartDataSectionType.SIZE,
+        type: ChartDataSectionType.Size,
         key: 'size',
         rows: [
           {
             colName: 'total',
-            aggregate: AggregateFieldActionType.COUNT,
+            aggregate: AggregateFieldActionType.Count,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.ComputedField as any,
           },
         ],
       },
       {
-        type: ChartDataSectionType.INFO,
+        type: ChartDataSectionType.Info,
         key: 'info',
         rows: [
           {
@@ -109,7 +110,7 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.MIXED,
+        type: ChartDataSectionType.Mixed,
         key: 'info',
         rows: [
           {
@@ -125,7 +126,7 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.GROUP,
+        type: ChartDataSectionType.Group,
         key: 'unknown',
         rows: [
           {
@@ -164,12 +165,12 @@ describe('ChartDataRequestBuild Test', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
-        type: ChartDataSectionType.AGGREGATE,
+        type: ChartDataSectionType.Aggregate,
         key: 'aggregation',
         rows: [
           {
             colName: 'amount',
-            aggregate: AggregateFieldActionType.AVG,
+            aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
           },
@@ -198,24 +199,24 @@ describe('ChartDataRequestBuild Test', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
-        type: ChartDataSectionType.AGGREGATE,
+        type: ChartDataSectionType.Aggregate,
         key: 'aggregation',
         rows: [
           {
             colName: 'amount',
-            aggregate: AggregateFieldActionType.AVG,
+            aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
           },
         ],
       },
       {
-        type: ChartDataSectionType.SIZE,
+        type: ChartDataSectionType.Size,
         key: 'size',
         rows: [
           {
             colName: 'amount',
-            aggregate: AggregateFieldActionType.AVG,
+            aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
           },
@@ -246,11 +247,11 @@ describe('ChartDataRequestBuild Test', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
-        type: ChartDataSectionType.GROUP,
+        type: ChartDataSectionType.Group,
         key: 'aggregation',
       },
       {
-        type: ChartDataSectionType.GROUP,
+        type: ChartDataSectionType.Group,
         key: 'aggregation',
         rows: [
           {
@@ -261,7 +262,7 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.COLOR,
+        type: ChartDataSectionType.Color,
         key: 'aggregation',
         rows: [
           {
@@ -272,7 +273,7 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.MIXED,
+        type: ChartDataSectionType.Mixed,
         key: 'address',
         rows: [
           {
@@ -308,24 +309,38 @@ describe('ChartDataRequestBuild Test', () => {
       { column: 'age' },
       { column: 'address' },
     ]);
+
+    const enableAggregation2 = false;
+
+    const builder2 = new ChartDataRequestBuilder(
+      dataView,
+      chartDataConfigs,
+      chartSettingConfigs,
+      pageInfo,
+      enableScript,
+      enableAggregation2,
+    );
+    const requestParams2 = builder2.build();
+
+    expect(requestParams2.groups).toEqual([]);
   });
 
   test('should get filters', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
-        type: ChartDataSectionType.FILTER,
+        type: ChartDataSectionType.Filter,
         key: 'filter1',
       },
       {
-        type: ChartDataSectionType.FILTER,
+        type: ChartDataSectionType.Filter,
         key: 'filter2',
         rows: [
           {
             colName: 'name',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
-            aggregate: AggregateFieldActionType.NONE,
+            aggregate: AggregateFieldActionType.None,
             filter: {
               condition: {
                 name: 'filter-1',
@@ -339,14 +354,14 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.FILTER,
+        type: ChartDataSectionType.Filter,
         key: 'filter3',
         rows: [
           {
             colName: 'name',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
-            aggregate: AggregateFieldActionType.AVG,
+            aggregate: AggregateFieldActionType.Avg,
             filter: {
               condition: {
                 name: 'filter-1',
@@ -605,16 +620,16 @@ describe('ChartDataRequestBuild Test', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
-        type: ChartDataSectionType.AGGREGATE,
+        type: ChartDataSectionType.Aggregate,
         key: 'aggregationL',
       },
       {
-        type: ChartDataSectionType.AGGREGATE,
+        type: ChartDataSectionType.Aggregate,
         key: 'aggregationR',
         rows: [
           {
             colName: 'age',
-            aggregate: AggregateFieldActionType.AVG,
+            aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             sort: {
@@ -624,7 +639,7 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.GROUP,
+        type: ChartDataSectionType.Group,
         key: 'group',
         rows: [
           {
@@ -654,7 +669,7 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.MIXED,
+        type: ChartDataSectionType.Mixed,
         key: 'info',
         rows: [
           {
@@ -699,12 +714,12 @@ describe('ChartDataRequestBuild Test', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
-        type: ChartDataSectionType.AGGREGATE,
+        type: ChartDataSectionType.Aggregate,
         key: 'aggregationR',
         rows: [
           {
             colName: 'age',
-            aggregate: AggregateFieldActionType.AVG,
+            aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             sort: {
@@ -714,7 +729,7 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.GROUP,
+        type: ChartDataSectionType.Group,
         key: 'group',
         rows: [
           {
@@ -744,7 +759,7 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.MIXED,
+        type: ChartDataSectionType.Mixed,
         key: 'info',
         rows: [
           {
@@ -783,9 +798,6 @@ describe('ChartDataRequestBuild Test', () => {
     const requestParams = builder.build();
 
     expect(requestParams.orders).toEqual([
-      { column: 'first-name', operator: 'ASC', aggOperator: undefined },
-      { column: 'last-name', operator: 'DESC', aggOperator: undefined },
-      { column: 'address', operator: 'DESC', aggOperator: undefined },
       {
         column: 'age',
         aggOperator: 'AVG',
@@ -798,9 +810,6 @@ describe('ChartDataRequestBuild Test', () => {
     builder.addExtraSorters(extraSorters2);
 
     expect(requestParams.orders).toEqual([
-      { column: 'first-name', operator: 'ASC', aggOperator: undefined },
-      { column: 'last-name', operator: 'DESC', aggOperator: undefined },
-      { column: 'address', operator: 'DESC', aggOperator: undefined },
       {
         column: 'age',
         aggOperator: 'AVG',
@@ -957,7 +966,7 @@ describe('ChartDataRequestBuild Test', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
-        type: ChartDataSectionType.AGGREGATE,
+        type: ChartDataSectionType.Aggregate,
         key: 'aggregation',
         rows: [
           {
@@ -968,7 +977,7 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.SIZE,
+        type: ChartDataSectionType.Size,
         key: 'size',
         rows: [
           {
@@ -979,7 +988,7 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.INFO,
+        type: ChartDataSectionType.Info,
         key: 'info',
         rows: [
           {
@@ -990,7 +999,7 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.COLOR,
+        type: ChartDataSectionType.Color,
         key: 'info',
         rows: [
           {
@@ -1001,7 +1010,7 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.GROUP,
+        type: ChartDataSectionType.Group,
         key: 'GROUP',
         rows: [
           {
@@ -1012,7 +1021,7 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.MIXED,
+        type: ChartDataSectionType.Mixed,
         key: 'MIXED',
         rows: [
           {
@@ -1023,7 +1032,7 @@ describe('ChartDataRequestBuild Test', () => {
         ],
       },
       {
-        type: ChartDataSectionType.FILTER,
+        type: ChartDataSectionType.Filter,
         key: 'filter',
         rows: [
           {
@@ -1056,6 +1065,122 @@ describe('ChartDataRequestBuild Test', () => {
       'sex',
       'name',
       'name',
+    ]);
+  });
+
+  test('should get select columns with drill option', () => {
+    const dataView = { id: 'view-id' } as any;
+    const chartDataConfigs = [
+      {
+        type: ChartDataSectionType.Group,
+        key: 'GROUP',
+        drillable: true,
+        rows: [
+          {
+            uid: 'group-r1',
+            colName: 'group-r1',
+            type: '',
+            category: '',
+          },
+          {
+            uid: 'group-r2',
+            colName: 'group-r2',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.Aggregate,
+        key: 'aggregation',
+        rows: [
+          {
+            colName: 'amount',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.Size,
+        key: 'size',
+        rows: [
+          {
+            colName: 'size',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.Info,
+        key: 'info',
+        rows: [
+          {
+            colName: 'info',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.Color,
+        key: 'color',
+        rows: [
+          {
+            colName: 'color',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.Mixed,
+        key: 'MIXED',
+        rows: [
+          {
+            colName: 'mix',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+      {
+        type: ChartDataSectionType.Filter,
+        key: 'filter',
+        rows: [
+          {
+            colName: 'filter',
+            type: '',
+            category: '',
+          },
+        ],
+      },
+    ] as any;
+    const chartSettingConfigs = [];
+    const pageInfo = {};
+    const enableScript = false;
+    const enableAggregation = false;
+    const drillOption = getChartDrillOption(chartDataConfigs);
+    drillOption?.drillDown();
+
+    const builder = new ChartDataRequestBuilder(
+      dataView,
+      chartDataConfigs,
+      chartSettingConfigs,
+      pageInfo,
+      enableScript,
+      enableAggregation,
+    ).addDrillOption(drillOption);
+    const requestParams = builder.build();
+
+    expect(requestParams.columns).toEqual([
+      'group-r2',
+      'amount',
+      'size',
+      'info',
+      'color',
+      'mix',
     ]);
   });
 });

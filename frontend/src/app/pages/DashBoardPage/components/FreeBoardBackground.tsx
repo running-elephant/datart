@@ -18,11 +18,11 @@
 
 import React, { createContext, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
-import StyledBackground from '../pages/Board/components/StyledBackground';
-import { BoardConfigContext } from './BoardProvider/BoardConfigProvider';
+import { BoardConfigValContext } from './BoardProvider/BoardConfigProvider';
 import { BoardContext } from './BoardProvider/BoardProvider';
+import StyledBackground from './WidgetComponents/StyledBackground';
 
-export const scaleContext = createContext<[number, number]>([1, 1]);
+export const BoardScaleContext = createContext<[number, number]>([1, 1]);
 export interface IProps {
   scale: [number, number];
   slideTranslate: [number, number];
@@ -33,7 +33,7 @@ const SlideBackground: React.FC<IProps> = props => {
     height: slideHeight,
     scaleMode,
     background,
-  } = useContext(BoardConfigContext);
+  } = useContext(BoardConfigValContext);
   const { editing } = useContext(BoardContext);
   const { scale, slideTranslate } = props;
   const slideStyle = useMemo(() => {
@@ -59,20 +59,15 @@ const SlideBackground: React.FC<IProps> = props => {
   }, [slideTranslate, slideWidth, slideHeight, scale, scaleMode, editing]);
 
   return (
-    <Warp
-      bg={background}
-      className="display-slide"
-      style={slideStyle}
-      editing={editing}
-    >
-      <scaleContext.Provider value={scale}>
+    <Wrapper bg={background} style={slideStyle} editing={editing}>
+      <BoardScaleContext.Provider value={scale}>
         {props.children}
-      </scaleContext.Provider>
-    </Warp>
+      </BoardScaleContext.Provider>
+    </Wrapper>
   );
 };
 export default SlideBackground;
-const Warp = styled(StyledBackground)<{ editing: boolean }>`
+const Wrapper = styled(StyledBackground)<{ editing: boolean }>`
   position: relative;
   box-shadow: ${p => (p.editing ? '0px 1px 8px 2px #8cb4be;' : '')};
   transform-origin: 0 0;

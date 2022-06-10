@@ -35,6 +35,7 @@ import {
   PermissionLevels,
   ResourceTypes,
 } from 'app/pages/MainPage/pages/PermissionPage/constants';
+import { ColumnRole } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
@@ -95,9 +96,7 @@ const ChartDataViewPanel: FC<{
       if (dataView?.id === value) {
         return false;
       }
-
       let Data = chartConfig?.datas?.filter(v => v.rows && v.rows.length);
-
       if (Data?.length) {
         (showModal as Function)({
           title: '',
@@ -227,33 +226,39 @@ const ChartDataViewPanel: FC<{
     });
   };
 
-  const getSortedFields = (dataView?: ChartDataView) => {
-    const stringFields =
-      (dataView?.meta || [])
-        .concat(dataView?.computedFields || [])
-        ?.filter(f => f.type === DataViewFieldType.STRING) || [];
-    const numericFields =
-      (dataView?.meta || [])
-        .concat(dataView?.computedFields || [])
-        ?.filter(f => f.type === DataViewFieldType.NUMERIC) || [];
-    const dateFields =
-      (dataView?.meta || [])
-        .concat(dataView?.computedFields || [])
-        ?.filter(f => f.type === DataViewFieldType.DATE) || [];
-    return [...dateFields, ...stringFields, ...numericFields];
-  };
+  const sortedMetaFields = useMemo(() => {
+    const computedFields = dataView?.computedFields?.filter(
+      v => v.category !== ChartDataViewFieldCategory.DateLevelComputedField,
+    );
+    const allFields = (dataView?.meta || []).concat(computedFields || []);
+    const hierarchyFields = allFields.filter(
+      f => f.role === ColumnRole.Hierarchy,
+    );
+    const allNonHierarchyFields = allFields.filter(
+      f => f.role !== ColumnRole.Hierarchy,
+    );
+    const stringFields = allNonHierarchyFields.filter(
+      f => f.type === DataViewFieldType.STRING,
+    );
+    const numericFields = allNonHierarchyFields.filter(
+      f => f.type === DataViewFieldType.NUMERIC,
+    );
+    const dateFields = allNonHierarchyFields.filter(
+      f => f.type === DataViewFieldType.DATE,
+    );
+    return [
+      ...hierarchyFields,
+      ...dateFields,
+      ...stringFields,
+      ...numericFields,
+    ];
+  }, [dataView?.meta, dataView?.computedFields]);
 
   const editView = useCallback(() => {
     let orgId = dataView?.orgId as string;
     let viewId = dataView?.id as string;
     history.push(`/organizations/${orgId}/views/${viewId}`);
   }, [dataView?.id, dataView?.orgId, history]);
-
-  useMount(() => {
-    if (defaultViewId) {
-      handleDataViewChange(defaultViewId);
-    }
-  });
 
   const handleConfirmVisible = useCallback(() => {
     (showModal as Function)({
@@ -263,6 +268,12 @@ const ChartDataViewPanel: FC<{
       onOk: editView,
     });
   }, [editView, showModal, t]);
+
+  useMount(() => {
+    if (defaultViewId) {
+      handleDataViewChange(defaultViewId);
+    }
+  });
 
   return (
     <StyledChartDataViewPanel>
@@ -310,7 +321,7 @@ const ChartDataViewPanel: FC<{
         {modalContextHolder}
       </Header>
       <ChartDraggableSourceGroupContainer
-        meta={getSortedFields(dataView)}
+        meta={sortedMetaFields}
         onDeleteComputedField={handleDeleteComputedField}
         onEditComputedField={handleEditComputedField}
       />

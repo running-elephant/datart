@@ -35,6 +35,8 @@ const config: ChartConfig = {
       options: {
         sortable: { backendSort: false },
       },
+      drillable: false,
+      drillContextMenuVisible: true,
     },
     {
       label: 'metrics',
@@ -60,59 +62,6 @@ const config: ChartConfig = {
     },
   ],
   styles: [
-    // {
-    //   label: 'column.title',
-    //   key: 'column',
-    //   comType: 'group',
-    //   rows: [
-    //     {
-    //       label: 'column.open',
-    //       key: 'modal',
-    //       comType: 'group',
-    //       options: { type: 'modal', modalSize: 'middle' },
-    //       rows: [
-    //         {
-    //           label: 'column.list',
-    //           key: 'list',
-    //           comType: 'listTemplate',
-    //           rows: [],
-    //           options: {
-    //             getItems: cols => {
-    //               const columns = (cols || [])
-    //                 .filter(col =>
-    //                   ['aggregate', 'group', 'mixed'].includes(col.type),
-    //                 )
-    //                 .reduce((acc, cur) => acc.concat(cur.rows || []), [])
-    //                 .map(c => ({
-    //                   key: c.uid,
-    //                   value: c.uid,
-    //                   label:
-    //                     c.label || c.aggregate
-    //                       ? `${c.aggregate}(${c.colName})`
-    //                       : c.colName,
-    //                 }));
-    //               return columns;
-    //             },
-    //           },
-    //           template: {
-    //             label: 'column.listItem',
-    //             key: 'listItem',
-    //             comType: 'group',
-    //             rows: [
-    //               {
-    //                 label: 'column.conditionalStyle',
-    //                 key: 'conditionalStyle',
-    //                 comType: 'group',
-    //                 options: { expand: true },
-    //                 rows: [],
-    //               },
-    //             ],
-    //           },
-    //         },
-    //       ],
-    //     },
-    //   ],
-    // },
     {
       label: 'style.title',
       key: 'style',
@@ -141,6 +90,14 @@ const config: ChartConfig = {
           key: 'metricNameShowIn',
           default: true,
           comType: 'radio',
+          watcher: {
+            deps: ['enableExpandRow'],
+            action: props => {
+              return {
+                disabled: props.enableExpandRow,
+              };
+            },
+          },
           options: {
             translateItemLabel: true,
             items: [
@@ -165,11 +122,6 @@ const config: ChartConfig = {
       comType: 'group',
       rows: [
         {
-          label: 'style.bgColor',
-          key: 'bgColor',
-          comType: 'fontColor',
-        },
-        {
           label: 'style.font',
           key: 'font',
           comType: 'font',
@@ -177,7 +129,6 @@ const config: ChartConfig = {
             fontFamily: 'PingFangSC',
             fontSize: 12,
             fontWeight: 'normal',
-            color: '#495057',
           },
           options: {
             fontFamilies: [
@@ -189,6 +140,7 @@ const config: ChartConfig = {
               'sans-serif',
             ],
             showFontStyle: false,
+            showFontColor: false,
           },
         },
         {
@@ -196,6 +148,23 @@ const config: ChartConfig = {
           key: 'align',
           default: 'right',
           comType: 'fontAlignment',
+        },
+        {
+          label: 'style.colHeight',
+          key: 'height',
+          default: 30,
+          options: {
+            min: 12,
+          },
+          comType: 'inputNumber',
+        },
+        {
+          label: 'style.rowWidth',
+          key: 'width',
+          options: {
+            min: 0,
+          },
+          comType: 'inputNumber',
         },
       ],
     },
@@ -205,16 +174,6 @@ const config: ChartConfig = {
       comType: 'group',
       rows: [
         {
-          label: 'style.oddBgColor',
-          key: 'oddBgColor',
-          comType: 'fontColor',
-        },
-        {
-          label: 'style.evenBgColor',
-          key: 'evenBgColor',
-          comType: 'fontColor',
-        },
-        {
           label: 'style.font',
           key: 'font',
           comType: 'font',
@@ -222,7 +181,6 @@ const config: ChartConfig = {
             fontFamily: 'PingFangSC',
             fontSize: 12,
             fontWeight: 'normal',
-            color: '#495057',
           },
           options: {
             fontFamilies: [
@@ -234,6 +192,7 @@ const config: ChartConfig = {
               'sans-serif',
             ],
             showFontStyle: false,
+            showFontColor: false,
           },
         },
         {
@@ -241,6 +200,35 @@ const config: ChartConfig = {
           key: 'align',
           default: 'left',
           comType: 'fontAlignment',
+        },
+        {
+          label: 'style.height',
+          key: 'height',
+          default: 30,
+          options: {
+            min: 12,
+          },
+          comType: 'inputNumber',
+        },
+        {
+          label: 'style.width',
+          key: 'width',
+          options: {
+            min: 0,
+          },
+          comType: 'inputNumber',
+        },
+      ],
+    },
+    {
+      label: 'theme.title',
+      key: 'theme',
+      comType: 'group',
+      rows: [
+        {
+          label: 'theme.themeType',
+          key: 'themeType',
+          comType: 'pivotSheetTheme',
         },
       ],
     },
@@ -267,6 +255,28 @@ const config: ChartConfig = {
     {
       label: 'summary.summaryAggregation',
       key: 'summaryAggregation',
+      comType: 'group',
+      rows: [
+        {
+          label: 'summary.aggregation',
+          key: 'aggregation',
+          default: 'SUM',
+          comType: 'select',
+          options: {
+            translateItemLabel: true,
+            items: [
+              { label: '@global@.summary.aggregations.sum', value: 'SUM' },
+              { label: '@global@.summary.aggregations.min', value: 'MIN' },
+              { label: '@global@.summary.aggregations.max', value: 'MAX' },
+              { label: '@global@.summary.aggregations.avg', value: 'AVG' },
+            ],
+          },
+        },
+      ],
+    },
+    {
+      label: 'summary.calcSubAggregation',
+      key: 'calcSubAggregation',
       comType: 'group',
       rows: [
         {
@@ -409,10 +419,36 @@ const config: ChartConfig = {
           tableHeaderStyle: '表头样式',
           tableBodyStyle: '表体样式',
           bgColor: '背景颜色',
-          evenBgColor: '偶数行背景颜色',
-          oddBgColor: '奇数行背景颜色',
           font: '字体',
           align: '对齐方式',
+          colHeight: '列表头高度',
+          rowWidth: '行表头宽度',
+          height: '单元格高度',
+          width: '单元格宽度',
+        },
+        theme: {
+          title: '主题',
+          themeType: '主题类型',
+          colHeaderFontColor: '列表头字体颜色',
+          evenBgColor: '偶数行背景颜色',
+          oddBgColor: '奇数行背景颜色',
+          cellBgColorHover: '选中单元格背景颜色',
+          colHeaderBgColorHover: '选中列表头背景颜色',
+          colHeaderBgColor: '列表头背景颜色',
+          prepareSelectMaskBgColor: '画刷层背景颜色',
+          linkTextColor: '超链接字体颜色',
+          resizeAreaColor: '拖拽区域颜色',
+          cellBorderColor: '单元格边框颜色',
+          colHeaderBorderColor: '列表头边框颜色',
+          verticalSplitLineColor: '垂直分割线颜色',
+          horizontalSplitLineColor: '水平分割线颜色',
+          cellFontColor: '单元格文字颜色',
+          rowHeaderFontColor: '行表头文字颜色',
+          type: {
+            default: '默认',
+            gray: '简约灰',
+            colorful: '多彩蓝',
+          },
         },
         summary: {
           title: '数据汇总',
@@ -421,9 +457,14 @@ const config: ChartConfig = {
           enableTotal: '启用总计',
           enableSubTotal: '启用小计',
           totalPosition: '总计位置',
+          totalPositionTop: '顶部',
+          totalPositionBottom: '底部',
           subTotalPosition: '小计位置',
+          subTotalPositionTop: '顶部',
+          subTotalPositionBottom: '底部',
           aggregateFields: '汇总列',
           summaryAggregation: '总计聚合',
+          calcSubAggregation: '小计聚合',
           aggregation: '聚合方式',
           aggregations: {
             sum: '求和',
@@ -437,7 +478,7 @@ const config: ChartConfig = {
             left: '左侧',
             right: '右侧',
           },
-          subTotal: '小记',
+          subTotal: '小计',
           total: '总计',
         },
       },
@@ -461,21 +502,52 @@ const config: ChartConfig = {
           tableHeaderStyle: 'Table Header Style',
           tableBodyStyle: 'Table Body Style',
           bgColor: 'Background Color',
-          evenBgColor: 'Even Row Background Color',
-          oddBgColor: 'Odd Row Background Color',
           font: 'Font',
           align: 'Align',
+          colHeight: 'Col Header Height',
+          rowWidth: 'Row Header Width',
+          height: 'Height',
+          width: 'Width',
+        },
+        theme: {
+          title: 'Theme',
+          themeType: 'Theme Type',
+          colHeaderFontColor: 'Col Header Font Color',
+          evenBgColor: 'Even Row Background Color',
+          oddBgColor: 'Odd Row Background Color',
+          cellBgColorHover: 'Selected Cell Background Color',
+          colHeaderBgColorHover: 'Selected Col Header Background Color',
+          colHeaderBgColor: 'Col Header Background Color',
+          prepareSelectMaskBgColor: 'Prepare Select Mask Color',
+          linkTextColor: 'Link Text Color',
+          resizeAreaColor: 'Resize Area Color',
+          cellBorderColor: 'Cell Border Color',
+          colHeaderBorderColor: 'Col Header Border Color',
+          verticalSplitLineColor: 'Vertical Split Line Color',
+          horizontalSplitLineColor: 'Horizontal Split Line Color',
+          cellFontColor: 'Cell Font Color',
+          rowHeaderFontColor: 'Row Header Font Color',
+          type: {
+            default: 'Default',
+            gray: 'Gray',
+            colorful: 'Colorful',
+          },
         },
         summary: {
           title: 'Summary',
           rowSummary: 'Row Total',
           colSummary: 'Column Total',
           enableTotal: 'Enable Total',
-          enableSubTotal: 'Enable Sub Total',
           totalPosition: 'Total Position',
+          totalPositionTop: 'Top',
+          totalPositionBottom: 'Bottom',
+          enableSubTotal: 'Enable Sub Total',
           subTotalPosition: 'Sub Total Position',
+          subTotalPositionTop: 'Top',
+          subTotalPositionBottom: 'Bottom',
           aggregateFields: 'Summary Fields',
           summaryAggregation: 'Summary Aggregation',
+          calcSubAggregation: 'Calc Sub Aggregation',
           aggregation: 'Aggregation Type',
           aggregations: {
             sum: 'Sum',

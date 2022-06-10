@@ -5,7 +5,7 @@
     <parent>
         <artifactId>datart-parent</artifactId>
         <groupId>datart</groupId>
-        <version>1.0.0-beta.2</version>
+        <version>1.0.0-beta.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -36,6 +36,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.29</version>
         </dependency>
 
         <dependency>
@@ -93,6 +94,17 @@
             <artifactId>jackson-annotations</artifactId>
         </dependency>
 
+
+        <dependency>
+            <groupId>de.vandermeer</groupId>
+            <artifactId>asciitable</artifactId>
+            <version>0.3.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.poi</groupId>

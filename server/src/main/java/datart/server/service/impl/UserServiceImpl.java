@@ -21,7 +21,7 @@ package datart.server.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.jayway.jsonpath.JsonPath;
 import datart.core.base.consts.Const;
-import datart.core.base.consts.SystemMode;
+import datart.core.base.consts.TenantManagementMode;
 import datart.core.base.consts.UserIdentityType;
 import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
@@ -37,6 +37,7 @@ import datart.core.mappers.ext.OrganizationMapperExt;
 import datart.core.mappers.ext.RelRoleUserMapperExt;
 import datart.core.mappers.ext.UserMapperExt;
 import datart.security.base.PasswordToken;
+import datart.security.base.RoleType;
 import datart.security.util.JwtUtils;
 import datart.security.util.SecurityUtils;
 import datart.server.base.dto.OrganizationBaseInfo;
@@ -46,6 +47,7 @@ import datart.server.service.*;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,6 +66,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static datart.core.common.Application.getAdminId;
 import static datart.core.common.Application.getProperty;
 
 @Service
@@ -138,6 +141,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
 
     @Override
+    @Transactional
     public boolean register(UserRegisterParam userRegisterParam, boolean sendMail) throws MessagingException, UnsupportedEncodingException {
         if (!checkUserName(userRegisterParam.getUsername())) {
             log.error("The username({}) has been registered", userRegisterParam.getUsername());
@@ -240,7 +244,7 @@ public class UserServiceImpl extends BaseService implements UserService {
      */
     @Transactional(propagation = Propagation.MANDATORY)
     public void initUser(User user) {
-        if (Application.getCurrMode().equals(SystemMode.SINGLE)) {
+        if (Application.getCurrMode().equals(TenantManagementMode.TEAM)) {
             List<Organization> organizationList = orgMapper.list();
             if (organizationList.size()==1) {
                 Organization organization = organizationList.get(0);
@@ -248,7 +252,7 @@ public class UserServiceImpl extends BaseService implements UserService {
                 log.info("The user({}) is joined the default organization({}).", user.getUsername(), organization.getName());
                 return ;
             } else if (organizationList.size()>1) {
-                Exceptions.msg("There is more than one organization in single mode.");
+                Exceptions.msg("There is more than one organization in team tenant-management-mode.");
             } else{
                 Exceptions.msg("There is no organization to join.");
             }
@@ -275,11 +279,37 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     @Override
     public String login(PasswordToken passwordToken) {
-        securityManager.login(passwordToken);
+        try {
+            securityManager.login(passwordToken);
+        } catch (Exception e) {
+            String tokenStr = ldapLogin(passwordToken);
+            if (StringUtils.isNotBlank(tokenStr)) {
+                return tokenStr;
+            }
+            log.error("Login error ({} {})", passwordToken.getSubject(), passwordToken.getPassword());
+            Exceptions.msg("login.fail");
+            return null;
+        }
         User user = userMapper.selectByNameOrEmail(passwordToken.getSubject());
         passwordToken.setPassword(user.getPassword());
         return JwtUtils.toJwtString(passwordToken);
     }
+
+    private String ldapLogin(PasswordToken passwordToken) {
+        String token = "";
+        try {
+            log.info("try to login with ldap ({}).", passwordToken.getSubject());
+            ExternalRegisterService externalRegisterService = Application.getBean(ExternalRegisterService.class);
+            token = externalRegisterService.ldapRegister(passwordToken.getSubject(), passwordToken.getPassword());
+            if (StringUtils.isNotBlank(token)) {
+                securityManager.login(token);
+            }
+        } catch (Exception e) {
+            Exceptions.e(e);
+        }
+        return token;
+    }
+
 
     @Override
     public String forgetPassword(UserIdentityType type, String principal) {
@@ -439,6 +469,72 @@ public class UserServiceImpl extends BaseService implements UserService {
         Set<String> roleIds = roleService.listUserRoles(orgId, userId).stream().map(Role::getId).collect(Collectors.toSet());
         res.setRoleIds(roleIds);
         return res;
+    }
+
+    @Override
+    @Transactional
+    public boolean setupUser(UserRegisterParam user) throws MessagingException, UnsupportedEncodingException {
+        boolean res;
+        if (Application.getCurrMode().equals(TenantManagementMode.TEAM)) {
+            User admin = initTeamAdminUser(user);
+            Organization organization = orgService.checkTeamOrg();
+            if (organization == null) {
+                OrgCreateParam createParam = new OrgCreateParam();
+                createParam.setName(admin.getUsername()+"'s Organization");
+                createParam.setDescription("");
+                securityManager.runAs(admin.getUsername());
+                orgService.createOrganization(createParam);
+            } else {
+                orgService.addUserToOrg(admin.getId(), organization.getId());
+                Role role = roleService.getDefaultMapper().selectOrgOwnerRole(organization.getId());
+                if (role == null) {
+                    orgService.createDefaultRole(RoleType.ORG_OWNER, admin, organization);
+                }
+                roleService.grantOrgOwner(organization.getId(), admin.getId(), false);
+            }
+            res = true;
+        } else {
+            res = register(user, false);
+        }
+        return res;
+    }
+
+    private User initTeamAdminUser(UserRegisterParam user) {
+        String adminId = getAdminId();
+        User adminUser = getDefaultMapper().selectByPrimaryKey(adminId);
+        if (adminUser==null) {
+            if (!checkUserName(user.getUsername())) {
+                log.error("The username({}) has been registered", user.getUsername());
+                Exceptions.tr(ParamException.class, "error.param.occupied", "resource.user.username");
+            }
+            if (!checkEmail(user.getEmail())) {
+                log.info("The email({}) has been registered", user.getEmail());
+                Exceptions.tr(ParamException.class, "error.param.occupied", "resource.user.email");
+            }
+            adminUser = new User();
+            adminUser.setId(adminId);
+            adminUser.setUsername(user.getUsername());
+            adminUser.setName(user.getName());
+            adminUser.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
+            adminUser.setEmail(user.getEmail());
+            adminUser.setActive(true);
+            adminUser.setCreateBy(adminId);
+            adminUser.setCreateTime(new Date());
+            getDefaultMapper().insert(adminUser);
+        } else {
+            adminUser.setUsername(user.getUsername());
+            adminUser.setName(user.getName());
+            adminUser.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
+            adminUser.setActive(true);
+            getDefaultMapper().updateByPrimaryKeySelective(adminUser);
+        }
+        List<Organization> organizations = orgService.getDefaultMapper().listOrganizationsByUserId(adminId);
+        if (!CollectionUtils.isEmpty(organizations)) {
+            for (Organization organization : organizations) {
+                orgService.getDefaultMapper().deleteOrgMember(organization.getId(), adminId);
+            }
+        }
+        return getDefaultMapper().selectByPrimaryKey(adminId);
     }
 
     @Override

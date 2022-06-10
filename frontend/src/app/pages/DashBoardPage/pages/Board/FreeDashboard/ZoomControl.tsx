@@ -19,6 +19,7 @@ import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import { Button, Slider, Space, Tooltip } from 'antd';
 import React, { useMemo } from 'react';
 import styled from 'styled-components/macro';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 
 export interface ZoomControlProps {
   sliderValue: number;
@@ -38,11 +39,12 @@ const ZoomControl: React.FC<ZoomControlProps> = props => {
     }
     return scale.map((s: number) => `${Math.floor(s * 100)}%`).join('/');
   }, [scale]);
+  const t = useI18NPrefix(`viz.board.action`);
   return (
-    <Warp>
+    <Wrapper>
       <div className="bottom-box">
         <Space>
-          <Tooltip title="缩小视图">
+          <Tooltip title={t('zoomIn')}>
             <Button
               size="small"
               type="text"
@@ -56,7 +58,7 @@ const ZoomControl: React.FC<ZoomControlProps> = props => {
             onChange={sliderChange}
             value={sliderValue}
           />
-          <Tooltip title="放大视图">
+          <Tooltip title={t('zoomOut')}>
             <Button
               size="small"
               type="text"
@@ -68,11 +70,11 @@ const ZoomControl: React.FC<ZoomControlProps> = props => {
           <label className="value-label">{percentage}</label>
         </Space>
       </div>
-    </Warp>
+    </Wrapper>
   );
 };
 export default ZoomControl;
-const Warp = styled.div`
+const Wrapper = styled.div`
   display: flex;
   flex-direction: row-reverse;
   justify-content: space-between;

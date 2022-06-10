@@ -17,16 +17,16 @@
  */
 
 import { Layout } from 'antd';
-import React from 'react';
+import { memo } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
-import { LayerList } from '../components/LayerList/LayerList';
+import { LayerTreePanel } from '../components/LayerPanel/LayerTreePanel';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
-import { FreeEditorWrapper } from './FreeEditorWrapper';
+import { FreeBoardEditor } from './FreeBoardEditor';
 
-const FreeEditor: React.FC = () => {
+export const FreeEditor: React.FC = memo(() => {
   const dispatch = useDispatch();
   const clearSelectedWidgets = e => {
     e.stopPropagation();
@@ -39,16 +39,15 @@ const FreeEditor: React.FC = () => {
       <Wrapper>
         <BoardToolBar />
         <Editor>
-          <LayerList />
-          <FreeEditorWrapper />
+          {/* <LayerList /> */}
+          <LayerTreePanel />
+          <FreeBoardEditor />
           <SlideSetting />
         </Editor>
       </Wrapper>
     </Layout>
   );
-};
-
-export default FreeEditor;
+});
 
 const Wrapper = styled.div`
   display: flex;

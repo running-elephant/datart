@@ -108,8 +108,8 @@ export class ChartDataSet<T>
     const orderConfigs = dataConfigs
       .filter(
         c =>
-          c.type === ChartDataSectionType.AGGREGATE ||
-          c.type === ChartDataSectionType.GROUP,
+          c.type === ChartDataSectionType.Aggregate ||
+          c.type === ChartDataSectionType.Group,
       )
       .flatMap(config => config.rows || []);
 
@@ -121,7 +121,7 @@ export class ChartDataSet<T>
       return;
     }
     const sort = order.sort;
-    if (!sort || sort.type !== SortActionType.CUSTOMIZE) {
+    if (!sort || sort.type !== SortActionType.Customize) {
       return;
     }
     const sortValues = order.sort.value || [];
@@ -163,6 +163,14 @@ export class ChartDataSetRow<T>
 
   public getCell(field: ChartDataSectionField) {
     return this?.[this.toIndexBy(this.columnIndexTable, field)] as T;
+  }
+
+  public getMultiCell(...fields: ChartDataSectionField[]): string {
+    return (fields || [])
+      .map(field => {
+        return this?.[this.toIndexBy(this.columnIndexTable, field)];
+      })
+      .join('-');
   }
 
   public getCellByKey(key: string) {

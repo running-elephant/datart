@@ -35,6 +35,7 @@ import datart.server.base.transfer.TransferConfig;
 import datart.server.base.transfer.model.ViewTransferModel;
 import datart.server.service.*;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -83,9 +84,18 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     @Transactional
     public View create(BaseCreateParam createParam) {
 
-        View view = ViewService.super.create(createParam);
-
         ViewCreateParam viewCreateParam = (ViewCreateParam) createParam;
+        View view = new View();
+        BeanUtils.copyProperties(createParam, view);
+        view.setType(viewCreateParam.getType().name());
+        view.setCreateBy(getCurrentUser().getId());
+        view.setCreateTime(new Date());
+        view.setId(UUIDGenerator.generate());
+        view.setStatus(Const.DATA_STATUS_ACTIVE);
+        requirePermission(view, Const.CREATE);
+        viewMapper.insert(view);
+
+        getRoleService().grantPermission(viewCreateParam.getPermissions());
 
         if (!CollectionUtils.isEmpty(viewCreateParam.getVariablesToCreate())) {
             List<VariableCreateParam> variablesToCreate = viewCreateParam.getVariablesToCreate();
@@ -200,6 +210,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     @Override
     public boolean updateBase(ViewBaseUpdateParam updateParam) {
         View view = retrieve(updateParam.getId());
+        requirePermission(view, Const.MANAGE);
         if (!view.getName().equals(updateParam.getName())) {
             //check name
             View check = new View();

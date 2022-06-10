@@ -21,14 +21,18 @@ import { FONT_FAMILY } from 'styles/StyleConstants';
 export const DATARTSEPERATOR = '@datart@';
 export const CHARTCONFIG_FIELD_PLACEHOLDER_UID = '@placeholder@';
 export const DATART_TRANSLATE_HOLDER = '@global@';
+export const EVENT_ACTION_DELAY_MS = 200;
+export const RUNTIME_FILTER_KEY = Symbol('@filters@');
 
 export enum StorageKeys {
   AuthorizationToken = 'AUTHORIZATION_TOKEN',
   LoggedInUser = 'LOGGED_IN_USER',
   ShareClientId = 'SHARE_CLIENT_ID',
+  AuthRedirectUrl = 'AUTH_REDIRECT_URL',
   Locale = 'LOCALE',
   Theme = 'THEME',
 }
+
 export const BASE_API_URL = '/api/v1';
 export const BASE_RESOURCE_URL = '/';
 // 1 hour
@@ -122,6 +126,7 @@ export const CHART_LINE_WIDTH = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 export const CHART_DRAG_ELEMENT_TYPE = {
   DATA_CONFIG_COLUMN: 'data_config_column',
   DATASET_COLUMN: 'dataset_column',
+  DATASET_COLUMN_GROUP: 'dataset_column_group',
 };
 
 export const TIME_UNIT_OPTIONS = [
@@ -176,6 +181,7 @@ export enum FilterSqlOperator {
   LessThanOrEqual = 'LTE',
   GreaterThanOrEqual = 'GTE',
 }
+
 export const DATE_FORMATTER = 'YYYY-MM-DD';
 export const TIME_FORMATTER = 'YYYY-MM-DD HH:mm:ss';
 
@@ -206,8 +212,20 @@ export const NumericUnitDescriptions = new Map<NumberUnitKey, [number, string]>(
     [NumberUnitKey.None, [1, '']],
     [NumberUnitKey.Thousand, [10 ** 3, 'K']],
     [NumberUnitKey.Million, [10 ** 6, 'M']],
-    [NumberUnitKey.Billion, [10 ** 10, 'B']],
+    [NumberUnitKey.Billion, [10 ** 9, 'B']],
     [NumberUnitKey.Wan, [10 ** 4, '万']],
     [NumberUnitKey.Yi, [10 ** 8, '亿']],
   ],
 );
+
+export const KEYBOARD_EVENT_NAME = {
+  CTRL: 'Control',
+  COMMAND: 'Meta',
+};
+
+// .drt = datart template file
+// .drr = datart resources file
+export enum DatartFileSuffixes {
+  Template = '.drt',
+  Resource = '.drr',
+}

@@ -61,12 +61,37 @@ export const selectSubVizTokenMap = createSelector(
   shareState => shareState.subVizTokenMap,
 );
 
-export const selectNeedPassword = createSelector(
+export const selectNeedVerify = createSelector(
   [selectDomain],
-  shareState => shareState.needPassword,
+  shareState => shareState.needVerify,
 );
 
 export const selectSharePassword = createSelector(
   [selectDomain],
   shareState => shareState.sharePassword,
+);
+
+export const selectLoginLoading = createSelector(
+  [selectDomain],
+  shareState => shareState.loginLoading,
+);
+
+export const selectOauth2Clients = createSelector(
+  [selectDomain],
+  appState => appState.oauth2Clients,
+);
+
+export const selectAvailableSourceFunctions = createSelector(
+  [selectDomain],
+  shareState => shareState.availableSourceFunctions,
+);
+
+export const selectSelectedItems = createSelector(
+  [selectDomain],
+  shareState => shareState.selectedItems,
+);
+
+export const selectMultipleSelect = createSelector(
+  [selectDomain],
+  shareState => shareState.multipleSelect,
 );

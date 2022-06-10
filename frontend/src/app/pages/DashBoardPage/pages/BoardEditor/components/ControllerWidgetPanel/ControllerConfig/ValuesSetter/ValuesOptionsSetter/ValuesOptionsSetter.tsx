@@ -205,7 +205,7 @@ const ValuesOptionsSetter: FC<{
   }, [getControllerConfig]);
 
   return (
-    <Wrap>
+    <Wrapper>
       <Form.Item
         label={tc('valueConfig')}
         shouldUpdate
@@ -299,13 +299,13 @@ const ValuesOptionsSetter: FC<{
           }}
         </Form.Item>
       </Form.Item>
-    </Wrap>
+    </Wrapper>
   );
 });
 
 export default ValuesOptionsSetter;
 
-const Wrap = styled.div`
+const Wrapper = styled.div`
   .transfer {
     padding: 10px 0;
   }

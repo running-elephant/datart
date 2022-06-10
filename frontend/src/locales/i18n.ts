@@ -9,6 +9,7 @@ import { initReactI18next } from 'react-i18next';
 import { instance as requestInstance } from 'utils/request';
 import en from './en/translation.json';
 import { convertLanguageJsonToObject } from './translations';
+import { getInitialLocale } from './utils';
 import zh from './zh/translation.json';
 
 export const translationsJson = {
@@ -24,16 +25,14 @@ export const translationsJson = {
 convertLanguageJsonToObject(en);
 
 export const changeLang = lang => {
-  i18next.changeLanguage(lang);
-  requestInstance.defaults.headers['Accept-Language'] =
-    lang === 'zh' ? 'zh-CN' : 'en-US'; // FIXME locale
   localStorage.setItem(StorageKeys.Locale, lang);
-  moment.locale(lang === 'zh' ? 'zh-cn' : 'en-us'); // FIXME locale
   window.location && window.location.reload();
 };
 
 const initialLocale = getInitialLocale();
-moment.locale(initialLocale);
+requestInstance.defaults.headers['Accept-Language'] =
+  initialLocale === 'zh' ? 'zh-CN' : 'en-US'; // FIXME locale
+moment.locale(initialLocale === 'zh' ? 'zh-cn' : 'en-us'); // FIXME locale
 
 export const i18n = i18next
   // pass the i18n instance to react-i18next.
@@ -60,15 +59,4 @@ export const antdLocales = {
   zh: antd_zh_CN,
 };
 
-function getInitialLocale() {
-  const storedLocale = localStorage.getItem(StorageKeys.Locale);
-  if (!storedLocale) {
-    const browserLocale = ['zh', 'zh-CN'].includes(navigator.language) // FIXME locale
-      ? 'zh'
-      : 'en';
-    localStorage.setItem(StorageKeys.Locale, browserLocale);
-    return browserLocale;
-  } else {
-    return storedLocale;
-  }
-}
+

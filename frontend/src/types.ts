@@ -12,7 +12,14 @@ import { MainState } from 'app/pages/MainPage/slice/types';
 import { SharePageState } from 'app/pages/SharePage/slice/types';
 import { StoryBoardState } from 'app/pages/StoryBoardPage/slice/types';
 import { AppState } from 'app/slice/types';
+import { CSSProp } from 'styled-components';
 import { ThemeState } from 'styles/theme/slice/types';
+
+declare module 'react' {
+  interface DOMAttributes<T> {
+    css?: CSSProp;
+  }
+}
 
 export interface RootState {
   theme?: ThemeState;
@@ -59,3 +66,11 @@ export declare type Currency<TAmount> = {
 export type ValueOf<T> = T[keyof T];
 
 export type Nullable<T> = T | null | undefined;
+
+export interface IFontDefault {
+  fontFamily: string;
+  fontSize: number | string;
+  fontWeight: number | string;
+  fontStyle: string;
+  color: string;
+}

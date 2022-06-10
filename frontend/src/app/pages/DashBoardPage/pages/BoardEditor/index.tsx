@@ -16,27 +16,29 @@
  * limitations under the License.
  */
 import ChartEditor from 'app/components/ChartEditor';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
+import { LEVEL_50 } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
+import {
+  boardDrillManager,
+  EDIT_PREFIX,
+} from '../../components/BoardDrillManager/BoardDrillManager';
 import EditorHeader from '../../components/BoardHeader/EditorHeader';
 import { BoardLoading } from '../../components/BoardLoading';
 import { BoardInitProvider } from '../../components/BoardProvider/BoardInitProvider';
-import { checkLinkAndJumpErr } from '../../utils';
 import { fetchBoardDetail } from '../Board/slice/thunk';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
-import AutoEditor from './AutoEditor/index';
+import { AutoEditor } from './AutoEditor';
 import ControllerWidgetPanel from './components/ControllerWidgetPanel';
 import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
-import FreeEditor from './FreeEditor/index';
-import { editDashBoardInfoActions, editWidgetInfoActions } from './slice';
+import { FreeEditor } from './FreeEditor';
+import { editDashBoardInfoActions } from './slice';
 import {
   addVariablesToBoard,
   clearEditBoardState,
@@ -44,9 +46,9 @@ import {
 } from './slice/actions/actions';
 import {
   selectBoardChartEditorProps,
+  selectControllerPanel,
   selectEditBoard,
   selectEditBoardLoading,
-  selectWidgetRecord,
 } from './slice/selectors';
 import { addChartWidget, fetchEditBoardDetail } from './slice/thunk';
 
@@ -58,40 +60,7 @@ export const BoardEditor: React.FC<{
   const board = useSelector(selectEditBoard);
   const boardLoading = useSelector(selectEditBoardLoading);
   const boardChartEditorProps = useSelector(selectBoardChartEditorProps);
-
-  const vizs = useSelector(selectVizs);
-  const WidgetRecord = useSelector(selectWidgetRecord);
-  const [folderIds, setFolderIds] = useState<any[]>([]);
-  const t = useI18NPrefix();
-
-  const propsFolderIds = useMemo(() => {
-    return vizs?.map(folder => {
-      return folder.relId;
-    });
-  }, [vizs]);
-
-  useEffect(() => {
-    let WidgetMapValue = Object.values(WidgetRecord);
-
-    WidgetMapValue?.forEach(v => {
-      let errInfo = checkLinkAndJumpErr(v, folderIds);
-      dispatch(
-        editWidgetInfoActions.setWidgetErrInfo({
-          boardId: v.dashboardId,
-          widgetId: v.id,
-          errInfo: t(errInfo),
-          errorType: 'interaction',
-        }),
-      );
-    });
-  }, [WidgetRecord, dispatch, folderIds, t]);
-
-  useEffect(() => {
-    if (folderIds.length !== propsFolderIds?.length) {
-      setFolderIds(propsFolderIds);
-    }
-  }, [folderIds.length, propsFolderIds]);
-
+  const widgetControllerPanelParams = useSelector(selectControllerPanel);
   const onCloseChartEditor = useCallback(() => {
     dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
   }, [dispatch]);
@@ -121,12 +90,14 @@ export const BoardEditor: React.FC<{
         allowDownload={false}
         allowShare={false}
         allowManage={false}
-        renderMode="read"
+        renderMode="edit"
       >
         <EditorHeader />
         {boardType === 'auto' && <AutoEditor />}
         {boardType === 'free' && <FreeEditor />}
-        <ControllerWidgetPanel />
+        {widgetControllerPanelParams.type !== 'hide' && (
+          <ControllerWidgetPanel {...widgetControllerPanelParams} />
+        )}
         <LinkagePanel />
         <SettingJumpModal />
         {boardChartEditorProps && (
@@ -139,9 +110,10 @@ export const BoardEditor: React.FC<{
       </BoardInitProvider>
     );
   }, [
-    boardChartEditorProps,
     board,
     boardId,
+    widgetControllerPanelParams,
+    boardChartEditorProps,
     onCloseChartEditor,
     onSaveToWidget,
   ]);
@@ -183,6 +155,8 @@ export const BoardEditor: React.FC<{
       dispatch(clearEditBoardState());
       //销毁时  更新view界面数据
       dispatch(fetchBoardDetail({ dashboardRelId: boardId }));
+      //
+      boardDrillManager.clearMapByBoardId(EDIT_PREFIX + boardId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onCloseChartEditor]);
@@ -203,7 +177,7 @@ const Wrapper = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 50;
+  z-index: ${LEVEL_50};
   display: flex;
   flex-direction: column;
   padding-bottom: 0;

@@ -29,8 +29,10 @@ public class SystemInfo {
 
     private boolean mailEnable;
 
-    private String mode;
+    private String tenantManagementMode;
 
     private boolean registerEnable;
+
+    private boolean initialized;
 
 }

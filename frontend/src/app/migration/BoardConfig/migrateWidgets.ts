@@ -1,37 +1,24 @@
-/**
- * Datart
- *
- * Copyright 2021
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+import { FONT_DEFAULT } from 'app/constants';
 import {
+  BoardType,
   ControllerWidgetContent,
   Relation,
   ServerRelation,
   ServerWidget,
-  Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import {
-  fontDefault,
-  VALUE_SPLITTER,
-} from 'app/pages/DashBoardPage/utils/widget';
-import { versionCanDo } from '../utils';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { VALUE_SPLITTER } from 'app/pages/DashBoardPage/utils/widget';
+import { setLatestVersion, versionCanDo } from '../utils';
 import {
   APP_VERSION_BETA_0,
-  APP_VERSION_BETA_1,
   APP_VERSION_BETA_2,
+  APP_VERSION_BETA_4,
 } from './../constants';
+import { WidgetBeta3 } from './types';
+import {
+  convertToBeta4AutoWidget,
+  convertWidgetToBeta4,
+} from './utils/beta4utils';
 
 /**
  *
@@ -59,10 +46,10 @@ export const convertWidgetRelationsToObj = (
 /**
  *
  * migrate beta0
- * @param {Widget} [widget]
+ * @param {WidgetBeta3} [widget]
  * @return {*}
  */
-export const beta0 = (widget?: Widget) => {
+export const beta0 = (widget?: WidgetBeta3) => {
   if (!widget) return undefined;
   if (!versionCanDo(APP_VERSION_BETA_0, widget?.config.version)) return widget;
 
@@ -72,7 +59,7 @@ export const beta0 = (widget?: Widget) => {
   }
   // 2.migration about font 5 旧数据没有 widget.config.nameConfig。统一把旧数据填充上fontDefault
   widget.config.nameConfig = {
-    ...fontDefault,
+    ...FONT_DEFAULT,
     ...widget.config.nameConfig,
   };
 
@@ -89,13 +76,7 @@ export const beta0 = (widget?: Widget) => {
   return widget;
 };
 
-export const beta1 = (widget?: Widget) => {
-  if (!widget) return undefined;
-  if (!versionCanDo(APP_VERSION_BETA_1, widget?.config.version)) return widget;
-  widget.config.version = APP_VERSION_BETA_1;
-  return widget;
-};
-export const beta2 = (widget?: Widget) => {
+export const beta2 = (widget?: WidgetBeta3) => {
   if (!widget) return undefined;
   if (!versionCanDo(APP_VERSION_BETA_2, widget?.config.version)) return widget;
   // widget.lock
@@ -105,12 +86,26 @@ export const beta2 = (widget?: Widget) => {
   widget.config.version = APP_VERSION_BETA_2;
   return widget;
 };
-/**
- *
- * parseServerWidget JSON.parse(widget.config)
- * @param {ServerWidget} sWidget
- * @return {*}
- */
+// beta3 没有变动
+
+// beta4 widget 重构 支持group
+export const beta4 = (boardType: BoardType, widget?: Widget | WidgetBeta3) => {
+  if (!widget) return undefined;
+  if (!versionCanDo(APP_VERSION_BETA_4, widget?.config.version))
+    return widget as Widget;
+  let beta4Widget = widget as any;
+  beta4Widget = convertToBeta4AutoWidget(boardType, beta4Widget);
+  if (widget.config.version !== APP_VERSION_BETA_4) {
+    beta4Widget = convertWidgetToBeta4(beta4Widget as WidgetBeta3);
+  }
+
+  return beta4Widget as Widget;
+};
+const finaleWidget = (widget?: Widget) => {
+  if (!widget) return undefined;
+  widget.config = setLatestVersion(widget.config);
+  return widget;
+};
 export const parseServerWidget = (sWidget: ServerWidget) => {
   try {
     sWidget.config = JSON.parse(sWidget.config);
@@ -120,7 +115,7 @@ export const parseServerWidget = (sWidget: ServerWidget) => {
   sWidget.relations = convertWidgetRelationsToObj(
     sWidget.relations,
   ) as unknown as ServerRelation[];
-  return sWidget as unknown as Widget;
+  return sWidget as unknown as WidgetBeta3;
 };
 /**
  *
@@ -128,7 +123,10 @@ export const parseServerWidget = (sWidget: ServerWidget) => {
  * @param {ServerWidget[]} widgets
  * @return {*}
  */
-export const migrateWidgets = (widgets: ServerWidget[]) => {
+export const migrateWidgets = (
+  widgets: ServerWidget[],
+  boardType: BoardType,
+) => {
   if (!Array.isArray(widgets)) {
     return [];
   }
@@ -140,9 +138,14 @@ export const migrateWidgets = (widgets: ServerWidget[]) => {
     .filter(widget => !!widget)
     .map(widget => {
       let resWidget = beta0(widget);
-      resWidget = beta1(resWidget);
+
       resWidget = beta2(resWidget);
-      return resWidget;
+
+      let beta4Widget = beta4(boardType, resWidget);
+
+      beta4Widget = finaleWidget(beta4Widget as Widget);
+
+      return beta4Widget;
     })
     .filter(widget => !!widget);
   return targetWidgets as Widget[];

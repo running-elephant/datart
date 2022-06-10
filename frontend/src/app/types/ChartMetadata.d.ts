@@ -18,15 +18,15 @@
 
 import { ChartDataSectionType } from 'app/types/ChartConfig';
 
+export type ChartRequirement = {
+  [key in Lowercase<keyof PartialSqlAssemblyType>]?: number[] | number;
+};
+
 export type ChartMetadata = {
   id: string;
   name: string;
   icon?: string;
   requirements?: ChartRequirement[];
-};
-
-export type ChartRequirement = {
-  [key in Lowercase<keyof PartialSqlAssemblyType>]?: number[] | number;
 };
 
 type PartialSqlAssemblyType = Pick<

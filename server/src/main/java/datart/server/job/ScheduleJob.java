@@ -3,6 +3,7 @@ package datart.server.job;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import datart.core.base.consts.AttachmentType;
 import datart.core.base.consts.FileOwner;
 import datart.core.common.Application;
@@ -20,6 +21,7 @@ import datart.security.base.ResourceType;
 import datart.security.manager.DatartSecurityManager;
 import datart.server.base.dto.DashboardDetail;
 import datart.server.base.dto.DatachartDetail;
+import datart.server.base.dto.JobFile;
 import datart.server.base.dto.ScheduleJobConfig;
 import datart.server.base.params.DownloadCreateParam;
 import datart.server.base.params.ViewExecuteParam;
@@ -32,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.io.Closeable;
@@ -62,7 +65,7 @@ public abstract class ScheduleJob implements Job, Closeable {
 
     protected final DatartSecurityManager securityManager;
 
-    protected final List<File> attachments = new LinkedList<>();
+    protected final List<JobFile> attachments = new LinkedList<>();
 
     protected final VizService vizService;
 
@@ -138,27 +141,40 @@ public abstract class ScheduleJob implements Job, Closeable {
             }
 
             for (AttachmentType type : config.getAttachments()) {
-                setVizId(downloadCreateParam, folder, type);
-                String beanName = type.name().toLowerCase() + "AttachmentService";
-                AttachmentService attachmentService = Application.getBean(beanName, AttachmentService.class);
-                attachments.add(attachmentService.getFile(downloadCreateParam, path, downloadCreateParam.getFileName()));
+                DownloadCreateParam param = setVizId(downloadCreateParam, folder, type);
+                AttachmentService attachmentService = AttachmentService.matchAttachmentService(type);
+                JobFile jobFile = new JobFile();
+                File file = attachmentService.getFile(param, path, downloadCreateParam.getFileName());
+                jobFile.setFile(file);
+                jobFile.setType(type);
+                attachments.add(jobFile);
             }
         }
 
     }
 
-    private void setVizId(DownloadCreateParam downloadCreateParam, Folder folder, AttachmentType attachmentType) {
+    private DownloadCreateParam setVizId(DownloadCreateParam downloadCreateParam, Folder folder, AttachmentType attachmentType) {
+        DownloadCreateParam result = new DownloadCreateParam();
+        BeanUtils.copyProperties(downloadCreateParam, result);
+
         if (ResourceType.DATACHART.name().equals(folder.getRelType())
-                && !CollectionUtils.isEmpty(downloadCreateParam.getDownloadParams())
-                && downloadCreateParam.getDownloadParams().size()==1) {
-            ViewExecuteParam viewExecuteParam = downloadCreateParam.getDownloadParams().get(0);
+                && !CollectionUtils.isEmpty(result.getDownloadParams())
+                && result.getDownloadParams().size()==1) {
+            ViewExecuteParam viewExecuteParam = result.getDownloadParams().get(0);
             if (attachmentType.equals(AttachmentType.EXCEL)) {
                 viewExecuteParam.setVizId(folder.getRelId());
                 viewExecuteParam.setVizType(ResourceType.DATACHART);
             } else {
                 viewExecuteParam.setVizId(folder.getId());
             }
+        } else if (ResourceType.DASHBOARD.name().equals(folder.getRelType())
+                && (attachmentType.equals(AttachmentType.IMAGE) || attachmentType.equals(AttachmentType.PDF)) ) {
+            ViewExecuteParam viewExecuteParam = new ViewExecuteParam();
+            viewExecuteParam.setVizId(folder.getId());
+            viewExecuteParam.setVizType(ResourceType.DASHBOARD);
+            result.setDownloadParams(Lists.newArrayList(viewExecuteParam));
         }
+        return result;
     }
 
     public abstract void doSend() throws Exception;
@@ -189,8 +205,8 @@ public abstract class ScheduleJob implements Job, Closeable {
             log.error("schedule logout error", e);
         }
 
-        for (File file : attachments) {
-            FileUtils.delete(file);
+        for (JobFile jobFile : attachments) {
+            FileUtils.delete(jobFile.getFile());
         }
     }
 

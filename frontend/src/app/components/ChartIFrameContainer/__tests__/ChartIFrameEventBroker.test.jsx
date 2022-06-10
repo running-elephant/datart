@@ -68,13 +68,32 @@ describe('ChartIFrameEventBroker Tests', () => {
     expect(chart.onMount).toHaveBeenCalledWith(mockOptions, mockContext);
   });
 
-  test('should call chart onUpdated lifecycle after mounted', () => {
+  test('should call chart onUpdated lifecycle after mounted', async () => {
     const chart = {
       state: 'ready',
       onUpdated: jest.fn().mockImplementation(),
     };
     broker.register(chart);
     broker.publish('updated', mockOptions, mockContext);
+
+    // NOTE: the milliseconds is from EVENT_ACTION_DELAY_MS
+    await new Promise(r => setTimeout(r, 300));
+    expect(chart.onUpdated).toHaveBeenCalledTimes(1);
+    expect(chart.onUpdated).toHaveBeenCalledWith(mockOptions, mockContext);
+  });
+
+  test('should invoke once onUpdated lifecycle with many update events', async () => {
+    const chart = {
+      state: 'ready',
+      onUpdated: jest.fn().mockImplementation(),
+    };
+    broker.register(chart);
+    broker.publish('updated', mockOptions, mockContext);
+    broker.publish('updated', mockOptions, mockContext);
+    broker.publish('updated', mockOptions, mockContext);
+
+    // NOTE: the milliseconds is from EVENT_ACTION_DELAY_MS
+    await new Promise(r => setTimeout(r, 300));
     expect(chart.onUpdated).toHaveBeenCalledTimes(1);
     expect(chart.onUpdated).toHaveBeenCalledWith(mockOptions, mockContext);
   });
@@ -88,13 +107,32 @@ describe('ChartIFrameEventBroker Tests', () => {
     expect(chart.onUpdated).toHaveBeenCalledTimes(0);
   });
 
-  test('should call chart onResize lifecycle after mounted', () => {
+  test('should call chart onResize lifecycle after mounted', async () => {
     const chart = {
       state: 'ready',
       onResize: jest.fn().mockImplementation(),
     };
     broker.register(chart);
     broker.publish('resize', mockOptions, mockContext);
+
+    // NOTE: the milliseconds is from EVENT_ACTION_DELAY_MS
+    await new Promise(r => setTimeout(r, 300));
+    expect(chart.onResize).toHaveBeenCalledTimes(1);
+    expect(chart.onResize).toHaveBeenCalledWith(mockOptions, mockContext);
+  });
+
+  test('should invoke once onResize lifecycle with many resize events', async () => {
+    const chart = {
+      state: 'ready',
+      onResize: jest.fn().mockImplementation(),
+    };
+    broker.register(chart);
+    broker.publish('resize', mockOptions, mockContext);
+    broker.publish('resize', mockOptions, mockContext);
+    broker.publish('resize', mockOptions, mockContext);
+
+    // NOTE: the milliseconds is from EVENT_ACTION_DELAY_MS
+    await new Promise(r => setTimeout(r, 300));
     expect(chart.onResize).toHaveBeenCalledTimes(1);
     expect(chart.onResize).toHaveBeenCalledWith(mockOptions, mockContext);
   });
@@ -160,13 +198,16 @@ describe('ChartIFrameEventBroker Tests', () => {
     expect(chart.state).toEqual('ready');
   });
 
-  test('should set state to ready after updated', () => {
+  test('should set state to ready after updated', async () => {
     const chart = {
       state: 'ready',
       onUpdated: jest.fn().mockImplementation(),
     };
     broker.register(chart);
     broker.publish('updated', mockOptions, mockContext);
+
+    // NOTE: the milliseconds is from EVENT_ACTION_DELAY_MS
+    await new Promise(r => setTimeout(r, 300));
     expect(chart.onUpdated).toHaveBeenCalledTimes(1);
     expect(chart.state).toEqual('ready');
   });

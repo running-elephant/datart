@@ -38,7 +38,7 @@ public class ExecuteParam implements Serializable {
 
     private List<SelectKeyword> keywords;
 
-    private List<String> columns;
+    private List<SelectColumn> columns;
 
     private List<AggregateOperator> aggregators;
 
@@ -50,7 +50,7 @@ public class ExecuteParam implements Serializable {
 
     private List<FunctionColumn> functionColumns;
 
-    private Set<String> includeColumns;
+    private Set<SelectColumn> includeColumns;
 
     private PageInfo pageInfo;
 

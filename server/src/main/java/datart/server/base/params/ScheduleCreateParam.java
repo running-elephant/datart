@@ -41,11 +41,11 @@ public class ScheduleCreateParam extends BaseCreateParam {
     private Date endDate;
 
     private String config;
-//
-//    private String parentId;
-//
-//    private Boolean isFolder;
-//
-//    private Integer index;
+
+    private String parentId;
+
+    private Boolean isFolder;
+
+    private Integer index;
 
 }

@@ -20,10 +20,14 @@ package datart.server.service.impl;
 
 import datart.core.common.Application;
 import datart.server.base.dto.SystemInfo;
+import datart.server.base.params.SetupParams;
 import datart.server.service.SysService;
+import datart.server.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -43,8 +47,9 @@ public class SysServiceImpl implements SysService {
         systemInfo.setTokenTimeout(tokenTimeout);
         systemInfo.setMailEnable(sendMail);
         systemInfo.setVersion(getVersion());
-        systemInfo.setMode(Application.getCurrMode().name());
+        systemInfo.setTenantManagementMode(Application.getCurrMode().name());
         systemInfo.setRegisterEnable(Application.canRegister());
+        systemInfo.setInitialized(Application.isInitialized());
         return systemInfo;
     }
 
@@ -59,4 +64,11 @@ public class SysServiceImpl implements SysService {
             return "dev";
         }
     }
+
+    @Override
+    public boolean setup(SetupParams params) throws MessagingException, UnsupportedEncodingException {
+        UserService userService = Application.getBean(UserService.class);
+        return userService.setupUser(params.getUser());
+    }
+
 }

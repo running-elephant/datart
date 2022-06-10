@@ -46,6 +46,7 @@ import javax.sql.DataSource;
 import java.io.Closeable;
 import java.lang.reflect.Constructor;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -179,6 +180,8 @@ public class JdbcDataProviderAdapter implements Closeable {
                 foreignKey.setColumn(importedKeys.getString(PKCOLUMN_NAME));
                 keyMap.computeIfAbsent(importedKeys.getString(FKCOLUMN_NAME), key -> new ArrayList<>()).add(foreignKey);
             }
+        } catch (SQLFeatureNotSupportedException e) {
+            log.warn(e.getMessage());
         }
         return keyMap;
     }
@@ -297,9 +300,14 @@ public class JdbcDataProviderAdapter implements Closeable {
             if (StringUtils.isNotBlank(driverInfo.getIdentifierQuote())) {
                 fieldValues.put("identifierQuoteString", driverInfo.getIdentifierQuote());
                 fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierQuote());
+                fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierQuote()+driverInfo.getIdentifierQuote());
             }
             if (StringUtils.isNotBlank(driverInfo.getIdentifierEndQuote())) {
                 fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierEndQuote());
+                fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierEndQuote()+driverInfo.getIdentifierEndQuote());
+            }
+            if (StringUtils.isNotBlank(driverInfo.getIdentifierEscapedQuote())) {
+                fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierEscapedQuote());
             }
             // set default casing UNCHANGED
             fieldValues.put("unquotedCasing", Casing.UNCHANGED);
@@ -327,7 +335,7 @@ public class JdbcDataProviderAdapter implements Closeable {
             ArrayList<Object> row = new ArrayList<>();
             rows.add(row);
             for (int i = 1; i < columns.size() + 1; i++) {
-                row.add(rs.getObject(i));
+                row.add(getObjFromResultSet(rs, i));
             }
             c++;
             if (c >= count) {
@@ -398,6 +406,16 @@ public class JdbcDataProviderAdapter implements Closeable {
         }
         dataframe.setScript(sql);
         return dataframe;
+    }
+
+    protected Object getObjFromResultSet(ResultSet rs, int columnIndex) throws SQLException {
+        Object obj = rs.getObject(columnIndex);
+        if (obj instanceof Boolean) {
+            obj = rs.getInt(columnIndex);
+        } else if (obj instanceof LocalDateTime ) {
+            obj = rs.getTimestamp(columnIndex);
+        }
+        return obj;
     }
 
 }

@@ -1,5 +1,5 @@
 import {
-  IFieldFormatConfig,
+  FormatFieldAction,
   LabelStyle,
   MarkArea,
   MarkLine,
@@ -9,7 +9,7 @@ export type Series = {
     rowData: { [key: string]: any };
     value: number | string | undefined;
     name?: string | undefined;
-    format: IFieldFormatConfig | undefined;
+    format: FormatFieldAction | undefined;
   }>;
   smooth?: boolean;
   step?: boolean;

@@ -17,20 +17,26 @@
  */
 
 import { Skeleton } from 'antd';
-import { ListTitle } from 'app/components';
+import { ListTitle, ListTitleProps } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { FC, memo } from 'react';
+import { FC, memo, ReactNode } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_TIMES } from 'styles/StyleConstants';
 
-const Container: FC<any> = memo(props => {
+interface ContainerProps extends ListTitleProps {
+  title: string;
+  loading?: boolean;
+  children?: ReactNode;
+}
+
+const Container: FC<ContainerProps> = memo(props => {
   const t = useI18NPrefix('view.properties');
-  const { title, children, isLoading, ...rest } = props;
+  const { title, children, loading, ...rest } = props;
 
   return (
     <StyledContainer>
       <ListTitle title={t(title)} {...rest} />
-      <Skeleton active loading={isLoading}>
+      <Skeleton active loading={loading}>
         {children}
       </Skeleton>
     </StyledContainer>

@@ -109,20 +109,20 @@ class BasicDoubleYChart extends Chart {
       dataConfigs,
     );
     const groupConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
+      .filter(c => c.type === ChartDataSectionType.Group)
       .flatMap(config => config.rows || []);
     const infoConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.INFO)
+      .filter(c => c.type === ChartDataSectionType.Info)
       .flatMap(config => config.rows || []);
 
     const leftMetricsConfigs = dataConfigs
       .filter(
-        c => c.type === ChartDataSectionType.AGGREGATE && c.key === 'metricsL',
+        c => c.type === ChartDataSectionType.Aggregate && c.key === 'metricsL',
       )
       .flatMap(config => config.rows || []);
     const rightMetricsConfigs = dataConfigs
       .filter(
-        c => c.type === ChartDataSectionType.AGGREGATE && c.key === 'metricsR',
+        c => c.type === ChartDataSectionType.Aggregate && c.key === 'metricsR',
       )
       .flatMap(config => config.rows || []);
 

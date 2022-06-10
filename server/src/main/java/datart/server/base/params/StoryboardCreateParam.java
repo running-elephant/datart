@@ -11,4 +11,10 @@ public class StoryboardCreateParam extends VizCreateParam {
 
     private String config;
 
+    private String parentId;
+
+    private Boolean isFolder;
+
+    private Double index;
+
 }

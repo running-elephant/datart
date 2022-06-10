@@ -1,12 +1,23 @@
-import { FontStyle } from 'app/types/ChartConfig';
-
-export type TextStyle = {
-  cell: { backgroundColor: string; crossBackgroundColor?: string };
-  text: { fill: string; textAlign: string } & FontStyle;
-  bolderText?: { fill: string; textAlign: string } & FontStyle;
-};
-
-export type TableSorters = {
-  sortFieldId: any;
-  sortFunc: (params) => string[];
-} | null;
+import {
+  Node,
+  Palette,
+  S2DataConfig,
+  S2Options,
+  S2Theme,
+  SpreadSheet,
+  TargetCellInfo,
+} from '@antv/s2';
+export interface AndvS2Config {
+  dataCfg?: S2DataConfig;
+  options: S2Options;
+  theme?: S2Theme;
+  palette?: Palette;
+  onRowCellCollapseTreeRows?: (val: {
+    isCollapsed: boolean;
+    node: Node;
+  }) => void;
+  onCollapseRowsAll?: (hierarchyCollapse: boolean) => void;
+  onSelected?: (cells: any[]) => void;
+  onDataCellClick?: (data: TargetCellInfo) => void;
+  getSpreadSheet?: (spreadsheet: SpreadSheet) => void;
+}

@@ -7,12 +7,15 @@ import {
   DeviceType,
   JumpPanel,
   WidgetData,
+  WidgetErrorType,
   WidgetInfo,
   WidgetPanelParams,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import { getInitBoardInfo } from 'app/pages/DashBoardPage/utils/board';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import { SelectedItem } from 'app/types/ChartConfig';
+import { compareSelectedItems } from 'app/utils/chartHelper';
 import { Layout } from 'react-grid-layout';
 /** { excludeAction,includeAction } */
 import undoable, { includeAction } from 'redux-undo';
@@ -48,12 +51,7 @@ const editDashBoardInfoSlice = createSlice({
         state[key] = boardInfo[key];
       });
     },
-    changeDashboardEdit(state, action: PayloadAction<boolean>) {
-      state.editing = action.payload;
-    },
-    changeEditBoardLoading(state, action: PayloadAction<boolean>) {
-      state.loading = action.payload;
-    },
+
     changeFullScreenItem(state, action: PayloadAction<string>) {
       state.fullScreenItemId = action.payload;
     },
@@ -81,12 +79,12 @@ const editDashBoardInfoSlice = createSlice({
     },
     addClipboardWidgets(
       state,
-      action: PayloadAction<BoardInfo['clipboardWidgets']>,
+      action: PayloadAction<BoardInfo['clipboardWidgetMap']>,
     ) {
-      state.clipboardWidgets = action.payload;
+      state.clipboardWidgetMap = action.payload;
     },
     clearClipboardWidgets(state) {
-      state.clipboardWidgets = {};
+      state.clipboardWidgetMap = {};
     },
     changeChartEditorProps(
       state,
@@ -116,26 +114,28 @@ const editDashBoardInfoSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    //  updateDashboard
-    builder.addCase(toUpdateDashboard.pending, state => {
-      state.saving = true;
-    });
-    builder.addCase(toUpdateDashboard.fulfilled, (state, action) => {
-      state.saving = false;
-    });
-    builder.addCase(toUpdateDashboard.rejected, state => {
-      state.saving = false;
-    });
-    //loadEditBoardDetail
-    builder.addCase(fetchEditBoardDetail.pending, state => {
-      state.loading = true;
-    });
-    builder.addCase(fetchEditBoardDetail.fulfilled, (state, action) => {
-      state.loading = false;
-    });
-    builder.addCase(fetchEditBoardDetail.rejected, state => {
-      state.loading = false;
-    });
+    try {
+      //  updateDashboard
+      builder.addCase(toUpdateDashboard.pending, state => {
+        state.saving = true;
+      });
+      builder.addCase(toUpdateDashboard.fulfilled, (state, action) => {
+        state.saving = false;
+      });
+      builder.addCase(toUpdateDashboard.rejected, state => {
+        state.saving = false;
+      });
+      // loadEditBoardDetail
+      builder.addCase(fetchEditBoardDetail.pending, state => {
+        state.loading = true;
+      });
+      builder.addCase(fetchEditBoardDetail.fulfilled, (state, action) => {
+        state.loading = false;
+      });
+      builder.addCase(fetchEditBoardDetail.rejected, state => {
+        state.loading = false;
+      });
+    } catch (error) {}
   },
 });
 // widgetInfo
@@ -150,9 +150,10 @@ const widgetInfoRecordSlice = createSlice({
         multipleKey: boolean;
         id: string;
         selected: boolean;
+        parentIds: string[];
       }>,
     ) {
-      const { multipleKey, id, selected } = action.payload;
+      const { multipleKey, id, selected, parentIds } = action.payload;
       if (multipleKey) {
         state[id].selected = selected;
       } else {
@@ -163,6 +164,11 @@ const widgetInfoRecordSlice = createSlice({
             state[key].selected = false;
           }
         }
+        parentIds.forEach(id => {
+          if (state[id]) {
+            state[id].editing = true;
+          }
+        });
       }
     },
     selectSubWidget(state, action: PayloadAction<string>) {
@@ -206,11 +212,11 @@ const widgetInfoRecordSlice = createSlice({
         }
       }
     },
-    addWidgetInfos(state, action: PayloadAction<Record<string, WidgetInfo>>) {
-      const widgetInfoMap = action.payload;
-      const widgetIds = Object.keys(widgetInfoMap);
-      widgetIds.forEach(id => {
-        state[id] = widgetInfoMap[id];
+    addWidgetInfos(state, action: PayloadAction<WidgetInfo[]>) {
+      const widgetInfos = action.payload;
+
+      widgetInfos.forEach(info => {
+        state[info.id] = info;
       });
     },
     clearWidgetInfo(state) {
@@ -246,53 +252,58 @@ const widgetInfoRecordSlice = createSlice({
         boardId?: string;
         widgetId: string;
         errInfo?: string;
-        errorType: 'request' | 'interaction';
+        errorType: WidgetErrorType;
       }>,
     ) {
       const { widgetId, errInfo, errorType } = action.payload;
-      let errorObj = state[widgetId]?.errInfo || {};
+
+      let WidgetRrrInfo = state?.[widgetId]?.errInfo;
+      if (!WidgetRrrInfo) return;
       if (errInfo) {
-        errorObj[errorType] = errInfo;
+        WidgetRrrInfo[errorType] = errInfo;
       } else {
-        delete errorObj[errorType];
-      }
-      if (state[widgetId]?.errInfo) {
-        state[widgetId].errInfo = errorObj;
+        delete WidgetRrrInfo[errorType];
       }
     },
   },
   extraReducers: builder => {
-    builder.addCase(getEditChartWidgetDataAsync.pending, (state, action) => {
-      const { widgetId } = action.meta.arg;
-      if (!state?.[widgetId]) return;
-      state[widgetId].loading = true;
-    });
-    builder.addCase(getEditChartWidgetDataAsync.fulfilled, (state, action) => {
-      const { widgetId } = action.meta.arg;
-      if (!state?.[widgetId]) return;
-
-      state[widgetId].loading = false;
-    });
-    builder.addCase(getEditChartWidgetDataAsync.rejected, (state, action) => {
-      const { widgetId } = action.meta.arg;
-      if (!state?.[widgetId]) return;
-      state[widgetId].loading = false;
-    });
-    builder.addCase(getEditControllerOptions.pending, (state, action) => {
-      const widgetId = action.meta.arg;
-      if (!state?.[widgetId]) return;
-      state[widgetId].loading = true;
-    });
-    builder.addCase(getEditControllerOptions.fulfilled, (state, action) => {
-      const widgetId = action.meta.arg;
-      if (!state?.[widgetId]) return;
-      state[widgetId].loading = false;
-    });
-    builder.addCase(getEditControllerOptions.rejected, (state, action) => {
-      const widgetId = action.meta.arg;
-      if (!state?.[widgetId]) return;
-      state[widgetId].loading = false;
-    });
+    try {
+      builder.addCase(getEditChartWidgetDataAsync.pending, (state, action) => {
+        const { widgetId } = action.meta.arg;
+        if (!state?.[widgetId]) return;
+        state[widgetId].loading = true;
+      });
+      builder.addCase(
+        getEditChartWidgetDataAsync.fulfilled,
+        (state, action) => {
+          const { widgetId } = action.meta.arg;
+          if (!state?.[widgetId]) return;
+          state[widgetId].loading = false;
+        },
+      );
+      builder.addCase(getEditChartWidgetDataAsync.rejected, (state, action) => {
+        const { widgetId } = action.meta.arg;
+        if (!state?.[widgetId]) return;
+        state[widgetId].loading = false;
+      });
+      builder.addCase(getEditControllerOptions.pending, (state, action) => {
+        const widgetId = action.meta.arg;
+        if (!state?.[widgetId]) return;
+        state[widgetId].loading = true;
+      });
+      builder.addCase(getEditControllerOptions.fulfilled, (state, action) => {
+        const widgetId = action.meta.arg;
+        if (!state?.[widgetId]) return;
+        state[widgetId].loading = false;
+      });
+      builder.addCase(getEditControllerOptions.rejected, (state, action) => {
+        const widgetId = action.meta.arg;
+        if (!state?.[widgetId]) return;
+        state[widgetId].loading = false;
+      });
+    } catch (error) {
+      // console.warn(error);
+    }
   },
 });
 const editWidgetDataSlice = createSlice({
@@ -305,27 +316,81 @@ const editWidgetDataSlice = createSlice({
     },
   },
 });
+const editWidgetSelectedItemsSlice = createSlice({
+  name: 'editBoard',
+  initialState: {
+    multipleSelect: false,
+    selectedItems: {},
+  } as EditBoardState['selectedItemsMap'],
+  reducers: {
+    updateMultipleSelectInEditor(state, { payload }: PayloadAction<boolean>) {
+      state.multipleSelect = payload;
+    },
+    normalSelectInEditor(
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        wid: string;
+        data: { index: string; data: any };
+      }>,
+    ) {
+      const index = state.selectedItems[payload.wid].findIndex(
+        v => v.index === payload.data.index,
+      );
+      if (state.multipleSelect) {
+        if (index < 0) {
+          state.selectedItems[payload.wid].push(payload.data);
+        } else {
+          state.selectedItems[payload.wid].splice(index, 1);
+        }
+      } else {
+        if (index < 0 || state.selectedItems[payload.wid].length > 1) {
+          state.selectedItems[payload.wid] = [payload.data];
+        } else {
+          state.selectedItems[payload.wid] = [];
+        }
+      }
+    },
+    changeSelectedItemsInEditor(
+      state,
+      { payload }: PayloadAction<{ wid: string; data: Array<SelectedItem> }>,
+    ) {
+      if (
+        compareSelectedItems(payload.data, state.selectedItems[payload.wid])
+      ) {
+        state.selectedItems[payload.wid] = payload.data;
+      }
+    },
+  },
+});
 export const { actions: editBoardStackActions } = editBoardStackSlice;
 export const { actions: editDashBoardInfoActions } = editDashBoardInfoSlice;
 export const { actions: editWidgetInfoActions } = widgetInfoRecordSlice;
 export const { actions: editWidgetDataActions } = editWidgetDataSlice;
+export const { actions: editWidgetSelectedItemsActions } =
+  editWidgetSelectedItemsSlice;
 const filterActions = [
   editBoardStackActions.setBoardToEditStack,
   editBoardStackActions.updateBoard,
-  editBoardStackActions.toggleAllowOverlap,
+
   editBoardStackActions.updateBoardConfig,
   editBoardStackActions.addWidgets,
   editBoardStackActions.deleteWidgets,
   editBoardStackActions.changeAutoBoardWidgetsRect,
-  editBoardStackActions.resizeWidgetEnd,
 
   editBoardStackActions.tabsWidgetAddTab,
   editBoardStackActions.tabsWidgetRemoveTab,
   editBoardStackActions.updateWidgetConfig,
   editBoardStackActions.updateWidgetsConfig,
   editBoardStackActions.changeWidgetsIndex,
-  editBoardStackActions.changeBoardHasQueryControl,
-  editBoardStackActions.changeBoardHasResetControl,
+
+  editBoardStackActions.toggleLockWidget,
+  editBoardStackActions.updateBoardConfigByKey,
+  editBoardStackActions.updateWidgetConfigByPath,
+  editBoardStackActions.changeFreeWidgetRect,
+  editBoardStackActions.dropWidgetToTab,
+  editBoardStackActions.dropWidgetToGroup,
 ].map(ele => ele.toString());
 const editBoardStackReducer = undoable(editBoardStackSlice.reducer, {
   undoType: BOARD_UNDO.undo,
@@ -341,6 +406,7 @@ const editBoardReducer = combineReducers({
   boardInfo: editDashBoardInfoSlice.reducer,
   widgetInfoRecord: widgetInfoRecordSlice.reducer,
   widgetDataMap: editWidgetDataSlice.reducer,
+  selectedItemsMap: editWidgetSelectedItemsSlice.reducer,
 });
 
 export const useEditBoardSlice = () => {

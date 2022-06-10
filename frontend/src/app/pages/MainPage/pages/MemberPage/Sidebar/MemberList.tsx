@@ -19,8 +19,10 @@
 import { LoadingOutlined, UserAddOutlined } from '@ant-design/icons';
 import { List, Modal } from 'antd';
 import { Avatar, ListItem, ListTitle } from 'app/components';
+import { TenantManagementMode } from 'app/constants';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { selectSystemInfo } from 'app/slice/selectors';
 import {
   memo,
   ReactElement,
@@ -46,6 +48,7 @@ export const MemberList = memo(() => {
   const [inviteFormVisible, setInviteFormVisible] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
+  const systemInfo = useSelector(selectSystemInfo);
   const orgId = useSelector(selectOrgId);
   const list = useSelector(selectMembers);
   const listLoading = useSelector(selectMemberListLoading);
@@ -128,19 +131,30 @@ export const MemberList = memo(() => {
     [history, orgId],
   );
 
+  const toAdd = useCallback(() => {
+    toDetail('add')();
+  }, [toDetail]);
+
   const titleProps = useMemo(
     () => ({
       key: 'list',
       subTitle: t('memberTitle'),
       search: true,
-      add: {
-        items: [{ key: 'invite', text: t('inviteMember') }],
-        icon: <UserAddOutlined />,
-        callback: showInviteForm,
-      },
+      add:
+        systemInfo?.tenantManagementMode === TenantManagementMode.Platform
+          ? {
+              items: [{ key: 'invite', text: t('inviteMember') }],
+              icon: <UserAddOutlined />,
+              callback: showInviteForm,
+            }
+          : {
+              items: [{ key: 'add', text: t('addMember') }],
+              icon: <UserAddOutlined />,
+              callback: toAdd,
+            },
       onSearch: debouncedSearch,
     }),
-    [showInviteForm, debouncedSearch, t],
+    [systemInfo, showInviteForm, toAdd, debouncedSearch, t],
   );
   return (
     <Wrapper>

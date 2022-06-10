@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { Empty } from 'antd';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
+import { BoardConfigValContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
@@ -41,17 +41,17 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
       width: slideWidth,
       height: slideHeight,
       scaleMode,
-    } = useContext(BoardConfigContext);
+    } = useContext(BoardConfigValContext);
     const { editing, autoFit } = useContext(BoardContext);
 
-    const widgetConfigRecords = useSelector((state: { board: BoardState }) =>
+    const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
       selectLayoutWidgetMapById()(state, boardId),
     );
-    const widgetConfigs = useMemo(() => {
-      return Object.values(widgetConfigRecords).sort((w1, w2) => {
+    const layoutWidgets = useMemo(() => {
+      return Object.values(layoutWidgetMap).sort((w1, w2) => {
         return w1.config.index - w2.config.index;
       });
-    }, [widgetConfigRecords]);
+    }, [layoutWidgetMap]);
 
     const [rect, refGridBackground] = useClientRect<HTMLDivElement>();
     const {
@@ -71,7 +71,7 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
       scaleMode,
     );
     const boardChildren = useMemo(() => {
-      return widgetConfigs.map(item => {
+      return layoutWidgets.map(item => {
         return (
           <WidgetWrapProvider
             key={item.id}
@@ -83,11 +83,11 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
           </WidgetWrapProvider>
         );
       });
-    }, [widgetConfigs, editing, boardId]);
+    }, [layoutWidgets, editing, boardId]);
     const { gridRef } = useBoardWidthHeight();
 
     return (
-      <Wrap>
+      <Wrapper>
         <div className="container" ref={gridRef}>
           <div
             className="grid-background"
@@ -95,7 +95,7 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
             ref={refGridBackground}
           >
             <SlideBackground scale={scale} slideTranslate={slideTranslate}>
-              {widgetConfigs.length ? (
+              {layoutWidgets.length ? (
                 boardChildren
               ) : (
                 <div className="empty">
@@ -114,12 +114,12 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
             />
           )}
         </div>
-      </Wrap>
+      </Wrapper>
     );
   },
 );
 
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: flex;
   flex: 1;
   overflow-y: hidden;

@@ -21,10 +21,11 @@ import {
   VizType,
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
+import { SelectedItem } from 'app/types/ChartConfig';
 import { ChartDTO } from 'app/types/ChartDTO';
 
 export interface SharePageState {
-  needPassword?: boolean;
+  needVerify?: boolean;
   vizType?: VizType;
   shareToken: string;
   executeToken?: string;
@@ -35,6 +36,11 @@ export interface SharePageState {
   headlessBrowserRenderSign: boolean;
   pageWidthHeight: [number, number];
   shareDownloadPolling: boolean;
+  loginLoading: boolean;
+  oauth2Clients: Array<{ name: string; value: string }>;
+  availableSourceFunctions?: string[];
+  selectedItems: SelectedItem[];
+  multipleSelect: boolean;
 }
 export interface ShareVizInfo {
   vizType: VizType | undefined;
@@ -42,6 +48,7 @@ export interface ShareVizInfo {
   download: boolean;
   executeToken: Record<string, ExecuteToken>;
   subVizToken: null | Record<string, ExecuteToken>;
+  shareToken: Record<string, ExecuteToken>;
 }
 
 export interface ShareExecuteParams {
@@ -49,7 +56,5 @@ export interface ShareExecuteParams {
   password: string | undefined;
 }
 export interface ExecuteToken {
-  password: string | undefined;
-  token: string;
-  usePassword: boolean;
+  authorizedToken: string;
 }

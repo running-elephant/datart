@@ -18,6 +18,8 @@
 
 import { ChartLifecycle } from 'app/constants';
 import { IChart } from 'app/types/Chart';
+import { EVENT_ACTION_DELAY_MS } from 'globalConstants';
+import debounce from 'lodash/debounce';
 import { ValueOf } from 'types';
 import { Debugger } from 'utils/debugger';
 
@@ -33,26 +35,70 @@ type HooksEvent = ValueOf<typeof ChartLifecycle>;
 
 class ChartIFrameEventBroker {
   private _listeners: Map<HooksEvent, Function> = new Map();
+  private _eventCache: Map<
+    HooksEvent,
+    { options?: any; context?: BrokerContext }
+  > = new Map();
   private _chart?: IChart;
+  private _eventActions = {
+    [ChartLifecycle.Mounted]: this.createImmediatelyAction(
+      ChartLifecycle.Mounted,
+    ),
+    [ChartLifecycle.Updated]: this.createDebounceAction(ChartLifecycle.Updated),
+    [ChartLifecycle.Resize]: this.createDebounceAction(ChartLifecycle.Resize),
+    [ChartLifecycle.UnMount]: this.createImmediatelyAction(
+      ChartLifecycle.UnMount,
+    ),
+  };
 
-  register(c: IChart) {
+  public register(c: IChart) {
     this._chart = c;
     this.registerListener(c);
   }
 
-  subscribe(event: HooksEvent, callback?: Function) {
+  public subscribe(event: HooksEvent, callback?: Function) {
     if (!callback || this._listeners.has(event)) {
       return;
     }
     this._listeners.set(event, callback);
   }
 
-  publish(event: HooksEvent, options, context?: BrokerContext) {
+  public publish(event: HooksEvent, options, context?: BrokerContext) {
     if (!this._listeners.has(event) || !this._listeners.get(event)) {
       return;
     }
+    this._eventCache[event] = { options, context };
+    return this._eventActions[event]?.();
+  }
 
-    this.invokeEvent(event, options, context);
+  public dispose() {
+    if (this._listeners && this._listeners.size > 0) {
+      this._listeners = new Map();
+    }
+    if (this._eventCache && this._eventCache.size > 0) {
+      this._eventCache = new Map();
+    }
+    if (this._chart) {
+      this._chart = undefined;
+    }
+  }
+
+  private createImmediatelyAction(event: HooksEvent) {
+    return () => this.actionCreator(event);
+  }
+
+  private createDebounceAction(event: HooksEvent) {
+    return debounce(() => this.actionCreator(event), EVENT_ACTION_DELAY_MS, {
+      // NOTE: in order to get a better optimization, we set `EVENT_ACTION_DELAY_MS` milliseconds delay in first time
+      // see more information with lodash doc https://www.lodashjs.com/docs/lodash.debounce
+      leading: false,
+    });
+  }
+
+  private actionCreator(event: HooksEvent) {
+    const options = this._eventCache[event]?.options;
+    const context = this._eventCache[event]?.context;
+    return this.invokeEvent(event, options, context);
   }
 
   private invokeEvent(event: HooksEvent, options, context?: BrokerContext) {
@@ -61,23 +107,23 @@ class ChartIFrameEventBroker {
     }
 
     switch (event) {
-      case ChartLifecycle.MOUNTED:
+      case ChartLifecycle.Mounted:
         this._chart.state = 'mounting';
         this.safeInvoke(event, options, context);
         break;
-      case ChartLifecycle.UPDATED:
+      case ChartLifecycle.Updated:
         if (this._chart.state === 'ready') {
           this._chart.state = 'updating';
           this.safeInvoke(event, options, context);
         }
         break;
-      case ChartLifecycle.RESIZE:
+      case ChartLifecycle.Resize:
         if (this._chart.state === 'ready') {
           this._chart.state = 'updating';
           this.safeInvoke(event, options, context);
         }
         break;
-      case ChartLifecycle.UNMOUNTED:
+      case ChartLifecycle.UnMount:
         if (this._chart.state === 'ready') {
           this._chart.state = 'unmounting';
           this.safeInvoke(event, options, context);
@@ -98,21 +144,17 @@ class ChartIFrameEventBroker {
     } catch (e) {
       console.error(`ChartEventBroker | ${event} exception ----> `, e);
     } finally {
-      this._chart!.state = 'ready';
+      if (this._chart) {
+        this._chart.state = 'ready';
+      }
     }
   }
 
   private registerListener(c: IChart): void {
-    this.subscribe(ChartLifecycle.MOUNTED, c?.onMount);
-    this.subscribe(ChartLifecycle.UPDATED, c?.onUpdated);
-    this.subscribe(ChartLifecycle.RESIZE, c?.onResize);
-    this.subscribe(ChartLifecycle.UNMOUNTED, c?.onUnMount);
-  }
-
-  dispose() {
-    if (this._listeners && this._listeners.size > 0) {
-      this._listeners = new Map();
-    }
+    this.subscribe(ChartLifecycle.Mounted, c?.onMount);
+    this.subscribe(ChartLifecycle.Updated, c?.onUpdated);
+    this.subscribe(ChartLifecycle.Resize, c?.onResize);
+    this.subscribe(ChartLifecycle.UnMount, c?.onUnMount);
   }
 }
 

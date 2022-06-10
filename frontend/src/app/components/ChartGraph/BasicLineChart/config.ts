@@ -25,7 +25,8 @@ const config: ChartConfig = {
       key: 'dimension',
       required: true,
       type: 'group',
-      limit: 1,
+      limit: [1, 999],
+      drillable: true,
     },
     {
       label: 'metrics',
@@ -449,6 +450,36 @@ const config: ChartConfig = {
           key: 'panel',
           comType: 'reference',
           options: { type: 'modal' },
+        },
+      ],
+    },
+  ],
+  interactions: [
+    {
+      label: 'drillThrough.title',
+      key: 'drillThrough',
+      comType: 'checkboxModal',
+      default: true,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'drillThrough.title',
+          key: 'setting',
+          comType: 'interaction.drillThrough',
+        },
+      ],
+    },
+    {
+      label: 'viewDetail.title',
+      key: 'viewDetail',
+      comType: 'checkboxModal',
+      default: true,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'viewDetail.title',
+          key: 'setting',
+          comType: 'interaction.viewDetail',
         },
       ],
     },

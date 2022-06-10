@@ -31,6 +31,7 @@ const scopedSliceNames = [
   'view',
   'editBoard',
   'board',
+  'member',
 ];
 
 rejectedErrorHandlerMiddleware.startListening({

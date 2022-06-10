@@ -18,13 +18,17 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
+import {
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+  DownloadFileType,
+  RUNTIME_DATE_LEVEL_KEY,
+} from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import ChartManager from 'app/models/ChartManager';
-import workbenchSlice, {
-  useWorkbenchSlice,
-} from 'app/pages/ChartWorkbenchPage/slice';
+import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
 import { ChartConfigReducerActionType } from 'app/pages/ChartWorkbenchPage/slice/constant';
 import {
   aggregationSelector,
@@ -32,14 +36,17 @@ import {
   chartConfigSelector,
   currentDataViewSelector,
   datasetsSelector,
+  selectAvailableSourceFunctions,
+  selectMultipleSelect,
+  selectSelectedItems,
   shadowChartConfigSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import {
+  fetchAvailableSourceFunctionsForChart,
   initWorkbenchAction,
   refreshDatasetAction,
   updateChartAction,
   updateChartConfigAndRefreshDatasetAction,
-  updateRichTextAction,
 } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useAddViz } from 'app/pages/MainPage/pages/VizPage/hooks/useAddViz';
 import { SaveForm } from 'app/pages/MainPage/pages/VizPage/SaveForm';
@@ -48,15 +55,27 @@ import {
   useSaveFormContext,
 } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { IChart } from 'app/types/Chart';
+import { SelectedItem } from 'app/types/ChartConfig';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
+import {
+  clearRuntimeDateLevelFieldsInChartConfig,
+  getRuntimeComputedFields,
+  getRuntimeDateLevelFields,
+} from 'app/utils/chartHelper';
 import { makeDownloadDataTask } from 'app/utils/fetch';
-import { transferChartConfigs } from 'app/utils/internalChartHelper';
-import { CommonFormTypes } from 'globalConstants';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  getChartDrillOption,
+  transferChartConfigs,
+} from 'app/utils/internalChartHelper';
+import { updateBy } from 'app/utils/mutation';
+import { CommonFormTypes, KEYBOARD_EVENT_NAME } from 'globalConstants';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
-import { CloneValueDeep } from 'utils/object';
+import { LEVEL_100 } from 'styles/StyleConstants';
+import { CloneValueDeep, isEmptyArray } from 'utils/object';
 import ChartWorkbench from '../pages/ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
 import {
   DataChart,
@@ -115,13 +134,37 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const shadowChartConfig = useSelector(shadowChartConfigSelector);
   const backendChart = useSelector(backendChartSelector);
   const aggregation = useSelector(aggregationSelector);
+  const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
+  const selectedItems = useSelector(selectSelectedItems);
+  const multipleSelect = useSelector(selectMultipleSelect);
   const [chart, setChart] = useState<IChart>();
+  const drillOptionRef = useRef<IChartDrillOption>();
   const [allowQuery, setAllowQuery] = useState<boolean>(false);
   const history = useHistory();
   const addVizFn = useAddViz({
     showSaveForm: saveFormContextValue.showSaveForm,
   });
   const tg = useI18NPrefix('global');
+  const chartIframeKeyboardListener = useCallback(
+    (e: KeyboardEvent) => {
+      if (
+        (e.key === KEYBOARD_EVENT_NAME.CTRL ||
+          e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
+        e.type === 'keydown' &&
+        !multipleSelect
+      ) {
+        dispatch(actions.updateMultipleSelect(true));
+      } else if (
+        (e.key === KEYBOARD_EVENT_NAME.CTRL ||
+          e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
+        e.type === 'keyup' &&
+        multipleSelect
+      ) {
+        dispatch(actions.updateMultipleSelect(false));
+      }
+    },
+    [dispatch, multipleSelect, actions],
+  );
 
   const expensiveQuery = useMemo(() => {
     try {
@@ -192,12 +235,42 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [backendChart?.config?.chartGraphId]);
 
+  useEffect(() => {
+    if (!isEmptyArray(chartConfig?.datas) && !drillOptionRef.current) {
+      drillOptionRef.current = getChartDrillOption(chartConfig?.datas);
+    }
+  }, [chartConfig?.datas, drillOptionRef]);
+
+  useEffect(() => {
+    if (dataview?.sourceId) {
+      dispatch(fetchAvailableSourceFunctionsForChart(dataview.sourceId));
+    }
+  }, [dataview?.sourceId, dispatch]);
+
+  const handleDrillOptionChange = useCallback(
+    (option: IChartDrillOption) => {
+      drillOptionRef.current = option;
+      dispatch(refreshDatasetAction({ drillOption: option }));
+    },
+    [dispatch],
+  );
+
   const registerChartEvents = useCallback(
     chart => {
       chart?.registerMouseEvents([
         {
           name: 'click',
           callback: param => {
+            if (
+              drillOptionRef.current?.isSelectedDrill &&
+              !drillOptionRef.current.isBottomLevel
+            ) {
+              const option = drillOptionRef.current;
+              option.drillDown(param.data.rowData);
+              drillOptionRef.current = option;
+              handleDrillOptionChange?.(option);
+              return;
+            }
             if (
               param.componentType === 'table' &&
               param.seriesType === 'paging-sort-filter'
@@ -217,14 +290,58 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               return;
             }
             if (param.seriesName === 'richText') {
-              dispatch(updateRichTextAction(param.value));
+              dispatch(
+                updateChartConfigAndRefreshDatasetAction({
+                  type: ChartConfigReducerActionType.STYLE,
+                  payload: {
+                    ancestors: [1, 0],
+                    value: {
+                      ...chart.config.styles[1].rows[0],
+                      value: param.value,
+                    },
+                  },
+                  needRefresh: false,
+                  updateDrillOption: config => {
+                    return undefined;
+                  },
+                }),
+              );
               return;
+            }
+            // NOTE 透视表树形结构展开下钻特殊处理方法
+            if (param.seriesName === 'drillOptionChange') {
+              handleDrillOptionChange?.(param.value);
+              return;
+            }
+
+            // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法
+            if (param.seriesName === 'changeSelectedItems') {
+              dispatch(actions.changeSelectedItems(param.data));
+              return;
+            }
+            if (chart.selectable) {
+              const {
+                dataIndex,
+                componentIndex,
+                data,
+              }: {
+                dataIndex?: number;
+                componentIndex?: number;
+                data: { rowData: { [p: string]: any } };
+                seriesName?: string;
+              } = param;
+              dispatch(
+                actions.normalSelect({
+                  index: componentIndex + ',' + dataIndex,
+                  data,
+                } as SelectedItem),
+              );
             }
           },
         },
       ]);
     },
-    [dispatch],
+    [dispatch, handleDrillOptionChange, actions],
   );
 
   const clearDataConfig = useCallback(() => {
@@ -240,62 +357,152 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       targetChartConfig,
     );
 
-    dispatch(workbenchSlice.actions.updateShadowChartConfig({}));
+    dispatch(actions.updateCurrentDataViewComputedFields([]));
+    dispatch(actions.updateShadowChartConfig({}));
     dispatch(
-      workbenchSlice.actions.updateChartConfig({
+      actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
         payload: {
           init: finalChartConfig,
         },
       }),
     );
-  }, [dispatch, chart?.meta?.id, registerChartEvents]);
+    drillOptionRef.current = getChartDrillOption(
+      chartConfig?.datas,
+      drillOptionRef.current,
+    );
+  }, [
+    dispatch,
+    chart?.meta?.id,
+    registerChartEvents,
+    chartConfig?.datas,
+    actions,
+  ]);
 
   const handleChartChange = (c: IChart) => {
     registerChartEvents(c);
     setChart(c);
-    const targetChartConfig = CloneValueDeep(c.config);
 
-    const finalChartConfig = transferChartConfigs(
-      targetChartConfig,
-      shadowChartConfig || chartConfig,
+    const targetChartConfig = CloneValueDeep(c.config);
+    const finalChartConfig = clearRuntimeDateLevelFieldsInChartConfig(
+      transferChartConfigs(targetChartConfig, shadowChartConfig || chartConfig),
     );
+
+    const computedFields = updateBy(dataview?.computedFields || [], draft => {
+      draft.forEach((v, i) => {
+        delete draft[i][RUNTIME_DATE_LEVEL_KEY];
+      });
+    });
+
+    dispatch(actions.updateCurrentDataViewComputedFields(computedFields));
+
     dispatch(
-      workbenchSlice.actions.updateChartConfig({
+      actions.updateChartConfig({
         type: ChartConfigReducerActionType.INIT,
         payload: {
           init: finalChartConfig,
         },
       }),
     );
+    drillOptionRef.current = getChartDrillOption(
+      finalChartConfig?.datas,
+      drillOptionRef.current,
+      true,
+    );
+
+    if (selectedItems.length) {
+      dispatch(actions.changeSelectedItems([]));
+    }
     if (!expensiveQuery) {
-      dispatch(refreshDatasetAction({}));
+      dispatch(refreshDatasetAction({ drillOption: drillOptionRef?.current }));
     } else {
       setAllowQuery(true);
     }
   };
 
-  const handleChartConfigChange = (type, payload) => {
-    if (expensiveQuery) {
+  const handleChartConfigChange = useCallback(
+    (type, payload) => {
+      if (expensiveQuery) {
+        dispatch(
+          actions.updateChartConfig({
+            type,
+            payload: payload,
+          }),
+        );
+        dispatch(actions.updateShadowChartConfig(null));
+        setAllowQuery(payload.needRefresh);
+        return true;
+      }
+      // generate runtime computed fields(date level)
+      if (
+        payload.value.type === ChartDataSectionType.Group ||
+        payload.value.type === ChartDataSectionType.Mixed
+      ) {
+        const dateLevelComputedFields = payload.value.rows.filter(
+          v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
+        );
+
+        const replacedConfig = payload.value.replacedConfig;
+        const computedFields = getRuntimeComputedFields(
+          dateLevelComputedFields,
+          replacedConfig,
+          dataview?.computedFields,
+        );
+
+        if (replacedConfig) {
+          payload = updateBy(payload, draft => {
+            delete draft.value.replacedConfig;
+          });
+        }
+
+        if (
+          JSON.stringify(computedFields) !==
+          JSON.stringify(dataview?.computedFields)
+        ) {
+          dispatch(actions.updateCurrentDataViewComputedFields(computedFields));
+        }
+      }
+      if (payload.value.key === 'enableExpandRow') {
+        dispatch(
+          updateChartConfigAndRefreshDatasetAction({
+            payload: {
+              ancestors: [1],
+              value: {
+                ...chartConfig?.datas?.[1]!,
+                drillable: payload.value.value as boolean,
+              },
+            },
+            type: ChartConfigReducerActionType.DATA,
+            needRefresh: true,
+            updateDrillOption: config => {
+              drillOptionRef.current = getChartDrillOption(
+                config?.datas,
+                drillOptionRef.current,
+                true,
+              );
+              return drillOptionRef.current;
+            },
+          }),
+        );
+      }
+
       dispatch(
-        workbenchSlice.actions.updateChartConfig({
+        updateChartConfigAndRefreshDatasetAction({
           type,
-          payload: payload,
+          payload,
+          needRefresh: payload.needRefresh,
+          updateDrillOption: config => {
+            drillOptionRef.current = getChartDrillOption(
+              config?.datas,
+              drillOptionRef.current,
+            );
+            return drillOptionRef.current;
+          },
         }),
       );
-      dispatch(workbenchSlice.actions.updateShadowChartConfig(null));
-      setAllowQuery(payload.needRefresh);
-      return true;
-    }
-
-    dispatch(
-      updateChartConfigAndRefreshDatasetAction({
-        type,
-        payload,
-        needRefresh: payload.needRefresh,
-      }),
-    );
-  };
+    },
+    [dispatch, expensiveQuery, dataview, chartConfig?.datas, actions],
+  );
 
   const handleDataViewChanged = useCallback(() => {
     clearDataConfig();
@@ -447,9 +654,11 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   );
 
   const handleRefreshDataset = useCallback(async () => {
-    await dispatch(refreshDatasetAction({}));
+    await dispatch(
+      refreshDatasetAction({ drillOption: drillOptionRef?.current }),
+    );
     setAllowQuery(false);
-  }, [dispatch]);
+  }, [dispatch, drillOptionRef]);
 
   const handleCreateDownloadDataTask = useCallback(async () => {
     if (!dataview?.id) {
@@ -478,6 +687,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           },
         ],
         fileName: backendChart?.name || 'chart',
+        downloadType: DownloadFileType.Excel,
         resolve: () => {
           dispatch(actions.setChartEditorDownloadPolling(true));
         },
@@ -495,6 +705,37 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     widgetId,
   ]);
 
+  const handleDateLevelChange = (type, payload) => {
+    const rows = getRuntimeDateLevelFields(payload.value?.rows);
+    const dateLevelComputedFields = rows.filter(
+      v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
+    );
+    const replacedConfig = payload.value.replacedConfig;
+    const computedFields = getRuntimeComputedFields(
+      dateLevelComputedFields,
+      replacedConfig,
+      dataview?.computedFields,
+      true,
+    );
+
+    dispatch(actions.updateCurrentDataViewComputedFields(computedFields));
+
+    dispatch(
+      updateChartConfigAndRefreshDatasetAction({
+        type,
+        payload,
+        needRefresh: payload.needRefresh,
+        updateDrillOption: config => {
+          drillOptionRef.current = getChartDrillOption(
+            config?.datas,
+            drillOptionRef.current,
+          );
+          return drillOptionRef.current;
+        },
+      }),
+    );
+  };
+
   return (
     <StyledChartWorkbenchPage>
       <SaveFormContext.Provider value={saveFormContextValue}>
@@ -510,6 +751,9 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             },
             onChangeAggregation: handleAggregationState,
           }}
+          drillOption={drillOptionRef?.current}
+          selectedItems={selectedItems}
+          onKeyboardPress={chartIframeKeyboardListener}
           aggregation={aggregation}
           chart={chart}
           dataset={dataset}
@@ -518,11 +762,14 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           defaultViewId={defaultViewId}
           expensiveQuery={expensiveQuery}
           allowQuery={allowQuery}
+          availableSourceFunctions={availableSourceFunctions}
           onChartChange={handleChartChange}
           onChartConfigChange={handleChartConfigChange}
+          onChartDrillOptionChange={handleDrillOptionChange}
           onDataViewChange={handleDataViewChanged}
           onRefreshDataset={handleRefreshDataset}
           onCreateDownloadDataTask={handleCreateDownloadDataTask}
+          onDateLevelChange={handleDateLevelChange}
         />
         <SaveForm
           width={400}
@@ -546,7 +793,7 @@ const StyledChartWorkbenchPage = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 55;
+  z-index: ${LEVEL_100};
   display: flex;
   min-width: 0;
   min-height: 0;

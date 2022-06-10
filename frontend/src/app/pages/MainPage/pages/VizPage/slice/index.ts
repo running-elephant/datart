@@ -2,7 +2,9 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ChartDataSectionType } from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/models/ChartManager';
+import { SelectedItem } from 'app/types/ChartConfig';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import { compareSelectedItems } from 'app/utils/chartHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
@@ -24,6 +26,7 @@ import {
   saveAsDashboard,
   unarchiveViz,
   updateFilterAndFetchDataset,
+  updateGroupAndFetchDataset,
 } from './thunks';
 import { ArchivedViz, VizState, VizTab } from './types';
 import { transferChartConfig } from './utils';
@@ -46,6 +49,8 @@ export const initialState: VizState = {
   selectedTab: '',
   dataChartListLoading: false,
   chartPreviews: [],
+  selectedItems: {} as Record<string, SelectedItem[]>,
+  multipleSelect: false,
 };
 
 const slice = createSlice({
@@ -80,7 +85,7 @@ const slice = createSlice({
       );
       if (chartPreview) {
         const filterSection = chartPreview?.chartConfig?.datas?.find(
-          section => section.type === ChartDataSectionType.FILTER,
+          section => section.type === ChartDataSectionType.Filter,
         );
         if (filterSection) {
           const filterRowIndex = filterSection.rows?.findIndex(
@@ -100,10 +105,91 @@ const slice = createSlice({
         }
       }
     },
+    updateChartPreviewGroup(
+      state,
+      action: PayloadAction<{ backendChartId: string; payload }>,
+    ) {
+      const chartPreview = state.chartPreviews.find(
+        c => c.backendChartId === action.payload.backendChartId,
+      );
+
+      if (chartPreview) {
+        const groupSection = chartPreview?.chartConfig?.datas?.find(
+          section => section.type === ChartDataSectionType.Group,
+        );
+        if (groupSection) {
+          groupSection.rows = action.payload.payload?.value?.rows;
+        }
+      }
+    },
+    updateComputedFields(
+      state,
+      action: PayloadAction<{
+        backendChartId: string;
+        computedFields: any;
+      }>,
+    ) {
+      const chartPreview = state.chartPreviews.find(
+        c => c.backendChartId === action.payload.backendChartId,
+      );
+
+      if (chartPreview && chartPreview?.backendChart?.config) {
+        chartPreview.backendChart.config.computedFields =
+          action.payload.computedFields;
+      }
+    },
     clear(state) {
       Object.entries(initialState).forEach(([key, value]) => {
         state[key] = value;
       });
+    },
+
+    normalSelect(
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        backendChartId: string;
+        data: SelectedItem;
+      }>,
+    ) {
+      const index = state.selectedItems?.[payload.backendChartId]?.findIndex(
+        v => payload.data.index === v.index,
+      );
+      if (state.multipleSelect) {
+        if (index < 0) {
+          state.selectedItems[payload.backendChartId].push(payload.data);
+        } else {
+          state.selectedItems[payload.backendChartId].splice(index, 1);
+        }
+      } else {
+        if (
+          index < 0 ||
+          state.selectedItems[payload.backendChartId].length > 1
+        ) {
+          state.selectedItems[payload.backendChartId] = [payload.data];
+        } else {
+          state.selectedItems[payload.backendChartId] = [];
+        }
+      }
+    },
+    changeSelectedItems(
+      state,
+      {
+        payload,
+      }: PayloadAction<{ backendChartId: string; data: SelectedItem[] }>,
+    ) {
+      if (
+        compareSelectedItems(
+          payload.data,
+          state.selectedItems[payload.backendChartId],
+        )
+      ) {
+        state.selectedItems[payload.backendChartId] = payload.data;
+      }
+    },
+    updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
+      state.multipleSelect = payload;
     },
   },
   extraReducers: builder => {
@@ -487,7 +573,7 @@ const slice = createSlice({
     });
     builder.addCase(fetchVizChartAction.fulfilled, (state, action) => {
       const newChartDto = CloneValueDeep(action.payload.data);
-
+      const jumpFilterParams = action.payload.jumpFilterParams;
       const filterSearchParams = action.payload.filterSearchParams;
       const index = state.chartPreviews?.findIndex(
         c => c.backendChartId === newChartDto?.id,
@@ -506,6 +592,8 @@ const slice = createSlice({
                   migrateChartConfig(newChartDto?.config),
                 ),
                 filterSearchParams,
+                false,
+                jumpFilterParams,
               )
             : undefined,
         });
@@ -516,10 +604,12 @@ const slice = createSlice({
           backendChart: newChartDto,
           chartConfig: transferChartConfig(
             mergeToChartConfig(
-              prevChartPreview?.chartConfig || currentChart?.config,
+              currentChart?.config,
               migrateChartConfig(newChartDto?.config),
             ),
             filterSearchParams,
+            false,
+            jumpFilterParams,
           ),
         };
       }
@@ -530,6 +620,7 @@ const slice = createSlice({
         const index = state.chartPreviews?.findIndex(
           c => c.backendChartId === action.payload?.backendChartId,
         );
+        state.selectedItems[action.payload?.backendChartId] = [];
         if (index < 0) {
           state.chartPreviews.push({
             backendChartId: action.payload?.backendChartId,
@@ -545,6 +636,18 @@ const slice = createSlice({
       },
     );
     builder.addCase(updateFilterAndFetchDataset.fulfilled, (state, action) => {
+      const index = state.chartPreviews?.findIndex(
+        c => c.backendChartId === action.payload?.backendChartId,
+      );
+      if (index < 0) {
+        return;
+      }
+      state.chartPreviews[index] = {
+        ...state.chartPreviews[index],
+        version: uuidv4(),
+      };
+    });
+    builder.addCase(updateGroupAndFetchDataset.fulfilled, (state, action) => {
       const index = state.chartPreviews?.findIndex(
         c => c.backendChartId === action.payload?.backendChartId,
       );

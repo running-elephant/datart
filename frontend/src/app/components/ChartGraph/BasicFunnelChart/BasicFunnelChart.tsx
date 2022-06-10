@@ -23,6 +23,7 @@ import {
   ChartStyleConfig,
   LabelStyle,
   LegendStyle,
+  SelectedItem,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, {
   IChartDataSet,
@@ -31,9 +32,11 @@ import ChartDataSetDTO, {
 import {
   getAutoFunnelTopPosition,
   getColumnRenderName,
+  getDrillableRows,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
+  getSelectedItemStyles,
   getSeriesTooltips4Scatter,
   getStyles,
   toFormattedValue,
@@ -42,12 +45,14 @@ import {
 import { init } from 'echarts';
 import isEmpty from 'lodash/isEmpty';
 import Chart from '../../../models/Chart';
+import { ChartDrillOption } from '../../../models/ChartDrillOption';
 import Config from './config';
 import { Series, SeriesData } from './types';
 
 class BasicFunnelChart extends Chart {
   config = Config;
   chart: any = null;
+  selectable = true;
 
   constructor() {
     super(
@@ -72,25 +77,32 @@ class BasicFunnelChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
+    this.chart.getZr().on('click', this.clearAllSelectedItems.bind(this));
     this.mouseEvents?.forEach(event => {
       this.chart.on(event.name, event.callback);
     });
   }
 
-  onUpdated(props): void {
-    if (!props.dataset || !props.dataset.columns || !props.config) {
+  onUpdated(options, context): void {
+    if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
 
     this.chart?.clear();
-    if (!this.isMatchRequirement(props.config)) {
+    if (!this.isMatchRequirement(options.config)) {
       return;
     }
-    const newOptions = this.getOptions(props.dataset, props.config);
+    const newOptions = this.getOptions(
+      options.dataset,
+      options.config,
+      options.drillOption,
+      options.selectedItems,
+    );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
   onUnMount(): void {
+    this.chart.getZr().off('click', this.clearAllSelectedItems.bind(this));
     this.chart?.dispose();
   }
 
@@ -98,17 +110,34 @@ class BasicFunnelChart extends Chart {
     this.chart?.resize({ width: context?.width, height: context?.height });
   }
 
-  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
+  clearAllSelectedItems(e: Event) {
+    if (!e.target) {
+      this.mouseEvents
+        ?.find(v => v.name === 'click')
+        ?.callback({
+          data: [],
+          seriesName: 'changeSelectedItems',
+        } as any);
+    }
+  }
+
+  private getOptions(
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    drillOption?: ChartDrillOption,
+    selectedItems?: SelectedItem[],
+  ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
-    const groupConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
-      .flatMap(config => config.rows || []);
+    const groupConfigs: ChartDataSectionField[] = getDrillableRows(
+      dataConfigs,
+      drillOption,
+    );
     const aggregateConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
     const infoConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.INFO)
+      .filter(c => c.type === ChartDataSectionType.Info)
       .flatMap(config => config.rows || []);
 
     const chartDataSet = transformToDataSet(
@@ -137,6 +166,7 @@ class BasicFunnelChart extends Chart {
       groupConfigs,
       dataList,
       infoConfigs,
+      selectedItems,
     );
 
     return {
@@ -146,6 +176,7 @@ class BasicFunnelChart extends Chart {
         infoConfigs,
       ),
       legend: this.getLegendStyle(styleConfigs, series.sort),
+      animation: false,
       series,
     };
   }
@@ -257,6 +288,9 @@ class BasicFunnelChart extends Chart {
       type,
       orient,
       textStyle: font,
+      itemStyle: {
+        opacity: 1,
+      },
     };
   }
 
@@ -266,6 +300,7 @@ class BasicFunnelChart extends Chart {
     groupConfigs: ChartDataSectionField[],
     dataList: IChartDataSet<string>,
     infoConfigs: ChartDataSectionField[],
+    selectedItems?: SelectedItem[],
   ): Series {
     const [selectAll] = getStyles(styles, ['legend'], ['selectAll']);
     const [sort, funnelAlign, gap] = getStyles(
@@ -276,7 +311,12 @@ class BasicFunnelChart extends Chart {
 
     if (!groupConfigs.length) {
       const dc = dataList?.[0];
-      const datas: SeriesData[] = aggregateConfigs.map(aggConfig => {
+      const datas: SeriesData[] = aggregateConfigs.map((aggConfig, acIndex) => {
+        const dataItemStyle = this.getDataItemStyle(
+          aggConfig,
+          groupConfigs,
+          dc,
+        );
         return {
           ...aggConfig,
           select: selectAll,
@@ -284,7 +324,12 @@ class BasicFunnelChart extends Chart {
             .concat(infoConfigs)
             .map(config => dc?.getCell(config)),
           name: getColumnRenderName(aggConfig),
-          itemStyle: this.getDataItemStyle(aggConfig, groupConfigs, dc),
+          ...getSelectedItemStyles(
+            0,
+            acIndex,
+            selectedItems || [],
+            dataItemStyle,
+          ),
           ...getExtraSeriesRowData(dc),
           ...getExtraSeriesDataFormat(aggConfig?.format),
         };
@@ -313,8 +358,13 @@ class BasicFunnelChart extends Chart {
       };
     }
 
-    const flattenedDatas = aggregateConfigs.flatMap(aggConfig => {
-      const ormalizeSerieDatas: SeriesData[] = dataList.map(dc => {
+    const flattenedDatas = aggregateConfigs.flatMap((aggConfig, acIndex) => {
+      const ormalizeSerieDatas: SeriesData[] = dataList.map((dc, dcIndex) => {
+        const dataItemStyle = this.getDataItemStyle(
+          aggConfig,
+          groupConfigs,
+          dc,
+        );
         return {
           ...aggConfig,
           select: selectAll,
@@ -322,7 +372,12 @@ class BasicFunnelChart extends Chart {
             .concat(infoConfigs)
             .map(config => dc?.getCell(config)),
           name: groupConfigs.map(config => dc.getCell(config)).join('-'),
-          itemStyle: this.getDataItemStyle(aggConfig, groupConfigs, dc),
+          ...getSelectedItemStyles(
+            0,
+            acIndex * dataList.length + dcIndex,
+            selectedItems || [],
+            dataItemStyle,
+          ),
           ...getExtraSeriesRowData(dc),
           ...getExtraSeriesDataFormat(aggConfig?.format),
         };

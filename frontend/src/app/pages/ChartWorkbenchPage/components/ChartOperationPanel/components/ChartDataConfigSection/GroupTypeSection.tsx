@@ -42,6 +42,7 @@ const GroupTypeSection: FC<ChartDataConfigSectionProps> = memo(
           [DataViewFieldType.DATE]: [
             ChartDataSectionFieldActionType.Alias,
             ChartDataSectionFieldActionType.Sortable,
+            ChartDataSectionFieldActionType.DateLevel,
           ],
         },
       },

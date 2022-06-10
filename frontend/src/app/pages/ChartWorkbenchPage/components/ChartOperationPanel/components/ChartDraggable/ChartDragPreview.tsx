@@ -18,6 +18,7 @@
 
 import React from 'react';
 import styled from 'styled-components/macro';
+import { WHITE } from 'styles/StyleConstants';
 import ChartDraggableSourceContainer from './ChartDraggableSourceContainer';
 
 const DragPreview = ({ dataItem }) => {
@@ -45,10 +46,10 @@ const DragPreview = ({ dataItem }) => {
 export default DragPreview;
 
 const Preview = styled.div`
-  border: 1px solid #fff;
-  background: #f2f2f2;
-  width: 256px;
   position: absolute;
+  width: 256px;
+  background: #f2f2f2;
+  border: 1px solid ${WHITE};
   transform-origin: bottom left;
-  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 `;

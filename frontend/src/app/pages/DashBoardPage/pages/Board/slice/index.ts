@@ -16,20 +16,37 @@
  * limitations under the License.
  */
 import { PayloadAction } from '@reduxjs/toolkit';
+import { ChartDataSectionType } from 'app/constants';
+import {
+  adjustGroupWidgets,
+  findChildIds,
+  findParentIds,
+  moveGroupAllChildren,
+  resetGroupAllChildrenRect,
+} from 'app/pages/DashBoardPage/components/Widgets/GroupWidget/utils';
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import {
   BoardLinkFilter,
   Dashboard,
   DataChart,
+  RectConfig,
   WidgetData,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { SelectedItem } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
+import { compareSelectedItems } from 'app/utils/chartHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
 import { createWidgetInfo } from '../../../utils/widget';
-import { getChartWidgetDataAsync, getControllerOptions } from './thunk';
-import { BoardInfo, BoardState, Widget } from './types';
+import {
+  fetchAvailableSourceFunctions,
+  getChartWidgetDataAsync,
+  getControllerOptions,
+} from './thunk';
+import { BoardInfo, BoardState } from './types';
 
 export const boardInit: BoardState = {
   boardRecord: {} as Record<string, Dashboard>,
@@ -39,6 +56,9 @@ export const boardInit: BoardState = {
   widgetDataMap: {} as Record<string, WidgetData>,
   dataChartMap: {} as Record<string, DataChart>,
   viewMap: {} as Record<string, ChartDataView>, // View
+  availableSourceFunctionsMap: {} as Record<string, string[]>,
+  selectedItems: {} as Record<string, SelectedItem[]>,
+  multipleSelect: false,
 };
 // boardActions
 const boardSlice = createSlice({
@@ -117,6 +137,14 @@ const boardSlice = createSlice({
       const widget = action.payload;
       state.widgetRecord[widget.dashboardId][widget.id] = widget;
     },
+    updateWidgetConfigByKey(
+      state,
+      action: PayloadAction<{ boardId: string; wid: string; key: string; val }>,
+    ) {
+      const { boardId, wid, key, val } = action.payload;
+      if (!state.widgetRecord?.[boardId]?.[wid]?.config) return;
+      state.widgetRecord[boardId][wid].config[key] = val;
+    },
 
     updateViewMap(state, action: PayloadAction<ChartDataView[]>) {
       const views = action.payload;
@@ -137,6 +165,59 @@ const boardSlice = createSlice({
         } catch (error) {}
       });
     },
+    changeFreeWidgetRect(
+      state,
+      action: PayloadAction<{
+        boardId: string;
+        wid: string;
+        rect: RectConfig;
+      }>,
+    ) {
+      const { wid, boardId, rect: newRect } = action.payload;
+      const widgetMap = state.widgetRecord[boardId];
+      if (!widgetMap) return;
+      const targetWidget = widgetMap[wid];
+      if (!targetWidget) return;
+      const oldRect = targetWidget.config.rect;
+      const diffRect: RectConfig = {
+        x: newRect.x - oldRect.x,
+        y: newRect.y - oldRect.y,
+        width: newRect.width - oldRect.width,
+        height: newRect.height - oldRect.height,
+      };
+      targetWidget.config.rect = newRect;
+
+      if (
+        !targetWidget.parentId &&
+        targetWidget.config.originalType !== ORIGINAL_TYPE_MAP.group
+      ) {
+        return;
+      }
+
+      const hasMoveEvent = diffRect.x !== 0 || diffRect.y !== 0;
+      const hasResizeEvent = diffRect.width !== 0 || diffRect.height !== 0;
+
+      if (hasMoveEvent) {
+        // handle children : collect all children and move them
+        const childIds: string[] = [];
+        findChildIds({ widget: targetWidget, widgetMap, childIds });
+        moveGroupAllChildren({ childIds, widgetMap, diffRect });
+        // handle parents : collect all parents and resetParentsRect
+        const parentIds: string[] = [];
+        findParentIds({ widget: targetWidget, widgetMap, parentIds });
+        adjustGroupWidgets({ groupIds: parentIds, widgetMap });
+      }
+      if (hasResizeEvent) {
+        // handle children : collect all children and resize them
+        const childIds: string[] = [];
+        findChildIds({ widget: targetWidget, widgetMap, childIds });
+        resetGroupAllChildrenRect({ childIds, widgetMap, oldRect, newRect });
+        // handle parents : collect all parents and resetParentsRect
+        const parentIds: string[] = [];
+        findParentIds({ widget: targetWidget, widgetMap, parentIds });
+        adjustGroupWidgets({ groupIds: parentIds, widgetMap });
+      }
+    },
     updateFullScreenPanel(
       state,
       action: PayloadAction<{ boardId: string; itemId: string }>,
@@ -148,6 +229,7 @@ const boardSlice = createSlice({
     setWidgetData(state, action: PayloadAction<WidgetData>) {
       const widgetData = action.payload;
       state.widgetDataMap[widgetData.id] = widgetData;
+      state.selectedItems[widgetData.id] = [];
     },
     changeBoardVisible(
       state,
@@ -210,7 +292,10 @@ const boardSlice = createSlice({
       action: PayloadAction<{ boardId: string; wh: [number, number] }>,
     ) {
       const { boardId, wh } = action.payload;
-      state.boardInfoRecord[boardId].boardWidthHeight = wh;
+      let boardInfo = state.boardInfoRecord?.[boardId];
+      if (boardInfo) {
+        state.boardInfoRecord[boardId].boardWidthHeight = wh;
+      }
     },
     changeBoardPublish(
       state,
@@ -244,15 +329,15 @@ const boardSlice = createSlice({
       }>,
     ) {
       const { boardId, widgetId, errInfo, errorType } = action.payload;
+
       if (!state.widgetInfoRecord?.[boardId]?.[widgetId]) return;
-      let errorObj = state.widgetInfoRecord[boardId][widgetId].errInfo || {};
+      let widgetInfo = state.widgetInfoRecord[boardId][widgetId];
 
       if (errInfo) {
-        errorObj[errorType] = errInfo;
+        widgetInfo.errInfo[errorType] = errInfo;
       } else {
-        delete errorObj[errorType];
+        delete widgetInfo[errorType];
       }
-      state.widgetInfoRecord[boardId][widgetId].errInfo = errorObj;
     },
     resetControlWidgets(
       state,
@@ -269,6 +354,82 @@ const boardSlice = createSlice({
       originControllerWidgets.forEach(widget => {
         state.widgetRecord[boardId][widget.id] = widget;
       });
+    },
+    updateDataChartGroup(
+      state,
+      action: PayloadAction<{ id: string; payload }>,
+    ) {
+      const dataChart = state.dataChartMap[action.payload.id];
+
+      if (dataChart?.config) {
+        const index = dataChart?.config?.chartConfig?.datas?.findIndex(
+          section => section.type === ChartDataSectionType.Group,
+        );
+        if (index !== undefined && dataChart.config.chartConfig.datas) {
+          dataChart.config.chartConfig.datas[index].rows =
+            action.payload.payload?.value?.rows;
+        }
+        state.dataChartMap[action.payload.id] = dataChart;
+      }
+    },
+    updateDataChartComputedFields(
+      state,
+      action: PayloadAction<{
+        id: string;
+        computedFields: any;
+      }>,
+    ) {
+      const dataChart = state.dataChartMap[action.payload.id];
+
+      if (dataChart?.config) {
+        dataChart.config.computedFields = action.payload.computedFields;
+        state.dataChartMap[action.payload.id] = dataChart;
+      }
+    },
+
+    normalSelect(
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        wid: string;
+        data: { index: string; data: any };
+      }>,
+    ) {
+      const index = state.selectedItems[payload.wid]?.findIndex(
+        v => v.index === payload.data.index,
+      );
+      if (state.multipleSelect) {
+        if (index < 0) {
+          state.selectedItems[payload.wid].push(payload.data);
+        } else {
+          state.selectedItems[payload.wid].splice(index, 1);
+        }
+      } else {
+        if (index < 0 || state.selectedItems[payload.wid].length > 1) {
+          state.selectedItems[payload.wid] = [payload.data];
+        } else {
+          state.selectedItems[payload.wid] = [];
+        }
+      }
+    },
+    changeSelectedItems(
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        wid: string;
+        data: SelectedItem[];
+      }>,
+    ) {
+      if (
+        compareSelectedItems(payload.data, state.selectedItems[payload.wid])
+      ) {
+        state.selectedItems[payload.wid] = payload.data;
+      }
+    },
+    updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
+      state.multipleSelect = payload;
     },
   },
   extraReducers: builder => {
@@ -308,6 +469,17 @@ const boardSlice = createSlice({
         state.widgetInfoRecord[boardId][widgetId].loading = false;
       } catch (error) {}
     });
+    builder.addCase(
+      fetchAvailableSourceFunctions.fulfilled,
+      (state, action) => {
+        try {
+          if (action.payload) {
+            const { sourceId, value } = action.payload;
+            state.availableSourceFunctionsMap[sourceId] = value;
+          }
+        } catch (error) {}
+      },
+    );
   },
 });
 export const { actions: boardActions } = boardSlice;

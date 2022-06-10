@@ -20,15 +20,17 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { migrateChartConfig } from 'app/migration';
 import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailConfig';
 import ChartManager from 'app/models/ChartManager';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import { compareSelectedItems } from 'app/utils/chartHelper';
 import { transformHierarchyMeta } from 'app/utils/internalChartHelper';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { ChartConfigReducerActionType } from './constant';
 import {
+  fetchAvailableSourceFunctionsForChart,
   fetchChartAction,
   fetchDataSetAction,
   fetchDataViewsAction,
@@ -44,6 +46,8 @@ export const initState: WorkbenchState = {
   aggregation: true,
   datasetLoading: false,
   chartEditorDownloadPolling: false,
+  selectedItems: [],
+  multipleSelect: false,
 };
 
 // Reducers
@@ -107,6 +111,14 @@ const workbenchSlice = createSlice({
                 value: action.payload.value,
               }),
             };
+          case ChartConfigReducerActionType.INTERACTION:
+            return {
+              ...state,
+              interactions: updateCollectionByAction(state.interactions || [], {
+                ancestors: action.payload.ancestors!,
+                value: action.payload.value,
+              }),
+            };
           case ChartConfigReducerActionType.I18N:
             return {
               ...state,
@@ -143,6 +155,35 @@ const workbenchSlice = createSlice({
     setChartEditorDownloadPolling(state, { payload }: PayloadAction<boolean>) {
       state.chartEditorDownloadPolling = payload;
     },
+    normalSelect(state, { payload }: PayloadAction<SelectedItem>) {
+      const index = state.selectedItems?.findIndex(
+        v => v.index === payload.index,
+      );
+      if (state.multipleSelect) {
+        if (index < 0) {
+          state.selectedItems.push(payload);
+        } else {
+          state.selectedItems.splice(index, 1);
+        }
+      } else {
+        if (index < 0 || state.selectedItems.length > 1) {
+          state.selectedItems = [payload];
+        } else {
+          state.selectedItems = [];
+        }
+      }
+    },
+    changeSelectedItems(
+      state,
+      { payload }: PayloadAction<Array<SelectedItem>>,
+    ) {
+      if (compareSelectedItems(payload, state.selectedItems)) {
+        state.selectedItems = payload;
+      }
+    },
+    updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
+      state.multipleSelect = payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -169,6 +210,7 @@ const workbenchSlice = createSlice({
         state.dataset = initState.dataset;
       })
       .addCase(fetchDataSetAction.fulfilled, (state, { payload }) => {
+        state.selectedItems = [];
         state.dataset = payload as any;
         state.datasetLoading = false;
       })
@@ -191,6 +233,7 @@ const workbenchSlice = createSlice({
         }
         state.currentDataView = {
           ...payload.view,
+          variables: payload.queryVariables || [],
           computedFields: chartConfigDTO?.computedFields || [],
         };
         state.backendChart = payload;
@@ -198,7 +241,13 @@ const workbenchSlice = createSlice({
           chartConfigDTO.aggregation === undefined
             ? true
             : chartConfigDTO.aggregation;
-      });
+      })
+      .addCase(
+        fetchAvailableSourceFunctionsForChart.fulfilled,
+        (state, { payload }) => {
+          state.availableSourceFunctions = payload;
+        },
+      );
 
     builder.addCase(fetchDataSetAction.pending, (state, action) => {
       state.datasetLoading = true;

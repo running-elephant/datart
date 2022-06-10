@@ -3,7 +3,7 @@ package datart.core.data.provider.sql;
 import lombok.Data;
 
 @Data
-public class FunctionColumn {
+public class FunctionColumn implements Alias {
 
     private String alias;
 

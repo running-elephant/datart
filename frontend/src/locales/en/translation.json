@@ -1,6 +1,6 @@
 {
   "global": {
-    "copy": "copy",
+    "copy": "Copy",
     "tokenExpired": "Token expired, please log in",
     "401": "Not logged in or token expired, please log in again",
     "title": {
@@ -34,7 +34,7 @@
     "validation": {
       "required": " is required",
       "invalidPassword": "Password must be 6-20 characters",
-      "passwordNotMatch": "Password and confirm password does not match"
+      "passwordNotMatch": "Password and confirm password do not match"
     },
     "time": {
       "minute": "Minute",
@@ -67,7 +67,7 @@
     "columnCategory": {
       "uncategorized": "Uncategorized",
       "country": "Country",
-      "provinceorstate": "ProvinceOrState",
+      "provinceorstate": "Province Or State",
       "city": "City",
       "county": "County"
     }
@@ -78,6 +78,7 @@
     "login": "Log in",
     "register": "Sign up for an account",
     "forgotPassword": "Can't log in?",
+    "authTitle": "OR",
     "alreadyLoggedIn": "Your account is already logged in",
     "enter": "Click to enter",
     "switch": "Switch accounts"
@@ -182,6 +183,12 @@
       },
       "orgSettings": {
         "title": "Organization Settings"
+      },
+      "export": {
+        "title": "Export"
+      },
+      "import": {
+        "title": "Import"
       }
     },
     "background": {
@@ -332,7 +339,7 @@
           "dropdownList": "Dropdown List",
           "radioGroup": "Radio Group",
           "checkboxGroup": "Checkbox Group",
-          "multiDropdownList": "multiple Dropdown List",
+          "multiDropdownList": "Multiple Dropdown List",
           "rangeTime": "Range Time",
           "rangeTimePicker": "Range Time",
           "recommendTime": "Recommend Time",
@@ -342,7 +349,15 @@
           "value": "Value",
           "time": "Time",
           "slider": "Slider",
-          "rangeSlider": "RangeSlider"
+          "rangeSlider": "Range Slider"
+        },
+        "controllerPlaceHolders": {
+          "multiSelectController": "Select ..",
+          "numberController": "Enter a number",
+          "rangeNumberControllerMin": "Min",
+          "rangeNumberControllerMax": "Max",
+          "selectController": "Select ..",
+          "textController": "Enter text"
         },
         "controllerVisibilityTypes": {
           "hide": "Hide",
@@ -353,7 +368,7 @@
           "alignment": "Alignment",
           "left": "Left",
           "center": "Center",
-          "right": "right"
+          "right": "Right"
         }
       },
       "filter": {
@@ -368,9 +383,9 @@
         "widthOption": "Width Option",
         "columnName": "Current Edit Column Name",
         "arrange": "Arrange",
-        "hide": "hide",
-        "show": "show",
-        "condition": "condition",
+        "hide": "Hide",
+        "show": "Show",
+        "condition": "Condition",
         "min": "Min",
         "max": "Max",
         "radioType": "Style",
@@ -402,7 +417,7 @@
           "select": "Select",
           "currentTime": "Current Time",
           "startTime": "Start Time",
-          "endTime": "end Time",
+          "endTime": "End Time",
           "exact": "Exact",
           "relative": "Relative"
         },
@@ -421,7 +436,7 @@
           "tableHeaderAction": "Operation",
           "deleteRow": "Delete",
           "setDefault": "As Default",
-          "setUnDefault": "As UnDefault",
+          "setUnDefault": "As Undefault",
           "addRow": "Add Row",
           "AddFromFields": "Add Row Current Field",
           "associateField": "Associate Field",
@@ -432,14 +447,14 @@
       }
     },
     "management": {
-      "title": "widgets management",
-      "subTitle": "widgets list",
+      "title": "Widgets Management",
+      "subTitle": "Widget List",
       "table": {
         "header": {
           "name": "Name",
           "description": "Description",
           "type": "Type",
-          "action": "action"
+          "action": "Action"
         }
       }
     },
@@ -479,14 +494,21 @@
         "deleteField": "Delete",
         "editViewTip": "Going back to the view will lose the current edit state, continue?",
         "editView": "Edit View",
-        "toggleViewTip": "Switching view will clear all chart configurations, continue?"
+        "toggleViewTip": "Switching view will clear all chart configurations, continue?",
+        "AGG_DATE_YEAR": "Year",
+        "AGG_DATE_QUARTER": "Quarter",
+        "AGG_DATE_MONTH": "Month",
+        "AGG_DATE_WEEK": "Week",
+        "AGG_DATE_DAY": "Day",
+        "default": "Default"
       }
     },
     "palette": {
       "title": {
         "content": "Data",
         "design": "Style",
-        "setting": "Analysis"
+        "setting": "Analytics",
+        "interaction": "Interaction"
       },
       "style": {
         "font": "Font",
@@ -496,16 +518,16 @@
             "newName": "Enter a new header name",
             "merge": "Merge",
             "reset": "Reset",
-            "moveUp": "moveUp",
-            "moveDown": "moveDown",
+            "moveUp": "Move Up",
+            "moveDown": "Move Down",
             "columnName": "Column Name",
             "backgroundColor": "Background Color",
             "font": "Font",
             "align": {
               "title": "Align",
-              "left": "left",
-              "center": "center",
-              "right": "right"
+              "left": "Left",
+              "center": "Center",
+              "right": "Right"
             }
           }
         },
@@ -580,9 +602,6 @@
           "arial": "Arial",
           "sansSerif": "sans-serif"
         },
-        "lineHeight": {
-          "default": "Default Line Height"
-        },
         "fontWeight": {
           "normal": "Normal",
           "bold": "Bold",
@@ -594,7 +613,11 @@
           "italic": "Italic",
           "oblique": "Oblique"
         },
+        "lineHeight": {
+          "default": "Default Line Height"
+        },
         "position": {
+          "title": "Position",
           "auto": "Auto",
           "right": "Right",
           "left": "Left",
@@ -608,7 +631,11 @@
           "insideTopLeft": "Inside Top Left",
           "insideBottomLeft": "Inside Bottom Left",
           "insideTopRight": "Inside Top Right",
-          "insideBottomRight": "Inside Bottom Right"
+          "insideBottomRight": "Inside Bottom Right",
+          "leftTop": "Left Top",
+          "leftBottom": "Left Bottom",
+          "rightTop": "Right Top",
+          "rightBottom": "Right Bottom"
         }
       },
       "data": {
@@ -625,6 +652,12 @@
         "size": "Size",
         "drop": "Drag some data fields here",
         "dropCount": "Drag {{count}} fields here at least",
+        "AGG_DATE_YEAR": "Year",
+        "AGG_DATE_QUARTER": "Quarter",
+        "AGG_DATE_MONTH": "Month",
+        "AGG_DATE_WEEK": "Week",
+        "AGG_DATE_DAY": "Day",
+        "drillable": "Drillable",
         "actions": {
           "sort": {
             "title": "Sort",
@@ -671,18 +704,19 @@
         },
         "enum": {
           "actionType": {
-            "sortable": "sortable",
-            "alias": "alias",
-            "format": "format",
-            "aggregate": "aggregate",
-            "aggregateLimit": "aggregate",
-            "filter": "filter",
-            "categoryFilter": "category filter",
-            "colorize": "colorize",
-            "colorRange": "colorize",
-            "colorSingle": "colorize",
-            "size": "size",
-            "chooseTheme": "Choose theme"
+            "sortable": "Sortable",
+            "alias": "Alias",
+            "format": "Format",
+            "aggregate": "Aggregate",
+            "aggregateLimit": "Aggregate",
+            "filter": "Filter",
+            "categoryFilter": "Category Filter",
+            "colorize": "Colorize",
+            "colorRange": "Colorize",
+            "colorSingle": "Colorize",
+            "size": "Size",
+            "chooseTheme": "Choose Theme",
+            "dateLevel": "Date Level"
           }
         }
       },
@@ -720,13 +754,76 @@
           "backgroundColor": "Background Color",
           "borderStyle": "Border Style",
           "constant": "Constant",
-          "avg": "AVG",
+          "avg": "Avg",
           "max": "Max",
           "min": "Min"
         },
         "paging": {
           "title": "Common",
           "pageSize": "Limit"
+        }
+      },
+      "interaction": {
+        "drillThrough": {
+          "title": "Drill Through",
+          "rule": {
+            "title": "Rule",
+            "addRule": "+ Add New",
+            "inputUrl": "Please input url",
+            "header": {
+              "category": "Category",
+              "open": "Open",
+              "relation": "Relation",
+              "operation": "Operation",
+              "event": "Event"
+            },
+            "event": {
+              "title": "Event",
+              "left": "Left",
+              "right": "Right"
+            },
+            "category": {
+              "title": "Categroy",
+              "jumpToChart": "Jump to Chart",
+              "jumpToDashboard": "Jump to Dashboard",
+              "jumpToUrl": "Jump to URL"
+            },
+            "action": {
+              "title": "Open",
+              "redirect": "Redirect",
+              "window": "Open New",
+              "dialog": "Open Dialog"
+            },
+            "reference": {
+              "title": "Reference View"
+            },
+            "relation": {
+              "setting": "Field Relation Setting",
+              "title": "Field Relation",
+              "auto": "Auto",
+              "customize": "Customize",
+              "type": "Type",
+              "source": "Source Field/Variable",
+              "target": "Target Field/Variable",
+              "addRelation": "+ Add",
+              "field": "Field",
+              "variable": "Variable"
+            },
+            "operation": {
+              "delete": "Delete"
+            }
+          }
+        },
+        "viewDetail": {
+          "title": "View Detail",
+          "event": "Ineraction Event",
+          "leftClick": "Left Click",
+          "rightClick": "Right Click",
+          "field": "Selected Fields",
+          "all": "All",
+          "customize": "Customize",
+          "summary": "Summary",
+          "details": "Details"
         }
       },
       "present": {
@@ -772,16 +869,46 @@
         "ok": "OK",
         "cancel": "Cancel",
         "number": "No.",
-        "summary": "Summary"
+        "summary": "Summary",
+        "richText": {
+          "bold": "Bold",
+          "italic": "Italic",
+          "underline": "Underline",
+          "strike": "Strike",
+          "indent": "Indent",
+          "indentUp": "Indent Up",
+          "ordered": "Ordered",
+          "list": "List",
+          "blockquote": "Blockquote",
+          "codeBlock": "Code Block",
+          "link": "Link",
+          "image": "Image",
+          "clean": "Clean",
+          "more": "More",
+          "families": "Families",
+          "fontSize": "Font Size",
+          "background": "Background",
+          "color": "Color",
+          "align": "Align"
+        }
+      },
+      "drill": {
+        "showNextLevel": "Show Next Level",
+        "expandNextLevel": "Expand to Next Level",
+        "selectDrillOn": "\"Click to drill down\" is on",
+        "selectDrillOff": "Turn on \"Click to drill down\"",
+        "rollUp": "Roll Up"
       }
     },
     "action": {
       "common": {
+        "downloadForExcel": "Download Excel",
         "confirm": "Please Confirm",
         "ok": "OK",
         "cancel": "Cancel",
         "save": "Save"
       },
+      "downloadTaskSuccess": "Download task created successfully",
       "edit": "Edit",
       "run": "Run",
       "publish": "Publish",
@@ -800,28 +927,56 @@
         "expireDate": "Expire Date",
         "enablePassword": "Password",
         "generateLink": "Generate Link",
-        "shareLink": "Share Link",
-        "downloadData": "Download Excel"
+        "shareLink": "Share Management",
+        "downloadData": "Download Excel",
+        "downloadPDF": "Download PDF",
+        "downloadPicture": "Download Picture",
+        "NONE": "None",
+        "CODE": "Code",
+        "LOGIN": "Login",
+        "verificationMethod": "Verification method",
+        "dataPermission": "Data permission",
+        "loginUser": "User login",
+        "shareUser": "User share",
+        "userOrRole": "Assign roles/members",
+        "selectRole": "Select role",
+        "selectUser": "Select members",
+        "save": "Save"
+      },
+      "shareList": {
+        "shareList": "Share link list",
+        "shortLink": "Short link",
+        "type": "Type",
+        "expireDate": "Expiration",
+        "operate": "Operate",
+        "copy": "Copy",
+        "copySuccess": "Copy success",
+        "delete": "Delete",
+        "addLink": "Add a link",
+        "deleteError": "Failed to delete",
+        "sureDelete": "Confirm to delete?",
+        "noDataTip": "No link yet, click on the top right corner to add",
+        "Permanent": "Permanent"
       }
     },
     "board": {
       "action": {
         "dataChart": "DataChart",
-        "ImportExistingDataCharts": "Import Existing DataCharts",
+        "importExistingDataCharts": "Import Existing DataCharts",
         "createDataChartInBoard": "Create DataChart In Board",
         "searchValue": "Search keywords",
         "media": "Media",
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",
-        "iframe": "iframe",
+        "iframe": "iFrame",
         "video": "Video",
         "container": "Container",
         "tab": "Tab",
         "carousel": "Carousel",
         "controller": "Controller",
-        "toTop": "move To Top",
-        "toBottom": "move To Bottom",
+        "toTop": "Move To Top",
+        "toBottom": "Move To Bottom",
         "undo": "Undo",
         "redo": "Redo",
         "delete": "Delete",
@@ -830,7 +985,12 @@
         "deviceSwitch": "Device Switch",
         "allowOverlap": "Allow Overlap",
         "forbidOverlap": "Forbid Overlap",
-        "multiSelect": "MultiSelect"
+        "multiSelect": "MultiSelect",
+        "zoomIn": "Zoom Out",
+        "zoomOut": "Zoom In",
+        "widgetList": "Widget List",
+        "group": "Group",
+        "unGroup": "Ungroup"
       },
       "controlTypes": {
         "common": "Common",
@@ -847,36 +1007,37 @@
         "align": "Align",
         "showTitle": "Show Title",
         "position": "Position",
-        "xAxis": "xAxis",
-        "yAxis": "yAxis",
+        "xAxis": "x-Axis",
+        "yAxis": "y-Axis",
         "size": "Size",
         "px": "px",
         "width": "Width",
         "height": "Height",
+        "font": "Font",
         "background": "Background",
         "color": "Color",
         "image": "Image",
-        "uploadTip": "click to Upload",
-        "padding": "padding",
-        "paddingTop": "padding Top",
-        "paddingRight": "padding Right",
-        "paddingBottom": "padding Bottom",
-        "paddingLeft": "padding Left",
+        "uploadTip": "Click to Upload",
+        "padding": "Padding",
+        "paddingTop": "Padding Top",
+        "paddingRight": "Padding Right",
+        "paddingBottom": "Padding Bottom",
+        "paddingLeft": "Padding Left",
         "border": "Border",
         "style": "Style",
         "radius": "Radius",
         "autoUpdate": "Auto Refresh",
-        "openAutoUpdate": "open Refresh",
-        "frequency": "frequency (s)",
+        "openAutoUpdate": "Enable Auto Refresh",
+        "frequency": "Frequency (s)",
         "baseProperty": "Base Property",
         "marginTB": "Margin-TB",
         "marginLR": "Margin-LR",
         "paddingTB": "Padding-TB",
         "paddingLR": "Padding-LR",
-        "rowHeight": "rowHeight",
-        "scaleMode": "scale Mode",
-        "queryMode": "query Mode",
-        "openInitQuery": "open Init Query",
+        "rowHeight": "Row Height",
+        "scaleMode": "Scale Mode",
+        "queryMode": "Query Mode",
+        "openInitQuery": "Open Init Query",
         "cutIn": "Cut In",
         "cutOut": "Cut Out",
         "speed": "Speed",
@@ -884,7 +1045,11 @@
         "duration": "Duration (s) ",
         "delPagesTip": "Confirm to delete all selected story pages?",
         "delPageTip": "Confirm to delete this story page?",
-        "enterHere": "Enter here"
+        "enterHere": "Enter here",
+        "storyName": "Name",
+        "storyDescription": "Description",
+        "format": "Format",
+        "interval": "Interval"
       }
     },
     "widget": {
@@ -894,36 +1059,39 @@
       "widgetType": "Widget Type",
       "type": {
         "chart": "Chart",
-        "widgetChart": "privateChart",
-        "dataChart": "publicChart",
+        "widgetChart": "Private Chart",
+        "dataChart": "Public Chart",
         "media": "Media",
         "container": "Container",
         "controller": "Controller",
-        "query": "Query",
-        "reset": "Reset",
+        "queryBtn": "Query",
+        "resetBtn": "Reset",
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",
-        "iframe": "iframe",
+        "iframe": "iFrame",
         "video": "Video",
         "tab": "Tab"
       },
       "action": {
         "refresh": "Refresh",
         "fullScreen": "FullScreen",
+        "exitFullScreen": "Exit FullScreen",
         "lock": "Lock",
         "edit": "Edit",
         "delete": "Delete",
         "confirmDel": "Confirm Delete",
-        "ContainerConfirmDel": "The components within this component will also be deleted, confirm whether to delete them or not?",
+        "ContainerConfirmDel": "The components within this component will also be deleted, confirm to delete them?",
         "info": "Info",
         "makeLinkage": "Set Linkage",
         "closeLinkage": "Close Linkage",
         "makeJump": "Set Jump",
-        "closeJump": "Close Jump"
+        "closeJump": "Close Jump",
+        "group": "Group",
+        "unGroup": "Ungroup"
       },
       "tips": {
-        "unlock": "LockIng drag and click to unlock",
+        "unlock": "Locking drag and click to unlock",
         "waiting": "Waiting for loadData",
         "cancelLinkage": "Cancel Linkage",
         "canLinkage": "Click the Widget to link"
@@ -940,7 +1108,7 @@
     },
     "jump": {
       "title": "Jump Settings",
-      "mode": "Jumping mode",
+      "mode": "Jump Mode",
       "target": "Target",
       "INTERNAL": "Dashboard/DataChart",
       "URL": "URL",
@@ -961,9 +1129,9 @@
       "presentation": "Presentation",
       "folders": {
         "folderTitle": "Dashboards & Datacharts",
-        "dashboard": "Create dashboard",
-        "dataChart": "Create dataChart",
-        "folder": "Create folder",
+        "dashboard": "Create Dashboard",
+        "dataChart": "Create Datachart",
+        "folder": "Create Folder",
         "recycle": "Recycle",
         "open": "Open",
         "close": "Close",
@@ -971,38 +1139,38 @@
       },
       "storyboards": {
         "title": "Storyboards",
-        "add": "Create storyboard",
+        "add": "Create Storyboard",
         "recycle": "Recycle"
       }
     },
     "lineOptions": {
-      "none": "none",
-      "solid": "solid",
-      "dashed": "dashed",
-      "dotted": "dotted",
-      "double": "double",
-      "hidden": "hidden",
-      "ridge": "ridge",
-      "groove": "groove",
-      "inset": "inset",
-      "outset": "outset"
+      "none": "None",
+      "solid": "Solid",
+      "dashed": "Dashed",
+      "dotted": "Dotted",
+      "double": "Double",
+      "hidden": "Hidden",
+      "ridge": "Ridge",
+      "groove": "Groove",
+      "inset": "Inset",
+      "outset": "Outset"
     },
     "scaleMode": {
-      "scaleWidth": "scaleWidth",
-      "scaleHeight": "scaleHeight",
-      "scaleFull": "scaleFull",
-      "noScale": "noScale"
+      "scaleWidth": "Scale Width",
+      "scaleHeight": "Scale Height",
+      "scaleFull": "Scale Full",
+      "noScale": "No Scale"
     },
     "tips": {
       "noStartValue": "Input Start Value",
       "noEndValue": "Input End Value",
-      "endGTStartErr": "End Value should GT StartValue "
+      "endGTStartErr": "End Value should be greater than Start Value "
     },
     "control": {
       "title": "Control Title",
       "valueConfig": "Value Config",
-      "selectViewField": "Select ViewField",
-      "selectDefaultValue": "Select DefaultValue",
+      "selectViewField": "Select View Field",
+      "selectDefaultValue": "Select Default Value",
       "defaultValue": "Default Value",
       "visibility": "Visibility",
       "sqlOperator": "Sql Operator",
@@ -1057,7 +1225,7 @@
     "sqlRequired": "SQL statement cannot be empty",
     "sqlRunWraning": "SQL parsing failed, welcome to submit an issue to help us improve. ",
     "detail": "Click here for details",
-    "warningDescription": "Datart uses calcite to parse SQL statements by default; calcite has a awesome parser, but it still can't parse all the grammars of all databases. When a parsing exception occurs, datart will still send the SQL statement to the database for execution after necessary processing. If the execution is successful, we will think that the parser needs to be improved for the syntax of the SQL statement. In this case, datart will show this warning message, which is convenient for users to submit the exceptional parsing statements to github or gitee issue, and help us improve the parser.",
+    "warningDescription": "Datart uses calcite to parse SQL statements by default; calcite has an awesome parser, but it still can't parse all the grammars of all databases. When a parsing exception occurs, datart will still send the SQL statement to the database for execution after necessary processing. If the execution is successful, we will think that the parser needs to be improved for the syntax of the SQL statement. In this case, datart will show this warning message, which is convenient for users to submit the exceptional parsing statements to github or gitee issue, and help us improve the parser.",
     "close": "Close",
     "tabs": {
       "discard": "Discard",
@@ -1083,7 +1251,7 @@
       "readonlyTip": "Not editable in recycle"
     },
     "properties": {
-      "reference": "Source reference",
+      "reference": "Source Reference",
       "variable": "Variables",
       "model": "Data Model",
       "columnPermissions": "Column Permissions"
@@ -1094,7 +1262,7 @@
     },
     "variable": {
       "title": "Variables",
-      "formTitle": "variable",
+      "formTitle": "Variable",
       "add": "Create variable",
       "prefix": "[Public]",
       "suffix": "duplicate"
@@ -1107,7 +1275,8 @@
       "permission": "Column Permissions",
       "newHierarchy": "New Hierarchy",
       "addToHierarchy": "Add To Hierarchy",
-      "hierarchyName": "Hierarchy Name"
+      "hierarchyName": "Hierarchy Name",
+      "duplicateName": "Name already exists!"
     },
     "columnPermission": {
       "title": "Column permissions",
@@ -1171,24 +1340,32 @@
       "addConfig": "Add configuration",
       "editConfig": "Edit configuration",
       "duplicate": "Duplicate key",
-      "duplicateName": "Duplicate Name"
+      "duplicateName": "Duplicate name"
     }
   },
   "member": {
     "memberDetail": {
-      "title": "Member detail",
+      "titleAdd": "Add Member",
+      "titleDetail": "Member detail",
       "grantOwner": "Granted to organization owner",
       "revokeOwner": "Revoke owner",
       "remove": "Remove",
       "removeConfirm": "Remove confirm",
       "removeSuccess": "Remove successful",
+      "delete": "Delete",
+      "deleteConfirm": "Delete confirm",
+      "deleteSuccess": "Delete successful",
       "grantSuccess": "Grant successful",
       "revokeSuccess": "Revoke successful",
       "username": "Username",
       "email": "Email",
+      "password": "Password",
+      "changePassword": "Click to change password",
       "name": "Name",
+      "description": "Description",
       "roles": "Roles",
-      "assignRole": "Assign roles"
+      "assignRole": "Assign roles",
+      "createSuccess": "Member created successfully"
     },
     "roleDetail": {
       "role": "Role",
@@ -1207,7 +1384,12 @@
     "form": {
       "email": "Email",
       "search": "Search or paste the emails of invited members",
-      "needConfirm": "Need email confirmation"
+      "needConfirm": "Need email confirmation",
+      "password": "Password",
+      "username": "Username",
+      "name": "Name",
+      "description": "Description",
+      "roles": "Roles"
     },
     "sidebar": {
       "member": "Members",
@@ -1216,6 +1398,7 @@
       "inviteMember": "Invite member",
       "inviteSuccess": "The invitation email has been sent successfully",
       "invalidEmail": "Invalid email addresses",
+      "addMember": "Add Member",
       "roleTitle": "Roles",
       "addRole": "Create role"
     }

@@ -23,7 +23,10 @@ import {
   RadioChangeEvent,
   Select,
 } from 'antd';
-import { ChartDataViewFieldCategory, ControllerFacadeTypes } from 'app/constants';
+import {
+  ChartDataViewFieldCategory,
+  ControllerFacadeTypes,
+} from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   ControllerWidgetContent,
@@ -161,7 +164,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
     );
 
     return (
-      <Wrap>
+      <Wrapper>
         <h3>{t('title')}</h3>
         <Form.List
           name="relatedViews"
@@ -236,11 +239,11 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
             );
           }}
         </Form.List>
-      </Wrap>
+      </Wrapper>
     );
   },
 );
-const Wrap = styled.div`
+const Wrapper = styled.div`
   display: block;
   min-height: 150px;
 

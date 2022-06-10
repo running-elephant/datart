@@ -15,11 +15,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ChartDataViewFieldCategory } from 'app/constants';
 
 export const ChartConfigReducerActionType = {
   INIT: 'init',
   STYLE: 'style',
   DATA: 'data',
   SETTING: 'setting',
+  INTERACTION: 'interaction',
   I18N: 'i18n',
 };
+
+export const DATE_LEVELS = [
+  {
+    category: ChartDataViewFieldCategory.DateLevelComputedField,
+    expression: 'AGG_DATE_YEAR',
+    id: 'YEAR',
+    type: 'DATE',
+  },
+  {
+    category: ChartDataViewFieldCategory.DateLevelComputedField,
+    expression: 'AGG_DATE_QUARTER',
+    id: 'QUARTER',
+    type: 'DATE',
+  },
+  {
+    category: ChartDataViewFieldCategory.DateLevelComputedField,
+    expression: 'AGG_DATE_MONTH',
+    id: 'MONTH',
+    type: 'DATE',
+  },
+  {
+    category: ChartDataViewFieldCategory.DateLevelComputedField,
+    expression: 'AGG_DATE_WEEK',
+    id: 'WEEK',
+    type: 'DATE',
+  },
+  {
+    category: ChartDataViewFieldCategory.DateLevelComputedField,
+    expression: 'AGG_DATE_DAY',
+    id: 'DAY',
+    type: 'DATE',
+  },
+];

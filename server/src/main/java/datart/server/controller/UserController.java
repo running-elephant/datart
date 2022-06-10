@@ -20,7 +20,7 @@ package datart.server.controller;
 
 import datart.core.base.annotations.SkipLogin;
 import datart.core.base.consts.Const;
-import datart.core.base.consts.SystemMode;
+import datart.core.base.consts.TenantManagementMode;
 import datart.core.base.consts.UserIdentityType;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
@@ -139,7 +139,7 @@ public class UserController extends BaseController {
     @ApiOperation(value = "add User to organization")
     @PostMapping("/{orgId}/addUser")
     public ResponseData<User> addUser(@PathVariable String orgId, @Validated @RequestBody UserAddParam userAddParam) throws MessagingException, UnsupportedEncodingException {
-        if (!Application.getCurrMode().equals(SystemMode.SINGLE)) {
+        if (!Application.getCurrMode().equals(TenantManagementMode.TEAM)) {
             Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.operation.denied");
         }
         return ResponseData.success(userService.addUserToOrg(userAddParam, orgId));
@@ -148,7 +148,7 @@ public class UserController extends BaseController {
     @ApiOperation(value = "add User to organization")
     @GetMapping("/{orgId}/getUser/{userId}")
     public ResponseData<UserUpdateByIdParam> selectUserByIdFromOrg(@PathVariable String orgId, @PathVariable String userId) throws MessagingException, UnsupportedEncodingException {
-        if (!Application.getCurrMode().equals(SystemMode.SINGLE)) {
+        if (!Application.getCurrMode().equals(TenantManagementMode.TEAM)) {
             Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.operation.denied");
         }
         return ResponseData.success(userService.selectUserById(userId, orgId));
@@ -157,7 +157,7 @@ public class UserController extends BaseController {
     @ApiOperation(value = "update user from organization")
     @PutMapping(value = "/{orgId}/updateUser")
     public ResponseData<Boolean> updateUserFromOrg(@PathVariable String orgId, @Validated @RequestBody UserUpdateByIdParam userUpdateParam) {
-        if (!Application.getCurrMode().equals(SystemMode.SINGLE)) {
+        if (!Application.getCurrMode().equals(TenantManagementMode.TEAM)) {
             Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.operation.denied");
         }
         return ResponseData.success(userService.updateUserFromOrg(userUpdateParam, orgId));
@@ -166,7 +166,7 @@ public class UserController extends BaseController {
     @ApiOperation(value = "User Delete from organization")
     @DeleteMapping(value = "/{orgId}/deleteUser")
     public ResponseData<Boolean> deleteUserFromOrg(@PathVariable String orgId, @RequestParam String userId) {
-        if (!Application.getCurrMode().equals(SystemMode.SINGLE)) {
+        if (!Application.getCurrMode().equals(TenantManagementMode.TEAM)) {
             Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.operation.denied");
         }
         return ResponseData.success(userService.deleteUserFromOrg(orgId, userId));

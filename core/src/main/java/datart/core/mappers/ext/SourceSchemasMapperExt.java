@@ -19,6 +19,7 @@ package datart.core.mappers.ext;
 
 import datart.core.entity.SourceSchemas;
 import datart.core.mappers.SourceSchemasMapper;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -32,5 +33,8 @@ public interface SourceSchemasMapperExt extends SourceSchemasMapper {
 
     @Select("SELECT update_time FROM source_schemas where source_id = #{sourceId}")
     Date selectUpdateDateBySource(String sourceId);
+
+    @Delete("DELETE FROM source_schemas where source_id = #{sourceId}")
+    int deleteBySource(String sourceId);
 
 }

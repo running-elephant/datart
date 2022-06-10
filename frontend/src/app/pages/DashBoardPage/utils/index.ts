@@ -19,39 +19,38 @@
 import {
   ChartDataSectionType,
   ChartDataViewFieldCategory,
-  DataViewFieldType,
   ControllerFacadeTypes,
+  DataViewFieldType,
   TimeFilterValueCategory,
 } from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
-import {
-  RelatedView,
-  WidgetType,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
-import { getTime } from 'app/utils/time';
+import { getStyles } from 'app/utils/chartHelper';
+import { getTime, splitRangerDateFilters } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
-import i18next from 'i18next';
 import moment from 'moment';
 import { CloneValueDeep } from 'utils/object';
+import { boardDrillManager } from '../components/BoardDrillManager/BoardDrillManager';
 import { BOARD_FILE_IMG_PREFIX } from '../constants';
 import {
   BoardLinkFilter,
   ControllerWidgetContent,
   DataChart,
   getDataOption,
-  Widget,
   WidgetInfo,
 } from '../pages/Board/slice/types';
 import {
   ControllerConfig,
   ControllerDate,
 } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
+import { Widget } from '../types/widgetTypes';
 import { DateControllerTypes } from './../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
@@ -93,11 +92,13 @@ export const getRGBAColor = color => {
   }
 };
 
-export const getDataChartRequestParams = (
-  dataChart: DataChart,
-  view: ChartDataView,
-  option,
-) => {
+export const getDataChartRequestParams = (obj: {
+  dataChart: DataChart;
+  view: ChartDataView;
+  drillOption?: ChartDrillOption;
+  option;
+}) => {
+  const { dataChart, view, option, drillOption } = obj;
   const migratedChartConfig = migrateChartConfig(
     CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
   );
@@ -117,6 +118,7 @@ export const getDataChartRequestParams = (
   );
   let requestParams = builder
     .addExtraSorters((option?.sorters as any) || [])
+    .addDrillOption(drillOption)
     .build();
   return requestParams;
 };
@@ -124,7 +126,7 @@ export const getDataChartRequestParams = (
 export const getChartGroupColumns = (datas: ChartDataConfig[] | undefined) => {
   const chartDataConfigs = datas;
   if (!chartDataConfigs) return [] as ChartDataSectionField[];
-  const groupTypes = [ChartDataSectionType.GROUP, ChartDataSectionType.COLOR];
+  const groupTypes = [ChartDataSectionType.Group, ChartDataSectionType.Color];
   const groupColumns = chartDataConfigs.reduce<ChartDataSectionField[]>(
     (acc, cur) => {
       if (!cur.rows) {
@@ -133,7 +135,7 @@ export const getChartGroupColumns = (datas: ChartDataConfig[] | undefined) => {
       if (groupTypes.includes(cur.type as any)) {
         return acc.concat(cur.rows);
       }
-      if (cur.type === ChartDataSectionType.MIXED) {
+      if (cur.type === ChartDataSectionType.Mixed) {
         return acc.concat(
           cur.rows.filter(({ type }) => type === DataViewFieldType.STRING),
         );
@@ -297,6 +299,7 @@ export const getControllerDateValues = (obj: {
     timeValues[0] = time.format(TIME_FORMATTER);
   }
   if (endTime) {
+    //end 精确时间
     if (endTime.relativeOrExact === TimeFilterValueCategory.Exact) {
       timeValues[1] = endTime.exactValue as string;
       if (obj.execute) {
@@ -308,8 +311,10 @@ export const getControllerDateValues = (obj: {
         timeValues[1] = endTime.exactValue as string;
       }
     } else {
+      // end 相对时间
       const { amount, unit, direction } = endTime.relativeValue!;
-      const time = getTime(+(direction + amount), unit)(unit, false);
+      const isStart = !obj.execute;
+      const time = getTime(+(direction + amount), unit)(unit, isStart);
       timeValues[1] = time.format(TIME_FORMATTER);
     }
   }
@@ -357,6 +362,7 @@ export const getChartWidgetRequestParams = (obj: {
   viewMap: Record<string, ChartDataView>;
   dataChartMap: Record<string, DataChart>;
   boardLinkFilters?: BoardLinkFilter[];
+  drillOption: ChartDrillOption | undefined;
 }) => {
   const {
     widgetId,
@@ -366,6 +372,7 @@ export const getChartWidgetRequestParams = (obj: {
     dataChartMap,
     option,
     boardLinkFilters,
+    drillOption,
   } = obj;
   if (!widgetId) return null;
   const curWidget = widgetMap[widgetId];
@@ -382,12 +389,12 @@ export const getChartWidgetRequestParams = (obj: {
 
   const chartDataView = viewMap[dataChart?.viewId];
 
-  let requestParams = getDataChartRequestParams(
+  let requestParams = getDataChartRequestParams({
     dataChart,
-    chartDataView,
-    option,
-  );
-
+    view: chartDataView,
+    option: option,
+    drillOption,
+  });
   const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
     chartWidget: curWidget,
     widgetMap,
@@ -412,17 +419,16 @@ export const getChartWidgetRequestParams = (obj: {
         aggOperator: null,
         column: getLinkedColumn(link.linkerWidgetId, triggerWidget),
         sqlOperator: FilterSqlOperator.In,
-        values: [
-          { value: triggerValue, valueType: DataViewFieldType.STRING },
-        ],
+        values: [{ value: triggerValue, valueType: DataViewFieldType.STRING }],
       };
       linkFilters.push(filter);
     });
     requestParams.filters = requestParams.filters.concat(linkFilters);
   }
 
-  // filter 去重
-  requestParams.filters = getDistinctFiltersByColumn(requestParams.filters);
+  // splitRangerDateFilters
+  requestParams.filters = splitRangerDateFilters(requestParams.filters);
+
   // 变量
   if (variableParams) {
     requestParams.params = variableParams;
@@ -454,6 +460,11 @@ export const getBoardChartRequests = (params: {
   const chartRequest = chartWidgetIds
     .map(widgetId => {
       const isWidget = widgetMap[widgetId].datachartId.indexOf('widget') !== -1;
+      const boardId = widgetMap[widgetId].dashboardId;
+      const drillOption = boardDrillManager.getWidgetDrill({
+        bid: boardId,
+        wid: widgetId,
+      });
       return {
         ...getChartWidgetRequestParams({
           widgetId,
@@ -462,6 +473,7 @@ export const getBoardChartRequests = (params: {
           option: undefined,
           widgetInfo: undefined,
           dataChartMap,
+          drillOption,
         }),
         ...{
           vizName: widgetMap[widgetId].config.name,
@@ -497,48 +509,4 @@ export const getDistinctFiltersByColumn = (
   return Object.values(filterMap);
 };
 
-export const getDefaultWidgetName = (
-  widgetType: WidgetType,
-  subWidgetType: string,
-  index: number,
-) => {
-  const typeTitle = i18next.t(`viz.widget.type.${widgetType}`);
-  const subTypeTitle = i18next.t(`viz.widget.type.${subWidgetType}`);
-  const widgetTypes: WidgetType[] = [
-    'chart',
-    'container',
-    'controller',
-    'media',
-  ];
-  const BtnTypes: WidgetType[] = ['query', 'reset'];
-  if (widgetTypes.includes(widgetType)) {
-    return `${subTypeTitle}_${index}`;
-  } else if (BtnTypes.includes(widgetType)) {
-    return `${typeTitle}`;
-  } else {
-    return `xxx${index}`;
-  }
-};
-export const checkLinkAndJumpErr = (
-  widgetData: Widget,
-  folderListIds?: string[],
-): string => {
-  let error: string = '';
-
-  if (
-    widgetData?.config?.linkageConfig?.open &&
-    widgetData?.relations?.length === 0
-  ) {
-    error = 'viz.linkage.linkageError';
-    return error;
-  }
-  if (
-    widgetData?.config?.jumpConfig?.open &&
-    widgetData?.config?.jumpConfig?.targetType === 'INTERNAL' &&
-    !folderListIds?.includes(widgetData.config.jumpConfig.target.relId)
-  ) {
-    error = 'viz.jump.jumpError';
-  }
-
-  return error;
-};
+export const getJsonConfigs = getStyles;

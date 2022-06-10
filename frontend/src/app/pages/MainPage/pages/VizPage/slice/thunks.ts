@@ -25,8 +25,10 @@ import {
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { getLoggedInUserPermissions } from 'app/pages/MainPage/slice/thunks';
 import { StoryBoard } from 'app/pages/StoryBoardPage/slice/types';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
-import { convertToChartDTO } from 'app/utils/ChartDtoHelper';
+import { convertToChartDto } from 'app/utils/ChartDtoHelper';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
 import { request2 } from 'utils/request';
@@ -234,12 +236,20 @@ export const initChartPreviewData = createAsyncThunk<
     backendChartId: string;
     orgId: string;
     filterSearchParams?: FilterSearchParams;
+    jumpFilterParams?: ChartDataRequestFilter[];
   }
 >(
   'viz/initChartPreviewData',
-  async ({ backendChartId, filterSearchParams }, thunkAPI) => {
+  async (
+    { backendChartId, filterSearchParams, jumpFilterParams },
+    thunkAPI,
+  ) => {
     await thunkAPI.dispatch(
-      fetchVizChartAction({ backendChartId, filterSearchParams }),
+      fetchVizChartAction({
+        backendChartId,
+        filterSearchParams,
+        jumpFilterParams,
+      }),
     );
     if (backendChartId) {
       await thunkAPI.dispatch(
@@ -254,7 +264,11 @@ export const initChartPreviewData = createAsyncThunk<
 
 export const fetchVizChartAction = createAsyncThunk(
   'viz/fetchVizChartAction',
-  async (arg: { backendChartId; filterSearchParams?: FilterSearchParams }) => {
+  async (arg: {
+    backendChartId;
+    filterSearchParams?: FilterSearchParams;
+    jumpFilterParams?: ChartDataRequestFilter[];
+  }) => {
     const response = await request2<
       Omit<ChartDTO, 'config'> & { config: string }
     >({
@@ -262,8 +276,9 @@ export const fetchVizChartAction = createAsyncThunk(
       url: `viz/datacharts/${arg.backendChartId}`,
     });
     return {
-      data: convertToChartDTO(response?.data),
+      data: convertToChartDto(response?.data),
       filterSearchParams: arg.filterSearchParams,
+      jumpFilterParams: arg.jumpFilterParams,
     };
   },
 );
@@ -275,6 +290,7 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
       backendChartId: string;
       pageInfo?;
       sorter?: { column: string; operator: string; aggOperator?: string };
+      drillOption?: IChartDrillOption;
     },
     thunkAPI,
   ) => {
@@ -297,6 +313,7 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
     );
     const data = builder
       .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
+      .addDrillOption(arg?.drillOption)
       .build();
 
     const response = await request2({
@@ -314,7 +331,12 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
 export const updateFilterAndFetchDataset = createAsyncThunk(
   'viz/updateFilterAndFetchDataset',
   async (
-    arg: { backendChartId: string; chartPreview?: ChartPreview; payload },
+    arg: {
+      backendChartId: string;
+      chartPreview?: ChartPreview;
+      payload;
+      drillOption?: IChartDrillOption;
+    },
     thunkAPI,
   ) => {
     await thunkAPI.dispatch(
@@ -326,6 +348,36 @@ export const updateFilterAndFetchDataset = createAsyncThunk(
     await thunkAPI.dispatch(
       fetchDataSetByPreviewChartAction({
         backendChartId: arg.backendChartId,
+        drillOption: arg.drillOption,
+      }),
+    );
+
+    return {
+      backendChartId: arg.backendChartId,
+    };
+  },
+);
+
+export const updateGroupAndFetchDataset = createAsyncThunk(
+  'viz/updateGroupAndFetchDataset',
+  async (
+    arg: {
+      backendChartId: string;
+      payload;
+      drillOption?: IChartDrillOption;
+    },
+    thunkAPI,
+  ) => {
+    await thunkAPI.dispatch(
+      vizActions.updateChartPreviewGroup({
+        backendChartId: arg.backendChartId,
+        payload: arg.payload,
+      }),
+    );
+    await thunkAPI.dispatch(
+      fetchDataSetByPreviewChartAction({
+        backendChartId: arg.backendChartId,
+        drillOption: arg.drillOption,
       }),
     );
 

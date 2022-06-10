@@ -1,7 +1,7 @@
 import { LoadingOutlined } from '@ant-design/icons';
 import { cloneElement, ReactElement } from 'react';
 import styled, { createGlobalStyle } from 'styled-components/macro';
-import { STICKY_LEVEL } from 'styles/StyleConstants';
+import { LEVEL_1 } from 'styles/StyleConstants';
 
 interface LoadingMaskProps {
   loading: boolean;
@@ -28,7 +28,7 @@ const SpinWrapper = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: ${STICKY_LEVEL};
+  z-index: ${LEVEL_1};
   display: flex;
   align-items: center;
   justify-content: center;

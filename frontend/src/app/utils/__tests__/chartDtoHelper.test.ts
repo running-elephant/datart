@@ -19,7 +19,7 @@
 import {
   buildUpdateChartRequest,
   convertToChartConfigDTO,
-  convertToChartDTO,
+  convertToChartDto,
   mergeToChartConfig,
 } from '../ChartDtoHelper';
 
@@ -31,11 +31,19 @@ describe('chartDtoHelper Test', () => {
         model: JSON.stringify({ name: 2 }),
       },
     };
-    const dto = convertToChartDTO(data);
+    const dto = convertToChartDto(data);
     expect(dto).toEqual({
       config: { id: 1 },
       view: {
-        meta: [{ id: 'name', category: 'field' }],
+        meta: [
+          {
+            name: 'name',
+            id: 'name',
+            subType: undefined,
+            category: 'field',
+            children: undefined,
+          },
+        ],
       },
     });
   });
@@ -48,6 +56,7 @@ describe('chartDtoHelper Test', () => {
         datas: [],
         styles: [],
         settings: [],
+        interactions: [],
       },
       graphId: 2,
       index: 0,
@@ -64,7 +73,7 @@ describe('chartDtoHelper Test', () => {
       name: 'a-chart',
       viewId: '1',
       config:
-        '{"aggregation":"AVG","chartConfig":{"datas":[],"styles":[],"settings":[]},"chartGraphId":2,"computedFields":[]}',
+        '{"aggregation":"AVG","chartConfig":{"datas":[],"styles":[],"settings":[],"interactions":[]},"chartGraphId":2,"computedFields":[]}',
       permissions: [],
       avatar: 2,
     });

@@ -409,25 +409,31 @@ const DataReferencePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           mergeDefaultToValue(CloneValueDeep(referencePanelConfig)),
         );
         onChange?.(ancestors, newData);
-      } else {
-        // add default component template if not exist, the template should only keep/save in component self
-        if (!data.rows[0].template) {
-          const newData = updateBy(data, draft => {
-            draft['rows'] = mergeChartStyleConfigs(
-              CloneValueDeep(referencePanelConfig),
-              data?.rows,
-            );
-          });
-          onChange?.(ancestors, newData);
-        }
       }
     }, [ancestors, data, onChange]);
+
+    const assemblyDynamicFunctions = (data: ChartStyleConfig) => {
+      return updateBy(data, draft => {
+        draft.rows?.map(tab => {
+          tab.rows = tab.rows?.map(panel => {
+            // reset template value with extra functions and reset rows
+            const template = CloneValueDeep(referencePanelConfig[0].template);
+            tab.template = template;
+            template.key = panel.key;
+            template.label = panel.label;
+            const rowPanels = mergeChartStyleConfigs([template], [panel]);
+            return rowPanels?.[0]!;
+          });
+          return tab;
+        });
+      });
+    };
 
     return (
       <StyledDataReferencePanel>
         <GroupLayout
           ancestors={ancestors}
-          data={data}
+          data={assemblyDynamicFunctions(data)}
           translate={t}
           dataConfigs={dataConfigs}
           onChange={onChange}
