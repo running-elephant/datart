@@ -29,7 +29,7 @@ export type VizType = {
   relType: string;
 };
 
-export type I18nTransator = {
+export type I18nTranslator = {
   translate: (title: string, disablePrefix?: boolean, options?: any) => string;
 };
 

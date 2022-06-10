@@ -28,7 +28,7 @@ import {
 import JumpToChart from './JumpToChart';
 import JumpToDashboard from './JumpToDashboard';
 import JumpToUrl from './JumpToUrl';
-import { I18nTransator, InteractionRule, VizType } from './types';
+import { I18nTranslator, InteractionRule, VizType } from './types';
 
 const RuleList: FC<
   {
@@ -37,7 +37,7 @@ const RuleList: FC<
     dataview?: ChartDataView;
     onRuleChange: (id, prop, value) => void;
     onDeleteRule: (id) => void;
-  } & I18nTransator
+  } & I18nTranslator
 > = ({ rules, vizs, dataview, onRuleChange, onDeleteRule, translate: t }) => {
   const columns: ColumnsType<InteractionRule> = [
     {

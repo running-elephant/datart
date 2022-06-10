@@ -21,7 +21,7 @@ import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo, useState } from 'react';
 import { InteractionFieldRelation } from '../../constants';
 import ControllerList from './ControllerList';
-import { I18nTransator, JumpToDashboardRule, VizType } from './types';
+import { I18nTranslator, JumpToDashboardRule, VizType } from './types';
 
 const JumpToDashboard: FC<
   {
@@ -29,7 +29,7 @@ const JumpToDashboard: FC<
     dataview?: ChartDataView;
     value?: JumpToDashboardRule;
     onValueChange: (value) => void;
-  } & I18nTransator
+  } & I18nTranslator
 > = memo(({ vizs, dataview, value, onValueChange, translate: t }) => {
   const [relations, setRelations] = useState(
     value?.[InteractionFieldRelation.Customize] || [],
