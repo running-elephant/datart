@@ -33,15 +33,17 @@ const StyledWrapper = styled.div`
   min-height: 0;
   /* overflow-y: auto; */
 `;
+
 export const WidgetConfigPanel: FC<{
   configs: ChartStyleConfig[];
   dataConfigs?: ChartDataConfig[];
+  context?: any;
   onChange: (
     ancestors: number[],
     config: ChartStyleConfig,
     needRefresh?: boolean,
   ) => void;
-}> = memo(({ configs, dataConfigs, onChange }) => {
+}> = memo(({ configs, dataConfigs, context, onChange }) => {
   const widget = useContext(WidgetContext);
 
   const widgetTypeId = widget.config.originalType;
@@ -53,6 +55,7 @@ export const WidgetConfigPanel: FC<{
         <BoardConfigCollapse
           dataConfigs={dataConfigs}
           configs={configs || []}
+          context={context}
           onChange={onChange}
         />
       </StyledWrapper>
@@ -64,12 +67,13 @@ export const WidgetConfigPanel: FC<{
 export const BoardConfigCollapse: FC<{
   configs: ChartStyleConfig[];
   dataConfigs?: ChartDataConfig[];
+  context?: any;
   onChange: (
     ancestors: number[],
     config: ChartStyleConfig,
     needRefresh?: boolean,
   ) => void;
-}> = memo(({ configs, dataConfigs, onChange }) => {
+}> = memo(({ configs, dataConfigs, context, onChange }) => {
   const t = useI18NPrefix();
   return (
     <Collapse className="datart-config-panel" ghost>
@@ -92,6 +96,7 @@ export const BoardConfigCollapse: FC<{
                   data={c}
                   translate={t}
                   dataConfigs={[]}
+                  context={context}
                   onChange={onChange}
                 />
               </Collapse.Panel>
@@ -103,6 +108,7 @@ export const BoardConfigCollapse: FC<{
                 data={c}
                 translate={t}
                 dataConfigs={dataConfigs}
+                context={context}
                 onChange={onChange}
               />
             );

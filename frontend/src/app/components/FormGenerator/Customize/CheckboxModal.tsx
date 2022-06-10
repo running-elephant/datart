@@ -33,6 +33,7 @@ const CheckboxModal: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     translate: t = title => title,
     data,
     dataConfigs,
+    context,
     onChange,
   }) => {
     const [openStateModal, contextHolder] = useStateModal({});
@@ -70,6 +71,7 @@ const CheckboxModal: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           data={data}
           translate={t}
           dataConfigs={dataConfigs}
+          context={context}
           onChange={onChangeEvent}
         />
       );

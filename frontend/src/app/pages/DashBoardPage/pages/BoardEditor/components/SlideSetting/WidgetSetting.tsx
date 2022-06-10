@@ -18,9 +18,11 @@
 import { Tabs } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
+import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useContext, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectViewMap } from '../../../Board/slice/selector';
 import { editBoardStackActions } from '../../slice';
 import { showRectAction } from '../../slice/actions/actions';
 import { NameSet } from './SettingItem/NameSet';
@@ -36,6 +38,8 @@ export const WidgetSetting: FC = memo(() => {
   const dispatch = useDispatch();
   const showRect = dispatch(showRectAction(widget)) as unknown as boolean;
   const [currentTab, setCurrentTab] = useState<string>('style');
+  const vizs = useSelector(selectVizs);
+  const viewMap = useSelector(selectViewMap);
 
   const handleStyleConfigChange = (
     ancestors: number[],
@@ -84,6 +88,10 @@ export const WidgetSetting: FC = memo(() => {
           <WidgetConfigPanel
             configs={widget.config.customConfig.interactions || []}
             onChange={handleInteractionConfigChange}
+            context={{
+              vizs,
+              dataview: viewMap?.[widget?.config?.content?.dataChart?.viewId],
+            }}
             dataConfigs={
               widget.config.content?.dataChart?.config?.chartConfig?.datas
             }
