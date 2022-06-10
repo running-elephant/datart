@@ -183,6 +183,12 @@
       },
       "orgSettings": {
         "title": "Organization Settings"
+      },
+      "export": {
+        "title": "Export"
+      },
+      "import": {
+        "title": "Import"
       }
     },
     "background": {

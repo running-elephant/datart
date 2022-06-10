@@ -183,6 +183,12 @@
       },
       "orgSettings": {
         "title": "组织设置"
+      },
+      "export": {
+        "title": "数据导出"
+      },
+      "import": {
+        "title": "数据导入"
       }
     },
     "background": {
