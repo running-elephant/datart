@@ -75,7 +75,7 @@ const ChartComputedFieldSettingPanel: FC<{
       AggregateFieldActionType.Max,
       AggregateFieldActionType.Min,
       AggregateFieldActionType.Sum,
-    ].some(agg => exp?.includes(agg));
+    ].some(agg => new RegExp(`${agg}\\(`, 'i').test(exp || ''));
   };
 
   const handleChange = (field: ChartDataViewMeta) => {
