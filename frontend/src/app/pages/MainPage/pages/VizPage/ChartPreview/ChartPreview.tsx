@@ -468,8 +468,8 @@ const ChartPreviewBoard: FC<{
                 return;
               }
               if (
-                param.componentType === 'table' &&
-                param.seriesType === 'paging-sort-filter'
+                param.chartType === 'table' &&
+                param.interactionType === 'paging-sort-filter'
               ) {
                 dispatch(
                   fetchDataSetByPreviewChartAction({
@@ -488,20 +488,22 @@ const ChartPreviewBoard: FC<{
               }
 
               // NOTE 透视表树形结构展开下钻特殊处理方法
-              if (param.seriesName === 'drillOptionChange') {
-                handleDrillOptionChange?.(param.value);
+              if (
+                param.chartType === 'pivotSheet' &&
+                param.interactionType === 'drilled'
+              ) {
+                handleDrillOptionChange?.(param.drillOption);
                 return;
               }
 
-              // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法
-              if (param.seriesName === 'changeSelectedItems') {
+              // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法 其他图标取消选中时调取
+              if (param.interactionType === 'selected') {
                 dispatch(
                   vizAction.changeSelectedItems({
                     backendChartId,
-                    data: param.data,
+                    data: param.selectedItems,
                   }),
                 );
-                return;
               }
 
               if (chart.selectable) {

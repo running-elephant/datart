@@ -40,6 +40,7 @@ import {
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
+  compareSelectedItems,
   getColumnRenderName,
   getStyles,
   toFormattedValue,
@@ -70,6 +71,7 @@ class PivotSheetChart extends ReactChart {
   hierarchyCollapse: boolean = true;
   drillLevel: number = 0;
   collapsedRows: Record<string, boolean> = {};
+  selectedItems: SelectedItem[] = [];
 
   constructor() {
     super(AntVS2Wrapper, {
@@ -128,7 +130,7 @@ class PivotSheetChart extends ReactChart {
         options: {},
       };
     }
-    if (!selectedItems?.length && this.chart) {
+    if (!selectedItems?.length && this.selectedItems.length && this.chart) {
       this.chart.interaction.reset();
     }
 
@@ -225,7 +227,6 @@ class PivotSheetChart extends ReactChart {
         this.collapsedRows = {};
       }
     }
-
     return {
       options: {
         hierarchyType: enableExpandRow ? 'tree' : 'grid',
@@ -360,11 +361,11 @@ class PivotSheetChart extends ReactChart {
       },
       onSelected: (cells: DataCell[]) => {
         const state = this.chart?.interaction.getState();
-        this.changeSelectedItems(state?.interactedCells || []);
+        this.changeSelectedItems(state?.interactedCells || [], chartDataSet);
       },
       onDataCellClick: (cell: TargetCellInfo) => {
         const state = this.chart?.interaction.getState();
-        this.changeSelectedItems(state?.interactedCells || []);
+        this.changeSelectedItems(state?.interactedCells || [], chartDataSet);
       },
       getSpreadSheet: getSpreadSheet => {
         this.chart = getSpreadSheet;
@@ -372,7 +373,10 @@ class PivotSheetChart extends ReactChart {
     };
   }
 
-  changeSelectedItems(cells: S2CellType<ViewMeta>[]) {
+  changeSelectedItems(
+    cells: S2CellType<ViewMeta>[],
+    chartDataSet: IChartDataSet<string>,
+  ) {
     const selectedItems: SelectedItem[] = [];
     cells.forEach(v => {
       const { rowIndex, data } = v.getMeta();
@@ -380,25 +384,22 @@ class PivotSheetChart extends ReactChart {
         selectedItems.push({
           index: rowIndex,
           data: {
-            rowData: Object.keys(data)?.reduce((pre, cur) => {
-              if (cur === '$$extra$$' || cur === '$$value$$') {
-                return pre;
-              }
-              return {
-                ...pre,
-                [cur]: data[cur],
-              };
-            }, {}),
+            rowData: chartDataSet[rowIndex].convertToCaseSensitiveObject(),
           },
         });
       }
     });
-    this.mouseEvents
-      ?.find(v => v.name === 'click')
-      ?.callback({
-        data: selectedItems,
-        seriesName: 'changeSelectedItems',
-      } as any);
+    if (compareSelectedItems(selectedItems, this.selectedItems)) {
+      this.selectedItems = selectedItems;
+      this.mouseEvents
+        ?.find(v => v.name === 'click')
+        ?.callback(
+          this.createEventParams({
+            selectedItems,
+            interactionType: 'selected',
+          }),
+        );
+    }
   }
 
   changeDrillConfig(
@@ -436,11 +437,28 @@ class PivotSheetChart extends ReactChart {
     this.drillLevel = level;
     this.mouseEvents
       ?.find(v => v.name === 'click')
-      ?.callback({
-        seriesName: 'drillOptionChange',
-        value: drillOption,
-      });
+      ?.callback(
+        this.createEventParams({
+          interactionType: 'drilled',
+          drillOption,
+        }),
+      );
   }
+
+  private createEventParams = params => ({
+    type: 'click',
+    chartType: 'pivotSheet',
+    interactionType: undefined,
+    componentType: undefined,
+    data: undefined,
+    dataIndex: undefined,
+    event: undefined,
+    name: undefined,
+    seriesName: undefined,
+    seriesType: undefined,
+    value: undefined,
+    ...params,
+  });
 
   getCollapsedRows(
     rowSectionConfigRows: ChartDataSectionField[],

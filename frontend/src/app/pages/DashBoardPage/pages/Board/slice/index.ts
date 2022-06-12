@@ -36,7 +36,6 @@ import {
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { SelectedItem } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
-import { compareSelectedItems } from 'app/utils/chartHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
@@ -422,11 +421,7 @@ const boardSlice = createSlice({
         data: SelectedItem[];
       }>,
     ) {
-      if (
-        compareSelectedItems(payload.data, state.selectedItems[payload.wid])
-      ) {
-        state.selectedItems[payload.wid] = payload.data;
-      }
+      state.selectedItems[payload.wid] = payload.data;
     },
     updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
       state.multipleSelect = payload;

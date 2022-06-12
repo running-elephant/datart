@@ -4,7 +4,6 @@ import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/models/ChartManager';
 import { SelectedItem } from 'app/types/ChartConfig';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
-import { compareSelectedItems } from 'app/utils/chartHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
@@ -179,14 +178,7 @@ const slice = createSlice({
         payload,
       }: PayloadAction<{ backendChartId: string; data: SelectedItem[] }>,
     ) {
-      if (
-        compareSelectedItems(
-          payload.data,
-          state.selectedItems[payload.backendChartId],
-        )
-      ) {
-        state.selectedItems[payload.backendChartId] = payload.data;
-      }
+      state.selectedItems[payload.backendChartId] = payload.data;
     },
     updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
       state.multipleSelect = payload;
