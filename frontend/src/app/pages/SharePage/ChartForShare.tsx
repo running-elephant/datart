@@ -172,13 +172,19 @@ const ChartForShare: FC<{
               dataIndex,
               componentIndex,
               data,
-            }: { dataIndex: number; componentIndex: number; data: any } = param;
-            dispatch(
-              shareActions.normalSelect({
-                index: componentIndex + ',' + dataIndex,
-                data,
-              }),
-            );
+            }: {
+              dataIndex?: number;
+              componentIndex?: number;
+              data?: { rowData: { [p: string]: any } };
+            } = param;
+            if (data?.rowData) {
+              dispatch(
+                shareActions.normalSelect({
+                  index: componentIndex + ',' + dataIndex,
+                  data,
+                }),
+              );
+            }
           }
         },
       },

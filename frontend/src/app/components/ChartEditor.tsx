@@ -332,15 +332,16 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               }: {
                 dataIndex?: number;
                 componentIndex?: number;
-                data: { rowData: { [p: string]: any } };
-                seriesName?: string;
+                data?: { rowData: { [p: string]: any } };
               } = param;
-              dispatch(
-                actions.normalSelect({
-                  index: componentIndex + ',' + dataIndex,
-                  data,
-                } as SelectedItem),
-              );
+              if (data?.rowData) {
+                dispatch(
+                  actions.normalSelect({
+                    index: componentIndex + ',' + dataIndex,
+                    data,
+                  } as SelectedItem),
+                );
+              }
             }
           },
         },

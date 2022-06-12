@@ -420,17 +420,22 @@ const ChartPreviewBoard: FC<{
                   dataIndex,
                   componentIndex,
                   data,
-                }: { dataIndex: number; componentIndex?: number; data: any } =
-                  param;
-                dispatch(
-                  vizAction.normalSelect({
-                    backendChartId,
-                    data: {
-                      index: componentIndex + ',' + dataIndex,
-                      data,
-                    },
-                  }),
-                );
+                }: {
+                  dataIndex?: number;
+                  componentIndex?: number;
+                  data?: { rowData: { [p: string]: any } };
+                } = param;
+                if (data?.rowData) {
+                  dispatch(
+                    vizAction.normalSelect({
+                      backendChartId,
+                      data: {
+                        index: componentIndex + ',' + dataIndex,
+                        data,
+                      },
+                    }),
+                  );
+                }
               }
             },
           },

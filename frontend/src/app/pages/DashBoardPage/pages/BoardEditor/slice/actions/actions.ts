@@ -564,7 +564,12 @@ export const selectedItemChange = (
     dataIndex,
     componentIndex,
     data,
-  }: { dataIndex: number; componentIndex?: number; data: any } = params;
+  }: {
+    dataIndex?: number;
+    componentIndex?: number;
+    data?: { rowData: { [p: string]: any } };
+  } = params;
+  if (!data?.rowData) return;
   const option = {
     wid,
     data: {
