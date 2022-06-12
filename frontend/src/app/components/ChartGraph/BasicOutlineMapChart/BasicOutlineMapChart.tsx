@@ -60,6 +60,7 @@ class BasicOutlineMapChart extends ReactChart {
   protected isNormalGeoMap = false;
   private geoMap;
   private option: any = null;
+  private containerId: string = '';
 
   constructor(props?) {
     super(BasicMapWrapper, {
@@ -79,9 +80,15 @@ class BasicOutlineMapChart extends ReactChart {
     if (options.containerId === undefined || !context.document) {
       return;
     }
+    this.containerId = options.containerId;
     this.adapter?.mounted(
       context.document.getElementById(options.containerId),
-      options,
+      {
+        options,
+        containerId: this.containerId,
+        mouseEvents: this.mouseEvents,
+        isNormalGeoMap: this.isNormalGeoMap,
+      },
       context,
     );
   }
@@ -95,8 +102,13 @@ class BasicOutlineMapChart extends ReactChart {
       return;
     }
     this.option = {
-      option: this.getOptions(props.dataset, props.config, props.selectedItems),
-      containerId: props.containerId,
+      options: props,
+      mapOption: this.getOptions(
+        props.dataset,
+        props.config,
+        props.selectedItems,
+      ),
+      containerId: this.containerId,
       mouseEvents: this.mouseEvents,
       isNormalGeoMap: this.isNormalGeoMap,
     };
@@ -104,7 +116,6 @@ class BasicOutlineMapChart extends ReactChart {
   }
 
   onResize(opt: any, context): void {
-    this.option.context = context;
     this.adapter?.updated(this.option, context);
   }
 

@@ -17,7 +17,6 @@
  */
 
 import {
-  RectConfig,
   Relation,
   RelationConfigType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -70,27 +69,11 @@ export const controlWidgetTpl = (opt: WidgetCreateProps) => {
   widget.config.content = opt.content;
   widget.config.name = opt.name || '';
   widget.config.type = 'controller';
-  if (opt.boardType === 'auto') {
-    const rect: RectConfig = {
-      x: 0,
-      y: 0,
-      width: 3,
-      height: 1,
-    };
-    widget.config.rect = rect;
-    widget.config.mRect = { ...rect, width: 6 };
-  } else {
-    const rect: RectConfig = {
-      x: 0,
-      y: 0,
-      width: 300,
-      height: 32,
-    };
-    widget.config.rect = rect;
-  }
+
   widget.config.content = opt.content; //controller
   widget.config.customConfig.props = [{ ...initTitleTpl() }];
-
+  widget.config.pRect.width = 4;
+  widget.config.pRect.height = 1;
   return widget;
 };
 export const getCanLinkControlWidgets = (widgets: Widget[]) => {

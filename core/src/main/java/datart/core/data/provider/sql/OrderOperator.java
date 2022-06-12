@@ -19,11 +19,11 @@
 package datart.core.data.provider.sql;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class OrderOperator implements Operator {
-
-    private String column;
+@EqualsAndHashCode(callSuper = true)
+public class OrderOperator extends ColumnOperator {
 
     private AggregateOperator.SqlOperator aggOperator;
 
@@ -37,7 +37,7 @@ public class OrderOperator implements Operator {
     @Override
     public String toString() {
         return "OrderOperator{" +
-                "column='" + column + '\'' +
+                "column='" + getColumnKey() + '\'' +
                 ", operator=" + operator +
                 '}';
     }

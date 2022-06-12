@@ -230,7 +230,7 @@ export const ChartStyleSectionComponentType = {
   TIMER_FORMAT: 'timerFormat',
   CHECKBOX_MODAL: 'checkboxModal',
   INTERACTION_DRILL_THROUGH_PANEL: 'interaction.drillThrough',
-  INTERACTION_VIEW_DATA_PANEL: 'interaction.viewData',
+  INTERACTION_VIEW_DETAIL_PANEL: 'interaction.viewDetail',
 };
 
 export enum DownloadFileType {

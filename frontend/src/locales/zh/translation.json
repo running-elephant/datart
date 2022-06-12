@@ -183,6 +183,12 @@
       },
       "orgSettings": {
         "title": "组织设置"
+      },
+      "export": {
+        "title": "数据导出"
+      },
+      "import": {
+        "title": "数据导入"
       }
     },
     "background": {
@@ -760,17 +766,21 @@
       "interaction": {
         "drillThrough": {
           "title": "跳转设置",
-          "event": "交互事件",
-          "leftClick": "左键单击",
-          "rightClick": "右键菜单",
           "rule": {
             "title": "规则设置",
             "addRule": "+ 点击新建",
+            "inputUrl": "请输入URL",
             "header": {
               "category": "类型",
               "open": "打开方式",
               "relation": "关系设置",
-              "operation": "操作"
+              "operation": "操作",
+              "event": "交互事件"
+            },
+            "event": {
+              "title": "交互事件",
+              "left": "左键单击",
+              "right": "右键菜单"
             },
             "category": {
               "title": "类型",
@@ -804,8 +814,16 @@
             }
           }
         },
-        "viewData": {
-          "title": "查看数据"
+        "viewDetail": {
+          "title": "查看数据",
+          "event": "交互事件",
+          "leftClick": "左键单击",
+          "rightClick": "右键菜单",
+          "field": "选择字段",
+          "all": "全部",
+          "customize": "自定义",
+          "summary": "汇总",
+          "details": "明细"
         }
       },
       "present": {
@@ -1258,7 +1276,8 @@
       "newHierarchy": "新建层次结构",
       "addToHierarchy": "添加到层次结构",
       "hierarchyName": "层级名称",
-      "createComputedFields": "新建计算字段"
+      "createComputedFields": "新建计算字段",
+      "duplicateName": "名称重复，请检查!"
     },
     "columnPermission": {
       "title": "列权限",

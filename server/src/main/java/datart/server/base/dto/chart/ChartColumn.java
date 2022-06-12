@@ -34,7 +34,7 @@ public class ChartColumn {
 
     private JSONObject format;
 
-    private int leafNum = 1;
+    private int leafNum = 0;
 
     private int deepNum = 1;
 

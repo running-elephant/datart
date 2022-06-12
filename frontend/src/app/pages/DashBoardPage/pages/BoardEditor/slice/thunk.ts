@@ -4,7 +4,7 @@ import {
   boardDrillManager,
   EDIT_PREFIX,
 } from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
-import widgetManagerInstance from 'app/pages/DashBoardPage/components/WidgetManager';
+import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/components/Widgets/ControllerWidget/config';
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
@@ -273,16 +273,14 @@ export const addDataChartWidgets = createAsyncThunk<
     const widgets = chartIds.map(dcId => {
       const dataChart = dataChartMap[dcId];
       const viewIds = dataChart.viewId ? [dataChart.viewId] : [];
-      let widget = widgetManagerInstance
-        .toolkit(ORIGINAL_TYPE_MAP.linkedChart)
-        .create({
-          boardType: boardType,
-          datachartId: dcId,
-          relations: [],
-          name: dataChart.name,
-          content: dataChartMap[dcId],
-          viewIds: viewIds,
-        });
+      let widget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.linkedChart).create({
+        boardType: boardType,
+        datachartId: dcId,
+        relations: [],
+        name: dataChart.name,
+        content: dataChartMap[dcId],
+        viewIds: viewIds,
+      });
       return widget;
     });
     dispatch(addWidgetsToEditBoard(widgets));
@@ -315,16 +313,14 @@ export const addWrapChartWidget = createAsyncThunk<
     const viewViews = view ? [view] : [];
     dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
-    let widget = widgetManagerInstance
-      .toolkit(ORIGINAL_TYPE_MAP.ownedChart)
-      .create({
-        boardType: boardType,
-        datachartId: chartId,
-        relations: [],
-        name: dataChart.name,
-        content: dataChart,
-        viewIds: view?.id ? [view.id] : [],
-      });
+    let widget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.ownedChart).create({
+      boardType: boardType,
+      datachartId: chartId,
+      relations: [],
+      name: dataChart.name,
+      content: dataChart,
+      viewIds: view?.id ? [view.id] : [],
+    });
     dispatch(addWidgetsToEditBoard([widget]));
     dispatch(addVariablesToBoard(view?.variables));
 
@@ -359,7 +355,7 @@ export const addChartWidget = createAsyncThunk<
         ? ORIGINAL_TYPE_MAP.linkedChart
         : ORIGINAL_TYPE_MAP.ownedChart;
 
-    let widget = widgetManagerInstance.toolkit(originalType).create({
+    let widget = widgetManager.toolkit(originalType).create({
       boardType: boardType,
       datachartId: chartId,
       relations: [],
@@ -522,8 +518,9 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
       );
     } finally {
       dispatch(
-        editWidgetSelectedItemsActions.clearSelectedItemsInEditor({
+        editWidgetSelectedItemsActions.changeSelectedItemsInEditor({
           wid: widgetId,
+          data: [],
         }),
       );
     }

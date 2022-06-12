@@ -284,3 +284,12 @@ export async function fetchDataChart(id: string) {
   const response = await request2<ChartDTO>(`/viz/datacharts/${id}`);
   return convertToChartDto(response?.data);
 }
+
+export async function fetchChartDataSet(requestParams) {
+  const { data } = await request2<ChartDataSetDTO>({
+    method: 'POST',
+    url: `data-provider/execute`,
+    data: requestParams,
+  });
+  return data;
+}

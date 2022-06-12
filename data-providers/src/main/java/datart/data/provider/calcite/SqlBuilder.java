@@ -21,10 +21,10 @@ package datart.data.provider.calcite;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ExecuteParam;
+import datart.core.data.provider.SelectColumn;
 import datart.core.data.provider.SingleTypedValue;
 import datart.core.data.provider.sql.*;
 import datart.data.provider.calcite.custom.CustomSqlBetweenOperator;
-import datart.data.provider.jdbc.SqlSplitter;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlBetweenOperator;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
@@ -39,9 +39,7 @@ import java.util.stream.Collectors;
 
 public class SqlBuilder {
 
-    private static final String T = "DATART_VTABLE";
-
-    private String srcSql;
+    private SqlNode from;
 
     private final Map<String, SqlNode> functionColumnMap = new HashMap<>();
 
@@ -53,6 +51,10 @@ public class SqlBuilder {
 
     private boolean quoteIdentifiers;
 
+    private boolean addNamePrefix;
+
+    private String namePrefix;
+
     private SqlBuilder() {
     }
 
@@ -61,13 +63,18 @@ public class SqlBuilder {
     }
 
 
-    public SqlBuilder withBaseSql(String sql) {
-        if (StringUtils.isNotBlank(sql)) {
-            sql = removeEndDelimiter(sql);
-        }
-        sql = StringUtils.appendIfMissing(sql, " ", " ");
-        sql = StringUtils.prependIfMissing(sql, " ", " ");
-        this.srcSql = sql;
+    public SqlBuilder withAddDefaultNamePrefix(boolean addDefaultNamePrefix) {
+        this.addNamePrefix = addDefaultNamePrefix;
+        return this;
+    }
+
+    public SqlBuilder withDefaultNamePrefix(SqlBuilder defaultNamePrefix) {
+        this.namePrefix = namePrefix;
+        return this;
+    }
+
+    public SqlBuilder withFrom(SqlNode from) {
+        this.from = from;
         return this;
     }
 
@@ -103,7 +110,7 @@ public class SqlBuilder {
     public String build() throws SqlParseException {
 
         if (executeParam == null) {
-            return srcSql;
+            return SqlNodeUtils.toSql(from, dialect, quoteIdentifiers);
         }
 
         final SqlNodeList selectList = new SqlNodeList(SqlParserPos.ZERO);
@@ -116,22 +123,20 @@ public class SqlBuilder {
 
         SqlNode having = null;
 
-        HashMap<String, String> columnAlias = new HashMap<>();
-
         //function columns
         if (!CollectionUtils.isEmpty(executeParam.getFunctionColumns())) {
             for (FunctionColumn functionColumn : executeParam.getFunctionColumns()) {
-                functionColumnMap.put(functionColumn.getAlias(), parseSnippet(functionColumn, T, true));
+                functionColumnMap.put(functionColumn.getAlias(), parseSnippet(functionColumn, namePrefix, true));
             }
         }
 
         //columns
         if (!CollectionUtils.isEmpty(executeParam.getColumns())) {
-            for (String column : executeParam.getColumns()) {
-                if (functionColumnMap.containsKey(column)) {
-                    selectList.add(SqlNodeUtils.createAliasNode(functionColumnMap.get(column), column));
+            for (SelectColumn column : executeParam.getColumns()) {
+                if (functionColumnMap.containsKey(column.getColumnKey())) {
+                    selectList.add(SqlNodeUtils.createAliasNode(functionColumnMap.get(column.getColumnKey()), column.getAlias()));
                 } else {
-                    selectList.add(SqlNodeUtils.createAliasNode(SqlNodeUtils.createSqlIdentifier(column, T), column));
+                    selectList.add(SqlNodeUtils.createAliasNode(SqlNodeUtils.createSqlIdentifier(column.getColumnNames(addNamePrefix, namePrefix)), column.getAlias()));
                 }
             }
         }
@@ -160,11 +165,11 @@ public class SqlBuilder {
         if (!CollectionUtils.isEmpty(executeParam.getGroups())) {
             for (GroupByOperator group : executeParam.getGroups()) {
                 SqlNode sqlNode = null;
-                if (functionColumnMap.containsKey(group.getColumn())) {
-                    sqlNode = functionColumnMap.get(group.getColumn());
-                    selectList.add(SqlNodeUtils.createAliasNode(sqlNode, group.getColumn()));
+                if (functionColumnMap.containsKey(group.getColumnKey())) {
+                    sqlNode = functionColumnMap.get(group.getColumnKey());
+                    selectList.add(SqlNodeUtils.createAliasNode(sqlNode, group.getAlias()));
                 } else {
-                    sqlNode = SqlNodeUtils.createSqlIdentifier(group.getColumn(), T);
+                    sqlNode = SqlNodeUtils.createSqlIdentifier(group.getColumnNames(addNamePrefix, namePrefix));
                     selectList.add(sqlNode);
                 }
                 groupBy.add(sqlNode);
@@ -174,21 +179,19 @@ public class SqlBuilder {
         // aggregators
         if (!CollectionUtils.isEmpty(executeParam.getAggregators())) {
             for (AggregateOperator aggregator : executeParam.getAggregators()) {
-                String alias;
-                if (aggregator.getSqlOperator() == null) {
-                    alias = aggregator.getColumn();
-                } else {
-                    alias = aggregator.getSqlOperator().name() + "(" + aggregator.getColumn() + ")";
-                }
-                columnAlias.put(aggregator.getColumn(), alias);
-                selectList.add(createAggNode(aggregator.getSqlOperator(), aggregator.getColumn(), alias));
+//                String alias = aggregator.getAlias() == null ? aggregator.getColumnKey() : aggregator.getAlias();
+//                if (aggregator.getSqlOperator() == null) {
+//                    alias = getColumnKey(aggregator.getColumnNames());
+//                } else {
+//                    alias = aggregator.getSqlOperator().name() + "(" + aggregator.getColumnNames() + ")";
+//                }
+                selectList.add(createAggNode(aggregator));
             }
         }
 
         //order
         if (!CollectionUtils.isEmpty(executeParam.getOrders())) {
             for (OrderOperator order : executeParam.getOrders()) {
-//                String columnName = columnAlias.containsKey(order.getColumn()) ? columnAlias.get(order.getColumn()) : order.getColumn();
                 orderBy.add(createOrderNode(order));
             }
         }
@@ -201,9 +204,9 @@ public class SqlBuilder {
             }
         }
 
-        SqlNode from = new SqlBasicCall(SqlStdOperatorTable.AS
-                , new SqlNode[]{new SqlFragment("(" + srcSql + ")"), new SqlIdentifier(T, SqlParserPos.ZERO.withQuoting(true))}
-                , SqlParserPos.ZERO);
+//        SqlNode from = new SqlBasicCall(SqlStdOperatorTable.AS
+//                , new SqlNode[]{new SqlFragment("(" + srcSql + ")"), new SqlIdentifier(T, SqlParserPos.ZERO.withQuoting(true))}
+//                , SqlParserPos.ZERO);
 
         if (selectList.size() == 0) {
             selectList.add(SqlIdentifier.star(SqlParserPos.ZERO));
@@ -231,19 +234,19 @@ public class SqlBuilder {
         return SqlNodeUtils.toSql(sqlSelect, this.dialect, quoteIdentifiers);
     }
 
-    private SqlNode createAggNode(AggregateOperator.SqlOperator sqlOperator, String column, String alias) {
-        SqlOperator sqlOp = mappingSqlAggFunction(sqlOperator);
+    private SqlNode createAggNode(AggregateOperator operator) {
         SqlNode sqlNode;
-        if (functionColumnMap.containsKey(column)) {
-            sqlNode = functionColumnMap.get(column);
+        String columnKey = operator.getColumnKey();
+        if (functionColumnMap.containsKey(columnKey)) {
+            sqlNode = functionColumnMap.get(columnKey);
         } else {
-            sqlNode = SqlNodeUtils.createSqlIdentifier(column, T);
+            sqlNode = SqlNodeUtils.createSqlIdentifier(operator.getColumnNames(addNamePrefix, namePrefix));
         }
-
+        SqlOperator sqlOp = mappingSqlAggFunction(operator.getSqlOperator());
         SqlNode aggCall;
-        if (sqlOperator == null) {
+        if (operator.getSqlOperator() == null) {
             aggCall = sqlNode;
-        } else if (sqlOperator == AggregateOperator.SqlOperator.COUNT_DISTINCT) {
+        } else if (operator.getSqlOperator() == AggregateOperator.SqlOperator.COUNT_DISTINCT) {
             aggCall = SqlNodeUtils
                     .createSqlBasicCall(sqlOp, Collections.singletonList(sqlNode),
                             SqlLiteral.createSymbol(SqlSelectKeyword.DISTINCT, SqlParserPos.ZERO));
@@ -252,8 +255,8 @@ public class SqlBuilder {
                     .createSqlBasicCall(sqlOp, Collections.singletonList(sqlNode));
         }
 
-        if (StringUtils.isNotBlank(alias)) {
-            return SqlNodeUtils.createAliasNode(aggCall, alias);
+        if (StringUtils.isNotBlank(operator.getAlias())) {
+            return SqlNodeUtils.createAliasNode(aggCall, operator.getAlias());
         } else {
             return aggCall;
         }
@@ -261,13 +264,13 @@ public class SqlBuilder {
 
     private SqlNode createOrderNode(OrderOperator operator) {
         SqlNode sqlNode;
-        if (functionColumnMap.containsKey(operator.getColumn())) {
-            sqlNode = functionColumnMap.get(operator.getColumn());
+        if (functionColumnMap.containsKey(operator.getColumnKey())) {
+            sqlNode = functionColumnMap.get(operator.getColumnKey());
         } else {
-            if (operator.getColumn() == null) {
+            if (operator.getColumnKey() == null) {
                 sqlNode = SqlLiteral.createNull(SqlParserPos.ZERO);
             } else {
-                sqlNode = SqlNodeUtils.createSqlIdentifier(operator.getColumn(), T);
+                sqlNode = SqlNodeUtils.createSqlIdentifier(operator.getColumnNames(addNamePrefix, namePrefix));
             }
         }
         if (operator.getAggOperator() != null) {
@@ -285,13 +288,14 @@ public class SqlBuilder {
 
 
     private SqlNode filterSqlNode(FilterOperator operator) {
-
-        //
         SqlNode column;
         if (operator.getAggOperator() != null) {
-            column = createAggNode(operator.getAggOperator(), operator.getColumn(), null);
+            AggregateOperator agg = new AggregateOperator();
+            agg.setSqlOperator(operator.getAggOperator());
+            agg.setColumn(operator.getColumnNames(addNamePrefix, namePrefix));
+            column = createAggNode(agg);
         } else {
-            column = SqlNodeUtils.createSqlIdentifier(operator.getColumn());
+            column = SqlNodeUtils.createSqlIdentifier(operator.getColumnNames(addNamePrefix, namePrefix));
         }
         List<SqlNode> nodes = Arrays.stream(operator.getValues())
                 .map(this::convertTypedValue)
@@ -431,7 +435,7 @@ public class SqlBuilder {
         if (typedValue.getValueType().equals(ValueType.SNIPPET) && functionColumnMap.containsKey(typedValue.getValue().toString())) {
             return functionColumnMap.get(typedValue.getValue().toString());
         }
-        return SqlNodeUtils.createSqlNode(typedValue, T);
+        return SqlNodeUtils.createSqlNode(typedValue);
     }
 
     private SqlAggFunction mappingSqlAggFunction(AggregateOperator.SqlOperator sqlOperator) {
@@ -454,20 +458,6 @@ public class SqlBuilder {
                 Exceptions.msg("message.provider.sql.type.unsupported", sqlOperator.name());
         }
         return null;
-    }
-
-    private String removeEndDelimiter(String sql) {
-        if (StringUtils.isBlank(sql)) {
-            return sql;
-        }
-        sql = sql.trim();
-        sql = StringUtils.removeEnd(sql, SqlSplitter.DEFAULT_DELIMITER + "");
-        sql = sql.trim();
-        if (sql.endsWith(SqlSplitter.DEFAULT_DELIMITER + "")) {
-            return removeEndDelimiter(sql);
-        } else {
-            return sql;
-        }
     }
 
 }

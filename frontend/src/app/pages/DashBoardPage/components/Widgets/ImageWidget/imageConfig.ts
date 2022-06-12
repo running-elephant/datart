@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import type {
   WidgetActionListItem,
   widgetActionType,
@@ -29,14 +28,10 @@ import {
   initBorderTpl,
   initPaddingTpl,
   initTitleTpl,
-  initWidgetEditActionTpl,
   initWidgetName,
-  initWidgetViewActionTpl,
   PaddingI18N,
   TitleI18N,
-  WidgetEditActionI18N,
   widgetTpl,
-  WidgetViewActionI18N,
 } from '../../WidgetManager/utils/init';
 
 const NameI18N = {
@@ -51,22 +46,14 @@ export const widgetMeta: WidgetMeta = {
   linkable: false,
   singleton: false,
   canFullScreen: true,
-  viewAction: {
-    ...initWidgetViewActionTpl(),
-  },
-  editAction: {
-    ...initWidgetEditActionTpl(),
-  },
+
   i18ns: [
     {
       lang: 'zh-CN',
       translation: {
         desc: 'img',
         widgetName: NameI18N.zh,
-        action: {
-          ...WidgetViewActionI18N.zh,
-          ...WidgetEditActionI18N.zh,
-        },
+        action: {},
         title: TitleI18N.zh,
         background: { backgroundGroup: '图片编辑' },
         padding: PaddingI18N.zh,
@@ -79,10 +66,7 @@ export const widgetMeta: WidgetMeta = {
       translation: {
         desc: 'img',
         widgetName: NameI18N.en,
-        action: {
-          ...WidgetViewActionI18N.en,
-          ...WidgetEditActionI18N.en,
-        },
+        action: {},
         title: TitleI18N.en,
         background: { backgroundGroup: 'Image Setting' },
         padding: PaddingI18N.en,
@@ -105,22 +89,6 @@ export const widgetToolkit: ImageToolkit = {
     widget.config.originalType = widgetMeta.originalType;
     widget.config.type = 'media';
     widget.config.name = opt.name || '';
-
-    const rect: RectConfig = {
-      x: 0,
-      y: 0,
-      width: 500,
-      height: 400,
-    };
-    widget.config.rect = rect;
-    const pRect: RectConfig = {
-      x: 0,
-      y: 0,
-      width: 6,
-      height: 9,
-    };
-    widget.config.pRect = pRect;
-    widget.config.mRect = undefined;
 
     widget.config.customConfig.props = [
       { ...initBackgroundTpl() },

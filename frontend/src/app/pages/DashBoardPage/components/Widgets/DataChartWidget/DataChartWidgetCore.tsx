@@ -48,6 +48,7 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
 import {
+  changeSelectedItems,
   multipleSelectChange,
   selectedItemChange,
 } from '../../../pages/BoardEditor/slice/actions/actions';
@@ -186,22 +187,29 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                 if (!params) {
                   return;
                 }
-                if (drillOptionRef.current?.isSelectedDrill) {
+                if (
+                  drillOptionRef.current?.isSelectedDrill &&
+                  !drillOptionRef.current.isBottomLevel
+                ) {
                   const option = drillOptionRef.current;
                   option.drillDown(params.data.rowData);
                   handleDrillOptionChange(option);
                   return;
                 }
+
+                // NOTE 透视表树形结构展开下钻特殊处理方法
                 if (params.seriesName === 'drillOptionChange') {
                   handleDrillOptionChange?.(params.value);
                   return;
                 }
-                if (
-                  !drillOptionRef.current?.isSelectedDrill &&
-                  chartInstance.selectable
-                ) {
-                  selectedItemChange(dispatch, renderMode, params, wid);
+
+                // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法
+                if (params.seriesName === 'changeSelectedItems') {
+                  changeSelectedItems(dispatch, renderMode, params.data, wid);
                   return;
+                }
+                if (chartInstance.selectable) {
+                  selectedItemChange(dispatch, renderMode, params, wid);
                 }
                 onWidgetChartClick(widgetRef.current, params);
               },

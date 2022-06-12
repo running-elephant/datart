@@ -233,74 +233,6 @@ export const initBorderTpl = () => {
   };
   return borderTpl;
 };
-export const initWidgetViewActionTpl = () => {
-  return {
-    fullScreen: {
-      label: 'action.fullScreen',
-      icon: 'fullscreen', //svg TODO
-      key: 'fullScreen',
-    },
-    refresh: {
-      label: 'action.refresh',
-      icon: 'refresh',
-      key: 'refresh',
-    },
-  };
-};
-
-export const WidgetViewActionI18N = {
-  zh: {
-    fullScreen: '全屏',
-    refresh: '刷新',
-  },
-  en: {
-    fullScreen: 'Full Screen',
-    refresh: 'Refresh',
-  },
-};
-export const initWidgetEditActionTpl = () => {
-  const widgetEditActionTpl = {
-    copy: {
-      label: 'action.copy',
-      icon: 'copy',
-      key: 'copy',
-    },
-    delete: {
-      label: 'action.delete',
-      icon: 'delete',
-      key: 'delete',
-      danger: true,
-    },
-    lock: {
-      label: 'action.lock',
-      icon: 'lock',
-      key: 'lock',
-    },
-    unLock: {
-      label: 'action.unLock',
-      icon: 'unLock',
-      key: 'unLock',
-    },
-  };
-  return widgetEditActionTpl;
-};
-
-export const WidgetEditActionI18N = {
-  zh: {
-    copy: '复制',
-    paste: '粘贴',
-    delete: '删除',
-    lock: '锁定',
-    unLock: '解锁',
-  },
-  en: {
-    copy: 'Copy',
-    paste: 'Paste',
-    delete: 'Delete',
-    lock: 'Lock',
-    unLock: 'UnLock',
-  },
-};
 
 export const initAutoWidgetRect = (): RectConfig => ({
   x: 0,
@@ -309,8 +241,8 @@ export const initAutoWidgetRect = (): RectConfig => ({
   height: 6,
 });
 export const initFreeWidgetRect = (): RectConfig => ({
-  x: 0,
-  y: 0,
+  x: Math.ceil(Math.random() * 200),
+  y: Math.ceil(Math.random() * 200),
   width: 400,
   height: 300,
 });
@@ -335,8 +267,10 @@ export const widgetTpl = (): Widget => {
       // visible: true,
       lock: false,
       content: {} as any,
-      rect: { x: 0, y: 0, width: 1, height: 1 },
-      pRect: { x: 0, y: 0, width: 1, height: 1 },
+      //
+      rect: initFreeWidgetRect(),
+      pRect: initAutoWidgetRect(),
+      mRect: undefined,
       customConfig: {
         props: [],
       },

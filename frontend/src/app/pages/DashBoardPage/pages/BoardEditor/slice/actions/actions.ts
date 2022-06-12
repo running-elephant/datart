@@ -201,14 +201,16 @@ export const copyWidgetsAction = (wIds?: string[]) => (dispatch, getState) => {
     }
     if (widget.config.type === 'container') {
       const content = widget.config.content as TabWidgetContent;
-      Object.values(content.itemMap).forEach(item => {
-        if (item.childWidgetId) {
-          const subWidget = widgetMap[item.childWidgetId];
-          if (subWidget) {
-            newWidgets[subWidget.id] = subWidget;
+      const needCopyIds = Object.values(content.itemMap)
+        .map(item => {
+          if (item.childWidgetId) {
+            const subWidget = widgetMap[item.childWidgetId];
+            if (subWidget) return subWidget.id;
           }
-        }
-      });
+          return undefined;
+        })
+        .filter(id => !!id);
+      needCopyWidgetIds = needCopyWidgetIds.concat(needCopyIds as string[]);
     }
   }
   dispatch(editDashBoardInfoActions.addClipboardWidgets(newWidgets));
@@ -369,7 +371,6 @@ export const onComposeGroupAction = (wid?: string) => (dispatch, getState) => {
   widgetInfo.selected = true;
   dispatch(editWidgetInfoActions.addWidgetInfos([widgetInfo]));
   dispatch(editBoardStackActions.addWidgets([groupWidget]));
-
   dispatch(editBoardStackActions.changeWidgetsParentId({ items }));
 };
 export const onUnGroupAction = (wid?: string) => (dispatch, getState) => {
@@ -562,18 +563,34 @@ export const selectedItemChange = (
   const {
     dataIndex,
     componentIndex,
-  }: { dataIndex: number; componentIndex: number } = params;
+    data,
+  }: { dataIndex: number; componentIndex?: number; data: any } = params;
   const option = {
     wid,
     data: {
       index: componentIndex + ',' + dataIndex,
-      data: params.data,
+      data,
     },
   };
   if (type === 'edit') {
     dispatch(editWidgetSelectedItemsActions.normalSelectInEditor(option));
   } else {
     dispatch(boardActions.normalSelect(option));
+  }
+};
+
+export const changeSelectedItems = (
+  dispatch,
+  type: VizRenderMode,
+  data,
+  wid,
+) => {
+  if (type === 'edit') {
+    dispatch(
+      editWidgetSelectedItemsActions.changeSelectedItemsInEditor({ wid, data }),
+    );
+  } else {
+    dispatch(boardActions.changeSelectedItems({ wid, data }));
   }
 };
 
@@ -610,4 +627,15 @@ export const multipleSelectChange = (
       dispatch(boardActions.updateMultipleSelect(false));
     }
   }
+};
+
+export const showRectAction = (widget: Widget) => (dispatch, getState) => {
+  if (widget.config.boardType === 'free') return true;
+  if (!widget.parentId) return false;
+  const editBoard = getState().editBoard as HistoryEditBoard;
+  const widgetMap = editBoard.stack.present.widgetRecord;
+  if (widget.parentId && widgetMap[widget.parentId]) {
+    return widgetMap[widget.parentId].config.type === 'group';
+  }
+  return false;
 };

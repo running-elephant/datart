@@ -20,6 +20,7 @@ package datart.data.provider.calcite;
 import com.google.common.collect.Sets;
 import datart.core.base.exception.Exceptions;
 import datart.data.provider.base.DataProviderException;
+import datart.data.provider.script.SqlStringUtils;
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.SqlNode;
@@ -117,7 +118,7 @@ public class SqlValidateUtils {
         if (src == null) {
             return null;
         }
-        src = SqlNodeUtils.cleanupSql(src);
+        src = SqlStringUtils.cleanupSql(src);
         return src.trim().split("\\s", 2)[0];
     }
 

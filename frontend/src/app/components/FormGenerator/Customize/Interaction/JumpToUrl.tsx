@@ -16,19 +16,74 @@
  * limitations under the License.
  */
 
-import { Button, Input, Space } from 'antd';
-import { FC, memo } from 'react';
-import { I18nTransator } from './types';
+import { Button, Dropdown, Input, Space } from 'antd';
+import ChartDataView from 'app/types/ChartDataView';
+import { FC, memo, useCallback, useState } from 'react';
+import { InteractionFieldRelation } from '../../constants';
+import { I18nTransator, JumpToUrlRule, VizType } from './types';
+import UrlParamList from './UrlParamList';
 
-const JumpToUrl: FC<{} & I18nTransator> = memo(
-  ({ translate: t = title => title }) => {
-    return (
-      <Space>
-        <Input />
+const JumpToUrl: FC<
+  {
+    vizs?: VizType[];
+    dataview?: ChartDataView;
+    value?: JumpToUrlRule;
+    onValueChange: (value) => void;
+  } & I18nTransator
+> = memo(({ vizs, dataview, value, onValueChange, translate: t }) => {
+  const [relations, setRelations] = useState(
+    value?.[InteractionFieldRelation.Customize] || [],
+  );
+  const [url, setUrl] = useState(value?.url);
+
+  const handleUpdateRelations = relations => {
+    const newRelations = [...relations];
+    setRelations(newRelations);
+    onValueChange({
+      ...value,
+      ...{ [InteractionFieldRelation.Customize]: newRelations },
+    });
+  };
+
+  const hanldeUpdateUrl = useCallback(url => {
+    setUrl(url);
+    onValueChange({
+      ...value,
+      url,
+    });
+  }, []);
+
+  return (
+    <Space>
+      <Input
+        style={{ width: 200 }}
+        value={url}
+        placeholder={t('drillThrough.rule.inputUrl')}
+        onChange={e => hanldeUpdateUrl(e.target.value)}
+      />
+      <Dropdown
+        destroyPopupOnHide
+        overlayStyle={{ margin: 4 }}
+        overlay={() => (
+          <UrlParamList
+            translate={t}
+            targetRelId={value?.relId}
+            sourceFields={
+              dataview?.meta?.concat(dataview?.computedFields || []) || []
+            }
+            sourceVariables={dataview?.variables || []}
+            relations={relations}
+            onRelationChange={handleUpdateRelations}
+          />
+        )}
+        placement="bottomLeft"
+        trigger={['click']}
+        arrow
+      >
         <Button type="link">{t('drillThrough.rule.relation.setting')}</Button>
-      </Space>
-    );
-  },
-);
+      </Dropdown>
+    </Space>
+  );
+});
 
 export default JumpToUrl;

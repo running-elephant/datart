@@ -26,6 +26,7 @@ import datart.core.common.UUIDGenerator;
 import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.QueryScript;
 import datart.core.data.provider.ScriptVariable;
+import datart.core.data.provider.SelectColumn;
 import datart.core.data.provider.sql.AggregateOperator;
 import datart.core.data.provider.sql.FunctionColumn;
 import datart.core.data.provider.sql.GroupByOperator;
@@ -45,8 +46,8 @@ public class ParamFactory {
             , variable("max", ValueType.NUMERIC, VariableTypeEnum.QUERY, false, "", "100")
             , variable("min", ValueType.NUMERIC, VariableTypeEnum.QUERY, false, "", "0")
             , variable("str", ValueType.STRING, VariableTypeEnum.QUERY, false, "", "content")
-            , variable("datetime", ValueType.STRING, VariableTypeEnum.QUERY, false, "","2020-01-01 00:00:00")
-            , variable("date", ValueType.DATE, VariableTypeEnum.QUERY, false,  "yyyy-MM-dd HH:mm:ss", "2020-01-01 00:00:00")
+            , variable("datetime", ValueType.STRING, VariableTypeEnum.QUERY, false, "", "2020-01-01 00:00:00")
+            , variable("date", ValueType.DATE, VariableTypeEnum.QUERY, false, "yyyy-MM-dd HH:mm:ss", "2020-01-01 00:00:00")
             , variable("where", ValueType.FRAGMENT, VariableTypeEnum.QUERY, false, "", "1=1")
     );
 
@@ -60,9 +61,9 @@ public class ParamFactory {
     }
 
     public static ExecuteParam getExecuteScriptExample() {
-        List<String> columns = new ArrayList<>();
-        columns.add("name");
-        columns.add("age");
+        List<SelectColumn> columns = new ArrayList<>();
+        columns.add(SelectColumn.of(null, "name"));
+        columns.add(SelectColumn.of("age"));
 
         List<FunctionColumn> functionColumns = new ArrayList<>();
         FunctionColumn functionColumn = new FunctionColumn();

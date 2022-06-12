@@ -16,6 +16,13 @@
  * limitations under the License.
  */
 
+import { InteractionFieldRelation } from 'app/components/FormGenerator/constants';
+import {
+  CustomizeRelation,
+  InteractionRule,
+  JumpToChartRule,
+  JumpToUrlRule,
+} from 'app/components/FormGenerator/Customize/Interaction/types';
 import {
   AggregateFieldActionType,
   ChartDataSectionType,
@@ -33,8 +40,10 @@ import {
   ChartCommonConfig,
   ChartStyleConfigDTO,
 } from 'app/types/ChartConfigDTO';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import { FilterSqlOperator } from 'globalConstants';
 import {
   cond,
   curry,
@@ -47,6 +56,7 @@ import {
   isUndefined,
   pipe,
 } from 'utils/object';
+import { getDrillableRows } from './chartHelper';
 
 export const transferChartConfigs = (
   targetConfig?: ChartConfig,
@@ -694,4 +704,87 @@ export const getChartDrillOption = (
     drillOption?.clearAll();
   }
   return drillOption;
+};
+
+const buildClickEventBaseFilters = (
+  rawData?: Record<string, any>,
+  rule?: InteractionRule,
+  drillOption?: IChartDrillOption,
+  dataConfigs?: ChartDataConfig[],
+) => {
+  const groupConfigs: ChartDataSectionField[] = getDrillableRows(
+    dataConfigs || [],
+    drillOption,
+  );
+  const colorConfigs = (dataConfigs || [])
+    .filter(c => c.type === ChartDataSectionType.Color)
+    .flatMap(config => config.rows || []);
+
+  return groupConfigs
+    .concat(colorConfigs)
+    .map(c => {
+      const value = rawData?.[c.colName];
+      if (isEmpty(value) || isEmpty(c.colName)) {
+        return null;
+      }
+      return {
+        aggOperator: null,
+        sqlOperator: FilterSqlOperator.In,
+        column: c.colName,
+        values: [{ value, valueType: c.type }],
+      };
+    })
+    .filter(Boolean);
+};
+
+export const getClickEventViewDetailFilters = (
+  rawData?: Record<string, any>,
+  drillOption?: IChartDrillOption,
+  dataConfigs?: ChartDataConfig[],
+) => {
+  const baseFilters = buildClickEventBaseFilters(
+    rawData,
+    undefined,
+    drillOption,
+    dataConfigs,
+  );
+  return baseFilters as ChartDataRequestFilter[];
+};
+
+export const getClickEventJumpFilters = (
+  rawData?: Record<string, any>,
+  rule?: InteractionRule,
+  drillOption?: IChartDrillOption,
+  dataConfigs?: ChartDataConfig[],
+): ChartDataRequestFilter[] => {
+  const baseFilters = buildClickEventBaseFilters(
+    rawData,
+    rule,
+    drillOption,
+    dataConfigs,
+  );
+  return baseFilters.map(f => {
+    if (isEmpty(f)) {
+      return null;
+    }
+    const jumpRule = rule?.[rule.category!] as JumpToChartRule | JumpToUrlRule;
+    if (isEmpty(jumpRule)) {
+      return null;
+    }
+    if (jumpRule?.['relation'] !== InteractionFieldRelation.Auto) {
+      const customizeRelations: CustomizeRelation[] =
+        jumpRule?.[InteractionFieldRelation.Customize];
+      if (isEmptyArray(customizeRelations)) {
+        return null;
+      }
+      const targetRelation = customizeRelations?.find(
+        r => r.source === f?.column,
+      );
+      if (isEmpty(targetRelation)) {
+        return null;
+      }
+      return Object.assign({}, f, { column: targetRelation?.target });
+    }
+    return f;
+  }) as ChartDataRequestFilter[];
 };

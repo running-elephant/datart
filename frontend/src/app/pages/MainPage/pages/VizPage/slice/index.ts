@@ -4,6 +4,7 @@ import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/models/ChartManager';
 import { SelectedItem } from 'app/types/ChartConfig';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import { compareSelectedItems } from 'app/utils/chartHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
@@ -149,7 +150,7 @@ const slice = createSlice({
         payload,
       }: PayloadAction<{
         backendChartId: string;
-        data: { index: string; data: any };
+        data: SelectedItem;
       }>,
     ) {
       const index = state.selectedItems?.[payload.backendChartId]?.findIndex(
@@ -170,6 +171,21 @@ const slice = createSlice({
         } else {
           state.selectedItems[payload.backendChartId] = [];
         }
+      }
+    },
+    changeSelectedItems(
+      state,
+      {
+        payload,
+      }: PayloadAction<{ backendChartId: string; data: SelectedItem[] }>,
+    ) {
+      if (
+        compareSelectedItems(
+          payload.data,
+          state.selectedItems[payload.backendChartId],
+        )
+      ) {
+        state.selectedItems[payload.backendChartId] = payload.data;
       }
     },
     updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
@@ -557,7 +573,7 @@ const slice = createSlice({
     });
     builder.addCase(fetchVizChartAction.fulfilled, (state, action) => {
       const newChartDto = CloneValueDeep(action.payload.data);
-
+      const jumpFilterParams = action.payload.jumpFilterParams;
       const filterSearchParams = action.payload.filterSearchParams;
       const index = state.chartPreviews?.findIndex(
         c => c.backendChartId === newChartDto?.id,
@@ -576,6 +592,8 @@ const slice = createSlice({
                   migrateChartConfig(newChartDto?.config),
                 ),
                 filterSearchParams,
+                false,
+                jumpFilterParams,
               )
             : undefined,
         });
@@ -590,6 +608,8 @@ const slice = createSlice({
               migrateChartConfig(newChartDto?.config),
             ),
             filterSearchParams,
+            false,
+            jumpFilterParams,
           ),
         };
       }

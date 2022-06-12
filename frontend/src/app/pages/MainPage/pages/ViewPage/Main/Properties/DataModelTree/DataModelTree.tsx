@@ -309,7 +309,7 @@ const DataModelTree: FC = memo(() => {
                   if (!allNodeNames.includes(getFieldValue('hierarchyName'))) {
                     return Promise.resolve(value);
                   }
-                  return Promise.reject(new Error('名称重复，请检查!'));
+                  return Promise.reject(new Error(t('model.duplicateName')));
                 },
               }),
             ]}
@@ -397,7 +397,7 @@ const DataModelTree: FC = memo(() => {
                   if (!allNodeNames.includes(getFieldValue('rename'))) {
                     return Promise.resolve(value);
                   }
-                  return Promise.reject(new Error('名称重复，请检查!'));
+                  return Promise.reject(new Error(t('model.duplicateName')));
                 },
               }),
             ]}

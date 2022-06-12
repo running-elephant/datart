@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {
   AggregateFieldActionType,
   ChartDataSectionFieldActionType,
@@ -25,7 +24,9 @@ import {
   DataViewFieldType,
   FieldFormatType,
   FilterConditionType,
+  RUNTIME_FILTER_KEY,
 } from 'app/constants';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   ControllerFacadeTypes,
@@ -186,6 +187,8 @@ export type ChartDataConfig = ChartConfigBase & {
   replacedConfig?: ChartDataSectionField;
   // NOTE: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
+  // Runtime filters
+  [RUNTIME_FILTER_KEY]?: ChartDataRequestFilter[];
 };
 
 export type ChartStyleConfig = ChartConfigBase & ChartStyleSectionGroup & {};
@@ -417,6 +420,11 @@ export interface GridStyle {
 }
 
 export interface SelectedItem {
-  index: string;
-  data: any;
+  index: string | number;
+  data: {
+    rowData: {
+      [p: string]: any;
+    };
+    [p: string]: any;
+  };
 }

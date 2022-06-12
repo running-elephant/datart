@@ -180,19 +180,22 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
         providerService.resetSource(source);
     }
 
-    private void excludeColumns(Dataframe data, Set<String> include) {
+    private void excludeColumns(Dataframe data, Set<SelectColumn> include) {
         if (data == null
                 || CollectionUtils.isEmpty(data.getColumns())
                 || include == null
                 || include.size() == 0
-                || include.contains("*")) {
+                || include.stream().anyMatch(selectColumn -> selectColumn.getColumnKey().contains("*"))) {
             return;
         }
 
         List<Integer> excludeIndex = new LinkedList<>();
         for (int i = 0; i < data.getColumns().size(); i++) {
             Column column = data.getColumns().get(i);
-            if (!include.contains(column.getName())) {
+            if (include
+                    .stream()
+                    .noneMatch(selectColumn ->
+                            column.getName().equals(selectColumn.getColumnKey()) || column.getName().equals(selectColumn.getAlias()))) {
                 excludeIndex.add(i);
             }
         }

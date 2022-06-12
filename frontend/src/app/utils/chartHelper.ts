@@ -52,6 +52,7 @@ import {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { updateBy } from 'app/utils/mutation';
 import { ECharts } from 'echarts';
@@ -1551,7 +1552,7 @@ export const getAutoFunnelTopPosition = (config: {
  */
 export const getDrillableRows = (
   configs: ChartDataConfig[],
-  option?: ChartDrillOption,
+  option?: IChartDrillOption,
 ): ChartDataSectionField[] => {
   return configs
     ?.filter(c => c.type === ChartDataSectionType.Group)
@@ -1725,4 +1726,21 @@ export const handleRowColNameInChartConfig = (
       });
     }
   });
+};
+
+export const compareSelectedItems = (
+  newSelectedItems: SelectedItem[],
+  oldSelectedItems?: SelectedItem[],
+): boolean => {
+  if (newSelectedItems.length !== oldSelectedItems?.length) {
+    return true;
+  } else if (
+    newSelectedItems.length === oldSelectedItems.length &&
+    newSelectedItems.length
+  ) {
+    const selectedIndexList = oldSelectedItems.map(v => v.index);
+    return !!newSelectedItems.filter(v => !selectedIndexList.includes(v.index))
+      .length;
+  }
+  return false;
 };

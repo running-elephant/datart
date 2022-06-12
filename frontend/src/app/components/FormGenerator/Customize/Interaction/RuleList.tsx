@@ -20,7 +20,11 @@ import { Button, Select, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC } from 'react';
-import { InteractionAction, InteractionCategory } from '../../constants';
+import {
+  InteractionAction,
+  InteractionCategory,
+  InteractionMouseEvent,
+} from '../../constants';
 import JumpToChart from './JumpToChart';
 import JumpToDashboard from './JumpToDashboard';
 import JumpToUrl from './JumpToUrl';
@@ -43,7 +47,7 @@ const RuleList: FC<
       render: (value, record) => (
         <Select
           style={{ width: '150px' }}
-          defaultValue={value}
+          value={value}
           onChange={value => onRuleChange(record.id, 'category', value)}
         >
           <Select.Option value={InteractionCategory.JumpToChart}>
@@ -59,13 +63,32 @@ const RuleList: FC<
       ),
     },
     {
+      title: t('drillThrough.rule.header.event'),
+      dataIndex: 'event',
+      key: 'event',
+      render: (value, record) => (
+        <Select
+          style={{ width: '150px' }}
+          value={value}
+          onChange={value => onRuleChange(record.id, 'event', value)}
+        >
+          <Select.Option value={InteractionMouseEvent.Left}>
+            {t('drillThrough.rule.event.left')}
+          </Select.Option>
+          <Select.Option value={InteractionMouseEvent.Right}>
+            {t('drillThrough.rule.event.right')}
+          </Select.Option>
+        </Select>
+      ),
+    },
+    {
       title: t('drillThrough.rule.header.open'),
       dataIndex: 'action',
       key: 'action',
       render: (value, record) => (
         <Select
           style={{ width: '150px' }}
-          defaultValue={value}
+          value={value}
           onChange={value => onRuleChange(record.id, 'action', value)}
         >
           <Select.Option value={InteractionAction.Redirect}>

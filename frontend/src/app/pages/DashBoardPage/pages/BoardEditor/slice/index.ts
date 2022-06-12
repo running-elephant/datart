@@ -14,6 +14,8 @@ import {
 import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import { getInitBoardInfo } from 'app/pages/DashBoardPage/utils/board';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import { SelectedItem } from 'app/types/ChartConfig';
+import { compareSelectedItems } from 'app/utils/chartHelper';
 import { Layout } from 'react-grid-layout';
 /** { excludeAction,includeAction } */
 import undoable, { includeAction } from 'redux-undo';
@@ -350,11 +352,15 @@ const editWidgetSelectedItemsSlice = createSlice({
         }
       }
     },
-    clearSelectedItemsInEditor(
+    changeSelectedItemsInEditor(
       state,
-      { payload }: PayloadAction<{ wid: string }>,
+      { payload }: PayloadAction<{ wid: string; data: Array<SelectedItem> }>,
     ) {
-      state.selectedItems[payload.wid] = [];
+      if (
+        compareSelectedItems(payload.data, state.selectedItems[payload.wid])
+      ) {
+        state.selectedItems[payload.wid] = payload.data;
+      }
     },
   },
 });

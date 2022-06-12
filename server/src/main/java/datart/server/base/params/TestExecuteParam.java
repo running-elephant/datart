@@ -18,9 +18,12 @@
 
 package datart.server.base.params;
 
+import datart.core.data.provider.ScriptType;
 import datart.core.data.provider.ScriptVariable;
+import datart.core.data.provider.SelectColumn;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -29,6 +32,11 @@ public class TestExecuteParam {
     private String sourceId;
 
     private String script;
+
+    private List<SelectColumn> columns;
+
+    @NotNull
+    private ScriptType scriptType;
 
     private List<ScriptVariable> variables;
 
