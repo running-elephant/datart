@@ -19,6 +19,7 @@
 import { TreeDataNode } from 'antd';
 import { DataViewFieldType } from 'app/constants';
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
+import isEqual from 'lodash/isEqual';
 import { FONT_WEIGHT_MEDIUM, SPACE_UNIT } from 'styles/StyleConstants';
 import { Nullable } from 'types';
 import { isEmptyArray } from 'utils/object';
@@ -32,9 +33,11 @@ import {
 import {
   Column,
   ColumnRole,
+  DatabaseSchema,
   HierarchyModel,
   Model,
   QueryResult,
+  SimpleViewQueryProps,
   ViewViewModel,
 } from './slice/types';
 
@@ -203,6 +206,7 @@ export function getSaveParamsFromViewModel(
   orgId: string,
   editingView: ViewViewModel,
   isUpdate?: boolean,
+  database?: DatabaseSchema[],
 ) {
   const {
     name,
@@ -216,6 +220,7 @@ export function getSaveParamsFromViewModel(
     originColumnPermissions,
     columnPermissions,
     index,
+    type,
   } = editingView;
 
   if (isUpdate) {
@@ -245,7 +250,14 @@ export function getSaveParamsFromViewModel(
       parentId,
       isFolder: false,
       index,
-      script,
+      type,
+      script:
+        type === 'SQL'
+          ? script
+          : handleObjectScriptToString(
+              script as SimpleViewQueryProps,
+              database!,
+            ),
       config: JSON.stringify(config),
       model: JSON.stringify(model),
       variablesToCreate: created,
@@ -286,7 +298,14 @@ export function getSaveParamsFromViewModel(
       parentId,
       isFolder: false,
       index,
-      script,
+      type,
+      script:
+        type === 'SQL'
+          ? script
+          : handleObjectScriptToString(
+              script as SimpleViewQueryProps,
+              database!,
+            ),
       config: JSON.stringify(config),
       model: JSON.stringify(model),
       variablesToCreate: variables,
@@ -300,6 +319,7 @@ export function getSaveParamsFromViewModel(
 
 export function transformModelToViewModel(
   data,
+  database: DatabaseSchema[] | null,
   tempViewModel?: object,
 ): ViewViewModel {
   const {
@@ -314,6 +334,7 @@ export function transformModelToViewModel(
   return {
     ...tempViewModel,
     ...rest,
+    type: rest.type || 'SQL',
     config: JSON.parse(config),
     model: JSON.parse(model),
     originVariables: variables.map(v => ({ ...v, relVariableSubjects })),
@@ -400,4 +421,111 @@ export function buildAntdTreeNodeModel<T extends TreeDataNode & { value: any }>(
     children,
     isLeaf,
   } as any;
+}
+
+export function buildRequestColumns(tableJSON: SimpleViewQueryProps) {
+  const columns: any = [];
+  tableJSON.columns.forEach((v, i) => {
+    const tableName = tableJSON.table[tableJSON.table.length - 1];
+    columns.push({
+      alias: [tableName, v],
+      column: [tableName, v],
+    });
+  });
+  tableJSON.joins.forEach(join => {
+    const tableName = join.table?.[join.table?.length - 1];
+    join.columns?.forEach(column => {
+      columns.push({
+        alias: [tableName, column],
+        column: [tableName, column],
+      });
+    });
+  });
+  return columns;
+}
+
+export function findAllColumnsOrIsCheckAll(
+  tableJSON: { table?: string[]; columns?: string[] },
+  database: DatabaseSchema[],
+): { columns?: string[]; isCheckAll: boolean } {
+  const { table = [], columns } = tableJSON;
+
+  if (table.length === 1) {
+    const foundColumns = database?.[0]?.tables
+      ?.find(v => v.tableName === table[0])
+      ?.['columns'].map(v => v.name);
+
+    return {
+      columns: foundColumns,
+      isCheckAll: isEqual(foundColumns, columns),
+    };
+  }
+
+  const foundColumns = database
+    ?.find(v => v.dbName === table[0])
+    ?.tables?.find(v => v.tableName === table[1])
+    ?.['columns'].map(v => v.name);
+
+  return {
+    columns: foundColumns,
+    isCheckAll: isEqual(foundColumns, columns),
+  };
+}
+
+export function handleStringScriptToObject(
+  script: string,
+  database: DatabaseSchema[] | null,
+) {
+  if (!database) {
+    return script;
+  }
+  try {
+    const scriptJSON = JSON.parse(script);
+    const { columns } = findAllColumnsOrIsCheckAll(scriptJSON, database);
+
+    return {
+      ...scriptJSON,
+      columns:
+        JSON.parse(scriptJSON.columns) === 'all'
+          ? columns
+          : JSON.parse(scriptJSON.columns),
+      joins: scriptJSON.joins.map(join => {
+        const { columns } = findAllColumnsOrIsCheckAll(join, database);
+        return {
+          ...join,
+          columns:
+            JSON.parse(join.columns) === 'all'
+              ? columns
+              : JSON.parse(scriptJSON.columns),
+        };
+      }),
+    };
+  } catch (err) {
+    return script;
+  }
+}
+
+export function handleObjectScriptToString(
+  structure: SimpleViewQueryProps,
+  database: DatabaseSchema[],
+) {
+  try {
+    const { isCheckAll } = findAllColumnsOrIsCheckAll(structure!, database);
+
+    const script = JSON.stringify({
+      ...structure,
+      columns: JSON.stringify(isCheckAll ? 'all' : structure?.columns),
+      joins: structure?.joins.map(j => {
+        const { isCheckAll } = findAllColumnsOrIsCheckAll(j, database);
+        return {
+          ...j,
+          columns: JSON.stringify(isCheckAll ? 'all' : j?.columns),
+        };
+      }),
+    });
+
+    return script;
+  } catch (err) {
+    throw err;
+  }
 }

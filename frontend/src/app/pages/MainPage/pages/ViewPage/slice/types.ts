@@ -80,7 +80,7 @@ export interface ViewSimpleViewModel extends ViewSimple {
 }
 
 export interface ViewViewModel<T = object>
-  extends Pick<View, 'name' | 'script'> {
+  extends Pick<View, 'name' | 'script' | 'type'> {
   id: string;
   description?: string;
   index: number | null;
@@ -102,7 +102,6 @@ export interface ViewViewModel<T = object>
   fragment: string;
   isSaveAs?: Boolean;
   warnings?: string[] | null;
-  type?: string;
 }
 
 export interface QueryResult {
@@ -144,6 +143,7 @@ export type HierarchyModel = {
   version?: string;
   hierarchy?: Model;
   columns?: Model;
+  computedFields?: ChartDataViewMeta[];
 };
 
 export interface ColumnPermissionRaw {
@@ -215,7 +215,6 @@ export interface SimpleViewQueryProps {
   table: Array<string>;
   columns: Array<string>;
   joins: Array<JoinTableProps>;
-  computedFields: Array<ChartDataViewMeta>;
 }
 
 export interface JoinTableProps {
@@ -224,3 +223,18 @@ export interface JoinTableProps {
   columns?: Array<string>;
   conditions?: Array<{ left: Array<string>; right: Array<string> }>;
 }
+
+export interface SimpleViewRequestProps {
+  table: Array<string>;
+  columns: string;
+  joins: JoinTableRequestProps;
+}
+
+export interface JoinTableRequestProps {
+  table?: Array<string>;
+  joinType?: SimpleViewJoinType;
+  columns?: string;
+  conditions?: Array<{ left: Array<string>; right: Array<string> }>;
+}
+
+export type viewType = 'SQL' | 'STRUCT';

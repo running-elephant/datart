@@ -24,6 +24,7 @@ import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
+import { handleStructureViewName } from 'utils/utils';
 
 const { Option } = Select;
 export interface ViewLinkageItem {
@@ -51,19 +52,29 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
         if (!viewLinkages) {
           return null;
         }
+        const viewType = viewMap[viewLinkages[index][key]]?.type || 'SQL';
         if (key === 'triggerViewId') {
-          return chartGroupColumns?.map(item => (
-            <Option
-              key={item.uid}
-              fieldvaluetype={item.type}
-              value={item.colName}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>{item.colName}</span>
-                <FieldType>{item.type}</FieldType>
-              </div>
-            </Option>
-          ));
+          return chartGroupColumns?.map(item => {
+            const columnName =
+              viewType === 'STRUCT'
+                ? handleStructureViewName(item.colName)
+                : item.colName;
+
+            return (
+              <Option
+                key={item.uid}
+                fieldvaluetype={item.type}
+                value={columnName}
+              >
+                <div
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
+                  <span>{columnName}</span>
+                  <FieldType>{item.type}</FieldType>
+                </div>
+              </Option>
+            );
+          });
         } else if (key === 'linkerViewId') {
           return viewMap[viewLinkages[index][key]].meta
             ?.filter(item => {
@@ -73,16 +84,23 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
               ];
               return item.type && enableTypes.includes(item.type);
             })
-            .map(item => (
-              <Option key={item.id} fieldvaluetype={item.type} value={item.id}>
-                <div
-                  style={{ display: 'flex', justifyContent: 'space-between' }}
-                >
-                  <span>{item.id}</span>
-                  <FieldType>{item.type}</FieldType>
-                </div>
-              </Option>
-            ));
+            .map(item => {
+              const id =
+                viewType === 'STRUCT'
+                  ? handleStructureViewName(item.id)
+                  : item.id;
+
+              return (
+                <Option key={id} fieldvaluetype={item.type} value={id}>
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between' }}
+                  >
+                    <span>{id}</span>
+                    <FieldType>{item.type}</FieldType>
+                  </div>
+                </Option>
+              );
+            });
         }
       },
       [chartGroupColumns, form, viewMap],

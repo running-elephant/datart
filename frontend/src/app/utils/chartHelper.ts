@@ -66,6 +66,7 @@ import {
   meanValue,
   pipe,
 } from 'utils/object';
+import { handleStructureViewName } from 'utils/utils';
 import { TableColumnsList } from '../components/ChartGraph/BasicTableChart/types';
 import {
   flattenHeaderRowsWithoutGroupRow,
@@ -1705,4 +1706,23 @@ export const getSelectedItemStyles = (
   return {
     itemStyle,
   };
+};
+
+export const handleRowColNameInChartConfig = (
+  config: ChartConfig,
+  viewType?: string,
+) => {
+  return updateBy(config, draft => {
+    if (draft?.datas) {
+      draft?.datas.forEach(data => {
+        data.rows?.forEach(row => {
+          row.colName =
+            viewType === 'STRUCT' &&
+            row.category === ChartDataViewFieldCategory.Field
+              ? handleStructureViewName(row.colName)
+              : row.colName;
+        });
+      });
+    }
+  });
 };

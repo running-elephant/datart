@@ -169,6 +169,7 @@ export const refreshDatasetAction = createAsyncThunk(
       return;
     }
     const datas = arg?.dataOption || workbenchState.chartConfig?.datas;
+
     const builder = new ChartDataRequestBuilder(
       workbenchState.currentDataView,
       datas,

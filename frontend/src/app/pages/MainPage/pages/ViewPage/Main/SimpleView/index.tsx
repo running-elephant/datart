@@ -21,24 +21,37 @@ import {
   CloseOutlined,
   PlusSquareOutlined,
 } from '@ant-design/icons';
-import { Button, Tooltip } from 'antd';
+import { Button, Spin, Tooltip } from 'antd';
+import { CommonFormTypes } from 'globalConstants';
 import produce from 'immer';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import {
   FONT_SIZE_ICON_MD,
+  FONT_SIZE_SUBHEADING,
   FONT_SIZE_TITLE,
   SPACE_LG,
   SPACE_XS,
 } from 'styles/StyleConstants';
-import { SimpleViewJoinType } from '../../constants';
+import { getInsertedNodeIndex } from 'utils/utils';
+import {
+  SimpleViewJoinType,
+  ViewStatus,
+  ViewViewModelStages,
+} from '../../constants';
+import { EditorContext } from '../../EditorContext';
 import { Toolbar } from '../../Main/Editor/Toolbar';
+import { SaveFormContext } from '../../SaveFormContext';
 import { useViewSlice } from '../../slice';
-import { selectCurrentEditingViewAttr } from '../../slice/selectors';
-import { runSql } from '../../slice/thunks';
+import {
+  selectAllSourceDatabaseSchemas,
+  selectCurrentEditingViewAttr,
+  selectViews,
+} from '../../slice/selectors';
+import { runSql, saveView } from '../../slice/thunks';
 import { SimpleViewQueryProps } from '../../slice/types';
-import AddComputedField from './components/AddComputedField';
+import { handleStringScriptToObject, isNewView } from '../../utils';
 import SelectDataSource from './components/SelectDataSource';
 import SelectJoinColumns from './components/SelectJoinColumns';
 import SelectJoinType from './components/SelectJoinType';
@@ -52,6 +65,8 @@ export const SimpleView = memo(
   ({ allowManage, allowEnableViz }: SimpleViewProps) => {
     const { actions } = useViewSlice();
     const dispatch = useDispatch();
+    const { initActions } = useContext(EditorContext);
+    const { showSaveForm } = useContext(SaveFormContext);
 
     const tableJSON = useSelector(state =>
       selectCurrentEditingViewAttr(state, { name: 'script' }),
@@ -62,9 +77,14 @@ export const SimpleView = memo(
     const sourceId = useSelector(state =>
       selectCurrentEditingViewAttr(state, { name: 'sourceId' }),
     ) as string;
-
-    const [isShowComputersField, setIsShowComputersField] =
-      useState<Boolean>(false);
+    const stage = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'stage' }),
+    ) as ViewViewModelStages;
+    const status = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'status' }),
+    ) as ViewStatus;
+    const viewsData = useSelector(selectViews);
+    const allDatabaseSchemas = useSelector(selectAllSourceDatabaseSchemas);
 
     const handleTableJSON = useCallback(
       (table: any, type: 'MAIN' | 'JOINS', index?: number) => {
@@ -76,7 +96,6 @@ export const SimpleView = memo(
                     table: table.table,
                     columns: table.columns,
                     joins: [],
-                    computedFields: [],
                   }
                 : produce(tableJSON, draft => {
                     draft.joins[index!] = table;
@@ -178,180 +197,255 @@ export const SimpleView = memo(
       [tableJSON, dispatch, actions],
     );
 
-    const handleComputedField = useCallback(
-      computedFields => {
+    const handleInterimRunSql = useCallback(
+      (type?: 'MAIN' | 'JOINS', joinIndex?: number) => {
+        let script: SimpleViewQueryProps = {
+          table: [],
+          columns: [],
+          joins: [],
+        };
+
+        if (type === 'MAIN') {
+          script.table = tableJSON.table;
+          script.columns = tableJSON.columns;
+        } else if (type === 'JOINS' && joinIndex !== undefined) {
+          script.table = tableJSON.table;
+          script.columns = tableJSON.columns;
+          script.joins = [tableJSON.joins[joinIndex]];
+        } else {
+          script = tableJSON;
+        }
+
+        dispatch(runSql({ id, isFragment: !!type, script }));
+      },
+      [dispatch, id, tableJSON],
+    );
+
+    const handleDeleteConditions = useCallback(
+      (joinIndex, conditionsIndex) => {
         dispatch(
           actions.changeCurrentEditingView({
-            script: { ...tableJSON, computedFields },
+            script: produce(tableJSON, draft => {
+              draft.joins[joinIndex].conditions?.splice(conditionsIndex, 1);
+            }),
           }),
         );
       },
-      [tableJSON, dispatch, actions],
+      [actions, dispatch, tableJSON],
     );
 
-    const handleDeleteComputedFields = useCallback(() => {
-      dispatch(
-        actions.changeCurrentEditingView({
-          script: { ...tableJSON, computedFields: [] },
-        }),
-      );
-      setIsShowComputersField(false);
-    }, [tableJSON, dispatch, actions]);
+    const save = useCallback(
+      (resolve?) => {
+        dispatch(saveView({ resolve }));
+      },
+      [dispatch],
+    );
 
-    const handleInterimRunSql = useCallback(() => {
-      dispatch(runSql({ id, isFragment: true }));
-    }, [dispatch, id]);
+    const callSave = useCallback(() => {
+      if (
+        status !== ViewStatus.Archived &&
+        stage === ViewViewModelStages.Saveable
+      ) {
+        if (isNewView(id)) {
+          showSaveForm({
+            type: CommonFormTypes.Edit,
+            visible: true,
+            parentIdLabel: '文件夹',
+            initialValues: {
+              name: '',
+              parentId: '',
+              config: {},
+            },
+            onSave: (values, onClose) => {
+              let index = getInsertedNodeIndex(values, viewsData);
+              dispatch(
+                actions.changeCurrentEditingView({
+                  ...values,
+                  parentId: values.parentId || null,
+                  index,
+                }),
+              );
+              save(onClose);
+            },
+          });
+        } else {
+          save();
+        }
+      }
+    }, [dispatch, actions, stage, status, id, save, showSaveForm, viewsData]);
+
+    useEffect(() => {
+      initActions({ onRun: handleInterimRunSql, onSave: callSave });
+    }, [initActions, callSave, handleInterimRunSql]);
+
+    useEffect(() => {
+      if (typeof tableJSON === 'string') {
+        dispatch(
+          actions.changeCurrentEditingView({
+            script: handleStringScriptToObject(
+              tableJSON,
+              allDatabaseSchemas[sourceId],
+            ),
+          }),
+        );
+      }
+    }, [sourceId, allDatabaseSchemas, actions, dispatch, tableJSON]);
 
     return (
       <SimpleViewWrapper>
-        <Toolbar
-          type={'STRUCT'}
-          allowManage={allowManage}
-          allowEnableViz={allowEnableViz}
-        />
-        <SelectTableTitle>数据</SelectTableTitle>
-        <SelectTableMainWrapper>
-          <SelectTableMain>
-            <SelectDataSource type="MAIN" callbackFn={handleTableJSON} />
-          </SelectTableMain>
-          <Button
-            className="runBtn"
-            icon={<CaretRightOutlined />}
-            onClick={handleInterimRunSql}
-          />
-        </SelectTableMainWrapper>
-        {tableJSON.joins.map((join, i) => {
-          return (
-            <ItemWrapper key={i}>
-              <SelectTableTitle>
-                <span>关联</span>
-                <CloseOutlined
-                  onClick={() => handleDeleteJoinsItem(i)}
-                  className="deleteJoinItem"
-                />
-              </SelectTableTitle>
-              <SelectTableMainWrapper>
-                <SelectTableMain>
-                  <SelectDataSource tableJSON={tableJSON} renderType="READ" />
-                  <SelectJoinType
-                    callbackFn={type => {
-                      handleTableJoinType(type, i);
-                    }}
-                    type={join.joinType!}
-                  />
-                  <SelectDataSource
-                    type="JOINS"
-                    sourceId={sourceId}
-                    callbackFn={(table, type) =>
-                      handleTableJoin(table, type, i)
-                    }
-                  />
-                  {join.table ? (
-                    <JoinConditionWrapper>
-                      <JoinSelectConditionColumn>
-                        选择关联字段
-                      </JoinSelectConditionColumn>
-                      <JoinConditionColumn>
-                        {join.conditions?.map(({ left, right }, ind) => {
-                          return (
-                            <div>
-                              <SelectJoinColumns
-                                columns={tableJSON['columns']}
-                                joinTable={join}
-                                callbackFn={(
-                                  columnName,
-                                  type,
-                                  joinConditionIndex,
-                                ) =>
-                                  handleTableJoinColumns(
-                                    columnName,
-                                    type,
-                                    i,
-                                    joinConditionIndex,
-                                  )
-                                }
-                                index={ind}
-                              />
-                              {left.length && right.length ? (
-                                ind === join.conditions!.length - 1 ? (
-                                  <PlusSquareOutlined
-                                    onClick={() => handleTableJoinAddColumns(i)}
-                                    className="joinAddCondition"
-                                  />
-                                ) : (
-                                  <span className="addConditionalSteps">
-                                    &&
-                                  </span>
-                                )
-                              ) : (
-                                ''
-                              )}
-                            </div>
-                          );
-                        })}
-                      </JoinConditionColumn>
-                    </JoinConditionWrapper>
-                  ) : (
-                    ''
-                  )}
-                </SelectTableMain>
-                <Button
-                  className="runBtn"
-                  icon={<CaretRightOutlined />}
-                  onClick={() => {}}
-                />
-              </SelectTableMainWrapper>
-            </ItemWrapper>
-          );
-        })}
-        {isShowComputersField && (
-          <ItemWrapper>
-            <SelectTableTitle>
-              <span>新建计算字段</span>
-              <CloseOutlined
-                onClick={handleDeleteComputedFields}
-                className="deleteJoinItem"
-              />
-            </SelectTableTitle>
+        {typeof tableJSON === 'string' ? (
+          <LoadingWrap>
+            <Spin />
+          </LoadingWrap>
+        ) : (
+          <>
+            <Toolbar
+              type={'STRUCT'}
+              allowManage={allowManage}
+              allowEnableViz={allowEnableViz}
+            />
+            <SelectTableTitle>数据</SelectTableTitle>
             <SelectTableMainWrapper>
-              <AddComputedField
-                tableJSON={tableJSON}
-                callbackFn={handleComputedField}
-              />
+              <SelectTableMain>
+                <SelectDataSource
+                  type="MAIN"
+                  callbackFn={handleTableJSON}
+                  sourceId={sourceId}
+                  tableJSON={tableJSON}
+                />
+              </SelectTableMain>
               <Button
                 className="runBtn"
                 icon={<CaretRightOutlined />}
-                onClick={() => {}}
+                onClick={() => handleInterimRunSql('MAIN')}
               />
             </SelectTableMainWrapper>
-          </ItemWrapper>
-        )}
-        {tableJSON['table'].length ? (
-          <ToolWrapper>
-            <Button className="addJoinTable" onClick={handleAddTableJoin}>
-              添加关联项
-            </Button>
-            {!isShowComputersField && (
-              <Button onClick={() => setIsShowComputersField(true)}>
-                新建计算字段
-              </Button>
-            )}
-          </ToolWrapper>
-        ) : (
-          ''
-        )}
+            {tableJSON.joins.map((join, i) => {
+              return (
+                <ItemWrapper key={i}>
+                  <SelectTableTitle>
+                    <span>关联</span>
+                    <CloseOutlined
+                      onClick={() => handleDeleteJoinsItem(i)}
+                      className="deleteJoinItem"
+                    />
+                  </SelectTableTitle>
+                  <SelectTableMainWrapper>
+                    <SelectTableMain>
+                      <SelectDataSource
+                        joinTable={join}
+                        tableJSON={tableJSON}
+                        renderType="READ"
+                      />
+                      <SelectJoinType
+                        callbackFn={type => {
+                          handleTableJoinType(type, i);
+                        }}
+                        type={join.joinType!}
+                      />
+                      <SelectDataSource
+                        type="JOINS"
+                        joinTable={join}
+                        sourceId={sourceId}
+                        tableJSON={tableJSON}
+                        callbackFn={(table, type) =>
+                          handleTableJoin(table, type, i)
+                        }
+                      />
+                      {join.table ? (
+                        <JoinConditionWrapper>
+                          <JoinSelectConditionColumn>
+                            选择关联字段
+                          </JoinSelectConditionColumn>
+                          <JoinConditionColumn>
+                            {join.conditions?.map(({ left, right }, ind) => {
+                              return (
+                                <div>
+                                  <SelectJoinColumns
+                                    tableJSON={tableJSON}
+                                    joinTable={join}
+                                    callbackFn={(
+                                      columnName,
+                                      type,
+                                      joinConditionIndex,
+                                    ) =>
+                                      handleTableJoinColumns(
+                                        columnName,
+                                        type,
+                                        i,
+                                        joinConditionIndex,
+                                      )
+                                    }
+                                    conditionsIndex={ind}
+                                    joinIndex={i}
+                                  />
+                                  {left.length && right.length ? (
+                                    ind === join.conditions!.length - 1 ? (
+                                      <div className="joinAddOrDelCondition">
+                                        <PlusSquareOutlined
+                                          onClick={() =>
+                                            handleTableJoinAddColumns(i)
+                                          }
+                                        />
+                                        {ind > 0 && (
+                                          <CloseOutlined
+                                            onClick={() =>
+                                              handleDeleteConditions(i, ind)
+                                            }
+                                            className="DelCondition"
+                                          />
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <span className="addConditionalSteps">
+                                        &&
+                                      </span>
+                                    )
+                                  ) : (
+                                    ''
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </JoinConditionColumn>
+                        </JoinConditionWrapper>
+                      ) : (
+                        ''
+                      )}
+                    </SelectTableMain>
+                    <Button
+                      className="runBtn"
+                      icon={<CaretRightOutlined />}
+                      onClick={() => handleInterimRunSql('JOINS', i)}
+                    />
+                  </SelectTableMainWrapper>
+                </ItemWrapper>
+              );
+            })}
 
-        {tableJSON['table'].length ? (
-          <Tooltip title="执行片段">
-            <Button
-              className="runBtn"
-              type="primary"
-              icon={<CaretRightOutlined />}
-              onClick={() => {}}
-            />
-          </Tooltip>
-        ) : (
-          ''
+            {tableJSON['table'].length ? (
+              <ToolWrapper>
+                <Button className="addJoinTable" onClick={handleAddTableJoin}>
+                  添加关联项
+                </Button>
+              </ToolWrapper>
+            ) : (
+              ''
+            )}
+
+            {tableJSON['table'].length ? (
+              <Tooltip title="执行片段">
+                <Button
+                  className="runBtn"
+                  type="primary"
+                  icon={<CaretRightOutlined />}
+                  onClick={() => handleInterimRunSql()}
+                />
+              </Tooltip>
+            ) : (
+              ''
+            )}
+          </>
         )}
       </SimpleViewWrapper>
     );
@@ -362,6 +456,7 @@ const SimpleViewWrapper = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  overflow-y: auto;
   background: ${p => p.theme.componentBackground};
   .addJoinTable {
     width: max-content;
@@ -412,7 +507,7 @@ const SelectTableMain = styled.div`
 const JoinConditionWrapper = styled.div`
   display: flex;
   align-items: center;
-  .joinAddCondition,
+  .joinAddOrDelCondition,
   .addConditionalSteps {
     margin-left: ${SPACE_XS};
     font-size: ${FONT_SIZE_ICON_MD};
@@ -421,6 +516,17 @@ const JoinConditionWrapper = styled.div`
   }
   .addConditionalSteps {
     font-size: ${FONT_SIZE_TITLE};
+  }
+  .joinAddOrDelCondition {
+    display: flex;
+    align-items: center;
+  }
+  .DelCondition {
+    display: none;
+    margin-left: ${SPACE_XS};
+    font-size: ${FONT_SIZE_SUBHEADING};
+    color: ${p => p.theme.textColor};
+    cursor: pointer;
   }
 `;
 
@@ -438,10 +544,23 @@ const JoinConditionColumn = styled.div`
     &:last-child {
       margin-bottom: 0px;
     }
+    &:hover {
+      .DelCondition {
+        display: inline-block;
+      }
+    }
   }
 `;
 
 const ToolWrapper = styled.div`
   display: flex;
   align-items: center;
+`;
+
+const LoadingWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100px;
 `;

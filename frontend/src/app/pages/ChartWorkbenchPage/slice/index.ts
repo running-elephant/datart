@@ -192,6 +192,16 @@ const workbenchSlice = createSlice({
         if (payload.id === state?.backendChart?.view?.id) {
           computedFields = state?.backendChart?.config?.computedFields || [];
         }
+        if (payload.model) {
+          const model = JSON.parse(payload.model);
+          const viewComputerFields = (model.computedFields || []).map(v => {
+            return {
+              ...v,
+              computedFieldsType: 'viewComputerField',
+            };
+          });
+          computedFields = computedFields.concat(viewComputerFields);
+        }
 
         if (index !== undefined) {
           state.currentDataView = {

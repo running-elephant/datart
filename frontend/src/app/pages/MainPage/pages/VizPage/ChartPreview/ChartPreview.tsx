@@ -356,6 +356,7 @@ const ChartPreviewBoard: FC<{
           config: chartPreview?.backendChart?.view.config || {},
           computedFields:
             chartPreview?.backendChart?.config.computedFields || [],
+          type: chartPreview?.backendChart?.view?.type || 'SQL',
         },
         chartPreview?.chartConfig?.datas,
         chartPreview?.chartConfig?.settings,
@@ -502,7 +503,7 @@ const ChartPreviewBoard: FC<{
         }),
       );
     };
-
+    console.log(chartPreview,'chartPreview');
     return (
       <StyledChartPreviewBoard>
         <VizHeader
@@ -554,6 +555,7 @@ const ChartPreviewBoard: FC<{
                     onKeyboardPress={chartIframeKeyboardListener}
                     width={cacheW}
                     height={cacheH}
+                    viewType={chartPreview?.backendChart?.view.type || 'SQL'}
                   />
                 </ChartDrillContextMenu>
               </Spin>

@@ -16,14 +16,15 @@
  * limitations under the License.
  */
 
-import { Col, Input, Row, Select, Space, Tabs } from 'antd';
-import { FormItemEx } from 'app/components';
+import { Col, Input, Row, Select, Space, Tabs, TreeDataNode } from 'antd';
+import { FormItemEx, Tree } from 'app/components';
 import {
   AggregateFieldActionType,
   ChartDataViewFieldCategory,
   DataViewFieldType,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { viewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { ChartComputedFieldHandle } from 'app/types/ComputedFieldEditor';
 import { FC, useRef, useState } from 'react';
@@ -48,8 +49,9 @@ const ChartComputedFieldSettingPanel: FC<{
   sourceId?: string;
   computedField?: ChartDataViewMeta;
   allComputedFields?: ChartDataViewMeta[];
-  fields?: ChartDataViewMeta[];
+  fields?: ChartDataViewMeta[] | TreeDataNode[];
   variables?: ChartDataViewMeta[];
+  viewType?: viewType;
   onChange?: (computedField?: ChartDataViewMeta) => void;
 }> = ({
   sourceId,
@@ -57,6 +59,7 @@ const ChartComputedFieldSettingPanel: FC<{
   allComputedFields,
   fields,
   variables,
+  viewType,
   onChange,
 }) => {
   const t = useI18NPrefix(`viz.workbench.dataview`);
@@ -212,13 +215,27 @@ const ChartComputedFieldSettingPanel: FC<{
         <Col span={4}>
           <Tabs defaultActiveKey="field" onChange={() => {}}>
             <Tabs.TabPane tab={`${t('field')}`} key="field">
-              <ChartSearchableList
-                source={(fields || []).map(f => ({
-                  value: f.id,
-                  label: f.id,
-                }))}
-                onItemSelected={handleFieldSelected}
-              />
+              {viewType === 'STRUCT' ? (
+                <Tree
+                  loading={false}
+                  showIcon={false}
+                  treeData={fields as TreeDataNode[]}
+                  defaultExpandAll={true}
+                  height={500}
+                  onSelect={selectKeys => {
+                    const selectKey = selectKeys[0] as any;
+                    handleFieldSelected(selectKey.join('.'));
+                  }}
+                />
+              ) : (
+                <ChartSearchableList
+                  source={(fields || []).map(f => ({
+                    value: f.id,
+                    label: f.id,
+                  }))}
+                  onItemSelected={handleFieldSelected}
+                />
+              )}
             </Tabs.TabPane>
             <Tabs.TabPane tab={`${t('variable')}`} key="variable">
               <ChartSearchableList

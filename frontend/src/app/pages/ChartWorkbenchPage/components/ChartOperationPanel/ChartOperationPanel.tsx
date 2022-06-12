@@ -20,7 +20,7 @@ import { IChart } from 'app/types/Chart';
 import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import FlexLayout, { Model } from 'flexlayout-react';
 import 'flexlayout-react/style/light.css';
-import { FC, memo, useContext, useState } from 'react';
+import { FC, memo, useContext, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import styled from 'styled-components/macro';
@@ -60,6 +60,9 @@ const ChartOperationPanel: FC<{
     const [layout, setLayout] = useState<Model>(() =>
       Model.fromJson(layoutConfig),
     );
+    const viewType = useMemo(() => {
+      return dataView?.type;
+    }, [dataView]);
 
     const layoutFactory = node => {
       var component = node.getComponent();
@@ -99,6 +102,7 @@ const ChartOperationPanel: FC<{
             expensiveQuery={expensiveQuery}
             allowQuery={allowQuery}
             chartConfig={chartConfig}
+            viewType={viewType}
             onChartChange={onChartChange}
             onRefreshDataset={onRefreshDataset}
             onCreateDownloadDataTask={onCreateDownloadDataTask}

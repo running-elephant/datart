@@ -108,6 +108,7 @@ function useStateModal({ initState }: { initState?: any }) {
     modalSize?: string | number | StateModalSize;
     onOk?: typeof handleClickOKButton;
     onCancel?: typeof handleClickCancelButton;
+    okButtonProps?: Object;
   }) => {
     okCallbackRef.current = props.onOk;
     cancelCallbackRef.current = props.onCancel;
@@ -128,6 +129,7 @@ function useStateModal({ initState }: { initState?: any }) {
       maskClosable: true,
       icon: null,
       centered: true,
+      okButtonProps: props.okButtonProps,
     });
   };
 

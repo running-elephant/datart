@@ -20,7 +20,7 @@ import React from 'react';
 import styled from 'styled-components/macro';
 import ChartDraggableSourceContainer from './ChartDraggableSourceContainer';
 
-const DragPreview = ({ dataItem }) => {
+const DragPreview = ({ dataItem, viewType }) => {
   return (
     <div>
       {dataItem?.slice(0, 3).map((v, i) => (
@@ -32,6 +32,7 @@ const DragPreview = ({ dataItem }) => {
           }}
         >
           <ChartDraggableSourceContainer
+            viewType={viewType}
             type={v.type}
             id={v.colName}
             name={v.colName}

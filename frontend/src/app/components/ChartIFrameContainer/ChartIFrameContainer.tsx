@@ -21,14 +21,19 @@ import {
   FrameContextConsumer,
 } from 'app/components/ReactFrameComponent';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
+import { viewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
+import {
+  handleRowColNameInChartConfig,
+  setRuntimeDateLevelFieldsInChartConfig,
+} from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
 import { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
 import ChartIFrameLifecycleAdapter from './ChartIFrameLifecycleAdapter';
+
 const ChartIFrameContainer: FC<{
   dataset: any;
   chart: IChart;
@@ -42,9 +47,13 @@ const ChartIFrameContainer: FC<{
   onKeyboardPress?: (event: KeyboardEvent) => void;
   widgetSpecialConfig?: any;
   scale?: [number, number];
+  viewType?: viewType;
 }> = memo(props => {
   const iframeContainerId = `chart-iframe-root-${props.containerId}`;
-  const config = setRuntimeDateLevelFieldsInChartConfig(props.config);
+  const config = handleRowColNameInChartConfig(
+    setRuntimeDateLevelFieldsInChartConfig(props.config),
+    props.viewType,
+  );
 
   const transformToSafeCSSProps = (width, height) => {
     let newStyle = { width, height };

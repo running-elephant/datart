@@ -16,56 +16,103 @@
  * limitations under the License.
  */
 
-import { Select } from 'antd';
-import { memo } from 'react';
+import { TreeSelect } from 'antd';
+import { memo, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { SPACE_SM } from 'styles/StyleConstants';
-import { JoinTableProps } from '../../../slice/types';
+import { JoinTableProps, SimpleViewQueryProps } from '../../../slice/types';
 
 interface SelectJoinColumnsProps {
-  columns: Array<string>;
+  tableJSON: SimpleViewQueryProps;
   joinTable: JoinTableProps;
   callbackFn: (field, type, index) => void;
-  index: number;
+  conditionsIndex: number;
+  joinIndex: number;
 }
 
 const SelectJoinColumns = memo(
-  ({ columns, callbackFn, joinTable, index }: SelectJoinColumnsProps) => {
+  ({
+    tableJSON,
+    callbackFn,
+    joinTable,
+    conditionsIndex,
+    joinIndex,
+  }: SelectJoinColumnsProps) => {
+    const handleLeftColumn = useCallback(() => {
+      const tableName = tableJSON.table;
+      const childrenData = tableJSON['columns']?.map((v, i) => {
+        return { title: v, key: [...tableName, v] };
+      });
+      const joinTable: any = [];
+      for (let i = 0; i < joinIndex; i++) {
+        const tableName = tableJSON.joins[i].table!;
+        const childrenData = tableJSON.joins[i]['columns']?.map((v, i) => {
+          return { title: v, key: [...tableName, v] };
+        });
+        joinTable.push({
+          title: tableName,
+          key: tableName,
+          selectable: false,
+          children: childrenData,
+        });
+      }
+      const treeData = [
+        {
+          title: tableName[tableName.length - 1],
+          key: tableName[tableName.length - 1],
+          selectable: false,
+          children: childrenData,
+        },
+        ...joinTable,
+      ];
+      return treeData;
+    }, [joinIndex, tableJSON]);
+
+    const handleRightColumn = useCallback((): any => {
+      const joinTableName = joinTable.table!;
+      const childrenData = joinTable.columns?.map((v, i) => {
+        return { title: v, key: [...joinTableName, v] };
+      });
+      const treeData: any = [
+        {
+          title: joinTableName[joinTableName.length - 1],
+          key: joinTableName,
+          selectable: false,
+          children: childrenData,
+        },
+      ];
+      return treeData;
+    }, [joinTable.table, joinTable.columns]);
+
+    useEffect(() => {
+      handleLeftColumn();
+    }, [handleLeftColumn]);
+
     return (
-      <JoinColumnsWrapper key={index}>
-        <Select
+      <JoinColumnsWrapper key={conditionsIndex}>
+        <TreeSelect
+          allowClear
           style={{ minWidth: '100px' }}
           placeholder={'选择一个字段'}
-          value={joinTable.conditions?.[index]?.left}
+          treeDefaultExpandAll={true}
+          value={joinTable.conditions?.[conditionsIndex]?.left.slice(-1)}
           onChange={columnName => {
-            callbackFn(columnName, 'left', index);
+            callbackFn(columnName || [], 'left', conditionsIndex);
           }}
-        >
-          {columns?.map((name, i) => {
-            return (
-              <Select.Option key={name} value={name}>
-                {name}
-              </Select.Option>
-            );
-          })}
-        </Select>
+          treeData={handleLeftColumn()}
+        ></TreeSelect>
         <JoinConditionLabel>=</JoinConditionLabel>
-        <Select
+        <TreeSelect
+          allowClear
           style={{ minWidth: '100px' }}
           placeholder={'选择一个字段'}
-          value={joinTable.conditions?.[index]?.right}
-          onChange={columnName => {
-            callbackFn(columnName, 'right', index);
+          treeDefaultExpandAll={true}
+          value={joinTable.conditions?.[conditionsIndex]?.right.slice(-1)}
+          onChange={(columnName, label) => {
+            callbackFn(columnName || [], 'right', conditionsIndex);
           }}
-        >
-          {joinTable.columns?.map((name, i) => {
-            return (
-              <Select.Option key={name} value={name}>
-                {name}
-              </Select.Option>
-            );
-          })}
-        </Select>
+          treeData={handleRightColumn()}
+        ></TreeSelect>
       </JoinColumnsWrapper>
     );
   },

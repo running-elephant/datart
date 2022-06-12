@@ -410,7 +410,7 @@ describe('should getDataChartRequestParams', () => {
     const targetFilter = [
       {
         aggOperator: null,
-        column: 'actor',
+        column: ['actor'],
         sqlOperator: 'IN',
         values: [
           {
@@ -774,7 +774,7 @@ describe('getTheWidgetFiltersAndParams', () => {
       filterParams: [
         {
           aggOperator: null,
-          column: '日期',
+          column: ['日期'],
           sqlOperator: 'NE',
           values: [
             {
@@ -910,7 +910,7 @@ describe('getTheWidgetFiltersAndParams', () => {
       filterParams: [
         {
           aggOperator: null,
-          column: 'name_level1',
+          column: ['name_level1'],
           sqlOperator: 'NE',
           values: [
             {
@@ -1754,19 +1754,21 @@ describe('getBoardChartRequests', () => {
         viewId: '836614b7c86042cdbd38fc40da270846',
         aggregators: [
           {
-            column: '总停留时间',
+            alias: 'SUM(总停留时间)',
+            column: ['总停留时间'],
             sqlOperator: 'SUM',
           },
         ],
         groups: [
           {
-            column: 'name_level2',
+            alias: 'name_level2',
+            column: ['name_level2'],
           },
         ],
         filters: [
           {
             aggOperator: null,
-            column: 'name_level3',
+            column: ['name_level3'],
             sqlOperator: 'IN',
             values: [
               {
@@ -1777,7 +1779,7 @@ describe('getBoardChartRequests', () => {
           },
           {
             aggOperator: null,
-            column: 'name_level1',
+            column: ['name_level1'],
             sqlOperator: 'IN',
             values: [
               {
@@ -1813,13 +1815,15 @@ describe('getBoardChartRequests', () => {
         viewId: '3ca2a12f09c84c8ca1a5714fc6fa44d8',
         aggregators: [
           {
-            column: 'GDP（亿元）',
+            alias: 'SUM(GDP（亿元）)',
+            column: ['GDP（亿元）'],
             sqlOperator: 'SUM',
           },
         ],
         groups: [
           {
-            column: '城市',
+            alias: '城市',
+            column: ['城市'],
           },
         ],
         filters: [],

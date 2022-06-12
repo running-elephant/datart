@@ -48,9 +48,9 @@ export enum ConcurrencyControlModes {
 export const UNPERSISTED_ID_PREFIX = 'GENERATED-';
 
 export enum SimpleViewJoinType {
-  rightJoin = 'RIGHTJOIN',
-  leftJoin = 'LEFTJOIN',
-  innerJoin = 'INNERJOIN',
+  rightJoin = 'RIGHT',
+  leftJoin = 'LEFT',
+  innerJoin = 'INNER',
 }
 
 export const DEFAULT_PREVIEW_SIZE = 1000;

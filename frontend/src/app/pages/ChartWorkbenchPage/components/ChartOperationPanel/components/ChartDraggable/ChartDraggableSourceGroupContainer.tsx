@@ -17,6 +17,7 @@
  */
 
 import { List } from 'antd';
+import { viewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { FC, memo, useCallback, useContext, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -26,10 +27,12 @@ import { ChartDraggableSourceContainer } from './ChartDraggableSourceContainer';
 import ChartDragLayer from './ChartDragLayer';
 
 export const ChartDraggableSourceGroupContainer: FC<{
+  viewType?: viewType;
   meta?: ChartDataViewMeta[];
   onDeleteComputedField: (fieldName) => void;
   onEditComputedField: (fieldName) => void;
 }> = memo(function ChartDraggableSourceGroupContainer({
+  viewType,
   meta,
   onDeleteComputedField,
   onEditComputedField,
@@ -104,7 +107,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
   return (
     <Container onClick={onClearCheckedList}>
       {/* 拖动层组件 */}
-      <ChartDragLayer />
+      <ChartDragLayer viewType={viewType} />
       <List
         dataSource={meta}
         rowKey={item => item.id}
@@ -122,6 +125,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
               subType={item.subType}
               role={item.role}
               children={item.children}
+              viewType={viewType}
               onDeleteComputedField={onDeleteComputedField}
               onEditComputedField={handleEditComputedField}
               onSelectionChange={onDataItemSelectionChange}

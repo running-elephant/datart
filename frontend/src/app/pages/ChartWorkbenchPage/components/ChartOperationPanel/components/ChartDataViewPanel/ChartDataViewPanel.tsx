@@ -46,7 +46,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { SPACE, SPACE_XS } from 'styles/StyleConstants';
-import { getPath } from 'utils/utils';
+import { getPath, handleStructureViewName } from 'utils/utils';
 import { ChartDraggableSourceGroupContainer } from '../ChartDraggable';
 import ChartComputedFieldSettingPanel from './components/ChartComputedFieldSettingPanel';
 
@@ -76,6 +76,10 @@ const ChartDataViewPanel: FC<{
         )
       : [];
   }, [views, dataView]);
+
+  const viewType = useMemo(() => {
+    return dataView?.type;
+  }, [dataView]);
 
   const managePermission = useCascadeAccess({
     module: ResourceTypes.View,
@@ -189,9 +193,20 @@ const ChartDataViewPanel: FC<{
   };
 
   const handleDeleteComputedField = fieldId => {
-    const newComputedFields = (dataView?.computedFields || []).filter(
-      f => f.id !== fieldId,
-    );
+    const newComputedFields: ChartDataViewMeta[] = [];
+    let deleteField: ChartDataViewMeta | null = null;
+
+    (dataView?.computedFields || []).forEach(f => {
+      if (f.id !== fieldId) {
+        newComputedFields.push(f);
+      } else {
+        deleteField = f;
+      }
+    });
+    if (deleteField!.computedFieldsType === 'viewComputerField') {
+      message.error('视图中创建的计算字段不能删除');
+      return false;
+    }
     dispatch(
       workbenchSlice.actions.updateCurrentDataViewComputedFields(
         newComputedFields,
@@ -203,7 +218,36 @@ const ChartDataViewPanel: FC<{
     const editField = (dataView?.computedFields || []).find(
       f => f.id === fieldId,
     );
+
     handleAddOrEditComputedField(editField);
+  };
+
+  const buildFieldsForComputedFieldSettingPanel = meta => {
+    return meta.reduce((acc, cur) => {
+      if (cur.children) {
+        return acc.concat(
+          cur.children.map(v => {
+            return {
+              ...v,
+              id:
+                dataView?.type === 'STRUCT'
+                  ? handleStructureViewName(v.id)
+                  : v.id,
+            };
+          }),
+        );
+      } else {
+        return acc.concat([
+          {
+            ...cur,
+            id:
+              dataView?.type === 'STRUCT'
+                ? handleStructureViewName(cur.id)
+                : cur.id,
+          },
+        ]);
+      }
+    }, []);
   };
 
   const handleAddOrEditComputedField = field => {
@@ -214,15 +258,19 @@ const ChartDataViewPanel: FC<{
         <ChartComputedFieldSettingPanel
           computedField={field}
           sourceId={dataView?.sourceId}
-          fields={dataView?.meta}
+          fields={buildFieldsForComputedFieldSettingPanel(dataView?.meta)}
           variables={dataView?.meta?.filter(
             c => c.category === ChartDataViewFieldCategory.Variable,
           )}
           allComputedFields={dataView?.computedFields}
+          viewType={'SQL'}
           onChange={onChange}
         />
       ),
       onOk: newField => handleAddNewOrUpdateComputedField(newField, field?.id),
+      okButtonProps: {
+        disabled: field?.computedFieldsType === 'viewComputerField',
+      },
     });
   };
 
@@ -231,6 +279,7 @@ const ChartDataViewPanel: FC<{
       v => v.category !== ChartDataViewFieldCategory.DateLevelComputedField,
     );
     const allFields = (dataView?.meta || []).concat(computedFields || []);
+
     const hierarchyFields = allFields.filter(
       f => f.role === ColumnRole.Hierarchy,
     );
@@ -321,6 +370,7 @@ const ChartDataViewPanel: FC<{
         {modalContextHolder}
       </Header>
       <ChartDraggableSourceGroupContainer
+        viewType={viewType}
         meta={sortedMetaFields}
         onDeleteComputedField={handleDeleteComputedField}
         onEditComputedField={handleEditComputedField}

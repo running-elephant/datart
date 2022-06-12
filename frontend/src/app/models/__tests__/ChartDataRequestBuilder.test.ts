@@ -153,11 +153,11 @@ describe('ChartDataRequestBuild Test', () => {
     const requestParams = builder.build();
 
     expect(requestParams.aggregators).toEqual([
-      { column: 'amount', sqlOperator: 'AVG' },
-      { column: 'sub-amount', sqlOperator: 'SUM' },
-      { column: 'total', sqlOperator: 'COUNT' },
-      { column: 'sex', sqlOperator: undefined },
-      { column: 'age', sqlOperator: undefined },
+      { alias: 'AVG(amount)', column: ['amount'], sqlOperator: 'AVG' },
+      { alias: 'SUM(sub-amount)', column: ['sub-amount'], sqlOperator: 'SUM' },
+      { alias: 'COUNT(total)', column: ['total'], sqlOperator: 'COUNT' },
+      { alias: 'sex', column: ['sex'], sqlOperator: undefined },
+      { alias: 'age', column: ['age'], sqlOperator: undefined },
     ]);
   });
 
@@ -239,7 +239,7 @@ describe('ChartDataRequestBuild Test', () => {
     const requestParams = builder.build();
 
     expect(requestParams.aggregators).toEqual([
-      { column: 'amount', sqlOperator: 'AVG' },
+      { alias: 'AVG(amount)', column: ['amount'], sqlOperator: 'AVG' },
     ]);
   });
 
@@ -305,9 +305,9 @@ describe('ChartDataRequestBuild Test', () => {
     const requestParams = builder.build();
 
     expect(requestParams.groups).toEqual([
-      { column: 'name' },
-      { column: 'age' },
-      { column: 'address' },
+      { column: ['name'], alias: 'name' },
+      { column: ['age'], alias: 'age' },
+      { column: ['address'], alias: 'address' },
     ]);
 
     const enableAggregation2 = false;
@@ -534,7 +534,7 @@ describe('ChartDataRequestBuild Test', () => {
     expect(requestParams.filters).toEqual([
       {
         aggOperator: null,
-        column: 'name',
+        column: ['name'],
         sqlOperator: 'IN',
         values: [
           { value: 'a', valueType: 'STRING' },
@@ -543,7 +543,7 @@ describe('ChartDataRequestBuild Test', () => {
       },
       {
         aggOperator: 'AVG',
-        column: 'name',
+        column: ['name'],
         sqlOperator: 'IN',
         values: [
           { value: 'a', valueType: 'STRING' },
@@ -552,19 +552,19 @@ describe('ChartDataRequestBuild Test', () => {
       },
       {
         aggOperator: undefined,
-        column: 'name',
+        column: ['name'],
         sqlOperator: 'NOT_NULL',
         values: [],
       },
       {
         aggOperator: undefined,
-        column: 'name',
+        column: ['name'],
         sqlOperator: 'IS_NULL',
         values: [],
       },
       {
         aggOperator: undefined,
-        column: 'address',
+        column: ['address'],
         sqlOperator: 'NOT_IN',
         values: [
           { value: 'a', valueType: 'STRING' },
@@ -573,25 +573,25 @@ describe('ChartDataRequestBuild Test', () => {
       },
       {
         aggOperator: undefined,
-        column: 'family',
+        column: ['family'],
         sqlOperator: 'IN',
         values: [{ value: 'a', valueType: 'STRING' }],
       },
       {
         aggOperator: undefined,
-        column: 'born',
+        column: ['born'],
         sqlOperator: 'IN',
         values: [{ value: '2022-03-16 00:00:00', valueType: 'DATE' }],
       },
       {
         aggOperator: undefined,
-        column: 'born',
+        column: ['born'],
         sqlOperator: 'IN',
         values: [{ value: `${today} 00:00:00`, valueType: 'DATE' }],
       },
       {
         aggOperator: undefined,
-        column: 'born',
+        column: ['born'],
         sqlOperator: 'IN',
         values: [
           { value: `${today} 00:00:00`, valueType: 'DATE' },
@@ -600,13 +600,13 @@ describe('ChartDataRequestBuild Test', () => {
       },
       {
         aggOperator: undefined,
-        column: 'birthday',
+        column: ['birthday'],
         sqlOperator: 'IN',
         values: [{ value: 'Invalid date', valueType: 'DATE' }],
       },
       {
         aggOperator: undefined,
-        column: 'born',
+        column: ['born'],
         sqlOperator: 'IN',
         values: [
           { value: `${today} 00:00:00`, valueType: 'DATE' },
@@ -700,13 +700,13 @@ describe('ChartDataRequestBuild Test', () => {
 
     expect(requestParams.orders).toEqual([
       {
-        column: 'age',
+        column: ['age'],
         aggOperator: 'AVG',
         operator: 'ASC',
       },
-      { column: 'first-name', operator: 'ASC', aggOperator: undefined },
-      { column: 'last-name', operator: 'DESC', aggOperator: undefined },
-      { column: 'address', operator: 'DESC', aggOperator: undefined },
+      { column: ['first-name'], operator: 'ASC', aggOperator: undefined },
+      { column: ['last-name'], operator: 'DESC', aggOperator: undefined },
+      { column: ['address'], operator: 'DESC', aggOperator: undefined },
     ]);
   });
 
@@ -798,9 +798,9 @@ describe('ChartDataRequestBuild Test', () => {
     const requestParams = builder.build();
 
     expect(requestParams.orders).toEqual([
-      { column: 'first-name', operator: 'ASC', aggOperator: undefined },
-      { column: 'last-name', operator: 'DESC', aggOperator: undefined },
-      { column: 'address', operator: 'DESC', aggOperator: undefined },
+      { column: ['first-name'], operator: 'ASC', aggOperator: undefined },
+      { column: ['last-name'], operator: 'DESC', aggOperator: undefined },
+      { column: ['address'], operator: 'DESC', aggOperator: undefined },
       {
         column: 'age',
         aggOperator: 'AVG',
@@ -813,9 +813,9 @@ describe('ChartDataRequestBuild Test', () => {
     builder.addExtraSorters(extraSorters2);
 
     expect(requestParams.orders).toEqual([
-      { column: 'first-name', operator: 'ASC', aggOperator: undefined },
-      { column: 'last-name', operator: 'DESC', aggOperator: undefined },
-      { column: 'address', operator: 'DESC', aggOperator: undefined },
+      { column: ['first-name'], operator: 'ASC', aggOperator: undefined },
+      { column: ['last-name'], operator: 'DESC', aggOperator: undefined },
+      { column: ['address'], operator: 'DESC', aggOperator: undefined },
       {
         column: 'age',
         aggOperator: 'AVG',
@@ -1065,12 +1065,12 @@ describe('ChartDataRequestBuild Test', () => {
     const requestParams = builder.build();
 
     expect(requestParams.columns).toEqual([
-      'amount',
-      'total',
-      'sex',
-      'sex',
-      'name',
-      'name',
+      { alias: 'amount', column: ['amount'] },
+      { alias: 'total', column: ['total'] },
+      { alias: 'sex', column: ['sex'] },
+      { alias: 'sex', column: ['sex'] },
+      { alias: 'name', column: ['name'] },
+      { alias: 'name', column: ['name'] },
     ]);
   });
 
@@ -1181,12 +1181,12 @@ describe('ChartDataRequestBuild Test', () => {
     const requestParams = builder.build();
 
     expect(requestParams.columns).toEqual([
-      'group-r2',
-      'amount',
-      'size',
-      'info',
-      'color',
-      'mix',
+      { alias: 'group-r2', column: ['group-r2'] },
+      { alias: 'amount', column: ['amount'] },
+      { alias: 'size', column: ['size'] },
+      { alias: 'info', column: ['info'] },
+      { alias: 'color', column: ['color'] },
+      { alias: 'mix', column: ['mix'] },
     ]);
   });
 });

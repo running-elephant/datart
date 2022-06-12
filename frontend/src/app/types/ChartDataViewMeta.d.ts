@@ -34,4 +34,5 @@ export type ChartDataViewMeta = {
   expression?: string;
   role?: string;
   children?: ChartDataViewMeta[];
+  computedFieldsType?: 'viewComputerField' | '';
 };

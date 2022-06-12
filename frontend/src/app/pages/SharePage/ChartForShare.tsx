@@ -257,6 +257,7 @@ const ChartForShare: FC<{
               onKeyboardPress={chartIframeKeyboardListener}
               width={width}
               height={height}
+              viewType={chartPreview?.backendChart?.view?.type || 'SQL'}
             />
           </ChartDrillContextMenu>
         </div>

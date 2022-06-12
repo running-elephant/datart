@@ -374,6 +374,7 @@ export function transformHierarchyMeta(model?: string): ChartDataViewMeta[] {
   const hierarchyMeta = !Object.keys(modelObj?.hierarchy || {}).length
     ? modelObj.columns
     : modelObj.hierarchy;
+
   return Object.keys(hierarchyMeta || {}).map(key => {
     return getMeta(key, hierarchyMeta?.[key]);
   });

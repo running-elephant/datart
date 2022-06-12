@@ -344,10 +344,11 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               const contentProps = {
                 modalSize: modalSize,
                 config: currentConfig,
-                columnConfig: columnConfig,
+                columnConfig,
                 ancestors: ancestors,
                 aggregation: aggregation,
                 availableSourceFunctions,
+                viewType: dataView?.type,
                 onConfigChanged: onConfigChanged,
                 handleOpenActionModal: handleOpenActionModal,
               };

@@ -194,12 +194,15 @@ export const getControlOptionQueryParams = (obj: {
     widgetMap: obj.widgetMap,
     params: undefined,
   });
+
   const requestParams: ChartDataRequest = {
     ...viewConfigs,
     aggregators: [],
     filters: filterParams,
     groups: [],
-    columns: [...new Set(obj.columns)],
+    columns: [...new Set(obj.columns)].map(v => {
+      return { alias: v, column: [v] };
+    }),
     pageInfo: {
       pageNo: 1,
       pageSize: 99999999,

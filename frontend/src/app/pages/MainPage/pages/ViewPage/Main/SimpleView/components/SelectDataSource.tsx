@@ -33,9 +33,12 @@ import { selectSources } from '../../../../SourcePage/slice/selectors';
 import { Source } from '../../../../SourcePage/slice/types';
 import { selectAllSourceDatabaseSchemas } from '../../../slice/selectors';
 import { getSchemaBySourceId } from '../../../slice/thunks';
-import { DatabaseSchema, SimpleViewQueryProps } from '../../../slice/types';
+import {
+  DatabaseSchema,
+  JoinTableProps,
+  SimpleViewQueryProps,
+} from '../../../slice/types';
 import { buildAntdTreeNodeModel } from '../../../utils';
-
 const CheckboxGroup = Checkbox.Group;
 
 interface SelectDataSourceProps {
@@ -44,6 +47,7 @@ interface SelectDataSourceProps {
   renderType?: 'READ' | 'OPERATE';
   tableJSON?: SimpleViewQueryProps;
   sourceId?: string;
+  joinTable?: JoinTableProps;
 }
 
 const SelectDataSource = memo(
@@ -53,6 +57,7 @@ const SelectDataSource = memo(
     renderType = 'OPERATE',
     tableJSON,
     sourceId,
+    joinTable,
   }: SelectDataSourceProps) => {
     const dispatch = useDispatch();
     const propsSources = useSelector(selectSources);
@@ -60,7 +65,7 @@ const SelectDataSource = memo(
 
     const [currentSources, setCurrentSources] = useState<Source | null>(null);
     const [selectDataSheet, setSelectDataSheet] = useState<any>(
-      tableJSON
+      tableJSON && renderType === 'READ'
         ? { table: tableJSON['table'], columns: tableJSON['columns'] }
         : null,
     );
@@ -173,6 +178,7 @@ const SelectDataSource = memo(
         if (node.children) {
           return;
         }
+
         const databaseSchemas = allDatabaseSchemas[currentSources!.id];
         const nodeList = node.value;
         const sheetName = node.value[node.value.length - 1];
@@ -182,9 +188,11 @@ const SelectDataSource = memo(
           columns: columns,
           sourceId: currentSources!.id,
         };
+
         if (type === 'JOINS') {
           delete dataSheet.sourceId;
         }
+
         setSelectDataSheet(dataSheet);
         callbackFn?.(dataSheet, type);
         onCheckAllDataSheet(true, dataSheet);
@@ -209,18 +217,45 @@ const SelectDataSource = memo(
 
     useEffect(() => {
       if (renderType === 'READ') {
-        setSelectDataSheet({
-          table: tableJSON?.['table'],
-          columns: tableJSON?.['columns'],
-        });
+        const leftContainer = joinTable?.conditions?.[0].left;
+
+        if (leftContainer) {
+          tableJSON?.joins.forEach(v => {
+            if (v.table?.every(val => leftContainer?.includes(val))) {
+              setSelectDataSheet({
+                table: v?.['table'],
+                columns: v?.['columns'],
+              });
+            }
+          });
+        }
       }
-    }, [tableJSON, renderType]);
+    }, [tableJSON, renderType, joinTable?.conditions]);
 
     useEffect(() => {
       if (type === 'JOINS') {
         setCurrentSources(sources.find(v => v.id === sourceId) || null);
       }
     }, [sourceId, sources, type]);
+
+    useEffect(() => {
+      if (type === 'MAIN' && tableJSON?.table.length && !selectDataSheet) {
+        setCurrentSources(sources.find(v => v.id === sourceId) || null);
+        setSelectDataSheet({
+          table: tableJSON['table'],
+          columns: tableJSON['columns'],
+        });
+        setCheckedList(tableJSON['columns']);
+      }
+
+      if (type === 'JOINS' && joinTable?.table && !selectDataSheet) {
+        setSelectDataSheet({
+          table: joinTable['table'],
+          columns: joinTable['columns'],
+        });
+        setCheckedList(joinTable['columns']!);
+      }
+    }, []);
 
     return (
       <SelectDataSourceWrapper>
@@ -246,7 +281,7 @@ const SelectDataSource = memo(
                 <Tree
                   autoExpandParent
                   defaultExpandParent
-                  loading={false}
+                  loading={!dataSheet}
                   icon={renderIcon}
                   treeData={dataSheet}
                   onSelect={handleSelectDataSheet}
@@ -289,7 +324,7 @@ const SelectDataSource = memo(
                 <Checkbox
                   indeterminate={indeterminate}
                   onChange={e => {
-                    onCheckAllDataSheet(e.target.value, selectDataSheet);
+                    onCheckAllDataSheet(e.target.checked, selectDataSheet);
                   }}
                   checked={checkAll}
                 >

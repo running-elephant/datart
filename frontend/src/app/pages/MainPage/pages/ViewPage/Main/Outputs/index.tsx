@@ -48,6 +48,7 @@ export const Outputs = memo(() => {
   const warnings = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'warnings' }),
   ) as string[];
+
   const { width, height, ref } = useResizeObserver({
     refreshMode: 'debounce',
     refreshRate: 200,

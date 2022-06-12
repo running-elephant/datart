@@ -209,7 +209,7 @@ export const getTheWidgetFiltersAndParams = (obj: {
     if (relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Field) {
       const filter: ChartDataRequestFilter = {
         aggOperator: null,
-        column: String(relatedViewItem.fieldValue),
+        column: [String(relatedViewItem.fieldValue)],
         sqlOperator: controllerConfig.sqlOperator,
         values: values,
       };

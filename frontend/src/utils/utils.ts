@@ -408,3 +408,10 @@ export function newIssueUrl({ type, ...options }) {
 
   return url.toString();
 }
+
+export function handleStructureViewName(name) {
+  if (typeof name === 'string') {
+    return JSON.parse(name)?.join('.');
+  }
+  return name;
+}

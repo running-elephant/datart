@@ -28,7 +28,10 @@ import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selec
 import { IChart } from 'app/types/Chart';
 import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
+import {
+  handleRowColNameInChartConfig,
+  setRuntimeDateLevelFieldsInChartConfig,
+} from 'app/utils/chartHelper';
 import { FC, memo, useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -56,6 +59,7 @@ const ChartPresentPanel: FC<{
   chartConfig?: ChartConfig;
   expensiveQuery: boolean;
   allowQuery: boolean;
+  viewType?: string;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
   selectedItems?: SelectedItem[];
@@ -69,6 +73,7 @@ const ChartPresentPanel: FC<{
     chartConfig,
     expensiveQuery,
     allowQuery,
+    viewType,
     onRefreshDataset,
     onCreateDownloadDataTask,
     selectedItems,
@@ -90,7 +95,11 @@ const ChartPresentPanel: FC<{
       if (!chart?.isMatchRequirement(chartConfig)) {
         return <Chart404Graph chart={chart} chartConfig={chartConfig} />;
       }
-      chartConfig = setRuntimeDateLevelFieldsInChartConfig(chartConfig);
+      chartConfig = handleRowColNameInChartConfig(
+        setRuntimeDateLevelFieldsInChartConfig(chartConfig),
+        viewType,
+      );
+
       return (
         !!chart &&
         chartDispatcher.getContainers(
