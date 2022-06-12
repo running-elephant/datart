@@ -53,6 +53,7 @@ class BasicFunnelChart extends Chart {
   config = Config;
   chart: any = null;
   selectable = true;
+  selectedItems = [];
 
   constructor() {
     super(
@@ -92,6 +93,7 @@ class BasicFunnelChart extends Chart {
     if (!this.isMatchRequirement(options.config)) {
       return;
     }
+    this.selectedItems = options.selectedItems;
     const newOptions = this.getOptions(
       options.dataset,
       options.config,
@@ -111,13 +113,13 @@ class BasicFunnelChart extends Chart {
   }
 
   clearAllSelectedItems(e: Event) {
-    if (!e.target) {
+    if (!e.target && this.selectedItems.length) {
       this.mouseEvents
         ?.find(v => v.name === 'click')
         ?.callback({
-          data: [],
-          seriesName: 'changeSelectedItems',
-        } as any);
+          selectedItems: [],
+          interactionType: 'selected',
+        });
     }
   }
 
