@@ -77,7 +77,7 @@ export const initInteractionTpl = () => {
     {
       label: 'drillThrough.title',
       key: 'drillThrough',
-      comType: 'boardCheckboxModal',
+      comType: 'checkboxModal',
       default: false,
       options: { modalSize: 'middle' },
       rows: [
@@ -91,7 +91,7 @@ export const initInteractionTpl = () => {
     {
       label: 'viewDetail.title',
       key: 'viewDetail',
-      comType: 'boardCheckboxModal',
+      comType: 'checkboxModal',
       default: false,
       options: { modalSize: 'middle' },
       rows: [

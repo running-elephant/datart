@@ -17,7 +17,6 @@
  */
 
 export { default as Background } from './Background';
-export { default as BoardCheckboxModal } from './BoardCheckboxModal';
 export { default as CheckboxModal } from './CheckboxModal';
 export { default as ConditionalStylePanel } from './ConditionalStyle';
 export { default as DataReferencePanel } from './DataReferencePanel';
