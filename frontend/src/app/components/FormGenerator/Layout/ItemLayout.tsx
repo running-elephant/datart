@@ -50,6 +50,7 @@ import {
 } from '../Basic';
 import {
   Background,
+  BoardCheckboxModal,
   CheckboxModal,
   ConditionalStylePanel,
   DataReferencePanel,
@@ -203,6 +204,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <TimerFormat {...props} />;
         case ChartStyleSectionComponentType.CHECKBOX_MODAL:
           return <CheckboxModal {...props} />;
+        case ChartStyleSectionComponentType.BOARD_CHECKBOX_MODAL:
+          return <BoardCheckboxModal {...props} />;
         case ChartStyleSectionComponentType.INTERACTION_DRILL_THROUGH_PANEL:
           return <DrillThroughPanel {...props} />;
         case ChartStyleSectionComponentType.INTERACTION_VIEW_DETAIL_PANEL:

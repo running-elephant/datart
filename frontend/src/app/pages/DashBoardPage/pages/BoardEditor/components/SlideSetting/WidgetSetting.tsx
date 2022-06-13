@@ -15,11 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import { Tabs } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
+import { getValue } from 'app/utils/chartHelper';
+import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectViewMap } from '../../../Board/slice/selector';
@@ -69,6 +72,52 @@ export const WidgetSetting: FC = memo(() => {
     );
   };
 
+  console.log(
+    `widget.config.content?.dataChart?.config?.chartConfig?.interactions ---> `,
+    widget.config.content?.dataChart?.config?.chartConfig?.interactions,
+  );
+
+  const updateInteractionOptionWhenHasChartInteraction = (
+    interactions: ChartStyleConfig[],
+  ) => {
+    const chartInteractions =
+      widget.config.content?.dataChart?.config?.chartConfig?.interactions || [];
+    const drillThroughKey = 'drillThrough';
+    const viewDetailKey = 'viewDetail';
+    const hasEnableDrillThrough = getValue(chartInteractions || [], [
+      drillThroughKey,
+    ]);
+    const hasEnableViewDetail = getValue(chartInteractions || [], [
+      viewDetailKey,
+    ]);
+
+    // TODO: hasLinkPanel with options
+
+    return updateBy(interactions, draft => {
+      let boardDrillThrough = draft.find(i => i.key === drillThroughKey);
+      let boardViewDetail = draft.find(i => i.key === viewDetailKey);
+      if (boardDrillThrough && hasEnableDrillThrough) {
+        boardDrillThrough.options = Object.assign(
+          {},
+          boardDrillThrough?.options,
+          {
+            hasOriginal: true,
+          },
+        );
+      }
+      if (boardViewDetail && hasEnableViewDetail) {
+        boardViewDetail.options = Object.assign(
+          {},
+          boardDrillThrough?.options,
+          {
+            hasOriginal: true,
+          },
+        );
+      }
+      return interactions;
+    });
+  };
+
   return (
     <Tabs activeKey={currentTab} onChange={key => setCurrentTab(key)}>
       <TabPane tab={t('style')} key="style">
@@ -86,15 +135,17 @@ export const WidgetSetting: FC = memo(() => {
       <TabPane tab={t('interaction')} key="interaction">
         <SettingPanel title={`${t('widget')}${t('setting')}`}>
           <WidgetConfigPanel
-            configs={widget.config.customConfig.interactions || []}
-            onChange={handleInteractionConfigChange}
+            configs={updateInteractionOptionWhenHasChartInteraction(
+              widget.config.customConfig.interactions || [],
+            )}
+            dataConfigs={
+              widget.config.content?.dataChart?.config?.chartConfig?.datas
+            }
             context={{
               vizs,
               dataview: viewMap?.[widget?.config?.content?.dataChart?.viewId],
             }}
-            dataConfigs={
-              widget.config.content?.dataChart?.config?.chartConfig?.datas
-            }
+            onChange={handleInteractionConfigChange}
           />
         </SettingPanel>
       </TabPane>

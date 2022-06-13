@@ -229,6 +229,7 @@ export const ChartStyleSectionComponentType = {
   WIDGET_BORDER: 'widgetBorder',
   TIMER_FORMAT: 'timerFormat',
   CHECKBOX_MODAL: 'checkboxModal',
+  BOARD_CHECKBOX_MODAL: 'boardCheckboxModal',
   INTERACTION_DRILL_THROUGH_PANEL: 'interaction.drillThrough',
   INTERACTION_VIEW_DETAIL_PANEL: 'interaction.viewDetail',
 };
