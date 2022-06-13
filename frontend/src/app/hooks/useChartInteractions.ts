@@ -27,7 +27,6 @@ import {
 } from 'app/components/FormGenerator/Customize/Interaction/types';
 import useDrillThrough from 'app/hooks/useDrillThrough';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
-import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { getStyles, getValue } from 'app/utils/chartHelper';
 import {
   buildClickEventBaseFilters,
@@ -37,6 +36,7 @@ import {
 import qs from 'qs';
 import { useCallback } from 'react';
 import { isEmpty } from 'utils/object';
+import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 
 const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
   const [

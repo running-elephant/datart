@@ -49,6 +49,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
+import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 import useDisplayViewDetail from '../hooks/useDisplayViewDetail';
 import useQSLibUrlHelper from '../hooks/useQSLibUrlHelper';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
@@ -70,7 +71,6 @@ import {
   updateGroupAndFetchDataset,
 } from '../slice/thunks';
 import { ChartPreview } from '../slice/types';
-import { urlSearchTransfer } from '../utils';
 import ControllerPanel from './components/ControllerPanel';
 
 const ChartPreviewBoard: FC<{
