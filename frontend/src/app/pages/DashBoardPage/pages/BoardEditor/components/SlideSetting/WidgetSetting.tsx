@@ -72,11 +72,6 @@ export const WidgetSetting: FC = memo(() => {
     );
   };
 
-  console.log(
-    `widget.config.content?.dataChart?.config?.chartConfig?.interactions ---> `,
-    widget.config.content?.dataChart?.config?.chartConfig?.interactions,
-  );
-
   const updateInteractionOptionWhenHasChartInteraction = (
     interactions: ChartStyleConfig[],
   ) => {

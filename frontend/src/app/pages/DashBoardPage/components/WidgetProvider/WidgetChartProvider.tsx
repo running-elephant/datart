@@ -17,6 +17,7 @@
  */
 
 import { DataChart } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import ChartDataView from 'app/types/ChartDataView';
 import { createContext, FC, memo, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import {
@@ -51,6 +52,7 @@ export const SupportTriggerChartIds: string[] = [
 ];
 export const WidgetChartContext = createContext<{
   dataChart: DataChart | undefined;
+  chartDataView?: ChartDataView;
   availableSourceFunctions?: string[];
   supportTrigger: boolean;
 }>({
@@ -73,9 +75,15 @@ export const WidgetChartProvider: FC = memo(({ children }) => {
   const supportTrigger = SupportTriggerChartIds.includes(
     dataChart?.config?.chartGraphId,
   );
+  const chartDataView = viewMap[dataChart?.viewId];
   return (
     <WidgetChartContext.Provider
-      value={{ dataChart, availableSourceFunctions, supportTrigger }}
+      value={{
+        dataChart,
+        availableSourceFunctions,
+        supportTrigger,
+        chartDataView,
+      }}
     >
       {children}
     </WidgetChartContext.Provider>
