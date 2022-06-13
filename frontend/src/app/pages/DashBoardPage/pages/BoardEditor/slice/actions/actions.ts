@@ -54,6 +54,7 @@ import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
+import { ChartMouseEventParams } from '../../../../../../types/Chart';
 import { ORIGINAL_TYPE_MAP } from '../../../../constants';
 import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
 import { EventLayerNode } from '../../components/LayerPanel/LayerTreeItem';
@@ -560,15 +561,7 @@ export const selectedItemChange = (
   params,
   wid,
 ) => {
-  const {
-    dataIndex,
-    componentIndex,
-    data,
-  }: {
-    dataIndex?: number;
-    componentIndex?: number;
-    data?: { rowData: { [p: string]: any } };
-  } = params;
+  const { dataIndex, componentIndex, data }: ChartMouseEventParams = params;
   if (!data?.rowData) return;
   const option = {
     wid,
