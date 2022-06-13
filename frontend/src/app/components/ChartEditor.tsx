@@ -55,7 +55,6 @@ import {
   useSaveFormContext,
 } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { ChartMouseEventParams, IChart } from 'app/types/Chart';
-import { SelectedItem } from 'app/types/ChartConfig';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
@@ -324,6 +323,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             if (param.interactionType === 'selected') {
               dispatch(actions.changeSelectedItems(param.selectedItems));
             }
+            if (param.interactionType === 'unselect') {
+              dispatch(actions.changeSelectedItems([]));
+            }
+
             if (chart.selectable) {
               const { dataIndex, componentIndex, data }: ChartMouseEventParams =
                 param;

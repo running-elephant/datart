@@ -1208,28 +1208,15 @@ class BasicTableChart extends ReactChart {
       : false;
   }
 
-  private createEventParams = params => ({
-    type: 'click',
-    chartType: 'table',
-    interactionType: undefined,
-    componentType: undefined,
-    data: undefined,
-    dataIndex: undefined,
-    event: undefined,
-    name: undefined,
-    seriesName: undefined,
-    seriesType: undefined,
-    value: undefined,
-    ...params,
-  });
-
   private invokePagingRelatedEvents(
     seriesName: string,
     value: any,
     pageNo: number,
     aggOperator?: string,
   ) {
-    const eventParams = this.createEventParams({
+    const eventParams = {
+      type: 'click',
+      chartType: 'table',
       interactionType: 'paging-sort-filter',
       seriesName,
       value: {
@@ -1238,7 +1225,7 @@ class BasicTableChart extends ReactChart {
           value === undefined ? undefined : value === 'ascend' ? 'ASC' : 'DESC',
         pageNo,
       },
-    });
+    };
     this.mouseEvents?.forEach(cur => {
       if (cur.name === 'click') {
         cur.callback?.(eventParams);
@@ -1315,7 +1302,9 @@ class BasicTableChart extends ReactChart {
     mixedSectionConfigRows: ChartDataSectionField[],
     aggOperator?: string,
   ): TableCellEvents {
-    const eventParams = this.createEventParams({
+    const eventParams = {
+      type: 'click',
+      chartType: 'table',
       interactionType: 'click',
       name,
       data: {
@@ -1328,7 +1317,7 @@ class BasicTableChart extends ReactChart {
       seriesName, // column name/index
       dataIndex, // row index
       value, // cell value
-    });
+    };
     return this.mouseEvents?.reduce((acc, cur) => {
       cur.name && (eventParams.type = cur.name);
       if (cur.name === 'click') {

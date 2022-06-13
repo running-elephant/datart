@@ -214,6 +214,9 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                     wid,
                   );
                 }
+                if (params.interactionType === 'unselect') {
+                  changeSelectedItems(dispatch, renderMode, [], wid);
+                }
                 if (chartInstance.selectable) {
                   selectedItemChange(dispatch, renderMode, params, wid);
                 }
