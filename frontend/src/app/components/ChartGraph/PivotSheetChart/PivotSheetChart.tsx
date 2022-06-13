@@ -393,12 +393,12 @@ class PivotSheetChart extends ReactChart {
       this.selectedItems = selectedItems;
       this.mouseEvents
         ?.find(v => v.name === 'click')
-        ?.callback(
-          this.createEventParams({
-            selectedItems,
-            interactionType: 'selected',
-          }),
-        );
+        ?.callback({
+          selectedItems,
+          interactionType: 'selected',
+          type: 'click',
+          chartType: 'pivotSheet',
+        });
     }
   }
 
@@ -437,28 +437,13 @@ class PivotSheetChart extends ReactChart {
     this.drillLevel = level;
     this.mouseEvents
       ?.find(v => v.name === 'click')
-      ?.callback(
-        this.createEventParams({
-          interactionType: 'drilled',
-          drillOption,
-        }),
-      );
+      ?.callback({
+        interactionType: 'drilled',
+        drillOption,
+        type: 'click',
+        chartType: 'pivotSheet',
+      });
   }
-
-  private createEventParams = params => ({
-    type: 'click',
-    chartType: 'pivotSheet',
-    interactionType: undefined,
-    componentType: undefined,
-    data: undefined,
-    dataIndex: undefined,
-    event: undefined,
-    name: undefined,
-    seriesName: undefined,
-    seriesType: undefined,
-    value: undefined,
-    ...params,
-  });
 
   getCollapsedRows(
     rowSectionConfigRows: ChartDataSectionField[],

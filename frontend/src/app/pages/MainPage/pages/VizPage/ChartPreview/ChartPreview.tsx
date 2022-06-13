@@ -505,6 +505,14 @@ const ChartPreviewBoard: FC<{
                   }),
                 );
               }
+              if (param.interactionType === 'unselect') {
+                dispatch(
+                  vizAction.changeSelectedItems({
+                    backendChartId,
+                    data: [],
+                  }),
+                );
+              }
 
               if (chart.selectable) {
                 const {

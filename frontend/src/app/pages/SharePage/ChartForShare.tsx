@@ -173,6 +173,9 @@ const ChartForShare: FC<{
           if (param.interactionType === 'selected') {
             dispatch(shareActions.changeSelectedItems(param.selectedItems));
           }
+          if (param.interactionType === 'unselect') {
+            dispatch(shareActions.changeSelectedItems([]));
+          }
           if (chart.selectable) {
             const { dataIndex, componentIndex, data }: ChartMouseEventParams =
               param;

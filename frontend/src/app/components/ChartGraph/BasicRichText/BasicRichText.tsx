@@ -18,7 +18,6 @@
 
 import { ChartDataSectionType } from 'app/constants';
 import ReactChart from 'app/models/ReactChart';
-import { ChartMouseEventParams } from 'app/types/Chart';
 import { ChartConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
@@ -141,27 +140,17 @@ class BasicRichText extends ReactChart {
     return '';
   }
 
-  private createEventParams = (params): ChartMouseEventParams => ({
-    type: 'change',
-    chartType: 'rich-text',
-    interactionType: 'rich-text-change-context',
-    componentType: undefined,
-    data: undefined,
-    dataIndex: undefined,
-    event: undefined,
-    name: undefined,
-    seriesName: undefined,
-    seriesType: undefined,
-    value: undefined,
-    ...params,
-  });
-
   getOnChange(): { [key: string]: any } | undefined {
     return this.mouseEvents?.reduce((acc, cur) => {
       if (cur.name === 'click') {
         Object.assign(acc, {
           onChange: delta =>
-            cur.callback?.(this.createEventParams({ value: delta })),
+            cur.callback?.({
+              type: 'change',
+              chartType: 'rich-text',
+              interactionType: 'rich-text-change-context',
+              value: delta,
+            }),
         });
       }
       return acc;

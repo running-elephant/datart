@@ -129,8 +129,7 @@ class BasicLineChart extends Chart {
       this.mouseEvents
         ?.find(v => v.name === 'click')
         ?.callback({
-          selectedItems: [],
-          interactionType: 'selected',
+          interactionType: 'unselect',
         });
     }
   }
