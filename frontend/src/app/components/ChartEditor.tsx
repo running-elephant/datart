@@ -332,7 +332,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
                   actions.normalSelect({
                     index: componentIndex + ',' + dataIndex,
                     data,
-                  } as SelectedItem),
+                  }),
                 );
               }
             }
