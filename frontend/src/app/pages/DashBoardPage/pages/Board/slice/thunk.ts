@@ -35,6 +35,7 @@ import { selectBoardById, selectBoardWidgetMap } from './selector';
 import {
   BoardState,
   ControllerWidgetContent,
+  Dashboard,
   getDataOption,
   ServerDashboard,
   VizRenderMode,
@@ -96,7 +97,22 @@ export const fetchBoardDetail = createAsyncThunk<
 
   return null;
 });
-
+export const exportBoardTpl = createAsyncThunk<
+  null,
+  {
+    dashboard: Partial<Dashboard>;
+    widgets: Partial<Widget>[];
+    callBack: () => void;
+  }
+>('board/exportBoardTpl', async (params, { dispatch, rejectWithValue }) => {
+  const { data } = await request2<any>({
+    url: `viz/export/dashboard/template`,
+    method: 'POST',
+    data: params,
+  });
+  params.callBack();
+  return null;
+});
 export const fetchBoardDetailInShare = createAsyncThunk<
   null,
   {

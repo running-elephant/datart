@@ -26,7 +26,7 @@ export interface MockDataPanelProps {
 
 export const MockDataTab: FC<{
   dataMap: Record<string, { id: string; name: string; data: object }>;
-  onChangeDataMap: any;
+  onChangeDataMap: (val) => void;
 }> = memo(({ dataMap, onChangeDataMap }) => {
   const dataList = Object.values(dataMap || {});
   const [wId, setWid] = useState<string>();

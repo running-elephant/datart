@@ -15,7 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BoardState } from '../../pages/Board/slice/types';
+import { CloneValueDeep } from 'utils/object';
+import { ORIGINAL_TYPE_MAP } from '../../constants';
+import {
+  BoardState,
+  Dashboard,
+  DataChart,
+} from '../../pages/Board/slice/types';
+import { Widget } from '../../types/widgetTypes';
 const emptyWidgets = [];
 export const getChartWidgets = (
   state: { board: BoardState },
@@ -30,4 +37,41 @@ export const getChartWidgets = (
     widget => widget.config.type === 'chart',
   );
   return chartWidgets;
+};
+
+export const handleBoardTplData = (
+  dataMap: Record<string, { id: string; name: string; data: object }>,
+  boardTplData: {
+    board: Dashboard;
+    widgetMap: Record<string, Widget>;
+    dataChartMap: Record<string, DataChart>;
+  },
+) => {
+  const { board, widgetMap, dataChartMap } = boardTplData;
+  let newBoard = CloneValueDeep(board) as Partial<Dashboard>;
+  delete newBoard.queryVariables;
+
+  const widgets = Object.values(widgetMap).map(w => {
+    const newWidget = CloneValueDeep(w) as Partial<Widget>;
+    newWidget.viewIds = [];
+
+    if (newWidget.config?.type === 'chart') {
+      newWidget.config.originalType = ORIGINAL_TYPE_MAP.ownedChart;
+      const datachart = dataChartMap[newWidget.datachartId || ''];
+
+      if (datachart) {
+        let newChart = CloneValueDeep(datachart) as Partial<DataChart>;
+        newChart.viewId = '';
+        newChart.orgId = '';
+        newWidget.config.content.dataChart = newChart;
+      }
+    }
+    console.log('__ ');
+    newWidget.datachartId = '';
+    return newWidget;
+  });
+  return {
+    dashboard: newBoard,
+    widgets,
+  };
 };
