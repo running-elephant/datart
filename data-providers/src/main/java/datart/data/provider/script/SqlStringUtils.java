@@ -29,12 +29,16 @@ import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SqlStringUtils {
 
     public static final String REG_SQL_SINGLE_LINE_COMMENT = "-{2,}.*([\r\n])";
 
     public static final String REG_SQL_MULTI_LINE_COMMENT = "/\\*+[\\s\\S]*\\*+/";
+
+    public static final String REG_WITH_SQL_FRAGMENT = "((?i)WITH[\\s\\S]+(?i)AS?\\s*\\([\\s\\S]+\\))\\s*(?i)SELECT";
 
     /**
      * 替换脚本中的表达式类型变量
@@ -85,6 +89,31 @@ public class SqlStringUtils {
         sql = sql.replace(CharUtils.CR, CharUtils.toChar(" "));
         sql = sql.replace(CharUtils.LF, CharUtils.toChar(" "));
         return sql.trim();
+    }
+
+    /**
+     * 处理sql with语句
+     * @param sql
+     * @return
+     */
+    public static String rebuildSqlWithFragment(String sql) {
+        if (!sql.toLowerCase().startsWith("with")) {
+            Matcher matcher = Pattern.compile(REG_WITH_SQL_FRAGMENT).matcher(sql);
+            if (matcher.find()) {
+                String withFragment = matcher.group();
+                if (!StringUtils.isEmpty(withFragment)) {
+                    if (withFragment.length() > 6) {
+                        int lastSelectIndex = withFragment.length() - 6;
+                        sql = sql.replace(withFragment, withFragment.substring(lastSelectIndex));
+                        withFragment = withFragment.substring(0, lastSelectIndex);
+                    }
+                    String space = " ";
+                    sql = withFragment + space + sql;
+                    sql = sql.replaceAll(space + "{2,}", space);
+                }
+            }
+        }
+        return sql;
     }
 
 }
