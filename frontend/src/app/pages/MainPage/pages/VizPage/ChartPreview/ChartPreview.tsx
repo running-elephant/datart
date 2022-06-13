@@ -41,7 +41,7 @@ import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
 import { selectAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { fetchAvailableSourceFunctionsForChart } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useMainSlice } from 'app/pages/MainPage/slice';
-import { IChart } from 'app/types/Chart';
+import { ChartMouseEventParams, IChart } from 'app/types/Chart';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
@@ -511,11 +511,7 @@ const ChartPreviewBoard: FC<{
                   dataIndex,
                   componentIndex,
                   data,
-                }: {
-                  dataIndex?: number;
-                  componentIndex?: number;
-                  data?: { rowData: { [p: string]: any } };
-                } = param;
+                }: ChartMouseEventParams = param;
                 if (data?.rowData) {
                   dispatch(
                     vizAction.normalSelect({

@@ -23,7 +23,7 @@ import { ChartDataViewFieldCategory } from 'app/constants';
 import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import ChartManager from 'app/models/ChartManager';
-import { IChart } from 'app/types/Chart';
+import { ChartMouseEventParams, IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
   getRuntimeComputedFields,
@@ -174,15 +174,8 @@ const ChartForShare: FC<{
             dispatch(shareActions.changeSelectedItems(param.selectedItems));
           }
           if (chart.selectable) {
-            const {
-              dataIndex,
-              componentIndex,
-              data,
-            }: {
-              dataIndex?: number;
-              componentIndex?: number;
-              data?: { rowData: { [p: string]: any } };
-            } = param;
+            const { dataIndex, componentIndex, data }: ChartMouseEventParams =
+              param;
             if (data?.rowData) {
               dispatch(
                 shareActions.normalSelect({
