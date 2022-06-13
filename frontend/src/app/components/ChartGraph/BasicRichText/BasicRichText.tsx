@@ -146,7 +146,9 @@ class BasicRichText extends ReactChart {
         Object.assign(acc, {
           onChange: delta =>
             cur.callback?.({
-              seriesName: 'richText',
+              type: 'change',
+              chartType: 'rich-text',
+              interactionType: 'rich-text-change-context',
               value: delta,
             }),
         });

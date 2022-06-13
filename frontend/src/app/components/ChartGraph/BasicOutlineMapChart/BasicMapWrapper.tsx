@@ -84,9 +84,8 @@ const BasicMapWrapper: FC<MapWrapperProps> = memo(
           mouseEvents
             ?.find(v => v.name === 'click')
             ?.callback({
-              data: [],
-              seriesName: 'changeSelectedItems',
-            } as any);
+              interactionType: 'unselect',
+            });
         }
       },
       [mouseEvents],

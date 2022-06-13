@@ -4,7 +4,6 @@ import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/models/ChartManager';
 import { SelectedItem } from 'app/types/ChartConfig';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
-import { compareSelectedItems } from 'app/utils/chartHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
@@ -75,6 +74,15 @@ const slice = createSlice({
             ? state.tabs[index]?.id || state.tabs[state.tabs.length - 1].id
             : '';
       }
+    },
+    closeOtherTabs(state: VizState, action: PayloadAction<string>) {
+      const currentTab = state.tabs.find(t => t.id === action.payload);
+      state.tabs = state.tabs.filter(t => t.id === action.payload);
+      state.selectedTab = currentTab?.id || '';
+    },
+    closeAllTabs(state) {
+      state.tabs = [];
+      state.selectedTab = '';
     },
     updateChartPreviewFilter(
       state,
@@ -179,14 +187,7 @@ const slice = createSlice({
         payload,
       }: PayloadAction<{ backendChartId: string; data: SelectedItem[] }>,
     ) {
-      if (
-        compareSelectedItems(
-          payload.data,
-          state.selectedItems[payload.backendChartId],
-        )
-      ) {
-        state.selectedItems[payload.backendChartId] = payload.data;
-      }
+      state.selectedItems[payload.backendChartId] = payload.data;
     },
     updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
       state.multipleSelect = payload;

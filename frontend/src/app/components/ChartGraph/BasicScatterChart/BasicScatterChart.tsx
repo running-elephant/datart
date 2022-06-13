@@ -51,6 +51,7 @@ class BasicScatterChart extends Chart {
   config = Config;
   chart: any = null;
   selectable = true;
+  selectedItems = [];
 
   constructor() {
     super('scatter', 'viz.palette.graph.names.scatterChart', 'sandiantu');
@@ -86,6 +87,7 @@ class BasicScatterChart extends Chart {
       this.chart?.clear();
       return;
     }
+    this.selectedItems = props.selectedItems;
     const newOptions = this.getOptions(
       props.dataset,
       props.config,
@@ -105,13 +107,12 @@ class BasicScatterChart extends Chart {
   }
 
   clearAllSelectedItems(e: Event) {
-    if (!e.target) {
+    if (!e.target && this.selectedItems.length) {
       this.mouseEvents
         ?.find(v => v.name === 'click')
         ?.callback({
-          data: [],
-          seriesName: 'changeSelectedItems',
-        } as any);
+          interactionType: 'unselect',
+        });
     }
   }
 

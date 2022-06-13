@@ -34,7 +34,7 @@ import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
 import { selectAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { fetchAvailableSourceFunctionsForChart } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useMainSlice } from 'app/pages/MainPage/slice';
-import { IChart } from 'app/types/Chart';
+import { ChartMouseEventParams, IChart } from 'app/types/Chart';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
@@ -370,8 +370,8 @@ const ChartPreviewBoard: FC<{
                 return;
               }
               if (
-                param.componentType === 'table' &&
-                param.seriesType === 'paging-sort-filter'
+                param.chartType === 'table' &&
+                param.interactionType === 'paging-sort-filter'
               ) {
                 dispatch(
                   fetchDataSetByPreviewChartAction({
@@ -390,20 +390,30 @@ const ChartPreviewBoard: FC<{
               }
 
               // NOTE 透视表树形结构展开下钻特殊处理方法
-              if (param.seriesName === 'drillOptionChange') {
-                handleDrillOptionChange?.(param.value);
+              if (
+                param.chartType === 'pivotSheet' &&
+                param.interactionType === 'drilled'
+              ) {
+                handleDrillOptionChange?.(param.drillOption);
                 return;
               }
 
-              // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法
-              if (param.seriesName === 'changeSelectedItems') {
+              // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法 其他图标取消选中时调取
+              if (param.interactionType === 'selected') {
                 dispatch(
                   vizAction.changeSelectedItems({
                     backendChartId,
-                    data: param.data,
+                    data: param.selectedItems,
                   }),
                 );
-                return;
+              }
+              if (param.interactionType === 'unselect') {
+                dispatch(
+                  vizAction.changeSelectedItems({
+                    backendChartId,
+                    data: [],
+                  }),
+                );
               }
 
               if (chart.selectable) {
@@ -411,17 +421,18 @@ const ChartPreviewBoard: FC<{
                   dataIndex,
                   componentIndex,
                   data,
-                }: { dataIndex: number; componentIndex?: number; data: any } =
-                  param;
-                dispatch(
-                  vizAction.normalSelect({
-                    backendChartId,
-                    data: {
-                      index: componentIndex + ',' + dataIndex,
-                      data,
-                    },
-                  }),
-                );
+                }: ChartMouseEventParams = param;
+                if (data?.rowData) {
+                  dispatch(
+                    vizAction.normalSelect({
+                      backendChartId,
+                      data: {
+                        index: componentIndex + ',' + dataIndex,
+                        data,
+                      },
+                    }),
+                  );
+                }
               }
             },
           },
