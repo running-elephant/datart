@@ -19,7 +19,6 @@
 import {
   InteractionAction,
   InteractionCategory,
-  InteractionMouseEvent,
 } from 'app/components/FormGenerator/constants';
 import {
   DrillThroughSetting,
@@ -102,32 +101,6 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
     } else {
       return null;
     }
-  };
-
-  const enableRightClickDrillThrough = interactions => {
-    const enableDrillThrough = getValue(interactions || [], ['drillThrough']);
-    const drillThroughSetting = getStyles(
-      interactions || [],
-      ['drillThrough'],
-      ['setting'],
-    )?.[0] as DrillThroughSetting;
-    const hasRightClickEvent = drillThroughSetting?.rules?.some(
-      r => r.event === InteractionMouseEvent.Right,
-    );
-    return enableDrillThrough && hasRightClickEvent;
-  };
-
-  const enableRightClickViewData = interactions => {
-    const enableViewDetail = getValue(interactions || [], ['viewDetail']);
-    const viewDetailSetting = getStyles(
-      interactions || [],
-      ['viewDetail'],
-      ['setting'],
-    )?.[0] as ViewDetailSetting;
-    return (
-      enableViewDetail &&
-      viewDetailSetting?.event === InteractionMouseEvent.Right
-    );
   };
 
   const handleDrillThroughEvent = useCallback(
@@ -284,8 +257,6 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
   return {
     getDrillThroughSetting,
     getViewDetailSetting,
-    enableRightClickDrillThrough,
-    enableRightClickViewData,
     handleDrillThroughEvent,
     handleViewDataEvent,
   };

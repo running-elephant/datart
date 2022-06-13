@@ -130,8 +130,6 @@ const ChartPreviewBoard: FC<{
     const {
       getDrillThroughSetting,
       getViewDetailSetting,
-      enableRightClickDrillThrough,
-      enableRightClickViewData,
       handleDrillThroughEvent,
       handleViewDataEvent,
     } = useChartInteractions({
@@ -261,7 +259,7 @@ const ChartPreviewBoard: FC<{
           ruleId,
         };
       },
-      [orgId, drillOptionRef, chartPreview, getDrillThroughSetting],
+      [orgId, chartPreview, getDrillThroughSetting],
     );
 
     const buildViewDataEventParams = useCallback(
@@ -287,11 +285,57 @@ const ChartPreviewBoard: FC<{
       },
       [
         chartPreview?.chartConfig,
-        drillOptionRef,
         chartPreview?.backendChart,
         getViewDetailSetting,
       ],
     );
+
+    const handleDrillThroughChange = useCallback(() => {
+      const drillThroughSetting = getDrillThroughSetting(
+        chartPreview?.chartConfig?.interactions,
+        [],
+      );
+      if (!drillThroughSetting) {
+        return;
+      }
+      return ruleId =>
+        handleDrillThroughEvent(
+          buildDrillThroughEventParams(
+            chartContextMenuEvent,
+            InteractionMouseEvent.Right,
+            ruleId,
+          ),
+        );
+    }, [
+      chartPreview?.chartConfig?.interactions,
+      chartContextMenuEvent,
+      getDrillThroughSetting,
+      handleDrillThroughEvent,
+      buildDrillThroughEventParams,
+    ]);
+
+    const handleViewDataChange = useCallback(() => {
+      const viewDetailSetting = getViewDetailSetting(
+        chartPreview?.chartConfig?.interactions,
+        [],
+      );
+      if (!viewDetailSetting) {
+        return;
+      }
+      return () =>
+        handleViewDataEvent(
+          buildViewDataEventParams(
+            chartContextMenuEvent,
+            InteractionMouseEvent.Right,
+          ),
+        );
+    }, [
+      chartPreview?.chartConfig?.interactions,
+      chartContextMenuEvent,
+      getViewDetailSetting,
+      handleViewDataEvent,
+      buildViewDataEventParams,
+    ]);
 
     const registerChartEvents = useCallback(
       (chart, backendChartId) => {
@@ -633,31 +677,8 @@ const ChartPreviewBoard: FC<{
               onDrillOptionChange: handleDrillOptionChange,
               availableSourceFunctions,
               onDateLevelChange: handleDateLevelChange,
-              onDrillThroughChange: enableRightClickDrillThrough(
-                chartPreview?.chartConfig?.interactions,
-              )
-                ? ruleId => {
-                    handleDrillThroughEvent(
-                      buildDrillThroughEventParams(
-                        chartContextMenuEvent,
-                        InteractionMouseEvent.Right,
-                        ruleId,
-                      ),
-                    );
-                  }
-                : undefined,
-              onViewDataChange: enableRightClickViewData(
-                chartPreview?.chartConfig?.interactions,
-              )
-                ? () => {
-                    handleViewDataEvent(
-                      buildViewDataEventParams(
-                        chartContextMenuEvent,
-                        InteractionMouseEvent.Right,
-                      ),
-                    );
-                  }
-                : undefined,
+              onDrillThroughChange: handleDrillThroughChange(),
+              onViewDataChange: handleViewDataChange(),
             }}
           >
             <div>

@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import useModal from 'antd/lib/modal/useModal';
 import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
@@ -27,6 +28,7 @@ import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import useDisplayViewDetail from 'app/pages/MainPage/pages/VizPage/hooks/useDisplayViewDetail';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
@@ -90,19 +92,20 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
   const widgetRef = useRef<Widget>(widget);
   const drillOptionRef = useRef<IChartDrillOption>();
+  const [openViewDetailPanel, viewDetailPanelContextHolder] =
+    useDisplayViewDetail();
+  const [openJumpDialogModal, jumpDialogContextHolder] = useModal();
   const [chartContextMenuEvent, setChartContextMenuEvent] = useState<{
     data?: any;
   }>();
   const {
     getDrillThroughSetting,
     getViewDetailSetting,
-    enableRightClickDrillThrough,
-    enableRightClickViewData,
     handleDrillThroughEvent,
     handleViewDataEvent,
   } = useChartInteractions({
-    openViewDetailPanel: () => {},
-    openJumpDialogModal: () => {},
+    openViewDetailPanel,
+    openJumpDialogModal,
   });
 
   useEffect(() => {
@@ -186,6 +189,93 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     [dispatch, renderMode, multipleSelect],
   );
 
+  const buildDrillThroughEventParams = useCallback(
+    (clickEventParams, targetEvent: InteractionMouseEvent, ruleId?: string) => {
+      const drillThroughSetting = getDrillThroughSetting(
+        dataChart?.config?.chartConfig?.interactions,
+        widgetRef?.current?.config?.customConfig?.interactions,
+      );
+      return {
+        drillOption: drillOptionRef?.current,
+        drillThroughSetting,
+        clickEventParams,
+        targetEvent,
+        orgId,
+        view: chartDataView,
+        computedFields: dataChart?.config?.computedFields,
+        aggregation: dataChart?.config?.aggregation,
+        chartConfig: dataChart?.config?.chartConfig,
+        ruleId,
+      };
+    },
+    [chartDataView, orgId, dataChart?.config, getDrillThroughSetting],
+  );
+
+  const buildViewDataEventParams = useCallback(
+    (clickEventParams, targetEvent: InteractionMouseEvent) => {
+      const viewDetailSetting = getViewDetailSetting(
+        dataChart?.config?.chartConfig?.interactions,
+        widgetRef?.current?.config?.customConfig?.interactions,
+      );
+      return {
+        drillOption: drillOptionRef.current,
+        viewDetailSetting,
+        clickEventParams,
+        targetEvent,
+        chartConfig: dataChart?.config?.chartConfig,
+        view: chartDataView,
+      };
+    },
+    [dataChart?.config?.chartConfig, chartDataView, getViewDetailSetting],
+  );
+
+  const handleDrillThroughChange = useCallback(() => {
+    const drillThroughSetting = getDrillThroughSetting(
+      dataChart?.config?.chartConfig?.interactions,
+      widgetRef?.current?.config?.customConfig?.interactions,
+    );
+    if (!drillThroughSetting) {
+      return;
+    }
+    return ruleId =>
+      handleDrillThroughEvent(
+        buildDrillThroughEventParams(
+          chartContextMenuEvent,
+          InteractionMouseEvent.Right,
+          ruleId,
+        ),
+      );
+  }, [
+    dataChart?.config?.chartConfig?.interactions,
+    chartContextMenuEvent,
+    getDrillThroughSetting,
+    handleDrillThroughEvent,
+    buildDrillThroughEventParams,
+  ]);
+
+  const handleViewDataChange = useCallback(() => {
+    const viewDetailSetting = getViewDetailSetting(
+      dataChart?.config?.chartConfig?.interactions,
+      widgetRef?.current?.config?.customConfig?.interactions,
+    );
+    if (!viewDetailSetting) {
+      return;
+    }
+    return () =>
+      handleViewDataEvent(
+        buildViewDataEventParams(
+          chartContextMenuEvent,
+          InteractionMouseEvent.Right,
+        ),
+      );
+  }, [
+    dataChart?.config?.chartConfig?.interactions,
+    chartContextMenuEvent,
+    getViewDetailSetting,
+    handleViewDataEvent,
+    buildViewDataEventParams,
+  ]);
+
   const chart = useMemo(() => {
     if (!dataChart) {
       return null;
@@ -204,34 +294,15 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                 if (!params) {
                   return;
                 }
-                const drillThroughSetting = getDrillThroughSetting(
-                  dataChart?.config?.chartConfig?.interactions,
-                  widgetRef?.current?.config?.customConfig?.interactions,
+                handleDrillThroughEvent(
+                  buildDrillThroughEventParams(
+                    params,
+                    InteractionMouseEvent.Left,
+                  ),
                 );
-                const viewDetailSetting = getViewDetailSetting(
-                  dataChart?.config?.chartConfig?.interactions,
-                  widgetRef?.current?.config?.customConfig?.interactions,
+                handleViewDataEvent(
+                  buildViewDataEventParams(params, InteractionMouseEvent.Left),
                 );
-                handleDrillThroughEvent({
-                  drillOption: drillOptionRef.current,
-                  drillThroughSetting,
-                  clickEventParams: params,
-                  targetEvent: InteractionMouseEvent.Left,
-                  orgId: orgId,
-                  view: chartDataView,
-                  computedFields: dataChart?.config?.computedFields,
-                  aggregation: dataChart?.config?.aggregation,
-                  chartConfig: dataChart?.config?.chartConfig,
-                  ruleId: null,
-                });
-                handleViewDataEvent({
-                  drillOption: drillOptionRef.current,
-                  viewDetailSetting,
-                  clickEventParams: params,
-                  targetEvent: InteractionMouseEvent.Left,
-                  chartConfig: dataChart?.config?.chartConfig,
-                  view: chartDataView,
-                });
                 if (
                   drillOptionRef.current?.isSelectedDrill &&
                   !drillOptionRef.current.isBottomLevel
@@ -282,9 +353,9 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     wid,
     renderMode,
     handleDrillThroughEvent,
+    buildDrillThroughEventParams,
     handleViewDataEvent,
-    getDrillThroughSetting,
-    getViewDetailSetting,
+    buildViewDataEventParams,
   ]);
 
   const config = useMemo(() => {
@@ -367,21 +438,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     onDrillOptionChange: handleDrillOptionChange,
     availableSourceFunctions,
     onDateLevelChange: handleDateLevelChange,
-    // onDrillThroughChange: enableRightClickDrillThrough([])
-    //   ? ruleId =>
-    //       handleDrillThroughEvent(
-    //         chartContextMenuEvent,
-    //         InteractionMouseEvent.Right,
-    //         ruleId,
-    //       )
-    //   : undefined,
-    // onViewDataChange: enableRightClickViewData([])
-    //   ? () =>
-    //       handleViewDataEvent(
-    //         chartContextMenuEvent,
-    //         InteractionMouseEvent.Right,
-    //       )
-    //   : undefined,
+    onDrillThroughChange: handleDrillThroughChange(),
+    onViewDataChange: handleViewDataChange(),
   };
 
   return (
@@ -390,6 +448,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         <StyledWrapper>
           <ChartFrameBox ref={cacheWhRef}>{chartFrame}</ChartFrameBox>
           <ChartDrillPaths chartConfig={dataChart?.config.chartConfig} />
+          {viewDetailPanelContextHolder}
+          {jumpDialogContextHolder}
         </StyledWrapper>
       </ChartDrillContextMenu>
     </ChartDrillContext.Provider>
