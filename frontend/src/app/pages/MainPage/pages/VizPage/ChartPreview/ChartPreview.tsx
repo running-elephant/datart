@@ -21,18 +21,11 @@ import useModal from 'antd/lib/modal/useModal';
 import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
-import {
-  InteractionAction,
-  InteractionCategory,
-  InteractionMouseEvent,
-} from 'app/components/FormGenerator/constants';
-import {
-  DrillThroughSetting,
-  ViewDetailSetting,
-} from 'app/components/FormGenerator/Customize/Interaction/types';
+import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
 import { VizHeader } from 'app/components/VizHeader';
 import { ChartDataViewFieldCategory } from 'app/constants';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
+import useChartInteractions from 'app/hooks/useChartInteractions';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import ChartManager from 'app/models/ChartManager';
@@ -47,26 +40,16 @@ import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
-  getStyles,
-  getValue,
 } from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
-import {
-  buildClickEventBaseFilters,
-  getChartDrillOption,
-  getJumpFiltersByInteractionRule,
-  getJumpOperationFiltersByInteractionRule,
-} from 'app/utils/internalChartHelper';
+import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import { KEYBOARD_EVENT_NAME } from 'globalConstants';
-import qs from 'qs';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
-import { isEmpty } from 'utils/object';
 import useDisplayViewDetail from '../hooks/useDisplayViewDetail';
-import useDrillThrough from '../hooks/useDrillThrough';
 import useQSLibUrlHelper from '../hooks/useQSLibUrlHelper';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import { useVizSlice } from '../slice';
@@ -141,18 +124,22 @@ const ChartPreviewBoard: FC<{
     const saveAsViz = useSaveAsViz();
     const history = useHistory();
     const vizs = useSelector(selectVizs);
-    const [
-      openNewTab,
-      openBrowserTab,
-      getDialogContent,
-      redirectByUrl,
-      openNewByUrl,
-      getDialogContentByUrl,
-    ] = useDrillThrough();
     const [openViewDetailPanel, viewDetailPanelContextHolder] =
       useDisplayViewDetail();
+    const [openJumpDialogModal, jumpDialogContextHolder] = useModal();
+    const {
+      getDrillThroughSetting,
+      getViewDetailSetting,
+      enableRightClickDrillThrough,
+      enableRightClickViewData,
+      handleDrillThroughEvent,
+      handleViewDataEvent,
+    } = useChartInteractions({
+      openViewDetailPanel,
+      openJumpDialogModal,
+    });
+
     const { parse } = useQSLibUrlHelper();
-    const [modal, jumpDialogContextHolder] = useModal();
 
     const chartIframeKeyboardListener = useCallback(
       (e: KeyboardEvent) => {
@@ -246,206 +233,63 @@ const ChartPreviewBoard: FC<{
       [backendChartId, chartPreview, dispatch],
     );
 
-    const enableRightClickDrillThrough = () => {
-      const enableDrillThrough = getValue(
-        chartPreview?.chartConfig?.interactions || [],
-        ['drillThrough'],
-      );
-      const drillThroughSetting = getStyles(
-        chartPreview?.chartConfig?.interactions || [],
-        ['drillThrough'],
-        ['setting'],
-      )?.[0] as DrillThroughSetting;
-      const hasRightClickEvent = drillThroughSetting?.rules?.some(
-        r => r.event === InteractionMouseEvent.Right,
-      );
-      return enableDrillThrough && hasRightClickEvent;
-    };
-
-    const enableRightClickViewData = () => {
-      const enableViewDetail = getValue(
-        chartPreview?.chartConfig?.interactions || [],
-        ['viewDetail'],
-      );
-      const viewDetailSetting = getStyles(
-        chartPreview?.chartConfig?.interactions || [],
-        ['viewDetail'],
-        ['setting'],
-      )?.[0] as ViewDetailSetting;
-      return (
-        enableViewDetail &&
-        viewDetailSetting?.event === InteractionMouseEvent.Right
-      );
-    };
-
-    const handleDrillThroughEvent = useCallback(
-      (param, targetEvent, ruleId?: string) => {
-        const enableDrillThrough = getValue(
-          chartPreview?.chartConfig?.interactions || [],
-          ['drillThrough'],
+    const buildDrillThroughEventParams = useCallback(
+      (
+        clickEventParams,
+        targetEvent: InteractionMouseEvent,
+        ruleId?: string,
+      ) => {
+        const drillThroughSetting = getDrillThroughSetting(
+          chartPreview?.chartConfig?.interactions,
+          [],
         );
-        const drillThroughSetting = getStyles(
-          chartPreview?.chartConfig?.interactions || [],
-          ['drillThrough'],
-          ['setting'],
-        )?.[0] as DrillThroughSetting;
-
-        if (enableDrillThrough) {
-          let nonAggChartFilters = new ChartDataRequestBuilder(
-            {
-              id: chartPreview?.backendChart?.view?.id || '',
-              config: chartPreview?.backendChart?.view.config || {},
-              computedFields:
-                chartPreview?.backendChart?.config.computedFields || [],
-            },
-            chartPreview?.chartConfig?.datas,
-            chartPreview?.chartConfig?.settings,
-            {},
-            false,
-            chartPreview?.backendChart?.config?.aggregation,
-          )
-            .addDrillOption(drillOptionRef?.current)
-            .build()
-            ?.filters?.filter(f => !Boolean(f.aggOperator));
-
-          (drillThroughSetting?.rules || [])
-            .filter(rule => rule.event === targetEvent)
-            .filter(rule => isEmpty(ruleId) || rule.id === ruleId)
-            .forEach(rule => {
-              const clickFilters = buildClickEventBaseFilters(
-                param?.data?.rowData,
-                rule,
-                drillOptionRef?.current,
-                chartPreview?.chartConfig?.datas,
-              );
-
-              const relId = rule?.[rule.category!]?.relId;
-              if (rule.category === InteractionCategory.JumpToChart) {
-                const urlFilters = getJumpOperationFiltersByInteractionRule(
-                  clickFilters,
-                  nonAggChartFilters,
-                  rule,
-                );
-                const urlFiltersStr: string = qs.stringify({
-                  filters: urlFilters || [],
-                });
-                if (rule?.action === InteractionAction.Redirect) {
-                  openNewTab(orgId, relId, urlFiltersStr);
-                }
-                if (rule?.action === InteractionAction.Window) {
-                  openBrowserTab(orgId, relId, urlFiltersStr);
-                }
-                if (rule?.action === InteractionAction.Dialog) {
-                  const modalContent = getDialogContent(
-                    orgId,
-                    relId,
-                    urlFiltersStr,
-                  );
-                  modal.info(modalContent as any);
-                }
-              } else if (
-                rule.category === InteractionCategory.JumpToDashboard
-              ) {
-                const urlFilters = getJumpFiltersByInteractionRule(
-                  clickFilters,
-                  nonAggChartFilters,
-                  rule,
-                );
-                Object.assign(urlFilters, { isMatchByName: true });
-                const urlFiltersStr: string =
-                  urlSearchTransfer.toUrlString(urlFilters);
-                if (rule?.action === InteractionAction.Redirect) {
-                  openNewTab(orgId, relId, urlFiltersStr);
-                }
-                if (rule?.action === InteractionAction.Window) {
-                  openBrowserTab(orgId, relId, urlFiltersStr);
-                }
-                if (rule?.action === InteractionAction.Dialog) {
-                  const modalContent = getDialogContent(
-                    orgId,
-                    relId,
-                    urlFiltersStr,
-                  );
-                  modal.info(modalContent as any);
-                }
-              } else if (rule.category === InteractionCategory.JumpToUrl) {
-                const urlFilters = getJumpFiltersByInteractionRule(
-                  clickFilters,
-                  nonAggChartFilters,
-                  rule,
-                );
-                Object.assign(urlFilters, { isMatchByName: true });
-                const urlFiltersStr: string =
-                  urlSearchTransfer.toUrlString(urlFilters);
-                const url = rule?.[rule.category!]?.url;
-                if (rule?.action === InteractionAction.Redirect) {
-                  redirectByUrl(url, urlFiltersStr);
-                }
-                if (rule?.action === InteractionAction.Window) {
-                  openNewByUrl(url, urlFiltersStr);
-                }
-                if (rule?.action === InteractionAction.Dialog) {
-                  const modalContent = getDialogContentByUrl(
-                    url,
-                    urlFiltersStr,
-                  );
-                  modal.info(modalContent as any);
-                }
-              }
-            });
-        }
+        return {
+          drillOption: drillOptionRef?.current,
+          drillThroughSetting,
+          clickEventParams,
+          targetEvent,
+          orgId,
+          view: {
+            id: chartPreview?.backendChart?.view?.id || '',
+            config: chartPreview?.backendChart?.view.config || {},
+            computedFields:
+              chartPreview?.backendChart?.config.computedFields || [],
+          },
+          computedFields: chartPreview?.backendChart?.config.computedFields,
+          aggregation: chartPreview?.backendChart?.config?.aggregation,
+          chartConfig: chartPreview?.chartConfig,
+          ruleId,
+        };
       },
-      [
-        chartPreview?.chartConfig?.interactions,
-        chartPreview?.chartConfig?.datas,
-        chartPreview?.chartConfig?.settings,
-        chartPreview?.backendChart?.view?.id,
-        chartPreview?.backendChart?.view.config,
-        chartPreview?.backendChart?.config.computedFields,
-        chartPreview?.backendChart?.config?.aggregation,
-        openNewTab,
-        orgId,
-        openBrowserTab,
-        getDialogContent,
-        modal,
-        redirectByUrl,
-        openNewByUrl,
-        getDialogContentByUrl,
-      ],
+      [orgId, drillOptionRef, chartPreview, getDrillThroughSetting],
     );
 
-    const handleViewDataEvent = useCallback(
-      (param, targetEvent) => {
-        const enableViewDetail = getValue(
-          chartPreview?.chartConfig?.interactions || [],
-          ['viewDetail'],
+    const buildViewDataEventParams = useCallback(
+      (clickEventParams, targetEvent: InteractionMouseEvent) => {
+        const viewDetailSetting = getViewDetailSetting(
+          chartPreview?.chartConfig?.interactions,
+          [],
         );
-        const viewDetailSetting = getStyles(
-          chartPreview?.chartConfig?.interactions || [],
-          ['viewDetail'],
-          ['setting'],
-        )?.[0] as ViewDetailSetting;
-
-        if (enableViewDetail && viewDetailSetting?.event === targetEvent) {
-          const clickFilters = buildClickEventBaseFilters(
-            param?.data?.rowData,
-            undefined,
-            drillOptionRef?.current,
-            chartPreview?.chartConfig?.datas,
-          );
-          (openViewDetailPanel as any)({
-            currentDataView: chartPreview?.backendChart?.view,
-            chartConfig: chartPreview?.chartConfig,
-            drillOption: drillOptionRef?.current,
-            viewDetailSetting: viewDetailSetting,
-            clickFilters: clickFilters,
-          });
-        }
+        const view = {
+          id: chartPreview?.backendChart?.view?.id || '',
+          config: chartPreview?.backendChart?.view.config || {},
+          computedFields:
+            chartPreview?.backendChart?.config.computedFields || [],
+        };
+        return {
+          drillOption: drillOptionRef.current,
+          clickEventParams,
+          targetEvent,
+          viewDetailSetting,
+          chartConfig: chartPreview?.chartConfig,
+          view,
+        };
       },
       [
         chartPreview?.chartConfig,
-        chartPreview?.backendChart?.view,
-        openViewDetailPanel,
+        drillOptionRef,
+        chartPreview?.backendChart,
+        getViewDetailSetting,
       ],
     );
 
@@ -455,8 +299,22 @@ const ChartPreviewBoard: FC<{
           {
             name: 'click',
             callback: param => {
-              handleDrillThroughEvent(param, InteractionMouseEvent.Left);
-              handleViewDataEvent(param, InteractionMouseEvent.Left);
+              handleDrillThroughEvent(
+                buildDrillThroughEventParams(param, InteractionMouseEvent.Left),
+              );
+              handleViewDataEvent(
+                buildViewDataEventParams(param, InteractionMouseEvent.Left),
+              );
+              if (
+                drillOptionRef.current?.isSelectedDrill &&
+                !drillOptionRef.current.isBottomLevel
+              ) {
+                const option = drillOptionRef.current;
+                option.drillDown(param.data.rowData);
+                handleDrillOptionChange(option);
+                return;
+              }
+
               if (
                 drillOptionRef.current?.isSelectedDrill &&
                 !drillOptionRef.current.isBottomLevel
@@ -536,7 +394,10 @@ const ChartPreviewBoard: FC<{
         handleDrillOptionChange,
         handleDrillThroughEvent,
         handleViewDataEvent,
+        buildDrillThroughEventParams,
+        buildViewDataEventParams,
         vizAction,
+        drillOptionRef,
       ],
     );
 
@@ -772,20 +633,30 @@ const ChartPreviewBoard: FC<{
               onDrillOptionChange: handleDrillOptionChange,
               availableSourceFunctions,
               onDateLevelChange: handleDateLevelChange,
-              onDrillThroughChange: enableRightClickDrillThrough()
-                ? ruleId =>
+              onDrillThroughChange: enableRightClickDrillThrough(
+                chartPreview?.chartConfig?.interactions,
+              )
+                ? ruleId => {
                     handleDrillThroughEvent(
-                      chartContextMenuEvent,
-                      InteractionMouseEvent.Right,
-                      ruleId,
-                    )
+                      buildDrillThroughEventParams(
+                        chartContextMenuEvent,
+                        InteractionMouseEvent.Right,
+                        ruleId,
+                      ),
+                    );
+                  }
                 : undefined,
-              onViewDataChange: enableRightClickViewData()
-                ? () =>
+              onViewDataChange: enableRightClickViewData(
+                chartPreview?.chartConfig?.interactions,
+              )
+                ? () => {
                     handleViewDataEvent(
-                      chartContextMenuEvent,
-                      InteractionMouseEvent.Right,
-                    )
+                      buildViewDataEventParams(
+                        chartContextMenuEvent,
+                        InteractionMouseEvent.Right,
+                      ),
+                    );
+                  }
                 : undefined,
             }}
           >
