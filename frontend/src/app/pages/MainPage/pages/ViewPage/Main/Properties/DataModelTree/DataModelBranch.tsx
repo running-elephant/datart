@@ -35,13 +35,13 @@ import {
   SPACE_XS,
   YELLOW,
 } from 'styles/StyleConstants';
-import { Column,viewType } from '../../../slice/types';
+import { Column, viewType } from '../../../slice/types';
 import { TreeNodeHierarchy } from './constant';
 import DataModelNode from './DataModelNode';
 
 const DataModelBranch: FC<{
   node: Column;
-  type: viewType;
+  viewType: viewType;
   onNodeTypeChange: (type: any, name: string) => void;
   onMoveToHierarchy: (node: Column) => void;
   onEditBranch;
@@ -50,7 +50,7 @@ const DataModelBranch: FC<{
 }> = memo(
   ({
     node,
-    type,
+    viewType,
     onNodeTypeChange,
     onMoveToHierarchy,
     onEditBranch,
@@ -102,7 +102,7 @@ const DataModelBranch: FC<{
           <div className="children">
             {node?.children?.map(childNode => (
               <DataModelNode
-                type={type}
+                viewType={viewType}
                 className="in-hierarchy"
                 node={childNode}
                 key={childNode.name}

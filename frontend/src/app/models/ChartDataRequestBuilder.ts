@@ -50,6 +50,7 @@ import {
   RUNTIME_FILTER_KEY,
   TIME_FORMATTER,
 } from 'globalConstants';
+import isEqual from 'lodash/isEqual';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 import { handleStructureViewName } from 'utils/utils';
 import { DrillMode } from './ChartDrillOption';
@@ -131,7 +132,7 @@ export class ChartDataRequestBuilder {
         column: this.buildColumnName(aggCol),
         sqlOperator: aggCol.aggregate!,
       })),
-      (a, b) => a.column === b.column && a.sqlOperator === b.sqlOperator,
+      (a, b) => isEqual(a.column, b.column) && a.sqlOperator === b.sqlOperator,
     );
   }
 
@@ -504,7 +505,12 @@ export class ChartDataRequestBuilder {
       },
       [],
     );
-    return selectColumns.map(col => col.colName);
+    return selectColumns.map(col => {
+      return {
+        alias: this.buildAliasName(col),
+        column: this.buildColumnName(col),
+      };
+    });
   }
 
   private buildViewConfigs() {

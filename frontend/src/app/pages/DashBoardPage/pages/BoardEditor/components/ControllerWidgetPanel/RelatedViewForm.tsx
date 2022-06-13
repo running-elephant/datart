@@ -147,7 +147,11 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                   ? handleStructureViewName(item.id)
                   : item.id;
               return (
-                <Option key={item.id} fieldvaluetype={item.type} value={id}>
+                <Option
+                  key={item.id}
+                  fieldvaluetype={item.type}
+                  value={item.id}
+                >
                   <div
                     style={{ display: 'flex', justifyContent: 'space-between' }}
                   >
@@ -170,7 +174,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
       },
       [getFormRelatedViews, viewMap],
     );
-    console.log(viewMap, 'viewMap');
+
     return (
       <Wrapper>
         <h3>{t('title')}</h3>

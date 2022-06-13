@@ -31,6 +31,7 @@ import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
 import { CSSProperties } from 'react';
 import { CloneValueDeep } from 'utils/object';
+import { handleStructureViewName } from 'utils/utils';
 import { adaptBoardImageUrl, fillPx, getBackgroundImage } from '.';
 import { initClientId } from '../components/WidgetManager/utils/init';
 import { LAYOUT_COLS_MAP, ORIGINAL_TYPE_MAP } from '../constants';
@@ -494,7 +495,7 @@ export const getLinkedColumn = (
 ) => {
   const relations = triggerWidget.relations;
   const relation = relations.find(item => item.targetId === targetWidgetId);
-  console.log(triggerWidget,'triggerWidget');
+
   return (
     relation?.config?.widgetToWidget?.linkerColumn ||
     relation?.config?.widgetToWidget?.triggerColumn ||
@@ -677,8 +678,11 @@ export const getWidgetMap = (
 export const getValueByRowData = (
   data: ChartsEventData | undefined,
   fieldName: string,
+  viewType: string,
 ) => {
-  let toCaseField = fieldName;
+  let toCaseField =
+    viewType === 'STRUCT' ? handleStructureViewName(fieldName) : fieldName;
+
   return data?.rowData[toCaseField];
 };
 

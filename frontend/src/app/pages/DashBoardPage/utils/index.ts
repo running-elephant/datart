@@ -152,9 +152,10 @@ export const getTheWidgetFiltersAndParams = (obj: {
   chartWidget: Widget;
   widgetMap: Record<string, Widget>;
   params: Record<string, string[]> | undefined;
+  viewType: string;
 }) => {
   // TODO chart 本身携带了变量，board没有相关配置的时候要拿到 chart本身的 变量值 Params
-  const { chartWidget, widgetMap, params: chartParams } = obj;
+  const { chartWidget, widgetMap, params: chartParams, viewType } = obj;
   const controllerWidgets = Object.values(widgetMap).filter(
     widget => widget.config.type === 'controller',
   );
@@ -174,7 +175,6 @@ export const getTheWidgetFiltersAndParams = (obj: {
       .filter(view => view.fieldValue)
       .find(view => view.viewId === chartWidget?.viewIds?.[0]);
     if (!relatedViewItem) return;
-
     const values = getWidgetControlValues({
       type,
       relatedViewItem,
@@ -209,7 +209,10 @@ export const getTheWidgetFiltersAndParams = (obj: {
     if (relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Field) {
       const filter: ChartDataRequestFilter = {
         aggOperator: null,
-        column: [String(relatedViewItem.fieldValue)],
+        column:
+          viewType === 'STRUCT'
+            ? JSON.parse(relatedViewItem.fieldValue as string)
+            : [String(relatedViewItem.fieldValue)],
         sqlOperator: controllerConfig.sqlOperator,
         values: values,
       };
@@ -388,6 +391,7 @@ export const getChartWidgetRequestParams = (obj: {
   if (!dataChart.viewId) return null;
 
   const chartDataView = viewMap[dataChart?.viewId];
+  const viewType = chartDataView?.type || 'SQL';
 
   let requestParams = getDataChartRequestParams({
     dataChart,
@@ -399,6 +403,7 @@ export const getChartWidgetRequestParams = (obj: {
     chartWidget: curWidget,
     widgetMap,
     params: requestParams.params,
+    viewType,
   });
 
   // 全局过滤 filter
@@ -415,9 +420,11 @@ export const getChartWidgetRequestParams = (obj: {
     links.forEach(link => {
       const { triggerValue, triggerWidgetId } = link;
       const triggerWidget = widgetMap[triggerWidgetId];
+      const linkColumn = getLinkedColumn(link.linkerWidgetId, triggerWidget);
+
       const filter: ChartDataRequestFilter = {
         aggOperator: null,
-        column: getLinkedColumn(link.linkerWidgetId, triggerWidget),
+        column: viewType === 'STRUCT' ? JSON.parse(linkColumn) : [linkColumn],
         sqlOperator: FilterSqlOperator.In,
         values: [{ value: triggerValue, valueType: DataViewFieldType.STRING }],
       };
@@ -503,9 +510,8 @@ export const getDistinctFiltersByColumn = (
   }
   const filterMap: Record<string, ChartDataRequestFilter> = {};
   filter.forEach(item => {
-    filterMap[item.column] = item;
+    filterMap[item.column[0]] = item;
   });
-
   return Object.values(filterMap);
 };
 

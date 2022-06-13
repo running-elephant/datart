@@ -172,10 +172,13 @@ export const getControlOptionQueryParams = (obj: {
   widgetMap: Record<string, Widget>;
 }) => {
   const viewConfigs = transformToViewConfig(obj.view?.config);
+  const viewType = obj.view?.type || 'SQL';
+
   const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
     chartWidget: obj.curWidget,
     widgetMap: obj.widgetMap,
     params: undefined,
+    viewType,
   });
 
   const requestParams: ChartDataRequest = {
@@ -184,7 +187,7 @@ export const getControlOptionQueryParams = (obj: {
     filters: filterParams,
     groups: [],
     columns: [...new Set(obj.columns)].map(v => {
-      return { alias: v, column: [v] };
+      return { alias: v, column: viewType === 'STRUCT' ? JSON.parse(v) : [v] };
     }),
     pageInfo: {
       pageNo: 1,

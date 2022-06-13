@@ -64,7 +64,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
               <Option
                 key={item.uid}
                 fieldvaluetype={item.type}
-                value={columnName}
+                value={item.colName}
               >
                 <div
                   style={{ display: 'flex', justifyContent: 'space-between' }}
@@ -91,7 +91,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
                   : item.id;
 
               return (
-                <Option key={id} fieldvaluetype={item.type} value={id}>
+                <Option key={id} fieldvaluetype={item.type} value={item.id}>
                   <div
                     style={{ display: 'flex', justifyContent: 'space-between' }}
                   >

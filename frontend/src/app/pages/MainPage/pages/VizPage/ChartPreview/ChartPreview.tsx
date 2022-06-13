@@ -332,6 +332,7 @@ const ChartPreviewBoard: FC<{
             param?.data?.rowData,
             drillOptionRef?.current,
             chartPreview?.chartConfig?.datas,
+            chartPreview?.backendChart?.view?.type || 'SQL',
           );
           (openViewDetailPanel as any)({
             currentDataView: chartPreview?.backendChart?.view,
@@ -642,7 +643,7 @@ const ChartPreviewBoard: FC<{
         }),
       );
     };
-    console.log(chartPreview,'chartPreview');
+
     return (
       <StyledChartPreviewBoard>
         <VizHeader

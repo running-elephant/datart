@@ -122,9 +122,10 @@ export const widgetClickJumpAction =
     widget: Widget;
     params: ChartMouseEventParams;
     history: any;
+    viewType: string;
   }) =>
   (dispatch, getState) => {
-    const { renderMode, widget, params, history } = obj;
+    const { renderMode, widget, params, history, viewType } = obj;
     const state = getState() as RootState;
     const orgId = state?.main?.orgId || '';
     const folderIds = state.viz?.vizs?.map(v => v.relId) || [];
@@ -142,7 +143,11 @@ export const widgetClickJumpAction =
     ) {
       return;
     }
-    const rowDataValue = getValueByRowData(params.data, jumpFieldName);
+    const rowDataValue = getValueByRowData(
+      params.data,
+      jumpFieldName,
+      viewType,
+    );
     console.warn(' jumpValue:', rowDataValue);
     console.warn('rowData', params.data?.rowData);
     console.warn(`rowData[${jumpFieldName}]:${rowDataValue} `);
@@ -183,6 +188,7 @@ export const widgetClickLinkageAction =
     renderMode: VizRenderMode,
     widget: Widget,
     params: ChartMouseEventParams,
+    viewType: string,
   ) =>
   (dispatch, getState) => {
     const { componentType, seriesType, seriesName } = params;
@@ -204,7 +210,11 @@ export const widgetClickLinkageAction =
       .map(re => {
         let linkageFieldName: string =
           re?.config?.widgetToWidget?.triggerColumn || '';
-        const linkValue = getValueByRowData(params.data, linkageFieldName);
+        const linkValue = getValueByRowData(
+          params.data,
+          linkageFieldName,
+          viewType,
+        );
         if (!linkValue) {
           console.warn('linkageFieldName:', linkageFieldName);
           console.warn('rowData', params.data?.rowData);
@@ -275,8 +285,14 @@ export const widgetChartClickAction =
     params: ChartMouseEventParams;
     history: any;
   }) =>
-  dispatch => {
+  (dispatch, getState) => {
     const { boardId, editing, renderMode, widget, params, history } = obj;
+    const rootState = getState() as RootState;
+    const viewBoardState = rootState.board as BoardState;
+    const viewMap = viewBoardState.viewMap;
+    const viewType =
+      viewMap[widget?.config?.content?.dataChart?.viewId]?.type || 'SQL';
+
     //is tableChart
     if (
       params.componentType === 'table' &&
@@ -290,14 +306,29 @@ export const widgetChartClickAction =
     // jump
     const jumpConfig = widget.config?.jumpConfig;
     if (jumpConfig && jumpConfig.open) {
-      dispatch(widgetClickJumpAction({ renderMode, widget, params, history }));
+      dispatch(
+        widgetClickJumpAction({
+          renderMode,
+          widget,
+          params,
+          history,
+          viewType,
+        }),
+      );
       return;
     }
     // linkage
     const linkageConfig = widget.config.linkageConfig;
     if (linkageConfig?.open && widget.relations.length) {
       dispatch(
-        widgetClickLinkageAction(boardId, editing, renderMode, widget, params),
+        widgetClickLinkageAction(
+          boardId,
+          editing,
+          renderMode,
+          widget,
+          params,
+          viewType,
+        ),
       );
       return;
     }

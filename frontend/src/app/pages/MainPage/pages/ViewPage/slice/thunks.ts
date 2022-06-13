@@ -252,6 +252,7 @@ export const saveView = createAsyncThunk<
           currentEditingView,
           false,
           allDatabaseSchemas[currentEditingView.sourceId!],
+          isSaveAs,
         ),
       });
       resolve && resolve();
@@ -276,12 +277,14 @@ export const saveView = createAsyncThunk<
           currentEditingView,
           true,
           allDatabaseSchemas[currentEditingView.sourceId!],
+          isSaveAs,
         ),
       });
       resolve && resolve();
       return currentEditingView;
     }
   } catch (error) {
+    console.log(error, 'error');
     errorHandle(error);
     throw error;
   }

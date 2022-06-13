@@ -72,15 +72,11 @@ export const Tabs = memo(() => {
 
   const tabChange = useCallback(
     activeKey => {
-      const currentEditingView = editingViews.find(v => v.id === activeKey);
-
       if (id !== activeKey) {
-        history.push(
-          `/organizations/${orgId}/views/${activeKey}/${currentEditingView?.type}`,
-        );
+        history.push(`/organizations/${orgId}/views/${activeKey}`);
       }
     },
-    [history, id, orgId, editingViews],
+    [history, id, orgId],
   );
 
   const tabEdit = useCallback(

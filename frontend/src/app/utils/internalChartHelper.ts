@@ -711,6 +711,7 @@ const buildClickEventBaseFilters = (
   rule?: InteractionRule,
   drillOption?: IChartDrillOption,
   dataConfigs?: ChartDataConfig[],
+  viewType?: string,
 ) => {
   const groupConfigs: ChartDataSectionField[] = getDrillableRows(
     dataConfigs || [],
@@ -730,7 +731,7 @@ const buildClickEventBaseFilters = (
       return {
         aggOperator: null,
         sqlOperator: FilterSqlOperator.In,
-        column: c.colName,
+        column: viewType === 'STRUCT' ? JSON.parse(c.colName) : [c.colName],
         values: [{ value, valueType: c.type }],
       };
     })
@@ -741,12 +742,14 @@ export const getClickEventViewDetailFilters = (
   rawData?: Record<string, any>,
   drillOption?: IChartDrillOption,
   dataConfigs?: ChartDataConfig[],
+  viewType?: string,
 ) => {
   const baseFilters = buildClickEventBaseFilters(
     rawData,
     undefined,
     drillOption,
     dataConfigs,
+    viewType,
   );
   return baseFilters as ChartDataRequestFilter[];
 };

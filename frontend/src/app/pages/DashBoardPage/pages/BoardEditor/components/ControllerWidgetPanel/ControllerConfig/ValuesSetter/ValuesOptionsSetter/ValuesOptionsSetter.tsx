@@ -32,7 +32,7 @@ import { transformMeta } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { request2 } from 'utils/request';
-import { errorHandle } from 'utils/utils';
+import { errorHandle, handleStructureViewName } from 'utils/utils';
 import { ControllerConfig } from '../../../types';
 import { AssistViewFields } from './AssistViewFields';
 import { CustomOptions } from './CustomOptions';
@@ -72,11 +72,13 @@ const ValuesOptionsSetter: FC<{
     try {
       const { data } = await request2<View>(`/views/${viewId}`);
       let meta = transformMeta(data?.model);
+      const viewType = data?.type || 'SQL';
       if (!meta) return [];
       const option: CascaderOptionType[] = meta.map(item => {
         return {
           value: item.id,
-          label: item.id,
+          label:
+            viewType === 'STRUCT' ? handleStructureViewName(item.id) : item.id,
         };
       });
       return option;
@@ -255,7 +257,7 @@ const ValuesOptionsSetter: FC<{
                           key={item.value}
                           value={item.value as string}
                         >
-                          {item.value}
+                          {item.label}
                         </Select.Option>
                       ))}
                     </Select>

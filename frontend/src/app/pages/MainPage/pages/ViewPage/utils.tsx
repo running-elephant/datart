@@ -207,6 +207,7 @@ export function getSaveParamsFromViewModel(
   editingView: ViewViewModel,
   isUpdate?: boolean,
   database?: DatabaseSchema[],
+  isSaveAs?: Boolean,
 ) {
   const {
     name,
@@ -252,12 +253,12 @@ export function getSaveParamsFromViewModel(
       index,
       type,
       script:
-        type === 'SQL'
-          ? script
-          : handleObjectScriptToString(
+        type === 'STRUCT'
+          ? handleObjectScriptToString(
               script as SimpleViewQueryProps,
               database!,
-            ),
+            )
+          : script,
       config: JSON.stringify(config),
       model: JSON.stringify(model),
       variablesToCreate: created,
@@ -300,12 +301,12 @@ export function getSaveParamsFromViewModel(
       index,
       type,
       script:
-        type === 'SQL'
-          ? script
-          : handleObjectScriptToString(
+        type === 'STRUCT' && !isSaveAs
+          ? handleObjectScriptToString(
               script as SimpleViewQueryProps,
               database!,
-            ),
+            )
+          : script,
       config: JSON.stringify(config),
       model: JSON.stringify(model),
       variablesToCreate: variables,

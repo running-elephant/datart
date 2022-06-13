@@ -42,11 +42,14 @@ export const getDistinctFields = async (
   executeToken: ExecuteToken | undefined,
 ) => {
   const viewConfigs = transformToViewConfig(view?.config);
+  const viewType = view?.type || 'SQL';
   const requestParams: ChartDataRequest = {
     aggregators: [],
     filters: [],
     groups: [],
-    columns: [...new Set(columns)],
+    columns: [...new Set(columns)].map(v => {
+      return { alias: v, column: viewType === 'STRUCT' ? JSON.parse(v) : [v] };
+    }),
     pageInfo: {
       pageNo: 1,
       pageSize: 99999999,
