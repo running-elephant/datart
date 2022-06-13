@@ -16,62 +16,72 @@
  * limitations under the License.
  */
 // import JSONFormatter from 'json-formatter-js';
-import { FC, memo, useCallback } from 'react';
+// import {languages} from 'monaco-editor/esm/vs/language/json/fillers/monaco-editor-core.js';
+import debounce from 'lodash/debounce';
+import 'monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution';
+import { FC, memo, useCallback, useMemo } from 'react';
 import MonacoEditor, { monaco } from 'react-monaco-editor';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { FONT_SIZE_BASE } from 'styles/StyleConstants';
 import { selectThemeKey } from 'styles/theme/slice/selectors';
-export const MockDataEditor: FC<{ jsonVal: object }> = memo(({ jsonVal }) => {
-  const theme = useSelector(selectThemeKey);
-  //   const formatter = new JSONFormatter(jsonVal);
-  const editorValue = JSON.stringify(jsonVal);
-  console.log('__ editorValue', editorValue);
-  const editorWillMount = useCallback(editor => {
-    // editor.languages.register({ id: 'javascript' });
-    // editor.languages.setMonarchTokensProvider('javascript', language);
-  }, []);
+export const MockDataEditor: FC<{ jsonVal: object; onDataChange: any }> = memo(
+  ({ jsonVal, onDataChange }) => {
+    const theme = useSelector(selectThemeKey);
+    //   const formatter = new JSONFormatter(jsonVal);
+    const editorValue = JSON.stringify(jsonVal, null, 4);
 
-  const editorDidMount = useCallback(
-    (editor: monaco.editor.IStandaloneCodeEditor) => {
-      // Removing the tooltip on the read-only editor
-      // https://github.com/microsoft/monaco-editor/issues/1742
-      console.log('__ editor', editor);
+    const editorWillMount = useCallback(editor => {}, []);
 
-      editor.getAction('editor.action.formatDocument').run(); //格式化
-      console.log('__ editor.getValue()', editor.getValue());
-      editor.setValue(editor.getValue());
-      editor.getAction('editor.action.formatDocument').run(); //格式化
-      editor.focus();
-    },
-    [],
-  );
-  return (
-    <StyledWrapper>
-      <MonacoEditor
-        value={editorValue}
-        language="json"
-        theme={`vs-${theme}`}
-        options={{
-          selectOnLineNumbers: true,
-          automaticLayout: true,
-          wordWrap: 'wordWrapColumn',
-          wrappingStrategy: 'simple',
-          wordWrapBreakBeforeCharacters: ',',
-          wordWrapBreakAfterCharacters: ',',
-          // disableLayerHinting: true,
-          fontSize: FONT_SIZE_BASE * 0.875,
-          minimap: { enabled: false },
-          readOnly: false,
-        }}
-        //   onChange={debouncedEditorChange}
-        editorWillMount={editorWillMount}
-        editorDidMount={editorDidMount}
-      />
-    </StyledWrapper>
-  );
-});
+    const editorDidMount = useCallback(
+      (editor: monaco.editor.IStandaloneCodeEditor) => {
+        // Removing the tooltip on the read-only editor
+        // https://github.com/microsoft/monaco-editor/issues/1742
+
+        editor.getAction('editor.action.formatDocument').run(); //格式化
+        editor.setValue(editor.getValue());
+        editor.focus();
+      },
+      [],
+    );
+    const debouncedEditorChange = useMemo(() => {
+      const editorChange = val => {
+        try {
+          let nextVal = JSON.parse(val);
+          onDataChange(val);
+        } catch (error) {
+          console.warn('error on', error);
+        }
+      };
+      return debounce(editorChange, 500);
+    }, [onDataChange]);
+    return (
+      <StyledWrapper>
+        <MonacoEditor
+          value={editorValue}
+          language="javascript"
+          theme={`vs-${theme}`}
+          options={{
+            selectOnLineNumbers: true,
+            automaticLayout: true,
+            wordWrap: 'wordWrapColumn',
+            wrappingStrategy: 'simple',
+            wordWrapBreakBeforeCharacters: ',',
+            wordWrapBreakAfterCharacters: ',',
+            // disableLayerHinting: true,
+            fontSize: FONT_SIZE_BASE * 0.875,
+            minimap: { enabled: true },
+            readOnly: false,
+          }}
+          onChange={debouncedEditorChange}
+          editorWillMount={editorWillMount}
+          editorDidMount={editorDidMount}
+        />
+      </StyledWrapper>
+    );
+  },
+);
 const StyledWrapper = styled.div`
-  display: flex;
-  height: 300px;
+  flex: 1;
+  height: 100%;
 `;

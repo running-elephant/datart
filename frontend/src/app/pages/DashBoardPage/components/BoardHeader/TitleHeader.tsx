@@ -46,7 +46,7 @@ export const TitleHeader: FC = memo(() => {
   const publishLoading = useSelector(selectPublishLoading);
   const history = useHistory();
   const [showShareLinkModal, setShowShareLinkModal] = useState(false);
-  const [mockDataModal, setMockDataModal] = useState(true);
+  const [mockDataModal, setMockDataModal] = useState(false);
   const [showSaveToStory, setShowSaveToStory] = useState<boolean>(false);
   const { name, status, allowManage, allowShare, boardId, orgId } =
     useContext(BoardContext);

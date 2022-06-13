@@ -15,14 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button } from 'antd';
+import { Button, Empty } from 'antd';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { FC, memo, useContext } from 'react';
-import { useSelector } from 'react-redux';
+import { FC, memo, useContext, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { LEVEL_100 } from 'styles/StyleConstants';
-import { selectLayoutWidgetMapById } from '../../pages/Board/slice/selector';
-import { BoardState } from '../../pages/Board/slice/types';
+import { getWidgetChartDatasAction } from '../../pages/Board/slice/asyncActions';
 import { MockDataTab } from './MockDataTab';
 
 export interface MockDataPanelProps {
@@ -30,17 +29,46 @@ export interface MockDataPanelProps {
 }
 export const MockDataPanel: FC<MockDataPanelProps> = memo(({ onClose }) => {
   const { boardId } = useContext(BoardContext);
-  const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
-    selectLayoutWidgetMapById()(state, boardId),
-  );
-  console.log('__ layoutWidgetMap', layoutWidgetMap);
+  const dispatch = useDispatch();
+  const [dataMap, setDataMap] = useState<any>();
+  useEffect(() => {
+    const dataMap = dispatch(getWidgetChartDatasAction(boardId));
+    setDataMap(dataMap);
+  }, [boardId, dispatch]);
+
+  const onExport = () => {
+    onClose();
+  };
+  const onChangeDataMap = opt => {
+    const newItemData = JSON.parse(opt.val);
+    const newItem = {
+      id: opt.id,
+      name: dataMap[opt.id].name,
+      data: newItemData,
+    };
+    const newData = Object.assign(dataMap, { [opt.id]: newItem });
+    setDataMap(newData);
+  };
   return (
-    <StyledWrapper>
+    <StyledWrapper className="mockDataPanel">
       <div className="content">
-        <MockDataTab />
-        <Button type="primary" onClick={onClose}>
-          close
-        </Button>
+        {Object.values(dataMap || {}).length ? (
+          <MockDataTab dataMap={dataMap} onChangeDataMap={onChangeDataMap} />
+        ) : (
+          <div className="empty-data" style={{ flex: 1 }}>
+            <Empty />
+          </div>
+        )}
+
+        <div className="btn-box">
+          <Button className="btn" type="primary" onClick={onExport}>
+            submit
+          </Button>
+
+          <Button className="btn" type="primary" onClick={onClose}>
+            close
+          </Button>
+        </div>
       </div>
     </StyledWrapper>
   );
@@ -57,9 +85,31 @@ const StyledWrapper = styled.div`
   width: 100%;
   height: 100%;
   padding: 50px;
-  background-color: rgb(204 204 204 / 50%);
-  .content {
+  background-color: rgb(0 0 0 / 50%);
+  & .content {
+    display: flex;
     flex: 1;
+    flex-direction: column;
     background-color: ${p => p.theme.bodyBackground};
+    .empty-data {
+      display: flex;
+      flex: 1;
+      align-content: center;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+  .btn-box {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    height: 50px;
+    .btn {
+      margin-right: 20px;
+    }
+  }
+  .tab-box {
+    display: flex;
+    flex: 1;
   }
 `;

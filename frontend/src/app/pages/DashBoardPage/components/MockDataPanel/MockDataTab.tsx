@@ -16,83 +16,61 @@
  * limitations under the License.
  */
 import { Tabs } from 'antd';
-import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { FC, memo, useContext, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { FC, memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import { selectLayoutWidgetMapById } from '../../pages/Board/slice/selector';
-import { BoardState } from '../../pages/Board/slice/types';
 import { MockDataEditor } from './MockDataEditor';
 const { TabPane } = Tabs;
 export interface MockDataPanelProps {
   onClose: () => void;
 }
-const json = [
-  {
-    label: 'common.borderStyle',
-    key: 'borderStyle',
-    value: {
-      type: 'solid',
-      width: 0,
-      color: '#ced4da',
-    },
-    comType: 'line',
-    rows: [],
-  },
-  {
-    label: 'bar.radius',
-    key: 'radius',
-    comType: 'inputNumber',
-    rows: [],
-  },
-  {
-    label: 'bar.width',
-    key: 'width',
-    value: 0,
-    comType: 'inputNumber',
-    rows: [],
-  },
-  {
-    label: 'bar.gap',
-    key: 'gap',
-    value: 0.1,
-    comType: 'inputPercentage',
-    rows: [],
-  },
-];
-export const MockDataTab: FC<{}> = memo(() => {
-  const { boardId } = useContext(BoardContext);
 
-  const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
-    selectLayoutWidgetMapById()(state, boardId),
-  );
-  const dispatch = useDispatch();
-
-  const wList = Object.values(layoutWidgetMap);
-  useEffect(() => {
-    setWid(wList[0]?.id);
-  }, [wList]);
+export const MockDataTab: FC<{
+  dataMap: Record<string, { id: string; name: string; data: object }>;
+  onChangeDataMap: any;
+}> = memo(({ dataMap, onChangeDataMap }) => {
+  const dataList = Object.values(dataMap || {});
   const [wId, setWid] = useState<string>();
+  const [curDataVal, setCurDataVal] = useState<any>();
+  useEffect(() => {
+    const dataList = Object.values(dataMap || {});
+    if (dataList && dataList[0]) {
+      setWid(dataList?.[0]?.id);
+    }
+  }, [dataMap]);
+
   const onChange = (key: string) => {
-    console.log(key);
     setWid(key);
   };
-
+  useEffect(() => {
+    const widgetData = dataMap?.[wId || ''];
+    if (widgetData) {
+      // const dataVal =  JSON.stringify(widgetData.data);
+      const dataVal = widgetData.data;
+      setCurDataVal(JSON.parse(JSON.stringify(dataVal, null, 4)));
+    }
+  }, [dataMap, wId]);
+  const onDataChange = strVal => {
+    onChangeDataMap({
+      id: wId,
+      val: strVal,
+    });
+  };
+  if (!wId) {
+    return null;
+  }
   return (
-    <StyledWrapper>
-      <Tabs centered defaultActiveKey="1" onChange={onChange}>
-        {wList.map(t => {
-          return <TabPane tab={t.config.name} key={t.id}></TabPane>;
+    <StyledWrapper className="tab">
+      <Tabs centered onChange={onChange}>
+        {dataList.map(t => {
+          return <TabPane tab={t.name} key={t.id}></TabPane>;
         })}
       </Tabs>
-      <div>
-        {wId && layoutWidgetMap[wId].config.name}
-        <MockDataEditor jsonVal={json} />
-      </div>
+      <MockDataEditor jsonVal={curDataVal} onDataChange={onDataChange} />
     </StyledWrapper>
   );
 });
 const StyledWrapper = styled.div`
   display: flex;
+  flex: 1;
   flex-direction: column;
 `;
