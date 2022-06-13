@@ -104,8 +104,10 @@ export const transferChartConfig = (
           return { ...v };
         });
       }
-
-      if (!isEmptyArray(jumpFilterParams)) {
+      if (
+        item.type === ChartDataSectionType.Filter &&
+        !isEmptyArray(jumpFilterParams)
+      ) {
         item[RUNTIME_FILTER_KEY] = jumpFilterParams;
       }
       return item;

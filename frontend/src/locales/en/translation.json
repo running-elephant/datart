@@ -771,6 +771,7 @@
             "addRule": "+ Add New",
             "inputUrl": "Please input url",
             "header": {
+              "name": "Name",
               "category": "Category",
               "open": "Open",
               "relation": "Relation",
@@ -807,7 +808,8 @@
               "target": "Target Field/Variable",
               "addRelation": "+ Add",
               "field": "Field",
-              "variable": "Variable"
+              "variable": "Variable",
+              "controller": "Controller"
             },
             "operation": {
               "delete": "Delete"
@@ -816,7 +818,7 @@
         },
         "viewDetail": {
           "title": "View Detail",
-          "event": "Ineraction Event",
+          "event": "Interaction Event",
           "leftClick": "Left Click",
           "rightClick": "Right Click",
           "field": "Selected Fields",
@@ -897,7 +899,9 @@
         "expandNextLevel": "Expand to Next Level",
         "selectDrillOn": "\"Click to drill down\" is on",
         "selectDrillOff": "Turn on \"Click to drill down\"",
-        "rollUp": "Roll Up"
+        "rollUp": "Roll Up",
+        "drillThrough": "Drill Through",
+        "viewData": "View Data"
       }
     },
     "action": {
@@ -999,6 +1003,7 @@
         "button": "Button"
       },
       "setting": {
+        "interaction": "Interaction",
         "setting": "Setting",
         "board": "Board",
         "widget": "Widget",
@@ -1212,7 +1217,9 @@
     "main": {
       "publishSuccess": "Publish success",
       "unpublishSuccess": "Unpublish success",
-      "empty": "Select vizs in the sidebar"
+      "empty": "Select vizs in the sidebar",
+      "closeOther": "close Other Tabs",
+      "closeAll": "close All Tabs"
     }
   },
   "view": {
@@ -1231,7 +1238,9 @@
       "discard": "Discard",
       "cancel": "Cancel",
       "execute": "Execute",
-      "warning": "There are unexecuted changes, still execute?"
+      "warning": "There are unexecuted changes, still execute?",
+      "closeOther": "close Other Tabs",
+      "closeAll": "close All Tabs"
     },
     "editor": {
       "startAnalysis": "Start Analysis",

@@ -29,7 +29,7 @@ export type VizType = {
   relType: string;
 };
 
-export type I18nTransator = {
+export type I18nTranslator = {
   translate: (title: string, disablePrefix?: boolean, options?: any) => string;
 };
 
@@ -46,6 +46,11 @@ export type JumpToChartRule = {
   [InteractionFieldRelation.Customize]: CustomizeRelation[];
 };
 
+export type JumpToDashboardRule = {
+  relId: string;
+  [InteractionFieldRelation.Customize]: CustomizeRelation[];
+};
+
 export type JumpToUrlRule = {
   relId: string;
   url: string;
@@ -54,11 +59,12 @@ export type JumpToUrlRule = {
 
 export type InteractionRule = {
   id: string;
+  name?: string;
   event?: InteractionMouseEvent;
   category?: InteractionCategory;
   action?: InteractionAction;
   [InteractionCategory.JumpToChart]?: JumpToChartRule;
-  [InteractionCategory.JumpToDashboard]?: any;
+  [InteractionCategory.JumpToDashboard]?: JumpToDashboardRule;
   [InteractionCategory.JumpToUrl]?: JumpToUrlRule;
 };
 

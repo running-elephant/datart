@@ -82,6 +82,12 @@ const FilterControlPanel: FC<
       if (Boolean(dataConfig?.disableAggregate) || aggregation === false) {
         return AggregateFieldActionType.None;
       }
+      if (
+        config.category === ChartDataViewFieldCategory.AggregateComputedField ||
+        config.category === ChartDataViewFieldCategory.ComputedField
+      ) {
+        return AggregateFieldActionType.None;
+      }
       if (config.aggregate) {
         return config.aggregate;
       } else if (

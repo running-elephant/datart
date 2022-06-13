@@ -17,10 +17,8 @@
  */
 
 import { Form, Radio, Select, Space } from 'antd';
-import { currentDataViewSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { isEmptyArray } from 'utils/object';
 import { InteractionFieldMapper, InteractionMouseEvent } from '../../constants';
@@ -29,13 +27,12 @@ import { itemLayoutComparer } from '../../utils';
 import { ViewDetailSetting } from './types';
 
 const ViewDetailPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
-  ({ ancestors, translate: t = title => title, data, onChange }) => {
-    const dataview = useSelector(currentDataViewSelector);
+  ({ ancestors, translate: t = title => title, data, context, onChange }) => {
     const [event, setEvent] = useState<ViewDetailSetting['event']>(
-      data.value?.event || InteractionMouseEvent.Left,
+      data.value?.event,
     );
     const [mapper, setMapper] = useState<ViewDetailSetting['mapper']>(
-      data?.value?.mapper || InteractionFieldMapper.All,
+      data?.value?.mapper,
     );
     const [customFields, setCustomFields] = useState<string[]>(
       data?.value?.[InteractionFieldMapper.Customize] || [],
@@ -119,7 +116,7 @@ const ViewDetailPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
                 allowClear
                 onChange={handleViewDetailCustomFieldsChange}
               >
-                {dataview?.meta?.map(f => {
+                {context?.dataview?.meta?.map(f => {
                   return (
                     <Select.Option key={f.id} value={f.name}>
                       {f.name}

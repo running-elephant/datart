@@ -22,7 +22,7 @@ import { FC, memo, useState } from 'react';
 import { isEmpty } from 'utils/object';
 import { InteractionFieldRelation } from '../../constants';
 import RelationList from './RalationList';
-import { I18nTransator, JumpToChartRule, VizType } from './types';
+import { I18nTranslator, JumpToChartRule, VizType } from './types';
 
 const JumpToChart: FC<
   {
@@ -30,7 +30,7 @@ const JumpToChart: FC<
     dataview?: ChartDataView;
     value?: JumpToChartRule;
     onValueChange: (value) => void;
-  } & I18nTransator
+  } & I18nTranslator
 > = memo(({ vizs, dataview, value, onValueChange, translate: t }) => {
   const [relations, setRelations] = useState(
     value?.[InteractionFieldRelation.Customize] || [],

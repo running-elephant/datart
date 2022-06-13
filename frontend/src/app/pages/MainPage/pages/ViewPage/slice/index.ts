@@ -73,6 +73,17 @@ const slice = createSlice({
         }
       }
     },
+    closeOtherEditingViews(state, action: PayloadAction<string>) {
+      state.editingViews = state.editingViews.filter(
+        v => v.id === action.payload,
+      );
+      state.currentEditingView =
+        state.editingViews[state.editingViews.length - 1].id || '';
+    },
+    closeAllEditingViews(state) {
+      state.editingViews = [];
+      state.currentEditingView = '';
+    },
     switchCurrentEditingView(state, action: PayloadAction<string>) {
       state.currentEditingView = action.payload;
     },

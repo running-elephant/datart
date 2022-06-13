@@ -71,6 +71,173 @@ export const initTitleTpl = () => {
   };
   return titleTpl;
 };
+
+export const initInteractionTpl = () => {
+  return [
+    {
+      label: 'drillThrough.title',
+      key: 'drillThrough',
+      comType: 'checkboxModal',
+      default: false,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'drillThrough.title',
+          key: 'setting',
+          comType: 'interaction.drillThrough',
+        },
+      ],
+    },
+    {
+      label: 'viewDetail.title',
+      key: 'viewDetail',
+      comType: 'checkboxModal',
+      default: false,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'viewDetail.title',
+          key: 'setting',
+          comType: 'interaction.viewDetail',
+        },
+      ],
+    },
+  ];
+};
+
+export const InteractionI18N = {
+  zh: {
+    drillThrough: {
+      title: '跳转设置',
+      rule: {
+        title: '规则设置',
+        addRule: '+ 点击新建',
+        inputUrl: '请输入URL',
+        header: {
+          name: '名称',
+          category: '类型',
+          open: '打开方式',
+          relation: '关系设置',
+          operation: '操作',
+          event: '交互事件',
+        },
+        event: {
+          title: '交互事件',
+          left: '左键单击',
+          right: '右键菜单',
+        },
+        category: {
+          title: '类型',
+          jumpToChart: '跳转到图表',
+          jumpToDashboard: '跳转到仪表板',
+          jumpToUrl: '跳转到URL',
+        },
+        action: {
+          title: '打开方式',
+          redirect: '从当前页打开',
+          window: '打开新窗口',
+          dialog: '打开对话框',
+        },
+        reference: {
+          title: '关联图表',
+        },
+        relation: {
+          setting: '字段关系配置',
+          title: '字段关系',
+          auto: '自动',
+          customize: '自定义',
+          type: '类型',
+          source: '源字段/变量',
+          target: '目标字段/变量',
+          addRelation: '+ 点击新建',
+          field: '字段',
+          variable: '变量',
+          controller: '控制器',
+        },
+        operation: {
+          delete: '删除',
+        },
+      },
+    },
+    viewDetail: {
+      title: '查看数据',
+      event: '交互事件',
+      leftClick: '左键单击',
+      rightClick: '右键菜单',
+      field: '选择字段',
+      all: '全部',
+      customize: '自定义',
+      summary: '汇总',
+      details: '明细',
+    },
+  },
+  en: {
+    drillThrough: {
+      title: 'Drill Through',
+      rule: {
+        title: 'Rule',
+        addRule: '+ Add New',
+        inputUrl: 'Please input url',
+        header: {
+          name: 'Name',
+          category: 'Category',
+          open: 'Open',
+          relation: 'Relation',
+          operation: 'Operation',
+          event: 'Event',
+        },
+        event: {
+          title: 'Event',
+          left: 'Left',
+          right: 'Right',
+        },
+        category: {
+          title: 'Categroy',
+          jumpToChart: 'Jump to Chart',
+          jumpToDashboard: 'Jump to Dashboard',
+          jumpToUrl: 'Jump to URL',
+        },
+        action: {
+          title: 'Open',
+          redirect: 'Redirect',
+          window: 'Open New',
+          dialog: 'Open Dialog',
+        },
+        reference: {
+          title: 'Reference View',
+        },
+        relation: {
+          setting: 'Field Relation Setting',
+          title: 'Field Relation',
+          auto: 'Auto',
+          customize: 'Customize',
+          type: 'Type',
+          source: 'Source Field/Variable',
+          target: 'Target Field/Variable',
+          addRelation: '+ Add',
+          field: 'Field',
+          variable: 'Variable',
+          controller: 'Controller',
+        },
+        operation: {
+          delete: 'Delete',
+        },
+      },
+    },
+    viewDetail: {
+      title: 'View Detail',
+      event: 'Interaction Event',
+      leftClick: 'Left Click',
+      rightClick: 'Right Click',
+      field: 'Selected Fields',
+      all: 'All',
+      customize: 'Customize',
+      summary: 'Summary',
+      details: 'Details',
+    },
+  },
+};
+
 export const TitleI18N = {
   zh: {
     titleGroup: '标题格式',

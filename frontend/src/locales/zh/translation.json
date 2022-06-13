@@ -771,6 +771,7 @@
             "addRule": "+ 点击新建",
             "inputUrl": "请输入URL",
             "header": {
+              "name": "名称",
               "category": "类型",
               "open": "打开方式",
               "relation": "关系设置",
@@ -807,7 +808,8 @@
               "target": "目标字段/变量",
               "addRelation": "+ 点击新建",
               "field": "字段",
-              "variable": "变量"
+              "variable": "变量",
+              "controller": "控制器"
             },
             "operation": {
               "delete": "删除"
@@ -897,7 +899,9 @@
         "expandNextLevel": "展开下一层级",
         "selectDrillOn": "已开启“点击下钻”",
         "selectDrillOff": "开启“点击下钻”",
-        "rollUp": "上卷"
+        "rollUp": "上卷",
+        "drillThrough": "跳转",
+        "viewData": "查看数据"
       }
     },
     "action": {
@@ -999,6 +1003,7 @@
         "button": "按钮"
       },
       "setting": {
+        "interaction": "交互",
         "setting": "设置",
         "board": "面板",
         "widget": "组件",
@@ -1212,7 +1217,9 @@
     "main": {
       "publishSuccess": "发布成功",
       "unpublishSuccess": "取消发布成功",
-      "empty": "请在左侧列表选择可视化"
+      "empty": "请在左侧列表选择可视化",
+      "closeOther": "关闭其他",
+      "closeAll": "关闭所有"
     }
   },
   "view": {
@@ -1231,7 +1238,9 @@
       "discard": "放弃",
       "cancel": "取消",
       "execute": "执行",
-      "warning": "有未执行的修改，是否执行？"
+      "warning": "有未执行的修改，是否执行？",
+      "closeOther": "关闭其他",
+      "closeAll": "关闭所有"
     },
     "editor": {
       "startAnalysis": "开始分析",

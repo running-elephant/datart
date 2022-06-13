@@ -198,15 +198,25 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                 }
 
                 // NOTE 透视表树形结构展开下钻特殊处理方法
-                if (params.seriesName === 'drillOptionChange') {
-                  handleDrillOptionChange?.(params.value);
+                if (
+                  params.chartType === 'pivotSheet' &&
+                  params.interactionType === 'drilled'
+                ) {
+                  handleDrillOptionChange?.(params.drillOption);
                   return;
                 }
 
-                // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法
-                if (params.seriesName === 'changeSelectedItems') {
-                  changeSelectedItems(dispatch, renderMode, params.data, wid);
-                  return;
+                // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法 其他图标取消选中时调取
+                if (params.interactionType === 'selected') {
+                  changeSelectedItems(
+                    dispatch,
+                    renderMode,
+                    params.selectedItems,
+                    wid,
+                  );
+                }
+                if (params.interactionType === 'unselect') {
+                  changeSelectedItems(dispatch, renderMode, [], wid);
                 }
                 if (chartInstance.selectable) {
                   selectedItemChange(dispatch, renderMode, params, wid);
