@@ -60,6 +60,8 @@ export const fetchShareVizInfo = createAsyncThunk(
     thunkAPI,
   ) => {
     const authenticationMode = filterSearchParams?.type.join();
+    const isMatchByName = !!filterSearchParams?.isMatchByName;
+
     let data = {} as ShareVizInfo;
     try {
       const response = await request2<ShareVizInfo>({
@@ -103,7 +105,11 @@ export const fetchShareVizInfo = createAsyncThunk(
           vizDetail: convertToChartDto(data.vizDetail),
         };
         thunkAPI.dispatch(
-          shareActions.setDataChart({ data: shareVizInfo, filterSearchParams }),
+          shareActions.setDataChart({
+            data: shareVizInfo,
+            filterSearchParams,
+            isMatchByName,
+          }),
         );
         break;
       case 'DASHBOARD':
@@ -150,6 +156,7 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
       pageInfo?: any;
       sorter?: { column: string; operator: string; aggOperator?: string };
       drillOption?: IChartDrillOption;
+      filterSearchParams?: FilterSearchParams;
     },
     thunkAPI,
   ) => {

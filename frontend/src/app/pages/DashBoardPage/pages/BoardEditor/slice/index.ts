@@ -387,7 +387,7 @@ const filterActions = [
 
   editBoardStackActions.toggleLockWidget,
   editBoardStackActions.updateBoardConfigByKey,
-  editBoardStackActions.updateWidgetConfigByPath,
+  editBoardStackActions.updateWidgetStyleConfigByPath,
   editBoardStackActions.changeFreeWidgetRect,
   editBoardStackActions.dropWidgetToTab,
   editBoardStackActions.dropWidgetToGroup,

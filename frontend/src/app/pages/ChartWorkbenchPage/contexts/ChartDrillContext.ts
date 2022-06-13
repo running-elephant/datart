@@ -24,6 +24,8 @@ const ChartDrillContext = createContext<{
   availableSourceFunctions?: string[];
   onDrillOptionChange?: (option: IChartDrillOption) => void;
   onDateLevelChange?: (type: string, option: any) => void;
+  onViewDataChange?: () => void;
+  onDrillThroughChange?: (ruleId?: string) => void;
 }>({});
 
 export default ChartDrillContext;

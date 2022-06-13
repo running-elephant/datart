@@ -15,29 +15,90 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Tabs } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { FC, memo, useContext } from 'react';
-import { useDispatch } from 'react-redux';
+import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
+import { ChartStyleConfig } from 'app/types/ChartConfig';
+import { FC, memo, useContext, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectViewMap } from '../../../Board/slice/selector';
+import { editBoardStackActions } from '../../slice';
 import { showRectAction } from '../../slice/actions/actions';
 import { NameSet } from './SettingItem/NameSet';
 import { RectSet } from './SettingItem/RectSet';
 import { SettingPanel } from './SettingPanel';
 import { WidgetConfigPanel } from './WidgetConfigPanel';
 
+const { TabPane } = Tabs;
+
 export const WidgetSetting: FC = memo(() => {
   const t = useI18NPrefix(`viz.board.setting`);
   const widget = useContext(WidgetContext);
   const dispatch = useDispatch();
   const showRect = dispatch(showRectAction(widget)) as unknown as boolean;
+  const [currentTab, setCurrentTab] = useState<string>('style');
+  const vizs = useSelector(selectVizs);
+  const viewMap = useSelector(selectViewMap);
+
+  const handleStyleConfigChange = (
+    ancestors: number[],
+    configItem: ChartStyleConfig,
+    needRefresh?: boolean,
+  ) => {
+    dispatch(
+      editBoardStackActions.updateWidgetStyleConfigByPath({
+        ancestors,
+        configItem,
+        wid: widget.id,
+      }),
+    );
+  };
+
+  const handleInteractionConfigChange = (
+    ancestors: number[],
+    configItem: ChartStyleConfig,
+    needRefresh?: boolean,
+  ) => {
+    dispatch(
+      editBoardStackActions.updateWidgetInteractionConfigByPath({
+        ancestors,
+        configItem,
+        wid: widget.id,
+      }),
+    );
+  };
+
   return (
-    <SettingPanel title={`${t('widget')}${t('setting')}`}>
-      <>
-        <NameSet wid={widget.id} name={widget.config.name} />
-        {showRect && <RectSet wid={widget.id} rect={widget.config.rect} />}
-        <WidgetConfigPanel />
-      </>
-    </SettingPanel>
+    <Tabs activeKey={currentTab} onChange={key => setCurrentTab(key)}>
+      <TabPane tab={t('style')} key="style">
+        <SettingPanel title={`${t('widget')}${t('setting')}`}>
+          <>
+            <NameSet wid={widget.id} name={widget.config.name} />
+            {showRect && <RectSet wid={widget.id} rect={widget.config.rect} />}
+            <WidgetConfigPanel
+              configs={widget.config.customConfig.props || []}
+              onChange={handleStyleConfigChange}
+            />
+          </>
+        </SettingPanel>
+      </TabPane>
+      <TabPane tab={t('interaction')} key="interaction">
+        <SettingPanel title={`${t('widget')}${t('setting')}`}>
+          <WidgetConfigPanel
+            configs={widget.config.customConfig.interactions || []}
+            onChange={handleInteractionConfigChange}
+            context={{
+              vizs,
+              dataview: viewMap?.[widget?.config?.content?.dataChart?.viewId],
+            }}
+            dataConfigs={
+              widget.config.content?.dataChart?.config?.chartConfig?.datas
+            }
+          />
+        </SettingPanel>
+      </TabPane>
+    </Tabs>
   );
 });
 
