@@ -32,7 +32,6 @@ class Chart implements IChart {
   public dependency: string[] = [];
   public isISOContainer: boolean | string = false;
   public useIFrame: boolean = true;
-  public selectable: boolean = false;
   public mouseEvents?: ChartMouseEvent[] = [];
 
   set state(state: ChartStatus) {

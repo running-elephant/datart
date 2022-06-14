@@ -130,8 +130,3 @@ export const selectSelectedItems = createSelector(
   [selectDomain],
   vizState => vizState.selectedItems,
 );
-
-export const selectMultipleSelect = createSelector(
-  [selectDomain],
-  vizState => vizState.multipleSelect,
-);

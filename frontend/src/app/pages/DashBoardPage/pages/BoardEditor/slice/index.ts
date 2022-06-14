@@ -318,39 +318,9 @@ const editWidgetDataSlice = createSlice({
 const editWidgetSelectedItemsSlice = createSlice({
   name: 'editBoard',
   initialState: {
-    multipleSelect: false,
     selectedItems: {},
   } as EditBoardState['selectedItemsMap'],
   reducers: {
-    updateMultipleSelectInEditor(state, { payload }: PayloadAction<boolean>) {
-      state.multipleSelect = payload;
-    },
-    normalSelectInEditor(
-      state,
-      {
-        payload,
-      }: PayloadAction<{
-        wid: string;
-        data: { index: string; data: any };
-      }>,
-    ) {
-      const index = state.selectedItems[payload.wid].findIndex(
-        v => v.index === payload.data.index,
-      );
-      if (state.multipleSelect) {
-        if (index < 0) {
-          state.selectedItems[payload.wid].push(payload.data);
-        } else {
-          state.selectedItems[payload.wid].splice(index, 1);
-        }
-      } else {
-        if (index < 0 || state.selectedItems[payload.wid].length > 1) {
-          state.selectedItems[payload.wid] = [payload.data];
-        } else {
-          state.selectedItems[payload.wid] = [];
-        }
-      }
-    },
     changeSelectedItemsInEditor(
       state,
       { payload }: PayloadAction<{ wid: string; data: Array<SelectedItem> }>,
