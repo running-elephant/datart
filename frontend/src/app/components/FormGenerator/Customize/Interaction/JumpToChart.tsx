@@ -18,8 +18,9 @@
 
 import { Button, Dropdown, Select, Space } from 'antd';
 import ChartDataView from 'app/types/ChartDataView';
-import { FC, memo, useState } from 'react';
+import { FC, memo, useMemo, useState } from 'react';
 import { isEmpty } from 'utils/object';
+import { handleDisplayViewName } from 'utils/utils';
 import { InteractionFieldRelation } from '../../constants';
 import RelationList from './RalationList';
 import { I18nTranslator, JumpToChartRule, VizType } from './types';
@@ -35,6 +36,9 @@ const JumpToChart: FC<
   const [relations, setRelations] = useState(
     value?.[InteractionFieldRelation.Customize] || [],
   );
+  const viewType = useMemo(() => {
+    return dataview?.type || 'SQL';
+  }, [dataview?.type]);
 
   const handleUpdateRelations = relations => {
     const newRelations = [...relations];
@@ -86,7 +90,18 @@ const JumpToChart: FC<
             translate={t}
             targetRelId={value?.relId}
             sourceFields={
-              dataview?.meta?.concat(dataview?.computedFields || []) || []
+              dataview?.meta
+                ?.map(v => {
+                  return {
+                    ...v,
+                    name: handleDisplayViewName({
+                      name: v.id,
+                      viewType,
+                      category: v.category,
+                    }),
+                  };
+                })
+                .concat(dataview?.computedFields || []) || []
             }
             sourceVariables={dataview?.variables || []}
             relations={relations}

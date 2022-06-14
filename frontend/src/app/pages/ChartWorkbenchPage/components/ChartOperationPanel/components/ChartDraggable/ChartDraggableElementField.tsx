@@ -28,10 +28,10 @@ import {
   SortDescendingOutlined,
 } from '@ant-design/icons';
 import Dropdown from 'antd/lib/dropdown';
-import { ChartDataViewFieldCategory, SortActionType } from 'app/constants';
+import { SortActionType } from 'app/constants';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, memo, useMemo } from 'react';
-import { handleStructureViewName } from 'utils/utils';
+import { handleDisplayViewName } from 'utils/utils';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
 
 const ChartDraggableElementField: FC<{
@@ -57,11 +57,11 @@ const ChartDraggableElementField: FC<{
     handleOpenActionModal,
   }) => {
     const colName = useMemo(() => {
-      const name =
-        viewType === 'STRUCT' &&
-        columnConfig.category === ChartDataViewFieldCategory.Field
-          ? handleStructureViewName(columnConfig.colName)
-          : columnConfig.colName;
+      const name = handleDisplayViewName({
+        name: columnConfig.colName,
+        viewType,
+        category: columnConfig.category,
+      });
 
       return aggregation === false
         ? name

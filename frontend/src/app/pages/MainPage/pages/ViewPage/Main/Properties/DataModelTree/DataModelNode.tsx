@@ -43,7 +43,7 @@ import {
   SUCCESS,
   WARNING,
 } from 'styles/StyleConstants';
-import { handleStructureViewName } from 'utils/utils';
+import { handleDisplayViewName } from 'utils/utils';
 import { ColumnCategories } from '../../../constants';
 import { Column, viewType } from '../../../slice/types';
 import { ALLOW_COMBINE_COLUMN_TYPES } from './constant';
@@ -151,11 +151,7 @@ const DataModelNode: FC<{
               <StyledIW fontSize={FONT_SIZE_TITLE}>{icon}</StyledIW>
             </Tooltip>
           </Dropdown>
-          <span>
-            {viewType === 'STRUCT'
-              ? handleStructureViewName(node.name)
-              : node.name}
-          </span>
+          <span>{handleDisplayViewName({ viewType, name: node.name })}</span>
           <div className="action">
             {isHover &&
               !isDragging &&

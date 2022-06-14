@@ -1,4 +1,5 @@
 import { message, TreeDataNode, TreeNodeProps } from 'antd';
+import { ChartDataViewFieldCategory } from 'app/constants';
 import { AxiosError, AxiosResponse } from 'axios';
 import classnames from 'classnames';
 import i18next from 'i18next';
@@ -11,6 +12,7 @@ import {
 import { APIResponse } from 'types';
 import { SaveFormModel } from '../app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { removeToken } from './auth';
+
 export { default as uuidv4 } from 'uuid/dist/umd/uuidv4.min';
 
 export function errorHandle(error) {
@@ -409,9 +411,46 @@ export function newIssueUrl({ type, ...options }) {
   return url.toString();
 }
 
-export function handleStructureViewName(name) {
-  if (typeof name === 'string') {
+export function handleDisplayViewName({
+  name,
+  viewType = 'SQL',
+  category,
+}: {
+  name: string;
+  viewType?: string;
+  category?:  Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
+}): string {
+  if (viewType === 'STRUCT' && category) {
+    if (category === ChartDataViewFieldCategory.Field) {
+      return JSON.parse(name)?.join('.');
+    } else {
+      return name;
+    }
+  } else if (viewType === 'STRUCT') {
     return JSON.parse(name)?.join('.');
+  } else {
+    return name;
   }
-  return name;
+}
+
+export function handleRequestColumnName({
+  name,
+  viewType = 'SQL',
+  category,
+}: {
+  name: string;
+  viewType?: string;
+  category?:  Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
+}): string[] {
+  if (viewType === 'STRUCT' && category) {
+    if (category === ChartDataViewFieldCategory.Field) {
+      return JSON.parse(name);
+    } else {
+      return [name];
+    }
+  } else if (viewType === 'STRUCT') {
+    return JSON.parse(name);
+  } else {
+    return [name];
+  }
 }

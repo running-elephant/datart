@@ -56,6 +56,7 @@ import {
   isUndefined,
   pipe,
 } from 'utils/object';
+import { handleDisplayViewName, handleRequestColumnName } from 'utils/utils';
 import { getDrillableRows } from './chartHelper';
 
 export const transferChartConfigs = (
@@ -739,14 +740,15 @@ export const buildClickEventBaseFilters = (
   return groupConfigs
     .concat(colorConfigs)
     .reduce<ChartDataRequestFilter[]>((acc, c) => {
-      const value = rawData?.[c.colName];
+      const value =
+        rawData?.[handleDisplayViewName({ name: c.colName, viewType })];
       if (isEmpty(value) || isEmpty(c.colName)) {
         return acc;
       }
       const filter = {
         aggOperator: null,
         sqlOperator: FilterSqlOperator.In,
-        column: viewType === 'STRUCT' ? JSON.parse(c.colName) : [c.colName],
+        column: handleRequestColumnName({ viewType, name: c.colName }),
         values: [{ value, valueType: c.type }],
       };
       acc.push(filter);
@@ -780,8 +782,9 @@ export const getJumpFiltersByInteractionRule = (
           return null;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column,
+          r => r.source === JSON.stringify(f?.column),
         );
+
         if (isEmpty(targetRelation)) {
           return null;
         }
@@ -793,7 +796,7 @@ export const getJumpFiltersByInteractionRule = (
     .filter(Boolean)
     .reduce((acc, cur) => {
       if (cur?.column) {
-        acc[cur.column!] = cur?.values?.map(v => v.value);
+        acc[String(cur.column)] = cur?.values?.map(v => v.value);
       }
       return acc;
     }, {});
@@ -803,6 +806,7 @@ export const getJumpOperationFiltersByInteractionRule = (
   clickEventFilters: ChartDataRequestFilter[] = [],
   chartFilters: ChartDataRequestFilter[] = [],
   rule?: InteractionRule,
+  viewType?: string,
 ): ChartDataRequestFilter[] => {
   return clickEventFilters
     .concat(chartFilters)
@@ -816,6 +820,7 @@ export const getJumpOperationFiltersByInteractionRule = (
       if (isEmpty(jumpRule)) {
         return acc;
       }
+
       if (jumpRule?.['relation'] === InteractionFieldRelation.Auto) {
         return acc.concat(f);
       } else {
@@ -825,13 +830,18 @@ export const getJumpOperationFiltersByInteractionRule = (
           return acc;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column,
+          r => r.source === JSON.stringify(f?.column),
         );
         if (isEmpty(targetRelation)) {
           return acc;
         }
         return acc.concat(
-          Object.assign({}, f, { column: targetRelation?.target }),
+          Object.assign({}, f, {
+            column: handleRequestColumnName({
+              name: targetRelation?.target || '',
+              viewType,
+            }),
+          }),
         );
       }
     }, []);

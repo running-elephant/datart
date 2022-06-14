@@ -46,7 +46,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { SPACE, SPACE_XS } from 'styles/StyleConstants';
-import { getPath, handleStructureViewName } from 'utils/utils';
+import { getPath, handleDisplayViewName } from 'utils/utils';
 import { ChartDraggableSourceGroupContainer } from '../ChartDraggable';
 import ChartComputedFieldSettingPanel from './components/ChartComputedFieldSettingPanel';
 
@@ -229,10 +229,10 @@ const ChartDataViewPanel: FC<{
           cur.children.map(v => {
             return {
               ...v,
-              id:
-                dataView?.type === 'STRUCT'
-                  ? handleStructureViewName(v.id)
-                  : v.id,
+              id: handleDisplayViewName({
+                name: v.id,
+                viewType: dataView?.type,
+              }),
             };
           }),
         );
@@ -240,10 +240,10 @@ const ChartDataViewPanel: FC<{
         return acc.concat([
           {
             ...cur,
-            id:
-              dataView?.type === 'STRUCT'
-                ? handleStructureViewName(cur.id)
-                : cur.id,
+            id: handleDisplayViewName({
+              name: cur.id,
+              viewType: dataView?.type,
+            }),
           },
         ]);
       }

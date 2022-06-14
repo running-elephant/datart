@@ -36,7 +36,7 @@ import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
-import { handleStructureViewName } from 'utils/utils';
+import { handleDisplayViewName } from 'utils/utils';
 import { filterValueTypeByControl, isRangeTypeController } from './utils';
 export interface RelatedViewFormProps {
   viewMap: Record<string, ChartDataView>;
@@ -142,10 +142,8 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
               return filterValueTypeByControl(controllerType, v.type);
             })
             .map(item => {
-              const id =
-                viewType === 'STRUCT'
-                  ? handleStructureViewName(item.id)
-                  : item.id;
+              const id = handleDisplayViewName({ viewType, name: item.id });
+
               return (
                 <Option
                   key={item.id}

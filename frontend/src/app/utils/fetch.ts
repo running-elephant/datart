@@ -32,7 +32,11 @@ import {
 import { saveAs } from 'file-saver';
 import i18next from 'i18next';
 import { request, request2, requestWithHeader } from 'utils/request';
-import { errorHandle } from 'utils/utils';
+import {
+  errorHandle,
+  handleDisplayViewName,
+  handleRequestColumnName,
+} from 'utils/utils';
 import { convertToChartDto } from './ChartDtoHelper';
 
 export const getDistinctFields = async (
@@ -48,7 +52,10 @@ export const getDistinctFields = async (
     filters: [],
     groups: [],
     columns: [...new Set(columns)].map(v => {
-      return { alias: v, column: viewType === 'STRUCT' ? JSON.parse(v) : [v] };
+      return {
+        alias: handleDisplayViewName({ viewType, name: v }),
+        column: handleRequestColumnName({ viewType, name: v }),
+      };
     }),
     pageInfo: {
       pageNo: 1,

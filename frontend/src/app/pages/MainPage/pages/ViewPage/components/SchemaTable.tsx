@@ -34,7 +34,7 @@ import {
   SPACE_XS,
   WARNING,
 } from 'styles/StyleConstants';
-import { handleStructureViewName, uuidv4 } from 'utils/utils';
+import { handleDisplayViewName, uuidv4 } from 'utils/utils';
 import { ColumnCategories } from '../constants';
 import { Column, Model, viewType } from '../slice/types';
 import { getColumnWidthMap, getHierarchyColumn } from '../utils';
@@ -116,7 +116,7 @@ export const SchemaTable = memo(
         const title = (
           <>
             <span className="content">
-              {viewType === 'STRUCT' ? handleStructureViewName(name) : name}
+              {handleDisplayViewName({ viewType, name })}
             </span>
             <Dropdown
               trigger={['click']}

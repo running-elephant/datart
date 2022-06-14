@@ -52,7 +52,7 @@ import {
   SUCCESS,
   WARNING,
 } from 'styles/StyleConstants';
-import { handleStructureViewName, stopPPG } from 'utils/utils';
+import { handleDisplayViewName, stopPPG } from 'utils/utils';
 import { DATE_LEVELS } from '../../../../slice/constant';
 import DateLevelFieldContainer from './DateLevelFieldContainer';
 
@@ -242,10 +242,12 @@ export const ChartDraggableSourceContainer: FC<
       <Row align="middle" style={{ width: '100%' }}>
         <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
         <StyledFieldContent>
-          {role !== ColumnRole.Hierarchy &&
-          viewType === 'STRUCT' &&
-          category !== ChartDataViewFieldCategory.ComputedField
-            ? handleStructureViewName(colName)
+          {role !== ColumnRole.Hierarchy
+            ? handleDisplayViewName({
+                name: colName,
+                category: category as ChartDataViewFieldCategory,
+                viewType,
+              })
             : colName}
         </StyledFieldContent>
         <div onClick={stopPPG}>

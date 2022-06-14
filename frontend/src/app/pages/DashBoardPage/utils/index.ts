@@ -37,6 +37,7 @@ import { getTime, splitRangerDateFilters } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import { CloneValueDeep } from 'utils/object';
+import { handleRequestColumnName } from 'utils/utils';
 import { boardDrillManager } from '../components/BoardDrillManager/BoardDrillManager';
 import { BOARD_FILE_IMG_PREFIX } from '../constants';
 import {
@@ -209,10 +210,10 @@ export const getTheWidgetFiltersAndParams = (obj: {
     if (relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Field) {
       const filter: ChartDataRequestFilter = {
         aggOperator: null,
-        column:
-          viewType === 'STRUCT'
-            ? JSON.parse(relatedViewItem.fieldValue as string)
-            : [String(relatedViewItem.fieldValue)],
+        column: handleRequestColumnName({
+          viewType,
+          name: String(relatedViewItem.fieldValue),
+        }),
         sqlOperator: controllerConfig.sqlOperator,
         values: values,
       };
@@ -424,7 +425,7 @@ export const getChartWidgetRequestParams = (obj: {
 
       const filter: ChartDataRequestFilter = {
         aggOperator: null,
-        column: viewType === 'STRUCT' ? JSON.parse(linkColumn) : [linkColumn],
+        column: handleRequestColumnName({ viewType, name: linkColumn }),
         sqlOperator: FilterSqlOperator.In,
         values: [{ value: triggerValue, valueType: DataViewFieldType.STRING }],
       };

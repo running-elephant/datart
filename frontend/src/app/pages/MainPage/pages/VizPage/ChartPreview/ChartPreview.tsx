@@ -181,7 +181,8 @@ const ChartPreviewBoard: FC<{
       const filterSearchParams = filterSearchUrl
         ? urlSearchTransfer.toParams(filterSearchUrl)
         : undefined;
-      dispatch(
+
+        dispatch(
         initChartPreviewData({
           backendChartId,
           orgId,
@@ -289,6 +290,7 @@ const ChartPreviewBoard: FC<{
           ['drillThrough'],
           ['setting'],
         )?.[0] as DrillThroughSetting;
+        const viewType = chartPreview?.backendChart?.view?.type || 'SQL';
 
         if (enableDrillThrough) {
           let nonAggChartFilters = new ChartDataRequestBuilder(
@@ -297,6 +299,7 @@ const ChartPreviewBoard: FC<{
               config: chartPreview?.backendChart?.view.config || {},
               computedFields:
                 chartPreview?.backendChart?.config.computedFields || [],
+              type: viewType,
             },
             chartPreview?.chartConfig?.datas,
             chartPreview?.chartConfig?.settings,
@@ -307,7 +310,6 @@ const ChartPreviewBoard: FC<{
             .addDrillOption(drillOptionRef?.current)
             .build()
             ?.filters?.filter(f => !Boolean(f.aggOperator));
-
           (drillThroughSetting?.rules || [])
             .filter(rule => rule.event === targetEvent)
             .filter(rule => isEmpty(ruleId) || rule.id === ruleId)
@@ -317,14 +319,15 @@ const ChartPreviewBoard: FC<{
                 rule,
                 drillOptionRef?.current,
                 chartPreview?.chartConfig?.datas,
+                viewType,
               );
-
               const relId = rule?.[rule.category!]?.relId;
               if (rule.category === InteractionCategory.JumpToChart) {
                 const urlFilters = getJumpOperationFiltersByInteractionRule(
                   clickFilters,
                   nonAggChartFilters,
                   rule,
+                  viewType,
                 );
                 const urlFiltersStr: string = qs.stringify({
                   filters: urlFilters || [],
@@ -374,6 +377,7 @@ const ChartPreviewBoard: FC<{
                   nonAggChartFilters,
                   rule,
                 );
+                console.log(urlFilters,'urlFilters');
                 Object.assign(urlFilters, { isMatchByName: true });
                 const urlFiltersStr: string =
                   urlSearchTransfer.toUrlString(urlFilters);
@@ -400,6 +404,7 @@ const ChartPreviewBoard: FC<{
         chartPreview?.chartConfig?.datas,
         chartPreview?.chartConfig?.settings,
         chartPreview?.backendChart?.view?.id,
+        chartPreview?.backendChart?.view.type,
         chartPreview?.backendChart?.view.config,
         chartPreview?.backendChart?.config.computedFields,
         chartPreview?.backendChart?.config?.aggregation,
@@ -425,6 +430,7 @@ const ChartPreviewBoard: FC<{
           ['viewDetail'],
           ['setting'],
         )?.[0] as ViewDetailSetting;
+        const viewType = chartPreview?.backendChart?.view?.type || 'SQL';
 
         if (enableViewDetail && viewDetailSetting?.event === targetEvent) {
           const clickFilters = buildClickEventBaseFilters(
@@ -432,7 +438,7 @@ const ChartPreviewBoard: FC<{
             undefined,
             drillOptionRef?.current,
             chartPreview?.chartConfig?.datas,
-            chartPreview?.backendChart?.view?.type || 'SQL',
+            viewType,
           );
           (openViewDetailPanel as any)({
             currentDataView: chartPreview?.backendChart?.view,

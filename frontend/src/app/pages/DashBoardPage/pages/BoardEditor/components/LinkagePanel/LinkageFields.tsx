@@ -24,7 +24,7 @@ import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
-import { handleStructureViewName } from 'utils/utils';
+import { handleDisplayViewName } from 'utils/utils';
 
 const { Option } = Select;
 export interface ViewLinkageItem {
@@ -55,10 +55,10 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
         const viewType = viewMap[viewLinkages[index][key]]?.type || 'SQL';
         if (key === 'triggerViewId') {
           return chartGroupColumns?.map(item => {
-            const columnName =
-              viewType === 'STRUCT'
-                ? handleStructureViewName(item.colName)
-                : item.colName;
+            const columnName = handleDisplayViewName({
+              viewType,
+              name: item.colName,
+            });
 
             return (
               <Option
@@ -85,10 +85,10 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
               return item.type && enableTypes.includes(item.type);
             })
             .map(item => {
-              const id =
-                viewType === 'STRUCT'
-                  ? handleStructureViewName(item.id)
-                  : item.id;
+              const id = handleDisplayViewName({
+                viewType,
+                name: item.id,
+              });
 
               return (
                 <Option key={id} fieldvaluetype={item.type} value={item.id}>

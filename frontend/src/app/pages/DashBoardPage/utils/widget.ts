@@ -31,7 +31,7 @@ import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
 import { CSSProperties } from 'react';
 import { CloneValueDeep } from 'utils/object';
-import { handleStructureViewName } from 'utils/utils';
+import { handleDisplayViewName } from 'utils/utils';
 import { adaptBoardImageUrl, fillPx, getBackgroundImage } from '.';
 import { initClientId } from '../components/WidgetManager/utils/init';
 import { LAYOUT_COLS_MAP, ORIGINAL_TYPE_MAP } from '../constants';
@@ -680,8 +680,7 @@ export const getValueByRowData = (
   fieldName: string,
   viewType: string,
 ) => {
-  let toCaseField =
-    viewType === 'STRUCT' ? handleStructureViewName(fieldName) : fieldName;
+  let toCaseField = handleDisplayViewName({ viewType, name: fieldName });
 
   return data?.rowData[toCaseField];
 };

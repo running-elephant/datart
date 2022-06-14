@@ -582,6 +582,7 @@ const slice = createSlice({
       const currentChart = ChartManager.instance().getById(
         newChartDto?.config?.chartGraphId,
       );
+
       if (index < 0) {
         state.chartPreviews.push({
           backendChartId: newChartDto?.id,

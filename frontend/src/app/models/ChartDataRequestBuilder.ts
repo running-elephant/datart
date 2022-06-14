@@ -19,7 +19,6 @@
 import {
   AggregateFieldActionType,
   ChartDataSectionType,
-  ChartDataViewFieldCategory,
   DataViewFieldType,
   FilterConditionType,
   SortActionType,
@@ -52,7 +51,7 @@ import {
 } from 'globalConstants';
 import isEqual from 'lodash/isEqual';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
-import { handleStructureViewName } from 'utils/utils';
+import { handleDisplayViewName, handleRequestColumnName } from 'utils/utils';
 import { DrillMode } from './ChartDrillOption';
 
 export class ChartDataRequestBuilder {
@@ -137,11 +136,11 @@ export class ChartDataRequestBuilder {
   }
 
   private buildAliasName(c) {
-    const colName =
-      this.dataView.type === 'STRUCT' &&
-      c.category === ChartDataViewFieldCategory.Field
-        ? handleStructureViewName(c.colName)
-        : c.colName;
+    const colName = handleDisplayViewName({
+      name: c.colName,
+      viewType: this.dataView.type,
+      category: c.category,
+    });
 
     if (c.aggregate === AggregateFieldActionType.None) {
       return colName;
@@ -153,10 +152,11 @@ export class ChartDataRequestBuilder {
   }
 
   private buildColumnName(col) {
-    return this.dataView.type === 'STRUCT' &&
-      col.category === ChartDataViewFieldCategory.Field
-      ? JSON.parse(col.colName)
-      : [col.colName];
+    return handleRequestColumnName({
+      name: col.colName,
+      category: col.category,
+      viewType: this.dataView.type,
+    });
   }
 
   private buildGroups() {

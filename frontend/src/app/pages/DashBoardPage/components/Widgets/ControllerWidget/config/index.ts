@@ -37,7 +37,11 @@ import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
-import { uuidv4 } from 'utils/utils';
+import {
+  handleDisplayViewName,
+  handleRequestColumnName,
+  uuidv4,
+} from 'utils/utils';
 import widgetManagerInstance from '../../../WidgetManager';
 import { initTitleTpl, widgetTpl } from '../../../WidgetManager/utils/init';
 
@@ -187,7 +191,10 @@ export const getControlOptionQueryParams = (obj: {
     filters: filterParams,
     groups: [],
     columns: [...new Set(obj.columns)].map(v => {
-      return { alias: v, column: viewType === 'STRUCT' ? JSON.parse(v) : [v] };
+      return {
+        alias: handleDisplayViewName({ viewType, name: v }),
+        column: handleRequestColumnName({ viewType, name: v }),
+      };
     }),
     pageInfo: {
       pageNo: 1,

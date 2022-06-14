@@ -24,7 +24,7 @@ import { fetchDataChart } from 'app/utils/fetch';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
-import { uuidv4 } from 'utils/utils';
+import { handleDisplayViewName, uuidv4 } from 'utils/utils';
 import { InteractionRelationType } from '../../constants';
 import { CustomizeRelation, I18nTranslator } from './types';
 
@@ -53,7 +53,18 @@ const RelationList: FC<
     if (targetRelId) {
       const data = await fetchDataChart(targetRelId);
       setTargetFields(
-        data?.view?.meta?.concat(data?.config?.computedFields || []) || [],
+        data?.view?.meta
+          ?.map(v => {
+            return {
+              ...v,
+              name: handleDisplayViewName({
+                name: v.name,
+                viewType: data.view.type,
+                category: v.category,
+              }),
+            };
+          })
+          .concat(data?.config?.computedFields || []) || [],
       );
       setTargetVariables(data?.queryVariables || []);
     }
@@ -128,7 +139,7 @@ const RelationList: FC<
           onChange={value => handleRelationChange(index, 'source', value)}
         >
           {(isFieldType(record) ? sourceFields : sourceVariables)?.map(sf => {
-            return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;
+            return <Select.Option value={sf?.id}>{sf?.name}</Select.Option>;
           })}
         </Select>
       ),
@@ -144,7 +155,7 @@ const RelationList: FC<
           onChange={value => handleRelationChange(index, 'target', value)}
         >
           {(isFieldType(record) ? targetFields : targetVariables)?.map(sf => {
-            return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;
+            return <Select.Option value={sf?.id}>{sf?.name}</Select.Option>;
           })}
         </Select>
       ),
