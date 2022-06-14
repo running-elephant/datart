@@ -21,11 +21,12 @@ import {
   ZoomInOutlined,
   ZoomOutOutlined,
 } from '@ant-design/icons';
+import { ChartSelectOption } from 'app/models/ChartSelectOption';
+import { ChartMouseEvent } from 'app/types/Chart';
 import { ECharts, init } from 'echarts';
-import { FC, memo, useCallback, useEffect, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
-import { CloneValueDeep } from '../../../../utils/object';
-import { ChartMouseEvent } from '../../../types/Chart';
+import { CloneValueDeep } from 'utils/object';
 import { GeoInfo, MapOption } from './types';
 
 interface MapWrapperProps {
@@ -33,96 +34,106 @@ interface MapWrapperProps {
   containerId?: string;
   mouseEvents: ChartMouseEvent[];
   isNormalGeoMap: boolean;
+  selectOption: null | ChartSelectOption;
 }
 
 const BasicMapWrapper: FC<MapWrapperProps> = memo(
-  ({ containerId, mouseEvents, mapOption, isNormalGeoMap }) => {
+  ({ containerId, mouseEvents, mapOption, isNormalGeoMap, selectOption }) => {
     const [chartContainerId] = useState<string>(containerId + '-map');
-    const [chart, setChart] = useState<ECharts>();
+    const chart = useRef<ECharts>();
     const [geoConfig, setGeoConfig] = useState<GeoInfo>({
       center: undefined,
       zoom: 1,
     });
 
     const getOptionsConfig = useCallback(() => {
-      const newOption: any = CloneValueDeep(chart?.getOption());
+      const newOption: any = CloneValueDeep(chart.current?.getOption());
       setGeoConfig(() => ({
         center: newOption?.geo?.[0].center,
         zoom: newOption?.geo?.[0].zoom,
       }));
-    }, [chart]);
+    }, []);
 
     useEffect(() => {
       const container = document.getElementById(chartContainerId);
       if (container) {
         const initChart = init(container, 'default');
-        setChart(initChart);
+        chart.current = initChart;
+        selectOption?.addUnselectOption({ chart: initChart, mouseEvents });
         container.removeEventListener('mouseup', getOptionsConfig);
         container.addEventListener('mouseup', getOptionsConfig);
         mouseEvents.forEach(event => {
           if (event.name === 'click') {
             initChart.on(event.name, (params: any) => {
               if (params.componentType === 'series' || isNormalGeoMap) {
-                event.callback(params);
+                selectOption?.normalSelect({
+                  index: params.componentIndex + ',' + params.dataIndex,
+                  data: params.data,
+                });
+                event.callback({
+                  ...params,
+                  interactionType: 'select',
+                  selectedItems: selectOption?.selectedItems,
+                });
               }
             });
           } else {
             initChart.on(event.name, event?.callback as any);
           }
         });
-        initChart.getZr().on('click', clearAllSelectedItems);
       }
       return () => {
         container?.removeEventListener('mouseup', getOptionsConfig);
-        chart?.clear();
+        selectOption?.removeEvent();
+        chart.current?.clear();
       };
     }, [chartContainerId]);
 
-    const clearAllSelectedItems = useCallback(
-      (e: Event) => {
-        if (!e.target) {
-          mouseEvents
-            ?.find(v => v.name === 'click')
-            ?.callback({
-              interactionType: 'unselect',
-            });
+    const setMapOption = useCallback(
+      geoConfig => {
+        if (mapOption) {
+          const newOption: object = Object.assign(mapOption, {
+            geo: {
+              ...mapOption.geo,
+              ...geoConfig,
+            },
+          });
+          chart.current?.setOption(Object.assign({}, newOption), true);
         }
       },
-      [mouseEvents],
+      [mapOption],
     );
 
     useEffect(() => {
-      if (mapOption) {
-        const newOption: object = Object.assign(mapOption, {
-          geo: {
-            ...mapOption.geo,
-            ...geoConfig,
-          },
-        });
-        chart?.setOption(Object.assign({}, newOption), true);
-      }
-    }, [chart, mapOption, geoConfig]);
+      setMapOption(geoConfig);
+    }, [setMapOption, mapOption]);
 
     const zoomIn = useCallback(() => {
-      setGeoConfig(() => ({
+      const geo = {
         center: geoConfig.center,
         zoom: geoConfig.zoom! * 1.25,
-      }));
-    }, [geoConfig]);
+      };
+      setGeoConfig(geo);
+      setMapOption(geo);
+    }, [geoConfig, setMapOption]);
 
     const zoomOut = useCallback(() => {
-      setGeoConfig(() => ({
+      const geo = {
         center: geoConfig.center,
         zoom: geoConfig.zoom! / 1.25,
-      }));
-    }, [geoConfig]);
+      };
+      setGeoConfig(geo);
+      setMapOption(geo);
+    }, [geoConfig, setMapOption]);
 
     const resetZoom = useCallback(() => {
-      setGeoConfig(() => ({
+      const geo = {
         center: undefined,
         zoom: 1,
-      }));
-    }, []);
+      };
+      setGeoConfig(geo);
+      setMapOption(geo);
+    }, [setMapOption]);
 
     return (
       <StyledMap>

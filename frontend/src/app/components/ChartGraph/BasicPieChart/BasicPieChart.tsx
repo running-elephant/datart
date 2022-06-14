@@ -17,6 +17,9 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
+import Chart from 'app/models/Chart';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { ChartSelectOption } from 'app/models/ChartSelectOption';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -30,6 +33,7 @@ import ChartDataSetDTO, {
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
 import {
+  getChartSelectOption,
   getColumnRenderName,
   getDrillableRows,
   getExtraSeriesDataFormat,
@@ -42,16 +46,14 @@ import {
   valueFormatter,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
-import Chart from '../../../models/Chart';
-import { ChartDrillOption } from '../../../models/ChartDrillOption';
 import Config from './config';
 import { PieSeries, PieSeriesImpl, PieSeriesStyle } from './types';
 
 class BasicPieChart extends Chart {
   config = Config;
   chart: any = null;
-  selectable = true;
-  selectedItems = [];
+
+  private selectOption: null | ChartSelectOption = null;
 
   protected isCircle = false;
   protected isRose = false;
@@ -68,7 +70,11 @@ class BasicPieChart extends Chart {
   }
 
   onMount(options, context): void {
-    if (options.containerId === undefined || !context.document) {
+    if (
+      options.containerId === undefined ||
+      !context.document ||
+      !context.window
+    ) {
       return;
     }
 
@@ -76,9 +82,26 @@ class BasicPieChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
-    this.chart.getZr().on('click', this.clearAllSelectedItems.bind(this));
+    this.selectOption = getChartSelectOption(context.window, {
+      chart: this.chart,
+      mouseEvents: this.mouseEvents,
+    });
     this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
+      if (event.name === 'click') {
+        this.chart.on(event.name, params => {
+          this.selectOption?.normalSelect({
+            index: params.componentIndex + ',' + params.dataIndex,
+            data: params.data,
+          });
+          event.callback({
+            ...params,
+            interactionType: 'select',
+            selectedItems: this.selectOption?.selectedItems,
+          });
+        });
+      } else {
+        this.chart.on(event.name, event.callback);
+      }
     });
   }
 
@@ -90,7 +113,12 @@ class BasicPieChart extends Chart {
       this.chart?.clear();
       return;
     }
-    this.selectedItems = props.selectedItems;
+    if (
+      this.selectOption?.selectedItems.length &&
+      !props.selectedItems?.length
+    ) {
+      this.selectOption?.clearAll();
+    }
     const newOptions = this.getOptions(
       props.dataset,
       props.config,
@@ -101,22 +129,12 @@ class BasicPieChart extends Chart {
   }
 
   onUnMount(): void {
-    this.chart.getZr().off('click', this.clearAllSelectedItems.bind(this));
     this.chart?.dispose();
+    this.selectOption?.removeEvent();
   }
 
   onResize(opt: any, context): void {
     this.chart?.resize(context);
-  }
-
-  clearAllSelectedItems(e: Event) {
-    if (!e.target && this.selectedItems.length) {
-      this.mouseEvents
-        ?.find(v => v.name === 'click')
-        ?.callback({
-          interactionType: 'unselect',
-        });
-    }
   }
 
   private getOptions(

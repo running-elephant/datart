@@ -40,7 +40,6 @@ export interface SharePageState {
   oauth2Clients: Array<{ name: string; value: string }>;
   availableSourceFunctions?: string[];
   selectedItems: SelectedItem[];
-  multipleSelect: boolean;
 }
 export interface ShareVizInfo {
   vizType: VizType | undefined;

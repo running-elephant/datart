@@ -17,6 +17,7 @@
  */
 
 import { DataViewFieldType } from 'app/constants';
+import { ChartSelectOption } from 'app/models/ChartSelectOption';
 import ReactChart from 'app/models/ReactChart';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import {
@@ -31,6 +32,7 @@ import {
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   compareSelectedItems,
+  getChartSelectOption,
   getColumnRenderName,
   getExtraSeriesRowData,
   getStyles,
@@ -39,7 +41,7 @@ import {
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { DATARTSEPERATOR, KEYBOARD_EVENT_NAME } from 'globalConstants';
+import { DATARTSEPERATOR } from 'globalConstants';
 import { darken, getLuminance, lighten } from 'polished';
 import { Debugger } from 'utils/debugger';
 import { CloneValueDeep, isEmptyArray, Omit } from 'utils/object';
@@ -69,25 +71,26 @@ class BasicTableChart extends ReactChart {
   useIFrame = false;
   isISOContainer = 'react-table';
   config = Config;
-  utilCanvas;
-  dataColumnWidths = {};
-  tablePadding = 16;
-  tableCellBorder = 1;
-  cachedAntTableOptions: any = {};
-  cachedDatartConfig: ChartConfig = {};
-  cacheContext: any = null;
-  showSummaryRow = false;
-  rowNumberUniqKey = `@datart@rowNumberKey`;
-  totalWidth = 0;
-  exceedMaxContent = false;
-  pageInfo: Partial<PageInfo> | undefined = {
+
+  protected rowNumberUniqKey = `@datart@rowNumberKey`;
+
+  private utilCanvas;
+  private dataColumnWidths = {};
+  private tablePadding = 16;
+  private tableCellBorder = 1;
+  private cachedAntTableOptions: any = {};
+  private cachedDatartConfig: ChartConfig = {};
+  private cacheContext: any = null;
+  private showSummaryRow = false;
+  private totalWidth = 0;
+  private exceedMaxContent = false;
+  private pageInfo: Partial<PageInfo> | undefined = {
     pageNo: 0,
     pageSize: 0,
     total: 0,
   };
-  selectedItems: SelectedItem[] = [];
-  selectedCellItems: SelectedItem[] = [];
-  multipleSelect: boolean = false;
+  private selectOption: null | ChartSelectOption = null;
+  private selectedRows: SelectedItem[] = [];
 
   constructor(props?) {
     super(AntdTableWrapper, {
@@ -112,14 +115,7 @@ class BasicTableChart extends ReactChart {
     ) {
       return;
     }
-    context.window.addEventListener(
-      'keydown',
-      this.updateMultipleSelect.bind(this),
-    );
-    context.window.addEventListener(
-      'keyup',
-      this.updateMultipleSelect.bind(this),
-    );
+    this.selectOption = getChartSelectOption(context.window);
     this.adapter?.mounted(
       context.document.getElementById(options.containerId),
       options,
@@ -132,6 +128,13 @@ class BasicTableChart extends ReactChart {
       this.adapter?.unmount();
       return;
     }
+    if (
+      this.selectOption?.selectedItems.length &&
+      !options.selectedItems?.length
+    ) {
+      this.selectOption?.clearAll();
+      this.selectedRows = [];
+    }
 
     Debugger.instance.measure(
       'Table OnUpdate cost ---> ',
@@ -141,7 +144,6 @@ class BasicTableChart extends ReactChart {
           options.dataset,
           options.config,
           options.widgetSpecialConfig,
-          options.selectedItems,
         );
         // this.cachedAntTableOptions = Omit(tableOptions, ['dataSource']);
         this.cachedAntTableOptions = Omit(tableOptions, []);
@@ -157,14 +159,8 @@ class BasicTableChart extends ReactChart {
     this.cachedAntTableOptions = {};
     this.cachedDatartConfig = {};
     this.cacheContext = null;
-    context?.window.removeEventListener(
-      'keydown',
-      this.updateMultipleSelect.bind(this),
-    );
-    context?.window.removeEventListener(
-      'keyup',
-      this.updateMultipleSelect.bind(this),
-    );
+    this.selectedRows = [];
+    this.selectOption?.removeEvent();
   }
 
   public onResize(options, context?): void {
@@ -188,39 +184,16 @@ class BasicTableChart extends ReactChart {
     this.adapter?.updated(tableOptions, context);
   }
 
-  protected updateMultipleSelect(e: KeyboardEvent) {
-    if (
-      (e.key === KEYBOARD_EVENT_NAME.CTRL ||
-        e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
-      e.type === 'keydown' &&
-      !this.multipleSelect
-    ) {
-      this.multipleSelect = true;
-    } else if (
-      (e.key === KEYBOARD_EVENT_NAME.CTRL ||
-        e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
-      e.type === 'keyup' &&
-      this.multipleSelect
-    ) {
-      this.multipleSelect = false;
-    }
-  }
-
   protected getOptions(
     context: ChartContext,
     dataset?: ChartDataSetDTO,
     config?: ChartConfig,
     widgetSpecialConfig?: any,
-    selectedItems?: SelectedItem[],
   ) {
     if (!dataset || !config) {
       return { locale: { emptyText: '  ' } };
     }
 
-    if (!selectedItems?.length && this.selectedItems.length) {
-      this.selectedItems = [];
-      this.selectedCellItems = [];
-    }
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
@@ -725,7 +698,7 @@ class BasicTableChart extends ReactChart {
           };
           let highlightStyle = {};
           if (
-            this.selectedCellItems.find(
+            this.selectOption?.selectedItems.find(
               v => v.index === rest.rowIndex + ',' + sensitiveFieldName,
             )
           ) {
@@ -1245,23 +1218,8 @@ class BasicTableChart extends ReactChart {
       index: dataIndex + ',' + seriesName,
       data,
     };
-    const index = this.selectedCellItems.findIndex(
-      v => v.index === option.index,
-    );
-    if (this.multipleSelect) {
-      if (index < 0) {
-        this.selectedCellItems.push(option);
-      } else {
-        this.selectedCellItems.splice(index, 1);
-      }
-    } else {
-      if (index < 0 || this.selectedCellItems.length > 1) {
-        this.selectedCellItems = [option];
-      } else {
-        this.selectedCellItems = [];
-      }
-    }
-    const newSelectedItems = this.selectedCellItems.reduce(
+    this.selectOption?.normalSelect(option);
+    const newSelectedItems = this.selectOption?.selectedItems.reduce(
       (selectedItems, item) => {
         const dataIndex = item.index.toString().split(',')[0];
         if (!selectedItems.find(v => v.index === dataIndex)) {
@@ -1274,10 +1232,10 @@ class BasicTableChart extends ReactChart {
       },
       [] as SelectedItem[],
     );
-    if (compareSelectedItems(newSelectedItems, this.selectedItems)) {
-      this.selectedItems = newSelectedItems;
-      params.selectedItems = this.selectedItems;
-      params.interactionType = 'selected';
+    if (compareSelectedItems(newSelectedItems || [], this.selectedRows)) {
+      this.selectedRows = newSelectedItems || [];
+      params.selectedItems = this.selectedRows;
+      params.interactionType = 'select';
     } else {
       const tableOptions = Object.assign(this.cachedAntTableOptions, {
         components: this.getTableComponents(

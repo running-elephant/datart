@@ -55,7 +55,6 @@ export const initialState: SharePageState = {
   oauth2Clients: [],
   availableSourceFunctions: [],
   selectedItems: [],
-  multipleSelect: false,
 };
 
 export const slice = createSlice({
@@ -194,29 +193,8 @@ export const slice = createSlice({
           action.payload.computedFields;
       }
     },
-    normalSelect(state, { payload }: PayloadAction<SelectedItem>) {
-      const index = state.selectedItems?.findIndex(
-        v => payload.index === v.index,
-      );
-      if (state.multipleSelect) {
-        if (index < 0) {
-          state.selectedItems.push(payload);
-        } else {
-          state.selectedItems.splice(index, 1);
-        }
-      } else {
-        if (index < 0 || state.selectedItems.length > 1) {
-          state.selectedItems = [payload];
-        } else {
-          state.selectedItems = [];
-        }
-      }
-    },
     changeSelectedItems(state, { payload }: PayloadAction<SelectedItem[]>) {
       state.selectedItems = payload;
-    },
-    updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
-      state.multipleSelect = payload;
     },
   },
   extraReducers: builder => {
