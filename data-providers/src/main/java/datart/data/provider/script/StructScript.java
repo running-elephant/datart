@@ -29,7 +29,7 @@ public class StructScript {
 
     private String[] table;
 
-    private List<String> columns;
+    private String columns;
 
     private List<TableJoin> joins;
 

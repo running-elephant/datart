@@ -15,18 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package datart.core.base.consts;
 
-package datart.server.base.transfer;
+public enum TransferFileType {
 
-import lombok.Builder;
-import lombok.Data;
+    DATART_RESOURCE_FILE(".drr"),
+    DATART_TEMPLATE_FILE(".drt");
 
-import java.io.Serializable;
+    private final String suffix;
 
-@Data
-@Builder
-public class TransferConfig implements Serializable {
+    TransferFileType(String suffix) {
+        this.suffix = suffix;
+    }
 
-    private boolean withParents;
-
+    public String getSuffix() {
+        return suffix;
+    }
 }

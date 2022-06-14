@@ -16,17 +16,19 @@
  * limitations under the License.
  */
 
-package datart.server.base.transfer;
+package datart.data.provider.calcite;
 
-import lombok.Builder;
+
 import lombok.Data;
-
-import java.io.Serializable;
+import org.apache.calcite.sql.SqlNode;
 
 @Data
-@Builder
-public class TransferConfig implements Serializable {
+public class QueryScriptProcessResult {
 
-    private boolean withParents;
+    private SqlNode from;
+
+    private String tablePrefix;
+
+    private boolean withDefaultPrefix;
 
 }

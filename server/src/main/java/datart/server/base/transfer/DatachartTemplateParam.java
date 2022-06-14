@@ -16,36 +16,16 @@
  * limitations under the License.
  */
 
-package datart.server.base.transfer.model;
+package datart.server.base.transfer;
 
 import datart.core.entity.Datachart;
-import datart.core.entity.Folder;
 import lombok.Data;
-
-import java.io.Serializable;
-import java.util.List;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class DatachartTransferModel extends ResourceTransferModel {
+@EqualsAndHashCode(callSuper = true)
+public class DatachartTemplateParam extends TransferParam {
 
-    private List<MainModel> mainModels;
+    private Datachart datachart;
 
-    private ViewTransferModel viewExportModel;
-
-    private List<Folder> parents;
-
-    @Override
-    public String getVizName() {
-        return mainModels.get(0).datachart.getName();
-    }
-
-
-    @Data
-    public static class MainModel  implements Serializable {
-
-        private Datachart datachart;
-
-        private Folder folder;
-
-    }
 }

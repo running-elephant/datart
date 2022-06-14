@@ -64,7 +64,7 @@ public class CustomOauth2AuthenticationFilter extends AbstractAuthenticationProc
 
     @Override
     protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
-        return this.authorizationRequestMatcher.matches(request);
+        return CustomOauth2Client.CUSTOM_OAUTH2_CLIENTS.contains(resolveRegistrationId(request));
     }
 
     private String resolveRegistrationId(HttpServletRequest request) {
@@ -74,5 +74,4 @@ public class CustomOauth2AuthenticationFilter extends AbstractAuthenticationProc
         }
         return null;
     }
-
 }

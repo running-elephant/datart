@@ -52,7 +52,7 @@ public class SqlQueryScriptProcessor implements QueryScriptProcessor {
     }
 
     @Override
-    public SqlNode process(QueryScript queryScript) {
+    public QueryScriptProcessResult process(QueryScript queryScript) {
 
         String script;
 
@@ -91,9 +91,14 @@ public class SqlQueryScriptProcessor implements QueryScriptProcessor {
         selectSql = StringUtils.appendIfMissing(selectSql, " ", " ");
         selectSql = StringUtils.prependIfMissing(selectSql, " ", " ");
 
-        return new SqlBasicCall(SqlStdOperatorTable.AS
+        SqlBasicCall sqlBasicCall = new SqlBasicCall(SqlStdOperatorTable.AS
                 , new SqlNode[]{new SqlFragment("(" + selectSql + ")"), new SqlIdentifier(T, SqlParserPos.ZERO.withQuoting(true))}
                 , SqlParserPos.ZERO);
+        QueryScriptProcessResult result = new QueryScriptProcessResult();
+        result.setFrom(sqlBasicCall);
+        result.setTablePrefix(T);
+        result.setWithDefaultPrefix(true);
+        return result;
     }
 
     private String parseSelectSql(String script) {

@@ -20,19 +20,18 @@ package datart.server.service.impl;
 import com.alibaba.fastjson.JSON;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
+import datart.core.base.consts.TransferFileType;
 import datart.core.base.consts.VariableTypeEnum;
 import datart.core.base.exception.Exceptions;
-import datart.core.common.UUIDGenerator;
+import datart.core.common.*;
 import datart.core.entity.*;
+import datart.core.mappers.ext.DownloadMapperExt;
 import datart.security.base.ResourceType;
 import datart.server.base.dto.*;
 import datart.server.base.dto.chart.WidgetConfig;
 import datart.server.base.params.*;
-import datart.server.base.transfer.ImportStrategy;
-import datart.server.base.transfer.TransferConfig;
-import datart.server.base.transfer.model.DashboardTransferModel;
-import datart.server.base.transfer.model.DatachartTransferModel;
-import datart.server.base.transfer.model.ResourceTransferModel;
+import datart.server.base.transfer.*;
+import datart.server.base.transfer.model.*;
 import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -41,10 +40,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
+
+import static datart.security.base.ResourceType.DATACHART;
 
 @Slf4j
 @Service
@@ -62,9 +66,13 @@ public class VizServiceImpl extends BaseService implements VizService {
 
     private final ViewService viewService;
 
+    private final SourceService sourceService;
+
     private final VariableService variableService;
 
     private final FileService fileService;
+
+    private final DownloadMapperExt downloadMapper;
 
     public VizServiceImpl(DatachartService datachartService,
                           DashboardService dashboardService,
@@ -72,16 +80,18 @@ public class VizServiceImpl extends BaseService implements VizService {
                           StorypageService storypageService,
                           FolderService folderService,
                           ViewService viewService,
-                          VariableService variableService,
-                          FileService fileService) {
+                          SourceService sourceService, VariableService variableService,
+                          FileService fileService, DownloadMapperExt downloadMapper) {
         this.datachartService = datachartService;
         this.dashboardService = dashboardService;
         this.storyboardService = storyboardService;
         this.storypageService = storypageService;
         this.folderService = folderService;
         this.viewService = viewService;
+        this.sourceService = sourceService;
         this.variableService = variableService;
         this.fileService = fileService;
+        this.downloadMapper = downloadMapper;
     }
 
     @Override
@@ -270,49 +280,168 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
-    public ResourceTransferModel exportViz(ResourceType vizType, boolean onlyViz, String... vizIds) throws IOException {
-        TransferConfig transferConfig = TransferConfig.builder().withParents(true)
-                .onlyMainModel(onlyViz)
-                .build();
-        switch (vizType) {
-            case DATACHART:
-//                return datachartService.export(vizId, true);
-            case DASHBOARD:
-                return dashboardService.exportResource(transferConfig, vizIds);
-            default:
-                Exceptions.msg("unsupported viz type " + vizType);
-        }
-        return null;
+    public Download exportResource(ResourceTransferParam param) throws IOException {
+        final String user = securityManager.getCurrentUser().getUsername();
+
+        return newExportDownloadTask(transferParam -> {
+            securityManager.runAs(user);
+            TransferConfig transferConfig = TransferConfig.builder()
+                    .withParents(true)
+                    .build();
+            List<ResourceTransferParam.VizItem> resources = transferParam.getResources();
+            ResourceModel resourceModel = new ResourceModel();
+            final Set<String> dashboards = new HashSet<>();
+            final Set<String> datacharts = new HashSet<>();
+            final Set<String> views = new HashSet<>();
+            final Set<String> sources = new HashSet<>();
+            dashboards.addAll(resources
+                    .parallelStream()
+                    .filter(vizItem -> ResourceType.DASHBOARD.equals(vizItem.getResourceType()))
+                    .map(ResourceTransferParam.VizItem::getResourceId)
+                    .collect(Collectors.toSet()));
+            datacharts.addAll(resources
+                    .parallelStream()
+                    .filter(vizItem -> DATACHART.equals(vizItem.getResourceType()))
+                    .map(ResourceTransferParam.VizItem::getResourceId)
+                    .collect(Collectors.toSet()));
+            if (dashboards.size() > 0) {
+                DashboardResourceModel dashboardResourceModel = dashboardService.exportResource(transferConfig, dashboards);
+                resourceModel.setDashboardResourceModel(dashboardService.exportResource(transferConfig, dashboards));
+                datacharts.addAll(dashboardResourceModel.getDatacharts());
+                views.addAll(dashboardResourceModel.getViews());
+            }
+
+            if (datacharts.size() > 0) {
+                DatachartResourceModel datachartResourceModel = datachartService.exportResource(transferConfig, datacharts);
+                resourceModel.setDatachartResourceModel(datachartResourceModel);
+                views.addAll(datachartResourceModel.getViews());
+            }
+            if (views.size() > 0) {
+                ViewResourceModel viewResourceModel = viewService.exportResource(transferConfig, views);
+                resourceModel.setViewResourceModel(viewResourceModel);
+                sources.addAll(viewResourceModel.getSources());
+            }
+            if (sources.size() > 0) {
+                SourceResourceModel sourceResourceModel = sourceService.exportResource(transferConfig, sources);
+                resourceModel.setSourceResourceModel(sourceResourceModel);
+            }
+            return resourceModel;
+        }, param, TransferFileType.DATART_RESOURCE_FILE);
+
     }
 
     @Override
     @Transactional
-    public boolean importViz(MultipartFile file, ImportStrategy importStrategy, String orgId) throws IOException {
-        ResourceTransferModel model = null;
+    public boolean importResource(MultipartFile file, ImportStrategy importStrategy, String orgId) throws IOException {
+        ResourceModel model = null;
         try {
-            model = extractModel(file);
+            model = (ResourceModel) extractModel(file);
         } catch (Exception e) {
             log.error("viz model extract error ", e);
+            Exceptions.e(e);
         }
         if (model == null) {
             Exceptions.msg("message.viz.import.invalid");
+            return false;
         }
-        Organization organization = null;
-        try {
-            // TODO  暂时不支持同库迁移
-            organization = retrieve(model.getOrgId(), Organization.class);
-        } catch (Exception ignore) {
+        Organization organization = retrieve(orgId, Organization.class);
+        if (organization == null) {
+            Exceptions.msg("The target organization does not exist");
         }
-        if (organization != null) {
-            Exceptions.msg("Current version does not support migration on the same database");
+        securityManager.requireOrgOwner(orgId);
+        if (ImportStrategy.NEW.equals(importStrategy)) {
+            final Map<String, String> sourceIdMapping = new HashMap<>();
+            final Map<String, String> viewIdMapping = new HashMap<>();
+            final Map<String, String> datachartIdMapping = new HashMap<>();
+            final Map<String, String> boardIdMapping = new HashMap<>();
+            // replace source Id
+            sourceService.replaceId(model.getSourceResourceModel(), sourceIdMapping, viewIdMapping, datachartIdMapping, boardIdMapping);
+            // replace view id
+            viewService.replaceId(model.getViewResourceModel(), sourceIdMapping, viewIdMapping, datachartIdMapping, boardIdMapping);
+            // replace datachart id
+            datachartService.replaceId(model.getDatachartResourceModel(), sourceIdMapping, viewIdMapping, datachartIdMapping, boardIdMapping);
+            //replace dashboard id
+            dashboardService.replaceId(model.getDashboardResourceModel(), sourceIdMapping, viewIdMapping, datachartIdMapping, boardIdMapping);
         }
-        if (model instanceof DashboardTransferModel) {
-            dashboardService.importResource((DashboardTransferModel) model, importStrategy, orgId, null);
-        } else if (model instanceof DatachartTransferModel) {
-            datachartService.importResource((DatachartTransferModel) model, importStrategy, orgId, null);
-        }
+        dashboardService.importResource(model.getDashboardResourceModel(), importStrategy, orgId);
+        datachartService.importResource(model.getDatachartResourceModel(), importStrategy, orgId);
+        viewService.importResource(model.getViewResourceModel(), importStrategy, orgId);
+        sourceService.importResource(model.getSourceResourceModel(), importStrategy, orgId);
         return true;
     }
+
+    @Override
+    public Download exportDatachartTemplate(DatachartTemplateParam param) {
+        return newExportDownloadTask(templateParam -> {
+            DatachartTemplateModel templateModel = new DatachartTemplateModel();
+            templateParam.setDatachart(param.getDatachart());
+            return templateModel;
+        }, param, TransferFileType.DATART_TEMPLATE_FILE);
+    }
+
+    @Override
+    public Download exportDashboardTemplate(DashboardTemplateParam param) {
+        return newExportDownloadTask(templateParam -> {
+            DashboardTemplateModel templateModel = new DashboardTemplateModel();
+            templateModel.setDashboard(param.getDashboard());
+            templateModel.setWidgets(param.getWidgets());
+            templateModel.setFiles(FileUtils.walkDirAsStream(new File(fileService.getBasePath(FileOwner.DASHBOARD, param.getDashboard().getId()))
+                    , null,
+                    false));
+            return templateModel;
+        }, param, TransferFileType.DATART_TEMPLATE_FILE);
+    }
+
+
+    private <P extends TransferParam, R extends TransferModel> Download newExportDownloadTask(Function<P, R> function, P param, TransferFileType fileType) {
+        final Download download = new Download();
+        download.setCreateTime(new Date());
+        download.setId(UUIDGenerator.generate());
+        download.setStatus((byte) 0);
+        download.setCreateBy(securityManager.getCurrentUser().getId());
+        String path = getExportFile(getMessage("message.viz.export.name"), fileType);
+        download.setName(new File(path).getName());
+        download.setPath(path);
+        downloadMapper.insert(download);
+        TaskExecutor.submit(() -> {
+            try {
+                TransferModel model = function.apply(param);
+                SerializerUtils.serializeObjectToFile(model, true, download.getPath());
+                download.setStatus((byte) 1);
+            } catch (Exception e) {
+                download.setStatus((byte) -1);
+                log.error("object serialize error", e);
+            } finally {
+                try {
+                    download.setUpdateTime(new Date());
+                    downloadMapper.updateByPrimaryKey(download);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    securityManager.releaseRunAs();
+                } catch (Exception ignored) {
+                }
+            }
+        });
+        return download;
+    }
+
+    @Override
+    public void importVizTemplate(MultipartFile file, String orgId, Folder parent, String name) {
+        TransferModel transferModel = null;
+        try {
+            transferModel = extractModel(file);
+            if (transferModel instanceof DatachartTemplateModel) {
+                datachartService.importTemplate((DatachartTemplateModel) transferModel, orgId, name, parent);
+            } else if (transferModel instanceof DashboardTemplateModel) {
+                dashboardService.importTemplate((DashboardTemplateModel) transferModel, orgId, name, parent);
+            }
+        } catch (Exception e) {
+            log.error("viz template import error");
+        }
+    }
+
 
     @Override
     public boolean updateStoryboardBase(StoryboardBaseUpdateParam updateParam) {
@@ -323,7 +452,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     @Transactional
     public boolean updateDatachart(DatachartUpdateParam updateParam) {
         // update folder
-        Folder vizFolder = folderService.getVizFolder(updateParam.getId(), ResourceType.DATACHART.name());
+        Folder vizFolder = folderService.getVizFolder(updateParam.getId(), DATACHART.name());
         vizFolder.setAvatar(updateParam.getAvatar());
         vizFolder.setSubType(updateParam.getSubType());
         folderService.getDefaultMapper().updateByPrimaryKey(vizFolder);
@@ -455,13 +584,13 @@ public class VizServiceImpl extends BaseService implements VizService {
         folderService.getDefaultMapper().insert(folder);
     }
 
-    private String getExportFile(String name) {
-        return fileService.getBasePath(FileOwner.EXPORT, null) + "/" + name + "-" + System.currentTimeMillis() + ".viz";
+    private String getExportFile(String name, TransferFileType fileType) {
+        return fileService.getBasePath(FileOwner.EXPORT, null) + "/" + name + "-" + System.currentTimeMillis() + fileType.getSuffix();
     }
 
-    public ResourceTransferModel extractModel(MultipartFile file) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream inputStream = new ObjectInputStream(file.getInputStream());) {
-            return (ResourceTransferModel) inputStream.readObject();
+    public TransferModel extractModel(MultipartFile file) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream inputStream = new ObjectInputStream(new GZIPInputStream(file.getInputStream()));) {
+            return (ResourceModel) inputStream.readObject();
         }
     }
 }

@@ -28,7 +28,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 
 @Api
 @Slf4j
@@ -48,20 +46,6 @@ public class ExternalRegisterController extends BaseController {
 
     public ExternalRegisterController(ExternalRegisterService externalRegisterService) {
         this.externalRegisterService = externalRegisterService;
-    }
-
-    @ApiOperation(value = "External Login")
-    @SkipLogin
-    @PostMapping(value = "oauth2", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseData<Object> externalLogin(Principal principal, HttpServletResponse response) throws MessagingException, UnsupportedEncodingException {
-        if (principal instanceof OAuth2AuthenticationToken) {
-            String token = externalRegisterService.oauth2Register((OAuth2AuthenticationToken) principal);
-            response.setHeader(Const.TOKEN, token);
-            response.setStatus(200);
-            return ResponseData.success(null);
-        }
-        response.setStatus(401);
-        return ResponseData.failure("oauth2 login fail");
     }
 
     @ApiOperation(value = "External Login")

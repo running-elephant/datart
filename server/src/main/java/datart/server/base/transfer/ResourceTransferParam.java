@@ -16,35 +16,29 @@
  * limitations under the License.
  */
 
-package datart.server.base.transfer.model;
+package datart.server.base.transfer;
 
-import datart.core.entity.Variable;
-import datart.core.entity.View;
+import datart.security.base.ResourceType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
-public class ViewTransferModel extends ResourceTransferModel {
+@EqualsAndHashCode(callSuper = true)
+public class ResourceTransferParam extends TransferParam {
 
-    private List<MainModel> mainModels;
-
-    private List<View> parents;
-
-    private SourceTransferModel sourceExportModel;
-
-    @Override
-    public String getVizName() {
-        return mainModels.get(0).view.getName();
-    }
+    @NotNull
+    private List<VizItem> resources;
 
     @Data
-    public static class MainModel implements Serializable {
+    public static class VizItem {
 
-        private View view;
+        private ResourceType resourceType;
 
-        private List<Variable> variables;
+        private String resourceId;
 
     }
+
 }

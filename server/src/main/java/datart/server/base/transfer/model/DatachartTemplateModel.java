@@ -16,17 +16,23 @@
  * limitations under the License.
  */
 
-package datart.server.base.transfer;
+package datart.server.base.transfer.model;
 
-import lombok.Builder;
+import datart.core.entity.Datachart;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
+import javax.validation.constraints.NotNull;
 
 @Data
-@Builder
-public class TransferConfig implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class DatachartTemplateModel extends TransferModel {
 
-    private boolean withParents;
+    @NotNull
+    private Datachart datachart;
 
+    @Override
+    public String getVizName() {
+        return datachart != null ? datachart.getName() : "DATACHART";
+    }
 }

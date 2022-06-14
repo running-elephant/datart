@@ -16,17 +16,24 @@
  * limitations under the License.
  */
 
-package datart.server.base.transfer;
+package datart.server.base.transfer.model;
 
-import lombok.Builder;
+import datart.core.base.consts.FileOwner;
+import datart.core.common.Application;
+import datart.server.service.FileService;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-@Builder
-public class TransferConfig implements Serializable {
+public abstract class TransferModel implements Serializable {
 
-    private boolean withParents;
+    private String orgId;
+
+    public String getFileName() {
+        return Application.getBean(FileService.class).getBasePath(FileOwner.EXPORT, null) + "/" + getVizName() + "-" + System.currentTimeMillis() + ".viz";
+    }
+
+    public abstract String getVizName();
 
 }
