@@ -25,7 +25,11 @@ import { getValue } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectViewMap } from '../../../Board/slice/selector';
+import {
+  selectBoardWidgetMapById,
+  selectViewMap,
+} from '../../../Board/slice/selector';
+import { BoardState } from '../../../Board/slice/types';
 import { editBoardStackActions } from '../../slice';
 import { showRectAction } from '../../slice/actions/actions';
 import { NameSet } from './SettingItem/NameSet';
@@ -35,7 +39,7 @@ import { WidgetConfigPanel } from './WidgetConfigPanel';
 
 const { TabPane } = Tabs;
 
-export const WidgetSetting: FC = memo(() => {
+export const WidgetSetting: FC<{ boardId?: string }> = memo(({ boardId }) => {
   const t = useI18NPrefix(`viz.board.setting`);
   const widget = useContext(WidgetContext);
   const dispatch = useDispatch();
@@ -43,6 +47,9 @@ export const WidgetSetting: FC = memo(() => {
   const [currentTab, setCurrentTab] = useState<string>('style');
   const vizs = useSelector(selectVizs);
   const viewMap = useSelector(selectViewMap);
+  const boardWidgets = useSelector((state: { board: BoardState }) =>
+    selectBoardWidgetMapById(state, boardId || ''),
+  );
 
   const handleStyleConfigChange = (
     ancestors: number[],
@@ -86,8 +93,6 @@ export const WidgetSetting: FC = memo(() => {
       viewDetailKey,
     ]);
 
-    // TODO: hasLinkPanel with options
-
     return updateBy(interactions, draft => {
       let boardDrillThrough = draft.find(i => i.key === drillThroughKey);
       let boardViewDetail = draft.find(i => i.key === viewDetailKey);
@@ -100,6 +105,7 @@ export const WidgetSetting: FC = memo(() => {
           },
         );
       }
+      // TODO(Stephen): has chart cross filtering with options
       if (boardViewDetail && hasEnableViewDetail) {
         boardViewDetail.options = Object.assign(
           {},
@@ -138,6 +144,7 @@ export const WidgetSetting: FC = memo(() => {
             }
             context={{
               vizs,
+              boardVizs: boardWidgets,
               dataview: viewMap?.[widget?.config?.content?.dataChart?.viewId],
             }}
             onChange={handleInteractionConfigChange}
