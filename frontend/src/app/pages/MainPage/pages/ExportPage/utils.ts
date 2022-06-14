@@ -1,5 +1,3 @@
-import { request2 } from 'utils/request';
-
 /**
  * Datart
  *
@@ -17,6 +15,7 @@ import { request2 } from 'utils/request';
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { request2 } from 'utils/request';
 export async function onExport(idList) {
   try {
     const response = await request2<any>({

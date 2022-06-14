@@ -27,8 +27,6 @@ import java.io.Serializable;
 @Builder
 public class TransferConfig implements Serializable {
 
-    private boolean onlyMainModel;
-
     private boolean withParents;
 
 }

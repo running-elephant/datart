@@ -37,7 +37,6 @@ class ChartIFrameContainerDispatcher {
       any,
       IChartDrillOption | undefined,
       SelectedItem[] | undefined,
-      ((event: KeyboardEvent) => void) | undefined,
     ]
   >();
   private editorEnv = { env: 'workbench' };
@@ -63,7 +62,6 @@ class ChartIFrameContainerDispatcher {
     style?: CSSProperties,
     drillOption?: IChartDrillOption,
     selectedItems?: SelectedItem[],
-    onKeyboardPress?: (event: KeyboardEvent) => void,
   ): Function[] {
     this.switchContainer(
       containerId,
@@ -72,7 +70,6 @@ class ChartIFrameContainerDispatcher {
       config,
       drillOption,
       selectedItems,
-      onKeyboardPress,
     );
     const renders: Function[] = [];
     this.chartContainerMap.forEach((chartRenderer: Function, key) => {
@@ -97,7 +94,6 @@ class ChartIFrameContainerDispatcher {
     config: ChartConfig,
     drillOption?: IChartDrillOption,
     selectedItems?: SelectedItem[],
-    onKeyboardPress?: (event: KeyboardEvent) => void,
   ) {
     this.chartMetadataMap.set(containerId, [
       chart,
@@ -105,7 +101,6 @@ class ChartIFrameContainerDispatcher {
       config,
       drillOption,
       selectedItems,
-      onKeyboardPress,
     ]);
     this.createNewIfNotExist(containerId);
   }
@@ -120,7 +115,6 @@ class ChartIFrameContainerDispatcher {
           config,
           drillOption,
           selectedItems?: SelectedItem[],
-          onKeyboardPress?: (event: KeyboardEvent) => void,
         ) => {
           return (
             <div key={containerId} style={style}>
@@ -130,7 +124,6 @@ class ChartIFrameContainerDispatcher {
                 config={config}
                 drillOption={drillOption}
                 selectedItems={selectedItems}
-                onKeyboardPress={onKeyboardPress}
                 containerId={containerId}
                 width={style?.width}
                 height={style?.height}

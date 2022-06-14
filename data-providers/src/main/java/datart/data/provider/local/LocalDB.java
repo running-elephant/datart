@@ -166,7 +166,7 @@ public class LocalDB {
      *
      * @param queryScript  查询脚本
      * @param executeParam 执行参数
-     * @param dataframes      原始数据
+     * @param dataframes   原始数据
      * @param persistent   原始数据是持久化
      * @return 查询脚本+执行参数 执行后结果
      */
@@ -177,6 +177,7 @@ public class LocalDB {
             queryScript.setScript(String.format(SELECT_START_SQL, dataframes.getDataframes().get(0).getName()));
             queryScript.setVariables(Collections.emptyList());
             queryScript.setSourceId(dataframes.getKey());
+            queryScript.setScriptType(ScriptType.SQL);
         }
 
         String url = getConnectionUrl(persistent, dataframes.getKey());

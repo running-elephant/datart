@@ -247,7 +247,6 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                 .script(view.getScript())
                 .scriptType(view.getType() == null ? ScriptType.SQL : ScriptType.valueOf(view.getType()))
                 .variables(variables)
-                .scriptType(ScriptType.valueOf(view.getType()))
                 .schema(parseSchema(view.getModel()))
                 .build();
 

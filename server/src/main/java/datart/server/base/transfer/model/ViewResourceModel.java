@@ -18,43 +18,34 @@
 
 package datart.server.base.transfer.model;
 
-import datart.core.entity.Dashboard;
-import datart.core.entity.Folder;
-import datart.server.base.dto.WidgetDetail;
+import datart.core.entity.Variable;
+import datart.core.entity.View;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 @Data
-public class DashboardTransferModel extends ResourceTransferModel {
+public class ViewResourceModel extends TransferModel {
 
     private List<MainModel> mainModels;
 
-    private List<Folder> parents;
+    private Set<String> sources;
 
-    private DatachartTransferModel datachartTransferModel;
-
-    private ViewTransferModel viewTransferModel;
+    private List<View> parents;
 
     @Override
     public String getVizName() {
-        return mainModels.get(0).getDashboard().getName();
+        return mainModels.get(0).view.getName();
     }
 
     @Data
     public static class MainModel implements Serializable {
 
-        private Dashboard dashboard;
+        private View view;
 
-        private Folder folder;
-
-        private List<WidgetDetail> widgets;
-
-        private Map<String, byte[]> files;
+        private List<Variable> variables;
 
     }
-
-
 }

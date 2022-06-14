@@ -24,10 +24,8 @@ import com.alibaba.fastjson.JSONObject;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
 import datart.core.base.exception.Exceptions;
-import datart.core.common.Application;
-import datart.core.common.DateUtils;
-import datart.core.common.FileUtils;
-import datart.core.common.TaskExecutor;
+import datart.core.base.exception.NotFoundException;
+import datart.core.common.*;
 import datart.core.data.provider.DataProviderConfigTemplate;
 import datart.core.data.provider.DataProviderSource;
 import datart.core.data.provider.SchemaInfo;
@@ -49,7 +47,7 @@ import datart.security.util.PermissionHelper;
 import datart.server.base.params.*;
 import datart.server.base.transfer.ImportStrategy;
 import datart.server.base.transfer.TransferConfig;
-import datart.server.base.transfer.model.SourceTransferModel;
+import datart.server.base.transfer.model.SourceResourceModel;
 import datart.server.job.SchemaSyncJob;
 import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -173,20 +171,19 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
-    public SourceTransferModel exportResource(TransferConfig transferConfig, String... ids) {
-
-        if (ids == null || ids.length == 0) {
+    public SourceResourceModel exportResource(TransferConfig transferConfig, Set<String> ids) {
+        if (ids == null || ids.size() == 0) {
             return null;
         }
-
-        SourceTransferModel sourceExportModel = new SourceTransferModel();
+        SourceResourceModel sourceExportModel = new SourceResourceModel();
         sourceExportModel.setMainModels(new LinkedList<>());
 
         Map<String, Source> parentMap = new HashMap<>();
 
         for (String sourceId : ids) {
-            SourceTransferModel.MainModel mainModel = new SourceTransferModel.MainModel();
+            SourceResourceModel.MainModel mainModel = new SourceResourceModel.MainModel();
             Source source = retrieve(sourceId);
+            securityManager.requireOrgOwner(source.getOrgId());
             mainModel.setSource(source);
             // files
             mainModel.setFiles(FileUtils.walkDirAsStream(new File(fileService.getBasePath(FileOwner.DATA_SOURCE, sourceId)), null, false));
@@ -206,18 +203,46 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
-    public boolean importResource(SourceTransferModel model, ImportStrategy strategy, String orgId, Set<String> requireTransfer) {
+    public boolean importResource(SourceResourceModel model, ImportStrategy strategy, String orgId) {
+        if (model == null) {
+            return true;
+        }
         switch (strategy) {
             case OVERWRITE:
-                importSource(model, orgId, true, true, requireTransfer);
+                importSource(model, orgId, true);
                 break;
-            case IGNORE:
-                importSource(model, orgId, false, true, requireTransfer);
+            case ROLLBACK:
+                importSource(model, orgId, false);
                 break;
             default:
-                importSource(model, orgId, false, false, requireTransfer);
+                importSource(model, orgId, false);
         }
         return true;
+    }
+
+    @Override
+    public void replaceId(SourceResourceModel model
+            , final Map<String, String> sourceIdMapping
+            , final Map<String, String> viewIdMapping
+            , final Map<String, String> chartIdMapping, Map<String, String> boardIdMapping) {
+
+        if (model == null || model.getMainModels() == null) {
+            return;
+        }
+        for (SourceResourceModel.MainModel mainModel : model.getMainModels()) {
+            String newId = UUIDGenerator.generate();
+            sourceIdMapping.put(mainModel.getSource().getId(), newId);
+            mainModel.getSource().setId(newId);
+        }
+        Map<String, String> parentIdMapping = new HashMap<>();
+        for (Source parent : model.getParents()) {
+            String newId = UUIDGenerator.generate();
+            parentIdMapping.put(parent.getId(), newId);
+            parent.setId(newId);
+        }
+        for (Source parent : model.getParents()) {
+            parent.setParentId(parentIdMapping.get(parent.getParentId()));
+        }
     }
 
     @Override
@@ -437,37 +462,31 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         }
     }
 
-    private void importSource(SourceTransferModel model,
+    private void importSource(SourceResourceModel model,
                               String orgId,
-                              boolean deleteFirst,
-                              boolean skipExists,
-                              Set<String> requireTransfer) {
+                              boolean deleteFirst) {
 
         if (model == null || CollectionUtils.isEmpty(model.getMainModels())) {
             return;
         }
-        for (SourceTransferModel.MainModel mainModel : model.getMainModels()) {
+        for (SourceResourceModel.MainModel mainModel : model.getMainModels()) {
             Source source = mainModel.getSource();
             if (source == null) {
                 continue;
             }
-            if (requireTransfer != null && !requireTransfer.contains(source.getId())) {
-                continue;
-            }
             if (deleteFirst) {
                 try {
-                    delete(source.getId());
-                } catch (Exception ignore) {
-                }
-            } else if (skipExists) {
-                try {
-                    if (retrieve(source.getId()) != null) {
-                        continue;
+                    Source retrieve = retrieve(source.getId(), false);
+                    if (retrieve != null && !retrieve.getOrgId().equals(orgId)) {
+                        Exceptions.msg("message.viz.import.database.conflict");
                     }
+                } catch (NotFoundException ignored) {
+                }
+                try {
+                    delete(source.getId(), false, false);
                 } catch (Exception ignore) {
                 }
             }
-
             // check name
             try {
                 Source check = new Source();

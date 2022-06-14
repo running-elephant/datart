@@ -19,16 +19,27 @@ package datart.server.service;
 
 import datart.server.base.transfer.ImportStrategy;
 import datart.server.base.transfer.TransferConfig;
-import datart.server.base.transfer.model.ResourceTransferModel;
+import datart.server.base.transfer.model.TransferModel;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-public interface ResourceTransferService<T, R extends ResourceTransferModel> {
+public interface ResourceTransferService<T, R extends TransferModel, RT extends TransferModel, F> {
 
     List<T> getAllParents(String id);
 
-    R exportResource(TransferConfig transferConfig, String... ids);
+    R exportResource(TransferConfig transferConfig, Set<String> ids);
 
-    boolean importResource(R model, ImportStrategy strategy, String orgId, Set<String> requireTransfer);
+    boolean importResource(R model, ImportStrategy strategy, String orgId);
+
+    void replaceId(R model
+            , Map<String, String> sourceIdMapping
+            , Map<String, String> viewIdMapping
+            , Map<String, String> chartIdMapping
+            , Map<String, String> boardIdMapping);
+
+    default void importTemplate(RT model, String orgId, String name, F folder) {
+    }
+
 }

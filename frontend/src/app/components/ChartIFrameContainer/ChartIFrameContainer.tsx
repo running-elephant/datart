@@ -44,7 +44,6 @@ const ChartIFrameContainer: FC<{
   isShown?: boolean;
   drillOption?: IChartDrillOption;
   selectedItems?: SelectedItem[];
-  onKeyboardPress?: (event: KeyboardEvent) => void;
   widgetSpecialConfig?: any;
   scale?: [number, number];
   viewType?: ViewType;
@@ -92,7 +91,6 @@ const ChartIFrameContainer: FC<{
               isShown={props.isShown}
               drillOption={props?.drillOption}
               selectedItems={props?.selectedItems}
-              onKeyboardPress={props?.onKeyboardPress}
             />
           </div>
         </div>
@@ -156,7 +154,6 @@ const ChartIFrameContainer: FC<{
                   isShown={props.isShown}
                   drillOption={props.drillOption}
                   selectedItems={props?.selectedItems}
-                  onKeyboardPress={props?.onKeyboardPress}
                 />
               </div>
             </StyleSheetManager>

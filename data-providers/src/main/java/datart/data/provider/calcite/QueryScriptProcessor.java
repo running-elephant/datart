@@ -18,10 +18,9 @@
 package datart.data.provider.calcite;
 
 import datart.core.data.provider.QueryScript;
-import org.apache.calcite.sql.SqlNode;
 
 public interface QueryScriptProcessor {
 
-    SqlNode process(QueryScript queryScript);
+    QueryScriptProcessResult process(QueryScript queryScript);
 
 }

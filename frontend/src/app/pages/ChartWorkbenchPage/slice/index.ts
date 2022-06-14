@@ -46,7 +46,6 @@ export const initState: WorkbenchState = {
   datasetLoading: false,
   chartEditorDownloadPolling: false,
   selectedItems: [],
-  multipleSelect: false,
 };
 
 // Reducers
@@ -154,32 +153,11 @@ const workbenchSlice = createSlice({
     setChartEditorDownloadPolling(state, { payload }: PayloadAction<boolean>) {
       state.chartEditorDownloadPolling = payload;
     },
-    normalSelect(state, { payload }: PayloadAction<SelectedItem>) {
-      const index = state.selectedItems?.findIndex(
-        v => v.index === payload.index,
-      );
-      if (state.multipleSelect) {
-        if (index < 0) {
-          state.selectedItems.push(payload);
-        } else {
-          state.selectedItems.splice(index, 1);
-        }
-      } else {
-        if (index < 0 || state.selectedItems.length > 1) {
-          state.selectedItems = [payload];
-        } else {
-          state.selectedItems = [];
-        }
-      }
-    },
     changeSelectedItems(
       state,
       { payload }: PayloadAction<Array<SelectedItem>>,
     ) {
       state.selectedItems = payload;
-    },
-    updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
-      state.multipleSelect = payload;
     },
   },
   extraReducers: builder => {

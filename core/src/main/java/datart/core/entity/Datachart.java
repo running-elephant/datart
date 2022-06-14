@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Datachart extends BaseEntity {
+
     private String name;
 
     private String description;

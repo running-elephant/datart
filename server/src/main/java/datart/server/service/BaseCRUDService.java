@@ -73,7 +73,12 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
 
     @Transactional
     default boolean delete(String id, boolean archive) {
-        if (!safeDelete(id)) {
+        return delete(id, archive, true);
+    }
+
+    @Transactional
+    default boolean delete(String id, boolean archive, boolean safeDelete) {
+        if (safeDelete && !safeDelete(id)) {
             Exceptions.tr(BaseException.class, "message.delete.error.relation");
         }
         return archive ? archive(id) : delete(id);

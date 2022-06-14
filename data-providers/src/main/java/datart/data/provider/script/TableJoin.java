@@ -31,7 +31,7 @@ public class TableJoin {
     @NotBlank
     private String[] table;
 
-    private List<String> columns;
+    private String columns;
 
     @NotNull
     private JoinType joinType;
