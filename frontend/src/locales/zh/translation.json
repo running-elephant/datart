@@ -901,7 +901,8 @@
         "selectDrillOff": "开启“点击下钻”",
         "rollUp": "上卷",
         "drillThrough": "跳转",
-        "viewData": "查看数据"
+        "viewData": "查看数据",
+        "crossFiltering": "联动"
       }
     },
     "action": {

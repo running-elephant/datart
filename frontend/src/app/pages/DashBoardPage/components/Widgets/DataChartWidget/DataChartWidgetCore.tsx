@@ -100,8 +100,10 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   }>();
   const {
     getDrillThroughSetting,
+    getCrossFilteringSetting,
     getViewDetailSetting,
     handleDrillThroughEvent,
+    handleCrossFilteringEvent,
     handleViewDataEvent,
   } = useChartInteractions({
     openViewDetailPanel,
@@ -211,6 +213,27 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     [chartDataView, orgId, dataChart?.config, getDrillThroughSetting],
   );
 
+  const buildCrossFilteringEventParams = useCallback(
+    (clickEventParams, targetEvent: InteractionMouseEvent) => {
+      const crossFilteringSetting = getCrossFilteringSetting(
+        dataChart?.config?.chartConfig?.interactions,
+        widgetRef?.current?.config?.customConfig?.interactions,
+      );
+      return {
+        drillOption: drillOptionRef?.current,
+        crossFilteringSetting,
+        clickEventParams,
+        targetEvent,
+        orgId,
+        view: chartDataView,
+        computedFields: dataChart?.config?.computedFields,
+        aggregation: dataChart?.config?.aggregation,
+        chartConfig: dataChart?.config?.chartConfig,
+      };
+    },
+    [chartDataView, orgId, dataChart?.config, getCrossFilteringSetting],
+  );
+
   const buildViewDataEventParams = useCallback(
     (clickEventParams, targetEvent: InteractionMouseEvent) => {
       const viewDetailSetting = getViewDetailSetting(
@@ -251,6 +274,29 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     getDrillThroughSetting,
     handleDrillThroughEvent,
     buildDrillThroughEventParams,
+  ]);
+
+  const handleCrossFilteringChange = useCallback(() => {
+    const crossFilteringSetting = getCrossFilteringSetting(
+      dataChart?.config?.chartConfig?.interactions,
+      widgetRef?.current?.config?.customConfig?.interactions,
+    );
+    if (!crossFilteringSetting) {
+      return;
+    }
+    return () =>
+      handleCrossFilteringEvent(
+        buildCrossFilteringEventParams(
+          chartContextMenuEvent,
+          InteractionMouseEvent.Right,
+        ),
+      );
+  }, [
+    dataChart?.config?.chartConfig?.interactions,
+    chartContextMenuEvent,
+    getCrossFilteringSetting,
+    handleCrossFilteringEvent,
+    buildCrossFilteringEventParams,
   ]);
 
   const handleViewDataChange = useCallback(() => {
@@ -296,6 +342,12 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                 }
                 handleDrillThroughEvent(
                   buildDrillThroughEventParams(
+                    params,
+                    InteractionMouseEvent.Left,
+                  ),
+                );
+                handleCrossFilteringEvent(
+                  buildCrossFilteringEventParams(
                     params,
                     InteractionMouseEvent.Left,
                   ),
@@ -357,11 +409,13 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     }
   }, [
     dataChart,
-    handleDrillOptionChange,
-    onWidgetChartClick,
     dispatch,
     wid,
     renderMode,
+    handleDrillOptionChange,
+    onWidgetChartClick,
+    handleCrossFilteringEvent,
+    buildCrossFilteringEventParams,
     handleDrillThroughEvent,
     buildDrillThroughEventParams,
     handleViewDataEvent,
@@ -449,6 +503,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     availableSourceFunctions,
     onDateLevelChange: handleDateLevelChange,
     onDrillThroughChange: handleDrillThroughChange(),
+    onCrossFilteringChange: handleCrossFilteringChange(),
     onViewDataChange: handleViewDataChange(),
   };
 

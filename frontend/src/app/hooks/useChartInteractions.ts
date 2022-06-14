@@ -21,6 +21,7 @@ import {
   InteractionCategory,
 } from 'app/components/FormGenerator/constants';
 import {
+  CrossFilteringSetting,
   DrillThroughSetting,
   ViewDetailSetting,
 } from 'app/components/FormGenerator/Customize/Interaction/types';
@@ -68,6 +69,34 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
       return getStyles(
         chartInteractions || [],
         ['drillThrough'],
+        ['setting'],
+      )?.[0];
+    } else {
+      return null;
+    }
+  };
+
+  const getCrossFilteringSetting = (
+    chartInteractions,
+    boardInteractions?,
+  ): CrossFilteringSetting | null => {
+    const enableBoardCrossFiltering = getValue(boardInteractions || [], [
+      'crossFiltering',
+    ]);
+    if (enableBoardCrossFiltering) {
+      return getStyles(
+        boardInteractions || [],
+        ['crossFiltering'],
+        ['setting'],
+      )?.[0];
+    }
+    const enableChartCrossFiltering = getValue(chartInteractions || [], [
+      'crossFiltering',
+    ]);
+    if (enableChartCrossFiltering) {
+      return getStyles(
+        chartInteractions || [],
+        ['crossFiltering'],
         ['setting'],
       )?.[0];
     } else {
@@ -226,6 +255,48 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
     ],
   );
 
+  const handleCrossFilteringEvent = useCallback(
+    ({
+      drillOption,
+      crossFilteringSetting,
+      clickEventParams,
+      targetEvent,
+      orgId,
+      view,
+      computedFields,
+      aggregation,
+      chartConfig,
+    }) => {
+      if (
+        !crossFilteringSetting ||
+        crossFilteringSetting?.event !== targetEvent
+      ) {
+        return null;
+      }
+      console.log('Do handleCrossFilteringEvent | ', crossFilteringSetting);
+      let nonAggChartFilters = new ChartDataRequestBuilder(
+        {
+          id: view?.id || '',
+          config: view?.config || {},
+          computedFields: computedFields || [],
+        },
+        chartConfig?.datas,
+        chartConfig?.settings,
+        {},
+        false,
+        aggregation,
+      )
+        .addDrillOption(drillOption)
+        .build()
+        .filters?.filter(f => !Boolean(f.aggOperator));
+
+      (crossFilteringSetting?.rules || []).forEach(rule => {
+        console.log(`crossFilteringSetting rule ---> `, rule);
+      });
+    },
+    [],
+  );
+
   const handleViewDataEvent = useCallback(
     ({
       drillOption,
@@ -256,8 +327,10 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
 
   return {
     getDrillThroughSetting,
+    getCrossFilteringSetting,
     getViewDetailSetting,
     handleDrillThroughEvent,
+    handleCrossFilteringEvent,
     handleViewDataEvent,
   };
 };

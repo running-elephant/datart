@@ -182,7 +182,6 @@ export const InteractionI18N = {
       },
       rule: {
         title: '规则设置',
-        addRule: '+ 点击新建',
         header: {
           relId: '关联图表',
           relation: '关系设置',
@@ -252,6 +251,25 @@ export const InteractionI18N = {
           field: 'Field',
           variable: 'Variable',
           controller: 'Controller',
+        },
+        operation: {
+          delete: 'Delete',
+        },
+      },
+    },
+    crossFiltering: {
+      title: 'Cross Filtering',
+      event: {
+        title: 'Event',
+        left: 'Left',
+        right: 'Right',
+      },
+      rule: {
+        title: 'Rule',
+        header: {
+          relId: 'Reference Chart',
+          relation: 'Relation',
+          operation: 'Operation',
         },
         operation: {
           delete: 'Delete',

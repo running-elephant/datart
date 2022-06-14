@@ -901,7 +901,8 @@
         "selectDrillOff": "Turn on \"Click to drill down\"",
         "rollUp": "Roll Up",
         "drillThrough": "Drill Through",
-        "viewData": "View Data"
+        "viewData": "View Data",
+        "crossFiltering": "Cross Filtering"
       }
     },
     "action": {
