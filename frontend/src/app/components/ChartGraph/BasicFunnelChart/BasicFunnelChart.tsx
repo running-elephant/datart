@@ -19,7 +19,7 @@
 import { ChartDataSectionType } from 'app/constants';
 import Chart from 'app/models/Chart';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
-import { ChartSelectOption } from 'app/models/ChartSelectOption';
+import { ChartSelection } from 'app/models/ChartSelection';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -34,7 +34,7 @@ import ChartDataSetDTO, {
 } from 'app/types/ChartDataSet';
 import {
   getAutoFunnelTopPosition,
-  getChartSelectOption,
+  getChartSelection,
   getColumnRenderName,
   getDrillableRows,
   getExtraSeriesDataFormat,
@@ -55,7 +55,7 @@ class BasicFunnelChart extends Chart {
   config = Config;
   chart: any = null;
 
-  private selectOption: null | ChartSelectOption = null;
+  private selection: null | ChartSelection = null;
 
   constructor() {
     super(
@@ -84,25 +84,28 @@ class BasicFunnelChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
-    this.selectOption = getChartSelectOption(context.window, {
+    this.selection = getChartSelection(context.window, {
       chart: this.chart,
       mouseEvents: this.mouseEvents,
     });
     this.mouseEvents?.forEach(event => {
-      if (event.name === 'click') {
-        this.chart.on(event.name, params => {
-          this.selectOption?.normalSelect({
-            index: params.componentIndex + ',' + params.dataIndex,
-            data: params.data,
+      switch (event.name) {
+        case 'click':
+          this.chart.on(event.name, params => {
+            this.selection?.doSelect({
+              index: params.componentIndex + ',' + params.dataIndex,
+              data: params.data,
+            });
+            event.callback({
+              ...params,
+              interactionType: 'select',
+              selectedItems: this.selection?.selectedItems,
+            });
           });
-          event.callback({
-            ...params,
-            interactionType: 'select',
-            selectedItems: this.selectOption?.selectedItems,
-          });
-        });
-      } else {
-        this.chart.on(event.name, event.callback);
+          break;
+        default:
+          this.chart.on(event.name, event.callback);
+          break;
       }
     });
   }
@@ -117,10 +120,10 @@ class BasicFunnelChart extends Chart {
       return;
     }
     if (
-      this.selectOption?.selectedItems.length &&
+      this.selection?.selectedItems.length &&
       !options.selectedItems?.length
     ) {
-      this.selectOption?.clearAll();
+      this.selection?.clearAll();
     }
     const newOptions = this.getOptions(
       options.dataset,
@@ -132,7 +135,7 @@ class BasicFunnelChart extends Chart {
   }
 
   onUnMount(): void {
-    this.selectOption?.removeEvent();
+    this.selection?.removeEvent();
     this.chart?.dispose();
   }
 

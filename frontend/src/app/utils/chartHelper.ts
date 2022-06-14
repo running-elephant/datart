@@ -25,7 +25,7 @@ import {
 } from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
 import { DrillMode } from 'app/models/ChartDrillOption';
-import { ChartSelectOption } from 'app/models/ChartSelectOption';
+import { ChartSelection } from 'app/models/ChartSelection';
 import { ChartMouseEvent } from 'app/types/Chart';
 import {
   AxisLabel,
@@ -1694,7 +1694,7 @@ export const setRuntimeDateLevelFieldsInChartConfig = (config: ChartConfig) => {
  * @param { string | number } comIndex
  * @param { string | number } dcIndex
  * @param { SelectedItem[] } selectionList
- * @param { [x: string]: any } itemStyle
+ * @param { [x: string]: any } [ itemStyle = {} ]
  * @return { itemStyle: [x: string]: any } itemStyle
  */
 export const getSelectedItemStyles = (
@@ -1723,7 +1723,7 @@ export const getSelectedItemStyles = (
  * Comparing old and new selectedItems
  *
  * @param { SelectedItem[] } newSelectedItems
- * @param { SelectedItem[] } oldSelectedItems
+ * @param { SelectedItem[] } [ oldSelectedItems ]
  * @return { boolean }
  */
 export const compareSelectedItems = (
@@ -1747,11 +1747,12 @@ export const compareSelectedItems = (
  * Get chart select option class.
  *
  * @param { Window } window
- * @return { Object }  ChartSelectOption
+ * @param { ChartSelectionOptions } [ options ]
+ * @return { Object }  ChartSelection
  */
-export const getChartSelectOption = (
+export const getChartSelection = (
   window: Window,
-  unselectConfig?: { chart: ECharts; mouseEvents?: ChartMouseEvent[] },
+  options?: { chart: ECharts; mouseEvents?: ChartMouseEvent[] },
 ) => {
-  return new ChartSelectOption(window, unselectConfig);
+  return new ChartSelection(window, options);
 };

@@ -16,20 +16,20 @@
  * limitations under the License.
  */
 
-import { ChartSelectOption } from '../ChartSelectOption';
+import { ChartSelection } from '../ChartSelection';
 
-describe('ChartSelectOption Test', () => {
+describe('ChartSelection Test', () => {
   test('should init model is a parameter', () => {
-    const option = new ChartSelectOption(window);
+    const option = new ChartSelection(window);
     expect(option).not.toBeNull();
     expect(option.selectedItems).toEqual([]);
     expect(option.addEvent()).toBeUndefined();
     expect(option.removeEvent()).toBeUndefined();
   });
 
-  test('should normal select and clear function', () => {
-    const option = new ChartSelectOption(window);
-    option.normalSelect({
+  test('should select and clear function', () => {
+    const option = new ChartSelection(window);
+    option.doSelect({
       index: '1',
       data: {
         rowData: {
@@ -50,7 +50,7 @@ describe('ChartSelectOption Test', () => {
         },
       ]),
     );
-    option.normalSelect({
+    option.doSelect({
       index: '1',
       data: {
         rowData: {

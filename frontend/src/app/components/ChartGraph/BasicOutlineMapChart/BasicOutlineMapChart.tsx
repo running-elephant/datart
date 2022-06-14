@@ -17,7 +17,7 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
-import { ChartSelectOption } from 'app/models/ChartSelectOption';
+import { ChartSelection } from 'app/models/ChartSelection';
 import ReactChart from 'app/models/ReactChart';
 import {
   ChartConfig,
@@ -27,7 +27,7 @@ import {
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
-  getChartSelectOption,
+  getChartSelection,
   getDataColumnMaxAndMin2,
   getExtraSeriesRowData,
   getScatterSymbolSizeFn,
@@ -59,7 +59,7 @@ class BasicOutlineMapChart extends ReactChart {
   config = Config;
 
   protected isNormalGeoMap = false;
-  private selectOption: null | ChartSelectOption = null;
+  private selection: null | ChartSelection = null;
   private geoMap;
   private option: any = null;
   private containerId: string = '';
@@ -87,7 +87,7 @@ class BasicOutlineMapChart extends ReactChart {
       return;
     }
     this.containerId = options.containerId;
-    this.selectOption = getChartSelectOption(context.window);
+    this.selection = getChartSelection(context.window);
     this.adapter?.mounted(
       context.document.getElementById(options.containerId),
       {
@@ -95,7 +95,7 @@ class BasicOutlineMapChart extends ReactChart {
         containerId: this.containerId,
         mouseEvents: this.mouseEvents,
         isNormalGeoMap: this.isNormalGeoMap,
-        selectOption: this.selectOption,
+        selection: this.selection,
       },
       context,
     );
@@ -109,11 +109,8 @@ class BasicOutlineMapChart extends ReactChart {
       this.adapter?.unmount();
       return;
     }
-    if (
-      this.selectOption?.selectedItems.length &&
-      !props.selectedItems?.length
-    ) {
-      this.selectOption?.clearAll();
+    if (this.selection?.selectedItems.length && !props.selectedItems?.length) {
+      this.selection?.clearAll();
     }
     this.option = {
       options: props,
@@ -125,7 +122,7 @@ class BasicOutlineMapChart extends ReactChart {
       containerId: this.containerId,
       mouseEvents: this.mouseEvents,
       isNormalGeoMap: this.isNormalGeoMap,
-      selectOption: this.selectOption,
+      selection: this.selection,
     };
     this.adapter?.updated(this.option, context);
   }
@@ -135,7 +132,7 @@ class BasicOutlineMapChart extends ReactChart {
   }
 
   onUnMount(options, context?) {
-    this.selectOption?.removeEvent();
+    this.selection?.removeEvent();
     this.adapter?.unmount();
   }
 

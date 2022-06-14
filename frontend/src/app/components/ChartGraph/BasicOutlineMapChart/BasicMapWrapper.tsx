@@ -21,7 +21,7 @@ import {
   ZoomInOutlined,
   ZoomOutOutlined,
 } from '@ant-design/icons';
-import { ChartSelectOption } from 'app/models/ChartSelectOption';
+import { ChartSelection } from 'app/models/ChartSelection';
 import { ChartMouseEvent } from 'app/types/Chart';
 import { ECharts, init } from 'echarts';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -34,11 +34,11 @@ interface MapWrapperProps {
   containerId?: string;
   mouseEvents: ChartMouseEvent[];
   isNormalGeoMap: boolean;
-  selectOption: null | ChartSelectOption;
+  selection: null | ChartSelection;
 }
 
 const BasicMapWrapper: FC<MapWrapperProps> = memo(
-  ({ containerId, mouseEvents, mapOption, isNormalGeoMap, selectOption }) => {
+  ({ containerId, mouseEvents, mapOption, isNormalGeoMap, selection }) => {
     const [chartContainerId] = useState<string>(containerId + '-map');
     const chart = useRef<ECharts>();
     const [geoConfig, setGeoConfig] = useState<GeoInfo>({
@@ -59,32 +59,35 @@ const BasicMapWrapper: FC<MapWrapperProps> = memo(
       if (container) {
         const initChart = init(container, 'default');
         chart.current = initChart;
-        selectOption?.addUnselectOption({ chart: initChart, mouseEvents });
+        selection?.setOptions({ chart: initChart, mouseEvents });
         container.removeEventListener('mouseup', getOptionsConfig);
         container.addEventListener('mouseup', getOptionsConfig);
         mouseEvents.forEach(event => {
-          if (event.name === 'click') {
-            initChart.on(event.name, (params: any) => {
-              if (params.componentType === 'series' || isNormalGeoMap) {
-                selectOption?.normalSelect({
-                  index: params.componentIndex + ',' + params.dataIndex,
-                  data: params.data,
-                });
-                event.callback({
-                  ...params,
-                  interactionType: 'select',
-                  selectedItems: selectOption?.selectedItems,
-                });
-              }
-            });
-          } else {
-            initChart.on(event.name, event?.callback as any);
+          switch (event.name) {
+            case 'click':
+              initChart.on(event.name, (params: any) => {
+                if (params.componentType === 'series' || isNormalGeoMap) {
+                  selection?.doSelect({
+                    index: params.componentIndex + ',' + params.dataIndex,
+                    data: params.data,
+                  });
+                  event.callback({
+                    ...params,
+                    interactionType: 'select',
+                    selectedItems: selection?.selectedItems,
+                  });
+                }
+              });
+              break;
+            default:
+              initChart.on(event.name, event?.callback as any);
+              break;
           }
         });
       }
       return () => {
         container?.removeEventListener('mouseup', getOptionsConfig);
-        selectOption?.removeEvent();
+        selection?.removeEvent();
         chart.current?.clear();
       };
     }, [chartContainerId]);

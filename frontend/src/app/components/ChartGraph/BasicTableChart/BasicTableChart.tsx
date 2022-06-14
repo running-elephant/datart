@@ -17,7 +17,7 @@
  */
 
 import { DataViewFieldType } from 'app/constants';
-import { ChartSelectOption } from 'app/models/ChartSelectOption';
+import { ChartSelection } from 'app/models/ChartSelection';
 import ReactChart from 'app/models/ReactChart';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import {
@@ -32,7 +32,7 @@ import {
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   compareSelectedItems,
-  getChartSelectOption,
+  getChartSelection,
   getColumnRenderName,
   getExtraSeriesRowData,
   getStyles,
@@ -89,7 +89,7 @@ class BasicTableChart extends ReactChart {
     pageSize: 0,
     total: 0,
   };
-  private selectOption: null | ChartSelectOption = null;
+  private selection: null | ChartSelection = null;
   private selectedRows: SelectedItem[] = [];
 
   constructor(props?) {
@@ -115,7 +115,7 @@ class BasicTableChart extends ReactChart {
     ) {
       return;
     }
-    this.selectOption = getChartSelectOption(context.window);
+    this.selection = getChartSelection(context.window);
     this.adapter?.mounted(
       context.document.getElementById(options.containerId),
       options,
@@ -129,10 +129,10 @@ class BasicTableChart extends ReactChart {
       return;
     }
     if (
-      this.selectOption?.selectedItems.length &&
+      this.selection?.selectedItems.length &&
       !options.selectedItems?.length
     ) {
-      this.selectOption?.clearAll();
+      this.selection?.clearAll();
       this.selectedRows = [];
     }
 
@@ -160,7 +160,7 @@ class BasicTableChart extends ReactChart {
     this.cachedDatartConfig = {};
     this.cacheContext = null;
     this.selectedRows = [];
-    this.selectOption?.removeEvent();
+    this.selection?.removeEvent();
   }
 
   public onResize(options, context?): void {
@@ -698,7 +698,7 @@ class BasicTableChart extends ReactChart {
           };
           let highlightStyle = {};
           if (
-            this.selectOption?.selectedItems.find(
+            this.selection?.selectedItems.find(
               v => v.index === rest.rowIndex + ',' + sensitiveFieldName,
             )
           ) {
@@ -1218,8 +1218,8 @@ class BasicTableChart extends ReactChart {
       index: dataIndex + ',' + seriesName,
       data,
     };
-    this.selectOption?.normalSelect(option);
-    const newSelectedItems = this.selectOption?.selectedItems.reduce(
+    this.selection?.doSelect(option);
+    const newSelectedItems = this.selection?.selectedItems.reduce(
       (selectedItems, item) => {
         const dataIndex = item.index.toString().split(',')[0];
         if (!selectedItems.find(v => v.index === dataIndex)) {

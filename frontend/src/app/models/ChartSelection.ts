@@ -15,35 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ChartMouseEvent } from 'app/types/Chart';
 import { SelectedItem } from 'app/types/ChartConfig';
-import { IChartSelectOption } from 'app/types/ChartSelectOption';
-import { ECharts } from 'echarts';
+import {
+  ChartSelectionOptions,
+  IChartSelection,
+} from 'app/types/ChartSelection';
 import { KEYBOARD_EVENT_NAME } from 'globalConstants';
 
-interface UnselectOption {
-  chart: ECharts;
-  mouseEvents?: ChartMouseEvent[];
-}
-
-export class ChartSelectOption implements IChartSelectOption {
+export class ChartSelection implements IChartSelection {
   private _selectedList: Array<SelectedItem> = [];
   private window?: Window;
   private multipleSelect: boolean = false;
-  private unselectOption?: UnselectOption;
+  private options?: ChartSelectionOptions;
 
-  constructor(window: Window, unselectOption?: UnselectOption) {
+  constructor(window: Window, options?: ChartSelectionOptions) {
     this.clearAll();
     this.window = window;
     this.addEvent();
-    unselectOption && this.addUnselectOption(unselectOption);
+    options && this.setOptions(options);
   }
 
   public get selectedItems() {
     return this._selectedList;
   }
 
-  public normalSelect(params: SelectedItem) {
+  public doSelect(params: SelectedItem) {
     let list = this._selectedList.concat();
     const index = list.findIndex(v => v.index === params.index);
     if (this.multipleSelect) {
@@ -75,7 +71,7 @@ export class ChartSelectOption implements IChartSelectOption {
       'keyup',
       this.updateMultipleSelect.bind(this),
     );
-    this.unselectOption?.chart
+    this.options?.chart
       .getZr()
       .off('click', this.clearAllSelectedItems.bind(this));
   }
@@ -91,16 +87,16 @@ export class ChartSelectOption implements IChartSelectOption {
     );
   }
 
-  public addUnselectOption(unselectOption: UnselectOption) {
-    this.unselectOption = unselectOption;
-    this.unselectOption.chart
+  public setOptions(options: ChartSelectionOptions) {
+    this.options = options;
+    this.options.chart
       .getZr()
       .on('click', this.clearAllSelectedItems.bind(this));
   }
 
   private clearAllSelectedItems(e: Event) {
     if (!e.target && this._selectedList.length) {
-      this.unselectOption?.mouseEvents
+      this.options?.mouseEvents
         ?.find(v => v.name === 'click')
         ?.callback({
           interactionType: 'select',

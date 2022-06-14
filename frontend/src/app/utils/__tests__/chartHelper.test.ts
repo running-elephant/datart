@@ -24,17 +24,17 @@ import {
 } from 'app/constants';
 import { ChartDataSetRow } from 'app/models/ChartDataSet';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
-import { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   ChartDataConfig,
   ChartDataSectionField,
   ChartStyleConfig,
   FormatFieldAction,
-} from '../../types/ChartConfig';
+} from 'app/types/ChartConfig';
+import { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   clearRuntimeDateLevelFieldsInChartConfig,
   compareSelectedItems,
-  getChartSelectOption,
+  getChartSelection,
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getDataColumnMaxAndMin2,
@@ -2896,9 +2896,9 @@ describe('Chart Helper ', () => {
     },
   );
 
-  describe('getChartSelectOption Test - ', () => {
-    test(`Get chart select option`, () => {
-      const option = getChartSelectOption(window);
+  describe('getChartSelection Test - ', () => {
+    test(`Get chart selection`, () => {
+      const option = getChartSelection(window);
       expect(option).not.toBeNull();
       expect(option.selectedItems).toEqual([]);
     });

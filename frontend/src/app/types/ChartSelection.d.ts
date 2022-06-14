@@ -17,11 +17,16 @@
  */
 
 import { SelectedItem } from 'app/types/ChartConfig';
-
-export interface IChartSelectOption {
+import { ChartMouseEvent } from './Chart';
+export interface ChartSelectionOptions {
+  chart: ECharts;
+  mouseEvents?: ChartMouseEvent[];
+}
+export interface IChartSelection {
   selectedItems: SelectedItem[];
-  normalSelect: (params: SelectedItem) => vold;
+  doSelect: (params: SelectedItem) => vold;
   clearAll: () => void;
   removeEvent: () => void;
   addEvent: () => void;
+  setOptions: (options: ChartSelectionOptions) => void;
 }

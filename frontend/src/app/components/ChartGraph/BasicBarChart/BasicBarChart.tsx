@@ -18,7 +18,7 @@
 
 import { ChartDataSectionType } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
-import { ChartSelectOption } from 'app/models/ChartSelectOption';
+import { ChartSelection } from 'app/models/ChartSelection';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -33,7 +33,7 @@ import {
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
-  getChartSelectOption,
+  getChartSelection,
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getDrillableRows,
@@ -64,7 +64,7 @@ class BasicBarChart extends Chart {
   protected isHorizonDisplay = false;
   protected isStackMode = false;
   protected isPercentageYAxis = false;
-  private selectOption: null | ChartSelectOption = null;
+  private selection: null | ChartSelection = null;
 
   constructor(props?: {
     id: string;
@@ -98,25 +98,28 @@ class BasicBarChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
-    this.selectOption = getChartSelectOption(context.window, {
+    this.selection = getChartSelection(context.window, {
       chart: this.chart,
       mouseEvents: this.mouseEvents,
     });
     this.mouseEvents?.forEach(event => {
-      if (event.name === 'click') {
-        this.chart.on(event.name, params => {
-          this.selectOption?.normalSelect({
-            index: params.componentIndex + ',' + params.dataIndex,
-            data: params.data,
+      switch (event.name) {
+        case 'click':
+          this.chart.on(event.name, params => {
+            this.selection?.doSelect({
+              index: params.componentIndex + ',' + params.dataIndex,
+              data: params.data,
+            });
+            event.callback({
+              ...params,
+              interactionType: 'select',
+              selectedItems: this.selection?.selectedItems,
+            });
           });
-          event.callback({
-            ...params,
-            interactionType: 'select',
-            selectedItems: this.selectOption?.selectedItems,
-          });
-        });
-      } else {
-        this.chart.on(event.name, event.callback);
+          break;
+        default:
+          this.chart.on(event.name, event.callback);
+          break;
       }
     });
   }
@@ -131,10 +134,10 @@ class BasicBarChart extends Chart {
       return;
     }
     if (
-      this.selectOption?.selectedItems.length &&
+      this.selection?.selectedItems.length &&
       !options.selectedItems?.length
     ) {
-      this.selectOption?.clearAll();
+      this.selection?.clearAll();
     }
     const newOptions = this.getOptions(
       options.dataset,
@@ -146,7 +149,7 @@ class BasicBarChart extends Chart {
   }
 
   onUnMount(): void {
-    this.selectOption?.removeEvent();
+    this.selection?.removeEvent();
     this.chart?.dispose();
   }
 

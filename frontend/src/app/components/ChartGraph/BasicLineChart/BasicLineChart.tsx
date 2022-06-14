@@ -18,7 +18,7 @@
 
 import { ChartDataSectionType } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
-import { ChartSelectOption } from 'app/models/ChartSelectOption';
+import { ChartSelection } from 'app/models/ChartSelection';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -36,7 +36,7 @@ import {
   getAxisLabel,
   getAxisLine,
   getAxisTick,
-  getChartSelectOption,
+  getChartSelection,
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getDrillableRows,
@@ -63,7 +63,7 @@ class BasicLineChart extends Chart {
   config = Config;
   chart: any = null;
 
-  private selectOption: null | ChartSelectOption = null;
+  private selection: null | ChartSelection = null;
 
   protected isArea = false;
   protected isStack = false;
@@ -95,25 +95,28 @@ class BasicLineChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
-    this.selectOption = getChartSelectOption(context.window, {
+    this.selection = getChartSelection(context.window, {
       chart: this.chart,
       mouseEvents: this.mouseEvents,
     });
     this.mouseEvents?.forEach(event => {
-      if (event.name === 'click') {
-        this.chart.on(event.name, params => {
-          this.selectOption?.normalSelect({
-            index: params.componentIndex + ',' + params.dataIndex,
-            data: params.data,
+      switch (event.name) {
+        case 'click':
+          this.chart.on(event.name, params => {
+            this.selection?.doSelect({
+              index: params.componentIndex + ',' + params.dataIndex,
+              data: params.data,
+            });
+            event.callback({
+              ...params,
+              interactionType: 'select',
+              selectedItems: this.selection?.selectedItems,
+            });
           });
-          event.callback({
-            ...params,
-            interactionType: 'select',
-            selectedItems: this.selectOption?.selectedItems,
-          });
-        });
-      } else {
-        this.chart.on(event.name, event.callback);
+          break;
+        default:
+          this.chart.on(event.name, event.callback);
+          break;
       }
     });
   }
@@ -126,11 +129,8 @@ class BasicLineChart extends Chart {
       this.chart?.clear();
       return;
     }
-    if (
-      this.selectOption?.selectedItems.length &&
-      !props.selectedItems?.length
-    ) {
-      this.selectOption?.clearAll();
+    if (this.selection?.selectedItems.length && !props.selectedItems?.length) {
+      this.selection?.clearAll();
     }
     const newOptions = this.getOptions(
       props.dataset,
@@ -148,7 +148,7 @@ class BasicLineChart extends Chart {
   }
 
   onUnMount(): void {
-    this.selectOption?.removeEvent();
+    this.selection?.removeEvent();
     this.chart?.dispose();
   }
 

@@ -19,7 +19,7 @@
 import { ChartDataSectionType } from 'app/constants';
 import Chart from 'app/models/Chart';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
-import { ChartSelectOption } from 'app/models/ChartSelectOption';
+import { ChartSelection } from 'app/models/ChartSelection';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -31,7 +31,7 @@ import {
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
-  getChartSelectOption,
+  getChartSelection,
   getColumnRenderName,
   getDataColumnMaxAndMin2,
   getDrillableRows,
@@ -53,7 +53,7 @@ class BasicScatterChart extends Chart {
   config = Config;
   chart: any = null;
 
-  private selectOption: null | ChartSelectOption = null;
+  private selection: null | ChartSelection = null;
 
   constructor() {
     super('scatter', 'viz.palette.graph.names.scatterChart', 'sandiantu');
@@ -78,25 +78,28 @@ class BasicScatterChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
-    this.selectOption = getChartSelectOption(context.window, {
+    this.selection = getChartSelection(context.window, {
       chart: this.chart,
       mouseEvents: this.mouseEvents,
     });
     this.mouseEvents?.forEach(event => {
-      if (event.name === 'click') {
-        this.chart.on(event.name, params => {
-          this.selectOption?.normalSelect({
-            index: params.componentIndex + ',' + params.dataIndex,
-            data: params.data,
+      switch (event.name) {
+        case 'click':
+          this.chart.on(event.name, params => {
+            this.selection?.doSelect({
+              index: params.componentIndex + ',' + params.dataIndex,
+              data: params.data,
+            });
+            event.callback({
+              ...params,
+              interactionType: 'select',
+              selectedItems: this.selection?.selectedItems,
+            });
           });
-          event.callback({
-            ...params,
-            interactionType: 'select',
-            selectedItems: this.selectOption?.selectedItems,
-          });
-        });
-      } else {
-        this.chart.on(event.name, event.callback);
+          break;
+        default:
+          this.chart.on(event.name, event.callback);
+          break;
       }
     });
   }
@@ -110,11 +113,8 @@ class BasicScatterChart extends Chart {
       this.chart?.clear();
       return;
     }
-    if (
-      this.selectOption?.selectedItems.length &&
-      !props.selectedItems?.length
-    ) {
-      this.selectOption?.clearAll();
+    if (this.selection?.selectedItems.length && !props.selectedItems?.length) {
+      this.selection?.clearAll();
     }
     const newOptions = this.getOptions(
       props.dataset,
@@ -127,7 +127,7 @@ class BasicScatterChart extends Chart {
 
   onUnMount(): void {
     this.chart?.dispose();
-    this.selectOption?.removeEvent();
+    this.selection?.removeEvent();
   }
 
   onResize(opt: any, context): void {
