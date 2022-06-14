@@ -28,12 +28,14 @@ import { DrillMode } from 'app/models/ChartDrillOption';
 import DateLevelMenuItems from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/DateLevelAction/DateLevelMenuItems';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { ChartConfig, ChartDataSectionField } from 'app/types/ChartConfig';
-import { getRuntimeDateLevelFields } from 'app/utils/chartHelper';
+import { getRuntimeDateLevelFields, getStyles } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import classnames from 'classnames';
+import { DATARTSEPERATOR } from 'globalConstants';
 import { FC, memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { FONT_WEIGHT_MEDIUM, SPACE_SM } from 'styles/StyleConstants';
+import { InteractionMouseEvent } from '../FormGenerator/constants';
 
 const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
   ({ children, chartConfig }) => {
@@ -43,6 +45,8 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       onDrillOptionChange,
       availableSourceFunctions,
       onDateLevelChange,
+      onViewDataChange,
+      onDrillThroughChange,
     } = useContext(ChartDrillContext);
 
     const currentDrillLevel = drillOption?.getCurrentDrillLevel();
@@ -116,6 +120,17 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       );
     }, [drillOption?.isSelectedDrill, t]);
 
+    const jumpRules = useMemo(() => {
+      const drillThroughSetting = getStyles(
+        chartConfig?.interactions || [],
+        ['drillThrough'],
+        ['setting'],
+      )?.[0];
+      return drillThroughSetting?.rules?.filter(
+        r => r.event === InteractionMouseEvent.Right,
+      );
+    }, [chartConfig?.interactions]);
+
     const menuVisible = !chartConfig?.datas?.filter(
       v => v.drillContextMenuVisible,
     ).length;
@@ -128,6 +143,7 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       if (!hasContextMenu) {
         return <></>;
       }
+
       return (
         <StyledChartDrillMenu
           onClick={({ key }) => {
@@ -146,9 +162,27 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
             } else if (key === 'rollUp') {
               drillOption?.rollUp();
               onDrillOptionChange?.(drillOption);
+            } else if (key.includes('drillThrough')) {
+              onDrillThroughChange?.(key.split(DATARTSEPERATOR)?.[1]);
+            } else if (key === 'viewData') {
+              onViewDataChange?.();
             }
           }}
         >
+          {onDrillThroughChange && (
+            <Menu.SubMenu key={'drillThrough'} title={t('drillThrough')}>
+              {(jumpRules || []).map(rule => {
+                return (
+                  <Menu.Item key={`drillThrough${DATARTSEPERATOR}${rule.id}`}>
+                    {rule?.name || rule.id}
+                  </Menu.Item>
+                );
+              })}
+            </Menu.SubMenu>
+          )}
+          {onViewDataChange && (
+            <Menu.Item key={'viewData'}>{t('viewData')}</Menu.Item>
+          )}
           {!!currentDrillLevel && (
             <Menu.Item key={'rollUp'}>{t('rollUp')}</Menu.Item>
           )}
@@ -181,15 +215,17 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
         </StyledChartDrillMenu>
       );
     }, [
-      currentDrillLevel,
+      hasContextMenu,
       t,
+      currentDrillLevel,
       drillOption,
       selectDrillStatusMenu,
       runtimeDateLevelFields,
-      onDrillOptionChange,
-      handleDateLevelChange,
       availableSourceFunctions,
-      hasContextMenu,
+      onDrillOptionChange,
+      onDrillThroughChange,
+      onViewDataChange,
+      handleDateLevelChange,
     ]);
 
     return (

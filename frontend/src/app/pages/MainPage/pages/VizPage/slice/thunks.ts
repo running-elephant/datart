@@ -22,6 +22,7 @@ import {
   Dashboard,
   DataChart,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { mainActions } from 'app/pages/MainPage/slice';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { getLoggedInUserPermissions } from 'app/pages/MainPage/slice/thunks';
 import { StoryBoard } from 'app/pages/StoryBoardPage/slice/types';
@@ -152,12 +153,21 @@ export const deleteStoryboard = createAsyncThunk<
 export const addViz = createAsyncThunk<Folder, AddVizParams>(
   'viz/addViz',
   async ({ viz, type }) => {
-    const { data } = await request2<Folder>({
-      url: `/viz/${type.toLowerCase()}s`,
-      method: 'POST',
-      data: viz,
-    });
-    return data;
+    if (type === 'TEMPLATE') {
+      const { data } = await request2<Folder>({
+        url: `/viz/import/template?parentId=${viz.parentId}&orgId=${viz.orgId}&name=${viz.name}`,
+        method: 'POST',
+        data: viz.file,
+      });
+      return data;
+    } else {
+      const { data } = await request2<Folder>({
+        url: `/viz/${type.toLowerCase()}s`,
+        method: 'POST',
+        data: viz,
+      });
+      return data;
+    }
   },
 );
 
@@ -230,6 +240,27 @@ export const removeTab = createAsyncThunk<
   return null;
 });
 
+export const closeAllTabs = createAsyncThunk<
+  null,
+  { resolve: (selectedTab: string) => void },
+  { state: RootState }
+>('viz/closeAllTabs', async ({ resolve }, { getState, dispatch }) => {
+  dispatch(vizActions.closeAllTabs());
+  resolve('');
+  return null;
+});
+
+export const closeOtherTabs = createAsyncThunk<
+  null,
+  { id: string; resolve: (selectedTab: string) => void },
+  { state: RootState }
+>('viz/closeOtherTabs', async ({ id, resolve }, { getState, dispatch }) => {
+  dispatch(vizActions.closeOtherTabs(id));
+  const selectedTab = selectSelectedTab(getState());
+  resolve(selectedTab ? selectedTab.id : '');
+  return null;
+});
+
 export const initChartPreviewData = createAsyncThunk<
   { backendChartId: string },
   {
@@ -282,7 +313,33 @@ export const fetchVizChartAction = createAsyncThunk(
     };
   },
 );
-
+export const exportChartTpl = createAsyncThunk(
+  'viz/exportChartTpl',
+  async (arg: { chartId; dataRows; callBack }, thunkAPI) => {
+    const vizState = (thunkAPI.getState() as RootState)?.viz as VizState;
+    const { chartId, dataRows, callBack } = arg;
+    const dataChart = vizState.chartPreviews.find(
+      item => item.backendChartId === chartId,
+    );
+    const newChart = {
+      id: '',
+      index: 0,
+      parent: 0,
+      name: '',
+      viewId: '',
+      permissions: [],
+      avatar: dataChart?.backendChart?.config.chartGraphId, //
+      config: JSON.stringify(dataChart?.backendChart?.config),
+    };
+    const { data } = await request2<any>({
+      url: `viz/export/datachart/template`,
+      method: 'POST',
+      data: { datachart: newChart },
+    });
+    callBack();
+    thunkAPI.dispatch(mainActions.setDownloadPolling(true));
+  },
+);
 export const fetchDataSetByPreviewChartAction = createAsyncThunk(
   'viz/fetchDataSetByPreviewChartAction',
   async (

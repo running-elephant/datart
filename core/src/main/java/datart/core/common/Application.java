@@ -131,22 +131,23 @@ public class Application implements ApplicationContextAware {
         if (initialized != null) {
             return initialized;
         }
+        updateInitialized();
+        return initialized;
+    }
+
+    public static void updateInitialized() {
         UserMapperExt userMapper = getBean(UserMapperExt.class);
         if (getCurrMode().equals(PLATFORM)) {
             initialized = userMapper.selectUserCount()>0;
-            return initialized;
         }
         OrganizationMapperExt orgMapper = getBean(OrganizationMapperExt.class);
         List<Organization> organizations = orgMapper.list();
         int orgCount = CollectionUtils.size(organizations);
         if (orgCount==0) {
             initialized = false;
-            return initialized;
         } else if (orgCount==1) {
             List<User> users = orgMapper.listOrgMembers(organizations.get(0).getId());
             initialized = users.stream().anyMatch(item -> getAdminId().equals(item.getId()));
         }
-        return initialized;
     }
-
 }

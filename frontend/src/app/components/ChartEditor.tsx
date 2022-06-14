@@ -54,8 +54,7 @@ import {
   SaveFormContext,
   useSaveFormContext,
 } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
-import { IChart } from 'app/types/Chart';
-import { SelectedItem } from 'app/types/ChartConfig';
+import { ChartMouseEventParams, IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
@@ -272,8 +271,8 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               return;
             }
             if (
-              param.componentType === 'table' &&
-              param.seriesType === 'paging-sort-filter'
+              param.chartType === 'table' &&
+              param.interactionType === 'paging-sort-filter'
             ) {
               dispatch(
                 refreshDatasetAction({
@@ -289,7 +288,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               );
               return;
             }
-            if (param.seriesName === 'richText') {
+            if (
+              param.chartType === 'rich-text' &&
+              param.interactionType === 'rich-text-change-context'
+            ) {
               dispatch(
                 updateChartConfigAndRefreshDatasetAction({
                   type: ChartConfigReducerActionType.STYLE,
@@ -309,33 +311,33 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               return;
             }
             // NOTE 透视表树形结构展开下钻特殊处理方法
-            if (param.seriesName === 'drillOptionChange') {
-              handleDrillOptionChange?.(param.value);
+            if (
+              param.chartType === 'pivotSheet' &&
+              param.interactionType === 'drilled'
+            ) {
+              handleDrillOptionChange?.(param.drillOption);
               return;
             }
 
-            // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法
-            if (param.seriesName === 'changeSelectedItems') {
-              dispatch(actions.changeSelectedItems(param.data));
-              return;
+            // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法 其他图标取消选中时调取
+            if (param.interactionType === 'selected') {
+              dispatch(actions.changeSelectedItems(param.selectedItems));
             }
+            if (param.interactionType === 'unselect') {
+              dispatch(actions.changeSelectedItems([]));
+            }
+
             if (chart.selectable) {
-              const {
-                dataIndex,
-                componentIndex,
-                data,
-              }: {
-                dataIndex?: number;
-                componentIndex?: number;
-                data: { rowData: { [p: string]: any } };
-                seriesName?: string;
-              } = param;
-              dispatch(
-                actions.normalSelect({
-                  index: componentIndex + ',' + dataIndex,
-                  data,
-                } as SelectedItem),
-              );
+              const { dataIndex, componentIndex, data }: ChartMouseEventParams =
+                param;
+              if (data?.rowData) {
+                dispatch(
+                  actions.normalSelect({
+                    index: componentIndex + ',' + dataIndex,
+                    data,
+                  }),
+                );
+              }
             }
           },
         },

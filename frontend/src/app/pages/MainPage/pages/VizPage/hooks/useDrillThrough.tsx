@@ -17,14 +17,9 @@
  */
 
 import { useHistory } from 'react-router-dom';
-import useQSLibUrlHelper from './useQSLibUrlHelper';
 
 const useDrillThrough = () => {
   const history = useHistory();
-  const { stringify } = useQSLibUrlHelper();
-
-  const stringifyParams = (filters?: any[]) =>
-    stringify({ filters: filters || [] });
 
   const urlSchemeCheck = (url: string) => {
     if (!/^http(s)?/.test(url)) {
@@ -33,20 +28,26 @@ const useDrillThrough = () => {
     return url;
   };
 
-  const openNewTab = (orgId, relId, params?: any[]) => {
-    history.push(
-      `/organizations/${orgId}/vizs/${relId}?${stringifyParams(params)}`,
-    );
+  const appendUrlParams = (url, params) => {
+    let urlParams = '';
+    if (/\?.*/.test(url)) {
+      urlParams = `&${params}`;
+    } else {
+      urlParams = `?${params}`;
+    }
+    return `${urlSchemeCheck(url)}${urlParams}`;
   };
 
-  const openBrowserTab = (orgId, relId, params?: any[]) => {
-    window.open(
-      `/organizations/${orgId}/vizs/${relId}?${stringifyParams(params)}`,
-      '_blank',
-    );
+  const openNewTab = (orgId, relId, params?: string) => {
+    history.push(`/organizations/${orgId}/vizs/${relId}?${params}`);
   };
 
-  const getDialogContent = (orgId, relId, params?: any[]) => {
+  const openBrowserTab = (orgId, relId, params?: string) => {
+    const url = `/organizations/${orgId}/vizs/${relId}?${params}`;
+    window.open(url, url);
+  };
+
+  const getDialogContent = (orgId, relId, params?: string) => {
     return {
       width: 1000,
       content: (
@@ -55,23 +56,22 @@ const useDrillThrough = () => {
           height={600}
           width="100%"
           frameBorder="none"
-          src={`/organizations/${orgId}/vizs/${relId}?${stringifyParams(
-            params,
-          )}`}
+          src={`/organizations/${orgId}/vizs/${relId}?${params}`}
         />
       ),
     };
   };
 
-  const redirectByUrl = (url, params?: any[]) => {
-    window.location.href = `${urlSchemeCheck(url)}?${stringifyParams(params)}`;
+  const redirectByUrl = (url, params?: string) => {
+    window.location.href = appendUrlParams(url, params);
   };
 
-  const openNewByUrl = (url, params?: any[]) => {
-    window.open(`${urlSchemeCheck(url)}?${stringifyParams(params)}`, '_blank');
+  const openNewByUrl = (url, params?: string) => {
+    const finalUrl = appendUrlParams(url, params);
+    window.open(finalUrl, finalUrl);
   };
 
-  const getDialogContentByUrl = (url, params?: any[]) => {
+  const getDialogContentByUrl = (url, params?: string) => {
     return {
       width: 1000,
       content: (
@@ -80,7 +80,7 @@ const useDrillThrough = () => {
           height={600}
           width="100%"
           frameBorder="none"
-          src={`${urlSchemeCheck(url)}?${stringifyParams(params)}`}
+          src={`${urlSchemeCheck(url)}?${params}`}
         />
       ),
     };

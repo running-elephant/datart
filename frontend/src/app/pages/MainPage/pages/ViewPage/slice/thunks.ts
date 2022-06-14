@@ -305,6 +305,30 @@ export const removeEditingView = createAsyncThunk<
   return null;
 });
 
+export const closeOtherEditingViews = createAsyncThunk<
+  null,
+  { id: string; resolve: (currentEditingViewKey: string) => void },
+  { state: RootState }
+>(
+  'view/closeOtherEditingViews',
+  async ({ id, resolve }, { dispatch, getState }) => {
+    dispatch(viewActions.closeOtherEditingViews(id));
+    const currentEditingViewKey = selectCurrentEditingViewKey(getState());
+    resolve(currentEditingViewKey);
+    return null;
+  },
+);
+
+export const closeAllEditingViews = createAsyncThunk<
+  null,
+  { resolve: () => void },
+  { state: RootState }
+>('view/closeAllEditingViews', async ({ resolve }, { dispatch, getState }) => {
+  dispatch(viewActions.closeAllEditingViews());
+  resolve();
+  return null;
+});
+
 export const unarchiveView = createAsyncThunk<
   string,
   UnarchiveViewParams,

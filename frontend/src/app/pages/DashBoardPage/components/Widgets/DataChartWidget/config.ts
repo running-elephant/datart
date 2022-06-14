@@ -26,9 +26,11 @@ import widgetManagerInstance from '../../WidgetManager';
 import {
   initBackgroundTpl,
   initBorderTpl,
+  initInteractionTpl,
   initLoopFetchTpl,
   initPaddingTpl,
   initTitleTpl,
+  InteractionI18N,
   LoopFetchI18N,
   PaddingI18N,
   TitleI18N,
@@ -62,6 +64,7 @@ export const getMeta = (opt: {
       {
         lang: 'zh-CN',
         translation: {
+          ...InteractionI18N.zh,
           desc: opt.zh.desc,
           widgetName: opt.zh.widgetName,
           action: {},
@@ -75,6 +78,7 @@ export const getMeta = (opt: {
       {
         lang: 'en-US',
         translation: {
+          ...InteractionI18N.en,
           desc: opt.en.desc,
           widgetName: opt.en.widgetName,
           action: {},
@@ -116,6 +120,7 @@ export const dataChartCreator = (opt: WidgetCreateProps) => {
       });
     }
   });
+  widget.config.customConfig.interactions = [...initInteractionTpl()];
 
   return widget;
 };

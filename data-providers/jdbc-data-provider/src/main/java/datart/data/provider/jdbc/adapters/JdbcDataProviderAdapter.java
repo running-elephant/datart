@@ -159,7 +159,7 @@ public class JdbcDataProviderAdapter implements Closeable {
     }
 
     public String getQueryKey(QueryScript script, ExecuteParam executeParam) throws SqlParseException {
-        SqlScriptRender render = new SqlScriptRender(script, executeParam, getSqlDialect());
+        SqlScriptRender render = new SqlScriptRender(script, executeParam, getSqlDialect(), jdbcProperties.isEnableSpecialSql());
         return "Q" + DigestUtils.md5Hex(render.render(true, true, true));
     }
 

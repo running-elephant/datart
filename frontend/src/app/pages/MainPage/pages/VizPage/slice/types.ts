@@ -9,6 +9,7 @@ export type VizType = [
   'DASHBOARD',
   'FOLDER',
   'STORYBOARD',
+  'TEMPLATE',
 ][number];
 
 export interface VizState {
@@ -101,6 +102,7 @@ export interface AddVizParams {
     description?: string;
     parentId?: string | null;
     orgId: string;
+    file?: FormData;
   };
   type: VizType;
 }

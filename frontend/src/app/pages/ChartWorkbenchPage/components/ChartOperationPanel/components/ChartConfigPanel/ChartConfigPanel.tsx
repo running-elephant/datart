@@ -29,7 +29,9 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import ChartPaletteContext from 'app/pages/ChartWorkbenchPage/contexts/ChartPaletteContext';
 import { ChartConfigReducerActionType } from 'app/pages/ChartWorkbenchPage/slice/constant';
+import { currentDataViewSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { ChartConfigPayloadType } from 'app/pages/ChartWorkbenchPage/slice/type';
+import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -37,6 +39,7 @@ import {
 } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
@@ -66,6 +69,8 @@ const ChartConfigPanel: FC<{
 }> = memo(
   ({ chartId, chartConfig, expensiveQuery, onChange }) => {
     const t = useI18NPrefix(`viz.palette`);
+    const vizs = useSelector(selectVizs);
+    const dataview = useSelector(currentDataViewSelector);
     const [tabActiveKey, setTabActiveKey] = useComputedState(
       () => {
         return cond(
@@ -199,6 +204,7 @@ const ChartConfigPanel: FC<{
                   i18nPrefix="viz.palette.interaction"
                   configs={chartConfig?.interactions}
                   dataConfigs={chartConfig?.datas}
+                  context={{ vizs, dataview }}
                   onChange={handleConfigChangeByAction(
                     ChartConfigReducerActionType.INTERACTION,
                   )}
