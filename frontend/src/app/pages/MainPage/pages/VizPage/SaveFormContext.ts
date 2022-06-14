@@ -6,10 +6,13 @@ import { VizType } from './slice/types';
 export interface SaveFormModel {
   id?: string;
   name: string;
-  boardType?: BoardType;
+  boardType?: BoardType; //template
   config?: string;
   description?: string;
   parentId?: string | null;
+  file?: FormData; //template
+  subType?: string; //board
+  avatar?: string; //datachart
 }
 
 interface SaveFormState {

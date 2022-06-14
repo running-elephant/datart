@@ -50,7 +50,7 @@ export const handleBoardTplData = (
   const { board, widgetMap, dataChartMap } = boardTplData;
   let newBoard = CloneValueDeep(board) as Partial<Dashboard>;
   delete newBoard.queryVariables;
-
+  newBoard.config = JSON.stringify(newBoard.config) as any;
   const widgets = Object.values(widgetMap).map(w => {
     const newWidget = CloneValueDeep(w) as Partial<Widget>;
     newWidget.viewIds = [];
@@ -66,8 +66,8 @@ export const handleBoardTplData = (
         newWidget.config.content.dataChart = newChart;
       }
     }
-    console.log('__ ');
     newWidget.datachartId = '';
+    newWidget.config = JSON.stringify(newWidget.config) as any;
     return newWidget;
   });
   return {

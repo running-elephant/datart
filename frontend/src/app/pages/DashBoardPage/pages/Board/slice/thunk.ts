@@ -20,6 +20,7 @@ import { boardDrillManager } from 'app/pages/DashBoardPage/components/BoardDrill
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/components/Widgets/ControllerWidget/config';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
+import { mainActions } from 'app/pages/MainPage/slice';
 import { shareActions } from 'app/pages/SharePage/slice';
 import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
@@ -105,12 +106,14 @@ export const exportBoardTpl = createAsyncThunk<
     callBack: () => void;
   }
 >('board/exportBoardTpl', async (params, { dispatch, rejectWithValue }) => {
+  const { dashboard, widgets, callBack } = params;
   const { data } = await request2<any>({
     url: `viz/export/dashboard/template`,
     method: 'POST',
-    data: params,
+    data: { dashboard, widgets },
   });
-  params.callBack();
+  callBack();
+  dispatch(mainActions.setDownloadPolling(true));
   return null;
 });
 export const fetchBoardDetailInShare = createAsyncThunk<

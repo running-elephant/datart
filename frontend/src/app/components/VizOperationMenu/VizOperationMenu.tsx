@@ -39,6 +39,7 @@ const VizOperationMenu: FC<{
   onAddToDashBoard?;
   onPublish?;
   onRecycleViz?;
+  openMockData?;
   allowDownload?: boolean;
   allowShare?: boolean;
   allowManage?: boolean;
@@ -47,6 +48,7 @@ const VizOperationMenu: FC<{
   ({
     onShareLinkClick,
     onDownloadDataLinkClick,
+    openMockData,
     onSaveAsVizs,
     onReloadData,
     onAddToDashBoard,
@@ -148,6 +150,19 @@ const VizOperationMenu: FC<{
               cancelText={t('common.cancel')}
             >
               {t('share.downloadPicture')}
+            </Popconfirm>
+          </Menu.Item>,
+          <Menu.Item key={'exportTpl'} icon={<CloudDownloadOutlined />}>
+            <Popconfirm
+              placement="left"
+              title={t('common.confirm')}
+              okText={t('common.ok')}
+              cancelText={t('common.cancel')}
+              onConfirm={() => {
+                openMockData?.();
+              }}
+            >
+              {t('share.exportTpl')}
             </Popconfirm>
           </Menu.Item>,
           <Menu.Divider />,
