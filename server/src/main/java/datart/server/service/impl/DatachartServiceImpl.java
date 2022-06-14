@@ -26,6 +26,7 @@ import datart.core.common.DateUtils;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.Datachart;
 import datart.core.entity.Folder;
+import datart.core.entity.Variable;
 import datart.core.entity.View;
 import datart.core.mappers.ext.DatachartMapperExt;
 import datart.core.mappers.ext.FolderMapperExt;
@@ -65,13 +66,16 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
 
     private final ViewService viewService;
 
+    private final VariableService variableService;
+
     public DatachartServiceImpl(RoleService roleService,
                                 FileService fileService,
                                 FolderMapperExt folderMapper,
                                 RelRoleResourceMapperExt rrrMapper,
                                 FolderService folderService,
                                 DatachartMapperExt datachartMapper,
-                                ViewService viewService) {
+                                ViewService viewService,
+                                VariableService variableService) {
         this.roleService = roleService;
         this.fileService = fileService;
         this.folderMapper = folderMapper;
@@ -79,6 +83,7 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
         this.folderService = folderService;
         this.datachartMapper = datachartMapper;
         this.viewService = viewService;
+        this.variableService = variableService;
     }
 
     @Override
@@ -132,6 +137,11 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
             datachartDetail.setView(retrieve(datachart.getViewId(), View.class));
         } catch (NotFoundException ignored) {
         }
+
+        //variables
+        LinkedList<Variable> variables = new LinkedList<>(variableService.listOrgQueryVariables(datachart.getOrgId()));
+        variables.addAll(variableService.listViewQueryVariables(datachart.getViewId()));
+        datachartDetail.setQueryVariables(variables);
 
         // download permission
         datachartDetail.setDownload(securityManager

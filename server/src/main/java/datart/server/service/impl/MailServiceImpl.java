@@ -193,7 +193,7 @@ public class MailServiceImpl extends BaseService implements MailService {
         Context context = new Context(LocaleContextHolder.getLocale());
         context.setVariable(USERNAME_KEY, user.getUsername());
         context.setVariable(TOKEN_KEY, tokenString);
-        String activeUrl = Application.getWebRootURL() + "/active";
+        String activeUrl = Application.getWebRootURL() + "/activation";
         context.setVariable(HOST_KEY, activeUrl);
         String mailContent = templateEngine.process(USER_ACTIVE_TEMPLATE, context);
         return createMimeMessage(user.getEmail(), getMessage("message.user.active.mail.subject"), mailContent, true);

@@ -98,7 +98,7 @@
         </header>
         <article>
             <div class="title"><span th:text="|#{message.user.active.mail.greeting},${username}|">greeting</span></div>
-            <a class="sure" th:text="#{message.user.active.mail.active}" th:href="@{{host}(token=${token},host=${host})}"></a>
+            <a class="sure" th:text="#{message.user.active.mail.active}" th:href="@{{host}(activation_token=${token},host=${host})}"></a>
             <p class="detail"><span th:text="#{message.user.active.mail.tips}"></span></p>
         </article>
     </div>
