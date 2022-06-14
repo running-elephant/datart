@@ -58,9 +58,11 @@ export interface LoginParams {
   };
   resolve: () => void;
 }
+
 export interface UserInfoByTokenParams {
   token: string;
   resolve: () => void;
+  reject: () => void;
 }
 
 export interface RegisterParams {

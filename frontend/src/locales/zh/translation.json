@@ -6,6 +6,7 @@
     "title": {
       "action": "操作"
     },
+    "version": "版本",
     "button": {
       "create": "新建",
       "save": "保存",
@@ -1529,11 +1530,14 @@
     "join": "成功加入组织",
     "confirming": "确认邀请中"
   },
-  "active": {
-    "activating": "激活中"
-  },
   "authorization": {
-    "processing": "处理中"
+    "authenticating": "认证中",
+    "authenticatingDesc": "正在认证，请等待认证通过",
+    "activating": "激活中",
+    "activatingDesc": "正在激活，请等待激活完成",
+    "activatingError": "激活失败",
+    "error": "认证失败",
+    "errorDesc": "发生错误，请检查并重新尝试"
   },
   "notfound": {
     "title": "没有这个页面"

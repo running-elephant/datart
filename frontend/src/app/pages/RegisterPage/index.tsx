@@ -17,12 +17,11 @@
  */
 
 import { message } from 'antd';
-import { Brand } from 'app/components/Brand';
+import { BrandContainer } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectSystemInfo } from 'app/slice/selectors';
 import React, { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
-import styled from 'styled-components/macro';
 import { RegisterForm } from './RegisterForm';
 import { SendEmailTips } from './SendEmailTips';
 import { sendEmail } from './service';
@@ -58,8 +57,7 @@ export function RegisterPage() {
   }, [email, t]);
 
   return (
-    <Wrapper>
-      <Brand />
+    <BrandContainer>
       {isRegister ? (
         <RegisterForm onRegisterSuccess={onRegisterSuccess} />
       ) : mailEnable ? (
@@ -72,18 +70,6 @@ export function RegisterPage() {
       ) : (
         <WithoutActivation onContinue={goBack} />
       )}
-    </Wrapper>
+    </BrandContainer>
   );
 }
-
-const Wrapper = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-`;

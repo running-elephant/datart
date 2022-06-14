@@ -64,7 +64,9 @@ const slice = createSlice({
 
     // getUserInfoByToken
     builder.addCase(getUserInfoByToken.fulfilled, (state, action) => {
-      state.loggedInUser = action.payload;
+      if (action.payload) {
+        state.loggedInUser = action.payload;
+      }
     });
 
     // register

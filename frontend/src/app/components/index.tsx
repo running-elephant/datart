@@ -1,6 +1,7 @@
-export { AuthForm } from './AuthenticationForm';
+export { AuthForm, Notification } from './Authorization';
 export { Authorized, AuthorizedRoute } from './Authorized';
 export { Avatar } from './Avatar';
+export { Brand, BrandContainer } from './Brand';
 export { Configuration } from './Configuration';
 export { Confirm } from './Confirm';
 export { EmptyFiller } from './EmptyFiller';

@@ -10,17 +10,18 @@ import {
 
 export function Brand() {
   return (
-    <Wrapper>
+    <S.Brand>
       <img src={logo} alt="logo" />
       <h1>datart</h1>
-    </Wrapper>
+    </S.Brand>
   );
 }
 
-const Wrapper = styled.header`
+const S: any = {};
+
+S.Brand = styled.header`
   display: flex;
   align-items: center;
-  margin-top: ${SPACE_TIMES(30)};
 
   h1 {
     padding: 0 ${SPACE_TIMES(7)} 0 ${SPACE_MD};
