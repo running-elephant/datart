@@ -412,6 +412,17 @@ const boardSlice = createSlice({
         }
       }
     },
+    changeSelectedItems(
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        wid: string;
+        data: SelectedItem[];
+      }>,
+    ) {
+      state.selectedItems[payload.wid] = payload.data;
+    },
     updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
       state.multipleSelect = payload;
     },

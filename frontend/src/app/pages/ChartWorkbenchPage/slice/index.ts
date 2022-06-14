@@ -172,8 +172,11 @@ const workbenchSlice = createSlice({
         }
       }
     },
-    clearSelectedItems(state) {
-      state.selectedItems = [];
+    changeSelectedItems(
+      state,
+      { payload }: PayloadAction<Array<SelectedItem>>,
+    ) {
+      state.selectedItems = payload;
     },
     updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
       state.multipleSelect = payload;

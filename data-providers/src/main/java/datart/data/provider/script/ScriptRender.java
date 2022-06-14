@@ -1,14 +1,9 @@
 package datart.data.provider.script;
 
 
-import datart.core.base.consts.Const;
 import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.QueryScript;
-import datart.data.provider.calcite.SqlBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.calcite.sql.SqlDialect;
-import org.apache.calcite.sql.parser.SqlParseException;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * 实现Script的变量替换和表达式替换。

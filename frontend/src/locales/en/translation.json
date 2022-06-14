@@ -359,14 +359,6 @@
           "selectController": "Select ..",
           "textController": "Enter text"
         },
-        "controllerPlaceHolders": {
-          "multiSelectController": "Select ..",
-          "numberController": "Enter a number",
-          "rangeNumberControllerMin": "Min",
-          "rangeNumberControllerMax": "Max",
-          "selectController": "Select ..",
-          "textController": "Enter text"
-        },
         "controllerVisibilityTypes": {
           "hide": "Hide",
           "show": "Show",
@@ -774,17 +766,22 @@
       "interaction": {
         "drillThrough": {
           "title": "Drill Through",
-          "event": "Ineraction Event",
-          "leftClick": "Left Click",
-          "rightClick": "Right Click",
           "rule": {
             "title": "Rule",
             "addRule": "+ Add New",
+            "inputUrl": "Please input url",
             "header": {
+              "name": "Name",
               "category": "Category",
               "open": "Open",
               "relation": "Relation",
-              "operation": "Operation"
+              "operation": "Operation",
+              "event": "Event"
+            },
+            "event": {
+              "title": "Event",
+              "left": "Left",
+              "right": "Right"
             },
             "category": {
               "title": "Categroy",
@@ -811,15 +808,24 @@
               "target": "Target Field/Variable",
               "addRelation": "+ Add",
               "field": "Field",
-              "variable": "Variable"
+              "variable": "Variable",
+              "controller": "Controller"
             },
             "operation": {
               "delete": "Delete"
             }
           }
         },
-        "viewData": {
-          "title": "View Data"
+        "viewDetail": {
+          "title": "View Detail",
+          "event": "Interaction Event",
+          "leftClick": "Left Click",
+          "rightClick": "Right Click",
+          "field": "Selected Fields",
+          "all": "All",
+          "customize": "Customize",
+          "summary": "Summary",
+          "details": "Details"
         }
       },
       "present": {
@@ -893,7 +899,9 @@
         "expandNextLevel": "Expand to Next Level",
         "selectDrillOn": "\"Click to drill down\" is on",
         "selectDrillOff": "Turn on \"Click to drill down\"",
-        "rollUp": "Roll Up"
+        "rollUp": "Roll Up",
+        "drillThrough": "Drill Through",
+        "viewData": "View Data"
       }
     },
     "action": {
@@ -996,6 +1004,7 @@
         "button": "Button"
       },
       "setting": {
+        "interaction": "Interaction",
         "setting": "Setting",
         "board": "Board",
         "widget": "Widget",
@@ -1215,7 +1224,9 @@
     "main": {
       "publishSuccess": "Publish success",
       "unpublishSuccess": "Unpublish success",
-      "empty": "Select vizs in the sidebar"
+      "empty": "Select vizs in the sidebar",
+      "closeOther": "close Other Tabs",
+      "closeAll": "close All Tabs"
     }
   },
   "view": {
@@ -1234,7 +1245,9 @@
       "discard": "Discard",
       "cancel": "Cancel",
       "execute": "Execute",
-      "warning": "There are unexecuted changes, still execute?"
+      "warning": "There are unexecuted changes, still execute?",
+      "closeOther": "close Other Tabs",
+      "closeAll": "close All Tabs"
     },
     "editor": {
       "startAnalysis": "Start Analysis",

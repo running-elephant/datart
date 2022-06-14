@@ -29,14 +29,14 @@ import { ChartMouseEvent } from '../../../types/Chart';
 import { GeoInfo, MapOption } from './types';
 
 interface MapWrapperProps {
-  option: MapOption;
+  mapOption: MapOption;
   containerId?: string;
-  mouseEvents?: ChartMouseEvent[];
+  mouseEvents: ChartMouseEvent[];
   isNormalGeoMap: boolean;
 }
 
 const BasicMapWrapper: FC<MapWrapperProps> = memo(
-  ({ containerId, mouseEvents, option, isNormalGeoMap }) => {
+  ({ containerId, mouseEvents, mapOption, isNormalGeoMap }) => {
     const [chartContainerId] = useState<string>(containerId + '-map');
     const [chart, setChart] = useState<ECharts>();
     const [geoConfig, setGeoConfig] = useState<GeoInfo>({
@@ -55,41 +55,53 @@ const BasicMapWrapper: FC<MapWrapperProps> = memo(
     useEffect(() => {
       const container = document.getElementById(chartContainerId);
       if (container) {
-        setChart(init(container, 'default'));
+        const initChart = init(container, 'default');
+        setChart(initChart);
         container.removeEventListener('mouseup', getOptionsConfig);
         container.addEventListener('mouseup', getOptionsConfig);
+        mouseEvents.forEach(event => {
+          if (event.name === 'click') {
+            initChart.on(event.name, (params: any) => {
+              if (params.componentType === 'series' || isNormalGeoMap) {
+                event.callback(params);
+              }
+            });
+          } else {
+            initChart.on(event.name, event?.callback as any);
+          }
+        });
+        initChart.getZr().on('click', clearAllSelectedItems);
       }
       return () => {
         container?.removeEventListener('mouseup', getOptionsConfig);
         chart?.clear();
       };
-    }, [chartContainerId, getOptionsConfig]);
+    }, [chartContainerId]);
 
-    useEffect(() => {
-      mouseEvents?.forEach(event => {
-        if (event.name === 'click') {
-          chart?.on(event.name, (params: any) => {
-            if (params.componentType === 'series' || isNormalGeoMap) {
-              event.callback(params);
-            }
-          });
-        } else {
-          chart?.on(event.name, event?.callback as any);
+    const clearAllSelectedItems = useCallback(
+      (e: Event) => {
+        if (!e.target) {
+          mouseEvents
+            ?.find(v => v.name === 'click')
+            ?.callback({
+              interactionType: 'unselect',
+            });
         }
-      });
-    }, [mouseEvents, chart, isNormalGeoMap]);
+      },
+      [mouseEvents],
+    );
 
     useEffect(() => {
-      if (option) {
-        const newOption: object = Object.assign(option, {
+      if (mapOption) {
+        const newOption: object = Object.assign(mapOption, {
           geo: {
-            ...option.geo,
+            ...mapOption.geo,
             ...geoConfig,
           },
         });
         chart?.setOption(Object.assign({}, newOption), true);
       }
-    }, [chart, option, geoConfig]);
+    }, [chart, mapOption, geoConfig]);
 
     const zoomIn = useCallback(() => {
       setGeoConfig(() => ({

@@ -19,6 +19,7 @@
 package datart.server.base.params;
 
 import datart.core.base.PageInfo;
+import datart.core.data.provider.SelectColumn;
 import datart.core.data.provider.sql.*;
 import datart.security.base.ResourceType;
 import lombok.Data;
@@ -41,7 +42,7 @@ public class ViewExecuteParam {
 
     private List<SelectKeyword> keywords;
 
-    private List<String> columns;
+    private List<SelectColumn> columns;
 
     private Map<String, Set<String>> params;
 

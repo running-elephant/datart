@@ -31,6 +31,9 @@ const AntVS2Wrapper: FC<AndvS2Config> = memo(
     palette,
     onCollapseRowsAll,
     onRowCellCollapseTreeRows,
+    onSelected,
+    getSpreadSheet,
+    onDataCellClick,
   }) => {
     if (!dataCfg) {
       return <div></div>;
@@ -60,6 +63,9 @@ const AntVS2Wrapper: FC<AndvS2Config> = memo(
         onCollapseRowsAll={onCollapseRowsAll}
         onRowCellCollapseTreeRows={onRowCellCollapseTreeRows}
         onDataCellHover={onDataCellHover}
+        onSelected={onSelected}
+        getSpreadSheet={getSpreadSheet}
+        onDataCellClick={onDataCellClick}
       />
     );
   },

@@ -8,10 +8,12 @@ import datart.core.common.FileUtils;
 import datart.core.common.MessageResolver;
 import datart.core.data.provider.*;
 import datart.data.provider.base.DataProviderException;
-import datart.data.provider.calcite.ViewSqlBuilder;
-import datart.data.provider.jdbc.*;
 import datart.data.provider.calcite.SqlParserUtils;
 import datart.data.provider.calcite.dialect.SqlStdOperatorSupport;
+import datart.data.provider.jdbc.DataSourceFactory;
+import datart.data.provider.jdbc.DataSourceFactoryDruidImpl;
+import datart.data.provider.jdbc.JdbcDriverInfo;
+import datart.data.provider.jdbc.JdbcProperties;
 import datart.data.provider.jdbc.adapters.JdbcDataProviderAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlDialect;
@@ -86,11 +88,6 @@ public class JdbcDataProvider extends DataProvider {
     @Override
     public Dataframe execute(DataProviderSource source, QueryScript script, ExecuteParam executeParam) throws Exception {
         JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
-
-        if (script.isViewScript()) {
-            String viewSql = ViewSqlBuilder.builder().withScript(script.getScript()).withDialect(adapter.getSqlDialect()).build();
-            script.setScript(viewSql);
-        }
         //If server aggregation is enabled, query the full data before performing server aggregation
         if (executeParam.isServerAggregate()) {
             return adapter.executeInLocal(script, executeParam);

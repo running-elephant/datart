@@ -28,13 +28,14 @@ const ChartStyleConfigPanel: FC<{
   configs?: ChartStyleConfig[];
   dataConfigs?: ChartDataConfig[];
   i18nPrefix: string;
+  context?: any;
   onChange: (
     ancestors: number[],
     config: ChartStyleConfig,
     needRefresh?: boolean,
   ) => void;
 }> = memo(
-  ({ configs, dataConfigs, i18nPrefix, onChange }) => {
+  ({ configs, dataConfigs, i18nPrefix, context, onChange }) => {
     const t = useI18NPrefix(i18nPrefix);
 
     return (
@@ -56,6 +57,7 @@ const ChartStyleConfigPanel: FC<{
                     translate={t}
                     dataConfigs={dataConfigs}
                     onChange={onChange}
+                    context={context}
                     flatten
                   />
                 </Collapse.Panel>
@@ -68,6 +70,7 @@ const ChartStyleConfigPanel: FC<{
                   translate={t}
                   dataConfigs={dataConfigs}
                   onChange={onChange}
+                  context={context}
                 />
               );
             }

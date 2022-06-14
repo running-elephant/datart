@@ -75,6 +75,15 @@ const slice = createSlice({
             : '';
       }
     },
+    closeOtherTabs(state: VizState, action: PayloadAction<string>) {
+      const currentTab = state.tabs.find(t => t.id === action.payload);
+      state.tabs = state.tabs.filter(t => t.id === action.payload);
+      state.selectedTab = currentTab?.id || '';
+    },
+    closeAllTabs(state) {
+      state.tabs = [];
+      state.selectedTab = '';
+    },
     updateChartPreviewFilter(
       state,
       action: PayloadAction<{ backendChartId: string; payload }>,
@@ -149,7 +158,7 @@ const slice = createSlice({
         payload,
       }: PayloadAction<{
         backendChartId: string;
-        data: { index: string; data: any };
+        data: SelectedItem;
       }>,
     ) {
       const index = state.selectedItems?.[payload.backendChartId]?.findIndex(
@@ -171,6 +180,14 @@ const slice = createSlice({
           state.selectedItems[payload.backendChartId] = [];
         }
       }
+    },
+    changeSelectedItems(
+      state,
+      {
+        payload,
+      }: PayloadAction<{ backendChartId: string; data: SelectedItem[] }>,
+    ) {
+      state.selectedItems[payload.backendChartId] = payload.data;
     },
     updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
       state.multipleSelect = payload;
@@ -557,7 +574,7 @@ const slice = createSlice({
     });
     builder.addCase(fetchVizChartAction.fulfilled, (state, action) => {
       const newChartDto = CloneValueDeep(action.payload.data);
-
+      const jumpFilterParams = action.payload.jumpFilterParams;
       const filterSearchParams = action.payload.filterSearchParams;
       const index = state.chartPreviews?.findIndex(
         c => c.backendChartId === newChartDto?.id,
@@ -576,6 +593,8 @@ const slice = createSlice({
                   migrateChartConfig(newChartDto?.config),
                 ),
                 filterSearchParams,
+                false,
+                jumpFilterParams,
               )
             : undefined,
         });
@@ -590,6 +609,8 @@ const slice = createSlice({
               migrateChartConfig(newChartDto?.config),
             ),
             filterSearchParams,
+            false,
+            jumpFilterParams,
           ),
         };
       }

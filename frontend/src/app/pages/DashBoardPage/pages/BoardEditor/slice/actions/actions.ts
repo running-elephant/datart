@@ -54,6 +54,7 @@ import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
+import { ChartMouseEventParams } from '../../../../../../types/Chart';
 import { ORIGINAL_TYPE_MAP } from '../../../../constants';
 import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
 import { EventLayerNode } from '../../components/LayerPanel/LayerTreeItem';
@@ -560,21 +561,34 @@ export const selectedItemChange = (
   params,
   wid,
 ) => {
-  const {
-    dataIndex,
-    componentIndex,
-  }: { dataIndex: number; componentIndex: number } = params;
+  const { dataIndex, componentIndex, data }: ChartMouseEventParams = params;
+  if (!data?.rowData) return;
   const option = {
     wid,
     data: {
       index: componentIndex + ',' + dataIndex,
-      data: params.data,
+      data,
     },
   };
   if (type === 'edit') {
     dispatch(editWidgetSelectedItemsActions.normalSelectInEditor(option));
   } else {
     dispatch(boardActions.normalSelect(option));
+  }
+};
+
+export const changeSelectedItems = (
+  dispatch,
+  type: VizRenderMode,
+  data,
+  wid,
+) => {
+  if (type === 'edit') {
+    dispatch(
+      editWidgetSelectedItemsActions.changeSelectedItemsInEditor({ wid, data }),
+    );
+  } else {
+    dispatch(boardActions.changeSelectedItems({ wid, data }));
   }
 };
 

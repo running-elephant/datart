@@ -26,6 +26,7 @@ import { mainActions } from 'app/pages/MainPage/slice';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { getLoggedInUserPermissions } from 'app/pages/MainPage/slice/thunks';
 import { StoryBoard } from 'app/pages/StoryBoardPage/slice/types';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { convertToChartDto } from 'app/utils/ChartDtoHelper';
@@ -239,18 +240,47 @@ export const removeTab = createAsyncThunk<
   return null;
 });
 
+export const closeAllTabs = createAsyncThunk<
+  null,
+  { resolve: (selectedTab: string) => void },
+  { state: RootState }
+>('viz/closeAllTabs', async ({ resolve }, { getState, dispatch }) => {
+  dispatch(vizActions.closeAllTabs());
+  resolve('');
+  return null;
+});
+
+export const closeOtherTabs = createAsyncThunk<
+  null,
+  { id: string; resolve: (selectedTab: string) => void },
+  { state: RootState }
+>('viz/closeOtherTabs', async ({ id, resolve }, { getState, dispatch }) => {
+  dispatch(vizActions.closeOtherTabs(id));
+  const selectedTab = selectSelectedTab(getState());
+  resolve(selectedTab ? selectedTab.id : '');
+  return null;
+});
+
 export const initChartPreviewData = createAsyncThunk<
   { backendChartId: string },
   {
     backendChartId: string;
     orgId: string;
     filterSearchParams?: FilterSearchParams;
+    jumpFilterParams?: ChartDataRequestFilter[];
   }
 >(
   'viz/initChartPreviewData',
-  async ({ backendChartId, filterSearchParams }, thunkAPI) => {
+  async (
+    { backendChartId, filterSearchParams, jumpFilterParams },
+    thunkAPI,
+  ) => {
     await thunkAPI.dispatch(
-      fetchVizChartAction({ backendChartId, filterSearchParams }),
+      fetchVizChartAction({
+        backendChartId,
+        filterSearchParams,
+        jumpFilterParams,
+      }),
     );
     if (backendChartId) {
       await thunkAPI.dispatch(
@@ -265,7 +295,11 @@ export const initChartPreviewData = createAsyncThunk<
 
 export const fetchVizChartAction = createAsyncThunk(
   'viz/fetchVizChartAction',
-  async (arg: { backendChartId; filterSearchParams?: FilterSearchParams }) => {
+  async (arg: {
+    backendChartId;
+    filterSearchParams?: FilterSearchParams;
+    jumpFilterParams?: ChartDataRequestFilter[];
+  }) => {
     const response = await request2<
       Omit<ChartDTO, 'config'> & { config: string }
     >({
@@ -275,6 +309,7 @@ export const fetchVizChartAction = createAsyncThunk(
     return {
       data: convertToChartDto(response?.data),
       filterSearchParams: arg.filterSearchParams,
+      jumpFilterParams: arg.jumpFilterParams,
     };
   },
 );

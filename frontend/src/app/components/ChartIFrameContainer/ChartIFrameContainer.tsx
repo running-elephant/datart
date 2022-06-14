@@ -29,6 +29,7 @@ import { FC, memo } from 'react';
 import { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
 import ChartIFrameLifecycleAdapter from './ChartIFrameLifecycleAdapter';
+
 const ChartIFrameContainer: FC<{
   dataset: any;
   chart: IChart;

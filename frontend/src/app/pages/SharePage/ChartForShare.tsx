@@ -23,7 +23,7 @@ import { ChartDataViewFieldCategory } from 'app/constants';
 import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import ChartManager from 'app/models/ChartManager';
-import { IChart } from 'app/types/Chart';
+import { ChartMouseEventParams, IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
   getRuntimeComputedFields,
@@ -58,7 +58,7 @@ const ChartForShare: FC<{
   chartPreview?: ChartPreview;
   filterSearchParams?: FilterSearchParams;
   availableSourceFunctions?: string[];
-}> = memo(({ chartPreview, availableSourceFunctions }) => {
+}> = memo(({ chartPreview, filterSearchParams, availableSourceFunctions }) => {
   const dispatch = useDispatch();
   const drillOptionRef = useRef<IChartDrillOption>();
   const [chart] = useState<IChart | undefined>(() => {
@@ -115,7 +115,12 @@ const ChartForShare: FC<{
       chartPreview?.chartConfig?.datas,
       drillOptionRef?.current,
     );
-    dispatch(fetchShareDataSetByPreviewChartAction({ preview: chartPreview }));
+    dispatch(
+      fetchShareDataSetByPreviewChartAction({
+        preview: chartPreview,
+        filterSearchParams,
+      }),
+    );
     registerChartEvents(chart);
   });
 
@@ -135,8 +140,8 @@ const ChartForShare: FC<{
             return;
           }
           if (
-            param.componentType === 'table' &&
-            param.seriesType === 'paging-sort-filter'
+            param.chartType === 'table' &&
+            param.interactionType === 'paging-sort-filter'
           ) {
             dispatch(
               fetchShareDataSetByPreviewChartAction({
@@ -149,27 +154,39 @@ const ChartForShare: FC<{
                 pageInfo: {
                   pageNo: param?.value?.pageNo,
                 },
+                filterSearchParams,
               }),
             );
-            return;
-          }
-          if (param.seriesName === 'drillOptionChange') {
-            handleDrillOptionChange?.(param.value);
             return;
           }
 
-          if (!drillOptionRef.current?.isSelectedDrill && chart.selectable) {
-            const {
-              dataIndex,
-              componentIndex,
-            }: { dataIndex: number; componentIndex: number } = param;
-            dispatch(
-              shareActions.normalSelect({
-                index: componentIndex + ',' + dataIndex,
-                data: param.data,
-              }),
-            );
+          // NOTE 透视表树形结构展开下钻特殊处理方法
+          if (
+            param.chartType === 'pivotSheet' &&
+            param.interactionType === 'drilled'
+          ) {
+            handleDrillOptionChange?.(param.drillOption);
             return;
+          }
+
+          // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法 其他图标取消选中时调取
+          if (param.interactionType === 'selected') {
+            dispatch(shareActions.changeSelectedItems(param.selectedItems));
+          }
+          if (param.interactionType === 'unselect') {
+            dispatch(shareActions.changeSelectedItems([]));
+          }
+          if (chart.selectable) {
+            const { dataIndex, componentIndex, data }: ChartMouseEventParams =
+              param;
+            if (data?.rowData) {
+              dispatch(
+                shareActions.normalSelect({
+                  index: componentIndex + ',' + dataIndex,
+                  data,
+                }),
+              );
+            }
           }
         },
       },

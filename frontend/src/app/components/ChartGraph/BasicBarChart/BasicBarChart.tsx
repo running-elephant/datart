@@ -59,6 +59,7 @@ class BasicBarChart extends Chart {
   config = Config;
   chart: any = null;
   selectable = true;
+  selectedItems = [];
 
   protected isHorizonDisplay = false;
   protected isStackMode = false;
@@ -92,6 +93,7 @@ class BasicBarChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
+    this.chart.getZr().on('click', this.clearAllSelectedItems.bind(this));
     this.mouseEvents?.forEach(event => {
       this.chart.on(event.name, event.callback);
     });
@@ -106,6 +108,7 @@ class BasicBarChart extends Chart {
       this.chart?.clear();
       return;
     }
+    this.selectedItems = options.selectedItems;
     const newOptions = this.getOptions(
       options.dataset,
       options.config,
@@ -116,6 +119,7 @@ class BasicBarChart extends Chart {
   }
 
   onUnMount(): void {
+    this.chart.getZr().off('click', this.clearAllSelectedItems.bind(this));
     this.chart?.dispose();
   }
 
@@ -123,6 +127,16 @@ class BasicBarChart extends Chart {
     this.chart?.resize({ width: context?.width, height: context?.height });
     hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
       this.onUpdated(opt, context);
+  }
+
+  clearAllSelectedItems(e: Event) {
+    if (!e.target && this.selectedItems.length) {
+      this.mouseEvents
+        ?.find(v => v.name === 'click')
+        ?.callback({
+          interactionType: 'unselect',
+        });
+    }
   }
 
   getOptions(

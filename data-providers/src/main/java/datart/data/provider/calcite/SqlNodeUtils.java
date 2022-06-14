@@ -28,22 +28,23 @@ import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.util.DateString;
 import org.apache.calcite.util.TimestampString;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class SqlNodeUtils {
 
-    public static final String REG_SQL_SINGLE_LINE_COMMENT = "-{2,}.*([\r\n])";
-
-    public static final String REG_SQL_MULTI_LINE_COMMENT = "/\\*+[\\s\\S]*\\*+/";
+    public static final String REG_WITH_SQL_FRAGMENT = "((?i)WITH[\\s\\S]+(?i)AS?\\s*\\([\\s\\S]+\\))\\s*(?i)SELECT";
 
     public static SqlBasicCall createSqlBasicCall(SqlOperator sqlOperator, List<SqlNode> sqlNodes) {
+        if (sqlNodes == null) {
+            return null;
+        }
         return new SqlBasicCall(sqlOperator, sqlNodes.toArray(new SqlNode[0]), SqlParserPos.ZERO);
     }
 
@@ -56,12 +57,17 @@ public class SqlNodeUtils {
                 functionQualifier);
     }
 
-    public static SqlIdentifier createSqlIdentifier(String name, String... names) {
-        ArrayList<String> nms = new ArrayList<>();
-        if (names != null) {
-            nms.addAll(Arrays.asList(names));
+    public static SqlIdentifier createSqlIdentifier(String... names) {
+        return new SqlIdentifier(Arrays.asList(names), SqlParserPos.ZERO);
+    }
+
+    public static SqlIdentifier createSqlIdentifier(String name, boolean addNamePrefix, String namePrefix) {
+        List<String> nms;
+        if (addNamePrefix) {
+            nms = Arrays.asList(name, namePrefix);
+        } else {
+            nms = Collections.singletonList(name);
         }
-        nms.add(name);
         return new SqlIdentifier(nms, SqlParserPos.ZERO);
     }
 
@@ -109,7 +115,7 @@ public class SqlNodeUtils {
         return null;
     }
 
-    public static SqlNode createSqlNode(SingleTypedValue value, String... names) {
+    public static SqlNode createSqlNode(SingleTypedValue value) {
         switch (value.getValueType()) {
             case STRING:
                 return new SqlSimpleStringLiteral(value.getValue().toString());
@@ -122,15 +128,11 @@ public class SqlNodeUtils {
             case FRAGMENT:
                 return new SqlFragment(value.getValue().toString());
             case IDENTIFIER:
-                return createSqlIdentifier(value.getValue().toString(), names);
+                return createSqlIdentifier((String[]) value.getValue());
             default:
                 Exceptions.msg("message.provider.sql.variable", value.getValueType().name());
         }
         return null;
-    }
-
-    public static SqlNode createSqlNode(SingleTypedValue value) {
-        return createSqlNode(value, null);
     }
 
     private static SqlNode createDateSqlNode(String value, String format) {
@@ -159,12 +161,24 @@ public class SqlNodeUtils {
                         .withIndentation(0)).getSql();
     }
 
-    public static String cleanupSql(String sql) {
-        sql = sql.replaceAll(REG_SQL_SINGLE_LINE_COMMENT, " ");
-        sql = sql.replaceAll(REG_SQL_MULTI_LINE_COMMENT, " ");
-        sql = sql.replace(CharUtils.CR, CharUtils.toChar(" "));
-        sql = sql.replace(CharUtils.LF, CharUtils.toChar(" "));
-        return sql.trim();
+    public static String rebuildSqlWithFragment(String sql) {
+        if (!sql.toLowerCase().startsWith("with")) {
+            Matcher matcher = Pattern.compile(REG_WITH_SQL_FRAGMENT).matcher(sql);
+            if (matcher.find()) {
+                String withFragment = matcher.group();
+                if (!StringUtils.isEmpty(withFragment)) {
+                    if (withFragment.length() > 6) {
+                        int lastSelectIndex = withFragment.length() - 6;
+                        sql = sql.replace(withFragment, withFragment.substring(lastSelectIndex));
+                        withFragment = withFragment.substring(0, lastSelectIndex);
+                    }
+                    String space = " ";
+                    sql = withFragment + space + sql;
+                    sql = sql.replaceAll(space + "{2,}", space);
+                }
+            }
+        }
+        return sql;
     }
 
 }

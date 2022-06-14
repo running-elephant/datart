@@ -17,11 +17,19 @@
  */
 
 import { message, Spin } from 'antd';
+import useModal from 'antd/lib/modal/useModal';
 import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
-import { InteractionAction } from 'app/components/FormGenerator/constants';
-import { DrillThroughSetting } from 'app/components/FormGenerator/Customize/Interaction/types';
+import {
+  InteractionAction,
+  InteractionCategory,
+  InteractionMouseEvent,
+} from 'app/components/FormGenerator/constants';
+import {
+  DrillThroughSetting,
+  ViewDetailSetting,
+} from 'app/components/FormGenerator/Customize/Interaction/types';
 import { VizHeader } from 'app/components/VizHeader';
 import { ChartDataViewFieldCategory } from 'app/constants';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
@@ -33,22 +41,33 @@ import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
 import { selectAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { fetchAvailableSourceFunctionsForChart } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useMainSlice } from 'app/pages/MainPage/slice';
-import { IChart } from 'app/types/Chart';
+import { ChartMouseEventParams, IChart } from 'app/types/Chart';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
   getStyles,
+  getValue,
 } from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
-import { getChartDrillOption } from 'app/utils/internalChartHelper';
+import {
+  buildClickEventBaseFilters,
+  getChartDrillOption,
+  getJumpFiltersByInteractionRule,
+  getJumpOperationFiltersByInteractionRule,
+} from 'app/utils/internalChartHelper';
 import { KEYBOARD_EVENT_NAME } from 'globalConstants';
+import qs from 'qs';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
+import { isEmpty } from 'utils/object';
+import useDisplayViewDetail from '../hooks/useDisplayViewDetail';
 import useDrillThrough from '../hooks/useDrillThrough';
+import useQSLibUrlHelper from '../hooks/useQSLibUrlHelper';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import { useVizSlice } from '../slice';
 import {
@@ -113,13 +132,27 @@ const ChartPreviewBoard: FC<{
     const [chartPreview, setChartPreview] = useState<ChartPreview>();
     const [chart, setChart] = useState<IChart>();
     const [loadingStatus, setLoadingStatus] = useState<boolean>(false);
+    const [chartContextMenuEvent, setChartContextMenuEvent] = useState<{
+      data?: any;
+    }>();
     const drillOptionRef = useRef<IChartDrillOption>();
     const t = useI18NPrefix('viz.main');
     const tg = useI18NPrefix('global');
     const saveAsViz = useSaveAsViz();
     const history = useHistory();
     const vizs = useSelector(selectVizs);
-    const [openNewTab, openBrowserTab] = useDrillThrough();
+    const [
+      openNewTab,
+      openBrowserTab,
+      getDialogContent,
+      redirectByUrl,
+      openNewByUrl,
+      getDialogContentByUrl,
+    ] = useDrillThrough();
+    const [openViewDetailPanel, viewDetailPanelContextHolder] =
+      useDisplayViewDetail();
+    const { parse } = useQSLibUrlHelper();
+    const [modal, jumpDialogContextHolder] = useModal();
 
     const chartIframeKeyboardListener = useCallback(
       (e: KeyboardEvent) => {
@@ -143,6 +176,8 @@ const ChartPreviewBoard: FC<{
     );
 
     useEffect(() => {
+      const jumpFilterParams: ChartDataRequestFilter[] =
+        parse(filterSearchUrl)?.filters || [];
       const filterSearchParams = filterSearchUrl
         ? urlSearchTransfer.toParams(filterSearchUrl)
         : undefined;
@@ -151,9 +186,10 @@ const ChartPreviewBoard: FC<{
           backendChartId,
           orgId,
           filterSearchParams,
+          jumpFilterParams,
         }),
       );
-    }, [dispatch, orgId, backendChartId, filterSearchUrl]);
+    }, [dispatch, orgId, backendChartId, filterSearchUrl, parse]);
 
     useEffect(() => {
       const sourceId = chartPreview?.backendChart?.view.sourceId;
@@ -210,27 +246,208 @@ const ChartPreviewBoard: FC<{
       [backendChartId, chartPreview, dispatch],
     );
 
-    const handleDrillThroughEvent = useCallback(() => {
-      const setting = getStyles(
+    const enableRightClickDrillThrough = () => {
+      const enableDrillThrough = getValue(
+        chartPreview?.chartConfig?.interactions || [],
+        ['drillThrough'],
+      );
+      const drillThroughSetting = getStyles(
         chartPreview?.chartConfig?.interactions || [],
         ['drillThrough'],
         ['setting'],
       )?.[0] as DrillThroughSetting;
-      if (setting?.event === 'left') {
-        const rule = setting?.rules?.[0];
-        if (rule?.action === InteractionAction.Redirect) {
-          openNewTab(orgId, rule?.jumpToChart?.relId);
+      const hasRightClickEvent = drillThroughSetting?.rules?.some(
+        r => r.event === InteractionMouseEvent.Right,
+      );
+      return enableDrillThrough && hasRightClickEvent;
+    };
+
+    const enableRightClickViewData = () => {
+      const enableViewDetail = getValue(
+        chartPreview?.chartConfig?.interactions || [],
+        ['viewDetail'],
+      );
+      const viewDetailSetting = getStyles(
+        chartPreview?.chartConfig?.interactions || [],
+        ['viewDetail'],
+        ['setting'],
+      )?.[0] as ViewDetailSetting;
+      return (
+        enableViewDetail &&
+        viewDetailSetting?.event === InteractionMouseEvent.Right
+      );
+    };
+
+    const handleDrillThroughEvent = useCallback(
+      (param, targetEvent, ruleId?: string) => {
+        const enableDrillThrough = getValue(
+          chartPreview?.chartConfig?.interactions || [],
+          ['drillThrough'],
+        );
+        const drillThroughSetting = getStyles(
+          chartPreview?.chartConfig?.interactions || [],
+          ['drillThrough'],
+          ['setting'],
+        )?.[0] as DrillThroughSetting;
+
+        if (enableDrillThrough) {
+          let nonAggChartFilters = new ChartDataRequestBuilder(
+            {
+              id: chartPreview?.backendChart?.view?.id || '',
+              config: chartPreview?.backendChart?.view.config || {},
+              computedFields:
+                chartPreview?.backendChart?.config.computedFields || [],
+            },
+            chartPreview?.chartConfig?.datas,
+            chartPreview?.chartConfig?.settings,
+            {},
+            false,
+            chartPreview?.backendChart?.config?.aggregation,
+          )
+            .addDrillOption(drillOptionRef?.current)
+            .build()
+            ?.filters?.filter(f => !Boolean(f.aggOperator));
+
+          (drillThroughSetting?.rules || [])
+            .filter(rule => rule.event === targetEvent)
+            .filter(rule => isEmpty(ruleId) || rule.id === ruleId)
+            .forEach(rule => {
+              const clickFilters = buildClickEventBaseFilters(
+                param?.data?.rowData,
+                rule,
+                drillOptionRef?.current,
+                chartPreview?.chartConfig?.datas,
+              );
+
+              const relId = rule?.[rule.category!]?.relId;
+              if (rule.category === InteractionCategory.JumpToChart) {
+                const urlFilters = getJumpOperationFiltersByInteractionRule(
+                  clickFilters,
+                  nonAggChartFilters,
+                  rule,
+                );
+                const urlFiltersStr: string = qs.stringify({
+                  filters: urlFilters || [],
+                });
+                if (rule?.action === InteractionAction.Redirect) {
+                  openNewTab(orgId, relId, urlFiltersStr);
+                }
+                if (rule?.action === InteractionAction.Window) {
+                  openBrowserTab(orgId, relId, urlFiltersStr);
+                }
+                if (rule?.action === InteractionAction.Dialog) {
+                  const modalContent = getDialogContent(
+                    orgId,
+                    relId,
+                    urlFiltersStr,
+                  );
+                  modal.info(modalContent as any);
+                }
+              } else if (
+                rule.category === InteractionCategory.JumpToDashboard
+              ) {
+                const urlFilters = getJumpFiltersByInteractionRule(
+                  clickFilters,
+                  nonAggChartFilters,
+                  rule,
+                );
+                Object.assign(urlFilters, { isMatchByName: true });
+                const urlFiltersStr: string =
+                  urlSearchTransfer.toUrlString(urlFilters);
+                if (rule?.action === InteractionAction.Redirect) {
+                  openNewTab(orgId, relId, urlFiltersStr);
+                }
+                if (rule?.action === InteractionAction.Window) {
+                  openBrowserTab(orgId, relId, urlFiltersStr);
+                }
+                if (rule?.action === InteractionAction.Dialog) {
+                  const modalContent = getDialogContent(
+                    orgId,
+                    relId,
+                    urlFiltersStr,
+                  );
+                  modal.info(modalContent as any);
+                }
+              } else if (rule.category === InteractionCategory.JumpToUrl) {
+                const urlFilters = getJumpFiltersByInteractionRule(
+                  clickFilters,
+                  nonAggChartFilters,
+                  rule,
+                );
+                Object.assign(urlFilters, { isMatchByName: true });
+                const urlFiltersStr: string =
+                  urlSearchTransfer.toUrlString(urlFilters);
+                const url = rule?.[rule.category!]?.url;
+                if (rule?.action === InteractionAction.Redirect) {
+                  redirectByUrl(url, urlFiltersStr);
+                }
+                if (rule?.action === InteractionAction.Window) {
+                  openNewByUrl(url, urlFiltersStr);
+                }
+                if (rule?.action === InteractionAction.Dialog) {
+                  const modalContent = getDialogContentByUrl(
+                    url,
+                    urlFiltersStr,
+                  );
+                  modal.info(modalContent as any);
+                }
+              }
+            });
         }
-        if (rule?.action === InteractionAction.Window) {
-          openBrowserTab(orgId, rule?.jumpToChart?.relId);
+      },
+      [
+        chartPreview?.chartConfig?.interactions,
+        chartPreview?.chartConfig?.datas,
+        chartPreview?.chartConfig?.settings,
+        chartPreview?.backendChart?.view?.id,
+        chartPreview?.backendChart?.view.config,
+        chartPreview?.backendChart?.config.computedFields,
+        chartPreview?.backendChart?.config?.aggregation,
+        openNewTab,
+        orgId,
+        openBrowserTab,
+        getDialogContent,
+        modal,
+        redirectByUrl,
+        openNewByUrl,
+        getDialogContentByUrl,
+      ],
+    );
+
+    const handleViewDataEvent = useCallback(
+      (param, targetEvent) => {
+        const enableViewDetail = getValue(
+          chartPreview?.chartConfig?.interactions || [],
+          ['viewDetail'],
+        );
+        const viewDetailSetting = getStyles(
+          chartPreview?.chartConfig?.interactions || [],
+          ['viewDetail'],
+          ['setting'],
+        )?.[0] as ViewDetailSetting;
+
+        if (enableViewDetail && viewDetailSetting?.event === targetEvent) {
+          const clickFilters = buildClickEventBaseFilters(
+            param?.data?.rowData,
+            undefined,
+            drillOptionRef?.current,
+            chartPreview?.chartConfig?.datas,
+          );
+          (openViewDetailPanel as any)({
+            currentDataView: chartPreview?.backendChart?.view,
+            chartConfig: chartPreview?.chartConfig,
+            drillOption: drillOptionRef?.current,
+            viewDetailSetting: viewDetailSetting,
+            clickFilters: clickFilters,
+          });
         }
-      }
-    }, [
-      chartPreview?.chartConfig?.interactions,
-      openBrowserTab,
-      openNewTab,
-      orgId,
-    ]);
+      },
+      [
+        chartPreview?.chartConfig,
+        chartPreview?.backendChart?.view,
+        openViewDetailPanel,
+      ],
+    );
 
     const registerChartEvents = useCallback(
       (chart, backendChartId) => {
@@ -238,7 +455,8 @@ const ChartPreviewBoard: FC<{
           {
             name: 'click',
             callback: param => {
-              handleDrillThroughEvent();
+              handleDrillThroughEvent(param, InteractionMouseEvent.Left);
+              handleViewDataEvent(param, InteractionMouseEvent.Left);
               if (
                 drillOptionRef.current?.isSelectedDrill &&
                 !drillOptionRef.current.isBottomLevel
@@ -250,8 +468,8 @@ const ChartPreviewBoard: FC<{
                 return;
               }
               if (
-                param.componentType === 'table' &&
-                param.seriesType === 'paging-sort-filter'
+                param.chartType === 'table' &&
+                param.interactionType === 'paging-sort-filter'
               ) {
                 dispatch(
                   fetchDataSetByPreviewChartAction({
@@ -268,34 +486,69 @@ const ChartPreviewBoard: FC<{
                 );
                 return;
               }
-              if (param.seriesName === 'drillOptionChange') {
-                handleDrillOptionChange?.(param.value);
+
+              // NOTE 透视表树形结构展开下钻特殊处理方法
+              if (
+                param.chartType === 'pivotSheet' &&
+                param.interactionType === 'drilled'
+              ) {
+                handleDrillOptionChange?.(param.drillOption);
                 return;
               }
-              if (
-                !drillOptionRef.current?.isSelectedDrill &&
-                chart.selectable
-              ) {
+
+              // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法 其他图标取消选中时调取
+              if (param.interactionType === 'selected') {
+                dispatch(
+                  vizAction.changeSelectedItems({
+                    backendChartId,
+                    data: param.selectedItems,
+                  }),
+                );
+              }
+              if (param.interactionType === 'unselect') {
+                dispatch(
+                  vizAction.changeSelectedItems({
+                    backendChartId,
+                    data: [],
+                  }),
+                );
+              }
+
+              if (chart.selectable) {
                 const {
                   dataIndex,
                   componentIndex,
-                }: { dataIndex: number; componentIndex: number } = param;
-                dispatch(
-                  vizAction.normalSelect({
-                    backendChartId,
-                    data: {
-                      index: componentIndex + ',' + dataIndex,
-                      data: param.data,
-                    },
-                  }),
-                );
-                return;
+                  data,
+                }: ChartMouseEventParams = param;
+                if (data?.rowData) {
+                  dispatch(
+                    vizAction.normalSelect({
+                      backendChartId,
+                      data: {
+                        index: componentIndex + ',' + dataIndex,
+                        data,
+                      },
+                    }),
+                  );
+                }
               }
+            },
+          },
+          {
+            name: 'contextmenu',
+            callback: param => {
+              setChartContextMenuEvent(param);
             },
           },
         ]);
       },
-      [dispatch, handleDrillOptionChange, handleDrillThroughEvent, vizAction],
+      [
+        dispatch,
+        handleDrillOptionChange,
+        handleDrillThroughEvent,
+        handleViewDataEvent,
+        vizAction,
+      ],
     );
 
     useEffect(() => {
@@ -530,6 +783,21 @@ const ChartPreviewBoard: FC<{
               onDrillOptionChange: handleDrillOptionChange,
               availableSourceFunctions,
               onDateLevelChange: handleDateLevelChange,
+              onDrillThroughChange: enableRightClickDrillThrough()
+                ? ruleId =>
+                    handleDrillThroughEvent(
+                      chartContextMenuEvent,
+                      InteractionMouseEvent.Right,
+                      ruleId,
+                    )
+                : undefined,
+              onViewDataChange: enableRightClickViewData()
+                ? () =>
+                    handleViewDataEvent(
+                      chartContextMenuEvent,
+                      InteractionMouseEvent.Right,
+                    )
+                : undefined,
             }}
           >
             <div>
@@ -564,6 +832,8 @@ const ChartPreviewBoard: FC<{
             <StyledChartDrillPathsContainer />
           </ChartDrillContext.Provider>
         </PreviewBlock>
+        {viewDetailPanelContextHolder}
+        {jumpDialogContextHolder}
       </StyledChartPreviewBoard>
     );
   },

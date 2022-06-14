@@ -92,7 +92,10 @@ export const fetchBoardDetail = createAsyncThunk<
     handleServerBoardAction({
       data,
       renderMode: 'read',
-      filterSearchMap: { params: params?.filterSearchParams },
+      filterSearchMap: {
+        params: params?.filterSearchParams,
+        isMatchByName: !!params?.filterSearchParams?.isMatchByName?.[0],
+      },
     }),
   );
 

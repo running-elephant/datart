@@ -18,8 +18,6 @@
 
 package datart.data.provider.jdbc;
 
-import com.google.common.collect.Iterables;
-import datart.core.base.consts.ValueType;
 import datart.core.base.exception.Exceptions;
 import datart.core.base.exception.SqlParseError;
 import datart.core.common.MessageResolver;
@@ -27,14 +25,10 @@ import datart.core.common.RequestContext;
 import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.QueryScript;
 import datart.core.data.provider.ScriptVariable;
-import datart.data.provider.base.DataProviderException;
-import datart.data.provider.calcite.SqlBuilder;
-import datart.data.provider.calcite.SqlNodeUtils;
-import datart.data.provider.calcite.SqlParserUtils;
-import datart.data.provider.calcite.SqlValidateUtils;
-import datart.data.provider.freemarker.FreemarkerContext;
+import datart.data.provider.calcite.*;
 import datart.data.provider.script.ReplacementPair;
 import datart.data.provider.script.ScriptRender;
+import datart.data.provider.script.SqlStringUtils;
 import datart.data.provider.script.VariablePlaceholder;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -59,8 +53,6 @@ public class SqlScriptRender extends ScriptRender {
     public static final String TRUE_CONDITION = "1=1";
 
     public static final String FALSE_CONDITION = "1=0";
-
-    public static final char SQL_SEP = ';';
 
     private final SqlDialect sqlDialect;
 
@@ -88,53 +80,39 @@ public class SqlScriptRender extends ScriptRender {
 
     public String render(boolean withExecuteParam, boolean withPage, boolean onlySelectStatement) throws SqlParseException {
 
-        String script;
-
-        //用freemarker处理脚本中的条件表达式
-        Map<String, ?> dataMap = queryScript.getVariables()
-                .stream()
-                .collect(Collectors.toMap(ScriptVariable::getName,
-                        variable -> {
-                            if (CollectionUtils.isEmpty(variable.getValues())) {
-                                return "";
-                            } else if (variable.getValues().size() == 1) {
-                                return variable.getValues().iterator().next();
-                            } else return variable.getValues();
-                        }));
-        script = FreemarkerContext.process(queryScript.getScript(), dataMap);
-
-        script = replaceFragmentVariables(script);
-
-        final String selectSql0 = parseSelectSql(script);
-
-        if (StringUtils.isEmpty(selectSql0)) {
-            Exceptions.tr(DataProviderException.class, "message.no.valid.sql");
-        }
-
-        String selectSql = SqlNodeUtils.cleanupSql(selectSql0);
-
+        SqlNode selectSqlNode = getScriptProcessor().process(queryScript);
+        String selectSql;
         // build with execute params
         if (withExecuteParam) {
             selectSql = SqlBuilder.builder()
                     .withExecuteParam(executeParam)
                     .withDialect(sqlDialect)
-                    .withBaseSql(selectSql)
+                    .withFrom(selectSqlNode)
                     .withPage(withPage)
                     .withQuoteIdentifiers(quoteIdentifiers)
                     .build();
+        } else {
+            selectSql = SqlNodeUtils.toSql(selectSqlNode, sqlDialect, quoteIdentifiers);
         }
-
-        selectSql = SqlNodeUtils.cleanupSql(selectSql);
-
-        selectSql = replaceFragmentVariables(selectSql);
+        selectSql = SqlStringUtils.replaceFragmentVariables(selectSql, queryScript.getVariables());
 
         selectSql = replaceVariables(selectSql);
-
-        selectSql = onlySelectStatement ? selectSql : script.replace(selectSql0, selectSql);
 
         RequestContext.setSql(selectSql);
 
         return selectSql;
+    }
+
+    public QueryScriptProcessor getScriptProcessor() {
+        switch (queryScript.getScriptType()) {
+            case SQL:
+                return new SqlQueryScriptProcessor(enableSpecialSQL, sqlDialect);
+            case STRUCT:
+                return new StructScriptProcessor();
+            default:
+                Exceptions.msg("Unsupported script type " + queryScript.getScriptType());
+                return null;
+        }
     }
 
 
@@ -177,56 +155,6 @@ public class SqlScriptRender extends ScriptRender {
         }
 
         return selectSql;
-    }
-
-
-    private String parseSelectSql(String script) {
-        String selectSql = null;
-        List<String> sqls = SqlSplitter.splitEscaped(script, SQL_SEP);
-        for (String sql : sqls) {
-            SqlNode sqlNode;
-            try {
-                sqlNode = parseSql(sql);
-            } catch (Exception e) {
-                if (SqlValidateUtils.validateQuery(sql, enableSpecialSQL)) {
-                    if (selectSql != null) {
-                        Exceptions.tr(DataProviderException.class, "message.provider.sql.multi.query");
-                    }
-                    selectSql = sql;
-                }
-                continue;
-            }
-            if (SqlValidateUtils.validateQuery(sqlNode, enableSpecialSQL)) {
-                if (selectSql != null) {
-                    Exceptions.tr(DataProviderException.class, "message.provider.sql.multi.query");
-                }
-                selectSql = sql;
-            }
-        }
-
-        if (selectSql == null) {
-            selectSql = sqls.get(sqls.size() - 1);
-        }
-
-        return selectSql;
-    }
-
-    private String replaceFragmentVariables(String sql) {
-        // 替换脚本中的表达式类型变量
-        for (ScriptVariable variable : queryScript.getVariables()) {
-            if (ValueType.FRAGMENT.equals(variable.getValueType())) {
-                int size = Iterables.size(variable.getValues());
-                if (size != 1) {
-                    Exceptions.tr(DataProviderException.class, "message.provider.variable.expression.size", size + ":" + variable.getValues());
-                }
-                sql = sql.replace(variable.getNameWithQuote(), Iterables.get(variable.getValues(), 0));
-            }
-        }
-        return sql;
-    }
-
-    private SqlNode parseSql(String sql) throws SqlParseException {
-        return SqlParserUtils.createParser(sql, sqlDialect).parseQuery();
     }
 
     private boolean containsVariable(String sql) {

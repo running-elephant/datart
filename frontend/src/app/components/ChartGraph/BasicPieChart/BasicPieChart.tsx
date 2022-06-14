@@ -51,6 +51,7 @@ class BasicPieChart extends Chart {
   config = Config;
   chart: any = null;
   selectable = true;
+  selectedItems = [];
 
   protected isCircle = false;
   protected isRose = false;
@@ -75,6 +76,7 @@ class BasicPieChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
+    this.chart.getZr().on('click', this.clearAllSelectedItems.bind(this));
     this.mouseEvents?.forEach(event => {
       this.chart.on(event.name, event.callback);
     });
@@ -88,6 +90,7 @@ class BasicPieChart extends Chart {
       this.chart?.clear();
       return;
     }
+    this.selectedItems = props.selectedItems;
     const newOptions = this.getOptions(
       props.dataset,
       props.config,
@@ -98,11 +101,22 @@ class BasicPieChart extends Chart {
   }
 
   onUnMount(): void {
+    this.chart.getZr().off('click', this.clearAllSelectedItems.bind(this));
     this.chart?.dispose();
   }
 
   onResize(opt: any, context): void {
     this.chart?.resize(context);
+  }
+
+  clearAllSelectedItems(e: Event) {
+    if (!e.target && this.selectedItems.length) {
+      this.mouseEvents
+        ?.find(v => v.name === 'click')
+        ?.callback({
+          interactionType: 'unselect',
+        });
+    }
   }
 
   private getOptions(

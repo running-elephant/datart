@@ -16,25 +16,74 @@
  * limitations under the License.
  */
 
-import { Button, Select, Space } from 'antd';
-import { FC, memo } from 'react';
-import { I18nTransator } from './types';
+import { Button, Dropdown, Select, Space } from 'antd';
+import ChartDataView from 'app/types/ChartDataView';
+import { FC, memo, useState } from 'react';
+import { InteractionFieldRelation } from '../../constants';
+import ControllerList from './ControllerList';
+import { I18nTranslator, JumpToDashboardRule, VizType } from './types';
 
-const JumpToDashboard: FC<{} & I18nTransator> = memo(
-  ({ translate: t = title => title }) => {
-    return (
-      <Space>
-        <Select
-          placeholder={t('drillThrough.rule.reference.title')}
-          // onChange={handleChange}
-        >
-          <Select.Option value="table-1">Table A</Select.Option>
-          <Select.Option value="table-2">Table B</Select.Option>
-        </Select>
+const JumpToDashboard: FC<
+  {
+    vizs?: VizType[];
+    dataview?: ChartDataView;
+    value?: JumpToDashboardRule;
+    onValueChange: (value) => void;
+  } & I18nTranslator
+> = memo(({ vizs, dataview, value, onValueChange, translate: t }) => {
+  const [relations, setRelations] = useState(
+    value?.[InteractionFieldRelation.Customize] || [],
+  );
+
+  const handleUpdateRelations = relations => {
+    const newRelations = [...relations];
+    setRelations(newRelations);
+    onValueChange({
+      ...value,
+      ...{ [InteractionFieldRelation.Customize]: newRelations },
+    });
+  };
+
+  return (
+    <Space>
+      <Select
+        value={value?.relId}
+        placeholder={t('drillThrough.rule.reference.title')}
+        onChange={relId => onValueChange({ ...value, ...{ relId } })}
+      >
+        {vizs
+          ?.filter(v => v.relType === 'DASHBOARD')
+          ?.map(c => {
+            return (
+              <Select.Option key={c.relId} value={c.relId}>
+                {c.name}
+              </Select.Option>
+            );
+          })}
+      </Select>
+      <Dropdown
+        destroyPopupOnHide
+        overlayStyle={{ margin: 4 }}
+        overlay={() => (
+          <ControllerList
+            translate={t}
+            targetRelId={value?.relId}
+            sourceFields={
+              dataview?.meta?.concat(dataview?.computedFields || []) || []
+            }
+            sourceVariables={dataview?.variables || []}
+            relations={relations}
+            onRelationChange={handleUpdateRelations}
+          />
+        )}
+        placement="bottomLeft"
+        trigger={['click']}
+        arrow
+      >
         <Button type="link">{t('drillThrough.rule.relation.setting')}</Button>
-      </Space>
-    );
-  },
-);
+      </Dropdown>
+    </Space>
+  );
+});
 
 export default JumpToDashboard;

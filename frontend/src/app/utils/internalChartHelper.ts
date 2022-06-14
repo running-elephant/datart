@@ -16,6 +16,13 @@
  * limitations under the License.
  */
 
+import { InteractionFieldRelation } from 'app/components/FormGenerator/constants';
+import {
+  CustomizeRelation,
+  InteractionRule,
+  JumpToChartRule,
+  JumpToUrlRule,
+} from 'app/components/FormGenerator/Customize/Interaction/types';
 import {
   AggregateFieldActionType,
   ChartDataSectionType,
@@ -33,8 +40,10 @@ import {
   ChartCommonConfig,
   ChartStyleConfigDTO,
 } from 'app/types/ChartConfigDTO';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import { FilterSqlOperator } from 'globalConstants';
 import {
   cond,
   curry,
@@ -47,6 +56,7 @@ import {
   isUndefined,
   pipe,
 } from 'utils/object';
+import { getDrillableRows } from './chartHelper';
 
 export const transferChartConfigs = (
   targetConfig?: ChartConfig,
@@ -56,6 +66,7 @@ export const transferChartConfigs = (
     transferChartDataConfig,
     transferChartStyleConfig,
     transferChartSettingConfig,
+    transferChartInteractionConfig,
   )(targetConfig, sourceConfig);
 };
 
@@ -69,6 +80,20 @@ const transferChartStyleConfig = (
   targetConfig.styles = mergeChartStyleConfigs(
     targetConfig?.styles,
     sourceConfig?.styles,
+  );
+  return targetConfig;
+};
+
+const transferChartInteractionConfig = (
+  targetConfig?: ChartConfig,
+  sourceConfig?: ChartConfig,
+): ChartConfig => {
+  if (!targetConfig) {
+    return sourceConfig!;
+  }
+  targetConfig.interactions = mergeChartStyleConfigs(
+    targetConfig?.interactions,
+    sourceConfig?.interactions,
   );
   return targetConfig;
 };
@@ -693,4 +718,119 @@ export const getChartDrillOption = (
     drillOption?.clearAll();
   }
   return drillOption;
+};
+
+export const buildClickEventBaseFilters = (
+  rawData?: Record<string, any>,
+  rule?: InteractionRule,
+  drillOption?: IChartDrillOption,
+  dataConfigs?: ChartDataConfig[],
+): ChartDataRequestFilter[] => {
+  const groupConfigs: ChartDataSectionField[] = getDrillableRows(
+    dataConfigs || [],
+    drillOption,
+  );
+  const colorConfigs = (dataConfigs || [])
+    .filter(c => c.type === ChartDataSectionType.Color)
+    .flatMap(config => config.rows || []);
+
+  return groupConfigs
+    .concat(colorConfigs)
+    .reduce<ChartDataRequestFilter[]>((acc, c) => {
+      const value = rawData?.[c.colName];
+      if (isEmpty(value) || isEmpty(c.colName)) {
+        return acc;
+      }
+      const filter = {
+        aggOperator: null,
+        sqlOperator: FilterSqlOperator.In,
+        column: c.colName,
+        values: [{ value, valueType: c.type }],
+      };
+      acc.push(filter);
+      return acc;
+    }, []);
+};
+
+export const getJumpFiltersByInteractionRule = (
+  clickEventFilters: ChartDataRequestFilter[] = [],
+  chartFilters: ChartDataRequestFilter[] = [],
+  rule?: InteractionRule,
+): Record<string, string | any> => {
+  return clickEventFilters
+    .concat(chartFilters)
+    .map(f => {
+      if (isEmpty(f)) {
+        return null;
+      }
+      const jumpRule = rule?.[rule.category!] as
+        | JumpToChartRule
+        | JumpToUrlRule;
+      if (isEmpty(jumpRule)) {
+        return null;
+      }
+      if (jumpRule?.['relation'] === InteractionFieldRelation.Auto) {
+        return f;
+      } else {
+        const customizeRelations: CustomizeRelation[] =
+          jumpRule?.[InteractionFieldRelation.Customize];
+        if (isEmptyArray(customizeRelations)) {
+          return null;
+        }
+        const targetRelation = customizeRelations?.find(
+          r => r.source === f?.column,
+        );
+        if (isEmpty(targetRelation)) {
+          return null;
+        }
+        return Object.assign({}, f, {
+          column: targetRelation?.target,
+        }) as ChartDataRequestFilter;
+      }
+    })
+    .filter(Boolean)
+    .reduce((acc, cur) => {
+      if (cur?.column) {
+        acc[cur.column!] = cur?.values?.map(v => v.value);
+      }
+      return acc;
+    }, {});
+};
+
+export const getJumpOperationFiltersByInteractionRule = (
+  clickEventFilters: ChartDataRequestFilter[] = [],
+  chartFilters: ChartDataRequestFilter[] = [],
+  rule?: InteractionRule,
+): ChartDataRequestFilter[] => {
+  return clickEventFilters
+    .concat(chartFilters)
+    .reduce<ChartDataRequestFilter[]>((acc, f) => {
+      if (isEmpty(f)) {
+        return acc;
+      }
+      const jumpRule = rule?.[rule.category!] as
+        | JumpToChartRule
+        | JumpToUrlRule;
+      if (isEmpty(jumpRule)) {
+        return acc;
+      }
+      if (jumpRule?.['relation'] === InteractionFieldRelation.Auto) {
+        return acc.concat(f);
+      } else {
+        const customizeRelations: CustomizeRelation[] =
+          jumpRule?.[InteractionFieldRelation.Customize];
+        if (isEmptyArray(customizeRelations)) {
+          return acc;
+        }
+        const targetRelation = customizeRelations?.find(
+          r => r.source === f?.column,
+        );
+        if (isEmpty(targetRelation)) {
+          return acc;
+        }
+        return acc.concat(
+          Object.assign({}, f, { column: targetRelation?.target }),
+        );
+      }
+    }, []);
 };

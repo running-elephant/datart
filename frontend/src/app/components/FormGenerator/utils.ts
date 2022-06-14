@@ -49,7 +49,8 @@ export function itemLayoutComparer<T>(
   if (
     prevProps.data !== nextProps.data ||
     prevProps.translate !== nextProps.translate ||
-    prevProps.dataConfigs !== nextProps.dataConfigs
+    prevProps.dataConfigs !== nextProps.dataConfigs ||
+    prevProps.context !== nextProps.context
   ) {
     return false;
   }

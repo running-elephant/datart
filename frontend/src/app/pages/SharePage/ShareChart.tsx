@@ -72,6 +72,7 @@ export function ShareChart() {
   const searchParams = useMemo(() => {
     return urlSearchTransfer.toParams(search);
   }, [search]);
+
   const loadVizData = () => {
     if (shareType === 'CODE') {
       const previousPassword = persistence.session.get(shareToken);
@@ -166,6 +167,7 @@ export function ShareChart() {
       {!Boolean(needVerify) && chartPreview && chartPreview?.backendChart && (
         <ChartForShare
           chartPreview={chartPreview}
+          filterSearchParams={searchParams}
           availableSourceFunctions={availableSourceFunctions}
         />
       )}
