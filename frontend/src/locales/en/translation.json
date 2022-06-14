@@ -1199,8 +1199,8 @@
         "requiredMessage": "Select a Layout Type"
       },
       "template": {
-        "label": "Layout",
-        "requiredMessage": "Select a Layout Type"
+        "label": "File",
+        "requiredMessage": "Select a Template file"
       },
       "parent": "Parent",
       "root": "Root",
