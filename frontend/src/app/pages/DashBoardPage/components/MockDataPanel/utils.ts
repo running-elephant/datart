@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CloneValueDeep } from 'utils/object';
 import { ORIGINAL_TYPE_MAP } from '../../constants';
 import {
   BoardState,
@@ -48,30 +47,39 @@ export const handleBoardTplData = (
   },
 ) => {
   const { board, widgetMap, dataChartMap } = boardTplData;
-  let newBoard = CloneValueDeep(board) as Partial<Dashboard>;
-  delete newBoard.queryVariables;
-  newBoard.config = JSON.stringify(newBoard.config) as any;
-  const widgets = Object.values(widgetMap).map(w => {
-    const newWidget = CloneValueDeep(w) as Partial<Widget>;
-    newWidget.viewIds = [];
+  const dashboard = {
+    ...board,
+    queryVariables: [],
+    config: JSON.stringify(board.config) as any,
+  } as Partial<Dashboard>;
 
-    if (newWidget.config?.type === 'chart') {
-      newWidget.config.originalType = ORIGINAL_TYPE_MAP.ownedChart;
-      const datachart = dataChartMap[newWidget.datachartId || ''];
+  const widgets = Object.values(widgetMap).map(w => {
+    const newWidgetConf = {
+      ...w.config,
+    };
+    if (newWidgetConf.type === 'chart') {
+      newWidgetConf.originalType = ORIGINAL_TYPE_MAP.ownedChart;
+      const datachart = dataChartMap[w.datachartId || ''];
 
       if (datachart) {
-        let newChart = CloneValueDeep(datachart) as Partial<DataChart>;
+        let newChart = { ...datachart };
         newChart.viewId = '';
         newChart.orgId = '';
-        newWidget.config.content.dataChart = newChart;
+        newWidgetConf.content = {
+          dataChart: newChart,
+        };
       }
     }
-    newWidget.datachartId = '';
-    newWidget.config = JSON.stringify(newWidget.config) as any;
+    const newWidget = {
+      ...w,
+      viewIds: [],
+      datachartId: '',
+      config: JSON.stringify(newWidgetConf) as any,
+    };
     return newWidget;
   });
   return {
-    dashboard: newBoard,
+    dashboard,
     widgets,
   };
 };
