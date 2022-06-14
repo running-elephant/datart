@@ -152,15 +152,13 @@ const VizOperationMenu: FC<{
               {t('share.downloadPicture')}
             </Popconfirm>
           </Menu.Item>,
-          <Menu.Item key={'exportTpl'} icon={<CloudDownloadOutlined />}>
+          <Menu.Item key="exportTpl" icon={<CloudDownloadOutlined />}>
             <Popconfirm
               placement="left"
               title={t('common.confirm')}
               okText={t('common.ok')}
               cancelText={t('common.cancel')}
-              onConfirm={() => {
-                openMockData?.();
-              }}
+              onConfirm={openMockData}
             >
               {t('share.exportTpl')}
             </Popconfirm>

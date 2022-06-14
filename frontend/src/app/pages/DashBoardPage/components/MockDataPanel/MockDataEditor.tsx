@@ -25,11 +25,11 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { FONT_SIZE_BASE } from 'styles/StyleConstants';
 import { selectThemeKey } from 'styles/theme/slice/selectors';
-export const MockDataEditor: FC<{ jsonVal: object; onDataChange: any }> = memo(
-  ({ jsonVal, onDataChange }) => {
+export const MockDataEditor: FC<{ originalData: object; onDataChange: any }> =
+  memo(({ originalData, onDataChange }) => {
     const theme = useSelector(selectThemeKey);
     //   const formatter = new JSONFormatter(jsonVal);
-    const editorValue = JSON.stringify(jsonVal, null, 4);
+    const editorValue = JSON.stringify(originalData, null, 4);
 
     const editorWillMount = useCallback(editor => {}, []);
 
@@ -79,8 +79,7 @@ export const MockDataEditor: FC<{ jsonVal: object; onDataChange: any }> = memo(
         />
       </StyledWrapper>
     );
-  },
-);
+  });
 const StyledWrapper = styled.div`
   flex: 1;
   height: 100%;

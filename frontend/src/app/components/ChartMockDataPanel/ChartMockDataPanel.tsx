@@ -49,7 +49,7 @@ export const ChartMockDataPanel: FC<MockDataPanelProps> = memo(
         <div className="content">
           <div>data :</div>
           <div className="empty-data" style={{ flex: 1 }}>
-            <MockDataEditor jsonVal={rows} onDataChange={onDataChange} />
+            <MockDataEditor originalData={rows} onDataChange={onDataChange} />
           </div>
 
           <div className="btn-box">

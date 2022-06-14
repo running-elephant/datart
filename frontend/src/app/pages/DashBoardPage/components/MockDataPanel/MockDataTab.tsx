@@ -34,7 +34,7 @@ export const MockDataTab: FC<{
   useEffect(() => {
     const dataList = Object.values(dataMap || {});
     if (dataList && dataList[0]) {
-      setWid(dataList?.[0]?.id);
+      setWid(dataList[0].id);
     }
   }, [dataMap]);
 
@@ -46,7 +46,7 @@ export const MockDataTab: FC<{
     if (widgetData) {
       // const dataVal =  JSON.stringify(widgetData.data);
       const dataVal = widgetData.data;
-      setCurDataVal(JSON.parse(JSON.stringify(dataVal, null, 4)));
+      setCurDataVal(dataVal);
     }
   }, [dataMap, wId]);
   const onDataChange = strVal => {
@@ -65,7 +65,7 @@ export const MockDataTab: FC<{
           return <TabPane tab={t.name} key={t.id}></TabPane>;
         })}
       </Tabs>
-      <MockDataEditor jsonVal={curDataVal} onDataChange={onDataChange} />
+      <MockDataEditor originalData={curDataVal} onDataChange={onDataChange} />
     </StyledWrapper>
   );
 });
