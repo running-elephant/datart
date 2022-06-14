@@ -17,7 +17,7 @@
  */
 
 import { List } from 'antd';
-import { viewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import { ViewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { FC, memo, useCallback, useContext, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -27,7 +27,7 @@ import { ChartDraggableSourceContainer } from './ChartDraggableSourceContainer';
 import ChartDragLayer from './ChartDragLayer';
 
 export const ChartDraggableSourceGroupContainer: FC<{
-  viewType?: viewType;
+  viewType?: ViewType;
   meta?: ChartDataViewMeta[];
   onDeleteComputedField: (fieldName) => void;
   onEditComputedField: (fieldName) => void;

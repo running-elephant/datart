@@ -33,7 +33,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useToggle from 'app/hooks/useToggle';
 import {
   ColumnRole,
-  viewType,
+  ViewType,
 } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { buildDragItem } from 'app/utils/internalChartHelper';
@@ -60,7 +60,7 @@ const { Panel } = Collapse;
 
 export const ChartDraggableSourceContainer: FC<
   {
-    viewType?: viewType;
+    viewType?: ViewType;
     availableSourceFunctions?: string[];
     onDeleteComputedField?: (fieldName) => void;
     onEditComputedField?: (fieldName) => void;

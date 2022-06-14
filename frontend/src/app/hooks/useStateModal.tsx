@@ -108,7 +108,7 @@ function useStateModal({ initState }: { initState?: any }) {
     modalSize?: string | number | StateModalSize;
     onOk?: typeof handleClickOKButton;
     onCancel?: typeof handleClickCancelButton;
-    okButtonProps?: Object;
+    okButtonProps?: any;
   }) => {
     okCallbackRef.current = props.onOk;
     cancelCallbackRef.current = props.onCancel;

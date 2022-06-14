@@ -43,7 +43,7 @@ import {
   ColumnRole,
   Model,
   SimpleViewQueryProps,
-  viewType,
+  ViewType,
 } from '../../../slice/types';
 import { dataModelColumnSorter } from '../../../utils';
 import Container from '../Container';
@@ -73,7 +73,7 @@ const DataModelTree: FC = memo(() => {
   ) as string;
   const type = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'type' }),
-  ) as viewType;
+  ) as ViewType;
   const script = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'script' }),
   ) as SimpleViewQueryProps;
@@ -81,7 +81,7 @@ const DataModelTree: FC = memo(() => {
   const [hierarchy, setHierarchy] = useState<Nullable<Model>>();
   const [computedFields, setComputedFields] = useState<ChartDataViewMeta[]>();
   const [fields, setFields] = useState<ChartDataViewMeta[]>();
-  const [viewType, setViewType] = useState<viewType>('SQL');
+  const [viewType, setViewType] = useState<ViewType>('SQL');
 
   useEffect(() => {
     setViewType(type);

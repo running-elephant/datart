@@ -42,7 +42,7 @@ import {
   Column,
   ColumnPermission,
   HierarchyModel,
-  viewType,
+  ViewType,
   ViewViewModel,
 } from '../../slice/types';
 
@@ -73,7 +73,7 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
   ) as ViewViewModel['previewResults'];
   const type = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'type' }),
-  ) as viewType;
+  ) as ViewType;
 
   const roles = useSelector(selectRoles);
   const t = useI18NPrefix('view');

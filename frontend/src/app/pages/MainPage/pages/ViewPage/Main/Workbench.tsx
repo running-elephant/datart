@@ -138,8 +138,7 @@ export const Workbench = memo(() => {
     if (sourceId) {
       dispatch(getSchemaBySourceId(sourceId));
     }
-    editorInstance?.layout();
-  }, [dispatch, sourceId, editorInstance]);
+  }, [dispatch, sourceId]);
 
   return (
     <Wrapper>

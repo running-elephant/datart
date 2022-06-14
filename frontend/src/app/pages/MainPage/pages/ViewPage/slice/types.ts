@@ -237,4 +237,4 @@ export interface JoinTableRequestProps {
   conditions?: Array<{ left: Array<string>; right: Array<string> }>;
 }
 
-export type viewType = 'SQL' | 'STRUCT';
+export type ViewType = 'SQL' | 'STRUCT';

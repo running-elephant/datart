@@ -24,7 +24,7 @@ import {
   DataViewFieldType,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { viewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import { ViewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { ChartComputedFieldHandle } from 'app/types/ComputedFieldEditor';
 import { FC, useRef, useState } from 'react';
@@ -51,7 +51,7 @@ const ChartComputedFieldSettingPanel: FC<{
   allComputedFields?: ChartDataViewMeta[];
   fields?: ChartDataViewMeta[] | TreeDataNode[];
   variables?: ChartDataViewMeta[];
-  viewType?: viewType;
+  viewType?: ViewType;
   onChange?: (computedField?: ChartDataViewMeta) => void;
 }> = ({
   sourceId,
