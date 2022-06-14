@@ -418,18 +418,27 @@ export function handleDisplayViewName({
 }: {
   name: string;
   viewType?: string;
-  category?:  Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
+  category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
 }): string {
-  if (viewType === 'STRUCT' && category) {
-    if (category === ChartDataViewFieldCategory.Field) {
+  try {
+    if (viewType === 'STRUCT' && category) {
+      if (category === ChartDataViewFieldCategory.Field) {
+        return JSON.parse(name)?.join('.');
+      } else {
+        return String(name);
+      }
+    } else if (viewType === 'STRUCT') {
       return JSON.parse(name)?.join('.');
     } else {
-      return name;
+      return String(name);
     }
-  } else if (viewType === 'STRUCT') {
-    return JSON.parse(name)?.join('.');
-  } else {
-    return name;
+  } catch (error) {
+    console.log('handleDisplayViewName', error, {
+      name,
+      viewType,
+      category,
+    });
+    throw error;
   }
 }
 
@@ -440,17 +449,26 @@ export function handleRequestColumnName({
 }: {
   name: string;
   viewType?: string;
-  category?:  Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
+  category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
 }): string[] {
-  if (viewType === 'STRUCT' && category) {
-    if (category === ChartDataViewFieldCategory.Field) {
+  try {
+    if (viewType === 'STRUCT' && category) {
+      if (category === ChartDataViewFieldCategory.Field) {
+        return JSON.parse(name);
+      } else {
+        return [name];
+      }
+    } else if (viewType === 'STRUCT') {
       return JSON.parse(name);
     } else {
       return [name];
     }
-  } else if (viewType === 'STRUCT') {
-    return JSON.parse(name);
-  } else {
-    return [name];
+  } catch (error) {
+    console.log('handleRequestColumnName', error, {
+      name,
+      viewType,
+      category,
+    });
+    throw error;
   }
 }

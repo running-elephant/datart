@@ -760,6 +760,7 @@ export const getJumpFiltersByInteractionRule = (
   clickEventFilters: ChartDataRequestFilter[] = [],
   chartFilters: ChartDataRequestFilter[] = [],
   rule?: InteractionRule,
+  viewType?: string,
 ): Record<string, string | any> => {
   return clickEventFilters
     .concat(chartFilters)
@@ -782,9 +783,16 @@ export const getJumpFiltersByInteractionRule = (
           return null;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === JSON.stringify(f?.column),
+          r =>
+            r.source ===
+            handleDisplayViewName({
+              name:
+                viewType === 'SQL'
+                  ? String(f?.column)
+                  : JSON.stringify(f?.column),
+              viewType,
+            }),
         );
-
         if (isEmpty(targetRelation)) {
           return null;
         }
@@ -830,7 +838,15 @@ export const getJumpOperationFiltersByInteractionRule = (
           return acc;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === JSON.stringify(f?.column),
+          r =>
+            r.source ===
+            handleDisplayViewName({
+              name:
+                viewType === 'SQL'
+                  ? String(f?.column)
+                  : JSON.stringify(f?.column),
+              viewType,
+            }),
         );
         if (isEmpty(targetRelation)) {
           return acc;

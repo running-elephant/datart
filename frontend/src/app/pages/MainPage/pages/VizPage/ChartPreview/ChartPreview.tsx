@@ -353,6 +353,7 @@ const ChartPreviewBoard: FC<{
                   clickFilters,
                   nonAggChartFilters,
                   rule,
+                  viewType,
                 );
                 Object.assign(urlFilters, { isMatchByName: true });
                 const urlFiltersStr: string =
@@ -376,8 +377,8 @@ const ChartPreviewBoard: FC<{
                   clickFilters,
                   nonAggChartFilters,
                   rule,
+                  viewType,
                 );
-                console.log(urlFilters,'urlFilters');
                 Object.assign(urlFilters, { isMatchByName: true });
                 const urlFiltersStr: string =
                   urlSearchTransfer.toUrlString(urlFilters);
