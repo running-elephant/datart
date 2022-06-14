@@ -17,6 +17,7 @@
  */
 import { Button, Card, Form, message, Select } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { DatartFileSuffixes } from 'globalConstants';
 import { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -66,7 +67,7 @@ export const ImportPage: FC<{}> = memo(() => {
             initialValue={undefined}
             rules={[{ required: true }]}
           >
-            <FileUpload />
+            <FileUpload suffix={DatartFileSuffixes.Resource} />
           </Form.Item>
           <Form.Item
             name="strategy"

@@ -935,6 +935,7 @@
         "downloadData": "Download Excel",
         "downloadPDF": "Download PDF",
         "downloadPicture": "Download Picture",
+        "exportTpl": "Export Template",
         "NONE": "None",
         "CODE": "Code",
         "LOGIN": "Login",
@@ -1137,6 +1138,7 @@
         "dashboard": "Create Dashboard",
         "dataChart": "Create Datachart",
         "folder": "Create Folder",
+        "template": "Import Template",
         "recycle": "Recycle",
         "open": "Open",
         "close": "Close",
@@ -1206,11 +1208,16 @@
         "freeTips": "Free: Precise, fixed layout",
         "requiredMessage": "Select a Layout Type"
       },
+      "template": {
+        "label": "File",
+        "requiredMessage": "Select a Template file"
+      },
       "parent": "Parent",
       "root": "Root",
       "vizType": {
         "datachart": "Datachart",
         "dashboard": "Dashboard",
+        "template": "From Template",
         "folder": "Folder",
         "storyboard": "Storyboard"
       }
