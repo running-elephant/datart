@@ -56,4 +56,10 @@ public class JdbcDriverInfo {
 
     private Boolean quoteIdentifiers;
 
+    private Boolean supportSqlLimit;
+
+    public boolean supportSqlLimit() {
+        return supportSqlLimit != null && supportSqlLimit;
+    }
+
 }

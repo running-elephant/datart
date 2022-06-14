@@ -156,11 +156,17 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     @Override
     public List<Source> getAllParents(String sourceId) {
         List<Source> parents = new LinkedList<>();
-        getParent(parents, sourceId);
+        Source source = sourceMapper.selectByPrimaryKey(sourceId);
+        if (source != null) {
+            getParent(parents, source.getParentId());
+        }
         return parents;
     }
 
     private void getParent(List<Source> list, String parentId) {
+        if (parentId == null) {
+            return;
+        }
         Source source = sourceMapper.selectByPrimaryKey(parentId);
         if (source != null) {
             if (source.getParentId() != null) {

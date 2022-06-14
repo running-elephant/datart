@@ -23,32 +23,24 @@ import datart.data.provider.jdbc.JdbcDriverInfo;
 import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.config.NullCollation;
 import org.apache.calcite.sql.SqlDialect;
+import org.apache.calcite.sql.SqlNode;
+import org.apache.calcite.sql.SqlWriter;
 import org.apache.calcite.sql.validate.SqlConformanceEnum;
 
 public class CustomSqlDialect extends SqlDialect {
+
+    private JdbcDriverInfo driverInfo;
 
     private CustomSqlDialect(Context context) {
         super(context);
     }
 
-    public CustomSqlDialect(JdbcDriverInfo driverInfo){
+    public CustomSqlDialect(JdbcDriverInfo driverInfo) {
         this(createContext(driverInfo));
+        this.driverInfo = driverInfo;
     }
 
-    public static CustomSqlDialect create(JdbcDriverInfo driverInfo) {
-        BeanUtils.validate(driverInfo);
-        Context context = SqlDialect.EMPTY_CONTEXT
-                .withDatabaseProductName(driverInfo.getName())
-                .withDatabaseVersion(driverInfo.getVersion())
-                .withConformance(SqlConformanceEnum.LENIENT)
-                .withIdentifierQuoteString(driverInfo.getIdentifierQuote())
-                .withLiteralQuoteString(driverInfo.getLiteralQuote())
-                .withUnquotedCasing(Casing.UNCHANGED)
-                .withNullCollation(NullCollation.LOW);
-        return new CustomSqlDialect(context);
-    }
-
-    public static Context createContext(JdbcDriverInfo driverInfo) {
+    private static Context createContext(JdbcDriverInfo driverInfo) {
         BeanUtils.validate(driverInfo);
         return SqlDialect.EMPTY_CONTEXT
                 .withDatabaseProductName(driverInfo.getName())
@@ -60,4 +52,11 @@ public class CustomSqlDialect extends SqlDialect {
                 .withNullCollation(NullCollation.LOW);
     }
 
+    @Override
+    public void unparseOffsetFetch(SqlWriter writer, SqlNode offset, SqlNode fetch) {
+        if (driverInfo.getSupportSqlLimit() != null && driverInfo.getSupportSqlLimit()) {
+            unparseFetchUsingLimit(writer, offset, fetch);
+        }
+        super.unparseOffsetFetch(writer, offset, fetch);
+    }
 }

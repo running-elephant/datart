@@ -35,12 +35,18 @@ public class ReflectUtils {
         return field;
     }
 
-    public static Object getFieldValue(Object o, String name) {
-        Field field = getDeclaredField(o.getClass(), name);
+    public static <T> T getFieldValue(Object o, String name) {
+        boolean isClass = o instanceof Class;
+        Field field;
+        if (isClass) {
+            field = getDeclaredField((Class<?>) o, name);
+        } else {
+            field = getDeclaredField(o.getClass(), name);
+        }
         if (field != null) {
             try {
                 field.setAccessible(true);
-                return field.get(o);
+                return (T) field.get(isClass ? null : o);
             } catch (IllegalAccessException e) {
                 return null;
             }

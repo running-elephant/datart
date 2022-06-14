@@ -21,6 +21,8 @@ import datart.core.entity.*;
 import datart.security.base.ResourceType;
 import datart.server.base.dto.*;
 import datart.server.base.params.*;
+import datart.server.base.transfer.DashboardTemplateParam;
+import datart.server.base.transfer.DatachartTemplateParam;
 import datart.server.base.transfer.ImportStrategy;
 import datart.server.base.transfer.ResourceTransferParam;
 import datart.server.service.VizService;
@@ -271,17 +273,34 @@ public class VizController extends BaseController {
     @PostMapping(value = "/export")
     public ResponseData<Download> exportViz(@RequestBody ResourceTransferParam param) throws IOException {
         return ResponseData.success(vizService.exportResource(param));
-//        response.setHeader("Content-Type", "application/octet-stream");
-//        response.setHeader("Content-Disposition", String.format("attachment;filename=\"%s\"", URLEncoder.encode(model.getFileName(), "utf-8")));
-//        try (ObjectOutputStream outputStream = new ObjectOutputStream(response.getOutputStream())) {
-//            outputStream.writeObject(model);
-//        }
     }
 
     @ApiOperation(value = "import viz")
     @PostMapping(value = "/import")
     public ResponseData<Boolean> importViz(@RequestParam("file") MultipartFile file, ImportStrategy strategy, String orgId) throws IOException {
         return ResponseData.success(vizService.importResource(file, strategy, orgId));
+    }
+
+
+    @ApiOperation(value = "export dashboard template")
+    @PostMapping(value = "/export/dashboard/template")
+    public ResponseData<Download> exportDashboardTemplate(@Validated @RequestBody DashboardTemplateParam param) throws IOException {
+        return ResponseData.success(vizService.exportDashboardTemplate(param));
+    }
+
+    @ApiOperation(value = "export datachart template")
+    @PostMapping(value = "/export/datachart/template")
+    public ResponseData<Download> exportDatachartTemplate(@Validated @RequestBody DatachartTemplateParam param) throws IOException {
+        return ResponseData.success(vizService.exportDatachartTemplate(param));
+
+    }
+
+
+    @ApiOperation(value = "import viz template")
+    @PostMapping(value = "/import/template")
+    public ResponseData<Boolean> importVizTemplate(@RequestParam("file") MultipartFile file, @RequestParam String parentId, @RequestParam String orgId, @RequestParam String name) throws IOException {
+        vizService.importVizTemplate(file, orgId, parentId, name);
+        return ResponseData.success(true);
     }
 
 }

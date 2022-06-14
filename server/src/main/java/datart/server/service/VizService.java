@@ -88,7 +88,7 @@ public interface VizService {
 
     Download exportDashboardTemplate(DashboardTemplateParam templateModel);
 
-    void importVizTemplate(MultipartFile file, String orgId, Folder parent, String name);
+    void importVizTemplate(MultipartFile file, String orgId, String parentId, String name);
 
     boolean updateStoryboardBase(StoryboardBaseUpdateParam updateParam);
 }

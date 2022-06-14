@@ -48,8 +48,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
-import static datart.security.base.ResourceType.DATACHART;
-
 @Slf4j
 @Service
 public class VizServiceImpl extends BaseService implements VizService {
@@ -301,7 +299,7 @@ public class VizServiceImpl extends BaseService implements VizService {
                     .collect(Collectors.toSet()));
             datacharts.addAll(resources
                     .parallelStream()
-                    .filter(vizItem -> DATACHART.equals(vizItem.getResourceType()))
+                    .filter(vizItem -> ResourceType.DATACHART.equals(vizItem.getResourceType()))
                     .map(ResourceTransferParam.VizItem::getResourceId)
                     .collect(Collectors.toSet()));
             if (dashboards.size() > 0) {
@@ -327,7 +325,6 @@ public class VizServiceImpl extends BaseService implements VizService {
             }
             return resourceModel;
         }, param, TransferFileType.DATART_RESOURCE_FILE);
-
     }
 
     @Override
@@ -428,7 +425,10 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
-    public void importVizTemplate(MultipartFile file, String orgId, Folder parent, String name) {
+    public void importVizTemplate(MultipartFile file, String orgId, String parentId, String name) {
+
+        Folder parent = folderService.retrieve(parentId);
+
         TransferModel transferModel = null;
         try {
             transferModel = extractModel(file);
@@ -452,7 +452,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     @Transactional
     public boolean updateDatachart(DatachartUpdateParam updateParam) {
         // update folder
-        Folder vizFolder = folderService.getVizFolder(updateParam.getId(), DATACHART.name());
+        Folder vizFolder = folderService.getVizFolder(updateParam.getId(), ResourceType.DATACHART.name());
         vizFolder.setAvatar(updateParam.getAvatar());
         vizFolder.setSubType(updateParam.getSubType());
         folderService.getDefaultMapper().updateByPrimaryKey(vizFolder);
@@ -569,7 +569,6 @@ public class VizServiceImpl extends BaseService implements VizService {
                 Exceptions.msg("unknown viz type");
                 return false;
         }
-
     }
 
     private void createFolder(ResourceType type, String id, String name, String orgId, String parentId, double index) {
