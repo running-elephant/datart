@@ -1129,6 +1129,7 @@
         "dashboard": "Create Dashboard",
         "dataChart": "Create Datachart",
         "folder": "Create Folder",
+        "template": "Import Template",
         "recycle": "Recycle",
         "open": "Open",
         "close": "Close",
@@ -1197,11 +1198,16 @@
         "freeTips": "Free: Precise, fixed layout",
         "requiredMessage": "Select a Layout Type"
       },
+      "template": {
+        "label": "Layout",
+        "requiredMessage": "Select a Layout Type"
+      },
       "parent": "Parent",
       "root": "Root",
       "vizType": {
         "datachart": "Datachart",
         "dashboard": "Dashboard",
+        "template": "From Template",
         "folder": "Folder",
         "storyboard": "Storyboard"
       }

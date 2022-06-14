@@ -1120,6 +1120,7 @@
         "folderTitle": "仪表板 & 数据图表",
         "dashboard": "新建仪表板",
         "dataChart": "新建数据图表",
+        "template": "导入模板",
         "folder": "新建目录",
         "recycle": "回收站",
         "open": "展开",
@@ -1189,12 +1190,17 @@
         "freeTips": "自由布局：固定布局，用于制作大屏",
         "requiredMessage": "请选择一种布局方式"
       },
+      "template": {
+        "label": "模版文件",
+        "requiredMessage": "导入模板文件"
+      },
       "parent": "所属目录",
       "root": "根目录",
       "vizType": {
         "datachart": "数据图表",
         "dashboard": "仪表板",
         "folder": "目录",
+        "template": "通过模板",
         "storyboard": "故事板"
       }
     },
