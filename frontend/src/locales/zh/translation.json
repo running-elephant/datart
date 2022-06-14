@@ -1169,7 +1169,8 @@
     "tips": {
       "noStartValue": "请填写 起始值",
       "noEndValue": "请填写 结束值",
-      "endGTStartErr": "起始值 该小于 结束值"
+      "endGTStartErr": "起始值 该小于 结束值",
+      "hasChartConfig": "图表已启用配置，当前仪表板启用后会覆盖图表配置。"
     },
     "control": {
       "title": "控制器标题",

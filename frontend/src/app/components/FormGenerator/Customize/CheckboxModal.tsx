@@ -17,7 +17,7 @@
  */
 
 import { InfoCircleOutlined } from '@ant-design/icons';
-import { Button, Checkbox } from 'antd';
+import { Button, Checkbox, Tooltip } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
@@ -91,7 +91,11 @@ const CheckboxModal: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         >
           {t(data.label)}
         </Button>
-        {hasOriginal && <InfoCircleOutlined />}
+        {hasOriginal && (
+          <Tooltip title={t('viz.tips.hasChartConfig', true)}>
+            <InfoCircleOutlined />
+          </Tooltip>
+        )}
         {contextHolder}
       </StyledCheckboxModal>
     );

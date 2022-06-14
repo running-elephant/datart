@@ -1169,7 +1169,8 @@
     "tips": {
       "noStartValue": "Input Start Value",
       "noEndValue": "Input End Value",
-      "endGTStartErr": "End Value should be greater than Start Value "
+      "endGTStartErr": "End Value should be greater than Start Value ",
+      "hasChartConfig": "The chart config already exist, it will overwrite after you enable board config."
     },
     "control": {
       "title": "Control Title",
