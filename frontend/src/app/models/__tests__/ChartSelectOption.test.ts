@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartSelectOption } from '../ChartSelectOption'
+import { ChartSelectOption } from '../ChartSelectOption';
 
 describe('ChartSelectOption Test', () => {
   test('should init model is a parameter', () => {
@@ -34,26 +34,30 @@ describe('ChartSelectOption Test', () => {
       data: {
         rowData: {
           text: 'test',
-        }
-      }
-    })
+        },
+      },
+    });
     expect(option).not.toBeNull();
-    expect(JSON.stringify(option.selectedItems)).toEqual(JSON.stringify([{
-      index: '1',
-      data: {
-        rowData: {
-          text: 'test',
-        }
-      }
-    }]));
+    expect(JSON.stringify(option.selectedItems)).toEqual(
+      JSON.stringify([
+        {
+          index: '1',
+          data: {
+            rowData: {
+              text: 'test',
+            },
+          },
+        },
+      ]),
+    );
     option.normalSelect({
       index: '1',
       data: {
         rowData: {
           text: 'test',
-        }
-      }
-    })
+        },
+      },
+    });
     expect(option.selectedItems).toEqual([]);
     option.clearAll();
     expect(option.selectedItems).toEqual([]);

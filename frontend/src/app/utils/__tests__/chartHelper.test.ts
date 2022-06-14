@@ -34,6 +34,7 @@ import {
 import {
   clearRuntimeDateLevelFieldsInChartConfig,
   compareSelectedItems,
+  getChartSelectOption,
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getDataColumnMaxAndMin2,
@@ -2894,4 +2895,12 @@ describe('Chart Helper ', () => {
       });
     },
   );
+
+  describe('getChartSelectOption Test - ', () => {
+    test(`Get chart select option`, () => {
+      const option = getChartSelectOption(window);
+      expect(option).not.toBeNull();
+      expect(option.selectedItems).toEqual([]);
+    });
+  });
 });
