@@ -296,9 +296,10 @@ public class SqlBuilder {
             column = createAggNode(agg);
         } else {
             if (functionColumnMap.containsKey(operator.getColumnKey())) {
-
+                column = functionColumnMap.get(operator.getColumnKey());
+            } else {
+                column = SqlNodeUtils.createSqlIdentifier(operator.getColumnNames(withNamePrefix, namePrefix));
             }
-            column = SqlNodeUtils.createSqlIdentifier(operator.getColumnNames(withNamePrefix, namePrefix));
         }
         List<SqlNode> nodes = Arrays.stream(operator.getValues())
                 .map(this::convertTypedValue)
