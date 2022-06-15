@@ -70,7 +70,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     useContext(WidgetChartContext);
   const scale = useContext(BoardScaleContext);
   const { data } = useContext(WidgetDataContext);
-  const { renderMode } = useContext(BoardContext);
+  const { renderMode, orgId } = useContext(BoardContext);
   const selectedItems = useContext(WidgetSelectionContext);
   const widget = useContext(WidgetContext);
   const { dashboardId, id: wid } = widget;
@@ -182,13 +182,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       pageInfo: data.pageInfo || {},
     }),
     [data],
-  );
-  
-  const chartIframeKeyboardListener = useCallback(
-    (e: KeyboardEvent) => {
-      multipleSelectChange(dispatch, renderMode, multipleSelect, e);
-    },
-    [dispatch, renderMode, multipleSelect],
   );
 
   const buildDrillThroughEventParams = useCallback(
