@@ -500,7 +500,8 @@
         "AGG_DATE_MONTH": "Month",
         "AGG_DATE_WEEK": "Week",
         "AGG_DATE_DAY": "Day",
-        "default": "Default"
+        "default": "Default",
+        "cannotDeleteComputerField": "Calculated fields created in views cannot be deleted"
       }
     },
     "palette": {
@@ -1329,6 +1330,21 @@
       "category": "Category",
       "type": "Type",
       "typeAndCategory": "Type & Category"
+    },
+    "structView": {
+      "STRUCT": "Struct View",
+      "SQL": "SQL View",
+      "file": "File",
+      "sourcedata": "Data",
+      "join": "Join Data",
+      "selectJoinColumn": "Select a column",
+      "addJoin": "Add join data",
+      "run": "Run selectio",
+      "searchTable": "Search datasheets",
+      "searchSource": "Search data sources",
+      "selectSource": "Select data source",
+      "all": "All",
+      "selectField": "Select a column"
     }
   },
   "source": {

@@ -22,6 +22,7 @@ import {
   PlusSquareOutlined,
 } from '@ant-design/icons';
 import { Button, Spin, Tooltip } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CommonFormTypes } from 'globalConstants';
 import produce from 'immer';
 import { memo, useCallback, useContext, useEffect } from 'react';
@@ -67,6 +68,7 @@ export const StructView = memo(
     const dispatch = useDispatch();
     const { initActions } = useContext(EditorContext);
     const { showSaveForm } = useContext(SaveFormContext);
+    const t = useI18NPrefix(`view.structView`);
 
     const tableJSON = useSelector(state =>
       selectCurrentEditingViewAttr(state, { name: 'script' }),
@@ -250,7 +252,7 @@ export const StructView = memo(
           showSaveForm({
             type: CommonFormTypes.Edit,
             visible: true,
-            parentIdLabel: '文件夹',
+            parentIdLabel: t('file'),
             initialValues: {
               name: '',
               parentId: '',
@@ -272,7 +274,17 @@ export const StructView = memo(
           save();
         }
       }
-    }, [dispatch, actions, stage, status, id, save, showSaveForm, viewsData]);
+    }, [
+      dispatch,
+      actions,
+      stage,
+      status,
+      id,
+      save,
+      showSaveForm,
+      viewsData,
+      t,
+    ]);
 
     useEffect(() => {
       initActions({ onRun: handleInterimRunSql, onSave: callSave });
@@ -304,7 +316,7 @@ export const StructView = memo(
               allowManage={allowManage}
               allowEnableViz={allowEnableViz}
             />
-            <SelectTableTitle>数据</SelectTableTitle>
+            <SelectTableTitle>{t('sourcedata')}</SelectTableTitle>
             <SelectTableMainWrapper>
               <SelectTableMain>
                 <SelectDataSource
@@ -324,7 +336,7 @@ export const StructView = memo(
               return (
                 <ItemWrapper key={i}>
                   <SelectTableTitle>
-                    <span>关联</span>
+                    <span>{t('join')}</span>
                     <CloseOutlined
                       onClick={() => handleDeleteJoinsItem(i)}
                       className="deleteJoinItem"
@@ -355,7 +367,7 @@ export const StructView = memo(
                       {join.table ? (
                         <JoinConditionWrapper>
                           <JoinSelectConditionColumn>
-                            选择关联字段
+                            {t('selectJoinColumn')}
                           </JoinSelectConditionColumn>
                           <JoinConditionColumn>
                             {join.conditions?.map(({ left, right }, ind) => {
@@ -426,7 +438,7 @@ export const StructView = memo(
             {tableJSON['table'].length ? (
               <ToolWrapper>
                 <Button className="addJoinTable" onClick={handleAddTableJoin}>
-                  添加关联项
+                  {t('addJoin')}
                 </Button>
               </ToolWrapper>
             ) : (
@@ -434,7 +446,7 @@ export const StructView = memo(
             )}
 
             {tableJSON['table'].length ? (
-              <Tooltip title="执行片段">
+              <Tooltip title={t('run')}>
                 <Button
                   className="runBtn"
                   type="primary"

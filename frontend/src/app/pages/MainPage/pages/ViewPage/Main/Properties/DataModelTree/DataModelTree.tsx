@@ -623,10 +623,10 @@ const DataModelTree: FC = memo(() => {
 
   const titleAdd = useMemo(() => {
     return {
-      items: [{ key: 'computerField', text: '新增计算字段' }],
+      items: [{ key: 'computerField', text: t('model.createComputedFields') }],
       callback: () => addCallback(null),
     };
-  }, [addCallback]);
+  }, [addCallback, t]);
 
   const handleComputedFieldMenuClick = useCallback(
     (node, key) => {

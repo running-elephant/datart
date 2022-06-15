@@ -122,9 +122,8 @@ export const Workbench = memo(() => {
               : '',
         }),
       );
-      editorInstance?.layout();
     },
-    [dispatch, actions, editorInstance],
+    [dispatch, actions],
   );
 
   useEffect(() => {
@@ -185,5 +184,8 @@ const Development = styled(Split)`
 `;
 
 const LoadingWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
 `;

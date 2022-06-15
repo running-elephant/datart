@@ -17,6 +17,7 @@
  */
 
 import { TreeSelect } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { memo, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { SPACE_SM } from 'styles/StyleConstants';
@@ -38,6 +39,8 @@ const SelectJoinColumns = memo(
     conditionsIndex,
     joinIndex,
   }: SelectJoinColumnsProps) => {
+    const t = useI18NPrefix(`view.structView`);
+
     const handleLeftColumn = useCallback(() => {
       const tableName = tableJSON.table;
       const childrenData = tableJSON['columns']?.map((v, i) => {
@@ -93,7 +96,7 @@ const SelectJoinColumns = memo(
         <TreeSelect
           allowClear
           style={{ minWidth: '100px' }}
-          placeholder={'选择一个字段'}
+          placeholder={t('selectField')}
           treeDefaultExpandAll={true}
           value={joinTable.conditions?.[conditionsIndex]?.left.slice(-1)}
           onChange={columnName => {
@@ -105,7 +108,7 @@ const SelectJoinColumns = memo(
         <TreeSelect
           allowClear
           style={{ minWidth: '100px' }}
-          placeholder={'选择一个字段'}
+          placeholder={t('selectField')}
           treeDefaultExpandAll={true}
           value={joinTable.conditions?.[conditionsIndex]?.right.slice(-1)}
           onChange={(columnName, label) => {

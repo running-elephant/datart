@@ -500,7 +500,8 @@
         "AGG_DATE_MONTH": "按月",
         "AGG_DATE_WEEK": "按周",
         "AGG_DATE_DAY": "按日",
-        "default": "默认"
+        "default": "默认",
+        "cannotDeleteComputerField": "视图中创建的计算字段不能删除"
       }
     },
     "palette": {
@@ -1329,6 +1330,21 @@
       "category": "分类",
       "type": "类型",
       "typeAndCategory": "类型与分类"
+    },
+    "structView": {
+      "STRUCT": "结构视图",
+      "SQL": "SQL 视图",
+      "file": "文件夹",
+      "sourcedata": "数据",
+      "join": "关联",
+      "selectJoinColumn": "选择关联字段",
+      "addJoin": "添加关联项",
+      "run": "执行片段",
+      "searchTable": "搜索数据表",
+      "searchSource": "搜索数据源",
+      "selectSource": "选择一个数据源",
+      "all": "全选",
+      "selectField": "选择一个字段"
     }
   },
   "source": {

@@ -205,7 +205,7 @@ const ChartDataViewPanel: FC<{
       }
     });
     if (deleteField!.computedFieldsType === 'viewComputerField') {
-      message.error('视图中创建的计算字段不能删除');
+      message.error(t('cannotDeleteComputerField'));
       return false;
     }
     dispatch(

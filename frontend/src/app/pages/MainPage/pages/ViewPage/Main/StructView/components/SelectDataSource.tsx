@@ -23,6 +23,7 @@ import {
 } from '@ant-design/icons';
 import { Checkbox, Divider, Empty, Input, Popover } from 'antd';
 import { MenuListItem, MenuWrapper, Tree } from 'app/components';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -39,6 +40,7 @@ import {
   StructViewQueryProps,
 } from '../../../slice/types';
 import { buildAntdTreeNodeModel } from '../../../utils';
+
 const CheckboxGroup = Checkbox.Group;
 
 interface SelectDataSourceProps {
@@ -62,6 +64,7 @@ const SelectDataSource = memo(
     const dispatch = useDispatch();
     const propsSources = useSelector(selectSources);
     const allDatabaseSchemas = useSelector(selectAllSourceDatabaseSchemas);
+    const t = useI18NPrefix(`view.structView`);
 
     const [currentSources, setCurrentSources] = useState<Source | null>(null);
     const [selectDataSheet, setSelectDataSheet] = useState<any>(
@@ -277,7 +280,10 @@ const SelectDataSource = memo(
                   />
                   <i>{currentSources.name}</i>
                 </DatabaseListHeader>
-                <Input placeholder="搜索数据表" onChange={searchDataSheet} />
+                <Input
+                  placeholder={t('searchTable')}
+                  onChange={searchDataSheet}
+                />
                 <Tree
                   autoExpandParent
                   defaultExpandParent
@@ -289,7 +295,10 @@ const SelectDataSource = memo(
               </PopoverBody>
             ) : (
               <PopoverBody>
-                <Input placeholder="搜索数据源" onChange={FilterSources} />
+                <Input
+                  placeholder={t('searchSource')}
+                  onChange={FilterSources}
+                />
                 <MenuWrapper onClick={hanldeCurrentSources}>
                   {sources && sources.length > 0 ? (
                     sources.map((v, i) => {
@@ -311,7 +320,7 @@ const SelectDataSource = memo(
           <span>
             {selectDataSheet
               ? selectDataSheet.table[selectDataSheet.table.length - 1]
-              : '选择一个数据源'}
+              : t('selectSource')}
           </span>
         </Popover>
 
@@ -328,7 +337,7 @@ const SelectDataSource = memo(
                   }}
                   checked={checkAll}
                 >
-                  全选
+                  {t('all')}
                 </Checkbox>
                 <DividerWrapper />
                 <CheckboxGroupWrapper

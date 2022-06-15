@@ -17,15 +17,18 @@
  */
 
 import { ConsoleSqlOutlined, PartitionOutlined } from '@ant-design/icons';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { memo } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_TIMES } from 'styles/StyleConstants';
+
 interface selectViewTypeProps {
   selectViewType: (viewType: string) => void;
 }
 
 const SelectViewType = memo(({ selectViewType }: selectViewTypeProps) => {
   const viewTypeList = ['STRUCT', 'SQL'];
+  const t = useI18NPrefix('view.structView');
 
   return (
     <SelectViewTypeWrapper>
@@ -33,7 +36,7 @@ const SelectViewType = memo(({ selectViewType }: selectViewTypeProps) => {
         return (
           <ViewTypeWrapper onClick={() => selectViewType(v)} key={i}>
             {v === 'STRUCT' ? <PartitionOutlined /> : <ConsoleSqlOutlined />}
-            <span>{v}</span>
+            <span>{t(v)}</span>
           </ViewTypeWrapper>
         );
       })}
