@@ -24,8 +24,9 @@ import datart.data.provider.DataProviderTestApplication;
 import datart.data.provider.base.DataProviderException;
 import datart.data.provider.calcite.SqlFragment;
 import datart.data.provider.jdbc.SqlScriptRender;
-import datart.data.provider.sql.entity.SqlTestEntity;
+import datart.data.provider.script.SqlStringUtils;
 import datart.data.provider.sql.common.ParamFactory;
+import datart.data.provider.sql.entity.SqlTestEntity;
 import datart.data.provider.sql.examples.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlBasicCall;
@@ -88,7 +89,11 @@ public class SqlScriptRenderTest {
             SqlScriptRender render = new SqlScriptRender(queryScript, sqlTest.getExecuteParam(), sqlTest.getSqlDialect(), enableSpecialSql);
             boolean withExecParam = sqlTest.getExecuteParam()!=null;
             String parsedSql = render.render(withExecParam, false, false);
-            sqlTest.setDesireSql(covertDesiredSql(sqlTest.getDesireSql(), sqlTest.getSqlDialect()));
+            if (sqlTest.getExecuteParam()==null) {
+                sqlTest.setDesireSql(covertDesiredSql(sqlTest.getDesireSql(), sqlTest.getSqlDialect()));
+            } else {
+                parsedSql = SqlStringUtils.cleanupSql(parsedSql);
+            }
             boolean result = parsedSql.equalsIgnoreCase(sqlTest.getDesireSql());
             if (!result){
                 Exceptions.msg("sql validate failed! \n" + sqlTest +

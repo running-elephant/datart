@@ -1,7 +1,7 @@
 package datart.data.provider.sql.examples;
 
-import datart.data.provider.sql.entity.SqlTestEntity;
 import datart.data.provider.sql.common.TestSqlDialects;
+import datart.data.provider.sql.entity.SqlTestEntity;
 import org.apache.calcite.sql.SqlDialect;
 
 import java.util.ArrayList;
