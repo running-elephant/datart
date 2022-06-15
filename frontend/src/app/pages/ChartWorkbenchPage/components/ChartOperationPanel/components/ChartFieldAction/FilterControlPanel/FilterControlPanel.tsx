@@ -29,12 +29,14 @@ import { ConditionBuilder } from 'app/models/ChartFilterCondition';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
-import { getColumnRenderName } from 'app/utils/chartHelper';
+import {
+  getColumnRenderName,
+  handleDisplayViewName,
+} from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import { CONTROLLER_WIDTH_OPTIONS } from 'globalConstants';
 import { FC, memo, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
-import { handleDisplayViewName } from 'utils/utils';
 import { FilterOptionForwardRef } from '.';
 import CategoryConditionConfiguration from './CategoryConditionConfiguration';
 import DateConditionConfiguration from './DateConditionConfiguration';

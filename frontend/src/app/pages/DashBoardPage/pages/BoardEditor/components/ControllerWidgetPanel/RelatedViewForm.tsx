@@ -34,9 +34,9 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
+import { handleDisplayViewName } from 'app/utils/chartHelper';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
-import { handleDisplayViewName } from 'utils/utils';
 import { filterValueTypeByControl, isRangeTypeController } from './utils';
 export interface RelatedViewFormProps {
   viewMap: Record<string, ChartDataView>;

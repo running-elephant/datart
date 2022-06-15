@@ -19,7 +19,7 @@
 import { Button, Dropdown, Input, Space } from 'antd';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo, useCallback, useMemo, useState } from 'react';
-import { handleDisplayViewName } from 'utils/utils';
+import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { InteractionFieldRelation } from '../../constants';
 import { I18nTranslator, JumpToUrlRule, VizType } from './types';
 import UrlParamList from './UrlParamList';

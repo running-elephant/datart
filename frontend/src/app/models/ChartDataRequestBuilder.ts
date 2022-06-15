@@ -36,7 +36,7 @@ import {
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import { getRuntimeDateLevelFields, getValue } from 'app/utils/chartHelper';
+import { getRuntimeDateLevelFields, getValue,handleDisplayViewName, handleRequestColumnName } from 'app/utils/chartHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import {
   formatTime,
@@ -51,7 +51,6 @@ import {
 } from 'globalConstants';
 import isEqual from 'lodash/isEqual';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
-import { handleDisplayViewName, handleRequestColumnName } from 'utils/utils';
 import { DrillMode } from './ChartDrillOption';
 
 export class ChartDataRequestBuilder {

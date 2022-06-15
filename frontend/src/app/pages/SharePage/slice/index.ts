@@ -31,7 +31,7 @@ import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { FilterSqlOperator } from 'globalConstants';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { Omit } from 'utils/object';
-import { handleRequestColumnName } from 'utils/utils';
+import { handleRequestColumnName } from 'app/utils/chartHelper';
 import {
   fetchAvailableSourceFunctions,
   fetchShareDataSetByPreviewChartAction,

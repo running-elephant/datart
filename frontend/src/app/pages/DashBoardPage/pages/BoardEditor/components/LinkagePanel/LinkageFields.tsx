@@ -22,9 +22,9 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
+import { handleDisplayViewName } from 'app/utils/chartHelper';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
-import { handleDisplayViewName } from 'utils/utils';
 
 const { Option } = Select;
 export interface ViewLinkageItem {

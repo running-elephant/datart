@@ -67,7 +67,6 @@ import {
   meanValue,
   pipe,
 } from 'utils/object';
-import { handleDisplayViewName } from 'utils/utils';
 import { TableColumnsList } from '../components/ChartGraph/BasicTableChart/types';
 import {
   flattenHeaderRowsWithoutGroupRow,
@@ -1715,15 +1714,15 @@ export const handleRowColNameInChartConfig = (
 ) => {
   return updateBy(config, draft => {
     if (draft?.datas) {
-      draft?.datas.forEach(data => {
-        data.rows?.forEach(row => {
-          row.colName = handleDisplayViewName({
-            viewType,
-            name: row.colName,
-            category: row.category,
-          });
-        });
-      });
+      // draft?.datas.forEach(data => {
+      //   data.rows?.forEach(row => {
+      //     row.colName = handleDisplayViewName({
+      //       viewType,
+      //       name: row.colName,
+      //       category: row.category,
+      //     });
+      //   });
+      // });
     }
   });
 };
@@ -1744,3 +1743,65 @@ export const compareSelectedItems = (
   }
   return false;
 };
+
+export function handleDisplayViewName({
+  name,
+  viewType = 'SQL',
+  category,
+}: {
+  name: string;
+  viewType?: string;
+  category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
+}): string {
+  try {
+    if (viewType === 'STRUCT' && category) {
+      if (category === ChartDataViewFieldCategory.Field) {
+        return JSON.parse(name)?.join('.');
+      } else {
+        return String(name);
+      }
+    } else if (viewType === 'STRUCT') {
+      return JSON.parse(name)?.join('.');
+    } else {
+      return String(name);
+    }
+  } catch (error) {
+    console.log('handleDisplayViewName', error, {
+      name,
+      viewType,
+      category,
+    });
+    throw error;
+  }
+}
+
+export function handleRequestColumnName({
+  name,
+  viewType = 'SQL',
+  category,
+}: {
+  name: string;
+  viewType?: string;
+  category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
+}): string[] {
+  try {
+    if (viewType === 'STRUCT' && category) {
+      if (category === ChartDataViewFieldCategory.Field) {
+        return JSON.parse(name);
+      } else {
+        return [name];
+      }
+    } else if (viewType === 'STRUCT') {
+      return JSON.parse(name);
+    } else {
+      return [name];
+    }
+  } catch (error) {
+    console.log('handleRequestColumnName', error, {
+      name,
+      viewType,
+      category,
+    });
+    throw error;
+  }
+}

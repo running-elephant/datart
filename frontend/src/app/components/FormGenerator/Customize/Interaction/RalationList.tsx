@@ -24,7 +24,8 @@ import { fetchDataChart } from 'app/utils/fetch';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
-import { handleDisplayViewName, uuidv4 } from 'utils/utils';
+import { handleDisplayViewName } from 'app/utils/chartHelper';
+import { uuidv4 } from 'utils/utils';
 import { InteractionRelationType } from '../../constants';
 import { CustomizeRelation, I18nTranslator } from './types';
 

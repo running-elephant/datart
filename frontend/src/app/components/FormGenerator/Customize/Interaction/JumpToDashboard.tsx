@@ -18,8 +18,8 @@
 
 import { Button, Dropdown, Select, Space } from 'antd';
 import ChartDataView from 'app/types/ChartDataView';
+import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { FC, memo, useMemo, useState } from 'react';
-import { handleDisplayViewName } from 'utils/utils';
 import { InteractionFieldRelation } from '../../constants';
 import ControllerList from './ControllerList';
 import { I18nTranslator, JumpToDashboardRule, VizType } from './types';

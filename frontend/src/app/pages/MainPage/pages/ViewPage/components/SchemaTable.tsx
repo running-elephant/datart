@@ -26,6 +26,7 @@ import { ToolbarButton } from 'app/components';
 import { VirtualTable } from 'app/components/VirtualTable';
 import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { memo, ReactElement, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -34,7 +35,7 @@ import {
   SPACE_XS,
   WARNING,
 } from 'styles/StyleConstants';
-import { handleDisplayViewName, uuidv4 } from 'utils/utils';
+import { uuidv4 } from 'utils/utils';
 import { ColumnCategories } from '../constants';
 import { Column, Model, ViewType } from '../slice/types';
 import { getColumnWidthMap, getHierarchyColumn } from '../utils';

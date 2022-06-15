@@ -1,5 +1,4 @@
 import { message, TreeDataNode, TreeNodeProps } from 'antd';
-import { ChartDataViewFieldCategory } from 'app/constants';
 import { AxiosError, AxiosResponse } from 'axios';
 import classnames from 'classnames';
 import i18next from 'i18next';
@@ -409,66 +408,4 @@ export function newIssueUrl({ type, ...options }) {
   }
 
   return url.toString();
-}
-
-export function handleDisplayViewName({
-  name,
-  viewType = 'SQL',
-  category,
-}: {
-  name: string;
-  viewType?: string;
-  category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
-}): string {
-  try {
-    if (viewType === 'STRUCT' && category) {
-      if (category === ChartDataViewFieldCategory.Field) {
-        return JSON.parse(name)?.join('.');
-      } else {
-        return String(name);
-      }
-    } else if (viewType === 'STRUCT') {
-      return JSON.parse(name)?.join('.');
-    } else {
-      return String(name);
-    }
-  } catch (error) {
-    console.log('handleDisplayViewName', error, {
-      name,
-      viewType,
-      category,
-    });
-    throw error;
-  }
-}
-
-export function handleRequestColumnName({
-  name,
-  viewType = 'SQL',
-  category,
-}: {
-  name: string;
-  viewType?: string;
-  category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
-}): string[] {
-  try {
-    if (viewType === 'STRUCT' && category) {
-      if (category === ChartDataViewFieldCategory.Field) {
-        return JSON.parse(name);
-      } else {
-        return [name];
-      }
-    } else if (viewType === 'STRUCT') {
-      return JSON.parse(name);
-    } else {
-      return [name];
-    }
-  } catch (error) {
-    console.log('handleRequestColumnName', error, {
-      name,
-      viewType,
-      category,
-    });
-    throw error;
-  }
 }

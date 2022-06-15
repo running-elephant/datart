@@ -36,12 +36,12 @@ import {
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
-import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import {
   handleDisplayViewName,
   handleRequestColumnName,
-  uuidv4,
-} from 'utils/utils';
+} from 'app/utils/chartHelper';
+import { transformToViewConfig } from 'app/utils/internalChartHelper';
+import { uuidv4 } from 'utils/utils';
 import widgetManagerInstance from '../../../WidgetManager';
 import { initTitleTpl, widgetTpl } from '../../../WidgetManager/utils/init';
 

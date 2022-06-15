@@ -26,17 +26,17 @@ import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
+  handleDisplayViewName,
+  handleRequestColumnName,
+} from 'app/utils/chartHelper';
+import {
   filterSqlOperatorName,
   transformToViewConfig,
 } from 'app/utils/internalChartHelper';
 import { saveAs } from 'file-saver';
 import i18next from 'i18next';
 import { request, request2, requestWithHeader } from 'utils/request';
-import {
-  errorHandle,
-  handleDisplayViewName,
-  handleRequestColumnName,
-} from 'utils/utils';
+import { errorHandle } from 'utils/utils';
 import { convertToChartDto } from './ChartDtoHelper';
 
 export const getDistinctFields = async (

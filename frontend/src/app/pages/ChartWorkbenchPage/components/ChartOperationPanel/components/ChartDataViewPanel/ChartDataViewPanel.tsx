@@ -39,6 +39,7 @@ import { ColumnRole } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { checkComputedFieldAsync } from 'app/utils/fetch';
 import { updateByKey } from 'app/utils/mutation';
 import { FC, memo, useCallback, useMemo } from 'react';
@@ -46,7 +47,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { SPACE, SPACE_XS } from 'styles/StyleConstants';
-import { getPath, handleDisplayViewName } from 'utils/utils';
+import { getPath } from 'utils/utils';
 import { ChartDraggableSourceGroupContainer } from '../ChartDraggable';
 import ChartComputedFieldSettingPanel from './components/ChartComputedFieldSettingPanel';
 

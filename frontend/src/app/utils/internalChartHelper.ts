@@ -43,6 +43,10 @@ import {
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import {
+  handleDisplayViewName,
+  handleRequestColumnName,
+} from 'app/utils/chartHelper';
 import { FilterSqlOperator } from 'globalConstants';
 import {
   cond,
@@ -56,7 +60,6 @@ import {
   isUndefined,
   pipe,
 } from 'utils/object';
-import { handleDisplayViewName, handleRequestColumnName } from 'utils/utils';
 import { getDrillableRows } from './chartHelper';
 
 export const transferChartConfigs = (

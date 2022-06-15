@@ -29,9 +29,11 @@ import {
 } from '@ant-design/icons';
 import Dropdown from 'antd/lib/dropdown';
 import { SortActionType } from 'app/constants';
-import { getColumnRenderName } from 'app/utils/chartHelper';
+import {
+  getColumnRenderName,
+  handleDisplayViewName,
+} from 'app/utils/chartHelper';
 import { FC, memo, useMemo } from 'react';
-import { handleDisplayViewName } from 'utils/utils';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
 
 const ChartDraggableElementField: FC<{

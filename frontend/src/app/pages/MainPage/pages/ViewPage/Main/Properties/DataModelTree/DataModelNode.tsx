@@ -29,6 +29,7 @@ import { Button, Dropdown, Menu, Tooltip } from 'antd';
 import { IW } from 'app/components';
 import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { FC, memo, useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components/macro';
@@ -43,7 +44,6 @@ import {
   SUCCESS,
   WARNING,
 } from 'styles/StyleConstants';
-import { handleDisplayViewName } from 'utils/utils';
 import { ColumnCategories } from '../../../constants';
 import { Column, ViewType } from '../../../slice/types';
 import { ALLOW_COMBINE_COLUMN_TYPES } from './constant';

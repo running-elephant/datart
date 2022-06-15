@@ -21,7 +21,7 @@ import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { isEmptyArray } from 'utils/object';
-import { handleDisplayViewName } from 'utils/utils';
+import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { InteractionFieldMapper, InteractionMouseEvent } from '../../constants';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';

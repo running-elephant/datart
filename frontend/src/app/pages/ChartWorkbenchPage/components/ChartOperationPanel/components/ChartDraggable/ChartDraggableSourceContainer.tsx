@@ -36,6 +36,7 @@ import {
   ViewType,
 } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { buildDragItem } from 'app/utils/internalChartHelper';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { FC, memo, useMemo } from 'react';
@@ -52,7 +53,7 @@ import {
   SUCCESS,
   WARNING,
 } from 'styles/StyleConstants';
-import { handleDisplayViewName, stopPPG } from 'utils/utils';
+import { stopPPG } from 'utils/utils';
 import { DATE_LEVELS } from '../../../../slice/constant';
 import DateLevelFieldContainer from './DateLevelFieldContainer';
 

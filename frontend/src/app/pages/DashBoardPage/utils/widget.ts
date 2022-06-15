@@ -26,12 +26,12 @@ import {
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ChartsEventData } from 'app/types/Chart';
 import ChartDataView from 'app/types/ChartDataView';
+import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { formatTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
 import { CSSProperties } from 'react';
 import { CloneValueDeep } from 'utils/object';
-import { handleDisplayViewName } from 'utils/utils';
 import { adaptBoardImageUrl, fillPx, getBackgroundImage } from '.';
 import { initClientId } from '../components/WidgetManager/utils/init';
 import { LAYOUT_COLS_MAP, ORIGINAL_TYPE_MAP } from '../constants';
