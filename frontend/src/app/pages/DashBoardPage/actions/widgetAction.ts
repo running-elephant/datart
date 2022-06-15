@@ -17,10 +17,10 @@
  */
 
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
-import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams } from 'app/types/Chart';
 import i18next from 'i18next';
 import { RootState } from 'types';
+import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 import { jumpTypes, ORIGINAL_TYPE_MAP } from '../constants';
 import { boardActions } from '../pages/Board/slice';
 import {
@@ -302,6 +302,15 @@ export const widgetChartClickAction =
       return;
     }
   };
+
+export const widgetLinkEventAction =
+  (obj: { widget: Widget; params: any }) => dispatch => {
+    const { widget, params } = obj;
+    // TODO(Stephen): to be implement chart link event
+    console.log(`widgetLinkEventAction | obj ---> `, widget, params);
+    // widgetClickLinkageAction(boardId, editing, renderMode, widget, params),
+  };
+
 export const widgetGetDataAction =
   (editing: boolean, widget: Widget, renderMode: VizRenderMode) => dispatch => {
     const boardId = widget.dashboardId;

@@ -21,7 +21,7 @@ import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo, useState } from 'react';
 import { isEmpty } from 'utils/object';
 import { InteractionFieldRelation } from '../../constants';
-import RelationList from './RalationList';
+import RelationList from './RelationList';
 import { I18nTranslator, JumpToChartRule, VizType } from './types';
 
 const JumpToChart: FC<

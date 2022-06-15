@@ -28,6 +28,7 @@ import {
   refreshWidgetsByControllerAction,
   widgetChartClickAction,
   widgetGetDataAction,
+  widgetLinkEventAction,
   widgetToClearLinkageAction,
 } from '../../actions/widgetAction';
 import { ORIGINAL_TYPE_MAP } from '../../constants';
@@ -158,6 +159,14 @@ export const WidgetActionProvider: FC<{
           } else {
             dispatch(boardActions.updateWidget(widget));
           }
+        },
+        onWidgetLinkEvent: (widget: Widget) => params => {
+          dispatch(
+            widgetLinkEventAction({
+              widget,
+              params,
+            }),
+          );
         },
         //
         onWidgetChartClick: (widget: Widget, params: ChartMouseEventParams) => {
@@ -296,6 +305,8 @@ export interface WidgetActionContextProps {
   onWidgetsQuery: () => void;
   onRenderedWidgetById: (wid: string) => void;
   onChangeGroupRect: (args: { wid: string; w: number; h: number }) => void;
+
+  onWidgetLinkEvent: (widget: Widget) => (params) => void;
 
   onWidgetDataUpdate: ({
     computedFields,
