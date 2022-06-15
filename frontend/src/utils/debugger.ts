@@ -42,4 +42,20 @@ export class Debugger {
     console.info(`Performance - ${info} - `, `${end - start} ms`);
     return result;
   }
+
+  /**
+   * Delay Function
+   * @Example
+   *  await Debugger.instance.delay(5000);
+   * @param {number} milliseconds
+   * @return {*}
+   * @memberof Debugger
+   */
+  public async delay(ms: number = 500) {
+    return await new Promise(resolve =>
+      setTimeout(() => {
+        resolve({});
+      }, ms),
+    );
+  }
 }

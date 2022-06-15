@@ -91,9 +91,8 @@ export function ShareChart() {
   useMount(() => {
     ChartManager.instance()
       .load()
+      .then(() => loadVizData())
       .catch(err => console.error('Fail to load customize charts with ', err));
-
-    loadVizData();
   });
 
   useEffect(() => {
