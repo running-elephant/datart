@@ -267,7 +267,7 @@ export const syncWidgetChartDataAsync = createAsyncThunk<
         data: requestParams,
       });
       widgetData = { ...data, id: widgetId };
-      dispatch(boardActions.setWidgetData(widgetData));
+      dispatch(boardActions.setWidgetData({ wid: widgetId, data: widgetData }));
     }
     return null;
   },
@@ -324,7 +324,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
           url: `data-provider/execute`,
           data: requestParams,
         });
-        widgetData = { ...data, id: widgetId };
+        widgetData = data;
       } else {
         const executeTokenMap = (getState() as RootState)?.share
           ?.executeTokenMap;
@@ -340,12 +340,13 @@ export const getChartWidgetDataAsync = createAsyncThunk<
           },
           data: requestParams,
         });
-        widgetData = { ...data, id: widgetId };
+        widgetData = data;
       }
       dispatch(
-        boardActions.setWidgetData(
-          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
-        ),
+        boardActions.setWidgetData({
+          wid: widgetId,
+          data: filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        }),
       );
       dispatch(
         boardActions.changePageInfo({
@@ -372,13 +373,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
         }),
       );
 
-      dispatch(
-        boardActions.setWidgetData({
-          id: widgetId,
-          columns: [],
-          rows: [],
-        } as WidgetData),
-      );
+      dispatch(boardActions.setWidgetData({ wid: widgetId, data: undefined }));
     }
     dispatch(
       boardActions.addFetchedItem({
@@ -444,19 +439,20 @@ export const getControllerOptions = createAsyncThunk<
           },
           data: requestParams,
         });
-        widgetData = { ...data, id: widget.id };
+        widgetData = data;
       } else {
         const { data } = await request2<WidgetData>({
           method: 'POST',
           url: `data-provider/execute`,
           data: requestParams,
         });
-        widgetData = { ...data, id: widget.id };
+        widgetData = data;
       }
       dispatch(
-        boardActions.setWidgetData(
-          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
-        ),
+        boardActions.setWidgetData({
+          wid: widgetId,
+          data: filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        }),
       );
       dispatch(
         boardActions.setWidgetErrInfo({

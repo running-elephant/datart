@@ -69,7 +69,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const { dataChart, availableSourceFunctions, chartDataView } =
     useContext(WidgetChartContext);
   const scale = useContext(BoardScaleContext);
-  const { data } = useContext(WidgetDataContext);
+  const { data: dataset } = useContext(WidgetDataContext);
   const { renderMode, orgId } = useContext(BoardContext);
   const selectedItems = useContext(WidgetSelectionContext);
   const widget = useContext(WidgetContext);
@@ -174,15 +174,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       jumpField,
     };
   }, [widget]);
-
-  const dataset = useMemo(
-    () => ({
-      columns: data.columns,
-      rows: data.rows,
-      pageInfo: data.pageInfo || {},
-    }),
-    [data],
-  );
 
   const buildDrillThroughEventParams = useCallback(
     (clickEventParams, targetEvent: InteractionMouseEvent, ruleId?: string) => {
@@ -480,8 +471,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     cacheW,
     errText,
     dataset,
-    selectedItems,
     chart,
+    selectedItems,
     containerId,
     widgetSpecialConfig,
     scale,
