@@ -49,7 +49,7 @@ export interface BoardState {
   widgetInfoRecord: Record<string, Record<string, WidgetInfo>>;
   dataChartMap: Record<string, DataChart>;
   viewMap: Record<string, ChartDataView>; // View
-  widgetDataMap: Record<string, WidgetData>;
+  widgetDataMap: Record<string, WidgetData | undefined>;
   availableSourceFunctionsMap: Record<string, string[]>;
   selectedItems: Record<string, SelectedItem[]>;
 }
@@ -181,7 +181,9 @@ export interface WidgetData {
   name?: string;
   rows?: string[][];
   pageInfo?: Partial<PageInfo>;
+  [key: string]: any;
 }
+
 //
 export const RenderTypes = [
   'rerender',
