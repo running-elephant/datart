@@ -51,6 +51,7 @@ import {
 } from 'app/utils/chartHelper';
 import { toPrecision } from 'app/utils/number';
 import { init } from 'echarts';
+import { transparentize } from 'polished';
 import { UniqArray } from 'utils/object';
 import Chart from '../../../models/Chart';
 import { ChartRequirement } from '../../../types/ChartMetadata';
@@ -65,6 +66,13 @@ class BasicBarChart extends Chart {
   protected isStackMode = false;
   protected isPercentageYAxis = false;
   private selection: null | ChartSelection = null;
+  protected dataZoomConfig: {
+    setConfig: any;
+    showConfig: any;
+  } = {
+    setConfig: null,
+    showConfig: null,
+  };
 
   constructor(props?: {
     id: string;
@@ -101,6 +109,12 @@ class BasicBarChart extends Chart {
     this.selection = getChartSelection(context.window, {
       chart: this.chart,
       mouseEvents: this.mouseEvents,
+    });
+    this.chart.on('datazoom', ({ end, start }) => {
+      this.dataZoomConfig.showConfig = {
+        end,
+        start,
+      };
     });
     this.mouseEvents?.forEach(event => {
       switch (event.name) {
@@ -256,8 +270,101 @@ class BasicBarChart extends Chart {
         ),
       },
       legend: this.getLegendStyle(styleConfigs, series),
+      dataZoom: this.getDataZoom(styleConfigs),
       ...option,
     };
+  }
+
+  private getDataZoom(styles: ChartStyleConfig[]) {
+    const [
+      showZoomSlider,
+      zoomSliderColor,
+      usePercentage,
+      start,
+      end,
+      startValue,
+      endValue,
+    ] = getStyles(
+      styles,
+      ['xAxis'],
+      [
+        'showZoomSlider',
+        'zoomSliderColor',
+        'usePercentage',
+        'zoomStartPercentage',
+        'zoomEndPercentage',
+        'zoomStartIndex',
+        'zoomEndIndex',
+      ],
+    );
+
+    return showZoomSlider
+      ? [
+          {
+            type: 'slider',
+            handleSize: '100%',
+            show: true,
+            orient: this.isHorizonDisplay ? 'vertical' : 'horizontal',
+            dataBackground: {
+              lineStyle: {
+                color: transparentize(0.7, zoomSliderColor),
+              },
+              areaStyle: {
+                color: transparentize(0.7, zoomSliderColor),
+              },
+            },
+            selectedDataBackground: {
+              lineStyle: {
+                color: zoomSliderColor,
+              },
+              areaStyle: {
+                color: zoomSliderColor,
+              },
+            },
+            brushStyle: {
+              color: transparentize(0.85, zoomSliderColor),
+            },
+            emphasis: {
+              handleStyle: {
+                color: zoomSliderColor,
+              },
+              moveHandleStyle: {
+                color: zoomSliderColor,
+              },
+            },
+            fillerColor: transparentize(0.85, zoomSliderColor),
+            ...this.getDataZoomStartAndEnd({
+              usePercentage,
+              start,
+              end,
+              startValue,
+              endValue,
+            }),
+          },
+        ]
+      : [];
+  }
+
+  private getDataZoomStartAndEnd(setConfig) {
+    if (
+      JSON.stringify(this.dataZoomConfig.setConfig) !==
+        JSON.stringify(setConfig) ||
+      !this.dataZoomConfig.showConfig
+    ) {
+      this.dataZoomConfig.setConfig = {
+        ...setConfig,
+      };
+      return setConfig.usePercentage
+        ? {
+            start: setConfig.start,
+            end: setConfig.end,
+          }
+        : {
+            startValue: setConfig.startValue,
+            endValue: setConfig.endValue,
+          };
+    }
+    return this.dataZoomConfig.showConfig;
   }
 
   private makePercentageYAxis(axisInfo: { xAxis: XAxis; yAxis: YAxis }) {

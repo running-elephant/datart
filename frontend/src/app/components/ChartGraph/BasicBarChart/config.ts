@@ -301,6 +301,96 @@ const config: ChartConfig = {
           default: 0,
           comType: 'inputNumber',
         },
+        {
+          label: 'common.showZoomSlider',
+          key: 'showZoomSlider',
+          default: false,
+          comType: 'checkbox',
+        },
+        {
+          label: 'common.zoomSliderColor',
+          key: 'zoomSliderColor',
+          comType: 'fontColor',
+          default: '#8fb0f7',
+        },
+        {
+          label: 'common.usePercentage',
+          key: 'usePercentage',
+          default: true,
+          comType: 'checkbox',
+        },
+        {
+          label: 'common.zoomStartPercentage',
+          key: 'zoomStartPercentage',
+          comType: 'inputNumber',
+          default: 0,
+          options: {
+            step: 1,
+            min: 0,
+            max: 100,
+          },
+          watcher: {
+            deps: ['usePercentage'],
+            action: props => {
+              return {
+                disabled: !props.usePercentage,
+              };
+            },
+          },
+        },
+        {
+          label: 'common.zoomEndPercentage',
+          key: 'zoomEndPercentage',
+          comType: 'inputNumber',
+          default: 100,
+          options: {
+            step: 1,
+            min: 0,
+            max: 100,
+          },
+          watcher: {
+            deps: ['usePercentage'],
+            action: props => {
+              return {
+                disabled: !props.usePercentage,
+              };
+            },
+          },
+        },
+        {
+          label: 'common.zoomStartIndex',
+          key: 'zoomStartIndex',
+          comType: 'inputNumber',
+          default: undefined,
+          options: {
+            min: 0,
+          },
+          watcher: {
+            deps: ['usePercentage'],
+            action: props => {
+              return {
+                disabled: props.usePercentage,
+              };
+            },
+          },
+        },
+        {
+          label: 'common.zoomEndIndex',
+          key: 'zoomEndIndex',
+          comType: 'inputNumber',
+          default: undefined,
+          options: {
+            min: 0,
+          },
+          watcher: {
+            deps: ['usePercentage'],
+            action: props => {
+              return {
+                disabled: props.usePercentage,
+              };
+            },
+          },
+        },
       ],
     },
     {
@@ -562,6 +652,13 @@ const config: ChartConfig = {
           nameGap: '标题与轴线距离',
           min: '最小值',
           max: '最大值',
+          showZoomSlider: '是否开启缩放滑块',
+          zoomSliderColor: '选中颜色',
+          usePercentage: '缩放使用百分比',
+          zoomStartPercentage: '起始百分比',
+          zoomEndPercentage: '结束百分比',
+          zoomStartIndex: '起始下标',
+          zoomEndIndex: '结束下标',
         },
         label: {
           title: '标签',
@@ -635,6 +732,13 @@ const config: ChartConfig = {
           nameGap: 'Name Gap',
           min: 'Min',
           max: 'Max',
+          showZoomSlider: 'Show Zoom Slider',
+          zoomSliderColor: 'Zoom Slider Color',
+          usePercentage: 'Use Percentage',
+          zoomStartPercentage: 'Zoom Slider Start Percentage',
+          zoomEndPercentage: 'Zoom Slider End Percentage',
+          zoomStartIndex: 'Zoom Slider Start Index',
+          zoomEndIndex: 'Zoom Slider End Index',
         },
         label: {
           title: 'Label',

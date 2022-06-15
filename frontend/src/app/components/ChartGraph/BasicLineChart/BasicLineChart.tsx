@@ -54,6 +54,7 @@ import {
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
+import { transparentize } from 'polished';
 import { UniqArray } from 'utils/object';
 import Chart from '../../../models/Chart';
 import Config from './config';
@@ -67,6 +68,13 @@ class BasicLineChart extends Chart {
 
   protected isArea = false;
   protected isStack = false;
+  protected dataZoomConfig: {
+    setConfig: any;
+    showConfig: any;
+  } = {
+    setConfig: null,
+    showConfig: null,
+  };
 
   constructor(props?) {
     super(
@@ -98,6 +106,12 @@ class BasicLineChart extends Chart {
     this.selection = getChartSelection(context.window, {
       chart: this.chart,
       mouseEvents: this.mouseEvents,
+    });
+    this.chart.on('datazoom', ({ end, start }) => {
+      this.dataZoomConfig.showConfig = {
+        end,
+        start,
+      };
     });
     this.mouseEvents?.forEach(event => {
       switch (event.name) {
@@ -230,8 +244,100 @@ class BasicLineChart extends Chart {
         styleConfigs,
         series?.map(s => s.name),
       ),
+      dataZoom: this.getDataZoom(styleConfigs),
       ...option,
     };
+  }
+
+  private getDataZoom(styles: ChartStyleConfig[]) {
+    const [
+      showZoomSlider,
+      zoomSliderColor,
+      usePercentage,
+      start,
+      end,
+      startValue,
+      endValue,
+    ] = getStyles(
+      styles,
+      ['xAxis'],
+      [
+        'showZoomSlider',
+        'zoomSliderColor',
+        'usePercentage',
+        'zoomStartPercentage',
+        'zoomEndPercentage',
+        'zoomStartIndex',
+        'zoomEndIndex',
+      ],
+    );
+
+    return showZoomSlider
+      ? [
+          {
+            type: 'slider',
+            handleSize: '100%',
+            show: true,
+            dataBackground: {
+              lineStyle: {
+                color: transparentize(0.7, zoomSliderColor),
+              },
+              areaStyle: {
+                color: transparentize(0.7, zoomSliderColor),
+              },
+            },
+            selectedDataBackground: {
+              lineStyle: {
+                color: zoomSliderColor,
+              },
+              areaStyle: {
+                color: zoomSliderColor,
+              },
+            },
+            brushStyle: {
+              color: transparentize(0.85, zoomSliderColor),
+            },
+            emphasis: {
+              handleStyle: {
+                color: zoomSliderColor,
+              },
+              moveHandleStyle: {
+                color: zoomSliderColor,
+              },
+            },
+            fillerColor: transparentize(0.85, zoomSliderColor),
+            ...this.getDataZoomStartAndEnd({
+              usePercentage,
+              start,
+              end,
+              startValue,
+              endValue,
+            }),
+          },
+        ]
+      : [];
+  }
+
+  private getDataZoomStartAndEnd(setConfig) {
+    if (
+      JSON.stringify(this.dataZoomConfig.setConfig) !==
+        JSON.stringify(setConfig) ||
+      !this.dataZoomConfig.showConfig
+    ) {
+      this.dataZoomConfig.setConfig = {
+        ...setConfig,
+      };
+      return setConfig.usePercentage
+        ? {
+            start: setConfig.start,
+            end: setConfig.end,
+          }
+        : {
+            startValue: setConfig.startValue,
+            endValue: setConfig.endValue,
+          };
+    }
+    return this.dataZoomConfig.showConfig;
   }
 
   private getSeries(
