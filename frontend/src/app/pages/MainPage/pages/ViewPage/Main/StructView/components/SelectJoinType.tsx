@@ -21,10 +21,10 @@ import classnames from 'classnames';
 import { memo } from 'react';
 import styled from 'styled-components';
 import { SPACE_SM } from 'styles/StyleConstants';
-import { SimpleViewJoinType } from '../../../constants';
+import { StructViewJoinType } from '../../../constants';
 
 interface SelectJoinTypeProps {
-  type: SimpleViewJoinType;
+  type: StructViewJoinType;
   callbackFn: (type) => void;
 }
 
@@ -35,13 +35,13 @@ const SelectJoinType = memo(({ type, callbackFn }: SelectJoinTypeProps) => {
       placement="bottomLeft"
       content={
         <MenuWrapper selectedKeys={[type]} onClick={e => callbackFn(e.key)}>
-          <MenuListItem key={SimpleViewJoinType['innerJoin']}>
+          <MenuListItem key={StructViewJoinType['innerJoin']}>
             Inner Join
           </MenuListItem>
-          <MenuListItem key={SimpleViewJoinType['leftJoin']}>
+          <MenuListItem key={StructViewJoinType['leftJoin']}>
             Left Join
           </MenuListItem>
-          <MenuListItem key={SimpleViewJoinType['rightJoin']}>
+          <MenuListItem key={StructViewJoinType['rightJoin']}>
             Right Join
           </MenuListItem>
         </MenuWrapper>
@@ -49,9 +49,9 @@ const SelectJoinType = memo(({ type, callbackFn }: SelectJoinTypeProps) => {
     >
       <Icon
         className={classnames('iconfont', {
-          'icon-join_inner': type === SimpleViewJoinType['innerJoin'],
-          'icon-join_right': type === SimpleViewJoinType['leftJoin'],
-          'icon-join_left': type === SimpleViewJoinType['rightJoin'],
+          'icon-join_inner': type === StructViewJoinType['innerJoin'],
+          'icon-join_right': type === StructViewJoinType['leftJoin'],
+          'icon-join_left': type === StructViewJoinType['rightJoin'],
         })}
       ></Icon>
     </Popup>

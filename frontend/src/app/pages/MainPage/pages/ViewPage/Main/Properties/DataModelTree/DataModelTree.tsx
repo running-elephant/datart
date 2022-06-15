@@ -42,7 +42,7 @@ import {
   Column,
   ColumnRole,
   Model,
-  SimpleViewQueryProps,
+  StructViewQueryProps,
   ViewType,
 } from '../../../slice/types';
 import { dataModelColumnSorter } from '../../../utils';
@@ -76,7 +76,7 @@ const DataModelTree: FC = memo(() => {
   ) as ViewType;
   const script = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'script' }),
-  ) as SimpleViewQueryProps;
+  ) as StructViewQueryProps;
 
   const [hierarchy, setHierarchy] = useState<Nullable<Model>>();
   const [computedFields, setComputedFields] = useState<ChartDataViewMeta[]>();

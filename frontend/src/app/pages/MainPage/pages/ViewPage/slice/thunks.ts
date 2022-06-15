@@ -54,7 +54,7 @@ import {
   QueryResult,
   SaveFolderParams,
   SaveViewParams,
-  SimpleViewQueryProps,
+  StructViewQueryProps,
   UnarchiveViewParams,
   UpdateViewBaseParams,
   VariableHierarchy,
@@ -158,7 +158,7 @@ export const getSchemaBySourceId = createAsyncThunk<any, string>(
 
 export const runSql = createAsyncThunk<
   QueryResult | null,
-  { id: string; isFragment: boolean; script?: SimpleViewQueryProps },
+  { id: string; isFragment: boolean; script?: StructViewQueryProps },
   { state: RootState }
 >('view/runSql', async ({ script: scriptProps }, { getState, dispatch }) => {
   const currentEditingView = selectCurrentEditingView(
@@ -168,7 +168,7 @@ export const runSql = createAsyncThunk<
 
   const { sourceId, size, fragment, variables, type } = currentEditingView;
   let sql = '';
-  let structure: SimpleViewQueryProps | null = null;
+  let structure: StructViewQueryProps | null = null;
   let script = '';
 
   if (scriptProps) {
@@ -177,7 +177,7 @@ export const runSql = createAsyncThunk<
     if (type === 'SQL') {
       sql = currentEditingView.script as string;
     } else {
-      structure = currentEditingView.script as SimpleViewQueryProps;
+      structure = currentEditingView.script as StructViewQueryProps;
     }
   }
 

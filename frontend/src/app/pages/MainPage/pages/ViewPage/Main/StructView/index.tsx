@@ -36,12 +36,11 @@ import {
 } from 'styles/StyleConstants';
 import { getInsertedNodeIndex } from 'utils/utils';
 import {
-  SimpleViewJoinType,
+  StructViewJoinType,
   ViewStatus,
   ViewViewModelStages,
 } from '../../constants';
 import { EditorContext } from '../../EditorContext';
-import { Toolbar } from '../../Main/Editor/Toolbar';
 import { SaveFormContext } from '../../SaveFormContext';
 import { useViewSlice } from '../../slice';
 import {
@@ -50,19 +49,20 @@ import {
   selectViews,
 } from '../../slice/selectors';
 import { runSql, saveView } from '../../slice/thunks';
-import { SimpleViewQueryProps } from '../../slice/types';
+import { StructViewQueryProps } from '../../slice/types';
 import { handleStringScriptToObject, isNewView } from '../../utils';
+import { Toolbar } from '../Editor/Toolbar';
 import SelectDataSource from './components/SelectDataSource';
 import SelectJoinColumns from './components/SelectJoinColumns';
 import SelectJoinType from './components/SelectJoinType';
 
-interface SimpleViewProps {
+interface StructViewProps {
   allowManage: boolean;
   allowEnableViz: boolean | undefined;
 }
 
-export const SimpleView = memo(
-  ({ allowManage, allowEnableViz }: SimpleViewProps) => {
+export const StructView = memo(
+  ({ allowManage, allowEnableViz }: StructViewProps) => {
     const { actions } = useViewSlice();
     const dispatch = useDispatch();
     const { initActions } = useContext(EditorContext);
@@ -70,7 +70,7 @@ export const SimpleView = memo(
 
     const tableJSON = useSelector(state =>
       selectCurrentEditingViewAttr(state, { name: 'script' }),
-    ) as SimpleViewQueryProps;
+    ) as StructViewQueryProps;
     const id = useSelector(state =>
       selectCurrentEditingViewAttr(state, { name: 'id' }),
     ) as string;
@@ -117,14 +117,14 @@ export const SimpleView = memo(
       dispatch(
         actions.changeCurrentEditingView({
           script: produce(tableJSON, draft => {
-            draft.joins.push({ joinType: SimpleViewJoinType.rightJoin });
+            draft.joins.push({ joinType: StructViewJoinType.rightJoin });
           }),
         }),
       );
     }, [tableJSON, dispatch, actions]);
 
     const handleTableJoinType = useCallback(
-      (type: SimpleViewJoinType, index: number) => {
+      (type: StructViewJoinType, index: number) => {
         dispatch(
           actions.changeCurrentEditingView({
             script: produce(tableJSON, draft => {
@@ -199,7 +199,7 @@ export const SimpleView = memo(
 
     const handleInterimRunSql = useCallback(
       (type?: 'MAIN' | 'JOINS', joinIndex?: number) => {
-        let script: SimpleViewQueryProps = {
+        let script: StructViewQueryProps = {
           table: [],
           columns: [],
           joins: [],
@@ -292,7 +292,7 @@ export const SimpleView = memo(
     }, [sourceId, allDatabaseSchemas, actions, dispatch, tableJSON]);
 
     return (
-      <SimpleViewWrapper>
+      <StructViewWrapper>
         {typeof tableJSON === 'string' ? (
           <LoadingWrap>
             <Spin />
@@ -447,12 +447,12 @@ export const SimpleView = memo(
             )}
           </>
         )}
-      </SimpleViewWrapper>
+      </StructViewWrapper>
     );
   },
 );
 
-const SimpleViewWrapper = styled.div`
+const StructViewWrapper = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;

@@ -36,7 +36,7 @@ import { getSchemaBySourceId } from '../../../slice/thunks';
 import {
   DatabaseSchema,
   JoinTableProps,
-  SimpleViewQueryProps,
+  StructViewQueryProps,
 } from '../../../slice/types';
 import { buildAntdTreeNodeModel } from '../../../utils';
 const CheckboxGroup = Checkbox.Group;
@@ -45,7 +45,7 @@ interface SelectDataSourceProps {
   type?: 'MAIN' | 'JOINS';
   callbackFn?: (data: any, type) => void;
   renderType?: 'READ' | 'OPERATE';
-  tableJSON?: SimpleViewQueryProps;
+  tableJSON?: StructViewQueryProps;
   sourceId?: string;
   joinTable?: JoinTableProps;
 }

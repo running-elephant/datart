@@ -47,7 +47,7 @@ export enum ConcurrencyControlModes {
 
 export const UNPERSISTED_ID_PREFIX = 'GENERATED-';
 
-export enum SimpleViewJoinType {
+export enum StructViewJoinType {
   rightJoin = 'RIGHT',
   leftJoin = 'LEFT',
   innerJoin = 'INNER',

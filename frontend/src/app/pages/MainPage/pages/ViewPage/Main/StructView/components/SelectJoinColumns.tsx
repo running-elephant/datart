@@ -20,10 +20,10 @@ import { TreeSelect } from 'antd';
 import { memo, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { SPACE_SM } from 'styles/StyleConstants';
-import { JoinTableProps, SimpleViewQueryProps } from '../../../slice/types';
+import { JoinTableProps, StructViewQueryProps } from '../../../slice/types';
 
 interface SelectJoinColumnsProps {
-  tableJSON: SimpleViewQueryProps;
+  tableJSON: StructViewQueryProps;
   joinTable: JoinTableProps;
   callbackFn: (field, type, index) => void;
   conditionsIndex: number;

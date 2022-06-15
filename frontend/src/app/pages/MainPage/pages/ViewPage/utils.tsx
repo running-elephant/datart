@@ -37,7 +37,7 @@ import {
   HierarchyModel,
   Model,
   QueryResult,
-  SimpleViewQueryProps,
+  StructViewQueryProps,
   ViewViewModel,
 } from './slice/types';
 
@@ -255,7 +255,7 @@ export function getSaveParamsFromViewModel(
       script:
         type === 'STRUCT'
           ? handleObjectScriptToString(
-              script as SimpleViewQueryProps,
+              script as StructViewQueryProps,
               database!,
             )
           : script,
@@ -303,7 +303,7 @@ export function getSaveParamsFromViewModel(
       script:
         type === 'STRUCT' && !isSaveAs
           ? handleObjectScriptToString(
-              script as SimpleViewQueryProps,
+              script as StructViewQueryProps,
               database!,
             )
           : script,
@@ -424,7 +424,7 @@ export function buildAntdTreeNodeModel<T extends TreeDataNode & { value: any }>(
   } as any;
 }
 
-export function buildRequestColumns(tableJSON: SimpleViewQueryProps) {
+export function buildRequestColumns(tableJSON: StructViewQueryProps) {
   const columns: any = [];
   tableJSON.columns.forEach((v, i) => {
     const tableName = tableJSON.table[tableJSON.table.length - 1];
@@ -507,7 +507,7 @@ export function handleStringScriptToObject(
 }
 
 export function handleObjectScriptToString(
-  structure: SimpleViewQueryProps,
+  structure: StructViewQueryProps,
   database: DatabaseSchema[],
 ) {
   try {

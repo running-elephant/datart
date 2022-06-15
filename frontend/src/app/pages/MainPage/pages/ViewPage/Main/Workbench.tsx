@@ -43,7 +43,7 @@ import { getSchemaBySourceId } from '../slice/thunks';
 import { Editor } from './Editor';
 import { Outputs } from './Outputs';
 import { Properties } from './Properties';
-import { SimpleView } from './SimpleView/index';
+import { StructView } from './StructView';
 
 export const Workbench = memo(() => {
   const dispatch = useDispatch();
@@ -157,7 +157,7 @@ export const Workbench = memo(() => {
             </LoadingWrap>
           )
         ) : viewType === 'STRUCT' ? (
-          <SimpleView
+          <StructView
             allowManage={allowManage}
             allowEnableViz={allowEnableViz}
           />
