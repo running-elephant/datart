@@ -381,6 +381,7 @@ export interface DataChartConfig {
   chartConfig: ChartConfig;
   chartGraphId: string;
   computedFields: any[];
+  sampleData?: any; // for template
 }
 
 export type ColsType = typeof LAYOUT_COLS_MAP;
