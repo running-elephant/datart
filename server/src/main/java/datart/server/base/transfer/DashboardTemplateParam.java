@@ -16,30 +16,21 @@
  * limitations under the License.
  */
 
-package datart.server.base.transfer.model;
+package datart.server.base.transfer;
 
-import datart.core.entity.Source;
+import datart.core.entity.Dashboard;
+import datart.core.entity.Widget;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 @Data
-public class SourceTransferModel extends ResourceTransferModel {
+@EqualsAndHashCode(callSuper = true)
+public class DashboardTemplateParam extends TransferParam {
 
-    private List<MainModel> mainModels;
+    private Dashboard dashboard;
 
-    private List<Source> parents;
+    private List<Widget> widgets;
 
-    @Override
-    public String getVizName() {
-        return mainModels.get(0).source.getName();
-    }
-
-    @Data
-    public static class MainModel  implements Serializable {
-        private Source source;
-        private Map<String, byte[]> files;
-    }
 }

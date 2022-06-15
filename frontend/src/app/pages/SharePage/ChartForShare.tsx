@@ -23,15 +23,14 @@ import { ChartDataViewFieldCategory } from 'app/constants';
 import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import ChartManager from 'app/models/ChartManager';
-import { ChartMouseEventParams, IChart } from 'app/types/Chart';
+import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
-import { KEYBOARD_EVENT_NAME } from 'globalConstants';
-import { FC, memo, useCallback, useRef, useState } from 'react';
+import { FC, memo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import ChartDrillContext from '../ChartWorkbenchPage/contexts/ChartDrillContext';
@@ -44,7 +43,6 @@ import { HeadlessBrowserIdentifier } from './HeadlessBrowserIdentifier';
 import { shareActions } from './slice';
 import {
   selectHeadlessBrowserRenderSign,
-  selectMultipleSelect,
   selectSelectedItems,
 } from './slice/selectors';
 import {
@@ -84,28 +82,6 @@ const ChartForShare: FC<{
     selectHeadlessBrowserRenderSign,
   );
   const selectedItems = useSelector(selectSelectedItems);
-  const multipleSelect = useSelector(selectMultipleSelect);
-
-  const chartIframeKeyboardListener = useCallback(
-    (e: KeyboardEvent) => {
-      if (
-        (e.key === KEYBOARD_EVENT_NAME.CTRL ||
-          e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
-        e.type === 'keydown' &&
-        !multipleSelect
-      ) {
-        dispatch(shareActions.updateMultipleSelect(true));
-      } else if (
-        (e.key === KEYBOARD_EVENT_NAME.CTRL ||
-          e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
-        e.type === 'keyup' &&
-        multipleSelect
-      ) {
-        dispatch(shareActions.updateMultipleSelect(false));
-      }
-    },
-    [dispatch, multipleSelect],
-  );
 
   useMount(() => {
     if (!chartPreview) {
@@ -169,24 +145,9 @@ const ChartForShare: FC<{
             return;
           }
 
-          // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法 其他图标取消选中时调取
-          if (param.interactionType === 'selected') {
+          // NOTE 直接修改selectedItems结果集处理方法
+          if (param.interactionType === 'select') {
             dispatch(shareActions.changeSelectedItems(param.selectedItems));
-          }
-          if (param.interactionType === 'unselect') {
-            dispatch(shareActions.changeSelectedItems([]));
-          }
-          if (chart.selectable) {
-            const { dataIndex, componentIndex, data }: ChartMouseEventParams =
-              param;
-            if (data?.rowData) {
-              dispatch(
-                shareActions.normalSelect({
-                  index: componentIndex + ',' + dataIndex,
-                  data,
-                }),
-              );
-            }
           }
         },
       },
@@ -271,7 +232,6 @@ const ChartForShare: FC<{
               config={chartPreview?.chartConfig!}
               drillOption={drillOptionRef.current}
               selectedItems={selectedItems}
-              onKeyboardPress={chartIframeKeyboardListener}
               width={width}
               height={height}
               viewType={chartPreview?.backendChart?.view?.type || 'SQL'}

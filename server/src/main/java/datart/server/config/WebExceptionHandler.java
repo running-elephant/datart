@@ -45,7 +45,6 @@ public class WebExceptionHandler {
         ResponseData.ResponseDataBuilder<String> builder = ResponseData.builder();
         return builder.success(false)
                 .message(MessageResolver.getMessage("login.session.timeout"))
-                .exception(e)
                 .build();
     }
 
@@ -57,7 +56,7 @@ public class WebExceptionHandler {
         return builder.success(false)
                 .message(e.getMessage())
                 .errCode(e.getErrCode())
-                .exception(e).build();
+                .build();
     }
 
     @ResponseBody
@@ -98,7 +97,6 @@ public class WebExceptionHandler {
         return builder.success(false)
                 .message(msg)
                 .data(data)
-                .exception(e)
                 .build();
     }
 

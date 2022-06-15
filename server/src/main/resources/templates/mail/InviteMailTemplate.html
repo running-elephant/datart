@@ -109,7 +109,7 @@
     <article>
       <div class="hi commonTitle">Hi, <span th:text="${username}">username</span></div>
       <div class="title"><span th:text="| ${inviter} #{message.user.invite.mail.invite},${orgName}|">greeting</span></div>
-      <a class="sure" th:text="#{message.user.invite.mail.confirm}"  th:href="@{{host}/#/joinOrganization(token=${token},host=${host})}"></a>
+      <a class="sure" th:text="#{message.user.invite.mail.confirm}"  th:href="@{{host}(invite_token=${token},host=${host})}"></a>
       <p class="detail"><span th:text="#{message.user.invite.mail.tips}"></span></p>
     </article>
   </div>

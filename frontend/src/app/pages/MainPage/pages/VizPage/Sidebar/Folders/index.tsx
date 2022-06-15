@@ -118,6 +118,7 @@ export const Folders = memo(
               { key: 'DATACHART', text: t('folders.startAnalysis') },
               { key: 'DASHBOARD', text: t('folders.dashboard') },
               { key: 'FOLDER', text: t('folders.folder') },
+              { key: 'TEMPLATE', text: t('folders.template') },
             ],
             callback: add,
           },

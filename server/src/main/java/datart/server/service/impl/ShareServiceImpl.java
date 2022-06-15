@@ -151,10 +151,9 @@ public class ShareServiceImpl extends BaseService implements ShareService {
 
     @Override
     public ShareInfo updateShare(ShareUpdateParam updateParam) {
-        Share retrieve = retrieve(updateParam.getId());
-        requirePermission(retrieve, Const.MANAGE);
+        Share update = retrieve(updateParam.getId());
+        requirePermission(update, Const.MANAGE);
 
-        Share update = new Share();
         BeanUtils.copyProperties(updateParam, update);
         if (updateParam.getRowPermissionBy() != null) {
             update.setRowPermissionBy(updateParam.getRowPermissionBy().name());
@@ -171,7 +170,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         }
         if (!CollectionUtils.isEmpty(updateParam.getUsers())) {
             for (String user : updateParam.getUsers()) {
-                Role role = roleService.getPerUserRole(retrieve.getOrgId(), user);
+                Role role = roleService.getPerUserRole(update.getOrgId(), user);
                 roleIds.add('u' + role.getId());
             }
         }
@@ -183,7 +182,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         update.setRoles(JSON.toJSONString(roleIds));
         update.setUpdateBy(getCurrentUser().getId());
         update.setUpdateTime(new Date());
-        shareMapper.updateByPrimaryKeySelective(update);
+        shareMapper.updateByPrimaryKey(update);
 
         ShareInfo shareInfo = new ShareInfo();
         BeanUtils.copyProperties(update, shareInfo);

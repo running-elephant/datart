@@ -102,7 +102,41 @@ export const handleServerBoardAction =
       }),
     );
   };
+export const getWidgetChartDatasAction =
+  (boardId: string) => (dispatch, getState) => {
+    const boardState = getState() as { board: BoardState };
+    const boardMapWidgetMap = boardState.board.widgetRecord;
+    const WidgetDataMap = boardState.board.widgetDataMap;
+    const widgetMap = boardMapWidgetMap[boardId];
+    const dataMap = Object.values(widgetMap || {})
+      .filter(w => w.config.type === 'chart')
+      .map(w => {
+        const item = {
+          id: w.id,
+          name: w.config.name,
+          data: WidgetDataMap[w.id]?.rows || [[]],
+        };
+        return item;
+      })
+      .reduce((acc, cur) => {
+        acc[cur.id] = cur;
+        return acc;
+      }, {} as Record<string, { id: string; name: string; data: string[][] }>);
 
+    return dataMap;
+  };
+export const getBoardTplData = (boardId: string) => (dispatch, getState) => {
+  const boardState = getState() as { board: BoardState };
+  const boardMapWidgetMap = boardState.board.widgetRecord;
+  const widgetMap = boardMapWidgetMap[boardId];
+  const board = boardState.board.boardRecord[boardId];
+  const dataChartMap = boardState.board.dataChartMap;
+  return {
+    board,
+    widgetMap,
+    dataChartMap,
+  };
+};
 export const boardDownLoadAction =
   (params: { boardId: string; downloadType: DownloadFileType }) =>
   async (dispatch, getState) => {

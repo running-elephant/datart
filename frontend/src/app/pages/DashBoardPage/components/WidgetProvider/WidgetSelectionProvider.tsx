@@ -19,21 +19,14 @@
 import { SelectedItem } from 'app/types/ChartConfig';
 import { createContext, FC, memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import {
-  makeSelectSelectedItems,
-  selectMultipleSelect,
-} from '../../pages/Board/slice/selector';
+import { makeSelectSelectedItems } from '../../pages/Board/slice/selector';
 import { BoardState } from '../../pages/Board/slice/types';
-import {
-  makeSelectSelectedItemsInEditor,
-  selectMultipleSelectInEditor,
-} from '../../pages/BoardEditor/slice/selectors';
+import { makeSelectSelectedItemsInEditor } from '../../pages/BoardEditor/slice/selectors';
 import { EditBoardState } from '../../pages/BoardEditor/slice/types';
 
-export const WidgetSelectionContext = createContext<{
-  selectedItems: SelectedItem[];
-  multipleSelect: boolean;
-}>({ selectedItems: [] as SelectedItem[], multipleSelect: false });
+export const WidgetSelectionContext = createContext<SelectedItem[]>(
+  [] as SelectedItem[],
+);
 
 export const WidgetSelectionProvider: FC<{
   boardEditing: boolean;
@@ -44,7 +37,6 @@ export const WidgetSelectionProvider: FC<{
   const selectedItemsInBoard = useSelector((state: { board: BoardState }) =>
     selectSelectedItems(state, widgetId),
   );
-  const multipleSelectInBoard = useSelector(selectMultipleSelect);
 
   // 编辑模式
   const selectSelectedItemsInEditor = useMemo(
@@ -55,29 +47,13 @@ export const WidgetSelectionProvider: FC<{
     (state: { editBoard: EditBoardState }) =>
       selectSelectedItemsInEditor(state, widgetId),
   );
-  const multipleSelectInBoardEditor = useSelector(
-    (state: { editBoard: EditBoardState }) =>
-      selectMultipleSelectInEditor(state),
-  );
 
   const selectedItems = useMemo(
     () => (boardEditing ? selectedItemsInBoardEditor : selectedItemsInBoard),
     [boardEditing, selectedItemsInBoard, selectedItemsInBoardEditor],
   );
-  const multipleSelect = useMemo(
-    () => (boardEditing ? multipleSelectInBoardEditor : multipleSelectInBoard),
-    [boardEditing, multipleSelectInBoard, multipleSelectInBoardEditor],
-  );
-
-  const selectedConfig = useMemo(
-    () => ({
-      selectedItems,
-      multipleSelect,
-    }),
-    [selectedItems, multipleSelect],
-  );
   return (
-    <WidgetSelectionContext.Provider value={selectedConfig}>
+    <WidgetSelectionContext.Provider value={selectedItems}>
       {children}
     </WidgetSelectionContext.Provider>
   );

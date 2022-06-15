@@ -82,7 +82,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
         try {
             subject.login(usernamePasswordToken);
         } catch (Exception e) {
-            log.error("Login error ({} {})", token.getSubject(), token.getPassword());
+            log.error("Login error ({})", token.getSubject());
             Exceptions.msg("login.fail");
         }
     }

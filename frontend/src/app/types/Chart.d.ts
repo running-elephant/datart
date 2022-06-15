@@ -17,7 +17,7 @@
  */
 
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { ChartConfig, SelectedItem } from './ChartConfig';
+import { ChartConfig } from './ChartConfig';
 import ChartMetadata from './ChartMetadata';
 
 export type ChartStatus =
@@ -53,7 +53,7 @@ export interface ChartsEventData extends Object {
 export interface ChartMouseEventParams {
   // 图标类型 'table', 'pivotSheet', 'bar',
   chartType?: string;
-  // 交互类型 'selected', 'drilled', 'paging-sort-filter', 'rich-text-change-context'
+  // 交互类型 'select', 'drilled', 'paging-sort-filter', 'rich-text-change-context'
   interactionType?: string;
 
   // 当前点击的图形元素所属的组件名称，
@@ -131,8 +131,6 @@ export interface IChart extends IChartLifecycle {
   dependency: string[];
   isISOContainer: boolean | string;
   useIFrame?: boolean;
-  selectable?: boolean;
-  selectedItems?: SelectedItem[];
 
   set state(state: ChartStatus);
   get state();

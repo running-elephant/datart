@@ -51,10 +51,6 @@ export const selectWidgetSelectedItemMap = createSelector(
   [boardState],
   state => state.selectedItems,
 );
-export const selectMultipleSelect = createSelector(
-  [boardState],
-  state => state.multipleSelect,
-);
 
 export const selectBoardById = createSelector(
   selectBoardRecord,

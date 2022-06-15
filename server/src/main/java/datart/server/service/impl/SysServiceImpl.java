@@ -18,6 +18,7 @@
 
 package datart.server.service.impl;
 
+import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
 import datart.server.base.dto.SystemInfo;
 import datart.server.base.params.SetupParams;
@@ -67,8 +68,13 @@ public class SysServiceImpl implements SysService {
 
     @Override
     public boolean setup(SetupParams params) throws MessagingException, UnsupportedEncodingException {
+        if (Application.isInitialized()) {
+            Exceptions.msg("The application is initialized.");
+        }
         UserService userService = Application.getBean(UserService.class);
-        return userService.setupUser(params.getUser());
+        boolean res = userService.setupUser(params.getUser());
+        Application.updateInitialized();
+        return res;
     }
 
 }

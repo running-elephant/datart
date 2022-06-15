@@ -66,12 +66,12 @@ class PivotSheetChart extends ReactChart {
   isISOContainer = 'piovt-sheet';
   config = Config;
   chart: null | SpreadSheet = null;
-  updateOptions: any = {};
-  lastRowsConfig: ChartDataSectionField[] = [];
-  hierarchyCollapse: boolean = true;
-  drillLevel: number = 0;
-  collapsedRows: Record<string, boolean> = {};
-  selectedItems: SelectedItem[] = [];
+  private updateOptions: any = {};
+  private lastRowsConfig: ChartDataSectionField[] = [];
+  private hierarchyCollapse: boolean = true;
+  private drillLevel: number = 0;
+  private collapsedRows: Record<string, boolean> = {};
+  private selectedItems: SelectedItem[] = [];
 
   constructor() {
     super(AntVS2Wrapper, {
@@ -395,7 +395,7 @@ class PivotSheetChart extends ReactChart {
         ?.find(v => v.name === 'click')
         ?.callback({
           selectedItems,
-          interactionType: 'selected',
+          interactionType: 'select',
           type: 'click',
           chartType: 'pivotSheet',
         });
