@@ -48,7 +48,6 @@ import {
 } from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
-import { KEYBOARD_EVENT_NAME } from 'globalConstants';
 import produce from 'immer';
 import { ActionCreators } from 'redux-undo';
 import { RootState } from 'types';
@@ -554,31 +553,6 @@ export const selectWidgetAction =
     );
   };
 
-export const selectedItemChange = (
-  dispatch,
-  type: VizRenderMode,
-  params,
-  wid,
-) => {
-  const {
-    dataIndex,
-    componentIndex,
-    data,
-  }: { dataIndex: number; componentIndex?: number; data: any } = params;
-  const option = {
-    wid,
-    data: {
-      index: componentIndex + ',' + dataIndex,
-      data,
-    },
-  };
-  if (type === 'edit') {
-    dispatch(editWidgetSelectedItemsActions.normalSelectInEditor(option));
-  } else {
-    dispatch(boardActions.normalSelect(option));
-  }
-};
-
 export const changeSelectedItems = (
   dispatch,
   type: VizRenderMode,
@@ -591,41 +565,6 @@ export const changeSelectedItems = (
     );
   } else {
     dispatch(boardActions.changeSelectedItems({ wid, data }));
-  }
-};
-
-export const multipleSelectChange = (
-  dispatch,
-  type: VizRenderMode,
-  state: boolean,
-  e: KeyboardEvent,
-) => {
-  if (
-    (e.key === KEYBOARD_EVENT_NAME.CTRL ||
-      e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
-    e.type === 'keydown' &&
-    !state
-  ) {
-    if (type === 'edit') {
-      dispatch(
-        editWidgetSelectedItemsActions.updateMultipleSelectInEditor(true),
-      );
-    } else {
-      dispatch(boardActions.updateMultipleSelect(true));
-    }
-  } else if (
-    (e.key === KEYBOARD_EVENT_NAME.CTRL ||
-      e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
-    e.type === 'keyup' &&
-    state
-  ) {
-    if (type === 'edit') {
-      dispatch(
-        editWidgetSelectedItemsActions.updateMultipleSelectInEditor(false),
-      );
-    } else {
-      dispatch(boardActions.updateMultipleSelect(false));
-    }
   }
 };
 

@@ -36,7 +36,6 @@ import {
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { SelectedItem } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
-import { compareSelectedItems } from 'app/utils/chartHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { createSlice } from 'utils/@reduxjs/toolkit';
 import { PageInfo } from '../../../../MainPage/pages/ViewPage/slice/types';
@@ -58,7 +57,6 @@ export const boardInit: BoardState = {
   viewMap: {} as Record<string, ChartDataView>, // View
   availableSourceFunctionsMap: {} as Record<string, string[]>,
   selectedItems: {} as Record<string, SelectedItem[]>,
-  multipleSelect: false,
 };
 // boardActions
 const boardSlice = createSlice({
@@ -386,33 +384,6 @@ const boardSlice = createSlice({
         state.dataChartMap[action.payload.id] = dataChart;
       }
     },
-
-    normalSelect(
-      state,
-      {
-        payload,
-      }: PayloadAction<{
-        wid: string;
-        data: { index: string; data: any };
-      }>,
-    ) {
-      const index = state.selectedItems[payload.wid]?.findIndex(
-        v => v.index === payload.data.index,
-      );
-      if (state.multipleSelect) {
-        if (index < 0) {
-          state.selectedItems[payload.wid].push(payload.data);
-        } else {
-          state.selectedItems[payload.wid].splice(index, 1);
-        }
-      } else {
-        if (index < 0 || state.selectedItems[payload.wid].length > 1) {
-          state.selectedItems[payload.wid] = [payload.data];
-        } else {
-          state.selectedItems[payload.wid] = [];
-        }
-      }
-    },
     changeSelectedItems(
       state,
       {
@@ -422,14 +393,7 @@ const boardSlice = createSlice({
         data: SelectedItem[];
       }>,
     ) {
-      if (
-        compareSelectedItems(payload.data, state.selectedItems[payload.wid])
-      ) {
-        state.selectedItems[payload.wid] = payload.data;
-      }
-    },
-    updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
-      state.multipleSelect = payload;
+      state.selectedItems[payload.wid] = payload.data;
     },
   },
   extraReducers: builder => {

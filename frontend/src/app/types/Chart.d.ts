@@ -49,8 +49,13 @@ export interface ChartsEventData extends Object {
   rowData: { [propName: string]: any };
 }
 
-// Note: `EventParams` type from echarts definition.
+// Note: `EventParams` type from echarts definition. But no interaction types are included.
 export interface ChartMouseEventParams {
+  // 图标类型 'table', 'pivotSheet', 'bar',
+  chartType?: string;
+  // 交互类型 'select', 'drilled', 'paging-sort-filter', 'rich-text-change-context'
+  interactionType?: string;
+
   // 当前点击的图形元素所属的组件名称，
   // 其值如 'series'、'markLine'、'markPoint'、'timeLine' 等。
   componentType?: string;
@@ -74,6 +79,7 @@ export interface ChartMouseEventParams {
   value?: number | string | [] | object | any;
   // 数据图形的颜色。当 componentType 为 'series' 时有意义。
   color?: string;
+  [p: string]: any;
 }
 
 export interface IChartLifecycle {
@@ -125,7 +131,6 @@ export interface IChart extends IChartLifecycle {
   dependency: string[];
   isISOContainer: boolean | string;
   useIFrame?: boolean;
-  selectable?: boolean;
 
   set state(state: ChartStatus);
   get state();

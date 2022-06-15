@@ -29,6 +29,7 @@ import { FC, memo } from 'react';
 import { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
 import ChartIFrameLifecycleAdapter from './ChartIFrameLifecycleAdapter';
+
 const ChartIFrameContainer: FC<{
   dataset: any;
   chart: IChart;
@@ -39,7 +40,6 @@ const ChartIFrameContainer: FC<{
   isShown?: boolean;
   drillOption?: IChartDrillOption;
   selectedItems?: SelectedItem[];
-  onKeyboardPress?: (event: KeyboardEvent) => void;
   widgetSpecialConfig?: any;
   scale?: [number, number];
 }> = memo(props => {
@@ -83,7 +83,6 @@ const ChartIFrameContainer: FC<{
               isShown={props.isShown}
               drillOption={props?.drillOption}
               selectedItems={props?.selectedItems}
-              onKeyboardPress={props?.onKeyboardPress}
             />
           </div>
         </div>
@@ -147,7 +146,6 @@ const ChartIFrameContainer: FC<{
                   isShown={props.isShown}
                   drillOption={props.drillOption}
                   selectedItems={props?.selectedItems}
-                  onKeyboardPress={props?.onKeyboardPress}
                 />
               </div>
             </StyleSheetManager>

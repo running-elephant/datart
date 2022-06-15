@@ -47,11 +47,7 @@ import React, {
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
-import {
-  changeSelectedItems,
-  multipleSelectChange,
-  selectedItemChange,
-} from '../../../pages/BoardEditor/slice/actions/actions';
+import { changeSelectedItems } from '../../../pages/BoardEditor/slice/actions/actions';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import {
   boardDrillManager,
@@ -70,7 +66,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const scale = useContext(BoardScaleContext);
   const { data } = useContext(WidgetDataContext);
   const { renderMode } = useContext(BoardContext);
-  const { selectedItems, multipleSelect } = useContext(WidgetSelectionContext);
+  const selectedItems = useContext(WidgetSelectionContext);
   const widget = useContext(WidgetContext);
   const { dashboardId, id: wid } = widget;
   const bid = useMemo(() => {
@@ -161,13 +157,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     [data],
   );
 
-  const chartIframeKeyboardListener = useCallback(
-    (e: KeyboardEvent) => {
-      multipleSelectChange(dispatch, renderMode, multipleSelect, e);
-    },
-    [dispatch, renderMode, multipleSelect],
-  );
-
   const chart = useMemo(() => {
     if (!dataChart) {
       return null;
@@ -197,18 +186,22 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                 }
 
                 // NOTE 透视表树形结构展开下钻特殊处理方法
-                if (params.seriesName === 'drillOptionChange') {
-                  handleDrillOptionChange?.(params.value);
+                if (
+                  params.chartType === 'pivotSheet' &&
+                  params.interactionType === 'drilled'
+                ) {
+                  handleDrillOptionChange?.(params.drillOption);
                   return;
                 }
 
-                // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法
-                if (params.seriesName === 'changeSelectedItems') {
-                  changeSelectedItems(dispatch, renderMode, params.data, wid);
-                  return;
-                }
-                if (chartInstance.selectable) {
-                  selectedItemChange(dispatch, renderMode, params, wid);
+                // NOTE 直接修改selectedItems结果集处理方法
+                if (params.interactionType === 'select') {
+                  changeSelectedItems(
+                    dispatch,
+                    renderMode,
+                    params.selectedItems,
+                    wid,
+                  );
                 }
                 onWidgetChartClick(widgetRef.current, params);
               },
@@ -286,7 +279,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         height={cacheH}
         drillOption={drillOption}
         selectedItems={selectedItems}
-        onKeyboardPress={chartIframeKeyboardListener}
         containerId={containerId}
         widgetSpecialConfig={widgetSpecialConfig}
         scale={scale}
@@ -303,7 +295,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     containerId,
     widgetSpecialConfig,
     scale,
-    chartIframeKeyboardListener,
   ]);
   const drillContextVal = {
     drillOption: drillOptionRef.current,

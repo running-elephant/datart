@@ -204,7 +204,7 @@ export const editBoardStackSlice = createSlice({
       const widget = action.payload;
       state.widgetRecord[widget.id] = widget;
     },
-    updateWidgetConfigByPath(
+    updateWidgetStyleConfigByPath(
       state,
       action: PayloadAction<{
         wid: string;
@@ -223,7 +223,25 @@ export const editBoardStackSlice = createSlice({
       );
       state.widgetRecord[wid].config.customConfig.props = newProps;
     },
-
+    updateWidgetInteractionConfigByPath(
+      state,
+      action: PayloadAction<{
+        wid: string;
+        ancestors: number[];
+        configItem: ChartStyleConfig;
+      }>,
+    ) {
+      const { ancestors, configItem, wid } = action.payload;
+      if (!state.widgetRecord[wid]) return;
+      const newProps = updateCollectionByAction(
+        state.widgetRecord[wid].config.customConfig.interactions || [],
+        {
+          ancestors: ancestors!,
+          value: configItem,
+        },
+      );
+      state.widgetRecord[wid].config.customConfig.interactions = newProps;
+    },
     updateWidgetConfig(
       state,
       action: PayloadAction<{ wid: string; config: WidgetConf }>,

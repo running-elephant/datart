@@ -17,6 +17,7 @@
  */
 
 import { DataViewFieldType } from 'app/constants';
+import { ChartSelection } from 'app/models/ChartSelection';
 import ReactChart from 'app/models/ReactChart';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import {
@@ -31,14 +32,16 @@ import {
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   compareSelectedItems,
+  getChartSelection,
   getColumnRenderName,
+  getExtraSeriesRowData,
   getStyles,
   getUnusedHeaderRows,
   getValue,
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { DATARTSEPERATOR, KEYBOARD_EVENT_NAME } from 'globalConstants';
+import { DATARTSEPERATOR } from 'globalConstants';
 import { darken, getLuminance, lighten } from 'polished';
 import { Debugger } from 'utils/debugger';
 import { CloneValueDeep, isEmptyArray, Omit } from 'utils/object';
@@ -68,25 +71,26 @@ class BasicTableChart extends ReactChart {
   useIFrame = false;
   isISOContainer = 'react-table';
   config = Config;
-  utilCanvas;
-  dataColumnWidths = {};
-  tablePadding = 16;
-  tableCellBorder = 1;
-  cachedAntTableOptions: any = {};
-  cachedDatartConfig: ChartConfig = {};
-  cacheContext: any = null;
-  showSummaryRow = false;
-  rowNumberUniqKey = `@datart@rowNumberKey`;
-  totalWidth = 0;
-  exceedMaxContent = false;
-  pageInfo: Partial<PageInfo> | undefined = {
+
+  protected rowNumberUniqKey = `@datart@rowNumberKey`;
+
+  private utilCanvas;
+  private dataColumnWidths = {};
+  private tablePadding = 16;
+  private tableCellBorder = 1;
+  private cachedAntTableOptions: any = {};
+  private cachedDatartConfig: ChartConfig = {};
+  private cacheContext: any = null;
+  private showSummaryRow = false;
+  private totalWidth = 0;
+  private exceedMaxContent = false;
+  private pageInfo: Partial<PageInfo> | undefined = {
     pageNo: 0,
     pageSize: 0,
     total: 0,
   };
-  selectedItems: SelectedItem[] = [];
-  selectedCellItems: SelectedItem[] = [];
-  multipleSelect: boolean = false;
+  private selection: null | ChartSelection = null;
+  private selectedRows: SelectedItem[] = [];
 
   constructor(props?) {
     super(AntdTableWrapper, {
@@ -111,14 +115,7 @@ class BasicTableChart extends ReactChart {
     ) {
       return;
     }
-    context.window.addEventListener(
-      'keydown',
-      this.updateMultipleSelect.bind(this),
-    );
-    context.window.addEventListener(
-      'keyup',
-      this.updateMultipleSelect.bind(this),
-    );
+    this.selection = getChartSelection(context.window);
     this.adapter?.mounted(
       context.document.getElementById(options.containerId),
       options,
@@ -131,6 +128,13 @@ class BasicTableChart extends ReactChart {
       this.adapter?.unmount();
       return;
     }
+    if (
+      this.selection?.selectedItems.length &&
+      !options.selectedItems?.length
+    ) {
+      this.selection?.clearAll();
+      this.selectedRows = [];
+    }
 
     Debugger.instance.measure(
       'Table OnUpdate cost ---> ',
@@ -140,7 +144,6 @@ class BasicTableChart extends ReactChart {
           options.dataset,
           options.config,
           options.widgetSpecialConfig,
-          options.selectedItems,
         );
         // this.cachedAntTableOptions = Omit(tableOptions, ['dataSource']);
         this.cachedAntTableOptions = Omit(tableOptions, []);
@@ -156,14 +159,8 @@ class BasicTableChart extends ReactChart {
     this.cachedAntTableOptions = {};
     this.cachedDatartConfig = {};
     this.cacheContext = null;
-    context?.window.removeEventListener(
-      'keydown',
-      this.updateMultipleSelect.bind(this),
-    );
-    context?.window.removeEventListener(
-      'keyup',
-      this.updateMultipleSelect.bind(this),
-    );
+    this.selectedRows = [];
+    this.selection?.removeEvent();
   }
 
   public onResize(options, context?): void {
@@ -187,39 +184,16 @@ class BasicTableChart extends ReactChart {
     this.adapter?.updated(tableOptions, context);
   }
 
-  protected updateMultipleSelect(e: KeyboardEvent) {
-    if (
-      (e.key === KEYBOARD_EVENT_NAME.CTRL ||
-        e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
-      e.type === 'keydown' &&
-      !this.multipleSelect
-    ) {
-      this.multipleSelect = true;
-    } else if (
-      (e.key === KEYBOARD_EVENT_NAME.CTRL ||
-        e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
-      e.type === 'keyup' &&
-      this.multipleSelect
-    ) {
-      this.multipleSelect = false;
-    }
-  }
-
   protected getOptions(
     context: ChartContext,
     dataset?: ChartDataSetDTO,
     config?: ChartConfig,
     widgetSpecialConfig?: any,
-    selectedItems?: SelectedItem[],
   ) {
     if (!dataset || !config) {
       return { locale: { emptyText: '  ' } };
     }
 
-    if (!selectedItems?.length && this.selectedItems.length) {
-      this.selectedItems = [];
-      this.selectedCellItems = [];
-    }
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
@@ -724,8 +698,8 @@ class BasicTableChart extends ReactChart {
           };
           let highlightStyle = {};
           if (
-            this.selectedCellItems.find(
-              v => v.index === rest.rowIndex + ',' + rest.dataIndex,
+            this.selection?.selectedItems.find(
+              v => v.index === rest.rowIndex + ',' + sensitiveFieldName,
             )
           ) {
             const backgroundColor = conditionalCellStyle?.backgroundColor
@@ -934,8 +908,8 @@ class BasicTableChart extends ReactChart {
         onCell: (record, rowIndex) => {
           const row = chartDataSet[rowIndex];
           const cellValue = row.getCell(c);
-          const seriesName = chartDataSet.getFieldKey(c);
-          const rowData = row.convertToObject();
+          const seriesName = chartDataSet.getFieldOriginKey(c);
+          const rowData = getExtraSeriesRowData(row);
           return {
             uid: c.uid,
             cellValue,
@@ -1207,27 +1181,16 @@ class BasicTableChart extends ReactChart {
       : false;
   }
 
-  private createEventParams = params => ({
-    type: 'click',
-    componentType: 'table',
-    seriesType: undefined,
-    data: undefined,
-    dataIndex: undefined,
-    event: undefined,
-    name: undefined,
-    seriesName: undefined,
-    value: undefined,
-    ...params,
-  });
-
   private invokePagingRelatedEvents(
     seriesName: string,
     value: any,
     pageNo: number,
     aggOperator?: string,
   ) {
-    const eventParams = this.createEventParams({
-      seriesType: 'paging-sort-filter',
+    const eventParams = {
+      type: 'click',
+      chartType: 'table',
+      interactionType: 'paging-sort-filter',
       seriesName,
       value: {
         aggOperator: aggOperator,
@@ -1235,7 +1198,7 @@ class BasicTableChart extends ReactChart {
           value === undefined ? undefined : value === 'ascend' ? 'ASC' : 'DESC',
         pageNo,
       },
-    });
+    };
     this.mouseEvents?.forEach(cur => {
       if (cur.name === 'click') {
         cur.callback?.(eventParams);
@@ -1244,45 +1207,19 @@ class BasicTableChart extends ReactChart {
   }
 
   private changeSelected(
-    selectedItem,
+    params,
     styleConfigs: ChartStyleConfig[],
     widgetSpecialConfig: { env: string | undefined; [x: string]: any },
     mixedSectionConfigRows: ChartDataSectionField[],
+    callback?,
   ) {
-    const { data, dataIndex, seriesName } = selectedItem;
+    const { data, dataIndex, seriesName } = params;
     const option = {
       index: dataIndex + ',' + seriesName,
       data,
     };
-    const index = this.selectedCellItems.findIndex(
-      v => v.index === option.index,
-    );
-    if (this.multipleSelect) {
-      if (index < 0) {
-        this.selectedCellItems.push(option);
-      } else {
-        this.selectedCellItems.splice(index, 1);
-      }
-    } else {
-      if (index < 0 || this.selectedCellItems.length > 1) {
-        this.selectedCellItems = [option];
-      } else {
-        this.selectedCellItems = [];
-      }
-    }
-    this.updateSelectedItems(
-      styleConfigs,
-      widgetSpecialConfig,
-      mixedSectionConfigRows,
-    );
-  }
-
-  private updateSelectedItems(
-    styleConfigs: ChartStyleConfig[],
-    widgetSpecialConfig: { env: string | undefined; [x: string]: any },
-    mixedSectionConfigRows: ChartDataSectionField[],
-  ) {
-    const newSelectedItems = this.selectedCellItems.reduce(
+    this.selection?.doSelect(option);
+    const newSelectedItems = this.selection?.selectedItems.reduce(
       (selectedItems, item) => {
         const dataIndex = item.index.toString().split(',')[0];
         if (!selectedItems.find(v => v.index === dataIndex)) {
@@ -1295,14 +1232,10 @@ class BasicTableChart extends ReactChart {
       },
       [] as SelectedItem[],
     );
-    if (compareSelectedItems(newSelectedItems, this.selectedItems)) {
-      this.selectedItems = newSelectedItems;
-      this.mouseEvents
-        ?.find(v => v.name === 'click')
-        ?.callback({
-          data: this.selectedItems,
-          seriesName: 'changeSelectedItems',
-        } as any);
+    if (compareSelectedItems(newSelectedItems || [], this.selectedRows)) {
+      this.selectedRows = newSelectedItems || [];
+      params.selectedItems = this.selectedRows;
+      params.interactionType = 'select';
     } else {
       const tableOptions = Object.assign(this.cachedAntTableOptions, {
         components: this.getTableComponents(
@@ -1313,6 +1246,7 @@ class BasicTableChart extends ReactChart {
       });
       this.adapter?.updated(tableOptions, this.cacheContext);
     }
+    callback?.(params);
   }
 
   private registerTableCellEvents(
@@ -1326,8 +1260,10 @@ class BasicTableChart extends ReactChart {
     mixedSectionConfigRows: ChartDataSectionField[],
     aggOperator?: string,
   ): TableCellEvents {
-    const eventParams = this.createEventParams({
-      seriesType: 'body',
+    const eventParams = {
+      type: 'click',
+      chartType: 'table',
+      interactionType: 'click',
       name,
       data: {
         format: undefined,
@@ -1339,18 +1275,18 @@ class BasicTableChart extends ReactChart {
       seriesName, // column name/index
       dataIndex, // row index
       value, // cell value
-    });
+    };
     return this.mouseEvents?.reduce((acc, cur) => {
       cur.name && (eventParams.type = cur.name);
       if (cur.name === 'click') {
         Object.assign(acc, {
           onClick: event => {
-            cur.callback?.({ ...eventParams, event });
             this.changeSelected(
               { ...eventParams, event },
               styleConfigs,
               widgetSpecialConfig,
               mixedSectionConfigRows,
+              cur.callback,
             );
           },
         });

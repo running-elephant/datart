@@ -4,7 +4,6 @@ import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/models/ChartManager';
 import { SelectedItem } from 'app/types/ChartConfig';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
-import { compareSelectedItems } from 'app/utils/chartHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { CloneValueDeep } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
@@ -50,7 +49,6 @@ export const initialState: VizState = {
   dataChartListLoading: false,
   chartPreviews: [],
   selectedItems: {} as Record<string, SelectedItem[]>,
-  multipleSelect: false,
 };
 
 const slice = createSlice({
@@ -75,6 +73,15 @@ const slice = createSlice({
             ? state.tabs[index]?.id || state.tabs[state.tabs.length - 1].id
             : '';
       }
+    },
+    closeOtherTabs(state: VizState, action: PayloadAction<string>) {
+      const currentTab = state.tabs.find(t => t.id === action.payload);
+      state.tabs = state.tabs.filter(t => t.id === action.payload);
+      state.selectedTab = currentTab?.id || '';
+    },
+    closeAllTabs(state) {
+      state.tabs = [];
+      state.selectedTab = '';
     },
     updateChartPreviewFilter(
       state,
@@ -143,53 +150,13 @@ const slice = createSlice({
         state[key] = value;
       });
     },
-
-    normalSelect(
-      state,
-      {
-        payload,
-      }: PayloadAction<{
-        backendChartId: string;
-        data: SelectedItem;
-      }>,
-    ) {
-      const index = state.selectedItems?.[payload.backendChartId]?.findIndex(
-        v => payload.data.index === v.index,
-      );
-      if (state.multipleSelect) {
-        if (index < 0) {
-          state.selectedItems[payload.backendChartId].push(payload.data);
-        } else {
-          state.selectedItems[payload.backendChartId].splice(index, 1);
-        }
-      } else {
-        if (
-          index < 0 ||
-          state.selectedItems[payload.backendChartId].length > 1
-        ) {
-          state.selectedItems[payload.backendChartId] = [payload.data];
-        } else {
-          state.selectedItems[payload.backendChartId] = [];
-        }
-      }
-    },
     changeSelectedItems(
       state,
       {
         payload,
       }: PayloadAction<{ backendChartId: string; data: SelectedItem[] }>,
     ) {
-      if (
-        compareSelectedItems(
-          payload.data,
-          state.selectedItems[payload.backendChartId],
-        )
-      ) {
-        state.selectedItems[payload.backendChartId] = payload.data;
-      }
-    },
-    updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
-      state.multipleSelect = payload;
+      state.selectedItems[payload.backendChartId] = payload.data;
     },
   },
   extraReducers: builder => {

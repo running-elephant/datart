@@ -25,10 +25,12 @@ import {
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transferChartConfig } from 'app/pages/MainPage/pages/VizPage/slice/utils';
 import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
-import { compareSelectedItems } from 'app/utils/chartHelper';
+import { FilterSqlOperator } from 'globalConstants';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
+import { Omit } from 'utils/object';
 import {
   fetchAvailableSourceFunctions,
   fetchShareDataSetByPreviewChartAction,
@@ -53,7 +55,6 @@ export const initialState: SharePageState = {
   oauth2Clients: [],
   availableSourceFunctions: [],
   selectedItems: [],
-  multipleSelect: false,
 };
 
 export const slice = createSlice({
@@ -96,15 +97,28 @@ export const slice = createSlice({
       action: PayloadAction<{
         data: ShareVizInfo;
         filterSearchParams?: FilterSearchParams;
+        isMatchByName?: boolean;
       }>,
     ) => {
-      const { data, filterSearchParams } = action.payload;
+      const { data, filterSearchParams, isMatchByName } = action.payload;
       const vizDetail = data.vizDetail as ChartDTO;
       const chartConfigDTO = vizDetail.config;
       const currentChart = ChartManager.instance().getById(
         chartConfigDTO?.chartGraphId,
       );
       let chartConfig = currentChart?.config as ChartConfig;
+      const jumpFilters: ChartDataRequestFilter[] = Object.entries(
+        Omit(filterSearchParams, ['type', 'isMatchByName']),
+      ).map(entity => {
+        return {
+          column: entity[0],
+          sqlOperator: FilterSqlOperator.In,
+          values: entity[1]?.map(v => ({
+            value: v,
+            valueType: 'STRING',
+          })),
+        };
+      });
       if (currentChart) {
         chartConfig = transferChartConfig(
           mergeToChartConfig(
@@ -112,6 +126,8 @@ export const slice = createSlice({
             migrateChartConfig(chartConfigDTO),
           ),
           filterSearchParams,
+          isMatchByName,
+          jumpFilters,
         );
       }
       const executeToken = data.executeToken;
@@ -177,31 +193,8 @@ export const slice = createSlice({
           action.payload.computedFields;
       }
     },
-    normalSelect(state, { payload }: PayloadAction<SelectedItem>) {
-      const index = state.selectedItems?.findIndex(
-        v => payload.index === v.index,
-      );
-      if (state.multipleSelect) {
-        if (index < 0) {
-          state.selectedItems.push(payload);
-        } else {
-          state.selectedItems.splice(index, 1);
-        }
-      } else {
-        if (index < 0 || state.selectedItems.length > 1) {
-          state.selectedItems = [payload];
-        } else {
-          state.selectedItems = [];
-        }
-      }
-    },
     changeSelectedItems(state, { payload }: PayloadAction<SelectedItem[]>) {
-      if (compareSelectedItems(payload, state.selectedItems)) {
-        state.selectedItems = payload;
-      }
-    },
-    updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
-      state.multipleSelect = payload;
+      state.selectedItems = payload;
     },
   },
   extraReducers: builder => {

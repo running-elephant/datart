@@ -18,6 +18,7 @@
 
 import { ChartDataSectionType } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { ChartSelection } from 'app/models/ChartSelection';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -32,6 +33,7 @@ import {
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
+  getChartSelection,
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getDrillableRows,
@@ -58,11 +60,11 @@ import { BarBorderStyle, BarSeriesImpl, Series } from './types';
 class BasicBarChart extends Chart {
   config = Config;
   chart: any = null;
-  selectable = true;
 
   protected isHorizonDisplay = false;
   protected isStackMode = false;
   protected isPercentageYAxis = false;
+  private selection: null | ChartSelection = null;
 
   constructor(props?: {
     id: string;
@@ -84,7 +86,11 @@ class BasicBarChart extends Chart {
   }
 
   onMount(options, context): void {
-    if (options.containerId === undefined || !context.document) {
+    if (
+      options.containerId === undefined ||
+      !context.document ||
+      !context.window
+    ) {
       return;
     }
 
@@ -92,9 +98,29 @@ class BasicBarChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
-    this.chart.getZr().on('click', this.clearAllSelectedItems.bind(this));
+    this.selection = getChartSelection(context.window, {
+      chart: this.chart,
+      mouseEvents: this.mouseEvents,
+    });
     this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
+      switch (event.name) {
+        case 'click':
+          this.chart.on(event.name, params => {
+            this.selection?.doSelect({
+              index: params.componentIndex + ',' + params.dataIndex,
+              data: params.data,
+            });
+            event.callback({
+              ...params,
+              interactionType: 'select',
+              selectedItems: this.selection?.selectedItems,
+            });
+          });
+          break;
+        default:
+          this.chart.on(event.name, event.callback);
+          break;
+      }
     });
   }
 
@@ -107,6 +133,12 @@ class BasicBarChart extends Chart {
       this.chart?.clear();
       return;
     }
+    if (
+      this.selection?.selectedItems.length &&
+      !options.selectedItems?.length
+    ) {
+      this.selection?.clearAll();
+    }
     const newOptions = this.getOptions(
       options.dataset,
       options.config,
@@ -117,7 +149,7 @@ class BasicBarChart extends Chart {
   }
 
   onUnMount(): void {
-    this.chart.getZr().off('click', this.clearAllSelectedItems.bind(this));
+    this.selection?.removeEvent();
     this.chart?.dispose();
   }
 
@@ -125,17 +157,6 @@ class BasicBarChart extends Chart {
     this.chart?.resize({ width: context?.width, height: context?.height });
     hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
       this.onUpdated(opt, context);
-  }
-
-  clearAllSelectedItems(e: Event) {
-    if (!e.target) {
-      this.mouseEvents
-        ?.find(v => v.name === 'click')
-        ?.callback({
-          data: [],
-          seriesName: 'changeSelectedItems',
-        } as any);
-    }
   }
 
   getOptions(

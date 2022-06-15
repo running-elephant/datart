@@ -279,8 +279,8 @@ export const widgetChartClickAction =
     const { boardId, editing, renderMode, widget, params, history } = obj;
     //is tableChart
     if (
-      params.componentType === 'table' &&
-      params.seriesType === 'paging-sort-filter'
+      params.chartType === 'table' &&
+      params.interactionType === 'paging-sort-filter'
     ) {
       dispatch(
         tableChartClickAction(boardId, editing, renderMode, widget, params),

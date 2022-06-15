@@ -11,7 +11,7 @@ public class DashboardCreateParam extends VizCreateParam {
 
     private String name;
 
-    private Double index;
+    private double index;
 
     private String parentId;
 

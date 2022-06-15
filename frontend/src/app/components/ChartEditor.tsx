@@ -37,7 +37,6 @@ import {
   currentDataViewSelector,
   datasetsSelector,
   selectAvailableSourceFunctions,
-  selectMultipleSelect,
   selectSelectedItems,
   shadowChartConfigSelector,
 } from 'app/pages/ChartWorkbenchPage/slice/selectors';
@@ -55,7 +54,6 @@ import {
   useSaveFormContext,
 } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { IChart } from 'app/types/Chart';
-import { SelectedItem } from 'app/types/ChartConfig';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
@@ -69,7 +67,7 @@ import {
   transferChartConfigs,
 } from 'app/utils/internalChartHelper';
 import { updateBy } from 'app/utils/mutation';
-import { CommonFormTypes, KEYBOARD_EVENT_NAME } from 'globalConstants';
+import { CommonFormTypes } from 'globalConstants';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
@@ -136,7 +134,6 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const aggregation = useSelector(aggregationSelector);
   const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
   const selectedItems = useSelector(selectSelectedItems);
-  const multipleSelect = useSelector(selectMultipleSelect);
   const [chart, setChart] = useState<IChart>();
   const drillOptionRef = useRef<IChartDrillOption>();
   const [allowQuery, setAllowQuery] = useState<boolean>(false);
@@ -145,26 +142,6 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     showSaveForm: saveFormContextValue.showSaveForm,
   });
   const tg = useI18NPrefix('global');
-  const chartIframeKeyboardListener = useCallback(
-    (e: KeyboardEvent) => {
-      if (
-        (e.key === KEYBOARD_EVENT_NAME.CTRL ||
-          e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
-        e.type === 'keydown' &&
-        !multipleSelect
-      ) {
-        dispatch(actions.updateMultipleSelect(true));
-      } else if (
-        (e.key === KEYBOARD_EVENT_NAME.CTRL ||
-          e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
-        e.type === 'keyup' &&
-        multipleSelect
-      ) {
-        dispatch(actions.updateMultipleSelect(false));
-      }
-    },
-    [dispatch, multipleSelect, actions],
-  );
 
   const expensiveQuery = useMemo(() => {
     try {
@@ -272,8 +249,8 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               return;
             }
             if (
-              param.componentType === 'table' &&
-              param.seriesType === 'paging-sort-filter'
+              param.chartType === 'table' &&
+              param.interactionType === 'paging-sort-filter'
             ) {
               dispatch(
                 refreshDatasetAction({
@@ -289,7 +266,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               );
               return;
             }
-            if (param.seriesName === 'richText') {
+            if (
+              param.chartType === 'rich-text' &&
+              param.interactionType === 'rich-text-change-context'
+            ) {
               dispatch(
                 updateChartConfigAndRefreshDatasetAction({
                   type: ChartConfigReducerActionType.STYLE,
@@ -309,33 +289,17 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               return;
             }
             // NOTE 透视表树形结构展开下钻特殊处理方法
-            if (param.seriesName === 'drillOptionChange') {
-              handleDrillOptionChange?.(param.value);
+            if (
+              param.chartType === 'pivotSheet' &&
+              param.interactionType === 'drilled'
+            ) {
+              handleDrillOptionChange?.(param.drillOption);
               return;
             }
 
-            // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法
-            if (param.seriesName === 'changeSelectedItems') {
-              dispatch(actions.changeSelectedItems(param.data));
-              return;
-            }
-            if (chart.selectable) {
-              const {
-                dataIndex,
-                componentIndex,
-                data,
-              }: {
-                dataIndex?: number;
-                componentIndex?: number;
-                data: { rowData: { [p: string]: any } };
-                seriesName?: string;
-              } = param;
-              dispatch(
-                actions.normalSelect({
-                  index: componentIndex + ',' + dataIndex,
-                  data,
-                } as SelectedItem),
-              );
+            // NOTE 直接修改selectedItems结果集处理方法
+            if (param.interactionType === 'select') {
+              dispatch(actions.changeSelectedItems(param.selectedItems));
             }
           },
         },
@@ -753,7 +717,6 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           }}
           drillOption={drillOptionRef?.current}
           selectedItems={selectedItems}
-          onKeyboardPress={chartIframeKeyboardListener}
           aggregation={aggregation}
           chart={chart}
           dataset={dataset}

@@ -2,7 +2,7 @@ package datart.data.provider.jdbc.adapters;
 
 import datart.core.base.PageInfo;
 import datart.core.data.provider.Dataframe;
-import datart.data.provider.calcite.SqlNodeUtils;
+import datart.data.provider.script.SqlStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
@@ -43,7 +43,7 @@ public class MsSqlDataProviderAdapter extends JdbcDataProviderAdapter {
 
     @Override
     protected Dataframe execute(String selectSql, PageInfo pageInfo) throws SQLException {
-        selectSql = SqlNodeUtils.rebuildSqlWithFragment(selectSql);
+        selectSql = SqlStringUtils.rebuildSqlWithFragment(selectSql);
         return super.execute(selectSql, pageInfo);
     }
 }

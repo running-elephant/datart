@@ -20,7 +20,7 @@ import { Button, Dropdown, Input, Space } from 'antd';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo, useCallback, useState } from 'react';
 import { InteractionFieldRelation } from '../../constants';
-import { I18nTransator, JumpToUrlRule, VizType } from './types';
+import { I18nTranslator, JumpToUrlRule, VizType } from './types';
 import UrlParamList from './UrlParamList';
 
 const JumpToUrl: FC<
@@ -29,7 +29,7 @@ const JumpToUrl: FC<
     dataview?: ChartDataView;
     value?: JumpToUrlRule;
     onValueChange: (value) => void;
-  } & I18nTransator
+  } & I18nTranslator
 > = memo(({ vizs, dataview, value, onValueChange, translate: t }) => {
   const [relations, setRelations] = useState(
     value?.[InteractionFieldRelation.Customize] || [],

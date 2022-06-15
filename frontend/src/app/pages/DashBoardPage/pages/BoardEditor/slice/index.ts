@@ -15,7 +15,6 @@ import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/
 import { getInitBoardInfo } from 'app/pages/DashBoardPage/utils/board';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { SelectedItem } from 'app/types/ChartConfig';
-import { compareSelectedItems } from 'app/utils/chartHelper';
 import { Layout } from 'react-grid-layout';
 /** { excludeAction,includeAction } */
 import undoable, { includeAction } from 'redux-undo';
@@ -319,48 +318,14 @@ const editWidgetDataSlice = createSlice({
 const editWidgetSelectedItemsSlice = createSlice({
   name: 'editBoard',
   initialState: {
-    multipleSelect: false,
     selectedItems: {},
   } as EditBoardState['selectedItemsMap'],
   reducers: {
-    updateMultipleSelectInEditor(state, { payload }: PayloadAction<boolean>) {
-      state.multipleSelect = payload;
-    },
-    normalSelectInEditor(
-      state,
-      {
-        payload,
-      }: PayloadAction<{
-        wid: string;
-        data: { index: string; data: any };
-      }>,
-    ) {
-      const index = state.selectedItems[payload.wid].findIndex(
-        v => v.index === payload.data.index,
-      );
-      if (state.multipleSelect) {
-        if (index < 0) {
-          state.selectedItems[payload.wid].push(payload.data);
-        } else {
-          state.selectedItems[payload.wid].splice(index, 1);
-        }
-      } else {
-        if (index < 0 || state.selectedItems[payload.wid].length > 1) {
-          state.selectedItems[payload.wid] = [payload.data];
-        } else {
-          state.selectedItems[payload.wid] = [];
-        }
-      }
-    },
     changeSelectedItemsInEditor(
       state,
       { payload }: PayloadAction<{ wid: string; data: Array<SelectedItem> }>,
     ) {
-      if (
-        compareSelectedItems(payload.data, state.selectedItems[payload.wid])
-      ) {
-        state.selectedItems[payload.wid] = payload.data;
-      }
+      state.selectedItems[payload.wid] = payload.data;
     },
   },
 });
@@ -387,7 +352,7 @@ const filterActions = [
 
   editBoardStackActions.toggleLockWidget,
   editBoardStackActions.updateBoardConfigByKey,
-  editBoardStackActions.updateWidgetConfigByPath,
+  editBoardStackActions.updateWidgetStyleConfigByPath,
   editBoardStackActions.changeFreeWidgetRect,
   editBoardStackActions.dropWidgetToTab,
   editBoardStackActions.dropWidgetToGroup,

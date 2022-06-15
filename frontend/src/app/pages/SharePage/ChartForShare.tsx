@@ -30,8 +30,7 @@ import {
   getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
-import { KEYBOARD_EVENT_NAME } from 'globalConstants';
-import { FC, memo, useCallback, useRef, useState } from 'react';
+import { FC, memo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import ChartDrillContext from '../ChartWorkbenchPage/contexts/ChartDrillContext';
@@ -44,7 +43,6 @@ import { HeadlessBrowserIdentifier } from './HeadlessBrowserIdentifier';
 import { shareActions } from './slice';
 import {
   selectHeadlessBrowserRenderSign,
-  selectMultipleSelect,
   selectSelectedItems,
 } from './slice/selectors';
 import {
@@ -58,7 +56,7 @@ const ChartForShare: FC<{
   chartPreview?: ChartPreview;
   filterSearchParams?: FilterSearchParams;
   availableSourceFunctions?: string[];
-}> = memo(({ chartPreview, availableSourceFunctions }) => {
+}> = memo(({ chartPreview, filterSearchParams, availableSourceFunctions }) => {
   const dispatch = useDispatch();
   const drillOptionRef = useRef<IChartDrillOption>();
   const [chart] = useState<IChart | undefined>(() => {
@@ -84,28 +82,6 @@ const ChartForShare: FC<{
     selectHeadlessBrowserRenderSign,
   );
   const selectedItems = useSelector(selectSelectedItems);
-  const multipleSelect = useSelector(selectMultipleSelect);
-
-  const chartIframeKeyboardListener = useCallback(
-    (e: KeyboardEvent) => {
-      if (
-        (e.key === KEYBOARD_EVENT_NAME.CTRL ||
-          e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
-        e.type === 'keydown' &&
-        !multipleSelect
-      ) {
-        dispatch(shareActions.updateMultipleSelect(true));
-      } else if (
-        (e.key === KEYBOARD_EVENT_NAME.CTRL ||
-          e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
-        e.type === 'keyup' &&
-        multipleSelect
-      ) {
-        dispatch(shareActions.updateMultipleSelect(false));
-      }
-    },
-    [dispatch, multipleSelect],
-  );
 
   useMount(() => {
     if (!chartPreview) {
@@ -115,7 +91,12 @@ const ChartForShare: FC<{
       chartPreview?.chartConfig?.datas,
       drillOptionRef?.current,
     );
-    dispatch(fetchShareDataSetByPreviewChartAction({ preview: chartPreview }));
+    dispatch(
+      fetchShareDataSetByPreviewChartAction({
+        preview: chartPreview,
+        filterSearchParams,
+      }),
+    );
     registerChartEvents(chart);
   });
 
@@ -135,8 +116,8 @@ const ChartForShare: FC<{
             return;
           }
           if (
-            param.componentType === 'table' &&
-            param.seriesType === 'paging-sort-filter'
+            param.chartType === 'table' &&
+            param.interactionType === 'paging-sort-filter'
           ) {
             dispatch(
               fetchShareDataSetByPreviewChartAction({
@@ -149,35 +130,24 @@ const ChartForShare: FC<{
                 pageInfo: {
                   pageNo: param?.value?.pageNo,
                 },
+                filterSearchParams,
               }),
             );
             return;
           }
 
           // NOTE 透视表树形结构展开下钻特殊处理方法
-          if (param.seriesName === 'drillOptionChange') {
-            handleDrillOptionChange?.(param.value);
+          if (
+            param.chartType === 'pivotSheet' &&
+            param.interactionType === 'drilled'
+          ) {
+            handleDrillOptionChange?.(param.drillOption);
             return;
           }
 
-          // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法
-          if (param.seriesName === 'changeSelectedItems') {
-            dispatch(shareActions.changeSelectedItems(param.data));
-            return;
-          }
-
-          if (chart.selectable) {
-            const {
-              dataIndex,
-              componentIndex,
-              data,
-            }: { dataIndex: number; componentIndex: number; data: any } = param;
-            dispatch(
-              shareActions.normalSelect({
-                index: componentIndex + ',' + dataIndex,
-                data,
-              }),
-            );
+          // NOTE 直接修改selectedItems结果集处理方法
+          if (param.interactionType === 'select') {
+            dispatch(shareActions.changeSelectedItems(param.selectedItems));
           }
         },
       },
@@ -262,7 +232,6 @@ const ChartForShare: FC<{
               config={chartPreview?.chartConfig!}
               drillOption={drillOptionRef.current}
               selectedItems={selectedItems}
-              onKeyboardPress={chartIframeKeyboardListener}
               width={width}
               height={height}
             />

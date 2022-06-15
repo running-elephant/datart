@@ -17,11 +17,11 @@
  */
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Upload } from 'antd';
-import { DatartFileSuffixes } from 'globalConstants';
 import { FC, memo, useState } from 'react';
+import styled from 'styled-components/macro';
 
-export const FileUpload: FC<{ value?: any; onChange?: any }> = memo(
-  ({ value, onChange }) => {
+export const FileUpload: FC<{ suffix: string; value?: any; onChange?: any }> =
+  memo(({ suffix, value, onChange }) => {
     const [fileName, setFileName] = useState();
     const fileChange = data => {
       setFileName(data.name);
@@ -29,17 +29,29 @@ export const FileUpload: FC<{ value?: any; onChange?: any }> = memo(
       return false;
     };
     return (
-      <>
+      <StyledWrapper>
         <Upload
           // accept=".jpg,.jpeg,.png,.gif"
-          accept={DatartFileSuffixes.Resource}
+          accept={suffix}
           showUploadList={false}
           beforeUpload={fileChange}
         >
           <Button icon={<UploadOutlined />}>Upload</Button>
         </Upload>
-        <span>{fileName}</span>
-      </>
+        <span title={fileName} className="file-name">
+          {fileName}
+        </span>
+      </StyledWrapper>
     );
-  },
-);
+  });
+const StyledWrapper = styled.div`
+  display: flex;
+  .file-name {
+    display: inline-block;
+    width: 100px;
+    overflow: hidden;
+    line-height: 32px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+`;

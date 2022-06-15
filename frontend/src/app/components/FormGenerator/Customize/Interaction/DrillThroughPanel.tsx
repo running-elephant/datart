@@ -17,12 +17,9 @@
  */
 
 import { Button, Form, Space } from 'antd';
-import { currentDataViewSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
-import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useState } from 'react';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
 import { ItemLayoutProps } from '../../types';
@@ -31,9 +28,7 @@ import RuleList from './RuleList';
 import { DrillThroughSetting, InteractionRule } from './types';
 
 const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
-  ({ ancestors, translate: t = title => title, data, onChange }) => {
-    const vizs = useSelector(selectVizs);
-    const dataview = useSelector(currentDataViewSelector);
+  ({ ancestors, translate: t = title => title, data, onChange, context }) => {
     const [drillThroughRules, setDrillThroughRules] = useState<
       DrillThroughSetting['rules']
     >(data.value?.rules || []);
@@ -88,8 +83,8 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
               {t('drillThrough.rule.addRule')}
             </Button>
             <RuleList
-              vizs={vizs}
-              dataview={dataview}
+              vizs={context?.vizs}
+              dataview={context?.dataview}
               rules={drillThroughRules}
               onRuleChange={handleUpdateRule}
               onDeleteRule={handleDeleteRule}

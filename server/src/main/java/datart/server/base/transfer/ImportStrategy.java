@@ -21,7 +21,7 @@ public enum ImportStrategy {
 
     NEW,
 
-    IGNORE,
+//    IGNORE,
 
     OVERWRITE,
 

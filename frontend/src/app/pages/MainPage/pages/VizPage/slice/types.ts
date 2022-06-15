@@ -9,6 +9,7 @@ export type VizType = [
   'DASHBOARD',
   'FOLDER',
   'STORYBOARD',
+  'TEMPLATE',
 ][number];
 
 export interface VizState {
@@ -31,7 +32,6 @@ export interface VizState {
   dataChartListLoading: boolean;
   chartPreviews: ChartPreview[];
   selectedItems: Record<string, SelectedItem[]>;
-  multipleSelect: boolean;
 }
 
 export interface Folder {
@@ -101,6 +101,7 @@ export interface AddVizParams {
     description?: string;
     parentId?: string | null;
     orgId: string;
+    file?: FormData;
   };
   type: VizType;
 }

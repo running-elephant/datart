@@ -26,7 +26,7 @@ import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
 import { InteractionRelationType } from '../../constants';
-import { CustomizeRelation, I18nTransator } from './types';
+import { CustomizeRelation, I18nTranslator } from './types';
 
 const RelationList: FC<
   {
@@ -35,7 +35,7 @@ const RelationList: FC<
     sourceFields?: ChartDataViewMeta[];
     sourceVariables?: Array<{ id: string; name: string }>;
     onRelationChange: (relations?: CustomizeRelation[]) => void;
-  } & I18nTransator
+  } & I18nTranslator
 > = ({
   targetRelId,
   relations,

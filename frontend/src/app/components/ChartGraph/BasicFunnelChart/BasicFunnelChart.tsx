@@ -17,6 +17,9 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
+import Chart from 'app/models/Chart';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { ChartSelection } from 'app/models/ChartSelection';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -31,6 +34,7 @@ import ChartDataSetDTO, {
 } from 'app/types/ChartDataSet';
 import {
   getAutoFunnelTopPosition,
+  getChartSelection,
   getColumnRenderName,
   getDrillableRows,
   getExtraSeriesDataFormat,
@@ -44,15 +48,14 @@ import {
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import isEmpty from 'lodash/isEmpty';
-import Chart from '../../../models/Chart';
-import { ChartDrillOption } from '../../../models/ChartDrillOption';
 import Config from './config';
 import { Series, SeriesData } from './types';
 
 class BasicFunnelChart extends Chart {
   config = Config;
   chart: any = null;
-  selectable = true;
+
+  private selection: null | ChartSelection = null;
 
   constructor() {
     super(
@@ -69,7 +72,11 @@ class BasicFunnelChart extends Chart {
   }
 
   onMount(options, context): void {
-    if (options.containerId === undefined || !context.document) {
+    if (
+      options.containerId === undefined ||
+      !context.document ||
+      !context.window
+    ) {
       return;
     }
 
@@ -77,9 +84,29 @@ class BasicFunnelChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
-    this.chart.getZr().on('click', this.clearAllSelectedItems.bind(this));
+    this.selection = getChartSelection(context.window, {
+      chart: this.chart,
+      mouseEvents: this.mouseEvents,
+    });
     this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
+      switch (event.name) {
+        case 'click':
+          this.chart.on(event.name, params => {
+            this.selection?.doSelect({
+              index: params.componentIndex + ',' + params.dataIndex,
+              data: params.data,
+            });
+            event.callback({
+              ...params,
+              interactionType: 'select',
+              selectedItems: this.selection?.selectedItems,
+            });
+          });
+          break;
+        default:
+          this.chart.on(event.name, event.callback);
+          break;
+      }
     });
   }
 
@@ -92,6 +119,12 @@ class BasicFunnelChart extends Chart {
     if (!this.isMatchRequirement(options.config)) {
       return;
     }
+    if (
+      this.selection?.selectedItems.length &&
+      !options.selectedItems?.length
+    ) {
+      this.selection?.clearAll();
+    }
     const newOptions = this.getOptions(
       options.dataset,
       options.config,
@@ -102,23 +135,12 @@ class BasicFunnelChart extends Chart {
   }
 
   onUnMount(): void {
-    this.chart.getZr().off('click', this.clearAllSelectedItems.bind(this));
+    this.selection?.removeEvent();
     this.chart?.dispose();
   }
 
   onResize(opt: any, context): void {
     this.chart?.resize({ width: context?.width, height: context?.height });
-  }
-
-  clearAllSelectedItems(e: Event) {
-    if (!e.target) {
-      this.mouseEvents
-        ?.find(v => v.name === 'click')
-        ?.callback({
-          data: [],
-          seriesName: 'changeSelectedItems',
-        } as any);
-    }
   }
 
   private getOptions(

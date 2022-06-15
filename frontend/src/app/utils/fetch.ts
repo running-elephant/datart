@@ -293,3 +293,8 @@ export async function fetchChartDataSet(requestParams) {
   });
   return data;
 }
+
+export async function fetchDashboardDetail(boardId: string) {
+  const { data } = await request2(`/viz/dashboards/${boardId}`);
+  return data;
+}

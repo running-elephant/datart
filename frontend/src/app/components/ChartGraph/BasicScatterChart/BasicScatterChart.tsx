@@ -17,6 +17,9 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
+import Chart from 'app/models/Chart';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { ChartSelection } from 'app/models/ChartSelection';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -28,6 +31,7 @@ import {
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
+  getChartSelection,
   getColumnRenderName,
   getDataColumnMaxAndMin2,
   getDrillableRows,
@@ -41,8 +45,6 @@ import {
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
-import Chart from '../../../models/Chart';
-import { ChartDrillOption } from '../../../models/ChartDrillOption';
 import Config from './config';
 import { ScatterMetricAndSizeSerie } from './types';
 
@@ -50,7 +52,8 @@ class BasicScatterChart extends Chart {
   dependency = [];
   config = Config;
   chart: any = null;
-  selectable = true;
+
+  private selection: null | ChartSelection = null;
 
   constructor() {
     super('scatter', 'viz.palette.graph.names.scatterChart', 'sandiantu');
@@ -63,7 +66,11 @@ class BasicScatterChart extends Chart {
   }
 
   onMount(options, context): void {
-    if (options.containerId === undefined || !context.document) {
+    if (
+      options.containerId === undefined ||
+      !context.document ||
+      !context.window
+    ) {
       return;
     }
 
@@ -71,9 +78,29 @@ class BasicScatterChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
-    this.chart.getZr().on('click', this.clearAllSelectedItems.bind(this));
+    this.selection = getChartSelection(context.window, {
+      chart: this.chart,
+      mouseEvents: this.mouseEvents,
+    });
     this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
+      switch (event.name) {
+        case 'click':
+          this.chart.on(event.name, params => {
+            this.selection?.doSelect({
+              index: params.componentIndex + ',' + params.dataIndex,
+              data: params.data,
+            });
+            event.callback({
+              ...params,
+              interactionType: 'select',
+              selectedItems: this.selection?.selectedItems,
+            });
+          });
+          break;
+        default:
+          this.chart.on(event.name, event.callback);
+          break;
+      }
     });
   }
 
@@ -86,6 +113,9 @@ class BasicScatterChart extends Chart {
       this.chart?.clear();
       return;
     }
+    if (this.selection?.selectedItems.length && !props.selectedItems?.length) {
+      this.selection?.clearAll();
+    }
     const newOptions = this.getOptions(
       props.dataset,
       props.config,
@@ -96,23 +126,12 @@ class BasicScatterChart extends Chart {
   }
 
   onUnMount(): void {
-    this.chart.getZr().off('click', this.clearAllSelectedItems.bind(this));
     this.chart?.dispose();
+    this.selection?.removeEvent();
   }
 
   onResize(opt: any, context): void {
     this.chart?.resize(opt, context);
-  }
-
-  clearAllSelectedItems(e: Event) {
-    if (!e.target) {
-      this.mouseEvents
-        ?.find(v => v.name === 'click')
-        ?.callback({
-          data: [],
-          seriesName: 'changeSelectedItems',
-        } as any);
-    }
   }
 
   private getOptions(

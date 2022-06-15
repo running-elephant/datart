@@ -33,7 +33,7 @@ import java.util.Arrays;
 
 public class StructScriptProcessor implements QueryScriptProcessor {
     @Override
-    public SqlNode process(QueryScript queryScript) {
+    public QueryScriptProcessResult process(QueryScript queryScript) {
         StructScript structScript = JSON.parseObject(queryScript.getScript(), StructScript.class);
 
         if (structScript.getTable() == null || structScript.getTable().length == 0) {
@@ -42,8 +42,11 @@ public class StructScriptProcessor implements QueryScriptProcessor {
 
         SqlNode sqlJoin = SqlNodeUtils.createSqlIdentifier(structScript.getTable());
 
+        QueryScriptProcessResult result = new QueryScriptProcessResult();
+        result.setWithDefaultPrefix(false);
         if (CollectionUtils.isEmpty(structScript.getJoins())) {
-            return sqlJoin;
+            result.setFrom(sqlJoin);
+            return result;
         }
         for (TableJoin tableJoin : structScript.getJoins()) {
             SqlNode conditionNode = null;
@@ -69,7 +72,8 @@ public class StructScriptProcessor implements QueryScriptProcessor {
                     , conditionNode
             );
         }
-        return sqlJoin;
+        result.setFrom(sqlJoin);
+        return result;
     }
 
 }
