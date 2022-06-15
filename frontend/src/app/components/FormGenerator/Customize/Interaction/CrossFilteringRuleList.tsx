@@ -28,7 +28,10 @@ import { CrossFilteringInteractionRule, I18nTranslator } from './types';
 const CrossFilteringRuleList: FC<
   {
     rules?: CrossFilteringInteractionRule[];
-    boardVizs?: Array<{ datachartId: string; config: { name: string } }>;
+    boardVizs?: Array<{
+      datachartId: string;
+      config: { name: string; type: string };
+    }>;
     dataview?: ChartDataView;
     onRuleChange: (id, prop, value) => void;
     onSelectedRules: (rules: CrossFilteringInteractionRule[]) => void;
@@ -42,19 +45,21 @@ const CrossFilteringRuleList: FC<
   translate: t,
 }) => {
   const currentRules = useMemo(() => {
-    return (boardVizs || []).map(bvz => {
-      const enableRule = rules?.find(r => r.relId === bvz.datachartId);
-      if (enableRule) {
-        return enableRule;
-      }
-      return {
-        id: uuidv4(),
-        enable: false,
-        relId: bvz.datachartId,
-        relName: bvz?.config?.name,
-        relation: InteractionFieldRelation.Auto,
-      };
-    });
+    return (boardVizs || [])
+      .filter(bvz => bvz?.config?.type === 'chart')
+      .map(bvz => {
+        const enableRule = rules?.find(r => r.relId === bvz.datachartId);
+        if (enableRule) {
+          return enableRule;
+        }
+        return {
+          id: uuidv4(),
+          enable: false,
+          relId: bvz.datachartId,
+          relName: bvz?.config?.name,
+          relation: InteractionFieldRelation.Auto,
+        };
+      });
   }, [boardVizs, rules]);
   const selectedRuleKeys = useMemo(
     () => currentRules?.filter(r => r.enable)?.map(r => r.id),

@@ -44,7 +44,7 @@ export function addByKey<T1, T2>(base: T1[], key: string, value: T2): T1[] {
 
 export function updateByKey<T1, T2>(
   base: T1,
-  key: string | number,
+  key: string | number | symbol,
   value: T2,
 ): T1 {
   return produce(base, draft => {

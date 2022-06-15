@@ -42,14 +42,7 @@ import {
   getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
-import {
-  buildClickEventBaseFilters,
-  getChartDrillOption,
-  getJumpFiltersByInteractionRule,
-  getJumpOperationFiltersByInteractionRule,
-} from 'app/utils/internalChartHelper';
-import { KEYBOARD_EVENT_NAME } from 'globalConstants';
-import qs from 'qs';
+import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';

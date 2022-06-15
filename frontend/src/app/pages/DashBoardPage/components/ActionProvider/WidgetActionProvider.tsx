@@ -28,7 +28,7 @@ import {
   refreshWidgetsByControllerAction,
   widgetChartClickAction,
   widgetGetDataAction,
-  widgetLinkEventAction,
+  widgetLinkEventActionCreator,
   widgetToClearLinkageAction,
 } from '../../actions/widgetAction';
 import { ORIGINAL_TYPE_MAP } from '../../constants';
@@ -162,7 +162,7 @@ export const WidgetActionProvider: FC<{
         },
         onWidgetLinkEvent: (widget: Widget) => params => {
           dispatch(
-            widgetLinkEventAction({
+            widgetLinkEventActionCreator({
               widget,
               params,
             }),
