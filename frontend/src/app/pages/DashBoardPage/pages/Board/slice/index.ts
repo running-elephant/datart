@@ -52,7 +52,7 @@ export const boardInit: BoardState = {
   boardInfoRecord: {} as Record<string, BoardInfo>,
   widgetRecord: {} as Record<string, Record<string, Widget>>,
   widgetInfoRecord: {} as Record<string, Record<string, WidgetInfo>>,
-  widgetDataMap: {} as Record<string, WidgetData>,
+  widgetDataMap: {} as Record<string, WidgetData | undefined>,
   dataChartMap: {} as Record<string, DataChart>,
   viewMap: {} as Record<string, ChartDataView>, // View
   availableSourceFunctionsMap: {} as Record<string, string[]>,
@@ -224,10 +224,13 @@ const boardSlice = createSlice({
       state.boardInfoRecord[boardId].fullScreenItemId = itemId;
     },
 
-    setWidgetData(state, action: PayloadAction<WidgetData>) {
-      const widgetData = action.payload;
-      state.widgetDataMap[widgetData.id] = widgetData;
-      state.selectedItems[widgetData.id] = [];
+    setWidgetData(
+      state,
+      action: PayloadAction<{ wid: string; data: WidgetData | undefined }>,
+    ) {
+      const { wid, data } = action.payload;
+      state.widgetDataMap[wid] = data;
+      state.selectedItems[wid] = [];
     },
     changeBoardVisible(
       state,

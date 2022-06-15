@@ -55,9 +55,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   // const emitQuery = getControlQueryEnable(widget.config.customConfig.props!);
   const [form] = Form.useForm();
 
-  const {
-    data: { rows },
-  } = useContext(WidgetDataContext);
+  const { data: dataset } = useContext(WidgetDataContext);
 
   const refreshLinkedWidgets = useCallback(
     (widget: Widget) => {
@@ -100,7 +98,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     return null;
   }, [title]);
   const optionRows = useMemo(() => {
-    const dataRows = rows || [];
+    const dataRows = dataset?.rows || [];
     if (valueOptionType === 'common') {
       return dataRows.map(ele => {
         const item: RelationFilterValue = {
@@ -115,7 +113,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     } else {
       return [];
     }
-  }, [valueOptions, valueOptionType, rows]);
+  }, [dataset?.rows, valueOptionType, valueOptions]);
 
   const onControllerChange = useCallback(() => {
     form.submit();

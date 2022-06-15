@@ -202,7 +202,7 @@ export const selectEditWidgetData = createSelector(
   (widgetDataMap, wid) => {
     if (!widgetDataMap) return DefaultWidgetData;
     if (!widgetDataMap[wid]) return DefaultWidgetData;
-    return widgetDataMap[wid];
+    return widgetDataMap[wid] || DefaultWidgetData;
   },
 );
 // past
