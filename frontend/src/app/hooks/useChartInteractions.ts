@@ -32,6 +32,7 @@ import {
   buildClickEventBaseFilters,
   getJumpFiltersByInteractionRule,
   getJumpOperationFiltersByInteractionRule,
+  getLinkFiltersByInteractionRule,
 } from 'app/utils/internalChartHelper';
 import qs from 'qs';
 import { useCallback } from 'react';
@@ -256,24 +257,25 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
   );
 
   const handleCrossFilteringEvent = useCallback(
-    ({
-      drillOption,
-      crossFilteringSetting,
-      clickEventParams,
-      targetEvent,
-      orgId,
-      view,
-      computedFields,
-      aggregation,
-      chartConfig,
-    }) => {
+    (
+      {
+        drillOption,
+        crossFilteringSetting,
+        clickEventParams,
+        targetEvent,
+        view,
+        computedFields,
+        aggregation,
+        chartConfig,
+      },
+      callback,
+    ) => {
       if (
         !crossFilteringSetting ||
         crossFilteringSetting?.event !== targetEvent
       ) {
         return null;
       }
-      console.log('Do handleCrossFilteringEvent | ', crossFilteringSetting);
       let nonAggChartFilters = new ChartDataRequestBuilder(
         {
           id: view?.id || '',
@@ -290,9 +292,24 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
         .build()
         .filters?.filter(f => !Boolean(f.aggOperator));
 
-      (crossFilteringSetting?.rules || []).forEach(rule => {
-        console.log(`crossFilteringSetting rule ---> `, rule);
+      const linkParams = (crossFilteringSetting?.rules || []).map(rule => {
+        const clickFilters = buildClickEventBaseFilters(
+          clickEventParams?.data?.rowData,
+          rule,
+          drillOption,
+          chartConfig?.datas,
+        );
+        const filters = getLinkFiltersByInteractionRule(
+          clickFilters,
+          nonAggChartFilters,
+          rule,
+        );
+        return {
+          rule,
+          filters,
+        };
       });
+      callback?.(linkParams);
     },
     [],
   );

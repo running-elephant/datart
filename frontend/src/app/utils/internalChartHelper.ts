@@ -797,6 +797,45 @@ export const getJumpFiltersByInteractionRule = (
     }, {});
 };
 
+export const getLinkFiltersByInteractionRule = (
+  clickEventFilters: ChartDataRequestFilter[] = [],
+  chartFilters: ChartDataRequestFilter[] = [],
+  rule?: InteractionRule,
+): Record<string, string | any> => {
+  return clickEventFilters
+    .concat(chartFilters)
+    .map(f => {
+      if (isEmpty(f)) {
+        return null;
+      }
+      if (rule?.['relation'] === InteractionFieldRelation.Auto) {
+        return f;
+      } else {
+        const customizeRelations: CustomizeRelation[] =
+          rule?.[InteractionFieldRelation.Customize];
+        if (isEmptyArray(customizeRelations)) {
+          return null;
+        }
+        const targetRelation = customizeRelations?.find(
+          r => r.source === f?.column,
+        );
+        if (isEmpty(targetRelation)) {
+          return null;
+        }
+        return Object.assign({}, f, {
+          column: targetRelation?.target,
+        }) as ChartDataRequestFilter;
+      }
+    })
+    .filter(Boolean)
+    .reduce((acc, cur) => {
+      if (cur?.column) {
+        acc[cur.column!] = cur?.values?.map(v => v.value);
+      }
+      return acc;
+    }, {});
+};
+
 export const getJumpOperationFiltersByInteractionRule = (
   clickEventFilters: ChartDataRequestFilter[] = [],
   chartFilters: ChartDataRequestFilter[] = [],

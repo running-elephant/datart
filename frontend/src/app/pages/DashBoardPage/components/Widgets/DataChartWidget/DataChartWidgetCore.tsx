@@ -87,8 +87,12 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const containerId = useMemo(() => {
     return `${wid}_${uuidv4()}`;
   }, [wid]);
-  const { onWidgetChartClick, onWidgetGetData, onWidgetDataUpdate } =
-    useContext(WidgetActionContext);
+  const {
+    onWidgetChartClick,
+    onWidgetLinkEvent,
+    onWidgetGetData,
+    onWidgetDataUpdate,
+  } = useContext(WidgetActionContext);
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
   const widgetRef = useRef<Widget>(widget);
   const drillOptionRef = useRef<IChartDrillOption>();
@@ -290,6 +294,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
           chartContextMenuEvent,
           InteractionMouseEvent.Right,
         ),
+        onWidgetLinkEvent(widgetRef.current),
       );
   }, [
     dataChart?.config?.chartConfig?.interactions,
@@ -297,6 +302,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     getCrossFilteringSetting,
     handleCrossFilteringEvent,
     buildCrossFilteringEventParams,
+    onWidgetLinkEvent,
   ]);
 
   const handleViewDataChange = useCallback(() => {
@@ -351,6 +357,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                     params,
                     InteractionMouseEvent.Left,
                   ),
+                  onWidgetLinkEvent(widgetRef.current),
                 );
                 handleViewDataEvent(
                   buildViewDataEventParams(params, InteractionMouseEvent.Left),
@@ -420,6 +427,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     buildDrillThroughEventParams,
     handleViewDataEvent,
     buildViewDataEventParams,
+    onWidgetLinkEvent,
   ]);
 
   const config = useMemo(() => {
