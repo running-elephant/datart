@@ -506,9 +506,14 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     [dispatch, expensiveQuery, dataview, chartConfig?.datas, actions],
   );
 
-  const handleDataViewChanged = useCallback(() => {
-    clearDataConfig();
-  }, [clearDataConfig]);
+  const handleDataViewChanged = useCallback(
+    (clear?: boolean) => {
+      if (clear) {
+        clearDataConfig();
+      }
+    },
+    [clearDataConfig],
+  );
 
   const handleAggregationState = useCallback(() => {
     clearDataConfig();

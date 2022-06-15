@@ -38,7 +38,7 @@ const ChartOperationPanel: FC<{
   allowQuery: boolean;
   onChartChange: (chart: IChart) => void;
   onChartConfigChange: (type, payload) => void;
-  onDataViewChange?: () => void;
+  onDataViewChange?: (clear?: boolean) => void;
   onCreateDownloadDataTask?: () => void;
   selectedItems?: SelectedItem[];
   onKeyboardPress?: (event: KeyboardEvent) => void;

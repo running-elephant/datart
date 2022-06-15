@@ -57,7 +57,7 @@ const ChartWorkbench: FC<{
   };
   onChartChange: (c: IChart) => void;
   onChartConfigChange: (type, payload) => void;
-  onDataViewChange?: () => void;
+  onDataViewChange?: (clear?: boolean) => void;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
   onChartDrillOptionChange?: (option: IChartDrillOption) => void;
