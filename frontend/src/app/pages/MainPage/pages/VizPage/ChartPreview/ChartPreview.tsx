@@ -34,7 +34,7 @@ import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
 import { selectAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { fetchAvailableSourceFunctionsForChart } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useMainSlice } from 'app/pages/MainPage/slice';
-import { ChartMouseEventParams, IChart } from 'app/types/Chart';
+import { IChart } from 'app/types/Chart';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
@@ -42,8 +42,14 @@ import {
   getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
-import { getChartDrillOption } from 'app/utils/internalChartHelper';
+import {
+  buildClickEventBaseFilters,
+  getChartDrillOption,
+  getJumpFiltersByInteractionRule,
+  getJumpOperationFiltersByInteractionRule,
+} from 'app/utils/internalChartHelper';
 import { KEYBOARD_EVENT_NAME } from 'globalConstants';
+import qs from 'qs';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -55,7 +61,6 @@ import useQSLibUrlHelper from '../hooks/useQSLibUrlHelper';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import { useVizSlice } from '../slice';
 import {
-  selectMultipleSelect,
   selectPreviewCharts,
   selectPublishLoading,
   selectSelectedItems,
@@ -108,7 +113,6 @@ const ChartPreviewBoard: FC<{
     const previewCharts = useSelector(selectPreviewCharts);
     const publishLoading = useSelector(selectPublishLoading);
     const selectedItems = useSelector(selectSelectedItems);
-    const multipleSelect = useSelector(selectMultipleSelect);
     const availableSourceFunctions = useSelector(
       selectAvailableSourceFunctions,
     );
@@ -138,27 +142,6 @@ const ChartPreviewBoard: FC<{
     });
 
     const { parse } = useQSLibUrlHelper();
-
-    const chartIframeKeyboardListener = useCallback(
-      (e: KeyboardEvent) => {
-        if (
-          (e.key === KEYBOARD_EVENT_NAME.CTRL ||
-            e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
-          e.type === 'keydown' &&
-          !multipleSelect
-        ) {
-          dispatch(vizAction.updateMultipleSelect(true));
-        } else if (
-          (e.key === KEYBOARD_EVENT_NAME.CTRL ||
-            e.key === KEYBOARD_EVENT_NAME.COMMAND) &&
-          e.type === 'keyup' &&
-          multipleSelect
-        ) {
-          dispatch(vizAction.updateMultipleSelect(false));
-        }
-      },
-      [dispatch, multipleSelect, vizAction],
-    );
 
     useEffect(() => {
       const jumpFilterParams: ChartDataRequestFilter[] =
@@ -398,41 +381,14 @@ const ChartPreviewBoard: FC<{
                 return;
               }
 
-              // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法 其他图标取消选中时调取
-              if (param.interactionType === 'selected') {
+              // NOTE 直接修改selectedItems结果集处理方法
+              if (param.interactionType === 'select') {
                 dispatch(
                   vizAction.changeSelectedItems({
                     backendChartId,
                     data: param.selectedItems,
                   }),
                 );
-              }
-              if (param.interactionType === 'unselect') {
-                dispatch(
-                  vizAction.changeSelectedItems({
-                    backendChartId,
-                    data: [],
-                  }),
-                );
-              }
-
-              if (chart.selectable) {
-                const {
-                  dataIndex,
-                  componentIndex,
-                  data,
-                }: ChartMouseEventParams = param;
-                if (data?.rowData) {
-                  dispatch(
-                    vizAction.normalSelect({
-                      backendChartId,
-                      data: {
-                        index: componentIndex + ',' + dataIndex,
-                        data,
-                      },
-                    }),
-                  );
-                }
               }
             },
           },
@@ -711,7 +667,6 @@ const ChartPreviewBoard: FC<{
                     config={chartPreview?.chartConfig!}
                     drillOption={drillOptionRef.current}
                     selectedItems={selectedItems[backendChartId]}
-                    onKeyboardPress={chartIframeKeyboardListener}
                     width={cacheW}
                     height={cacheH}
                   />

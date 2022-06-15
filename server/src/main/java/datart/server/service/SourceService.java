@@ -19,16 +19,18 @@
 package datart.server.service;
 
 import datart.core.data.provider.SchemaInfo;
+import datart.core.entity.Folder;
 import datart.core.entity.Source;
 import datart.core.mappers.ext.SourceMapperExt;
 import datart.server.base.params.SourceBaseUpdateParam;
 import datart.server.base.params.SourceCreateParam;
 import datart.server.base.params.SourceUpdateParam;
-import datart.server.base.transfer.model.SourceTransferModel;
+import datart.server.base.transfer.model.SourceResourceModel;
+import datart.server.base.transfer.model.TransferModel;
 
 import java.util.List;
 
-public interface SourceService extends BaseCRUDService<Source, SourceMapperExt>, ResourceTransferService<Source, SourceTransferModel> {
+public interface SourceService extends BaseCRUDService<Source, SourceMapperExt>, ResourceTransferService<Source, SourceResourceModel, TransferModel, Folder> {
 
     List<Source> listSources(String orgId, boolean active);
 

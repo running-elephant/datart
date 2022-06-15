@@ -99,8 +99,3 @@ export const selectSelectedItems = createSelector(
   workbenchSelector,
   wb => wb.selectedItems,
 );
-
-export const selectMultipleSelect = createSelector(
-  workbenchSelector,
-  wb => wb.multipleSelect,
-);
