@@ -268,14 +268,29 @@ export const syncWidgetChartDataAsync = createAsyncThunk<
           url: `data-provider/execute`,
           data: requestParams,
         });
-        dispatch(
+        await dispatch(
           boardActions.setWidgetData({
             wid: widgetId,
             data: { ...data, id: widgetId },
           }),
         );
+        await dispatch(
+          boardActions.changePageInfo({
+            boardId,
+            widgetId,
+            pageInfo: data?.pageInfo,
+          }),
+        );
+        await dispatch(
+          boardActions.setWidgetErrInfo({
+            boardId,
+            widgetId,
+            errInfo: undefined,
+            errorType: 'request',
+          }),
+        );
       } catch (error) {
-        dispatch(
+        await dispatch(
           boardActions.setWidgetErrInfo({
             boardId,
             widgetId,
@@ -283,7 +298,7 @@ export const syncWidgetChartDataAsync = createAsyncThunk<
             errorType: 'request',
           }),
         );
-        dispatch(
+        await dispatch(
           boardActions.setWidgetData({ wid: widgetId, data: undefined }),
         );
       }

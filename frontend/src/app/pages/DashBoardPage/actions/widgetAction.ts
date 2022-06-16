@@ -188,7 +188,7 @@ export const widgetLinkEventAction =
     const widgetMapMap = rootState.board?.widgetRecord;
     const widgetMap = widgetMapMap?.[widget?.dashboardId] || {};
 
-    // 1. get link charts
+    // 1. get linked charts
     const boardLinkWidgets = Object.entries(
       widgetMapMap?.[widget?.dashboardId] || {},
     )
@@ -196,7 +196,6 @@ export const widgetLinkEventAction =
         return targetLinkDataChartIds.includes(v.datachartId);
       })
       .map(([k, v]) => v);
-
     // 2. update all linked charts dataset
     boardLinkWidgets.forEach(w => {
       // 2.1 get current widget click event filters
@@ -219,15 +218,16 @@ export const widgetLinkEventAction =
           widgetMap: widgetMap,
           params: undefined,
         });
-
+      // 2.3 get current widget page info
+      const widgetInfo =
+        rootState.board?.widgetInfoRecord?.[widget?.dashboardId]?.[w.id];
+      // 2.4 refresh widget dataset
       dispatch(
         syncWidgetChartDataAsync({
           boardId: w.dashboardId,
           widgetId: w.id,
           renderMode: 'read',
-          option: {
-            pageInfo: { pageNo: 1 },
-          },
+          option: widgetInfo,
           extraFilters: clickFilters.concat(controllerFilters),
           variableParams,
         }),
