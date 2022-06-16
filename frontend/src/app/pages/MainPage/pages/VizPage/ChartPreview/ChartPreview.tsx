@@ -58,7 +58,15 @@ import {
   getJumpOperationFiltersByInteractionRule,
 } from 'app/utils/internalChartHelper';
 import qs from 'qs';
-import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  FC,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
@@ -704,7 +712,19 @@ const ChartPreviewBoard: FC<{
         }),
       );
     };
-
+    const dataset = useMemo(() => {
+      if (
+        !chartPreview?.backendChart?.viewId &&
+        chartPreview?.backendChart?.config.sampleData
+      ) {
+        return chartPreview?.backendChart?.config.sampleData;
+      }
+      return chartPreview?.dataset;
+    }, [
+      chartPreview?.backendChart?.config.sampleData,
+      chartPreview?.backendChart?.viewId,
+      chartPreview?.dataset,
+    ]);
     return (
       <StyledChartPreviewBoard>
         <VizHeader
@@ -763,7 +783,7 @@ const ChartPreviewBoard: FC<{
                   <ChartIFrameContainer
                     key={backendChartId}
                     containerId={backendChartId}
-                    dataset={chartPreview?.dataset}
+                    dataset={dataset}
                     chart={chart!}
                     config={chartPreview?.chartConfig!}
                     drillOption={drillOptionRef.current}
