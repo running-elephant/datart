@@ -901,7 +901,8 @@
         "selectDrillOff": "Turn on \"Click to drill down\"",
         "rollUp": "Roll Up",
         "drillThrough": "Drill Through",
-        "viewData": "View Data"
+        "viewData": "View Data",
+        "crossFiltering": "Cross Filtering"
       }
     },
     "action": {
@@ -1171,7 +1172,8 @@
     "tips": {
       "noStartValue": "Input Start Value",
       "noEndValue": "Input End Value",
-      "endGTStartErr": "End Value should be greater than Start Value "
+      "endGTStartErr": "End Value should be greater than Start Value ",
+      "hasChartConfig": "The chart config already exist, it will overwrite after you enable board config."
     },
     "control": {
       "title": "Control Title",

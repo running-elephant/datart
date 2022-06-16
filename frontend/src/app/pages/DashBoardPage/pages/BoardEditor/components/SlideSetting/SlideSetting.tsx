@@ -40,7 +40,7 @@ export const SlideSetting: FC<{}> = memo(() => {
           boardEditing={true}
           boardId={boardId}
         >
-          <WidgetSetting />
+          <WidgetSetting boardId={boardId} />
         </WidgetWrapProvider>
       )}
     </Wrapper>

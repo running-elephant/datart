@@ -230,6 +230,7 @@ export const ChartStyleSectionComponentType = {
   TIMER_FORMAT: 'timerFormat',
   CHECKBOX_MODAL: 'checkboxModal',
   INTERACTION_DRILL_THROUGH_PANEL: 'interaction.drillThrough',
+  INTERACTION_CROSS_FILTERING: 'interaction.crossFiltering',
   INTERACTION_VIEW_DETAIL_PANEL: 'interaction.viewDetail',
 };
 
