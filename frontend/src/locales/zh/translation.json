@@ -6,6 +6,7 @@
     "title": {
       "action": "操作"
     },
+    "version": "版本",
     "button": {
       "create": "新建",
       "save": "保存",
@@ -71,6 +72,18 @@
       "city": "城市",
       "county": "区县"
     }
+  },
+  "setup": {
+    "welcome": "欢迎使用 datart",
+    "welcomeDesc": "在首次使用之前，请设置一位初始用户",
+    "success": "设置成功",
+    "successDesc": "已成功设置初始用户，点击这里",
+    "goLogin": "去登录",
+    "username": "用户名",
+    "email": "邮箱",
+    "password": "密码",
+    "name": "姓名",
+    "initialize": "初始化"
   },
   "login": {
     "username": "用户名 / 邮箱",
@@ -1379,7 +1392,7 @@
       "email": "邮箱",
       "password": "密码",
       "changePassword": "点击修改密码",
-      "name": "用户姓名",
+      "name": "姓名",
       "description": "描述",
       "roles": "角色列表",
       "assignRole": "为用户指定角色",
@@ -1396,7 +1409,7 @@
       "searchMember": "搜索成员关键字",
       "username": "用户名",
       "email": "邮箱",
-      "name": "用户姓名",
+      "name": "姓名",
       "remove": "移除"
     },
     "form": {
@@ -1531,11 +1544,14 @@
     "join": "成功加入组织",
     "confirming": "确认邀请中"
   },
-  "active": {
-    "activating": "激活中"
-  },
   "authorization": {
-    "processing": "处理中"
+    "authenticating": "认证中",
+    "authenticatingDesc": "正在认证，请等待认证通过",
+    "activating": "激活中",
+    "activatingDesc": "正在激活，请等待激活完成",
+    "activatingError": "激活失败",
+    "error": "认证失败",
+    "errorDesc": "发生错误，请检查并重新尝试"
   },
   "notfound": {
     "title": "没有这个页面"

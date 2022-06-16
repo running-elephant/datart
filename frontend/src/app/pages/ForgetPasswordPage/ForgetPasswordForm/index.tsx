@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { AuthForm } from 'app/components';
+import * as AuthLayout from 'app/components/styles/AuthLayout';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -35,14 +35,14 @@ export function ForgetPasswordForm() {
     setToken(token);
   }, []);
   return (
-    <AuthForm>
+    <AuthLayout.Form>
       {isCheckForm ? (
         <CheckCodeForm onNextStep={onNextStep} />
       ) : (
         <ResetPasswordForm token={token} />
       )}
       <LinkButton to="/login">{t('return')}</LinkButton>
-    </AuthForm>
+    </AuthLayout.Form>
   );
 }
 

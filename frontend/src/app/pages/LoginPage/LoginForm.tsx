@@ -17,7 +17,7 @@
  */
 
 import { Button, Form, Input } from 'antd';
-import { AuthForm } from 'app/components';
+import * as AuthLayout from 'app/components/styles/AuthLayout';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { User } from 'app/slice/types';
 import { StorageKeys } from 'globalConstants';
@@ -81,7 +81,7 @@ export function LoginForm({
   );
 
   return (
-    <AuthForm>
+    <AuthLayout.Form>
       {logged && !switchUser && !inShare ? (
         <>
           <h2>{t('alreadyLoggedIn')}</h2>
@@ -164,7 +164,7 @@ export function LoginForm({
           )}
         </Form>
       )}
-    </AuthForm>
+    </AuthLayout.Form>
   );
 }
 

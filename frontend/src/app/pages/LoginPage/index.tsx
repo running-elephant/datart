@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Brand } from 'app/components/Brand';
+import { LayoutWithBrand } from 'app/components';
 import { Version } from 'app/components/Version';
 import {
   selectLoggedInUser,
@@ -28,7 +28,6 @@ import { getOauth2Clients, login } from 'app/slice/thunks';
 import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import styled from 'styled-components/macro';
 import { LoginForm } from './LoginForm';
 
 export function LoginPage() {
@@ -57,8 +56,7 @@ export function LoginPage() {
     [dispatch, history],
   );
   return (
-    <Wrapper>
-      <Brand />
+    <LayoutWithBrand>
       <LoginForm
         loading={loading}
         loggedInUser={loggedInUser}
@@ -67,19 +65,6 @@ export function LoginPage() {
         onLogin={onLogin}
       />
       <Version version={systemInfo?.version} />
-    </Wrapper>
+    </LayoutWithBrand>
   );
 }
-
-const Wrapper = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  background: ${p => p.theme.bodyBackground};
-`;
