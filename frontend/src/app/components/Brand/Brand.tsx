@@ -10,16 +10,14 @@ import {
 
 export function Brand() {
   return (
-    <S.Brand>
+    <Header>
       <img src={logo} alt="logo" />
       <h1>datart</h1>
-    </S.Brand>
+    </Header>
   );
 }
 
-const S: any = {};
-
-S.Brand = styled.header`
+const Header = styled.header`
   display: flex;
   align-items: center;
 

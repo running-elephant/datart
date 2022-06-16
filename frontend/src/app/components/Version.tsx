@@ -9,15 +9,13 @@ interface VersionProps {
 export function Version({ version }: VersionProps) {
   const t = useI18NPrefix('global');
   return version ? (
-    <S.Content>
+    <Title>
       {t('version')}: {version}
-    </S.Content>
+    </Title>
   ) : null;
 }
 
-const S: any = {};
-
-S.Content = styled.h3`
+const Title = styled.h3`
   position: absolute;
   right: ${SPACE_LG};
   bottom: ${SPACE_LG};

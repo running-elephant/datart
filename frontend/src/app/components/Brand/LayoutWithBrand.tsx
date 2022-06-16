@@ -3,23 +3,21 @@ import styled from 'styled-components';
 import { SPACE_LG, SPACE_TIMES } from 'styles/StyleConstants';
 import { Brand } from './Brand';
 
-interface BrandContainerProps {
+interface LayoutWithBrandProps {
   className?: string;
   children?: ReactNode;
 }
 
-export function BrandContainer({ className, children }: BrandContainerProps) {
+export function LayoutWithBrand({ className, children }: LayoutWithBrandProps) {
   return (
-    <S.BrandContainer {...(className && { className })}>
+    <Layout {...(className && { className })}>
       <Brand />
       {children}
-    </S.BrandContainer>
+    </Layout>
   );
 }
 
-const S: any = {};
-
-S.BrandContainer = styled.div`
+const Layout = styled.div`
   position: absolute;
   top: 0;
   right: 0;
@@ -31,7 +29,7 @@ S.BrandContainer = styled.div`
   justify-content: center;
   padding: ${SPACE_LG} ${SPACE_LG} ${SPACE_TIMES(30)} ${SPACE_LG};
 
-  &.notification {
+  &.alert {
     justify-content: flex-start;
     padding: ${SPACE_TIMES(20)} ${SPACE_LG} ${SPACE_LG} ${SPACE_LG};
   }

@@ -1,4 +1,4 @@
-import { Notification } from 'app/components';
+import { Alert } from 'app/components/Alert';
 import { AuthorizationStatus } from 'app/constants';
 import { getUserInfoByToken } from 'app/slice/thunks';
 import { StorageKeys } from 'globalConstants';
@@ -51,5 +51,5 @@ export const AuthorizationPage = () => {
     }
   }, [dispatch, history]);
 
-  return <Notification status={status} errorMessage={errorMessage} />;
+  return <Alert status={status} errorMessage={errorMessage} />;
 };

@@ -73,6 +73,18 @@
       "county": "County"
     }
   },
+  "setup": {
+    "welcome": "Welcome to datart",
+    "welcomeDesc": "Before using datart for the first time, set up an initial user",
+    "success": "Success",
+    "successDesc": "Initial user set up successfully. Click here to",
+    "goLogin": "Log In",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "initialize": "Initialize"
+  },
   "login": {
     "username": "Username / Email",
     "password": "Password",

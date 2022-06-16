@@ -24,6 +24,7 @@ const rejectedErrorHandlerMiddleware = createListenerMiddleware();
 
 // TODO(all): to be removed scoped sliced names after replace all `request` function to `request2`
 const scopedSliceNames = [
+  'app',
   'workbench',
   'storyBoard',
   'share',

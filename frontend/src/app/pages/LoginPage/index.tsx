@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { BrandContainer } from 'app/components';
+import { LayoutWithBrand } from 'app/components';
 import { Version } from 'app/components/Version';
 import {
   selectLoggedInUser,
@@ -56,7 +56,7 @@ export function LoginPage() {
     [dispatch, history],
   );
   return (
-    <BrandContainer>
+    <LayoutWithBrand>
       <LoginForm
         loading={loading}
         loggedInUser={loggedInUser}
@@ -65,6 +65,6 @@ export function LoginPage() {
         onLogin={onLogin}
       />
       <Version version={systemInfo?.version} />
-    </BrandContainer>
+    </LayoutWithBrand>
   );
 }

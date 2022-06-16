@@ -181,7 +181,6 @@ export interface WidgetData {
   name?: string;
   rows?: string[][];
   pageInfo?: Partial<PageInfo>;
-  [key: string]: any;
 }
 
 //

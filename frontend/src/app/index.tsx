@@ -35,6 +35,7 @@ import { LazyAuthorizationPage } from './pages/AuthorizationPage/Loadable';
 import { LazyForgetPasswordPage } from './pages/ForgetPasswordPage/Loadable';
 import { LazyLoginPage } from './pages/LoginPage/Loadable';
 import { LazyRegisterPage } from './pages/RegisterPage/Loadable';
+import { LazySetupPage } from './pages/SetupPage/Loadable';
 import { useAppSlice } from './slice';
 import { getSystemInfo, logout, setLoggedInUser } from './slice/thunks';
 
@@ -73,6 +74,7 @@ export function App() {
           <meta name="description" content="Data Art" />
         </Helmet>
         <Switch>
+          <Route path="/setup" component={LazySetupPage} />
           <Route path="/login" component={LazyLoginPage} />
           <Route path="/register" component={LazyRegisterPage} />
           <Route path="/activation" component={LazyActivationPage} />

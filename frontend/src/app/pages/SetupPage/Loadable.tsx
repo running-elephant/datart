@@ -16,13 +16,9 @@
  * limitations under the License.
  */
 
-import { LayoutWithBrand } from 'app/components';
-import { ForgetPasswordForm } from './ForgetPasswordForm';
+import { defaultLazyLoad } from 'utils/loadable';
 
-export function ForgetPasswordPage() {
-  return (
-    <LayoutWithBrand>
-      <ForgetPasswordForm />
-    </LayoutWithBrand>
-  );
-}
+export const LazySetupPage = defaultLazyLoad(
+  () => import('./index'),
+  module => module.SetupPage,
+);

@@ -17,7 +17,7 @@
  */
 
 import { message } from 'antd';
-import { BrandContainer } from 'app/components';
+import { LayoutWithBrand } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectSystemInfo } from 'app/slice/selectors';
 import React, { useCallback, useState } from 'react';
@@ -28,7 +28,7 @@ import { sendEmail } from './service';
 import { WithoutActivation } from './WithoutActivation';
 
 export function RegisterPage() {
-  const [isRegister, setIsRegister] = useState(true);
+  const [registered, setRegistered] = useState(false);
   const [email, setEmail] = useState<string>('');
   const [sendEmailLoading, setSendEmailLoading] = useState(false);
   const systemInfo = useSelector(selectSystemInfo);
@@ -37,11 +37,11 @@ export function RegisterPage() {
 
   const onRegisterSuccess = useCallback((email: string) => {
     setEmail(email);
-    setIsRegister(false);
+    setRegistered(true);
   }, []);
 
   const goBack = useCallback(() => {
-    setIsRegister(true);
+    setRegistered(false);
   }, []);
 
   const onSendEmail = useCallback(() => {
@@ -57,8 +57,8 @@ export function RegisterPage() {
   }, [email, t]);
 
   return (
-    <BrandContainer>
-      {isRegister ? (
+    <LayoutWithBrand>
+      {!registered ? (
         <RegisterForm onRegisterSuccess={onRegisterSuccess} />
       ) : mailEnable ? (
         <SendEmailTips
@@ -70,6 +70,6 @@ export function RegisterPage() {
       ) : (
         <WithoutActivation onContinue={goBack} />
       )}
-    </BrandContainer>
+    </LayoutWithBrand>
   );
 }

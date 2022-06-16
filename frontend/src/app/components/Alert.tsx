@@ -1,20 +1,14 @@
 import { ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons';
-import { BrandContainer } from 'app/components';
+import { LayoutWithBrand } from 'app/components';
+import * as AuthLayout from 'app/components/styles/AuthLayout';
 import { AuthorizationStatus } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { lighten } from 'polished';
 import { ReactNode, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import {
-  FONT_SIZE_BASE,
-  FONT_SIZE_HEADING,
-  FONT_SIZE_ICON_XL,
-  FONT_WEIGHT_MEDIUM,
-  SPACE_MD,
-  SPACE_TIMES,
-} from 'styles/StyleConstants';
+import { FONT_SIZE_BASE } from 'styles/StyleConstants';
 
-interface NotificationProps {
+interface AlertProps {
   status: AuthorizationStatus;
   pendingTitle?: string;
   pendingMessage?: string;
@@ -22,13 +16,13 @@ interface NotificationProps {
   errorMessage?: string;
 }
 
-export const Notification = ({
+export const Alert = ({
   status,
   pendingTitle,
   pendingMessage,
   errorTitle,
   errorMessage,
-}: NotificationProps) => {
+}: AlertProps) => {
   const [icon, setIcon] = useState<ReactNode>(null);
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState<ReactNode>(null);
@@ -39,12 +33,12 @@ export const Notification = ({
       case AuthorizationStatus.Pending:
         setTitle(pendingTitle || t('authenticating'));
         setDesc(pendingMessage || t('authenticatingDesc'));
-        setIcon(<LoadingOutlined className="loading" />);
+        setIcon(<Loading />);
         break;
       case AuthorizationStatus.Error:
         setTitle(errorTitle || t('error'));
         setDesc(errorMessage || t('errorDesc'));
-        setIcon(<ExclamationCircleOutlined className="error" />);
+        setIcon(<Error />);
         break;
       default:
         break;
@@ -52,41 +46,19 @@ export const Notification = ({
   }, [status, pendingTitle, pendingMessage, errorTitle, errorMessage, t]);
 
   return (
-    <BrandContainer className="notification">
-      <S.Icon>{icon}</S.Icon>
-      <S.Title>{title}</S.Title>
-      <S.Desc>{desc}</S.Desc>
-    </BrandContainer>
+    <LayoutWithBrand className="alert">
+      <AuthLayout.Picture>{icon}</AuthLayout.Picture>
+      <AuthLayout.Title>{title}</AuthLayout.Title>
+      <AuthLayout.Description>{desc}</AuthLayout.Description>
+    </LayoutWithBrand>
   );
 };
 
-const S: any = {};
-
-S.Icon = styled.div`
-  display: flex;
-  align-items: center;
-  height: ${SPACE_TIMES(40)};
-  margin-top: ${SPACE_MD};
-
-  .loading {
-    font-size: ${FONT_SIZE_BASE * 2}px;
-    color: ${p => p.theme.textColorLight};
-  }
-
-  .error {
-    font-size: ${FONT_SIZE_BASE * 4}px;
-    color: ${p => lighten(0.1, p.theme.error)};
-  }
+const Loading = styled(LoadingOutlined)`
+  font-size: ${FONT_SIZE_BASE * 2}px;
+  color: ${p => p.theme.textColorLight} !important;
 `;
 
-S.Title = styled.h1`
-  margin-bottom: ${SPACE_TIMES(8)};
-  font-size: ${FONT_SIZE_ICON_XL};
-  font-weight: ${FONT_WEIGHT_MEDIUM};
-  color: ${p => p.theme.textColorSnd};
-`;
-
-S.Desc = styled.p`
-  font-size: ${FONT_SIZE_HEADING};
-  color: ${p => p.theme.textColorLight};
+const Error = styled(ExclamationCircleOutlined)`
+  color: ${p => lighten(0.15, p.theme.error)} !important;
 `;

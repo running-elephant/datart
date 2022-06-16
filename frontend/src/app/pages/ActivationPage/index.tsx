@@ -1,4 +1,4 @@
-import { Notification } from 'app/components';
+import { Alert } from 'app/components/Alert';
 import { AuthorizationStatus } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { getUserInfoByToken } from 'app/slice/thunks';
@@ -53,7 +53,7 @@ export const ActivationPage = () => {
   }, [activateAndLogin]);
 
   return (
-    <Notification
+    <Alert
       status={status}
       pendingTitle={t('activating')}
       pendingMessage={t('activatingDesc')}

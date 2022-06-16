@@ -28,10 +28,24 @@ import {
   ModifyPasswordParams,
   RegisterParams,
   SaveProfileParams,
+  SetupParams,
   SystemInfo,
   User,
   UserInfoByTokenParams,
 } from './types';
+
+export const setup = createAsyncThunk<boolean, SetupParams>(
+  'app/setup',
+  async ({ params, resolve }) => {
+    const { data } = await request2<boolean>({
+      url: '/sys/setup',
+      method: 'POST',
+      data: { user: params },
+    });
+    resolve();
+    return data;
+  },
+);
 
 export const login = createAsyncThunk<User, LoginParams>(
   'app/login',

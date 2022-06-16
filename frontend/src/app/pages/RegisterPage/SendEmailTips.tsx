@@ -18,7 +18,7 @@
 
 import { CheckCircleOutlined, LeftCircleOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import { AuthForm } from 'app/components';
+import * as AuthLayout from 'app/components/styles/AuthLayout';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, useCallback } from 'react';
 import styled from 'styled-components/macro';
@@ -46,7 +46,7 @@ export const SendEmailTips: FC<SendEmailTipsProps> = ({
   }, [email]);
 
   return (
-    <AuthForm>
+    <AuthLayout.Form>
       <Success />
       <Title>{t('tipTitle')}</Title>
       <Content>
@@ -77,7 +77,7 @@ export const SendEmailTips: FC<SendEmailTipsProps> = ({
       >
         <LeftCircleOutlined /> {t('back')}
       </Button>
-    </AuthForm>
+    </AuthLayout.Form>
   );
 };
 
