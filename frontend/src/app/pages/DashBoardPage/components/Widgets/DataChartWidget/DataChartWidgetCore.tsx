@@ -268,7 +268,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     if (cacheH <= 1 || cacheW <= 1) return null;
     if (errText) return errText;
     const drillOption = drillOptionRef.current;
-    console.log('__ chart?.meta.name:', chart?.meta.name);
 
     return (
       <ChartIFrameContainer
