@@ -155,7 +155,9 @@ export const addViz = createAsyncThunk<Folder, AddVizParams>(
   async ({ viz, type }) => {
     if (type === 'TEMPLATE') {
       const { data } = await request2<Folder>({
-        url: `/viz/import/template?parentId=${viz.parentId}&orgId=${viz.orgId}&name=${viz.name}`,
+        url: `/viz/import/template?parentId=${viz.parentId || ''}&orgId=${
+          viz.orgId
+        }&name=${viz.name}`,
         method: 'POST',
         data: viz.file,
       });
@@ -315,23 +317,20 @@ export const fetchVizChartAction = createAsyncThunk(
 );
 export const exportChartTpl = createAsyncThunk(
   'viz/exportChartTpl',
-  async (arg: { chartId; dataRows; callBack }, thunkAPI) => {
+  async (arg: { chartId; dataset; callBack }, thunkAPI) => {
     const vizState = (thunkAPI.getState() as RootState)?.viz as VizState;
-    const { chartId, dataRows, callBack } = arg;
+    const { chartId, dataset, callBack } = arg;
     const dataChart = vizState.chartPreviews.find(
       item => item.backendChartId === chartId,
     );
+    const newConf = { ...dataChart?.backendChart?.config };
+    newConf.sampleData = dataset;
+    // newConf.
     const newChart = {
-      id: '',
-      index: 0,
-      parent: 0,
-      name: '',
-      viewId: '',
-      permissions: [],
-      avatar: dataChart?.backendChart?.config.chartGraphId, //
-      config: JSON.stringify(dataChart?.backendChart?.config),
+      avatar: newConf.chartGraphId, //
+      config: JSON.stringify(newConf),
     };
-    const { data } = await request2<any>({
+    await request2<any>({
       url: `viz/export/datachart/template`,
       method: 'POST',
       data: { datachart: newChart },
@@ -355,6 +354,12 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
     const currentChartPreview = vizState?.chartPreviews?.find(
       c => c.backendChartId === arg.backendChartId,
     );
+    if (!currentChartPreview?.backendChart?.view.id) {
+      return {
+        backendChartId: currentChartPreview?.backendChartId,
+        data: currentChartPreview?.backendChart?.config.sampleData,
+      };
+    }
     const builder = new ChartDataRequestBuilder(
       {
         id: currentChartPreview?.backendChart?.view.id || '',

@@ -68,8 +68,9 @@ import { WidgetSelectionContext } from '../../WidgetProvider/WidgetSelectionProv
 export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const { dataChart, availableSourceFunctions, chartDataView } =
     useContext(WidgetChartContext);
+
   const scale = useContext(BoardScaleContext);
-  const { data: dataset } = useContext(WidgetDataContext);
+  const { data: widgetData } = useContext(WidgetDataContext);
   const { renderMode, orgId } = useContext(BoardContext);
   const selectedItems = useContext(WidgetSelectionContext);
   const widget = useContext(WidgetContext);
@@ -113,6 +114,12 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   useEffect(() => {
     widgetRef.current = widget;
   }, [widget]);
+  const dataset = useMemo(() => {
+    if (!dataChart?.viewId && dataChart?.config.sampleData) {
+      return dataChart?.config.sampleData;
+    }
+    return widgetData;
+  }, [widgetData, dataChart]);
   const dispatch = useDispatch();
   const handleDateLevelChange = useCallback(
     (type, payload) => {
@@ -451,6 +458,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     if (cacheH <= 1 || cacheW <= 1) return null;
     if (errText) return errText;
     const drillOption = drillOptionRef.current;
+
     return (
       <ChartIFrameContainer
         dataset={dataset}
@@ -470,8 +478,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     cacheH,
     cacheW,
     errText,
-    dataset,
     chart,
+    dataset,
     selectedItems,
     containerId,
     widgetSpecialConfig,

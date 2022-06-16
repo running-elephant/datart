@@ -23,5 +23,5 @@ export const getDataChartData = (chartId: string) => (dispatch, getState) => {
 
   const dataChart = chartPreviews.find(item => item.backendChartId === chartId);
 
-  return dataChart?.dataset?.rows;
+  return dataChart?.dataset;
 };

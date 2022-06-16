@@ -47,7 +47,7 @@ export const selectWidgetInfoGroupMap = createSelector(
   [boardState],
   state => state.widgetInfoRecord,
 );
-export const selectWidgetSelectedItemMap = createSelector(
+export const selectWidgetSelectedItemsMap = createSelector(
   [boardState],
   state => state.selectedItems,
 );
@@ -81,7 +81,7 @@ export const selectWidgetBy2Id = createSelector(
 
 export const selectLayoutWidgetMapById = () =>
   createSelector(selectBoardWidgetMap, selectPropsId, (widgetRecord, id) => {
-    if (!widgetRecord[id]) return DefaultObject;
+    if (!widgetRecord[id]) return DefaultObject as Record<string, Widget>;
     const allWidgetMap = widgetRecord[id];
     const layoutWidgets = getLayoutWidgets(allWidgetMap);
     const LayoutWidgetMap: Record<string, Widget> = {};
@@ -99,10 +99,10 @@ export const selectWidgetInfoMap = createSelector(
 
 export const makeSelectSelectedItems = () => {
   return createSelector(
-    selectWidgetSelectedItemMap,
+    selectWidgetSelectedItemsMap,
     selectPropsId,
-    (widgetInfoGroupMap, widgetId) => {
-      return widgetInfoGroupMap?.[widgetId] || [];
+    (widgetSelectedItemsMap, widgetId) => {
+      return widgetSelectedItemsMap?.[widgetId];
     },
   );
 };
