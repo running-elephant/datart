@@ -231,6 +231,6 @@ export const makeSelectSelectedItemsInEditor = () => {
   return createSelector(
     selectEditSelectedItems,
     (_, widgetId: string) => widgetId,
-    (selectedItemsMap, wId) => selectedItemsMap.selectedItems?.[wId] || [],
+    (selectedItemsMap, wId) => selectedItemsMap.selectedItems?.[wId],
   );
 };

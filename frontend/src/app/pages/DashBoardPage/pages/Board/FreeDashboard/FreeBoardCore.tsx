@@ -20,10 +20,8 @@ import { BoardConfigValContext } from 'app/pages/DashBoardPage/components/BoardP
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import useBoardWidthHeight from 'app/pages/DashBoardPage/hooks/useBoardWidthHeight';
-import { selectLayoutWidgetMapById } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
-import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import useLayoutMap from 'app/pages/DashBoardPage/hooks/useLayoutMap';
 import { memo, useContext, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import SlideBackground from '../../../components/FreeBoardBackground';
 import useClientRect from '../../../hooks/useClientRect';
@@ -44,14 +42,7 @@ export const FreeBoardCore: React.FC<FreeBoardCoreProps> = memo(
     } = useContext(BoardConfigValContext);
     const { editing, autoFit } = useContext(BoardContext);
 
-    const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
-      selectLayoutWidgetMapById()(state, boardId),
-    );
-    const layoutWidgets = useMemo(() => {
-      return Object.values(layoutWidgetMap).sort((w1, w2) => {
-        return w1.config.index - w2.config.index;
-      });
-    }, [layoutWidgetMap]);
+    const layoutWidgets = useLayoutMap(boardId);
 
     const [rect, refGridBackground] = useClientRect<HTMLDivElement>();
     const {

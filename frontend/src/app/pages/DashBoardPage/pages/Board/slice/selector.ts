@@ -47,7 +47,7 @@ export const selectWidgetInfoGroupMap = createSelector(
   [boardState],
   state => state.widgetInfoRecord,
 );
-export const selectWidgetSelectedItemMap = createSelector(
+export const selectWidgetSelectedItemsMap = createSelector(
   [boardState],
   state => state.selectedItems,
 );
@@ -99,10 +99,10 @@ export const selectWidgetInfoMap = createSelector(
 
 export const makeSelectSelectedItems = () => {
   return createSelector(
-    selectWidgetSelectedItemMap,
+    selectWidgetSelectedItemsMap,
     selectPropsId,
-    (widgetInfoGroupMap, widgetId) => {
-      return widgetInfoGroupMap?.[widgetId] || [];
+    (widgetSelectedItemsMap, widgetId) => {
+      return widgetSelectedItemsMap?.[widgetId];
     },
   );
 };
