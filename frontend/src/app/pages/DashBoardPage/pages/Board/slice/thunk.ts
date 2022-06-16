@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { boardDrillManager } from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
 import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/components/Widgets/ControllerWidget/config';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
@@ -23,6 +24,7 @@ import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types
 import { mainActions } from 'app/pages/MainPage/slice';
 import { shareActions } from 'app/pages/SharePage/slice';
 import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { fetchAvailableSourceFunctionsAsync } from 'app/utils/fetch';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
@@ -208,6 +210,69 @@ export const getWidgetData = createAsyncThunk<
     }
   },
 );
+
+export const syncWidgetChartDataAsync = createAsyncThunk<
+  null,
+  {
+    boardId: string;
+    widgetId: string;
+    renderMode: VizRenderMode | undefined;
+    option?: getDataOption;
+    extraFilters?: ChartDataRequestFilter[];
+  },
+  { state: RootState }
+>(
+  'board/syncWidgetChartDataAsync',
+  async (
+    { boardId, widgetId, renderMode, option, extraFilters },
+    { getState, dispatch },
+  ) => {
+    let widgetData;
+    const boardState = getState() as { board: BoardState };
+    const widgetMapMap = boardState.board.widgetRecord;
+    const widgetMap = widgetMapMap[boardId];
+    const curWidget = widgetMap[widgetId];
+    if (!curWidget) {
+      return null;
+    }
+    const viewMap = boardState.board.viewMap;
+    const dataChartMap = boardState.board.dataChartMap;
+    const drillOption = boardDrillManager.getWidgetDrill({
+      bid: curWidget.dashboardId,
+      wid: widgetId,
+    });
+    const dataChart = dataChartMap?.[curWidget.datachartId];
+    const chartDataView = viewMap[dataChart?.viewId];
+    let requestParams = new ChartDataRequestBuilder(
+      {
+        id: chartDataView?.id || '',
+        config: chartDataView?.config || {},
+        computedFields: dataChart?.config?.computedFields || [],
+      },
+      dataChart?.config?.chartConfig?.datas,
+      dataChart?.config?.chartConfig?.settings,
+      {},
+      false,
+      dataChart?.config?.aggregation,
+    )
+      .addExtraSorters(option?.sorters as any[])
+      .addRuntimeFilters(extraFilters)
+      .addDrillOption(drillOption)
+      .build();
+
+    if (renderMode === 'read') {
+      const { data } = await request2<WidgetData>({
+        method: 'POST',
+        url: `data-provider/execute`,
+        data: requestParams,
+      });
+      widgetData = { ...data, id: widgetId };
+      dispatch(boardActions.setWidgetData({ wid: widgetId, data: widgetData }));
+    }
+    return null;
+  },
+);
+
 export const getChartWidgetDataAsync = createAsyncThunk<
   null,
   {

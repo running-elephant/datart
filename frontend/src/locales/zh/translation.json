@@ -901,7 +901,8 @@
         "selectDrillOff": "开启“点击下钻”",
         "rollUp": "上卷",
         "drillThrough": "跳转",
-        "viewData": "查看数据"
+        "viewData": "查看数据",
+        "crossFiltering": "联动"
       }
     },
     "action": {
@@ -1171,7 +1172,8 @@
     "tips": {
       "noStartValue": "请填写 起始值",
       "noEndValue": "请填写 结束值",
-      "endGTStartErr": "起始值 该小于 结束值"
+      "endGTStartErr": "起始值 该小于 结束值",
+      "hasChartConfig": "图表已启用配置，当前仪表板启用后会覆盖图表配置。"
     },
     "control": {
       "title": "控制器标题",
