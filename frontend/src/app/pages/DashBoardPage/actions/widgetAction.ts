@@ -40,6 +40,7 @@ import {
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
+  editWidgetDataActions,
   editWidgetInfoActions,
 } from '../pages/BoardEditor/slice';
 import {
@@ -51,7 +52,10 @@ import {
   getEditControllerOptions,
   getEditWidgetData,
 } from '../pages/BoardEditor/slice/thunk';
-import { HistoryEditBoard } from '../pages/BoardEditor/slice/types';
+import {
+  EditBoardState,
+  HistoryEditBoard,
+} from '../pages/BoardEditor/slice/types';
 import { Widget } from '../types/widgetTypes';
 import {
   getCascadeControllers,
@@ -394,6 +398,35 @@ export const showJumpErrorAction =
           errInfo: errorInfo,
           errorType: 'interaction',
         }),
+      );
+    }
+  };
+export const setWidgetSampleDataAction =
+  (args: { boardEditing: boolean; datachartId: string; wid: string }) =>
+  (dispatch, getState) => {
+    const { boardEditing, datachartId, wid } = args;
+    const rootState = getState() as RootState;
+    const viewBoardState = rootState.board as BoardState;
+    const editBoardState = rootState.editBoard as EditBoardState;
+    const dataChartMap = viewBoardState.dataChartMap;
+    const curChart = dataChartMap[datachartId];
+    if (!curChart) return;
+    if (curChart.viewId) return;
+    if (!curChart.config.sampleData) return;
+    if (boardEditing) {
+      const dataset = editBoardState.widgetDataMap[wid];
+      if (dataset?.id) return;
+      dispatch(
+        editWidgetDataActions.setWidgetData({
+          wid,
+          data: curChart.config.sampleData,
+        }),
+      );
+    } else {
+      const dataset = viewBoardState.widgetDataMap[wid];
+      if (dataset?.id) return;
+      dispatch(
+        boardActions.setWidgetData({ wid, data: curChart.config.sampleData }),
       );
     }
   };
