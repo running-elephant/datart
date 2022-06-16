@@ -152,7 +152,7 @@ export const deleteStoryboard = createAsyncThunk<
 
 export const addViz = createAsyncThunk<Folder, AddVizParams>(
   'viz/addViz',
-  async ({ viz, type }) => {
+  async ({ viz, type }, { dispatch }) => {
     if (type === 'TEMPLATE') {
       const { data } = await request2<Folder>({
         url: `/viz/import/template?parentId=${viz.parentId || ''}&orgId=${
@@ -161,6 +161,7 @@ export const addViz = createAsyncThunk<Folder, AddVizParams>(
         method: 'POST',
         data: viz.file,
       });
+      dispatch(getFolders(viz.orgId as string));
       return data;
     } else {
       const { data } = await request2<Folder>({

@@ -114,12 +114,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   useEffect(() => {
     widgetRef.current = widget;
   }, [widget]);
-  // const dataset = useMemo(() => {
-  //   if (!dataChart?.viewId && dataChart?.config.sampleData) {
-  //     return dataChart?.config.sampleData;
-  //   }
-  //   return widgetData;
-  // }, [widgetData, dataChart]);
   const dispatch = useDispatch();
   const handleDateLevelChange = useCallback(
     (type, payload) => {
