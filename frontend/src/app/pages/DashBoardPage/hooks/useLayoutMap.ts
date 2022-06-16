@@ -19,13 +19,11 @@ import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { selectLayoutWidgetMapById } from '../pages/Board/slice/selector';
 import { BoardState } from '../pages/Board/slice/types';
-import { Widget } from '../types/widgetTypes';
 
 export default function useLayoutMap(boardId: string) {
   const selectLayoutWidgetsConfigById = useMemo(selectLayoutWidgetMapById, []);
-  const layoutWidgetMap: Record<string, Widget> = useSelector(
-    (state: { board: BoardState }) =>
-      selectLayoutWidgetsConfigById(state, boardId),
+  const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
+    selectLayoutWidgetsConfigById(state, boardId),
   );
 
   const sortedLayoutWidgets = useMemo(

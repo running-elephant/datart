@@ -81,7 +81,7 @@ export const selectWidgetBy2Id = createSelector(
 
 export const selectLayoutWidgetMapById = () =>
   createSelector(selectBoardWidgetMap, selectPropsId, (widgetRecord, id) => {
-    if (!widgetRecord[id]) return DefaultObject;
+    if (!widgetRecord[id]) return DefaultObject as Record<string, Widget>;
     const allWidgetMap = widgetRecord[id];
     const layoutWidgets = getLayoutWidgets(allWidgetMap);
     const LayoutWidgetMap: Record<string, Widget> = {};
