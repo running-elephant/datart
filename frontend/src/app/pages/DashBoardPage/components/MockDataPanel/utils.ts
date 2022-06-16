@@ -38,8 +38,8 @@ export const getChartWidgets = (
   return chartWidgets;
 };
 
-export const handleBoardTplData = (
-  dataMap: Record<string, { id: string; name: string; data: object }>,
+export const getBoardTplData = (
+  dataMap: Record<string, { id: string; name: string; data }>,
   boardTplData: {
     board: Dashboard;
     widgetMap: Record<string, Widget>;
@@ -62,7 +62,10 @@ export const handleBoardTplData = (
       const datachart = dataChartMap[w.datachartId || ''];
 
       if (datachart) {
-        let newChart = { ...datachart };
+        let newChart = {
+          ...datachart,
+          config: { ...datachart.config, sampleData: dataMap[w.id].data },
+        };
         newChart.viewId = '';
         newChart.orgId = '';
         newWidgetConf.content = {

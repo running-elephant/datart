@@ -22,12 +22,12 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { LEVEL_100 } from 'styles/StyleConstants';
 import {
-  getBoardTplData,
+  getBoardStateAction,
   getWidgetChartDatasAction,
 } from '../../pages/Board/slice/asyncActions';
 import { exportBoardTpl } from '../../pages/Board/slice/thunk';
 import { MockDataTab } from './MockDataTab';
-import { handleBoardTplData } from './utils';
+import { getBoardTplData } from './utils';
 
 export interface MockDataPanelProps {
   onClose: () => void;
@@ -42,8 +42,8 @@ export const MockDataPanel: FC<MockDataPanelProps> = memo(({ onClose }) => {
   }, [boardId, dispatch]);
 
   const onExport = async () => {
-    const boardTplData = dispatch(getBoardTplData(boardId));
-    const data = handleBoardTplData(dataMap, boardTplData as any);
+    const boardState = dispatch(getBoardStateAction(boardId));
+    const data = getBoardTplData(dataMap, boardState as any);
     dispatch(exportBoardTpl({ ...data, callBack: onClose }));
   };
   const onChangeDataMap = opt => {
