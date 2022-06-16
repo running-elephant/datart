@@ -23,7 +23,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getInsertedNodeIndex } from 'utils/utils';
 import { SaveFormModel } from '../SaveFormContext';
 import { selectVizs } from '../slice/selectors';
-import { addViz } from '../slice/thunks';
+import { addViz, getFolders } from '../slice/thunks';
 import { Folder, VizType } from '../slice/types';
 
 export interface addVizParams {
@@ -88,6 +88,7 @@ export function useAddViz({ showSaveForm }) {
             }),
           );
           if (!vizData.error) {
+            dispatch(getFolders(orgId as string));
             callback?.(vizData.payload);
             onClose();
           }
