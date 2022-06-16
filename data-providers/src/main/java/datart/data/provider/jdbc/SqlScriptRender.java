@@ -97,6 +97,8 @@ public class SqlScriptRender extends ScriptRender {
         }
         selectSql = SqlStringUtils.replaceFragmentVariables(selectSql, queryScript.getVariables());
 
+        selectSql = SqlStringUtils.cleanupSql(selectSql);
+
         selectSql = replaceVariables(selectSql);
 
         RequestContext.setSql(selectSql);
