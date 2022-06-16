@@ -30,7 +30,7 @@ import { CrossFilteringSetting, InteractionRule } from './types';
 const CrossFilteringPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange, context }) => {
     const [event, setEvent] = useState<CrossFilteringSetting['event']>(
-      data.value?.event,
+      data.value?.event || InteractionMouseEvent.Left,
     );
     const [rules, setRules] = useState<CrossFilteringSetting['rules']>(
       data.value?.rules || [],
