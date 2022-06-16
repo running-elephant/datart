@@ -186,9 +186,12 @@ export const widgetLinkEventAction =
     const targetLinkDataChartIds = (params || []).map(p => p.rule?.relId);
     const rootState = getState() as RootState;
     const widgetMapMap = rootState.board?.widgetRecord;
+    const boardWidgetInfoRecord =
+      rootState.board?.widgetInfoRecord?.[widget?.dashboardId];
     const widgetMap = widgetMapMap?.[widget?.dashboardId] || {};
+    const sourceWidgetInfo = boardWidgetInfoRecord?.[widget.id];
+    const sourceRuntimeWidgetInfo = sourceWidgetInfo?.linkInfo || {};
 
-    // 1. get linked charts
     const boardLinkWidgets = Object.entries(
       widgetMapMap?.[widget?.dashboardId] || {},
     )
@@ -196,9 +199,7 @@ export const widgetLinkEventAction =
         return targetLinkDataChartIds.includes(v.datachartId);
       })
       .map(([k, v]) => v);
-    // 2. update all linked charts dataset
     boardLinkWidgets.forEach(w => {
-      // 2.1 get current widget click event filters
       const filterObj = params?.find(
         p => p?.rule?.relId === w.datachartId,
       )?.filters;
@@ -211,29 +212,32 @@ export const widgetLinkEventAction =
           values: (v as any)?.map(vv => ({ value: vv, valueType: 'STRING' })),
         };
       });
-      // 2.2. get current widget controller filters
+      const widgetInfo = boardWidgetInfoRecord?.[w.id];
+      const runtimeWidgetInfo = widgetInfo?.linkInfo || {};
       const { filterParams: controllerFilters, variableParams } =
         getTheWidgetFiltersAndParams({
           chartWidget: w,
           widgetMap: widgetMap,
           params: undefined,
         });
-      // 2.3 get current widget page info
-      const widgetInfo =
-        rootState.board?.widgetInfoRecord?.[widget?.dashboardId]?.[w.id];
-      // 2.4 refresh widget dataset
       dispatch(
         syncWidgetChartDataAsync({
           boardId: w.dashboardId,
           widgetId: w.id,
           renderMode: 'read',
           option: widgetInfo,
-          extraFilters: clickFilters.concat(controllerFilters),
-          variableParams,
+          extraFilters: (clickFilters || [])
+            .concat(controllerFilters || [])
+            .concat(sourceRuntimeWidgetInfo?.filters || [])
+            .concat(runtimeWidgetInfo?.filters || []),
+          variableParams: Object.assign(
+            variableParams,
+            sourceRuntimeWidgetInfo?.variables,
+            runtimeWidgetInfo?.variables,
+          ),
         }),
       );
     });
-    // TODO: 3. save link filter into chart
   };
 
 export const widgetClickLinkageAction =

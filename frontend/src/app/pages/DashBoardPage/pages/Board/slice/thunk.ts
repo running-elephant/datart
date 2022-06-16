@@ -275,6 +275,16 @@ export const syncWidgetChartDataAsync = createAsyncThunk<
           }),
         );
         await dispatch(
+          boardActions.changeWidgetLinkInfo({
+            boardId,
+            widgetId,
+            linkInfo: {
+              filters: extraFilters,
+              variables: variableParams,
+            },
+          }),
+        );
+        await dispatch(
           boardActions.changePageInfo({
             boardId,
             widgetId,

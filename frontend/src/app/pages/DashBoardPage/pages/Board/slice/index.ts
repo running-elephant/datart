@@ -32,6 +32,7 @@ import {
   RectConfig,
   WidgetData,
   WidgetInfo,
+  WidgetLinkInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { SelectedItem } from 'app/types/ChartConfig';
@@ -319,6 +320,19 @@ const boardSlice = createSlice({
       state.widgetInfoRecord[boardId][widgetId].pageInfo = pageInfo || {
         pageNo: 1,
       };
+    },
+    changeWidgetLinkInfo(
+      state,
+      action: PayloadAction<{
+        boardId: string;
+        widgetId: string;
+        linkInfo?: WidgetLinkInfo;
+      }>,
+    ) {
+      const { boardId, widgetId, linkInfo } = action.payload;
+      if (state.widgetInfoRecord?.[boardId]?.[widgetId]) {
+        state.widgetInfoRecord[boardId][widgetId].linkInfo = linkInfo;
+      }
     },
     setWidgetErrInfo(
       state,
