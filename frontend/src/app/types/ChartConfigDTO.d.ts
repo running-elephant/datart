@@ -41,6 +41,7 @@ export type ChartDetailConfigDTO = {
   chartGraphId: string;
   computedFields: ChartDataViewMeta[];
   aggregation: boolean;
+  sampleData?: any;
 };
 
 export interface ChartCommonConfig {
