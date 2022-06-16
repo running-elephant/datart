@@ -53,6 +53,7 @@ import {
 } from '../pages/BoardEditor/slice/thunk';
 import { HistoryEditBoard } from '../pages/BoardEditor/slice/types';
 import { Widget } from '../types/widgetTypes';
+import { getTheWidgetFiltersAndParams } from '../utils';
 import {
   getCascadeControllers,
   getNeedRefreshWidgetsByController,
@@ -182,11 +183,14 @@ export const widgetClickJumpAction =
 export const widgetLinkEventAction =
   (widget: Widget, params: Array<{ filters; rule }>) =>
   async (dispatch, getState) => {
-    // 1. get link charts
     const targetLinkDataChartIds = (params || []).map(p => p.rule?.relId);
     const rootState = getState() as RootState;
+    const widgetMapMap = rootState.board?.widgetRecord;
+    const widgetMap = widgetMapMap?.[widget?.dashboardId] || {};
+
+    // 1. get link charts
     const boardLinkWidgets = Object.entries(
-      rootState.board?.widgetRecord?.[widget?.dashboardId] || {},
+      widgetMapMap?.[widget?.dashboardId] || {},
     )
       .filter(([k, v]) => {
         return targetLinkDataChartIds.includes(v.datachartId);
@@ -195,10 +199,11 @@ export const widgetLinkEventAction =
 
     // 2. update all linked charts dataset
     boardLinkWidgets.forEach(w => {
+      // 2.1 get current widget click event filters
       const filterObj = params?.find(
         p => p?.rule?.relId === w.datachartId,
       )?.filters;
-      const extraFilters: ChartDataRequestFilter[] = Object.entries(
+      const clickFilters: ChartDataRequestFilter[] = Object.entries(
         filterObj || {},
       ).map(([k, v]) => {
         return {
@@ -207,6 +212,14 @@ export const widgetLinkEventAction =
           values: (v as any)?.map(vv => ({ value: vv, valueType: 'STRING' })),
         };
       });
+      // 2.2. get current widget controller filters
+      const { filterParams: controllerFilters, variableParams } =
+        getTheWidgetFiltersAndParams({
+          chartWidget: w,
+          widgetMap: widgetMap,
+          params: undefined,
+        });
+
       dispatch(
         syncWidgetChartDataAsync({
           boardId: w.dashboardId,
@@ -215,7 +228,8 @@ export const widgetLinkEventAction =
           option: {
             pageInfo: { pageNo: 1 },
           },
-          extraFilters,
+          extraFilters: clickFilters.concat(controllerFilters),
+          variableParams,
         }),
       );
     });
@@ -352,6 +366,7 @@ export const widgetChartClickAction =
 export const widgetLinkEventActionCreator =
   (obj: { widget: Widget; params: any }) => dispatch => {
     const { widget, params } = obj;
+    // TODO(Stephen): if not edit mode
     dispatch(widgetLinkEventAction(widget, params));
   };
 
