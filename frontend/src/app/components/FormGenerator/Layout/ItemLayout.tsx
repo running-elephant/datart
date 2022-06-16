@@ -52,6 +52,7 @@ import {
   Background,
   CheckboxModal,
   ConditionalStylePanel,
+  CrossFilteringPanel,
   DataReferencePanel,
   DrillThroughPanel,
   FontAlignment,
@@ -205,6 +206,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <CheckboxModal {...props} />;
         case ChartStyleSectionComponentType.INTERACTION_DRILL_THROUGH_PANEL:
           return <DrillThroughPanel {...props} />;
+        case ChartStyleSectionComponentType.INTERACTION_CROSS_FILTERING:
+          return <CrossFilteringPanel {...props} />;
         case ChartStyleSectionComponentType.INTERACTION_VIEW_DETAIL_PANEL:
           return <ViewDetailPanel {...props} />;
         default:
