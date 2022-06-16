@@ -494,7 +494,7 @@
         "deleteField": "Delete",
         "editViewTip": "Going back to the view will lose the current edit state, continue?",
         "editView": "Edit View",
-        "toggleViewTip": "Switching view will clear all chart configurations, continue?",
+        "toggleViewTip": "Switch data View Whether to clear the current chart configuration?",
         "AGG_DATE_YEAR": "Year",
         "AGG_DATE_QUARTER": "Quarter",
         "AGG_DATE_MONTH": "Month",

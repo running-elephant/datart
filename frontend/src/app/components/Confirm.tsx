@@ -4,27 +4,25 @@ import styled from 'styled-components/macro';
 import {
   FONT_SIZE_HEADING,
   FONT_SIZE_ICON_MD,
-  SPACE_MD,
   SPACE_SM,
 } from 'styles/StyleConstants';
 import { mergeClassNames } from 'utils/utils';
 
-interface ConfirmProps extends ModalProps {
+export interface ConfirmProps extends ModalProps {
   icon?: ReactElement;
   title?: ReactNode;
   content?: ReactNode;
   footer?: ReactNode;
 }
 
-export function Confirm({
-  title,
-  content,
-  icon,
-  footer,
-  ...modalProps
-}: ConfirmProps) {
+export function Confirm({ title, content, icon, ...modalProps }: ConfirmProps) {
   return (
-    <Modal width={400} footer={false} closable={false} {...modalProps}>
+    <Modal
+      width={400}
+      {...(modalProps.footer ? { footer: false } : {})}
+      closable={false}
+      {...modalProps}
+    >
       <ConfirmBody>
         {icon &&
           cloneElement(icon, {
@@ -33,7 +31,6 @@ export function Confirm({
         <ConfirmContent>
           {title && typeof title === 'string' ? <h2>{title}</h2> : title}
           {content && typeof content === 'string' ? <p>{content}</p> : content}
-          <Actions>{footer}</Actions>
         </ConfirmContent>
       </ConfirmBody>
     </Modal>
@@ -56,9 +53,4 @@ const ConfirmContent = styled.div`
     margin-bottom: ${SPACE_SM};
     font-size: ${FONT_SIZE_HEADING};
   }
-`;
-
-const Actions = styled.div`
-  margin-top: ${SPACE_MD};
-  text-align: right;
 `;
