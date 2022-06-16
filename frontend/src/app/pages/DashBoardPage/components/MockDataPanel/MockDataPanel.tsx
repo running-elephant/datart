@@ -47,11 +47,9 @@ export const MockDataPanel: FC<MockDataPanelProps> = memo(({ onClose }) => {
     dispatch(exportBoardTpl({ ...data, callBack: onClose }));
   };
   const onChangeDataMap = opt => {
-    const newItemData = JSON.parse(opt.val);
     const newItem = {
-      id: opt.id,
-      name: dataMap[opt.id].name,
-      data: newItemData,
+      ...dataMap[opt.id],
+      data: { ...dataMap[opt.id].data, rows: opt.val },
     };
     const newData = Object.assign(dataMap, { [opt.id]: newItem });
     setDataMap(newData);
