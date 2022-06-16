@@ -27,8 +27,10 @@ import { CrossFilteringInteractionRule, I18nTranslator } from './types';
 
 const CrossFilteringRuleList: FC<
   {
+    widgetId: string;
     rules?: CrossFilteringInteractionRule[];
     boardVizs?: Array<{
+      id: string;
       datachartId: string;
       config: { name: string; type: string };
     }>;
@@ -37,6 +39,7 @@ const CrossFilteringRuleList: FC<
     onSelectedRules: (rules: CrossFilteringInteractionRule[]) => void;
   } & I18nTranslator
 > = ({
+  widgetId,
   rules,
   boardVizs,
   dataview,
@@ -46,7 +49,7 @@ const CrossFilteringRuleList: FC<
 }) => {
   const currentRules = useMemo(() => {
     return (boardVizs || [])
-      .filter(bvz => bvz?.config?.type === 'chart')
+      .filter(bvz => bvz?.config?.type === 'chart' && bvz?.id !== widgetId)
       .map(bvz => {
         const enableRule = rules?.find(r => r.relId === bvz.datachartId);
         if (enableRule) {

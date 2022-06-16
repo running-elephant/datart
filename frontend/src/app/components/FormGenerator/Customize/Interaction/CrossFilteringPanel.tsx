@@ -44,11 +44,6 @@ const CrossFilteringPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       handleSettingChange(undefined, newRules);
     };
 
-    const handleDeleteRule = (id: string) => {
-      const newRules = rules?.filter(r => r.id !== id);
-      handleSettingChange(undefined, newRules);
-    };
-
     const handleUpdateRule = (id: string, prop: string, value: any) => {
       const updatorIndex = (rules || []).findIndex(r => r.id === id);
       if (updatorIndex > -1) {
@@ -104,6 +99,7 @@ const CrossFilteringPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           </Form.Item>
           <Form.Item label={t('crossFiltering.rule.title')} name="rule">
             <CrossFilteringRuleList
+              widgetId={context?.widgetId}
               boardVizs={Object.values(context?.boardVizs)}
               dataview={context?.dataview}
               rules={rules}
