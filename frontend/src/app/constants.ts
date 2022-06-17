@@ -250,3 +250,10 @@ export const FONT_DEFAULT: IFontDefault = {
   fontStyle: 'normal',
   color: G90,
 };
+
+export enum AuthorizationStatus {
+  Initialized = 'initialized',
+  Pending = 'pending',
+  Success = 'success',
+  Error = 'error',
+}

@@ -19,48 +19,30 @@
 import { Button, Form, Input } from 'antd';
 import * as AuthLayout from 'app/components/styles/AuthLayout';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { selectRegisterLoading } from 'app/slice/selectors';
-import { register } from 'app/slice/thunks';
+import { setup } from 'app/slice/thunks';
 import React, { FC, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
-import styled from 'styled-components/macro';
-import { LINE_HEIGHT_ICON_LG } from 'styles/StyleConstants';
+import { useDispatch } from 'react-redux';
 import { getPasswordValidator } from 'utils/validators';
 
 interface RegisterFormProps {
-  onRegisterSuccess: (email: string) => void;
+  loading: boolean;
 }
-export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
+export const SetupForm: FC<RegisterFormProps> = ({ loading }) => {
   const dispatch = useDispatch();
-  const history = useHistory();
-  const loading = useSelector(selectRegisterLoading);
   const [form] = Form.useForm();
-  const t = useI18NPrefix('register');
+  const t = useI18NPrefix('setup');
   const tg = useI18NPrefix('global');
 
-  const onRegister = useCallback(
+  const onSetup = useCallback(
     values => {
-      dispatch(
-        register({
-          data: values,
-          resolve: () => {
-            form.resetFields();
-            onRegisterSuccess(values.email);
-          },
-        }),
-      );
+      dispatch(setup({ params: values, resolve: () => {} }));
     },
-    [dispatch, form, onRegisterSuccess],
+    [dispatch],
   );
-
-  const toLogin = useCallback(() => {
-    history.push('/login');
-  }, [history]);
 
   return (
     <AuthLayout.Form>
-      <Form form={form} onFinish={onRegister}>
+      <Form form={form} onFinish={onSetup}>
         <Form.Item
           name="username"
           rules={[
@@ -98,6 +80,9 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
         >
           <Input.Password placeholder={t('password')} size="large" />
         </Form.Item>
+        <Form.Item name="name">
+          <Input placeholder={t('name')} size="large" />
+        </Form.Item>
         <Form.Item className="last" shouldUpdate>
           {() => (
             <Button
@@ -107,31 +92,16 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
               loading={loading}
               disabled={
                 loading ||
-                !form.isFieldsTouched(true) ||
                 !!form.getFieldsError().filter(({ errors }) => errors.length)
                   .length
               }
               block
             >
-              {t('register')}
+              {t('initialize')}
             </Button>
           )}
         </Form.Item>
-        <Links>
-          {t('desc1')}
-          <LinkButton onClick={toLogin}>{t('login')}</LinkButton>
-        </Links>
       </Form>
     </AuthLayout.Form>
   );
 };
-
-const Links = styled.div`
-  line-height: ${LINE_HEIGHT_ICON_LG};
-  color: ${p => p.theme.textColorLight};
-  text-align: right;
-`;
-
-const LinkButton = styled.a`
-  line-height: ${LINE_HEIGHT_ICON_LG};
-`;

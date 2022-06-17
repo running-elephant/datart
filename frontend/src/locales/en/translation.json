@@ -6,6 +6,7 @@
     "title": {
       "action": "Action"
     },
+    "version": "Version",
     "button": {
       "create": "Create",
       "save": "Save",
@@ -71,6 +72,18 @@
       "city": "City",
       "county": "County"
     }
+  },
+  "setup": {
+    "welcome": "Welcome to datart",
+    "welcomeDesc": "Before using datart for the first time, set up an initial user",
+    "success": "Success",
+    "successDesc": "Initial user set up successfully. Click here to",
+    "goLogin": "Log In",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "initialize": "Initialize"
   },
   "login": {
     "username": "Username / Email",
@@ -1531,11 +1544,14 @@
     "join": "Join successful",
     "confirming": "Confirming"
   },
-  "active": {
-    "activating": "Activating"
-  },
   "authorization": {
-    "processing": "Processing"
+    "authenticating": "Authenticating",
+    "authenticatingDesc": "In progress, please wait for the completion of authentication",
+    "activating": "Activating",
+    "activatingDesc": "In progress, please wait for the completion of activation",
+    "activatingError": "Activation Error",
+    "error": "Authentication Error",
+    "errorDesc": "Something went wrong, please check and try again"
   },
   "notfound": {
     "title": "Page not found"

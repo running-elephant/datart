@@ -18,8 +18,9 @@
 
 import { DataChart } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
-import { createContext, FC, memo, useContext } from 'react';
-import { useSelector } from 'react-redux';
+import { createContext, FC, memo, useContext, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setWidgetSampleDataAction } from '../../actions/widgetAction';
 import {
   selectAvailableSourceFunctionsMap,
   selectDataChartById,
@@ -61,8 +62,19 @@ export const WidgetChartContext = createContext<{
   supportTrigger: true,
 });
 
-export const WidgetChartProvider: FC = memo(({ children }) => {
+export const WidgetChartProvider: FC<{
+  boardEditing: boolean;
+  widgetId: string;
+}> = memo(({ boardEditing, widgetId, children }) => {
   const { datachartId } = useContext(WidgetContext);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!datachartId) return;
+    if (!widgetId) return;
+    dispatch(
+      setWidgetSampleDataAction({ boardEditing, datachartId, wid: widgetId }),
+    );
+  }, [boardEditing, datachartId, dispatch, widgetId]);
   const dataChart = useSelector((state: { board: BoardState }) =>
     selectDataChartById(state, datachartId),
   );
