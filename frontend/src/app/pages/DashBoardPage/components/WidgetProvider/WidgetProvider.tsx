@@ -47,19 +47,6 @@ export const WidgetProvider: FC<{
   );
   const widget = useMemo(() => {
     const widget = boardEditing ? editWidget : readWidget;
-
-    //   return newWidget;
-    //   // 为了board可以被整体复制，服务端拷贝文件图片文件 副本到新的boardId文件夹下，前端替换掉原来的boardId 使用当前boardId
-    //   //这样副本 图片引用可以不受原来 board 资源删除影响
-    //   // url=resources/image/dashboard/3062ff86cdcb47b3bba75565b3f2991d/2e1cac3a-600c-4636-b858-cbcb07f4a3b3
-    //   // const adaptBoardImageWidget = produce(widget, draft => {
-    //   //   draft.config.background.image = adaptBoardImageUrl(
-    //   //     widget.config.background.image,
-    //   //     boardId,
-    //   //   );
-    //   // });
-    //   // return adaptBoardImageWidget;
-    // }
     return widget;
   }, [boardEditing, editWidget, readWidget]);
 

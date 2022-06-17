@@ -17,16 +17,19 @@
  */
 
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
-import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { ChartMouseEventParams } from 'app/types/Chart';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
 import { RootState } from 'types';
+import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 import { jumpTypes, ORIGINAL_TYPE_MAP } from '../constants';
 import { boardActions } from '../pages/Board/slice';
 import {
   getChartWidgetDataAsync,
   getControllerOptions,
   getWidgetData,
+  syncWidgetChartDataAsync,
 } from '../pages/Board/slice/thunk';
 import {
   BoardLinkFilter,
@@ -37,6 +40,7 @@ import {
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
+  editWidgetDataActions,
   editWidgetInfoActions,
 } from '../pages/BoardEditor/slice';
 import {
@@ -48,7 +52,10 @@ import {
   getEditControllerOptions,
   getEditWidgetData,
 } from '../pages/BoardEditor/slice/thunk';
-import { HistoryEditBoard } from '../pages/BoardEditor/slice/types';
+import {
+  EditBoardState,
+  HistoryEditBoard,
+} from '../pages/BoardEditor/slice/types';
 import { Widget } from '../types/widgetTypes';
 import {
   getCascadeControllers,
@@ -175,6 +182,49 @@ export const widgetClickJumpAction =
         );
       }
     }
+  };
+
+export const widgetLinkEventAction =
+  (widget: Widget, params: Array<{ filters; rule }>) =>
+  async (dispatch, getState) => {
+    // 1. get link charts
+    const targetLinkDataChartIds = (params || []).map(p => p.rule?.relId);
+    const rootState = getState() as RootState;
+    const boardLinkWidgets = Object.entries(
+      rootState.board?.widgetRecord?.[widget?.dashboardId] || {},
+    )
+      .filter(([k, v]) => {
+        return targetLinkDataChartIds.includes(v.datachartId);
+      })
+      .map(([k, v]) => v);
+
+    // 2. update all linked charts dataset
+    boardLinkWidgets.forEach(w => {
+      const filterObj = params?.find(
+        p => p?.rule?.relId === w.datachartId,
+      )?.filters;
+      const extraFilters: ChartDataRequestFilter[] = Object.entries(
+        filterObj || {},
+      ).map(([k, v]) => {
+        return {
+          sqlOperator: FilterSqlOperator.In,
+          column: k,
+          values: (v as any)?.map(vv => ({ value: vv, valueType: 'STRING' })),
+        };
+      });
+      dispatch(
+        syncWidgetChartDataAsync({
+          boardId: w.dashboardId,
+          widgetId: w.id,
+          renderMode: 'read',
+          option: {
+            pageInfo: { pageNo: 1 },
+          },
+          extraFilters,
+        }),
+      );
+    });
+    // TODO: 3. save link filter into chart
   };
 
 export const widgetClickLinkageAction =
@@ -324,6 +374,13 @@ export const widgetChartClickAction =
       return;
     }
   };
+
+export const widgetLinkEventActionCreator =
+  (obj: { widget: Widget; params: any }) => dispatch => {
+    const { widget, params } = obj;
+    dispatch(widgetLinkEventAction(widget, params));
+  };
+
 export const widgetGetDataAction =
   (editing: boolean, widget: Widget, renderMode: VizRenderMode) => dispatch => {
     const boardId = widget.dashboardId;
@@ -363,6 +420,35 @@ export const showJumpErrorAction =
           errInfo: errorInfo,
           errorType: 'interaction',
         }),
+      );
+    }
+  };
+export const setWidgetSampleDataAction =
+  (args: { boardEditing: boolean; datachartId: string; wid: string }) =>
+  (dispatch, getState) => {
+    const { boardEditing, datachartId, wid } = args;
+    const rootState = getState() as RootState;
+    const viewBoardState = rootState.board as BoardState;
+    const editBoardState = rootState.editBoard as EditBoardState;
+    const dataChartMap = viewBoardState.dataChartMap;
+    const curChart = dataChartMap[datachartId];
+    if (!curChart) return;
+    if (curChart.viewId) return;
+    if (!curChart.config.sampleData) return;
+    if (boardEditing) {
+      const dataset = editBoardState.widgetDataMap[wid];
+      if (dataset?.id) return;
+      dispatch(
+        editWidgetDataActions.setWidgetData({
+          wid,
+          data: curChart.config.sampleData,
+        }),
+      );
+    } else {
+      const dataset = viewBoardState.widgetDataMap[wid];
+      if (dataset?.id) return;
+      dispatch(
+        boardActions.setWidgetData({ wid, data: curChart.config.sampleData }),
       );
     }
   };

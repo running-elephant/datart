@@ -30,7 +30,7 @@ export interface EditBoardState {
   stack: EditBoardStack;
   boardInfo: BoardInfo;
   widgetInfoRecord: Record<string, WidgetInfo>;
-  widgetDataMap: Record<string, WidgetData>;
+  widgetDataMap: Record<string, WidgetData | undefined>;
   selectedItemsMap: {
     selectedItems: Record<string, SelectedItem[]>;
   };

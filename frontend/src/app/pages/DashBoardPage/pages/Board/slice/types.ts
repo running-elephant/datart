@@ -49,7 +49,7 @@ export interface BoardState {
   widgetInfoRecord: Record<string, Record<string, WidgetInfo>>;
   dataChartMap: Record<string, DataChart>;
   viewMap: Record<string, ChartDataView>; // View
-  widgetDataMap: Record<string, WidgetData>;
+  widgetDataMap: Record<string, WidgetData | undefined>;
   availableSourceFunctionsMap: Record<string, string[]>;
   selectedItems: Record<string, SelectedItem[]>;
 }
@@ -182,6 +182,7 @@ export interface WidgetData {
   rows?: string[][];
   pageInfo?: Partial<PageInfo>;
 }
+
 //
 export const RenderTypes = [
   'rerender',
@@ -379,6 +380,7 @@ export interface DataChartConfig {
   chartConfig: ChartConfig;
   chartGraphId: string;
   computedFields: any[];
+  sampleData?: any; // for template
 }
 
 export type ColsType = typeof LAYOUT_COLS_MAP;

@@ -17,19 +17,18 @@
  */
 
 import { message } from 'antd';
-import { Brand } from 'app/components/Brand';
+import { LayoutWithBrand } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectSystemInfo } from 'app/slice/selectors';
 import React, { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
-import styled from 'styled-components/macro';
 import { RegisterForm } from './RegisterForm';
 import { SendEmailTips } from './SendEmailTips';
 import { sendEmail } from './service';
 import { WithoutActivation } from './WithoutActivation';
 
 export function RegisterPage() {
-  const [isRegister, setIsRegister] = useState(true);
+  const [registered, setRegistered] = useState(false);
   const [email, setEmail] = useState<string>('');
   const [sendEmailLoading, setSendEmailLoading] = useState(false);
   const systemInfo = useSelector(selectSystemInfo);
@@ -38,11 +37,11 @@ export function RegisterPage() {
 
   const onRegisterSuccess = useCallback((email: string) => {
     setEmail(email);
-    setIsRegister(false);
+    setRegistered(true);
   }, []);
 
   const goBack = useCallback(() => {
-    setIsRegister(true);
+    setRegistered(false);
   }, []);
 
   const onSendEmail = useCallback(() => {
@@ -58,9 +57,8 @@ export function RegisterPage() {
   }, [email, t]);
 
   return (
-    <Wrapper>
-      <Brand />
-      {isRegister ? (
+    <LayoutWithBrand>
+      {!registered ? (
         <RegisterForm onRegisterSuccess={onRegisterSuccess} />
       ) : mailEnable ? (
         <SendEmailTips
@@ -72,18 +70,6 @@ export function RegisterPage() {
       ) : (
         <WithoutActivation onContinue={goBack} />
       )}
-    </Wrapper>
+    </LayoutWithBrand>
   );
 }
-
-const Wrapper = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-`;

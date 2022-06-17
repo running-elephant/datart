@@ -23,10 +23,7 @@ import datart.core.base.PageInfo;
 import datart.core.base.consts.ValueType;
 import datart.core.base.consts.VariableTypeEnum;
 import datart.core.common.UUIDGenerator;
-import datart.core.data.provider.ExecuteParam;
-import datart.core.data.provider.QueryScript;
-import datart.core.data.provider.ScriptVariable;
-import datart.core.data.provider.SelectColumn;
+import datart.core.data.provider.*;
 import datart.core.data.provider.sql.AggregateOperator;
 import datart.core.data.provider.sql.FunctionColumn;
 import datart.core.data.provider.sql.GroupByOperator;
@@ -57,13 +54,14 @@ public class ParamFactory {
                 .variables(new LinkedList<>(variables))
                 .viewId(UUIDGenerator.generate())
                 .test(false)
+                .scriptType(ScriptType.SQL)
                 .build();
     }
 
     public static ExecuteParam getExecuteScriptExample() {
         List<SelectColumn> columns = new ArrayList<>();
-        columns.add(SelectColumn.of(null, "name"));
-        columns.add(SelectColumn.of("age"));
+        columns.add(SelectColumn.of("name", "name"));
+        columns.add(SelectColumn.of("age","age"));
 
         List<FunctionColumn> functionColumns = new ArrayList<>();
         FunctionColumn functionColumn = new FunctionColumn();
@@ -75,11 +73,13 @@ public class ParamFactory {
         AggregateOperator aggregateOperator = new AggregateOperator();
         aggregateOperator.setColumn("val");
         aggregateOperator.setSqlOperator(AggregateOperator.SqlOperator.SUM);
+        aggregateOperator.setAlias("SUM(val)");
         aggregateOperators.add(aggregateOperator);
 
         List<GroupByOperator> groupByOperators = new ArrayList<>();
         GroupByOperator group = new GroupByOperator();
         group.setColumn("id");
+        group.setAlias("id");
         groupByOperators.add(group);
 
         List<OrderOperator> orderOperators = new ArrayList<>();

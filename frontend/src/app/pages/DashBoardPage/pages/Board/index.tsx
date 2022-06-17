@@ -17,12 +17,12 @@
  */
 
 import useResizeObserver from 'app/hooks/useResizeObserver';
-import { urlSearchTransfer } from 'app/pages/MainPage/pages/VizPage/utils';
 import { FC, memo, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 import { boardDrillManager } from '../../components/BoardDrillManager/BoardDrillManager';
 import { TitleHeader } from '../../components/BoardHeader/TitleHeader';
 import { BoardLoading } from '../../components/BoardLoading';

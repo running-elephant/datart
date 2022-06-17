@@ -18,8 +18,10 @@
 
 import { DataChart } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ViewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
-import { createContext, FC, memo, useContext } from 'react';
-import { useSelector } from 'react-redux';
+import ChartDataView from 'app/types/ChartDataView';
+import { createContext, FC, memo, useContext, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setWidgetSampleDataAction } from '../../actions/widgetAction';
 import {
   selectAvailableSourceFunctionsMap,
   selectDataChartById,
@@ -52,6 +54,7 @@ export const SupportTriggerChartIds: string[] = [
 ];
 export const WidgetChartContext = createContext<{
   dataChart: DataChart | undefined;
+  chartDataView?: ChartDataView;
   availableSourceFunctions?: string[];
   supportTrigger: boolean;
   viewType: ViewType;
@@ -62,8 +65,19 @@ export const WidgetChartContext = createContext<{
   viewType: 'SQL',
 });
 
-export const WidgetChartProvider: FC = memo(({ children }) => {
+export const WidgetChartProvider: FC<{
+  boardEditing: boolean;
+  widgetId: string;
+}> = memo(({ boardEditing, widgetId, children }) => {
   const { datachartId } = useContext(WidgetContext);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!datachartId) return;
+    if (!widgetId) return;
+    dispatch(
+      setWidgetSampleDataAction({ boardEditing, datachartId, wid: widgetId }),
+    );
+  }, [boardEditing, datachartId, dispatch, widgetId]);
   const dataChart = useSelector((state: { board: BoardState }) =>
     selectDataChartById(state, datachartId),
   );
@@ -76,11 +90,18 @@ export const WidgetChartProvider: FC = memo(({ children }) => {
   const supportTrigger = SupportTriggerChartIds.includes(
     dataChart?.config?.chartGraphId,
   );
+  const chartDataView = viewMap[dataChart?.viewId];
   const viewType = viewMap[dataChart?.viewId]?.type || 'SQL';
 
   return (
     <WidgetChartContext.Provider
-      value={{ dataChart, availableSourceFunctions, supportTrigger, viewType }}
+      value={{
+        dataChart,
+        availableSourceFunctions,
+        supportTrigger,
+        chartDataView,
+        viewType,
+      }}
     >
       {children}
     </WidgetChartContext.Provider>

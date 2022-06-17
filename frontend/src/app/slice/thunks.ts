@@ -19,7 +19,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { StorageKeys } from 'globalConstants';
 import { removeToken, setToken, setTokenExpiration } from 'utils/auth';
-import { request } from 'utils/request';
+import { request, request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { appActions } from '.';
 import {
@@ -28,10 +28,24 @@ import {
   ModifyPasswordParams,
   RegisterParams,
   SaveProfileParams,
+  SetupParams,
   SystemInfo,
   User,
   UserInfoByTokenParams,
 } from './types';
+
+export const setup = createAsyncThunk<boolean, SetupParams>(
+  'app/setup',
+  async ({ params, resolve }) => {
+    const { data } = await request2<boolean>({
+      url: '/sys/setup',
+      method: 'POST',
+      data: { user: params },
+    });
+    resolve();
+    return data;
+  },
+);
 
 export const login = createAsyncThunk<User, LoginParams>(
   'app/login',
@@ -52,25 +66,24 @@ export const login = createAsyncThunk<User, LoginParams>(
   },
 );
 
-export const getUserInfoByToken = createAsyncThunk<User, UserInfoByTokenParams>(
-  'app/getUserInfoByToken',
-  async ({ token, resolve }) => {
-    setToken(token);
-    try {
-      const { data } = await request<User>({
-        url: '/users',
-        method: 'GET',
-      });
-      localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(data));
-      resolve();
-      return data;
-    } catch (error) {
-      errorHandle(error);
-      removeToken();
-      throw error;
-    }
-  },
-);
+export const getUserInfoByToken = createAsyncThunk<
+  User | undefined,
+  UserInfoByTokenParams
+>('app/getUserInfoByToken', async ({ token, resolve, reject }) => {
+  setToken(token);
+  try {
+    const { data } = await request2<User>({
+      url: '/users',
+      method: 'GET',
+    });
+    localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(data));
+    resolve();
+    return data;
+  } catch (error) {
+    reject();
+    removeToken();
+  }
+});
 
 export const register = createAsyncThunk<null, RegisterParams>(
   'app/register',

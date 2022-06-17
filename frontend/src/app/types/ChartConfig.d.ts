@@ -237,6 +237,11 @@ export type ChartStyleSectionRowOption = {
    * Default is false for now, will be change in future version
    */
   translateItemLabel?: boolean;
+
+  /**
+   * Other Free Property
+   */
+  [key: string]: any;
 };
 
 export type ChartStyleSelectorItem = {

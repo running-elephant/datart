@@ -64,7 +64,10 @@ const RelationList: FC<
 
   const handleAddRelation = () => {
     onRelationChange(
-      relations?.concat({ id: uuidv4(), type: InteractionRelationType.Field }),
+      (relations || []).concat({
+        id: uuidv4(),
+        type: InteractionRelationType.Field,
+      }),
     );
   };
 

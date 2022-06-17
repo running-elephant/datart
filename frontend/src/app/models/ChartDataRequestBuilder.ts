@@ -55,8 +55,9 @@ import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 import { DrillMode } from './ChartDrillOption';
 export class ChartDataRequestBuilder {
   extraSorters: ChartDataRequest['orders'] = [];
+  extraRuntimeFilters: ChartDataRequestFilter[] = [];
   chartDataConfigs: ChartDataConfig[];
-  charSettingConfigs;
+  chartSettingConfigs;
   pageInfo;
   dataView;
   script: boolean;
@@ -75,13 +76,13 @@ export class ChartDataRequestBuilder {
   ) {
     this.dataView = dataView;
     this.chartDataConfigs = dataConfigs || [];
-    this.charSettingConfigs = settingConfigs || [];
+    this.chartSettingConfigs = settingConfigs || [];
     this.pageInfo = pageInfo || {};
     this.script = script || false;
     this.aggregation = aggregation;
   }
 
-  public addExtraSorters(sorters: ChartDataRequest['orders']) {
+  public addExtraSorters(sorters: ChartDataRequest['orders'] = []) {
     if (!isEmptyArray(sorters)) {
       this.extraSorters = this.extraSorters.concat(sorters!);
     }
@@ -90,6 +91,13 @@ export class ChartDataRequestBuilder {
 
   public addDrillOption(drillOption?: IChartDrillOption) {
     this.drillOption = drillOption;
+    return this;
+  }
+
+  public addRuntimeFilters(filters: ChartDataRequestFilter[] = []) {
+    if (!isEmptyArray(filters)) {
+      this.extraRuntimeFilters = filters;
+    }
     return this;
   }
 
@@ -334,13 +342,12 @@ export class ChartDataRequestBuilder {
   }
 
   private normalizeRuntimeFilters(): ChartDataRequestFilter[] {
-    return (
-      this.chartDataConfigs
-        ?.filter(c => c.type === ChartDataSectionType.Filter)
-        ?.flatMap(c => {
-          return c[RUNTIME_FILTER_KEY] || [];
-        }) || []
-    );
+    return (this.chartDataConfigs || [])
+      .filter(c => c.type === ChartDataSectionType.Filter)
+      .flatMap(c => {
+        return c[RUNTIME_FILTER_KEY] || [];
+      })
+      .concat(this.extraRuntimeFilters);
   }
 
   private buildOrders() {
@@ -398,7 +405,7 @@ export class ChartDataRequestBuilder {
   }
 
   private buildPageInfo() {
-    const settingStyles = this.charSettingConfigs;
+    const settingStyles = this.chartSettingConfigs;
     const pageSize = getValue(settingStyles, ['paging', 'pageSize']);
     const enablePaging = getValue(settingStyles, ['paging', 'enablePaging']);
     return {

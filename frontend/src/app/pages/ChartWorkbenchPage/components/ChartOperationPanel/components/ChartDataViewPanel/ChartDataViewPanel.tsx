@@ -16,9 +16,14 @@
  * limitations under the License.
  */
 
-import { EllipsisOutlined, FormOutlined } from '@ant-design/icons';
-import { Menu, message, Tooltip, TreeSelect } from 'antd';
+import {
+  EllipsisOutlined,
+  FormOutlined,
+  InfoCircleOutlined,
+} from '@ant-design/icons';
+import { Button, Menu, message, Space, Tooltip, TreeSelect } from 'antd';
 import { MenuListItem, Popup, ToolbarButton } from 'app/components';
+import { Confirm, ConfirmProps } from 'app/components/Confirm';
 import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
@@ -41,11 +46,11 @@ import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { checkComputedFieldAsync } from 'app/utils/fetch';
 import { updateByKey } from 'app/utils/mutation';
-import { FC, memo, useCallback, useMemo } from 'react';
+import { FC, memo, useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
-import { SPACE, SPACE_XS } from 'styles/StyleConstants';
+import { ORANGE, SPACE, SPACE_XS } from 'styles/StyleConstants';
 import { getPath } from 'utils/utils';
 import { ChartDraggableSourceGroupContainer } from '../ChartDraggable';
 import ChartComputedFieldSettingPanel from './components/ChartComputedFieldSettingPanel';
@@ -54,7 +59,7 @@ const ChartDataViewPanel: FC<{
   dataView?: ChartDataView;
   defaultViewId?: string;
   chartConfig?: ChartConfig;
-  onDataViewChange?: () => void;
+  onDataViewChange?: (clear?: boolean) => void;
 }> = memo(({ dataView, defaultViewId, chartConfig, onDataViewChange }) => {
   const t = useI18NPrefix(`viz.workbench.dataview`);
   const dispatch = useDispatch();
@@ -66,6 +71,8 @@ const ChartDataViewPanel: FC<{
   const dataviewTreeData = useSelector(state =>
     dataviewTreeSelector(state, getSelectable),
   );
+  const [confirmProps, setConfirmProps] = useState<ConfirmProps>({});
+
   const [isDisplayAddNewModal, setIsDisplayAddNewModal] = useToggle();
   const views = useSelector(dataviewsSelector);
 
@@ -99,28 +106,44 @@ const ChartDataViewPanel: FC<{
       }
       let Data = chartConfig?.datas?.filter(v => v.rows && v.rows.length);
       if (Data?.length) {
-        (showModal as Function)({
-          title: '',
-          modalSize: StateModalSize.XSMALL,
-          content: () => t('toggleViewTip'),
-          onOk: () => {
-            onDataViewChange?.();
-            dispatch(fetchViewDetailAction(value));
-          },
+        setConfirmProps({
+          visible: true,
+          title: t('toggleViewTip'),
+          width: 500,
+          icon: <InfoCircleOutlined style={{ color: ORANGE }} />,
+          footer: (
+            <Space>
+              <Button onClick={() => setConfirmProps({ visible: false })}>
+                {'取消'}
+              </Button>
+              <Button
+                onClick={() => {
+                  onDataViewChange?.(true);
+                  setConfirmProps({ visible: false });
+                  dispatch(fetchViewDetailAction(value));
+                }}
+              >
+                {'清空'}
+              </Button>
+              <Button
+                onClick={() => {
+                  onDataViewChange?.();
+                  setConfirmProps({ visible: false });
+                  dispatch(fetchViewDetailAction(value));
+                }}
+                type="primary"
+              >
+                {'保留'}
+              </Button>
+            </Space>
+          ),
         });
       } else {
         onDataViewChange?.();
         dispatch(fetchViewDetailAction(value));
       }
     },
-    [
-      chartConfig?.datas,
-      dataView?.id,
-      dispatch,
-      onDataViewChange,
-      showModal,
-      t,
-    ],
+    [chartConfig?.datas, dataView?.id, dispatch, onDataViewChange, t],
   );
 
   const filterDateViewTreeNode = useCallback(
@@ -157,10 +180,10 @@ const ChartDataViewPanel: FC<{
       );
       if (isNameConflict) {
         message.error(
-          'The computed field has already been exist, please choose anohter one!',
+          'The computed field has already been exist, please choose another one!',
         );
         return Promise.reject(
-          'The computed field has already been exist, please choose anohter one!',
+          'The computed field has already been exist, please choose another one!',
         );
       }
 
@@ -404,6 +427,8 @@ const ChartDataViewPanel: FC<{
         </Popup>
         {modalContextHolder}
       </Header>
+      <Confirm {...confirmProps} />
+
       <ChartDraggableSourceGroupContainer
         meta={sortedMetaFields}
         onDeleteComputedField={handleDeleteComputedField}
