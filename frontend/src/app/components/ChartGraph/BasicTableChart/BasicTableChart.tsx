@@ -909,7 +909,7 @@ class BasicTableChart extends ReactChart {
           const row = chartDataSet[rowIndex];
           const cellValue = row.getCell(c);
           const seriesName = chartDataSet.getFieldOriginKey(c);
-          const rowData = getExtraSeriesRowData(row);
+          const { rowData } = getExtraSeriesRowData(row);
           return {
             uid: c.uid,
             cellValue,
