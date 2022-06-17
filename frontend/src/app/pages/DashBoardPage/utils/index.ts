@@ -32,7 +32,7 @@ import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
-import { getStyles } from 'app/utils/chartHelper';
+import { getStyles, handleRequestColumnName } from 'app/utils/chartHelper';
 import { getTime, splitRangerDateFilters } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
@@ -54,6 +54,7 @@ import { Widget } from '../types/widgetTypes';
 import { DateControllerTypes } from './../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
+import migrationDataChartConfig from 'app/migration/vizDataChartConfig/migrationDataChartConfig';
 
 export const convertImageUrl = (urlKey: string = ''): string => {
   if (urlKey.startsWith(BOARD_FILE_IMG_PREFIX)) {
@@ -102,9 +103,14 @@ export const getDataChartRequestParams = (obj: {
   const migratedChartConfig = migrateChartConfig(
     CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
   );
+  console.log(migratedChartConfig, 'migratedChartConfig');
+  if (migratedChartConfig?.chartConfig) {
+    migratedChartConfig.chartConfig = migrationDataChartConfig(migratedChartConfig.chartConfig);
+  }
   const { datas, settings } = convertToChartConfigDTO(
     migratedChartConfig as ChartDetailConfigDTO,
   );
+  console.log(datas, 'datas');
   const builder = new ChartDataRequestBuilder(
     {
       ...view,
@@ -184,6 +190,7 @@ export const getTheWidgetFiltersAndParams = (obj: {
       console.log(`has no FilterValues return on ${chartWidget.id}`);
       return;
     }
+
     // 关联变量逻辑
     if (
       relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Variable
@@ -205,11 +212,12 @@ export const getTheWidgetFiltersAndParams = (obj: {
         variableParams[key] = curValues;
       }
     }
+
     // 关联字段 逻辑
     if (relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Field) {
       const filter: ChartDataRequestFilter = {
         aggOperator: null,
-        column: String(relatedViewItem.fieldValue),
+        column: JSON.parse(relatedViewItem.fieldValue as string),
         sqlOperator: controllerConfig.sqlOperator,
         values: values,
       };
@@ -218,6 +226,7 @@ export const getTheWidgetFiltersAndParams = (obj: {
   });
   // filter 去重
   filterParams = getDistinctFiltersByColumn(filterParams);
+
   const res = {
     filterParams: filterParams,
     variableParams: variableParams,
@@ -237,6 +246,7 @@ export const getWidgetControlValues = (opt: {
     }[] => {
   const { type, relatedViewItem, config } = opt;
   const valueType = relatedViewItem.fieldValueType;
+
   if (DateControllerTypes.includes(type)) {
     if (!config?.controllerDate) {
       return false;
@@ -415,9 +425,11 @@ export const getChartWidgetRequestParams = (obj: {
     links.forEach(link => {
       const { triggerValue, triggerWidgetId } = link;
       const triggerWidget = widgetMap[triggerWidgetId];
+      const linkColumn = getLinkedColumn(link.linkerWidgetId, triggerWidget);
+
       const filter: ChartDataRequestFilter = {
         aggOperator: null,
-        column: getLinkedColumn(link.linkerWidgetId, triggerWidget),
+        column: JSON.parse(linkColumn),
         sqlOperator: FilterSqlOperator.In,
         values: [{ value: triggerValue, valueType: DataViewFieldType.STRING }],
       };
@@ -503,9 +515,8 @@ export const getDistinctFiltersByColumn = (
   }
   const filterMap: Record<string, ChartDataRequestFilter> = {};
   filter.forEach(item => {
-    filterMap[item.column] = item;
+    filterMap[item.column[0]] = item;
   });
-
   return Object.values(filterMap);
 };
 

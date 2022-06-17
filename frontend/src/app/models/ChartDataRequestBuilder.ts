@@ -19,6 +19,7 @@
 import {
   AggregateFieldActionType,
   ChartDataSectionType,
+  ChartDataViewFieldCategory,
   DataViewFieldType,
   FilterConditionType,
   SortActionType,
@@ -49,9 +50,9 @@ import {
   RUNTIME_FILTER_KEY,
   TIME_FORMATTER,
 } from 'globalConstants';
+import isEqual from 'lodash/isEqual';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 import { DrillMode } from './ChartDrillOption';
-
 export class ChartDataRequestBuilder {
   extraSorters: ChartDataRequest['orders'] = [];
   extraRuntimeFilters: ChartDataRequestFilter[] = [];
@@ -64,7 +65,7 @@ export class ChartDataRequestBuilder {
   drillOption?: IChartDrillOption;
 
   constructor(
-    dataView: Pick<ChartDataView, 'id' | 'computedFields'> & {
+    dataView: Pick<ChartDataView, 'id' | 'computedFields' | 'type'> & {
       config: string | object;
     },
     dataConfigs?: ChartDataConfig[],
@@ -133,11 +134,30 @@ export class ChartDataRequestBuilder {
 
     return UniqWith(
       aggColumns.map(aggCol => ({
-        column: aggCol.colName,
+        alias: this.buildAliasName(aggCol),
+        column: this.buildColumnName(aggCol),
         sqlOperator: aggCol.aggregate!,
       })),
-      (a, b) => a.column === b.column && a.sqlOperator === b.sqlOperator,
+      (a, b) => isEqual(a.column, b.column) && a.sqlOperator === b.sqlOperator,
     );
+  }
+
+  private buildAliasName(c) {
+    if (c.aggregate === AggregateFieldActionType.None) {
+      return c.colName;
+    }
+    if (c.aggregate) {
+      return `${c.aggregate}(${c.colName})`;
+    }
+    return c.colName;
+  }
+
+  private buildColumnName(col) {
+    console.log(col, 'col');
+    if (col.category === ChartDataViewFieldCategory.Field) {
+      return col.id;
+    }
+    return [col.id];
   }
 
   private buildGroups() {
@@ -186,7 +206,12 @@ export class ChartDataRequestBuilder {
       [],
     );
     return Array.from(
-      new Set(groupColumns.map(groupCol => ({ column: groupCol.colName }))),
+      new Set(
+        groupColumns.map(groupCol => ({
+          alias: this.buildAliasName(groupCol),
+          column: this.buildColumnName(groupCol),
+        })),
+      ),
     );
   }
 
@@ -291,7 +316,7 @@ export class ChartDataRequestBuilder {
             field.aggregate === AggregateFieldActionType.None
               ? null
               : field.aggregate,
-          column: field.colName,
+          column: this.buildColumnName(field),
           sqlOperator: field.filter?.condition?.operator!,
           values: _transformFieldValues(field) || [],
         };
@@ -307,7 +332,7 @@ export class ChartDataRequestBuilder {
       .map(f => {
         return {
           aggOperator: null,
-          column: f.condition?.name!,
+          column: this.buildColumnName(f.condition?.name!),
           sqlOperator: f.condition?.operator! as FilterSqlOperator,
           values: [
             { value: f.condition?.value as string, valueType: 'STRING' },
@@ -365,7 +390,7 @@ export class ChartDataRequestBuilder {
       );
 
     const originalSorters = sortColumns.map(aggCol => ({
-      column: aggCol.colName,
+      column: this.buildColumnName(aggCol),
       operator: aggCol.sort?.type!,
       aggOperator: aggCol.aggregate,
     }));
@@ -447,7 +472,12 @@ export class ChartDataRequestBuilder {
       },
       [],
     );
-    return selectColumns.map(col => col.colName);
+    return selectColumns.map(col => {
+      return {
+        alias: this.buildAliasName(col),
+        column: this.buildColumnName(col),
+      };
+    });
   }
 
   private buildDetailColumns() {
@@ -475,7 +505,12 @@ export class ChartDataRequestBuilder {
       },
       [],
     );
-    return selectColumns.map(col => col.colName);
+    return selectColumns.map(col => {
+      return {
+        alias: this.buildAliasName(col),
+        column: this.buildColumnName(col),
+      };
+    });
   }
 
   private buildViewConfigs() {

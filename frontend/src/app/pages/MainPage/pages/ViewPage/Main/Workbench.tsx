@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { Spin } from 'antd';
 import { Split } from 'app/components';
 import { useAccess, useCascadeAccess } from 'app/pages/MainPage/Access';
 import debounce from 'lodash/debounce';
@@ -33,17 +34,22 @@ import {
   PermissionLevels,
   ResourceTypes,
 } from '../../PermissionPage/constants';
+import SelectView from '../components/SelectViewType';
 import { UNPERSISTED_ID_PREFIX } from '../constants';
 import { EditorContext } from '../EditorContext';
+import { useViewSlice } from '../slice';
 import { selectCurrentEditingViewAttr, selectViews } from '../slice/selectors';
 import { getSchemaBySourceId } from '../slice/thunks';
 import { Editor } from './Editor';
 import { Outputs } from './Outputs';
 import { Properties } from './Properties';
+import { StructView } from './StructView';
 
 export const Workbench = memo(() => {
   const dispatch = useDispatch();
   const { editorInstance } = useContext(EditorContext);
+  const { actions } = useViewSlice();
+
   const views = useSelector(selectViews);
   const id = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'id' }),
@@ -54,12 +60,9 @@ export const Workbench = memo(() => {
   const sourceId = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'sourceId' }),
   ) as string;
-
-  useEffect(() => {
-    if (sourceId) {
-      dispatch(getSchemaBySourceId(sourceId));
-    }
-  }, [dispatch, sourceId]);
+  const viewType = useSelector(state =>
+    selectCurrentEditingViewAttr(state, { name: 'type' }),
+  ) as string;
 
   const path = useMemo(
     () =>
@@ -97,6 +100,32 @@ export const Workbench = memo(() => {
     [editorInstance],
   );
 
+  const editorResize = useCallback(
+    sizes => {
+      editorInstance?.layout();
+    },
+    [editorInstance],
+  );
+
+  const handleSelectViewType = useCallback(
+    viewType => {
+      dispatch(
+        actions.changeCurrentEditingView({
+          type: viewType,
+          script:
+            viewType === 'STRUCT'
+              ? {
+                  table: [],
+                  columns: [],
+                  joins: [],
+                }
+              : '',
+        }),
+      );
+    },
+    [dispatch, actions],
+  );
+
   useEffect(() => {
     window.addEventListener('resize', onResize, false);
     return () => {
@@ -104,12 +133,11 @@ export const Workbench = memo(() => {
     };
   }, [onResize]);
 
-  const editorResize = useCallback(
-    sizes => {
-      editorInstance?.layout();
-    },
-    [editorInstance],
-  );
+  useEffect(() => {
+    if (sourceId) {
+      dispatch(getSchemaBySourceId(sourceId));
+    }
+  }, [dispatch, sourceId]);
 
   return (
     <Wrapper>
@@ -119,10 +147,26 @@ export const Workbench = memo(() => {
         className="datart-split"
         onDrag={editorResize}
       >
-        <Editor allowManage={allowManage} allowEnableViz={allowEnableViz} />
+        {!viewType ? (
+          unpersistedNewView ? (
+            <SelectView selectViewType={handleSelectViewType} />
+          ) : (
+            <LoadingWrap>
+              <Spin />
+            </LoadingWrap>
+          )
+        ) : viewType === 'STRUCT' ? (
+          <StructView
+            allowManage={allowManage}
+            allowEnableViz={allowEnableViz}
+          />
+        ) : (
+          <Editor allowManage={allowManage} allowEnableViz={allowEnableViz} />
+        )}
+
         <Outputs />
       </Development>
-      <Properties allowManage={allowManage} />
+      <Properties viewType={viewType} allowManage={allowManage} />
     </Wrapper>
   );
 });
@@ -137,4 +181,11 @@ const Development = styled(Split)`
   display: flex;
   flex: 1;
   flex-direction: column;
+`;
+
+const LoadingWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 `;

@@ -150,6 +150,7 @@ const ChartPreviewBoard: FC<{
       const filterSearchParams = filterSearchUrl
         ? urlSearchTransfer.toParams(filterSearchUrl)
         : undefined;
+
       dispatch(
         initChartPreviewData({
           backendChartId,
@@ -471,6 +472,7 @@ const ChartPreviewBoard: FC<{
           config: chartPreview?.backendChart?.view.config || {},
           computedFields:
             chartPreview?.backendChart?.config.computedFields || [],
+          type: chartPreview?.backendChart?.view?.type || 'SQL',
         },
         chartPreview?.chartConfig?.datas,
         chartPreview?.chartConfig?.settings,
@@ -682,6 +684,7 @@ const ChartPreviewBoard: FC<{
                     selectedItems={selectedItems[backendChartId]}
                     width={cacheW}
                     height={cacheH}
+                    viewType={chartPreview?.backendChart?.view.type || 'SQL'}
                   />
                 </ChartDrillContextMenu>
               </Spin>

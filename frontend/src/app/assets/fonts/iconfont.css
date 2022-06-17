@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 2869064 */
-  src: url('iconfont.woff2?t=1653452426739') format('woff2'),
-       url('iconfont.woff?t=1653452426739') format('woff'),
-       url('iconfont.ttf?t=1653452426739') format('truetype');
+  src: url('iconfont.woff2?t=1653903844873') format('woff2'),
+       url('iconfont.woff?t=1653903844873') format('woff'),
+       url('iconfont.ttf?t=1653903844873') format('truetype');
 }
 
 .iconfont {
@@ -233,4 +233,5 @@
 .icon-users1:before {
   content: "\e92e";
 }
+
 

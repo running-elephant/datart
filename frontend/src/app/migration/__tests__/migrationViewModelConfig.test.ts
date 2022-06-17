@@ -16,23 +16,23 @@
  * limitations under the License.
  */
 
-import { APP_VERSION_BETA_2 } from '../constants';
+import { APP_VERSION_BETA_4 } from '../constants';
 import beginViewModelMigration from '../ViewConfig/migrationViewModelConfig';
 
 describe('migrationViewModelConfig Test', () => {
   test('should get latest version after migration', () => {
     const model = JSON.stringify({});
-    expect(beginViewModelMigration(model)).toEqual(
+    expect(beginViewModelMigration(model, 'SQL')).toEqual(
       JSON.stringify({
         hierarchy: {},
         columns: {},
-        version: APP_VERSION_BETA_2,
+        version: APP_VERSION_BETA_4,
       }),
     );
   });
 
   test('should get latest version even model is empty', () => {
-    expect(beginViewModelMigration('')).toEqual('');
+    expect(beginViewModelMigration('', 'SQL')).toEqual('');
   });
 
   test('should migrate model to nested model object', () => {
@@ -41,11 +41,11 @@ describe('migrationViewModelConfig Test', () => {
       column2: { name: 'column2', role: 'role', type: 'NUMBER' },
     };
     const migrationResultObj = JSON.parse(
-      beginViewModelMigration(JSON.stringify(originalModel)),
+      beginViewModelMigration(JSON.stringify(originalModel), 'SQL'),
     );
     expect(migrationResultObj.columns).toMatchObject(originalModel);
     expect(migrationResultObj.hierarchy).toMatchObject(originalModel);
-    expect(migrationResultObj.version).toEqual(APP_VERSION_BETA_2);
+    expect(migrationResultObj.version).toEqual(APP_VERSION_BETA_4);
   });
 
   test('should migrate model name to columns', () => {
@@ -54,7 +54,7 @@ describe('migrationViewModelConfig Test', () => {
       column2: { role: 'role', type: 'NUMBER' },
     };
     const migrationResultObj = JSON.parse(
-      beginViewModelMigration(JSON.stringify(originalModel)),
+      beginViewModelMigration(JSON.stringify(originalModel), 'SQL'),
     );
     expect(migrationResultObj.columns).toMatchObject({
       column1: { name: 'column1', role: 'role', type: 'STRING' },
@@ -64,6 +64,6 @@ describe('migrationViewModelConfig Test', () => {
       column1: { name: 'column1', role: 'role', type: 'STRING' },
       column2: { name: 'column2', role: 'role', type: 'NUMBER' },
     });
-    expect(migrationResultObj.version).toEqual(APP_VERSION_BETA_2);
+    expect(migrationResultObj.version).toEqual(APP_VERSION_BETA_4);
   });
 });

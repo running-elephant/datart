@@ -37,7 +37,7 @@ import { convertToChartDto } from './ChartDtoHelper';
 
 export const getDistinctFields = async (
   viewId: string,
-  columns: string[],
+  columns: Array<{ colName: string; colPath: string[] }>,
   view: ChartDTO['view'] | undefined,
   executeToken: ExecuteToken | undefined,
 ) => {
@@ -46,7 +46,12 @@ export const getDistinctFields = async (
     aggregators: [],
     filters: [],
     groups: [],
-    columns: [...new Set(columns)],
+    columns: [...new Set(columns)].map(v => {
+      return {
+        alias: v.colName,
+        column: v.colPath,
+      };
+    }),
     pageInfo: {
       pageNo: 1,
       pageSize: 99999999,

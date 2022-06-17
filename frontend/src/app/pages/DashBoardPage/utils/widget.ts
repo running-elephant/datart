@@ -494,7 +494,7 @@ export const getLinkedColumn = (
 ) => {
   const relations = triggerWidget.relations;
   const relation = relations.find(item => item.targetId === targetWidgetId);
-
+  console.log(relation, 'relation');
   return (
     relation?.config?.widgetToWidget?.linkerColumn ||
     relation?.config?.widgetToWidget?.triggerColumn ||
@@ -678,7 +678,8 @@ export const getValueByRowData = (
   data: ChartsEventData | undefined,
   fieldName: string,
 ) => {
-  let toCaseField = fieldName;
+  let toCaseField = JSON.parse(fieldName).join('.');
+
   return data?.rowData[toCaseField];
 };
 

@@ -379,13 +379,13 @@ export function transformMeta(model?: string) {
     if (!isEmptyArray(column?.children)) {
       return column.children.map(c => ({
         ...c,
-        id: c.name,
+        id: c.path,
         category: ChartDataViewFieldCategory.Field,
       }));
     }
     return {
       ...column,
-      id: colKey,
+      id: column.path,
       category: ChartDataViewFieldCategory.Field,
     };
   });
@@ -399,6 +399,7 @@ export function transformHierarchyMeta(model?: string): ChartDataViewMeta[] {
   const hierarchyMeta = !Object.keys(modelObj?.hierarchy || {}).length
     ? modelObj.columns
     : modelObj.hierarchy;
+
   return Object.keys(hierarchyMeta || {}).map(key => {
     return getMeta(key, hierarchyMeta?.[key]);
   });
@@ -411,10 +412,9 @@ function getMeta(key, column) {
     isHierarchy = true;
     children = column?.children.map(child => getMeta(child?.name, child));
   }
-
   return {
     ...column,
-    id: key,
+    id: column.path || key,
     subType: column?.category,
     category: isHierarchy
       ? ChartDataViewFieldCategory.Hierarchy
@@ -666,7 +666,8 @@ export const transformToViewConfig = (
 
 export const buildDragItem = (item, children: any[] = []) => {
   return {
-    colName: item?.id,
+    id: item?.id,
+    colName: item?.name,
     type: item?.type,
     subType: item?.subType,
     category: item?.category,
@@ -744,7 +745,7 @@ export const buildClickEventBaseFilters = (
       const filter = {
         aggOperator: null,
         sqlOperator: FilterSqlOperator.In,
-        column: c.colName,
+        column: c.id,
         values: [{ value, valueType: c.type }],
       };
       acc.push(filter);
@@ -778,7 +779,7 @@ export const getJumpFiltersByInteractionRule = (
           return null;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column,
+          r => r.source === JSON.stringify(f?.column),
         );
         if (isEmpty(targetRelation)) {
           return null;
@@ -791,7 +792,7 @@ export const getJumpFiltersByInteractionRule = (
     .filter(Boolean)
     .reduce((acc, cur) => {
       if (cur?.column) {
-        acc[cur.column!] = cur?.values?.map(v => v.value);
+        acc[String(cur.column!)] = cur?.values?.map(v => v.value);
       }
       return acc;
     }, {});
@@ -817,7 +818,7 @@ export const getLinkFiltersByInteractionRule = (
           return null;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column,
+          r => r.source === JSON.stringify(f?.column),
         );
         if (isEmpty(targetRelation)) {
           return null;
@@ -830,7 +831,7 @@ export const getLinkFiltersByInteractionRule = (
     .filter(Boolean)
     .reduce((acc, cur) => {
       if (cur?.column) {
-        acc[cur.column!] = cur?.values?.map(v => v.value);
+        acc[String(cur.column!)] = cur?.values?.map(v => v.value);
       }
       return acc;
     }, {});
@@ -861,14 +862,17 @@ export const getJumpOperationFiltersByInteractionRule = (
         if (isEmptyArray(customizeRelations)) {
           return acc;
         }
+
         const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column,
+          r => r.source === JSON.stringify(f?.column),
         );
         if (isEmpty(targetRelation)) {
           return acc;
         }
         return acc.concat(
-          Object.assign({}, f, { column: targetRelation?.target }),
+          Object.assign({}, f, {
+            column: targetRelation?.target && JSON.parse(targetRelation.target),
+          }),
         );
       }
     }, []);

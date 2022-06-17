@@ -66,7 +66,7 @@ import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { WidgetSelectionContext } from '../../WidgetProvider/WidgetSelectionProvider';
 
 export const DataChartWidgetCore: React.FC<{}> = memo(() => {
-  const { dataChart, availableSourceFunctions, chartDataView } =
+  const { dataChart, availableSourceFunctions, chartDataView, viewType } =
     useContext(WidgetChartContext);
 
   const scale = useContext(BoardScaleContext);
@@ -114,6 +114,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   useEffect(() => {
     widgetRef.current = widget;
   }, [widget]);
+
   const dispatch = useDispatch();
   const handleDateLevelChange = useCallback(
     (type, payload) => {
@@ -447,6 +448,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     }
     return null;
   }, [chart, dataChart]);
+
   const chartFrame = useMemo(() => {
     if (!config) return null;
     if (cacheH <= 1 || cacheW <= 1) return null;
@@ -465,6 +467,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         containerId={containerId}
         widgetSpecialConfig={widgetSpecialConfig}
         scale={scale}
+        viewType={viewType}
       />
     );
   }, [
@@ -478,6 +481,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     containerId,
     widgetSpecialConfig,
     scale,
+    viewType,
   ]);
   const drillContextVal = {
     drillOption: drillOptionRef.current,

@@ -9,6 +9,7 @@ function DateLevelFieldContainer({
   onClearCheckedList,
   item,
   colName,
+  id,
 }: {
   onClearCheckedList?: () => any;
   item: {
@@ -18,6 +19,7 @@ function DateLevelFieldContainer({
     type: string;
   };
   colName: string;
+  id: string[];
 }) {
   const t = useI18NPrefix(`viz.workbench.dataview`);
   const [, drag] = useDrag(
@@ -25,6 +27,7 @@ function DateLevelFieldContainer({
       type: CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
       canDrag: true,
       item: {
+        id: id,
         colName: `${colName}`,
         type: item.type,
         category: item.category,

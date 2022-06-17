@@ -27,6 +27,7 @@ import {
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
+import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { getDistinctFields } from 'app/utils/fetch';
 import { transformMeta } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -72,11 +73,12 @@ const ValuesOptionsSetter: FC<{
     try {
       const { data } = await request2<View>(`/views/${viewId}`);
       let meta = transformMeta(data?.model);
+      const viewType = data?.type || 'SQL';
       if (!meta) return [];
       const option: CascaderOptionType[] = meta.map(item => {
         return {
           value: item.id,
-          label: item.id,
+          label: handleDisplayViewName({ viewType, name: item.id }),
         };
       });
       return option;
@@ -99,6 +101,7 @@ const ValuesOptionsSetter: FC<{
   );
   const fetchNewDataset = useCallback(
     async (viewId: string, columns: string[]) => {
+      console.log('fetchNewDataset');
       const fieldDataset = await getDistinctFields(
         viewId,
         columns,
@@ -137,6 +140,7 @@ const ValuesOptionsSetter: FC<{
       setLabelOptions(options);
 
       const [viewId, ...columns] = value;
+      console.log(value,'value');
       const dataset = await fetchNewDataset(viewId, columns);
       setOptionValues(convertToList(dataset?.rows));
     },
@@ -145,6 +149,7 @@ const ValuesOptionsSetter: FC<{
   const onLabelChange = useCallback(
     (labelKey: string | undefined) => {
       const controllerConfig = getControllerConfig();
+      console.log(controllerConfig,'controllerConfig');
       const [viewId, valueId] = controllerConfig.assistViewFields || [];
       setLabelKey(labelKey);
       const nextAssistViewFields = labelKey
@@ -255,7 +260,7 @@ const ValuesOptionsSetter: FC<{
                           key={item.value}
                           value={item.value as string}
                         >
-                          {item.value}
+                          {item.label}
                         </Select.Option>
                       ))}
                     </Select>

@@ -152,6 +152,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
             id: view?.id || '',
             config: view?.config || {},
             computedFields: computedFields || [],
+            type: view?.type,
           },
           chartConfig?.datas,
           chartConfig?.settings,

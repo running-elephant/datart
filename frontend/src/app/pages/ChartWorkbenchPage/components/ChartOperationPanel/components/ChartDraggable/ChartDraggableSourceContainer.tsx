@@ -91,7 +91,10 @@ export const ChartDraggableSourceContainer: FC<
       canDrag: true,
       item: selectedItems?.length
         ? selectedItems.map(item => buildDragItem(item))
-        : buildDragItem({ id: colName, type, subType, category }, children),
+        : buildDragItem(
+            { id, type, subType, category, name: colName },
+            children,
+          ),
       collect: monitor => ({
         isDragging: monitor.isDragging(),
       }),
@@ -222,6 +225,7 @@ export const ChartDraggableSourceContainer: FC<
                 return (
                   <DateLevelFieldContainer
                     colName={colName}
+                    id={id}
                     key={i}
                     item={item}
                     onClearCheckedList={onClearCheckedList}

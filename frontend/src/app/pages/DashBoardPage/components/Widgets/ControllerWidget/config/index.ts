@@ -36,6 +36,10 @@ import {
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
+import {
+  handleDisplayViewName,
+  handleRequestColumnName,
+} from 'app/utils/chartHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import { uuidv4 } from 'utils/utils';
 import widgetManagerInstance from '../../../WidgetManager';
@@ -172,17 +176,25 @@ export const getControlOptionQueryParams = (obj: {
   widgetMap: Record<string, Widget>;
 }) => {
   const viewConfigs = transformToViewConfig(obj.view?.config);
+  const viewType = obj.view?.type || 'SQL';
+
   const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
     chartWidget: obj.curWidget,
     widgetMap: obj.widgetMap,
     params: undefined,
   });
+
   const requestParams: ChartDataRequest = {
     ...viewConfigs,
     aggregators: [],
     filters: filterParams,
     groups: [],
-    columns: [...new Set(obj.columns)],
+    columns: [...new Set(obj.columns)].map(v => {
+      return {
+        alias: handleDisplayViewName({ viewType, name: v }),
+        column: handleRequestColumnName({ viewType, name: v }),
+      };
+    }),
     pageInfo: {
       pageNo: 1,
       pageSize: 99999999,

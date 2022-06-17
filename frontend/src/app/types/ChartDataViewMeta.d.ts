@@ -23,7 +23,7 @@ import {
 } from 'app/constants';
 
 export type ChartDataViewMeta = {
-  id: string;
+  id: string[];
   name: string;
   isActive?: boolean;
   selectedItems?: Array<ChartDataViewMeta>;
@@ -34,4 +34,5 @@ export type ChartDataViewMeta = {
   expression?: string;
   role?: string;
   children?: ChartDataViewMeta[];
+  computedFieldsType?: 'viewComputerField' | '';
 };

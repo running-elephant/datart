@@ -18,7 +18,8 @@
 
 import { Button, Dropdown, Select, Space } from 'antd';
 import ChartDataView from 'app/types/ChartDataView';
-import { FC, memo, useState } from 'react';
+import { getAllColumnInMeta } from 'app/utils/chartHelper';
+import { FC, memo, useMemo, useState } from 'react';
 import { InteractionFieldRelation } from '../../constants';
 import ControllerList from './ControllerList';
 import { I18nTranslator, JumpToDashboardRule, VizType } from './types';
@@ -34,6 +35,9 @@ const JumpToDashboard: FC<
   const [relations, setRelations] = useState(
     value?.[InteractionFieldRelation.Customize] || [],
   );
+  const viewType = useMemo(() => {
+    return dataview?.type || 'SQL';
+  }, [dataview?.type]);
 
   const handleUpdateRelations = relations => {
     const newRelations = [...relations];
@@ -69,7 +73,9 @@ const JumpToDashboard: FC<
             translate={t}
             targetRelId={value?.relId}
             sourceFields={
-              dataview?.meta?.concat(dataview?.computedFields || []) || []
+              getAllColumnInMeta(dataview?.meta)?.concat(
+                dataview?.computedFields || [],
+              ) || []
             }
             sourceVariables={dataview?.variables || []}
             relations={relations}

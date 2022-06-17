@@ -18,7 +18,8 @@
 
 import { Button, Dropdown, Select, Space } from 'antd';
 import ChartDataView from 'app/types/ChartDataView';
-import { FC, memo, useState } from 'react';
+import { getAllColumnInMeta } from 'app/utils/chartHelper';
+import { FC, memo, useMemo, useState } from 'react';
 import { isEmpty } from 'utils/object';
 import { InteractionFieldRelation } from '../../constants';
 import RelationList from './RelationList';
@@ -86,7 +87,9 @@ const JumpToChart: FC<
             translate={t}
             targetRelId={value?.relId}
             sourceFields={
-              dataview?.meta?.concat(dataview?.computedFields || []) || []
+              getAllColumnInMeta(dataview?.meta)?.concat(
+                dataview?.computedFields || [],
+              ) || []
             }
             sourceVariables={dataview?.variables || []}
             relations={relations}

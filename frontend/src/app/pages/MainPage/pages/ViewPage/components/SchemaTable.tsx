@@ -36,8 +36,9 @@ import {
 } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import { ColumnCategories } from '../constants';
-import { Column, Model } from '../slice/types';
+import { Column, Model, ViewType } from '../slice/types';
 import { getColumnWidthMap, getHierarchyColumn } from '../utils';
+
 const ROW_KEY = 'DATART_ROW_KEY';
 
 interface SchemaTableProps extends TableProps<object> {
@@ -47,6 +48,7 @@ interface SchemaTableProps extends TableProps<object> {
   hierarchy: Model;
   dataSource?: object[];
   hasCategory?: boolean;
+  viewType?: ViewType;
   getExtraHeaderActions?: (
     name: string,
     column: Omit<Column, 'name'>,
@@ -65,6 +67,7 @@ export const SchemaTable = memo(
     hierarchy,
     dataSource,
     hasCategory,
+    viewType,
     getExtraHeaderActions,
     onSchemaTypeChange,
     ...tableProps

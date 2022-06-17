@@ -29,7 +29,11 @@ interface EditorProps {
 export const Editor = memo(({ allowManage, allowEnableViz }: EditorProps) => {
   return (
     <Wrapper>
-      <Toolbar allowManage={allowManage} allowEnableViz={allowEnableViz} />
+      <Toolbar
+        type="SQL"
+        allowManage={allowManage}
+        allowEnableViz={allowEnableViz}
+      />
       <SQLEditor />
     </Wrapper>
   );

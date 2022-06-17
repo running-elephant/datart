@@ -11,6 +11,7 @@ import {
 import { APIResponse } from 'types';
 import { SaveFormModel } from '../app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { removeToken } from './auth';
+
 export { default as uuidv4 } from 'uuid/dist/umd/uuidv4.min';
 
 export function errorHandle(error) {

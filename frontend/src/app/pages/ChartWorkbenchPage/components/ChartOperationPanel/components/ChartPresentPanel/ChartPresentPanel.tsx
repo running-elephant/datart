@@ -56,6 +56,7 @@ const ChartPresentPanel: FC<{
   chartConfig?: ChartConfig;
   expensiveQuery: boolean;
   allowQuery: boolean;
+  viewType?: string;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
   selectedItems?: SelectedItem[];
@@ -68,6 +69,7 @@ const ChartPresentPanel: FC<{
     chartConfig,
     expensiveQuery,
     allowQuery,
+    viewType,
     onRefreshDataset,
     onCreateDownloadDataTask,
     selectedItems,
@@ -89,6 +91,7 @@ const ChartPresentPanel: FC<{
         return <Chart404Graph chart={chart} chartConfig={chartConfig} />;
       }
       chartConfig = setRuntimeDateLevelFieldsInChartConfig(chartConfig);
+
       return (
         !!chart &&
         chartDispatcher.getContainers(

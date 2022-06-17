@@ -51,19 +51,24 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
         if (!viewLinkages) {
           return null;
         }
+
         if (key === 'triggerViewId') {
-          return chartGroupColumns?.map(item => (
-            <Option
-              key={item.uid}
-              fieldvaluetype={item.type}
-              value={item.colName}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>{item.colName}</span>
-                <FieldType>{item.type}</FieldType>
-              </div>
-            </Option>
-          ));
+          return chartGroupColumns?.map(item => {
+            return (
+              <Option
+                key={item.uid}
+                fieldvaluetype={item.type}
+                value={JSON.stringify(item.id)}
+              >
+                <div
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
+                  <span>{item.colName}</span>
+                  <FieldType>{item.type}</FieldType>
+                </div>
+              </Option>
+            );
+          });
         } else if (key === 'linkerViewId') {
           return viewMap[viewLinkages[index][key]].meta
             ?.filter(item => {
@@ -73,16 +78,22 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
               ];
               return item.type && enableTypes.includes(item.type);
             })
-            .map(item => (
-              <Option key={item.id} fieldvaluetype={item.type} value={item.id}>
-                <div
-                  style={{ display: 'flex', justifyContent: 'space-between' }}
+            .map(item => {
+              return (
+                <Option
+                  key={item.name}
+                  fieldvaluetype={item.type}
+                  value={JSON.stringify(item.id)}
                 >
-                  <span>{item.id}</span>
-                  <FieldType>{item.type}</FieldType>
-                </div>
-              </Option>
-            ));
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between' }}
+                  >
+                    <span>{item.name}</span>
+                    <FieldType>{item.type}</FieldType>
+                  </div>
+                </Option>
+              );
+            });
         }
       },
       [chartGroupColumns, form, viewMap],
