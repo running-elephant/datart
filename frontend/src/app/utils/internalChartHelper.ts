@@ -721,7 +721,7 @@ export const getChartDrillOption = (
 };
 
 export const buildClickEventBaseFilters = (
-  rawData?: Record<string, any>,
+  rowDatas?: Record<string, any>[],
   rule?: InteractionRule,
   drillOption?: IChartDrillOption,
   dataConfigs?: ChartDataConfig[],
@@ -737,15 +737,18 @@ export const buildClickEventBaseFilters = (
   return groupConfigs
     .concat(colorConfigs)
     .reduce<ChartDataRequestFilter[]>((acc, c) => {
-      const value = rawData?.[c.colName];
-      if (isEmpty(value) || isEmpty(c.colName)) {
+      const filterValues = rowDatas
+        ?.map(rowData => rowData?.[c.colName])
+        ?.filter(Boolean)
+        ?.map(value => ({ value, valueType: c.type }));
+      if (isEmptyArray(filterValues) || isEmpty(c.colName)) {
         return acc;
       }
       const filter = {
         aggOperator: null,
         sqlOperator: FilterSqlOperator.In,
         column: c.colName,
-        values: [{ value, valueType: c.type }],
+        values: filterValues,
       };
       acc.push(filter);
       return acc;
