@@ -545,6 +545,7 @@ const slice = createSlice({
       const index = state.chartPreviews?.findIndex(
         c => c.backendChartId === newChartDto?.id,
       );
+
       const currentChart = ChartManager.instance().getById(
         newChartDto?.config?.chartGraphId,
       );

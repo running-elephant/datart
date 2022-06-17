@@ -333,6 +333,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         }
         return <DropPlaceholder>{t('drop')}</DropPlaceholder>;
       }
+
       return currentConfig.rows?.map((columnConfig, index) => {
         return (
           <ChartDraggableElement
@@ -348,7 +349,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 ancestors: ancestors,
                 aggregation: aggregation,
                 availableSourceFunctions,
-                viewType: dataView?.type,
                 onConfigChanged: onConfigChanged,
                 handleOpenActionModal: handleOpenActionModal,
               };

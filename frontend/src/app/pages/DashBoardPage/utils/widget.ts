@@ -26,7 +26,6 @@ import {
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ChartsEventData } from 'app/types/Chart';
 import ChartDataView from 'app/types/ChartDataView';
-import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { formatTime } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
@@ -495,7 +494,7 @@ export const getLinkedColumn = (
 ) => {
   const relations = triggerWidget.relations;
   const relation = relations.find(item => item.targetId === targetWidgetId);
-
+  console.log(relation, 'relation');
   return (
     relation?.config?.widgetToWidget?.linkerColumn ||
     relation?.config?.widgetToWidget?.triggerColumn ||
@@ -678,9 +677,8 @@ export const getWidgetMap = (
 export const getValueByRowData = (
   data: ChartsEventData | undefined,
   fieldName: string,
-  viewType: string,
 ) => {
-  let toCaseField = handleDisplayViewName({ viewType, name: fieldName });
+  let toCaseField = JSON.parse(fieldName).join('.');
 
   return data?.rowData[toCaseField];
 };

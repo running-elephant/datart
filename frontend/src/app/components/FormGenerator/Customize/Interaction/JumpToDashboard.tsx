@@ -18,7 +18,7 @@
 
 import { Button, Dropdown, Select, Space } from 'antd';
 import ChartDataView from 'app/types/ChartDataView';
-import { handleDisplayViewName } from 'app/utils/chartHelper';
+import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { FC, memo, useMemo, useState } from 'react';
 import { InteractionFieldRelation } from '../../constants';
 import ControllerList from './ControllerList';
@@ -73,18 +73,9 @@ const JumpToDashboard: FC<
             translate={t}
             targetRelId={value?.relId}
             sourceFields={
-              dataview?.meta
-                ?.map(v => {
-                  return {
-                    ...v,
-                    name: handleDisplayViewName({
-                      name: v.name,
-                      viewType,
-                      category: v.category,
-                    }),
-                  };
-                })
-                .concat(dataview?.computedFields || []) || []
+              getAllColumnInMeta(dataview?.meta)?.concat(
+                dataview?.computedFields || [],
+              ) || []
             }
             sourceVariables={dataview?.variables || []}
             relations={relations}

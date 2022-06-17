@@ -501,7 +501,13 @@
         "AGG_DATE_WEEK": "按周",
         "AGG_DATE_DAY": "按日",
         "default": "默认",
-        "cannotDeleteComputerField": "视图中创建的计算字段不能删除"
+        "cannotDeleteComputerField": "视图中创建的计算字段不能删除",
+        "byDataBaseGroup": "按数据库名分组",
+        "noGroup": "不分组",
+        "byNameSort": "按名称排序",
+        "noSort": "按原始字段顺序排序",
+        "Group": "分组方式",
+        "Sort": "排序方式"
       }
     },
     "palette": {

@@ -31,12 +31,8 @@ import { IW, ToolbarButton } from 'app/components';
 import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useToggle from 'app/hooks/useToggle';
-import {
-  ColumnRole,
-  ViewType,
-} from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import { ColumnRole } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
-import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { buildDragItem } from 'app/utils/internalChartHelper';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { FC, memo, useMemo } from 'react';
@@ -61,7 +57,6 @@ const { Panel } = Collapse;
 
 export const ChartDraggableSourceContainer: FC<
   {
-    viewType?: ViewType;
     availableSourceFunctions?: string[];
     onDeleteComputedField?: (fieldName) => void;
     onEditComputedField?: (fieldName) => void;
@@ -80,7 +75,6 @@ export const ChartDraggableSourceContainer: FC<
   availableSourceFunctions,
   role,
   children,
-  viewType,
   onDeleteComputedField,
   onEditComputedField,
   onSelectionChange,
@@ -97,7 +91,10 @@ export const ChartDraggableSourceContainer: FC<
       canDrag: true,
       item: selectedItems?.length
         ? selectedItems.map(item => buildDragItem(item))
-        : buildDragItem({ id: colName, type, subType, category }, children),
+        : buildDragItem(
+            { id, type, subType, category, name: colName },
+            children,
+          ),
       collect: monitor => ({
         isDragging: monitor.isDragging(),
       }),
@@ -228,6 +225,7 @@ export const ChartDraggableSourceContainer: FC<
                 return (
                   <DateLevelFieldContainer
                     colName={colName}
+                    id={id}
                     key={i}
                     item={item}
                     onClearCheckedList={onClearCheckedList}
@@ -242,15 +240,7 @@ export const ChartDraggableSourceContainer: FC<
     ) : (
       <Row align="middle" style={{ width: '100%' }}>
         <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
-        <StyledFieldContent>
-          {role !== ColumnRole.Hierarchy
-            ? handleDisplayViewName({
-                name: colName,
-                category: category as ChartDataViewFieldCategory,
-                viewType,
-              })
-            : colName}
-        </StyledFieldContent>
+        <StyledFieldContent>{colName}</StyledFieldContent>
         <div onClick={stopPPG}>
           <Dropdown
             disabled={_isAllowMoreAction()}
@@ -280,7 +270,6 @@ export const ChartDraggableSourceContainer: FC<
     onClearCheckedList,
     drag,
     availableSourceFunctions,
-    viewType,
   ]);
 
   const renderChildren = useMemo(() => {
@@ -294,19 +283,12 @@ export const ChartDraggableSourceContainer: FC<
         type={item.type}
         role={item.role}
         children={item.children}
-        viewType={viewType}
         onDeleteComputedField={onDeleteComputedField}
         onClearCheckedList={onClearCheckedList}
         selectedItems={selectedItems}
       />
     ));
-  }, [
-    children,
-    onDeleteComputedField,
-    onClearCheckedList,
-    selectedItems,
-    viewType,
-  ]);
+  }, [children, onDeleteComputedField, onClearCheckedList, selectedItems]);
 
   return (
     <Container

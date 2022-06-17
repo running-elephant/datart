@@ -143,11 +143,7 @@ export const widgetClickJumpAction =
     ) {
       return;
     }
-    const rowDataValue = getValueByRowData(
-      params.data,
-      jumpFieldName,
-      viewType,
-    );
+    const rowDataValue = getValueByRowData(params.data, jumpFieldName);
     console.warn(' jumpValue:', rowDataValue);
     console.warn('rowData', params.data?.rowData);
     console.warn(`rowData[${jumpFieldName}]:${rowDataValue} `);
@@ -210,11 +206,7 @@ export const widgetClickLinkageAction =
       .map(re => {
         let linkageFieldName: string =
           re?.config?.widgetToWidget?.triggerColumn || '';
-        const linkValue = getValueByRowData(
-          params.data,
-          linkageFieldName,
-          viewType,
-        );
+        const linkValue = getValueByRowData(params.data, linkageFieldName);
         if (!linkValue) {
           console.warn('linkageFieldName:', linkageFieldName);
           console.warn('rowData', params.data?.rowData);
@@ -230,7 +222,6 @@ export const widgetClickLinkageAction =
         return filter;
       })
       .filter(item => !!item) as BoardLinkFilter[];
-
     if (editing) {
       dispatch(
         editDashBoardInfoActions.changeBoardLinkFilter({

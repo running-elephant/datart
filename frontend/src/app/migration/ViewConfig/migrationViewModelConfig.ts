@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
+import { addPathToHierarchyStructureAndChangeName } from 'app/pages/MainPage/pages/ViewPage/utils';
 import { CloneValueDeep } from 'utils/object';
-import { APP_VERSION_BETA_2 } from '../constants';
+import { APP_VERSION_BETA_2, APP_VERSION_BETA_4 } from '../constants';
 import MigrationEvent from '../MigrationEvent';
 import MigrationEventDispatcher from '../MigrationEventDispatcher';
 
@@ -54,13 +55,26 @@ const beta2 = (model?: object): object | undefined => {
   return model;
 };
 
+const beta4 = (model, viewType) => {
+  try {
+    model.hierarchy = addPathToHierarchyStructureAndChangeName(
+      model.hierarchy,
+      viewType,
+    );
+    return model;
+  } catch (error) {
+    console.error('Migration view Errors | beta.4 | ', error);
+    return model;
+  }
+};
+
 /**
  * main entry point of migration
  *
  * @param {string} model
  * @return {string}
  */
-const beginViewModelMigration = (model: string): string => {
+const beginViewModelMigration = (model: string, viewType): string => {
   if (!model?.trim().length) {
     return model;
   }
@@ -68,7 +82,12 @@ const beginViewModelMigration = (model: string): string => {
   const event2 = new MigrationEvent(APP_VERSION_BETA_2, beta2);
   const dispatcher = new MigrationEventDispatcher(event2);
   const result = dispatcher.process(modelObj);
-  return JSON.stringify(result);
+
+  const event4 = new MigrationEvent(APP_VERSION_BETA_4, beta4);
+  const dispatcher4 = new MigrationEventDispatcher(event4);
+  const result4 = dispatcher4.process(result, viewType);
+
+  return JSON.stringify(result4);
 };
 
 export default beginViewModelMigration;

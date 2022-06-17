@@ -158,7 +158,7 @@ const ChartPreviewBoard: FC<{
         ? urlSearchTransfer.toParams(filterSearchUrl)
         : undefined;
 
-        dispatch(
+      dispatch(
         initChartPreviewData({
           backendChartId,
           orgId,
@@ -295,16 +295,16 @@ const ChartPreviewBoard: FC<{
                 rule,
                 drillOptionRef?.current,
                 chartPreview?.chartConfig?.datas,
-                viewType,
               );
+
               const relId = rule?.[rule.category!]?.relId;
               if (rule.category === InteractionCategory.JumpToChart) {
                 const urlFilters = getJumpOperationFiltersByInteractionRule(
                   clickFilters,
                   nonAggChartFilters,
                   rule,
-                  viewType,
                 );
+                console.log(urlFilters, 'urlFilters');
                 const urlFiltersStr: string = qs.stringify({
                   filters: urlFilters || [],
                 });
@@ -329,7 +329,6 @@ const ChartPreviewBoard: FC<{
                   clickFilters,
                   nonAggChartFilters,
                   rule,
-                  viewType,
                 );
                 Object.assign(urlFilters, { isMatchByName: true });
                 const urlFiltersStr: string =
@@ -353,7 +352,6 @@ const ChartPreviewBoard: FC<{
                   clickFilters,
                   nonAggChartFilters,
                   rule,
-                  viewType,
                 );
                 Object.assign(urlFilters, { isMatchByName: true });
                 const urlFiltersStr: string =
@@ -407,7 +405,6 @@ const ChartPreviewBoard: FC<{
           ['viewDetail'],
           ['setting'],
         )?.[0] as ViewDetailSetting;
-        const viewType = chartPreview?.backendChart?.view?.type || 'SQL';
 
         if (enableViewDetail && viewDetailSetting?.event === targetEvent) {
           const clickFilters = buildClickEventBaseFilters(
@@ -415,7 +412,6 @@ const ChartPreviewBoard: FC<{
             undefined,
             drillOptionRef?.current,
             chartPreview?.chartConfig?.datas,
-            viewType,
           );
           (openViewDetailPanel as any)({
             currentDataView: chartPreview?.backendChart?.view,

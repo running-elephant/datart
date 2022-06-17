@@ -18,6 +18,7 @@
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import sqlReservedWords from 'app/assets/javascripts/sqlReservedWords';
+import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
@@ -126,9 +127,11 @@ export const getViewDetail = createAsyncThunk<
     dispatch(viewActions.addEditingView(tempViewModel));
 
     try {
-      const { data } = await request<View>(`/views/${viewId}`);
+      let { data } = await request<View>(`/views/${viewId}`);
+      data = migrationViewConfig(data);
       data.config = migrateViewConfig(data.config);
-      data.model = beginViewModelMigration(data?.model);
+      data.model = beginViewModelMigration(data?.model, data.type);
+
       return transformModelToViewModel(data, null, tempViewModel);
     } catch (error) {
       return rejectHandle(error, rejectWithValue);
@@ -206,7 +209,7 @@ export const runSql = createAsyncThunk<
         script,
         sourceId,
         size,
-        scriptType: type || 'SQL',
+        scriptType: type,
         columns: type === 'STRUCT' ? buildRequestColumns(structure!) : '',
         variables: variables.map(
           ({ name, type, valueType, defaultValue, expression }) => ({

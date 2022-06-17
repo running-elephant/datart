@@ -29,11 +29,8 @@ import {
 } from '@ant-design/icons';
 import Dropdown from 'antd/lib/dropdown';
 import { SortActionType } from 'app/constants';
-import {
-  getColumnRenderName,
-  handleDisplayViewName,
-} from 'app/utils/chartHelper';
-import { FC, memo, useMemo } from 'react';
+import { getColumnRenderName } from 'app/utils/chartHelper';
+import { FC, memo } from 'react';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
 
 const ChartDraggableElementField: FC<{
@@ -43,7 +40,6 @@ const ChartDraggableElementField: FC<{
   ancestors;
   aggregation;
   availableSourceFunctions;
-  viewType;
   onConfigChanged;
   handleOpenActionModal;
 }> = memo(
@@ -54,22 +50,9 @@ const ChartDraggableElementField: FC<{
     ancestors,
     aggregation,
     availableSourceFunctions,
-    viewType,
     onConfigChanged,
     handleOpenActionModal,
   }) => {
-    const colName = useMemo(() => {
-      const name = handleDisplayViewName({
-        name: columnConfig.colName,
-        viewType,
-        category: columnConfig.category,
-      });
-
-      return aggregation === false
-        ? name
-        : getColumnRenderName({ ...columnConfig, colName: name });
-    }, [viewType, columnConfig, aggregation]);
-
     const renderActionExtensionMenu = (uid: string, type: string, category) => {
       return (
         <ChartDataConfigSectionActionMenu
@@ -132,7 +115,11 @@ const ChartDraggableElementField: FC<{
       >
         <div>
           {config?.actions && <DownOutlined style={{ marginRight: '10px' }} />}
-          <span>{colName}</span>
+          <span>
+            {aggregation === false
+              ? columnConfig.colName
+              : getColumnRenderName(columnConfig)}
+          </span>
           <div style={{ display: 'inline-block', marginLeft: '5px' }}>
             {enableActionsIcons(columnConfig)}
           </div>

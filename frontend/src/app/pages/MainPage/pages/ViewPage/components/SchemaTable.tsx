@@ -26,7 +26,6 @@ import { ToolbarButton } from 'app/components';
 import { VirtualTable } from 'app/components/VirtualTable';
 import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { memo, ReactElement, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -116,9 +115,7 @@ export const SchemaTable = memo(
 
         const title = (
           <>
-            <span className="content">
-              {handleDisplayViewName({ viewType, name })}
-            </span>
+            <span className="content">{name}</span>
             <Dropdown
               trigger={['click']}
               overlay={
@@ -185,7 +182,6 @@ export const SchemaTable = memo(
       hasCategory,
       getExtraHeaderActions,
       onSchemaTypeChange,
-      viewType,
       t,
       tg,
     ]);

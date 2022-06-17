@@ -45,6 +45,7 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
   FilterOptionForwardRef,
   {
     colName: string;
+    colPath: string[];
     dataView?: ChartDataView;
     condition?: ChartFilterCondition;
     onChange: (condition: ChartFilterCondition) => void;
@@ -53,6 +54,7 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
 > = (
   {
     colName,
+    colPath,
     i18nPrefix,
     condition,
     dataView,
@@ -141,13 +143,19 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
   const isChecked = (selectedKeys, eventKey) =>
     selectedKeys.indexOf(eventKey) !== -1;
 
-  const fetchNewDataset = async (viewId, colName: string, dataView) => {
+  const fetchNewDataset = async (
+    viewId,
+    colName: string,
+    dataView,
+    colPath: string[],
+  ) => {
     const fieldDataset = await getDistinctFields(
       viewId,
-      [colName],
+      [{ colName, colPath }],
       dataView,
       undefined,
     );
+
     return fieldDataset;
   };
 
@@ -217,14 +225,16 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
   };
 
   const handleFetchData = () => {
-    fetchNewDataset?.(dataView?.id, colName, dataView).then(dataset => {
-      if (isTree) {
-        // setTreeDatas(convertToTree(dataset?.columns, selectedKeys));
-        // setListDatas(convertToList(dataset?.columns, selectedKeys));
-      } else {
-        setListDatas(convertToList(dataset?.rows, selectedKeys));
-      }
-    });
+    fetchNewDataset?.(dataView?.id, colName, dataView, colPath).then(
+      dataset => {
+        if (isTree) {
+          // setTreeDatas(convertToTree(dataset?.columns, selectedKeys));
+          // setListDatas(convertToList(dataset?.columns, selectedKeys));
+        } else {
+          setListDatas(convertToList(dataset?.rows, selectedKeys));
+        }
+      },
+    );
   };
 
   const convertToList = (collection, selectedKeys) => {
@@ -375,6 +385,7 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
           dataView={dataView}
           i18nPrefix={i18nPrefix}
           condition={condition}
+          colPath={colPath}
           onConditionChange={onConditionChange}
           fetchDataByField={fetchDataByField}
         />

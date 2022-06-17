@@ -182,7 +182,6 @@ export const getControlOptionQueryParams = (obj: {
     chartWidget: obj.curWidget,
     widgetMap: obj.widgetMap,
     params: undefined,
-    viewType,
   });
 
   const requestParams: ChartDataRequest = {

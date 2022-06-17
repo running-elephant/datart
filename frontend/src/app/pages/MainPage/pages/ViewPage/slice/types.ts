@@ -133,6 +133,7 @@ export interface Column extends Schema {
 
   role?: ColumnRole;
   children?: Column[];
+  path?: string[];
 }
 
 export interface Model {
@@ -143,6 +144,7 @@ export type HierarchyModel = {
   version?: string;
   hierarchy?: Model;
   columns?: Model;
+  path?: string[];
   computedFields?: ChartDataViewMeta[];
 };
 

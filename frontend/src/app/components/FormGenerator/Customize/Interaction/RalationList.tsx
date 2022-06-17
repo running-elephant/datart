@@ -20,11 +20,11 @@ import { Button, Radio, Select, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import useMount from 'app/hooks/useMount';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { fetchDataChart } from 'app/utils/fetch';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
-import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { uuidv4 } from 'utils/utils';
 import { InteractionRelationType } from '../../constants';
 import { CustomizeRelation, I18nTranslator } from './types';
@@ -54,18 +54,9 @@ const RelationList: FC<
     if (targetRelId) {
       const data = await fetchDataChart(targetRelId);
       setTargetFields(
-        data?.view?.meta
-          ?.map(v => {
-            return {
-              ...v,
-              name: handleDisplayViewName({
-                name: v.name,
-                viewType: data.view.type,
-                category: v.category,
-              }),
-            };
-          })
-          .concat(data?.config?.computedFields || []) || [],
+        getAllColumnInMeta(data?.view?.meta)?.concat(
+          data?.config?.computedFields || [],
+        ) || [],
       );
       setTargetVariables(data?.queryVariables || []);
     }
@@ -140,7 +131,11 @@ const RelationList: FC<
           onChange={value => handleRelationChange(index, 'source', value)}
         >
           {(isFieldType(record) ? sourceFields : sourceVariables)?.map(sf => {
-            return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;
+            return (
+              <Select.Option value={JSON.stringify(sf?.id)}>
+                {sf?.name}
+              </Select.Option>
+            );
           })}
         </Select>
       ),
@@ -156,7 +151,11 @@ const RelationList: FC<
           onChange={value => handleRelationChange(index, 'target', value)}
         >
           {(isFieldType(record) ? targetFields : targetVariables)?.map(sf => {
-            return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;
+            return (
+              <Select.Option value={JSON.stringify(sf?.id)}>
+                {sf?.name}
+              </Select.Option>
+            );
           })}
         </Select>
       ),

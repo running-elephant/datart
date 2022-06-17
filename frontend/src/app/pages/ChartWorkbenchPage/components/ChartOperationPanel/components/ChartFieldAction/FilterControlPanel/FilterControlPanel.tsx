@@ -29,10 +29,7 @@ import { ConditionBuilder } from 'app/models/ChartFilterCondition';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
-import {
-  getColumnRenderName,
-  handleDisplayViewName,
-} from 'app/utils/chartHelper';
+import { getColumnRenderName } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import { CONTROLLER_WIDTH_OPTIONS } from 'globalConstants';
 import { FC, memo, useRef, useState } from 'react';
@@ -189,6 +186,7 @@ const FilterControlPanel: FC<
     const renderConditionConfigurationByModel = () => {
       const filterProps = {
         colName: config?.colName,
+        colPath: config?.id,
         ref: filterOptionRef,
         dataset,
         dataView,
@@ -245,10 +243,7 @@ const FilterControlPanel: FC<
           label={t('filterName')}
           name="filterName"
           rules={[{ required: true }]}
-          initialValue={handleDisplayViewName({
-            name: getColumnRenderName(config),
-            viewType: dataView?.type,
-          })}
+          initialValue={getColumnRenderName(config)}
         >
           <Input onChange={e => handleNameChange(e.target?.value)} />
         </FormItemEx>

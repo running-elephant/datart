@@ -43,10 +43,6 @@ import {
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import {
-  handleDisplayViewName,
-  handleRequestColumnName,
-} from 'app/utils/chartHelper';
 import { FilterSqlOperator } from 'globalConstants';
 import {
   cond,
@@ -383,13 +379,13 @@ export function transformMeta(model?: string) {
     if (!isEmptyArray(column?.children)) {
       return column.children.map(c => ({
         ...c,
-        id: c.name,
+        id: c.path,
         category: ChartDataViewFieldCategory.Field,
       }));
     }
     return {
       ...column,
-      id: colKey,
+      id: column.path,
       category: ChartDataViewFieldCategory.Field,
     };
   });
@@ -416,10 +412,9 @@ function getMeta(key, column) {
     isHierarchy = true;
     children = column?.children.map(child => getMeta(child?.name, child));
   }
-
   return {
     ...column,
-    id: key,
+    id: column.path || key,
     subType: column?.category,
     category: isHierarchy
       ? ChartDataViewFieldCategory.Hierarchy
@@ -671,7 +666,8 @@ export const transformToViewConfig = (
 
 export const buildDragItem = (item, children: any[] = []) => {
   return {
-    colName: item?.id,
+    id: item?.id,
+    colName: item?.name,
     type: item?.type,
     subType: item?.subType,
     category: item?.category,
@@ -730,7 +726,6 @@ export const buildClickEventBaseFilters = (
   rule?: InteractionRule,
   drillOption?: IChartDrillOption,
   dataConfigs?: ChartDataConfig[],
-  viewType?: string,
 ): ChartDataRequestFilter[] => {
   const groupConfigs: ChartDataSectionField[] = getDrillableRows(
     dataConfigs || [],
@@ -743,15 +738,14 @@ export const buildClickEventBaseFilters = (
   return groupConfigs
     .concat(colorConfigs)
     .reduce<ChartDataRequestFilter[]>((acc, c) => {
-      const value =
-        rawData?.[handleDisplayViewName({ name: c.colName, viewType })];
+      const value = rawData?.[c.colName];
       if (isEmpty(value) || isEmpty(c.colName)) {
         return acc;
       }
       const filter = {
         aggOperator: null,
         sqlOperator: FilterSqlOperator.In,
-        column: handleRequestColumnName({ viewType, name: c.colName }),
+        column: c.id,
         values: [{ value, valueType: c.type }],
       };
       acc.push(filter);
@@ -763,7 +757,6 @@ export const getJumpFiltersByInteractionRule = (
   clickEventFilters: ChartDataRequestFilter[] = [],
   chartFilters: ChartDataRequestFilter[] = [],
   rule?: InteractionRule,
-  viewType?: string,
 ): Record<string, string | any> => {
   return clickEventFilters
     .concat(chartFilters)
@@ -786,15 +779,7 @@ export const getJumpFiltersByInteractionRule = (
           return null;
         }
         const targetRelation = customizeRelations?.find(
-          r =>
-            r.source ===
-            handleDisplayViewName({
-              name:
-                viewType === 'SQL'
-                  ? String(f?.column)
-                  : JSON.stringify(f?.column),
-              viewType,
-            }),
+          r => r.source === JSON.stringify(f?.column),
         );
         if (isEmpty(targetRelation)) {
           return null;
@@ -807,7 +792,46 @@ export const getJumpFiltersByInteractionRule = (
     .filter(Boolean)
     .reduce((acc, cur) => {
       if (cur?.column) {
-        acc[String(cur.column)] = cur?.values?.map(v => v.value);
+        acc[String(cur.column!)] = cur?.values?.map(v => v.value);
+      }
+      return acc;
+    }, {});
+};
+
+export const getLinkFiltersByInteractionRule = (
+  clickEventFilters: ChartDataRequestFilter[] = [],
+  chartFilters: ChartDataRequestFilter[] = [],
+  rule?: InteractionRule,
+): Record<string, string | any> => {
+  return clickEventFilters
+    .concat(chartFilters)
+    .map(f => {
+      if (isEmpty(f)) {
+        return null;
+      }
+      if (rule?.['relation'] === InteractionFieldRelation.Auto) {
+        return f;
+      } else {
+        const customizeRelations: CustomizeRelation[] =
+          rule?.[InteractionFieldRelation.Customize];
+        if (isEmptyArray(customizeRelations)) {
+          return null;
+        }
+        const targetRelation = customizeRelations?.find(
+          r => r.source === JSON.stringify(f?.column),
+        );
+        if (isEmpty(targetRelation)) {
+          return null;
+        }
+        return Object.assign({}, f, {
+          column: targetRelation?.target,
+        }) as ChartDataRequestFilter;
+      }
+    })
+    .filter(Boolean)
+    .reduce((acc, cur) => {
+      if (cur?.column) {
+        acc[String(cur.column!)] = cur?.values?.map(v => v.value);
       }
       return acc;
     }, {});
@@ -817,7 +841,6 @@ export const getJumpOperationFiltersByInteractionRule = (
   clickEventFilters: ChartDataRequestFilter[] = [],
   chartFilters: ChartDataRequestFilter[] = [],
   rule?: InteractionRule,
-  viewType?: string,
 ): ChartDataRequestFilter[] => {
   return clickEventFilters
     .concat(chartFilters)
@@ -831,7 +854,6 @@ export const getJumpOperationFiltersByInteractionRule = (
       if (isEmpty(jumpRule)) {
         return acc;
       }
-
       if (jumpRule?.['relation'] === InteractionFieldRelation.Auto) {
         return acc.concat(f);
       } else {
@@ -840,26 +862,16 @@ export const getJumpOperationFiltersByInteractionRule = (
         if (isEmptyArray(customizeRelations)) {
           return acc;
         }
+
         const targetRelation = customizeRelations?.find(
-          r =>
-            r.source ===
-            handleDisplayViewName({
-              name:
-                viewType === 'SQL'
-                  ? String(f?.column)
-                  : JSON.stringify(f?.column),
-              viewType,
-            }),
+          r => r.source === JSON.stringify(f?.column),
         );
         if (isEmpty(targetRelation)) {
           return acc;
         }
         return acc.concat(
           Object.assign({}, f, {
-            column: handleRequestColumnName({
-              name: targetRelation?.target || '',
-              viewType,
-            }),
+            column: targetRelation?.target && JSON.parse(targetRelation.target),
           }),
         );
       }

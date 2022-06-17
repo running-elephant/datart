@@ -22,7 +22,6 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
-import { handleDisplayViewName } from 'app/utils/chartHelper';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 
@@ -52,24 +51,19 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
         if (!viewLinkages) {
           return null;
         }
-        const viewType = viewMap[viewLinkages[index][key]]?.type || 'SQL';
+
         if (key === 'triggerViewId') {
           return chartGroupColumns?.map(item => {
-            const columnName = handleDisplayViewName({
-              viewType,
-              name: item.colName,
-            });
-
             return (
               <Option
                 key={item.uid}
                 fieldvaluetype={item.type}
-                value={item.colName}
+                value={JSON.stringify(item.id)}
               >
                 <div
                   style={{ display: 'flex', justifyContent: 'space-between' }}
                 >
-                  <span>{columnName}</span>
+                  <span>{item.colName}</span>
                   <FieldType>{item.type}</FieldType>
                 </div>
               </Option>
@@ -85,17 +79,16 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
               return item.type && enableTypes.includes(item.type);
             })
             .map(item => {
-              const id = handleDisplayViewName({
-                viewType,
-                name: item.id,
-              });
-
               return (
-                <Option key={id} fieldvaluetype={item.type} value={item.id}>
+                <Option
+                  key={item.name}
+                  fieldvaluetype={item.type}
+                  value={JSON.stringify(item.id)}
+                >
                   <div
                     style={{ display: 'flex', justifyContent: 'space-between' }}
                   >
-                    <span>{id}</span>
+                    <span>{item.name}</span>
                     <FieldType>{item.type}</FieldType>
                   </div>
                 </Option>

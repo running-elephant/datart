@@ -88,6 +88,13 @@ const DataModelTree: FC = memo(() => {
   }, [type]);
 
   useEffect(() => {
+    setHierarchy(currentEditingView?.model?.hierarchy);
+  }, [currentEditingView?.model?.hierarchy]);
+  console.log(
+    currentEditingView?.model?.hierarchy,
+    'currentEditingView?.model?.hierarchy',
+  );
+  useEffect(() => {
     setComputedFields(currentEditingView?.model?.computedFields);
   }, [currentEditingView?.model?.computedFields]);
 
@@ -135,7 +142,7 @@ const DataModelTree: FC = memo(() => {
   const tableColumns = useMemo<Column[]>(() => {
     return Object.entries(hierarchy || {})
       .map(([name, column], index) => {
-        return Object.assign({ index }, column, { name });
+        return Object.assign({ index }, column, { name: column.name || name });
       })
       .sort(dataModelColumnSorter);
   }, [hierarchy]);
@@ -665,7 +672,6 @@ const DataModelTree: FC = memo(() => {
                 return col.role === ColumnRole.Hierarchy ? (
                   <DataModelBranch
                     node={col}
-                    viewType={viewType}
                     key={col.name}
                     onNodeTypeChange={handleNodeTypeChange}
                     onMoveToHierarchy={openMoveToHierarchyModal}
@@ -675,7 +681,6 @@ const DataModelTree: FC = memo(() => {
                   />
                 ) : (
                   <DataModelNode
-                    viewType={viewType}
                     node={col}
                     key={col.name}
                     onCreateHierarchy={openCreateHierarchyModal}

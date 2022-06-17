@@ -19,6 +19,7 @@
 import {
   AggregateFieldActionType,
   ChartDataSectionType,
+  ChartDataViewFieldCategory,
   DataViewFieldType,
   FilterConditionType,
   SortActionType,
@@ -36,7 +37,7 @@ import {
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import { getRuntimeDateLevelFields, getValue,handleDisplayViewName, handleRequestColumnName } from 'app/utils/chartHelper';
+import { getRuntimeDateLevelFields, getValue } from 'app/utils/chartHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import {
   formatTime,
@@ -52,7 +53,6 @@ import {
 import isEqual from 'lodash/isEqual';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 import { DrillMode } from './ChartDrillOption';
-
 export class ChartDataRequestBuilder {
   extraSorters: ChartDataRequest['orders'] = [];
   chartDataConfigs: ChartDataConfig[];
@@ -135,27 +135,21 @@ export class ChartDataRequestBuilder {
   }
 
   private buildAliasName(c) {
-    const colName = handleDisplayViewName({
-      name: c.colName,
-      viewType: this.dataView.type,
-      category: c.category,
-    });
-
     if (c.aggregate === AggregateFieldActionType.None) {
-      return colName;
+      return c.colName;
     }
     if (c.aggregate) {
-      return `${c.aggregate}(${colName})`;
+      return `${c.aggregate}(${c.colName})`;
     }
-    return colName;
+    return c.colName;
   }
 
   private buildColumnName(col) {
-    return handleRequestColumnName({
-      name: col.colName,
-      category: col.category,
-      viewType: this.dataView.type,
-    });
+    console.log(col, 'col');
+    if (col.category === ChartDataViewFieldCategory.Field) {
+      return col.id;
+    }
+    return [col.id];
   }
 
   private buildGroups() {

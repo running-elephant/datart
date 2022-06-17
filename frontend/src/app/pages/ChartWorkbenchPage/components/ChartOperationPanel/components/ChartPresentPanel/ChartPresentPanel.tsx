@@ -28,10 +28,7 @@ import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selec
 import { IChart } from 'app/types/Chart';
 import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import {
-  handleRowColNameInChartConfig,
-  setRuntimeDateLevelFieldsInChartConfig,
-} from 'app/utils/chartHelper';
+import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
 import { FC, memo, useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -93,10 +90,7 @@ const ChartPresentPanel: FC<{
       if (!chart?.isMatchRequirement(chartConfig)) {
         return <Chart404Graph chart={chart} chartConfig={chartConfig} />;
       }
-      chartConfig = handleRowColNameInChartConfig(
-        setRuntimeDateLevelFieldsInChartConfig(chartConfig),
-        viewType,
-      );
+      chartConfig = setRuntimeDateLevelFieldsInChartConfig(chartConfig);
 
       return (
         !!chart &&

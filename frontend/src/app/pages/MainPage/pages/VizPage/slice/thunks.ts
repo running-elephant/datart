@@ -355,6 +355,7 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
     const currentChartPreview = vizState?.chartPreviews?.find(
       c => c.backendChartId === arg.backendChartId,
     );
+
     const builder = new ChartDataRequestBuilder(
       {
         id: currentChartPreview?.backendChart?.view.id || '',

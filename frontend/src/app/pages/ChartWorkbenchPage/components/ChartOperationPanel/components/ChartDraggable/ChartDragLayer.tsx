@@ -58,7 +58,7 @@ function CardDragLayer(props) {
       case 'dataset_column':
         return (
           <div style={getItemStyles(currentOffset)}>
-            <ChartDragPreview viewType={viewType} dataItem={item} />
+            <ChartDragPreview dataItem={item} />
           </div>
         );
       default:

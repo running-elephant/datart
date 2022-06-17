@@ -501,7 +501,13 @@
         "AGG_DATE_WEEK": "Week",
         "AGG_DATE_DAY": "Day",
         "default": "Default",
-        "cannotDeleteComputerField": "Calculated fields created in views cannot be deleted"
+        "cannotDeleteComputerField": "Calculated fields created in views cannot be deleted",
+        "byDataBaseGroup": "Group by database name",
+        "noGroup": "Not grouped",
+        "byNameSort": "Sort by name",
+        "noSort": "Sort by original field order",
+        "Group": "Group",
+        "Sort": "Sort"
       }
     },
     "palette": {

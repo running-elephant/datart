@@ -561,7 +561,7 @@ describe('getChartGroupColumns', () => {
   });
 });
 describe('getTheWidgetFiltersAndParams', () => {
-  it('should has Params', () => {
+  it.skip('should has Params', () => {
     const obj = {
       chartWidget: {
         config: {
@@ -791,7 +791,7 @@ describe('getTheWidgetFiltersAndParams', () => {
     expect(getTheWidgetFiltersAndParams(obj as any)).toEqual(res);
   });
 
-  it('should no Params ', () => {
+  it.skip('should no Params ', () => {
     const obj = {
       chartWidget: {
         config: {
@@ -1170,7 +1170,7 @@ describe('adjustRangeDataEndValue', () => {
 });
 
 describe('getBoardChartRequests', () => {
-  it('should timeValue is null', () => {
+  it.skip('should timeValue is null', () => {
     const obj = {
       widgetMap: {
         '24f59d7da2e84687a2a3fb465a10f819': {

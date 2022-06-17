@@ -25,10 +25,7 @@ import { ViewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import {
-  handleRowColNameInChartConfig,
-  setRuntimeDateLevelFieldsInChartConfig,
-} from 'app/utils/chartHelper';
+import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
 import { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
@@ -49,10 +46,7 @@ const ChartIFrameContainer: FC<{
   viewType?: ViewType;
 }> = memo(props => {
   const iframeContainerId = `chart-iframe-root-${props.containerId}`;
-  const config = handleRowColNameInChartConfig(
-    setRuntimeDateLevelFieldsInChartConfig(props.config),
-    props.viewType,
-  );
+  const config = setRuntimeDateLevelFieldsInChartConfig(props.config);
 
   const transformToSafeCSSProps = (width, height) => {
     let newStyle = { width, height };

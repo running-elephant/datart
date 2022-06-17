@@ -69,7 +69,6 @@ const ChartComputedFieldSettingPanel: FC<{
   const [selectedFunctionCategory, setSelectedFunctionCategory] = useState(
     defaultFunctionCategory,
   );
-
   const hasAggregationFunction = (exp?: string) => {
     return [
       AggregateFieldActionType.Avg,
@@ -230,8 +229,8 @@ const ChartComputedFieldSettingPanel: FC<{
               ) : (
                 <ChartSearchableList
                   source={(fields || []).map(f => ({
-                    value: f.id,
-                    label: f.id,
+                    value: f.name,
+                    label: f.name,
                   }))}
                   onItemSelected={handleFieldSelected}
                 />

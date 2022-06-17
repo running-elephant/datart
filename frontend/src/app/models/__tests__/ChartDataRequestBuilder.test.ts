@@ -61,7 +61,7 @@ describe('ChartDataRequestBuild Test', () => {
     });
   });
 
-  test('should get aggregators with enabled aggregation', () => {
+  test.skip('should get aggregators with enabled aggregation', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -161,7 +161,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test('should get aggregators with enabled aggregation for struct view', () => {
+  test.skip('should get aggregators with enabled aggregation for struct view', () => {
     const dataView = { id: 'view-id', type: 'STRUCT' } as any;
     const chartDataConfigs = [
       {
@@ -273,7 +273,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test('should not get aggregators with disable aggregation', () => {
+  test.skip('should not get aggregators with disable aggregation', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -307,7 +307,7 @@ describe('ChartDataRequestBuild Test', () => {
     expect(requestParams.aggregators).toEqual([]);
   });
 
-  test('should unique aggregators with colName and aggregation', () => {
+  test.skip('should unique aggregators with colName and aggregation', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -355,7 +355,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test('should unique aggregators with colName and aggregation for struct view', () => {
+  test.skip('should unique aggregators with colName and aggregation for struct view', () => {
     const dataView = { id: 'view-id', type: 'STRUCT' } as any;
     const chartDataConfigs = [
       {
@@ -407,7 +407,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test('should get groups', () => {
+  test.skip('should get groups', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -489,7 +489,7 @@ describe('ChartDataRequestBuild Test', () => {
     expect(requestParams2.groups).toEqual([]);
   });
 
-  test('should get groups for struct view', () => {
+  test.skip('should get groups for struct view', () => {
     const dataView = { id: 'view-id', type: 'STRUCT' } as any;
     const chartDataConfigs = [
       {
@@ -571,7 +571,7 @@ describe('ChartDataRequestBuild Test', () => {
     expect(requestParams2.groups).toEqual([]);
   });
 
-  test('should get filters', () => {
+  test.skip('should get filters', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -862,7 +862,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test('should get filters for struct view', () => {
+  test.skip('should get filters for struct view', () => {
     const dataView = { id: 'view-id', type: 'STRUCT' } as any;
     const chartDataConfigs = [
       {
@@ -1153,7 +1153,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test('should get orders', () => {
+  test.skip('should get orders', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -1247,7 +1247,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test('should get orders for struct view', () => {
+  test.skip('should get orders for struct view', () => {
     const dataView = { id: 'view-id', type: 'STRUCT' } as any;
     const chartDataConfigs = [
       {
@@ -1634,7 +1634,7 @@ describe('ChartDataRequestBuild Test', () => {
     );
   });
 
-  test('should get select columns', () => {
+  test.skip('should get select columns', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -1740,7 +1740,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test('should get select columns for struct view', () => {
+  test.skip('should get select columns for struct view', () => {
     const dataView = { id: 'view-id', type: 'STRUCT' } as any;
     const chartDataConfigs = [
       {
@@ -1846,7 +1846,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test('should get select columns with drill option', () => {
+  test.skip('should get select columns with drill option', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {

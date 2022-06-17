@@ -101,6 +101,7 @@ const ValuesOptionsSetter: FC<{
   );
   const fetchNewDataset = useCallback(
     async (viewId: string, columns: string[]) => {
+      console.log('fetchNewDataset');
       const fieldDataset = await getDistinctFields(
         viewId,
         columns,
@@ -139,6 +140,7 @@ const ValuesOptionsSetter: FC<{
       setLabelOptions(options);
 
       const [viewId, ...columns] = value;
+      console.log(value,'value');
       const dataset = await fetchNewDataset(viewId, columns);
       setOptionValues(convertToList(dataset?.rows));
     },
@@ -147,6 +149,7 @@ const ValuesOptionsSetter: FC<{
   const onLabelChange = useCallback(
     (labelKey: string | undefined) => {
       const controllerConfig = getControllerConfig();
+      console.log(controllerConfig,'controllerConfig');
       const [viewId, valueId] = controllerConfig.assistViewFields || [];
       setLabelKey(labelKey);
       const nextAssistViewFields = labelKey

@@ -18,7 +18,7 @@
 
 import { Button, Dropdown, Select, Space } from 'antd';
 import ChartDataView from 'app/types/ChartDataView';
-import { handleDisplayViewName } from 'app/utils/chartHelper';
+import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { FC, memo, useMemo, useState } from 'react';
 import { isEmpty } from 'utils/object';
 import { InteractionFieldRelation } from '../../constants';
@@ -36,9 +36,6 @@ const JumpToChart: FC<
   const [relations, setRelations] = useState(
     value?.[InteractionFieldRelation.Customize] || [],
   );
-  const viewType = useMemo(() => {
-    return dataview?.type || 'SQL';
-  }, [dataview?.type]);
 
   const handleUpdateRelations = relations => {
     const newRelations = [...relations];
@@ -90,18 +87,9 @@ const JumpToChart: FC<
             translate={t}
             targetRelId={value?.relId}
             sourceFields={
-              dataview?.meta
-                ?.map(v => {
-                  return {
-                    ...v,
-                    name: handleDisplayViewName({
-                      name: v.id,
-                      viewType,
-                      category: v.category,
-                    }),
-                  };
-                })
-                .concat(dataview?.computedFields || []) || []
+              getAllColumnInMeta(dataview?.meta)?.concat(
+                dataview?.computedFields || [],
+              ) || []
             }
             sourceVariables={dataview?.variables || []}
             relations={relations}

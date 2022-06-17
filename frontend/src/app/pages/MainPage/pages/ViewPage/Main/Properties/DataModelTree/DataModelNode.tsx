@@ -29,7 +29,6 @@ import { Button, Dropdown, Menu, Tooltip } from 'antd';
 import { IW } from 'app/components';
 import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { FC, memo, useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components/macro';
@@ -45,12 +44,11 @@ import {
   WARNING,
 } from 'styles/StyleConstants';
 import { ColumnCategories } from '../../../constants';
-import { Column, ViewType } from '../../../slice/types';
+import { Column } from '../../../slice/types';
 import { ALLOW_COMBINE_COLUMN_TYPES } from './constant';
 
 const DataModelNode: FC<{
   node: Column;
-  viewType: ViewType;
   className?: string;
   onNodeTypeChange: (type: any, name: string) => void;
   onMoveToHierarchy: (node: Column) => void;
@@ -59,7 +57,6 @@ const DataModelNode: FC<{
 }> = memo(
   ({
     node,
-    viewType,
     className,
     onCreateHierarchy,
     onMoveToHierarchy,
@@ -151,7 +148,7 @@ const DataModelNode: FC<{
               <StyledIW fontSize={FONT_SIZE_TITLE}>{icon}</StyledIW>
             </Tooltip>
           </Dropdown>
-          <span>{handleDisplayViewName({ viewType, name: node.name })}</span>
+          <span>{node.name}</span>
           <div className="action">
             {isHover &&
               !isDragging &&

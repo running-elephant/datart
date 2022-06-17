@@ -293,7 +293,7 @@ export const StructView = memo(
     useEffect(() => {
       if (typeof tableJSON === 'string') {
         dispatch(
-          actions.changeCurrentEditingView({
+          actions.initCurrentEditingStructViewScript({
             script: handleStringScriptToObject(
               tableJSON,
               allDatabaseSchemas[sourceId],

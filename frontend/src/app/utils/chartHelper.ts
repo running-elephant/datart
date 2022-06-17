@@ -54,6 +54,7 @@ import {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { updateBy } from 'app/utils/mutation';
@@ -1719,25 +1720,6 @@ export const getSelectedItemStyles = (
   };
 };
 
-export const handleRowColNameInChartConfig = (
-  config: ChartConfig,
-  viewType?: string,
-) => {
-  return updateBy(config, draft => {
-    if (draft?.datas) {
-      draft?.datas.forEach(data => {
-        data.rows?.forEach(row => {
-          row.colName = handleDisplayViewName({
-            viewType,
-            name: row.colName,
-            category: row.category,
-          });
-        });
-      });
-    }
-  });
-};
-
 /**
  * Comparing old and new selectedItems
  *
@@ -1772,13 +1754,13 @@ export function handleDisplayViewName({
   category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
 }): string {
   try {
-    if (viewType === 'STRUCT' && category) {
+    if (viewType === 'STRUCT' && category && viewType.indexOf('[') === 0) {
       if (category === ChartDataViewFieldCategory.Field) {
         return JSON.parse(name)?.join('.');
       } else {
         return String(name);
       }
-    } else if (viewType === 'STRUCT') {
+    } else if (viewType === 'STRUCT' && viewType.indexOf('[') === 0) {
       return JSON.parse(name)?.join('.');
     } else {
       return String(name);
@@ -1803,13 +1785,13 @@ export function handleRequestColumnName({
   category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
 }): string[] {
   try {
-    if (viewType === 'STRUCT' && category) {
+    if (viewType === 'STRUCT' && category && viewType.indexOf('[') === 0) {
       if (category === ChartDataViewFieldCategory.Field) {
         return JSON.parse(name);
       } else {
         return [name];
       }
-    } else if (viewType === 'STRUCT') {
+    } else if (viewType === 'STRUCT' && viewType.indexOf('[') === 0) {
       return JSON.parse(name);
     } else {
       return [name];
@@ -1836,3 +1818,17 @@ export const getChartSelection = (
 ) => {
   return new ChartSelection(window, options);
 };
+
+export function getAllColumnInMeta(
+  meta?: ChartDataViewMeta[],
+): ChartDataViewMeta[] | undefined {
+  if (!meta) {
+    return meta;
+  }
+
+  const allColumn: any = meta.reduce<ChartDataViewMeta[]>((arr, cur) => {
+    return cur.children ? arr.concat(cur.children) : arr.concat([cur]);
+  }, []);
+
+  return allColumn;
+}

@@ -18,8 +18,8 @@
 
 import { Button, Dropdown, Input, Space } from 'antd';
 import ChartDataView from 'app/types/ChartDataView';
+import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { FC, memo, useCallback, useMemo, useState } from 'react';
-import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { InteractionFieldRelation } from '../../constants';
 import { I18nTranslator, JumpToUrlRule, VizType } from './types';
 import UrlParamList from './UrlParamList';
@@ -73,18 +73,9 @@ const JumpToUrl: FC<
             translate={t}
             targetRelId={value?.relId}
             sourceFields={
-              dataview?.meta
-                ?.map(v => {
-                  return {
-                    ...v,
-                    name: handleDisplayViewName({
-                      name: v.name,
-                      viewType,
-                      category: v.category,
-                    }),
-                  };
-                })
-                .concat(dataview?.computedFields || []) || []
+              getAllColumnInMeta(dataview?.meta)?.concat(
+                dataview?.computedFields || [],
+              ) || []
             }
             sourceVariables={dataview?.variables || []}
             relations={relations}

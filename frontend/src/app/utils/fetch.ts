@@ -26,10 +26,6 @@ import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
-  handleDisplayViewName,
-  handleRequestColumnName,
-} from 'app/utils/chartHelper';
-import {
   filterSqlOperatorName,
   transformToViewConfig,
 } from 'app/utils/internalChartHelper';
@@ -41,20 +37,19 @@ import { convertToChartDto } from './ChartDtoHelper';
 
 export const getDistinctFields = async (
   viewId: string,
-  columns: string[],
+  columns: Array<{ colName: string; colPath: string[] }>,
   view: ChartDTO['view'] | undefined,
   executeToken: ExecuteToken | undefined,
 ) => {
   const viewConfigs = transformToViewConfig(view?.config);
-  const viewType = view?.type || 'SQL';
   const requestParams: ChartDataRequest = {
     aggregators: [],
     filters: [],
     groups: [],
     columns: [...new Set(columns)].map(v => {
       return {
-        alias: handleDisplayViewName({ viewType, name: v }),
-        column: handleRequestColumnName({ viewType, name: v }),
+        alias: v.colName,
+        column: v.colPath,
       };
     }),
     pageInfo: {

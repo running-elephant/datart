@@ -21,7 +21,6 @@ import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { isEmptyArray } from 'utils/object';
-import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { InteractionFieldMapper, InteractionMouseEvent } from '../../constants';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
@@ -119,12 +118,8 @@ const ViewDetailPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
               >
                 {context?.dataview?.meta?.map(f => {
                   return (
-                    <Select.Option key={f.id} value={f.id}>
-                      {handleDisplayViewName({
-                        name: f.name,
-                        viewType: context?.dataview?.type,
-                        category: f.category,
-                      })}
+                    <Select.Option key={f.id} value={f.name}>
+                      {f.name}
                     </Select.Option>
                   );
                 })}
