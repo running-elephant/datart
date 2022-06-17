@@ -734,13 +734,19 @@ export const buildClickEventBaseFilters = (
     .filter(c => c.type === ChartDataSectionType.Color)
     .flatMap(config => config.rows || []);
 
+  const mixConfigs = (dataConfigs || [])
+    .filter(c => c.type === ChartDataSectionType.Mixed)
+    .flatMap(config => config.rows || []);
+
   return groupConfigs
     .concat(colorConfigs)
+    .concat(mixConfigs)
     .reduce<ChartDataRequestFilter[]>((acc, c) => {
       const filterValues = rowDatas
         ?.map(rowData => rowData?.[c.colName])
         ?.filter(Boolean)
         ?.map(value => ({ value, valueType: c.type }));
+
       if (isEmptyArray(filterValues) || isEmpty(c.colName)) {
         return acc;
       }
