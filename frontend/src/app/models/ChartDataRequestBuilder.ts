@@ -62,6 +62,7 @@ export class ChartDataRequestBuilder {
   script: boolean;
   aggregation?: boolean;
   drillOption?: IChartDrillOption;
+  variableParams?: Record<string, any[]>;
 
   constructor(
     dataView: Pick<ChartDataView, 'id' | 'computedFields'> & {
@@ -96,6 +97,13 @@ export class ChartDataRequestBuilder {
   public addRuntimeFilters(filters: ChartDataRequestFilter[] = []) {
     if (!isEmptyArray(filters)) {
       this.extraRuntimeFilters = filters;
+    }
+    return this;
+  }
+
+  public addVariableParams(params?: Record<string, any[]>) {
+    if (params) {
+      this.variableParams = params;
     }
     return this;
   }
@@ -502,6 +510,7 @@ export class ChartDataRequestBuilder {
       functionColumns: this.buildFunctionColumns(),
       columns: this.buildSelectColumns(),
       script: this.script,
+      params: this.variableParams,
     };
   }
 
@@ -517,6 +526,7 @@ export class ChartDataRequestBuilder {
       functionColumns: this.buildFunctionColumns(),
       columns: this.buildDetailColumns(),
       script: this.script,
+      params: this.variableParams,
     };
   }
 }

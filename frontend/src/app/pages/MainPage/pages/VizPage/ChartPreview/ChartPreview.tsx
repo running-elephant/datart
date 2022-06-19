@@ -56,6 +56,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
+import { isEmptyArray } from 'utils/object';
 import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 import useDisplayViewDetail from '../hooks/useDisplayViewDetail';
 import useQSLibUrlHelper from '../hooks/useQSLibUrlHelper';
@@ -282,17 +283,27 @@ const ChartPreviewBoard: FC<{
       if (!drillThroughSetting) {
         return;
       }
-      return ruleId =>
+
+      return ruleId => {
+        const rightClickEvent = !isEmptyArray(selectedItems?.[backendChartId])
+          ? Object.assign({}, chartContextMenuEvent, {
+              selectedItems: selectedItems?.[backendChartId],
+            })
+          : { selectedItems: [chartContextMenuEvent?.data] || [] };
+
         handleDrillThroughEvent(
           buildDrillThroughEventParams(
-            chartContextMenuEvent,
+            rightClickEvent,
             InteractionMouseEvent.Right,
             ruleId,
           ),
         );
+      };
     }, [
+      backendChartId,
       chartPreview?.chartConfig?.interactions,
       chartContextMenuEvent,
+      selectedItems,
       getDrillThroughSetting,
       handleDrillThroughEvent,
       buildDrillThroughEventParams,
@@ -306,19 +317,28 @@ const ChartPreviewBoard: FC<{
       if (!viewDetailSetting) {
         return;
       }
-      return () =>
+      return () => {
+        const rightClickEvent = !isEmptyArray(selectedItems?.[backendChartId])
+          ? Object.assign({}, chartContextMenuEvent, {
+              selectedItems: selectedItems?.[backendChartId],
+            })
+          : { selectedItems: [chartContextMenuEvent?.data] || [] };
+
         handleViewDataEvent(
           buildViewDataEventParams(
-            chartContextMenuEvent,
+            rightClickEvent,
             InteractionMouseEvent.Right,
           ),
         );
+      };
     }, [
       chartPreview?.chartConfig?.interactions,
+      selectedItems,
+      backendChartId,
       chartContextMenuEvent,
-      getViewDetailSetting,
       handleViewDataEvent,
       buildViewDataEventParams,
+      getViewDetailSetting,
     ]);
 
     const registerChartEvents = useCallback(
