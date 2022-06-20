@@ -1745,36 +1745,6 @@ export const compareSelectedItems = (
   return false;
 };
 
-export function handleRequestColumnName({
-  name,
-  viewType = 'SQL',
-  category,
-}: {
-  name: string;
-  viewType?: string;
-  category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
-}): string[] {
-  try {
-    if (viewType === 'STRUCT' && category && viewType.indexOf('[') === 0) {
-      if (category === ChartDataViewFieldCategory.Field) {
-        return JSON.parse(name);
-      } else {
-        return [name];
-      }
-    } else if (viewType === 'STRUCT' && viewType.indexOf('[') === 0) {
-      return JSON.parse(name);
-    } else {
-      return [name];
-    }
-  } catch (error) {
-    console.log('handleRequestColumnName', error, {
-      name,
-      viewType,
-      category,
-    });
-    throw error;
-  }
-}
 /**
  * Get chart select option class.
  *
