@@ -59,7 +59,7 @@ export const fetchShareVizInfo = createAsyncThunk(
     },
     thunkAPI,
   ) => {
-    const authenticationMode = filterSearchParams?.type.join();
+    const authenticationMode = filterSearchParams?.type?.join();
     const isMatchByName = !!filterSearchParams?.isMatchByName;
 
     let data = {} as ShareVizInfo;
