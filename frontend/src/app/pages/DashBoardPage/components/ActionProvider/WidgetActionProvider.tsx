@@ -163,6 +163,7 @@ export const WidgetActionProvider: FC<{
         onWidgetLinkEvent: (widget: Widget) => params => {
           dispatch(
             widgetLinkEventActionCreator({
+              renderMode,
               widget,
               params,
             }),

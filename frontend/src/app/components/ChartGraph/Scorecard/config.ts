@@ -350,7 +350,7 @@ const config: ChartConfig = {
         common: {
           position: 'Position',
           conditionalStyle: 'Conditional Style',
-          autoFontSize: 'Automatically adjust font size',
+          autoFontSize: 'Automatically Adjust Font Size',
           scale: 'Scale',
           fixedFontSize: 'Font Size',
           alignment: 'Alignment',
@@ -362,7 +362,7 @@ const config: ChartConfig = {
         },
         label: {
           title: 'Label',
-          show: 'showTitle',
+          show: 'Show Title',
         },
         data: {
           title: 'Data',

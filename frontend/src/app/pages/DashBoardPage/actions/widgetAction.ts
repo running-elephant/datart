@@ -29,7 +29,7 @@ import {
   getChartWidgetDataAsync,
   getControllerOptions,
   getWidgetData,
-  syncWidgetChartDataAsync,
+  syncBoardWidgetChartDataAsync,
 } from '../pages/Board/slice/thunk';
 import {
   BoardLinkFilter,
@@ -51,6 +51,7 @@ import {
   getEditChartWidgetDataAsync,
   getEditControllerOptions,
   getEditWidgetData,
+  syncEditBoardWidgetChartDataAsync,
 } from '../pages/BoardEditor/slice/thunk';
 import {
   EditBoardState,
@@ -186,13 +187,17 @@ export const widgetClickJumpAction =
   };
 
 export const widgetLinkEventAction =
-  (widget: Widget, params: Array<{ filters; rule }>) =>
+  (renderMode, widget: Widget, params: Array<{ filters; rule }>) =>
   async (dispatch, getState) => {
     const targetLinkDataChartIds = (params || []).map(p => p.rule?.relId);
     const rootState = getState() as RootState;
-    const widgetMapMap = rootState.board?.widgetRecord;
+    const viewBoardState = rootState.board as BoardState;
+    const editBoardState = rootState.editBoard as EditBoardState;
+    const widgetMapMap = viewBoardState?.widgetRecord;
     const boardWidgetInfoRecord =
-      rootState.board?.widgetInfoRecord?.[widget?.dashboardId];
+      renderMode === 'read'
+        ? viewBoardState?.widgetInfoRecord?.[widget?.dashboardId]
+        : editBoardState.widgetInfoRecord;
     const widgetMap = widgetMapMap?.[widget?.dashboardId] || {};
     const sourceWidgetInfo = boardWidgetInfoRecord?.[widget.id];
     const sourceRuntimeWidgetInfo = sourceWidgetInfo?.linkInfo || {};
@@ -226,23 +231,42 @@ export const widgetLinkEventAction =
           widgetMap: widgetMap,
           params: undefined,
         });
-      dispatch(
-        syncWidgetChartDataAsync({
-          boardId: w.dashboardId,
-          widgetId: w.id,
-          renderMode: 'read',
-          option: widgetInfo,
-          extraFilters: (clickFilters || [])
-            .concat(controllerFilters || [])
-            .concat(sourceRuntimeWidgetInfo?.filters || [])
-            .concat(runtimeWidgetInfo?.filters || []),
-          variableParams: Object.assign(
-            variableParams,
-            sourceRuntimeWidgetInfo?.variables,
-            runtimeWidgetInfo?.variables,
-          ),
-        }),
-      );
+
+      if (renderMode === 'read') {
+        dispatch(
+          syncBoardWidgetChartDataAsync({
+            boardId: w.dashboardId,
+            widgetId: w.id,
+            option: widgetInfo,
+            extraFilters: (clickFilters || [])
+              .concat(controllerFilters || [])
+              .concat(sourceRuntimeWidgetInfo?.filters || [])
+              .concat(runtimeWidgetInfo?.filters || []),
+            variableParams: Object.assign(
+              variableParams,
+              sourceRuntimeWidgetInfo?.variables,
+              runtimeWidgetInfo?.variables,
+            ),
+          }),
+        );
+      } else if (renderMode === 'edit') {
+        dispatch(
+          syncEditBoardWidgetChartDataAsync({
+            boardId: w.dashboardId,
+            widgetId: w.id,
+            option: widgetInfo,
+            extraFilters: (clickFilters || [])
+              .concat(controllerFilters || [])
+              .concat(sourceRuntimeWidgetInfo?.filters || [])
+              .concat(runtimeWidgetInfo?.filters || []),
+            variableParams: Object.assign(
+              variableParams,
+              sourceRuntimeWidgetInfo?.variables,
+              runtimeWidgetInfo?.variables,
+            ),
+          }),
+        );
+      }
     });
   };
 
@@ -382,10 +406,9 @@ export const widgetChartClickAction =
   };
 
 export const widgetLinkEventActionCreator =
-  (obj: { widget: Widget; params: any }) => dispatch => {
-    const { widget, params } = obj;
-    // TODO(Stephen): if not edit mode
-    dispatch(widgetLinkEventAction(widget, params));
+  (obj: { renderMode: string; widget: Widget; params: any }) => dispatch => {
+    const { renderMode, widget, params } = obj;
+    dispatch(widgetLinkEventAction(renderMode, widget, params));
   };
 
 export const widgetGetDataAction =
