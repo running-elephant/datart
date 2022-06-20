@@ -9,6 +9,7 @@ import {
   WidgetData,
   WidgetErrorType,
   WidgetInfo,
+  WidgetLinkInfo,
   WidgetPanelParams,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
@@ -244,6 +245,19 @@ const widgetInfoRecordSlice = createSlice({
     ) {
       const { widgetId, pageInfo } = action.payload;
       state[widgetId].pageInfo = pageInfo || { pageNo: 1 };
+    },
+    changeWidgetLinkInfo(
+      state,
+      action: PayloadAction<{
+        boardId: string;
+        widgetId: string;
+        linkInfo?: WidgetLinkInfo;
+      }>,
+    ) {
+      const { widgetId, linkInfo } = action.payload;
+      if (state[widgetId]) {
+        state[widgetId].linkInfo = linkInfo;
+      }
     },
     setWidgetErrInfo(
       state,
