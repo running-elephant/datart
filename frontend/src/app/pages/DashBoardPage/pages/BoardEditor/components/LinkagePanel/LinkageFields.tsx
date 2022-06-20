@@ -55,11 +55,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
         if (key === 'triggerViewId') {
           return chartGroupColumns?.map(item => {
             return (
-              <Option
-                key={item.uid}
-                fieldvaluetype={item.type}
-                value={JSON.stringify(item.id)}
-              >
+              <Option key={item.uid} fieldvaluetype={item.type} value={item.id}>
                 <div
                   style={{ display: 'flex', justifyContent: 'space-between' }}
                 >
@@ -83,7 +79,7 @@ export const LinkageFields: React.FC<LinkageFieldsProps> = memo(
                 <Option
                   key={item.name}
                   fieldvaluetype={item.type}
-                  value={JSON.stringify(item.id)}
+                  value={item.id}
                 >
                   <div
                     style={{ display: 'flex', justifyContent: 'space-between' }}

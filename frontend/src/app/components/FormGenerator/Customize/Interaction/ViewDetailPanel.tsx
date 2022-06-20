@@ -73,7 +73,7 @@ const ViewDetailPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       }
       onChange?.(ancestors, newSetting, false);
     };
-    console.log(context?.dataview?.meta, 'context?.dataview?.meta?');
+
     return (
       <StyledDrillThroughPanel direction="vertical">
         <Form

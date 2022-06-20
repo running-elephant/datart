@@ -254,6 +254,7 @@ const ControllerWidgetPanel: React.FC<WidgetControllerPanelParams> = memo(
             draft.config.content = nextContent;
             draft.viewIds = getViewIdsInControlConfig(config);
           });
+
           dispatch(editBoardStackActions.updateWidget(newWidget));
           dispatch(getEditControllerOptions(newWidget.id));
           refreshLinkedWidgets(newWidget);

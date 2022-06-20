@@ -225,7 +225,6 @@ export const ChartDraggableSourceContainer: FC<
                 return (
                   <DateLevelFieldContainer
                     colName={colName}
-                    id={id}
                     key={i}
                     item={item}
                     onClearCheckedList={onClearCheckedList}

@@ -17,7 +17,6 @@
  */
 
 import { DataChart } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { ViewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import { createContext, FC, memo, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -57,12 +56,10 @@ export const WidgetChartContext = createContext<{
   chartDataView?: ChartDataView;
   availableSourceFunctions?: string[];
   supportTrigger: boolean;
-  viewType: ViewType;
 }>({
   dataChart: {} as DataChart,
   availableSourceFunctions: undefined,
   supportTrigger: true,
-  viewType: 'SQL',
 });
 
 export const WidgetChartProvider: FC<{
@@ -91,7 +88,6 @@ export const WidgetChartProvider: FC<{
     dataChart?.config?.chartGraphId,
   );
   const chartDataView = viewMap[dataChart?.viewId];
-  const viewType = viewMap[dataChart?.viewId]?.type || 'SQL';
 
   return (
     <WidgetChartContext.Provider
@@ -100,7 +96,6 @@ export const WidgetChartProvider: FC<{
         availableSourceFunctions,
         supportTrigger,
         chartDataView,
-        viewType,
       }}
     >
       {children}

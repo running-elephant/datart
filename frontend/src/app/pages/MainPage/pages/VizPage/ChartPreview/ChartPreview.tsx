@@ -684,7 +684,6 @@ const ChartPreviewBoard: FC<{
                     selectedItems={selectedItems[backendChartId]}
                     width={cacheW}
                     height={cacheH}
-                    viewType={chartPreview?.backendChart?.view.type || 'SQL'}
                   />
                 </ChartDrillContextMenu>
               </Spin>

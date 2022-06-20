@@ -90,10 +90,7 @@ const DataModelTree: FC = memo(() => {
   useEffect(() => {
     setHierarchy(currentEditingView?.model?.hierarchy);
   }, [currentEditingView?.model?.hierarchy]);
-  console.log(
-    currentEditingView?.model?.hierarchy,
-    'currentEditingView?.model?.hierarchy',
-  );
+
   useEffect(() => {
     setComputedFields(currentEditingView?.model?.computedFields);
   }, [currentEditingView?.model?.computedFields]);

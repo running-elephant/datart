@@ -20,6 +20,8 @@ import { Form, FormInstance, Radio, Select, Space } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
 import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
+import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import {
   OPERATOR_TYPE_OPTION,
   ValueOptionType,
@@ -27,7 +29,6 @@ import {
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
-import { handleDisplayViewName } from 'app/utils/chartHelper';
 import { getDistinctFields } from 'app/utils/fetch';
 import { transformMeta } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -71,14 +72,21 @@ const ValuesOptionsSetter: FC<{
   const getViewOption = useCallback(async (viewId: string) => {
     if (!viewId) return [];
     try {
-      const { data } = await request2<View>(`/views/${viewId}`);
+      let { data } = await request2<View>(`/views/${viewId}`);
+      if (data) {
+        data = migrationViewConfig(data);
+      }
+      if (data?.model) {
+        data.model = beginViewModelMigration(data.model, data.type);
+      }
       let meta = transformMeta(data?.model);
-      const viewType = data?.type || 'SQL';
+      const viewComputerField = JSON.parse(data.model)?.computedFields || [];
+
       if (!meta) return [];
       const option: CascaderOptionType[] = meta.map(item => {
         return {
           value: item.id,
-          label: handleDisplayViewName({ viewType, name: item.id }),
+          label: item.name,
         };
       });
       return option;
@@ -101,7 +109,6 @@ const ValuesOptionsSetter: FC<{
   );
   const fetchNewDataset = useCallback(
     async (viewId: string, columns: string[]) => {
-      console.log('fetchNewDataset');
       const fieldDataset = await getDistinctFields(
         viewId,
         columns,
@@ -140,7 +147,6 @@ const ValuesOptionsSetter: FC<{
       setLabelOptions(options);
 
       const [viewId, ...columns] = value;
-      console.log(value,'value');
       const dataset = await fetchNewDataset(viewId, columns);
       setOptionValues(convertToList(dataset?.rows));
     },
@@ -149,7 +155,6 @@ const ValuesOptionsSetter: FC<{
   const onLabelChange = useCallback(
     (labelKey: string | undefined) => {
       const controllerConfig = getControllerConfig();
-      console.log(controllerConfig,'controllerConfig');
       const [viewId, valueId] = controllerConfig.assistViewFields || [];
       setLabelKey(labelKey);
       const nextAssistViewFields = labelKey

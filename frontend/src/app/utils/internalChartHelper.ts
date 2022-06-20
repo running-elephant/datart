@@ -379,13 +379,13 @@ export function transformMeta(model?: string) {
     if (!isEmptyArray(column?.children)) {
       return column.children.map(c => ({
         ...c,
-        id: c.path,
+        id: JSON.stringify(c.path),
         category: ChartDataViewFieldCategory.Field,
       }));
     }
     return {
       ...column,
-      id: column.path,
+      id: JSON.stringify(column.path) || colKey,
       category: ChartDataViewFieldCategory.Field,
     };
   });
@@ -414,7 +414,7 @@ function getMeta(key, column) {
   }
   return {
     ...column,
-    id: column.path || key,
+    id: JSON.stringify(column.path) || key,
     subType: column?.category,
     category: isHierarchy
       ? ChartDataViewFieldCategory.Hierarchy
@@ -745,7 +745,7 @@ export const buildClickEventBaseFilters = (
       const filter = {
         aggOperator: null,
         sqlOperator: FilterSqlOperator.In,
-        column: c.id,
+        column: JSON.parse(c.id),
         values: [{ value, valueType: c.type }],
       };
       acc.push(filter);

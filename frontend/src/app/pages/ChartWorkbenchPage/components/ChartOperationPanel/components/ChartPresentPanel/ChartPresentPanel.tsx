@@ -56,7 +56,6 @@ const ChartPresentPanel: FC<{
   chartConfig?: ChartConfig;
   expensiveQuery: boolean;
   allowQuery: boolean;
-  viewType?: string;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
   selectedItems?: SelectedItem[];
@@ -69,7 +68,6 @@ const ChartPresentPanel: FC<{
     chartConfig,
     expensiveQuery,
     allowQuery,
-    viewType,
     onRefreshDataset,
     onCreateDownloadDataTask,
     selectedItems,

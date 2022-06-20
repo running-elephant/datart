@@ -61,7 +61,7 @@ describe('ChartDataRequestBuild Test', () => {
     });
   });
 
-  test.skip('should get aggregators with enabled aggregation', () => {
+  test('should get aggregators with enabled aggregation', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -70,12 +70,14 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'amount',
+            id: JSON.stringify(['amount']),
             aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
           },
           {
             colName: 'sub-amount',
+            id: 'sub-amount',
             aggregate: AggregateFieldActionType.Sum,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.ComputedField as any,
@@ -92,6 +94,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'total',
+            id: 'total',
             aggregate: AggregateFieldActionType.Count,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.ComputedField as any,
@@ -104,6 +107,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'sex',
+            id: 'sex',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Variable as any,
           },
@@ -115,11 +119,13 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'sex',
+            id: 'sex',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Variable as any,
           },
           {
             colName: 'age',
+            id: 'age',
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Variable as any,
           },
@@ -131,6 +137,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'name',
+            id: 'name',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Variable as any,
           },
@@ -161,7 +168,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test.skip('should get aggregators with enabled aggregation for struct view', () => {
+  test('should get aggregators with enabled aggregation for struct view', () => {
     const dataView = { id: 'view-id', type: 'STRUCT' } as any;
     const chartDataConfigs = [
       {
@@ -169,13 +176,15 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'aggregation',
         rows: [
           {
-            colName: '["dad", "amount"]',
+            id: '["dad", "amount"]',
+            colName: 'dad.amount',
             aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
           },
           {
             colName: 'sub-amount',
+            id: 'sub-amount',
             aggregate: AggregateFieldActionType.Sum,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.ComputedField as any,
@@ -192,6 +201,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'total',
+            id: 'total',
             aggregate: AggregateFieldActionType.Count,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.ComputedField as any,
@@ -204,6 +214,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'sex',
+            id: 'sex',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Variable as any,
           },
@@ -215,11 +226,13 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'sex',
+            id: 'sex',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Variable as any,
           },
           {
             colName: 'age',
+            id: 'age',
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Variable as any,
           },
@@ -230,7 +243,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'unknown',
         rows: [
           {
-            colName: '["dad", "name"]',
+            id: '["dad", "name"]',
+            colName: 'dad.name',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Variable as any,
           },
@@ -273,7 +287,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test.skip('should not get aggregators with disable aggregation', () => {
+  test('should not get aggregators with disable aggregation', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -282,6 +296,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'amount',
+            id: JSON.stringify(['amount']),
             aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
@@ -307,7 +322,7 @@ describe('ChartDataRequestBuild Test', () => {
     expect(requestParams.aggregators).toEqual([]);
   });
 
-  test.skip('should unique aggregators with colName and aggregation', () => {
+  test('should unique aggregators with colName and aggregation', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -316,6 +331,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'amount',
+            id: JSON.stringify(['amount']),
             aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
@@ -328,6 +344,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'amount',
+            id: JSON.stringify(['amount']),
             aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
@@ -355,7 +372,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test.skip('should unique aggregators with colName and aggregation for struct view', () => {
+  test('should unique aggregators with colName and aggregation for struct view', () => {
     const dataView = { id: 'view-id', type: 'STRUCT' } as any;
     const chartDataConfigs = [
       {
@@ -363,7 +380,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'aggregation',
         rows: [
           {
-            colName: '["dad", "amount"]',
+            colName: 'dad.amount',
+            id: JSON.stringify(['dad', 'amount']),
             aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
@@ -375,7 +393,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'size',
         rows: [
           {
-            colName: '["dad", "amount"]',
+            colName: 'dad.amount',
+            id: JSON.stringify(['dad', 'amount']),
             aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
@@ -407,7 +426,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test.skip('should get groups', () => {
+  test('should get groups', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -420,6 +439,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'name',
+            id: JSON.stringify(['name']),
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
           },
@@ -431,6 +451,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'age',
+            id: JSON.stringify(['age']),
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
           },
@@ -442,11 +463,13 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'address',
+            id: JSON.stringify(['address']),
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
           },
           {
             colName: 'post',
+            id: JSON.stringify(['post']),
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
           },
@@ -489,7 +512,7 @@ describe('ChartDataRequestBuild Test', () => {
     expect(requestParams2.groups).toEqual([]);
   });
 
-  test.skip('should get groups for struct view', () => {
+  test('should get groups for struct view', () => {
     const dataView = { id: 'view-id', type: 'STRUCT' } as any;
     const chartDataConfigs = [
       {
@@ -501,7 +524,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'aggregation',
         rows: [
           {
-            colName: '["dad", "name"]',
+            colName: 'dad.name',
+            id: JSON.stringify(['dad', 'name']),
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
           },
@@ -512,7 +536,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'aggregation',
         rows: [
           {
-            colName: '["dad", "age"]',
+            colName: 'dad.age',
+            id: JSON.stringify(['dad', 'age']),
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
           },
@@ -523,12 +548,14 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'address',
         rows: [
           {
-            colName: '["dad", "address"]',
+            colName: 'dad.address',
+            id: JSON.stringify(['dad', 'address']),
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
           },
           {
-            colName: '["dad", "post"]',
+            colName: 'dad.post',
+            id: JSON.stringify(['dad', 'post']),
             type: DataViewFieldType.NUMERIC,
             category: ChartDataViewFieldCategory.Field as any,
           },
@@ -571,7 +598,7 @@ describe('ChartDataRequestBuild Test', () => {
     expect(requestParams2.groups).toEqual([]);
   });
 
-  test.skip('should get filters', () => {
+  test('should get filters', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -584,6 +611,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'name',
+            id: JSON.stringify(['name']),
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             aggregate: AggregateFieldActionType.None,
@@ -605,6 +633,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'name',
+            id: JSON.stringify(['name']),
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             aggregate: AggregateFieldActionType.Avg,
@@ -620,6 +649,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'name',
+            id: JSON.stringify(['name']),
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -633,6 +663,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'name',
+            id: JSON.stringify(['name']),
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -646,6 +677,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'address',
+            id: JSON.stringify(['address']),
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -660,6 +692,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'address',
+            id: JSON.stringify(['address']),
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -673,6 +706,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'family',
+            id: JSON.stringify(['family']),
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -690,6 +724,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'born',
+            id: JSON.stringify(['born']),
             type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -704,6 +739,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'born',
+            id: JSON.stringify(['born']),
             type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -718,6 +754,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'born',
+            id: JSON.stringify(['born']),
             type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -732,6 +769,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'birthday',
+            id: JSON.stringify(['birthday']),
             type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -746,6 +784,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'born',
+            id: JSON.stringify(['born']),
             type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -862,7 +901,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test.skip('should get filters for struct view', () => {
+  test('should get filters for struct view', () => {
     const dataView = { id: 'view-id', type: 'STRUCT' } as any;
     const chartDataConfigs = [
       {
@@ -874,7 +913,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'filter2',
         rows: [
           {
-            colName: '["dad", "name"]',
+            colName: 'dad.name',
+            id: '["dad", "name"]',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             aggregate: AggregateFieldActionType.None,
@@ -895,7 +935,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'filter3',
         rows: [
           {
-            colName: '["dad", "name"]',
+            id: '["dad", "name"]',
+            colName: 'dad.name',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             aggregate: AggregateFieldActionType.Avg,
@@ -910,7 +951,8 @@ describe('ChartDataRequestBuild Test', () => {
             },
           },
           {
-            colName: '["dad", "name"]',
+            id: '["dad", "name"]',
+            colName: 'dad.name',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -923,7 +965,8 @@ describe('ChartDataRequestBuild Test', () => {
             },
           },
           {
-            colName: '["dad", "name"]',
+            id: '["dad", "name"]',
+            colName: 'dad.name',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -936,7 +979,8 @@ describe('ChartDataRequestBuild Test', () => {
             },
           },
           {
-            colName: '["dad", "address"]',
+            id: '["dad", "address"]',
+            colName: 'dad.address',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -950,7 +994,8 @@ describe('ChartDataRequestBuild Test', () => {
             },
           },
           {
-            colName: '["dad", "address"]',
+            id: '["dad", "address"]',
+            colName: 'dad.address',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -963,7 +1008,8 @@ describe('ChartDataRequestBuild Test', () => {
             },
           },
           {
-            colName: '["dad", "family"]',
+            id: '["dad", "family"]',
+            colName: 'dad.family',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -980,7 +1026,8 @@ describe('ChartDataRequestBuild Test', () => {
             },
           },
           {
-            colName: '["dad", "born"]',
+            id: '["dad", "born"]',
+            colName: 'dad.born',
             type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -994,7 +1041,8 @@ describe('ChartDataRequestBuild Test', () => {
             },
           },
           {
-            colName: '["dad", "born"]',
+            id: '["dad", "born"]',
+            colName: 'dad.born',
             type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -1008,7 +1056,8 @@ describe('ChartDataRequestBuild Test', () => {
             },
           },
           {
-            colName: '["dad", "born"]',
+            id: '["dad", "born"]',
+            colName: 'dad.born',
             type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -1022,7 +1071,8 @@ describe('ChartDataRequestBuild Test', () => {
             },
           },
           {
-            colName: '["dad", "birthday"]',
+            id: '["dad", "birthday"]',
+            colName: 'dad.birthday',
             type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -1036,7 +1086,8 @@ describe('ChartDataRequestBuild Test', () => {
             },
           },
           {
-            colName: '["dad", "born"]',
+            id: '["dad", "born"]',
+            colName: 'dad.born',
             type: DataViewFieldType.DATE,
             category: ChartDataViewFieldCategory.Field as any,
             filter: {
@@ -1153,7 +1204,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test.skip('should get orders', () => {
+  test('should get orders', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -1166,6 +1217,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'age',
+            id: '["age"]',
             aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
@@ -1181,6 +1233,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'first-name',
+            id: '["first-name"]',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             sort: {
@@ -1189,6 +1242,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'last-name',
+            id: 'last-name',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.ComputedField as any,
             sort: {
@@ -1197,6 +1251,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'middle-name',
+            id: 'middle-name',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.ComputedField as any,
             sort: {
@@ -1211,6 +1266,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'address',
+            id: 'address',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.ComputedField as any,
             sort: {
@@ -1247,7 +1303,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test.skip('should get orders for struct view', () => {
+  test('should get orders for struct view', () => {
     const dataView = { id: 'view-id', type: 'STRUCT' } as any;
     const chartDataConfigs = [
       {
@@ -1259,7 +1315,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'aggregationR',
         rows: [
           {
-            colName: '["dad", "age"]',
+            colName: 'dad.age',
+            id: '["dad", "age"]',
             aggregate: AggregateFieldActionType.Avg,
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
@@ -1274,7 +1331,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'group',
         rows: [
           {
-            colName: '["dad", "first-name"]',
+            colName: 'dad.first-name',
+            id: '["dad", "first-name"]',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.Field as any,
             sort: {
@@ -1283,6 +1341,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'last-name',
+            id: 'last-name',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.ComputedField as any,
             sort: {
@@ -1291,6 +1350,7 @@ describe('ChartDataRequestBuild Test', () => {
           },
           {
             colName: 'middle-name',
+            id: 'middle-name',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.ComputedField as any,
             sort: {
@@ -1305,6 +1365,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'address',
+            id: 'address',
             type: DataViewFieldType.STRING,
             category: ChartDataViewFieldCategory.ComputedField as any,
             sort: {
@@ -1634,7 +1695,7 @@ describe('ChartDataRequestBuild Test', () => {
     );
   });
 
-  test.skip('should get select columns', () => {
+  test('should get select columns', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -1643,6 +1704,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'amount',
+            id: 'amount',
             type: '',
             category: '',
           },
@@ -1654,6 +1716,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'total',
+            id: 'total',
             type: '',
             category: '',
           },
@@ -1665,6 +1728,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'sex',
+            id: 'sex',
             type: '',
             category: '',
           },
@@ -1676,6 +1740,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'sex',
+            id: 'sex',
             type: '',
             category: '',
           },
@@ -1687,6 +1752,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'name',
+            id: 'name',
             type: '',
             category: '',
           },
@@ -1698,6 +1764,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'name',
+            id: 'name',
             type: '',
             category: '',
           },
@@ -1709,6 +1776,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'filter',
+            id: 'filter',
             type: '',
             category: '',
           },
@@ -1740,7 +1808,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test.skip('should get select columns for struct view', () => {
+  test('should get select columns for struct view', () => {
     const dataView = { id: 'view-id', type: 'STRUCT' } as any;
     const chartDataConfigs = [
       {
@@ -1748,7 +1816,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'aggregation',
         rows: [
           {
-            colName: '["dad", "amount"]',
+            colName: 'dad.amount',
+            id: '["dad", "amount"]',
             type: '',
             category: ChartDataViewFieldCategory.Field,
           },
@@ -1759,7 +1828,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'size',
         rows: [
           {
-            colName: '["dad", "total"]',
+            colName: 'dad.total',
+            id: '["dad", "total"]',
             type: '',
             category: ChartDataViewFieldCategory.Field,
           },
@@ -1770,7 +1840,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'info',
         rows: [
           {
-            colName: '["dad", "sex"]',
+            colName: 'dad.sex',
+            id: '["dad", "sex"]',
             type: '',
             category: ChartDataViewFieldCategory.Field,
           },
@@ -1781,7 +1852,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'info',
         rows: [
           {
-            colName: '["dad", "sex"]',
+            colName: 'dad.sex',
+            id: '["dad", "sex"]',
             type: '',
             category: ChartDataViewFieldCategory.Field,
           },
@@ -1792,7 +1864,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'GROUP',
         rows: [
           {
-            colName: '["dad", "name"]',
+            colName: 'dad.name',
+            id: '["dad", "name"]',
             type: '',
             category: ChartDataViewFieldCategory.Field,
           },
@@ -1803,7 +1876,8 @@ describe('ChartDataRequestBuild Test', () => {
         key: 'MIXED',
         rows: [
           {
-            colName: '["dad", "name"]',
+            colName: 'dad.name',
+            id: '["dad", "name"]',
             type: '',
             category: ChartDataViewFieldCategory.Field,
           },
@@ -1846,7 +1920,7 @@ describe('ChartDataRequestBuild Test', () => {
     ]);
   });
 
-  test.skip('should get select columns with drill option', () => {
+  test('should get select columns with drill option', () => {
     const dataView = { id: 'view-id' } as any;
     const chartDataConfigs = [
       {
@@ -1857,12 +1931,14 @@ describe('ChartDataRequestBuild Test', () => {
           {
             uid: 'group-r1',
             colName: 'group-r1',
+            id: 'group-r1',
             type: '',
             category: '',
           },
           {
             uid: 'group-r2',
             colName: 'group-r2',
+            id: 'group-r2',
             type: '',
             category: '',
           },
@@ -1874,6 +1950,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'amount',
+            id: 'amount',
             type: '',
             category: '',
           },
@@ -1885,6 +1962,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'size',
+            id: 'size',
             type: '',
             category: '',
           },
@@ -1896,6 +1974,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'info',
+            id: 'info',
             type: '',
             category: '',
           },
@@ -1907,6 +1986,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'color',
+            id: 'color',
             type: '',
             category: '',
           },
@@ -1918,6 +1998,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'mix',
+            id: 'mix',
             type: '',
             category: '',
           },
@@ -1929,6 +2010,7 @@ describe('ChartDataRequestBuild Test', () => {
         rows: [
           {
             colName: 'filter',
+            id: 'filter',
             type: '',
             category: '',
           },

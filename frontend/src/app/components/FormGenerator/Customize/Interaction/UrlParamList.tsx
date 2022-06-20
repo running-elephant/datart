@@ -111,11 +111,7 @@ const UrlParamList: FC<
           onChange={value => handleRelationChange(index, 'source', value)}
         >
           {(isFieldType(record) ? sourceFields : sourceVariables)?.map(sf => {
-            return (
-              <Select.Option value={JSON.stringify(sf?.id)}>
-                {sf?.name}
-              </Select.Option>
-            );
+            return <Select.Option value={sf?.id}>{sf?.name}</Select.Option>;
           })}
         </Select>
       ),

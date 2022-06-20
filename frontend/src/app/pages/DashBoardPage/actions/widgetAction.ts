@@ -129,10 +129,9 @@ export const widgetClickJumpAction =
     widget: Widget;
     params: ChartMouseEventParams;
     history: any;
-    viewType: string;
   }) =>
   (dispatch, getState) => {
-    const { renderMode, widget, params, history, viewType } = obj;
+    const { renderMode, widget, params, history } = obj;
     const state = getState() as RootState;
     const orgId = state?.main?.orgId || '';
     const folderIds = state.viz?.vizs?.map(v => v.relId) || [];
@@ -234,7 +233,6 @@ export const widgetClickLinkageAction =
     renderMode: VizRenderMode,
     widget: Widget,
     params: ChartMouseEventParams,
-    viewType: string,
   ) =>
   (dispatch, getState) => {
     const { componentType, seriesType, seriesName } = params;
@@ -257,12 +255,14 @@ export const widgetClickLinkageAction =
         let linkageFieldName: string =
           re?.config?.widgetToWidget?.triggerColumn || '';
         const linkValue = getValueByRowData(params.data, linkageFieldName);
+
         if (!linkValue) {
           console.warn('linkageFieldName:', linkageFieldName);
           console.warn('rowData', params.data?.rowData);
           console.warn(`rowData[${linkageFieldName}]:${linkValue} `);
           return undefined;
         }
+
         const filter: BoardLinkFilter = {
           triggerWidgetId: widget.id,
           triggerValue: linkValue,
@@ -328,12 +328,6 @@ export const widgetChartClickAction =
   }) =>
   (dispatch, getState) => {
     const { boardId, editing, renderMode, widget, params, history } = obj;
-    const rootState = getState() as RootState;
-    const viewBoardState = rootState.board as BoardState;
-    const viewMap = viewBoardState.viewMap;
-    const viewType =
-      viewMap[widget?.config?.content?.dataChart?.viewId]?.type || 'SQL';
-
     //is tableChart
     if (
       params.chartType === 'table' &&
@@ -353,7 +347,6 @@ export const widgetChartClickAction =
           widget,
           params,
           history,
-          viewType,
         }),
       );
       return;
@@ -362,14 +355,7 @@ export const widgetChartClickAction =
     const linkageConfig = widget.config.linkageConfig;
     if (linkageConfig?.open && widget.relations.length) {
       dispatch(
-        widgetClickLinkageAction(
-          boardId,
-          editing,
-          renderMode,
-          widget,
-          params,
-          viewType,
-        ),
+        widgetClickLinkageAction(boardId, editing, renderMode, widget, params),
       );
       return;
     }

@@ -228,10 +228,12 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       selectDrillStatusMenu,
       runtimeDateLevelFields,
       availableSourceFunctions,
+      jumpRules,
       onDrillOptionChange,
       onDrillThroughChange,
       onViewDataChange,
       handleDateLevelChange,
+      onCrossFilteringChange,
     ]);
 
     return (

@@ -1581,6 +1581,7 @@ export const getDrillableRows = (
 
 export const getRuntimeDateLevelFields = (rows: any) => {
   const _rows = CloneValueDeep(rows);
+
   _rows?.forEach((v, i) => {
     const symbolData = v?.[RUNTIME_DATE_LEVEL_KEY];
     if (symbolData) {
@@ -1743,37 +1744,6 @@ export const compareSelectedItems = (
   }
   return false;
 };
-
-export function handleDisplayViewName({
-  name,
-  viewType = 'SQL',
-  category,
-}: {
-  name: string;
-  viewType?: string;
-  category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
-}): string {
-  try {
-    if (viewType === 'STRUCT' && category && viewType.indexOf('[') === 0) {
-      if (category === ChartDataViewFieldCategory.Field) {
-        return JSON.parse(name)?.join('.');
-      } else {
-        return String(name);
-      }
-    } else if (viewType === 'STRUCT' && viewType.indexOf('[') === 0) {
-      return JSON.parse(name)?.join('.');
-    } else {
-      return String(name);
-    }
-  } catch (error) {
-    console.log('handleDisplayViewName', error, {
-      name,
-      viewType,
-      category,
-    });
-    throw error;
-  }
-}
 
 export function handleRequestColumnName({
   name,

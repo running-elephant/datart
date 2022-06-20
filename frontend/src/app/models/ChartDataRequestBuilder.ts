@@ -153,10 +153,10 @@ export class ChartDataRequestBuilder {
   }
 
   private buildColumnName(col) {
-    console.log(col, 'col');
-    if (col.category === ChartDataViewFieldCategory.Field) {
-      return col.id;
+    if (col.category === ChartDataViewFieldCategory.Field && col.id) {
+      return JSON.parse(col.id);
     }
+
     return [col.id];
   }
 
@@ -205,6 +205,7 @@ export class ChartDataRequestBuilder {
       },
       [],
     );
+
     return Array.from(
       new Set(
         groupColumns.map(groupCol => ({

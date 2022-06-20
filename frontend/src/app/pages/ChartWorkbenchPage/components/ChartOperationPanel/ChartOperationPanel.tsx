@@ -97,7 +97,6 @@ const ChartOperationPanel: FC<{
             expensiveQuery={expensiveQuery}
             allowQuery={allowQuery}
             chartConfig={chartConfig}
-            viewType={dataView?.type}
             onChartChange={onChartChange}
             onRefreshDataset={onRefreshDataset}
             onCreateDownloadDataTask={onCreateDownloadDataTask}

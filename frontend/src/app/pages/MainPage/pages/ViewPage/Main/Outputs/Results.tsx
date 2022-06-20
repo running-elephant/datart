@@ -42,7 +42,6 @@ import {
   Column,
   ColumnPermission,
   HierarchyModel,
-  ViewType,
   ViewViewModel,
 } from '../../slice/types';
 
@@ -71,9 +70,6 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
   const previewResults = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'previewResults' }),
   ) as ViewViewModel['previewResults'];
-  const type = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'type' }),
-  ) as ViewType;
 
   const roles = useSelector(selectRoles);
   const t = useI18NPrefix('view');
@@ -256,7 +252,6 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
   return stage > ViewViewModelStages.Fresh ? (
     <TableWrapper>
       <SchemaTable
-        viewType={type}
         height={height ? height - 96 : 0}
         width={width}
         model={model.columns || {}}

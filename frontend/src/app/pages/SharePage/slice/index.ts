@@ -28,10 +28,10 @@ import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import { handleRequestColumnName } from 'app/utils/chartHelper';
 import { FilterSqlOperator } from 'globalConstants';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { Omit } from 'utils/object';
-import { handleRequestColumnName } from 'app/utils/chartHelper';
 import {
   fetchAvailableSourceFunctions,
   fetchShareDataSetByPreviewChartAction,
