@@ -290,8 +290,8 @@ public class OrgServiceImpl extends BaseService implements OrgService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public boolean removeUser(String orgId, String userId) {
+        Organization organization = organizationMapper.selectForUpdate(orgId);
         securityManager.requireOrgOwner(orgId);
-        Organization organization = organizationMapper.selectByPrimaryKey(orgId);
 
         if (organization.getCreateBy().equals(userId)) {
             Exceptions.tr(NotAllowedException.class,"message.org.member.delete-creator");
