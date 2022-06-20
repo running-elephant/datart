@@ -59,7 +59,7 @@ export const fetchShareVizInfo = createAsyncThunk(
     },
     thunkAPI,
   ) => {
-    const authenticationMode = filterSearchParams?.type.join();
+    const authenticationMode = filterSearchParams?.type?.join();
     const isMatchByName = !!filterSearchParams?.isMatchByName;
 
     let data = {} as ShareVizInfo;
@@ -162,6 +162,9 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
   ) => {
     const state = thunkAPI.getState() as RootState;
     const shareState = state.share;
+    if (!args.preview?.backendChart?.view.id) {
+      return;
+    }
     const builder = new ChartDataRequestBuilder(
       {
         id: args.preview?.backendChart?.view.id || '',

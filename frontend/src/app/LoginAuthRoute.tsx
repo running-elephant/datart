@@ -16,17 +16,23 @@
  * limitations under the License.
  */
 
-import { AuthorizedRoute } from 'app/components';
+import { useSelector } from 'react-redux';
+import { Redirect, Route } from 'react-router-dom';
 import { getToken } from 'utils/auth';
 import { LazyMainPage } from './pages/MainPage/Loadable';
+import { selectSystemInfo } from './slice/selectors';
 
 export function LoginAuthRoute() {
   const logged = !!getToken();
-  return (
-    <AuthorizedRoute
-      authority={logged}
-      routeProps={{ path: '/', component: LazyMainPage }}
-      redirectProps={{ to: '/login' }}
-    />
-  );
+  const systemInfo = useSelector(selectSystemInfo);
+
+  if (logged) {
+    return <Route path="/" component={LazyMainPage} />;
+  }
+
+  if (systemInfo) {
+    return <Redirect to={systemInfo.initialized ? '/login' : '/setup'} />;
+  } else {
+    return null;
+  }
 }

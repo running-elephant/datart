@@ -21,7 +21,7 @@ import styled from 'styled-components/macro';
 import { WHITE } from 'styles/StyleConstants';
 import ChartDraggableSourceContainer from './ChartDraggableSourceContainer';
 
-const DragPreview = ({ dataItem, viewType }) => {
+const DragPreview = ({ dataItem }) => {
   return (
     <div>
       {dataItem?.slice(0, 3).map((v, i) => (
@@ -33,7 +33,6 @@ const DragPreview = ({ dataItem, viewType }) => {
           }}
         >
           <ChartDraggableSourceContainer
-            viewType={viewType}
             type={v.type}
             id={v.colName}
             name={v.colName}

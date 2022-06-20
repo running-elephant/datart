@@ -34,7 +34,6 @@ import { updateBy } from 'app/utils/mutation';
 import { CONTROLLER_WIDTH_OPTIONS } from 'globalConstants';
 import { FC, memo, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
-import { handleDisplayViewName } from 'utils/utils';
 import { FilterOptionForwardRef } from '.';
 import CategoryConditionConfiguration from './CategoryConditionConfiguration';
 import DateConditionConfiguration from './DateConditionConfiguration';
@@ -186,7 +185,7 @@ const FilterControlPanel: FC<
 
     const renderConditionConfigurationByModel = () => {
       const filterProps = {
-        colName: config?.colName,
+        colName: config?.id,
         ref: filterOptionRef,
         dataset,
         dataView,
@@ -243,10 +242,7 @@ const FilterControlPanel: FC<
           label={t('filterName')}
           name="filterName"
           rules={[{ required: true }]}
-          initialValue={handleDisplayViewName({
-            name: getColumnRenderName(config),
-            viewType: dataView?.type,
-          })}
+          initialValue={getColumnRenderName(config)}
         >
           <Input onChange={e => handleNameChange(e.target?.value)} />
         </FormItemEx>

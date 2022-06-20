@@ -23,9 +23,10 @@ import {
   Widget,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { IFontDefault } from 'types';
+import { CloneValueDeep } from 'utils/object';
 import widgetManagerInstance from '../../../pages/DashBoardPage/components/WidgetManager';
 import { RectConfig } from '../../../pages/DashBoardPage/pages/Board/slice/types';
-import { WidgetBeta3 } from '../types';
+import { WidgetBeta3, WidgetConfBeta3 } from '../types';
 
 const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
   newWidget.id = oldW.id;
@@ -417,4 +418,33 @@ export const convertWidgetToBeta4 = (widget: WidgetBeta3) => {
   if (widgetType === 'controller') {
     return convertControllerToBeta4(widget);
   }
+};
+
+export const convertWidgetConfigToBeta4 = (widgetConfig: WidgetConfBeta3) => {
+  const _widgetConfig = CloneValueDeep(widgetConfig);
+  if (_widgetConfig.type === 'controller') {
+    const content = _widgetConfig.content;
+    const assistViewFields = content?.config?.assistViewFields;
+    if (assistViewFields && Array.isArray(assistViewFields)) {
+      if (assistViewFields[1] && assistViewFields[1].indexOf('[') !== 0) {
+        assistViewFields[1] = JSON.stringify([assistViewFields[1]]);
+      }
+      if (assistViewFields[2] && assistViewFields[2].indexOf('[') !== 0) {
+        assistViewFields[2] = JSON.stringify([assistViewFields[2]]);
+      }
+    }
+
+    const relatedViews = content?.relatedViews;
+    if (relatedViews) {
+      relatedViews?.forEach(v => {
+        if (
+          typeof v?.fieldValue === 'string' &&
+          v?.fieldValue?.indexOf('[') !== 0
+        ) {
+          v.fieldValue = JSON.stringify([v.fieldValue]);
+        }
+      });
+    }
+  }
+  return _widgetConfig;
 };

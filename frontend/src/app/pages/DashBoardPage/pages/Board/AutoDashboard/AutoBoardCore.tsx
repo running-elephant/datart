@@ -22,9 +22,9 @@ import { BoardConfigValContext } from 'app/pages/DashBoardPage/components/BoardP
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import { LAYOUT_COLS_MAP } from 'app/pages/DashBoardPage/constants';
-import useAutoLayoutMap from 'app/pages/DashBoardPage/hooks/useAutoLayoutMap';
 import useBoardScroll from 'app/pages/DashBoardPage/hooks/useBoardScroll';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
+import useLayoutMap from 'app/pages/DashBoardPage/hooks/useLayoutMap';
 import { getBoardMarginPadding } from 'app/pages/DashBoardPage/utils/board';
 import { memo, useCallback, useContext, useMemo } from 'react';
 import RGL, { Layout, WidthProvider } from 'react-grid-layout';
@@ -48,7 +48,7 @@ export const AutoBoardCore: React.FC<{ boardId: string }> = memo(
 
     const { gridWrapRef, thEmitScroll } = useBoardScroll(boardId);
 
-    const sortedLayoutWidgets = useAutoLayoutMap(boardId);
+    const sortedLayoutWidgets = useLayoutMap(boardId);
     const layoutMap = useGridLayoutMap(sortedLayoutWidgets);
 
     const onLayoutChange = useCallback(

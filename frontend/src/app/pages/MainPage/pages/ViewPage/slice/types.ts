@@ -25,7 +25,7 @@ import { SubjectTypes } from '../../PermissionPage/constants';
 import { RowPermissionRaw, Variable } from '../../VariablePage/slice/types';
 import {
   ColumnCategories,
-  SimpleViewJoinType,
+  StructViewJoinType,
   ViewStatus,
   ViewViewModelStages,
 } from '../constants';
@@ -133,6 +133,7 @@ export interface Column extends Schema {
 
   role?: ColumnRole;
   children?: Column[];
+  path?: string[];
 }
 
 export interface Model {
@@ -143,6 +144,7 @@ export type HierarchyModel = {
   version?: string;
   hierarchy?: Model;
   columns?: Model;
+  path?: string[];
   computedFields?: ChartDataViewMeta[];
 };
 
@@ -211,7 +213,7 @@ export interface SelectViewFolderTreeProps {
   getDisabled: (o: ViewSimpleViewModel, path: string[]) => boolean;
 }
 
-export interface SimpleViewQueryProps {
+export interface StructViewQueryProps {
   table: Array<string>;
   columns: Array<string>;
   joins: Array<JoinTableProps>;
@@ -219,12 +221,12 @@ export interface SimpleViewQueryProps {
 
 export interface JoinTableProps {
   table?: Array<string>;
-  joinType?: SimpleViewJoinType;
+  joinType?: StructViewJoinType;
   columns?: Array<string>;
   conditions?: Array<{ left: Array<string>; right: Array<string> }>;
 }
 
-export interface SimpleViewRequestProps {
+export interface StructViewRequestProps {
   table: Array<string>;
   columns: string;
   joins: JoinTableRequestProps;
@@ -232,7 +234,7 @@ export interface SimpleViewRequestProps {
 
 export interface JoinTableRequestProps {
   table?: Array<string>;
-  joinType?: SimpleViewJoinType;
+  joinType?: StructViewJoinType;
   columns?: string;
   conditions?: Array<{ left: Array<string>; right: Array<string> }>;
 }

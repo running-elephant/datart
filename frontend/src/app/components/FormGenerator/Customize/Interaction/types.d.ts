@@ -68,8 +68,23 @@ export type InteractionRule = {
   [InteractionCategory.JumpToUrl]?: JumpToUrlRule;
 };
 
+export type CrossFilteringInteractionRule = {
+  id: string;
+  relId?: string;
+  relName?: string;
+  enable?: boolean;
+  name?: string;
+  relation?: InteractionFieldRelation;
+  [InteractionFieldRelation.Customize]: CustomizeRelation[];
+};
+
 export type DrillThroughSetting = {
   rules?: InteractionRule[];
+};
+
+export type CrossFilteringSetting = {
+  event?: InteractionMouseEvent;
+  rules?: CrossFilteringInteractionRule[];
 };
 
 export type ViewDetailSetting = {

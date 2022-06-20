@@ -32,6 +32,7 @@ import {
   RectConfig,
   WidgetData,
   WidgetInfo,
+  WidgetLinkInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { SelectedItem } from 'app/types/ChartConfig';
@@ -52,7 +53,7 @@ export const boardInit: BoardState = {
   boardInfoRecord: {} as Record<string, BoardInfo>,
   widgetRecord: {} as Record<string, Record<string, Widget>>,
   widgetInfoRecord: {} as Record<string, Record<string, WidgetInfo>>,
-  widgetDataMap: {} as Record<string, WidgetData>,
+  widgetDataMap: {} as Record<string, WidgetData | undefined>,
   dataChartMap: {} as Record<string, DataChart>,
   viewMap: {} as Record<string, ChartDataView>, // View
   availableSourceFunctionsMap: {} as Record<string, string[]>,
@@ -224,10 +225,13 @@ const boardSlice = createSlice({
       state.boardInfoRecord[boardId].fullScreenItemId = itemId;
     },
 
-    setWidgetData(state, action: PayloadAction<WidgetData>) {
-      const widgetData = action.payload;
-      state.widgetDataMap[widgetData.id] = widgetData;
-      state.selectedItems[widgetData.id] = [];
+    setWidgetData(
+      state,
+      action: PayloadAction<{ wid: string; data: WidgetData | undefined }>,
+    ) {
+      const { wid, data } = action.payload;
+      state.widgetDataMap[wid] = data;
+      state.selectedItems[wid] = [];
     },
     changeBoardVisible(
       state,
@@ -316,6 +320,19 @@ const boardSlice = createSlice({
       state.widgetInfoRecord[boardId][widgetId].pageInfo = pageInfo || {
         pageNo: 1,
       };
+    },
+    changeWidgetLinkInfo(
+      state,
+      action: PayloadAction<{
+        boardId: string;
+        widgetId: string;
+        linkInfo?: WidgetLinkInfo;
+      }>,
+    ) {
+      const { boardId, widgetId, linkInfo } = action.payload;
+      if (state.widgetInfoRecord?.[boardId]?.[widgetId]) {
+        state.widgetInfoRecord[boardId][widgetId].linkInfo = linkInfo;
+      }
     },
     setWidgetErrInfo(
       state,

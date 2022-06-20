@@ -28,12 +28,14 @@ import {
   register,
   saveProfile,
   setLoggedInUser,
+  setup,
 } from './thunks';
 import { AppState, User } from './types';
 
 export const initialState: AppState = {
   loggedInUser: null,
   systemInfo: null,
+  setupLoading: false,
   loginLoading: false,
   registerLoading: false,
   saveProfileLoading: false,
@@ -50,6 +52,18 @@ const slice = createSlice({
     },
   },
   extraReducers: builder => {
+    // setup
+    builder.addCase(setup.pending, state => {
+      state.setupLoading = true;
+    });
+    builder.addCase(setup.fulfilled, (state, action) => {
+      state.setupLoading = false;
+      state.systemInfo!.initialized = true;
+    });
+    builder.addCase(setup.rejected, state => {
+      state.setupLoading = false;
+    });
+
     // login
     builder.addCase(login.pending, state => {
       state.loginLoading = true;
@@ -64,7 +78,9 @@ const slice = createSlice({
 
     // getUserInfoByToken
     builder.addCase(getUserInfoByToken.fulfilled, (state, action) => {
-      state.loggedInUser = action.payload;
+      if (action.payload) {
+        state.loggedInUser = action.payload;
+      }
     });
 
     // register

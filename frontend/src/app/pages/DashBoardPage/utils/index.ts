@@ -24,10 +24,15 @@ import {
   TimeFilterValueCategory,
 } from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
+import migrationDataChartConfig from 'app/migration/vizDataChartConfig/migrationDataChartConfig';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
+import {
+  ChartConfig,
+  ChartDataConfig,
+  ChartDataSectionField,
+} from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
@@ -37,7 +42,6 @@ import { getTime, splitRangerDateFilters } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import { CloneValueDeep } from 'utils/object';
-import { handleRequestColumnName } from 'utils/utils';
 import { boardDrillManager } from '../components/BoardDrillManager/BoardDrillManager';
 import { BOARD_FILE_IMG_PREFIX } from '../constants';
 import {
@@ -103,9 +107,16 @@ export const getDataChartRequestParams = (obj: {
   const migratedChartConfig = migrateChartConfig(
     CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
   );
+
+  if (migratedChartConfig?.chartConfig) {
+    migratedChartConfig.chartConfig = migrationDataChartConfig(
+      migratedChartConfig.chartConfig as ChartConfig,
+    );
+  }
   const { datas, settings } = convertToChartConfigDTO(
     migratedChartConfig as ChartDetailConfigDTO,
   );
+
   const builder = new ChartDataRequestBuilder(
     {
       ...view,
@@ -153,10 +164,9 @@ export const getTheWidgetFiltersAndParams = (obj: {
   chartWidget: Widget;
   widgetMap: Record<string, Widget>;
   params: Record<string, string[]> | undefined;
-  viewType: string;
 }) => {
   // TODO chart 本身携带了变量，board没有相关配置的时候要拿到 chart本身的 变量值 Params
-  const { chartWidget, widgetMap, params: chartParams, viewType } = obj;
+  const { chartWidget, widgetMap, params: chartParams } = obj;
   const controllerWidgets = Object.values(widgetMap).filter(
     widget => widget.config.type === 'controller',
   );
@@ -176,6 +186,7 @@ export const getTheWidgetFiltersAndParams = (obj: {
       .filter(view => view.fieldValue)
       .find(view => view.viewId === chartWidget?.viewIds?.[0]);
     if (!relatedViewItem) return;
+
     const values = getWidgetControlValues({
       type,
       relatedViewItem,
@@ -185,6 +196,7 @@ export const getTheWidgetFiltersAndParams = (obj: {
       console.log(`has no FilterValues return on ${chartWidget.id}`);
       return;
     }
+
     // 关联变量逻辑
     if (
       relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Variable
@@ -206,14 +218,12 @@ export const getTheWidgetFiltersAndParams = (obj: {
         variableParams[key] = curValues;
       }
     }
+
     // 关联字段 逻辑
     if (relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Field) {
       const filter: ChartDataRequestFilter = {
         aggOperator: null,
-        column: handleRequestColumnName({
-          viewType,
-          name: String(relatedViewItem.fieldValue),
-        }),
+        column: JSON.parse(relatedViewItem.fieldValue as string),
         sqlOperator: controllerConfig.sqlOperator,
         values: values,
       };
@@ -222,6 +232,7 @@ export const getTheWidgetFiltersAndParams = (obj: {
   });
   // filter 去重
   filterParams = getDistinctFiltersByColumn(filterParams);
+
   const res = {
     filterParams: filterParams,
     variableParams: variableParams,
@@ -241,6 +252,7 @@ export const getWidgetControlValues = (opt: {
     }[] => {
   const { type, relatedViewItem, config } = opt;
   const valueType = relatedViewItem.fieldValueType;
+
   if (DateControllerTypes.includes(type)) {
     if (!config?.controllerDate) {
       return false;
@@ -392,7 +404,6 @@ export const getChartWidgetRequestParams = (obj: {
   if (!dataChart.viewId) return null;
 
   const chartDataView = viewMap[dataChart?.viewId];
-  const viewType = chartDataView?.type || 'SQL';
 
   let requestParams = getDataChartRequestParams({
     dataChart,
@@ -404,7 +415,6 @@ export const getChartWidgetRequestParams = (obj: {
     chartWidget: curWidget,
     widgetMap,
     params: requestParams.params,
-    viewType,
   });
 
   // 全局过滤 filter
@@ -425,7 +435,7 @@ export const getChartWidgetRequestParams = (obj: {
 
       const filter: ChartDataRequestFilter = {
         aggOperator: null,
-        column: handleRequestColumnName({ viewType, name: linkColumn }),
+        column: JSON.parse(linkColumn),
         sqlOperator: FilterSqlOperator.In,
         values: [{ value: triggerValue, valueType: DataViewFieldType.STRING }],
       };

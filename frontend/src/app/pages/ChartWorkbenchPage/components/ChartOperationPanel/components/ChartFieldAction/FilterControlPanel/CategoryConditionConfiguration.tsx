@@ -148,6 +148,7 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
       dataView,
       undefined,
     );
+
     return fieldDataset;
   };
 

@@ -30,6 +30,9 @@ export const widgetMapToTree = (args: {
   const { widgetMap, widgetInfoMap, parentId, tree } = args;
 
   const widgets = Object.values(widgetMap).filter(widget => {
+    if (!parentId && !widget.parentId) {
+      return true;
+    }
     return widget.parentId === parentId;
   });
   if (!widgets.length) return [];

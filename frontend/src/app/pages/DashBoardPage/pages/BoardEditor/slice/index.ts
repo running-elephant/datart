@@ -300,18 +300,19 @@ const widgetInfoRecordSlice = createSlice({
         if (!state?.[widgetId]) return;
         state[widgetId].loading = false;
       });
-    } catch (error) {
-      // console.warn(error);
-    }
+    } catch (error) {}
   },
 });
 const editWidgetDataSlice = createSlice({
   name: 'editBoard',
   initialState: {} as EditBoardState['widgetDataMap'],
   reducers: {
-    setWidgetData(state, action: PayloadAction<WidgetData>) {
-      const widgetData = action.payload;
-      state[widgetData.id] = widgetData;
+    setWidgetData(
+      state,
+      action: PayloadAction<{ wid: string; data: WidgetData | undefined }>,
+    ) {
+      const { wid, data } = action.payload;
+      state[wid] = data;
     },
   },
 });
@@ -329,9 +330,10 @@ const editWidgetSelectedItemsSlice = createSlice({
     },
   },
 });
+export const { actions: editWidgetInfoActions } = widgetInfoRecordSlice;
 export const { actions: editBoardStackActions } = editBoardStackSlice;
 export const { actions: editDashBoardInfoActions } = editDashBoardInfoSlice;
-export const { actions: editWidgetInfoActions } = widgetInfoRecordSlice;
+
 export const { actions: editWidgetDataActions } = editWidgetDataSlice;
 export const { actions: editWidgetSelectedItemsActions } =
   editWidgetSelectedItemsSlice;

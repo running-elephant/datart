@@ -17,7 +17,7 @@
  */
 
 import { Button, Form, Input } from 'antd';
-import { AuthForm } from 'app/components';
+import * as AuthLayout from 'app/components/styles/AuthLayout';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectRegisterLoading } from 'app/slice/selectors';
 import { register } from 'app/slice/thunks';
@@ -59,7 +59,7 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
   }, [history]);
 
   return (
-    <AuthForm>
+    <AuthLayout.Form>
       <Form form={form} onFinish={onRegister}>
         <Form.Item
           name="username"
@@ -122,7 +122,7 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onRegisterSuccess }) => {
           <LinkButton onClick={toLogin}>{t('login')}</LinkButton>
         </Links>
       </Form>
-    </AuthForm>
+    </AuthLayout.Form>
   );
 };
 

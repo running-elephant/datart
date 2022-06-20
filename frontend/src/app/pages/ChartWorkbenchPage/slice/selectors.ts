@@ -45,10 +45,12 @@ export const currentDataViewSelector = createSelector(
   wb => wb.currentDataView,
 );
 
-export const datasetsSelector = createSelector(
-  workbenchSelector,
-  wb => wb.dataset,
-);
+export const datasetsSelector = createSelector(workbenchSelector, wb => {
+  if (!wb.currentDataView?.id && wb.backendChart?.config.sampleData) {
+    return wb.backendChart?.config.sampleData;
+  }
+  return wb.dataset;
+});
 
 export const languageSelector = createSelector(
   workbenchSelector,

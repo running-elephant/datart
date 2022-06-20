@@ -22,7 +22,7 @@ import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import isEqual from 'lodash/isEqual';
 import { FONT_WEIGHT_MEDIUM, SPACE_UNIT } from 'styles/StyleConstants';
 import { Nullable } from 'types';
-import { isEmptyArray } from 'utils/object';
+import { CloneValueDeep, isEmptyArray } from 'utils/object';
 import { getDiffParams, getTextWidth } from 'utils/utils';
 import {
   ColumnCategories,
@@ -37,7 +37,8 @@ import {
   HierarchyModel,
   Model,
   QueryResult,
-  SimpleViewQueryProps,
+  StructViewQueryProps,
+  ViewType,
   ViewViewModel,
 } from './slice/types';
 
@@ -98,6 +99,7 @@ export function isNewView(id: string | undefined): boolean {
 export function transformQueryResultToModelAndDataSource(
   data: QueryResult,
   lastModel: HierarchyModel,
+  viewType?: ViewType,
 ): {
   model: HierarchyModel;
   dataSource: object[];
@@ -108,9 +110,10 @@ export function transformQueryResultToModelAndDataSource(
       name,
       lastModel?.hierarchy || {},
     );
+    const key = viewType === 'STRUCT' ? JSON.parse(name).join('.') : name;
     return {
       ...obj,
-      [name]: {
+      [key]: {
         name,
         type: hierarchyColumn?.type || type,
         primaryKey,
@@ -119,10 +122,17 @@ export function transformQueryResultToModelAndDataSource(
     };
   }, {});
   const dataSource = rows.map(arr =>
-    arr.reduce(
-      (obj, val, index) => ({ ...obj, [columns[index].name]: val }),
-      {},
-    ),
+    arr.reduce((obj, val, index) => {
+      const key =
+        viewType === 'STRUCT'
+          ? JSON.parse(columns[index].name).join('.')
+          : columns[index].name;
+
+      return {
+        ...obj,
+        [key]: val,
+      };
+    }, {}),
   );
   return {
     model: { ...lastModel, columns: newColumns },
@@ -255,7 +265,7 @@ export function getSaveParamsFromViewModel(
       script:
         type === 'STRUCT'
           ? handleObjectScriptToString(
-              script as SimpleViewQueryProps,
+              script as StructViewQueryProps,
               database!,
             )
           : script,
@@ -303,7 +313,7 @@ export function getSaveParamsFromViewModel(
       script:
         type === 'STRUCT' && !isSaveAs
           ? handleObjectScriptToString(
-              script as SimpleViewQueryProps,
+              script as StructViewQueryProps,
               database!,
             )
           : script,
@@ -335,7 +345,6 @@ export function transformModelToViewModel(
   return {
     ...tempViewModel,
     ...rest,
-    type: rest.type || 'SQL',
     config: JSON.parse(config),
     model: JSON.parse(model),
     originVariables: variables.map(v => ({ ...v, relVariableSubjects })),
@@ -373,7 +382,10 @@ export const dataModelColumnSorter = (prev: Column, next: Column): number => {
   );
 };
 
-export const diffMergeHierarchyModel = (model: HierarchyModel) => {
+export const diffMergeHierarchyModel = (
+  model: HierarchyModel,
+  viewType: ViewType,
+) => {
   const hierarchy = model?.hierarchy || {};
   const columns = model?.columns || {};
   const allHierarchyColumnNames = Object.keys(hierarchy).flatMap(name => {
@@ -389,7 +401,7 @@ export const diffMergeHierarchyModel = (model: HierarchyModel) => {
     acc[name] = columns[name];
     return acc;
   }, {});
-  const newHierarchy = Object.keys(hierarchy).reduce((acc, name) => {
+  let newHierarchy = Object.keys(hierarchy).reduce((acc, name) => {
     if (name in columns) {
       acc[name] = hierarchy[name];
     } else if (!isEmptyArray(hierarchy[name]?.children)) {
@@ -403,9 +415,49 @@ export const diffMergeHierarchyModel = (model: HierarchyModel) => {
     }
     return acc;
   }, additionalObjs);
+
+  newHierarchy = addPathToHierarchyStructureAndChangeName(
+    newHierarchy,
+    viewType,
+  );
   model.hierarchy = newHierarchy;
   return model;
 };
+
+export function addPathToHierarchyStructureAndChangeName(
+  Hierarchy: Model,
+  viewType: ViewType,
+): Model {
+  const _hierarchy = CloneValueDeep(Hierarchy);
+  Object.entries(_hierarchy || {}).forEach(
+    ([name, column]: [string, Column]) => {
+      if (column.children) {
+        column.children.forEach(children => {
+          if (!children['path']) {
+            children['path'] =
+              viewType === 'STRUCT'
+                ? JSON.parse(children.name)
+                : [children.name];
+
+            children['name'] =
+              viewType === 'STRUCT'
+                ? JSON.parse(children.name).join('.')
+                : children.name;
+          }
+        });
+      } else {
+        if (!column['path']) {
+          column['path'] =
+            viewType === 'STRUCT' ? JSON.parse(column.name) : [name];
+
+          column['name'] = name;
+        }
+      }
+    },
+  );
+
+  return _hierarchy;
+}
 
 export function buildAntdTreeNodeModel<T extends TreeDataNode & { value: any }>(
   ancestors: string[] = [],
@@ -424,7 +476,7 @@ export function buildAntdTreeNodeModel<T extends TreeDataNode & { value: any }>(
   } as any;
 }
 
-export function buildRequestColumns(tableJSON: SimpleViewQueryProps) {
+export function buildRequestColumns(tableJSON: StructViewQueryProps) {
   const columns: any = [];
   tableJSON.columns.forEach((v, i) => {
     const tableName = tableJSON.table[tableJSON.table.length - 1];
@@ -507,7 +559,7 @@ export function handleStringScriptToObject(
 }
 
 export function handleObjectScriptToString(
-  structure: SimpleViewQueryProps,
+  structure: StructViewQueryProps,
   database: DatabaseSchema[],
 ) {
   try {

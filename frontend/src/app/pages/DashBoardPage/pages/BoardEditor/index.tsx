@@ -38,7 +38,7 @@ import ControllerWidgetPanel from './components/ControllerWidgetPanel';
 import { LinkagePanel } from './components/LinkagePanel';
 import { SettingJumpModal } from './components/SettingJumpModal';
 import { FreeEditor } from './FreeEditor';
-import { editDashBoardInfoActions } from './slice';
+import { editDashBoardInfoActions, useEditBoardSlice } from './slice';
 import {
   addVariablesToBoard,
   clearEditBoardState,
@@ -55,6 +55,7 @@ import { addChartWidget, fetchEditBoardDetail } from './slice/thunk';
 export const BoardEditor: React.FC<{
   boardId: string;
 }> = memo(({ boardId }) => {
+  useEditBoardSlice();
   const dispatch = useDispatch();
   const history = useHistory();
   const board = useSelector(selectEditBoard);

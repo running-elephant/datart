@@ -42,7 +42,7 @@ import {
   Column,
   ColumnRole,
   Model,
-  SimpleViewQueryProps,
+  StructViewQueryProps,
   ViewType,
 } from '../../../slice/types';
 import { dataModelColumnSorter } from '../../../utils';
@@ -76,7 +76,7 @@ const DataModelTree: FC = memo(() => {
   ) as ViewType;
   const script = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'script' }),
-  ) as SimpleViewQueryProps;
+  ) as StructViewQueryProps;
 
   const [hierarchy, setHierarchy] = useState<Nullable<Model>>();
   const [computedFields, setComputedFields] = useState<ChartDataViewMeta[]>();
@@ -86,6 +86,10 @@ const DataModelTree: FC = memo(() => {
   useEffect(() => {
     setViewType(type);
   }, [type]);
+
+  useEffect(() => {
+    setHierarchy(currentEditingView?.model?.hierarchy);
+  }, [currentEditingView?.model?.hierarchy]);
 
   useEffect(() => {
     setComputedFields(currentEditingView?.model?.computedFields);
@@ -135,7 +139,7 @@ const DataModelTree: FC = memo(() => {
   const tableColumns = useMemo<Column[]>(() => {
     return Object.entries(hierarchy || {})
       .map(([name, column], index) => {
-        return Object.assign({ index }, column, { name });
+        return Object.assign({ index }, column, { name: column.name || name });
       })
       .sort(dataModelColumnSorter);
   }, [hierarchy]);
@@ -623,10 +627,10 @@ const DataModelTree: FC = memo(() => {
 
   const titleAdd = useMemo(() => {
     return {
-      items: [{ key: 'computerField', text: '新增计算字段' }],
+      items: [{ key: 'computerField', text: t('model.createComputedFields') }],
       callback: () => addCallback(null),
     };
-  }, [addCallback]);
+  }, [addCallback, t]);
 
   const handleComputedFieldMenuClick = useCallback(
     (node, key) => {
@@ -665,7 +669,6 @@ const DataModelTree: FC = memo(() => {
                 return col.role === ColumnRole.Hierarchy ? (
                   <DataModelBranch
                     node={col}
-                    viewType={viewType}
                     key={col.name}
                     onNodeTypeChange={handleNodeTypeChange}
                     onMoveToHierarchy={openMoveToHierarchyModal}
@@ -675,7 +678,6 @@ const DataModelTree: FC = memo(() => {
                   />
                 ) : (
                   <DataModelNode
-                    viewType={viewType}
                     node={col}
                     key={col.name}
                     onCreateHierarchy={openCreateHierarchyModal}

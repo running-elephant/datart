@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-import { Button, Checkbox } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Button, Checkbox, Tooltip } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { FC, memo, useState } from 'react';
+import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_TIMES } from 'styles/StyleConstants';
 import { CollectionLayout } from '../Layout';
@@ -37,12 +38,12 @@ const CheckboxModal: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     onChange,
   }) => {
     const [openStateModal, contextHolder] = useStateModal({});
-    const [enable, setEnable] = useState(data.value);
+    const hasOriginal = !!data?.options?.hasOriginal;
+    const enable = !!data.value;
 
     const handleCheckboxClick = (e: CheckboxChangeEvent) => {
       e.stopPropagation();
       const isCheck = !enable;
-      setEnable(isCheck);
       onChange?.(ancestors, isCheck);
     };
 
@@ -89,6 +90,11 @@ const CheckboxModal: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         >
           {t(data.label)}
         </Button>
+        {hasOriginal && (
+          <Tooltip title={t('viz.tips.hasChartConfig', true)}>
+            <InfoCircleOutlined />
+          </Tooltip>
+        )}
         {contextHolder}
       </StyledCheckboxModal>
     );

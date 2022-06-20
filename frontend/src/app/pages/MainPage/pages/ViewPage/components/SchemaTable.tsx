@@ -34,9 +34,9 @@ import {
   SPACE_XS,
   WARNING,
 } from 'styles/StyleConstants';
-import { handleDisplayViewName, uuidv4 } from 'utils/utils';
+import { uuidv4 } from 'utils/utils';
 import { ColumnCategories } from '../constants';
-import { Column, Model, ViewType } from '../slice/types';
+import { Column, Model } from '../slice/types';
 import { getColumnWidthMap, getHierarchyColumn } from '../utils';
 
 const ROW_KEY = 'DATART_ROW_KEY';
@@ -48,7 +48,6 @@ interface SchemaTableProps extends TableProps<object> {
   hierarchy: Model;
   dataSource?: object[];
   hasCategory?: boolean;
-  viewType?: ViewType;
   getExtraHeaderActions?: (
     name: string,
     column: Omit<Column, 'name'>,
@@ -67,7 +66,6 @@ export const SchemaTable = memo(
     hierarchy,
     dataSource,
     hasCategory,
-    viewType,
     getExtraHeaderActions,
     onSchemaTypeChange,
     ...tableProps
@@ -115,9 +113,7 @@ export const SchemaTable = memo(
 
         const title = (
           <>
-            <span className="content">
-              {handleDisplayViewName({ viewType, name })}
-            </span>
+            <span className="content">{name}</span>
             <Dropdown
               trigger={['click']}
               overlay={
@@ -184,7 +180,6 @@ export const SchemaTable = memo(
       hasCategory,
       getExtraHeaderActions,
       onSchemaTypeChange,
-      viewType,
       t,
       tg,
     ]);

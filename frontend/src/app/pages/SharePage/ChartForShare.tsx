@@ -30,7 +30,7 @@ import {
   getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
-import { FC, memo, useRef, useState } from 'react';
+import { FC, memo, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import ChartDrillContext from '../ChartWorkbenchPage/contexts/ChartDrillContext';
@@ -204,7 +204,19 @@ const ChartForShare: FC<{
       }),
     );
   };
-
+  const dataset = useMemo(() => {
+    if (
+      !chartPreview?.backendChart?.viewId &&
+      chartPreview?.backendChart?.config.sampleData
+    ) {
+      return chartPreview?.backendChart?.config.sampleData;
+    }
+    return chartPreview?.dataset;
+  }, [
+    chartPreview?.backendChart?.config.sampleData,
+    chartPreview?.backendChart?.viewId,
+    chartPreview?.dataset,
+  ]);
   return (
     <StyledChartPreviewBoard>
       <div ref={controlRef}>
@@ -227,14 +239,13 @@ const ChartForShare: FC<{
             <ChartIFrameContainer
               key={chartPreview?.backendChart?.id!}
               containerId={chartPreview?.backendChart?.id!}
-              dataset={chartPreview?.dataset}
+              dataset={dataset}
               chart={chart!}
               config={chartPreview?.chartConfig!}
               drillOption={drillOptionRef.current}
               selectedItems={selectedItems}
               width={width}
               height={height}
-              viewType={chartPreview?.backendChart?.view?.type || 'SQL'}
             />
           </ChartDrillContextMenu>
         </div>

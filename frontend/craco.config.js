@@ -208,11 +208,11 @@ module.exports = {
     proxy: {
       '/api/v1': {
         changeOrigin: true,
-        target: 'http://10.8.0.54:8081/',
+        target: 'http://10.11.0.154:8080/',
       },
       '/resources': {
         changeOrigin: true,
-        target: 'http://10.8.0.54:8081/',
+        target: 'http://10.11.0.154:8080/',
       },
     },
     historyApiFallback: {

@@ -216,6 +216,7 @@ const workbenchSlice = createSlice({
         if (!state.shadowChartConfig) {
           state.shadowChartConfig = state.chartConfig;
         }
+
         state.currentDataView = {
           ...payload.view,
           variables: payload.queryVariables || [],

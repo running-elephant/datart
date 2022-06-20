@@ -105,6 +105,7 @@ export type AggregateLimit = Pick<typeof AggregateFieldActionType, 'COUNT'>;
 export type ChartDataSectionField = {
   uid?: string;
   colName: string;
+  id: string;
   desc?: string;
   type: DataViewFieldType;
   category: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
@@ -236,6 +237,11 @@ export type ChartStyleSectionRowOption = {
    * Default is false for now, will be change in future version
    */
   translateItemLabel?: boolean;
+
+  /**
+   * Other Free Property
+   */
+  [key: string]: any;
 };
 
 export type ChartStyleSelectorItem = {

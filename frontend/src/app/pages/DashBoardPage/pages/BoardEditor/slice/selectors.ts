@@ -202,7 +202,7 @@ export const selectEditWidgetData = createSelector(
   (widgetDataMap, wid) => {
     if (!widgetDataMap) return DefaultWidgetData;
     if (!widgetDataMap[wid]) return DefaultWidgetData;
-    return widgetDataMap[wid];
+    return widgetDataMap[wid] || DefaultWidgetData;
   },
 );
 // past
@@ -231,6 +231,6 @@ export const makeSelectSelectedItemsInEditor = () => {
   return createSelector(
     selectEditSelectedItems,
     (_, widgetId: string) => widgetId,
-    (selectedItemsMap, wId) => selectedItemsMap.selectedItems?.[wId] || [],
+    (selectedItemsMap, wId) => selectedItemsMap.selectedItems?.[wId],
   );
 };

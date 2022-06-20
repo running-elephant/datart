@@ -43,7 +43,7 @@ const getItemStyles = currentOffset => {
 };
 
 function CardDragLayer(props) {
-  const { item, itemType, currentOffset, isDragging, viewType } = props;
+  const { item, itemType, currentOffset, isDragging } = props;
 
   /**
    * zh: 如果不是正在拖动或者拖动的数据项不是一个数组则不执行
@@ -58,7 +58,7 @@ function CardDragLayer(props) {
       case 'dataset_column':
         return (
           <div style={getItemStyles(currentOffset)}>
-            <ChartDragPreview viewType={viewType} dataItem={item} />
+            <ChartDragPreview dataItem={item} />
           </div>
         );
       default:

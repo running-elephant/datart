@@ -43,14 +43,12 @@ import {
   SUCCESS,
   WARNING,
 } from 'styles/StyleConstants';
-import { handleDisplayViewName } from 'utils/utils';
 import { ColumnCategories } from '../../../constants';
-import { Column, ViewType } from '../../../slice/types';
+import { Column } from '../../../slice/types';
 import { ALLOW_COMBINE_COLUMN_TYPES } from './constant';
 
 const DataModelNode: FC<{
   node: Column;
-  viewType: ViewType;
   className?: string;
   onNodeTypeChange: (type: any, name: string) => void;
   onMoveToHierarchy: (node: Column) => void;
@@ -59,7 +57,6 @@ const DataModelNode: FC<{
 }> = memo(
   ({
     node,
-    viewType,
     className,
     onCreateHierarchy,
     onMoveToHierarchy,
@@ -151,7 +148,7 @@ const DataModelNode: FC<{
               <StyledIW fontSize={FONT_SIZE_TITLE}>{icon}</StyledIW>
             </Tooltip>
           </Dropdown>
-          <span>{handleDisplayViewName({ viewType, name: node.name })}</span>
+          <span>{node.name}</span>
           <div className="action">
             {isHover &&
               !isDragging &&

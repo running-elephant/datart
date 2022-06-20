@@ -178,11 +178,15 @@ export default DropTarget(
   DragSource(
     CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN,
     {
-      beginDrag: (props: ChartDraggableElementProps) => ({
-        id: props.id,
-        index: props.index,
-        ...props.config,
-      }),
+      beginDrag: (props: ChartDraggableElementProps) =>
+        Object.assign(
+          {},
+          {
+            id: props.id,
+            index: props.index,
+          },
+          props.config,
+        ),
       endDrag: (props, monitor) => {
         const dropResult = monitor.getDropResult();
         if (!monitor.didDrop() && !dropResult) {

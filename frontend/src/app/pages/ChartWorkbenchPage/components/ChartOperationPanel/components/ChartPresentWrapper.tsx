@@ -35,7 +35,6 @@ const ChartPresentWrapper: FC<{
   chartConfig?: ChartConfig;
   expensiveQuery: boolean;
   allowQuery: boolean;
-  viewType?: string;
   onChartChange: (c: IChart) => void;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
@@ -49,7 +48,6 @@ const ChartPresentWrapper: FC<{
     expensiveQuery,
     chartConfig,
     allowQuery,
-    viewType,
     onChartChange,
     onRefreshDataset,
     onCreateDownloadDataTask,
@@ -86,7 +84,6 @@ const ChartPresentWrapper: FC<{
             expensiveQuery={expensiveQuery}
             allowQuery={allowQuery}
             chartConfig={chartConfig}
-            viewType={viewType}
             onRefreshDataset={onRefreshDataset}
             onCreateDownloadDataTask={onCreateDownloadDataTask}
             selectedItems={selectedItems}

@@ -17,7 +17,6 @@
  */
 
 import { List } from 'antd';
-import { ViewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { FC, memo, useCallback, useContext, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -27,12 +26,10 @@ import { ChartDraggableSourceContainer } from './ChartDraggableSourceContainer';
 import ChartDragLayer from './ChartDragLayer';
 
 export const ChartDraggableSourceGroupContainer: FC<{
-  viewType?: ViewType;
   meta?: ChartDataViewMeta[];
   onDeleteComputedField: (fieldName) => void;
   onEditComputedField: (fieldName) => void;
 }> = memo(function ChartDraggableSourceGroupContainer({
-  viewType,
   meta,
   onDeleteComputedField,
   onEditComputedField,
@@ -66,21 +63,21 @@ export const ChartDraggableSourceGroupContainer: FC<{
       }
     } else if (shiftKeyActive && dataItemId !== previousActiveItemId) {
       const activeCardIndex: any = dataViewMeta.findIndex(
-        c => c.id === previousActiveItemId,
+        c => c.name === previousActiveItemId,
       );
-      const cardIndex = dataViewMeta.findIndex(c => c.id === dataItemId);
+      const cardIndex = dataViewMeta.findIndex(c => c.name === dataItemId);
       const lowerIndex = Math.min(activeCardIndex, cardIndex);
       const upperIndex = Math.max(activeCardIndex, cardIndex);
       interimSelectedItemsIds = dataViewMeta
         .slice(lowerIndex, upperIndex + 1)
-        .map(c => c.id);
+        .map(c => c.name);
     } else {
       interimSelectedItemsIds = [dataItemId];
       interimActiveItemId = dataItemId;
     }
 
     const selectedCards = dataViewMeta.filter(c =>
-      interimSelectedItemsIds.includes(c.id),
+      interimSelectedItemsIds.includes(c.name),
     );
 
     setSelectedItemsIds(interimSelectedItemsIds);
@@ -107,16 +104,16 @@ export const ChartDraggableSourceGroupContainer: FC<{
   return (
     <Container onClick={onClearCheckedList}>
       {/* 拖动层组件 */}
-      <ChartDragLayer viewType={viewType} />
+      <ChartDragLayer />
       <List
         dataSource={meta}
-        rowKey={item => item.id}
+        rowKey={item => item.name}
         renderItem={item => (
           <Item onClick={stopPPG}>
             <ChartDraggableSourceContainer
               key={item.id}
               id={item.id}
-              name={item.id}
+              name={item.name}
               category={item.category}
               expression={item.expression}
               type={item.type}
@@ -125,12 +122,11 @@ export const ChartDraggableSourceGroupContainer: FC<{
               subType={item.subType}
               role={item.role}
               children={item.children}
-              viewType={viewType}
               onDeleteComputedField={onDeleteComputedField}
               onEditComputedField={handleEditComputedField}
               onSelectionChange={onDataItemSelectionChange}
               onClearCheckedList={onClearCheckedList}
-              isActive={selectedItemsIds.includes(item.id)}
+              isActive={selectedItemsIds.includes(item.name)}
             />
           </Item>
         )}

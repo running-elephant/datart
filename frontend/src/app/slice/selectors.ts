@@ -32,6 +32,11 @@ export const selectSystemInfo = createSelector(
   appState => appState.systemInfo,
 );
 
+export const selectSetupLoading = createSelector(
+  [selectDomain],
+  appState => appState.setupLoading,
+);
+
 export const selectLoginLoading = createSelector(
   [selectDomain],
   appState => appState.loginLoading,

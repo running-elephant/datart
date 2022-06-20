@@ -89,6 +89,20 @@ export const initInteractionTpl = () => {
       ],
     },
     {
+      label: 'crossFiltering.title',
+      key: 'crossFiltering',
+      comType: 'checkboxModal',
+      default: false,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'crossFiltering.title',
+          key: 'setting',
+          comType: 'interaction.crossFiltering',
+        },
+      ],
+    },
+    {
       label: 'viewDetail.title',
       key: 'viewDetail',
       comType: 'checkboxModal',
@@ -159,6 +173,25 @@ export const InteractionI18N = {
         },
       },
     },
+    crossFiltering: {
+      title: '联动',
+      event: {
+        title: '交互事件',
+        left: '左键单击',
+        right: '右键菜单',
+      },
+      rule: {
+        title: '规则设置',
+        header: {
+          relId: '关联图表',
+          relation: '关系设置',
+          operation: '操作',
+        },
+        operation: {
+          delete: '删除',
+        },
+      },
+    },
     viewDetail: {
       title: '查看数据',
       event: '交互事件',
@@ -218,6 +251,25 @@ export const InteractionI18N = {
           field: 'Field',
           variable: 'Variable',
           controller: 'Controller',
+        },
+        operation: {
+          delete: 'Delete',
+        },
+      },
+    },
+    crossFiltering: {
+      title: 'Cross Filtering',
+      event: {
+        title: 'Event',
+        left: 'Left',
+        right: 'Right',
+      },
+      rule: {
+        title: 'Rule',
+        header: {
+          relId: 'Reference Chart',
+          relation: 'Relation',
+          operation: 'Operation',
         },
         operation: {
           delete: 'Delete',

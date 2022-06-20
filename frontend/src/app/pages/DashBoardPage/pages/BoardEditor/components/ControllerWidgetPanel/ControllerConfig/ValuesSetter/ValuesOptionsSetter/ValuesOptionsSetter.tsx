@@ -18,8 +18,13 @@
 
 import { Form, FormInstance, Radio, Select, Space } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
-import { ControllerFacadeTypes } from 'app/constants';
+import {
+  ChartDataViewFieldCategory,
+  ControllerFacadeTypes,
+} from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
+import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import {
   OPERATOR_TYPE_OPTION,
   ValueOptionType,
@@ -32,7 +37,7 @@ import { transformMeta } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { request2 } from 'utils/request';
-import { errorHandle, handleDisplayViewName } from 'utils/utils';
+import { errorHandle } from 'utils/utils';
 import { ControllerConfig } from '../../../types';
 import { AssistViewFields } from './AssistViewFields';
 import { CustomOptions } from './CustomOptions';
@@ -70,16 +75,30 @@ const ValuesOptionsSetter: FC<{
   const getViewOption = useCallback(async (viewId: string) => {
     if (!viewId) return [];
     try {
-      const { data } = await request2<View>(`/views/${viewId}`);
+      let { data } = await request2<View>(`/views/${viewId}`);
+      if (data) {
+        data = migrationViewConfig(data);
+      }
+      if (data?.model) {
+        data.model = beginViewModelMigration(data.model, data.type);
+      }
       let meta = transformMeta(data?.model);
-      const viewType = data?.type || 'SQL';
+      //TODO: Support after beta4
+      // const viewComputerField = JSON.parse(data.model)?.computedFields || [];
+
       if (!meta) return [];
-      const option: CascaderOptionType[] = meta.map(item => {
-        return {
-          value: item.id,
-          label: handleDisplayViewName({ viewType, name: item.id }),
-        };
-      });
+      const option: CascaderOptionType[] = meta
+        // .concat(viewComputerField)
+        .map(item => {
+          return {
+            value: item.id,
+            label:
+              item.category === ChartDataViewFieldCategory.ComputedField
+                ? item.id
+                : item.name,
+          };
+        });
+
       return option;
     } catch (error) {
       errorHandle(error);

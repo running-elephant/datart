@@ -22,7 +22,7 @@ import {
 } from '../pages/MainPage/pages/VariablePage/slice/types';
 import {
   ColumnPermissionRaw,
-  SimpleViewQueryProps,
+  StructViewQueryProps,
   ViewSimple,
   viewType,
 } from '../pages/MainPage/pages/ViewPage/slice/types';
@@ -30,7 +30,7 @@ import {
 export interface View extends ViewSimple {
   config: string;
   model: string;
-  script: string | SimpleViewQueryProps;
+  script: string | StructViewQueryProps;
   variables: Variable[];
   relVariableSubjects: RowPermissionRaw[];
   relSubjectColumns: ColumnPermissionRaw[];

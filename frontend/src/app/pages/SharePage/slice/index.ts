@@ -31,7 +31,6 @@ import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { FilterSqlOperator } from 'globalConstants';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { Omit } from 'utils/object';
-import { handleRequestColumnName } from 'utils/utils';
 import {
   fetchAvailableSourceFunctions,
   fetchShareDataSetByPreviewChartAction,
@@ -107,14 +106,12 @@ export const slice = createSlice({
       const currentChart = ChartManager.instance().getById(
         chartConfigDTO?.chartGraphId,
       );
-      const viewType = vizDetail?.view?.type || 'SQL';
-
       let chartConfig = currentChart?.config as ChartConfig;
       const jumpFilters: ChartDataRequestFilter[] = Object.entries(
         Omit(filterSearchParams, ['type', 'isMatchByName']),
       ).map(entity => {
         return {
-          column: handleRequestColumnName({ viewType, name: entity[0] }),
+          column: entity[0]?.split('.'),
           sqlOperator: FilterSqlOperator.In,
           values: entity[1]?.map(v => ({
             value: v,

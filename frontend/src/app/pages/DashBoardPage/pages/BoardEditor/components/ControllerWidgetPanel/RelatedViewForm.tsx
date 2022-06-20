@@ -36,7 +36,6 @@ import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
-import { handleDisplayViewName } from 'utils/utils';
 import { filterValueTypeByControl, isRangeTypeController } from './utils';
 export interface RelatedViewFormProps {
   viewMap: Record<string, ChartDataView>;
@@ -135,25 +134,22 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
               </Option>
             ));
         } else {
-          const viewType = viewMap?.[relatedViews[index].viewId]?.type || 'SQL';
           // 字段
           return viewMap?.[relatedViews[index].viewId]?.meta
             ?.filter(v => {
               return filterValueTypeByControl(controllerType, v.type);
             })
             .map(item => {
-              const id = handleDisplayViewName({ viewType, name: item.id });
-
               return (
                 <Option
-                  key={item.id}
+                  key={item.name}
                   fieldvaluetype={item.type}
                   value={item.id}
                 >
                   <div
                     style={{ display: 'flex', justifyContent: 'space-between' }}
                   >
-                    <span>{id}</span>
+                    <span>{item.name}</span>
                     <FieldType>{item.type}</FieldType>
                   </div>
                 </Option>

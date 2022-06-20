@@ -54,6 +54,7 @@ import {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { updateBy } from 'app/utils/mutation';
@@ -69,7 +70,6 @@ import {
   meanValue,
   pipe,
 } from 'utils/object';
-import { handleDisplayViewName } from 'utils/utils';
 import { TableColumnsList } from '../components/ChartGraph/BasicTableChart/types';
 import {
   flattenHeaderRowsWithoutGroupRow,
@@ -1581,6 +1581,7 @@ export const getDrillableRows = (
 
 export const getRuntimeDateLevelFields = (rows: any) => {
   const _rows = CloneValueDeep(rows);
+
   _rows?.forEach((v, i) => {
     const symbolData = v?.[RUNTIME_DATE_LEVEL_KEY];
     if (symbolData) {
@@ -1720,25 +1721,6 @@ export const getSelectedItemStyles = (
   };
 };
 
-export const handleRowColNameInChartConfig = (
-  config: ChartConfig,
-  viewType?: string,
-) => {
-  return updateBy(config, draft => {
-    if (draft?.datas) {
-      draft?.datas.forEach(data => {
-        data.rows?.forEach(row => {
-          row.colName = handleDisplayViewName({
-            viewType,
-            name: row.colName,
-            category: row.category,
-          });
-        });
-      });
-    }
-  });
-};
-
 /**
  * Comparing old and new selectedItems
  *
@@ -1763,6 +1745,36 @@ export const compareSelectedItems = (
   return false;
 };
 
+export function handleRequestColumnName({
+  name,
+  viewType = 'SQL',
+  category,
+}: {
+  name: string;
+  viewType?: string;
+  category?: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
+}): string[] {
+  try {
+    if (viewType === 'STRUCT' && category && viewType.indexOf('[') === 0) {
+      if (category === ChartDataViewFieldCategory.Field) {
+        return JSON.parse(name);
+      } else {
+        return [name];
+      }
+    } else if (viewType === 'STRUCT' && viewType.indexOf('[') === 0) {
+      return JSON.parse(name);
+    } else {
+      return [name];
+    }
+  } catch (error) {
+    console.log('handleRequestColumnName', error, {
+      name,
+      viewType,
+      category,
+    });
+    throw error;
+  }
+}
 /**
  * Get chart select option class.
  *
@@ -1776,3 +1788,17 @@ export const getChartSelection = (
 ) => {
   return new ChartSelection(window, options);
 };
+
+export function getAllColumnInMeta(
+  meta?: ChartDataViewMeta[],
+): ChartDataViewMeta[] | undefined {
+  if (!meta) {
+    return meta;
+  }
+
+  const allColumn: any = meta.reduce<ChartDataViewMeta[]>((arr, cur) => {
+    return cur.children ? arr.concat(cur.children) : arr.concat([cur]);
+  }, []);
+
+  return allColumn;
+}

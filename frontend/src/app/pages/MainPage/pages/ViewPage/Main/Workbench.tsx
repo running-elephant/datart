@@ -43,7 +43,7 @@ import { getSchemaBySourceId } from '../slice/thunks';
 import { Editor } from './Editor';
 import { Outputs } from './Outputs';
 import { Properties } from './Properties';
-import { SimpleView } from './SimpleView/index';
+import { StructView } from './StructView';
 
 export const Workbench = memo(() => {
   const dispatch = useDispatch();
@@ -122,9 +122,8 @@ export const Workbench = memo(() => {
               : '',
         }),
       );
-      editorInstance?.layout();
     },
-    [dispatch, actions, editorInstance],
+    [dispatch, actions],
   );
 
   useEffect(() => {
@@ -156,13 +155,13 @@ export const Workbench = memo(() => {
               <Spin />
             </LoadingWrap>
           )
-        ) : viewType === 'STRUCT' ? (
-          <SimpleView
+        ) : viewType !== 'STRUCT' ? (
+          <Editor allowManage={allowManage} allowEnableViz={allowEnableViz} />
+        ) : (
+          <StructView
             allowManage={allowManage}
             allowEnableViz={allowEnableViz}
           />
-        ) : (
-          <Editor allowManage={allowManage} allowEnableViz={allowEnableViz} />
         )}
 
         <Outputs />
@@ -185,5 +184,8 @@ const Development = styled(Split)`
 `;
 
 const LoadingWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
 `;

@@ -23,8 +23,10 @@ import datart.core.base.exception.Exceptions;
 import datart.core.common.DateUtils;
 import datart.core.data.provider.*;
 import datart.data.provider.calcite.SqlParserUtils;
+import datart.data.provider.calcite.dialect.SqlStdOperatorSupport;
 import datart.data.provider.local.LocalDB;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.calcite.sql.SqlDialect;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateParser;
@@ -136,6 +138,17 @@ public abstract class DefaultDataProvider extends DataProvider {
             persistent = false;
         }
         return LocalDB.executeLocalQuery(queryScript, executeParam, dataframes, persistent, expire);
+    }
+
+    @Override
+    public Set<StdSqlOperator> supportedStdFunctions(DataProviderSource source) {
+        SqlDialect sqlDialect = LocalDB.SQL_DIALECT;
+
+        if (!(sqlDialect instanceof SqlStdOperatorSupport)) {
+            return super.supportedStdFunctions(source);
+        }
+
+        return ((SqlStdOperatorSupport) sqlDialect).supportedOperators();
     }
 
 

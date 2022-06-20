@@ -14,9 +14,10 @@ import {
   APP_VERSION_BETA_2,
   APP_VERSION_BETA_4,
 } from './../constants';
-import { WidgetBeta3 } from './types';
+import { WidgetBeta3, WidgetConfBeta3 } from './types';
 import {
   convertToBeta4AutoWidget,
+  convertWidgetConfigToBeta4,
   convertWidgetToBeta4,
 } from './utils/beta4utils';
 
@@ -97,6 +98,9 @@ export const beta4 = (boardType: BoardType, widget?: Widget | WidgetBeta3) => {
   beta4Widget = convertToBeta4AutoWidget(boardType, beta4Widget);
   if (widget.config.version !== APP_VERSION_BETA_4) {
     beta4Widget = convertWidgetToBeta4(beta4Widget as WidgetBeta3);
+    beta4Widget.config = convertWidgetConfigToBeta4(
+      beta4Widget.config as WidgetConfBeta3,
+    );
   }
 
   return beta4Widget as Widget;

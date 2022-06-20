@@ -482,11 +482,12 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
         url: `data-provider/execute`,
         data: requestParams,
       });
-      widgetData = { ...data, id: widgetId };
+      widgetData = data;
       dispatch(
-        editWidgetDataActions.setWidgetData(
-          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
-        ),
+        editWidgetDataActions.setWidgetData({
+          wid: widgetId,
+          data: filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        }),
       );
       dispatch(
         editWidgetInfoActions.changePageInfo({
@@ -510,11 +511,7 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
         }),
       );
       dispatch(
-        editWidgetDataActions.setWidgetData({
-          id: widgetId,
-          columns: [],
-          rows: [],
-        } as WidgetData),
+        editWidgetDataActions.setWidgetData({ wid: widgetId, data: undefined }),
       );
     } finally {
       dispatch(
@@ -566,11 +563,12 @@ export const getEditControllerOptions = createAsyncThunk<
       url: `data-provider/execute`,
       data: requestParams,
     });
-    widgetData = { ...data, id: widget.id };
+    widgetData = data;
     dispatch(
-      editWidgetDataActions.setWidgetData(
-        filterSqlOperatorName(requestParams, widgetData) as WidgetData,
-      ),
+      editWidgetDataActions.setWidgetData({
+        wid: widgetId,
+        data: filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+      }),
     );
 
     return null;

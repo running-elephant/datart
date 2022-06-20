@@ -32,11 +32,7 @@ import {
 import { saveAs } from 'file-saver';
 import i18next from 'i18next';
 import { request, request2, requestWithHeader } from 'utils/request';
-import {
-  errorHandle,
-  handleDisplayViewName,
-  handleRequestColumnName,
-} from 'utils/utils';
+import { errorHandle } from 'utils/utils';
 import { convertToChartDto } from './ChartDtoHelper';
 
 export const getDistinctFields = async (
@@ -46,15 +42,14 @@ export const getDistinctFields = async (
   executeToken: ExecuteToken | undefined,
 ) => {
   const viewConfigs = transformToViewConfig(view?.config);
-  const viewType = view?.type || 'SQL';
   const requestParams: ChartDataRequest = {
     aggregators: [],
     filters: [],
     groups: [],
     columns: [...new Set(columns)].map(v => {
       return {
-        alias: handleDisplayViewName({ viewType, name: v }),
-        column: handleRequestColumnName({ viewType, name: v }),
+        alias: v,
+        column: JSON.parse(v),
       };
     }),
     pageInfo: {

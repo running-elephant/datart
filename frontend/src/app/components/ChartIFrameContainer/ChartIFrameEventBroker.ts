@@ -135,7 +135,7 @@ class ChartIFrameEventBroker {
   private safeInvoke(event: HooksEvent, options: any, context?: BrokerContext) {
     try {
       Debugger.instance.measure(
-        `ChartEventBroker | ${event} `,
+        `ChartEventBroker | ${this._chart?.meta?.id} | ${event} `,
         () => {
           this._listeners.get(event)?.call?.(this._chart, options, context);
         },
