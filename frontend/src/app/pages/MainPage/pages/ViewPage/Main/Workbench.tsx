@@ -155,13 +155,13 @@ export const Workbench = memo(() => {
               <Spin />
             </LoadingWrap>
           )
-        ) : viewType === 'STRUCT' ? (
+        ) : viewType !== 'STRUCT' ? (
+          <Editor allowManage={allowManage} allowEnableViz={allowEnableViz} />
+        ) : (
           <StructView
             allowManage={allowManage}
             allowEnableViz={allowEnableViz}
           />
-        ) : (
-          <Editor allowManage={allowManage} allowEnableViz={allowEnableViz} />
         )}
 
         <Outputs />

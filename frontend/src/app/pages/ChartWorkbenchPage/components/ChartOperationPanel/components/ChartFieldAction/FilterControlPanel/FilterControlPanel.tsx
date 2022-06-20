@@ -185,8 +185,7 @@ const FilterControlPanel: FC<
 
     const renderConditionConfigurationByModel = () => {
       const filterProps = {
-        colName: config?.colName,
-        colPath: config?.id,
+        colName: config?.id,
         ref: filterOptionRef,
         dataset,
         dataView,

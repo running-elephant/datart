@@ -63,7 +63,6 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
       },
       [controllerType, getFormRelatedViews],
     );
-    console.log(viewMap, 'viewMap');
     const fieldValueValidator = async (opt, fieldValue: string[]) => {
       if (!fieldValue) {
         return Promise.reject(new Error(t('noValueErr')));
@@ -145,7 +144,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                 <Option
                   key={item.name}
                   fieldvaluetype={item.type}
-                  value={JSON.stringify(item.id)}
+                  value={item.id}
                 >
                   <div
                     style={{ display: 'flex', justifyContent: 'space-between' }}

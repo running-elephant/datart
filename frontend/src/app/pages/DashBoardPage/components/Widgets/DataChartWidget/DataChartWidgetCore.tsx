@@ -51,6 +51,7 @@ import React, {
 } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
+import { isEmptyArray } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { changeSelectedItems } from '../../../pages/BoardEditor/slice/actions/actions';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
@@ -66,7 +67,7 @@ import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { WidgetSelectionContext } from '../../WidgetProvider/WidgetSelectionProvider';
 
 export const DataChartWidgetCore: React.FC<{}> = memo(() => {
-  const { dataChart, availableSourceFunctions, chartDataView, viewType } =
+  const { dataChart, availableSourceFunctions, chartDataView } =
     useContext(WidgetChartContext);
 
   const scale = useContext(BoardScaleContext);
@@ -246,17 +247,24 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     if (!drillThroughSetting) {
       return;
     }
-    return ruleId =>
+    return ruleId => {
+      const rightClickEvent = !isEmptyArray(selectedItems)
+        ? Object.assign({}, chartContextMenuEvent, {
+            selectedItems: selectedItems,
+          })
+        : { selectedItems: [chartContextMenuEvent?.data] || [] };
       handleDrillThroughEvent(
         buildDrillThroughEventParams(
-          chartContextMenuEvent,
+          rightClickEvent,
           InteractionMouseEvent.Right,
           ruleId,
         ),
       );
+    };
   }, [
     dataChart?.config?.chartConfig?.interactions,
     chartContextMenuEvent,
+    selectedItems,
     getDrillThroughSetting,
     handleDrillThroughEvent,
     buildDrillThroughEventParams,
@@ -270,17 +278,24 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     if (!crossFilteringSetting) {
       return;
     }
-    return () =>
+    return () => {
+      const rightClickEvent = !isEmptyArray(selectedItems)
+        ? Object.assign({}, chartContextMenuEvent, {
+            selectedItems: selectedItems,
+          })
+        : { selectedItems: [chartContextMenuEvent?.data] || [] };
       handleCrossFilteringEvent(
         buildCrossFilteringEventParams(
-          chartContextMenuEvent,
+          rightClickEvent,
           InteractionMouseEvent.Right,
         ),
         onWidgetLinkEvent(widgetRef.current),
       );
+    };
   }, [
     dataChart?.config?.chartConfig?.interactions,
     chartContextMenuEvent,
+    selectedItems,
     getCrossFilteringSetting,
     handleCrossFilteringEvent,
     buildCrossFilteringEventParams,
@@ -295,16 +310,20 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     if (!viewDetailSetting) {
       return;
     }
-    return () =>
+    return () => {
+      const rightClickEvent = !isEmptyArray(selectedItems)
+        ? Object.assign({}, chartContextMenuEvent, {
+            selectedItems: selectedItems,
+          })
+        : { selectedItems: [chartContextMenuEvent?.data] || [] };
       handleViewDataEvent(
-        buildViewDataEventParams(
-          chartContextMenuEvent,
-          InteractionMouseEvent.Right,
-        ),
+        buildViewDataEventParams(rightClickEvent, InteractionMouseEvent.Right),
       );
+    };
   }, [
     dataChart?.config?.chartConfig?.interactions,
     chartContextMenuEvent,
+    selectedItems,
     getViewDetailSetting,
     handleViewDataEvent,
     buildViewDataEventParams,
@@ -467,7 +486,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         containerId={containerId}
         widgetSpecialConfig={widgetSpecialConfig}
         scale={scale}
-        viewType={viewType}
       />
     );
   }, [
@@ -481,7 +499,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     containerId,
     widgetSpecialConfig,
     scale,
-    viewType,
   ]);
   const drillContextVal = {
     drillOption: drillOptionRef.current,

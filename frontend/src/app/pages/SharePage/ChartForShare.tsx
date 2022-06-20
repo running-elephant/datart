@@ -246,7 +246,6 @@ const ChartForShare: FC<{
               selectedItems={selectedItems}
               width={width}
               height={height}
-              viewType={chartPreview?.backendChart?.view?.type || 'SQL'}
             />
           </ChartDrillContextMenu>
         </div>

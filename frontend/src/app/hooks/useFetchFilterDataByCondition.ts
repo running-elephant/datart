@@ -32,6 +32,7 @@ export const useFetchFilterDataByCondition = (
     if (!viewId || condition?.type !== FilterConditionType.List) {
       return;
     }
+
     getDistinctFields?.(viewId, [condition?.name!], view, undefined)?.then(
       dataset => {
         const _convertToList = collection => {

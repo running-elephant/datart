@@ -57,6 +57,7 @@ import {
   HistoryEditBoard,
 } from '../pages/BoardEditor/slice/types';
 import { Widget } from '../types/widgetTypes';
+import { getTheWidgetFiltersAndParams } from '../utils';
 import {
   getCascadeControllers,
   getNeedRefreshWidgetsByController,
@@ -129,10 +130,9 @@ export const widgetClickJumpAction =
     widget: Widget;
     params: ChartMouseEventParams;
     history: any;
-    viewType: string;
   }) =>
   (dispatch, getState) => {
-    const { renderMode, widget, params, history, viewType } = obj;
+    const { renderMode, widget, params, history } = obj;
     const state = getState() as RootState;
     const orgId = state?.main?.orgId || '';
     const folderIds = state.viz?.vizs?.map(v => v.relId) || [];
@@ -187,23 +187,27 @@ export const widgetClickJumpAction =
 export const widgetLinkEventAction =
   (widget: Widget, params: Array<{ filters; rule }>) =>
   async (dispatch, getState) => {
-    // 1. get link charts
     const targetLinkDataChartIds = (params || []).map(p => p.rule?.relId);
     const rootState = getState() as RootState;
+    const widgetMapMap = rootState.board?.widgetRecord;
+    const boardWidgetInfoRecord =
+      rootState.board?.widgetInfoRecord?.[widget?.dashboardId];
+    const widgetMap = widgetMapMap?.[widget?.dashboardId] || {};
+    const sourceWidgetInfo = boardWidgetInfoRecord?.[widget.id];
+    const sourceRuntimeWidgetInfo = sourceWidgetInfo?.linkInfo || {};
+
     const boardLinkWidgets = Object.entries(
-      rootState.board?.widgetRecord?.[widget?.dashboardId] || {},
+      widgetMapMap?.[widget?.dashboardId] || {},
     )
       .filter(([k, v]) => {
         return targetLinkDataChartIds.includes(v.datachartId);
       })
       .map(([k, v]) => v);
-
-    // 2. update all linked charts dataset
     boardLinkWidgets.forEach(w => {
       const filterObj = params?.find(
         p => p?.rule?.relId === w.datachartId,
       )?.filters;
-      const extraFilters: ChartDataRequestFilter[] = Object.entries(
+      const clickFilters: ChartDataRequestFilter[] = Object.entries(
         filterObj || {},
       ).map(([k, v]) => {
         return {
@@ -212,19 +216,32 @@ export const widgetLinkEventAction =
           values: (v as any)?.map(vv => ({ value: vv, valueType: 'STRING' })),
         };
       });
+      const widgetInfo = boardWidgetInfoRecord?.[w.id];
+      const runtimeWidgetInfo = widgetInfo?.linkInfo || {};
+      const { filterParams: controllerFilters, variableParams } =
+        getTheWidgetFiltersAndParams({
+          chartWidget: w,
+          widgetMap: widgetMap,
+          params: undefined,
+        });
       dispatch(
         syncWidgetChartDataAsync({
           boardId: w.dashboardId,
           widgetId: w.id,
           renderMode: 'read',
-          option: {
-            pageInfo: { pageNo: 1 },
-          },
-          extraFilters,
+          option: widgetInfo,
+          extraFilters: (clickFilters || [])
+            .concat(controllerFilters || [])
+            .concat(sourceRuntimeWidgetInfo?.filters || [])
+            .concat(runtimeWidgetInfo?.filters || []),
+          variableParams: Object.assign(
+            variableParams,
+            sourceRuntimeWidgetInfo?.variables,
+            runtimeWidgetInfo?.variables,
+          ),
         }),
       );
     });
-    // TODO: 3. save link filter into chart
   };
 
 export const widgetClickLinkageAction =
@@ -234,7 +251,6 @@ export const widgetClickLinkageAction =
     renderMode: VizRenderMode,
     widget: Widget,
     params: ChartMouseEventParams,
-    viewType: string,
   ) =>
   (dispatch, getState) => {
     const { componentType, seriesType, seriesName } = params;
@@ -257,12 +273,14 @@ export const widgetClickLinkageAction =
         let linkageFieldName: string =
           re?.config?.widgetToWidget?.triggerColumn || '';
         const linkValue = getValueByRowData(params.data, linkageFieldName);
+
         if (!linkValue) {
           console.warn('linkageFieldName:', linkageFieldName);
           console.warn('rowData', params.data?.rowData);
           console.warn(`rowData[${linkageFieldName}]:${linkValue} `);
           return undefined;
         }
+
         const filter: BoardLinkFilter = {
           triggerWidgetId: widget.id,
           triggerValue: linkValue,
@@ -328,12 +346,6 @@ export const widgetChartClickAction =
   }) =>
   (dispatch, getState) => {
     const { boardId, editing, renderMode, widget, params, history } = obj;
-    const rootState = getState() as RootState;
-    const viewBoardState = rootState.board as BoardState;
-    const viewMap = viewBoardState.viewMap;
-    const viewType =
-      viewMap[widget?.config?.content?.dataChart?.viewId]?.type || 'SQL';
-
     //is tableChart
     if (
       params.chartType === 'table' &&
@@ -353,7 +365,6 @@ export const widgetChartClickAction =
           widget,
           params,
           history,
-          viewType,
         }),
       );
       return;
@@ -362,14 +373,7 @@ export const widgetChartClickAction =
     const linkageConfig = widget.config.linkageConfig;
     if (linkageConfig?.open && widget.relations.length) {
       dispatch(
-        widgetClickLinkageAction(
-          boardId,
-          editing,
-          renderMode,
-          widget,
-          params,
-          viewType,
-        ),
+        widgetClickLinkageAction(boardId, editing, renderMode, widget, params),
       );
       return;
     }
@@ -378,6 +382,7 @@ export const widgetChartClickAction =
 export const widgetLinkEventActionCreator =
   (obj: { widget: Widget; params: any }) => dispatch => {
     const { widget, params } = obj;
+    // TODO(Stephen): if not edit mode
     dispatch(widgetLinkEventAction(widget, params));
   };
 

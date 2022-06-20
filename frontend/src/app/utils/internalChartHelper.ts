@@ -379,13 +379,13 @@ export function transformMeta(model?: string) {
     if (!isEmptyArray(column?.children)) {
       return column.children.map(c => ({
         ...c,
-        id: c.path,
+        id: JSON.stringify(c.path),
         category: ChartDataViewFieldCategory.Field,
       }));
     }
     return {
       ...column,
-      id: column.path,
+      id: JSON.stringify(column.path) || colKey,
       category: ChartDataViewFieldCategory.Field,
     };
   });
@@ -414,7 +414,7 @@ function getMeta(key, column) {
   }
   return {
     ...column,
-    id: column.path || key,
+    id: JSON.stringify(column.path) || key,
     subType: column?.category,
     category: isHierarchy
       ? ChartDataViewFieldCategory.Hierarchy
@@ -722,7 +722,7 @@ export const getChartDrillOption = (
 };
 
 export const buildClickEventBaseFilters = (
-  rawData?: Record<string, any>,
+  rowDatas?: Record<string, any>[],
   rule?: InteractionRule,
   drillOption?: IChartDrillOption,
   dataConfigs?: ChartDataConfig[],
@@ -735,18 +735,27 @@ export const buildClickEventBaseFilters = (
     .filter(c => c.type === ChartDataSectionType.Color)
     .flatMap(config => config.rows || []);
 
+  const mixConfigs = (dataConfigs || [])
+    .filter(c => c.type === ChartDataSectionType.Mixed)
+    .flatMap(config => config.rows || []);
+
   return groupConfigs
     .concat(colorConfigs)
+    .concat(mixConfigs)
     .reduce<ChartDataRequestFilter[]>((acc, c) => {
-      const value = rawData?.[c.colName];
-      if (isEmpty(value) || isEmpty(c.colName)) {
+      const filterValues = rowDatas
+        ?.map(rowData => rowData?.[c.colName])
+        ?.filter(Boolean)
+        ?.map(value => ({ value, valueType: c.type }));
+
+      if (isEmptyArray(filterValues) || isEmpty(c.colName)) {
         return acc;
       }
       const filter = {
         aggOperator: null,
         sqlOperator: FilterSqlOperator.In,
-        column: c.id,
-        values: [{ value, valueType: c.type }],
+        column: JSON.parse(c.id),
+        values: filterValues,
       };
       acc.push(filter);
       return acc;

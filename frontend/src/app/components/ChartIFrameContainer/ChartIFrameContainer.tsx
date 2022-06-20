@@ -21,7 +21,6 @@ import {
   FrameContextConsumer,
 } from 'app/components/ReactFrameComponent';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
-import { ViewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
@@ -43,7 +42,6 @@ const ChartIFrameContainer: FC<{
   selectedItems?: SelectedItem[];
   widgetSpecialConfig?: any;
   scale?: [number, number];
-  viewType?: ViewType;
 }> = memo(props => {
   const iframeContainerId = `chart-iframe-root-${props.containerId}`;
   const config = setRuntimeDateLevelFieldsInChartConfig(props.config);

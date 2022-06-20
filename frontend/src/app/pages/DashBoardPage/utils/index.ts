@@ -24,15 +24,20 @@ import {
   TimeFilterValueCategory,
 } from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
+import migrationDataChartConfig from 'app/migration/vizDataChartConfig/migrationDataChartConfig';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
+import {
+  ChartConfig,
+  ChartDataConfig,
+  ChartDataSectionField,
+} from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
-import { getStyles, handleRequestColumnName } from 'app/utils/chartHelper';
+import { getStyles } from 'app/utils/chartHelper';
 import { getTime, splitRangerDateFilters } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
@@ -54,7 +59,6 @@ import { Widget } from '../types/widgetTypes';
 import { DateControllerTypes } from './../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
-import migrationDataChartConfig from 'app/migration/vizDataChartConfig/migrationDataChartConfig';
 
 export const convertImageUrl = (urlKey: string = ''): string => {
   if (urlKey.startsWith(BOARD_FILE_IMG_PREFIX)) {
@@ -103,14 +107,16 @@ export const getDataChartRequestParams = (obj: {
   const migratedChartConfig = migrateChartConfig(
     CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
   );
-  console.log(migratedChartConfig, 'migratedChartConfig');
+
   if (migratedChartConfig?.chartConfig) {
-    migratedChartConfig.chartConfig = migrationDataChartConfig(migratedChartConfig.chartConfig);
+    migratedChartConfig.chartConfig = migrationDataChartConfig(
+      migratedChartConfig.chartConfig as ChartConfig,
+    );
   }
   const { datas, settings } = convertToChartConfigDTO(
     migratedChartConfig as ChartDetailConfigDTO,
   );
-  console.log(datas, 'datas');
+
   const builder = new ChartDataRequestBuilder(
     {
       ...view,

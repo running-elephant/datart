@@ -193,7 +193,7 @@ export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
     if (view?.model) {
       view.model = beginViewModelMigration(view.model, view.type);
     }
-    console.log(transformMeta(view.model), 'transformMeta(view.model)');
+
     let viewView = {
       ...view,
       meta: transformMeta(view.model),

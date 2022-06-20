@@ -32,7 +32,6 @@ const CategoryConditionEditableTable: FC<
   {
     condition?: ChartFilterCondition;
     dataView?: ChartDataView;
-    colPath: string[];
     onConditionChange: (condition: ChartFilterCondition) => void;
     fetchDataByField?: (fieldId) => Promise<string[]>;
   } & I18NComponentProps
@@ -41,7 +40,6 @@ const CategoryConditionEditableTable: FC<
     i18nPrefix,
     condition,
     dataView,
-    colPath,
     onConditionChange,
     fetchDataByField,
   }) => {
@@ -159,12 +157,7 @@ const CategoryConditionEditableTable: FC<
 
     const handleFetchDataFromField = field => async () => {
       if (fetchDataByField) {
-        const dataset = await fetchNewDataset(
-          dataView?.id!,
-          field,
-          dataView,
-          colPath,
-        );
+        const dataset = await fetchNewDataset(dataView?.id!, field, dataView);
         const newRows = convertToList(dataset?.rows, []);
         setRows(newRows);
         handleFilterConditionChange(newRows);
@@ -182,15 +175,10 @@ const CategoryConditionEditableTable: FC<
       [rows],
     );
 
-    const fetchNewDataset = async (
-      viewId,
-      colName: string,
-      dataView,
-      colPath: string[],
-    ) => {
+    const fetchNewDataset = async (viewId, colName: string, dataView) => {
       const fieldDataset = await getDistinctFields(
         viewId,
-        [{ colName, colPath }],
+        [colName],
         dataView,
         undefined,
       );

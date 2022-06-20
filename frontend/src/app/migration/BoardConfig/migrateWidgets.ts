@@ -98,6 +98,30 @@ export const beta4 = (boardType: BoardType, widget?: Widget | WidgetBeta3) => {
   if (widget.config.version !== APP_VERSION_BETA_4) {
     beta4Widget = convertWidgetToBeta4(beta4Widget as WidgetBeta3);
   }
+  if (widget.config.type === 'controller') {
+    const content = widget.config.content as ControllerWidgetContent;
+    const assistViewFields = content?.config?.assistViewFields;
+    if (assistViewFields && typeof assistViewFields === 'object') {
+      if (assistViewFields[1] && assistViewFields[1].indexOf('[') !== 0) {
+        assistViewFields[1] = JSON.stringify([assistViewFields[1]]);
+      }
+      if (assistViewFields[2] && assistViewFields[2].indexOf('[') !== 0) {
+        assistViewFields[2] = JSON.stringify([assistViewFields[2]]);
+      }
+    }
+
+    const relatedViews = content?.relatedViews;
+    if (relatedViews) {
+      relatedViews?.forEach(v => {
+        if (
+          typeof v?.fieldValue === 'string' &&
+          v?.fieldValue?.indexOf('[') !== 0
+        ) {
+          v.fieldValue = JSON.stringify([v.fieldValue]);
+        }
+      });
+    }
+  }
 
   return beta4Widget as Widget;
 };

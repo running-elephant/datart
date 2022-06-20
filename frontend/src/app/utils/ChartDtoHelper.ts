@@ -41,7 +41,7 @@ export function convertToChartDto(data): ChartDTO {
     data.view.model = beginViewModelMigration(data.view.model, data.view.type);
   }
   const config = JSON.parse(data?.config);
-  if (data?.config) {
+  if (config && config.chartConfig) {
     config.chartConfig = migrationDataChartConfig(config.chartConfig);
   }
 
