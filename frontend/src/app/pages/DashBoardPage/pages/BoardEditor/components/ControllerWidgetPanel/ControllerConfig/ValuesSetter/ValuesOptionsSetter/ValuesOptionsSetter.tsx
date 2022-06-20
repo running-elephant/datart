@@ -18,7 +18,10 @@
 
 import { Form, FormInstance, Radio, Select, Space } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
-import { ControllerFacadeTypes } from 'app/constants';
+import {
+  ChartDataViewFieldCategory,
+  ControllerFacadeTypes,
+} from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
@@ -80,15 +83,22 @@ const ValuesOptionsSetter: FC<{
         data.model = beginViewModelMigration(data.model, data.type);
       }
       let meta = transformMeta(data?.model);
-      const viewComputerField = JSON.parse(data.model)?.computedFields || [];
+      //TODO: Support after beta4
+      // const viewComputerField = JSON.parse(data.model)?.computedFields || [];
 
       if (!meta) return [];
-      const option: CascaderOptionType[] = meta.map(item => {
-        return {
-          value: item.id,
-          label: item.name,
-        };
-      });
+      const option: CascaderOptionType[] = meta
+        // .concat(viewComputerField)
+        .map(item => {
+          return {
+            value: item.id,
+            label:
+              item.category === ChartDataViewFieldCategory.ComputedField
+                ? item.id
+                : item.name,
+          };
+        });
+
       return option;
     } catch (error) {
       errorHandle(error);

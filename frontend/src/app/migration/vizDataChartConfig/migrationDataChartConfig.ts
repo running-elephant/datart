@@ -12,7 +12,7 @@ export const beta4 = chartConfig => {
   try {
     chartConfig?.datas?.forEach(data => {
       data?.rows?.forEach(row => {
-        if (!row?.id) {
+        if (!row?.id || row?.id === row?.uid) {
           row.id =
             row.category === ChartDataViewFieldCategory.Field
               ? JSON.stringify([row.colName])

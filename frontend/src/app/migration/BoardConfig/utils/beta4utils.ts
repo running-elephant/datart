@@ -422,7 +422,6 @@ export const convertWidgetToBeta4 = (widget: WidgetBeta3) => {
 
 export const convertWidgetConfigToBeta4 = (widgetConfig: WidgetConfBeta3) => {
   const _widgetConfig = CloneValueDeep(widgetConfig);
-
   if (_widgetConfig.type === 'controller') {
     const content = _widgetConfig.content;
     const assistViewFields = content?.config?.assistViewFields;

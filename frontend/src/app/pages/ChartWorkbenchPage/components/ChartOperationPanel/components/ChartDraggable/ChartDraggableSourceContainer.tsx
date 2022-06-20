@@ -276,7 +276,7 @@ export const ChartDraggableSourceContainer: FC<
       <ChartDraggableSourceContainer
         key={item.id}
         id={item.id}
-        name={item.id}
+        name={item.name}
         category={item.category}
         expression={item.expression}
         type={item.type}
