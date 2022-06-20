@@ -96,7 +96,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const drillOptionRef = useRef<IChartDrillOption>();
   const [openViewDetailPanel, viewDetailPanelContextHolder] =
     useDisplayViewDetail();
-  const [openJumpDialogModal, jumpDialogContextHolder] = useModal();
+  const [jumpDialogModal, jumpDialogContextHolder] = useModal();
   const [chartContextMenuEvent, setChartContextMenuEvent] = useState<{
     data?: any;
   }>();
@@ -109,7 +109,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     handleViewDataEvent,
   } = useChartInteractions({
     openViewDetailPanel,
-    openJumpDialogModal,
+    openJumpDialogModal: jumpDialogModal.info,
   });
 
   useEffect(() => {

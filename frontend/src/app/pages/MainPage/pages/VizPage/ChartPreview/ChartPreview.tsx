@@ -132,7 +132,7 @@ const ChartPreviewBoard: FC<{
     const vizs = useSelector(selectVizs);
     const [openViewDetailPanel, viewDetailPanelContextHolder] =
       useDisplayViewDetail();
-    const [openJumpDialogModal, jumpDialogContextHolder] = useModal();
+    const [jumpDialogModal, jumpDialogContextHolder] = useModal();
     const {
       getDrillThroughSetting,
       getViewDetailSetting,
@@ -140,7 +140,7 @@ const ChartPreviewBoard: FC<{
       handleViewDataEvent,
     } = useChartInteractions({
       openViewDetailPanel,
-      openJumpDialogModal,
+      openJumpDialogModal: jumpDialogModal.info,
     });
 
     const { parse } = useQSLibUrlHelper();
