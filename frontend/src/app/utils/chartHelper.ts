@@ -24,7 +24,9 @@ import {
   RUNTIME_DATE_LEVEL_KEY,
 } from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
-import { ChartDrillOption, DrillMode } from 'app/models/ChartDrillOption';
+import { DrillMode } from 'app/models/ChartDrillOption';
+import { ChartSelection } from 'app/models/ChartSelection';
+import { ChartMouseEvent } from 'app/types/Chart';
 import {
   AxisLabel,
   AxisLineStyle,
@@ -1686,6 +1688,15 @@ export const setRuntimeDateLevelFieldsInChartConfig = (config: ChartConfig) => {
   });
 };
 
+/**
+ * Get common selected styles
+ *
+ * @param { string | number } comIndex
+ * @param { string | number } dcIndex
+ * @param { SelectedItem[] } selectionList
+ * @param { [x: string]: any } [ itemStyle = {} ]
+ * @return { itemStyle: [x: string]: any } itemStyle
+ */
 export const getSelectedItemStyles = (
   comIndex: string | number,
   dcIndex: string | number,
@@ -1708,6 +1719,13 @@ export const getSelectedItemStyles = (
   };
 };
 
+/**
+ * Comparing old and new selectedItems
+ *
+ * @param { SelectedItem[] } newSelectedItems
+ * @param { SelectedItem[] } [ oldSelectedItems ]
+ * @return { boolean }
+ */
 export const compareSelectedItems = (
   newSelectedItems: SelectedItem[],
   oldSelectedItems?: SelectedItem[],
@@ -1723,4 +1741,18 @@ export const compareSelectedItems = (
       .length;
   }
   return false;
+};
+
+/**
+ * Get chart select option class.
+ *
+ * @param { Window } window
+ * @param { ChartSelectionOptions } [ options ]
+ * @return { Object }  ChartSelection
+ */
+export const getChartSelection = (
+  window: Window,
+  options?: { chart: ECharts; mouseEvents?: ChartMouseEvent[] },
+) => {
+  return new ChartSelection(window, options);
 };

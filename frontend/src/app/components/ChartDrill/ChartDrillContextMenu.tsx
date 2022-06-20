@@ -47,6 +47,7 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       onDateLevelChange,
       onViewDataChange,
       onDrillThroughChange,
+      onCrossFilteringChange,
     } = useContext(ChartDrillContext);
 
     const currentDrillLevel = drillOption?.getCurrentDrillLevel();
@@ -166,6 +167,8 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
               onDrillThroughChange?.(key.split(DATARTSEPERATOR)?.[1]);
             } else if (key === 'viewData') {
               onViewDataChange?.();
+            } else if (key === 'crossFiltering') {
+              onCrossFilteringChange?.();
             }
           }}
         >
@@ -182,6 +185,9 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
           )}
           {onViewDataChange && (
             <Menu.Item key={'viewData'}>{t('viewData')}</Menu.Item>
+          )}
+          {onCrossFilteringChange && (
+            <Menu.Item key={'crossFiltering'}>{t('crossFiltering')}</Menu.Item>
           )}
           {!!currentDrillLevel && (
             <Menu.Item key={'rollUp'}>{t('rollUp')}</Menu.Item>
@@ -216,15 +222,17 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       );
     }, [
       hasContextMenu,
+      onDrillThroughChange,
       t,
+      jumpRules,
+      onViewDataChange,
+      onCrossFilteringChange,
       currentDrillLevel,
       drillOption,
       selectDrillStatusMenu,
       runtimeDateLevelFields,
-      availableSourceFunctions,
       onDrillOptionChange,
-      onDrillThroughChange,
-      onViewDataChange,
+      availableSourceFunctions,
       handleDateLevelChange,
     ]);
 

@@ -26,10 +26,10 @@ import { useLocation, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
 import { getToken } from 'utils/auth';
 import persistence from 'utils/persistence';
+import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
 import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
-import { urlSearchTransfer } from '../MainPage/pages/VizPage/utils';
 import ChartForShare from './ChartForShare';
 import PasswordModal from './PasswordModal';
 import ShareLoginModal from './ShareLoginModal';
@@ -91,9 +91,8 @@ export function ShareChart() {
   useMount(() => {
     ChartManager.instance()
       .load()
+      .then(() => loadVizData())
       .catch(err => console.error('Fail to load customize charts with ', err));
-
-    loadVizData();
   });
 
   useEffect(() => {

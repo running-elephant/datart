@@ -70,6 +70,8 @@ public class SqlQueryScriptProcessor implements QueryScriptProcessor {
 
         script = FreemarkerContext.process(queryScript.getScript(), dataMap);
 
+        script = SqlStringUtils.cleanupSqlComments(script, sqlDialect);
+
         script = SqlStringUtils.replaceFragmentVariables(script, queryScript.getVariables());
 
         script = StringUtils.appendIfMissing(script, " ", " ");

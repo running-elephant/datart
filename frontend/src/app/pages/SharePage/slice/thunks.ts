@@ -162,6 +162,9 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
   ) => {
     const state = thunkAPI.getState() as RootState;
     const shareState = state.share;
+    if (!args.preview?.backendChart?.view.id) {
+      return;
+    }
     const builder = new ChartDataRequestBuilder(
       {
         id: args.preview?.backendChart?.view.id || '',

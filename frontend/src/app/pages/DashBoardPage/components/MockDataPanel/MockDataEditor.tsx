@@ -48,7 +48,7 @@ export const MockDataEditor: FC<{ originalData: object; onDataChange: any }> =
       const editorChange = val => {
         try {
           let nextVal = JSON.parse(val);
-          onDataChange(val);
+          onDataChange(nextVal);
         } catch (error) {
           console.warn('error on', error);
         }

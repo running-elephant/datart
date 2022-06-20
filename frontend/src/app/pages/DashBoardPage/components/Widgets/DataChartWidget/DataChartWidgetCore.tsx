@@ -15,16 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import useModal from 'antd/lib/modal/useModal';
 import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
+import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
 import { ChartDataViewFieldCategory } from 'app/constants';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
+import useChartInteractions from 'app/hooks/useChartInteractions';
 import { migrateChartConfig } from 'app/migration';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import useDisplayViewDetail from 'app/pages/MainPage/pages/VizPage/hooks/useDisplayViewDetail';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
@@ -43,15 +47,13 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
+import { isEmptyArray } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
-import {
-  changeSelectedItems,
-  multipleSelectChange,
-  selectedItemChange,
-} from '../../../pages/BoardEditor/slice/actions/actions';
+import { changeSelectedItems } from '../../../pages/BoardEditor/slice/actions/actions';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import {
   boardDrillManager,
@@ -65,12 +67,13 @@ import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { WidgetSelectionContext } from '../../WidgetProvider/WidgetSelectionProvider';
 
 export const DataChartWidgetCore: React.FC<{}> = memo(() => {
-  const { dataChart, availableSourceFunctions } =
+  const { dataChart, availableSourceFunctions, chartDataView } =
     useContext(WidgetChartContext);
+
   const scale = useContext(BoardScaleContext);
-  const { data } = useContext(WidgetDataContext);
-  const { renderMode } = useContext(BoardContext);
-  const { selectedItems, multipleSelect } = useContext(WidgetSelectionContext);
+  const { data: dataset } = useContext(WidgetDataContext);
+  const { renderMode, orgId } = useContext(BoardContext);
+  const selectedItems = useContext(WidgetSelectionContext);
   const widget = useContext(WidgetContext);
   const { dashboardId, id: wid } = widget;
   const bid = useMemo(() => {
@@ -82,11 +85,33 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const containerId = useMemo(() => {
     return `${wid}_${uuidv4()}`;
   }, [wid]);
-  const { onWidgetChartClick, onWidgetGetData, onWidgetDataUpdate } =
-    useContext(WidgetActionContext);
+  const {
+    onWidgetChartClick,
+    onWidgetLinkEvent,
+    onWidgetGetData,
+    onWidgetDataUpdate,
+  } = useContext(WidgetActionContext);
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
   const widgetRef = useRef<Widget>(widget);
   const drillOptionRef = useRef<IChartDrillOption>();
+  const [openViewDetailPanel, viewDetailPanelContextHolder] =
+    useDisplayViewDetail();
+  const [openJumpDialogModal, jumpDialogContextHolder] = useModal();
+  const [chartContextMenuEvent, setChartContextMenuEvent] = useState<{
+    data?: any;
+  }>();
+  const {
+    getDrillThroughSetting,
+    getCrossFilteringSetting,
+    getViewDetailSetting,
+    handleDrillThroughEvent,
+    handleCrossFilteringEvent,
+    handleViewDataEvent,
+  } = useChartInteractions({
+    openViewDetailPanel,
+    openJumpDialogModal,
+  });
+
   useEffect(() => {
     widgetRef.current = widget;
   }, [widget]);
@@ -152,21 +177,156 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     };
   }, [widget]);
 
-  const dataset = useMemo(
-    () => ({
-      columns: data.columns,
-      rows: data.rows,
-      pageInfo: data.pageInfo || {},
-    }),
-    [data],
+  const buildDrillThroughEventParams = useCallback(
+    (clickEventParams, targetEvent: InteractionMouseEvent, ruleId?: string) => {
+      const drillThroughSetting = getDrillThroughSetting(
+        dataChart?.config?.chartConfig?.interactions,
+        widgetRef?.current?.config?.customConfig?.interactions,
+      );
+      return {
+        drillOption: drillOptionRef?.current,
+        drillThroughSetting,
+        clickEventParams,
+        targetEvent,
+        orgId,
+        view: chartDataView,
+        computedFields: dataChart?.config?.computedFields,
+        aggregation: dataChart?.config?.aggregation,
+        chartConfig: dataChart?.config?.chartConfig,
+        ruleId,
+      };
+    },
+    [chartDataView, orgId, dataChart?.config, getDrillThroughSetting],
   );
 
-  const chartIframeKeyboardListener = useCallback(
-    (e: KeyboardEvent) => {
-      multipleSelectChange(dispatch, renderMode, multipleSelect, e);
+  const buildCrossFilteringEventParams = useCallback(
+    (clickEventParams, targetEvent: InteractionMouseEvent) => {
+      const crossFilteringSetting = getCrossFilteringSetting(
+        dataChart?.config?.chartConfig?.interactions,
+        widgetRef?.current?.config?.customConfig?.interactions,
+      );
+      return {
+        drillOption: drillOptionRef?.current,
+        crossFilteringSetting,
+        clickEventParams,
+        targetEvent,
+        orgId,
+        view: chartDataView,
+        computedFields: dataChart?.config?.computedFields,
+        aggregation: dataChart?.config?.aggregation,
+        chartConfig: dataChart?.config?.chartConfig,
+      };
     },
-    [dispatch, renderMode, multipleSelect],
+    [chartDataView, orgId, dataChart?.config, getCrossFilteringSetting],
   );
+
+  const buildViewDataEventParams = useCallback(
+    (clickEventParams, targetEvent: InteractionMouseEvent) => {
+      const viewDetailSetting = getViewDetailSetting(
+        dataChart?.config?.chartConfig?.interactions,
+        widgetRef?.current?.config?.customConfig?.interactions,
+      );
+      return {
+        drillOption: drillOptionRef.current,
+        viewDetailSetting,
+        clickEventParams,
+        targetEvent,
+        chartConfig: dataChart?.config?.chartConfig,
+        view: chartDataView,
+      };
+    },
+    [dataChart?.config?.chartConfig, chartDataView, getViewDetailSetting],
+  );
+
+  const handleDrillThroughChange = useCallback(() => {
+    const drillThroughSetting = getDrillThroughSetting(
+      dataChart?.config?.chartConfig?.interactions,
+      widgetRef?.current?.config?.customConfig?.interactions,
+    );
+    if (!drillThroughSetting) {
+      return;
+    }
+    return ruleId => {
+      const rightClickEvent = !isEmptyArray(selectedItems)
+        ? Object.assign({}, chartContextMenuEvent, {
+            selectedItems: selectedItems,
+          })
+        : { selectedItems: [chartContextMenuEvent?.data] || [] };
+      handleDrillThroughEvent(
+        buildDrillThroughEventParams(
+          rightClickEvent,
+          InteractionMouseEvent.Right,
+          ruleId,
+        ),
+      );
+    };
+  }, [
+    dataChart?.config?.chartConfig?.interactions,
+    chartContextMenuEvent,
+    selectedItems,
+    getDrillThroughSetting,
+    handleDrillThroughEvent,
+    buildDrillThroughEventParams,
+  ]);
+
+  const handleCrossFilteringChange = useCallback(() => {
+    const crossFilteringSetting = getCrossFilteringSetting(
+      dataChart?.config?.chartConfig?.interactions,
+      widgetRef?.current?.config?.customConfig?.interactions,
+    );
+    if (!crossFilteringSetting) {
+      return;
+    }
+    return () => {
+      const rightClickEvent = !isEmptyArray(selectedItems)
+        ? Object.assign({}, chartContextMenuEvent, {
+            selectedItems: selectedItems,
+          })
+        : { selectedItems: [chartContextMenuEvent?.data] || [] };
+      handleCrossFilteringEvent(
+        buildCrossFilteringEventParams(
+          rightClickEvent,
+          InteractionMouseEvent.Right,
+        ),
+        onWidgetLinkEvent(widgetRef.current),
+      );
+    };
+  }, [
+    dataChart?.config?.chartConfig?.interactions,
+    chartContextMenuEvent,
+    selectedItems,
+    getCrossFilteringSetting,
+    handleCrossFilteringEvent,
+    buildCrossFilteringEventParams,
+    onWidgetLinkEvent,
+  ]);
+
+  const handleViewDataChange = useCallback(() => {
+    const viewDetailSetting = getViewDetailSetting(
+      dataChart?.config?.chartConfig?.interactions,
+      widgetRef?.current?.config?.customConfig?.interactions,
+    );
+    if (!viewDetailSetting) {
+      return;
+    }
+    return () => {
+      const rightClickEvent = !isEmptyArray(selectedItems)
+        ? Object.assign({}, chartContextMenuEvent, {
+            selectedItems: selectedItems,
+          })
+        : { selectedItems: [chartContextMenuEvent?.data] || [] };
+      handleViewDataEvent(
+        buildViewDataEventParams(rightClickEvent, InteractionMouseEvent.Right),
+      );
+    };
+  }, [
+    dataChart?.config?.chartConfig?.interactions,
+    chartContextMenuEvent,
+    selectedItems,
+    getViewDetailSetting,
+    handleViewDataEvent,
+    buildViewDataEventParams,
+  ]);
 
   const chart = useMemo(() => {
     if (!dataChart) {
@@ -186,6 +346,22 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                 if (!params) {
                   return;
                 }
+                handleDrillThroughEvent(
+                  buildDrillThroughEventParams(
+                    params,
+                    InteractionMouseEvent.Left,
+                  ),
+                );
+                handleCrossFilteringEvent(
+                  buildCrossFilteringEventParams(
+                    params,
+                    InteractionMouseEvent.Left,
+                  ),
+                  onWidgetLinkEvent(widgetRef.current),
+                );
+                handleViewDataEvent(
+                  buildViewDataEventParams(params, InteractionMouseEvent.Left),
+                );
                 if (
                   drillOptionRef.current?.isSelectedDrill &&
                   !drillOptionRef.current.isBottomLevel
@@ -205,8 +381,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                   return;
                 }
 
-                // NOTE 表格和透视表直接修改selectedItems结果集特殊处理方法 其他图标取消选中时调取
-                if (params.interactionType === 'selected') {
+                // NOTE 直接修改selectedItems结果集处理方法
+                if (params.interactionType === 'select') {
                   changeSelectedItems(
                     dispatch,
                     renderMode,
@@ -214,13 +390,13 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                     wid,
                   );
                 }
-                if (params.interactionType === 'unselect') {
-                  changeSelectedItems(dispatch, renderMode, [], wid);
-                }
-                if (chartInstance.selectable) {
-                  selectedItemChange(dispatch, renderMode, params, wid);
-                }
                 onWidgetChartClick(widgetRef.current, params);
+              },
+            },
+            {
+              name: 'contextmenu',
+              callback: param => {
+                setChartContextMenuEvent(param);
               },
             },
           ]);
@@ -234,12 +410,20 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     }
   }, [
     dataChart,
-    handleDrillOptionChange,
-    onWidgetChartClick,
     dispatch,
     wid,
     renderMode,
+    handleDrillOptionChange,
+    onWidgetChartClick,
+    handleCrossFilteringEvent,
+    buildCrossFilteringEventParams,
+    handleDrillThroughEvent,
+    buildDrillThroughEventParams,
+    handleViewDataEvent,
+    buildViewDataEventParams,
+    onWidgetLinkEvent,
   ]);
+
   const config = useMemo(() => {
     if (!chart?.config) return undefined;
     if (!dataChart?.config) return undefined;
@@ -287,6 +471,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     if (cacheH <= 1 || cacheW <= 1) return null;
     if (errText) return errText;
     const drillOption = drillOptionRef.current;
+
     return (
       <ChartIFrameContainer
         dataset={dataset}
@@ -296,7 +481,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         height={cacheH}
         drillOption={drillOption}
         selectedItems={selectedItems}
-        onKeyboardPress={chartIframeKeyboardListener}
         containerId={containerId}
         widgetSpecialConfig={widgetSpecialConfig}
         scale={scale}
@@ -307,19 +491,21 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     cacheH,
     cacheW,
     errText,
+    chart,
     dataset,
     selectedItems,
-    chart,
     containerId,
     widgetSpecialConfig,
     scale,
-    chartIframeKeyboardListener,
   ]);
   const drillContextVal = {
     drillOption: drillOptionRef.current,
     onDrillOptionChange: handleDrillOptionChange,
     availableSourceFunctions,
     onDateLevelChange: handleDateLevelChange,
+    onDrillThroughChange: handleDrillThroughChange(),
+    onCrossFilteringChange: handleCrossFilteringChange(),
+    onViewDataChange: handleViewDataChange(),
   };
 
   return (
@@ -328,6 +514,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         <StyledWrapper>
           <ChartFrameBox ref={cacheWhRef}>{chartFrame}</ChartFrameBox>
           <ChartDrillPaths chartConfig={dataChart?.config.chartConfig} />
+          {viewDetailPanelContextHolder}
+          {jumpDialogContextHolder}
         </StyledWrapper>
       </ChartDrillContextMenu>
     </ChartDrillContext.Provider>

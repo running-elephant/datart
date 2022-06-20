@@ -32,6 +32,7 @@ import {
   RectConfig,
   WidgetData,
   WidgetInfo,
+  WidgetLinkInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { SelectedItem } from 'app/types/ChartConfig';
@@ -52,12 +53,11 @@ export const boardInit: BoardState = {
   boardInfoRecord: {} as Record<string, BoardInfo>,
   widgetRecord: {} as Record<string, Record<string, Widget>>,
   widgetInfoRecord: {} as Record<string, Record<string, WidgetInfo>>,
-  widgetDataMap: {} as Record<string, WidgetData>,
+  widgetDataMap: {} as Record<string, WidgetData | undefined>,
   dataChartMap: {} as Record<string, DataChart>,
   viewMap: {} as Record<string, ChartDataView>, // View
   availableSourceFunctionsMap: {} as Record<string, string[]>,
   selectedItems: {} as Record<string, SelectedItem[]>,
-  multipleSelect: false,
 };
 // boardActions
 const boardSlice = createSlice({
@@ -225,10 +225,13 @@ const boardSlice = createSlice({
       state.boardInfoRecord[boardId].fullScreenItemId = itemId;
     },
 
-    setWidgetData(state, action: PayloadAction<WidgetData>) {
-      const widgetData = action.payload;
-      state.widgetDataMap[widgetData.id] = widgetData;
-      state.selectedItems[widgetData.id] = [];
+    setWidgetData(
+      state,
+      action: PayloadAction<{ wid: string; data: WidgetData | undefined }>,
+    ) {
+      const { wid, data } = action.payload;
+      state.widgetDataMap[wid] = data;
+      state.selectedItems[wid] = [];
     },
     changeBoardVisible(
       state,
@@ -318,6 +321,19 @@ const boardSlice = createSlice({
         pageNo: 1,
       };
     },
+    changeWidgetLinkInfo(
+      state,
+      action: PayloadAction<{
+        boardId: string;
+        widgetId: string;
+        linkInfo?: WidgetLinkInfo;
+      }>,
+    ) {
+      const { boardId, widgetId, linkInfo } = action.payload;
+      if (state.widgetInfoRecord?.[boardId]?.[widgetId]) {
+        state.widgetInfoRecord[boardId][widgetId].linkInfo = linkInfo;
+      }
+    },
     setWidgetErrInfo(
       state,
       action: PayloadAction<{
@@ -385,33 +401,6 @@ const boardSlice = createSlice({
         state.dataChartMap[action.payload.id] = dataChart;
       }
     },
-
-    normalSelect(
-      state,
-      {
-        payload,
-      }: PayloadAction<{
-        wid: string;
-        data: { index: string; data: any };
-      }>,
-    ) {
-      const index = state.selectedItems[payload.wid]?.findIndex(
-        v => v.index === payload.data.index,
-      );
-      if (state.multipleSelect) {
-        if (index < 0) {
-          state.selectedItems[payload.wid].push(payload.data);
-        } else {
-          state.selectedItems[payload.wid].splice(index, 1);
-        }
-      } else {
-        if (index < 0 || state.selectedItems[payload.wid].length > 1) {
-          state.selectedItems[payload.wid] = [payload.data];
-        } else {
-          state.selectedItems[payload.wid] = [];
-        }
-      }
-    },
     changeSelectedItems(
       state,
       {
@@ -422,9 +411,6 @@ const boardSlice = createSlice({
       }>,
     ) {
       state.selectedItems[payload.wid] = payload.data;
-    },
-    updateMultipleSelect(state, { payload }: PayloadAction<boolean>) {
-      state.multipleSelect = payload;
     },
   },
   extraReducers: builder => {

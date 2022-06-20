@@ -20,7 +20,7 @@ import { useSelector } from 'react-redux';
 import { selectLayoutWidgetMapById } from '../pages/Board/slice/selector';
 import { BoardState } from '../pages/Board/slice/types';
 
-export default function useAutoLayoutMap(boardId: string) {
+export default function useLayoutMap(boardId: string) {
   const selectLayoutWidgetsConfigById = useMemo(selectLayoutWidgetMapById, []);
   const layoutWidgetMap = useSelector((state: { board: BoardState }) =>
     selectLayoutWidgetsConfigById(state, boardId),

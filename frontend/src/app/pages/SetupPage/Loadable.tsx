@@ -18,7 +18,7 @@
 
 import { defaultLazyLoad } from 'utils/loadable';
 
-export const LazyActivePage = defaultLazyLoad(
+export const LazySetupPage = defaultLazyLoad(
   () => import('./index'),
-  module => module.ActivePage,
+  module => module.SetupPage,
 );

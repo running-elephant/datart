@@ -38,10 +38,9 @@ const ChartOperationPanel: FC<{
   allowQuery: boolean;
   onChartChange: (chart: IChart) => void;
   onChartConfigChange: (type, payload) => void;
-  onDataViewChange?: () => void;
+  onDataViewChange?: (clear?: boolean) => void;
   onCreateDownloadDataTask?: () => void;
   selectedItems?: SelectedItem[];
-  onKeyboardPress?: (event: KeyboardEvent) => void;
 }> = memo(
   ({
     chart,
@@ -53,7 +52,6 @@ const ChartOperationPanel: FC<{
     onDataViewChange,
     onCreateDownloadDataTask,
     selectedItems,
-    onKeyboardPress,
   }) => {
     const { dataset, onRefreshDataset } = useContext(ChartDatasetContext);
     const { dataView, expensiveQuery } = useContext(ChartDataViewContext);
@@ -103,7 +101,6 @@ const ChartOperationPanel: FC<{
             onRefreshDataset={onRefreshDataset}
             onCreateDownloadDataTask={onCreateDownloadDataTask}
             selectedItems={selectedItems}
-            onKeyboardPress={onKeyboardPress}
           />
         );
       }

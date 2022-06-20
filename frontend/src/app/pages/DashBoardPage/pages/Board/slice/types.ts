@@ -25,6 +25,7 @@ import { BoardConfig } from 'app/pages/DashBoardPage/types/boardTypes';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDatasetMeta } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { DeltaStatic } from 'quill';
@@ -49,10 +50,9 @@ export interface BoardState {
   widgetInfoRecord: Record<string, Record<string, WidgetInfo>>;
   dataChartMap: Record<string, DataChart>;
   viewMap: Record<string, ChartDataView>; // View
-  widgetDataMap: Record<string, WidgetData>;
+  widgetDataMap: Record<string, WidgetData | undefined>;
   availableSourceFunctionsMap: Record<string, string[]>;
   selectedItems: Record<string, SelectedItem[]>;
-  multipleSelect: boolean;
 }
 // 应用内浏览，分享页模式，定时任务模式，编辑模式
 export type VizRenderMode = 'read' | 'share' | 'schedule' | 'edit';
@@ -175,6 +175,7 @@ export interface WidgetInfo {
   pageInfo: Partial<PageInfo>;
   errInfo: Record<WidgetErrorType, string>;
   parameters?: any;
+  linkInfo?: WidgetLinkInfo;
 }
 export interface WidgetData {
   id: string;
@@ -183,6 +184,7 @@ export interface WidgetData {
   rows?: string[][];
   pageInfo?: Partial<PageInfo>;
 }
+
 //
 export const RenderTypes = [
   'rerender',
@@ -380,6 +382,7 @@ export interface DataChartConfig {
   chartConfig: ChartConfig;
   chartGraphId: string;
   computedFields: any[];
+  sampleData?: any; // for template
 }
 
 export type ColsType = typeof LAYOUT_COLS_MAP;
@@ -449,3 +452,8 @@ export interface getDataOption {
 }
 
 export type WidgetErrorType = 'request' | 'interaction';
+
+export type WidgetLinkInfo = {
+  filters?: ChartDataRequestFilter[];
+  variables?: Record<string, any[]>;
+};

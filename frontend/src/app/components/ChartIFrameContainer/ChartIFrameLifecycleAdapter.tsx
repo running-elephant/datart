@@ -45,7 +45,6 @@ const ChartIFrameLifecycleAdapter: FC<{
   isShown?: boolean;
   drillOption?: IChartDrillOption;
   selectedItems?: SelectedItem[];
-  onKeyboardPress?: (event: KeyboardEvent) => void;
   widgetSpecialConfig?: any;
 }> = ({
   dataset,
@@ -56,31 +55,17 @@ const ChartIFrameLifecycleAdapter: FC<{
   drillOption,
   selectedItems,
   widgetSpecialConfig,
-  onKeyboardPress,
 }) => {
   const [chartResourceLoader] = useState(() => new ChartIFrameResourceLoader());
+  const eventBrokerRef = useRef<ChartIFrameEventBroker>();
   const [containerStatus, setContainerStatus] = useState(ContainerStatus.INIT);
   const { document, window } = useFrame();
   const [containerId] = useState(() => uuidv4());
-  const eventBrokerRef = useRef<ChartIFrameEventBroker>();
   const translator = usePrefixI18N();
-
-  useEffect(() => {
-    if (onKeyboardPress) {
-      window?.addEventListener('keydown', onKeyboardPress);
-      window?.addEventListener('keyup', onKeyboardPress);
-    }
-    return () => {
-      if (onKeyboardPress) {
-        window?.removeEventListener('keydown', onKeyboardPress);
-        window?.removeEventListener('keyup', onKeyboardPress);
-      }
-    };
-  }, [window, onKeyboardPress]);
 
   /**
    * Chart Mount Event
-   * Dependency: 'chart?.meta?.id', 'eventBrokerRef', 'isShown'
+   * Dependency: 'chart?.meta?.id', 'isShown'
    */
   useEffect(() => {
     if (
@@ -134,7 +119,7 @@ const ChartIFrameLifecycleAdapter: FC<{
       eventBrokerRef?.current?.dispose();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chart?.meta?.id, eventBrokerRef, isShown, translator]);
+  }, [chart?.meta?.id, isShown]);
 
   /**
    * Chart Update Event
@@ -178,7 +163,6 @@ const ChartIFrameLifecycleAdapter: FC<{
     document,
     window,
     isShown,
-    translator,
     drillOption,
     selectedItems,
   ]);
@@ -223,7 +207,7 @@ const ChartIFrameLifecycleAdapter: FC<{
     document,
     window,
     isShown,
-    translator,
+    containerStatus,
     drillOption,
   ]);
 

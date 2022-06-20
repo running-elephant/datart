@@ -25,7 +25,7 @@ export interface MockDataPanelProps {
 }
 
 export const MockDataTab: FC<{
-  dataMap: Record<string, { id: string; name: string; data: object }>;
+  dataMap: Record<string, { id: string; name: string; data }>;
   onChangeDataMap: (val) => void;
 }> = memo(({ dataMap, onChangeDataMap }) => {
   const dataList = Object.values(dataMap || {});
@@ -44,8 +44,7 @@ export const MockDataTab: FC<{
   useEffect(() => {
     const widgetData = dataMap?.[wId || ''];
     if (widgetData) {
-      // const dataVal =  JSON.stringify(widgetData.data);
-      const dataVal = widgetData.data;
+      const dataVal = widgetData.data?.rows;
       setCurDataVal(dataVal);
     }
   }, [dataMap, wId]);

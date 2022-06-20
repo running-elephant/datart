@@ -9,6 +9,7 @@ import {
   WidgetData,
   WidgetErrorType,
   WidgetInfo,
+  WidgetLinkInfo,
   WidgetPanelParams,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
@@ -245,6 +246,19 @@ const widgetInfoRecordSlice = createSlice({
       const { widgetId, pageInfo } = action.payload;
       state[widgetId].pageInfo = pageInfo || { pageNo: 1 };
     },
+    changeWidgetLinkInfo(
+      state,
+      action: PayloadAction<{
+        boardId: string;
+        widgetId: string;
+        linkInfo?: WidgetLinkInfo;
+      }>,
+    ) {
+      const { widgetId, linkInfo } = action.payload;
+      if (state[widgetId]) {
+        state[widgetId].linkInfo = linkInfo;
+      }
+    },
     setWidgetErrInfo(
       state,
       action: PayloadAction<{
@@ -300,57 +314,28 @@ const widgetInfoRecordSlice = createSlice({
         if (!state?.[widgetId]) return;
         state[widgetId].loading = false;
       });
-    } catch (error) {
-      // console.warn(error);
-    }
+    } catch (error) {}
   },
 });
 const editWidgetDataSlice = createSlice({
   name: 'editBoard',
   initialState: {} as EditBoardState['widgetDataMap'],
   reducers: {
-    setWidgetData(state, action: PayloadAction<WidgetData>) {
-      const widgetData = action.payload;
-      state[widgetData.id] = widgetData;
+    setWidgetData(
+      state,
+      action: PayloadAction<{ wid: string; data: WidgetData | undefined }>,
+    ) {
+      const { wid, data } = action.payload;
+      state[wid] = data;
     },
   },
 });
 const editWidgetSelectedItemsSlice = createSlice({
   name: 'editBoard',
   initialState: {
-    multipleSelect: false,
     selectedItems: {},
   } as EditBoardState['selectedItemsMap'],
   reducers: {
-    updateMultipleSelectInEditor(state, { payload }: PayloadAction<boolean>) {
-      state.multipleSelect = payload;
-    },
-    normalSelectInEditor(
-      state,
-      {
-        payload,
-      }: PayloadAction<{
-        wid: string;
-        data: { index: string; data: any };
-      }>,
-    ) {
-      const index = state.selectedItems[payload.wid].findIndex(
-        v => v.index === payload.data.index,
-      );
-      if (state.multipleSelect) {
-        if (index < 0) {
-          state.selectedItems[payload.wid].push(payload.data);
-        } else {
-          state.selectedItems[payload.wid].splice(index, 1);
-        }
-      } else {
-        if (index < 0 || state.selectedItems[payload.wid].length > 1) {
-          state.selectedItems[payload.wid] = [payload.data];
-        } else {
-          state.selectedItems[payload.wid] = [];
-        }
-      }
-    },
     changeSelectedItemsInEditor(
       state,
       { payload }: PayloadAction<{ wid: string; data: Array<SelectedItem> }>,
@@ -359,9 +344,10 @@ const editWidgetSelectedItemsSlice = createSlice({
     },
   },
 });
+export const { actions: editWidgetInfoActions } = widgetInfoRecordSlice;
 export const { actions: editBoardStackActions } = editBoardStackSlice;
 export const { actions: editDashBoardInfoActions } = editDashBoardInfoSlice;
-export const { actions: editWidgetInfoActions } = widgetInfoRecordSlice;
+
 export const { actions: editWidgetDataActions } = editWidgetDataSlice;
 export const { actions: editWidgetSelectedItemsActions } =
   editWidgetSelectedItemsSlice;

@@ -31,25 +31,32 @@ export interface MockDataPanelProps {
 export const ChartMockDataPanel: FC<MockDataPanelProps> = memo(
   ({ chartId, onClose }) => {
     const dispatch = useDispatch();
-    const [rows, setRows] = useState<any>();
+    const [dataset, setDataset] = useState<any>();
     useEffect(() => {
-      const rows = dispatch(getDataChartData(chartId));
-      setRows(rows);
+      const dataset = dispatch(getDataChartData(chartId));
+      setDataset(dataset);
     }, [chartId, dispatch]);
 
     const onExport = async () => {
-      dispatch(exportChartTpl({ chartId, dataRows: rows, callBack: onClose }));
+      dispatch(
+        exportChartTpl({ chartId, dataset: dataset, callBack: onClose }),
+      );
     };
 
     const onDataChange = val => {
-      console.log('__val123 ', val);
+      const newDataset = { ...dataset };
+      newDataset.rows = val;
+      setDataset(newDataset);
     };
     return (
       <StyledWrapper className="mockDataPanel">
         <div className="content">
           <div>data :</div>
           <div className="empty-data" style={{ flex: 1 }}>
-            <MockDataEditor originalData={rows} onDataChange={onDataChange} />
+            <MockDataEditor
+              originalData={dataset?.rows}
+              onDataChange={onDataChange}
+            />
           </div>
 
           <div className="btn-box">

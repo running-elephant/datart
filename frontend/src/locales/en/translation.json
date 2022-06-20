@@ -6,6 +6,7 @@
     "title": {
       "action": "Action"
     },
+    "version": "Version",
     "button": {
       "create": "Create",
       "save": "Save",
@@ -71,6 +72,18 @@
       "city": "City",
       "county": "County"
     }
+  },
+  "setup": {
+    "welcome": "Welcome to datart",
+    "welcomeDesc": "Before using datart for the first time, set up an initial user",
+    "success": "Success",
+    "successDesc": "Initial user set up successfully. Click here to",
+    "goLogin": "Log In",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "initialize": "Initialize"
   },
   "login": {
     "username": "Username / Email",
@@ -494,7 +507,7 @@
         "deleteField": "Delete",
         "editViewTip": "Going back to the view will lose the current edit state, continue?",
         "editView": "Edit View",
-        "toggleViewTip": "Switching view will clear all chart configurations, continue?",
+        "toggleViewTip": "Switch data View Whether to clear the current chart configuration?",
         "AGG_DATE_YEAR": "Year",
         "AGG_DATE_QUARTER": "Quarter",
         "AGG_DATE_MONTH": "Month",
@@ -901,7 +914,8 @@
         "selectDrillOff": "Turn on \"Click to drill down\"",
         "rollUp": "Roll Up",
         "drillThrough": "Drill Through",
-        "viewData": "View Data"
+        "viewData": "View Data",
+        "crossFiltering": "Cross Filtering"
       }
     },
     "action": {
@@ -1171,7 +1185,8 @@
     "tips": {
       "noStartValue": "Input Start Value",
       "noEndValue": "Input End Value",
-      "endGTStartErr": "End Value should be greater than Start Value "
+      "endGTStartErr": "End Value should be greater than Start Value ",
+      "hasChartConfig": "The chart config already exist, it will overwrite after you enable board config."
     },
     "control": {
       "title": "Control Title",
@@ -1336,7 +1351,7 @@
     "createSuccess": "Source created successfully",
     "archived": "Archived ",
     "noPermission": "You do not have permission to access this page",
-    "creatView": "Creat View",
+    "creatView": "Create View",
     "syncDatabase": "Sync Database",
     "syncDatabaseSchemaSuccess": "Sync database schema successfully",
     "lastUpdateTime": "Last Update Time",
@@ -1529,11 +1544,14 @@
     "join": "Join successful",
     "confirming": "Confirming"
   },
-  "active": {
-    "activating": "Activating"
-  },
   "authorization": {
-    "processing": "Processing"
+    "authenticating": "Authenticating",
+    "authenticatingDesc": "In progress, please wait for the completion of authentication",
+    "activating": "Activating",
+    "activatingDesc": "In progress, please wait for the completion of activation",
+    "activatingError": "Activation Error",
+    "error": "Authentication Error",
+    "errorDesc": "Something went wrong, please check and try again"
   },
   "notfound": {
     "title": "Page not found"

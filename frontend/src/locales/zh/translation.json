@@ -6,6 +6,7 @@
     "title": {
       "action": "操作"
     },
+    "version": "版本",
     "button": {
       "create": "新建",
       "save": "保存",
@@ -71,6 +72,18 @@
       "city": "城市",
       "county": "区县"
     }
+  },
+  "setup": {
+    "welcome": "欢迎使用 datart",
+    "welcomeDesc": "在首次使用之前，请设置一位初始用户",
+    "success": "设置成功",
+    "successDesc": "已成功设置初始用户，点击这里",
+    "goLogin": "去登录",
+    "username": "用户名",
+    "email": "邮箱",
+    "password": "密码",
+    "name": "姓名",
+    "initialize": "初始化"
   },
   "login": {
     "username": "用户名 / 邮箱",
@@ -494,7 +507,7 @@
         "deleteField": "删除",
         "editViewTip": "回到数据视图会丢失当前编辑状态，是否继续？",
         "editView": "编辑数据视图",
-        "toggleViewTip": "切换数据视图将会清空所有图表配置，确认继续？",
+        "toggleViewTip": "切换数据视图是否清空当前图表配置？",
         "AGG_DATE_YEAR": "按年",
         "AGG_DATE_QUARTER": "按季度",
         "AGG_DATE_MONTH": "按月",
@@ -901,7 +914,8 @@
         "selectDrillOff": "开启“点击下钻”",
         "rollUp": "上卷",
         "drillThrough": "跳转",
-        "viewData": "查看数据"
+        "viewData": "查看数据",
+        "crossFiltering": "联动"
       }
     },
     "action": {
@@ -1171,7 +1185,8 @@
     "tips": {
       "noStartValue": "请填写 起始值",
       "noEndValue": "请填写 结束值",
-      "endGTStartErr": "起始值 该小于 结束值"
+      "endGTStartErr": "起始值 该小于 结束值",
+      "hasChartConfig": "图表已启用配置，当前仪表板启用后会覆盖图表配置。"
     },
     "control": {
       "title": "控制器标题",
@@ -1377,7 +1392,7 @@
       "email": "邮箱",
       "password": "密码",
       "changePassword": "点击修改密码",
-      "name": "用户姓名",
+      "name": "姓名",
       "description": "描述",
       "roles": "角色列表",
       "assignRole": "为用户指定角色",
@@ -1394,7 +1409,7 @@
       "searchMember": "搜索成员关键字",
       "username": "用户名",
       "email": "邮箱",
-      "name": "用户姓名",
+      "name": "姓名",
       "remove": "移除"
     },
     "form": {
@@ -1529,11 +1544,14 @@
     "join": "成功加入组织",
     "confirming": "确认邀请中"
   },
-  "active": {
-    "activating": "激活中"
-  },
   "authorization": {
-    "processing": "处理中"
+    "authenticating": "认证中",
+    "authenticatingDesc": "正在认证，请等待认证通过",
+    "activating": "激活中",
+    "activatingDesc": "正在激活，请等待激活完成",
+    "activatingError": "激活失败",
+    "error": "认证失败",
+    "errorDesc": "发生错误，请检查并重新尝试"
   },
   "notfound": {
     "title": "没有这个页面"

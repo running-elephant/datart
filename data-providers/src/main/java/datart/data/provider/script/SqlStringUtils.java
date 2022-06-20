@@ -21,13 +21,22 @@ package datart.data.provider.script;
 import com.google.common.collect.Iterables;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.Exceptions;
+import datart.core.common.ReflectUtils;
 import datart.core.data.provider.ScriptVariable;
 import datart.data.provider.base.DataProviderException;
 import datart.data.provider.jdbc.SqlSplitter;
+import jdk.nashorn.internal.parser.TokenType;
+import org.apache.calcite.avatica.util.Quoting;
+import org.apache.calcite.config.Lex;
+import org.apache.calcite.sql.SqlDialect;
+import org.apache.calcite.sql.advise.SqlSimpleParser;
+import org.apache.calcite.sql.parser.SqlParser;
+import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -84,10 +93,41 @@ public class SqlStringUtils {
     }
 
     public static String cleanupSql(String sql) {
-        sql = sql.replaceAll(REG_SQL_SINGLE_LINE_COMMENT, " ");
-        sql = sql.replaceAll(REG_SQL_MULTI_LINE_COMMENT, " ");
+        //sql = sql.replaceAll(REG_SQL_SINGLE_LINE_COMMENT, " ");
+        //sql = sql.replaceAll(REG_SQL_MULTI_LINE_COMMENT, " ");
         sql = sql.replace(CharUtils.CR, CharUtils.toChar(" "));
         sql = sql.replace(CharUtils.LF, CharUtils.toChar(" "));
+        return sql.trim();
+    }
+
+    public static String cleanupSqlComments(String sql, SqlDialect sqlDialect) {
+        Quoting quoting = Lex.MYSQL.quoting;
+        if (sqlDialect != null) {
+            quoting = sqlDialect.configureParser(SqlParser.Config.DEFAULT).quoting();
+        }
+        List<SqlParserPos> posList = new ArrayList<>();
+
+        SqlSimpleParser.Tokenizer tokenizer = new SqlSimpleParser.Tokenizer(sql, "", quoting);
+        int currPos = 0;
+        while (true) {
+            SqlSimpleParser.Token token = tokenizer.nextToken();
+            if (token==null) {
+                break;
+            } else {
+                Object tokenType = ReflectUtils.getFieldValue(token, "type");
+                Integer endIndex = (Integer) ReflectUtils.getFieldValue(tokenizer, "pos");
+                if (tokenType.toString().equals(TokenType.COMMENT.name())) {
+                    posList.add(new SqlParserPos(0, currPos, 0, endIndex));
+                }
+                currPos = endIndex;
+            }
+        }
+        int removeLength = 0;
+        for (SqlParserPos pos : posList) {
+            String pattern = sql.substring(pos.getColumnNum()-removeLength, pos.getEndColumnNum()-removeLength);
+            sql = StringUtils.replaceOnce(sql, pattern, "");
+            removeLength = removeLength+pattern.length();
+        }
         return sql.trim();
     }
 

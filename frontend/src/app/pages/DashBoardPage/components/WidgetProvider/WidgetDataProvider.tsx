@@ -24,7 +24,9 @@ import { BoardState } from '../../pages/Board/slice/types';
 import { selectEditWidgetData } from '../../pages/BoardEditor/slice/selectors';
 import { EditBoardState } from '../../pages/BoardEditor/slice/types';
 
-export const WidgetDataContext = createContext<{ data: WidgetData }>({
+export const WidgetDataContext = createContext<{
+  data: WidgetData | undefined;
+}>({
   data: { id: '', columns: [], rows: [] } as WidgetData,
 });
 export const WidgetDataProvider: FC<{

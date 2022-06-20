@@ -41,7 +41,6 @@ const ChartWorkbench: FC<{
   aggregation?: boolean;
   drillOption?: IChartDrillOption;
   selectedItems?: SelectedItem[];
-  onKeyboardPress?: (event: KeyboardEvent) => void;
   defaultViewId?: string;
   expensiveQuery: boolean;
   allowQuery: boolean;
@@ -57,7 +56,7 @@ const ChartWorkbench: FC<{
   };
   onChartChange: (c: IChart) => void;
   onChartConfigChange: (type, payload) => void;
-  onDataViewChange?: () => void;
+  onDataViewChange?: (clear?: boolean) => void;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
   onChartDrillOptionChange?: (option: IChartDrillOption) => void;
@@ -71,7 +70,6 @@ const ChartWorkbench: FC<{
     aggregation,
     drillOption,
     selectedItems,
-    onKeyboardPress,
     header,
     defaultViewId,
     expensiveQuery,
@@ -141,7 +139,6 @@ const ChartWorkbench: FC<{
                       onDataViewChange={onDataViewChange}
                       onCreateDownloadDataTask={onCreateDownloadDataTask}
                       selectedItems={selectedItems}
-                      onKeyboardPress={onKeyboardPress}
                     />
                   </StyledChartOperationPanel>
                 </StyledChartWorkbench>
