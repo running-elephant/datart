@@ -204,20 +204,18 @@ export const widgetLinkEventAction =
         return targetLinkDataChartIds.includes(v.datachartId);
       })
       .map(([k, v]) => v);
+
     boardLinkWidgets.forEach(w => {
       const filterObj = params?.find(
         p => p?.rule?.relId === w.datachartId,
       )?.filters;
-<<<<<<< HEAD
 
-=======
->>>>>>> upstream/devView
       const clickFilters: ChartDataRequestFilter[] = Object.entries(
         filterObj || {},
       ).map(([k, v]) => {
         return {
           sqlOperator: FilterSqlOperator.In,
-          column: k,
+          column: JSON.parse(k),
           values: (v as any)?.map(vv => ({ value: vv, valueType: 'STRING' })),
         };
       });
