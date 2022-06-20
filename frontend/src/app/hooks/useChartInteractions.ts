@@ -147,7 +147,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
       chartConfig,
     }) => {
       if (drillThroughSetting) {
-        let nonAggChartFilters = new ChartDataRequestBuilder(
+        const sourceChartFilters = new ChartDataRequestBuilder(
           {
             id: view?.id || '',
             config: view?.config || {},
@@ -160,8 +160,10 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
           aggregation,
         )
           .addDrillOption(drillOption)
-          .build()
-          ?.filters?.filter(f => !Boolean(f.aggOperator));
+          .build()?.filters;
+        const sourceChartNonAggFilters = (sourceChartFilters || []).filter(
+          f => !Boolean(f.aggOperator),
+        );
 
         (drillThroughSetting?.rules || [])
           .filter(rule => rule.event === targetEvent)
@@ -178,7 +180,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
             if (rule.category === InteractionCategory.JumpToChart) {
               const urlFilters = getJumpOperationFiltersByInteractionRule(
                 clickFilters,
-                nonAggChartFilters,
+                sourceChartFilters,
                 rule,
               );
               const urlFiltersStr: string = qs.stringify({
@@ -201,7 +203,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
             } else if (rule.category === InteractionCategory.JumpToDashboard) {
               const urlFilters = getJumpFiltersByInteractionRule(
                 clickFilters,
-                nonAggChartFilters,
+                sourceChartNonAggFilters,
                 rule,
               );
               Object.assign(urlFilters, { isMatchByName: true });
@@ -224,7 +226,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
             } else if (rule.category === InteractionCategory.JumpToUrl) {
               const urlFilters = getJumpFiltersByInteractionRule(
                 clickFilters,
-                nonAggChartFilters,
+                sourceChartNonAggFilters,
                 rule,
               );
               Object.assign(urlFilters, { isMatchByName: true });
