@@ -208,7 +208,10 @@ export const widgetLinkEventAction =
       const filterObj = params?.find(
         p => p?.rule?.relId === w.datachartId,
       )?.filters;
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/devView
       const clickFilters: ChartDataRequestFilter[] = Object.entries(
         filterObj || {},
       ).map(([k, v]) => {
