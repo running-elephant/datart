@@ -169,7 +169,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
           .filter(rule => isEmpty(ruleId) || rule.id === ruleId)
           .forEach(rule => {
             const clickFilters = buildClickEventBaseFilters(
-              clickEventParams?.data?.rowData,
+              clickEventParams?.selectedItems?.map(item => item?.data?.rowData),
               rule,
               drillOption,
               chartConfig?.datas,
@@ -295,7 +295,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
 
       const linkParams = (crossFilteringSetting?.rules || []).map(rule => {
         const clickFilters = buildClickEventBaseFilters(
-          clickEventParams?.data?.rowData,
+          clickEventParams?.selectedItems?.map(item => item?.data?.rowData),
           rule,
           drillOption,
           chartConfig?.datas,
@@ -326,7 +326,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
     }) => {
       if (viewDetailSetting?.event === targetEvent) {
         const clickFilters = buildClickEventBaseFilters(
-          clickEventParams?.data?.rowData,
+          clickEventParams?.selectedItems?.map(item => item?.data?.rowData),
           undefined,
           drillOption,
           chartConfig?.datas,

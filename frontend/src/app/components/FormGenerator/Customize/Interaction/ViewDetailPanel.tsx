@@ -29,7 +29,7 @@ import { ViewDetailSetting } from './types';
 const ViewDetailPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, context, onChange }) => {
     const [event, setEvent] = useState<ViewDetailSetting['event']>(
-      data.value?.event,
+      data.value?.event || InteractionMouseEvent.Left,
     );
     const [mapper, setMapper] = useState<ViewDetailSetting['mapper']>(
       data?.value?.mapper,
@@ -84,10 +84,7 @@ const ViewDetailPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           initialValues={{ event, mapper, custom: customFields }}
         >
           <Form.Item label={t('viewDetail.event')} name="event">
-            <Radio.Group
-              defaultValue={InteractionMouseEvent.Left}
-              onChange={handleViewDetailEventChange}
-            >
+            <Radio.Group onChange={handleViewDetailEventChange}>
               <Radio value={InteractionMouseEvent.Left}>
                 {t('viewDetail.leftClick')}
               </Radio>
@@ -97,10 +94,7 @@ const ViewDetailPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             </Radio.Group>
           </Form.Item>
           <Form.Item label={t('viewDetail.field')} name="mapper">
-            <Radio.Group
-              defaultValue={InteractionFieldMapper.All}
-              onChange={handleViewDetailMapperChange}
-            >
+            <Radio.Group onChange={handleViewDetailMapperChange}>
               <Radio value={InteractionFieldMapper.All}>
                 {t('viewDetail.all')}
               </Radio>

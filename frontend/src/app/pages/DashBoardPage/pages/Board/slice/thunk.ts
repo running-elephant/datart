@@ -219,15 +219,15 @@ export const syncWidgetChartDataAsync = createAsyncThunk<
     renderMode: VizRenderMode | undefined;
     option?: getDataOption;
     extraFilters?: ChartDataRequestFilter[];
+    variableParams?: Record<string, any[]>;
   },
   { state: RootState }
 >(
   'board/syncWidgetChartDataAsync',
   async (
-    { boardId, widgetId, renderMode, option, extraFilters },
+    { boardId, widgetId, renderMode, option, extraFilters, variableParams },
     { getState, dispatch },
   ) => {
-    let widgetData;
     const boardState = getState() as { board: BoardState };
     const widgetMapMap = boardState.board.widgetRecord;
     const widgetMap = widgetMapMap[boardId];
@@ -242,8 +242,8 @@ export const syncWidgetChartDataAsync = createAsyncThunk<
       wid: widgetId,
     });
     const dataChart = dataChartMap?.[curWidget.datachartId];
-    const chartDataView = viewMap[dataChart?.viewId];
-    let requestParams = new ChartDataRequestBuilder(
+    const chartDataView = viewMap?.[dataChart?.viewId];
+    const requestParams = new ChartDataRequestBuilder(
       {
         id: chartDataView?.id || '',
         config: chartDataView?.config || {},
@@ -255,20 +255,65 @@ export const syncWidgetChartDataAsync = createAsyncThunk<
       false,
       dataChart?.config?.aggregation,
     )
+      .addVariableParams(variableParams)
       .addExtraSorters(option?.sorters as any[])
       .addRuntimeFilters(extraFilters)
       .addDrillOption(drillOption)
       .build();
 
     if (renderMode === 'read') {
-      const { data } = await request2<WidgetData>({
-        method: 'POST',
-        url: `data-provider/execute`,
-        data: requestParams,
-      });
-      widgetData = { ...data, id: widgetId };
-      dispatch(boardActions.setWidgetData({ wid: widgetId, data: widgetData }));
+      try {
+        const { data } = await request2<WidgetData>({
+          method: 'POST',
+          url: `data-provider/execute`,
+          data: requestParams,
+        });
+        await dispatch(
+          boardActions.setWidgetData({
+            wid: widgetId,
+            data: { ...data, id: widgetId },
+          }),
+        );
+        await dispatch(
+          boardActions.changeWidgetLinkInfo({
+            boardId,
+            widgetId,
+            linkInfo: {
+              filters: extraFilters,
+              variables: variableParams,
+            },
+          }),
+        );
+        await dispatch(
+          boardActions.changePageInfo({
+            boardId,
+            widgetId,
+            pageInfo: data?.pageInfo,
+          }),
+        );
+        await dispatch(
+          boardActions.setWidgetErrInfo({
+            boardId,
+            widgetId,
+            errInfo: undefined,
+            errorType: 'request',
+          }),
+        );
+      } catch (error) {
+        await dispatch(
+          boardActions.setWidgetErrInfo({
+            boardId,
+            widgetId,
+            errInfo: getErrorMessage(error),
+            errorType: 'request',
+          }),
+        );
+        await dispatch(
+          boardActions.setWidgetData({ wid: widgetId, data: undefined }),
+        );
+      }
     }
+    // TODO(Stephen): edit mode, share, eager share
     return null;
   },
 );

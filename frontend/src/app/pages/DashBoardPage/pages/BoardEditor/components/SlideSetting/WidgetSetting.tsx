@@ -143,6 +143,7 @@ export const WidgetSetting: FC<{ boardId?: string }> = memo(({ boardId }) => {
               widget.config.content?.dataChart?.config?.chartConfig?.datas
             }
             context={{
+              widgetId: widget?.id,
               vizs,
               boardVizs: boardWidgets,
               dataview: viewMap?.[widget?.config?.content?.dataChart?.viewId],
