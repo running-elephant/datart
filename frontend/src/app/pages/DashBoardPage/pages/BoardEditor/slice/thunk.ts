@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
+import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import {
   boardDrillManager,
   EDIT_PREFIX,
@@ -32,12 +33,13 @@ import {
   getWidgetMap,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
 import { request2 } from 'utils/request';
-import { uuidv4 } from 'utils/utils';
+import { getErrorMessage, uuidv4 } from 'utils/utils';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
@@ -429,6 +431,109 @@ export const getEditWidgetData = createAsyncThunk<
     }
     if (widget.config.type === 'controller') {
       dispatch(getEditControllerOptions(widget.id));
+    }
+    return null;
+  },
+);
+
+export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
+  null,
+  {
+    boardId: string;
+    widgetId: string;
+    option?: getDataOption;
+    extraFilters?: ChartDataRequestFilter[];
+    variableParams?: Record<string, any[]>;
+  },
+  { state: RootState }
+>(
+  'board/syncEditBoardWidgetChartDataAsync',
+  async (
+    { boardId, widgetId, option, extraFilters, variableParams },
+    { getState, dispatch },
+  ) => {
+    const boardState = getState() as { board: BoardState };
+    const widgetMapMap = boardState.board.widgetRecord;
+    const widgetMap = widgetMapMap[boardId];
+    const curWidget = widgetMap[widgetId];
+    if (!curWidget) {
+      return null;
+    }
+    const viewMap = boardState.board.viewMap;
+    const dataChartMap = boardState.board.dataChartMap;
+    const drillOption = boardDrillManager.getWidgetDrill({
+      bid: curWidget.dashboardId,
+      wid: widgetId,
+    });
+    const dataChart = dataChartMap?.[curWidget.datachartId];
+    const chartDataView = viewMap?.[dataChart?.viewId];
+    const requestParams = new ChartDataRequestBuilder(
+      {
+        id: chartDataView?.id || '',
+        config: chartDataView?.config || {},
+        computedFields: dataChart?.config?.computedFields || [],
+      },
+      dataChart?.config?.chartConfig?.datas,
+      dataChart?.config?.chartConfig?.settings,
+      {},
+      false,
+      dataChart?.config?.aggregation,
+    )
+      .addVariableParams(variableParams)
+      .addExtraSorters(option?.sorters as any[])
+      .addRuntimeFilters(extraFilters)
+      .addDrillOption(drillOption)
+      .build();
+
+    try {
+      const { data } = await request2<WidgetData>({
+        method: 'POST',
+        url: `data-provider/execute`,
+        data: requestParams,
+      });
+      await dispatch(
+        editWidgetDataActions.setWidgetData({
+          wid: widgetId,
+          data: { ...data, id: widgetId },
+        }),
+      );
+      await dispatch(
+        editWidgetInfoActions.changeWidgetLinkInfo({
+          boardId,
+          widgetId,
+          linkInfo: {
+            filters: extraFilters,
+            variables: variableParams,
+          },
+        }),
+      );
+      await dispatch(
+        editWidgetInfoActions.changePageInfo({
+          boardId,
+          widgetId,
+          pageInfo: data?.pageInfo,
+        }),
+      );
+      await dispatch(
+        editWidgetInfoActions.setWidgetErrInfo({
+          boardId,
+          widgetId,
+          errInfo: undefined,
+          errorType: 'request',
+        }),
+      );
+    } catch (error) {
+      await dispatch(
+        editWidgetInfoActions.setWidgetErrInfo({
+          boardId,
+          widgetId,
+          errInfo: getErrorMessage(error),
+          errorType: 'request',
+        }),
+      );
+      await dispatch(
+        editWidgetDataActions.setWidgetData({ wid: widgetId, data: undefined }),
+      );
     }
     return null;
   },
