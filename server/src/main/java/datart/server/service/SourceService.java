@@ -32,6 +32,8 @@ import java.util.List;
 
 public interface SourceService extends BaseCRUDService<Source, SourceMapperExt>, ResourceTransferService<Source, SourceResourceModel, TransferModel, Folder> {
 
+    boolean checkUnique(String orgId, String parentId, String name);
+
     List<Source> listSources(String orgId, boolean active);
 
     SchemaInfo getSourceSchemaInfo(String sourceId);

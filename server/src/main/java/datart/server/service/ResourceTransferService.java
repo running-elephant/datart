@@ -37,9 +37,11 @@ public interface ResourceTransferService<T, R extends TransferModel, RT extends 
             , Map<String, String> sourceIdMapping
             , Map<String, String> viewIdMapping
             , Map<String, String> chartIdMapping
-            , Map<String, String> boardIdMapping);
+            , Map<String, String> boardIdMapping
+            , Map<String, String> folderIdMapping);
 
-    default void importTemplate(RT model, String orgId, String name, F folder) {
+    default F importTemplate(RT model, String orgId, String name, F folder) {
+        return null;
     }
 
 }

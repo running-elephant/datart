@@ -18,20 +18,17 @@
 
 package datart.server.base.transfer.model;
 
+import datart.core.entity.Folder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 @Data
-public class ResourceModel extends TransferModel {
+@EqualsAndHashCode(callSuper = true)
+public class FolderTransferModel extends TransferModel {
 
-    private DashboardResourceModel dashboardResourceModel;
-
-    private DatachartResourceModel datachartResourceModel;
-
-    private ViewResourceModel viewResourceModel;
-
-    private SourceResourceModel sourceResourceModel;
-
-    private FolderTransferModel folderTransferModel;
+    private List<Folder> folders;
 
     @Override
     public String getVizName() {

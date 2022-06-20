@@ -298,9 +298,8 @@ public class VizController extends BaseController {
 
     @ApiOperation(value = "import viz template")
     @PostMapping(value = "/import/template")
-    public ResponseData<Boolean> importVizTemplate(@RequestParam("file") MultipartFile file, @RequestParam String parentId, @RequestParam String orgId, @RequestParam String name) throws IOException {
-        vizService.importVizTemplate(file, orgId, parentId, name);
-        return ResponseData.success(true);
+    public ResponseData<Folder> importVizTemplate(@RequestParam("file") MultipartFile file, @RequestParam String parentId, @RequestParam String orgId, @RequestParam String name) throws Exception {
+        return ResponseData.success(vizService.importVizTemplate(file, orgId, parentId, name));
     }
 
 }

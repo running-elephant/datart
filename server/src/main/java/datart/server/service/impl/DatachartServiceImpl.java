@@ -182,7 +182,7 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
         datachartResourceModel.setMainModels(new LinkedList<>());
 
         Set<String> viewIds = new HashSet<>();
-        Map<String, Folder> parentMap = new HashMap<>();
+        Set<String> parents = new HashSet<>();
 
         for (String datachartId : ids) {
             DatachartResourceModel.MainModel mainModel = new DatachartResourceModel.MainModel();
@@ -200,14 +200,13 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
                 List<Folder> allParents = folderService.getAllParents(vizFolder.getParentId());
                 if (!CollectionUtils.isEmpty(allParents)) {
                     for (Folder folder : allParents) {
-                        parentMap.put(folder.getId(), folder);
+                        parents.add(folder.getId());
                     }
                 }
-                datachartResourceModel.setParents(folderService.getAllParents(vizFolder.getParentId()));
             }
         }
         //folder
-        datachartResourceModel.setParents(new LinkedList<>(parentMap.values()));
+        datachartResourceModel.setParents(parents);
         // view
         datachartResourceModel.getViews().addAll(viewIds);
         return datachartResourceModel;
@@ -236,7 +235,8 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
             , final Map<String, String> sourceIdMapping
             , final Map<String, String> viewIdMapping
             , final Map<String, String> chartIdMapping
-            , final Map<String, String> boardIdMapping) {
+            , final Map<String, String> boardIdMapping
+            , final Map<String, String> folderIdMapping) {
         if (model == null || model.getMainModels() == null) {
             return;
         }
@@ -247,22 +247,20 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
             mainModel.getDatachart().setViewId(viewIdMapping.get(mainModel.getDatachart().getViewId()));
             mainModel.getFolder().setId(UUIDGenerator.generate());
             mainModel.getFolder().setRelId(newId);
-        }
-        Map<String, String> parentIdMapping = new HashMap<>();
-        for (Folder folder : model.getParents()) {
-            String newId = UUIDGenerator.generate();
-            parentIdMapping.put(folder.getId(), newId);
-            folder.setId(newId);
-            folder.setRelId(chartIdMapping.get(folder.getRelId()));
-        }
-        for (Folder parent : model.getParents()) {
-            parent.setParentId(parentIdMapping.get(parent.getParentId()));
+            mainModel.getFolder().setParentId(folderIdMapping.get(mainModel.getFolder().getParentId()));
         }
     }
 
     @Override
-    public void importTemplate(DatachartTemplateModel model, String orgId, String name, Folder folder) {
-        DatachartService.super.importTemplate(model, orgId, name, folder);
+    public Folder importTemplate(DatachartTemplateModel model, String orgId, String name, Folder folder) {
+        DatachartCreateParam createParam = new DatachartCreateParam();
+        createParam.setOrgId(orgId);
+        createParam.setConfig(model.getDatachart().getConfig());
+        createParam.setName(name);
+        if (folder != null) {
+            createParam.setParentId(folder.getId());
+        }
+        return createWithFolder(createParam);
     }
 
     private void importDatachart(DatachartResourceModel model,
@@ -290,7 +288,7 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
             Folder folder = mainModel.getFolder();
             folder.setOrgId(orgId);
             try {
-                folderService.checkUnique(ResourceType.DATACHART, orgId, folder.getParentId(), folder.getName());
+                folderService.checkUnique(orgId, folder.getParentId(), folder.getName());
             } catch (Exception e) {
                 folder.setName(DateUtils.withTimeString(folder.getName()));
                 datachart.setName(folder.getName());
@@ -301,17 +299,6 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
             datachart.setUpdateBy(getCurrentUser().getId());
             datachart.setUpdateTime(new Date());
             datachartMapper.insert(datachart);
-
-            // insert parents
-            if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(model.getParents())) {
-                for (Folder parent : model.getParents()) {
-                    try {
-                        parent.setOrgId(orgId);
-                        folderMapper.insert(parent);
-                    } catch (Exception ignore) {
-                    }
-                }
-            }
         }
     }
 
