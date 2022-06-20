@@ -217,20 +217,10 @@ const ChartDataViewPanel: FC<{
   );
 
   const handleDeleteComputedField = fieldId => {
-    const newComputedFields: ChartDataViewMeta[] = [];
-    let deleteField: ChartDataViewMeta | null = null;
+    const newComputedFields = (dataView?.computedFields || []).filter(
+      f => f.id !== fieldId,
+    );
 
-    (dataView?.computedFields || []).forEach(f => {
-      if (f.id !== fieldId) {
-        newComputedFields.push(f);
-      } else {
-        deleteField = f;
-      }
-    });
-    if (deleteField!.computedFieldsType === 'viewComputerField') {
-      message.error(t('cannotDeleteComputerField'));
-      return false;
-    }
     dispatch(
       workbenchSlice.actions.updateCurrentDataViewComputedFields(
         newComputedFields,
@@ -276,9 +266,6 @@ const ChartDataViewPanel: FC<{
         ),
         onOk: newField =>
           handleAddNewOrUpdateComputedField(newField, field?.id),
-        okButtonProps: {
-          disabled: field?.computedFieldsType === 'viewComputerField',
-        },
       });
     },
     [

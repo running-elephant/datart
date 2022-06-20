@@ -57,6 +57,7 @@ const { Panel } = Collapse;
 
 export const ChartDraggableSourceContainer: FC<
   {
+    isViewComputerField?: boolean;
     availableSourceFunctions?: string[];
     onDeleteComputedField?: (fieldName) => void;
     onEditComputedField?: (fieldName) => void;
@@ -75,6 +76,7 @@ export const ChartDraggableSourceContainer: FC<
   availableSourceFunctions,
   role,
   children,
+  isViewComputerField,
   onDeleteComputedField,
   onEditComputedField,
   onSelectionChange,
@@ -123,7 +125,8 @@ export const ChartDraggableSourceContainer: FC<
     const _isAllowMoreAction = () => {
       return (
         ChartDataViewFieldCategory.Field === category ||
-        ChartDataViewFieldCategory.Hierarchy === category
+        ChartDataViewFieldCategory.Hierarchy === category ||
+        isViewComputerField
       );
     };
 
@@ -269,6 +272,7 @@ export const ChartDraggableSourceContainer: FC<
     onClearCheckedList,
     drag,
     availableSourceFunctions,
+    isViewComputerField,
   ]);
 
   const renderChildren = useMemo(() => {
@@ -282,6 +286,7 @@ export const ChartDraggableSourceContainer: FC<
         type={item.type}
         role={item.role}
         children={item.children}
+        isViewComputerField={item.computedFieldsType}
         onDeleteComputedField={onDeleteComputedField}
         onClearCheckedList={onClearCheckedList}
         selectedItems={selectedItems}

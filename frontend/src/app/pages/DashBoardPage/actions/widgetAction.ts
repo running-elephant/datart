@@ -214,7 +214,7 @@ export const widgetLinkEventAction =
       ).map(([k, v]) => {
         return {
           sqlOperator: FilterSqlOperator.In,
-          column: k,
+          column: JSON.parse(k),
           values: (v as any)?.map(vv => ({ value: vv, valueType: 'STRING' })),
         };
       });

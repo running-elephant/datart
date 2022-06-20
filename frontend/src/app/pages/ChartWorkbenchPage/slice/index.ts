@@ -178,7 +178,7 @@ const workbenchSlice = createSlice({
           const viewComputerFields = (model.computedFields || []).map(v => {
             return {
               ...v,
-              computedFieldsType: 'viewComputerField',
+              computedFieldsType: true,
             };
           });
           computedFields = computedFields.concat(viewComputerFields);

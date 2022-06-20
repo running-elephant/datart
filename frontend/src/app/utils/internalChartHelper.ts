@@ -840,7 +840,7 @@ export const getLinkFiltersByInteractionRule = (
     .filter(Boolean)
     .reduce((acc, cur) => {
       if (cur?.column) {
-        acc[String(cur.column!)] = cur?.values?.map(v => v.value);
+        acc[JSON.stringify(cur.column!)] = cur?.values?.map(v => v.value);
       }
       return acc;
     }, {});
