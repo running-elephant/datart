@@ -483,7 +483,7 @@ export class ChartDataRequestBuilder {
       },
       [],
     );
-    return selectColumns.map(col => col.colName);
+    return Array.from(new Set(selectColumns.map(col => col.colName)));
   }
 
   private buildViewConfigs() {
