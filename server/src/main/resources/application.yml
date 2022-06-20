@@ -74,8 +74,6 @@ datart:
   server:
     path-prefix: /api/v1
 
-  admin-id: datart-admin
-
   migration:
     enable: true
 

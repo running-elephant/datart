@@ -309,11 +309,12 @@ public class RoleServiceImpl extends BaseService implements RoleService {
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public boolean revokeOrgOwner(String orgId, String userId) {
+        Organization organization = orgService.getDefaultMapper().selectForUpdate(orgId);
         List<User> users = roleMapper.selectOrgOwners(orgId);
         if (users.size() < 2) {
-            Exceptions.msg("");
+            Exceptions.msg("resource.organization.owner");
         }
         securityManager.requireOrgOwner(orgId);
         Role role = roleMapper.selectOrgOwnerRole(orgId);
