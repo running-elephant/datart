@@ -782,9 +782,6 @@ export const getJumpFiltersByInteractionRule = (
       if (isEmpty(jumpRule)) {
         return null;
       }
-      if (rule?.category === InteractionCategory.JumpToUrl) {
-        return f;
-      }
       if (jumpRule?.['relation'] === InteractionFieldRelation.Auto) {
         return f;
       } else {
