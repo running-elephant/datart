@@ -16,11 +16,15 @@
  * limitations under the License.
  */
 
-import { InteractionFieldRelation } from 'app/components/FormGenerator/constants';
+import {
+  InteractionCategory,
+  InteractionFieldRelation,
+} from 'app/components/FormGenerator/constants';
 import {
   CustomizeRelation,
   InteractionRule,
   JumpToChartRule,
+  JumpToDashboardRule,
   JumpToUrlRule,
 } from 'app/components/FormGenerator/Customize/Interaction/types';
 import {
@@ -773,7 +777,7 @@ export const getJumpFiltersByInteractionRule = (
         return null;
       }
       const jumpRule = rule?.[rule.category!] as
-        | JumpToChartRule
+        | JumpToDashboardRule
         | JumpToUrlRule;
       if (isEmpty(jumpRule)) {
         return null;
@@ -858,7 +862,7 @@ export const getJumpOperationFiltersByInteractionRule = (
       }
       const jumpRule = rule?.[rule.category!] as
         | JumpToChartRule
-        | JumpToUrlRule;
+        | JumpToDashboardRule
       if (isEmpty(jumpRule)) {
         return acc;
       }
