@@ -272,6 +272,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
         clickEventParams,
         targetEvent,
         view,
+        queryVariables,
         computedFields,
         aggregation,
         chartConfig,
@@ -312,9 +313,11 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
           nonAggChartFilters,
           rule,
         );
+        const variables = getVariablesByInteractionRule(queryVariables, rule);
         return {
           rule,
           filters,
+          variables,
         };
       });
       callback?.(linkParams);
