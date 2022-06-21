@@ -15,14 +15,4 @@ public interface WidgetService extends BaseCRUDService<Widget, WidgetMapper> {
 
     boolean deleteWidgets(List<String> widgetIds);
 
-//    List<WidgetDetail> getDashboardWidgets(String dashboardId);
-//
-//    boolean deleteDashboardWidgets(String dashboardId);
-//
-//    List<RelWidgetWidget> createWidgetsRel(List<RelWidgetWidget> widgetsRel);
-//
-//    boolean updateWidgetsRel(List<RelWidgetWidget> widgetsRel);
-//
-//    boolean deleteWidgetsRel(List<String> widgetIds);
-
 }

@@ -99,7 +99,6 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
         if (CollectionUtils.isNotEmpty(variablePlaceholders)) {
             variablePlaceholders.sort(Comparator.comparingInt(VariablePlaceholder::getStartPos));
         }
-
         return variablePlaceholders;
     }
 
@@ -124,6 +123,15 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
         logicExpressionCall = SpecialSqlCallConverter.convert(logicExpressionCall);
         int startIndex = logicExpressionCall.getParserPosition().getColumnNum();
         int endIndex = logicExpressionCall.getParserPosition().getEndColumnNum();
+        // 处理calcite不把左右括号算进index，导致的index错位问题
+        System.out.println(srcSql.charAt(startIndex - 1));
+        System.out.println(srcSql.charAt(startIndex));
+        if (startIndex > 1 && srcSql.charAt(startIndex - 2) == '(') {
+            startIndex = startIndex - 1;
+        }
+        if (endIndex < srcSql.length() && srcSql.charAt(endIndex) == ')') {
+            endIndex = endIndex + 1;
+        }
         String originalSqlFragment = srcSql.substring(startIndex - 1, endIndex).trim();
 
         List<ScriptVariable> variables = new LinkedList<>();

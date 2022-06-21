@@ -45,11 +45,7 @@ public class ViewController extends BaseController {
     @ApiOperation(value = "check view name is unique")
     @PostMapping("/check/name")
     public ResponseData<Boolean> checkViewName(@Validated @RequestBody CheckNameParam param) {
-        View view = new View();
-        view.setName(param.getName());
-        view.setOrgId(param.getOrgId());
-        view.setParentId(param.getParentId());
-        return ResponseData.success(viewService.checkUnique(view));
+        return ResponseData.success(viewService.checkUnique(param.getOrgId(), param.getParentId(), param.getName()));
     }
 
     @ApiOperation(value = "get org views")

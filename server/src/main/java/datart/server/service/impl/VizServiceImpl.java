@@ -34,6 +34,7 @@ import datart.server.base.transfer.*;
 import datart.server.base.transfer.model.*;
 import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,8 +48,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
-
-import static datart.security.base.ResourceType.DATACHART;
 
 @Slf4j
 @Service
@@ -102,7 +101,7 @@ public class VizServiceImpl extends BaseService implements VizService {
             storyboard.setOrgId(orgId);
             return storyboardService.checkUnique(storyboard);
         } else {
-            return folderService.checkUnique(vizType, orgId, parentId, name);
+            return folderService.checkUnique(orgId, parentId, name);
         }
     }
 
@@ -294,6 +293,7 @@ public class VizServiceImpl extends BaseService implements VizService {
             final Set<String> datacharts = new HashSet<>();
             final Set<String> views = new HashSet<>();
             final Set<String> sources = new HashSet<>();
+            final Set<String> folders = new HashSet<>();
             dashboards.addAll(resources
                     .parallelStream()
                     .filter(vizItem -> ResourceType.DASHBOARD.equals(vizItem.getResourceType()))
@@ -301,7 +301,7 @@ public class VizServiceImpl extends BaseService implements VizService {
                     .collect(Collectors.toSet()));
             datacharts.addAll(resources
                     .parallelStream()
-                    .filter(vizItem -> DATACHART.equals(vizItem.getResourceType()))
+                    .filter(vizItem -> ResourceType.DATACHART.equals(vizItem.getResourceType()))
                     .map(ResourceTransferParam.VizItem::getResourceId)
                     .collect(Collectors.toSet()));
             if (dashboards.size() > 0) {
@@ -309,12 +309,17 @@ public class VizServiceImpl extends BaseService implements VizService {
                 resourceModel.setDashboardResourceModel(dashboardService.exportResource(transferConfig, dashboards));
                 datacharts.addAll(dashboardResourceModel.getDatacharts());
                 views.addAll(dashboardResourceModel.getViews());
+                if (dashboardResourceModel.getParents() != null) {
+                    folders.addAll(dashboardResourceModel.getParents());
+                }
             }
-
             if (datacharts.size() > 0) {
                 DatachartResourceModel datachartResourceModel = datachartService.exportResource(transferConfig, datacharts);
                 resourceModel.setDatachartResourceModel(datachartResourceModel);
                 views.addAll(datachartResourceModel.getViews());
+                if (datachartResourceModel.getParents() != null) {
+                    folders.addAll(datachartResourceModel.getParents());
+                }
             }
             if (views.size() > 0) {
                 ViewResourceModel viewResourceModel = viewService.exportResource(transferConfig, views);
@@ -322,12 +327,13 @@ public class VizServiceImpl extends BaseService implements VizService {
                 sources.addAll(viewResourceModel.getSources());
             }
             if (sources.size() > 0) {
-                SourceResourceModel sourceResourceModel = sourceService.exportResource(transferConfig, sources);
-                resourceModel.setSourceResourceModel(sourceResourceModel);
+                resourceModel.setSourceResourceModel(sourceService.exportResource(transferConfig, sources));
+            }
+            if (folders.size() > 0) {
+                resourceModel.setFolderTransferModel(folderService.exportResource(transferConfig, folders));
             }
             return resourceModel;
         }, param, TransferFileType.DATART_RESOURCE_FILE);
-
     }
 
     @Override
@@ -354,19 +360,23 @@ public class VizServiceImpl extends BaseService implements VizService {
             final Map<String, String> viewIdMapping = new HashMap<>();
             final Map<String, String> datachartIdMapping = new HashMap<>();
             final Map<String, String> boardIdMapping = new HashMap<>();
+            final Map<String, String> folderIdMapping = new HashMap<>();
+            // replace folder Id
+            folderService.replaceId(model.getFolderTransferModel(), sourceIdMapping, viewIdMapping, datachartIdMapping, boardIdMapping, folderIdMapping);
             // replace source Id
-            sourceService.replaceId(model.getSourceResourceModel(), sourceIdMapping, viewIdMapping, datachartIdMapping, boardIdMapping);
+            sourceService.replaceId(model.getSourceResourceModel(), sourceIdMapping, viewIdMapping, datachartIdMapping, boardIdMapping, folderIdMapping);
             // replace view id
-            viewService.replaceId(model.getViewResourceModel(), sourceIdMapping, viewIdMapping, datachartIdMapping, boardIdMapping);
+            viewService.replaceId(model.getViewResourceModel(), sourceIdMapping, viewIdMapping, datachartIdMapping, boardIdMapping, folderIdMapping);
             // replace datachart id
-            datachartService.replaceId(model.getDatachartResourceModel(), sourceIdMapping, viewIdMapping, datachartIdMapping, boardIdMapping);
+            datachartService.replaceId(model.getDatachartResourceModel(), sourceIdMapping, viewIdMapping, datachartIdMapping, boardIdMapping, folderIdMapping);
             //replace dashboard id
-            dashboardService.replaceId(model.getDashboardResourceModel(), sourceIdMapping, viewIdMapping, datachartIdMapping, boardIdMapping);
+            dashboardService.replaceId(model.getDashboardResourceModel(), sourceIdMapping, viewIdMapping, datachartIdMapping, boardIdMapping, folderIdMapping);
         }
         dashboardService.importResource(model.getDashboardResourceModel(), importStrategy, orgId);
         datachartService.importResource(model.getDatachartResourceModel(), importStrategy, orgId);
         viewService.importResource(model.getViewResourceModel(), importStrategy, orgId);
         sourceService.importResource(model.getSourceResourceModel(), importStrategy, orgId);
+        folderService.importResource(model.getFolderTransferModel(), importStrategy, orgId);
         return true;
     }
 
@@ -374,7 +384,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     public Download exportDatachartTemplate(DatachartTemplateParam param) {
         return newExportDownloadTask(templateParam -> {
             DatachartTemplateModel templateModel = new DatachartTemplateModel();
-            templateParam.setDatachart(param.getDatachart());
+            templateModel.setDatachart(param.getDatachart());
             return templateModel;
         }, param, TransferFileType.DATART_TEMPLATE_FILE);
     }
@@ -428,18 +438,21 @@ public class VizServiceImpl extends BaseService implements VizService {
     }
 
     @Override
-    public void importVizTemplate(MultipartFile file, String orgId, Folder parent, String name) {
-        TransferModel transferModel = null;
-        try {
-            transferModel = extractModel(file);
-            if (transferModel instanceof DatachartTemplateModel) {
-                datachartService.importTemplate((DatachartTemplateModel) transferModel, orgId, name, parent);
-            } else if (transferModel instanceof DashboardTemplateModel) {
-                dashboardService.importTemplate((DashboardTemplateModel) transferModel, orgId, name, parent);
-            }
-        } catch (Exception e) {
-            log.error("viz template import error");
+    @Transactional
+    public Folder importVizTemplate(MultipartFile file, String orgId, String parentId, String name) throws Exception {
+        Folder parent = null;
+        if (StringUtils.isNotBlank(parentId)) {
+            parent = folderService.retrieve(parentId);
         }
+        TransferModel transferModel = null;
+        transferModel = extractModel(file);
+        datart.core.common.BeanUtils.validate(transferModel);
+        if (transferModel instanceof DatachartTemplateModel) {
+            return datachartService.importTemplate((DatachartTemplateModel) transferModel, orgId, name, parent);
+        } else if (transferModel instanceof DashboardTemplateModel) {
+            return dashboardService.importTemplate((DashboardTemplateModel) transferModel, orgId, name, parent);
+        }
+        return null;
     }
 
 
@@ -452,7 +465,7 @@ public class VizServiceImpl extends BaseService implements VizService {
     @Transactional
     public boolean updateDatachart(DatachartUpdateParam updateParam) {
         // update folder
-        Folder vizFolder = folderService.getVizFolder(updateParam.getId(), DATACHART.name());
+        Folder vizFolder = folderService.getVizFolder(updateParam.getId(), ResourceType.DATACHART.name());
         vizFolder.setAvatar(updateParam.getAvatar());
         vizFolder.setSubType(updateParam.getSubType());
         folderService.getDefaultMapper().updateByPrimaryKey(vizFolder);
@@ -536,7 +549,7 @@ public class VizServiceImpl extends BaseService implements VizService {
                 Dashboard dashboard = dashboardService.retrieve(vizId);
                 dashboardService.requirePermission(dashboard, Const.MANAGE);
                 //check name
-                folderService.checkUnique(vizType, dashboard.getOrgId(), parentId, newName);
+                folderService.checkUnique(dashboard.getOrgId(), parentId, newName);
                 // add to folder
                 createFolder(vizType, vizId, newName, dashboard.getOrgId(), parentId, index);
                 dashboard.setName(newName);
@@ -547,7 +560,7 @@ public class VizServiceImpl extends BaseService implements VizService {
                 Datachart datachart = datachartService.retrieve(vizId);
                 datachartService.requirePermission(datachart, Const.MANAGE);
                 //check name
-                folderService.checkUnique(vizType, datachart.getOrgId(), parentId, newName);
+                folderService.checkUnique(datachart.getOrgId(), parentId, newName);
                 //update status
                 datachart.setName(newName);
                 datachart.setStatus(Const.DATA_STATUS_ACTIVE);
@@ -569,7 +582,6 @@ public class VizServiceImpl extends BaseService implements VizService {
                 Exceptions.msg("unknown viz type");
                 return false;
         }
-
     }
 
     private void createFolder(ResourceType type, String id, String name, String orgId, String parentId, double index) {
@@ -590,7 +602,7 @@ public class VizServiceImpl extends BaseService implements VizService {
 
     public TransferModel extractModel(MultipartFile file) throws IOException, ClassNotFoundException {
         try (ObjectInputStream inputStream = new ObjectInputStream(new GZIPInputStream(file.getInputStream()));) {
-            return (ResourceModel) inputStream.readObject();
+            return (TransferModel) inputStream.readObject();
         }
     }
 }

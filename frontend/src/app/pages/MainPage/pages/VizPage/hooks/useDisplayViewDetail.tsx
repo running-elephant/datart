@@ -149,7 +149,7 @@ const useDisplayViewDetail = () => {
       modalSize: StateModalSize.MIDDLE,
       content: () => {
         return (
-          <StyeldTabs defaultActiveKey="summary">
+          <StyledTabs defaultActiveKey="summary">
             <TabPane tab={t('summary')} key="summary">
               <TemplateTable
                 requestParams={getSummaryTableRequestParams(props)}
@@ -160,7 +160,7 @@ const useDisplayViewDetail = () => {
                 requestParams={getDetailsTableRequestParams(props)}
               />
             </TabPane>
-          </StyeldTabs>
+          </StyledTabs>
         );
       },
     });
@@ -170,7 +170,7 @@ const useDisplayViewDetail = () => {
 
 export default useDisplayViewDetail;
 
-const StyeldTabs = styled(Tabs)`
+const StyledTabs = styled(Tabs)`
   .ant-tabs-nav {
     margin-bottom: ${SPACE_XS} !important;
   }

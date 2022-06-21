@@ -514,12 +514,16 @@ export class ChartDataRequestBuilder {
       },
       [],
     );
-    return selectColumns.map(col => {
-      return {
-        alias: this.buildAliasName(col),
-        column: this.buildColumnName(col),
-      };
-    });
+    return Array.from(
+      new Set(
+        selectColumns.map(col => {
+          return {
+            alias: this.buildAliasName(col),
+            column: this.buildColumnName(col),
+          };
+        }),
+      ),
+    );
   }
 
   private buildViewConfigs() {
@@ -556,7 +560,7 @@ export class ChartDataRequestBuilder {
       viewId: this.dataView?.id,
       aggregators: [],
       groups: [],
-      filters: this.buildFilters(),
+      filters: this.buildFilters().filter(f => !f.aggOperator),
       orders: [],
       pageInfo: this.buildPageInfo(),
       functionColumns: this.buildFunctionColumns(),
