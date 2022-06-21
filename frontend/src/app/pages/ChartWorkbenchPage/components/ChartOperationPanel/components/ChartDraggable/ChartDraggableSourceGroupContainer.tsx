@@ -17,16 +17,16 @@
  */
 
 import { List } from 'antd';
-import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { FC, memo, useCallback, useContext, useState } from 'react';
 import styled from 'styled-components/macro';
 import { stopPPG } from 'utils/utils';
 import ChartDataViewContext from '../../../../contexts/ChartDataViewContext';
+import { renderMataProps } from '../../../../slice/type';
 import { ChartDraggableSourceContainer } from './ChartDraggableSourceContainer';
 import ChartDragLayer from './ChartDragLayer';
 
 export const ChartDraggableSourceGroupContainer: FC<{
-  meta?: ChartDataViewMeta[];
+  meta?: renderMataProps[];
   onDeleteComputedField: (fieldName) => void;
   onEditComputedField: (fieldName) => void;
 }> = memo(function ChartDraggableSourceGroupContainer({
@@ -34,10 +34,11 @@ export const ChartDraggableSourceGroupContainer: FC<{
   onDeleteComputedField,
   onEditComputedField,
 }) {
-  const [selectedItems, setSelectedItems] = useState<ChartDataViewMeta[]>([]);
+  const [selectedItems, setSelectedItems] = useState<renderMataProps[]>([]);
   const [selectedItemsIds, setSelectedItemsIds] = useState<Array<string>>([]);
   const [activeItemId, setActiveItemId] = useState<string>('');
-  const { availableSourceFunctions } = useContext(ChartDataViewContext);
+  const { availableSourceFunctions, dataView } =
+    useContext(ChartDataViewContext);
 
   const onDataItemSelectionChange = (
     dataItemId: string,
@@ -122,6 +123,8 @@ export const ChartDraggableSourceGroupContainer: FC<{
               subType={item.subType}
               role={item.role}
               children={item.children}
+              viewType={dataView?.type}
+              dateLevelFields={item?.dateLevelFields}
               isViewComputerField={item.computedFieldsType}
               onDeleteComputedField={onDeleteComputedField}
               onEditComputedField={handleEditComputedField}

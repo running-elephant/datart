@@ -107,7 +107,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                   val.category ===
                   ChartDataViewFieldCategory.DateLevelComputedField
                 ) {
-                  config.id = `${val.colName}（${t(val.expression)}）`;
                   config.colName = `${val.colName}（${t(val.expression)}）`;
                   config.expression = `${val.expression}(${val.colName})`;
                   config.field = val.colName;

@@ -19,7 +19,7 @@
 import { Button, Dropdown, Select, Space } from 'antd';
 import ChartDataView from 'app/types/ChartDataView';
 import { getAllColumnInMeta } from 'app/utils/chartHelper';
-import { FC, memo, useMemo, useState } from 'react';
+import { FC, memo, useState } from 'react';
 import { isEmpty } from 'utils/object';
 import { InteractionFieldRelation } from '../../constants';
 import RelationList from './RelationList';

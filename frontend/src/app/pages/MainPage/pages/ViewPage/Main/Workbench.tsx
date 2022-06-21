@@ -147,23 +147,24 @@ export const Workbench = memo(() => {
         className="datart-split"
         onDrag={editorResize}
       >
-        {!viewType ? (
-          unpersistedNewView ? (
-            <SelectView selectViewType={handleSelectViewType} />
+        <Wrapper>
+          {!viewType ? (
+            unpersistedNewView ? (
+              <SelectView selectViewType={handleSelectViewType} />
+            ) : (
+              <LoadingWrap>
+                <Spin />
+              </LoadingWrap>
+            )
+          ) : viewType !== 'STRUCT' ? (
+            <Editor allowManage={allowManage} allowEnableViz={allowEnableViz} />
           ) : (
-            <LoadingWrap>
-              <Spin />
-            </LoadingWrap>
-          )
-        ) : viewType !== 'STRUCT' ? (
-          <Editor allowManage={allowManage} allowEnableViz={allowEnableViz} />
-        ) : (
-          <StructView
-            allowManage={allowManage}
-            allowEnableViz={allowEnableViz}
-          />
-        )}
-
+            <StructView
+              allowManage={allowManage}
+              allowEnableViz={allowEnableViz}
+            />
+          )}
+        </Wrapper>
         <Outputs />
       </Development>
       <Properties viewType={viewType} allowManage={allowManage} />

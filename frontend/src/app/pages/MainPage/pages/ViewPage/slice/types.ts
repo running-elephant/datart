@@ -125,6 +125,7 @@ export interface Schema {
 export enum ColumnRole {
   Role = 'role',
   Hierarchy = 'hierachy',
+  Table = 'table',
 }
 
 export interface Column extends Schema {

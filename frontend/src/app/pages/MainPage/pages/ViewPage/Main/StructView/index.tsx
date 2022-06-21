@@ -217,7 +217,6 @@ export const StructView = memo(
         } else {
           script = tableJSON;
         }
-
         dispatch(runSql({ id, isFragment: !!type, script }));
       },
       [dispatch, id, tableJSON],
