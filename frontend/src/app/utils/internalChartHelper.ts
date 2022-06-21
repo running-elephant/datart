@@ -17,8 +17,8 @@
  */
 
 import {
-  InteractionCategory,
   InteractionFieldRelation,
+  InteractionRelationType,
 } from 'app/components/FormGenerator/constants';
 import {
   CustomizeRelation,
@@ -34,6 +34,8 @@ import {
   DataViewFieldType,
 } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { VariableTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
+import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -768,12 +770,17 @@ export const buildClickEventBaseFilters = (
 export const getJumpFiltersByInteractionRule = (
   clickEventFilters: ChartDataRequestFilter[] = [],
   chartFilters: ChartDataRequestFilter[] = [],
+  variableFilters: ChartDataRequestFilter[] = [],
   rule?: InteractionRule,
 ): Record<string, string | any> => {
   return clickEventFilters
     .concat(chartFilters)
+    .concat(variableFilters)
     .map(f => {
       if (isEmpty(f)) {
+        return null;
+      }
+      if (f?.sqlOperator !== FilterSqlOperator.In) {
         return null;
       }
       const jumpRule = rule?.[rule.category!] as
@@ -785,13 +792,14 @@ export const getJumpFiltersByInteractionRule = (
       if (jumpRule?.['relation'] === InteractionFieldRelation.Auto) {
         return f;
       } else {
-        const customizeRelations: CustomizeRelation[] =
-          jumpRule?.[InteractionFieldRelation.Customize];
+        const customizeRelations: CustomizeRelation[] = jumpRule?.[
+          InteractionFieldRelation.Customize
+        ]?.filter(r => r.type === InteractionRelationType.Field);
         if (isEmptyArray(customizeRelations)) {
           return null;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column,
+          r => r.source === f?.column && r?.target,
         );
         if (isEmpty(targetRelation)) {
           return null;
@@ -804,7 +812,19 @@ export const getJumpFiltersByInteractionRule = (
     .filter(Boolean)
     .reduce((acc, cur) => {
       if (cur?.column) {
-        acc[cur.column!] = cur?.values?.map(v => v.value);
+        const currentValues = cur?.values?.map(v => v.value) || [];
+        if (cur.column in acc) {
+          const oldValues: string[] = acc[cur.column!] || [];
+          if (isEmptyArray(oldValues)) {
+            acc[cur.column!] = currentValues;
+          } else {
+            acc[cur.column!] = currentValues.filter(cv =>
+              oldValues.includes(cv),
+            );
+          }
+        } else {
+          acc[cur.column!] = currentValues;
+        }
       }
       return acc;
     }, {});
@@ -813,24 +833,30 @@ export const getJumpFiltersByInteractionRule = (
 export const getLinkFiltersByInteractionRule = (
   clickEventFilters: ChartDataRequestFilter[] = [],
   chartFilters: ChartDataRequestFilter[] = [],
+  variableFilters: ChartDataRequestFilter[] = [],
   rule?: InteractionRule,
 ): Record<string, string | any> => {
   return clickEventFilters
     .concat(chartFilters)
+    .concat(variableFilters)
     .map(f => {
       if (isEmpty(f)) {
+        return null;
+      }
+      if (f?.sqlOperator !== FilterSqlOperator.In) {
         return null;
       }
       if (rule?.['relation'] === InteractionFieldRelation.Auto) {
         return f;
       } else {
-        const customizeRelations: CustomizeRelation[] =
-          rule?.[InteractionFieldRelation.Customize];
+        const customizeRelations: CustomizeRelation[] = rule?.[
+          InteractionFieldRelation.Customize
+        ]?.filter(r => r.type === InteractionRelationType.Field);
         if (isEmptyArray(customizeRelations)) {
           return null;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column,
+          r => r.source === f?.column && r?.target,
         );
         if (isEmpty(targetRelation)) {
           return null;
@@ -843,7 +869,19 @@ export const getLinkFiltersByInteractionRule = (
     .filter(Boolean)
     .reduce((acc, cur) => {
       if (cur?.column) {
-        acc[cur.column!] = cur?.values?.map(v => v.value);
+        const currentValues = cur?.values?.map(v => v.value) || [];
+        if (cur.column in acc) {
+          const oldValues: string[] = acc[cur.column!] || [];
+          if (isEmptyArray(oldValues)) {
+            acc[cur.column!] = currentValues;
+          } else {
+            acc[cur.column!] = currentValues.filter(cv =>
+              oldValues.includes(cv),
+            );
+          }
+        } else {
+          acc[cur.column!] = currentValues;
+        }
       }
       return acc;
     }, {});
@@ -862,20 +900,21 @@ export const getJumpOperationFiltersByInteractionRule = (
       }
       const jumpRule = rule?.[rule.category!] as
         | JumpToChartRule
-        | JumpToDashboardRule
+        | JumpToDashboardRule;
       if (isEmpty(jumpRule)) {
         return acc;
       }
       if (jumpRule?.['relation'] === InteractionFieldRelation.Auto) {
         return acc.concat(f);
       } else {
-        const customizeRelations: CustomizeRelation[] =
-          jumpRule?.[InteractionFieldRelation.Customize];
+        const customizeRelations: CustomizeRelation[] = jumpRule?.[
+          InteractionFieldRelation.Customize
+        ]?.filter(r => r.type === InteractionRelationType.Field);
         if (isEmptyArray(customizeRelations)) {
           return acc;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column,
+          r => r.source === f?.column && r?.target,
         );
         if (isEmpty(targetRelation)) {
           return acc;
@@ -885,4 +924,42 @@ export const getJumpOperationFiltersByInteractionRule = (
         );
       }
     }, []);
+};
+
+export const getVariablesByInteractionRule = (
+  queryVariables?: Variable[],
+  rule?: InteractionRule,
+): Record<string, any[]> | undefined => {
+  if (rule?.[rule.category!]?.['relation'] === InteractionFieldRelation.Auto) {
+    return undefined;
+  }
+  const customizeRelations: CustomizeRelation[] = rule?.[rule.category!]?.[
+    InteractionFieldRelation.Customize
+  ]?.filter(r => r.type === InteractionRelationType.Variable);
+
+  if (isEmptyArray(customizeRelations)) {
+    return undefined;
+  }
+  return customizeRelations?.reduce((acc, cur) => {
+    const sourceVariableValueStr = queryVariables
+      ?.filter(v => v.type === VariableTypes.Query)
+      ?.find(v => v.name === cur.source)?.defaultValue;
+    if (sourceVariableValueStr && cur.target) {
+      acc[cur.target] = JSON.parse(sourceVariableValueStr);
+      return acc;
+    }
+    return acc;
+  }, {});
+};
+
+export const variableToFilter = (
+  queryVariables?: Record<string, any[]>,
+): ChartDataRequestFilter[] => {
+  return Object.entries(queryVariables || {}).map(([k, v]) => {
+    return {
+      sqlOperator: FilterSqlOperator.In,
+      column: k,
+      values: v?.map(value => ({ value, valueType: 'STRING' })),
+    };
+  });
 };

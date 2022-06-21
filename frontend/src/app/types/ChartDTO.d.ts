@@ -17,6 +17,7 @@
  */
 
 import ChartDataView from 'app/types/ChartDataView';
+import { Variable } from '../pages/MainPage/pages/VariablePage/slice/types';
 import { ChartDetailConfigDTO } from './ChartConfigDTO';
 
 export type ChartDTO = {
@@ -28,5 +29,5 @@ export type ChartDTO = {
   viewId: string;
   view: ChartDataView;
   config: ChartDetailConfigDTO;
-  queryVariables?: any[];
+  queryVariables?: Variable[];
 };
