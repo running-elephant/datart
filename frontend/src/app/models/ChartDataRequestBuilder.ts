@@ -483,7 +483,7 @@ export class ChartDataRequestBuilder {
       },
       [],
     );
-    return selectColumns.map(col => col.colName);
+    return Array.from(new Set(selectColumns.map(col => col.colName)));
   }
 
   private buildViewConfigs() {
@@ -520,7 +520,7 @@ export class ChartDataRequestBuilder {
       viewId: this.dataView?.id,
       aggregators: [],
       groups: [],
-      filters: this.buildFilters(),
+      filters: this.buildFilters().filter(f => !f.aggOperator),
       orders: [],
       pageInfo: this.buildPageInfo(),
       functionColumns: this.buildFunctionColumns(),

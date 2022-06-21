@@ -72,6 +72,7 @@ const useDrillThrough = () => {
   };
 
   const getDialogContentByUrl = (url, params?: string) => {
+    const finalUrl = appendUrlParams(url, params);
     return {
       width: 1000,
       content: (
@@ -80,7 +81,7 @@ const useDrillThrough = () => {
           height={600}
           width="100%"
           frameBorder="none"
-          src={`${urlSchemeCheck(url)}?${params}`}
+          src={finalUrl}
         />
       ),
     };
