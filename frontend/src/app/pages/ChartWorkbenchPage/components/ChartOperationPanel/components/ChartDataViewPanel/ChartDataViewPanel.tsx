@@ -336,7 +336,7 @@ const ChartDataViewPanel: FC<{
               availableSourceFunctions.includes(item.expression)
             ) {
               return {
-                id: `${v.name}（${t(item.expression)}）`,
+                id: `${v.name}（${item.expression}）`,
                 colName: v.name,
                 type: item.type,
                 category: item.category,
@@ -348,7 +348,7 @@ const ChartDataViewPanel: FC<{
         });
       });
     },
-    [availableSourceFunctions, t],
+    [availableSourceFunctions],
   );
 
   const fieldsSortByType = (fields, sortType) => {

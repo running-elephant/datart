@@ -1616,7 +1616,7 @@ export const getRuntimeComputedFields = (
       if (dateLevelConfig) {
         draft[index][RUNTIME_DATE_LEVEL_KEY] = {
           category: dateLevelConfig.category,
-          id: dateLevelConfig.colName,
+          id: dateLevelConfig.id,
           type: dateLevelConfig.type,
           expression: dateLevelConfig.expression,
         };
@@ -1637,7 +1637,7 @@ export const getRuntimeComputedFields = (
           _computedFields = updateBy(_computedFields, draft => {
             draft.push({
               category: v.category,
-              id: v.colName,
+              id: v.id,
               type: v.type,
               expression: v.expression,
             });

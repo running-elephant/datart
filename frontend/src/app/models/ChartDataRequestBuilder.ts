@@ -434,7 +434,7 @@ export class ChartDataRequestBuilder {
     const computedFields = getRuntimeDateLevelFields(
       this.dataView.computedFields,
     );
-
+    console.log(this.dataView.computedFields, 'computedFields');
     return (computedFields || []).map(f => ({
       alias: f.id!,
       snippet: _removeSquareBrackets(f.expression),
