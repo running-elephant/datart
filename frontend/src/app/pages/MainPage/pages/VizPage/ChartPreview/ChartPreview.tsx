@@ -142,8 +142,13 @@ const ChartPreviewBoard: FC<{
     const { parse } = useQSLibUrlHelper();
 
     useEffect(() => {
-      const jumpFilterParams: ChartDataRequestFilter[] =
-        parse(filterSearchUrl)?.filters || [];
+      const jumpFilterParams: ChartDataRequestFilter[] = parse(
+        filterSearchUrl,
+        { ignoreQueryPrefix: true },
+      )?.filters;
+      const jumpVariableParams: Record<string, any[]> = parse(filterSearchUrl, {
+        ignoreQueryPrefix: true,
+      })?.variables;
       const filterSearchParams = filterSearchUrl
         ? urlSearchTransfer.toParams(filterSearchUrl)
         : undefined;
@@ -153,6 +158,7 @@ const ChartPreviewBoard: FC<{
           orgId,
           filterSearchParams,
           jumpFilterParams,
+          jumpVariableParams,
         }),
       );
     }, [dispatch, orgId, backendChartId, filterSearchUrl, parse]);
@@ -234,6 +240,7 @@ const ChartPreviewBoard: FC<{
             computedFields:
               chartPreview?.backendChart?.config.computedFields || [],
           },
+          queryVariables: chartPreview?.backendChart?.queryVariables || [],
           computedFields: chartPreview?.backendChart?.config.computedFields,
           aggregation: chartPreview?.backendChart?.config?.aggregation,
           chartConfig: chartPreview?.chartConfig,

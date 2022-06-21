@@ -33,6 +33,7 @@ import {
   getJumpFiltersByInteractionRule,
   getJumpOperationFiltersByInteractionRule,
   getLinkFiltersByInteractionRule,
+  getVariablesByInteractionRule,
 } from 'app/utils/internalChartHelper';
 import qs from 'qs';
 import { useCallback } from 'react';
@@ -142,6 +143,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
       ruleId,
       orgId,
       view,
+      queryVariables,
       computedFields,
       aggregation,
       chartConfig,
@@ -175,7 +177,10 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
               drillOption,
               chartConfig?.datas,
             );
-
+            const clickVariables = getVariablesByInteractionRule(
+              queryVariables,
+              rule,
+            );
             const relId = rule?.[rule.category!]?.relId;
             if (rule.category === InteractionCategory.JumpToChart) {
               const urlFilters = getJumpOperationFiltersByInteractionRule(
@@ -185,6 +190,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
               );
               const urlFiltersStr: string = qs.stringify({
                 filters: urlFilters || [],
+                variables: clickVariables,
               });
               if (rule?.action === InteractionAction.Redirect) {
                 openNewTab(orgId, relId, urlFiltersStr);

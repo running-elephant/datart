@@ -17,8 +17,8 @@
  */
 
 import {
-  InteractionCategory,
   InteractionFieldRelation,
+  InteractionRelationType,
 } from 'app/components/FormGenerator/constants';
 import {
   CustomizeRelation,
@@ -34,6 +34,8 @@ import {
   DataViewFieldType,
 } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { VariableTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
+import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -785,13 +787,14 @@ export const getJumpFiltersByInteractionRule = (
       if (jumpRule?.['relation'] === InteractionFieldRelation.Auto) {
         return f;
       } else {
-        const customizeRelations: CustomizeRelation[] =
-          jumpRule?.[InteractionFieldRelation.Customize];
+        const customizeRelations: CustomizeRelation[] = jumpRule?.[
+          InteractionFieldRelation.Customize
+        ]?.filter(r => r.type === InteractionRelationType.Field);
         if (isEmptyArray(customizeRelations)) {
           return null;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column,
+          r => r.source === f?.column && r?.target,
         );
         if (isEmpty(targetRelation)) {
           return null;
@@ -824,13 +827,14 @@ export const getLinkFiltersByInteractionRule = (
       if (rule?.['relation'] === InteractionFieldRelation.Auto) {
         return f;
       } else {
-        const customizeRelations: CustomizeRelation[] =
-          rule?.[InteractionFieldRelation.Customize];
+        const customizeRelations: CustomizeRelation[] = rule?.[
+          InteractionFieldRelation.Customize
+        ]?.filter(r => r.type === InteractionRelationType.Field);
         if (isEmptyArray(customizeRelations)) {
           return null;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column,
+          r => r.source === f?.column && r?.target,
         );
         if (isEmpty(targetRelation)) {
           return null;
@@ -862,20 +866,21 @@ export const getJumpOperationFiltersByInteractionRule = (
       }
       const jumpRule = rule?.[rule.category!] as
         | JumpToChartRule
-        | JumpToDashboardRule
+        | JumpToDashboardRule;
       if (isEmpty(jumpRule)) {
         return acc;
       }
       if (jumpRule?.['relation'] === InteractionFieldRelation.Auto) {
         return acc.concat(f);
       } else {
-        const customizeRelations: CustomizeRelation[] =
-          jumpRule?.[InteractionFieldRelation.Customize];
+        const customizeRelations: CustomizeRelation[] = jumpRule?.[
+          InteractionFieldRelation.Customize
+        ]?.filter(r => r.type === InteractionRelationType.Field);
         if (isEmptyArray(customizeRelations)) {
           return acc;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column,
+          r => r.source === f?.column && r?.target,
         );
         if (isEmpty(targetRelation)) {
           return acc;
@@ -885,4 +890,30 @@ export const getJumpOperationFiltersByInteractionRule = (
         );
       }
     }, []);
+};
+
+export const getVariablesByInteractionRule = (
+  queryVariables?: Variable[],
+  rule?: InteractionRule,
+): Record<string, any[]> | null => {
+  if (rule?.[rule.category!]?.['relation'] === InteractionFieldRelation.Auto) {
+    return null;
+  }
+  const customizeRelations: CustomizeRelation[] = rule?.[rule.category!]?.[
+    InteractionFieldRelation.Customize
+  ]?.filter(r => r.type === InteractionRelationType.Variable);
+
+  if (isEmptyArray(customizeRelations)) {
+    return null;
+  }
+  return customizeRelations?.reduce((acc, cur) => {
+    const sourceVariableValueStr = queryVariables
+      ?.filter(v => v.type === VariableTypes.Query)
+      ?.find(v => v.name === cur.source)?.defaultValue;
+    if (sourceVariableValueStr && cur.target) {
+      acc[cur.target] = JSON.parse(sourceVariableValueStr);
+      return acc;
+    }
+    return acc;
+  }, {});
 };
