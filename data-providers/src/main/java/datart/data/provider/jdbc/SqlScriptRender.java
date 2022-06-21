@@ -138,7 +138,7 @@ public class SqlScriptRender extends ScriptRender {
         List<VariablePlaceholder> placeholders = null;
         try {
             placeholders = SqlParserVariableResolver.resolve(sqlDialect, selectSql, variableMap);
-        } catch (SqlParseException e) {
+        } catch (Exception e) {
             SqlParseError sqlParseError = new SqlParseError(e);
             sqlParseError.setSql(selectSql);
             sqlParseError.setDbType(sqlDialect.getDatabaseProduct().name());
