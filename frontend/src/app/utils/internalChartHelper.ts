@@ -780,6 +780,9 @@ export const getJumpFiltersByInteractionRule = (
       if (isEmpty(f)) {
         return null;
       }
+      if (f?.sqlOperator !== FilterSqlOperator.In) {
+        return null;
+      }
       const jumpRule = rule?.[rule.category!] as
         | JumpToDashboardRule
         | JumpToUrlRule;
@@ -838,6 +841,9 @@ export const getLinkFiltersByInteractionRule = (
     .concat(variableFilters)
     .map(f => {
       if (isEmpty(f)) {
+        return null;
+      }
+      if (f?.sqlOperator !== FilterSqlOperator.In) {
         return null;
       }
       if (rule?.['relation'] === InteractionFieldRelation.Auto) {
