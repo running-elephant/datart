@@ -809,7 +809,19 @@ export const getJumpFiltersByInteractionRule = (
     .filter(Boolean)
     .reduce((acc, cur) => {
       if (cur?.column) {
-        acc[cur.column!] = cur?.values?.map(v => v.value);
+        const currentValues = cur?.values?.map(v => v.value) || [];
+        if (cur.column in acc) {
+          const oldValues: string[] = acc[cur.column!] || [];
+          if (isEmptyArray(oldValues)) {
+            acc[cur.column!] = currentValues;
+          } else {
+            acc[cur.column!] = currentValues.filter(cv =>
+              oldValues.includes(cv),
+            );
+          }
+        } else {
+          acc[cur.column!] = currentValues;
+        }
       }
       return acc;
     }, {});
@@ -851,7 +863,19 @@ export const getLinkFiltersByInteractionRule = (
     .filter(Boolean)
     .reduce((acc, cur) => {
       if (cur?.column) {
-        acc[cur.column!] = cur?.values?.map(v => v.value);
+        const currentValues = cur?.values?.map(v => v.value) || [];
+        if (cur.column in acc) {
+          const oldValues: string[] = acc[cur.column!] || [];
+          if (isEmptyArray(oldValues)) {
+            acc[cur.column!] = currentValues;
+          } else {
+            acc[cur.column!] = currentValues.filter(cv =>
+              oldValues.includes(cv),
+            );
+          }
+        } else {
+          acc[cur.column!] = currentValues;
+        }
       }
       return acc;
     }, {});
