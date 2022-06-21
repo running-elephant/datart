@@ -56,7 +56,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
-import { isEmptyArray } from 'utils/object';
 import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 import useDisplayViewDetail from '../hooks/useDisplayViewDetail';
 import useQSLibUrlHelper from '../hooks/useQSLibUrlHelper';
@@ -121,9 +120,6 @@ const ChartPreviewBoard: FC<{
     const [chartPreview, setChartPreview] = useState<ChartPreview>();
     const [chart, setChart] = useState<IChart>();
     const [loadingStatus, setLoadingStatus] = useState<boolean>(false);
-    const [chartContextMenuEvent, setChartContextMenuEvent] = useState<{
-      data?: any;
-    }>();
     const drillOptionRef = useRef<IChartDrillOption>();
     const t = useI18NPrefix('viz.main');
     const tg = useI18NPrefix('global');
@@ -285,12 +281,9 @@ const ChartPreviewBoard: FC<{
       }
 
       return ruleId => {
-        const rightClickEvent = !isEmptyArray(selectedItems?.[backendChartId])
-          ? Object.assign({}, chartContextMenuEvent, {
-              selectedItems: selectedItems?.[backendChartId],
-            })
-          : { selectedItems: [chartContextMenuEvent?.data] || [] };
-
+        const rightClickEvent = {
+          selectedItems: selectedItems?.[backendChartId],
+        };
         handleDrillThroughEvent(
           buildDrillThroughEventParams(
             rightClickEvent,
@@ -302,7 +295,6 @@ const ChartPreviewBoard: FC<{
     }, [
       backendChartId,
       chartPreview?.chartConfig?.interactions,
-      chartContextMenuEvent,
       selectedItems,
       getDrillThroughSetting,
       handleDrillThroughEvent,
@@ -318,12 +310,9 @@ const ChartPreviewBoard: FC<{
         return;
       }
       return () => {
-        const rightClickEvent = !isEmptyArray(selectedItems?.[backendChartId])
-          ? Object.assign({}, chartContextMenuEvent, {
-              selectedItems: selectedItems?.[backendChartId],
-            })
-          : { selectedItems: [chartContextMenuEvent?.data] || [] };
-
+        const rightClickEvent = {
+          selectedItems: selectedItems?.[backendChartId],
+        };
         handleViewDataEvent(
           buildViewDataEventParams(
             rightClickEvent,
@@ -335,7 +324,6 @@ const ChartPreviewBoard: FC<{
       chartPreview?.chartConfig?.interactions,
       selectedItems,
       backendChartId,
-      chartContextMenuEvent,
       handleViewDataEvent,
       buildViewDataEventParams,
       getViewDetailSetting,
@@ -415,9 +403,7 @@ const ChartPreviewBoard: FC<{
           },
           {
             name: 'contextmenu',
-            callback: param => {
-              setChartContextMenuEvent(param);
-            },
+            callback: param => {},
           },
         ]);
       },
