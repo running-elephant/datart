@@ -770,10 +770,12 @@ export const buildClickEventBaseFilters = (
 export const getJumpFiltersByInteractionRule = (
   clickEventFilters: ChartDataRequestFilter[] = [],
   chartFilters: ChartDataRequestFilter[] = [],
+  variableFilters: ChartDataRequestFilter[] = [],
   rule?: InteractionRule,
 ): Record<string, string | any> => {
   return clickEventFilters
     .concat(chartFilters)
+    .concat(variableFilters)
     .map(f => {
       if (isEmpty(f)) {
         return null;
@@ -816,10 +818,12 @@ export const getJumpFiltersByInteractionRule = (
 export const getLinkFiltersByInteractionRule = (
   clickEventFilters: ChartDataRequestFilter[] = [],
   chartFilters: ChartDataRequestFilter[] = [],
+  variableFilters: ChartDataRequestFilter[] = [],
   rule?: InteractionRule,
 ): Record<string, string | any> => {
   return clickEventFilters
     .concat(chartFilters)
+    .concat(variableFilters)
     .map(f => {
       if (isEmpty(f)) {
         return null;
@@ -895,16 +899,16 @@ export const getJumpOperationFiltersByInteractionRule = (
 export const getVariablesByInteractionRule = (
   queryVariables?: Variable[],
   rule?: InteractionRule,
-): Record<string, any[]> | null => {
+): Record<string, any[]> | undefined => {
   if (rule?.[rule.category!]?.['relation'] === InteractionFieldRelation.Auto) {
-    return null;
+    return undefined;
   }
   const customizeRelations: CustomizeRelation[] = rule?.[rule.category!]?.[
     InteractionFieldRelation.Customize
   ]?.filter(r => r.type === InteractionRelationType.Variable);
 
   if (isEmptyArray(customizeRelations)) {
-    return null;
+    return undefined;
   }
   return customizeRelations?.reduce((acc, cur) => {
     const sourceVariableValueStr = queryVariables
@@ -916,4 +920,16 @@ export const getVariablesByInteractionRule = (
     }
     return acc;
   }, {});
+};
+
+export const variableToFilter = (
+  queryVariables?: Record<string, any[]>,
+): ChartDataRequestFilter[] => {
+  return Object.entries(queryVariables || {}).map(([k, v]) => {
+    return {
+      sqlOperator: FilterSqlOperator.In,
+      column: k,
+      values: v?.map(value => ({ value, valueType: 'STRING' })),
+    };
+  });
 };
