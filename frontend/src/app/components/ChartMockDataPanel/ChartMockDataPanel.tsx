@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Button } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { MockDataEditor } from 'app/pages/DashBoardPage/components/MockDataPanel/MockDataEditor';
 import { exportChartTpl } from 'app/pages/MainPage/pages/VizPage/slice/thunks';
 import { FC, memo, useEffect, useState } from 'react';
@@ -31,6 +32,7 @@ export interface MockDataPanelProps {
 export const ChartMockDataPanel: FC<MockDataPanelProps> = memo(
   ({ chartId, onClose }) => {
     const dispatch = useDispatch();
+    const t = useI18NPrefix('global.button');
     const [dataset, setDataset] = useState<any>();
     useEffect(() => {
       const dataset = dispatch(getDataChartData(chartId));
@@ -51,7 +53,6 @@ export const ChartMockDataPanel: FC<MockDataPanelProps> = memo(
     return (
       <StyledWrapper className="mockDataPanel">
         <div className="content">
-          <div>data :</div>
           <div className="empty-data" style={{ flex: 1 }}>
             <MockDataEditor
               originalData={dataset?.rows}
@@ -61,11 +62,11 @@ export const ChartMockDataPanel: FC<MockDataPanelProps> = memo(
 
           <div className="btn-box">
             <Button className="btn" type="primary" onClick={onExport}>
-              submit
+              {t('ok')}
             </Button>
 
-            <Button className="btn" type="primary" onClick={onClose}>
-              close
+            <Button className="btn" onClick={onClose}>
+              {t('cancel')}
             </Button>
           </div>
         </div>

@@ -70,7 +70,7 @@ export const ExportSelector: FC<{
             treeCheckable={true}
             value={selectedIds}
             dropdownStyle={{ maxHeight: 1000, overflow: 'auto' }}
-            placeholder="Please select"
+            placeholder={t('export.selectText')}
             allowClear
             multiple
             treeData={treeData}
@@ -83,7 +83,7 @@ export const ExportSelector: FC<{
             disabled={!selectedIds?.length}
             onClick={onSubmit}
           >
-            export
+            {t('export.submit')}
           </Button>
         </div>
       </Card>

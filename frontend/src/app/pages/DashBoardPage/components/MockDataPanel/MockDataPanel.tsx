@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Button, Empty } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { FC, memo, useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -35,6 +36,7 @@ export interface MockDataPanelProps {
 export const MockDataPanel: FC<MockDataPanelProps> = memo(({ onClose }) => {
   const { boardId } = useContext(BoardContext);
   const dispatch = useDispatch();
+  const t = useI18NPrefix('global.button');
   const [dataMap, setDataMap] = useState<any>();
   useEffect(() => {
     const dataMap = dispatch(getWidgetChartDatasAction(boardId));
@@ -67,11 +69,11 @@ export const MockDataPanel: FC<MockDataPanelProps> = memo(({ onClose }) => {
 
         <div className="btn-box">
           <Button className="btn" type="primary" onClick={onExport}>
-            submit
+            {t('ok')}
           </Button>
 
-          <Button className="btn" type="primary" onClick={onClose}>
-            close
+          <Button className="btn" onClick={onClose}>
+            {t('cancel')}
           </Button>
         </div>
       </div>
