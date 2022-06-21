@@ -20,30 +20,34 @@ import { Button, Upload } from 'antd';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 
-export const FileUpload: FC<{ suffix: string; value?: any; onChange?: any }> =
-  memo(({ suffix, value, onChange }) => {
-    const [fileName, setFileName] = useState();
-    const fileChange = data => {
-      setFileName(data.name);
-      onChange(data);
-      return false;
-    };
-    return (
-      <StyledWrapper>
-        <Upload
-          // accept=".jpg,.jpeg,.png,.gif"
-          accept={suffix}
-          showUploadList={false}
-          beforeUpload={fileChange}
-        >
-          <Button icon={<UploadOutlined />}>Upload</Button>
-        </Upload>
-        <span title={fileName} className="file-name">
-          {fileName}
-        </span>
-      </StyledWrapper>
-    );
-  });
+export const FileUpload: FC<{
+  suffix: string;
+  value?: any;
+  onChange?: any;
+  uploadText?: string;
+}> = memo(({ suffix, value, onChange, uploadText }) => {
+  const [fileName, setFileName] = useState();
+  const fileChange = data => {
+    setFileName(data.name);
+    onChange(data);
+    return false;
+  };
+  return (
+    <StyledWrapper>
+      <Upload
+        // accept=".jpg,.jpeg,.png,.gif"
+        accept={suffix}
+        showUploadList={false}
+        beforeUpload={fileChange}
+      >
+        <Button icon={<UploadOutlined />}>{uploadText ?? 'upload'}</Button>
+      </Upload>
+      <span title={fileName} className="file-name">
+        {fileName}
+      </span>
+    </StyledWrapper>
+  );
+});
 const StyledWrapper = styled.div`
   display: flex;
   .file-name {
