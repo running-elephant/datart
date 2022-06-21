@@ -262,8 +262,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
 
         DashboardResourceModel dashboardExportModel = new DashboardResourceModel();
         dashboardExportModel.setMainModels(new ArrayList<>());
-        Map<String, Folder> parentMap = new HashMap<>();
-
+        Set<String> parents = new HashSet<>();
         Set<String> viewIds = new HashSet<>();
         Set<String> datachartIds = new HashSet<>();
 
@@ -279,7 +278,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
                 List<Folder> allParents = getAllParents(folder.getParentId());
                 if (CollectionUtils.isNotEmpty(allParents)) {
                     for (Folder parent : allParents) {
-                        parentMap.put(parent.getId(), parent);
+                        parents.add(parent.getId());
                     }
                 }
             }
@@ -290,7 +289,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
             mainModel.setFiles(FileUtils.walkDirAsStream(new File(fileService.getBasePath(FileOwner.DASHBOARD, dashboardId)), null, false));
             dashboardExportModel.getMainModels().add(mainModel);
         }
-        dashboardExportModel.setParents(new LinkedList<>(parentMap.values()));
+        dashboardExportModel.setParents(parents);
         // datacharts
         dashboardExportModel.setDatacharts(datachartIds);
         // views
@@ -301,7 +300,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
 
 
     @Override
-    public void importTemplate(DashboardTemplateModel model, String orgId, String name, Folder parent) {
+    public Folder importTemplate(DashboardTemplateModel model, String orgId, String name, Folder parent) {
         securityManager.requireOrgOwner(orgId);
         DashboardCreateParam createParam = new DashboardCreateParam();
         createParam.setOrgId(orgId);
@@ -322,6 +321,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
                         return widgetCreateParam;
                     }).collect(Collectors.toList());
             updateParam.setWidgetToCreate(widgetCreateParams);
+            updateParam.setId(folder.getRelId());
             update(updateParam);
         }
 
@@ -337,6 +337,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
                 }
             }
         }
+        return folder;
     }
 
     @Override
@@ -387,34 +388,40 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         HashMap<String, String> widgetIdMapping = new HashMap<>();
 
         // generate widget id
-        for (WidgetCreateParam widgetCreateParam : param.getWidgetToCreate()) {
-            String uuid = UUIDGenerator.generate();
-            widgetIdMapping.put(widgetCreateParam.getId(), uuid);
-            widgetCreateParam.setId(uuid);
-        }
-
-
-        //replace widget relation id and parent id
-        for (WidgetCreateParam widgetCreateParam : param.getWidgetToCreate()) {
-            if (widgetIdMapping.containsKey(widgetCreateParam.getParentId())) {
-                widgetCreateParam.setParentId(widgetIdMapping.get(widgetCreateParam.getParentId()));
+        if (CollectionUtils.isNotEmpty(param.getWidgetToCreate())) {
+            for (WidgetCreateParam widgetCreateParam : param.getWidgetToCreate()) {
+                String uuid = UUIDGenerator.generate();
+                widgetIdMapping.put(widgetCreateParam.getId(), uuid);
+                widgetCreateParam.setId(uuid);
             }
-            for (WidgetRelParam relation : widgetCreateParam.getRelations()) {
-                relation.setSourceId(widgetCreateParam.getId());
-                if (widgetIdMapping.containsKey(relation.getTargetId())) {
-                    relation.setTargetId(widgetIdMapping.get(relation.getTargetId()));
+            //replace widget relation id and parent id
+            for (WidgetCreateParam widgetCreateParam : param.getWidgetToCreate()) {
+                if (widgetIdMapping.containsKey(widgetCreateParam.getParentId())) {
+                    widgetCreateParam.setParentId(widgetIdMapping.get(widgetCreateParam.getParentId()));
+                }
+                if (CollectionUtils.isNotEmpty(widgetCreateParam.getRelations())) {
+                    for (WidgetRelParam relation : widgetCreateParam.getRelations()) {
+                        relation.setSourceId(widgetCreateParam.getId());
+                        if (widgetIdMapping.containsKey(relation.getTargetId())) {
+                            relation.setTargetId(widgetIdMapping.get(relation.getTargetId()));
+                        }
+                    }
                 }
             }
         }
 
-        for (WidgetUpdateParam widgetUpdateParam : param.getWidgetToUpdate()) {
-            if (widgetIdMapping.containsKey(widgetUpdateParam.getParentId())) {
-                widgetUpdateParam.setParentId(widgetIdMapping.get(widgetUpdateParam.getParentId()));
-            }
-            for (WidgetRelParam relation : widgetUpdateParam.getRelations()) {
-                relation.setSourceId(widgetUpdateParam.getId());
-                if (widgetIdMapping.containsKey(relation.getTargetId())) {
-                    relation.setTargetId(widgetIdMapping.get(relation.getTargetId()));
+        if (CollectionUtils.isNotEmpty(param.getWidgetToUpdate())) {
+            for (WidgetUpdateParam widgetUpdateParam : param.getWidgetToUpdate()) {
+                if (widgetIdMapping.containsKey(widgetUpdateParam.getParentId())) {
+                    widgetUpdateParam.setParentId(widgetIdMapping.get(widgetUpdateParam.getParentId()));
+                }
+                if (CollectionUtils.isNotEmpty(widgetUpdateParam.getRelations())) {
+                    for (WidgetRelParam relation : widgetUpdateParam.getRelations()) {
+                        relation.setSourceId(widgetUpdateParam.getId());
+                        if (widgetIdMapping.containsKey(relation.getTargetId())) {
+                            relation.setTargetId(widgetIdMapping.get(relation.getTargetId()));
+                        }
+                    }
                 }
             }
         }
@@ -492,20 +499,10 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
             , final Map<String, String> sourceIdMapping
             , final Map<String, String> viewIdMapping
             , final Map<String, String> chartIdMapping
-            , final Map<String, String> boardIdMapping) {
+            , final Map<String, String> boardIdMapping
+            , final Map<String, String> folderIdMapping) {
         if (model == null || model.getMainModels() == null) {
             return;
-        }
-
-        Map<String, String> parentIdMapping = new HashMap<>();
-        for (Folder folder : model.getParents()) {
-            String newId = UUIDGenerator.generate();
-            parentIdMapping.put(folder.getId(), newId);
-            folder.setId(newId);
-            folder.setRelId(chartIdMapping.get(folder.getRelId()));
-        }
-        for (Folder parent : model.getParents()) {
-            parent.setParentId(parentIdMapping.get(parent.getParentId()));
         }
 
         for (DashboardResourceModel.MainModel mainModel : model.getMainModels()) {
@@ -514,7 +511,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
             mainModel.getDashboard().setId(newId);
             mainModel.getFolder().setRelId(newId);
             mainModel.getFolder().setId(UUIDGenerator.generate());
-            mainModel.getFolder().setParentId(parentIdMapping.get(mainModel.getFolder().getParentId()));
+            mainModel.getFolder().setParentId(folderIdMapping.get(mainModel.getFolder().getParentId()));
 
             final Map<String, String> widgetIdMapping = new HashMap<>();
             for (WidgetDetail widget : mainModel.getWidgets()) {
@@ -553,6 +550,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
                                  String orgId,
                                  boolean deleteOld) {
         List<DashboardResourceModel.MainModel> mainModels = model.getMainModels();
+
         if (CollectionUtils.isNotEmpty(mainModels)) {
             for (DashboardResourceModel.MainModel mainModel : mainModels) {
                 Dashboard dashboard = mainModel.getDashboard();
@@ -569,11 +567,12 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
                     } catch (Exception ignore) {
                     }
                 }
+
                 // dashboard folder
                 Folder folder = mainModel.getFolder();
                 folder.setOrgId(orgId);
                 try {
-                    folderService.checkUnique(ResourceType.DASHBOARD, orgId, folder.getParentId(), folder.getName());
+                    folderService.checkUnique(orgId, folder.getParentId(), folder.getName());
                 } catch (Exception e) {
                     folder.setName(DateUtils.withTimeString(folder.getName()));
                     dashboard.setName(folder.getName());
@@ -630,16 +629,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
                     }
                 }
             }
-            // insert parents
-            if (CollectionUtils.isNotEmpty(model.getParents())) {
-                for (Folder parent : model.getParents()) {
-                    try {
-                        parent.setOrgId(orgId);
-                        folderMapper.insert(parent);
-                    } catch (Exception ignore) {
-                    }
-                }
-            }
+
         }
     }
 

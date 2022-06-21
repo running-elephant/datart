@@ -21,6 +21,7 @@ package datart.server.service.impl;
 import datart.core.base.consts.Const;
 import datart.core.base.exception.Exceptions;
 import datart.core.base.exception.NotFoundException;
+import datart.core.base.exception.ParamException;
 import datart.core.common.DateUtils;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
@@ -285,7 +286,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     public void replaceId(ViewResourceModel model
             , final Map<String, String> sourceIdMapping
             , final Map<String, String> viewIdMapping
-            , final Map<String, String> chartIdMapping, Map<String, String> boardIdMapping) {
+            , final Map<String, String> chartIdMapping, Map<String, String> boardIdMapping, Map<String, String> folderIdMapping) {
 
         if (model == null || model.getMainModels() == null) {
             return;
@@ -313,13 +314,11 @@ public class ViewServiceImpl extends BaseService implements ViewService {
 
 
     @Override
-    public boolean checkUnique(BaseEntity entity) {
-        View v = (View) entity;
-        View check = new View();
-        check.setParentId(v.getParentId());
-        check.setOrgId(v.getOrgId());
-        check.setName(v.getName());
-        return ViewService.super.checkUnique(check);
+    public boolean checkUnique(String orgId, String parentId, String name) {
+        if (!CollectionUtils.isEmpty(viewMapper.checkName(orgId, parentId, name))) {
+            Exceptions.tr(ParamException.class, "error.param.exists.name");
+        }
+        return true;
     }
 
     @Override
@@ -454,6 +453,15 @@ public class ViewServiceImpl extends BaseService implements ViewService {
             if (!CollectionUtils.isEmpty(model.getParents())) {
                 for (View parent : model.getParents()) {
                     try {
+                        View check = new View();
+                        check.setOrgId(orgId);
+                        check.setName(parent.getName());
+                        check.setParentId(check.getParentId());
+                        checkUnique(check);
+                    } catch (Exception e) {
+                        parent.setName(DateUtils.withTimeString(parent.getName()));
+                    }
+                    try {
                         parent.setOrgId(orgId);
                         viewMapper.insert(parent);
                     } catch (Exception ignore) {
@@ -461,7 +469,6 @@ public class ViewServiceImpl extends BaseService implements ViewService {
                 }
             }
         }
-
     }
 
     @Override

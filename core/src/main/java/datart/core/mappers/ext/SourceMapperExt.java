@@ -15,14 +15,17 @@ import java.util.List;
 public interface SourceMapperExt extends SourceMapper {
 
     @Select({
-            "SELECT " +
-                    "	s.* " +
-                    "FROM " +
-                    "	source s " +
-                    "WHERE " +
-                    "	s.org_id = #{orgId} AND s.`name` =#{name}"
+            "<script>",
+            "SELECT * FROM source  WHERE org_id=#{orgId} AND `name` = #{name}",
+            "<if test=\"parentId==null\">",
+            " AND parent_id IS NULL ",
+            "</if>",
+            "<if test=\"parentId!=null\">",
+            " AND parent_id=#{parentId} ",
+            "</if>",
+            "</script>",
     })
-    Source checkNameWithOrg(@Param("orgId") String orgId, @Param("name") String name);
+    List<Source> checkName(String orgId, String parentId, String name);
 
     @Select({
             "SELECT s.* FROM source s WHERE s.status=#{archived} and s.org_id=#{orgId} ORDER BY create_time ASC"

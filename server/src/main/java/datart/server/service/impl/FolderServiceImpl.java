@@ -19,6 +19,10 @@ package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
 import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.NotAllowedException;
+import datart.core.base.exception.NotFoundException;
+import datart.core.base.exception.ParamException;
+import datart.core.common.DateUtils;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
 import datart.core.mappers.ext.*;
@@ -28,9 +32,13 @@ import datart.security.base.SubjectType;
 import datart.security.exception.PermissionDeniedException;
 import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.PermissionHelper;
-import datart.core.base.exception.NotAllowedException;
-import datart.core.base.exception.ParamException;
-import datart.server.base.params.*;
+import datart.server.base.params.BaseCreateParam;
+import datart.server.base.params.BaseUpdateParam;
+import datart.server.base.params.FolderCreateParam;
+import datart.server.base.params.FolderUpdateParam;
+import datart.server.base.transfer.ImportStrategy;
+import datart.server.base.transfer.TransferConfig;
+import datart.server.base.transfer.model.FolderTransferModel;
 import datart.server.service.BaseService;
 import datart.server.service.FolderService;
 import datart.server.service.RoleService;
@@ -143,24 +151,11 @@ public class FolderServiceImpl extends BaseService implements FolderService {
     }
 
     @Override
-    public boolean checkUnique(ResourceType resourceType, String orgId, String parentId, String name) {
-        switch (resourceType) {
-            case FOLDER:
-                Folder folder = new Folder();
-                folder.setName(name);
-                folder.setOrgId(orgId);
-                folder.setParentId(parentId);
-                return checkUnique(folder);
-            case DASHBOARD:
-            case DATACHART:
-                if (!CollectionUtils.isEmpty(folderMapper.checkVizName(orgId, parentId, name))) {
-                    Exceptions.tr(ParamException.class, "error.param.exists.name");
-                }
-                return true;
-            default:
-                Exceptions.tr(ParamException.class, "error.param.invalid", resourceType.name());
+    public boolean checkUnique(String orgId, String parentId, String name) {
+        if (!CollectionUtils.isEmpty(folderMapper.checkVizName(orgId, parentId, name))) {
+            Exceptions.tr(ParamException.class, "error.param.exists.name");
         }
-        return false;
+        return true;
     }
 
     @Override
@@ -173,6 +168,123 @@ public class FolderServiceImpl extends BaseService implements FolderService {
         List<Folder> parents = new LinkedList<>();
         getParent(parents, folderId);
         return parents;
+    }
+
+    @Override
+    public FolderTransferModel exportResource(TransferConfig transferConfig, Set<String> ids) {
+        FolderTransferModel folderTransferModel = new FolderTransferModel();
+        folderTransferModel.setFolders(folderMapper.selectByPrimaryKeys(ids));
+        return folderTransferModel;
+    }
+
+    @Override
+    public boolean importResource(FolderTransferModel model, ImportStrategy strategy, String orgId) {
+        securityManager.requireOrgOwner(orgId);
+        if (model == null || model.getFolders() == null) {
+            return true;
+        }
+        switch (strategy) {
+            case NEW:
+            case ROLLBACK:
+                importFolders(orgId, model.getFolders(), false);
+                break;
+            case OVERWRITE:
+                importFolders(orgId, model.getFolders(), true);
+                break;
+        }
+        return true;
+    }
+
+    private void importFolders(String orgId, List<Folder> folders, boolean deleteFirst) {
+        if (deleteFirst) {
+            for (Folder folder : folders) {
+                try {
+                    Folder retrieve = retrieve(folder.getId());
+                    if (retrieve == null) {
+                        continue;
+                    }
+                    if (!retrieve.getOrgId().equals(orgId)) {
+                        Exceptions.msg("message.viz.import.database.conflict");
+                    }
+                    try {
+                        delete(retrieve.getId(), false, false);
+                    } catch (Exception ignore) {
+                    }
+                } catch (NotFoundException ignored) {
+                }
+            }
+        }
+
+        for (Folder folder : folders) {
+            try {
+                checkUnique(orgId, folder.getParentId(), folder.getName());
+            } catch (Exception e) {
+                folder.setName(DateUtils.withTimeString(folder.getName()));
+            }
+            folderMapper.insert(folder);
+        }
+//        Folder root = null;
+//        for (Folder folder : folders) {
+//            if (folder.getParentId() == null) {
+//                if (root != null) {
+//                    Exceptions.msg("Folder has duplicate root nodes");
+//                }
+//                root = folder;
+//            }
+//        }
+//        if (root == null) {
+//            Exceptions.msg("Folder does not have a root node");
+//        }
+//        final Folder rootFolder = root;
+//        Map<String, List<Folder>> folderMap = folders.stream()
+//                .collect(Collectors.groupingBy(Folder::getId));
+//        Map<String, List<Folder>> folderTree = folders.stream()
+//                .filter(folder -> !folder.getId().equals(rootFolder.getId()))
+//                .collect(Collectors.groupingBy(Folder::getParentId));
+//
+//        //  insert root
+//        folderMapper.insert(rootFolder);
+//        if (!folderTree.isEmpty()) {
+//            for (String key : folderTree.keySet()) {
+//                List<Folder> nodes = folderTree.get(key);
+//            }
+//        }
+    }
+
+//    private void insertFolderTree(Map<String, List<Folder>> folderTree, Map<String, Folder> folderMap, String parentId, String orgId) {
+//        List<Folder> folders = folderTree.get(parentId);
+//        if (CollectionUtils.isEmpty(folders)) {
+//            return;
+//        }
+//        for (Folder folder : folders) {
+//            Folder folder0 = folderMapper.selectByParentIdAndName(parentId, folder.getName());
+//            if (folder0 != null) {
+//                folder.setId(folder0.getId());
+//                continue;
+//            }
+//            folder.setParentId(folderMap.get(folder.getParentId()).getId());
+//            folderMapper.insert(folder);
+//        }
+//    }
+
+    @Override
+    public void replaceId(FolderTransferModel model
+            , final Map<String, String> sourceIdMapping
+            , final Map<String, String> viewIdMapping
+            , final Map<String, String> chartIdMapping
+            , final Map<String, String> boardIdMapping
+            , final Map<String, String> folderIdMapping) {
+        if (model != null && model.getFolders() != null) {
+            for (Folder folder : model.getFolders()) {
+                String newId = UUIDGenerator.generate();
+                folderIdMapping.put(folder.getId(), newId);
+                folder.setId(newId);
+            }
+            for (Folder folder : model.getFolders()) {
+                folder.setParentId(folderIdMapping.get(folder.getParentId()));
+            }
+        }
+
     }
 
     private void getParent(List<Folder> list, String parentId) {
@@ -190,7 +302,6 @@ public class FolderServiceImpl extends BaseService implements FolderService {
     public boolean update(BaseUpdateParam baseUpdateParam) {
 
         FolderUpdateParam updateParam = (FolderUpdateParam) baseUpdateParam;
-
         Folder folder = retrieve(updateParam.getId());
         if (folder == null) {
             Exceptions.notFound("resource.folder");
@@ -304,4 +415,5 @@ public class FolderServiceImpl extends BaseService implements FolderService {
         permissionInfo.setPermission(Const.CREATE);
         roleService.grantPermission(Collections.singletonList(permissionInfo));
     }
+
 }

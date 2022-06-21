@@ -25,6 +25,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private Oauth2AuthenticationSuccessHandler authenticationSuccessHandler;
 
+    private Oauth2AuthenticationFailureHandler authenticationFailureHandler;
+
     private ClientRegistrationRepositoryImpl clientRegistrations;
 
     @Override
@@ -39,6 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         if (this.oAuth2ClientProperties != null) {
             http.addFilterBefore(new CustomOAuth2AuthorizationRequestRedirectFilter(clientRegistrations), OAuth2AuthorizationRequestRedirectFilter.class);
             http.addFilterBefore(new CustomOauth2AuthenticationFilter(clientRegistrations, authenticationSuccessHandler), OAuth2LoginAuthenticationFilter.class);
+            http.oauth2Login().failureHandler(authenticationFailureHandler);
             http.oauth2Login().clientRegistrationRepository(clientRegistrations);
             http.oauth2Login().successHandler(authenticationSuccessHandler);
             http
@@ -62,5 +65,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void setClientRegistrations(ClientRegistrationRepositoryImpl clientRegistrations) {
         this.clientRegistrations = clientRegistrations;
+    }
+
+    @Autowired
+    public void setAuthenticationFailureHandler(Oauth2AuthenticationFailureHandler authenticationFailureHandler) {
+        this.authenticationFailureHandler = authenticationFailureHandler;
     }
 }

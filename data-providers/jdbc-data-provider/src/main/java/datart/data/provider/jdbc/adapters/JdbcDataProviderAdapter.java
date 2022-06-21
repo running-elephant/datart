@@ -32,6 +32,9 @@ import datart.data.provider.jdbc.JdbcDriverInfo;
 import datart.data.provider.jdbc.JdbcProperties;
 import datart.data.provider.jdbc.SqlScriptRender;
 import datart.data.provider.local.LocalDB;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -260,10 +263,11 @@ public class JdbcDataProviderAdapter implements Closeable {
     }
 
     public boolean supportPaging() {
-        return sqlDialect instanceof FetchAndOffsetSupport;
+        return driverInfo.supportSqlLimit() || (sqlDialect instanceof FetchAndOffsetSupport);
     }
 
     public SqlDialect getSqlDialect() {
+
         if (sqlDialect != null) {
             return sqlDialect;
         }
@@ -283,7 +287,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         }
         if (sqlDialect == null) {
             try {
-                sqlDialect = SqlDialect.DatabaseProduct.valueOf(driverInfo.getDbType().toUpperCase()).getDialect();
+                sqlDialect = getDefaultSqlDialect(driverInfo);
             } catch (Exception ignored) {
                 log.warn("DBType " + driverInfo.getDbType() + " mismatched, use custom sql dialect");
                 sqlDialect = new CustomSqlDialect(driverInfo);
@@ -300,11 +304,11 @@ public class JdbcDataProviderAdapter implements Closeable {
             if (StringUtils.isNotBlank(driverInfo.getIdentifierQuote())) {
                 fieldValues.put("identifierQuoteString", driverInfo.getIdentifierQuote());
                 fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierQuote());
-                fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierQuote()+driverInfo.getIdentifierQuote());
+                fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierQuote() + driverInfo.getIdentifierQuote());
             }
             if (StringUtils.isNotBlank(driverInfo.getIdentifierEndQuote())) {
                 fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierEndQuote());
-                fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierEndQuote()+driverInfo.getIdentifierEndQuote());
+                fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierEndQuote() + driverInfo.getIdentifierEndQuote());
             }
             if (StringUtils.isNotBlank(driverInfo.getIdentifierEscapedQuote())) {
                 fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierEscapedQuote());
@@ -320,6 +324,23 @@ public class JdbcDataProviderAdapter implements Closeable {
         } catch (Exception e) {
             log.warn("sql dialect config error for " + driverInfo.getSqlDialect());
         }
+    }
+
+    protected SqlDialect getDefaultSqlDialect(JdbcDriverInfo driverInfo) throws Exception {
+        sqlDialect = SqlDialect.DatabaseProduct.valueOf(driverInfo.getDbType().toUpperCase()).getDialect();
+        Class<? extends SqlDialect> dialectClass = sqlDialect.getClass();
+        ClassPool classPool = ClassPool.getDefault();
+        CtClass superClass = classPool.get(dialectClass.getName());
+        CtClass ctClass = classPool.makeClass(dialectClass.getName().toLowerCase(Locale.ROOT) + ".Proxy", superClass);
+        if (driverInfo.supportSqlLimit()) {
+            ctClass.addMethod(CtMethod.make("    public void unparseOffsetFetch(org.apache.calcite.sql.SqlWriter writer, org.apache.calcite.sql.SqlNode offset, org.apache.calcite.sql.SqlNode fetch) {\n" +
+                    "        unparseFetchUsingLimit(writer, offset, fetch);\n" +
+                    "    }", ctClass));
+        }
+        Class<?> aClass = ctClass.toClass();
+        Constructor<?> constructor = aClass.getConstructor(SqlDialect.Context.class);
+        SqlDialect.Context context = ReflectUtils.getFieldValue(dialectClass, "DEFAULT_CONTEXT");
+        return (SqlDialect) constructor.newInstance(context);
     }
 
     protected Dataframe parseResultSet(ResultSet rs) throws SQLException {
@@ -412,7 +433,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         Object obj = rs.getObject(columnIndex);
         if (obj instanceof Boolean) {
             obj = rs.getInt(columnIndex);
-        } else if (obj instanceof LocalDateTime ) {
+        } else if (obj instanceof LocalDateTime) {
             obj = rs.getTimestamp(columnIndex);
         }
         return obj;
