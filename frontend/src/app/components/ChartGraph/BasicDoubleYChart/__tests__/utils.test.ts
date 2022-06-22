@@ -18,8 +18,8 @@
 
 import { DataViewFieldType } from 'app/constants';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
-import { transformToDataSet } from 'app/utils/chartHelper';
-import { getMinAndMaxNumber, getYAxisIntervalConfig } from '../calcMethod';
+import { getMinAndMaxNumber, transformToDataSet } from 'app/utils/chartHelper';
+import { getYAxisIntervalConfig } from '../utils';
 
 describe('DoubleYChart calc medthod', () => {
   describe('getYAxisIntervalConfig Test - ', () => {
