@@ -85,3 +85,12 @@ export type Series = {
   markLine: MarkLine;
   markArea: MarkArea;
 } & LabelStyle;
+
+export interface IntervalConfig {
+  leftMin?: number;
+  leftMax?: number;
+  rightMin?: number;
+  rightMax?: number;
+  leftInterval?: number;
+  rightInterval?: number;
+}

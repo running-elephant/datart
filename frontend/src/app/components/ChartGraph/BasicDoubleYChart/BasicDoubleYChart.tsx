@@ -46,10 +46,9 @@ import {
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import Chart from '../../../models/Chart';
-import { getYAxisIntervalConfig } from './calcMethod';
 import Config from './config';
 import { DoubleYChartXAxis, DoubleYChartYAxis, Series } from './types';
-
+import { getYAxisIntervalConfig } from './utils';
 class BasicDoubleYChart extends Chart {
   dependency = [];
   config = Config;
