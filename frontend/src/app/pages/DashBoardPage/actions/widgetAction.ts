@@ -202,6 +202,15 @@ export const widgetLinkEventAction =
     const sourceWidgetInfo = boardWidgetInfoRecord?.[widget.id];
     const sourceWidgetRuntimeLinkInfo = sourceWidgetInfo?.linkInfo || {};
 
+    const {
+      filterParams: sourceControllerFilters,
+      variableParams: sourceVariableParams,
+    } = getTheWidgetFiltersAndParams({
+      chartWidget: widget,
+      widgetMap: widgetMap,
+      params: undefined,
+    });
+
     const boardLinkWidgets = Object.entries(
       widgetMapMap?.[widget?.dashboardId] || {},
     )
@@ -239,10 +248,12 @@ export const widgetLinkEventAction =
             option: widgetInfo,
             extraFilters: (clickFilters || [])
               .concat(controllerFilters || [])
-              .concat(sourceWidgetRuntimeLinkInfo?.filters || []),
+              .concat(sourceWidgetRuntimeLinkInfo?.filters || [])
+              .concat(sourceControllerFilters || []),
             variableParams: Object.assign(
               variableParams,
               sourceWidgetRuntimeLinkInfo?.variables,
+              sourceVariableParams,
             ),
           }),
         );
@@ -254,10 +265,12 @@ export const widgetLinkEventAction =
             option: widgetInfo,
             extraFilters: (clickFilters || [])
               .concat(controllerFilters || [])
-              .concat(sourceWidgetRuntimeLinkInfo?.filters || []),
+              .concat(sourceWidgetRuntimeLinkInfo?.filters || [])
+              .concat(sourceControllerFilters || []),
             variableParams: Object.assign(
               variableParams,
               sourceWidgetRuntimeLinkInfo?.variables,
+              sourceVariableParams,
             ),
           }),
         );
