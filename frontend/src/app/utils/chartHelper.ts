@@ -1604,12 +1604,11 @@ export const getRuntimeComputedFields = (
 
   if (isRuntime && replacedConfig?.field) {
     const index = getRuntimeDateLevelFields(_computedFields).findIndex(
-      v => v.id === replacedConfig?.colName,
+      v => v.id === replacedConfig?.id,
     );
     const replacedConfigIndex = dateLevelComputedFields.findIndex(
       v => v.field === replacedConfig?.field,
     );
-
     _computedFields = updateBy(_computedFields, draft => {
       const dateLevelConfig = dateLevelComputedFields[replacedConfigIndex];
 

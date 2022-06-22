@@ -425,19 +425,13 @@ export class ChartDataRequestBuilder {
   }
 
   private buildFunctionColumns() {
-    const _removeSquareBrackets = expression => {
-      if (!expression) {
-        return '';
-      }
-      return expression.replaceAll('[', '').replaceAll(']', '');
-    };
     const computedFields = getRuntimeDateLevelFields(
       this.dataView.computedFields,
     );
 
     return (computedFields || []).map(f => ({
       alias: f.id!,
-      snippet: _removeSquareBrackets(f.expression),
+      snippet: f.expression,
     }));
   }
 

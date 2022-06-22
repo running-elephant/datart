@@ -1584,8 +1584,8 @@ describe('ChartDataRequestBuild Test', () => {
     const requestParams = builder.build();
 
     expect(requestParams.functionColumns).toEqual([
-      { alias: 'f1', snippet: 'a' },
-      { alias: 'f2', snippet: 'b' },
+      { alias: 'f1', snippet: '[a' },
+      { alias: 'f2', snippet: '[b]' },
       { alias: 'f3', snippet: '' },
     ]);
   });
@@ -1595,8 +1595,8 @@ describe('ChartDataRequestBuild Test', () => {
       id: 'view-id',
       type: 'STRUCT',
       computedFields: [
-        { id: 'f1', expression: '[dad.a' },
-        { id: 'f2', expression: '[dad.b]' },
+        { id: 'f1', expression: '[dad].[a]' },
+        { id: 'f2', expression: '[dad].[b]' },
         { id: 'f3', expression: '' },
       ],
     } as any;
@@ -1617,8 +1617,8 @@ describe('ChartDataRequestBuild Test', () => {
     const requestParams = builder.build();
 
     expect(requestParams.functionColumns).toEqual([
-      { alias: 'f1', snippet: 'dad.a' },
-      { alias: 'f2', snippet: 'dad.b' },
+      { alias: 'f1', snippet: '[dad].[a]' },
+      { alias: 'f2', snippet: '[dad].[b]' },
       { alias: 'f3', snippet: '' },
     ]);
   });

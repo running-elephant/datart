@@ -24,6 +24,7 @@ import {
   DataViewFieldType,
 } from 'app/constants';
 import useFieldActionModal from 'app/hooks/useFieldActionModal';
+import { FieldTemplate } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartDataViewPanel/components/utils';
 import ChartAggregationContext from 'app/pages/ChartWorkbenchPage/contexts/ChartAggregationContext';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import VizDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
@@ -108,7 +109,9 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                   ChartDataViewFieldCategory.DateLevelComputedField
                 ) {
                   config.colName = `${val.colName}（${t(val.expression)}）`;
-                  config.expression = `${val.expression}(${val.colName})`;
+                  config.expression = `${val.expression}(${FieldTemplate(
+                    JSON.parse(val.colPath),
+                  )})`;
                   config.field = val.colName;
                 }
                 return config;

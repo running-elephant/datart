@@ -327,9 +327,12 @@ const ChartDataViewPanel: FC<{
   );
 
   const buildDateLevelFields = useCallback(
-    DateField => {
-      return updateBy(DateField, draft => {
+    dateField => {
+      return updateBy(dateField, draft => {
         draft.forEach(v => {
+          if (v.type !== 'DATE') {
+            return false;
+          }
           v.dateLevelFields = DATE_LEVELS.map((item, i) => {
             if (
               availableSourceFunctions &&
@@ -341,6 +344,7 @@ const ChartDataViewPanel: FC<{
                 type: item.type,
                 category: item.category,
                 expression: item.expression,
+                colPath: v.id,
               };
             }
             return null;
@@ -387,7 +391,7 @@ const ChartDataViewPanel: FC<{
         ? dataView?.meta || []
         : (dataView?.meta || []).concat(computedFields);
 
-      const hierarchyFields = allFields.filter(
+      let hierarchyFields = allFields.filter(
         f => f.role === ColumnRole.Hierarchy,
       );
       const allNoHierarchyFields = fieldsSortByType(
@@ -412,6 +416,11 @@ const ChartDataViewPanel: FC<{
       const dateComFields = computedFields.filter(
         f => f.type === DataViewFieldType.DATE,
       );
+      hierarchyFields = updateBy(hierarchyFields, draft => {
+        draft.forEach((v, i) => {
+          draft[i].children = buildDateLevelFields(v.children);
+        });
+      });
 
       return {
         allFields,

@@ -27,23 +27,18 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ViewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { ChartComputedFieldHandle } from 'app/types/ComputedFieldEditor';
-import { FC, useRef, useState } from 'react';
+import { FC, useCallback, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
 import ChartComputedFieldEditor from './ChartComputedFieldEditor/ChartComputedFieldEditor';
 import ChartSearchableList from './ChartSearchableList';
 import ComputedFunctionDescriptions from './computed-function-description-map';
+import { FieldTemplate, FunctionTemplate, VariableTemplate } from './utils';
 
 enum TextType {
   Field = 'field',
   Variable = 'variable',
   Function = 'function',
 }
-
-const FieldTemplate = f => `[${f}]`;
-
-const VariableTemplate = v => `$${v}$`;
-
-const FunctionTemplate = f => `${f}()`;
 
 const ChartComputedFieldSettingPanel: FC<{
   sourceId?: string;
@@ -165,13 +160,23 @@ const ChartComputedFieldSettingPanel: FC<{
     );
   };
 
-  const handleFieldSelected = field => {
+  const handleFieldSelected = useCallback(field => {
     editorRef.current?.insertField(getInputText(field, TextType.Field));
-  };
+  }, []);
 
   const handleVariableSelected = variable => {
     editorRef.current?.insertField(getInputText(variable, TextType.Variable));
   };
+
+  const handleOnSelectValue = useCallback(
+    selectKeys => {
+      if (selectKeys?.length) {
+        const selectKey = selectKeys[0] as any;
+        handleFieldSelected(selectKey);
+      }
+    },
+    [handleFieldSelected],
+  );
 
   return (
     <StyledChartComputedFieldSettingPanel direction="vertical">
@@ -221,10 +226,7 @@ const ChartComputedFieldSettingPanel: FC<{
                   treeData={fields as TreeDataNode[]}
                   defaultExpandAll={true}
                   height={500}
-                  onSelect={selectKeys => {
-                    const selectKey = selectKeys[0] as any;
-                    handleFieldSelected(selectKey.join('.'));
-                  }}
+                  onSelect={handleOnSelectValue}
                 />
               ) : (
                 <ChartSearchableList
