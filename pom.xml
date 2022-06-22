@@ -44,9 +44,6 @@
         <module>core</module>
         <module>security</module>
         <module>data-providers</module>
-        <module>data-providers/file-data-provider</module>
-        <module>data-providers/http-data-provider</module>
-        <module>data-providers/jdbc-data-provider</module>
         <module>server</module>
     </modules>
 
