@@ -60,35 +60,41 @@ public class WebUtils {
 
     public static <T> T screenShot(String url, OutputType<T> outputType, int imageWidth) throws Exception {
         WebDriver webDriver = createWebDriver();
-        webDriver.get(url);
+        T output = null;
+        try {
+            webDriver.get(url);
 
-        WebDriverWait wait = new WebDriverWait(webDriver, getTimeout());
+            WebDriverWait wait = new WebDriverWait(webDriver, getTimeout());
 
-        ExpectedCondition<WebElement> ConditionOfSign = ExpectedConditions.presenceOfElementLocated(By.id("headlessBrowserRenderSign"));
-        ExpectedCondition<WebElement> ConditionOfWidth = ExpectedConditions.presenceOfElementLocated(By.id("width"));
-        ExpectedCondition<WebElement> ConditionOfHeight = ExpectedConditions.presenceOfElementLocated(By.id("height"));
-        wait.until(ExpectedConditions.and(ConditionOfSign, ConditionOfWidth, ConditionOfHeight));
+            ExpectedCondition<WebElement> ConditionOfSign = ExpectedConditions.presenceOfElementLocated(By.id("headlessBrowserRenderSign"));
+            ExpectedCondition<WebElement> ConditionOfWidth = ExpectedConditions.presenceOfElementLocated(By.id("width"));
+            ExpectedCondition<WebElement> ConditionOfHeight = ExpectedConditions.presenceOfElementLocated(By.id("height"));
+            wait.until(ExpectedConditions.and(ConditionOfSign, ConditionOfWidth, ConditionOfHeight));
 
-        Double contentWidth = Double.parseDouble(webDriver.findElement(By.id("width")).getAttribute("value"));
+            Double contentWidth = Double.parseDouble(webDriver.findElement(By.id("width")).getAttribute("value"));
 
-        Double contentHeight = Double.parseDouble(webDriver.findElement(By.id("height")).getAttribute("value"));
+            Double contentHeight = Double.parseDouble(webDriver.findElement(By.id("height")).getAttribute("value"));
 
-        if (imageWidth>0 && imageWidth != contentWidth) {
-            // scale the window
-            webDriver.manage().window().setSize(new Dimension(imageWidth, contentHeight.intValue()));
+            if (imageWidth>0 && imageWidth != contentWidth) {
+                // scale the window
+                webDriver.manage().window().setSize(new Dimension(imageWidth, contentHeight.intValue()));
+            }
+            Thread.sleep(1500);
+            // scale the window again
+            contentWidth = Double.parseDouble(webDriver.findElement(By.id("width")).getAttribute("value"));
+            contentWidth = contentWidth>0 ? contentWidth : 1920;
+            contentHeight = Double.parseDouble(webDriver.findElement(By.id("height")).getAttribute("value"));
+            contentHeight = contentHeight>0 ? contentHeight : 600;
+            webDriver.manage().window().setSize(new Dimension(contentWidth.intValue(), contentHeight.intValue()));
+            Thread.sleep(1000);
+
+            TakesScreenshot screenshot = (TakesScreenshot) webDriver;
+            output = screenshot.getScreenshotAs(outputType);
+        } catch (Exception e) {
+            Exceptions.e(e);
+        } finally {
+            webDriver.quit();
         }
-        Thread.sleep(1500);
-        // scale the window again
-        contentWidth = Double.parseDouble(webDriver.findElement(By.id("width")).getAttribute("value"));
-        contentWidth = contentWidth>0 ? contentWidth : 1920;
-        contentHeight = Double.parseDouble(webDriver.findElement(By.id("height")).getAttribute("value"));
-        contentHeight = contentHeight>0 ? contentHeight : 600;
-        webDriver.manage().window().setSize(new Dimension(contentWidth.intValue(), contentHeight.intValue()));
-        Thread.sleep(1000);
-
-        TakesScreenshot screenshot = (TakesScreenshot) webDriver;
-        T output = screenshot.getScreenshotAs(outputType);
-        webDriver.quit();
         return output;
     }
 
