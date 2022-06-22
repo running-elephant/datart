@@ -28,17 +28,15 @@ import {
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { BoardContext } from '../BoardProvider/BoardProvider';
-import { WidgetChartContext } from '../WidgetProvider/WidgetChartProvider';
 
 export const WidgetDropdownList: React.FC<{
   widget: Widget;
 }> = memo(({ widget }) => {
   const { renderMode } = useContext(BoardContext);
-  const { supportTrigger } = useContext(WidgetChartContext)!;
   const actions: WidgetActionListItem<widgetActionType>[] =
     widgetManager
       .toolkit(widget.config.originalType)
-      .getDropDownList(widget.config, supportTrigger) || [];
+      .getDropDownList(widget.config) || [];
   const widgetAction = useWidgetAction();
   const actionList = useWidgetDropdownList(renderMode, actions);
   const t = useI18NPrefix(`viz.widget.action`);

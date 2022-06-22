@@ -5,12 +5,10 @@ import {
   BoardInfo,
   BoardLinkFilter,
   DeviceType,
-  JumpPanel,
   WidgetData,
   WidgetErrorType,
   WidgetInfo,
   WidgetLinkInfo,
-  WidgetPanelParams,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import { getInitBoardInfo } from 'app/pages/DashBoardPage/utils/board';
@@ -61,12 +59,10 @@ const editDashBoardInfoSlice = createSlice({
     ) {
       state.controllerPanel = action.payload;
     },
-    changeLinkagePanel(state, action: PayloadAction<WidgetPanelParams>) {
-      state.linkagePanel = action.payload;
-    },
-    changeJumpPanel(state, action: PayloadAction<JumpPanel>) {
-      state.jumpPanel = action.payload;
-    },
+    // changeLinkagePanel(state, action: PayloadAction<WidgetPanelParams>) {
+    //   state.linkagePanel = action.payload;
+    // },
+
     adjustDashLayouts(state, action: PayloadAction<Layout[]>) {
       state.layouts = JSON.parse(JSON.stringify(action.payload));
       // state.layouts = [...action.payload];
