@@ -46,6 +46,7 @@ import {
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import Chart from '../../../models/Chart';
+import { getYAxisIntervalConfig } from './calcMethod';
 import Config from './config';
 import { DoubleYChartXAxis, DoubleYChartYAxis, Series } from './types';
 
@@ -142,6 +143,7 @@ class BasicDoubleYChart extends Chart {
         styleConfigs,
         leftMetricsConfigs,
         rightMetricsConfigs,
+        chartDataSet,
       ),
       grid: getGridStyle(styleConfigs),
       series: this.getSeries(
@@ -325,11 +327,18 @@ class BasicDoubleYChart extends Chart {
     styles: ChartStyleConfig[],
     leftDeminsionConfigs: ChartDataSectionField[],
     rightDeminsionConfigs: ChartDataSectionField[],
+    chartDataSet: IChartDataSet<string>,
   ): DoubleYChartYAxis[] {
     const [showHorizonLine, horizonLineStyle] = getStyles(
       styles,
       ['splitLine'],
       ['showHorizonLine', 'horizonLineStyle'],
+    );
+
+    const yAxisIntervalConfig = getYAxisIntervalConfig(
+      leftDeminsionConfigs,
+      rightDeminsionConfigs,
+      chartDataSet,
     );
 
     const _yAxisTemplate = (position, name): DoubleYChartYAxis => {
@@ -352,6 +361,9 @@ class BasicDoubleYChart extends Chart {
           fontFamily: 'PingFang SC',
           fontSize: 12,
         },
+        min: yAxisIntervalConfig[position + 'Min'],
+        max: yAxisIntervalConfig[position + 'Max'],
+        interval: yAxisIntervalConfig[position + 'Interval'],
         inverse,
         axisLine: getAxisLine(showAxis),
         axisLabel: getAxisLabel(showLabel, font),
