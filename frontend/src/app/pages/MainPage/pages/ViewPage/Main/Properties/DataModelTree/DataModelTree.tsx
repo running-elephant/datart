@@ -32,6 +32,7 @@ import styled from 'styled-components/macro';
 import { SPACE_LG } from 'styles/StyleConstants';
 import { Nullable } from 'types';
 import { CloneValueDeep, isEmpty, isEmptyArray } from 'utils/object';
+import { moduleListFormsTreeByTableName } from 'utils/utils';
 import { ViewViewModelStages } from '../../../constants';
 import { useViewSlice } from '../../../slice';
 import {
@@ -648,6 +649,23 @@ const DataModelTree: FC = memo(() => {
     [addCallback, computedFields, handleDataModelComputerFieldChange],
   );
 
+  const GroupTableColumn = useCallback((TableColumn, viewType) => {
+    if (viewType === 'SQL') {
+      return TableColumn;
+    }
+    const hierarchyColumn = CloneValueDeep(TableColumn).filter(
+      v => v.role === ColumnRole.Hierarchy,
+    );
+    const copyTableColumn = CloneValueDeep(TableColumn).filter(
+      v => v.role !== ColumnRole.Hierarchy,
+    );
+    const columnTreeData = moduleListFormsTreeByTableName(
+      copyTableColumn,
+      'viewPage',
+    );
+    return [...hierarchyColumn, ...columnTreeData];
+  }, []);
+
   return (
     <Container
       title="model"
@@ -665,8 +683,9 @@ const DataModelTree: FC = memo(() => {
               ref={droppableProvided.innerRef}
               isDraggingOver={droppableSnapshot.isDraggingOver}
             >
-              {tableColumns.map(col => {
-                return col.role === ColumnRole.Hierarchy ? (
+              {GroupTableColumn(tableColumns, viewType).map(col => {
+                return col.role === ColumnRole.Hierarchy ||
+                  col.role === ColumnRole.Table ? (
                   <DataModelBranch
                     node={col}
                     key={col.name}
@@ -675,6 +694,7 @@ const DataModelTree: FC = memo(() => {
                     onEditBranch={openEditBranchModal}
                     onDelete={handleDeleteBranch}
                     onDeleteFromHierarchy={handleDeleteFromBranch}
+                    onCreateHierarchy={openCreateHierarchyModal}
                   />
                 ) : (
                   <DataModelNode

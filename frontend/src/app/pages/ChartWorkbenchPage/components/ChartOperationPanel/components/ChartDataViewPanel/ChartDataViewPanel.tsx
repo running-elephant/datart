@@ -60,7 +60,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { ORANGE, SPACE, SPACE_XS } from 'styles/StyleConstants';
-import { getPath } from 'utils/utils';
+import { getPath, moduleListFormsTreeByTableName } from 'utils/utils';
 import ChartDataViewContext from '../../../../contexts/ChartDataViewContext';
 import { DATE_LEVELS } from '../../../../slice/constant';
 import { ChartDraggableSourceGroupContainer } from '../ChartDraggable';
@@ -440,40 +440,11 @@ const ChartDataViewPanel: FC<{
         numericComFields,
         dateComFields,
       } = getAllFieldsOfEachType(true, sortType);
-      const tableNameList: string[] = [];
-      const columnNameObj: { [key: string]: any } = {};
-      const columnTreeData: any = [];
 
-      [...stringFields, ...dateFields, ...numericFields]?.forEach((v, i) => {
-        const tableName = JSON.parse(v.id)[0];
-        if (!tableNameList.includes(tableName)) {
-          tableNameList.push(tableName);
-        }
-      });
-
-      [...stringFields, ...dateFields, ...numericFields]?.forEach((v, i) => {
-        const tableName = JSON.parse(v.id)[0];
-        if (tableNameList.includes(tableName)) {
-          const columnNameArr = columnNameObj[tableName];
-          columnNameObj[tableName] = columnNameArr
-            ? [...columnNameArr, v]
-            : [v];
-        }
-      });
-
-      tableNameList.sort((a, b) => a.localeCompare(b));
-
-      tableNameList.forEach(v => {
-        columnTreeData.push({
-          id: v,
-          name: v,
-          category: 'hierarchy',
-          role: ColumnRole.Table,
-          subType: undefined,
-          type: 'STRING',
-          children: columnNameObj[v],
-        });
-      });
+      const columnTreeData = moduleListFormsTreeByTableName(
+        [...stringFields, ...dateFields, ...numericFields],
+        'analysisPage',
+      );
 
       return [
         ...columnTreeData,
