@@ -41,7 +41,10 @@ import { useCallback } from 'react';
 import { isEmpty } from 'utils/object';
 import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 
-const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
+const useChartInteractions = (props: {
+  openViewDetailPanel?: Function;
+  openJumpDialogModal?: Function;
+}) => {
   const [
     openNewTab,
     openBrowserTab,
@@ -206,7 +209,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
                   relId,
                   urlFiltersStr,
                 );
-                openJumpDialogModal(modalContent as any);
+                props?.openJumpDialogModal?.(modalContent as any);
               }
             } else if (rule.category === InteractionCategory.JumpToDashboard) {
               const variableFilters = variableToFilter(
@@ -233,7 +236,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
                   relId,
                   urlFiltersStr,
                 );
-                openJumpDialogModal(modalContent as any);
+                props?.openJumpDialogModal?.(modalContent as any);
               }
             } else if (rule.category === InteractionCategory.JumpToUrl) {
               const variableFilters = variableToFilter(
@@ -257,7 +260,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
               }
               if (rule?.action === InteractionAction.Dialog) {
                 const modalContent = getDialogContentByUrl(url, urlFiltersStr);
-                openJumpDialogModal(modalContent as any);
+                props?.openJumpDialogModal?.(modalContent as any);
               }
             }
           });
@@ -267,7 +270,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
       openNewTab,
       openBrowserTab,
       getDialogContent,
-      openJumpDialogModal,
+      props,
       redirectByUrl,
       openNewByUrl,
       getDialogContentByUrl,
@@ -355,7 +358,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
           drillOption,
           chartConfig?.datas,
         );
-        (openViewDetailPanel as any)({
+        (props?.openViewDetailPanel as any)({
           currentDataView: view,
           chartConfig: chartConfig,
           drillOption: drillOption,
@@ -364,7 +367,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
         });
       }
     },
-    [openViewDetailPanel],
+    [props?.openViewDetailPanel],
   );
 
   return {

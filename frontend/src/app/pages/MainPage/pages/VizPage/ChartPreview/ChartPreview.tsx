@@ -135,7 +135,7 @@ const ChartPreviewBoard: FC<{
       handleDrillThroughEvent,
       handleViewDataEvent,
     } = useChartInteractions({
-      openViewDetailPanel,
+      openViewDetailPanel: openViewDetailPanel as any,
       openJumpDialogModal: jumpDialogModal.info,
     });
 

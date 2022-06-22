@@ -17,16 +17,17 @@
  */
 
 import { Tabs } from 'antd';
+import useChartInteractions from 'app/hooks/useChartInteractions';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { getValue } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   selectBoardWidgetMapById,
+  selectDataChartById,
   selectViewMap,
 } from '../../../Board/slice/selector';
 import { BoardState } from '../../../Board/slice/types';
@@ -49,6 +50,12 @@ export const WidgetSetting: FC<{ boardId?: string }> = memo(({ boardId }) => {
   const viewMap = useSelector(selectViewMap);
   const boardWidgets = useSelector((state: { board: BoardState }) =>
     selectBoardWidgetMapById(state, boardId || ''),
+  );
+  const { getDrillThroughSetting, getViewDetailSetting } = useChartInteractions(
+    {},
+  );
+  const dataChart = useSelector((state: { board: BoardState }) =>
+    selectDataChartById(state, widget?.datachartId),
   );
 
   const handleStyleConfigChange = (
@@ -82,36 +89,33 @@ export const WidgetSetting: FC<{ boardId?: string }> = memo(({ boardId }) => {
   const updateInteractionOptionWhenHasChartInteraction = (
     interactions: ChartStyleConfig[],
   ) => {
-    const chartInteractions =
-      widget.config.content?.dataChart?.config?.chartConfig?.interactions || [];
     const drillThroughKey = 'drillThrough';
     const viewDetailKey = 'viewDetail';
-    const hasEnableDrillThrough = getValue(chartInteractions || [], [
-      drillThroughKey,
-    ]);
-    const hasEnableViewDetail = getValue(chartInteractions || [], [
-      viewDetailKey,
-    ]);
-
+    const chartInteractions =
+      dataChart?.config?.chartConfig?.interactions || [];
+    const chartDrillThroughSetting = getDrillThroughSetting(
+      chartInteractions,
+      [],
+    );
+    const chartViewDetailSetting = getViewDetailSetting(chartInteractions, []);
     return updateBy(interactions, draft => {
       let boardDrillThrough = draft.find(i => i.key === drillThroughKey);
       let boardViewDetail = draft.find(i => i.key === viewDetailKey);
-      if (boardDrillThrough && hasEnableDrillThrough) {
+      if (boardDrillThrough) {
         boardDrillThrough.options = Object.assign(
           {},
           boardDrillThrough?.options,
           {
-            hasOriginal: true,
+            hasOriginal: !!chartDrillThroughSetting,
           },
         );
       }
-      // TODO(Stephen): has chart cross filtering with options
-      if (boardViewDetail && hasEnableViewDetail) {
+      if (boardViewDetail) {
         boardViewDetail.options = Object.assign(
           {},
           boardDrillThrough?.options,
           {
-            hasOriginal: true,
+            hasOriginal: !!chartViewDetailSetting,
           },
         );
       }
@@ -139,14 +143,12 @@ export const WidgetSetting: FC<{ boardId?: string }> = memo(({ boardId }) => {
             configs={updateInteractionOptionWhenHasChartInteraction(
               widget.config.customConfig.interactions || [],
             )}
-            dataConfigs={
-              widget.config.content?.dataChart?.config?.chartConfig?.datas
-            }
+            dataConfigs={dataChart?.config?.chartConfig?.datas}
             context={{
               widgetId: widget?.id,
               vizs,
               boardVizs: boardWidgets,
-              dataview: viewMap?.[widget?.config?.content?.dataChart?.viewId],
+              dataview: viewMap?.[dataChart?.viewId],
             }}
             onChange={handleInteractionConfigChange}
           />
