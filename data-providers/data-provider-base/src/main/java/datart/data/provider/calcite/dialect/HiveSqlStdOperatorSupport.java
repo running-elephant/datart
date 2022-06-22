@@ -18,12 +18,9 @@
 package datart.data.provider.calcite.dialect;
 
 import datart.core.data.provider.StdSqlOperator;
-import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.sql.SqlCall;
-import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlWriter;
-import org.apache.calcite.sql.dialect.H2SqlDialect;
-import org.apache.calcite.sql.dialect.MysqlSqlDialect;
+import org.apache.calcite.sql.dialect.HiveSqlDialect;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -31,7 +28,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import static datart.core.data.provider.StdSqlOperator.*;
 
-public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, FetchAndOffsetSupport {
+public class HiveSqlStdOperatorSupport extends HiveSqlDialect implements SqlStdOperatorSupport, FetchAndOffsetSupport {
 
     static ConcurrentSkipListSet<StdSqlOperator> OWN_SUPPORTED = new ConcurrentSkipListSet<>(
             EnumSet.of(AGG_DATE_YEAR, AGG_DATE_QUARTER, AGG_DATE_MONTH, AGG_DATE_WEEK, AGG_DATE_DAY));
@@ -40,17 +37,12 @@ public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, Fe
         OWN_SUPPORTED.addAll(SUPPORTED);
     }
 
-    /**
-     * Creates an H2SqlDialect.
-     *
-     * @param context
-     */
-    public H2Dialect(Context context) {
-        super(context);
+    public HiveSqlStdOperatorSupport() {
+        this(DEFAULT_CONTEXT);
     }
 
-    public H2Dialect() {
-        this(MysqlSqlDialect.DEFAULT_CONTEXT.withUnquotedCasing(Casing.UNCHANGED).withUnquotedCasing(Casing.UNCHANGED));
+    private HiveSqlStdOperatorSupport(Context context) {
+        super(context);
     }
 
     @Override
@@ -70,29 +62,22 @@ public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, Fe
                 return true;
             case AGG_DATE_QUARTER: {
                 String columnName = call.getOperandList().get(0).toSqlString(this).getSql();
-                writer.print("CONCAT(FORMATDATETIME("+columnName+",'Y-'),QUARTER("+columnName+"))");
+                writer.print("CONCAT(DATE_FORMAT("+columnName+",'YYYY-'),QUARTER("+columnName+"))");
                 return true;
             }
             case AGG_DATE_MONTH:
-                writer.print("FORMATDATETIME("+call.getOperandList().get(0).toSqlString(this).getSql()+",'yyyy-MM')");
+                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'YYYY-MM')");
                 return true;
-            case AGG_DATE_WEEK: {
-                String columnName = call.getOperandList().get(0).toSqlString(this).getSql();
-                writer.print("CONCAT_WS('-',ISO_YEAR("+columnName+"),RIGHT(100+ISO_WEEK("+columnName+"),2))");
+            case AGG_DATE_WEEK:
+                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'YYYY-ww')");
                 return true;
-            }
             case AGG_DATE_DAY:
-                writer.print("FORMATDATETIME("+call.getOperandList().get(0).toSqlString(this).getSql()+",'yyyy-MM-dd')");
+                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'YYYY-MM-dd')");
                 return true;
             default:
                 break;
         }
         return false;
-    }
-
-    @Override
-    public void unparseOffsetFetch(SqlWriter writer, SqlNode offset, SqlNode fetch) {
-        unparseFetchUsingLimit(writer, offset, fetch);
     }
 
     @Override

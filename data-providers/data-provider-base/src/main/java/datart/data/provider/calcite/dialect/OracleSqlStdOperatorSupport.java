@@ -68,19 +68,19 @@ public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements Sql
                 writer.print("SYSDATE");
                 return true;
             case AGG_DATE_YEAR:
-                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY')");
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'YYYY')");
                 return true;
             case AGG_DATE_QUARTER:
-                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY-Q')");
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'YYYY-Q')");
                 return true;
             case AGG_DATE_MONTH:
-                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY-MM')");
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'YYYY-MM')");
                 return true;
             case AGG_DATE_WEEK:
-                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'IYYY-IW')");
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'IYYY-IW')");
                 return true;
             case AGG_DATE_DAY:
-                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY-MM-DD')");
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'YYYY-MM-DD')");
                 return true;
             default:
                 break;
