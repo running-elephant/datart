@@ -55,16 +55,17 @@ const beta2 = (model?: object): object | undefined => {
   return model;
 };
 
-const beta4 = (model, viewType) => {
+const beta4 = obj => {
+  const { viewType, result } = obj;
   try {
-    model.hierarchy = addPathToHierarchyStructureAndChangeName(
-      model.hierarchy,
+    result.hierarchy = addPathToHierarchyStructureAndChangeName(
+      result.hierarchy,
       viewType,
     );
-    return model;
+    return result;
   } catch (error) {
     console.error('Migration view Errors | beta.4 | ', error);
-    return model;
+    return result;
   }
 };
 
@@ -85,7 +86,8 @@ const beginViewModelMigration = (model: string, viewType): string => {
 
   const event4 = new MigrationEvent(APP_VERSION_BETA_4, beta4);
   const dispatcher4 = new MigrationEventDispatcher(event4);
-  const result4 = dispatcher4.process(result, viewType);
+
+  const result4 = dispatcher4.process({ result, viewType });
 
   return JSON.stringify(result4);
 };

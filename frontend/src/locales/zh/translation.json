@@ -1315,7 +1315,9 @@
       "addToHierarchy": "添加到层次结构",
       "hierarchyName": "层级名称",
       "createComputedFields": "新建计算字段",
-      "duplicateName": "名称重复，请检查!"
+      "duplicateName": "名称重复，请检查!",
+      "deleteSure": "确定要删除吗？",
+      "edit": "编辑"
     },
     "columnPermission": {
       "title": "列权限",

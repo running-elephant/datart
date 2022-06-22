@@ -21,12 +21,13 @@ import { BoardType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ITimeDefault,
   Widget,
+  WidgetConf,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { IFontDefault } from 'types';
 import { CloneValueDeep } from 'utils/object';
 import widgetManagerInstance from '../../../pages/DashBoardPage/components/WidgetManager';
 import { RectConfig } from '../../../pages/DashBoardPage/pages/Board/slice/types';
-import { WidgetBeta3, WidgetConfBeta3 } from '../types';
+import { WidgetBeta3 } from '../types';
 
 const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
   newWidget.id = oldW.id;
@@ -368,6 +369,9 @@ export const convertControllerToBeta4 = (widget: WidgetBeta3) => {
   let newWidget = {} as Widget;
   newWidget = widgetManagerInstance.toolkit(subType).create({ ...widget });
   newWidget = commonBeta4Convert(newWidget, widget);
+  newWidget.config = convertControllerConfigToBeta4(
+    newWidget.config as WidgetConf,
+  );
   return newWidget;
 };
 export const convertToBeta4AutoWidget = (
@@ -420,7 +424,7 @@ export const convertWidgetToBeta4 = (widget: WidgetBeta3) => {
   }
 };
 
-export const convertWidgetConfigToBeta4 = (widgetConfig: WidgetConfBeta3) => {
+export const convertControllerConfigToBeta4 = (widgetConfig: WidgetConf) => {
   const _widgetConfig = CloneValueDeep(widgetConfig);
   if (_widgetConfig.type === 'controller') {
     const content = _widgetConfig.content;

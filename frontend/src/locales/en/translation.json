@@ -1315,7 +1315,9 @@
       "addToHierarchy": "Add To Hierarchy",
       "hierarchyName": "Hierarchy Name",
       "createComputedFields": "Create Computed Field",
-      "duplicateName": "Name already exists!"
+      "duplicateName": "Name already exists!",
+      "deleteSure": "You sure you want to delete it?",
+      "edit": "Edit"
     },
     "columnPermission": {
       "title": "Column permissions",
@@ -1360,7 +1362,7 @@
       "join": "Join Data",
       "selectJoinColumn": "Select a column",
       "addJoin": "Add join data",
-      "run": "Run selectio",
+      "run": "Run selection",
       "searchTable": "Search datasheets",
       "searchSource": "Search data sources",
       "selectSource": "Select data source",

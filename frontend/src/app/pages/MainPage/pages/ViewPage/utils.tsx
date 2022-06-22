@@ -432,30 +432,28 @@ export function addPathToHierarchyStructureAndChangeName(
   Object.entries(_hierarchy || {}).forEach(
     ([name, column]: [string, Column]) => {
       if (column.children) {
-        column.children.forEach(children => {
+        column.children.forEach((children, i) => {
           if (!children['path']) {
-            children['path'] =
+            column.children![i]['path'] =
               viewType === 'STRUCT'
                 ? JSON.parse(children.name)
                 : [children.name];
 
-            children['name'] =
+            column.children![i]['name'] =
               viewType === 'STRUCT'
                 ? JSON.parse(children.name).join('.')
                 : children.name;
           }
         });
-      } else {
-        if (!column['path']) {
-          column['path'] =
-            viewType === 'STRUCT' ? JSON.parse(column.name) : [name];
+      }
+      if (!column['path']) {
+        column['path'] =
+          viewType === 'STRUCT' ? JSON.parse(column.name) : [name];
 
-          column['name'] = name;
-        }
+        column['name'] = name;
       }
     },
   );
-
   return _hierarchy;
 }
 

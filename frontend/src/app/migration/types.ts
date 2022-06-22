@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-export type Task<T> = (v?: T, v2?: T) => T | undefined;
+export type Task<T> = (v?: T) => T | undefined;
 
 export type IDomainEvent<T> = {
   version: string;

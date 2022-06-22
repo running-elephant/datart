@@ -99,17 +99,17 @@ const DataModelComputerFieldNode: FC<{
                   key="exit"
                   prefix={<EditOutlined className="icon" />}
                 >
-                  编辑
+                  {t('edix')}
                 </MenuListItem>
                 <MenuListItem
                   key="del"
                   prefix={<DeleteOutlined className="icon" />}
                 >
                   <Popconfirm
-                    title={'确定要删除吗'}
+                    title={t('deleteSure')}
                     onConfirm={() => menuClick(node, 'delete')}
                   >
-                    删除
+                    {t('delete')}
                   </Popconfirm>
                 </MenuListItem>
               </Menu>
