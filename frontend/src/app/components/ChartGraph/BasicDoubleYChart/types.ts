@@ -56,6 +56,9 @@ export type DoubleYChartYAxis = {
   showTitleAndUnit: boolean;
   splitLine: AxisLineStyle;
   type: string;
+  min?: number | string;
+  max?: number | string;
+  interval?: number;
 };
 
 export type Series = {
