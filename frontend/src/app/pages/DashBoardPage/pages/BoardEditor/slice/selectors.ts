@@ -165,14 +165,7 @@ export const selectControllerPanel = createSelector(
   [boardInfoState],
   boardInfo => boardInfo.controllerPanel,
 );
-export const selectLinkagePanel = createSelector(
-  [boardInfoState],
-  boardInfo => boardInfo.linkagePanel,
-);
-export const selectJumpPanel = createSelector(
-  [boardInfoState],
-  boardInfo => boardInfo.jumpPanel,
-);
+
 export const selectBoardChartEditorProps = createSelector(
   [boardInfoState],
   boardInfo => boardInfo.chartEditorProps,

@@ -59,13 +59,9 @@ const editDashBoardInfoSlice = createSlice({
     ) {
       state.controllerPanel = action.payload;
     },
-    // changeLinkagePanel(state, action: PayloadAction<WidgetPanelParams>) {
-    //   state.linkagePanel = action.payload;
-    // },
 
     adjustDashLayouts(state, action: PayloadAction<Layout[]>) {
       state.layouts = JSON.parse(JSON.stringify(action.payload));
-      // state.layouts = [...action.payload];
     },
     changeShowBlockMask(state, action: PayloadAction<boolean>) {
       state.showBlockMask = action.payload;

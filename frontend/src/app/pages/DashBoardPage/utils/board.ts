@@ -111,16 +111,9 @@ export const getInitBoardInfo = (obj: {
       type: 'hide',
       widgetId: '',
     },
-    linkagePanel: {
-      type: 'hide',
-      widgetId: '',
-    },
+
     linkFilter: [],
-    jumpPanel: {
-      visible: false,
-      type: 'add',
-      widgetId: '',
-    },
+
     deviceType: DeviceType.Desktop,
     needFetchItems: [],
     hasFetchItems: [],
