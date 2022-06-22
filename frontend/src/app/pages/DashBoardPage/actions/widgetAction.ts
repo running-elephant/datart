@@ -200,7 +200,7 @@ export const widgetLinkEventAction =
         : editBoardState.widgetInfoRecord;
     const widgetMap = widgetMapMap?.[widget?.dashboardId] || {};
     const sourceWidgetInfo = boardWidgetInfoRecord?.[widget.id];
-    const sourceRuntimeWidgetInfo = sourceWidgetInfo?.linkInfo || {};
+    const sourceWidgetRuntimeLinkInfo = sourceWidgetInfo?.linkInfo || {};
 
     const boardLinkWidgets = Object.entries(
       widgetMapMap?.[widget?.dashboardId] || {},
@@ -224,7 +224,6 @@ export const widgetLinkEventAction =
         };
       });
       const widgetInfo = boardWidgetInfoRecord?.[w.id];
-      const runtimeWidgetInfo = widgetInfo?.linkInfo || {};
       const { filterParams: controllerFilters, variableParams } =
         getTheWidgetFiltersAndParams({
           chartWidget: w,
@@ -240,12 +239,10 @@ export const widgetLinkEventAction =
             option: widgetInfo,
             extraFilters: (clickFilters || [])
               .concat(controllerFilters || [])
-              .concat(sourceRuntimeWidgetInfo?.filters || [])
-              .concat(runtimeWidgetInfo?.filters || []),
+              .concat(sourceWidgetRuntimeLinkInfo?.filters || []),
             variableParams: Object.assign(
               variableParams,
-              sourceRuntimeWidgetInfo?.variables,
-              runtimeWidgetInfo?.variables,
+              sourceWidgetRuntimeLinkInfo?.variables,
             ),
           }),
         );
@@ -257,12 +254,10 @@ export const widgetLinkEventAction =
             option: widgetInfo,
             extraFilters: (clickFilters || [])
               .concat(controllerFilters || [])
-              .concat(sourceRuntimeWidgetInfo?.filters || [])
-              .concat(runtimeWidgetInfo?.filters || []),
+              .concat(sourceWidgetRuntimeLinkInfo?.filters || []),
             variableParams: Object.assign(
               variableParams,
-              sourceRuntimeWidgetInfo?.variables,
-              runtimeWidgetInfo?.variables,
+              sourceWidgetRuntimeLinkInfo?.variables,
             ),
           }),
         );
