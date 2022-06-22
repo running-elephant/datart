@@ -5,9 +5,6 @@ spring:
   main:
     banner-mode: off
 
-  profiles:
-    active: config
-
   servlet:
     multipart:
       max-file-size: 1024MB
