@@ -454,7 +454,7 @@ public class JdbcDataProviderAdapter implements Closeable {
     protected Object getObjFromResultSet(ResultSet rs, int columnIndex) throws SQLException {
         Object obj = rs.getObject(columnIndex);
         if (obj instanceof Boolean) {
-            obj = rs.getInt(columnIndex);
+            obj = rs.getObject(columnIndex).toString();
         } else if (obj instanceof LocalDateTime) {
             obj = rs.getTimestamp(columnIndex);
         }
