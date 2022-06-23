@@ -50,8 +50,6 @@ import {
 } from '../../pages/BoardEditor/slice';
 import {
   clearActiveWidgets,
-  closeJumpAction,
-  closeLinkageAction,
   copyWidgetsAction,
   deleteWidgetsAction,
   editChartInWidgetAction,
@@ -233,28 +231,14 @@ export const WidgetActionProvider: FC<{
             }),
           );
         },
-        onEditWidgetLinkage: (widgetId: string) => {
-          dispatch(
-            editDashBoardInfoActions.changeLinkagePanel({
-              type: 'add',
-              widgetId,
-            }),
-          );
-        },
-        onEditWidgetJump: (widgetId: string) => {
-          dispatch(
-            editDashBoardInfoActions.changeJumpPanel({
-              visible: true,
-              widgetId,
-            }),
-          );
-        },
-        onEditWidgetCloseLinkage: (widget: Widget) => {
-          dispatch(closeLinkageAction(widget));
-        },
-        onEditWidgetCloseJump: (widget: Widget) => {
-          dispatch(closeJumpAction(widget));
-        },
+        // onEditWidgetLinkage: (widgetId: string) => {},
+
+        // onEditWidgetCloseLinkage: (widget: Widget) => {
+        //   dispatch(closeLinkageAction(widget));
+        // },
+        // onEditWidgetCloseJump: (widget: Widget) => {
+        //   dispatch(closeJumpAction(widget));
+        // },
         onEditWidgetLock: (id: string) => {
           dispatch(editBoardStackActions.toggleLockWidget({ id, lock: true }));
         },
@@ -334,10 +318,10 @@ export interface WidgetActionContextProps {
   onEditContainerWidget: (wid: string) => void;
   onEditMediaWidget: (wid: string) => void;
   onEditControllerWidget: (widget: Widget) => void;
-  onEditWidgetLinkage: (wid: string) => void;
-  onEditWidgetJump: (wid: string) => void;
-  onEditWidgetCloseLinkage: (widget: Widget) => void;
-  onEditWidgetCloseJump: (widget: Widget) => void;
+  // onEditWidgetLinkage: (wid: string) => void;
+  // onEditWidgetJump: (wid: string) => void;
+  // onEditWidgetCloseLinkage: (widget: Widget) => void;
+  // onEditWidgetCloseJump: (widget: Widget) => void;
   onEditWidgetLock: (id: string) => void;
   onEditWidgetUnLock: (id: string) => void;
   onEditClearActiveWidgets: () => void;

@@ -403,9 +403,7 @@ export interface BoardInfo {
   deviceType: DeviceType; // deviceType for autoBoard defaultValue = desktop
   widgetIds: string[]; // board保存的时候 区分那些是删除的，哪些是新增的
   controllerPanel: WidgetControllerPanelParams; //
-  linkagePanel: WidgetPanelParams;
   linkFilter: BoardLinkFilter[];
-  jumpPanel: JumpPanel; //
   chartEditorProps?: ChartEditorProps;
   needFetchItems: string[];
   hasFetchItems: string[];
@@ -426,20 +424,10 @@ export interface BoardLinkFilter {
  * @description 'filter'
  */
 
-export interface WidgetPanelParams {
-  type: 'add' | 'edit' | 'hide';
-  widgetId: string;
-}
 export interface WidgetControllerPanelParams {
   type: 'add' | 'edit' | 'hide';
   widgetId: string;
   controllerType?: ControllerFacadeTypes;
-}
-
-export interface JumpPanel {
-  visible: boolean;
-  type?: 'add' | 'edit';
-  widgetId: string;
 }
 
 export interface ServerDatachart extends Omit<DataChart, 'config'> {
