@@ -557,7 +557,7 @@ class PivotSheetChart extends ReactChart {
     const [bodyFont, bodyTextAlign] = getStyles(
       styleConfigs,
       ['tableBodyStyle'],
-      ['font', 'align'],
+      ['font', 'tableAlign'],
     );
 
     const _getBolderFontWeight = (
