@@ -157,6 +157,7 @@ const useChartInteractions = (props: {
           {
             id: view?.id || '',
             config: view?.config || {},
+            meta: view?.meta,
             computedFields: computedFields || [],
             type: view?.type,
           },
@@ -302,6 +303,7 @@ const useChartInteractions = (props: {
         {
           id: view?.id || '',
           config: view?.config || {},
+          meta: view?.meta,
           computedFields: computedFields || [],
         },
         chartConfig?.datas,

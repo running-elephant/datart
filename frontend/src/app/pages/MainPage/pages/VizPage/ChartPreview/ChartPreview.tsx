@@ -238,6 +238,7 @@ const ChartPreviewBoard: FC<{
           view: {
             id: chartPreview?.backendChart?.view?.id || '',
             config: chartPreview?.backendChart?.view.config || {},
+            meta: chartPreview?.backendChart?.view.meta,
             computedFields:
               chartPreview?.backendChart?.config.computedFields || [],
           },
@@ -260,6 +261,7 @@ const ChartPreviewBoard: FC<{
         const view = {
           id: chartPreview?.backendChart?.view?.id || '',
           config: chartPreview?.backendChart?.view.config || {},
+          meta: chartPreview?.backendChart?.view.meta,
           computedFields:
             chartPreview?.backendChart?.config.computedFields || [],
         };
@@ -483,6 +485,7 @@ const ChartPreviewBoard: FC<{
         {
           id: chartPreview?.backendChart?.view?.id || '',
           config: chartPreview?.backendChart?.view.config || {},
+          meta: chartPreview?.backendChart?.view?.meta,
           computedFields:
             chartPreview?.backendChart?.config.computedFields || [],
           type: chartPreview?.backendChart?.view?.type || 'SQL',
