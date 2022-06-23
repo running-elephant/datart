@@ -236,6 +236,7 @@ class PivotSheetChart extends ReactChart {
         tooltip: {
           showTooltip: true,
         },
+        cornerExtraFieldText: context.translator('summary.number'),
         interaction: {
           hoverHighlight: Boolean(enableHoverHighlight),
           selectedCellsSpotlight: Boolean(enableSelectedHighlight),
