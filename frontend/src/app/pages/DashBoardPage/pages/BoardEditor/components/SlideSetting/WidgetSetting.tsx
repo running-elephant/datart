@@ -19,20 +19,16 @@
 import { Tabs } from 'antd';
 import useChartInteractions from 'app/hooks/useChartInteractions';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { WidgetChartContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetChartProvider';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  selectBoardWidgetMapById,
-  selectDataChartById,
-  selectViewMap,
-} from '../../../Board/slice/selector';
-import { BoardState } from '../../../Board/slice/types';
 import { editBoardStackActions } from '../../slice';
 import { showRectAction } from '../../slice/actions/actions';
+import { selectSortAllWidgets } from '../../slice/selectors';
 import { NameSet } from './SettingItem/NameSet';
 import { RectSet } from './SettingItem/RectSet';
 import { SettingPanel } from './SettingPanel';
@@ -42,20 +38,15 @@ const { TabPane } = Tabs;
 
 export const WidgetSetting: FC<{ boardId?: string }> = memo(({ boardId }) => {
   const t = useI18NPrefix(`viz.board.setting`);
-  const widget = useContext(WidgetContext);
   const dispatch = useDispatch();
+  const widget = useContext(WidgetContext);
+  const { dataChart, chartDataView } = useContext(WidgetChartContext);
   const showRect = dispatch(showRectAction(widget)) as unknown as boolean;
   const [currentTab, setCurrentTab] = useState<string>('style');
   const vizs = useSelector(selectVizs);
-  const viewMap = useSelector(selectViewMap);
-  const boardWidgets = useSelector((state: { board: BoardState }) =>
-    selectBoardWidgetMapById(state, boardId || ''),
-  );
+  const allWidgets = useSelector(selectSortAllWidgets);
   const { getDrillThroughSetting, getViewDetailSetting } = useChartInteractions(
     {},
-  );
-  const dataChart = useSelector((state: { board: BoardState }) =>
-    selectDataChartById(state, widget?.datachartId),
   );
 
   const handleStyleConfigChange = (
@@ -147,8 +138,8 @@ export const WidgetSetting: FC<{ boardId?: string }> = memo(({ boardId }) => {
             context={{
               widgetId: widget?.id,
               vizs,
-              boardVizs: boardWidgets,
-              dataview: viewMap?.[dataChart?.viewId],
+              boardVizs: allWidgets,
+              dataview: chartDataView,
             }}
             onChange={handleInteractionConfigChange}
           />
