@@ -432,3 +432,10 @@ export interface SelectedItem {
     [p: string]: any;
   };
 }
+
+export type IntervalScaleNiceTicksResult = {
+  interval: number;
+  intervalPrecision: number;
+  niceTickExtent: [number, number];
+  extent: [number, number];
+};
