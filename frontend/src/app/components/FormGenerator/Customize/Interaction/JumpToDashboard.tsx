@@ -18,6 +18,7 @@
 
 import { Button, Dropdown, Select, Space } from 'antd';
 import ChartDataView from 'app/types/ChartDataView';
+import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { FC, memo, useState } from 'react';
 import { InteractionFieldRelation } from '../../constants';
 import ControllerList from './ControllerList';
@@ -69,7 +70,9 @@ const JumpToDashboard: FC<
             translate={t}
             targetRelId={value?.relId}
             sourceFields={
-              dataview?.meta?.concat(dataview?.computedFields || []) || []
+              getAllColumnInMeta(dataview?.meta)?.concat(
+                dataview?.computedFields || [],
+              ) || []
             }
             sourceVariables={dataview?.variables || []}
             relations={relations}

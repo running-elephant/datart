@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 import { migrateBoardConfig } from 'app/migration/BoardConfig/migrateBoardConfig';
+import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
+import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import {
   BoardInfo,
   BoardType,
@@ -111,16 +113,9 @@ export const getInitBoardInfo = (obj: {
       type: 'hide',
       widgetId: '',
     },
-    linkagePanel: {
-      type: 'hide',
-      widgetId: '',
-    },
+
     linkFilter: [],
-    jumpPanel: {
-      visible: false,
-      type: 'add',
-      widgetId: '',
-    },
+
     deviceType: DeviceType.Desktop,
     needFetchItems: [],
     hasFetchItems: [],
@@ -184,11 +179,21 @@ export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
   const viewViews: ChartDataView[] = [];
   views.forEach(view => {
     const dataChart = dataCharts.find(dc => dc.viewId === view.id);
+    const viewComputerField = JSON.parse(view.model)?.computedFields || [];
+    if (view) {
+      view = migrationViewConfig(view);
+    }
+    if (view?.model) {
+      view.model = beginViewModelMigration(view.model, view.type);
+    }
+
     let viewView = {
       ...view,
       meta: transformMeta(view.model),
       model: '',
-      computedFields: dataChart?.config.computedFields || [],
+      computedFields: viewComputerField.concat(
+        dataChart?.config.computedFields || [],
+      ),
     };
     viewViews.push(viewView);
   });

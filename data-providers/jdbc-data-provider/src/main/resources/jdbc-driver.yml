@@ -62,6 +62,7 @@ HIVE:
   db-type: HIVE
   name: HIVE
   driver-class: org.apache.hive.jdbc.HiveDriver
+  sql-dialect: datart.data.provider.calcite.dialect.HiveSqlStdOperatorSupport
   adapter-class: datart.data.provider.jdbc.adapters.HiveDataProviderAdapter
   url-prefix: jdbc:hive2://
   identifier-quote: "`"

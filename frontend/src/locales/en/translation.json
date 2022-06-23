@@ -198,10 +198,24 @@
         "title": "Organization Settings"
       },
       "export": {
-        "title": "Export"
+        "title": "Export",
+        "selectText": "Select the data to export",
+        "submit": "Submit"
       },
       "import": {
-        "title": "Import"
+        "title": "Import",
+        "submit": "Submit",
+        "upload": "Upload",
+        "file": "File",
+        "strategy": "Strategy",
+        "new": "New",
+        "overwrite": "OverWrite",
+        "rollback": "Rollback",
+        "desc": {
+          "new": "New:All imported resources are recreated",
+          "overwrite": "OverWrite:The system checks whether the imported resource exists in the database by ID. If yes, the system updates the resource. If no, the system creates a new resource",
+          "rollback": "Rollback:The system checks whether the imported resource exists in the database by ID. If the imported resource exists, an error message is displayed and the import operation is rolled back. The import can be completed only if all checks pass"
+        }
       }
     },
     "background": {
@@ -513,7 +527,14 @@
         "AGG_DATE_MONTH": "Month",
         "AGG_DATE_WEEK": "Week",
         "AGG_DATE_DAY": "Day",
-        "default": "Default"
+        "default": "Default",
+        "cannotDeleteComputerField": "Calculated fields created in views cannot be deleted",
+        "byDataBaseGroup": "Group by database name",
+        "noGroup": "Not grouped",
+        "byNameSort": "Sort by name",
+        "noSort": "Sort by original field order",
+        "Group": "Group",
+        "Sort": "Sort"
       }
     },
     "palette": {
@@ -1307,7 +1328,10 @@
       "newHierarchy": "New Hierarchy",
       "addToHierarchy": "Add To Hierarchy",
       "hierarchyName": "Hierarchy Name",
-      "duplicateName": "Name already exists!"
+      "createComputedFields": "Create Computed Field",
+      "duplicateName": "Name already exists!",
+      "deleteSure": "You sure you want to delete it?",
+      "edit": "Edit"
     },
     "columnPermission": {
       "title": "Column permissions",
@@ -1343,6 +1367,21 @@
       "category": "Category",
       "type": "Type",
       "typeAndCategory": "Type & Category"
+    },
+    "structView": {
+      "STRUCT": "Struct View",
+      "SQL": "SQL View",
+      "file": "File",
+      "sourcedata": "Data",
+      "join": "Join Data",
+      "selectJoinColumn": "Select a column",
+      "addJoin": "Add join data",
+      "run": "Run selection",
+      "searchTable": "Search datasheets",
+      "searchSource": "Search data sources",
+      "selectSource": "Select data source",
+      "all": "All",
+      "selectField": "Select a column"
     }
   },
   "source": {
@@ -1351,7 +1390,7 @@
     "createSuccess": "Source created successfully",
     "archived": "Archived ",
     "noPermission": "You do not have permission to access this page",
-    "creatView": "Creat View",
+    "creatView": "Create View",
     "syncDatabase": "Sync Database",
     "syncDatabaseSchemaSuccess": "Sync database schema successfully",
     "lastUpdateTime": "Last Update Time",

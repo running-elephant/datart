@@ -54,6 +54,7 @@ import {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { updateBy } from 'app/utils/mutation';
@@ -78,6 +79,7 @@ import {
   getRequiredGroupedSections,
   isInRange,
 } from './internalChartHelper';
+import { isNumber } from './number';
 
 /**
  * [中文] 获取格式聚合数据
@@ -1580,6 +1582,7 @@ export const getDrillableRows = (
 
 export const getRuntimeDateLevelFields = (rows: any) => {
   const _rows = CloneValueDeep(rows);
+
   _rows?.forEach((v, i) => {
     const symbolData = v?.[RUNTIME_DATE_LEVEL_KEY];
     if (symbolData) {
@@ -1602,19 +1605,18 @@ export const getRuntimeComputedFields = (
 
   if (isRuntime && replacedConfig?.field) {
     const index = getRuntimeDateLevelFields(_computedFields).findIndex(
-      v => v.id === replacedConfig?.colName,
+      v => v.id === replacedConfig?.id,
     );
     const replacedConfigIndex = dateLevelComputedFields.findIndex(
       v => v.field === replacedConfig?.field,
     );
-
     _computedFields = updateBy(_computedFields, draft => {
       const dateLevelConfig = dateLevelComputedFields[replacedConfigIndex];
 
       if (dateLevelConfig) {
         draft[index][RUNTIME_DATE_LEVEL_KEY] = {
           category: dateLevelConfig.category,
-          id: dateLevelConfig.colName,
+          id: dateLevelConfig.id,
           type: dateLevelConfig.type,
           expression: dateLevelConfig.expression,
         };
@@ -1635,7 +1637,7 @@ export const getRuntimeComputedFields = (
           _computedFields = updateBy(_computedFields, draft => {
             draft.push({
               category: v.category,
-              id: v.colName,
+              id: v.id,
               type: v.type,
               expression: v.expression,
             });
@@ -1691,11 +1693,11 @@ export const setRuntimeDateLevelFieldsInChartConfig = (config: ChartConfig) => {
 /**
  * Get common selected styles
  *
- * @param { string | number } comIndex
- * @param { string | number } dcIndex
- * @param { SelectedItem[] } selectionList
- * @param { [x: string]: any } [ itemStyle = {} ]
- * @return { itemStyle: [x: string]: any } itemStyle
+ * @param {string | number} comIndex
+ * @param {string | number} dcIndex
+ * @param {SelectedItem[]} selectionList
+ * @param {[x: string]: any} [itemStyle = {}]
+ * @return {itemStyle: [x: string]: any} itemStyle
  */
 export const getSelectedItemStyles = (
   comIndex: string | number,
@@ -1722,9 +1724,9 @@ export const getSelectedItemStyles = (
 /**
  * Comparing old and new selectedItems
  *
- * @param { SelectedItem[] } newSelectedItems
- * @param { SelectedItem[] } [ oldSelectedItems ]
- * @return { boolean }
+ * @param {SelectedItem[]} newSelectedItems
+ * @param {SelectedItem[]} [oldSelectedItems]
+ * @return {boolean}
  */
 export const compareSelectedItems = (
   newSelectedItems: SelectedItem[],
@@ -1746,9 +1748,9 @@ export const compareSelectedItems = (
 /**
  * Get chart select option class.
  *
- * @param { Window } window
- * @param { ChartSelectionOptions } [ options ]
- * @return { Object }  ChartSelection
+ * @param {Window} window
+ * @param {ChartSelectionOptions} [options]
+ * @return {Object}  ChartSelection
  */
 export const getChartSelection = (
   window: Window,
@@ -1756,3 +1758,53 @@ export const getChartSelection = (
 ) => {
   return new ChartSelection(window, options);
 };
+
+export function getAllColumnInMeta(
+  meta?: ChartDataViewMeta[],
+): ChartDataViewMeta[] | undefined {
+  if (!meta) {
+    return meta;
+  }
+
+  const allColumn: any = meta.reduce<ChartDataViewMeta[]>((arr, cur) => {
+    return cur.children ? arr.concat(cur.children) : arr.concat([cur]);
+  }, []);
+
+  return allColumn;
+}
+
+/**
+ * Get precision number.
+ *
+ * @param {number | string} x
+ * @param {number} [precision]
+ * @return {number}  x
+ */
+export function round(x: number | string, precision?: number): number {
+  if (precision == null) {
+    precision = 10;
+  }
+  precision = Math.min(Math.max(0, precision), 20);
+  x = (+x).toFixed(precision);
+  return +x;
+}
+
+/**
+ * Get min and max number.
+ *
+ * @param {ChartDataSectionField[]} configs
+ * @param {IChartDataSet<string>} [chartDataset]
+ * @return {[number, number]}  minAndMax
+ */
+export function getMinAndMaxNumber(
+  configs: ChartDataSectionField[],
+  chartDataset: IChartDataSet<string>,
+) {
+  const datas = configs
+    .reduce(
+      (acc, cur) => acc.concat(chartDataset.map(dc => Number(dc.getCell(cur)))),
+      [] as any[],
+    )
+    .filter(isNumber) as number[];
+  return [Math.min(0, ...datas), Math.max(0, ...datas)];
+}

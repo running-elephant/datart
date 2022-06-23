@@ -47,7 +47,6 @@ import datart.server.service.*;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,7 +65,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static datart.core.common.Application.getAdminId;
 import static datart.core.common.Application.getProperty;
 
 @Service
@@ -475,66 +473,28 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Transactional
     public boolean setupUser(UserRegisterParam user) throws MessagingException, UnsupportedEncodingException {
         boolean res;
-        if (Application.getCurrMode().equals(TenantManagementMode.TEAM)) {
-            User admin = initTeamAdminUser(user);
-            Organization organization = orgService.checkTeamOrg();
-            if (organization == null) {
-                OrgCreateParam createParam = new OrgCreateParam();
-                createParam.setName(admin.getUsername()+"'s Organization");
-                createParam.setDescription("");
-                securityManager.runAs(admin.getUsername());
-                orgService.createOrganization(createParam);
-            } else {
-                orgService.addUserToOrg(admin.getId(), organization.getId());
-                Role role = roleService.getDefaultMapper().selectOrgOwnerRole(organization.getId());
-                if (role == null) {
-                    orgService.createDefaultRole(RoleType.ORG_OWNER, admin, organization);
-                }
-                roleService.grantOrgOwner(organization.getId(), admin.getId(), false);
-            }
-            res = true;
+        if (Application.getCurrMode().equals(TenantManagementMode.PLATFORM)) {
+            res = register(user, false);
+            return res;
+        }
+        Organization organization = orgService.checkTeamOrg();
+        if (organization == null) {
+            Application.setCurrMode(TenantManagementMode.PLATFORM);
+            res = register(user, false);
+            Application.setCurrMode(TenantManagementMode.TEAM);
         } else {
             res = register(user, false);
+            User setupUser = userMapper.selectByNameOrEmail(user.getUsername());
+            if (setupUser != null) {
+                securityManager.runAs(setupUser.getUsername());
+                Role role = roleService.getDefaultMapper().selectOrgOwnerRole(organization.getId());
+                if (role == null) {
+                    orgService.createDefaultRole(RoleType.ORG_OWNER, setupUser, organization);
+                }
+                roleService.grantOrgOwner(organization.getId(), setupUser.getId(), false);
+            }
         }
         return res;
-    }
-
-    private User initTeamAdminUser(UserRegisterParam user) {
-        String adminId = getAdminId();
-        User adminUser = getDefaultMapper().selectByPrimaryKey(adminId);
-        if (adminUser==null) {
-            if (!checkUserName(user.getUsername())) {
-                log.error("The username({}) has been registered", user.getUsername());
-                Exceptions.tr(ParamException.class, "error.param.occupied", "resource.user.username");
-            }
-            if (!checkEmail(user.getEmail())) {
-                log.info("The email({}) has been registered", user.getEmail());
-                Exceptions.tr(ParamException.class, "error.param.occupied", "resource.user.email");
-            }
-            adminUser = new User();
-            adminUser.setId(adminId);
-            adminUser.setUsername(user.getUsername());
-            adminUser.setName(user.getName());
-            adminUser.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
-            adminUser.setEmail(user.getEmail());
-            adminUser.setActive(true);
-            adminUser.setCreateBy(adminId);
-            adminUser.setCreateTime(new Date());
-            getDefaultMapper().insert(adminUser);
-        } else {
-            adminUser.setUsername(user.getUsername());
-            adminUser.setName(user.getName());
-            adminUser.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
-            adminUser.setActive(true);
-            getDefaultMapper().updateByPrimaryKeySelective(adminUser);
-        }
-        List<Organization> organizations = orgService.getDefaultMapper().listOrganizationsByUserId(adminId);
-        if (!CollectionUtils.isEmpty(organizations)) {
-            for (Organization organization : organizations) {
-                orgService.getDefaultMapper().deleteOrgMember(organization.getId(), adminId);
-            }
-        }
-        return getDefaultMapper().selectByPrimaryKey(adminId);
     }
 
     @Override

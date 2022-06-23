@@ -52,7 +52,11 @@ public class ClientRegistrationRepositoryImpl implements ClientRegistrationRepos
 
     @Override
     public Iterator<ClientRegistration> iterator() {
-        return this.registrations.values().iterator();
+        if (registrations == null) {
+            return Collections.emptyIterator();
+        } else {
+            return this.registrations.values().iterator();
+        }
     }
 
     private void addDefaultProviders(OAuth2ClientProperties properties) {

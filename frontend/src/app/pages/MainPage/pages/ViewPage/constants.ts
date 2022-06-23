@@ -47,6 +47,12 @@ export enum ConcurrencyControlModes {
 
 export const UNPERSISTED_ID_PREFIX = 'GENERATED-';
 
+export enum StructViewJoinType {
+  rightJoin = 'RIGHT',
+  leftJoin = 'LEFT',
+  innerJoin = 'INNER',
+}
+
 export const DEFAULT_PREVIEW_SIZE = 1000;
 export const PREVIEW_SIZE_LIST = [100, 1000, 10000, 100000];
 export const MAX_RESULT_TABLE_COLUMN_WIDTH = 480;

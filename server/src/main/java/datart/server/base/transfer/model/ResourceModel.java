@@ -31,6 +31,8 @@ public class ResourceModel extends TransferModel {
 
     private SourceResourceModel sourceResourceModel;
 
+    private FolderTransferModel folderTransferModel;
+
     @Override
     public String getVizName() {
         return null;

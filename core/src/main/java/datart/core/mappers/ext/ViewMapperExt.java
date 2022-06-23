@@ -50,4 +50,17 @@ public interface ViewMapperExt extends ViewMapper {
     })
     int checkReference(String viewId);
 
+    @Select({
+            "<script>",
+            "SELECT * FROM  `view`  WHERE org_id=#{orgId} AND `name` = #{name}",
+            "<if test=\"parentId==null\">",
+            " AND parent_id IS NULL ",
+            "</if>",
+            "<if test=\"parentId!=null\">",
+            " AND parent_id=#{parentId} ",
+            "</if>",
+            "</script>",
+    })
+    List<View> checkName(String orgId, String parentId, String name);
+
 }

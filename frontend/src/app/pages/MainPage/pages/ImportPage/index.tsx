@@ -49,7 +49,19 @@ export const ImportPage: FC<{}> = memo(() => {
       message.warn('warn');
     }
   };
-
+  const descStrategy = () => {
+    return (
+      <div>
+        <span>{t('import.desc.new')}</span>
+        <br />
+        <br />
+        <span>{t('import.desc.overwrite')}</span>
+        <br />
+        <br />
+        <span>{t('import.desc.rollback')}</span>
+      </div>
+    );
+  };
   return (
     <StyledWrapper>
       <Card title={t('import.title')}>
@@ -62,30 +74,34 @@ export const ImportPage: FC<{}> = memo(() => {
         >
           <Form.Item
             name="file"
-            label="file"
+            label={t('import.file')}
             colon={false}
             initialValue={undefined}
             rules={[{ required: true }]}
           >
-            <FileUpload suffix={DatartFileSuffixes.Resource} />
+            <FileUpload
+              suffix={DatartFileSuffixes.Resource}
+              uploadText={t('import.upload')}
+            />
           </Form.Item>
           <Form.Item
             name="strategy"
-            label={'strategy'}
+            label={t('import.strategy')}
             colon={false}
             initialValue={'NEW'}
+            tooltip={descStrategy()}
           >
             <Select showSearch style={{ width: '200px' }}>
               {options.map(o => (
                 <Select.Option key={o} value={o}>
-                  {o}
+                  {t(`import.${o.toLocaleLowerCase()}`)}
                 </Select.Option>
               ))}
             </Select>
           </Form.Item>
           <Form.Item label=" " colon={false}>
             <Button type="primary" htmlType="submit">
-              import
+              {t(`import.submit`)}
             </Button>
           </Form.Item>
         </Form>

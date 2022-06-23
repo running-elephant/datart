@@ -303,29 +303,6 @@ export const editHasChartWidget =
     dispatch(getEditChartWidgetDataAsync({ widgetId: curWidget.id }));
   };
 
-export const closeJumpAction = (widget: Widget) => (dispatch, getState) => {
-  const nextConf = produce(widget.config, draft => {
-    draft!.jumpConfig!.open = false;
-  });
-  dispatch(
-    editBoardStackActions.updateWidgetConfig({
-      wid: widget.id,
-      config: nextConf,
-    }),
-  );
-};
-
-export const closeLinkageAction = (widget: Widget) => (dispatch, getState) => {
-  const nextConf = produce(widget.config, draft => {
-    draft!.linkageConfig!.open = false;
-  });
-  dispatch(
-    editBoardStackActions.updateWidgetConfig({
-      wid: widget.id,
-      config: nextConf,
-    }),
-  );
-};
 export const onComposeGroupAction = (wid?: string) => (dispatch, getState) => {
   const rootState = getState() as RootState;
   const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;

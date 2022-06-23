@@ -56,6 +56,9 @@ export type DoubleYChartYAxis = {
   showTitleAndUnit: boolean;
   splitLine: AxisLineStyle;
   type: string;
+  min?: number | string;
+  max?: number | string;
+  interval?: number;
 };
 
 export type Series = {
@@ -82,3 +85,12 @@ export type Series = {
   markLine: MarkLine;
   markArea: MarkArea;
 } & LabelStyle;
+
+export interface IntervalConfig {
+  leftMin?: number;
+  leftMax?: number;
+  rightMin?: number;
+  rightMax?: number;
+  leftInterval?: number;
+  rightInterval?: number;
+}

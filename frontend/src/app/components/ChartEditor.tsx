@@ -449,7 +449,6 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           }),
         );
       }
-
       dispatch(
         updateChartConfigAndRefreshDatasetAction({
           type,

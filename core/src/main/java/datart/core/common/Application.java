@@ -107,13 +107,6 @@ public class Application implements ApplicationContextAware {
         return BooleanUtils.toBoolean(getProperty("datart.user.register", "true"));
     }
 
-    public static String getAdminId() {
-        if (getCurrMode().equals(TenantManagementMode.TEAM)){
-            return getProperty("datart.admin-id", "datart-admin");
-        }
-        return "";
-    }
-
     public static TenantManagementMode getCurrMode() {
         if (currMode == null) {
             String mode = Application.getProperty("datart.tenant-management-mode");
@@ -125,6 +118,10 @@ public class Application implements ApplicationContextAware {
             currMode = PLATFORM;
         }
         return currMode;
+    }
+
+    public static void setCurrMode(TenantManagementMode mode) {
+        currMode = mode;
     }
 
     public static Boolean isInitialized() {
@@ -147,7 +144,7 @@ public class Application implements ApplicationContextAware {
             initialized = false;
         } else if (orgCount==1) {
             List<User> users = orgMapper.listOrgMembers(organizations.get(0).getId());
-            initialized = users.stream().anyMatch(item -> getAdminId().equals(item.getId()));
+            initialized = users.size()>0;
         }
     }
 }

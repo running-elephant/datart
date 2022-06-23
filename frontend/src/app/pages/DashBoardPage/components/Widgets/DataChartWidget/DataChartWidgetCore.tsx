@@ -109,6 +109,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   useEffect(() => {
     widgetRef.current = widget;
   }, [widget]);
+
   const dispatch = useDispatch();
   const handleDateLevelChange = useCallback(
     (type, payload) => {
@@ -461,6 +462,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     }
     return null;
   }, [chart, dataChart]);
+
   const chartFrame = useMemo(() => {
     if (!config) return null;
     if (cacheH <= 1 || cacheW <= 1) return null;

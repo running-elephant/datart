@@ -172,17 +172,24 @@ export const getControlOptionQueryParams = (obj: {
   widgetMap: Record<string, Widget>;
 }) => {
   const viewConfigs = transformToViewConfig(obj.view?.config);
+
   const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
     chartWidget: obj.curWidget,
     widgetMap: obj.widgetMap,
     params: undefined,
   });
+
   const requestParams: ChartDataRequest = {
     ...viewConfigs,
     aggregators: [],
     filters: filterParams,
     groups: [],
-    columns: [...new Set(obj.columns)],
+    columns: [...new Set(obj.columns)].map(v => {
+      return {
+        alias: v,
+        column: JSON.parse(v),
+      };
+    }),
     pageInfo: {
       pageNo: 1,
       pageSize: 99999999,

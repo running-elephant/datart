@@ -36,12 +36,15 @@ export const Main = memo(({ sliderVisible }: { sliderVisible: boolean }) => {
   useSourceSlice();
   useMemberSlice();
   useVariableSlice();
+
   const dispatch = useDispatch();
   const {
     params: { viewId },
   } = useRouteMatch<{ viewId: string }>();
+
   const orgId = useSelector(selectOrgId);
   const editingViews = useSelector(selectEditingViews);
+
   const t = useI18NPrefix('view');
 
   useEffect(() => {
@@ -50,7 +53,7 @@ export const Main = memo(({ sliderVisible }: { sliderVisible: boolean }) => {
 
   useEffect(() => {
     if (viewId) {
-      dispatch(getViewDetail(viewId));
+      dispatch(getViewDetail({ viewId }));
     }
   }, [dispatch, viewId, orgId]);
 

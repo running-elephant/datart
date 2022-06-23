@@ -16,7 +16,9 @@
  * limitations under the License.
  */
 
+import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
+import migrationDataChartConfig from 'app/migration/vizDataChartConfig/migrationDataChartConfig';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -32,11 +34,19 @@ import {
 import { Omit } from 'utils/object';
 
 export function convertToChartDto(data): ChartDTO {
-  if (data?.view?.model) {
-    data.view.model = beginViewModelMigration(data.view.model);
+  if (data?.view) {
+    data.view = migrationViewConfig(data.view);
   }
+  if (data?.view?.model) {
+    data.view.model = beginViewModelMigration(data.view.model, data.view.type);
+  }
+  const config = JSON.parse(data?.config);
+  if (config && config.chartConfig) {
+    config.chartConfig = migrationDataChartConfig(config.chartConfig);
+  }
+
   return Object.assign({}, data, {
-    config: JSON.parse(data?.config),
+    config: config,
     view: {
       ...Omit(data?.view, ['model']),
       meta: transformHierarchyMeta(data?.view?.model),

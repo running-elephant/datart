@@ -19,15 +19,11 @@
 package datart.server.controller;
 
 
-import datart.core.base.consts.TenantManagementMode;
-import datart.core.base.exception.Exceptions;
-import datart.core.common.Application;
 import datart.core.entity.Role;
 import datart.core.entity.ext.UserBaseInfo;
 import datart.security.base.PermissionInfo;
 import datart.security.base.ResourceType;
 import datart.security.base.SubjectType;
-import datart.security.exception.PermissionDeniedException;
 import datart.server.base.dto.ResourcePermissions;
 import datart.server.base.dto.ResponseData;
 import datart.server.base.dto.SubjectPermissions;
@@ -148,9 +144,6 @@ public class RoleController extends BaseController {
     @DeleteMapping(value = "/permission/revoke/org_owner")
     public ResponseData<Boolean> revokeOrgOwner(@RequestParam String orgId,
                                                 @RequestParam String userId) {
-        if (Application.getCurrMode().equals(TenantManagementMode.TEAM) && userId.equals(Application.getAdminId())) {
-            Exceptions.tr(PermissionDeniedException.class, "message.provider.execute.permission.denied");
-        }
         return ResponseData.success(roleService.revokeOrgOwner(orgId, userId));
     }
 

@@ -2129,12 +2129,14 @@ describe('Chart Helper ', () => {
             {
               uid: '1',
               colName: 'col1',
+              id: '["col1"]',
               type: DataViewFieldType.STRING,
               category: ChartDataViewFieldCategory.Field,
             },
             {
               uid: '2',
               colName: 'col2',
+              id: '["col2"]',
               type: DataViewFieldType.STRING,
               category: ChartDataViewFieldCategory.Field,
             },
@@ -2144,8 +2146,20 @@ describe('Chart Helper ', () => {
       const drillOption = new ChartDrillOption(config[0].rows);
       const drillRows = getDrillableRows(config, drillOption);
       expect(drillRows).toEqual([
-        { uid: '1', colName: 'col1', type: 'STRING', category: 'field' },
-        { uid: '2', colName: 'col2', type: 'STRING', category: 'field' },
+        {
+          uid: '1',
+          colName: 'col1',
+          type: 'STRING',
+          category: 'field',
+          id: '["col1"]',
+        },
+        {
+          uid: '2',
+          colName: 'col2',
+          type: 'STRING',
+          category: 'field',
+          id: '["col2"]',
+        },
       ]);
     });
 
@@ -2159,12 +2173,14 @@ describe('Chart Helper ', () => {
             {
               uid: '1',
               colName: 'col1',
+              id: '["col1"]',
               type: DataViewFieldType.STRING,
               category: ChartDataViewFieldCategory.Field,
             },
             {
               uid: '2',
               colName: 'col2',
+              id: '["col2"]',
               type: DataViewFieldType.STRING,
               category: ChartDataViewFieldCategory.Field,
             },
@@ -2175,7 +2191,13 @@ describe('Chart Helper ', () => {
       drillOption.drillDown();
       const drillRows = getDrillableRows(config, drillOption);
       expect(drillRows).toEqual([
-        { uid: '2', colName: 'col2', type: 'STRING', category: 'field' },
+        {
+          uid: '2',
+          colName: 'col2',
+          type: 'STRING',
+          category: 'field',
+          id: '["col2"]',
+        },
       ]);
     });
 
@@ -2189,12 +2211,14 @@ describe('Chart Helper ', () => {
             {
               uid: '1',
               colName: 'col1',
+              id: '["col1"]',
               type: DataViewFieldType.STRING,
               category: ChartDataViewFieldCategory.Field,
             },
             {
               uid: '2',
               colName: 'col2',
+              id: '["col2"]',
               type: DataViewFieldType.STRING,
               category: ChartDataViewFieldCategory.Field,
             },
@@ -2204,7 +2228,13 @@ describe('Chart Helper ', () => {
       const drillOption = new ChartDrillOption(config[0].rows);
       const drillRows = getDrillableRows(config, drillOption);
       expect(drillRows).toEqual([
-        { uid: '1', colName: 'col1', type: 'STRING', category: 'field' },
+        {
+          uid: '1',
+          colName: 'col1',
+          type: 'STRING',
+          category: 'field',
+          id: '["col1"]',
+        },
       ]);
     });
   });
@@ -2242,6 +2272,7 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           colName: '签署日期（按周）',
+          id: '签署日期（按周）',
           expression: 'AGG_DATE_WEEK(签署日期)',
           field: '签署日期',
           type: DataViewFieldType.DATE,
@@ -2251,6 +2282,7 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           colName: '合同截止日期（按月）',
+          id: '合同截止日期（按月）',
           expression: 'AGG_DATE_MONTH(合同截止日期)',
           field: '合同截止日期',
           type: DataViewFieldType.DATE,
@@ -2260,6 +2292,7 @@ describe('Chart Helper ', () => {
       const replacedConfig = {
         category: ChartDataViewFieldCategory.DateLevelComputedField,
         colName: '签署日期（按月）',
+        id: '签署日期（按月）',
         expression: 'AGG_DATE_MONTH(签署日期)',
         field: '签署日期',
         type: DataViewFieldType.DATE,
@@ -2267,6 +2300,7 @@ describe('Chart Helper ', () => {
         [RUNTIME_DATE_LEVEL_KEY]: {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           colName: '签署日期（按周）',
+          id: '签署日期（按周）',
           expression: 'AGG_DATE_WEEK(签署日期)',
           field: '签署日期',
           type: DataViewFieldType.DATE,
@@ -2325,6 +2359,7 @@ describe('Chart Helper ', () => {
           colName: '签署日期（按月）',
           expression: 'AGG_DATE_MONTH(签署日期)',
           field: '签署日期',
+          id: '签署日期（按月）',
           type: DataViewFieldType.DATE,
           uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
           [RUNTIME_DATE_LEVEL_KEY]: null,
@@ -2332,6 +2367,7 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           colName: '合同截止日期（按周）',
+          id: '合同截止日期（按周）',
           expression: 'AGG_DATE_WEEK(合同截止日期)',
           field: '合同截止日期',
           type: DataViewFieldType.DATE,
@@ -2344,6 +2380,7 @@ describe('Chart Helper ', () => {
         expression: 'AGG_DATE_MONTH(合同截止日期)',
         field: '合同截止日期',
         type: DataViewFieldType.DATE,
+        id: '合同截止日期（按月）',
         uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
       };
 
@@ -2406,6 +2443,7 @@ describe('Chart Helper ', () => {
         colName: '签署日期（按月）',
         expression: 'AGG_DATE_MONTH(签署日期)',
         field: '签署日期',
+        id: '签署日期（按月）',
         type: DataViewFieldType.DATE,
         uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
       };
@@ -2454,6 +2492,7 @@ describe('Chart Helper ', () => {
           colName: '合同截止日期（按周）',
           expression: 'AGG_DATE_WEEK(合同截止日期)',
           field: '合同截止日期',
+          id: '合同截止日期（按周）',
           type: DataViewFieldType.DATE,
           uid: 'fe3f3810-7fe1-41dc-b745-298aaa8b4b95',
         },
@@ -2461,6 +2500,7 @@ describe('Chart Helper ', () => {
       const replacedConfig = {
         category: ChartDataViewFieldCategory.Field,
         colName: '签署日期',
+        id: '签署日期',
         type: DataViewFieldType.DATE,
         uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
       };
@@ -2513,6 +2553,7 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           colName: '签署日期（按周）',
+          id: '签署日期（按周）',
           expression: 'AGG_DATE_WEEK(签署日期)',
           field: '签署日期',
           type: DataViewFieldType.DATE,
@@ -2522,6 +2563,7 @@ describe('Chart Helper ', () => {
       const replacedConfig = {
         category: ChartDataViewFieldCategory.DateLevelComputedField,
         colName: '签署日期（按月）',
+        id: '签署日期（按月）',
         expression: 'AGG_DATE_MONTH(签署日期)',
         field: '签署日期',
         type: DataViewFieldType.DATE,
@@ -2557,6 +2599,7 @@ describe('Chart Helper ', () => {
       const replacedConfig = {
         category: ChartDataViewFieldCategory.DateLevelComputedField,
         colName: '签署日期（按月）',
+        id: '签署日期（按月）',
         expression: 'AGG_DATE_MONTH(签署日期)',
         field: '签署日期',
         type: DataViewFieldType.DATE,

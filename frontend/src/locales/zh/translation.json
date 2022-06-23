@@ -198,10 +198,24 @@
         "title": "组织设置"
       },
       "export": {
-        "title": "数据导出"
+        "title": "数据导出",
+        "selectText": "选择要导出的数据",
+        "submit": "提交"
       },
       "import": {
-        "title": "数据导入"
+        "title": "数据导入",
+        "submit": "提交",
+        "upload": "上传文件",
+        "file": "文件",
+        "strategy": "策略",
+        "new": "新建",
+        "overwrite": "更新",
+        "rollback": "增量更新",
+        "desc": {
+          "new": "新建：导入的所有资源都会重新创建",
+          "overwrite": "更新：会按照 ID 检测导入资源在数据库中是否已存在，如果存在则做更新处理，如果不存在则新建",
+          "rollback": "增量更新：会按照 ID 检测导入资源在数据库中是否已存在，如果检测到已存在的资源，则报错并回滚本次导入操作；仅在所有检测都通过的情况下才能完成本次导入"
+        }
       }
     },
     "background": {
@@ -513,7 +527,14 @@
         "AGG_DATE_MONTH": "按月",
         "AGG_DATE_WEEK": "按周",
         "AGG_DATE_DAY": "按日",
-        "default": "默认"
+        "default": "默认",
+        "cannotDeleteComputerField": "视图中创建的计算字段不能删除",
+        "byDataBaseGroup": "按数据库名分组",
+        "noGroup": "不分组",
+        "byNameSort": "按名称排序",
+        "noSort": "按原始字段顺序排序",
+        "Group": "分组方式",
+        "Sort": "排序方式"
       }
     },
     "palette": {
@@ -1224,7 +1245,8 @@
       },
       "template": {
         "label": "模版文件",
-        "requiredMessage": "导入模板文件"
+        "requiredMessage": "导入模板文件",
+        "upload": "上传模板"
       },
       "parent": "所属目录",
       "root": "根目录",
@@ -1307,7 +1329,10 @@
       "newHierarchy": "新建层次结构",
       "addToHierarchy": "添加到层次结构",
       "hierarchyName": "层级名称",
-      "duplicateName": "名称重复，请检查!"
+      "createComputedFields": "新建计算字段",
+      "duplicateName": "名称重复，请检查!",
+      "deleteSure": "确定要删除吗？",
+      "edit": "编辑"
     },
     "columnPermission": {
       "title": "列权限",
@@ -1343,6 +1368,21 @@
       "category": "分类",
       "type": "类型",
       "typeAndCategory": "类型与分类"
+    },
+    "structView": {
+      "STRUCT": "结构视图",
+      "SQL": "SQL 视图",
+      "file": "文件夹",
+      "sourcedata": "数据",
+      "join": "关联",
+      "selectJoinColumn": "选择关联字段",
+      "addJoin": "添加关联项",
+      "run": "执行片段",
+      "searchTable": "搜索数据表",
+      "searchSource": "搜索数据源",
+      "selectSource": "选择一个数据源",
+      "all": "全选",
+      "selectField": "选择一个字段"
     }
   },
   "source": {

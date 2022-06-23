@@ -32,7 +32,7 @@ public class DatachartResourceModel extends TransferModel {
 
     private List<MainModel> mainModels;
 
-    private List<Folder> parents;
+    private Set<String> parents;
 
     private final Set<String> views = new HashSet<>();
 

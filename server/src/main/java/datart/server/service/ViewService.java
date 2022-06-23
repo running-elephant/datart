@@ -38,4 +38,6 @@ public interface ViewService extends VizCRUDService<View, ViewMapperExt>, Resour
 
     boolean updateBase(ViewBaseUpdateParam updateParam);
 
+    boolean checkUnique(String orgId, String parentId, String name);
+
 }

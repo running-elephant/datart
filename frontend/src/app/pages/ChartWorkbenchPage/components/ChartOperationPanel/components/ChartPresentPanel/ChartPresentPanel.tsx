@@ -89,6 +89,7 @@ const ChartPresentPanel: FC<{
         return <Chart404Graph chart={chart} chartConfig={chartConfig} />;
       }
       chartConfig = setRuntimeDateLevelFieldsInChartConfig(chartConfig);
+
       return (
         !!chart &&
         chartDispatcher.getContainers(

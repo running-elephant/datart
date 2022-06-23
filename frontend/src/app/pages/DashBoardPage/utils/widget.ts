@@ -678,7 +678,8 @@ export const getValueByRowData = (
   data: ChartsEventData | undefined,
   fieldName: string,
 ) => {
-  let toCaseField = fieldName;
+  let toCaseField = JSON.parse(fieldName).join('.');
+
   return data?.rowData[toCaseField];
 };
 

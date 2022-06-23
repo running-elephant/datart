@@ -43,6 +43,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -287,10 +288,10 @@ public class OrgServiceImpl extends BaseService implements OrgService {
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public boolean removeUser(String orgId, String userId) {
+        Organization organization = organizationMapper.selectForUpdate(orgId);
         securityManager.requireOrgOwner(orgId);
-        Organization organization = organizationMapper.selectByPrimaryKey(orgId);
 
         if (organization.getCreateBy().equals(userId)) {
             Exceptions.tr(NotAllowedException.class,"message.org.member.delete-creator");

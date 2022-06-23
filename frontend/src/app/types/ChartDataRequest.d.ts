@@ -22,7 +22,7 @@ import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 
 export type ChartDataRequestFilter = {
   aggOperator?: AggregateFieldActionType | null;
-  column: string;
+  column: string[];
   sqlOperator: string;
   values?: Array<{
     value: string;
@@ -32,21 +32,21 @@ export type ChartDataRequestFilter = {
 
 export type ChartDataRequest = {
   viewId: string;
-  aggregators: Array<{ column: string; sqlOperator: string }>;
+  aggregators: Array<{ column: string[]; sqlOperator: string }>;
   expired?: number;
   filters: ChartDataRequestFilter[];
   flush?: boolean;
-  groups?: Array<{ column: string }>;
+  groups?: Array<{ column: string[] }>;
   functionColumns?: Array<{ alias: string; snippet: string }>;
   limit?: any;
   nativeQuery?: boolean;
   orders: Array<{
-    column: string;
+    column: string[];
     operator: SortActionType;
     aggOperator?: AggregateFieldActionType;
   }>;
   pageInfo?: ChartDatasetPageInfo;
-  columns?: string[];
+  columns?: Array<{ alias: string; column: string[] }>;
   script?: boolean;
   keywords?: string[];
   cache?: boolean;

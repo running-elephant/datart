@@ -37,7 +37,7 @@ public class DashboardResourceModel extends TransferModel {
 
     private Set<String> views;
 
-    private List<Folder> parents;
+    private Set<String> parents;
 
     @Override
     public String getVizName() {

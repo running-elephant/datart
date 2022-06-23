@@ -35,8 +35,6 @@ import { fetchBoardDetail } from '../Board/slice/thunk';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
 import { AutoEditor } from './AutoEditor';
 import ControllerWidgetPanel from './components/ControllerWidgetPanel';
-import { LinkagePanel } from './components/LinkagePanel';
-import { SettingJumpModal } from './components/SettingJumpModal';
 import { FreeEditor } from './FreeEditor';
 import { editDashBoardInfoActions, useEditBoardSlice } from './slice';
 import {
@@ -99,8 +97,7 @@ export const BoardEditor: React.FC<{
         {widgetControllerPanelParams.type !== 'hide' && (
           <ControllerWidgetPanel {...widgetControllerPanelParams} />
         )}
-        <LinkagePanel />
-        <SettingJumpModal />
+
         {boardChartEditorProps && (
           <ChartEditor
             {...boardChartEditorProps}

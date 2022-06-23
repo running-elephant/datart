@@ -111,7 +111,7 @@ export const slice = createSlice({
         Omit(filterSearchParams, ['type', 'isMatchByName']),
       ).map(entity => {
         return {
-          column: entity[0],
+          column: entity[0]?.split('.'),
           sqlOperator: FilterSqlOperator.In,
           values: entity[1]?.map(v => ({
             value: v,

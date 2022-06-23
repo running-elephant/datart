@@ -26,11 +26,7 @@ export default function useWidgetAction() {
     onEditChartWidget,
     onEditMediaWidget,
     onEditContainerWidget,
-    onEditWidgetLinkage,
-    onEditWidgetJump,
     onEditControllerWidget,
-    onEditWidgetCloseLinkage,
-    onEditWidgetCloseJump,
     onEditWidgetLock,
     onEditWidgetUnLock,
     onEditDeleteActiveWidgets,
@@ -74,18 +70,6 @@ export default function useWidgetAction() {
         break;
       case 'edit':
         onWidgetEdit(widget);
-        break;
-      case 'makeLinkage':
-        onEditWidgetLinkage(widget.id);
-        break;
-      case 'closeLinkage':
-        onEditWidgetCloseLinkage(widget);
-        break;
-      case 'makeJump':
-        onEditWidgetJump(widget.id);
-        break;
-      case 'closeJump':
-        onEditWidgetCloseJump(widget);
         break;
       case 'lock':
         onEditWidgetLock(widget.id);

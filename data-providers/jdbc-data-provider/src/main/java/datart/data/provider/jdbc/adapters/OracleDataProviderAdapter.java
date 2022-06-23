@@ -26,7 +26,9 @@ import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.QueryScript;
 import datart.data.provider.jdbc.SqlScriptRender;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -36,8 +38,14 @@ public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
 
     private static final String PAGE_SQL = "SELECT * FROM (SELECT ROWNUM V_R_N,V_T0.* FROM (%s) V_T0 WHERE ROWNUM <= %d) WHERE V_R_N>%d";
 
-    public Set<String> readAllDatabases() {
-        return Collections.singleton(jdbcProperties.getUser());
+    @Override
+    protected String readCurrDatabase(Connection conn, boolean isCatalog) throws SQLException {
+        String user = jdbcProperties.getUser();
+        if (StringUtils.endsWithIgnoreCase(user, " AS SYSDBA")
+                || StringUtils.endsWithIgnoreCase(user, " AS SYSOPER")) {
+            return null;
+        }
+        return super.readCurrDatabase(conn, isCatalog);
     }
 
     @Override

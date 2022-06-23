@@ -5,9 +5,6 @@ spring:
   main:
     banner-mode: off
 
-  profiles:
-    active: config
-
   servlet:
     multipart:
       max-file-size: 1024MB
@@ -73,8 +70,6 @@ shiro:
 datart:
   server:
     path-prefix: /api/v1
-
-  admin-id: datart-admin
 
   migration:
     enable: true

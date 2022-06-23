@@ -19,6 +19,7 @@
 import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { ChartDTO } from 'app/types/ChartDTO';
 
 export type ChartConfigPayloadType = {
@@ -44,3 +45,18 @@ export type WorkbenchState = {
   availableSourceFunctions?: string[];
   selectedItems: SelectedItem[];
 };
+
+export interface renderMataProps extends Omit<ChartDataViewMeta, 'children'> {
+  dateLevelFields?: Array<dateLevelFieldsProps>;
+  children?: Array<renderMataProps>;
+  selectedItems?: Array<renderMataProps>;
+  computedFieldsType?: boolean;
+}
+
+export interface dateLevelFieldsProps {
+  colName: string;
+  category: string;
+  expression: string;
+  id: string;
+  type: string;
+}

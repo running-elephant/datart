@@ -179,7 +179,10 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
           name="file"
           label={t('template.label')}
         >
-          <FileUpload suffix={DatartFileSuffixes.Template} />
+          <FileUpload
+            suffix={DatartFileSuffixes.Template}
+            uploadText={t('template.upload')}
+          />
         </Form.Item>
       )}
 

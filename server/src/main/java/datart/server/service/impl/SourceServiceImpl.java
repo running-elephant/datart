@@ -25,6 +25,7 @@ import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
 import datart.core.base.exception.Exceptions;
 import datart.core.base.exception.NotFoundException;
+import datart.core.base.exception.ParamException;
 import datart.core.common.*;
 import datart.core.data.provider.DataProviderConfigTemplate;
 import datart.core.data.provider.DataProviderSource;
@@ -97,6 +98,14 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
+    public boolean checkUnique(String orgId, String parentId, String name) {
+        if (!CollectionUtils.isEmpty(sourceMapper.checkName(orgId, parentId, name))) {
+            Exceptions.tr(ParamException.class, "error.param.exists.name");
+        }
+        return true;
+    }
+
+    @Override
     public List<Source> listSources(String orgId, boolean active) throws PermissionDeniedException {
 
         List<Source> sources = sourceMapper.listByOrg(orgId, active);
@@ -156,11 +165,17 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     @Override
     public List<Source> getAllParents(String sourceId) {
         List<Source> parents = new LinkedList<>();
-        getParent(parents, sourceId);
+        Source source = sourceMapper.selectByPrimaryKey(sourceId);
+        if (source != null) {
+            getParent(parents, source.getParentId());
+        }
         return parents;
     }
 
     private void getParent(List<Source> list, String parentId) {
+        if (parentId == null) {
+            return;
+        }
         Source source = sourceMapper.selectByPrimaryKey(parentId);
         if (source != null) {
             if (source.getParentId() != null) {
@@ -224,7 +239,7 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     public void replaceId(SourceResourceModel model
             , final Map<String, String> sourceIdMapping
             , final Map<String, String> viewIdMapping
-            , final Map<String, String> chartIdMapping, Map<String, String> boardIdMapping) {
+            , final Map<String, String> chartIdMapping, Map<String, String> boardIdMapping, Map<String, String> folderIdMapping) {
 
         if (model == null || model.getMainModels() == null) {
             return;
@@ -506,6 +521,15 @@ public class SourceServiceImpl extends BaseService implements SourceService {
             // insert parents
             if (!CollectionUtils.isEmpty(model.getParents())) {
                 for (Source parent : model.getParents()) {
+                    try {
+                        Source check = new Source();
+                        check.setName(parent.getName());
+                        check.setOrgId(parent.getOrgId());
+                        check.setParentId(source.getParentId());
+                        checkUnique(check);
+                    } catch (Exception e) {
+                        source.setName(DateUtils.withTimeString(source.getName()));
+                    }
                     try {
                         parent.setOrgId(orgId);
                         sourceMapper.insert(parent);

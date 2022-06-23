@@ -151,6 +151,7 @@ export const widgetClickJumpAction =
     ) {
       return;
     }
+
     const rowDataValue = getValueByRowData(params.data, jumpFieldName);
     console.warn(' jumpValue:', rowDataValue);
     console.warn('rowData', params.data?.rowData);
@@ -212,12 +213,13 @@ export const widgetLinkEventAction =
       const filterObj = params?.find(
         p => p?.rule?.relId === w.datachartId,
       )?.filters;
+
       const clickFilters: ChartDataRequestFilter[] = Object.entries(
         filterObj || {},
       ).map(([k, v]) => {
         return {
           sqlOperator: FilterSqlOperator.In,
-          column: k,
+          column: JSON.parse(k),
           values: (v as any)?.map(vv => ({ value: vv, valueType: 'STRING' })),
         };
       });
@@ -297,12 +299,14 @@ export const widgetClickLinkageAction =
         let linkageFieldName: string =
           re?.config?.widgetToWidget?.triggerColumn || '';
         const linkValue = getValueByRowData(params.data, linkageFieldName);
+
         if (!linkValue) {
           console.warn('linkageFieldName:', linkageFieldName);
           console.warn('rowData', params.data?.rowData);
           console.warn(`rowData[${linkageFieldName}]:${linkValue} `);
           return undefined;
         }
+
         const filter: BoardLinkFilter = {
           triggerWidgetId: widget.id,
           triggerValue: linkValue,
@@ -312,7 +316,6 @@ export const widgetClickLinkageAction =
         return filter;
       })
       .filter(item => !!item) as BoardLinkFilter[];
-
     if (editing) {
       dispatch(
         editDashBoardInfoActions.changeBoardLinkFilter({
@@ -382,7 +385,14 @@ export const widgetChartClickAction =
     // jump
     const jumpConfig = widget.config?.jumpConfig;
     if (jumpConfig && jumpConfig.open) {
-      dispatch(widgetClickJumpAction({ renderMode, widget, params, history }));
+      dispatch(
+        widgetClickJumpAction({
+          renderMode,
+          widget,
+          params,
+          history,
+        }),
+      );
       return;
     }
     // linkage

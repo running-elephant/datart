@@ -61,6 +61,7 @@ export const Tabs = memo(() => {
   const id = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'id' }),
   ) as string;
+
   const t = useI18NPrefix('view.tabs');
 
   const redirect = useCallback(

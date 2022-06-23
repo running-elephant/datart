@@ -70,6 +70,7 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
   const previewResults = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'previewResults' }),
   ) as ViewViewModel['previewResults'];
+
   const roles = useSelector(selectRoles);
   const t = useI18NPrefix('view');
 

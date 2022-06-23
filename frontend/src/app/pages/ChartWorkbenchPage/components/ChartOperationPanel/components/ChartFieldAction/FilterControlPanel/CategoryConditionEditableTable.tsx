@@ -157,7 +157,7 @@ const CategoryConditionEditableTable: FC<
 
     const handleFetchDataFromField = field => async () => {
       if (fetchDataByField) {
-        const dataset = await fetchNewDataset(dataView?.id!, field);
+        const dataset = await fetchNewDataset(dataView?.id!, field, dataView);
         const newRows = convertToList(dataset?.rows, []);
         setRows(newRows);
         handleFilterConditionChange(newRows);
@@ -175,11 +175,11 @@ const CategoryConditionEditableTable: FC<
       [rows],
     );
 
-    const fetchNewDataset = async (viewId, colName: string) => {
+    const fetchNewDataset = async (viewId, colName: string, dataView) => {
       const fieldDataset = await getDistinctFields(
         viewId,
         [colName],
-        undefined,
+        dataView,
         undefined,
       );
       return fieldDataset;
