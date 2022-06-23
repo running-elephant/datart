@@ -89,13 +89,14 @@ const slice = createSlice({
     },
     changeCurrentEditingView(
       state,
-      { payload }: PayloadAction<Partial<ViewViewModel>>,
+      action: PayloadAction<Partial<ViewViewModel>>,
     ) {
       const currentEditingView = state.editingViews.find(
         v => v.id === state.currentEditingView,
       );
+
       if (currentEditingView) {
-        const entries = Object.entries(payload);
+        const entries = Object.entries(action.payload);
         entries.forEach(([key, value]) => {
           currentEditingView[key] = value;
         });
@@ -115,6 +116,21 @@ const slice = createSlice({
             }
           }
         }
+      }
+    },
+    initCurrentEditingStructViewScript(
+      state,
+      action: PayloadAction<Partial<ViewViewModel>>,
+    ) {
+      const currentEditingView = state.editingViews.find(
+        v => v.id === state.currentEditingView,
+      );
+
+      if (currentEditingView) {
+        const entries = Object.entries(action.payload);
+        entries.forEach(([key, value]) => {
+          currentEditingView[key] = value;
+        });
       }
     },
     addTables(
@@ -203,7 +219,9 @@ const slice = createSlice({
 
     // getViewDetail
     builder.addCase(getViewDetail.fulfilled, (state, action) => {
-      const index = state.editingViews.findIndex(v => v.id === action.meta.arg);
+      const index = state.editingViews.findIndex(
+        v => v.id === action.meta.arg.viewId,
+      );
       const loadedEditingView: ViewViewModel = {
         ...action.payload,
         stage:
@@ -215,7 +233,7 @@ const slice = createSlice({
     });
     builder.addCase(getViewDetail.rejected, (state, action) => {
       const view = state.editingViews.find(
-        v => v.id === action.meta.arg,
+        v => v.id === action.meta.arg.viewId,
       ) as ViewViewModel;
       view.stage = ViewViewModelStages.NotLoaded;
       view.error = action.payload as string;
@@ -240,8 +258,12 @@ const slice = createSlice({
         const { model, dataSource } = transformQueryResultToModelAndDataSource(
           action.payload,
           currentEditingView.model,
+          currentEditingView.type,
         );
-        currentEditingView.model = diffMergeHierarchyModel(model);
+        currentEditingView.model = diffMergeHierarchyModel(
+          model,
+          currentEditingView.type,
+        );
         currentEditingView.previewResults = dataSource;
         if (!action.meta.arg.isFragment) {
           currentEditingView.stage = ViewViewModelStages.Saveable;

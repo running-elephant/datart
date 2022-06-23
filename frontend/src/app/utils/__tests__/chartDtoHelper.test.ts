@@ -38,12 +38,15 @@ describe('chartDtoHelper Test', () => {
         meta: [
           {
             name: 'name',
-            id: 'name',
+            id: '["name"]',
+            path: ['name'],
             subType: undefined,
             category: 'field',
             children: undefined,
           },
         ],
+        type: 'SQL',
+        version: '1.0.0-beta.4',
       },
     });
   });

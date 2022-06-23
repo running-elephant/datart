@@ -88,6 +88,7 @@ export const WidgetChartProvider: FC<{
     dataChart?.config?.chartGraphId,
   );
   const chartDataView = viewMap[dataChart?.viewId];
+
   return (
     <WidgetChartContext.Provider
       value={{

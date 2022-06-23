@@ -54,6 +54,7 @@ import {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { updateBy } from 'app/utils/mutation';
@@ -1580,6 +1581,7 @@ export const getDrillableRows = (
 
 export const getRuntimeDateLevelFields = (rows: any) => {
   const _rows = CloneValueDeep(rows);
+
   _rows?.forEach((v, i) => {
     const symbolData = v?.[RUNTIME_DATE_LEVEL_KEY];
     if (symbolData) {
@@ -1602,19 +1604,18 @@ export const getRuntimeComputedFields = (
 
   if (isRuntime && replacedConfig?.field) {
     const index = getRuntimeDateLevelFields(_computedFields).findIndex(
-      v => v.id === replacedConfig?.colName,
+      v => v.id === replacedConfig?.id,
     );
     const replacedConfigIndex = dateLevelComputedFields.findIndex(
       v => v.field === replacedConfig?.field,
     );
-
     _computedFields = updateBy(_computedFields, draft => {
       const dateLevelConfig = dateLevelComputedFields[replacedConfigIndex];
 
       if (dateLevelConfig) {
         draft[index][RUNTIME_DATE_LEVEL_KEY] = {
           category: dateLevelConfig.category,
-          id: dateLevelConfig.colName,
+          id: dateLevelConfig.id,
           type: dateLevelConfig.type,
           expression: dateLevelConfig.expression,
         };
@@ -1635,7 +1636,7 @@ export const getRuntimeComputedFields = (
           _computedFields = updateBy(_computedFields, draft => {
             draft.push({
               category: v.category,
-              id: v.colName,
+              id: v.id,
               type: v.type,
               expression: v.expression,
             });
@@ -1756,3 +1757,17 @@ export const getChartSelection = (
 ) => {
   return new ChartSelection(window, options);
 };
+
+export function getAllColumnInMeta(
+  meta?: ChartDataViewMeta[],
+): ChartDataViewMeta[] | undefined {
+  if (!meta) {
+    return meta;
+  }
+
+  const allColumn: any = meta.reduce<ChartDataViewMeta[]>((arr, cur) => {
+    return cur.children ? arr.concat(cur.children) : arr.concat([cur]);
+  }, []);
+
+  return allColumn;
+}

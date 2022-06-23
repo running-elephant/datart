@@ -37,7 +37,6 @@ import ChartDataView from 'app/types/ChartDataView';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { filterValueTypeByControl, isRangeTypeController } from './utils';
-
 export interface RelatedViewFormProps {
   viewMap: Record<string, ChartDataView>;
   form: FormInstance<ControllerWidgetContent> | undefined;
@@ -107,6 +106,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
         if (!relatedViews) {
           return null;
         }
+
         if (
           relatedViews[index].relatedCategory ===
           ChartDataViewFieldCategory.Variable
@@ -139,16 +139,22 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
             ?.filter(v => {
               return filterValueTypeByControl(controllerType, v.type);
             })
-            .map(item => (
-              <Option key={item.id} fieldvaluetype={item.type} value={item.id}>
-                <div
-                  style={{ display: 'flex', justifyContent: 'space-between' }}
+            .map(item => {
+              return (
+                <Option
+                  key={item.name}
+                  fieldvaluetype={item.type}
+                  value={item.id}
                 >
-                  <span>{item.id}</span>
-                  <FieldType>{item.type}</FieldType>
-                </div>
-              </Option>
-            ));
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between' }}
+                  >
+                    <span>{item.name}</span>
+                    <FieldType>{item.type}</FieldType>
+                  </div>
+                </Option>
+              );
+            });
         }
       },
       [controllerType, getFormRelatedViews, queryVariables, viewMap],

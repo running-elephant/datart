@@ -141,13 +141,14 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
   const isChecked = (selectedKeys, eventKey) =>
     selectedKeys.indexOf(eventKey) !== -1;
 
-  const fetchNewDataset = async (viewId, colName: string) => {
+  const fetchNewDataset = async (viewId, colName: string, dataView) => {
     const fieldDataset = await getDistinctFields(
       viewId,
       [colName],
-      undefined,
+      dataView,
       undefined,
     );
+
     return fieldDataset;
   };
 
@@ -217,7 +218,7 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
   };
 
   const handleFetchData = () => {
-    fetchNewDataset?.(dataView?.id, colName).then(dataset => {
+    fetchNewDataset?.(dataView?.id, colName, dataView).then(dataset => {
       if (isTree) {
         // setTreeDatas(convertToTree(dataset?.columns, selectedKeys));
         // setListDatas(convertToList(dataset?.columns, selectedKeys));

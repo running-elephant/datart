@@ -385,13 +385,13 @@ export function transformMeta(model?: string) {
     if (!isEmptyArray(column?.children)) {
       return column.children.map(c => ({
         ...c,
-        id: c.name,
+        id: JSON.stringify(c.path),
         category: ChartDataViewFieldCategory.Field,
       }));
     }
     return {
       ...column,
-      id: colKey,
+      id: JSON.stringify(column.path) || colKey,
       category: ChartDataViewFieldCategory.Field,
     };
   });
@@ -405,6 +405,7 @@ export function transformHierarchyMeta(model?: string): ChartDataViewMeta[] {
   const hierarchyMeta = !Object.keys(modelObj?.hierarchy || {}).length
     ? modelObj.columns
     : modelObj.hierarchy;
+
   return Object.keys(hierarchyMeta || {}).map(key => {
     return getMeta(key, hierarchyMeta?.[key]);
   });
@@ -417,10 +418,9 @@ function getMeta(key, column) {
     isHierarchy = true;
     children = column?.children.map(child => getMeta(child?.name, child));
   }
-
   return {
     ...column,
-    id: key,
+    id: JSON.stringify(column.path) || key,
     subType: column?.category,
     category: isHierarchy
       ? ChartDataViewFieldCategory.Hierarchy
@@ -672,7 +672,8 @@ export const transformToViewConfig = (
 
 export const buildDragItem = (item, children: any[] = []) => {
   return {
-    colName: item?.id,
+    id: item?.id,
+    colName: item?.name,
     type: item?.type,
     subType: item?.subType,
     category: item?.category,
@@ -759,7 +760,7 @@ export const buildClickEventBaseFilters = (
       const filter = {
         aggOperator: null,
         sqlOperator: FilterSqlOperator.In,
-        column: c.colName,
+        column: JSON.parse(c.id),
         values: filterValues,
       };
       acc.push(filter);
@@ -799,7 +800,7 @@ export const getJumpFiltersByInteractionRule = (
           return null;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column && r?.target,
+          r => r.source === JSON.stringify(f?.column) && r?.target,
         );
         if (isEmpty(targetRelation)) {
           return null;
@@ -813,17 +814,17 @@ export const getJumpFiltersByInteractionRule = (
     .reduce((acc, cur) => {
       if (cur?.column) {
         const currentValues = cur?.values?.map(v => v.value) || [];
-        if (cur.column in acc) {
-          const oldValues: string[] = acc[cur.column!] || [];
+        const strColumn = String(cur.column!);
+
+        if (JSON.stringify(cur.column!) in acc) {
+          const oldValues: string[] = acc[strColumn] || [];
           if (isEmptyArray(oldValues)) {
-            acc[cur.column!] = currentValues;
+            acc[strColumn] = currentValues;
           } else {
-            acc[cur.column!] = currentValues.filter(cv =>
-              oldValues.includes(cv),
-            );
+            acc[strColumn] = currentValues.filter(cv => oldValues.includes(cv));
           }
         } else {
-          acc[cur.column!] = currentValues;
+          acc[String(cur.column!)] = currentValues;
         }
       }
       return acc;
@@ -856,7 +857,7 @@ export const getLinkFiltersByInteractionRule = (
           return null;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column && r?.target,
+          r => r.source === JSON.stringify(f?.column) && r?.target,
         );
         if (isEmpty(targetRelation)) {
           return null;
@@ -870,17 +871,16 @@ export const getLinkFiltersByInteractionRule = (
     .reduce((acc, cur) => {
       if (cur?.column) {
         const currentValues = cur?.values?.map(v => v.value) || [];
-        if (cur.column in acc) {
-          const oldValues: string[] = acc[cur.column!] || [];
+        const strColumn = JSON.stringify(cur.column);
+        if (strColumn in acc) {
+          const oldValues: string[] = acc[strColumn] || [];
           if (isEmptyArray(oldValues)) {
-            acc[cur.column!] = currentValues;
+            acc[strColumn] = currentValues;
           } else {
-            acc[cur.column!] = currentValues.filter(cv =>
-              oldValues.includes(cv),
-            );
+            acc[strColumn] = currentValues.filter(cv => oldValues.includes(cv));
           }
         } else {
-          acc[cur.column!] = currentValues;
+          acc[strColumn] = currentValues;
         }
       }
       return acc;
@@ -913,14 +913,17 @@ export const getJumpOperationFiltersByInteractionRule = (
         if (isEmptyArray(customizeRelations)) {
           return acc;
         }
+
         const targetRelation = customizeRelations?.find(
-          r => r.source === f?.column && r?.target,
+          r => r.source === JSON.stringify(f?.column) && r?.target,
         );
         if (isEmpty(targetRelation)) {
           return acc;
         }
         return acc.concat(
-          Object.assign({}, f, { column: targetRelation?.target }),
+          Object.assign({}, f, {
+            column: targetRelation?.target && JSON.parse(targetRelation.target),
+          }),
         );
       }
     }, []);
@@ -958,7 +961,7 @@ export const variableToFilter = (
   return Object.entries(queryVariables || {}).map(([k, v]) => {
     return {
       sqlOperator: FilterSqlOperator.In,
-      column: k,
+      column: [k],
       values: v?.map(value => ({ value, valueType: 'STRING' })),
     };
   });

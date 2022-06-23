@@ -104,7 +104,7 @@ describe('diffMergeHierarchyModel test', () => {
       },
       hierarchy: {},
     };
-    expect(diffMergeHierarchyModel(model as any)).toMatchObject({
+    expect(diffMergeHierarchyModel(model as any, 'SQL')).toMatchObject({
       columns: {
         id: { name: 'id', type: 'STRING' },
         age: { name: 'age', type: 'NUMBER' },
@@ -127,7 +127,7 @@ describe('diffMergeHierarchyModel test', () => {
         age: { name: 'age', type: 'NUMBER' },
       },
     };
-    expect(diffMergeHierarchyModel(model as any)).toMatchObject({
+    expect(diffMergeHierarchyModel(model as any, 'SQL')).toMatchObject({
       columns: model.columns,
       hierarchy: {
         id: { name: 'id', type: 'STRING' },
@@ -148,7 +148,7 @@ describe('diffMergeHierarchyModel test', () => {
         address: { name: 'address', type: 'STRING' },
       },
     };
-    expect(diffMergeHierarchyModel(model as any)).toMatchObject({
+    expect(diffMergeHierarchyModel(model as any, 'SQL')).toMatchObject({
       columns: model.columns,
       hierarchy: {
         id: { name: 'id', type: 'STRING' },
@@ -173,7 +173,7 @@ describe('diffMergeHierarchyModel test', () => {
         },
       },
     };
-    expect(diffMergeHierarchyModel(model as any)).toMatchObject({
+    expect(diffMergeHierarchyModel(model as any, 'SQL')).toMatchObject({
       columns: model.columns,
       hierarchy: {
         dealers: {
@@ -201,7 +201,7 @@ describe('diffMergeHierarchyModel test', () => {
         },
       },
     };
-    expect(diffMergeHierarchyModel(model as any)).toMatchObject({
+    expect(diffMergeHierarchyModel(model as any, 'SQL')).toMatchObject({
       columns: model.columns,
       hierarchy: {},
     });
@@ -226,7 +226,7 @@ describe('diffMergeHierarchyModel test', () => {
         },
       },
     };
-    expect(diffMergeHierarchyModel(model as any)).toMatchObject({
+    expect(diffMergeHierarchyModel(model as any, 'SQL')).toMatchObject({
       columns: model.columns,
       hierarchy: {
         age: { name: 'age', type: 'NUMBER' },

@@ -21,6 +21,8 @@ import {
   ChartDataSectionType,
   ChartDataViewFieldCategory,
   ChartStyleSectionComponentType,
+  ControllerFacadeTypes,
+  ControllerVisibilityTypes,
   DataViewFieldType,
   FieldFormatType,
   FilterConditionType,
@@ -28,10 +30,6 @@ import {
 } from 'app/constants';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import {
-  ControllerFacadeTypes,
-  ControllerVisibilityTypes,
-} from 'app/types/FilterControlPanel';
 import {
   FilterSqlOperator,
   NumberUnitKey,
@@ -105,12 +103,12 @@ export type AggregateLimit = Pick<typeof AggregateFieldActionType, 'COUNT'>;
 export type ChartDataSectionField = {
   uid?: string;
   colName: string;
+  id: string;
   desc?: string;
   type: DataViewFieldType;
   category: Uncapitalize<keyof typeof ChartDataViewFieldCategory>;
   expression?: string;
   field?: string;
-
   sort?: SortFieldAction;
   alias?: AliasFieldAction;
   format?: FormatFieldAction;

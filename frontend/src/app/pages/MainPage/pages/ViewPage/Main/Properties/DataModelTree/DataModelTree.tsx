@@ -16,25 +16,36 @@
  * limitations under the License.
  */
 
-import { Form, Input, Select } from 'antd';
+import { Form, Input, message, Select } from 'antd';
 import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
-import { FC, memo, useEffect, useMemo, useState } from 'react';
+import ChartComputedFieldSettingPanel from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartDataViewPanel/components/ChartComputedFieldSettingPanel';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { checkComputedFieldAsync } from 'app/utils/fetch';
+import { updateBy, updateByKey } from 'app/utils/mutation';
+import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_LG } from 'styles/StyleConstants';
 import { Nullable } from 'types';
 import { CloneValueDeep, isEmpty, isEmptyArray } from 'utils/object';
+import { moduleListFormsTreeByTableName } from 'utils/utils';
 import { ViewViewModelStages } from '../../../constants';
 import { useViewSlice } from '../../../slice';
 import {
   selectCurrentEditingView,
   selectCurrentEditingViewAttr,
 } from '../../../slice/selectors';
-import { Column, ColumnRole, Model } from '../../../slice/types';
+import {
+  Column,
+  ColumnRole,
+  Model,
+  StructViewQueryProps,
+  ViewType,
+} from '../../../slice/types';
 import { dataModelColumnSorter } from '../../../utils';
 import Container from '../Container';
 import {
@@ -43,6 +54,7 @@ import {
   TreeNodeHierarchy,
 } from './constant';
 import DataModelBranch from './DataModelBranch';
+import DataModelComputerFieldNode from './DataModelComputerFieldNode';
 import DataModelNode from './DataModelNode';
 import { toModel } from './utils';
 
@@ -51,20 +63,84 @@ const DataModelTree: FC = memo(() => {
   const { actions } = useViewSlice();
   const dispatch = useDispatch();
   const [openStateModal, contextHolder] = useStateModal({});
+  const [showModal, modalContextHolder] = useStateModal({});
+
   const currentEditingView = useSelector(selectCurrentEditingView);
   const stage = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'stage' }),
   ) as ViewViewModelStages;
+  const sourceId = useSelector(state =>
+    selectCurrentEditingViewAttr(state, { name: 'sourceId' }),
+  ) as string;
+  const type = useSelector(state =>
+    selectCurrentEditingViewAttr(state, { name: 'type' }),
+  ) as ViewType;
+  const script = useSelector(state =>
+    selectCurrentEditingViewAttr(state, { name: 'script' }),
+  ) as StructViewQueryProps;
+
   const [hierarchy, setHierarchy] = useState<Nullable<Model>>();
+  const [computedFields, setComputedFields] = useState<ChartDataViewMeta[]>();
+  const [fields, setFields] = useState<ChartDataViewMeta[]>();
+  const [viewType, setViewType] = useState<ViewType>('SQL');
+
+  useEffect(() => {
+    setViewType(type);
+  }, [type]);
 
   useEffect(() => {
     setHierarchy(currentEditingView?.model?.hierarchy);
   }, [currentEditingView?.model?.hierarchy]);
 
+  useEffect(() => {
+    setComputedFields(currentEditingView?.model?.computedFields);
+  }, [currentEditingView?.model?.computedFields]);
+
+  useEffect(() => {
+    if (viewType === 'STRUCT' && script.table) {
+      const tableName = script.table;
+      const childrenData = script['columns']?.map((v, i) => {
+        return { title: v, key: [...tableName, v] };
+      });
+      const joinTable: any = [];
+      for (let i = 0; i < script.joins.length; i++) {
+        const tableName = script.joins[i].table!;
+        const childrenData = script.joins[i]['columns']?.map((v, i) => {
+          return { title: v, key: [...tableName, v] };
+        });
+        joinTable.push({
+          title: tableName,
+          key: tableName,
+          selectable: false,
+          children: childrenData,
+        });
+      }
+      const treeData = [
+        {
+          title: tableName[tableName.length - 1],
+          key: tableName[tableName.length - 1],
+          selectable: false,
+          children: childrenData,
+        },
+        ...joinTable,
+      ];
+
+      setFields(treeData);
+    } else {
+      if (currentEditingView?.model?.columns) {
+        setFields(
+          Object.values(currentEditingView.model.columns).map(v => {
+            return { id: v.name, name: v.name };
+          }),
+        );
+      }
+    }
+  }, [script, viewType, currentEditingView?.model?.columns]);
+
   const tableColumns = useMemo<Column[]>(() => {
     return Object.entries(hierarchy || {})
       .map(([name, column], index) => {
-        return Object.assign({ index }, column, { name });
+        return Object.assign({ index }, column, { name: column.name || name });
       })
       .sort(dataModelColumnSorter);
   }, [hierarchy]);
@@ -138,6 +214,22 @@ const DataModelTree: FC = memo(() => {
       }),
     );
   };
+
+  const handleDataModelComputerFieldChange = useCallback(
+    computedFields => {
+      setComputedFields(computedFields);
+      dispatch(
+        actions.changeCurrentEditingView({
+          model: {
+            ...currentEditingView?.model,
+            computedFields,
+            version: APP_CURRENT_VERSION,
+          },
+        }),
+      );
+    },
+    [actions, currentEditingView?.model, dispatch],
+  );
 
   const handleDragEnd = result => {
     if (Boolean(result.destination) && isEmpty(result?.combine)) {
@@ -443,8 +535,143 @@ const DataModelTree: FC = memo(() => {
     );
   };
 
+  const handleAddNewOrUpdateComputedField = useCallback(
+    async (field?: ChartDataViewMeta, originId?: string) => {
+      if (!field) {
+        return Promise.reject('field is empty');
+      }
+
+      let validComputedField = true;
+      try {
+        validComputedField = await checkComputedFieldAsync(
+          sourceId,
+          field.expression,
+        );
+      } catch (error) {
+        validComputedField = false;
+      }
+
+      if (!validComputedField) {
+        message.error('validate function computed field failed');
+        return Promise.reject('validate function computed field failed');
+      }
+      const otherComputedFields = computedFields?.filter(
+        f => f.id !== originId,
+      );
+      const isNameConflict = !!otherComputedFields?.find(
+        f => f.id === field?.id,
+      );
+      if (isNameConflict) {
+        message.error(
+          'The computed field has already been exist, please choose anohter one!',
+        );
+        return Promise.reject(
+          'The computed field has already been exist, please choose anohter one!',
+        );
+      }
+
+      const currentFieldIndex = (computedFields || []).findIndex(
+        f => f.id === originId,
+      );
+
+      if (currentFieldIndex >= 0) {
+        const newComputedFields = updateByKey(
+          computedFields,
+          currentFieldIndex,
+          {
+            type: field.type,
+            id: field.id,
+            expression: field.expression,
+            category: field.category,
+          },
+        );
+        handleDataModelComputerFieldChange(newComputedFields);
+
+        return;
+      }
+      const newComputedFields = (computedFields || []).concat([field]);
+      handleDataModelComputerFieldChange(newComputedFields);
+    },
+    [computedFields, sourceId, handleDataModelComputerFieldChange],
+  );
+
+  const addCallback = useCallback(
+    field => {
+      (showModal as Function)({
+        title: t('model.createComputedFields'),
+        modalSize: StateModalSize.MIDDLE,
+        content: onChange => (
+          <ChartComputedFieldSettingPanel
+            viewType={viewType}
+            computedField={field}
+            sourceId={sourceId}
+            fields={fields}
+            variables={[]}
+            allComputedFields={computedFields}
+            onChange={onChange}
+          />
+        ),
+        onOk: newField =>
+          handleAddNewOrUpdateComputedField(newField, field?.id),
+      });
+    },
+    [
+      computedFields,
+      showModal,
+      sourceId,
+      t,
+      fields,
+      viewType,
+      handleAddNewOrUpdateComputedField,
+    ],
+  );
+
+  const titleAdd = useMemo(() => {
+    return {
+      items: [{ key: 'computerField', text: t('model.createComputedFields') }],
+      callback: () => addCallback(null),
+    };
+  }, [addCallback, t]);
+
+  const handleComputedFieldMenuClick = useCallback(
+    (node, key) => {
+      if (key === 'exit') {
+        addCallback(node);
+      } else if (key === 'delete') {
+        const newComputedFields = updateBy(computedFields, draft => {
+          const index = draft!.findIndex(v => v.id === node.id);
+          draft!.splice(index, 1);
+        });
+
+        handleDataModelComputerFieldChange(newComputedFields);
+      }
+    },
+    [addCallback, computedFields, handleDataModelComputerFieldChange],
+  );
+
+  const GroupTableColumn = useCallback((TableColumn, viewType) => {
+    if (viewType === 'SQL') {
+      return TableColumn;
+    }
+    const hierarchyColumn = CloneValueDeep(TableColumn).filter(
+      v => v.role === ColumnRole.Hierarchy,
+    );
+    const copyTableColumn = CloneValueDeep(TableColumn).filter(
+      v => v.role !== ColumnRole.Hierarchy,
+    );
+    const columnTreeData = moduleListFormsTreeByTableName(
+      copyTableColumn,
+      'viewPage',
+    );
+    return [...hierarchyColumn, ...columnTreeData];
+  }, []);
+
   return (
-    <Container title="model" loading={stage === ViewViewModelStages.Running}>
+    <Container
+      title="model"
+      add={titleAdd}
+      loading={stage === ViewViewModelStages.Running}
+    >
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable
           droppableId={ROOT_CONTAINER_ID}
@@ -456,8 +683,9 @@ const DataModelTree: FC = memo(() => {
               ref={droppableProvided.innerRef}
               isDraggingOver={droppableSnapshot.isDraggingOver}
             >
-              {tableColumns.map(col => {
-                return col.role === ColumnRole.Hierarchy ? (
+              {GroupTableColumn(tableColumns, viewType).map(col => {
+                return col.role === ColumnRole.Hierarchy ||
+                  col.role === ColumnRole.Table ? (
                   <DataModelBranch
                     node={col}
                     key={col.name}
@@ -466,6 +694,7 @@ const DataModelTree: FC = memo(() => {
                     onEditBranch={openEditBranchModal}
                     onDelete={handleDeleteBranch}
                     onDeleteFromHierarchy={handleDeleteFromBranch}
+                    onCreateHierarchy={openCreateHierarchyModal}
                   />
                 ) : (
                   <DataModelNode
@@ -482,7 +711,17 @@ const DataModelTree: FC = memo(() => {
           )}
         </Droppable>
       </DragDropContext>
+      {computedFields?.map((v, i) => {
+        return (
+          <DataModelComputerFieldNode
+            key={i}
+            node={v}
+            menuClick={handleComputedFieldMenuClick}
+          ></DataModelComputerFieldNode>
+        );
+      })}
       {contextHolder}
+      {modalContextHolder}
     </Container>
   );
 });

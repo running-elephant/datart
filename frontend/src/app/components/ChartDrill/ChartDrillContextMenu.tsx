@@ -226,7 +226,6 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       t,
       jumpRules,
       onViewDataChange,
-      onCrossFilteringChange,
       currentDrillLevel,
       drillOption,
       selectDrillStatusMenu,
@@ -234,6 +233,7 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
       onDrillOptionChange,
       availableSourceFunctions,
       handleDateLevelChange,
+      onCrossFilteringChange,
     ]);
 
     return (

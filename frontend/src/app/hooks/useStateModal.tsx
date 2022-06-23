@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Form, FormInstance, Modal } from 'antd';
+import { Form, FormInstance, Modal, ModalFuncProps } from 'antd';
 import { useRef } from 'react';
 import { isPromise } from 'utils/object';
 
@@ -108,6 +108,7 @@ function useStateModal({ initState }: { initState?: any }) {
     modalSize?: string | number | StateModalSize;
     onOk?: typeof handleClickOKButton;
     onCancel?: typeof handleClickCancelButton;
+    okButtonProps?: ModalFuncProps['okButtonProps'];
   }) => {
     okCallbackRef.current = props.onOk;
     cancelCallbackRef.current = props.onCancel;
@@ -128,6 +129,7 @@ function useStateModal({ initState }: { initState?: any }) {
       maskClosable: true,
       icon: null,
       centered: true,
+      okButtonProps: props.okButtonProps,
     });
   };
 

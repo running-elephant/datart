@@ -25,6 +25,7 @@ import {
   FolderOpenOutlined,
   MoreOutlined,
   NumberOutlined,
+  TableOutlined,
 } from '@ant-design/icons';
 import { Collapse, Dropdown, Menu, Row } from 'antd';
 import { IW, ToolbarButton } from 'app/components';
@@ -32,10 +33,9 @@ import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useToggle from 'app/hooks/useToggle';
 import { ColumnRole } from 'app/pages/MainPage/pages/ViewPage/slice/types';
-import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { buildDragItem } from 'app/utils/internalChartHelper';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
-import { FC, memo, useMemo } from 'react';
+import { FC, memo, useEffect, useMemo } from 'react';
 import { useDrag } from 'react-dnd';
 import styled from 'styled-components/macro';
 import {
@@ -50,19 +50,22 @@ import {
   WARNING,
 } from 'styles/StyleConstants';
 import { stopPPG } from 'utils/utils';
-import { DATE_LEVELS } from '../../../../slice/constant';
+import { dateLevelFieldsProps, renderMataProps } from '../../../../slice/type';
 import DateLevelFieldContainer from './DateLevelFieldContainer';
 
 const { Panel } = Collapse;
 
 export const ChartDraggableSourceContainer: FC<
   {
+    viewType?: string;
+    isViewComputerField?: boolean;
     availableSourceFunctions?: string[];
+    dateLevelFields?: dateLevelFieldsProps[];
     onDeleteComputedField?: (fieldName) => void;
     onEditComputedField?: (fieldName) => void;
     onSelectionChange?: (dataItemId, cmdKeyActive, shiftKeyActive) => void;
     onClearCheckedList?: () => void;
-  } & ChartDataViewMeta
+  } & renderMataProps
 > = memo(function ChartDraggableSourceContainer({
   id,
   name: colName,
@@ -75,6 +78,9 @@ export const ChartDraggableSourceContainer: FC<
   availableSourceFunctions,
   role,
   children,
+  isViewComputerField,
+  viewType,
+  dateLevelFields,
   onDeleteComputedField,
   onEditComputedField,
   onSelectionChange,
@@ -82,16 +88,20 @@ export const ChartDraggableSourceContainer: FC<
 }) {
   const t = useI18NPrefix(`viz.workbench.dataview`);
   const [showChild, setShowChild] = useToggle(false);
-  const isHierarchyField = role === ColumnRole.Hierarchy;
+  const isHierarchyFieldOrTable =
+    role === ColumnRole.Hierarchy || role === ColumnRole.Table;
   const [, drag] = useDrag(
     () => ({
-      type: isHierarchyField
+      type: isHierarchyFieldOrTable
         ? CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN_GROUP
         : CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
       canDrag: true,
       item: selectedItems?.length
         ? selectedItems.map(item => buildDragItem(item))
-        : buildDragItem({ id: colName, type, subType, category }, children),
+        : buildDragItem(
+            { id, type, subType, category, name: colName },
+            children,
+          ),
       collect: monitor => ({
         isDragging: monitor.isDragging(),
       }),
@@ -120,7 +130,8 @@ export const ChartDraggableSourceContainer: FC<
     const _isAllowMoreAction = () => {
       return (
         ChartDataViewFieldCategory.Field === category ||
-        ChartDataViewFieldCategory.Hierarchy === category
+        ChartDataViewFieldCategory.Hierarchy === category ||
+        isViewComputerField
       );
     };
 
@@ -179,6 +190,15 @@ export const ChartDraggableSourceContainer: FC<
           />
         );
       }
+    } else if (role === ColumnRole.Table) {
+      icon = (
+        <TableOutlined
+          {...props}
+          onClick={() => {
+            setShowChild(!showChild);
+          }}
+        />
+      );
     } else {
       switch (type) {
         case DataViewFieldType.STRING:
@@ -214,21 +234,14 @@ export const ChartDraggableSourceContainer: FC<
               </div>
             }
           >
-            {DATE_LEVELS.map((item, i) => {
-              if (
-                availableSourceFunctions &&
-                availableSourceFunctions.includes(item.expression)
-              ) {
-                return (
-                  <DateLevelFieldContainer
-                    colName={colName}
-                    key={i}
-                    item={item}
-                    onClearCheckedList={onClearCheckedList}
-                  />
-                );
-              }
-              return null;
+            {dateLevelFields?.map((item, i) => {
+              return (
+                <DateLevelFieldContainer
+                  key={i}
+                  item={item}
+                  onClearCheckedList={onClearCheckedList}
+                />
+              );
             })}
           </Panel>
         </CollapseWrapper>
@@ -265,7 +278,8 @@ export const ChartDraggableSourceContainer: FC<
     t,
     onClearCheckedList,
     drag,
-    availableSourceFunctions,
+    isViewComputerField,
+    dateLevelFields,
   ]);
 
   const renderChildren = useMemo(() => {
@@ -273,24 +287,39 @@ export const ChartDraggableSourceContainer: FC<
       <ChartDraggableSourceContainer
         key={item.id}
         id={item.id}
-        name={item.id}
+        name={item.name}
         category={item.category}
         expression={item.expression}
         type={item.type}
         role={item.role}
         children={item.children}
+        viewType={viewType}
+        dateLevelFields={item.dateLevelFields}
+        isViewComputerField={item.computedFieldsType}
+        availableSourceFunctions={availableSourceFunctions}
         onDeleteComputedField={onDeleteComputedField}
         onClearCheckedList={onClearCheckedList}
         selectedItems={selectedItems}
       />
     ));
-  }, [children, onDeleteComputedField, onClearCheckedList, selectedItems]);
+  }, [
+    children,
+    onDeleteComputedField,
+    onClearCheckedList,
+    selectedItems,
+    viewType,
+    availableSourceFunctions,
+  ]);
+
+  useEffect(() => {
+    setShowChild(viewType === 'STRUCT');
+  }, [viewType, setShowChild]);
 
   return (
     <Container
       flexDirection={children ? 'column' : 'row'}
       onClick={e => {
-        if (isHierarchyField) {
+        if (isHierarchyFieldOrTable) {
           return;
         }
         onSelectionChange?.(colName, e.metaKey || e.ctrlKey, e.shiftKey);
