@@ -537,8 +537,6 @@ export class ChartDataRequestBuilder {
     const dataViewFieldsNames = (
       (this.dataView?.meta as ChartDataViewMeta[]) || []
     ).map(c => c?.id);
-    console.debug(`removeInvalidFilter ---> `, dataViewFieldsNames, filters);
-
     return (filters || []).filter(f => {
       return dataViewFieldsNames.includes(JSON.stringify(f.column));
     });
