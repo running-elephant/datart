@@ -55,7 +55,6 @@ public class SqlScriptRenderTest {
     }
 
     @Test
-    @Disabled
     public void testSqlWithExecParam() throws SqlParseException {
         validateTestSql(ExecParamSqlExamples.sqlList, false);
         log.info("SqlWithExecParamSqlScripts validate passed");
