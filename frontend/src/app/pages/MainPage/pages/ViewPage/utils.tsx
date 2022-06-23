@@ -110,10 +110,9 @@ export function transformQueryResultToModelAndDataSource(
       name,
       lastModel?.hierarchy || {},
     );
-    const key = viewType === 'STRUCT' ? JSON.parse(name).join('.') : name;
     return {
       ...obj,
-      [key]: {
+      [name]: {
         name,
         type: hierarchyColumn?.type || type,
         primaryKey,
@@ -123,10 +122,7 @@ export function transformQueryResultToModelAndDataSource(
   }, {});
   const dataSource = rows.map(arr =>
     arr.reduce((obj, val, index) => {
-      const key =
-        viewType === 'STRUCT'
-          ? JSON.parse(columns[index].name).join('.')
-          : columns[index].name;
+      const key = columns[index].name;
 
       return {
         ...obj,
@@ -479,7 +475,7 @@ export function buildRequestColumns(tableJSON: StructViewQueryProps) {
   tableJSON.columns.forEach((v, i) => {
     const tableName = tableJSON.table[tableJSON.table.length - 1];
     columns.push({
-      alias: [tableName, v],
+      alias: [tableName, v].join('.'),
       column: [tableName, v],
     });
   });
@@ -487,7 +483,7 @@ export function buildRequestColumns(tableJSON: StructViewQueryProps) {
     const tableName = join.table?.[join.table?.length - 1];
     join.columns?.forEach(column => {
       columns.push({
-        alias: [tableName, column],
+        alias: [tableName, column].join('.'),
         column: [tableName, column],
       });
     });
