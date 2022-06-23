@@ -5,30 +5,21 @@ import datart.core.data.provider.Dataframe;
 import datart.data.provider.script.SqlStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.sql.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class MsSqlDataProviderAdapter extends JdbcDataProviderAdapter {
 
     @Override
-    public Set<String> readAllDatabases() throws SQLException {
+    protected String readCurrDatabase(Connection conn, boolean isCatalog) throws SQLException {
         String databaseName = StringUtils.substringAfterLast(jdbcProperties.getUrl().toLowerCase(), "databasename=");
         databaseName = StringUtils.substringBefore(databaseName, ";");
         if (StringUtils.isBlank(databaseName)) {
-            Set<String> catalogs = new HashSet<>();
-            try (Connection conn = getConn()) {
-                DatabaseMetaData metadata = conn.getMetaData();
-                try (ResultSet rs = metadata.getCatalogs()) {
-                    while (rs.next()) {
-                        String catalogName = rs.getString(1);
-                        catalogs.add(catalogName);
-                    }
-                }
-                return catalogs;
-            }
+            return null;
         }
-        return super.readAllDatabases();
+        return super.readCurrDatabase(conn, isCatalog);
     }
 
     @Override

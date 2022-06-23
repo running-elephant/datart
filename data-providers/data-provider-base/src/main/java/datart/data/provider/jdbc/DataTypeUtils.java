@@ -29,6 +29,7 @@ import java.util.Date;
 public class DataTypeUtils {
 
     public static ValueType sqlType2DataType(String sqlType) {
+        sqlType = sqlType.toUpperCase();
         SqlTypeName sqlTypeName = SqlTypeName.get(sqlType);
         SqlTypeFamily family;
         if (sqlTypeName == null) {

@@ -67,21 +67,21 @@ public class MysqlSqlStdOperatorSupport extends MysqlSqlDialect implements SqlSt
                 renameCallOperator("DAYOFMONTH", call);
                 break;
             case AGG_DATE_YEAR:
-                writer.print("YEAR(" + call.getOperandList().get(0).toString() + ")");
+                writer.print("YEAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ")");
                 return true;
             case AGG_DATE_QUARTER: {
-                String columnName = call.getOperandList().get(0).toString();
+                String columnName = call.getOperandList().get(0).toSqlString(this).getSql();
                 writer.print("CONCAT(DATE_FORMAT("+columnName+",'%Y-'),QUARTER("+columnName+"))");
                 return true;
             }
             case AGG_DATE_MONTH:
-                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toString() + ",'%Y-%m')");
+                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'%Y-%m')");
                 return true;
             case AGG_DATE_WEEK:
-                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toString() + ",'%x-%v')");
+                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'%x-%v')");
                 return true;
             case AGG_DATE_DAY:
-                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toString() + ",'%Y-%m-%d')");
+                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'%Y-%m-%d')");
                 return true;
             default:
                 break;

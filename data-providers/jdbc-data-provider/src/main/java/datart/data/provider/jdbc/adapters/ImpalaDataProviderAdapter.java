@@ -25,28 +25,14 @@ import datart.core.data.provider.sql.OrderOperator;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 public class ImpalaDataProviderAdapter extends JdbcDataProviderAdapter {
 
     @Override
-    public Set<String> readAllTables(String database) throws SQLException {
-        try (Connection conn = getConn()) {
-            Set<String> tables = new HashSet<>();
-            DatabaseMetaData metadata = conn.getMetaData();
-            try (ResultSet rs = metadata.getTables(null, null, "%", new String[]{"TABLE", "VIEW"})) {
-                while (rs.next()) {
-                    String tableName = rs.getString(3);
-                    tables.add(tableName);
-                }
-            }
-            return tables;
-        }
+    protected boolean isReadFromCatalog(Connection conn) throws SQLException {
+        return false;
     }
 
     @Override

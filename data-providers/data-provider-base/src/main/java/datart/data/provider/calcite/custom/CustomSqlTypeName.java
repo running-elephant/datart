@@ -8,7 +8,8 @@ import java.util.Map;
 public enum CustomSqlTypeName {
     ANY(SqlTypeFamily.ANY),
     DATETIME(SqlTypeFamily.DATETIME),
-    DATETIME2(SqlTypeFamily.DATETIME);
+    DATETIME2(SqlTypeFamily.DATETIME),
+    INT(SqlTypeFamily.INTEGER);
 
     public static final Map<String, CustomSqlTypeName> SQL_TYPE_FAMILY_MAP = Util.enumConstants(CustomSqlTypeName.class);
     private final SqlTypeFamily family;

@@ -62,24 +62,28 @@ public class MsSqlStdOperatorSupport extends MssqlSqlDialect implements SqlStdOp
         StdSqlOperator operator = symbolOf(call.getOperator().getName());
         switch (operator) {
             case AGG_DATE_YEAR:
-                writer.print("YEAR(" + call.getOperandList().get(0).toString() + ")");
+                writer.print("YEAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ")");
                 return true;
             case AGG_DATE_QUARTER: {
-                String columnName = call.getOperandList().get(0).toString();
-                writer.print("CONCAT_WS('-',YEAR("+columnName+"),(month("+columnName+")+2)/3)");
+                String columnName = call.getOperandList().get(0).toSqlString(this).getSql();
+                writer.print("CONCAT(YEAR("+columnName+"), '-', (MONTH("+columnName+")+2)/3)");
                 return true;
             }
-            case AGG_DATE_MONTH:
-                writer.print("FORMAT(" + call.getOperandList().get(0).toString() + ",'yyyy-MM')");
+            case AGG_DATE_MONTH: {
+                String columnName = call.getOperandList().get(0).toSqlString(this).getSql();
+                writer.print("CONCAT(YEAR("+columnName+"), '-', MONTH("+columnName+"))");
                 return true;
+            }
             case AGG_DATE_WEEK: {
-                String columnName = call.getOperandList().get(0).toString();
-                writer.print("CONCAT_WS('-', YEAR("+columnName+"), RIGHT(100+DATEPART(ww,"+columnName+"),2))");
+                String columnName = call.getOperandList().get(0).toSqlString(this).getSql();
+                writer.print("CONCAT(YEAR("+columnName+"), '-', RIGHT(100+DATEPART(ww,"+columnName+"),2))");
                 return true;
             }
-            case AGG_DATE_DAY:
-                writer.print("FORMAT(" + call.getOperandList().get(0).toString() + ",'yyyy-MM-dd')");
+            case AGG_DATE_DAY: {
+                String columnName = call.getOperandList().get(0).toSqlString(this).getSql();
+                writer.print("CONCAT(YEAR("+columnName+"), '-', MONTH("+columnName+"), '-', DAY("+columnName+"))");
                 return true;
+            }
             default:
                 break;
         }
