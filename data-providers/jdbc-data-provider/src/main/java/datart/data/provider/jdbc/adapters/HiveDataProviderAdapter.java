@@ -4,38 +4,20 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.net.URI;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 public class HiveDataProviderAdapter extends JdbcDataProviderAdapter {
 
-    @Override
-    public Set<String> readAllDatabases() throws SQLException {
-        Set<String> schemas = new HashSet<>();
-        try (Connection conn = getConn()) {
-            String schema = conn.getSchema();
-            if (StringUtils.isNotBlank(getSchemaFromUrl()) && StringUtils.isNotBlank(schema)) {
-                return Collections.singleton(schema);
-            }
-            DatabaseMetaData metadata = conn.getMetaData();
-            try (ResultSet rs = metadata.getSchemas()) {
-                while (rs.next()) {
-                    String schemaName = rs.getString(1);
-                    schemas.add(schemaName);
-                }
-            }
-            return schemas;
-        }
-    }
 
-    private String getSchemaFromUrl() {
+    @Override
+    protected String readCurrDatabase(Connection conn, boolean isCatalog) throws SQLException {
         String url = jdbcProperties.getUrl().replaceFirst(".*://", "jdbc://");
         url = StringUtils.split(url, ";")[0];
         URI uri = URI.create(url);
-        return uri.getPath().replace("/", "");
+        String database = uri.getPath().replace("/", "");
+        if (StringUtils.isBlank(database)) {
+            return null;
+        }
+        return super.readCurrDatabase(conn, isCatalog);
     }
 }

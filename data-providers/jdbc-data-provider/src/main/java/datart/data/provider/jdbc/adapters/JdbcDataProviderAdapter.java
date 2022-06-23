@@ -109,30 +109,48 @@ public class JdbcDataProviderAdapter implements Closeable {
     }
 
     public Set<String> readAllDatabases() throws SQLException {
-
-        Set<String> catalogs = new HashSet<>();
-
+        Set<String> databases = new HashSet<>();
         try (Connection conn = getConn()) {
-            String catalog = conn.getCatalog();
-            if (StringUtils.isNotBlank(catalog)) {
-                return Collections.singleton(catalog);
+            DatabaseMetaData metaData = conn.getMetaData();
+            boolean isCatalog = isReadFromCatalog(conn);
+            ResultSet rs = null;
+            if (isCatalog) {
+                rs = metaData.getCatalogs();
+            } else {
+                rs = metaData.getSchemas();
+                log.info("Database 'catalogs' is empty, get databases with 'schemas'");
             }
-            DatabaseMetaData metadata = conn.getMetaData();
-            try (ResultSet rs = metadata.getCatalogs()) {
-                while (rs.next()) {
-                    String catalogName = rs.getString(1);
-                    catalogs.add(catalogName);
-                }
+
+            String currDatabase = readCurrDatabase(conn, isCatalog);
+            if (StringUtils.isNotBlank(currDatabase)) {
+                return Collections.singleton(currDatabase);
             }
-            return catalogs;
+
+            while (rs.next()) {
+                String database = rs.getString(1);
+                databases.add(database);
+            }
+            return databases;
         }
+    }
+
+    protected String readCurrDatabase(Connection conn, boolean isCatalog) throws SQLException {
+        return isCatalog ? conn.getCatalog() : conn.getSchema();
     }
 
     public Set<String> readAllTables(String database) throws SQLException {
         try (Connection conn = getConn()) {
             Set<String> tables = new HashSet<>();
             DatabaseMetaData metadata = conn.getMetaData();
-            try (ResultSet rs = metadata.getTables(database, conn.getSchema(), "%", new String[]{"TABLE", "VIEW"})) {
+            String catalog = null;
+            String schema = null;
+            if (isReadFromCatalog(conn)) {
+                catalog = database;
+                schema = conn.getSchema();
+            } else {
+                schema = database;
+            }
+            try (ResultSet rs = metadata.getTables(catalog, schema, "%", new String[]{"TABLE", "VIEW"})) {
                 while (rs.next()) {
                     String tableName = rs.getString(3);
                     tables.add(tableName);
@@ -140,6 +158,10 @@ public class JdbcDataProviderAdapter implements Closeable {
             }
             return tables;
         }
+    }
+
+    protected boolean isReadFromCatalog(Connection conn) throws SQLException {
+        return conn.getMetaData().getCatalogs().next();
     }
 
     public Set<Column> readTableColumn(String database, String table) throws SQLException {
@@ -432,7 +454,7 @@ public class JdbcDataProviderAdapter implements Closeable {
     protected Object getObjFromResultSet(ResultSet rs, int columnIndex) throws SQLException {
         Object obj = rs.getObject(columnIndex);
         if (obj instanceof Boolean) {
-            obj = rs.getInt(columnIndex);
+            obj = rs.getObject(columnIndex).toString();
         } else if (obj instanceof LocalDateTime) {
             obj = rs.getTimestamp(columnIndex);
         }

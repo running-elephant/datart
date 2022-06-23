@@ -53,28 +53,7 @@ const widgetToolkit: OwnedChartToolkit = {
   getName(key) {
     return initWidgetName(NameI18N, key);
   },
-  getDropDownList(widgetConf, supportTrigger?) {
-    let disabledMakeLinkage = false;
-    let showCloseLinkage = false;
-    let disabledMakeJump = false;
-    let showCloseJump = false;
-    if (supportTrigger) {
-      if (widgetConf.jumpConfig?.open) {
-        showCloseJump = true;
-        disabledMakeLinkage = true;
-      } else {
-        showCloseJump = false;
-        disabledMakeLinkage = false;
-      }
-
-      if (widgetConf.linkageConfig?.open) {
-        showCloseLinkage = true;
-        disabledMakeJump = true;
-      } else {
-        showCloseLinkage = false;
-        disabledMakeJump = false;
-      }
-    }
+  getDropDownList(widgetConf) {
     const list: WidgetActionListItem<widgetActionType>[] = [
       {
         key: 'refresh',
@@ -99,31 +78,6 @@ const widgetToolkit: OwnedChartToolkit = {
       {
         key: 'group',
         renderMode: ['edit'],
-      },
-
-      {
-        key: 'makeLinkage',
-        label: 'makeLinkage',
-        renderMode: ['edit'],
-        show: supportTrigger,
-        disabled: disabledMakeLinkage,
-      },
-      {
-        key: 'closeLinkage',
-        renderMode: ['edit'],
-        show: supportTrigger && showCloseLinkage,
-      },
-      {
-        key: 'makeJump',
-        label: 'makeJump',
-        renderMode: ['edit'],
-        show: supportTrigger,
-        disabled: disabledMakeJump,
-      },
-      {
-        key: 'closeJump',
-        renderMode: ['edit'],
-        show: supportTrigger && showCloseJump,
       },
     ];
     return list;

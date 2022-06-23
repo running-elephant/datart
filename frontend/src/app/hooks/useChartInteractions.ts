@@ -33,6 +33,8 @@ import {
   getJumpFiltersByInteractionRule,
   getJumpOperationFiltersByInteractionRule,
   getLinkFiltersByInteractionRule,
+  getVariablesByInteractionRule,
+  variableToFilter,
 } from 'app/utils/internalChartHelper';
 import qs from 'qs';
 import { useCallback } from 'react';
@@ -142,6 +144,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
       ruleId,
       orgId,
       view,
+      queryVariables,
       computedFields,
       aggregation,
       chartConfig,
@@ -176,7 +179,6 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
               drillOption,
               chartConfig?.datas,
             );
-
             const relId = rule?.[rule.category!]?.relId;
             if (rule.category === InteractionCategory.JumpToChart) {
               const urlFilters = getJumpOperationFiltersByInteractionRule(
@@ -184,8 +186,13 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
                 sourceChartFilters,
                 rule,
               );
+              const clickVariables = getVariablesByInteractionRule(
+                queryVariables,
+                rule,
+              );
               const urlFiltersStr: string = qs.stringify({
                 filters: urlFilters || [],
+                variables: clickVariables,
               });
               if (rule?.action === InteractionAction.Redirect) {
                 openNewTab(orgId, relId, urlFiltersStr);
@@ -202,9 +209,13 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
                 openJumpDialogModal(modalContent as any);
               }
             } else if (rule.category === InteractionCategory.JumpToDashboard) {
+              const variableFilters = variableToFilter(
+                getVariablesByInteractionRule(queryVariables, rule),
+              );
               const urlFilters = getJumpFiltersByInteractionRule(
                 clickFilters,
                 sourceChartNonAggFilters,
+                variableFilters,
                 rule,
               );
               Object.assign(urlFilters, { isMatchByName: true });
@@ -225,9 +236,13 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
                 openJumpDialogModal(modalContent as any);
               }
             } else if (rule.category === InteractionCategory.JumpToUrl) {
+              const variableFilters = variableToFilter(
+                getVariablesByInteractionRule(queryVariables, rule),
+              );
               const urlFilters = getJumpFiltersByInteractionRule(
                 clickFilters,
                 sourceChartNonAggFilters,
+                variableFilters,
                 rule,
               );
               Object.assign(urlFilters, { isMatchByName: true });
@@ -267,6 +282,7 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
         clickEventParams,
         targetEvent,
         view,
+        queryVariables,
         computedFields,
         aggregation,
         chartConfig,
@@ -296,6 +312,9 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
         .filters?.filter(f => !Boolean(f.aggOperator));
 
       const linkParams = (crossFilteringSetting?.rules || []).map(rule => {
+        const variableFilters = variableToFilter(
+          getVariablesByInteractionRule(queryVariables, rule),
+        );
         const clickFilters = buildClickEventBaseFilters(
           clickEventParams?.selectedItems?.map(item => item?.data?.rowData),
           rule,
@@ -305,11 +324,14 @@ const useChartInteractions = ({ openViewDetailPanel, openJumpDialogModal }) => {
         const filters = getLinkFiltersByInteractionRule(
           clickFilters,
           nonAggChartFilters,
+          variableFilters,
           rule,
         );
+        const variables = getVariablesByInteractionRule(queryVariables, rule);
         return {
           rule,
           filters,
+          variables,
         };
       });
       callback?.(linkParams);

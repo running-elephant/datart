@@ -271,11 +271,17 @@ export const initChartPreviewData = createAsyncThunk<
     orgId: string;
     filterSearchParams?: FilterSearchParams;
     jumpFilterParams?: ChartDataRequestFilter[];
+    jumpVariableParams?: Record<string, any[]>;
   }
 >(
   'viz/initChartPreviewData',
   async (
-    { backendChartId, filterSearchParams, jumpFilterParams },
+    {
+      backendChartId,
+      filterSearchParams,
+      jumpFilterParams,
+      jumpVariableParams,
+    },
     thunkAPI,
   ) => {
     await thunkAPI.dispatch(
@@ -289,6 +295,7 @@ export const initChartPreviewData = createAsyncThunk<
       await thunkAPI.dispatch(
         fetchDataSetByPreviewChartAction({
           backendChartId,
+          jumpVariableParams,
         }),
       );
     }
@@ -348,6 +355,7 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
       pageInfo?;
       sorter?: { column: string; operator: string; aggOperator?: string };
       drillOption?: IChartDrillOption;
+      jumpVariableParams?: Record<string, any[]>;
     },
     thunkAPI,
   ) => {
@@ -378,6 +386,7 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
     const data = builder
       .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
       .addDrillOption(arg?.drillOption)
+      .addVariableParams(arg?.jumpVariableParams)
       .build();
 
     const response = await request2({

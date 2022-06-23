@@ -67,10 +67,9 @@ import { WidgetSelectionContext } from '../../WidgetProvider/WidgetSelectionProv
 export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const { dataChart, availableSourceFunctions, chartDataView } =
     useContext(WidgetChartContext);
-
   const scale = useContext(BoardScaleContext);
   const { data: dataset } = useContext(WidgetDataContext);
-  const { renderMode, orgId } = useContext(BoardContext);
+  const { renderMode, orgId, queryVariables } = useContext(BoardContext);
   const selectedItems = useContext(WidgetSelectionContext);
   const widget = useContext(WidgetContext);
   const { dashboardId, id: wid } = widget;
@@ -179,6 +178,9 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         dataChart?.config?.chartConfig?.interactions,
         widgetRef?.current?.config?.customConfig?.interactions,
       );
+      const widgetViewQueryVariables = queryVariables?.filter(qv =>
+        widgetRef?.current?.viewIds?.includes(qv?.viewId || ''),
+      );
       return {
         drillOption: drillOptionRef?.current,
         drillThroughSetting,
@@ -186,13 +188,22 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         targetEvent,
         orgId,
         view: chartDataView,
+        queryVariables: widgetViewQueryVariables || [],
         computedFields: dataChart?.config?.computedFields,
         aggregation: dataChart?.config?.aggregation,
         chartConfig: dataChart?.config?.chartConfig,
         ruleId,
       };
     },
-    [chartDataView, orgId, dataChart?.config, getDrillThroughSetting],
+    [
+      getDrillThroughSetting,
+      dataChart?.config?.chartConfig,
+      dataChart?.config?.computedFields,
+      dataChart?.config?.aggregation,
+      queryVariables,
+      orgId,
+      chartDataView,
+    ],
   );
 
   const buildCrossFilteringEventParams = useCallback(

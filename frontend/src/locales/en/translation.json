@@ -198,10 +198,24 @@
         "title": "Organization Settings"
       },
       "export": {
-        "title": "Export"
+        "title": "Export",
+        "selectText": "Select the data to export",
+        "submit": "Submit"
       },
       "import": {
-        "title": "Import"
+        "title": "Import",
+        "submit": "Submit",
+        "upload": "Upload",
+        "file": "File",
+        "strategy": "Strategy",
+        "new": "New",
+        "overwrite": "OverWrite",
+        "rollback": "Rollback",
+        "desc": {
+          "new": "New:All imported resources are recreated",
+          "overwrite": "OverWrite:The system checks whether the imported resource exists in the database by ID. If yes, the system updates the resource. If no, the system creates a new resource",
+          "rollback": "Rollback:The system checks whether the imported resource exists in the database by ID. If the imported resource exists, an error message is displayed and the import operation is rolled back. The import can be completed only if all checks pass"
+        }
       }
     },
     "background": {

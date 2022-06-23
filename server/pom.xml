@@ -103,7 +103,7 @@
         </dependency>
         <dependency>
             <groupId>datart</groupId>
-            <artifactId>datart-data-provider</artifactId>
+            <artifactId>datart-data-provider-base</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>

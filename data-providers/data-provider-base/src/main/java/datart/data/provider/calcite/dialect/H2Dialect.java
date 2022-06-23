@@ -18,9 +18,12 @@
 package datart.data.provider.calcite.dialect;
 
 import datart.core.data.provider.StdSqlOperator;
+import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.sql.SqlCall;
+import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlWriter;
-import org.apache.calcite.sql.dialect.OracleSqlDialect;
+import org.apache.calcite.sql.dialect.H2SqlDialect;
+import org.apache.calcite.sql.dialect.MysqlSqlDialect;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -28,28 +31,26 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import static datart.core.data.provider.StdSqlOperator.*;
 
-public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements SqlStdOperatorSupport {
+public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, FetchAndOffsetSupport {
 
     static ConcurrentSkipListSet<StdSqlOperator> OWN_SUPPORTED = new ConcurrentSkipListSet<>(
-            EnumSet.of(STDDEV, ABS, CEILING, FLOOR, POWER, ROUND, SQRT, EXP, LOG10, RAND, DEGREES, RADIANS,
-            SIGN, ACOS, ASIN, ATAN, ATAN2, SIN, COS, TAN, COT, LENGTH, CONCAT, REPLACE, SUBSTRING, LOWER, UPPER, LTRIM, RTRIM, TRIM,
-            NOW, AGG_DATE_YEAR, AGG_DATE_QUARTER, AGG_DATE_MONTH, AGG_DATE_WEEK, AGG_DATE_DAY));
+            EnumSet.of(AGG_DATE_YEAR, AGG_DATE_QUARTER, AGG_DATE_MONTH, AGG_DATE_WEEK, AGG_DATE_DAY));
 
     static {
         OWN_SUPPORTED.addAll(SUPPORTED);
     }
 
-    public OracleSqlStdOperatorSupport() {
-        this(DEFAULT_CONTEXT);
-    }
-
-    private OracleSqlStdOperatorSupport(Context context) {
+    /**
+     * Creates an H2SqlDialect.
+     *
+     * @param context
+     */
+    public H2Dialect(Context context) {
         super(context);
     }
 
-    @Override
-    public String quoteIdentifier(String val) {
-        return val;
+    public H2Dialect() {
+        this(MysqlSqlDialect.DEFAULT_CONTEXT.withUnquotedCasing(Casing.UNCHANGED).withUnquotedCasing(Casing.UNCHANGED));
     }
 
     @Override
@@ -64,23 +65,24 @@ public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements Sql
     public boolean unparseStdSqlOperator(SqlWriter writer, SqlCall call, int leftPrec, int rightPrec) {
         StdSqlOperator operator = symbolOf(call.getOperator().getName());
         switch (operator) {
-            case NOW:
-                writer.print("SYSDATE");
-                return true;
             case AGG_DATE_YEAR:
-                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY')");
+                writer.print("YEAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ")");
                 return true;
-            case AGG_DATE_QUARTER:
-                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY-Q')");
+            case AGG_DATE_QUARTER: {
+                String columnName = call.getOperandList().get(0).toSqlString(this).getSql();
+                writer.print("CONCAT(FORMATDATETIME("+columnName+",'Y-'),QUARTER("+columnName+"))");
                 return true;
+            }
             case AGG_DATE_MONTH:
-                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY-MM')");
+                writer.print("FORMATDATETIME("+call.getOperandList().get(0).toSqlString(this).getSql()+",'yyyy-MM')");
                 return true;
-            case AGG_DATE_WEEK:
-                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'IYYY-IW')");
+            case AGG_DATE_WEEK: {
+                String columnName = call.getOperandList().get(0).toSqlString(this).getSql();
+                writer.print("CONCAT_WS('-',ISO_YEAR("+columnName+"),RIGHT(100+ISO_WEEK("+columnName+"),2))");
                 return true;
+            }
             case AGG_DATE_DAY:
-                writer.print("TO_CHAR(" + call.getOperandList().get(0).toString() + ",'YYYY-MM-DD')");
+                writer.print("FORMATDATETIME("+call.getOperandList().get(0).toSqlString(this).getSql()+",'yyyy-MM-dd')");
                 return true;
             default:
                 break;
@@ -89,15 +91,12 @@ public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements Sql
     }
 
     @Override
-    public void quoteStringLiteral(StringBuilder buf, String charsetName, String val) {
-        buf.append(literalQuoteString);
-        buf.append(val.replace(literalEndQuoteString, literalEscapedQuote));
-        buf.append(literalEndQuoteString);
+    public void unparseOffsetFetch(SqlWriter writer, SqlNode offset, SqlNode fetch) {
+        unparseFetchUsingLimit(writer, offset, fetch);
     }
 
     @Override
     public Set<StdSqlOperator> supportedOperators() {
         return OWN_SUPPORTED;
     }
-
 }

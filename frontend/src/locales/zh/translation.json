@@ -198,10 +198,24 @@
         "title": "组织设置"
       },
       "export": {
-        "title": "数据导出"
+        "title": "数据导出",
+        "selectText": "选择要导出的数据",
+        "submit": "提交"
       },
       "import": {
-        "title": "数据导入"
+        "title": "数据导入",
+        "submit": "提交",
+        "upload": "上传文件",
+        "file": "文件",
+        "strategy": "策略",
+        "new": "新建",
+        "overwrite": "更新",
+        "rollback": "增量更新",
+        "desc": {
+          "new": "新建：导入的所有资源都会重新创建",
+          "overwrite": "更新：会按照 ID 检测导入资源在数据库中是否已存在，如果存在则做更新处理，如果不存在则新建",
+          "rollback": "增量更新：会按照 ID 检测导入资源在数据库中是否已存在，如果检测到已存在的资源，则报错并回滚本次导入操作；仅在所有检测都通过的情况下才能完成本次导入"
+        }
       }
     },
     "background": {
@@ -1231,7 +1245,8 @@
       },
       "template": {
         "label": "模版文件",
-        "requiredMessage": "导入模板文件"
+        "requiredMessage": "导入模板文件",
+        "upload": "上传模板"
       },
       "parent": "所属目录",
       "root": "根目录",

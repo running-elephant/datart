@@ -20,32 +20,31 @@ package datart.data.provider.calcite.dialect;
 import datart.core.data.provider.StdSqlOperator;
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlWriter;
-import org.apache.calcite.sql.dialect.MssqlSqlDialect;
+import org.apache.calcite.sql.dialect.MysqlSqlDialect;
 
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import static datart.core.data.provider.StdSqlOperator.*;
-import static datart.core.data.provider.StdSqlOperator.COALESCE;
 
-public class MsSqlStdOperatorSupport extends MssqlSqlDialect implements SqlStdOperatorSupport {
+public class MysqlSqlStdOperatorSupport extends MysqlSqlDialect implements SqlStdOperatorSupport, FetchAndOffsetSupport {
 
     static ConcurrentSkipListSet<StdSqlOperator> OWN_SUPPORTED = new ConcurrentSkipListSet<>(
-            EnumSet.of(STDDEV, ABS, MEDIAN, ABS, CEILING, FLOOR, POWER, ROUND, SQRT,
-                    EXP, LN, MOD, TRUNC, SIGN, ACOS, ASIN, ATAN, ATAN2, SIN, COS, TAN,
-                    LENGTH, CONCAT, REPLACE, SUBSTRING, LOWER, UPPER, LTRIM, RTRIM, TRIM,
-                    NOW, COALESCE, AGG_DATE_YEAR, AGG_DATE_QUARTER, AGG_DATE_MONTH, AGG_DATE_WEEK, AGG_DATE_DAY));
+            EnumSet.of(STDDEV, ABS, CEILING, FLOOR, POWER, ROUND, SQRT, EXP, LOG10, LN, MOD, RAND, DEGREES, RADIANS, TRUNC, SIGN,
+            ACOS, ASIN, ATAN, ATAN2, SIN, COS, TAN, COT, LENGTH, CONCAT, REPLACE, SUBSTRING, LOWER, UPPER, LTRIM, RTRIM, TRIM,
+            NOW, DAY, SECOND, MINUTE, HOUR, DAY, WEEK, QUARTER, MONTH, YEAR, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR,
+            IF, COALESCE, AGG_DATE_YEAR, AGG_DATE_QUARTER, AGG_DATE_MONTH, AGG_DATE_WEEK, AGG_DATE_DAY));
 
     static {
         OWN_SUPPORTED.addAll(SUPPORTED);
     }
 
-    public MsSqlStdOperatorSupport() {
+    public MysqlSqlStdOperatorSupport() {
         this(DEFAULT_CONTEXT);
     }
 
-    private MsSqlStdOperatorSupport(Context context) {
+    private MysqlSqlStdOperatorSupport(Context context) {
         super(context);
     }
 
@@ -61,29 +60,40 @@ public class MsSqlStdOperatorSupport extends MssqlSqlDialect implements SqlStdOp
     public boolean unparseStdSqlOperator(SqlWriter writer, SqlCall call, int leftPrec, int rightPrec) {
         StdSqlOperator operator = symbolOf(call.getOperator().getName());
         switch (operator) {
+            case TRUNC:
+                renameCallOperator("TRUNCATE", call);
+                break;
+            case DAY_OF_MONTH:
+                renameCallOperator("DAYOFMONTH", call);
+                break;
             case AGG_DATE_YEAR:
-                writer.print("YEAR(" + call.getOperandList().get(0).toString() + ")");
+                writer.print("YEAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ")");
                 return true;
             case AGG_DATE_QUARTER: {
-                String columnName = call.getOperandList().get(0).toString();
-                writer.print("CONCAT_WS('-',YEAR("+columnName+"),(month("+columnName+")+2)/3)");
+                String columnName = call.getOperandList().get(0).toSqlString(this).getSql();
+                writer.print("CONCAT(DATE_FORMAT("+columnName+",'%Y-'),QUARTER("+columnName+"))");
                 return true;
             }
             case AGG_DATE_MONTH:
-                writer.print("FORMAT(" + call.getOperandList().get(0).toString() + ",'yyyy-MM')");
+                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'%Y-%m')");
                 return true;
-            case AGG_DATE_WEEK: {
-                String columnName = call.getOperandList().get(0).toString();
-                writer.print("CONCAT_WS('-', YEAR("+columnName+"), RIGHT(100+DATEPART(ww,"+columnName+"),2))");
+            case AGG_DATE_WEEK:
+                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'%x-%v')");
                 return true;
-            }
             case AGG_DATE_DAY:
-                writer.print("FORMAT(" + call.getOperandList().get(0).toString() + ",'yyyy-MM-dd')");
+                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'%Y-%m-%d')");
                 return true;
             default:
                 break;
         }
         return false;
+    }
+
+    @Override
+    public void quoteStringLiteral(StringBuilder buf, String charsetName, String val) {
+        buf.append(literalQuoteString);
+        buf.append(val.replace(literalEndQuoteString, literalEscapedQuote));
+        buf.append(literalEndQuoteString);
     }
 
     @Override

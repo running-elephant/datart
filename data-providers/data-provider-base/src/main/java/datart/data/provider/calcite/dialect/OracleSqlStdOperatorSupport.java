@@ -20,7 +20,7 @@ package datart.data.provider.calcite.dialect;
 import datart.core.data.provider.StdSqlOperator;
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlWriter;
-import org.apache.calcite.sql.dialect.MysqlSqlDialect;
+import org.apache.calcite.sql.dialect.OracleSqlDialect;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -28,24 +28,28 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import static datart.core.data.provider.StdSqlOperator.*;
 
-public class MysqlSqlStdOperatorSupport extends MysqlSqlDialect implements SqlStdOperatorSupport, FetchAndOffsetSupport {
+public class OracleSqlStdOperatorSupport extends OracleSqlDialect implements SqlStdOperatorSupport {
 
     static ConcurrentSkipListSet<StdSqlOperator> OWN_SUPPORTED = new ConcurrentSkipListSet<>(
-            EnumSet.of(STDDEV, ABS, CEILING, FLOOR, POWER, ROUND, SQRT, EXP, LOG10, LN, MOD, RAND, DEGREES, RADIANS, TRUNC, SIGN,
-            ACOS, ASIN, ATAN, ATAN2, SIN, COS, TAN, COT, LENGTH, CONCAT, REPLACE, SUBSTRING, LOWER, UPPER, LTRIM, RTRIM, TRIM,
-            NOW, DAY, SECOND, MINUTE, HOUR, DAY, WEEK, QUARTER, MONTH, YEAR, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR,
-            IF, COALESCE, AGG_DATE_YEAR, AGG_DATE_QUARTER, AGG_DATE_MONTH, AGG_DATE_WEEK, AGG_DATE_DAY));
+            EnumSet.of(STDDEV, ABS, CEILING, FLOOR, POWER, ROUND, SQRT, EXP, LOG10, RAND, DEGREES, RADIANS,
+            SIGN, ACOS, ASIN, ATAN, ATAN2, SIN, COS, TAN, COT, LENGTH, CONCAT, REPLACE, SUBSTRING, LOWER, UPPER, LTRIM, RTRIM, TRIM,
+            NOW, AGG_DATE_YEAR, AGG_DATE_QUARTER, AGG_DATE_MONTH, AGG_DATE_WEEK, AGG_DATE_DAY));
 
     static {
         OWN_SUPPORTED.addAll(SUPPORTED);
     }
 
-    public MysqlSqlStdOperatorSupport() {
+    public OracleSqlStdOperatorSupport() {
         this(DEFAULT_CONTEXT);
     }
 
-    private MysqlSqlStdOperatorSupport(Context context) {
+    private OracleSqlStdOperatorSupport(Context context) {
         super(context);
+    }
+
+    @Override
+    public String quoteIdentifier(String val) {
+        return val;
     }
 
     @Override
@@ -60,28 +64,23 @@ public class MysqlSqlStdOperatorSupport extends MysqlSqlDialect implements SqlSt
     public boolean unparseStdSqlOperator(SqlWriter writer, SqlCall call, int leftPrec, int rightPrec) {
         StdSqlOperator operator = symbolOf(call.getOperator().getName());
         switch (operator) {
-            case TRUNC:
-                renameCallOperator("TRUNCATE", call);
-                break;
-            case DAY_OF_MONTH:
-                renameCallOperator("DAYOFMONTH", call);
-                break;
+            case NOW:
+                writer.print("SYSDATE");
+                return true;
             case AGG_DATE_YEAR:
-                writer.print("YEAR(" + call.getOperandList().get(0).toString() + ")");
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'YYYY')");
                 return true;
-            case AGG_DATE_QUARTER: {
-                String columnName = call.getOperandList().get(0).toString();
-                writer.print("CONCAT(DATE_FORMAT("+columnName+",'%Y-'),QUARTER("+columnName+"))");
+            case AGG_DATE_QUARTER:
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'YYYY-Q')");
                 return true;
-            }
             case AGG_DATE_MONTH:
-                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toString() + ",'%Y-%m')");
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'YYYY-MM')");
                 return true;
             case AGG_DATE_WEEK:
-                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toString() + ",'%x-%v')");
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'IYYY-IW')");
                 return true;
             case AGG_DATE_DAY:
-                writer.print("DATE_FORMAT(" + call.getOperandList().get(0).toString() + ",'%Y-%m-%d')");
+                writer.print("TO_CHAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ",'YYYY-MM-DD')");
                 return true;
             default:
                 break;
@@ -100,4 +99,5 @@ public class MysqlSqlStdOperatorSupport extends MysqlSqlDialect implements SqlSt
     public Set<StdSqlOperator> supportedOperators() {
         return OWN_SUPPORTED;
     }
+
 }

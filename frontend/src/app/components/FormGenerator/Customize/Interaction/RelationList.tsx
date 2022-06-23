@@ -19,6 +19,7 @@
 import { Button, Radio, Select, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import useMount from 'app/hooks/useMount';
+import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { fetchDataChart } from 'app/utils/fetch';
@@ -46,9 +47,7 @@ const RelationList: FC<
   translate: t,
 }) => {
   const [targetFields, setTargetFields] = useState<ChartDataViewMeta[]>([]);
-  const [targetVariables, setTargetVariables] = useState<ChartDataViewMeta[]>(
-    [],
-  );
+  const [targetVariables, setTargetVariables] = useState<Variable[]>([]);
 
   useMount(async () => {
     if (targetRelId) {
