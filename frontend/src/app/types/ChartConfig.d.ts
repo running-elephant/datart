@@ -21,6 +21,8 @@ import {
   ChartDataSectionType,
   ChartDataViewFieldCategory,
   ChartStyleSectionComponentType,
+  ControllerFacadeTypes,
+  ControllerVisibilityTypes,
   DataViewFieldType,
   FieldFormatType,
   FilterConditionType,
@@ -28,10 +30,6 @@ import {
 } from 'app/constants';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import {
-  ControllerFacadeTypes,
-  ControllerVisibilityTypes,
-} from 'app/types/FilterControlPanel';
 import {
   FilterSqlOperator,
   NumberUnitKey,

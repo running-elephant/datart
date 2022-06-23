@@ -961,7 +961,7 @@ export const variableToFilter = (
   return Object.entries(queryVariables || {}).map(([k, v]) => {
     return {
       sqlOperator: FilterSqlOperator.In,
-      column: k,
+      column: [k],
       values: v?.map(value => ({ value, valueType: 'STRING' })),
     };
   });
