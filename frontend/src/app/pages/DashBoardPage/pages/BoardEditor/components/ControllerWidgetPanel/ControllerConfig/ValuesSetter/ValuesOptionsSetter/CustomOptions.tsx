@@ -21,6 +21,7 @@ import { RelationFilterValue } from 'app/types/ChartConfig';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ControllerConfig } from '../../../types';
+import i18next from 'i18next';
 export interface CustomOptionsProps {
   form: FormInstance<{ config: ControllerConfig }> | undefined;
   fieldRowData: RelationFilterValue[];
@@ -82,7 +83,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
     };
     const columns = [
       {
-        title: '备选项值',
+        title: i18next.t('viz.control.value'),
         dataIndex: 'key',
         width: '30%',
         sorter: (rowA, rowB) => {
@@ -91,7 +92,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
         editable: true,
       },
       {
-        title: '备选项标签',
+        title: i18next.t('viz.control.label'),
         dataIndex: 'label',
         width: '40%',
         sorter: (rowA, rowB) => {
@@ -100,7 +101,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
         editable: true,
       },
       {
-        title: '操作',
+        title: i18next.t('viz.control.action'),
         dataIndex: 'action',
         width: '30%',
         render: (_, record: RelationFilterValue) => (
@@ -115,11 +116,11 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
                 });
               }}
             >
-              {record.isSelected ? '取消默认值' : '设为默认值'}
+              {record.isSelected ? i18next.t('viz.control.unsetDefault') : i18next.t('viz.control.setDefault')}
             </a>
 
             <a href="#!" onClick={() => handleDelete(record.key)}>
-              删除
+              {i18next.t('viz.control.delete')}
             </a>
           </Space>
         ),
@@ -155,7 +156,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
       <Wrapper>
         <div>
           <Space>
-            <Button onClick={addRowByField}>从字段填充备选项</Button>
+            <Button onClick={addRowByField}>{i18next.t('viz.control.populate')}</Button>
             <Button onClick={handleAdd} type="primary">
               +
             </Button>
