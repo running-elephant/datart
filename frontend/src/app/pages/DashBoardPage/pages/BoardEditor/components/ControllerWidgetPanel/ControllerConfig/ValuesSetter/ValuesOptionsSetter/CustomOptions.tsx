@@ -21,7 +21,8 @@ import { RelationFilterValue } from 'app/types/ChartConfig';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ControllerConfig } from '../../../types';
-import i18next from 'i18next';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
+
 export interface CustomOptionsProps {
   form: FormInstance<{ config: ControllerConfig }> | undefined;
   fieldRowData: RelationFilterValue[];
@@ -30,7 +31,7 @@ export interface CustomOptionsProps {
 export const CustomOptions: React.FC<CustomOptionsProps> = memo(
   ({ fieldRowData, form, getControllerConfig }) => {
     const [rows, setRows] = useState<RelationFilterValue[]>([]);
-
+    const t = useI18NPrefix(`viz.control`);
     const onChangeFilterOptions = useCallback(
       (rows: RelationFilterValue[]) => {
         setRows(rows);
@@ -83,7 +84,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
     };
     const columns = [
       {
-        title: i18next.t('viz.control.value'),
+        title: t('value'),
         dataIndex: 'key',
         width: '30%',
         sorter: (rowA, rowB) => {
@@ -92,7 +93,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
         editable: true,
       },
       {
-        title: i18next.t('viz.control.label'),
+        title: t('label'),
         dataIndex: 'label',
         width: '40%',
         sorter: (rowA, rowB) => {
@@ -101,7 +102,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
         editable: true,
       },
       {
-        title: i18next.t('viz.control.action'),
+        title: t('action'),
         dataIndex: 'action',
         width: '30%',
         render: (_, record: RelationFilterValue) => (
@@ -116,11 +117,11 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
                 });
               }}
             >
-              {record.isSelected ? i18next.t('viz.control.unsetDefault') : i18next.t('viz.control.setDefault')}
+              {record.isSelected ? t('unsetDefault') : t('setDefault')}
             </a>
 
             <a href="#!" onClick={() => handleDelete(record.key)}>
-              {i18next.t('viz.control.delete')}
+              {t('delete')}
             </a>
           </Space>
         ),
@@ -156,7 +157,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
       <Wrapper>
         <div>
           <Space>
-            <Button onClick={addRowByField}>{i18next.t('viz.control.populate')}</Button>
+            <Button onClick={addRowByField}>{t('populate')}</Button>
             <Button onClick={handleAdd} type="primary">
               +
             </Button>
