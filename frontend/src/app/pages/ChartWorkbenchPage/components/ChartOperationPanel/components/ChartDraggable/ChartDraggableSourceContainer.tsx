@@ -234,11 +234,11 @@ export const ChartDraggableSourceContainer: FC<
               </div>
             }
           >
-            {dateLevelFields?.map((item, i) => {
+            {children?.map((item, i) => {
               return (
                 <DateLevelFieldContainer
                   key={i}
-                  item={item}
+                  item={item as any}
                   onClearCheckedList={onClearCheckedList}
                 />
               );
@@ -267,19 +267,19 @@ export const ChartDraggableSourceContainer: FC<
       </Row>
     );
   }, [
-    type,
     role,
+    type,
+    category,
     colName,
-    showChild,
-    setShowChild,
+    drag,
+    children,
     onDeleteComputedField,
     onEditComputedField,
-    category,
-    t,
-    onClearCheckedList,
-    drag,
     isViewComputerField,
-    dateLevelFields,
+    t,
+    showChild,
+    setShowChild,
+    onClearCheckedList,
   ]);
 
   const renderChildren = useMemo(() => {
