@@ -101,7 +101,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 let config: ChartDataSectionField = {
                   uid: uuidv4(),
                   ...val,
-                  aggregate: getDefaultAggregate(val),
+                  aggregate: getDefaultAggregate(val, currentConfig),
                 };
                 if (
                   val.category ===
@@ -128,7 +128,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               hierarchyChildFields.map(val => ({
                 uid: uuidv4(),
                 ...val,
-                aggregate: getDefaultAggregate(val),
+                aggregate: getDefaultAggregate(val, currentConfig),
               })),
             );
             updateCurrentConfigColumns(currentConfig, currentColumns, true);
@@ -146,7 +146,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 currentConfig?.rows || [],
                 draft => {
                   draft.splice(originItemIndex, 1);
-                  item.aggregate = getDefaultAggregate(item);
+                  item.aggregate = getDefaultAggregate(item, currentConfig);
                   return draft.splice(item?.index!, 0, item);
                 },
               );
@@ -159,7 +159,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               const currentColumns = updateBy(
                 currentConfig?.rows || [],
                 draft => {
-                  item.aggregate = getDefaultAggregate(item);
+                  item.aggregate = getDefaultAggregate(item, currentConfig);
                   return draft.splice(item?.index!, 0, item);
                 },
               );
