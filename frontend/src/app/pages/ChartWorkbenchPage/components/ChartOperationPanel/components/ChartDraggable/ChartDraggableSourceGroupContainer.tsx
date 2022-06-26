@@ -124,7 +124,6 @@ export const ChartDraggableSourceGroupContainer: FC<{
               role={item.role}
               children={item.children}
               viewType={dataView?.type}
-              dateLevelFields={item?.dateLevelFields}
               isViewComputerField={item.computedFieldsType}
               onDeleteComputedField={onDeleteComputedField}
               onEditComputedField={handleEditComputedField}
