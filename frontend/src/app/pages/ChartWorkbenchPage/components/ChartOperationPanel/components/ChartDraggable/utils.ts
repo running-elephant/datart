@@ -46,7 +46,7 @@ export const updateDataConfigByField = (
 };
 export const getDefaultAggregate = (
   item: ChartDataSectionField,
-  config?: ChartDataConfig,
+  config: ChartDataConfig,
 ) => {
   if (
     config?.type === ChartDataSectionType.Aggregate ||
