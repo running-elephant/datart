@@ -462,8 +462,8 @@
           "tableHeaderLabel": "Title",
           "tableHeaderAction": "Operation",
           "deleteRow": "Delete",
-          "setDefault": "As Default",
-          "setUnDefault": "As Undefault",
+          "setDefault": "Set Default",
+          "setUnDefault": "Unset Default",
           "addRow": "Add Row",
           "AddFromFields": "Add Row Current Field",
           "associateField": "Associate Field",
@@ -1222,7 +1222,14 @@
       "showMark": "Show Mark",
       "common": "General",
       "custom": "Customize",
-      "optionLabelField": "Option Label Field"
+      "optionLabelField": "Option Label Field",
+      "value": "Value",
+      "label": "Label",
+      "action": "Action",
+      "unsetDefault": "Unset Default",
+      "setDefault": "Set Default",
+      "delete": "Delete",
+      "populate": "Populate From Field Values"
     },
     "date": {
       "year": "Year",
