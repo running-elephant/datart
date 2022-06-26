@@ -17,7 +17,6 @@
  */
 
 import {
-  AggregateFieldSubAggregateType,
   ChartDataSectionFieldActionType,
   ChartDataSectionType,
   ChartDataViewFieldCategory,
@@ -53,7 +52,7 @@ import { uuidv4 } from 'utils/utils';
 import ChartDraggableElement from './ChartDraggableElement';
 import ChartDraggableElementField from './ChartDraggableElementField';
 import ChartDraggableElementHierarchy from './ChartDraggableElementHierarchy';
-import { updateDataConfigByField } from './utils';
+import { getDefaultAggregate, updateDataConfigByField } from './utils';
 
 type DragItem = {
   index?: number;
@@ -239,43 +238,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       const newCurrentConfig = updateByKey(currentConfig, 'rows', newColumns);
       setCurrentConfig(newCurrentConfig);
       onConfigChanged?.(ancestors, newCurrentConfig, refreshDataset);
-    };
-
-    const getDefaultAggregate = (item: ChartDataSectionField) => {
-      if (
-        currentConfig?.type === ChartDataSectionType.Aggregate ||
-        currentConfig?.type === ChartDataSectionType.Size ||
-        currentConfig?.type === ChartDataSectionType.Info ||
-        currentConfig?.type === ChartDataSectionType.Mixed
-      ) {
-        if (
-          currentConfig.disableAggregate ||
-          item.category === ChartDataViewFieldCategory.AggregateComputedField
-        ) {
-          return;
-        }
-        if (item.aggregate) {
-          return item.aggregate;
-        }
-
-        let aggType: string = '';
-        if (currentConfig?.actions instanceof Array) {
-          currentConfig?.actions?.find(
-            type =>
-              type === ChartDataSectionFieldActionType.Aggregate ||
-              type === ChartDataSectionFieldActionType.AggregateLimit,
-          );
-        } else if (currentConfig?.actions instanceof Object) {
-          aggType = currentConfig?.actions?.[item?.type]?.find(
-            type =>
-              type === ChartDataSectionFieldActionType.Aggregate ||
-              type === ChartDataSectionFieldActionType.AggregateLimit,
-          );
-        }
-        if (aggType) {
-          return AggregateFieldSubAggregateType?.[aggType]?.[0];
-        }
-      }
     };
 
     const onDraggableItemMove = (dragIndex: number, hoverIndex: number) => {
