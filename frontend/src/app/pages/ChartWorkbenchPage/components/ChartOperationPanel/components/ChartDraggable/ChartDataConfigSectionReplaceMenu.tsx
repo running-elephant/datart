@@ -39,7 +39,6 @@ export const ChartDataConfigSectionReplaceMenu: FC<{
   columnConfig,
   onConfigChanged,
 }) => {
-  console.log('__ menu viewFields', viewFields);
   const handleFieldConfigChanged = (item: ChartDataViewMeta) => {
     const newFieldConfig: ChartDataSectionField = {
       ...item,
