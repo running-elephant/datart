@@ -32,6 +32,7 @@ export interface BoardPageItemProps {
 }
 export const BoardPageItem: React.FC<BoardPageItemProps> = memo(
   ({ boardId }) => {
+    // TODO(Stephen): fix code to make pure action creator
     const dashboard = useSelector((state: { board: BoardState }) =>
       makeSelectBoardConfigById()(state, boardId),
     );

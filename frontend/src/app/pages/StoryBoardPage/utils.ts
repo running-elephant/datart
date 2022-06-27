@@ -18,7 +18,6 @@
 
 import { migrateStoryConfig } from 'app/migration/StoryConfig/migrateStoryConfig';
 import { migrateStoryPageConfig } from 'app/migration/StoryConfig/migrateStoryPageConfig';
-import { generateShareLinkAsync } from 'app/utils/fetch';
 import {
   ServerStoryBoard,
   StoryBoard,

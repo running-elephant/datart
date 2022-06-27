@@ -138,7 +138,7 @@ export const Resource = memo(() => {
 
   return (
     <Container title="reference">
-      <Searchbar>
+      <SearchBar>
         <Col span={24}>
           <Input
             prefix={<SearchOutlined className="icon" />}
@@ -148,7 +148,7 @@ export const Resource = memo(() => {
             onChange={debouncedSearch}
           />
         </Col>
-      </Searchbar>
+      </SearchBar>
       <TreeWrapper ref={treeWrapperRef}>
         <Tree
           className="medium"
@@ -165,7 +165,7 @@ export const Resource = memo(() => {
   );
 });
 
-const Searchbar = styled(Row)`
+const SearchBar = styled(Row)`
   .input {
     padding-bottom: ${SPACE_XS};
   }

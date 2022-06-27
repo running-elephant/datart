@@ -30,6 +30,7 @@ export const dataviewsSelector = createSelector(
   wb => wb.dataviews,
 );
 
+// TODO(Stephen): fix to use pure action creator
 export const makeDataviewTreeSelector = () =>
   createSelector(
     [

@@ -149,7 +149,7 @@ const ChartComputedFieldSettingPanel: FC<{
     }
   };
 
-  const handleFieldFuncionSelected = funName => {
+  const handleFieldFunctionSelected = funName => {
     const functionDescription = ComputedFunctionDescriptions.find(
       f => f.name === funName,
     );
@@ -267,7 +267,7 @@ const ChartComputedFieldSettingPanel: FC<{
             />
             <ChartSearchableList
               source={getFunctionList()}
-              onItemSelected={handleFieldFuncionSelected}
+              onItemSelected={handleFieldFunctionSelected}
             />
           </Space>
         </Col>

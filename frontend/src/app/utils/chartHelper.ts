@@ -108,7 +108,7 @@ export function toFormattedValue(
     return '-';
   }
 
-  if (!format || format.type === FieldFormatType.Defalut) {
+  if (!format || format.type === FieldFormatType.Default) {
     return value;
   }
 

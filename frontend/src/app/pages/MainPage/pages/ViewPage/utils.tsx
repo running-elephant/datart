@@ -117,7 +117,7 @@ export function transformQueryResultToModelAndDataSource(
         name,
         type: hierarchyColumn?.type || type,
         primaryKey,
-        category: hierarchyColumn?.category || ColumnCategories.Uncategorized, // FIXME: model 重构时一起改
+        category: hierarchyColumn?.category || ColumnCategories.UnCategorized, // FIXME: model 重构时一起改
       },
     };
   }, {});

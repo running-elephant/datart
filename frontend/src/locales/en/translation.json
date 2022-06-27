@@ -640,7 +640,16 @@
           "normal": "Normal",
           "bold": "Bold",
           "bolder": "Bolder",
-          "lighter": "Lighter"
+          "lighter": "Lighter",
+          "100": "100",
+          "200": "100",
+          "300": "100",
+          "400": "100",
+          "500": "100",
+          "600": "100",
+          "700": "100",
+          "800": "100",
+          "900": "100"
         },
         "fontStyle": {
           "normal": "Normal",

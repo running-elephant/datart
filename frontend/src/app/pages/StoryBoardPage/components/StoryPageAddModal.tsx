@@ -18,10 +18,8 @@
 import { Modal, Table } from 'antd';
 import { RowSelectionType } from 'antd/lib/table/interface';
 import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
-import React, { useEffect, useState } from 'react';
 import i18next from 'i18next';
-
-// import { ChartWidget } from '../../../types';
+import React, { useEffect, useState } from 'react';
 
 export interface IProps {
   // dataCharts: DataChart[];

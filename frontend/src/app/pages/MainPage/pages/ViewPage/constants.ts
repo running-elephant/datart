@@ -17,7 +17,7 @@
  */
 
 export enum ColumnCategories {
-  Uncategorized = 'UNCATEGORIZED',
+  UnCategorized = 'UNCATEGORIZED',
   Country = 'COUNTRY',
   ProvinceOrState = 'PROVINCEORSTATE',
   City = 'CITY',

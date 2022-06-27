@@ -563,10 +563,10 @@ const DataModelTree: FC = memo(() => {
       );
       if (isNameConflict) {
         message.error(
-          'The computed field has already been exist, please choose anohter one!',
+          'The computed field has already been exist, please choose another one!',
         );
         return Promise.reject(
-          'The computed field has already been exist, please choose anohter one!',
+          'The computed field has already been exist, please choose another one!',
         );
       }
 
@@ -729,6 +729,7 @@ const DataModelTree: FC = memo(() => {
 export default DataModelTree;
 
 const StyledDroppableContainer = styled.div<{ isDraggingOver }>`
+  overflow: auto;
   user-select: 'none';
 `;
 

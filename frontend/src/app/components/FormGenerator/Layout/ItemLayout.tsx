@@ -192,9 +192,9 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <LegendType {...props} />;
         case ChartStyleSectionComponentType.LEGEND_POSITION:
           return <LegendPosition {...props} />;
-        case ChartStyleSectionComponentType.SCORECARD_CONDITIONAL_SYTLE:
+        case ChartStyleSectionComponentType.SCORECARD_CONDITIONAL_STYLE:
           return <ScorecardConditionalStylePanel {...props} />;
-        case ChartStyleSectionComponentType.PIOVTSHEET_THEME:
+        case ChartStyleSectionComponentType.PIVOT_SHEET_THEME:
           return <PivotSheetTheme {...props} />;
         case ChartStyleSectionComponentType.BACKGROUND:
           return <Background {...props} />;

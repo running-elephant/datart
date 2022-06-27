@@ -46,8 +46,8 @@ const AggregationOperationMenu: FC<{
 
   return (
     <Aggregation>
-      {t('aggregationSwitch')}
-      <Switch checked={checkedValue} onChange={onChange} />
+      {t('aggregationSwitch') + ' '}
+      <Switch checked={checkedValue} size="small" onChange={onChange} />
     </Aggregation>
   );
 });
