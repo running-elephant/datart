@@ -344,10 +344,9 @@ class PivotSheetChart extends ReactChart {
       },
       palette: {
         basicColors: this.getThemeColorList(styleConfigs),
-        semanticColors: {
-          red: '#FF4D4F',
-          green: '#29A294',
-        },
+        semanticColors: {},
+        brandColor: '#3471F9',
+        basicColorRelations: [],
       },
       onRowCellCollapseTreeRows: ({ isCollapsed, node }) => {
         this.collapsedRows[node.id] = isCollapsed;
