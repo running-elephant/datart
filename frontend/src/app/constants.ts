@@ -16,8 +16,7 @@
  * limitations under the License.
  */
 
-import { FONT_FAMILY } from '@antv/s2';
-import { G90 } from 'styles/StyleConstants';
+import { FONT_FAMILY, G90 } from 'styles/StyleConstants';
 import { IFontDefault } from 'types';
 
 export enum TenantManagementMode {
