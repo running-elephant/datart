@@ -99,7 +99,7 @@ export enum SortActionType {
 }
 
 export enum FieldFormatType {
-  Defalut = 'default',
+  Default = 'default',
   Numeric = 'numeric',
   Currency = 'currency',
   Percentage = 'percentage',
@@ -222,8 +222,8 @@ export const ChartStyleSectionComponentType = {
   LEGEND_TYPE: 'legendType',
   LEGEND_POSITION: 'legendPosition',
   SCORECARD_LIST_TEMPLATE: 'scorecardListTemplate',
-  SCORECARD_CONDITIONAL_SYTLE: 'scorecardConditionalStyle',
-  PIOVTSHEET_THEME: 'pivotSheetTheme',
+  SCORECARD_CONDITIONAL_STYLE: 'scorecardConditionalStyle',
+  PIVOT_SHEET_THEME: 'pivotSheetTheme',
   BACKGROUND: 'background',
   WIDGET_BORDER: 'widgetBorder',
   TIMER_FORMAT: 'timerFormat',

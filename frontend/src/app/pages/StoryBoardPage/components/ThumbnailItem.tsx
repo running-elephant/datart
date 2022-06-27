@@ -73,7 +73,9 @@ const ThumbnailItem: React.FC<IProps> = ({
           thumbnail,
         }),
       );
-    } catch (error) {}
+    } catch (error) {
+      // TODO(Stephen): why the original code eat error, try to remove catch
+    }
     // storyActions.updateStoryPageNameAndThumbnail
   }, [dashboard, dispatch, page.id, page.storyId]);
   const [{ handlerId }, drop] = useDrop({

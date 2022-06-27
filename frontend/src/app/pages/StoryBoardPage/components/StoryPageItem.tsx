@@ -49,7 +49,7 @@ const StoryPageItem: React.FC<{
   return (
     <SectionWrap
       className="story-page"
-      data-transition={`${effectIn}${' '}${effectOut}`}
+      data-transition={`${effectIn} ${effectOut}`}
       data-transition-speed={speed}
     >
       {SlideContent}

@@ -4,7 +4,7 @@ import { lazyLoad } from 'utils/loadable';
 
 const LoadingIndicator = () => <div>Loading</div>;
 
-const LazyComponenWithDefaultExport = lazyLoad(
+const LazyComponentWithDefaultExport = lazyLoad(
   () => import('utils/testing/loadable.mock'),
 );
 
@@ -25,7 +25,7 @@ describe('loadable', () => {
   it('should render null by default', () => {
     const {
       container: { firstChild },
-    } = render(<LazyComponenWithDefaultExport />);
+    } = render(<LazyComponentWithDefaultExport />);
     expect(firstChild).toMatchSnapshot();
   });
 

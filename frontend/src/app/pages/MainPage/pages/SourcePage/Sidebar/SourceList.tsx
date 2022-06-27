@@ -18,12 +18,11 @@
 
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import classnames from 'classnames';
-import React, { memo, useCallback, useEffect } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import { errorHandle } from 'utils/utils';
 import { List, ListItem } from '.';
-import { selectSourceListLoading } from '../slice/selectors';
 import { getSources } from '../slice/thunks';
 import { Source } from '../slice/types';
 
@@ -36,7 +35,6 @@ export const SourceList = memo(({ sourceId, list }: SourceListProps) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const orgId = useSelector(selectOrgId);
-  const listLoading = useSelector(selectSourceListLoading);
 
   useEffect(() => {
     dispatch(getSources(orgId));

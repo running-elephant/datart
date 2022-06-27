@@ -140,16 +140,6 @@ export const StoryPagePreview: React.FC<{
     );
   }, [dispatch, currentPageIndex, sortedPages, storyId]);
 
-  // 自动加载所有
-  // useEffect(() => {
-  //   sortedPages.forEach(page => {
-  //     try {
-  //       const { relId, relType } = page;
-  //       dispatch(getPageContentDetail({ relId, relType }));
-  //     } catch (error) {}
-  //   });
-  // }, [dispatch, sortedPages]);
-
   return (
     <DndProvider backend={HTML5Backend}>
       <StoryContext.Provider

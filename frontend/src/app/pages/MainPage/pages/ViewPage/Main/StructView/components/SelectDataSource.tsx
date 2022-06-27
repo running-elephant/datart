@@ -78,7 +78,7 @@ const SelectDataSource = memo(
     const [sources, setSources] = useState<Source[]>(propsSources);
     const [visible, setVisible] = useState<boolean>(false);
 
-    const hanldeCurrentSources = useCallback(
+    const handleCurrentSources = useCallback(
       ({ key }) => {
         const selectSources = sources?.[key];
         setCurrentSources(selectSources);
@@ -299,7 +299,7 @@ const SelectDataSource = memo(
                   placeholder={t('searchSource')}
                   onChange={FilterSources}
                 />
-                <MenuWrapper onClick={hanldeCurrentSources}>
+                <MenuWrapper onClick={handleCurrentSources}>
                   {sources && sources.length > 0 ? (
                     sources.map((v, i) => {
                       return (
