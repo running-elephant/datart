@@ -1222,7 +1222,14 @@
       "showMark": "显示标签",
       "common": "常规",
       "custom": "自定义",
-      "optionLabelField": "取值文本字段"
+      "optionLabelField": "取值文本字段",
+      "value": "备选项值",
+      "label": "备选项标签",
+      "action": "操作",
+      "unsetDefault": "取消默认值",
+      "setDefault": "设为默认值",
+      "delete": "删除",
+      "populate": "从字段填充备选项"
     },
     "date": {
       "year": "年",
