@@ -17,9 +17,9 @@
  */
 
 import {
-  EllipsisOutlined,
   FormOutlined,
   InfoCircleOutlined,
+  MoreOutlined,
 } from '@ant-design/icons';
 import { Button, Menu, message, Space, Tooltip, TreeSelect } from 'antd';
 import { MenuListItem, Popup, ToolbarButton } from 'app/components';
@@ -349,8 +349,8 @@ const ChartDataViewPanel: FC<{
       );
 
       return [
-        ...columnTreeData,
         ...hierarchyFields,
+        ...columnTreeData,
         ...stringComFields,
         ...numericComFields,
         ...dateComFields,
@@ -511,7 +511,7 @@ const ChartDataViewPanel: FC<{
             </Menu>
           }
         >
-          <ToolbarButton icon={<EllipsisOutlined />} size="small" />
+          <ToolbarButton icon={<MoreOutlined />} size="small" />
         </Popup>
         {modalContextHolder}
       </Header>
