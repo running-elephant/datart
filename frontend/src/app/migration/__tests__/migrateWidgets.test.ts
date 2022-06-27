@@ -17,7 +17,7 @@
  */
 
 import { FONT_DEFAULT } from 'app/constants';
-import { convertControllerConfigToBeta4 } from 'app/migration/BoardConfig/utils/beta4utils';
+import { convertControllerConfigTobeta4_1 } from 'app/migration/BoardConfig/utils/beta4utils';
 import { ServerRelation } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { WidgetConf } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
@@ -26,6 +26,7 @@ import {
 } from '../BoardConfig/migrateWidgets';
 import { WidgetBeta3 } from '../BoardConfig/types';
 import { APP_VERSION_BETA_0 } from '../constants';
+
 describe('test migrateWidgets ', () => {
   test('should return undefined  when widget.config.type === filter', () => {
     const widget1 = {
@@ -99,10 +100,10 @@ describe('test migrateWidgets ', () => {
     expect(convertWidgetRelationsToObj(relations1)).toMatchObject(relations2);
   });
 
-  test('convertControllerConfigToBeta4 function', () => {
+  test('convertControllerConfigTobeta4_1 function', () => {
     const config = {
       clientId: 'client_18c64442-a192-4f26-8582-0385cb3b2b32',
-      version: '1.0.0-beta.4',
+      version: '1.0.0-beta.4+1',
       index: 9,
       name: '23456y',
       boardType: 'auto',
@@ -142,10 +143,10 @@ describe('test migrateWidgets ', () => {
         },
       },
     } as WidgetConf;
-    expect(convertControllerConfigToBeta4(config)).toEqual(config);
+    expect(convertControllerConfigTobeta4_1(config)).toEqual(config);
     const config1 = {
       clientId: 'client_18c64442-a192-4f26-8582-0385cb3b2b32',
-      version: '1.0.0-beta.4',
+      version: '1.0.0-beta.4+1',
       index: 9,
       name: '23456y',
       boardType: 'auto',
@@ -185,9 +186,9 @@ describe('test migrateWidgets ', () => {
         },
       },
     } as WidgetConf;
-    expect(convertControllerConfigToBeta4(config1)).toEqual({
+    expect(convertControllerConfigTobeta4_1(config1)).toEqual({
       clientId: 'client_18c64442-a192-4f26-8582-0385cb3b2b32',
-      version: '1.0.0-beta.4',
+      version: '1.0.0-beta.4+1',
       index: 9,
       name: '23456y',
       boardType: 'auto',
