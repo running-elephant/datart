@@ -110,9 +110,10 @@ export function transformQueryResultToModelAndDataSource(
       name,
       lastModel?.hierarchy || {},
     );
+    const key = viewType === 'STRUCT' ? JSON.parse(name).join('.') : name;
     return {
       ...obj,
-      [name]: {
+      [key]: {
         name,
         type: hierarchyColumn?.type || type,
         primaryKey,
@@ -122,8 +123,10 @@ export function transformQueryResultToModelAndDataSource(
   }, {});
   const dataSource = rows.map(arr =>
     arr.reduce((obj, val, index) => {
-      const key = columns[index].name;
-
+      const key =
+        viewType === 'STRUCT'
+          ? JSON.parse(columns[index].name).join('.')
+          : columns[index].name;
       return {
         ...obj,
         [key]: val,
@@ -441,8 +444,7 @@ export function addPathToHierarchyStructureAndChangeName(
                 : children.name;
           }
         });
-      }
-      if (!column['path']) {
+      } else if (!column['path']) {
         column['path'] =
           viewType === 'STRUCT' ? JSON.parse(column.name) : [name];
 
@@ -475,7 +477,7 @@ export function buildRequestColumns(tableJSON: StructViewQueryProps) {
   tableJSON.columns.forEach((v, i) => {
     const tableName = tableJSON.table[tableJSON.table.length - 1];
     columns.push({
-      alias: [tableName, v].join('.'),
+      alias: JSON.stringify([tableName, v]),
       column: [tableName, v],
     });
   });
@@ -483,7 +485,7 @@ export function buildRequestColumns(tableJSON: StructViewQueryProps) {
     const tableName = join.table?.[join.table?.length - 1];
     join.columns?.forEach(column => {
       columns.push({
-        alias: [tableName, column].join('.'),
+        alias: JSON.stringify([tableName, column]),
         column: [tableName, column],
       });
     });
