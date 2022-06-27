@@ -36,6 +36,7 @@ import {
 } from 'app/types/ChartDataRequest';
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { getRuntimeDateLevelFields, getValue } from 'app/utils/chartHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
@@ -66,7 +67,7 @@ export class ChartDataRequestBuilder {
   variableParams?: Record<string, any[]>;
 
   constructor(
-    dataView: Pick<ChartDataView, 'id' | 'computedFields' | 'type'> & {
+    dataView: Pick<ChartDataView, 'id' | 'computedFields' | 'type' | 'meta'> & {
       config: string | object;
     },
     dataConfigs?: ChartDataConfig[],
@@ -532,13 +533,23 @@ export class ChartDataRequestBuilder {
     );
   }
 
+  private removeInvalidFilter(filters: ChartDataRequestFilter[]) {
+    const dataViewFieldsNames = (
+      (this.dataView?.meta as ChartDataViewMeta[]) || []
+    ).map(c => c?.id);
+    return (filters || []).filter(f => {
+      return dataViewFieldsNames.includes(JSON.stringify(f.column));
+    });
+  }
+
   public build(): ChartDataRequest {
+    const validFilters = this.removeInvalidFilter(this.buildFilters());
     return {
       ...this.buildViewConfigs(),
       viewId: this.dataView?.id,
       aggregators: this.buildAggregators(),
       groups: this.buildGroups(),
-      filters: this.buildFilters(),
+      filters: validFilters,
       orders: this.buildOrders(),
       pageInfo: this.buildPageInfo(),
       functionColumns: this.buildFunctionColumns(),
@@ -549,12 +560,15 @@ export class ChartDataRequestBuilder {
   }
 
   public buildDetails(): ChartDataRequest {
+    const validFilters = this.removeInvalidFilter(
+      this.buildFilters().filter(f => !f.aggOperator),
+    );
     return {
       ...this.buildViewConfigs(),
       viewId: this.dataView?.id,
       aggregators: [],
       groups: [],
-      filters: this.buildFilters().filter(f => !f.aggOperator),
+      filters: validFilters,
       orders: [],
       pageInfo: this.buildPageInfo(),
       functionColumns: this.buildFunctionColumns(),

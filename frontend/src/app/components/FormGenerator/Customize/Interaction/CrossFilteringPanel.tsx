@@ -100,7 +100,7 @@ const CrossFilteringPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           <Form.Item label={t('crossFiltering.rule.title')} name="rule">
             <CrossFilteringRuleList
               widgetId={context?.widgetId}
-              boardVizs={Object.values(context?.boardVizs)}
+              boardVizs={context?.boardVizs}
               dataview={context?.dataview}
               rules={rules}
               onRuleChange={handleUpdateRule}

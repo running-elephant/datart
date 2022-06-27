@@ -67,6 +67,7 @@ import { WidgetSelectionContext } from '../../WidgetProvider/WidgetSelectionProv
 export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const { dataChart, availableSourceFunctions, chartDataView } =
     useContext(WidgetChartContext);
+  const dispatch = useDispatch();
   const scale = useContext(BoardScaleContext);
   const { data: dataset } = useContext(WidgetDataContext);
   const { renderMode, orgId, queryVariables } = useContext(BoardContext);
@@ -102,7 +103,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     handleCrossFilteringEvent,
     handleViewDataEvent,
   } = useChartInteractions({
-    openViewDetailPanel,
+    openViewDetailPanel: openViewDetailPanel as any,
     openJumpDialogModal: jumpDialogModal.info,
   });
 
@@ -110,7 +111,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     widgetRef.current = widget;
   }, [widget]);
 
-  const dispatch = useDispatch();
   const handleDateLevelChange = useCallback(
     (type, payload) => {
       const rows = getRuntimeDateLevelFields(payload.value?.rows);

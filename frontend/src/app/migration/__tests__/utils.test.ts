@@ -15,21 +15,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { APP_SEMANTIC_VERSIONS } from '../constants';
-import { versionCanDo } from '../utils';
+import { APP_CURRENT_VERSION, APP_SEMANTIC_VERSIONS } from '../constants';
+import { setLatestVersion, versionCanDo } from '../utils';
+
+const v1 = APP_SEMANTIC_VERSIONS[0];
+const v2 = APP_SEMANTIC_VERSIONS[1];
+
 describe('test versionCanDo ', () => {
   test(`no testVersion `, () => {
     expect(versionCanDo('v1', undefined)).toBe(true);
   });
-  const v1 = APP_SEMANTIC_VERSIONS[0];
-  const v2 = APP_SEMANTIC_VERSIONS[1];
+
   test(`v2 canDo v1 `, () => {
     expect(versionCanDo(v2, v1)).toBe(true);
   });
+
   test(`v1 not canDo v2 `, () => {
     expect(versionCanDo(v1, v2)).toBe(false);
   });
+
   test(`v2 canDo v2 `, () => {
     expect(versionCanDo(v2, v2)).toBe(true);
+  });
+
+  test(`should set current version`, () => {
+    expect(setLatestVersion({ version: 'v1' }).version).toBe(
+      APP_CURRENT_VERSION,
+    );
   });
 });
