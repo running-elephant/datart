@@ -236,6 +236,7 @@ class PivotSheetChart extends ReactChart {
         tooltip: {
           showTooltip: true,
         },
+        cornerExtraFieldText: context.translator('summary.number'),
         interaction: {
           hoverHighlight: Boolean(enableHoverHighlight),
           selectedCellsSpotlight: Boolean(enableSelectedHighlight),
@@ -343,10 +344,9 @@ class PivotSheetChart extends ReactChart {
       },
       palette: {
         basicColors: this.getThemeColorList(styleConfigs),
-        semanticColors: {
-          red: '#FF4D4F',
-          green: '#29A294',
-        },
+        semanticColors: {},
+        brandColor: '#3471F9',
+        basicColorRelations: [],
       },
       onRowCellCollapseTreeRows: ({ isCollapsed, node }) => {
         this.collapsedRows[node.id] = isCollapsed;
