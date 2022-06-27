@@ -384,7 +384,6 @@ export const getChartWidgetDataAsync = createAsyncThunk<
         });
         widgetData = data;
       }
-      console.log(widgetData, 'widgetData');
       dispatch(
         boardActions.setWidgetData({
           wid: widgetId,

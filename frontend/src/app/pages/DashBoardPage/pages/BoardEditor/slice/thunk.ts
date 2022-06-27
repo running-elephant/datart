@@ -111,7 +111,6 @@ export const fetchEditBoardDetail = createAsyncThunk<
     // TODO
     const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
     const migratedWidgets = migrateWidgets(serverWidgets, boardType);
-
     const { widgetMap, wrappedDataCharts } = getWidgetMap(
       migratedWidgets, //todo
       dataCharts,
@@ -127,7 +126,6 @@ export const fetchEditBoardDetail = createAsyncThunk<
     // datacharts
 
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
-
     dispatch(boardActions.setDataChartToMap(allDataCharts));
     const viewViews = getChartDataView(serverViews, allDataCharts);
 
