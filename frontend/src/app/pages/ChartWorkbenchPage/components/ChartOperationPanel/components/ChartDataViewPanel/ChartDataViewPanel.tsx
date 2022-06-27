@@ -17,9 +17,9 @@
  */
 
 import {
-  EllipsisOutlined,
   FormOutlined,
   InfoCircleOutlined,
+  MoreOutlined,
 } from '@ant-design/icons';
 import { Button, Menu, message, Space, Tooltip, TreeSelect } from 'antd';
 import { MenuListItem, Popup, ToolbarButton } from 'app/components';
@@ -488,7 +488,6 @@ const ChartDataViewPanel: FC<{
               <MenuListItem key="createComputedFields">
                 {t('createComputedFields')}
               </MenuListItem>
-              <Menu.Divider />
               <MenuListItem
                 disabled={dataView?.type !== 'STRUCT'}
                 title={t('Group')}
@@ -500,7 +499,6 @@ const ChartDataViewPanel: FC<{
                 </MenuListItem>
                 <MenuListItem key="byNoGroup">{t('noGroup')}</MenuListItem>
               </MenuListItem>
-              <Menu.Divider />
               <MenuListItem title={t('Sort')} key="sort" sub>
                 <MenuListItem key="byNameSort">{t('byNameSort')}</MenuListItem>
                 <MenuListItem key="byOriginalFieldSort">
@@ -510,7 +508,7 @@ const ChartDataViewPanel: FC<{
             </Menu>
           }
         >
-          <ToolbarButton icon={<EllipsisOutlined />} size="small" />
+          <ToolbarButton icon={<MoreOutlined />} size="small" />
         </Popup>
         {modalContextHolder}
       </Header>
