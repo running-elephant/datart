@@ -729,6 +729,7 @@ const DataModelTree: FC = memo(() => {
 export default DataModelTree;
 
 const StyledDroppableContainer = styled.div<{ isDraggingOver }>`
+  overflow: auto;
   user-select: 'none';
 `;
 
