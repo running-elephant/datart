@@ -214,72 +214,75 @@ export const ChartDraggableSourceContainer: FC<
           icon = <FileUnknownOutlined {...props} />;
       }
     }
-
-    return type === 'DATE' && category === 'field' ? (
-      <Row align="middle" style={{ width: '100%' }}>
-        <CollapseWrapper
-          defaultActiveKey={[colName]}
-          ghost
-          expandIconPosition="right"
-          expandIcon={({ isActive }) => {
-            return <DownOutlined rotate={isActive ? -180 : 0} />;
-          }}
-        >
-          <Panel
-            key={colName}
-            header={
-              <div ref={drag}>
-                <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
-                <p>{colName}</p>
-              </div>
-            }
+    if (type !== 'DATE') {
+      return (
+        <Row align="middle" style={{ width: '100%' }}>
+          <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
+          <StyledFieldContent>{colName}</StyledFieldContent>
+          <div onClick={stopPPG}>
+            <Dropdown
+              disabled={_isAllowMoreAction()}
+              overlay={_getExtraActionMenus()}
+              trigger={['click']}
+            >
+              <ToolbarButton
+                icon={<MoreOutlined />}
+                iconSize={FONT_SIZE_BASE}
+                className="setting"
+                onClick={e => e.preventDefault()}
+              />
+            </Dropdown>
+          </div>
+        </Row>
+      );
+    } else if (type === 'DATE' && category === 'field') {
+      return (
+        <Row align="middle" style={{ width: '100%' }}>
+          <CollapseWrapper
+            defaultActiveKey={[colName]}
+            ghost
+            expandIconPosition="right"
+            expandIcon={({ isActive }) => {
+              return <DownOutlined rotate={isActive ? -180 : 0} />;
+            }}
           >
-            {dateLevelFields?.map((item, i) => {
-              return (
-                <DateLevelFieldContainer
-                  key={i}
-                  item={item}
-                  onClearCheckedList={onClearCheckedList}
-                />
-              );
-            })}
-          </Panel>
-        </CollapseWrapper>
-      </Row>
-    ) : (
-      <Row align="middle" style={{ width: '100%' }}>
-        <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
-        <StyledFieldContent>{colName}</StyledFieldContent>
-        <div onClick={stopPPG}>
-          <Dropdown
-            disabled={_isAllowMoreAction()}
-            overlay={_getExtraActionMenus()}
-            trigger={['click']}
-          >
-            <ToolbarButton
-              icon={<MoreOutlined />}
-              iconSize={FONT_SIZE_BASE}
-              className="setting"
-              onClick={e => e.preventDefault()}
-            />
-          </Dropdown>
-        </div>
-      </Row>
-    );
+            <Panel
+              key={colName}
+              header={
+                <div ref={drag}>
+                  <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
+                  <p>{colName}</p>
+                </div>
+              }
+            >
+              {children?.map((item, i) => {
+                return (
+                  <DateLevelFieldContainer
+                    key={i}
+                    item={item as any}
+                    onClearCheckedList={onClearCheckedList}
+                  />
+                );
+              })}
+            </Panel>
+          </CollapseWrapper>
+        </Row>
+      );
+    }
   }, [
-    type,
     role,
+    type,
+    category,
     colName,
-    showChild,
-    setShowChild,
+    drag,
+    children,
     onDeleteComputedField,
     onEditComputedField,
-    category,
-    t,
-    onClearCheckedList,
-    drag,
     isViewComputerField,
-    dateLevelFields,
+    t,
+    showChild,
+    setShowChild,
+    onClearCheckedList,
   ]);
 
   const renderChildren = useMemo(() => {
@@ -294,7 +297,6 @@ export const ChartDraggableSourceContainer: FC<
         role={item.role}
         children={item.children}
         viewType={viewType}
-        dateLevelFields={item.dateLevelFields}
         isViewComputerField={item.computedFieldsType}
         availableSourceFunctions={availableSourceFunctions}
         onDeleteComputedField={onDeleteComputedField}

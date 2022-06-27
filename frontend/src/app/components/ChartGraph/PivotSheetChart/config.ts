@@ -197,7 +197,7 @@ const config: ChartConfig = {
         },
         {
           label: 'style.align',
-          key: 'align',
+          key: 'tableAlign',
           default: 'left',
           comType: 'fontAlignment',
         },
