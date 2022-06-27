@@ -18,6 +18,7 @@
 import { migrateBoardConfig } from 'app/migration/BoardConfig/migrateBoardConfig';
 import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
+import migrationDataChartConfig from 'app/migration/vizDataChartConfig/migrationDataChartConfig';
 import {
   BoardInfo,
   BoardType,
@@ -164,8 +165,16 @@ export const getInitBoardConfig = (boardType?: BoardType) => {
 // dataCharts
 export const getDataChartsByServer = (serverDataCharts: ServerDatachart[]) => {
   const dataCharts: DataChart[] = serverDataCharts.map(item => {
-    return { ...item, config: JSON.parse(item.config) };
+    const config = JSON.parse(item.config);
+    return {
+      ...item,
+      config: {
+        ...config,
+        chartConfig: migrationDataChartConfig(config.chartConfig),
+      },
+    };
   });
+
   return dataCharts;
 };
 export const getDataChartMap = (dataCharts: DataChart[]) => {
