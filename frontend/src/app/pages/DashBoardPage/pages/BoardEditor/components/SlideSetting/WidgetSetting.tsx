@@ -17,21 +17,18 @@
  */
 
 import { Tabs } from 'antd';
+import useChartInteractions from 'app/hooks/useChartInteractions';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { WidgetChartContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetChartProvider';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { getValue } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  selectBoardWidgetMapById,
-  selectViewMap,
-} from '../../../Board/slice/selector';
-import { BoardState } from '../../../Board/slice/types';
 import { editBoardStackActions } from '../../slice';
 import { showRectAction } from '../../slice/actions/actions';
+import { selectSortAllWidgets } from '../../slice/selectors';
 import { NameSet } from './SettingItem/NameSet';
 import { RectSet } from './SettingItem/RectSet';
 import { SettingPanel } from './SettingPanel';
@@ -41,14 +38,15 @@ const { TabPane } = Tabs;
 
 export const WidgetSetting: FC<{ boardId?: string }> = memo(({ boardId }) => {
   const t = useI18NPrefix(`viz.board.setting`);
-  const widget = useContext(WidgetContext);
   const dispatch = useDispatch();
+  const widget = useContext(WidgetContext);
+  const { dataChart, chartDataView } = useContext(WidgetChartContext);
   const showRect = dispatch(showRectAction(widget)) as unknown as boolean;
   const [currentTab, setCurrentTab] = useState<string>('style');
   const vizs = useSelector(selectVizs);
-  const viewMap = useSelector(selectViewMap);
-  const boardWidgets = useSelector((state: { board: BoardState }) =>
-    selectBoardWidgetMapById(state, boardId || ''),
+  const allWidgets = useSelector(selectSortAllWidgets);
+  const { getDrillThroughSetting, getViewDetailSetting } = useChartInteractions(
+    {},
   );
 
   const handleStyleConfigChange = (
@@ -82,36 +80,33 @@ export const WidgetSetting: FC<{ boardId?: string }> = memo(({ boardId }) => {
   const updateInteractionOptionWhenHasChartInteraction = (
     interactions: ChartStyleConfig[],
   ) => {
-    const chartInteractions =
-      widget.config.content?.dataChart?.config?.chartConfig?.interactions || [];
     const drillThroughKey = 'drillThrough';
     const viewDetailKey = 'viewDetail';
-    const hasEnableDrillThrough = getValue(chartInteractions || [], [
-      drillThroughKey,
-    ]);
-    const hasEnableViewDetail = getValue(chartInteractions || [], [
-      viewDetailKey,
-    ]);
-
+    const chartInteractions =
+      dataChart?.config?.chartConfig?.interactions || [];
+    const chartDrillThroughSetting = getDrillThroughSetting(
+      chartInteractions,
+      [],
+    );
+    const chartViewDetailSetting = getViewDetailSetting(chartInteractions, []);
     return updateBy(interactions, draft => {
       let boardDrillThrough = draft.find(i => i.key === drillThroughKey);
       let boardViewDetail = draft.find(i => i.key === viewDetailKey);
-      if (boardDrillThrough && hasEnableDrillThrough) {
+      if (boardDrillThrough) {
         boardDrillThrough.options = Object.assign(
           {},
           boardDrillThrough?.options,
           {
-            hasOriginal: true,
+            hasOriginal: !!chartDrillThroughSetting,
           },
         );
       }
-      // TODO(Stephen): has chart cross filtering with options
-      if (boardViewDetail && hasEnableViewDetail) {
+      if (boardViewDetail) {
         boardViewDetail.options = Object.assign(
           {},
           boardDrillThrough?.options,
           {
-            hasOriginal: true,
+            hasOriginal: !!chartViewDetailSetting,
           },
         );
       }
@@ -139,14 +134,12 @@ export const WidgetSetting: FC<{ boardId?: string }> = memo(({ boardId }) => {
             configs={updateInteractionOptionWhenHasChartInteraction(
               widget.config.customConfig.interactions || [],
             )}
-            dataConfigs={
-              widget.config.content?.dataChart?.config?.chartConfig?.datas
-            }
+            dataConfigs={dataChart?.config?.chartConfig?.datas}
             context={{
               widgetId: widget?.id,
               vizs,
-              boardVizs: boardWidgets,
-              dataview: viewMap?.[widget?.config?.content?.dataChart?.viewId],
+              boardVizs: allWidgets,
+              dataview: chartDataView,
             }}
             onChange={handleInteractionConfigChange}
           />

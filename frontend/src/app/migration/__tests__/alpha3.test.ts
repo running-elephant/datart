@@ -19,6 +19,11 @@
 import { alpha3, hasWrongDimensionName } from '../alpha3';
 
 describe('alpha3 - ', () => {
+  test('should return false when config is null', () => {
+    const config = null;
+    expect(hasWrongDimensionName(config as any)).toBe(false);
+  });
+
   test('should not match has wrong dimension name when config datas is empty', () => {
     const config = {
       datas: [],

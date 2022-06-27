@@ -471,6 +471,7 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
       {
         id: chartDataView?.id || '',
         config: chartDataView?.config || {},
+        meta: chartDataView?.meta,
         computedFields: dataChart?.config?.computedFields || [],
       },
       dataChart?.config?.chartConfig?.datas,

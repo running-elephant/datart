@@ -513,7 +513,15 @@ describe('ChartDataRequestBuild Test', () => {
   });
 
   test('should get groups for struct view', () => {
-    const dataView = { id: 'view-id', type: 'STRUCT' } as any;
+    const dataView = {
+      id: 'view-id',
+      type: 'STRUCT',
+      meta: [
+        { id: JSON.stringify(['dad', 'name']) },
+        { id: JSON.stringify(['dad', 'age']) },
+        { id: JSON.stringify(['dad', 'address']) },
+      ],
+    } as any;
     const chartDataConfigs = [
       {
         type: ChartDataSectionType.Group,
@@ -598,8 +606,17 @@ describe('ChartDataRequestBuild Test', () => {
     expect(requestParams2.groups).toEqual([]);
   });
 
-  test('should get filters', () => {
-    const dataView = { id: 'view-id' } as any;
+  test('should get filters with meta info', () => {
+    const dataView = {
+      id: 'view-id',
+      meta: [
+        { id: JSON.stringify(['name']) },
+        { id: JSON.stringify(['address']) },
+        { id: JSON.stringify(['family']) },
+        { id: JSON.stringify(['born']) },
+        { id: JSON.stringify(['birthday']) },
+      ],
+    } as any;
     const chartDataConfigs = [
       {
         type: ChartDataSectionType.Filter,
@@ -902,7 +919,18 @@ describe('ChartDataRequestBuild Test', () => {
   });
 
   test('should get filters for struct view', () => {
-    const dataView = { id: 'view-id', type: 'STRUCT' } as any;
+    const dataView = {
+      id: 'view-id',
+      type: 'STRUCT',
+      meta: [
+        { id: JSON.stringify(['dad', 'name']) },
+        { id: JSON.stringify(['dad', 'age']) },
+        { id: JSON.stringify(['dad', 'address']) },
+        { id: JSON.stringify(['dad', 'family']) },
+        { id: JSON.stringify(['dad', 'born']) },
+        { id: JSON.stringify(['dad', 'birthday']) },
+      ],
+    } as any;
     const chartDataConfigs = [
       {
         type: ChartDataSectionType.Filter,
