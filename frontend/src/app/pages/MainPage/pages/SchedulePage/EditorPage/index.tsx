@@ -103,6 +103,7 @@ export const EditorPage: FC = () => {
             params: { ...params, id: editingSchedule?.id as string },
             resolve: () => {
               message.success(t('saveSuccess'));
+              dispatch(getScheduleDetails(editingSchedule?.id!));
               refreshScheduleList();
             },
           }),
@@ -111,13 +112,13 @@ export const EditorPage: FC = () => {
     });
   }, [
     form,
-    isAdd,
     orgId,
-    dispatch,
-    editingSchedule,
-    refreshScheduleList,
-    toDetails,
+    isAdd,
     t,
+    dispatch,
+    toDetails,
+    refreshScheduleList,
+    editingSchedule?.id,
   ]);
 
   const onResetForm = useCallback(() => {
