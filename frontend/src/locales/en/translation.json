@@ -679,6 +679,15 @@
           "leftBottom": "Left Bottom",
           "rightTop": "Right Top",
           "rightBottom": "Right Bottom"
+        },
+        "dataZoomSlider": {
+          "showZoomSlider": "Show Zoom Slider",
+          "zoomSliderColor": "Zoom Slider Color",
+          "usePercentage": "Use Percentage",
+          "zoomStartPercentage": "Zoom Slider Start Percentage",
+          "zoomEndPercentage": "Zoom Slider End Percentage",
+          "zoomStartIndex": "Zoom Slider Start Index",
+          "zoomEndIndex": "Zoom Slider End Index"
         }
       },
       "data": {

@@ -231,6 +231,7 @@ export const ChartStyleSectionComponentType = {
   INTERACTION_DRILL_THROUGH_PANEL: 'interaction.drillThrough',
   INTERACTION_CROSS_FILTERING: 'interaction.crossFiltering',
   INTERACTION_VIEW_DETAIL_PANEL: 'interaction.viewDetail',
+  DATA_ZOOM_PANEL: 'dataZoomPanel',
 };
 
 export enum DownloadFileType {
