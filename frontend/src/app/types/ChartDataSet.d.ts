@@ -38,6 +38,8 @@ export interface IChartDataSetRow<T> extends Array<T> {
 export interface IChartDataSet<T> extends Array<IChartDataSetRow<T>> {
   getFieldKey(field: ChartDataSectionField): string;
 
+  getOriginFieldInfo(key: string): ChartDataSectionField;
+
   getFieldOriginKey(field: ChartDataSectionField): string;
 
   getFieldIndex(field: ChartDataSectionField): number;
