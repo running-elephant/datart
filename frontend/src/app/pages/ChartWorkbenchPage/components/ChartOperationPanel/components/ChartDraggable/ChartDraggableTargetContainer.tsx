@@ -303,7 +303,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         return (
           <ChartDraggableElement
             key={columnConfig.uid}
-            id={columnConfig.uid}
             index={index}
             config={columnConfig}
             content={() => {
