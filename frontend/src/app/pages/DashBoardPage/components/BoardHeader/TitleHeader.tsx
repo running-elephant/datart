@@ -56,6 +56,8 @@ export const TitleHeader: FC = memo(() => {
   const onOpenShareLink = useCallback(() => {
     setShowShareLinkModal(true);
   }, []);
+  const isArchived = Number(status) === 0;
+
   const toBoardEditor = () => {
     const pathName = history.location.pathname;
     if (pathName.includes(boardId)) {
@@ -84,7 +86,7 @@ export const TitleHeader: FC = memo(() => {
     <Wrapper>
       <h1 className={classnames({ disabled: status < 2 })}>{title}</h1>
       <Space>
-        {allowManage && (
+        {!isArchived && allowManage && (
           <>
             {Number(status) === 1 && (
               <Button
@@ -101,44 +103,45 @@ export const TitleHeader: FC = memo(() => {
             </Button>
           </>
         )}
-        <Dropdown
-          overlay={
-            <BoardDropdownList
-              onOpenShareLink={onOpenShareLink}
-              openStoryList={() => setShowSaveToStory(true)}
-              openMockData={() => setMockDataModal(true)}
-            />
-          }
-          placement="bottomRight"
-          arrow
-        >
-          <Button icon={<MoreOutlined />} />
-        </Dropdown>
+        {!isArchived && (
+          <Dropdown
+            overlay={
+              <BoardDropdownList
+                onOpenShareLink={onOpenShareLink}
+                openStoryList={() => setShowSaveToStory(true)}
+                openMockData={() => setMockDataModal(true)}
+              />
+            }
+            placement="bottomRight"
+            arrow
+          >
+            <Button icon={<MoreOutlined />} />
+          </Dropdown>
+        )}
+        {!isArchived && allowManage && (
+          <SaveToStoryBoard
+            title={t('addToStory')}
+            orgId={orgId as string}
+            isModalVisible={showSaveToStory}
+            handleOk={saveToStoryOk}
+            handleCancel={() => setShowSaveToStory(false)}
+          ></SaveToStoryBoard>
+        )}
+        {!isArchived && allowShare && (
+          <ShareManageModal
+            vizId={boardId as string}
+            orgId={orgId as string}
+            vizType="DASHBOARD"
+            visibility={showShareLinkModal}
+            onOk={() => setShowShareLinkModal(false)}
+            onCancel={() => setShowShareLinkModal(false)}
+            onGenerateShareLink={onGenerateShareLink}
+          />
+        )}
+        {!isArchived && mockDataModal && (
+          <MockDataPanel onClose={() => setMockDataModal(false)} />
+        )}
       </Space>
-      {allowManage && (
-        <SaveToStoryBoard
-          title={t('addToStory')}
-          orgId={orgId as string}
-          isModalVisible={showSaveToStory}
-          handleOk={saveToStoryOk}
-          handleCancel={() => setShowSaveToStory(false)}
-        ></SaveToStoryBoard>
-      )}
-
-      {allowShare && (
-        <ShareManageModal
-          vizId={boardId as string}
-          orgId={orgId as string}
-          vizType="DASHBOARD"
-          visibility={showShareLinkModal}
-          onOk={() => setShowShareLinkModal(false)}
-          onCancel={() => setShowShareLinkModal(false)}
-          onGenerateShareLink={onGenerateShareLink}
-        />
-      )}
-      {mockDataModal && (
-        <MockDataPanel onClose={() => setMockDataModal(false)} />
-      )}
     </Wrapper>
   );
 });

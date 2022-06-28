@@ -33,10 +33,9 @@ export interface BoardOverLayProps {
   onPublish?;
   allowShare?: boolean;
   allowManage?: boolean;
-  isArchived?: boolean;
 }
 export const StoryOverLay: React.FC<BoardOverLayProps> = memo(
-  ({ onOpenShareLink, allowShare, allowManage, onPublish, isArchived }) => {
+  ({ onOpenShareLink, allowShare, allowManage, onPublish }) => {
     const t = useI18NPrefix(`viz.action`);
     const tg = useI18NPrefix(`global`);
     const { storyId: stroyId, orgId } = useContext(StoryContext);
@@ -57,7 +56,7 @@ export const StoryOverLay: React.FC<BoardOverLayProps> = memo(
           icon: <VerticalAlignBottomOutlined />,
           onClick: onPublish,
           disabled: false,
-          render: allowManage && !isArchived && onPublish,
+          render: allowManage && onPublish,
           content: t('unpublish'),
         },
         {
@@ -75,16 +74,7 @@ export const StoryOverLay: React.FC<BoardOverLayProps> = memo(
           ),
         },
       ],
-      [
-        onOpenShareLink,
-        allowShare,
-        t,
-        onPublish,
-        allowManage,
-        isArchived,
-        tg,
-        recycleViz,
-      ],
+      [onOpenShareLink, allowShare, t, onPublish, allowManage, tg, recycleViz],
     );
     const actionItems = useMemo(
       () =>
