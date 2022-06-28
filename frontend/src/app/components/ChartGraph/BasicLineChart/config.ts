@@ -247,6 +247,11 @@ const config: ChartConfig = {
           default: 0,
           comType: 'inputNumber',
         },
+        {
+          label: 'common.dataZoomPanel',
+          key: 'dataZoomPanel',
+          comType: 'dataZoomPanel',
+        },
       ],
     },
     {

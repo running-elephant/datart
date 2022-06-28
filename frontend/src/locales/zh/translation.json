@@ -679,6 +679,15 @@
           "leftBottom": "左下",
           "rightTop": "右上",
           "rightBottom": "右下"
+        },
+        "dataZoomSlider": {
+          "showZoomSlider": "是否开启缩放滑块",
+          "zoomSliderColor": "选中颜色",
+          "usePercentage": "缩放使用百分比",
+          "zoomStartPercentage": "起始百分比",
+          "zoomEndPercentage": "结束百分比",
+          "zoomStartIndex": "起始下标",
+          "zoomEndIndex": "结束下标"
         }
       },
       "data": {

@@ -54,6 +54,7 @@ import {
   ConditionalStylePanel,
   CrossFilteringPanel,
   DataReferencePanel,
+  DataZoomPanel,
   DrillThroughPanel,
   FontAlignment,
   LabelPosition,
@@ -210,6 +211,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <CrossFilteringPanel {...props} />;
         case ChartStyleSectionComponentType.INTERACTION_VIEW_DETAIL_PANEL:
           return <ViewDetailPanel {...props} />;
+        case ChartStyleSectionComponentType.DATA_ZOOM_PANEL:
+          return <DataZoomPanel {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }
