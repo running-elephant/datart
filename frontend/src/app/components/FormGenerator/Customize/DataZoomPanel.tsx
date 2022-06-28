@@ -24,6 +24,7 @@ import { CloneValueDeep, mergeDefaultToValue } from 'utils/object';
 import { GroupLayout } from '../Layout';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
+import { FormGroupLayoutMode } from '../constants';
 
 const template = {
   label: '',
@@ -121,9 +122,6 @@ const template = {
       },
     },
   ],
-  options: {
-    tilemode: true,
-  },
 };
 
 const DataZoomPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
@@ -141,7 +139,7 @@ const DataZoomPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           const temp = CloneValueDeep(template);
           draft.label = data?.label || temp.label;
           draft.key = data?.key || temp.key;
-          draft.options = temp.options;
+          draft.options = data?.options;
           draft.comType = temp.comType;
           draft.rows = mergeDefaultToValue(data?.rows || temp.rows);
         });
@@ -156,6 +154,7 @@ const DataZoomPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       onChange,
       dataConfigs,
       flatten: true,
+      mode: FormGroupLayoutMode.INNER
     };
 
     return (

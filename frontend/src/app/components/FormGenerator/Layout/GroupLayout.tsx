@@ -90,17 +90,6 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
         );
       }
 
-      if (!!data?.options?.tilemode) {
-        return (
-          <>
-            {renderCollectionComponents(
-              data,
-              handleConfirmModalDialogOrDataUpdate,
-            )}
-          </>
-        );
-      }
-
       return (
         <Collapse
           expandIconPosition="right"
