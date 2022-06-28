@@ -163,7 +163,11 @@ export class ChartDataRequestBuilder {
 
   private buildColumnName(col) {
     if (col.category === ChartDataViewFieldCategory.Field && col.id) {
-      return JSON.parse(col.id);
+      try {
+        return JSON.parse(col.id);
+      } catch (e) {
+        console.log('error buildColumnName JSON parse col.id=' + col.id);
+      }
     }
 
     return [col.id];

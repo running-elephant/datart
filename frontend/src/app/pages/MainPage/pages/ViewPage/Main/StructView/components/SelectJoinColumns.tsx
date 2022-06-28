@@ -94,6 +94,7 @@ const SelectJoinColumns = memo(
     return (
       <JoinColumnsWrapper key={conditionsIndex}>
         <TreeSelect
+          dropdownMatchSelectWidth={false}
           allowClear
           style={{ minWidth: '100px' }}
           placeholder={t('selectField')}
@@ -106,12 +107,13 @@ const SelectJoinColumns = memo(
         ></TreeSelect>
         <JoinConditionLabel>=</JoinConditionLabel>
         <TreeSelect
+          dropdownMatchSelectWidth={false}
           allowClear
           style={{ minWidth: '100px' }}
           placeholder={t('selectField')}
           treeDefaultExpandAll={true}
           value={joinTable.conditions?.[conditionsIndex]?.right.slice(-1)}
-          onChange={(columnName, label) => {
+          onChange={columnName => {
             callbackFn(columnName || [], 'right', conditionsIndex);
           }}
           treeData={handleRightColumn()}

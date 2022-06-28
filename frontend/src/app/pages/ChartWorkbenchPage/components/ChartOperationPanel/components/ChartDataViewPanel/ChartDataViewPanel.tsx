@@ -311,6 +311,7 @@ const ChartDataViewPanel: FC<{
         ),
         onOk: newField =>
           handleAddNewOrUpdateComputedField(newField, field?.id),
+        onButtonProps: { display: field?.isViewComputedFields },
       });
     },
     [
@@ -348,8 +349,8 @@ const ChartDataViewPanel: FC<{
       );
 
       return [
-        ...columnTreeData,
         ...hierarchyFields,
+        ...columnTreeData,
         ...stringComFields,
         ...numericComFields,
         ...dateComFields,

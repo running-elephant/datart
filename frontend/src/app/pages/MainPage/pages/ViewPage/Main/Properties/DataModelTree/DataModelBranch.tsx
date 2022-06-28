@@ -38,7 +38,7 @@ import {
   YELLOW,
 } from 'styles/StyleConstants';
 import { Column, ColumnRole } from '../../../slice/types';
-import { TreeNodeHierarchy } from './constant';
+import { ROOT_CONTAINER_ID, TreeNodeHierarchy } from './constant';
 import DataModelNode from './DataModelNode';
 
 const DataModelBranch: FC<{
@@ -144,7 +144,11 @@ const DataModelBranch: FC<{
               {...draggableProvided.dragHandleProps}
             >
               <Droppable
-                droppableId={node?.name}
+                droppableId={
+                  node.role === ColumnRole.Table
+                    ? ROOT_CONTAINER_ID
+                    : node?.name
+                }
                 type={TreeNodeHierarchy.Branch}
                 isCombineEnabled={false}
               >

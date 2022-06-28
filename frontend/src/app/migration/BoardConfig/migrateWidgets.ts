@@ -6,16 +6,18 @@ import {
   ServerRelation,
   ServerWidget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { Widget, WidgetConf } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { VALUE_SPLITTER } from 'app/pages/DashBoardPage/utils/widget';
 import { setLatestVersion, versionCanDo } from '../utils';
 import {
   APP_VERSION_BETA_0,
   APP_VERSION_BETA_2,
   APP_VERSION_BETA_4,
+  APP_VERSION_BETA_4_1,
 } from './../constants';
 import { WidgetBeta3 } from './types';
 import {
+  convertControllerConfigTobeta4_1,
   convertToBeta4AutoWidget,
   convertWidgetToBeta4,
 } from './utils/beta4utils';
@@ -101,6 +103,22 @@ export const beta4 = (boardType: BoardType, widget?: Widget | WidgetBeta3) => {
 
   return beta4Widget as Widget;
 };
+
+// beta4.1 controller for widget migrate assistViewFields and relatedViews string to array of string
+export const beta4_1 = (widget?: Widget | WidgetBeta3) => {
+  if (!widget) return undefined;
+  if (!versionCanDo(APP_VERSION_BETA_4_1, widget?.config.version))
+    return widget as Widget;
+  let beta4_1Widget = widget as any;
+  if (widget.config.version !== APP_VERSION_BETA_4_1) {
+    beta4_1Widget.config = convertControllerConfigTobeta4_1(
+      beta4_1Widget.config as WidgetConf,
+    );
+  }
+
+  return beta4_1Widget as Widget;
+};
+
 const finaleWidget = (widget?: Widget) => {
   if (!widget) return undefined;
   widget.config = setLatestVersion(widget.config);
@@ -141,11 +159,13 @@ export const migrateWidgets = (
 
       resWidget = beta2(resWidget);
 
-      let beta4Widget = beta4(boardType, resWidget);
+      const beta4Widget = beta4(boardType, resWidget);
 
-      beta4Widget = finaleWidget(beta4Widget as Widget);
+      let beta4_1Widget = beta4_1(beta4Widget);
 
-      return beta4Widget;
+      beta4_1Widget = finaleWidget(beta4_1Widget as Widget);
+
+      return beta4_1Widget;
     })
     .filter(widget => !!widget);
   return targetWidgets as Widget[];

@@ -34,6 +34,7 @@ const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
   newWidget.config.index = oldW.config.index;
   newWidget.config.lock = oldW.config.lock;
   newWidget.config.rect = oldW.config.rect;
+  newWidget.config.version = oldW.config.version;
   newWidget.dashboardId = oldW.dashboardId;
   // @ts-ignore
   newWidget.config.pRect = oldW.config.pRect;
@@ -369,9 +370,6 @@ export const convertControllerToBeta4 = (widget: WidgetBeta3) => {
   let newWidget = {} as Widget;
   newWidget = widgetManagerInstance.toolkit(subType).create({ ...widget });
   newWidget = commonBeta4Convert(newWidget, widget);
-  newWidget.config = convertControllerConfigToBeta4(
-    newWidget.config as WidgetConf,
-  );
   return newWidget;
 };
 export const convertToBeta4AutoWidget = (
@@ -424,7 +422,7 @@ export const convertWidgetToBeta4 = (widget: WidgetBeta3) => {
   }
 };
 
-export const convertControllerConfigToBeta4 = (widgetConfig: WidgetConf) => {
+export const convertControllerConfigTobeta4_1 = (widgetConfig: WidgetConf) => {
   const _widgetConfig = CloneValueDeep(widgetConfig);
   if (_widgetConfig.type === 'controller') {
     const content = _widgetConfig.content;

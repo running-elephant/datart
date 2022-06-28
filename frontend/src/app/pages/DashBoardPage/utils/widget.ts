@@ -17,6 +17,7 @@
  */
 
 import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
+import migrationDataChartConfig from 'app/migration/vizDataChartConfig/migrationDataChartConfig';
 import {
   ContainerItem,
   TabWidgetContent,
@@ -596,6 +597,9 @@ export const getWidgetMap = (
       const ownedDataChartId = `widget_${widget.dashboardId}_${widget.id}`;
       if (dataChart) {
         dataChart.id = ownedDataChartId;
+        dataChart.config.chartConfig = migrationDataChartConfig(
+          dataChart.config.chartConfig,
+        );
         wrappedDataCharts.push(dataChart!);
       }
       widget.datachartId = ownedDataChartId;
