@@ -187,6 +187,10 @@ export function isEmpty(o?: null | any): boolean {
   return o === null || isUndefined(o);
 }
 
+export function isEmptyString(o?: null | any): boolean {
+  return isEmpty(o) || o === '';
+}
+
 export function isFunc(f) {
   return isFunction(f);
 }
