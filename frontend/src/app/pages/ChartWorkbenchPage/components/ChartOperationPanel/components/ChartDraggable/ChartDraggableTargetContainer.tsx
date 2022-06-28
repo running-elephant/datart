@@ -192,15 +192,23 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             return false;
           }
 
-          // if (
-          //   typeof currentConfig.actions === 'object' &&
-          //   !(item.type in currentConfig.actions)
-          // ) {
-          //   return false;
-          // }
-
-          if (currentConfig.allowSameField) {
-            return true;
+          if (
+            items[0].category ===
+            ChartDataViewFieldCategory.DateLevelComputedField
+          ) {
+            if (
+              ![
+                ChartDataSectionType.Group,
+                ChartDataSectionType.Color,
+                ChartDataSectionType.Mixed,
+              ].includes(currentConfig.type as ChartDataSectionType)
+            ) {
+              return false;
+            }
+            const colNames = currentConfig.rows?.map(col => col.colName);
+            return colNames
+              ? colNames.every(v => !v?.includes(items[0].colName))
+              : true;
           }
 
           if (
@@ -209,14 +217,8 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             return true;
           }
 
-          if (
-            items[0].category ===
-            ChartDataViewFieldCategory.DateLevelComputedField
-          ) {
-            const colNames = currentConfig.rows?.map(col => col.colName);
-            return colNames
-              ? colNames.every(v => !v?.includes(items[0].colName))
-              : true;
+          if (currentConfig.allowSameField) {
+            return true;
           }
 
           const exists = currentConfig.rows?.map(col => col.colName);
