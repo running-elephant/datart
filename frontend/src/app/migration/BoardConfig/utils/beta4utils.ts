@@ -34,6 +34,7 @@ const commonBeta4Convert = (newWidget: Widget, oldW: WidgetBeta3) => {
   newWidget.config.index = oldW.config.index;
   newWidget.config.lock = oldW.config.lock;
   newWidget.config.rect = oldW.config.rect;
+  newWidget.config.version = oldW.config.version;
   newWidget.dashboardId = oldW.dashboardId;
   // @ts-ignore
   newWidget.config.pRect = oldW.config.pRect;
