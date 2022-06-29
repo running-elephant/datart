@@ -43,7 +43,6 @@ const VizOperationMenu: FC<{
   allowDownload?: boolean;
   allowShare?: boolean;
   allowManage?: boolean;
-  isArchived?: boolean;
 }> = memo(
   ({
     onShareLinkClick,
@@ -56,7 +55,6 @@ const VizOperationMenu: FC<{
     allowDownload,
     allowShare,
     allowManage,
-    isArchived,
     onRecycleViz,
   }) => {
     const t = useI18NPrefix(`viz.action`);
@@ -168,7 +166,7 @@ const VizOperationMenu: FC<{
         );
       }
 
-      if (allowManage && !isArchived && onPublish) {
+      if (allowManage && onPublish) {
         menus.push(
           <Menu.Item
             key="publish"

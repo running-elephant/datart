@@ -378,6 +378,8 @@ class PivotSheetChart extends ReactChart {
     chartDataSet: IChartDataSet<string>,
   ) {
     const selectedItems: SelectedItem[] = [];
+    // TODO(tianlei): delete this line,  const a  = chartDataSet.getOriginFieldInfo('Area');
+
     cells.forEach(v => {
       const { rowIndex, data } = v.getMeta();
       if (!selectedItems.find(v => v.index === rowIndex) && data) {

@@ -110,6 +110,7 @@ const ChartPreviewBoard: FC<{
     const { actions } = useMainSlice();
     const chartManager = ChartManager.instance();
     const dispatch = useDispatch();
+    const { parse } = useQSLibUrlHelper();
     const [version, setVersion] = useState<string>();
     const previewCharts = useSelector(selectPreviewCharts);
     const publishLoading = useSelector(selectPublishLoading);
@@ -138,8 +139,6 @@ const ChartPreviewBoard: FC<{
       openViewDetailPanel: openViewDetailPanel as any,
       openJumpDialogModal: jumpDialogModal.info,
     });
-
-    const { parse } = useQSLibUrlHelper();
 
     useEffect(() => {
       const jumpFilterParams: ChartDataRequestFilter[] = parse(
