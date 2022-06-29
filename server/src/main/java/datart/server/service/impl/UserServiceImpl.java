@@ -36,8 +36,10 @@ import datart.core.entity.ext.UserBaseInfo;
 import datart.core.mappers.ext.OrganizationMapperExt;
 import datart.core.mappers.ext.RelRoleUserMapperExt;
 import datart.core.mappers.ext.UserMapperExt;
+import datart.security.base.JwtToken;
 import datart.security.base.PasswordToken;
 import datart.security.base.RoleType;
+import datart.security.exception.AuthException;
 import datart.security.util.JwtUtils;
 import datart.security.util.SecurityUtils;
 import datart.server.base.dto.OrganizationBaseInfo;
@@ -169,13 +171,13 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Override
     @Transactional
     public String activeUser(String activeString) {
-        PasswordToken passwordToken = null;
+        JwtToken jwtToken = null;
         try {
-            passwordToken = JwtUtils.toPasswordToken(activeString);
+            jwtToken = JwtUtils.toJwtToken(activeString);
         } catch (ExpiredJwtException e) {
             Exceptions.msg("message.user.confirm.mail.timeout");
         }
-        User user = userMapper.selectByUsername(passwordToken.getSubject());
+        User user = userMapper.selectByUsername(jwtToken.getSubject());
         if (user == null) {
             Exceptions.notFound("resource.not-exist", "resource.user");
         }
@@ -186,10 +188,10 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
         initUser(user);
         log.info("User({}) activation success", user.getUsername());
-        passwordToken.setPassword(null);
-        passwordToken.setExp(null);
-        passwordToken.setCreateTime(System.currentTimeMillis());
-        return JwtUtils.toJwtString(passwordToken);
+        jwtToken.setPwdHash(user.getPassword().hashCode());
+        jwtToken.setExp(null);
+        jwtToken.setCreateTime(System.currentTimeMillis());
+        return JwtUtils.toJwtString(jwtToken);
     }
 
     @Override
@@ -244,14 +246,14 @@ public class UserServiceImpl extends BaseService implements UserService {
     public void initUser(User user) {
         if (Application.getCurrMode().equals(TenantManagementMode.TEAM)) {
             List<Organization> organizationList = orgMapper.list();
-            if (organizationList.size()==1) {
+            if (organizationList.size() == 1) {
                 Organization organization = organizationList.get(0);
                 orgService.addUserToOrg(user.getId(), organization.getId());
                 log.info("The user({}) is joined the default organization({}).", user.getUsername(), organization.getName());
-                return ;
-            } else if (organizationList.size()>1) {
+                return;
+            } else if (organizationList.size() > 1) {
                 Exceptions.msg("There is more than one organization in team tenant-management-mode.");
-            } else{
+            } else {
                 Exceptions.msg("There is no organization to join.");
             }
         }
@@ -289,8 +291,10 @@ public class UserServiceImpl extends BaseService implements UserService {
             return null;
         }
         User user = userMapper.selectByNameOrEmail(passwordToken.getSubject());
-        passwordToken.setPassword(user.getPassword());
-        return JwtUtils.toJwtString(passwordToken);
+        if (user == null) {
+            Exceptions.tr(AuthException.class, "login.fail");
+        }
+        return JwtUtils.toJwtString(JwtUtils.createJwtToken(user));
     }
 
     private String ldapLogin(PasswordToken passwordToken) {
@@ -342,12 +346,11 @@ public class UserServiceImpl extends BaseService implements UserService {
         if (!valid) {
             Exceptions.tr(ParamException.class, "message.user.verify.code.timeout");
         }
-        PasswordToken passwordToken = JwtUtils.toPasswordToken(passwordParam.getToken());
-        if (!passwordToken.getPassword().equals(passwordParam.getVerifyCode())) {
+        JwtToken jwtToken = JwtUtils.toJwtToken(passwordParam.getToken());
+        if (jwtToken.getPwdHash() != passwordParam.getVerifyCode().hashCode()) {
             Exceptions.tr(ParamException.class, "message.user.verify.code.error");
-
         }
-        User user = userMapper.selectByUsername(passwordToken.getSubject());
+        User user = userMapper.selectByUsername(jwtToken.getSubject());
         if (user == null) {
             Exceptions.notFound("resource.not-exist", "resource.user");
         }
@@ -451,7 +454,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
         if (StringUtils.isBlank(userUpdateParam.getPassword())) {
             userUpdateParam.setPassword(user.getPassword());
-        } else if (!userUpdateParam.getPassword().equals(user.getPassword())){
+        } else if (!userUpdateParam.getPassword().equals(user.getPassword())) {
             userUpdateParam.setPassword(BCrypt.hashpw(userUpdateParam.getPassword(), BCrypt.gensalt()));
         }
         roleService.updateRolesForUser(user.getId(), orgId, userUpdateParam.getRoleIds());
