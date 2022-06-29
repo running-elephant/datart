@@ -138,7 +138,6 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
 
     @Override
     public List<ScheduleBaseInfo> listArchivedSchedules(String orgId) {
-        securityManager.requireOrgOwner(orgId);
         return scheduleMapper.selectArchived(orgId)
                 .stream()
                 .map(ScheduleBaseInfo::new)
