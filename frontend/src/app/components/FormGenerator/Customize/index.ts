@@ -20,6 +20,7 @@ export { default as Background } from './Background';
 export { default as CheckboxModal } from './CheckboxModal';
 export { default as ConditionalStylePanel } from './ConditionalStyle';
 export { default as DataReferencePanel } from './DataReferencePanel';
+export { default as DataZoomPanel } from './DataZoomPanel';
 export { default as FontAlignment } from './FontAlignment';
 export { default as CrossFilteringPanel } from './Interaction/CrossFilteringPanel';
 export { default as DrillThroughPanel } from './Interaction/DrillThroughPanel';

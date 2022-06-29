@@ -57,10 +57,12 @@ const { Panel } = Collapse;
 
 export const ChartDraggableSourceContainer: FC<
   {
+    isActive?: boolean;
     viewType?: string;
     isViewComputerField?: boolean;
     availableSourceFunctions?: string[];
     dateLevelFields?: dateLevelFieldsProps[];
+    selectedItemsIds?: string[];
     onDeleteComputedField?: (fieldName) => void;
     onEditComputedField?: (fieldName) => void;
     onSelectionChange?: (dataItemId, cmdKeyActive, shiftKeyActive) => void;
@@ -72,7 +74,7 @@ export const ChartDraggableSourceContainer: FC<
   type,
   subType,
   category,
-  expression,
+  selectedItemsIds,
   selectedItems,
   isActive,
   availableSourceFunctions,
@@ -130,8 +132,7 @@ export const ChartDraggableSourceContainer: FC<
     const _isAllowMoreAction = () => {
       return (
         ChartDataViewFieldCategory.Field === category ||
-        ChartDataViewFieldCategory.Hierarchy === category ||
-        isViewComputerField
+        ChartDataViewFieldCategory.Hierarchy === category
       );
     };
 
@@ -158,7 +159,9 @@ export const ChartDraggableSourceContainer: FC<
       return (
         <Menu onClick={e => _handleMenuClick(e, colName)}>
           <Menu.Item key="edit">{t('editField')}</Menu.Item>
-          <Menu.Item key="delete">{t('deleteField')}</Menu.Item>
+          <Menu.Item disabled={isViewComputerField} key="delete">
+            {t('deleteField')}
+          </Menu.Item>
         </Menu>
       );
     };
@@ -216,7 +219,14 @@ export const ChartDraggableSourceContainer: FC<
     }
     if (type !== 'DATE') {
       return (
-        <Row align="middle" style={{ width: '100%' }}>
+        <Row
+          align="middle"
+          style={{ width: '100%' }}
+          onClick={e => {
+            onSelectionChange?.(colName, e.metaKey || e.ctrlKey, e.shiftKey);
+          }}
+          className={styleClasses.join(' ')}
+        >
           <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
           <StyledFieldContent>{colName}</StyledFieldContent>
           <div onClick={stopPPG}>
@@ -283,6 +293,8 @@ export const ChartDraggableSourceContainer: FC<
     showChild,
     setShowChild,
     onClearCheckedList,
+    onSelectionChange,
+    styleClasses,
   ]);
 
   const renderChildren = useMemo(() => {
@@ -297,10 +309,12 @@ export const ChartDraggableSourceContainer: FC<
         role={item.role}
         children={item.children}
         viewType={viewType}
-        isViewComputerField={item.computedFieldsType}
+        isViewComputerField={item.isViewComputedFields}
+        isActive={selectedItemsIds?.includes(item.name)}
         availableSourceFunctions={availableSourceFunctions}
         onDeleteComputedField={onDeleteComputedField}
         onClearCheckedList={onClearCheckedList}
+        onSelectionChange={onSelectionChange}
         selectedItems={selectedItems}
       />
     ));
@@ -311,6 +325,8 @@ export const ChartDraggableSourceContainer: FC<
     selectedItems,
     viewType,
     availableSourceFunctions,
+    onSelectionChange,
+    selectedItemsIds,
   ]);
 
   useEffect(() => {
@@ -348,7 +364,7 @@ const Container = styled.div<{ flexDirection?: string }>`
   font-weight: ${FONT_WEIGHT_MEDIUM};
   color: ${p => p.theme.textColorSnd};
   cursor: pointer;
-  &.container-active {
+  .container-active {
     background-color: ${p => p.theme.bodyBackground};
   }
   > p {

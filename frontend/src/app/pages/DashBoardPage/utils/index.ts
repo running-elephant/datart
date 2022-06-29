@@ -24,15 +24,10 @@ import {
   TimeFilterValueCategory,
 } from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
-import migrationDataChartConfig from 'app/migration/vizDataChartConfig/migrationDataChartConfig';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import {
-  ChartConfig,
-  ChartDataConfig,
-  ChartDataSectionField,
-} from 'app/types/ChartConfig';
+import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
@@ -108,11 +103,6 @@ export const getDataChartRequestParams = (obj: {
     CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
   );
 
-  if (migratedChartConfig?.chartConfig) {
-    migratedChartConfig.chartConfig = migrationDataChartConfig(
-      migratedChartConfig.chartConfig as ChartConfig,
-    );
-  }
   const { datas, settings } = convertToChartConfigDTO(
     migratedChartConfig as ChartDetailConfigDTO,
   );

@@ -158,10 +158,10 @@ describe('migrationViewModelConfig Test', () => {
     });
 
     const originalModel3 = {
-      '["dad", "column1"]': {
+      file1: {
         role: 'role',
         type: 'STRING',
-        name: ['dad', 'column1'],
+        name: 'file1',
         children: [
           {
             role: 'role',
@@ -170,10 +170,10 @@ describe('migrationViewModelConfig Test', () => {
           },
         ],
       },
-      '["dad", "column2"]': {
+      file2: {
         role: 'role',
         type: 'NUMBER',
-        name: ['dad', 'column2'],
+        name: 'file2',
         children: [
           {
             role: 'role',
@@ -188,9 +188,8 @@ describe('migrationViewModelConfig Test', () => {
       'STRUCT',
     );
     expect(JSON.parse(migrationResultObj3).hierarchy).toEqual({
-      '["dad", "column1"]': {
-        name: '["dad", "column1"]',
-        path: ['dad', 'column1'],
+      file1: {
+        name: 'file1',
         role: 'role',
         type: 'STRING',
         children: [
@@ -202,9 +201,8 @@ describe('migrationViewModelConfig Test', () => {
           },
         ],
       },
-      '["dad", "column2"]': {
-        name: '["dad", "column2"]',
-        path: ['dad', 'column2'],
+      file2: {
+        name: 'file2',
         role: 'role',
         type: 'NUMBER',
         children: [
