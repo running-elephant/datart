@@ -93,7 +93,13 @@ public class SqlScriptRender extends ScriptRender {
                     .withQuoteIdentifiers(quoteIdentifiers)
                     .build();
         } else {
-            selectSql = SqlNodeUtils.toSql(result.getFrom(), sqlDialect, quoteIdentifiers);
+            selectSql = SqlBuilder.builder()
+                    .withDialect(sqlDialect)
+                    .withFrom(result.getFrom())
+                    .withAddDefaultNamePrefix(result.isWithDefaultPrefix())
+                    .withDefaultNamePrefix(result.getTablePrefix())
+                    .withQuoteIdentifiers(quoteIdentifiers)
+                    .build();
         }
         selectSql = SqlStringUtils.replaceFragmentVariables(selectSql, queryScript.getVariables());
 

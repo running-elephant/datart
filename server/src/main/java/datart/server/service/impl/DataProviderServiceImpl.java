@@ -444,18 +444,18 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                         if (children != null && children.size() > 0) {
                             for (int i = 0; i < children.size(); i++) {
                                 JSONObject child = children.getJSONObject(i);
-                                schema.put(child.getString("name"), new Column(child.getString("name"), ValueType.valueOf(child.getString("type"))));
+                                schema.put(child.getString("name"), Column.of(ValueType.valueOf(child.getString("type")), child.getString("name").split("\\.")));
                             }
                         }
                     } else {
-                        schema.put(key, new Column(key, ValueType.valueOf(item.getString("type"))));
+                        schema.put(key, Column.of(ValueType.valueOf(item.getString("type")), key));
                     }
                 }
             } else {
                 // 兼容1.0.0-beta.1以前的版本
                 for (String key : jsonObject.keySet()) {
                     ValueType type = ValueType.valueOf(jsonObject.getJSONObject(key).getString("type"));
-                    schema.put(key, new Column(key, type));
+                    schema.put(key, Column.of(type, key));
                 }
             }
         } catch (Exception e) {

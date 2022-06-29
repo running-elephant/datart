@@ -74,7 +74,7 @@ public class ResponseJsonParser implements HttpResponseParser {
 
         dataframe.setColumns(columns);
 
-        Set<String> columnKeySet = columns.stream().map(Column::getName)
+        Set<String> columnKeySet = columns.stream().map(Column::columnName)
                 .collect(Collectors.toSet());
 
         List<List<Object>> rows = array.toJavaList(JSONObject.class).parallelStream()
