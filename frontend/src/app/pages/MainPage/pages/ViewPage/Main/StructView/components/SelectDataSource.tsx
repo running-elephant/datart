@@ -21,8 +21,17 @@ import {
   DatabaseOutlined,
   TableOutlined,
 } from '@ant-design/icons';
-import { Button, Checkbox, Divider, Empty, Input, Popover } from 'antd';
-import { MenuListItem, MenuWrapper, Tree } from 'app/components';
+import {
+  Button,
+  Checkbox,
+  Divider,
+  Empty,
+  Input,
+  Menu,
+  Popover,
+  Tree,
+} from 'antd';
+import { MenuListItem } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
 import classnames from 'classnames';
@@ -31,7 +40,12 @@ import { darken, getLuminance, lighten } from 'polished';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { SPACE_SM, SPACE_XS } from 'styles/StyleConstants';
+import {
+  FONT_WEIGHT_MEDIUM,
+  SPACE_SM,
+  SPACE_TIMES,
+  SPACE_XS,
+} from 'styles/StyleConstants';
 import { selectSources } from '../../../../SourcePage/slice/selectors';
 import { Source } from '../../../../SourcePage/slice/types';
 import { selectAllSourceDatabaseSchemas } from '../../../slice/selectors';
@@ -123,9 +137,9 @@ const SelectDataSource = memo(
       if (Array.isArray(value)) {
         switch (value.length) {
           case 1:
-            return <DatabaseOutlined />;
+            return <DatabaseOutlined className="list-icon" />;
           case 2:
-            return <TableOutlined />;
+            return <TableOutlined className="list-icon" />;
         }
       }
     }, []);
@@ -267,6 +281,7 @@ const SelectDataSource = memo(
         <Popover
           trigger={['click']}
           placement="bottomLeft"
+          overlayClassName="datart-popup"
           visible={visible}
           onVisibleChange={
             renderType === 'OPERATE' ? handleVisibleChange : undefined
@@ -274,47 +289,62 @@ const SelectDataSource = memo(
           content={
             currentSources ? (
               <PopoverBody>
-                <DatabaseListHeader>
+                <ListHeader>
                   <ArrowLeftOutlined
                     onClick={() =>
                       type === 'JOINS' ? null : setCurrentSources(null)
                     }
                   />
-                  <i>{currentSources.name}</i>
-                </DatabaseListHeader>
-                <Input
-                  placeholder={t('searchTable')}
-                  onChange={searchDataSheet}
-                />
-                <Tree
-                  autoExpandParent
-                  defaultExpandParent
-                  loading={!dataSheet}
-                  icon={renderIcon}
-                  treeData={dataSheet}
-                  onSelect={handleSelectDataSheet}
-                ></Tree>
+                  <h4>{currentSources.name}</h4>
+                </ListHeader>
+                <SearchBox>
+                  <Input
+                    placeholder={t('searchTable')}
+                    onChange={searchDataSheet}
+                  />
+                </SearchBox>
+                <DatabaseTableList>
+                  <Tree
+                    autoExpandParent
+                    defaultExpandParent
+                    showIcon
+                    blockNode
+                    // loading={!dataSheet}
+                    icon={renderIcon}
+                    treeData={dataSheet}
+                    onSelect={handleSelectDataSheet}
+                  />
+                </DatabaseTableList>
               </PopoverBody>
             ) : (
               <PopoverBody>
-                <Input
-                  placeholder={t('searchSource')}
-                  onChange={FilterSources}
-                />
-                <MenuWrapper onClick={handleCurrentSources}>
-                  {sources && sources.length > 0 ? (
-                    sources.map((v, i) => {
-                      return (
-                        <MenuListItem key={i}>
-                          <DatabaseOutlined />
-                          {v.name}
-                        </MenuListItem>
-                      );
-                    })
-                  ) : (
-                    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-                  )}
-                </MenuWrapper>
+                <SearchBox>
+                  <Input
+                    placeholder={t('searchSource')}
+                    onChange={FilterSources}
+                  />
+                </SearchBox>
+                <DatasourceList>
+                  <Menu
+                    prefixCls="ant-dropdown-menu"
+                    onClick={handleCurrentSources}
+                  >
+                    {sources && sources.length > 0 ? (
+                      sources.map((v, i) => {
+                        return (
+                          <MenuListItem
+                            key={i}
+                            prefix={<DatabaseOutlined className="list-icon" />}
+                          >
+                            {v.name}
+                          </MenuListItem>
+                        );
+                      })
+                    ) : (
+                      <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                    )}
+                  </Menu>
+                </DatasourceList>
               </PopoverBody>
             )
           }
@@ -346,8 +376,8 @@ const SelectDataSource = memo(
                 >
                   {t('all')}
                 </Checkbox>
-                <DividerWrapper />
-                <CheckboxGroupWrapper
+                <SmallDiveder />
+                <ColumnList
                   value={checkedList}
                   onChange={onChangeDataSheet}
                   options={selectDataSheet.columns}
@@ -366,29 +396,55 @@ const SelectDataSource = memo(
 export default SelectDataSource;
 
 const PopoverBody = styled.div`
-  height: 400px;
-  overflow-y: auto;
-  .ant-menu {
-    border: none;
-  }
-  .ant-popover-inner-content {
-    padding: 10px;
-  }
-`;
-
-const CheckboxGroupWrapper = styled(CheckboxGroup)`
   display: flex;
   flex-direction: column;
+  max-height: 400px;
+
+  .list-icon {
+    color: ${p => p.theme.textColorDisabled};
+  }
 `;
 
-const DividerWrapper = styled(Divider)`
-  margin: ${SPACE_SM} 0;
+const ListHeader = styled.div`
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  padding: ${SPACE_XS} ${SPACE_SM};
+  border-bottom: 1px solid ${p => p.theme.borderColorSplit};
+
+  h4 {
+    padding: 0 ${SPACE_SM};
+    font-weight: ${FONT_WEIGHT_MEDIUM};
+    color: ${p => p.theme.textColorSnd};
+  }
 `;
 
-const DatabaseListHeader = styled.div`
-  margin-bottom: ${SPACE_XS};
-  > i {
-    margin-left: ${SPACE_XS};
+const SearchBox = styled.div`
+  flex-shrink: 0;
+  padding: ${SPACE_XS} ${SPACE_SM};
+`;
+
+const DatasourceList = styled.div`
+  flex: 1;
+  overflow-y: auto;
+`;
+
+const DatabaseTableList = styled.div`
+  flex: 1;
+  padding: 0 ${SPACE_XS};
+  overflow-y: auto;
+`;
+
+const SmallDiveder = styled(Divider)`
+  margin: ${SPACE_XS} 0;
+`;
+
+const ColumnList = styled(CheckboxGroup)`
+  display: flex;
+  flex-direction: column;
+
+  .ant-checkbox-group-item {
+    padding: ${SPACE_TIMES(0.5)} 0;
   }
 `;
 
