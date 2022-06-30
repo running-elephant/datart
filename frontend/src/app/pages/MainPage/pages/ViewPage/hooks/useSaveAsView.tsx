@@ -20,7 +20,7 @@ import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailC
 import { CommonFormTypes } from 'globalConstants';
 import { useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle, getInsertedNodeIndex } from 'utils/utils';
 import { View } from '../../../../../types/View';
 import { SaveFormContext } from '../SaveFormContext';
@@ -47,7 +47,7 @@ export function useSaveAsView() {
 
   const getViewData = useCallback(async (viewId): Promise<View> => {
     try {
-      const { data } = await request<View>(`/views/${viewId}`);
+      const { data } = await request2<View>(`/views/${viewId}`);
       data.config = migrateViewConfig(data.config);
       return data;
     } catch (error) {

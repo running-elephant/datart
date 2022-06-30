@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 import { UserSettingTypes } from '../constants';
 import { UserSetting } from './types';
 
@@ -37,14 +37,14 @@ export const updateLvoUserSettings = async (
 
     if (lvoSetting) {
       if (!orgId) {
-        await request<boolean>({
+        await request2<boolean>({
           url: `/settings/user/${lvoSetting.id}`,
           method: 'DELETE',
         });
         return userSettings.filter(({ id }) => id !== lvoSetting.id);
       } else {
         const updated = { ...lvoSetting, relId: orgId };
-        await request<UserSetting>({
+        await request2<UserSetting>({
           url: `/settings/user/${lvoSetting.id}`,
           method: 'PUT',
           data: updated,
@@ -52,7 +52,7 @@ export const updateLvoUserSettings = async (
         return userSettings.map(s => (s.id === updated.id ? updated : s));
       }
     } else {
-      const { data } = await request<UserSetting>({
+      const { data } = await request2<UserSetting>({
         url: '/settings/user',
         method: 'POST',
         data: {
