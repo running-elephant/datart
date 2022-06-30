@@ -76,7 +76,7 @@ export const StructView = memo(
     const { showSaveForm } = useContext(SaveFormContext);
     const t = useI18NPrefix(`view.structView`);
 
-    const tableJSON = useSelector(state =>
+    const structure = useSelector(state =>
       selectCurrentEditingViewAttr(state, { name: 'script' }),
     ) as StructViewQueryProps;
     const id = useSelector(state =>
@@ -94,7 +94,7 @@ export const StructView = memo(
     const viewsData = useSelector(selectViews);
     const allDatabaseSchemas = useSelector(selectAllSourceDatabaseSchemas);
 
-    const handleTableJSON = useCallback(
+    const handleStructureChange = useCallback(
       (table: any, type: 'MAIN' | 'JOINS', index?: number) => {
         dispatch(
           actions.changeCurrentEditingView({
@@ -105,7 +105,7 @@ export const StructView = memo(
                     columns: table.columns,
                     joins: [],
                   }
-                : produce(tableJSON, draft => {
+                : produce(structure, draft => {
                     draft.joins[index!] = table;
                   }),
           }),
@@ -118,39 +118,39 @@ export const StructView = memo(
           );
         }
       },
-      [tableJSON, dispatch, actions],
+      [structure, dispatch, actions],
     );
 
     const handleAddTableJoin = useCallback(() => {
       dispatch(
         actions.changeCurrentEditingView({
-          script: produce(tableJSON, draft => {
+          script: produce(structure, draft => {
             draft.joins.push({ joinType: StructViewJoinType.LeftJoin });
           }),
         }),
       );
-    }, [tableJSON, dispatch, actions]);
+    }, [structure, dispatch, actions]);
 
     const handleTableJoinType = useCallback(
       (type: StructViewJoinType, index: number) => {
         dispatch(
           actions.changeCurrentEditingView({
-            script: produce(tableJSON, draft => {
+            script: produce(structure, draft => {
               draft.joins[index].joinType = type;
             }),
           }),
         );
       },
-      [tableJSON, dispatch, actions],
+      [structure, dispatch, actions],
     );
 
     const handleTableJoin = useCallback(
       (table: any, type: 'MAIN' | 'JOINS', index: number) => {
-        handleTableJSON(
+        handleStructureChange(
           {
-            ...tableJSON.joins[index],
+            ...structure.joins[index],
             ...table,
-            conditions: tableJSON.joins[index].conditions || [
+            conditions: structure.joins[index].conditions || [
               { left: [], right: [] },
             ],
           },
@@ -158,7 +158,7 @@ export const StructView = memo(
           index,
         );
       },
-      [tableJSON, handleTableJSON],
+      [structure, handleStructureChange],
     );
 
     const handleTableJoinColumns = useCallback(
@@ -168,41 +168,41 @@ export const StructView = memo(
         joinIndex: number,
         joinConditionIndex: number,
       ) => {
-        handleTableJSON(
-          produce(tableJSON.joins[joinIndex], draft => {
+        handleStructureChange(
+          produce(structure.joins[joinIndex], draft => {
             draft.conditions![joinConditionIndex][type] = columnName;
           }),
           'JOINS',
           joinIndex,
         );
       },
-      [tableJSON, handleTableJSON],
+      [structure, handleStructureChange],
     );
 
     const handleTableJoinAddColumns = useCallback(
       (index: number) => {
-        handleTableJSON(
-          produce(tableJSON.joins[index], draft => {
+        handleStructureChange(
+          produce(structure.joins[index], draft => {
             draft.conditions!.push({ left: [], right: [] });
           }),
           'JOINS',
           index,
         );
       },
-      [handleTableJSON, tableJSON.joins],
+      [handleStructureChange, structure.joins],
     );
 
     const handleDeleteJoinsItem = useCallback(
       index => {
         dispatch(
           actions.changeCurrentEditingView({
-            script: produce(tableJSON, draft => {
+            script: produce(structure, draft => {
               draft.joins.splice(index, 1);
             }),
           }),
         );
       },
-      [tableJSON, dispatch, actions],
+      [structure, dispatch, actions],
     );
 
     const handleInterimRunSql = useCallback(
@@ -214,31 +214,31 @@ export const StructView = memo(
         };
 
         if (type === 'MAIN') {
-          script.table = tableJSON.table;
-          script.columns = tableJSON.columns;
+          script.table = structure.table;
+          script.columns = structure.columns;
         } else if (type === 'JOINS' && joinIndex !== undefined) {
-          script.table = tableJSON.table;
-          script.columns = tableJSON.columns;
-          script.joins = [tableJSON.joins[joinIndex]];
+          script.table = structure.table;
+          script.columns = structure.columns;
+          script.joins = [structure.joins[joinIndex]];
         } else {
-          script = tableJSON;
+          script = structure;
         }
         dispatch(runSql({ id, isFragment: !!type, script }));
       },
-      [dispatch, id, tableJSON],
+      [dispatch, id, structure],
     );
 
     const handleDeleteConditions = useCallback(
       (joinIndex, conditionsIndex) => {
         dispatch(
           actions.changeCurrentEditingView({
-            script: produce(tableJSON, draft => {
+            script: produce(structure, draft => {
               draft.joins[joinIndex].conditions?.splice(conditionsIndex, 1);
             }),
           }),
         );
       },
-      [actions, dispatch, tableJSON],
+      [actions, dispatch, structure],
     );
 
     const save = useCallback(
@@ -296,21 +296,21 @@ export const StructView = memo(
     }, [initActions, callSave, handleInterimRunSql]);
 
     useEffect(() => {
-      if (typeof tableJSON === 'string') {
+      if (typeof structure === 'string') {
         dispatch(
           actions.initCurrentEditingStructViewScript({
             script: handleStringScriptToObject(
-              tableJSON,
+              structure,
               allDatabaseSchemas[sourceId],
             ),
           }),
         );
       }
-    }, [sourceId, allDatabaseSchemas, actions, dispatch, tableJSON]);
+    }, [sourceId, allDatabaseSchemas, actions, dispatch, structure]);
 
     return (
       <StructContainer>
-        {typeof tableJSON === 'string' ? (
+        {typeof structure === 'string' ? (
           <LoadingWrap>
             <Spin />
           </LoadingWrap>
@@ -338,15 +338,15 @@ export const StructView = memo(
                     <Space>
                       <SelectDataSource
                         type="MAIN"
-                        callbackFn={handleTableJSON}
                         sourceId={sourceId}
-                        tableJSON={tableJSON}
+                        structure={structure}
+                        onChange={handleStructureChange}
                       />
                     </Space>
                   </ProcessItemContent>
                 </ProcessItem>
 
-                {tableJSON.joins.map((join, i) => {
+                {structure.joins.map((join, i) => {
                   return (
                     <ProcessItem>
                       <ProcessItemLabel>
@@ -363,21 +363,21 @@ export const StructView = memo(
                         <TableRelation>
                           <SelectDataSource
                             joinTable={join}
-                            tableJSON={tableJSON}
-                            renderType="READ"
+                            structure={structure}
+                            renderType="READONLY"
                           />
                           <SelectJoinType
-                            callbackFn={type => {
+                            type={join.joinType!}
+                            onChange={type => {
                               handleTableJoinType(type, i);
                             }}
-                            type={join.joinType!}
                           />
                           <SelectDataSource
                             type="JOINS"
                             joinTable={join}
                             sourceId={sourceId}
-                            tableJSON={tableJSON}
-                            callbackFn={(table, type) =>
+                            structure={structure}
+                            onChange={(table, type) =>
                               handleTableJoin(table, type, i)
                             }
                           />
@@ -392,9 +392,9 @@ export const StructView = memo(
                                 return (
                                   <JoinConditionLine>
                                     <SelectJoinColumns
-                                      tableJSON={tableJSON}
+                                      structure={structure}
                                       joinTable={join}
-                                      callbackFn={(
+                                      onChange={(
                                         columnName,
                                         type,
                                         joinConditionIndex,
@@ -456,7 +456,7 @@ export const StructView = memo(
                 })}
               </ProcessLine>
 
-              {!!tableJSON['table'].length && (
+              {!!structure.table.length && (
                 <>
                   <Button
                     type="link"

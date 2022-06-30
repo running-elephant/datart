@@ -61,21 +61,21 @@ const CheckboxGroup = Checkbox.Group;
 
 interface SelectDataSourceProps {
   type?: 'MAIN' | 'JOINS';
-  callbackFn?: (data: any, type) => void;
-  renderType?: 'READ' | 'OPERATE';
-  tableJSON?: StructViewQueryProps;
+  renderType?: 'READONLY' | 'MANAGE';
+  structure?: StructViewQueryProps;
   sourceId?: string;
   joinTable?: JoinTableProps;
+  onChange?: (data: any, type) => void;
 }
 
 const SelectDataSource = memo(
   ({
     type,
-    callbackFn,
-    renderType = 'OPERATE',
-    tableJSON,
+    renderType = 'MANAGE',
+    structure,
     sourceId,
     joinTable,
+    onChange,
   }: SelectDataSourceProps) => {
     const dispatch = useDispatch();
     const propsSources = useSelector(selectSources);
@@ -83,9 +83,9 @@ const SelectDataSource = memo(
     const t = useI18NPrefix(`view.structView`);
 
     const [currentSources, setCurrentSources] = useState<Source | null>(null);
-    const [selectDataSheet, setSelectDataSheet] = useState<any>(
-      tableJSON && renderType === 'READ'
-        ? { table: tableJSON['table'], columns: tableJSON['columns'] }
+    const [selectedTableSchema, setSelectedTableSchema] = useState<any>(
+      structure && renderType === 'READONLY'
+        ? { table: structure.table, columns: structure.columns }
         : null,
     );
     const [checkedList, setCheckedList] = useState<Array<string> | []>([]);
@@ -160,7 +160,7 @@ const SelectDataSource = memo(
       return [];
     }, [buildTableNode, currentSources, allDatabaseSchemas]);
 
-    const { filteredData: dataSheet, debouncedSearch: searchDataSheet } =
+    const { filteredData: tableSchema, debouncedSearch: tableSchemaSearch } =
       useSearchAndExpand(
         databaseTreeModel,
         (keywords, data: any) => (data.title as string).includes(keywords),
@@ -168,31 +168,31 @@ const SelectDataSource = memo(
         true,
       );
 
-    const onChangeDataSheet = useCallback(
+    const handleColumnCheck = useCallback(
       list => {
-        const plainOptions = selectDataSheet.columns;
+        const plainOptions = selectedTableSchema.columns;
 
         setCheckedList(list);
         setIndeterminate(!!list.length && list.length < plainOptions.length);
         setCheckAll(list.length === plainOptions.length);
-        callbackFn?.({ ...selectDataSheet, columns: list }, type);
+        onChange?.({ ...selectedTableSchema, columns: list }, type);
       },
-      [callbackFn, selectDataSheet, type],
+      [onChange, selectedTableSchema, type],
     );
 
-    const onCheckAllDataSheet = useCallback(
-      (checked, dataSheet) => {
-        const checkedList = checked ? dataSheet.columns : [];
+    const handleCheckAllColumns = useCallback(
+      (checked, tableSchema) => {
+        const checkedList = checked ? tableSchema.columns : [];
 
         setCheckedList(checkedList);
         setIndeterminate(false);
         setCheckAll(checked);
-        callbackFn?.({ ...dataSheet, columns: checkedList }, type);
+        onChange?.({ ...tableSchema, columns: checkedList }, type);
       },
-      [callbackFn, type],
+      [onChange, type],
     );
 
-    const handleSelectDataSheet = useCallback(
+    const handleTableSelect = useCallback(
       (key, { node }) => {
         if (node.children) {
           return;
@@ -202,25 +202,25 @@ const SelectDataSource = memo(
         const nodeList = node.value;
         const sheetName = node.value[node.value.length - 1];
         const columns = node.columns.map(v => v.name);
-        const dataSheet: any = {
+        const tableSchema: any = {
           table: databaseSchemas.length === 1 ? [sheetName] : nodeList,
           columns: columns,
           sourceId: currentSources!.id,
         };
 
         if (type === 'JOINS') {
-          delete dataSheet.sourceId;
+          delete tableSchema.sourceId;
         }
 
-        setSelectDataSheet(dataSheet);
-        callbackFn?.(dataSheet, type);
-        onCheckAllDataSheet(true, dataSheet);
+        setSelectedTableSchema(tableSchema);
+        onChange?.(tableSchema, type);
+        handleCheckAllColumns(true, tableSchema);
         setVisible(false);
       },
       [
-        callbackFn,
         type,
-        onCheckAllDataSheet,
+        onChange,
+        handleCheckAllColumns,
         allDatabaseSchemas,
         currentSources,
       ],
@@ -235,13 +235,13 @@ const SelectDataSource = memo(
     }, [propsSources]);
 
     useEffect(() => {
-      if (renderType === 'READ') {
+      if (renderType === 'READONLY') {
         const leftContainer = joinTable?.conditions?.[0].left;
 
         if (leftContainer) {
-          tableJSON?.joins.forEach(v => {
+          structure?.joins.forEach(v => {
             if (v.table?.every(val => leftContainer?.includes(val))) {
-              setSelectDataSheet({
+              setSelectedTableSchema({
                 table: v?.['table'],
                 columns: v?.['columns'],
               });
@@ -249,7 +249,7 @@ const SelectDataSource = memo(
           });
         }
       }
-    }, [tableJSON, renderType, joinTable?.conditions]);
+    }, [structure, renderType, joinTable?.conditions]);
 
     useEffect(() => {
       if (type === 'JOINS') {
@@ -258,17 +258,17 @@ const SelectDataSource = memo(
     }, [sourceId, sources, type]);
 
     useEffect(() => {
-      if (type === 'MAIN' && tableJSON?.table.length && !selectDataSheet) {
+      if (type === 'MAIN' && structure?.table.length && !selectedTableSchema) {
         setCurrentSources(sources.find(v => v.id === sourceId) || null);
-        setSelectDataSheet({
-          table: tableJSON['table'],
-          columns: tableJSON['columns'],
+        setSelectedTableSchema({
+          table: structure.table,
+          columns: structure.columns,
         });
-        setCheckedList(tableJSON['columns']);
+        setCheckedList(structure.columns);
       }
 
-      if (type === 'JOINS' && joinTable?.table && !selectDataSheet) {
-        setSelectDataSheet({
+      if (type === 'JOINS' && joinTable?.table && !selectedTableSchema) {
+        setSelectedTableSchema({
           table: joinTable['table'],
           columns: joinTable['columns'],
         });
@@ -284,7 +284,7 @@ const SelectDataSource = memo(
           overlayClassName="datart-popup"
           visible={visible}
           onVisibleChange={
-            renderType === 'OPERATE' ? handleVisibleChange : undefined
+            renderType === 'MANAGE' ? handleVisibleChange : undefined
           }
           content={
             currentSources ? (
@@ -300,7 +300,7 @@ const SelectDataSource = memo(
                 <SearchBox>
                   <Input
                     placeholder={t('searchTable')}
-                    onChange={searchDataSheet}
+                    onChange={tableSchemaSearch}
                   />
                 </SearchBox>
                 <DatabaseTableList>
@@ -309,10 +309,10 @@ const SelectDataSource = memo(
                     defaultExpandParent
                     showIcon
                     blockNode
-                    // loading={!dataSheet}
+                    // loading={!tableSchema}
                     icon={renderIcon}
-                    treeData={dataSheet}
-                    onSelect={handleSelectDataSheet}
+                    treeData={tableSchema}
+                    onSelect={handleTableSelect}
                   />
                 </DatabaseTableList>
               </PopoverBody>
@@ -324,7 +324,7 @@ const SelectDataSource = memo(
                     onChange={FilterSources}
                   />
                 </SearchBox>
-                <DatasourceList>
+                <SourceList>
                   <Menu
                     prefixCls="ant-dropdown-menu"
                     onClick={handleCurrentSources}
@@ -344,7 +344,7 @@ const SelectDataSource = memo(
                       <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
                     )}
                   </Menu>
-                </DatasourceList>
+                </SourceList>
               </PopoverBody>
             )
           }
@@ -352,16 +352,16 @@ const SelectDataSource = memo(
           <TableButton
             type="primary"
             className={classnames({
-              'with-columns': selectDataSheet && renderType === 'OPERATE',
+              'with-columns': selectedTableSchema && renderType === 'MANAGE',
             })}
           >
-            {selectDataSheet
-              ? selectDataSheet.table[selectDataSheet.table.length - 1]
+            {selectedTableSchema
+              ? selectedTableSchema.table[selectedTableSchema.table.length - 1]
               : t('selectTable')}
           </TableButton>
         </Popover>
 
-        {selectDataSheet && renderType === 'OPERATE' && (
+        {selectedTableSchema && renderType === 'MANAGE' && (
           <Popover
             trigger={['click']}
             placement="bottomLeft"
@@ -370,17 +370,20 @@ const SelectDataSource = memo(
                 <Checkbox
                   indeterminate={indeterminate}
                   onChange={e => {
-                    onCheckAllDataSheet(e.target.checked, selectDataSheet);
+                    handleCheckAllColumns(
+                      e.target.checked,
+                      selectedTableSchema,
+                    );
                   }}
                   checked={checkAll}
                 >
                   {t('all')}
                 </Checkbox>
-                <SmallDiveder />
+                <SmallDivider />
                 <ColumnList
                   value={checkedList}
-                  onChange={onChangeDataSheet}
-                  options={selectDataSheet.columns}
+                  onChange={handleColumnCheck}
+                  options={selectedTableSchema.columns}
                 />
               </PopoverBody>
             }
@@ -424,7 +427,7 @@ const SearchBox = styled.div`
   padding: ${SPACE_XS} ${SPACE_SM};
 `;
 
-const DatasourceList = styled.div`
+const SourceList = styled.div`
   flex: 1;
   overflow-y: auto;
 `;
@@ -435,7 +438,7 @@ const DatabaseTableList = styled.div`
   overflow-y: auto;
 `;
 
-const SmallDiveder = styled(Divider)`
+const SmallDivider = styled(Divider)`
   margin: ${SPACE_XS} 0;
 `;
 
