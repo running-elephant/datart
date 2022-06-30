@@ -373,6 +373,7 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
       {
         id: currentChartPreview?.backendChart?.view.id || '',
         config: currentChartPreview?.backendChart?.view.config || {},
+        meta: currentChartPreview?.backendChart?.view.meta,
         computedFields:
           currentChartPreview?.backendChart?.config?.computedFields || [],
         type: currentChartPreview?.backendChart?.view.type || 'SQL',

@@ -26,11 +26,9 @@ const Layout = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: ${SPACE_LG} ${SPACE_LG} ${SPACE_TIMES(30)} ${SPACE_LG};
+  margin-top: ${SPACE_TIMES(30)};
 
   &.alert {
-    justify-content: flex-start;
-    padding: ${SPACE_TIMES(20)} ${SPACE_LG} ${SPACE_LG} ${SPACE_LG};
+    margin-top: ${SPACE_TIMES(20)};
   }
 `;

@@ -17,7 +17,7 @@
  */
 
 import { FONT_DEFAULT } from 'app/constants';
-import { convertControllerConfigToBeta4 } from 'app/migration/BoardConfig/utils/beta4utils';
+import { convertControllerConfigTobeta4_1 } from 'app/migration/BoardConfig/utils/beta4utils';
 import { ServerRelation } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { WidgetConf } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
@@ -26,6 +26,7 @@ import {
 } from '../BoardConfig/migrateWidgets';
 import { WidgetBeta3 } from '../BoardConfig/types';
 import { APP_VERSION_BETA_0 } from '../constants';
+
 describe('test migrateWidgets ', () => {
   test('should return undefined  when widget.config.type === filter', () => {
     const widget1 = {
@@ -99,59 +100,10 @@ describe('test migrateWidgets ', () => {
     expect(convertWidgetRelationsToObj(relations1)).toMatchObject(relations2);
   });
 
-  test('convertControllerConfigToBeta4 function', () => {
-    const config = {
-      clientId: 'client_18c64442-a192-4f26-8582-0385cb3b2b32',
-      version: '1.0.0-beta.4',
-      index: 9,
-      name: '23456y',
-      boardType: 'auto',
-      type: 'controller',
-      originalType: 'dropdownList',
-      lock: false,
-      content: {
-        type: 'dropdownList',
-        relatedViews: [
-          {
-            viewId: '1caa682f2a154913900622ef15778703',
-            relatedCategory: 'field',
-            fieldValue: '["dad","name_level2"]',
-            fieldValueType: 'STRING',
-          },
-          {
-            viewId: 'ed7a365741474fc8a5569d4047d1a18e',
-            relatedCategory: 'field',
-            fieldValue: '["国家"]',
-            fieldValueType: 'STRING',
-          },
-        ],
-        name: '23456y',
-        config: {
-          controllerValues: [],
-          valueOptions: [],
-          valueOptionType: 'common',
-          assistViewFields: [
-            '1caa682f2a154913900622ef15778703',
-            '["dad","name_level2"]',
-            '["dad","name_level2"]',
-          ],
-          sqlOperator: 'EQ',
-          visibility: {
-            visibilityType: 'show',
-          },
-        },
-      },
-    } as WidgetConf;
-    expect(convertControllerConfigToBeta4(config)).toEqual(config);
+  test('should controllerConfig relatedViews fieldValue and assistViewFields string to array of string', () => {
     const config1 = {
-      clientId: 'client_18c64442-a192-4f26-8582-0385cb3b2b32',
-      version: '1.0.0-beta.4',
-      index: 9,
-      name: '23456y',
-      boardType: 'auto',
+      version: '1.0.0-beta.4+1',
       type: 'controller',
-      originalType: 'dropdownList',
-      lock: false,
       content: {
         type: 'dropdownList',
         relatedViews: [
@@ -185,15 +137,9 @@ describe('test migrateWidgets ', () => {
         },
       },
     } as WidgetConf;
-    expect(convertControllerConfigToBeta4(config1)).toEqual({
-      clientId: 'client_18c64442-a192-4f26-8582-0385cb3b2b32',
-      version: '1.0.0-beta.4',
-      index: 9,
-      name: '23456y',
-      boardType: 'auto',
+    expect(convertControllerConfigTobeta4_1(config1)).toEqual({
+      version: '1.0.0-beta.4+1',
       type: 'controller',
-      originalType: 'dropdownList',
-      lock: false,
       content: {
         type: 'dropdownList',
         relatedViews: [
@@ -227,5 +173,45 @@ describe('test migrateWidgets ', () => {
         },
       },
     });
+  });
+
+  test('if the controllerConfig related Views fieldValue and assistViewFields  is a string array, it will remain unchanged', () => {
+    const config = {
+      version: '1.0.0-beta.4+1',
+      type:'controller',
+      content: {
+        type: 'dropdownList',
+        relatedViews: [
+          {
+            viewId: '1caa682f2a154913900622ef15778703',
+            relatedCategory: 'field',
+            fieldValue: '["dad","name_level2"]',
+            fieldValueType: 'STRING',
+          },
+          {
+            viewId: 'ed7a365741474fc8a5569d4047d1a18e',
+            relatedCategory: 'field',
+            fieldValue: '["国家"]',
+            fieldValueType: 'STRING',
+          },
+        ],
+        name: '23456y',
+        config: {
+          controllerValues: [],
+          valueOptions: [],
+          valueOptionType: 'common',
+          assistViewFields: [
+            '1caa682f2a154913900622ef15778703',
+            '["dad","name_level2"]',
+            '["dad","name_level2"]',
+          ],
+          sqlOperator: 'EQ',
+          visibility: {
+            visibilityType: 'show',
+          },
+        },
+      },
+    } as WidgetConf;
+    expect(convertControllerConfigTobeta4_1(config)).toEqual(config);
   });
 });

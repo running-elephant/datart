@@ -34,13 +34,13 @@ describe('DataModelTree Util Tests', () => {
         {
           name: 'age',
           type: DataViewFieldType.NUMERIC,
-          category: ColumnCategories.Uncategorized,
+          category: ColumnCategories.UnCategorized,
           index: 0,
         },
         {
           name: 'address',
           type: DataViewFieldType.STRING,
-          category: ColumnCategories.Uncategorized,
+          category: ColumnCategories.UnCategorized,
           index: 0,
         },
       ];
@@ -69,14 +69,14 @@ describe('DataModelTree Util Tests', () => {
           name: 'name',
           role: ColumnRole.Role,
           type: DataViewFieldType.STRING,
-          category: ColumnCategories.Uncategorized,
+          category: ColumnCategories.UnCategorized,
           index: 0,
           children: [
             {
               name: 'first-name',
               role: ColumnRole.Role,
               type: DataViewFieldType.STRING,
-              category: ColumnCategories.Uncategorized,
+              category: ColumnCategories.UnCategorized,
               index: 0,
             },
           ],
@@ -85,7 +85,7 @@ describe('DataModelTree Util Tests', () => {
           name: 'age',
           role: ColumnRole.Hierarchy,
           type: DataViewFieldType.NUMERIC,
-          category: ColumnCategories.Uncategorized,
+          category: ColumnCategories.UnCategorized,
           index: 0,
           children: [],
         },
@@ -93,21 +93,21 @@ describe('DataModelTree Util Tests', () => {
           name: 'address',
           role: ColumnRole.Hierarchy,
           type: DataViewFieldType.STRING,
-          category: ColumnCategories.Uncategorized,
+          category: ColumnCategories.UnCategorized,
           index: 0,
           children: [
             {
               name: 'address1',
               role: ColumnRole.Role,
               type: DataViewFieldType.STRING,
-              category: ColumnCategories.Uncategorized,
+              category: ColumnCategories.UnCategorized,
               index: 0,
             },
             {
               name: 'address2',
               role: ColumnRole.Role,
               type: DataViewFieldType.STRING,
-              category: ColumnCategories.Uncategorized,
+              category: ColumnCategories.UnCategorized,
               index: 0,
             },
           ],
@@ -150,7 +150,7 @@ describe('DataModelTree Util Tests', () => {
         {
           name: 'age',
           type: DataViewFieldType.NUMERIC,
-          category: ColumnCategories.Uncategorized,
+          category: ColumnCategories.UnCategorized,
           index: 0,
         },
       ];
@@ -158,7 +158,7 @@ describe('DataModelTree Util Tests', () => {
         {
           name: 'address',
           type: DataViewFieldType.STRING,
-          category: ColumnCategories.Uncategorized,
+          category: ColumnCategories.UnCategorized,
           index: 0,
         },
       ];

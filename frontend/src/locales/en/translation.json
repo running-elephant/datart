@@ -640,7 +640,16 @@
           "normal": "Normal",
           "bold": "Bold",
           "bolder": "Bolder",
-          "lighter": "Lighter"
+          "lighter": "Lighter",
+          "100": "100",
+          "200": "100",
+          "300": "100",
+          "400": "100",
+          "500": "100",
+          "600": "100",
+          "700": "100",
+          "800": "100",
+          "900": "100"
         },
         "fontStyle": {
           "normal": "Normal",
@@ -670,6 +679,15 @@
           "leftBottom": "Left Bottom",
           "rightTop": "Right Top",
           "rightBottom": "Right Bottom"
+        },
+        "dataZoomSlider": {
+          "showZoomSlider": "Show Zoom Slider",
+          "zoomSliderColor": "Zoom Slider Color",
+          "usePercentage": "Use Percentage",
+          "zoomStartPercentage": "Zoom Slider Start Percentage",
+          "zoomEndPercentage": "Zoom Slider End Percentage",
+          "zoomStartIndex": "Zoom Slider Start Index",
+          "zoomEndIndex": "Zoom Slider End Index"
         }
       },
       "data": {
@@ -1376,19 +1394,23 @@
       "typeAndCategory": "Type & Category"
     },
     "structView": {
-      "STRUCT": "Struct View",
+      "STRUCT": "Table View",
       "SQL": "SQL View",
       "file": "File",
-      "sourcedata": "Data",
-      "join": "Join Data",
-      "selectJoinColumn": "Select a column",
+      "main": "Main: ",
+      "join": "Join: ",
+      "selectJoinColumn": "Relations",
       "addJoin": "Add join data",
-      "run": "Run selection",
-      "searchTable": "Search datasheets",
-      "searchSource": "Search data sources",
-      "selectSource": "Select data source",
+      "run": "Run",
+      "runStep": "Run step",
+      "searchTable": "Search Tables",
+      "searchSource": "Search Sources",
+      "selectTable": "Select a table",
       "all": "All",
-      "selectField": "Select a column"
+      "selectField": "Select a column",
+      "RIGHT": "Right Join",
+      "LEFT": "Left Join",
+      "INNER": "Inner Join"
     }
   },
   "source": {

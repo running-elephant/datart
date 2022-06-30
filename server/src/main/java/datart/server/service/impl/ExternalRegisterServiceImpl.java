@@ -103,10 +103,8 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
 
         if (userService.register(registerParam, false)) {
             PasswordToken passwordToken = new PasswordToken(registerParam.getUsername(),
-                    null,
+                    registerParam.getPassword(),
                     System.currentTimeMillis());
-
-            passwordToken.setPassword(registerParam.getPassword());
             return JwtUtils.toJwtString(passwordToken);
         }
         return null;
@@ -119,7 +117,7 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
         User user = userMapper.selectByNameOrEmail(oauthUser.getName());
         if (user != null) {
             PasswordToken passwordToken = new PasswordToken(user.getUsername(),
-                    null,
+                    user.getPassword(),
                     System.currentTimeMillis());
             return JwtUtils.toJwtString(passwordToken);
         }
@@ -135,10 +133,8 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
         }
         if (userService.register(userRegisterParam, false)) {
             PasswordToken passwordToken = new PasswordToken(userRegisterParam.getUsername(),
-                    null,
+                    userRegisterParam.getPassword(),
                     System.currentTimeMillis());
-
-            passwordToken.setPassword(userRegisterParam.getPassword());
             return JwtUtils.toJwtString(passwordToken);
         }
         return null;

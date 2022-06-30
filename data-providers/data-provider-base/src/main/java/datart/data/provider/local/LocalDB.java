@@ -93,7 +93,7 @@ public class LocalDB {
         if (!CollectionUtils.isEmpty(dataframe.getColumns())) {
             // add columns
             for (Column column : dataframe.getColumns()) {
-                rs.addColumn(column.getName(), DataTypeUtils.valueType2SqlTypes(column.getType()), -1, -1);
+                rs.addColumn(column.columnName(), DataTypeUtils.valueType2SqlTypes(column.getType()), -1, -1);
             }
         }
         if (conn.getMetaData().getURL().equals("jdbc:columnlist:connection")) {

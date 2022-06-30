@@ -40,7 +40,7 @@ const valueTransder = {
 export const transferChartConfig = (
   chartConfig?: ChartConfig,
   params?: FilterSearchParams,
-  mactchByName?: boolean,
+  matchByName?: boolean,
   jumpFilterParams?: ChartDataRequestFilter[],
 ): ChartConfig => {
   if (!chartConfig) {
@@ -56,10 +56,10 @@ export const transferChartConfig = (
         item.rows?.length > 0
       ) {
         item.rows = item.rows.map(v => {
-          const isMatch = mactchByName
+          const isMatch = matchByName
             ? v.colName && idKeys.includes(v.colName)
             : v.uid && idKeys.includes(v.uid);
-          const value = mactchByName
+          const value = matchByName
             ? v.colName && params[v.colName]
             : v.uid && params[v.uid];
           if (isMatch && v.filter && v.filter.condition) {

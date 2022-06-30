@@ -127,7 +127,6 @@ export const fetchEditBoardDetail = createAsyncThunk<
 
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
     dispatch(boardActions.setDataChartToMap(allDataCharts));
-
     const viewViews = getChartDataView(serverViews, allDataCharts);
 
     dispatch(boardActions.updateViewMap(viewViews));
@@ -471,6 +470,7 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
       {
         id: chartDataView?.id || '',
         config: chartDataView?.config || {},
+        meta: chartDataView?.meta,
         computedFields: dataChart?.config?.computedFields || [],
       },
       dataChart?.config?.chartConfig?.datas,

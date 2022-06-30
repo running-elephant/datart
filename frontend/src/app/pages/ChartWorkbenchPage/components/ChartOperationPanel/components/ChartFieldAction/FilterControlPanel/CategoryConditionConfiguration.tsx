@@ -36,7 +36,13 @@ import {
 } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
-import { isEmpty, isEmptyArray, IsKeyIn, isTreeModel } from 'utils/object';
+import {
+  isEmpty,
+  isEmptyArray,
+  isEmptyString,
+  IsKeyIn,
+  isTreeModel,
+} from 'utils/object';
 import { FilterOptionForwardRef } from '.';
 import CategoryConditionEditableTable from './CategoryConditionEditableTable';
 import CategoryConditionRelationSelector from './CategoryConditionRelationSelector';
@@ -116,7 +122,7 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
           FilterSqlOperator.NotEqual,
         ].includes(args?.operator as FilterSqlOperator)
       ) {
-        return !isEmpty(args?.value);
+        return !isEmptyString(args?.value);
       } else if (
         [FilterSqlOperator.Null, FilterSqlOperator.NotNull].includes(
           args?.operator as FilterSqlOperator,

@@ -37,7 +37,6 @@ import {
   fetchShareVizInfo,
   getOauth2Clients,
 } from './thunks';
-// import { fetchShareDataSetByPreviewChartAction } from './thunk';
 import { ExecuteToken, SharePageState, ShareVizInfo } from './types';
 
 export const initialState: SharePageState = {

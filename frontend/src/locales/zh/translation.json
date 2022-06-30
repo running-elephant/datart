@@ -640,7 +640,16 @@
           "normal": "常规字号",
           "bold": "粗体",
           "bolder": "特粗体",
-          "lighter": "细体"
+          "lighter": "细体",
+          "100": "100",
+          "200": "100",
+          "300": "100",
+          "400": "100",
+          "500": "100",
+          "600": "100",
+          "700": "100",
+          "800": "100",
+          "900": "100"
         },
         "fontStyle": {
           "normal": "常规体",
@@ -670,6 +679,15 @@
           "leftBottom": "左下",
           "rightTop": "右上",
           "rightBottom": "右下"
+        },
+        "dataZoomSlider": {
+          "showZoomSlider": "是否开启缩放滑块",
+          "zoomSliderColor": "选中颜色",
+          "usePercentage": "缩放使用百分比",
+          "zoomStartPercentage": "起始百分比",
+          "zoomEndPercentage": "结束百分比",
+          "zoomStartIndex": "起始下标",
+          "zoomEndIndex": "结束下标"
         }
       },
       "data": {
@@ -1377,19 +1395,23 @@
       "typeAndCategory": "类型与分类"
     },
     "structView": {
-      "STRUCT": "结构视图",
+      "STRUCT": "表视图",
       "SQL": "SQL 视图",
       "file": "文件夹",
-      "sourcedata": "数据",
-      "join": "关联",
-      "selectJoinColumn": "选择关联字段",
-      "addJoin": "添加关联项",
-      "run": "执行片段",
+      "main": "主表：",
+      "join": "表连接：",
+      "selectJoinColumn": "关联字段",
+      "addJoin": "添加表连接",
+      "run": "执行",
+      "runStep": "执行当前步骤",
       "searchTable": "搜索数据表",
       "searchSource": "搜索数据源",
-      "selectSource": "选择一个数据源",
+      "selectTable": "选择表格",
       "all": "全选",
-      "selectField": "选择一个字段"
+      "selectField": "选择字段",
+      "RIGHT": "右连接",
+      "LEFT": "左连接",
+      "INNER": "内连接"
     }
   },
   "source": {

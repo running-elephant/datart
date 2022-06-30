@@ -45,7 +45,7 @@ import styled from 'styled-components/macro';
 import { SPACE_TIMES } from 'styles/StyleConstants';
 
 const DefaultFormatDetailConfig: FormatFieldAction = {
-  type: FieldFormatType.Defalut,
+  type: FieldFormatType.Default,
   [FieldFormatType.Numeric]: {
     decimalPlaces: 2,
     unitKey: NumberUnitKey.None,
@@ -119,7 +119,7 @@ const NumberFormatAction: FC<{
   };
 
   const renderFieldFormatExtendSetting = () => {
-    if (FieldFormatType.Defalut === type) {
+    if (FieldFormatType.Default === type) {
       return null;
     } else {
       return (
@@ -251,7 +251,7 @@ const NumberFormatAction: FC<{
           value={type}
         >
           <Space direction="vertical">
-            <Radio value={FieldFormatType.Defalut}>{t('format.default')}</Radio>
+            <Radio value={FieldFormatType.Default}>{t('format.default')}</Radio>
             <Radio value={FieldFormatType.Numeric}>{t('format.numeric')}</Radio>
             <Radio value={FieldFormatType.Currency}>
               {t('format.currency')}

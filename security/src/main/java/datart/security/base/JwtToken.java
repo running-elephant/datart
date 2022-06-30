@@ -12,6 +12,8 @@ public class JwtToken implements Serializable {
 
     private Date exp;
 
+    private int pwdHash;
+
     private Long createTime;
 
 }

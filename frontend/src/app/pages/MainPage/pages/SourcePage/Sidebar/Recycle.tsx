@@ -22,7 +22,6 @@ import { memo, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import { List, ListItem } from '.';
-import { selectArchivedListLoading } from '../slice/selectors';
 import { getArchivedSources } from '../slice/thunks';
 import { Source } from '../slice/types';
 
@@ -34,7 +33,6 @@ interface RecycleProps {
 export const Recycle = memo(({ sourceId, list }: RecycleProps) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const loading = useSelector(selectArchivedListLoading);
   const orgId = useSelector(selectOrgId);
 
   useEffect(() => {

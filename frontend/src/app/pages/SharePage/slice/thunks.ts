@@ -169,6 +169,7 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
       {
         id: args.preview?.backendChart?.view.id || '',
         config: args.preview?.backendChart?.view.config || {},
+        meta: args?.preview?.backendChart?.view?.meta,
         computedFields:
           args.preview?.backendChart?.config?.computedFields || [],
         type: args.preview?.backendChart?.view.type || 'SQL',

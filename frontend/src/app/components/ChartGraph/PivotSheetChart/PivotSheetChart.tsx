@@ -236,6 +236,7 @@ class PivotSheetChart extends ReactChart {
         tooltip: {
           showTooltip: true,
         },
+        cornerExtraFieldText: context.translator('summary.number'),
         interaction: {
           hoverHighlight: Boolean(enableHoverHighlight),
           selectedCellsSpotlight: Boolean(enableSelectedHighlight),
@@ -343,10 +344,9 @@ class PivotSheetChart extends ReactChart {
       },
       palette: {
         basicColors: this.getThemeColorList(styleConfigs),
-        semanticColors: {
-          red: '#FF4D4F',
-          green: '#29A294',
-        },
+        semanticColors: {},
+        brandColor: '#3471F9',
+        basicColorRelations: [],
       },
       onRowCellCollapseTreeRows: ({ isCollapsed, node }) => {
         this.collapsedRows[node.id] = isCollapsed;
@@ -378,6 +378,8 @@ class PivotSheetChart extends ReactChart {
     chartDataSet: IChartDataSet<string>,
   ) {
     const selectedItems: SelectedItem[] = [];
+    // TODO(tianlei): delete this line,  const a  = chartDataSet.getOriginFieldInfo('Area');
+
     cells.forEach(v => {
       const { rowIndex, data } = v.getMeta();
       if (!selectedItems.find(v => v.index === rowIndex) && data) {

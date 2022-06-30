@@ -57,10 +57,12 @@ const { Panel } = Collapse;
 
 export const ChartDraggableSourceContainer: FC<
   {
+    isActive?: boolean;
     viewType?: string;
     isViewComputerField?: boolean;
     availableSourceFunctions?: string[];
     dateLevelFields?: dateLevelFieldsProps[];
+    selectedItemsIds?: string[];
     onDeleteComputedField?: (fieldName) => void;
     onEditComputedField?: (fieldName) => void;
     onSelectionChange?: (dataItemId, cmdKeyActive, shiftKeyActive) => void;
@@ -72,7 +74,7 @@ export const ChartDraggableSourceContainer: FC<
   type,
   subType,
   category,
-  expression,
+  selectedItemsIds,
   selectedItems,
   isActive,
   availableSourceFunctions,
@@ -130,8 +132,7 @@ export const ChartDraggableSourceContainer: FC<
     const _isAllowMoreAction = () => {
       return (
         ChartDataViewFieldCategory.Field === category ||
-        ChartDataViewFieldCategory.Hierarchy === category ||
-        isViewComputerField
+        ChartDataViewFieldCategory.Hierarchy === category
       );
     };
 
@@ -158,7 +159,9 @@ export const ChartDraggableSourceContainer: FC<
       return (
         <Menu onClick={e => _handleMenuClick(e, colName)}>
           <Menu.Item key="edit">{t('editField')}</Menu.Item>
-          <Menu.Item key="delete">{t('deleteField')}</Menu.Item>
+          <Menu.Item disabled={isViewComputerField} key="delete">
+            {t('deleteField')}
+          </Menu.Item>
         </Menu>
       );
     };
@@ -214,72 +217,84 @@ export const ChartDraggableSourceContainer: FC<
           icon = <FileUnknownOutlined {...props} />;
       }
     }
-
-    return type === 'DATE' && category === 'field' ? (
-      <Row align="middle" style={{ width: '100%' }}>
-        <CollapseWrapper
-          defaultActiveKey={[colName]}
-          ghost
-          expandIconPosition="right"
-          expandIcon={({ isActive }) => {
-            return <DownOutlined rotate={isActive ? -180 : 0} />;
+    if (type !== 'DATE') {
+      return (
+        <Row
+          align="middle"
+          style={{ width: '100%' }}
+          onClick={e => {
+            onSelectionChange?.(colName, e.metaKey || e.ctrlKey, e.shiftKey);
           }}
+          className={styleClasses.join(' ')}
         >
-          <Panel
-            key={colName}
-            header={
-              <div ref={drag}>
-                <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
-                <p>{colName}</p>
-              </div>
-            }
+          <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
+          <StyledFieldContent>{colName}</StyledFieldContent>
+          <div onClick={stopPPG}>
+            <Dropdown
+              disabled={_isAllowMoreAction()}
+              overlay={_getExtraActionMenus()}
+              trigger={['click']}
+            >
+              <ToolbarButton
+                icon={<MoreOutlined />}
+                iconSize={FONT_SIZE_BASE}
+                className="setting"
+                onClick={e => e.preventDefault()}
+              />
+            </Dropdown>
+          </div>
+        </Row>
+      );
+    } else if (type === 'DATE' && category === 'field') {
+      return (
+        <Row align="middle" style={{ width: '100%' }}>
+          <CollapseWrapper
+            defaultActiveKey={[colName]}
+            ghost
+            expandIconPosition="right"
+            expandIcon={({ isActive }) => {
+              return <DownOutlined rotate={isActive ? -180 : 0} />;
+            }}
           >
-            {dateLevelFields?.map((item, i) => {
-              return (
-                <DateLevelFieldContainer
-                  key={i}
-                  item={item}
-                  onClearCheckedList={onClearCheckedList}
-                />
-              );
-            })}
-          </Panel>
-        </CollapseWrapper>
-      </Row>
-    ) : (
-      <Row align="middle" style={{ width: '100%' }}>
-        <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
-        <StyledFieldContent>{colName}</StyledFieldContent>
-        <div onClick={stopPPG}>
-          <Dropdown
-            disabled={_isAllowMoreAction()}
-            overlay={_getExtraActionMenus()}
-            trigger={['click']}
-          >
-            <ToolbarButton
-              icon={<MoreOutlined />}
-              iconSize={FONT_SIZE_BASE}
-              className="setting"
-              onClick={e => e.preventDefault()}
-            />
-          </Dropdown>
-        </div>
-      </Row>
-    );
+            <Panel
+              key={colName}
+              header={
+                <div ref={drag}>
+                  <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
+                  <p>{colName}</p>
+                </div>
+              }
+            >
+              {children?.map((item, i) => {
+                return (
+                  <DateLevelFieldContainer
+                    key={i}
+                    item={item as any}
+                    onClearCheckedList={onClearCheckedList}
+                  />
+                );
+              })}
+            </Panel>
+          </CollapseWrapper>
+        </Row>
+      );
+    }
   }, [
-    type,
     role,
+    type,
+    category,
     colName,
-    showChild,
-    setShowChild,
+    drag,
+    children,
     onDeleteComputedField,
     onEditComputedField,
-    category,
-    t,
-    onClearCheckedList,
-    drag,
     isViewComputerField,
-    dateLevelFields,
+    t,
+    showChild,
+    setShowChild,
+    onClearCheckedList,
+    onSelectionChange,
+    styleClasses,
   ]);
 
   const renderChildren = useMemo(() => {
@@ -294,11 +309,12 @@ export const ChartDraggableSourceContainer: FC<
         role={item.role}
         children={item.children}
         viewType={viewType}
-        dateLevelFields={item.dateLevelFields}
-        isViewComputerField={item.computedFieldsType}
+        isViewComputerField={item.isViewComputedFields}
+        isActive={selectedItemsIds?.includes(item.name)}
         availableSourceFunctions={availableSourceFunctions}
         onDeleteComputedField={onDeleteComputedField}
         onClearCheckedList={onClearCheckedList}
+        onSelectionChange={onSelectionChange}
         selectedItems={selectedItems}
       />
     ));
@@ -309,6 +325,8 @@ export const ChartDraggableSourceContainer: FC<
     selectedItems,
     viewType,
     availableSourceFunctions,
+    onSelectionChange,
+    selectedItemsIds,
   ]);
 
   useEffect(() => {
@@ -346,7 +364,7 @@ const Container = styled.div<{ flexDirection?: string }>`
   font-weight: ${FONT_WEIGHT_MEDIUM};
   color: ${p => p.theme.textColorSnd};
   cursor: pointer;
-  &.container-active {
+  .container-active {
     background-color: ${p => p.theme.bodyBackground};
   }
   > p {

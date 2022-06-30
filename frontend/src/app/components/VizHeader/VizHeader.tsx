@@ -124,7 +124,6 @@ const VizHeader: FC<{
           allowDownload={allowDownload}
           allowShare={allowShare}
           allowManage={allowManage}
-          isArchived={isArchived}
           openMockData={() => setMockDataModal(true)}
           onPublish={Number(status) === 2 ? onPublish : ''}
           onRecycleViz={onRecycleViz}
@@ -168,9 +167,11 @@ const VizHeader: FC<{
                   {t('edit')}
                 </Button>
               )}
-              <Dropdown key="more" arrow overlay={getOverlays()}>
-                <Button icon={<MoreOutlined />} />
-              </Dropdown>
+              {!isArchived && (
+                <Dropdown key="more" arrow overlay={getOverlays()}>
+                  <Button icon={<MoreOutlined />} />
+                </Dropdown>
+              )}
             </>
           }
         />

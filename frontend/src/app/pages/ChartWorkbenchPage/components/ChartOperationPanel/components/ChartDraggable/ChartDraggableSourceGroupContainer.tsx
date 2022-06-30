@@ -17,6 +17,7 @@
  */
 
 import { List } from 'antd';
+import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { FC, memo, useCallback, useContext, useState } from 'react';
 import styled from 'styled-components/macro';
 import { stopPPG } from 'utils/utils';
@@ -47,7 +48,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
   ) => {
     let interimSelectedItemsIds: Array<string> = [];
     let interimActiveItemId = '';
-    const dataViewMeta = meta?.slice() || [];
+    const dataViewMeta = getAllColumnInMeta(meta) || [];
     const previousSelectedItemsIds: Array<any> = selectedItemsIds.slice();
     const previousActiveItemId = activeItemId;
 
@@ -119,13 +120,13 @@ export const ChartDraggableSourceGroupContainer: FC<{
               expression={item.expression}
               type={item.type}
               selectedItems={selectedItems}
+              selectedItemsIds={selectedItemsIds}
               availableSourceFunctions={availableSourceFunctions}
               subType={item.subType}
               role={item.role}
               children={item.children}
               viewType={dataView?.type}
-              dateLevelFields={item?.dateLevelFields}
-              isViewComputerField={item.computedFieldsType}
+              isViewComputerField={item.isViewComputedFields}
               onDeleteComputedField={onDeleteComputedField}
               onEditComputedField={handleEditComputedField}
               onSelectionChange={onDataItemSelectionChange}

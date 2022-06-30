@@ -17,7 +17,7 @@
  */
 
 export enum ColumnCategories {
-  Uncategorized = 'UNCATEGORIZED',
+  UnCategorized = 'UNCATEGORIZED',
   Country = 'COUNTRY',
   ProvinceOrState = 'PROVINCEORSTATE',
   City = 'CITY',
@@ -48,9 +48,9 @@ export enum ConcurrencyControlModes {
 export const UNPERSISTED_ID_PREFIX = 'GENERATED-';
 
 export enum StructViewJoinType {
-  rightJoin = 'RIGHT',
-  leftJoin = 'LEFT',
-  innerJoin = 'INNER',
+  RightJoin = 'RIGHT',
+  LeftJoin = 'LEFT',
+  InnerJoin = 'INNER',
 }
 
 export const DEFAULT_PREVIEW_SIZE = 1000;

@@ -17,7 +17,6 @@
  */
 
 import {
-  AggregateFieldSubAggregateType,
   ChartDataSectionFieldActionType,
   ChartDataSectionType,
   ChartDataViewFieldCategory,
@@ -53,7 +52,7 @@ import { uuidv4 } from 'utils/utils';
 import ChartDraggableElement from './ChartDraggableElement';
 import ChartDraggableElementField from './ChartDraggableElementField';
 import ChartDraggableElementHierarchy from './ChartDraggableElementHierarchy';
-import { updateDataConfigByField } from './utils';
+import { getDefaultAggregate, updateDataConfigByField } from './utils';
 
 type DragItem = {
   index?: number;
@@ -102,7 +101,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 let config: ChartDataSectionField = {
                   uid: uuidv4(),
                   ...val,
-                  aggregate: getDefaultAggregate(val),
+                  aggregate: getDefaultAggregate(val, currentConfig),
                 };
                 if (
                   val.category ===
@@ -129,7 +128,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               hierarchyChildFields.map(val => ({
                 uid: uuidv4(),
                 ...val,
-                aggregate: getDefaultAggregate(val),
+                aggregate: getDefaultAggregate(val, currentConfig),
               })),
             );
             updateCurrentConfigColumns(currentConfig, currentColumns, true);
@@ -147,7 +146,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 currentConfig?.rows || [],
                 draft => {
                   draft.splice(originItemIndex, 1);
-                  item.aggregate = getDefaultAggregate(item);
+                  item.aggregate = getDefaultAggregate(item, currentConfig);
                   return draft.splice(item?.index!, 0, item);
                 },
               );
@@ -160,7 +159,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               const currentColumns = updateBy(
                 currentConfig?.rows || [],
                 draft => {
-                  item.aggregate = getDefaultAggregate(item);
+                  item.aggregate = getDefaultAggregate(item, currentConfig);
                   return draft.splice(item?.index!, 0, item);
                 },
               );
@@ -193,15 +192,23 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             return false;
           }
 
-          // if (
-          //   typeof currentConfig.actions === 'object' &&
-          //   !(item.type in currentConfig.actions)
-          // ) {
-          //   return false;
-          // }
-
-          if (currentConfig.allowSameField) {
-            return true;
+          if (
+            items[0].category ===
+            ChartDataViewFieldCategory.DateLevelComputedField
+          ) {
+            if (
+              ![
+                ChartDataSectionType.Group,
+                ChartDataSectionType.Color,
+                ChartDataSectionType.Mixed,
+              ].includes(currentConfig.type as ChartDataSectionType)
+            ) {
+              return false;
+            }
+            const colNames = currentConfig.rows?.map(col => col.colName);
+            return colNames
+              ? colNames.every(v => !v?.includes(items[0].colName))
+              : true;
           }
 
           if (
@@ -210,14 +217,8 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             return true;
           }
 
-          if (
-            items[0].category ===
-            ChartDataViewFieldCategory.DateLevelComputedField
-          ) {
-            const colNames = currentConfig.rows?.map(col => col.colName);
-            return colNames
-              ? colNames.every(v => !v?.includes(items[0].colName))
-              : true;
+          if (currentConfig.allowSameField) {
+            return true;
           }
 
           const exists = currentConfig.rows?.map(col => col.colName);
@@ -239,43 +240,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       const newCurrentConfig = updateByKey(currentConfig, 'rows', newColumns);
       setCurrentConfig(newCurrentConfig);
       onConfigChanged?.(ancestors, newCurrentConfig, refreshDataset);
-    };
-
-    const getDefaultAggregate = (item: ChartDataSectionField) => {
-      if (
-        currentConfig?.type === ChartDataSectionType.Aggregate ||
-        currentConfig?.type === ChartDataSectionType.Size ||
-        currentConfig?.type === ChartDataSectionType.Info ||
-        currentConfig?.type === ChartDataSectionType.Mixed
-      ) {
-        if (
-          currentConfig.disableAggregate ||
-          item.category === ChartDataViewFieldCategory.AggregateComputedField
-        ) {
-          return;
-        }
-        if (item.aggregate) {
-          return item.aggregate;
-        }
-
-        let aggType: string = '';
-        if (currentConfig?.actions instanceof Array) {
-          currentConfig?.actions?.find(
-            type =>
-              type === ChartDataSectionFieldActionType.Aggregate ||
-              type === ChartDataSectionFieldActionType.AggregateLimit,
-          );
-        } else if (currentConfig?.actions instanceof Object) {
-          aggType = currentConfig?.actions?.[item?.type]?.find(
-            type =>
-              type === ChartDataSectionFieldActionType.Aggregate ||
-              type === ChartDataSectionFieldActionType.AggregateLimit,
-          );
-        }
-        if (aggType) {
-          return AggregateFieldSubAggregateType?.[aggType]?.[0];
-        }
-      }
     };
 
     const onDraggableItemMove = (dragIndex: number, hoverIndex: number) => {
@@ -341,7 +305,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         return (
           <ChartDraggableElement
             key={columnConfig.uid}
-            id={columnConfig.uid}
             index={index}
             config={columnConfig}
             content={() => {

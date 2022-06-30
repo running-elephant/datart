@@ -23,7 +23,6 @@ import datart.core.entity.RelSubjectColumns;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
@@ -44,7 +43,6 @@ public class ViewCreateParam extends VizCreateParam {
 
     private String script;
 
-    @NotNull
     private ScriptType type;
 
     private String model;

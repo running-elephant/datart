@@ -54,6 +54,7 @@ import {
   ConditionalStylePanel,
   CrossFilteringPanel,
   DataReferencePanel,
+  DataZoomPanel,
   DrillThroughPanel,
   FontAlignment,
   LabelPosition,
@@ -192,9 +193,9 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <LegendType {...props} />;
         case ChartStyleSectionComponentType.LEGEND_POSITION:
           return <LegendPosition {...props} />;
-        case ChartStyleSectionComponentType.SCORECARD_CONDITIONAL_SYTLE:
+        case ChartStyleSectionComponentType.SCORECARD_CONDITIONAL_STYLE:
           return <ScorecardConditionalStylePanel {...props} />;
-        case ChartStyleSectionComponentType.PIOVTSHEET_THEME:
+        case ChartStyleSectionComponentType.PIVOT_SHEET_THEME:
           return <PivotSheetTheme {...props} />;
         case ChartStyleSectionComponentType.BACKGROUND:
           return <Background {...props} />;
@@ -210,6 +211,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <CrossFilteringPanel {...props} />;
         case ChartStyleSectionComponentType.INTERACTION_VIEW_DETAIL_PANEL:
           return <ViewDetailPanel {...props} />;
+        case ChartStyleSectionComponentType.DATA_ZOOM_PANEL:
+          return <DataZoomPanel {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

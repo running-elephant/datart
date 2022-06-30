@@ -98,15 +98,15 @@ export const FONT_WEIGHT = [
   { name: 'viz.palette.style.fontWeight.bold', value: 'bold' },
   { name: 'viz.palette.style.fontWeight.bolder', value: 'bolder' },
   { name: 'viz.palette.style.fontWeight.lighter', value: 'lighter' },
-  { name: '100', value: '100' },
-  { name: '200', value: '200' },
-  { name: '300', value: '300' },
-  { name: '400', value: '400' },
-  { name: '500', value: '500' },
-  { name: '600', value: '600' },
-  { name: '700', value: '700' },
-  { name: '800', value: '800' },
-  { name: '900', value: '900' },
+  { name: 'viz.palette.style.fontWeight.100', value: '100' },
+  { name: 'viz.palette.style.fontWeight.200', value: '200' },
+  { name: 'viz.palette.style.fontWeight.300', value: '300' },
+  { name: 'viz.palette.style.fontWeight.400', value: '400' },
+  { name: 'viz.palette.style.fontWeight.500', value: '500' },
+  { name: 'viz.palette.style.fontWeight.600', value: '600' },
+  { name: 'viz.palette.style.fontWeight.700', value: '700' },
+  { name: 'viz.palette.style.fontWeight.800', value: '800' },
+  { name: 'viz.palette.style.fontWeight.900', value: '900' },
 ];
 
 export const FONT_STYLE = [
@@ -148,7 +148,7 @@ export const TIME_DIRECTION = [
 export const RECOMMEND_TIME = {
   TODAY: 'today',
   YESTERDAY: 'yesterday',
-  THISWEEK: 'this_week',
+  THIS_WEEK: 'this_week',
   LAST_7_DAYS: 'last_7_days',
   LAST_30_DAYS: 'last_30_days',
   LAST_90_DAYS: 'last_90_days',

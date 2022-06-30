@@ -60,9 +60,9 @@ export const EditorPage: FC = () => {
   const { params } = useRouteMatch<{ scheduleId: string; orgId: string }>();
   const editingSchedule = useSelector(selectEditingSchedule);
   const loading = useSelector(selectScheduleDetailLoading);
-  const saveLoding = useSelector(selectSaveLoading);
+  const saveLoading = useSelector(selectSaveLoading);
   const unarchiveLoading = useSelector(selectUnarchiveLoading);
-  const deleteLoding = useSelector(selectDeleteLoading);
+  const deleteLoading = useSelector(selectDeleteLoading);
   const { toDetails } = useToScheduleDetails();
   const isArchived = editingSchedule?.status === 0;
   const t = useI18NPrefix('main.pages.schedulePage.sidebar.editorPage.index');
@@ -103,6 +103,7 @@ export const EditorPage: FC = () => {
             params: { ...params, id: editingSchedule?.id as string },
             resolve: () => {
               message.success(t('saveSuccess'));
+              dispatch(getScheduleDetails(editingSchedule?.id!));
               refreshScheduleList();
             },
           }),
@@ -111,13 +112,13 @@ export const EditorPage: FC = () => {
     });
   }, [
     form,
-    isAdd,
     orgId,
-    dispatch,
-    editingSchedule,
-    refreshScheduleList,
-    toDetails,
+    isAdd,
     t,
+    dispatch,
+    toDetails,
+    refreshScheduleList,
+    editingSchedule?.id,
   ]);
 
   const onResetForm = useCallback(() => {
@@ -247,7 +248,7 @@ export const EditorPage: FC = () => {
                   <Button loading={unarchiveLoading}>{t('restore')}</Button>
                 </Popconfirm>
                 <Popconfirm title={t('sureToDelete')} onConfirm={del(false)}>
-                  <Button loading={deleteLoding} danger>
+                  <Button loading={deleteLoading} danger>
                     {t('delete')}
                   </Button>
                 </Popconfirm>
@@ -259,7 +260,7 @@ export const EditorPage: FC = () => {
                   title={active ? t('allowModificationAfterStopping') : ''}
                 >
                   <Button
-                    loading={saveLoding}
+                    loading={saveLoading}
                     type="primary"
                     onClick={form.submit}
                     disabled={active}
@@ -276,7 +277,7 @@ export const EditorPage: FC = () => {
                       title={t('sureMoveRecycleBin')}
                       onConfirm={del(true)}
                     >
-                      <Button loading={deleteLoding} disabled={active} danger>
+                      <Button loading={deleteLoading} disabled={active} danger>
                         {t('moveToTrash')}
                       </Button>
                     </Popconfirm>

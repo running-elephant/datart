@@ -95,6 +95,12 @@ export class ChartDataSet<T>
     }
   }
 
+  public getOriginFieldInfo(key: string) {
+    return this.originalFields?.[
+      this.toIndex(this.columnIndexTable, key)
+    ] as ChartDataSectionField;
+  }
+
   public getFieldKey(field: ChartDataSectionField) {
     return this.toKey(field);
   }
