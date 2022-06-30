@@ -28,7 +28,7 @@ import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import ChartDrillContext from '../../contexts/ChartDrillContext';
+import ChartDrillContext from '../../../../contexts/ChartDrillContext';
 import { dateFormatSelector, languageSelector } from '../../slice/selectors';
 import ChartHeaderPanel from '../ChartHeaderPanel';
 import ChartOperationPanel from '../ChartOperationPanel';

@@ -18,7 +18,7 @@
 
 import { Breadcrumb } from 'antd';
 import { DrillMode } from 'app/models/ChartDrillOption';
-import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { getColumnRenderName } from 'app/utils/chartHelper';
 import { FC, memo, useContext } from 'react';

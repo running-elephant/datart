@@ -26,7 +26,7 @@ import {
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { DrillMode } from 'app/models/ChartDrillOption';
 import DateLevelMenuItems from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/DateLevelAction/DateLevelMenuItems';
-import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { ChartConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { getRuntimeDateLevelFields, getStyles } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';

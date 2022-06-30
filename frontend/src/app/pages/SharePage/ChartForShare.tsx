@@ -33,7 +33,7 @@ import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import { FC, memo, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import ChartDrillContext from '../ChartWorkbenchPage/contexts/ChartDrillContext';
+import ChartDrillContext from '../../contexts/ChartDrillContext';
 import ControllerPanel from '../MainPage/pages/VizPage/ChartPreview/components/ControllerPanel';
 import {
   ChartPreview,

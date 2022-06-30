@@ -27,7 +27,7 @@ import { FieldTemplate } from 'app/pages/ChartWorkbenchPage/components/ChartOper
 import ChartAggregationContext from 'app/pages/ChartWorkbenchPage/contexts/ChartAggregationContext';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import VizDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
-import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { getColumnRenderName } from 'app/utils/chartHelper';
