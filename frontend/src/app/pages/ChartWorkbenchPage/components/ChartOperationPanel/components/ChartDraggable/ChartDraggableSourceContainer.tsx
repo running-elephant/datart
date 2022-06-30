@@ -50,7 +50,7 @@ import {
   WARNING,
 } from 'styles/StyleConstants';
 import { stopPPG } from 'utils/utils';
-import { dateLevelFieldsProps, renderMataProps } from '../../../../slice/type';
+import { dateLevelFieldsProps, renderMataProps } from '../../../../slice/types';
 import DateLevelFieldContainer from './DateLevelFieldContainer';
 
 const { Panel } = Collapse;

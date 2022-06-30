@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import {
   AggregateFieldActionType,
   ChartDataSectionFieldActionType,
@@ -26,7 +27,8 @@ import {
   DataViewFieldType,
   FieldFormatType,
   FilterConditionType,
-  RUNTIME_FILTER_KEY,
+  FilterRelationType,
+  SortActionType,
 } from 'app/constants';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
@@ -34,6 +36,7 @@ import {
   FilterSqlOperator,
   NumberUnitKey,
   RECOMMEND_TIME,
+  RUNTIME_FILTER_KEY,
 } from 'globalConstants';
 import { ValueOf } from 'types';
 import { IChartDrillOption } from './ChartDrillOption';
@@ -98,7 +101,7 @@ export type RelationFilterValue = {
   children?: RelationFilterValue[];
 };
 
-export type AggregateLimit = Pick<typeof AggregateFieldActionType, 'COUNT'>;
+export type AggregateLimit = Pick<typeof AggregateFieldActionType, 'Count'>;
 
 export type ChartDataSectionField = {
   uid?: string;
@@ -112,7 +115,7 @@ export type ChartDataSectionField = {
   sort?: SortFieldAction;
   alias?: AliasFieldAction;
   format?: FormatFieldAction;
-  aggregate?: AggregateFieldAction;
+  aggregate?: AggregateFieldActionType;
   filter?: FilterFieldAction;
   color?: ColorFieldAction;
   size?: number;

@@ -60,7 +60,7 @@ const CrossFilteringRuleList: FC<
           enable: false,
           relId: bvz.datachartId,
           relation: InteractionFieldRelation.Auto,
-        };
+        } as CrossFilteringInteractionRule;
       });
   }, [boardVizs, rules, widgetId]);
 
@@ -140,7 +140,15 @@ const CrossFilteringRuleList: FC<
         },
       },
     ],
-    [rules, dataview, onRuleChange, t],
+    [
+      t,
+      boardVizs,
+      rules,
+      onRuleChange,
+      dataview?.meta,
+      dataview?.computedFields,
+      dataview?.variables,
+    ],
   );
 
   return (

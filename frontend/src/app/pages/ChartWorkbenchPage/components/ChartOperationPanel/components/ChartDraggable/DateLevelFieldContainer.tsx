@@ -4,7 +4,7 @@ import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { useDrag } from 'react-dnd';
 import styled from 'styled-components/macro';
 import { INFO } from 'styles/StyleConstants';
-import { dateLevelFieldsProps } from '../../../../slice/type';
+import { dateLevelFieldsProps } from '../../../../slice/types';
 
 function DateLevelFieldContainer({
   onClearCheckedList,
