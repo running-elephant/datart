@@ -19,9 +19,10 @@
 import {
   CaretRightOutlined,
   CloseOutlined,
-  PlusSquareOutlined,
+  DeleteOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
-import { Button, Spin, Tooltip } from 'antd';
+import { Button, Space, Spin, Tooltip } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CommonFormTypes } from 'globalConstants';
 import produce from 'immer';
@@ -30,9 +31,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import {
   FONT_SIZE_ICON_MD,
-  FONT_SIZE_SUBHEADING,
-  FONT_SIZE_TITLE,
-  SPACE_LG,
+  FONT_WEIGHT_MEDIUM,
+  LEVEL_1,
+  LEVEL_5,
+  SPACE_MD,
+  SPACE_SM,
+  SPACE_TIMES,
+  SPACE_UNIT,
+  SPACE_XL,
   SPACE_XS,
 } from 'styles/StyleConstants';
 import { getInsertedNodeIndex } from 'utils/utils';
@@ -119,7 +125,7 @@ export const StructView = memo(
       dispatch(
         actions.changeCurrentEditingView({
           script: produce(tableJSON, draft => {
-            draft.joins.push({ joinType: StructViewJoinType.rightJoin });
+            draft.joins.push({ joinType: StructViewJoinType.LeftJoin });
           }),
         }),
       );
@@ -303,7 +309,7 @@ export const StructView = memo(
     }, [sourceId, allDatabaseSchemas, actions, dispatch, tableJSON]);
 
     return (
-      <StructViewWrapper>
+      <StructContainer>
         {typeof tableJSON === 'string' ? (
           <LoadingWrap>
             <Spin />
@@ -315,257 +321,234 @@ export const StructView = memo(
               allowManage={allowManage}
               allowEnableViz={allowEnableViz}
             />
-            <SelectTableTitle>{t('sourcedata')}</SelectTableTitle>
-            <SelectTableMainWrapper>
-              <SelectTableMain>
-                <SelectDataSource
-                  type="MAIN"
-                  callbackFn={handleTableJSON}
-                  sourceId={sourceId}
-                  tableJSON={tableJSON}
-                />
-              </SelectTableMain>
-              <Button
-                className="runBtn"
-                icon={<CaretRightOutlined />}
-                onClick={() => handleInterimRunSql('MAIN')}
-              />
-            </SelectTableMainWrapper>
-            {tableJSON.joins.map((join, i) => {
-              return (
-                <ItemWrapper key={i}>
-                  <SelectTableTitle>
-                    <span>{t('join')}</span>
-                    <CloseOutlined
-                      onClick={() => handleDeleteJoinsItem(i)}
-                      className="deleteJoinItem"
-                    />
-                  </SelectTableTitle>
-                  <SelectTableMainWrapper>
-                    <SelectTableMain>
-                      <SelectDataSource
-                        joinTable={join}
-                        tableJSON={tableJSON}
-                        renderType="READ"
+            <ConfigPanel>
+              <ProcessLine>
+                <ProcessItem>
+                  <ProcessItemLabel>
+                    <Tooltip title={t('runStep')} placement="left">
+                      <Button
+                        className="runFragment"
+                        icon={<CaretRightOutlined />}
+                        onClick={() => handleInterimRunSql('MAIN')}
                       />
-                      <SelectJoinType
-                        callbackFn={type => {
-                          handleTableJoinType(type, i);
-                        }}
-                        type={join.joinType!}
-                      />
+                    </Tooltip>
+                    {t('main')}
+                  </ProcessItemLabel>
+                  <ProcessItemContent>
+                    <Space>
                       <SelectDataSource
-                        type="JOINS"
-                        joinTable={join}
+                        type="MAIN"
+                        callbackFn={handleTableJSON}
                         sourceId={sourceId}
                         tableJSON={tableJSON}
-                        callbackFn={(table, type) =>
-                          handleTableJoin(table, type, i)
-                        }
                       />
-                      {join.table ? (
-                        <JoinConditionWrapper>
-                          <JoinSelectConditionColumn>
-                            {t('selectJoinColumn')}
-                          </JoinSelectConditionColumn>
-                          <JoinConditionColumn>
-                            {join.conditions?.map(({ left, right }, ind) => {
-                              return (
-                                <div>
-                                  <SelectJoinColumns
-                                    tableJSON={tableJSON}
-                                    joinTable={join}
-                                    callbackFn={(
-                                      columnName,
-                                      type,
-                                      joinConditionIndex,
-                                    ) =>
-                                      handleTableJoinColumns(
+                    </Space>
+                  </ProcessItemContent>
+                </ProcessItem>
+
+                {tableJSON.joins.map((join, i) => {
+                  return (
+                    <ProcessItem>
+                      <ProcessItemLabel>
+                        <Tooltip title={t('runStep')} placement="left">
+                          <Button
+                            className="runFragment"
+                            icon={<CaretRightOutlined />}
+                            onClick={() => handleInterimRunSql('JOINS', i)}
+                          />
+                        </Tooltip>
+                        {t('join')}
+                      </ProcessItemLabel>
+                      <ProcessItemContent>
+                        <TableRelation>
+                          <SelectDataSource
+                            joinTable={join}
+                            tableJSON={tableJSON}
+                            renderType="READ"
+                          />
+                          <SelectJoinType
+                            callbackFn={type => {
+                              handleTableJoinType(type, i);
+                            }}
+                            type={join.joinType!}
+                          />
+                          <SelectDataSource
+                            type="JOINS"
+                            joinTable={join}
+                            sourceId={sourceId}
+                            tableJSON={tableJSON}
+                            callbackFn={(table, type) =>
+                              handleTableJoin(table, type, i)
+                            }
+                          />
+                        </TableRelation>
+                        {join.table && (
+                          <>
+                            <SelectJoinColumnLabel>
+                              {t('selectJoinColumn')}
+                            </SelectJoinColumnLabel>
+                            <JoinConditionWrapper>
+                              {join.conditions?.map(({ left, right }, ind) => {
+                                return (
+                                  <JoinConditionLine>
+                                    <SelectJoinColumns
+                                      tableJSON={tableJSON}
+                                      joinTable={join}
+                                      callbackFn={(
                                         columnName,
                                         type,
-                                        i,
                                         joinConditionIndex,
-                                      )
-                                    }
-                                    conditionsIndex={ind}
-                                    joinIndex={i}
-                                  />
-                                  {left.length && right.length ? (
-                                    ind === join.conditions!.length - 1 ? (
-                                      <div className="joinAddOrDelCondition">
-                                        <PlusSquareOutlined
-                                          onClick={() =>
-                                            handleTableJoinAddColumns(i)
-                                          }
-                                        />
-                                        {ind > 0 && (
-                                          <CloseOutlined
+                                      ) =>
+                                        handleTableJoinColumns(
+                                          columnName,
+                                          type,
+                                          i,
+                                          joinConditionIndex,
+                                        )
+                                      }
+                                      conditionsIndex={ind}
+                                      joinIndex={i}
+                                    />
+                                    <Space className="action">
+                                      {!!left.length &&
+                                        !!right.length &&
+                                        ind === join.conditions!.length - 1 && (
+                                          <Button
+                                            type="link"
+                                            size="small"
+                                            icon={<PlusOutlined />}
+                                            onClick={() =>
+                                              handleTableJoinAddColumns(i)
+                                            }
+                                          />
+                                        )}
+                                      {ind === join.conditions!.length - 1 &&
+                                        ind > 0 && (
+                                          <Button
+                                            danger
+                                            type="link"
+                                            size="small"
+                                            icon={<CloseOutlined />}
                                             onClick={() =>
                                               handleDeleteConditions(i, ind)
                                             }
-                                            className="DelCondition"
                                           />
                                         )}
-                                      </div>
-                                    ) : (
-                                      <span className="addConditionalSteps">
-                                        &&
-                                      </span>
-                                    )
-                                  ) : (
-                                    ''
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </JoinConditionColumn>
-                        </JoinConditionWrapper>
-                      ) : (
-                        ''
-                      )}
-                    </SelectTableMain>
-                    <Button
-                      className="runBtn"
-                      icon={<CaretRightOutlined />}
-                      onClick={() => handleInterimRunSql('JOINS', i)}
-                    />
-                  </SelectTableMainWrapper>
-                </ItemWrapper>
-              );
-            })}
+                                    </Space>
+                                  </JoinConditionLine>
+                                );
+                              })}
+                            </JoinConditionWrapper>
+                          </>
+                        )}
+                      </ProcessItemContent>
+                      <ProcessItemAction>
+                        <Button
+                          danger
+                          size="small"
+                          className="deleteItem"
+                          icon={<DeleteOutlined />}
+                          onClick={() => handleDeleteJoinsItem(i)}
+                        />
+                      </ProcessItemAction>
+                    </ProcessItem>
+                  );
+                })}
+              </ProcessLine>
 
-            {tableJSON['table'].length ? (
-              <ToolWrapper>
-                <Button className="addJoinTable" onClick={handleAddTableJoin}>
-                  {t('addJoin')}
-                </Button>
-              </ToolWrapper>
-            ) : (
-              ''
-            )}
-
-            {tableJSON['table'].length ? (
-              <Tooltip title={t('run')}>
-                <Button
-                  className="runBtn"
-                  type="primary"
-                  icon={<CaretRightOutlined />}
-                  onClick={() => handleInterimRunSql()}
-                />
-              </Tooltip>
-            ) : (
-              ''
-            )}
+              {!!tableJSON['table'].length && (
+                <>
+                  <Button
+                    type="link"
+                    className="join"
+                    icon={<PlusOutlined />}
+                    onClick={handleAddTableJoin}
+                  >
+                    {t('addJoin')}
+                  </Button>
+                  <Button
+                    type="primary"
+                    className="run"
+                    icon={<CaretRightOutlined />}
+                    onClick={() => handleInterimRunSql()}
+                  >
+                    {t('run')}
+                  </Button>
+                </>
+              )}
+            </ConfigPanel>
           </>
         )}
-      </StructViewWrapper>
+      </StructContainer>
     );
   },
 );
 
-const StructViewWrapper = styled.div`
+const StructContainer = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-  overflow-y: auto;
   background: ${p => p.theme.componentBackground};
-  .addJoinTable {
-    width: max-content;
-    margin: ${SPACE_XS};
-  }
-  .runBtn {
-    margin: ${SPACE_XS};
-  }
 `;
 
-const ItemWrapper = styled.div`
-  .deleteJoinItem {
-    display: none;
-    cursor: pointer;
-  }
-  &:hover {
-    .deleteJoinItem {
-      display: inline-block;
-    }
-  }
-`;
-
-const SelectTableTitle = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: ${SPACE_XS};
-`;
-
-const SelectTableMainWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  margin: ${SPACE_XS};
-  > button {
-    margin-left: ${SPACE_XS};
-  }
-`;
-
-const SelectTableMain = styled.div`
-  display: flex;
+const ConfigPanel = styled.div`
   flex: 1;
+  padding: ${SPACE_MD};
+  overflow: auto;
+
+  .join {
+    display: block;
+    margin: 0 0 ${SPACE_MD} 92px;
+  }
+
+  .run {
+    display: block;
+    margin: 0 0 ${SPACE_MD} 108px;
+  }
+`;
+
+const TableRelation = styled.div`
+  display: flex;
+  flex-shrink: 0;
   align-items: center;
-  padding: ${SPACE_XS};
-  background: ${p => p.theme.bodyBackground};
-  border-radius: ${SPACE_XS};
+  align-self: flex-start;
+  padding: ${SPACE_SM} 0;
 `;
 
 const JoinConditionWrapper = styled.div`
+  padding: ${SPACE_SM} 0;
+  margin-right: ${SPACE_XL};
+`;
+
+const JoinConditionLine = styled.div`
   display: flex;
   align-items: center;
-  .joinAddOrDelCondition,
-  .addConditionalSteps {
-    margin-left: ${SPACE_XS};
-    font-size: ${FONT_SIZE_ICON_MD};
-    color: ${p => p.theme.blue};
-    cursor: pointer;
-  }
-  .addConditionalSteps {
-    font-size: ${FONT_SIZE_TITLE};
-  }
-  .joinAddOrDelCondition {
-    display: flex;
-    align-items: center;
-  }
-  .DelCondition {
-    display: none;
-    margin-left: ${SPACE_XS};
-    font-size: ${FONT_SIZE_SUBHEADING};
-    color: ${p => p.theme.textColor};
-    cursor: pointer;
-  }
-`;
+  margin-top: ${SPACE_XS};
 
-const JoinSelectConditionColumn = styled.div`
-  margin: 0 ${SPACE_LG};
-`;
+  &:first-of-type {
+    margin-top: 0;
+  }
 
-const JoinConditionColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  > div {
-    display: flex;
-    align-items: center;
-    margin-bottom: ${SPACE_XS};
-    &:last-child {
-      margin-bottom: 0px;
-    }
-    &:hover {
-      .DelCondition {
-        display: inline-block;
-      }
+  .action {
+    margin-left: ${SPACE_XS};
+    visibility: hidden;
+  }
+
+  &:hover {
+    .action {
+      visibility: visible;
     }
   }
 `;
 
-const ToolWrapper = styled.div`
+const SelectJoinColumnLabel = styled.span`
   display: flex;
-  align-items: center;
+  align-self: flex-start;
+  justify-content: center;
+  width: ${SPACE_TIMES(30)};
+  padding: ${SPACE_SM} 0;
+  line-height: 32px;
+  color: ${p => p.theme.textColorLight};
 `;
 
 const LoadingWrap = styled.div`
@@ -574,4 +557,95 @@ const LoadingWrap = styled.div`
   justify-content: center;
   width: 100%;
   height: 100px;
+`;
+
+const ProcessLine = styled.div`
+  position: relative;
+
+  &:before {
+    position: absolute;
+    top: 28px;
+    left: ${SPACE_TIMES(18)};
+    z-index: ${LEVEL_1};
+    width: 4px;
+    height: calc(100% - 56px);
+    content: '';
+    background-color: ${p => p.theme.borderColorSplit};
+  }
+`;
+
+const ProcessItem = styled.div`
+  position: relative;
+  display: flex;
+
+  .runFragment {
+    position: absolute;
+    top: ${SPACE_SM};
+    left: ${SPACE_MD};
+    display: none;
+  }
+
+  .deleteItem {
+    display: none;
+    font-size: ${FONT_SIZE_ICON_MD};
+  }
+
+  &:hover {
+    background-color: ${p => p.theme.bodyBackground};
+
+    .runFragment {
+      display: inline-block;
+    }
+    .deleteItem {
+      display: inline-block;
+    }
+  }
+
+  &:before {
+    position: absolute;
+    top: 22px;
+    left: ${SPACE_TIMES(17)};
+    z-index: ${LEVEL_5};
+    width: ${SPACE_TIMES(3)};
+    height: ${SPACE_TIMES(3)};
+    content: '';
+    background-color: ${p => p.theme.primary};
+    border-radius: 50%;
+  }
+
+  &:after {
+    position: absolute;
+    top: ${22 + SPACE_UNIT / 2}px;
+    left: ${SPACE_TIMES(17.5)};
+    z-index: ${LEVEL_5};
+    width: ${SPACE_TIMES(2)};
+    height: ${SPACE_TIMES(2)};
+    content: '';
+    background-color: ${p => p.theme.componentBackground};
+    border-radius: 50%;
+  }
+`;
+
+const ProcessItemLabel = styled.p`
+  position: relative;
+  flex-shrink: 0;
+  width: ${SPACE_TIMES(40)};
+  padding: ${SPACE_SM} 0 ${SPACE_SM} ${SPACE_TIMES(26)};
+  font-weight: ${FONT_WEIGHT_MEDIUM};
+  line-height: 32px;
+  color: ${p => p.theme.textColorSnd};
+`;
+
+const ProcessItemContent = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-left: ${SPACE_XL};
+`;
+
+const ProcessItemAction = styled.div`
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  margin: 0 ${SPACE_XL};
 `;

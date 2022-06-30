@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import { MenuListItem, MenuWrapper, Popup } from 'app/components';
+import { Dropdown, Menu } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import classnames from 'classnames';
 import { memo } from 'react';
 import styled from 'styled-components';
@@ -29,32 +30,33 @@ interface SelectJoinTypeProps {
 }
 
 const SelectJoinType = memo(({ type, callbackFn }: SelectJoinTypeProps) => {
+  const t = useI18NPrefix(`view.structView`);
   return (
-    <Popup
+    <Dropdown
       trigger={['click']}
       placement="bottomLeft"
-      content={
-        <MenuWrapper selectedKeys={[type]} onClick={e => callbackFn(e.key)}>
-          <MenuListItem key={StructViewJoinType['innerJoin']}>
-            Inner Join
-          </MenuListItem>
-          <MenuListItem key={StructViewJoinType['leftJoin']}>
-            Left Join
-          </MenuListItem>
-          <MenuListItem key={StructViewJoinType['rightJoin']}>
-            Right Join
-          </MenuListItem>
-        </MenuWrapper>
+      overlay={
+        <Menu selectedKeys={[type]} onClick={e => callbackFn(e.key)}>
+          <Menu.Item key={StructViewJoinType.LeftJoin}>
+            ${t(StructViewJoinType.LeftJoin)}
+          </Menu.Item>
+          <Menu.Item key={StructViewJoinType.RightJoin}>
+            ${t(StructViewJoinType.RightJoin)}
+          </Menu.Item>
+          <Menu.Item key={StructViewJoinType.InnerJoin}>
+            ${t(StructViewJoinType.InnerJoin)}
+          </Menu.Item>
+        </Menu>
       }
     >
       <Icon
         className={classnames('iconfont', {
-          'icon-join_inner': type === StructViewJoinType['innerJoin'],
-          'icon-join_right': type === StructViewJoinType['leftJoin'],
-          'icon-join_left': type === StructViewJoinType['rightJoin'],
+          'icon-join_inner': type === StructViewJoinType.InnerJoin,
+          'icon-join_right': type === StructViewJoinType.RightJoin,
+          'icon-join_left': type === StructViewJoinType.LeftJoin,
         })}
       ></Icon>
-    </Popup>
+    </Dropdown>
   );
 });
 
