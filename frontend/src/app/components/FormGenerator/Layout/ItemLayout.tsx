@@ -219,7 +219,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
     };
 
     return (
-      <StyledItemLayout className="chart-config-item-layout" flatten={flatten}>
+      <StyledItemLayout className="chart-config-item-layout">
         {renderBasicComponent()}
       </StyledItemLayout>
     );
@@ -229,7 +229,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
 
 export default ItemLayout;
 
-const StyledItemLayout = styled.div<{ flatten?: boolean }>`
-  padding: ${p => (p.flatten ? 0 : SPACE)};
+const StyledItemLayout = styled.div`
+  padding: ${SPACE};
   user-select: none;
 `;
