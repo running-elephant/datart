@@ -115,6 +115,7 @@ export const buildDateLevelFields = (args: {
             category: item.category,
             expression: item.expression,
             colPath: v.id,
+            displayName: v.id[v.id.length - 1],
           };
         }
         return null;
@@ -134,7 +135,7 @@ export const fieldsSortByType = (fields, sortType) => {
 
         return aFileName.localeCompare(bFileName);
       } else {
-        return a.id.localeCompare(b.id);
+        return a.name.localeCompare(b.name);
       }
     } else {
       return null;

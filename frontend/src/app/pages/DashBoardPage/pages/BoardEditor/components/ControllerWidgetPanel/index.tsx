@@ -204,7 +204,6 @@ const ControllerWidgetPanel: React.FC<WidgetControllerPanelParams> = memo(
     const onFinish = useCallback(
       (values: ControllerWidgetContent) => {
         if (!controllerType) return;
-        console.log('--values', values);
         setVisible(false);
         const { relatedViews, config, name } = values;
         if (type === 'add') {

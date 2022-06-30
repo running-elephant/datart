@@ -60,7 +60,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { ORANGE, SPACE, SPACE_XS } from 'styles/StyleConstants';
-import { getPath, moduleListFormsTreeByTableName } from 'utils/utils';
+import { getPath, modelListFormsTreeByTableName } from 'utils/utils';
 import { getAllFieldsOfEachType } from '../../utils';
 import { ChartDraggableSourceGroupContainer } from '../ChartDraggable';
 import ChartComputedFieldSettingPanel from './components/ChartComputedFieldSettingPanel';
@@ -343,7 +343,7 @@ const ChartDataViewPanel: FC<{
         availableSourceFunctions,
       });
 
-      const columnTreeData = moduleListFormsTreeByTableName(
+      const columnTreeData = modelListFormsTreeByTableName(
         [...stringFields, ...dateLevelFields, ...numericFields],
         'analysisPage',
       );

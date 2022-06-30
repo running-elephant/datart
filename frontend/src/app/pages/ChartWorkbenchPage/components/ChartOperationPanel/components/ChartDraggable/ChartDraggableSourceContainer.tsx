@@ -50,7 +50,7 @@ import {
   WARNING,
 } from 'styles/StyleConstants';
 import { stopPPG } from 'utils/utils';
-import { dateLevelFieldsProps, renderMataProps } from '../../../../slice/type';
+import { renderMataProps } from '../../../../slice/type';
 import DateLevelFieldContainer from './DateLevelFieldContainer';
 
 const { Panel } = Collapse;
@@ -61,8 +61,9 @@ export const ChartDraggableSourceContainer: FC<
     viewType?: string;
     isViewComputerField?: boolean;
     availableSourceFunctions?: string[];
-    dateLevelFields?: dateLevelFieldsProps[];
     selectedItemsIds?: string[];
+    displayName?: string;
+    folderRole?: string;
     onDeleteComputedField?: (fieldName) => void;
     onEditComputedField?: (fieldName) => void;
     onSelectionChange?: (dataItemId, cmdKeyActive, shiftKeyActive) => void;
@@ -82,7 +83,8 @@ export const ChartDraggableSourceContainer: FC<
   children,
   isViewComputerField,
   viewType,
-  dateLevelFields,
+  displayName,
+  folderRole,
   onDeleteComputedField,
   onEditComputedField,
   onSelectionChange,
@@ -92,6 +94,7 @@ export const ChartDraggableSourceContainer: FC<
   const [showChild, setShowChild] = useToggle(false);
   const isHierarchyFieldOrTable =
     role === ColumnRole.Hierarchy || role === ColumnRole.Table;
+  const isHierarchy = role === ColumnRole.Hierarchy;
   const [, drag] = useDrag(
     () => ({
       type: isHierarchyFieldOrTable
@@ -137,7 +140,7 @@ export const ChartDraggableSourceContainer: FC<
     };
 
     const _getIconStyle = () => {
-      if (role === ColumnRole.Hierarchy) {
+      if (isHierarchy) {
         return WARNING;
       }
       if (
@@ -173,7 +176,7 @@ export const ChartDraggableSourceContainer: FC<
         color: _getIconStyle(),
       },
     };
-    if (role === ColumnRole.Hierarchy) {
+    if (isHierarchy) {
       if (!showChild) {
         icon = (
           <FolderAddOutlined
@@ -228,7 +231,13 @@ export const ChartDraggableSourceContainer: FC<
           className={styleClasses.join(' ')}
         >
           <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
-          <StyledFieldContent>{colName}</StyledFieldContent>
+          <StyledFieldContent>
+            {isHierarchyFieldOrTable ||
+            !folderRole ||
+            folderRole === ColumnRole.Hierarchy
+              ? colName
+              : displayName}
+          </StyledFieldContent>
           <div onClick={stopPPG}>
             <Dropdown
               disabled={_isAllowMoreAction()}
@@ -261,7 +270,11 @@ export const ChartDraggableSourceContainer: FC<
               header={
                 <div ref={drag}>
                   <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
-                  <p>{colName}</p>
+                  <p>
+                    {!folderRole || folderRole === ColumnRole.Hierarchy
+                      ? colName
+                      : displayName}
+                  </p>
                 </div>
               }
             >
@@ -280,21 +293,25 @@ export const ChartDraggableSourceContainer: FC<
       );
     }
   }, [
+    t,
+    drag,
     role,
     type,
     category,
     colName,
-    drag,
     children,
-    onDeleteComputedField,
-    onEditComputedField,
     isViewComputerField,
-    t,
+    isHierarchyFieldOrTable,
+    displayName,
+    folderRole,
     showChild,
     setShowChild,
+    isHierarchy,
+    styleClasses,
+    onDeleteComputedField,
+    onEditComputedField,
     onClearCheckedList,
     onSelectionChange,
-    styleClasses,
   ]);
 
   const renderChildren = useMemo(() => {
@@ -303,10 +320,12 @@ export const ChartDraggableSourceContainer: FC<
         key={item.id}
         id={item.id}
         name={item.name}
+        displayName={item.displayName}
         category={item.category}
         expression={item.expression}
         type={item.type}
         role={item.role}
+        folderRole={role}
         children={item.children}
         viewType={viewType}
         isViewComputerField={item.isViewComputedFields}
@@ -319,6 +338,7 @@ export const ChartDraggableSourceContainer: FC<
       />
     ));
   }, [
+    role,
     children,
     onDeleteComputedField,
     onClearCheckedList,

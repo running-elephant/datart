@@ -26,12 +26,13 @@ function DateLevelFieldContainer({
     }),
     [],
   );
+
   return (
     <ItemWrapper ref={drag}>
       <CalendarOutlined style={{ color: INFO }} />
       &nbsp;
       <span>
-        {item.colName}（{t(item.expression)}）
+        {item.displayName}（{t(item.expression)}）
       </span>
     </ItemWrapper>
   );

@@ -32,7 +32,7 @@ import styled from 'styled-components/macro';
 import { SPACE_LG } from 'styles/StyleConstants';
 import { Nullable } from 'types';
 import { CloneValueDeep, isEmpty, isEmptyArray } from 'utils/object';
-import { moduleListFormsTreeByTableName } from 'utils/utils';
+import { modelListFormsTreeByTableName } from 'utils/utils';
 import { ViewViewModelStages } from '../../../constants';
 import { useViewSlice } from '../../../slice';
 import {
@@ -659,7 +659,7 @@ const DataModelTree: FC = memo(() => {
     const copyTableColumn = CloneValueDeep(TableColumn).filter(
       v => v.role !== ColumnRole.Hierarchy,
     );
-    const columnTreeData = moduleListFormsTreeByTableName(
+    const columnTreeData = modelListFormsTreeByTableName(
       copyTableColumn,
       'viewPage',
     );

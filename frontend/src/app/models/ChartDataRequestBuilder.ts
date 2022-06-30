@@ -38,7 +38,11 @@ import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import { getRuntimeDateLevelFields, getValue } from 'app/utils/chartHelper';
+import {
+  getAllColumnInMeta,
+  getRuntimeDateLevelFields,
+  getValue,
+} from 'app/utils/chartHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import {
   formatTime,
@@ -162,9 +166,12 @@ export class ChartDataRequestBuilder {
   }
 
   private buildColumnName(col) {
-    if (col.category === ChartDataViewFieldCategory.Field && col.id) {
+    if (col.category === ChartDataViewFieldCategory.Field) {
+      const row = getAllColumnInMeta(this.dataView.meta)!.find(
+        v => v.name === col.colName,
+      )!;
       try {
-        return JSON.parse(col.id);
+        return JSON.parse(row.id);
       } catch (e) {
         console.log('error buildColumnName JSON parse col.id=' + col.id);
       }

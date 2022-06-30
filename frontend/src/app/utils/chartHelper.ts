@@ -1605,7 +1605,7 @@ export const getRuntimeComputedFields = (
 
   if (isRuntime && replacedConfig?.field) {
     const index = getRuntimeDateLevelFields(_computedFields).findIndex(
-      v => v.id === replacedConfig?.id,
+      v => v.id === replacedConfig?.colName,
     );
     const replacedConfigIndex = dateLevelComputedFields.findIndex(
       v => v.field === replacedConfig?.field,
