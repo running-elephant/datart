@@ -92,11 +92,10 @@ const SelectJoinColumns = memo(
     }, [handleLeftColumn]);
 
     return (
-      <JoinColumnsWrapper key={conditionsIndex}>
-        <TreeSelect
+      <Line key={conditionsIndex}>
+        <ColumnSelect
           dropdownMatchSelectWidth={false}
           allowClear
-          style={{ minWidth: '100px' }}
           placeholder={t('selectField')}
           treeDefaultExpandAll={true}
           value={joinTable.conditions?.[conditionsIndex]?.left.slice(-1)}
@@ -104,12 +103,11 @@ const SelectJoinColumns = memo(
             callbackFn(columnName || [], 'left', conditionsIndex);
           }}
           treeData={handleLeftColumn()}
-        ></TreeSelect>
-        <JoinConditionLabel>=</JoinConditionLabel>
-        <TreeSelect
+        />
+        <Equal>=</Equal>
+        <ColumnSelect
           dropdownMatchSelectWidth={false}
           allowClear
-          style={{ minWidth: '100px' }}
           placeholder={t('selectField')}
           treeDefaultExpandAll={true}
           value={joinTable.conditions?.[conditionsIndex]?.right.slice(-1)}
@@ -117,15 +115,19 @@ const SelectJoinColumns = memo(
             callbackFn(columnName || [], 'right', conditionsIndex);
           }}
           treeData={handleRightColumn()}
-        ></TreeSelect>
-      </JoinColumnsWrapper>
+        />
+      </Line>
     );
   },
 );
 
-const JoinColumnsWrapper = styled.div``;
+const Line = styled.div``;
 
-const JoinConditionLabel = styled.span`
+const ColumnSelect = styled(TreeSelect)`
+  min-width: 120px;
+`;
+
+const Equal = styled.span`
   margin: 0 ${SPACE_SM};
 `;
 

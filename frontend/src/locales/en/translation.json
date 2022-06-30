@@ -1394,19 +1394,23 @@
       "typeAndCategory": "Type & Category"
     },
     "structView": {
-      "STRUCT": "Struct View",
+      "STRUCT": "Table View",
       "SQL": "SQL View",
       "file": "File",
-      "sourcedata": "Data",
-      "join": "Join Data",
-      "selectJoinColumn": "Select a column",
+      "main": "Main: ",
+      "join": "Join: ",
+      "selectJoinColumn": "Relations",
       "addJoin": "Add join data",
-      "run": "Run selection",
-      "searchTable": "Search datasheets",
-      "searchSource": "Search data sources",
-      "selectSource": "Select data source",
+      "run": "Run",
+      "runStep": "Run step",
+      "searchTable": "Search Tables",
+      "searchSource": "Search Sources",
+      "selectTable": "Select a table",
       "all": "All",
-      "selectField": "Select a column"
+      "selectField": "Select a column",
+      "RIGHT": "Right Join",
+      "LEFT": "Left Join",
+      "INNER": "Inner Join"
     }
   },
   "source": {

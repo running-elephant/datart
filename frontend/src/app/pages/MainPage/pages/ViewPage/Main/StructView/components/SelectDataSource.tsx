@@ -21,11 +21,13 @@ import {
   DatabaseOutlined,
   TableOutlined,
 } from '@ant-design/icons';
-import { Checkbox, Divider, Empty, Input, Popover } from 'antd';
+import { Button, Checkbox, Divider, Empty, Input, Popover } from 'antd';
 import { MenuListItem, MenuWrapper, Tree } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
+import classnames from 'classnames';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
+import { darken, getLuminance, lighten } from 'polished';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -261,7 +263,7 @@ const SelectDataSource = memo(
     }, []);
 
     return (
-      <SelectDataSourceWrapper>
+      <>
         <Popover
           trigger={['click']}
           placement="bottomLeft"
@@ -317,11 +319,16 @@ const SelectDataSource = memo(
             )
           }
         >
-          <span>
+          <TableButton
+            type="primary"
+            className={classnames({
+              'with-columns': selectDataSheet && renderType === 'OPERATE',
+            })}
+          >
             {selectDataSheet
               ? selectDataSheet.table[selectDataSheet.table.length - 1]
-              : t('selectSource')}
-          </span>
+              : t('selectTable')}
+          </TableButton>
         </Popover>
 
         {selectDataSheet && renderType === 'OPERATE' && (
@@ -348,25 +355,15 @@ const SelectDataSource = memo(
               </PopoverBody>
             }
           >
-            <TableOutlinedIconWrapper />
+            <ColumnButton type="primary" icon={<TableOutlined />} />
           </Popover>
         )}
-      </SelectDataSourceWrapper>
+      </>
     );
   },
 );
 
 export default SelectDataSource;
-
-const SelectDataSourceWrapper = styled.div`
-  display: inline-block;
-  width: max-content;
-  padding: ${SPACE_XS};
-  color: #fff;
-  cursor: pointer;
-  background: ${p => p.theme.primary};
-  border-radius: ${SPACE_XS};
-`;
 
 const PopoverBody = styled.div`
   height: 400px;
@@ -395,6 +392,18 @@ const DatabaseListHeader = styled.div`
   }
 `;
 
-const TableOutlinedIconWrapper = styled(TableOutlined)`
-  margin-left: ${SPACE_XS};
+const TableButton = styled(Button)`
+  &.with-columns {
+    border-right: 1px solid
+      ${p =>
+        getLuminance(p.theme.primary) > 0.5
+          ? darken(0.1, p.theme.primary)
+          : lighten(0.1, p.theme.primary)} !important;
+    border-radius: 2px 0 0 2px !important;
+  }
+`;
+
+const ColumnButton = styled(Button)`
+  border-left: 0 !important;
+  border-radius: 0 2px 2px 0 !important;
 `;
