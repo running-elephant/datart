@@ -71,7 +71,6 @@ export type InteractionRule = {
 export type CrossFilteringInteractionRule = {
   id: string;
   relId?: string;
-  relName?: string;
   enable?: boolean;
   name?: string;
   relation?: InteractionFieldRelation;
