@@ -321,7 +321,9 @@ const SelectDataSource = memo(
         >
           <TableButton
             type="primary"
-            className={classnames({ withColumns: renderType === 'OPERATE' })}
+            className={classnames({
+              'with-columns': selectDataSheet && renderType === 'OPERATE',
+            })}
           >
             {selectDataSheet
               ? selectDataSheet.table[selectDataSheet.table.length - 1]
@@ -391,7 +393,7 @@ const DatabaseListHeader = styled.div`
 `;
 
 const TableButton = styled(Button)`
-  &.withColumns {
+  &.with-columns {
     border-right: 1px solid
       ${p =>
         getLuminance(p.theme.primary) > 0.5

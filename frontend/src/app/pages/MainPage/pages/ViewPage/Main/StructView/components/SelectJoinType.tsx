@@ -38,13 +38,13 @@ const SelectJoinType = memo(({ type, callbackFn }: SelectJoinTypeProps) => {
       overlay={
         <Menu selectedKeys={[type]} onClick={e => callbackFn(e.key)}>
           <Menu.Item key={StructViewJoinType.LeftJoin}>
-            ${t(StructViewJoinType.LeftJoin)}
+            {t(StructViewJoinType.LeftJoin)}
           </Menu.Item>
           <Menu.Item key={StructViewJoinType.RightJoin}>
-            ${t(StructViewJoinType.RightJoin)}
+            {t(StructViewJoinType.RightJoin)}
           </Menu.Item>
           <Menu.Item key={StructViewJoinType.InnerJoin}>
-            ${t(StructViewJoinType.InnerJoin)}
+            {t(StructViewJoinType.InnerJoin)}
           </Menu.Item>
         </Menu>
       }
