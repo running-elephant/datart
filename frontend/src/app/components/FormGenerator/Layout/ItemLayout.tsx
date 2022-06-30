@@ -230,6 +230,6 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
 export default ItemLayout;
 
 const StyledItemLayout = styled.div`
-  padding: ${SPACE};
+  padding: ${SPACE} 0;
   user-select: none;
 `;
