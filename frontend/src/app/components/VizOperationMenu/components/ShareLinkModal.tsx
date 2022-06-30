@@ -210,12 +210,13 @@ const ShareLinkModal: FC<{
                     onChange={handleChangeRoles}
                     placeholder={t('share.selectRole')}
                     mode="multiple"
-                    maxTagCount={2}
+                    maxTagCount="responsive"
+                    optionFilterProp="label"
                     value={selectRoles || []}
                   >
                     {rolesList?.map((v, i) => {
                       return (
-                        <Select.Option key={i} value={v.id}>
+                        <Select.Option key={i} value={v.id} label={v.name}>
                           {v.name}
                         </Select.Option>
                       );
@@ -225,12 +226,13 @@ const ShareLinkModal: FC<{
                     onChange={handleChangeMembers}
                     placeholder={t('share.selectUser')}
                     mode="multiple"
-                    maxTagCount={2}
+                    maxTagCount="responsive"
+                    optionFilterProp="label"
                     value={selectUsers || []}
                   >
                     {usersList?.map((v, i) => {
                       return (
-                        <Select.Option key={i} value={v.id}>
+                        <Select.Option key={i} value={v.id} label={v.username}>
                           {v.username}
                         </Select.Option>
                       );
