@@ -235,7 +235,6 @@ export function FolderTree({
       onSelect={menuSelect}
       onDrop={onDrop}
       {...(selectedId && { selectedKeys: [selectedId] })}
-      defaultExpandAll
       draggable
     />
   );
