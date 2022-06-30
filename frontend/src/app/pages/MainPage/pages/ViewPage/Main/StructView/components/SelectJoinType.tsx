@@ -26,17 +26,17 @@ import { StructViewJoinType } from '../../../constants';
 
 interface SelectJoinTypeProps {
   type: StructViewJoinType;
-  callbackFn: (type) => void;
+  onChange: (type) => void;
 }
 
-const SelectJoinType = memo(({ type, callbackFn }: SelectJoinTypeProps) => {
+const SelectJoinType = memo(({ type, onChange }: SelectJoinTypeProps) => {
   const t = useI18NPrefix(`view.structView`);
   return (
     <Dropdown
       trigger={['click']}
       placement="bottomLeft"
       overlay={
-        <Menu selectedKeys={[type]} onClick={e => callbackFn(e.key)}>
+        <Menu selectedKeys={[type]} onClick={e => onChange(e.key)}>
           <Menu.Item key={StructViewJoinType.LeftJoin}>
             {t(StructViewJoinType.LeftJoin)}
           </Menu.Item>

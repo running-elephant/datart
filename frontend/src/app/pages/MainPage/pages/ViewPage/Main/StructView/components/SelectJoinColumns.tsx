@@ -24,17 +24,17 @@ import { SPACE_SM } from 'styles/StyleConstants';
 import { JoinTableProps, StructViewQueryProps } from '../../../slice/types';
 
 interface SelectJoinColumnsProps {
-  tableJSON: StructViewQueryProps;
+  structure: StructViewQueryProps;
   joinTable: JoinTableProps;
-  callbackFn: (field, type, index) => void;
   conditionsIndex: number;
   joinIndex: number;
+  onChange: (field, type, index) => void;
 }
 
 const SelectJoinColumns = memo(
   ({
-    tableJSON,
-    callbackFn,
+    structure,
+    onChange,
     joinTable,
     conditionsIndex,
     joinIndex,
@@ -42,14 +42,14 @@ const SelectJoinColumns = memo(
     const t = useI18NPrefix(`view.structView`);
 
     const handleLeftColumn = useCallback(() => {
-      const tableName = tableJSON.table;
-      const childrenData = tableJSON['columns']?.map((v, i) => {
+      const tableName = structure.table;
+      const childrenData = structure['columns']?.map((v, i) => {
         return { title: v, key: [...tableName, v] };
       });
       const joinTable: any = [];
       for (let i = 0; i < joinIndex; i++) {
-        const tableName = tableJSON.joins[i].table!;
-        const childrenData = tableJSON.joins[i]['columns']?.map((v, i) => {
+        const tableName = structure.joins[i].table!;
+        const childrenData = structure.joins[i]['columns']?.map((v, i) => {
           return { title: v, key: [...tableName, v] };
         });
         joinTable.push({
@@ -69,7 +69,7 @@ const SelectJoinColumns = memo(
         ...joinTable,
       ];
       return treeData;
-    }, [joinIndex, tableJSON]);
+    }, [joinIndex, structure]);
 
     const handleRightColumn = useCallback((): any => {
       const joinTableName = joinTable.table!;
@@ -100,7 +100,7 @@ const SelectJoinColumns = memo(
           treeDefaultExpandAll={true}
           value={joinTable.conditions?.[conditionsIndex]?.left.slice(-1)}
           onChange={columnName => {
-            callbackFn(columnName || [], 'left', conditionsIndex);
+            onChange(columnName || [], 'left', conditionsIndex);
           }}
           treeData={handleLeftColumn()}
         />
@@ -112,7 +112,7 @@ const SelectJoinColumns = memo(
           treeDefaultExpandAll={true}
           value={joinTable.conditions?.[conditionsIndex]?.right.slice(-1)}
           onChange={columnName => {
-            callbackFn(columnName || [], 'right', conditionsIndex);
+            onChange(columnName || [], 'right', conditionsIndex);
           }}
           treeData={handleRightColumn()}
         />
