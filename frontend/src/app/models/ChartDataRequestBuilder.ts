@@ -170,8 +170,9 @@ export class ChartDataRequestBuilder {
       const row = getAllColumnInMeta(this.dataView.meta)!.find(
         v => v.name === col.colName,
       )!;
+
       try {
-        return JSON.parse(row.id);
+        return row.path;
       } catch (e) {
         console.log('error buildColumnName JSON parse col.id=' + col.id);
       }

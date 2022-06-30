@@ -45,7 +45,6 @@ export const ChartDataConfigSectionReplaceMenu: FC<{
       aggregate: undefined,
       category: item.category as any,
       colName: item.name,
-      id: item.id,
       type: item.type!,
       uid: columnConfig.uid,
     };
@@ -63,13 +62,16 @@ export const ChartDataConfigSectionReplaceMenu: FC<{
   const renderMenuItem = (item: ChartDataViewMeta) => {
     if (item.children && item.children.length) {
       return (
-        <Menu.SubMenu key={item.id} title={item.name}>
+        <Menu.SubMenu key={item.name} title={item.name}>
           {item.children.map(item => renderMenuItem(item))}
         </Menu.SubMenu>
       );
     } else {
       return (
-        <Menu.Item key={item.id} onClick={() => handleFieldConfigChanged(item)}>
+        <Menu.Item
+          key={item.name}
+          onClick={() => handleFieldConfigChanged(item)}
+        >
           {item.name}
         </Menu.Item>
       );

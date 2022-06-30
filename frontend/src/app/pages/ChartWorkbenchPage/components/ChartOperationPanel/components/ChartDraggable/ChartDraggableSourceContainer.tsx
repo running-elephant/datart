@@ -70,7 +70,6 @@ export const ChartDraggableSourceContainer: FC<
     onClearCheckedList?: () => void;
   } & renderMataProps
 > = memo(function ChartDraggableSourceContainer({
-  id,
   name: colName,
   type,
   subType,
@@ -103,10 +102,7 @@ export const ChartDraggableSourceContainer: FC<
       canDrag: true,
       item: selectedItems?.length
         ? selectedItems.map(item => buildDragItem(item))
-        : buildDragItem(
-            { id, type, subType, category, name: colName },
-            children,
-          ),
+        : buildDragItem({ type, subType, category, name: colName }, children),
       collect: monitor => ({
         isDragging: monitor.isDragging(),
       }),
@@ -317,8 +313,8 @@ export const ChartDraggableSourceContainer: FC<
   const renderChildren = useMemo(() => {
     return (children || []).map(item => (
       <ChartDraggableSourceContainer
-        key={item.id}
-        id={item.id}
+        key={item.name}
+        id={item.name}
         name={item.name}
         displayName={item.displayName}
         category={item.category}

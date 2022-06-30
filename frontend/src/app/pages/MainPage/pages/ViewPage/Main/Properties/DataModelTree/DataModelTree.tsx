@@ -109,7 +109,7 @@ const DataModelTree: FC = memo(() => {
           return { title: v, key: [...tableName, v] };
         });
         joinTable.push({
-          title: tableName,
+          title: tableName.join('.'),
           key: tableName,
           selectable: false,
           children: childrenData,
@@ -117,8 +117,8 @@ const DataModelTree: FC = memo(() => {
       }
       const treeData = [
         {
-          title: tableName[tableName.length - 1],
-          key: tableName[tableName.length - 1],
+          title: tableName.join('.'),
+          key: tableName,
           selectable: false,
           children: childrenData,
         },

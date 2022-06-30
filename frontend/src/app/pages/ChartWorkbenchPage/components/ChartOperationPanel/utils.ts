@@ -114,8 +114,8 @@ export const buildDateLevelFields = (args: {
             type: item.type,
             category: item.category,
             expression: item.expression,
-            colPath: v.id,
-            displayName: v.id[v.id.length - 1],
+            colPath: v.path,
+            displayName: v.path[v.path.length - 1],
           };
         }
         return null;
@@ -210,7 +210,7 @@ export const findSameFieldInView = (
     }
     if (bool) return true;
     if (
-      String(item.id) === String(field.id) &&
+      String(item.name) === String(field.colName) &&
       item.category === field.category &&
       item.type === field.type
     ) {

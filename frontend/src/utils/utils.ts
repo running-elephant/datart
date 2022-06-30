@@ -417,7 +417,7 @@ export function modelListFormsTreeByTableName(model, type) {
   const columnTreeData: any = [];
 
   model?.forEach(v => {
-    const path = type === 'viewPage' ? v.path : v.id;
+    const path = v.path;
     const tableName = path.slice(0, path.length - 1).join('.');
     if (!tableNameList.includes(tableName)) {
       tableNameList.push(tableName);
@@ -425,7 +425,7 @@ export function modelListFormsTreeByTableName(model, type) {
   });
 
   model?.forEach(v => {
-    const path = type === 'viewPage' ? v.path : v.id;
+    const path = v.path;
     const tableName = path.slice(0, path.length - 1).join('.');
     const fieldName = path[path.length - 1];
     if (tableNameList.includes(tableName)) {

@@ -133,7 +133,7 @@ const RelationList: FC<
           onChange={value => handleRelationChange(index, 'source', value)}
         >
           {(isFieldType(record) ? sourceFields : sourceVariables)?.map(sf => {
-            return <Select.Option value={sf?.id}>{sf?.name}</Select.Option>;
+            return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;
           })}
         </Select>
       ),
@@ -149,7 +149,7 @@ const RelationList: FC<
           onChange={value => handleRelationChange(index, 'target', value)}
         >
           {(isFieldType(record) ? targetFields : targetVariables)?.map(sf => {
-            return <Select.Option value={sf?.id}>{sf?.name}</Select.Option>;
+            return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;
           })}
         </Select>
       ),

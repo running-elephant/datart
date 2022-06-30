@@ -260,19 +260,22 @@ const ChartDataViewPanel: FC<{
         const columnTreeData: any = [];
 
         allColumn?.forEach((v, i) => {
-          const tableName = JSON.parse(v.id)[0];
+          const path = v.path;
+          const tableName = path?.slice(0, path?.length - 1).join('.') || '';
           if (!tableNameList.includes(tableName)) {
             tableNameList.push(tableName);
           }
         });
 
         allColumn?.forEach((v, i) => {
-          const tableName = JSON.parse(v.id)[0];
+          const path = v.path;
+          const tableName = path?.slice(0, path?.length - 1).join('.') || '';
           if (tableNameList.includes(tableName)) {
+            const fieldName = path?.[path.length - 1];
             const columnNameArr = columnNameObj[tableName];
             columnNameObj[tableName] = columnNameArr
-              ? [...columnNameArr, { title: v.name, key: JSON.parse(v.id) }]
-              : [{ title: v.name, key: JSON.parse(v.id) }];
+              ? [...columnNameArr, { title: fieldName, key: path }]
+              : [{ title: fieldName, key: path }];
           }
         });
 
