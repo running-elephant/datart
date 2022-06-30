@@ -125,16 +125,13 @@ public abstract class DefaultDataProvider extends DataProvider {
         if (persistent) {
             expire = getExpireTime(config);
         }
-        // 如果自定义了schema,执行分两部完成。1、执行view sql，取得中间结果。2、使用中间结果，修改schema，加入执行参数，完成执行。
-        if (queryScript != null && !CollectionUtils.isEmpty(queryScript.getSchema())) {
-            Dataframe temp = LocalDB.executeLocalQuery(queryScript, ExecuteParam.empty(), dataframes, persistent, expire);
-            for (Column column : temp.getColumns()) {
-                column.setType(queryScript.getSchema().getOrDefault(column.getName(), column).getType());
+        if (!dataframes.isEmpty() && queryScript != null && !CollectionUtils.isEmpty(queryScript.getSchema())) {
+            for (Dataframe dataframe : dataframes.getDataframes()) {
+                for (Column column : dataframe.getColumns()) {
+                    column.setType(queryScript.getSchema().getOrDefault(column.columnKey(), column).getType());
+                }
+                dataframe.setRows(parseValues(dataframe.getRows(), dataframe.getColumns()));
             }
-            temp.setRows(parseValues(temp.getRows(), temp.getColumns()));
-            temp.setName(queryScript.toQueryKey());
-            dataframes = Dataframes.of(temp.getName(), temp);
-            queryScript = null;
             persistent = false;
         }
         return LocalDB.executeLocalQuery(queryScript, executeParam, dataframes, persistent, expire);
@@ -159,7 +156,7 @@ public abstract class DefaultDataProvider extends DataProvider {
             if (!CollectionUtils.isEmpty(columnConfig)) {
                 columns = columnConfig
                         .stream()
-                        .map(c -> new Column(c.get(COLUMN_NAME), ValueType.valueOf(c.get(COLUMN_TYPE))))
+                        .map(c -> Column.of(ValueType.valueOf(c.get(COLUMN_TYPE)), c.get(COLUMN_NAME)))
                         .collect(Collectors.toList());
             }
         } catch (ClassCastException ignored) {
@@ -177,7 +174,7 @@ public abstract class DefaultDataProvider extends DataProvider {
     /**
      * 检查该数据源缓存中数据是否存在
      */
-    public boolean cacheExists(DataProviderSource config,String cacheKey) throws SQLException {
+    public boolean cacheExists(DataProviderSource config, String cacheKey) throws SQLException {
         Object cacheEnable = config.getProperties().get("cacheEnable");
         if (cacheEnable == null) {
             return false;

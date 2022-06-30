@@ -109,10 +109,6 @@ public class SqlBuilder {
      */
     public String build() throws SqlParseException {
 
-        if (executeParam == null) {
-            return SqlNodeUtils.toSql(from, dialect, quoteIdentifiers);
-        }
-
         final SqlNodeList selectList = new SqlNodeList(SqlParserPos.ZERO);
 
         final SqlNodeList orderBy = new SqlNodeList(SqlParserPos.ZERO);
@@ -124,14 +120,14 @@ public class SqlBuilder {
         SqlNode having = null;
 
         //function columns
-        if (!CollectionUtils.isEmpty(executeParam.getFunctionColumns())) {
+        if (executeParam != null && !CollectionUtils.isEmpty(executeParam.getFunctionColumns())) {
             for (FunctionColumn functionColumn : executeParam.getFunctionColumns()) {
                 functionColumnMap.put(functionColumn.getAlias(), parseSnippet(functionColumn, namePrefix, true));
             }
         }
 
         //columns
-        if (!CollectionUtils.isEmpty(executeParam.getColumns())) {
+        if (executeParam != null && !CollectionUtils.isEmpty(executeParam.getColumns())) {
             for (SelectColumn column : executeParam.getColumns()) {
                 if (functionColumnMap.containsKey(column.getColumnKey())) {
                     selectList.add(SqlNodeUtils.createAliasNode(functionColumnMap.get(column.getColumnKey()), column.getAlias()));
@@ -142,7 +138,7 @@ public class SqlBuilder {
         }
 
         // filters
-        if (!CollectionUtils.isEmpty(executeParam.getFilters())) {
+        if (executeParam != null && !CollectionUtils.isEmpty(executeParam.getFilters())) {
             for (FilterOperator filter : executeParam.getFilters()) {
                 SqlNode filterSqlNode = filterSqlNode(filter);
                 if (filter.getAggOperator() != null) {
@@ -162,7 +158,7 @@ public class SqlBuilder {
         }
 
         //group by
-        if (!CollectionUtils.isEmpty(executeParam.getGroups())) {
+        if (executeParam != null && !CollectionUtils.isEmpty(executeParam.getGroups())) {
             for (GroupByOperator group : executeParam.getGroups()) {
                 SqlNode sqlNode = null;
                 if (functionColumnMap.containsKey(group.getColumnKey())) {
@@ -177,20 +173,14 @@ public class SqlBuilder {
         }
 
         // aggregators
-        if (!CollectionUtils.isEmpty(executeParam.getAggregators())) {
+        if (executeParam != null && !CollectionUtils.isEmpty(executeParam.getAggregators())) {
             for (AggregateOperator aggregator : executeParam.getAggregators()) {
-//                String alias = aggregator.getAlias() == null ? aggregator.getColumnKey() : aggregator.getAlias();
-//                if (aggregator.getSqlOperator() == null) {
-//                    alias = getColumnKey(aggregator.getColumnNames());
-//                } else {
-//                    alias = aggregator.getSqlOperator().name() + "(" + aggregator.getColumnNames() + ")";
-//                }
                 selectList.add(createAggNode(aggregator));
             }
         }
 
         //order
-        if (!CollectionUtils.isEmpty(executeParam.getOrders())) {
+        if (executeParam != null && !CollectionUtils.isEmpty(executeParam.getOrders())) {
             for (OrderOperator order : executeParam.getOrders()) {
                 orderBy.add(createOrderNode(order));
             }
@@ -198,25 +188,22 @@ public class SqlBuilder {
 
         //keywords
         SqlNodeList keywordList = new SqlNodeList(SqlParserPos.ZERO);
-        if (!CollectionUtils.isEmpty(executeParam.getKeywords())) {
+        if (executeParam != null && !CollectionUtils.isEmpty(executeParam.getKeywords())) {
             for (SelectKeyword keyword : executeParam.getKeywords()) {
                 keywordList.add(SqlLiteral.createSymbol(SqlSelectKeyword.valueOf(keyword.name()), SqlParserPos.ZERO));
             }
         }
 
-//        SqlNode from = new SqlBasicCall(SqlStdOperatorTable.AS
-//                , new SqlNode[]{new SqlFragment("(" + srcSql + ")"), new SqlIdentifier(T, SqlParserPos.ZERO.withQuoting(true))}
-//                , SqlParserPos.ZERO);
+        // fetch &　offset
+        SqlNode fetch = null;
+        SqlNode offset = null;
+        if (executeParam != null && withPage && executeParam.getPageInfo() != null) {
+            fetch = SqlLiteral.createExactNumeric(Math.min(executeParam.getPageInfo().getPageSize(), Integer.MAX_VALUE) + "", SqlParserPos.ZERO);
+            offset = SqlLiteral.createExactNumeric(Math.min((executeParam.getPageInfo().getPageNo() - 1) * executeParam.getPageInfo().getPageSize(), Integer.MAX_VALUE) + "", SqlParserPos.ZERO);
+        }
 
         if (selectList.size() == 0) {
             selectList.add(SqlIdentifier.star(SqlParserPos.ZERO));
-        }
-
-        SqlNode fetch = null;
-        SqlNode offset = null;
-        if (withPage && executeParam.getPageInfo() != null) {
-            fetch = SqlLiteral.createExactNumeric(Math.min(executeParam.getPageInfo().getPageSize(), Integer.MAX_VALUE) + "", SqlParserPos.ZERO);
-            offset = SqlLiteral.createExactNumeric(Math.min((executeParam.getPageInfo().getPageNo() - 1) * executeParam.getPageInfo().getPageSize(), Integer.MAX_VALUE) + "", SqlParserPos.ZERO);
         }
 
         SqlSelect sqlSelect = new SqlSelect(SqlParserPos.ZERO,
