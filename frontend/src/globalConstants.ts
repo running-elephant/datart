@@ -23,6 +23,7 @@ export const CHARTCONFIG_FIELD_PLACEHOLDER_UID = '@placeholder@';
 export const DATART_TRANSLATE_HOLDER = '@global@';
 export const EVENT_ACTION_DELAY_MS = 200;
 export const RUNTIME_FILTER_KEY = Symbol('@filters@');
+export const BOARD_COPY_CHART_SUFFIX = '_copy';
 
 export enum StorageKeys {
   AuthorizationToken = 'AUTHORIZATION_TOKEN',

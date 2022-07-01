@@ -26,7 +26,7 @@ import { fetchDataChart } from 'app/utils/fetch';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
-import { uuidv4 } from 'utils/utils';
+import { errorHandle, uuidv4 } from 'utils/utils';
 import { InteractionRelationType } from '../../constants';
 import { CustomizeRelation, I18nTranslator } from './types';
 
@@ -51,7 +51,7 @@ const RelationList: FC<
 
   useMount(async () => {
     if (targetRelId) {
-      const data = await fetchDataChart(targetRelId);
+      const data = await fetchDataChart(targetRelId).catch(errorHandle);
       setTargetFields(
         getAllColumnInMeta(data?.view?.meta)?.concat(
           data?.config?.computedFields || [],

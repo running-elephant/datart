@@ -19,6 +19,7 @@
 import { Button, Dropdown, Select, Space, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import ChartDataView from 'app/types/ChartDataView';
+import { BOARD_COPY_CHART_SUFFIX } from 'globalConstants';
 import { FC, useMemo } from 'react';
 import { uuidv4 } from 'utils/utils';
 import { InteractionFieldRelation } from '../../constants';
@@ -48,8 +49,10 @@ const CrossFilteringRuleList: FC<
   translate: t,
 }) => {
   const currentRules = useMemo(() => {
+    console.log(`boardVizs ---> `, boardVizs);
     return (boardVizs || [])
       .filter(bvz => bvz?.config?.type === 'chart' && bvz?.id !== widgetId)
+      .filter(bvz => !bvz?.datachartId?.includes(BOARD_COPY_CHART_SUFFIX))
       .map(bvz => {
         const enableRule = rules?.find(r => r.relId === bvz.datachartId);
         if (enableRule) {
