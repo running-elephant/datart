@@ -18,22 +18,21 @@
 
 import { Button, Dropdown, Select, Space, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
+import { selectViewMap } from 'app/pages/DashBoardPage/pages/Board/slice/selector';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { uuidv4 } from 'utils/utils';
 import { InteractionFieldRelation } from '../../constants';
-import RelationList from './RelationList';
+import BoardRelationList from './BoardRelationList';
 import { CrossFilteringInteractionRule, I18nTranslator } from './types';
 
 const CrossFilteringRuleList: FC<
   {
     widgetId: string;
     rules?: CrossFilteringInteractionRule[];
-    boardVizs?: Array<{
-      id: string;
-      datachartId: string;
-      config: { name: string; type: string };
-    }>;
+    boardVizs?: Array<Widget>;
     dataview?: ChartDataView;
     onRuleChange: (id, prop, value) => void;
     onSelectedRules: (rules: CrossFilteringInteractionRule[]) => void;
@@ -47,6 +46,8 @@ const CrossFilteringRuleList: FC<
   onSelectedRules,
   translate: t,
 }) => {
+  const viewMap = useSelector(selectViewMap);
+
   const currentRules = useMemo(() => {
     return (boardVizs || [])
       .filter(bvz => bvz?.config?.type === 'chart' && bvz?.id !== widgetId)
@@ -109,9 +110,11 @@ const CrossFilteringRuleList: FC<
                   !rules?.map(r => r.id).includes(record?.id)
                 }
                 overlay={() => (
-                  <RelationList
+                  <BoardRelationList
                     translate={t}
                     targetRelId={record?.relId}
+                    boardVizs={boardVizs}
+                    viewMap={viewMap}
                     sourceFields={
                       dataview?.meta?.concat(dataview?.computedFields || []) ||
                       []
@@ -145,6 +148,7 @@ const CrossFilteringRuleList: FC<
       boardVizs,
       rules,
       onRuleChange,
+      viewMap,
       dataview?.meta,
       dataview?.computedFields,
       dataview?.variables,

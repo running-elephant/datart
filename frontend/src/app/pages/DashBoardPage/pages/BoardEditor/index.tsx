@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import ChartEditor from 'app/components/ChartEditor';
+import { BOARD_SELF_CHART_PREFIX } from 'globalConstants';
 import React, { memo, useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -125,7 +126,7 @@ export const BoardEditor: React.FC<{
         if (widgetInfo) {
           let subType: 'widgetChart' | 'dataChart' = 'dataChart';
           if (!widgetInfo.dataChart.id) {
-            widgetInfo.dataChart.id = 'widget_' + uuidv4();
+            widgetInfo.dataChart.id = `${BOARD_SELF_CHART_PREFIX}` + uuidv4();
             subType = 'widgetChart';
           }
           dispatch(
