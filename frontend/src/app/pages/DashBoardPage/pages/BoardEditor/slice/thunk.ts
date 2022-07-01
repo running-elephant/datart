@@ -33,7 +33,7 @@ import {
   getWidgetMap,
 } from 'app/pages/DashBoardPage/utils/widget';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
-import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
@@ -441,7 +441,7 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
     boardId: string;
     widgetId: string;
     option?: getDataOption;
-    extraFilters?: ChartDataRequestFilter[];
+    extraFilters?: PendingChartDataRequestFilter[];
     variableParams?: Record<string, any[]>;
   },
   { state: RootState }

@@ -168,7 +168,7 @@ const useChartInteractions = (props: {
           aggregation,
         )
           .addDrillOption(drillOption)
-          .build()?.filters;
+          .getColNameStringFilter();
         const sourceChartNonAggFilters = (sourceChartFilters || []).filter(
           f => !Boolean(f.aggOperator),
         );
@@ -313,8 +313,8 @@ const useChartInteractions = (props: {
         aggregation,
       )
         .addDrillOption(drillOption)
-        .build()
-        .filters?.filter(f => !Boolean(f.aggOperator));
+        .getColNameStringFilter()
+        ?.filter(f => !Boolean(f.aggOperator));
 
       const linkParams = (crossFilteringSetting?.rules || []).map(rule => {
         const variableFilters = variableToFilter(

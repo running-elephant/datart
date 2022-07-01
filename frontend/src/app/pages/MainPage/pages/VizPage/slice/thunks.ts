@@ -384,6 +384,7 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
       false,
       currentChartPreview?.backendChart?.config?.aggregation,
     );
+
     const data = builder
       .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
       .addDrillOption(arg?.drillOption)

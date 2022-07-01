@@ -1808,3 +1808,7 @@ export function getMinAndMaxNumber(
     .filter(isNumber) as number[];
   return [Math.min(0, ...datas), Math.max(0, ...datas)];
 }
+
+export function findPathByNameInMeta(meta, colName) {
+  return getAllColumnInMeta(meta)?.find(v => v.name === colName);
+}

@@ -34,8 +34,12 @@ import {
   getTheWidgetFiltersAndParams,
 } from 'app/pages/DashBoardPage/utils';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
-import { ChartDataRequest } from 'app/types/ChartDataRequest';
+import {
+  ChartDataRequest,
+  ChartDataRequestFilter,
+} from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
+import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import { uuidv4 } from 'utils/utils';
 import widgetManagerInstance from '../../../WidgetManager';
@@ -172,22 +176,26 @@ export const getControlOptionQueryParams = (obj: {
   widgetMap: Record<string, Widget>;
 }) => {
   const viewConfigs = transformToViewConfig(obj.view?.config);
-
-  const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
-    chartWidget: obj.curWidget,
-    widgetMap: obj.widgetMap,
-    params: undefined,
-  });
+  const { filterParams, variableParams } =
+    getTheWidgetFiltersAndParams<ChartDataRequestFilter>({
+      chartWidget: obj.curWidget,
+      widgetMap: obj.widgetMap,
+      params: undefined,
+      view: obj.view,
+    });
 
   const requestParams: ChartDataRequest = {
     ...viewConfigs,
     aggregators: [],
     filters: filterParams,
     groups: [],
-    columns: [...new Set(obj.columns)].map(v => {
+    columns: [...new Set(obj.columns)].map(columnName => {
+      const row = getAllColumnInMeta(obj.view?.meta)?.find(
+        v => v.name === columnName,
+      );
       return {
-        alias: v,
-        column: JSON.parse(v),
+        alias: columnName,
+        column: row?.path || [],
       };
     }),
     pageInfo: {

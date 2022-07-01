@@ -102,7 +102,10 @@ export const ChartDraggableSourceContainer: FC<
       canDrag: true,
       item: selectedItems?.length
         ? selectedItems.map(item => buildDragItem(item))
-        : buildDragItem({ type, subType, category, name: colName }, children),
+        : buildDragItem(
+            { id: colName, type, subType, category, name: colName },
+            children,
+          ),
       collect: monitor => ({
         isDragging: monitor.isDragging(),
       }),

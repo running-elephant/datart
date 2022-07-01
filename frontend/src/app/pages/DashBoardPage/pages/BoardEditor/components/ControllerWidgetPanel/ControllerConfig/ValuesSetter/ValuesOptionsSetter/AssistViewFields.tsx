@@ -33,7 +33,9 @@ import { errorHandle } from 'utils/utils';
 export interface AssistViewFieldsProps
   extends Omit<CascaderProps, 'options' | 'onChange'> {
   onChange?: (value: string[]) => void;
-  getViewOption: (viewId: string) => Promise<CascaderOptionType[] | undefined>;
+  getViewOption: (
+    viewId: string,
+  ) => Promise<{ option: CascaderOptionType[] | undefined }>;
   value?: string[];
 }
 export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
@@ -60,11 +62,11 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
             };
           });
           if (Array.isArray(propsValue) && propsValue.length) {
-            const children = await getViewOption(propsValue[0]);
+            const { option } = await getViewOption(propsValue[0]);
 
             views.forEach(view => {
               if (view.value === propsValue[0]) {
-                view.children = children;
+                view.children = option;
               }
             });
           }
@@ -85,8 +87,8 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
       async (selectedOptions: CascaderOptionType[]) => {
         const targetOption = selectedOptions[selectedOptions.length - 1];
         targetOption.loading = true;
-        const children = await getViewOption(targetOption.value as string);
-        targetOption.children = children;
+        const { option } = await getViewOption(targetOption.value as string);
+        targetOption.children = option;
         targetOption.loading = false;
         const nextOptions = [...options].map(item => {
           if (item.value === targetOption.value) {
@@ -103,6 +105,7 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
       setVal(value);
       onChange?.(value || []);
     };
+
     return (
       <Cascader
         allowClear

@@ -33,12 +33,14 @@ import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import {
   ChartDataRequest,
   ChartDataRequestFilter,
+  PendingChartDataRequestFilter,
 } from 'app/types/ChartDataRequest';
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
+  findPathByNameInMeta,
   getAllColumnInMeta,
   getRuntimeDateLevelFields,
   getValue,
@@ -100,9 +102,14 @@ export class ChartDataRequestBuilder {
     return this;
   }
 
-  public addRuntimeFilters(filters: ChartDataRequestFilter[] = []) {
+  public addRuntimeFilters(filters: PendingChartDataRequestFilter[] = []) {
     if (!isEmptyArray(filters)) {
-      this.extraRuntimeFilters = filters;
+      this.extraRuntimeFilters = filters.map(v => {
+        return {
+          ...v,
+          column: this.buildColumnName(v),
+        };
+      });
     }
     return this;
   }
@@ -112,6 +119,18 @@ export class ChartDataRequestBuilder {
       this.variableParams = params;
     }
     return this;
+  }
+
+  public getColNameStringFilter(): PendingChartDataRequestFilter[] {
+    return this.buildFilters().map(v => {
+      const row = getAllColumnInMeta(this.dataView.meta)?.find(val =>
+        isEqual(val.path, v.column),
+      );
+      return {
+        ...v,
+        column: row?.name || '',
+      };
+    });
   }
 
   private buildAggregators() {
@@ -167,14 +186,12 @@ export class ChartDataRequestBuilder {
 
   private buildColumnName(col) {
     if (col.category === ChartDataViewFieldCategory.Field) {
-      const row = getAllColumnInMeta(this.dataView.meta)!.find(
-        v => v.name === col.colName,
-      )!;
+      const row = findPathByNameInMeta(this.dataView.meta, col.colName);
 
       try {
-        return row.path;
+        return row?.path || [];
       } catch (e) {
-        console.log('error buildColumnName JSON parse col.id=' + col.id);
+        console.log('error buildColumnName row ' + col.colName);
       }
     }
 
@@ -258,6 +275,7 @@ export class ChartDataRequestBuilder {
         return true;
       })
       .map(col => col);
+
     return this.normalizeFilters(fields)
       .concat(this.normalizeDrillFilters())
       .concat(this.normalizeRuntimeFilters());
@@ -547,15 +565,16 @@ export class ChartDataRequestBuilder {
 
   private removeInvalidFilter(filters: ChartDataRequestFilter[]) {
     const dataViewFieldsNames = (
-      (this.dataView?.meta as ChartDataViewMeta[]) || []
-    ).map(c => c?.id);
+      (getAllColumnInMeta(this.dataView?.meta) as ChartDataViewMeta[]) || []
+    ).map(c => c?.name);
     return (filters || []).filter(f => {
-      return dataViewFieldsNames.includes(JSON.stringify(f.column));
+      return dataViewFieldsNames.includes(f.column.join('.'));
     });
   }
 
   public build(): ChartDataRequest {
     const validFilters = this.removeInvalidFilter(this.buildFilters());
+
     return {
       ...this.buildViewConfigs(),
       viewId: this.dataView?.id,

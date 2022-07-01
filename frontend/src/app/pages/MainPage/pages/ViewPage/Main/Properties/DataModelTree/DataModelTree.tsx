@@ -130,7 +130,7 @@ const DataModelTree: FC = memo(() => {
       if (currentEditingView?.model?.columns) {
         setFields(
           Object.values(currentEditingView.model.columns).map(v => {
-            return { id: v.name, name: v.name };
+            return { id: v.name, name: v.name, displayName: v.name };
           }),
         );
       }
@@ -140,7 +140,10 @@ const DataModelTree: FC = memo(() => {
   const tableColumns = useMemo<Column[]>(() => {
     return Object.entries(hierarchy || {})
       .map(([name, column], index) => {
-        return Object.assign({ index }, column, { name: column.name || name });
+        return Object.assign({ index }, column, {
+          name: column.name || name,
+          displayName: column.name || name,
+        });
       })
       .sort(dataModelColumnSorter);
   }, [hierarchy]);

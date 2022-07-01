@@ -17,9 +17,7 @@
  */
 
 import { FONT_DEFAULT } from 'app/constants';
-import { convertControllerConfigTobeta4_1 } from 'app/migration/BoardConfig/utils/beta4utils';
 import { ServerRelation } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { WidgetConf } from 'app/pages/DashBoardPage/types/widgetTypes';
 import {
   beta0,
   convertWidgetRelationsToObj,
@@ -98,120 +96,5 @@ describe('test migrateWidgets ', () => {
       },
     ] as ServerRelation[];
     expect(convertWidgetRelationsToObj(relations1)).toMatchObject(relations2);
-  });
-
-  test('should controllerConfig relatedViews fieldValue and assistViewFields string to array of string', () => {
-    const config1 = {
-      version: '1.0.0-beta.4+1',
-      type: 'controller',
-      content: {
-        type: 'dropdownList',
-        relatedViews: [
-          {
-            viewId: '1caa682f2a154913900622ef15778703',
-            relatedCategory: 'field',
-            fieldValue: 'name_level2',
-            fieldValueType: 'STRING',
-          },
-          {
-            viewId: 'ed7a365741474fc8a5569d4047d1a18e',
-            relatedCategory: 'field',
-            fieldValue: '国家',
-            fieldValueType: 'STRING',
-          },
-        ],
-        name: '23456y',
-        config: {
-          controllerValues: [],
-          valueOptions: [],
-          valueOptionType: 'common',
-          assistViewFields: [
-            '1caa682f2a154913900622ef15778703',
-            'name_level2',
-            'name_level2',
-          ],
-          sqlOperator: 'EQ',
-          visibility: {
-            visibilityType: 'show',
-          },
-        },
-      },
-    } as WidgetConf;
-    expect(convertControllerConfigTobeta4_1(config1)).toEqual({
-      version: '1.0.0-beta.4+1',
-      type: 'controller',
-      content: {
-        type: 'dropdownList',
-        relatedViews: [
-          {
-            viewId: '1caa682f2a154913900622ef15778703',
-            relatedCategory: 'field',
-            fieldValue: '["name_level2"]',
-            fieldValueType: 'STRING',
-          },
-          {
-            viewId: 'ed7a365741474fc8a5569d4047d1a18e',
-            relatedCategory: 'field',
-            fieldValue: '["国家"]',
-            fieldValueType: 'STRING',
-          },
-        ],
-        name: '23456y',
-        config: {
-          controllerValues: [],
-          valueOptions: [],
-          valueOptionType: 'common',
-          assistViewFields: [
-            '1caa682f2a154913900622ef15778703',
-            '["name_level2"]',
-            '["name_level2"]',
-          ],
-          sqlOperator: 'EQ',
-          visibility: {
-            visibilityType: 'show',
-          },
-        },
-      },
-    });
-  });
-
-  test('if the controllerConfig related Views fieldValue and assistViewFields  is a string array, it will remain unchanged', () => {
-    const config = {
-      version: '1.0.0-beta.4+1',
-      type:'controller',
-      content: {
-        type: 'dropdownList',
-        relatedViews: [
-          {
-            viewId: '1caa682f2a154913900622ef15778703',
-            relatedCategory: 'field',
-            fieldValue: '["dad","name_level2"]',
-            fieldValueType: 'STRING',
-          },
-          {
-            viewId: 'ed7a365741474fc8a5569d4047d1a18e',
-            relatedCategory: 'field',
-            fieldValue: '["国家"]',
-            fieldValueType: 'STRING',
-          },
-        ],
-        name: '23456y',
-        config: {
-          controllerValues: [],
-          valueOptions: [],
-          valueOptionType: 'common',
-          assistViewFields: [
-            '1caa682f2a154913900622ef15778703',
-            '["dad","name_level2"]',
-            '["dad","name_level2"]',
-          ],
-          sqlOperator: 'EQ',
-          visibility: {
-            visibilityType: 'show',
-          },
-        },
-      },
-    } as WidgetConf;
-    expect(convertControllerConfigTobeta4_1(config)).toEqual(config);
   });
 });

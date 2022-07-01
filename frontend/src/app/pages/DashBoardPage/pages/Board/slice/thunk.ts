@@ -24,7 +24,7 @@ import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types
 import { mainActions } from 'app/pages/MainPage/slice';
 import { shareActions } from 'app/pages/SharePage/slice';
 import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';
-import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { fetchAvailableSourceFunctionsAsync } from 'app/utils/fetch';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
@@ -217,7 +217,7 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
     boardId: string;
     widgetId: string;
     option?: getDataOption;
-    extraFilters?: ChartDataRequestFilter[];
+    extraFilters?: PendingChartDataRequestFilter[];
     variableParams?: Record<string, any[]>;
   },
   { state: RootState }
@@ -355,6 +355,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
       boardLinkFilters,
       drillOption,
     });
+
     if (!requestParams) {
       return null;
     }

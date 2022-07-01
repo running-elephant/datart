@@ -114,7 +114,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
           <Item onClick={stopPPG}>
             <ChartDraggableSourceContainer
               key={item.id}
-              id={item.id}
+              id={item.name}
               name={item.name}
               displayName={item.displayName}
               category={item.category}
