@@ -53,7 +53,7 @@ const ViewDetailPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     };
 
     const handleViewDetailSettingChange = (
-      newEvent?: string,
+      newEvent?: InteractionMouseEvent,
       newMapper?: InteractionFieldMapper,
       customFields?: string[],
     ) => {

@@ -17,12 +17,12 @@
  */
 
 import { List } from 'antd';
+import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
+import { renderMataProps } from 'app/pages/ChartWorkbenchPage/slice/types';
 import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { FC, memo, useCallback, useContext, useState } from 'react';
 import styled from 'styled-components/macro';
 import { stopPPG } from 'utils/utils';
-import ChartDataViewContext from '../../../../contexts/ChartDataViewContext';
-import { renderMataProps } from '../../../../slice/type';
 import { ChartDraggableSourceContainer } from './ChartDraggableSourceContainer';
 import ChartDragLayer from './ChartDragLayer';
 

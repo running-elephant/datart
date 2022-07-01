@@ -40,8 +40,8 @@ import { useDrag } from 'react-dnd';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_BASE,
-  FONT_SIZE_HEADING,
-  FONT_SIZE_SUBTITLE,
+  FONT_SIZE_BODY,
+  FONT_SIZE_TITLE,
   FONT_WEIGHT_MEDIUM,
   INFO,
   SPACE,
@@ -49,8 +49,9 @@ import {
   SUCCESS,
   WARNING,
 } from 'styles/StyleConstants';
+import { isEmpty } from 'utils/object';
 import { stopPPG } from 'utils/utils';
-import { renderMataProps } from '../../../../slice/type';
+import { renderMataProps } from '../../../../slice/types';
 import DateLevelFieldContainer from './DateLevelFieldContainer';
 
 const { Panel } = Collapse;
@@ -219,6 +220,7 @@ export const ChartDraggableSourceContainer: FC<
           icon = <FileUnknownOutlined {...props} />;
       }
     }
+
     if (type !== 'DATE') {
       return (
         <Row
@@ -229,8 +231,9 @@ export const ChartDraggableSourceContainer: FC<
           }}
           className={styleClasses.join(' ')}
         >
-          <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
+          <IW fontSize={FONT_SIZE_TITLE}>{icon}</IW>
           <StyledFieldContent>
+            {' '}
             {isHierarchyFieldOrTable ||
             !folderRole ||
             folderRole === ColumnRole.Hierarchy
@@ -268,7 +271,7 @@ export const ChartDraggableSourceContainer: FC<
               key={colName}
               header={
                 <div ref={drag}>
-                  <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
+                  <IW fontSize={FONT_SIZE_TITLE}>{icon}</IW>
                   <p>
                     {!folderRole || folderRole === ColumnRole.Hierarchy
                       ? colName
@@ -277,7 +280,7 @@ export const ChartDraggableSourceContainer: FC<
                 </div>
               }
             >
-              {children?.map((item, i) => {
+              {(children || []).map((item, i) => {
                 return (
                   <DateLevelFieldContainer
                     key={i}
@@ -314,28 +317,30 @@ export const ChartDraggableSourceContainer: FC<
   ]);
 
   const renderChildren = useMemo(() => {
-    return (children || []).map(item => (
-      <ChartDraggableSourceContainer
-        key={item.name}
-        id={item.name}
-        name={item.name}
-        displayName={item.displayName}
-        category={item.category}
-        expression={item.expression}
-        type={item.type}
-        role={item.role}
-        folderRole={role}
-        children={item.children}
-        viewType={viewType}
-        isViewComputerField={item.isViewComputedFields}
-        isActive={selectedItemsIds?.includes(item.name)}
-        availableSourceFunctions={availableSourceFunctions}
-        onDeleteComputedField={onDeleteComputedField}
-        onClearCheckedList={onClearCheckedList}
-        onSelectionChange={onSelectionChange}
-        selectedItems={selectedItems}
-      />
-    ));
+    return (children || [])
+      .filter(item => !isEmpty(item.name))
+      .map(item => (
+        <ChartDraggableSourceContainer
+          key={item.id}
+          id={item.name}
+          name={item.name}
+          displayName={item.displayName}
+          category={item.category}
+          expression={item.expression}
+          type={item.type}
+          role={item.role}
+          folderRole={role}
+          children={item.children}
+          viewType={viewType}
+          isViewComputerField={item.isViewComputedFields}
+          isActive={selectedItemsIds?.includes(item.name)}
+          availableSourceFunctions={availableSourceFunctions}
+          onDeleteComputedField={onDeleteComputedField}
+          onClearCheckedList={onClearCheckedList}
+          onSelectionChange={onSelectionChange}
+          selectedItems={selectedItems}
+        />
+      ));
   }, [
     role,
     children,
@@ -379,7 +384,7 @@ const Container = styled.div<{ flexDirection?: string }>`
   flex: 1;
   flex-direction: ${p => p.flexDirection || 'row'};
   padding: ${SPACE_TIMES(0.5)} ${SPACE} ${SPACE_TIMES(0.5)} ${SPACE_TIMES(2)};
-  font-size: ${FONT_SIZE_SUBTITLE};
+  font-size: ${FONT_SIZE_BODY};
   font-weight: ${FONT_WEIGHT_MEDIUM};
   color: ${p => p.theme.textColorSnd};
   cursor: pointer;
@@ -414,6 +419,15 @@ const Container = styled.div<{ flexDirection?: string }>`
 const CollapseWrapper = styled(Collapse)`
   .ant-collapse-header {
     padding: 0 !important;
+  }
+  .ant-collapse-content .ant-collapse-content-box {
+    padding-top: 0 !important;
+    padding-right: 8px;
+    padding-bottom: 0 !important;
+    padding-left: 8px;
+    & > div {
+      line-height: 32px;
+    }
   }
   &.ant-collapse {
     width: 100%;

@@ -262,7 +262,7 @@ const slice = createSlice({
         );
         currentEditingView.model = diffMergeHierarchyModel(
           model,
-          currentEditingView.type,
+          currentEditingView.type!,
         );
         currentEditingView.previewResults = dataSource;
         if (!action.meta.arg.isFragment) {

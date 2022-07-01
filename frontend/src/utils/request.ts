@@ -46,23 +46,6 @@ instance.interceptors.response.use(response => {
 });
 
 /**
- * @deprecated should be use @see {@link request2} in all places
- * @export
- * @template T
- * @param {(string | AxiosRequestConfig)} url
- * @param {AxiosRequestConfig} [config]
- * @return {*}  {Promise<APIResponse<T>>}
- */
-export function request<T>(
-  url: string | AxiosRequestConfig,
-  config?: AxiosRequestConfig,
-): Promise<APIResponse<T>> {
-  const axiosPromise =
-    typeof url === 'string' ? instance(url, config) : instance(url);
-  return axiosPromise.then(response => response.data as APIResponse<T>);
-}
-
-/**
  * New Http Request Util
  * Feature:
  *  1. Support customize onFulfilled and onRejected handler

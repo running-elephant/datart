@@ -25,7 +25,7 @@ import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import i18n from 'i18next';
 import { monaco } from 'react-monaco-editor';
 import { RootState } from 'types';
-import { request, request2 } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle, getErrorMessage, rejectHandle } from 'utils/utils';
 import { viewActions } from '.';
 import { View } from '../../../../../types/View';
@@ -67,28 +67,18 @@ import {
 export const getViews = createAsyncThunk<ViewSimple[], string>(
   'view/getViews',
   async orgId => {
-    try {
-      const { data } = await request<ViewSimple[]>(`/views?orgId=${orgId}`);
-      return data;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    const { data } = await request2<ViewSimple[]>(`/views?orgId=${orgId}`);
+    return data;
   },
 );
 
 export const getArchivedViews = createAsyncThunk<ViewSimple[], string>(
   'view/getArchivedViews',
   async orgId => {
-    try {
-      const { data } = await request<ViewSimple[]>(
-        `/views/archived?orgId=${orgId}`,
-      );
-      return data;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    const { data } = await request2<ViewSimple[]>(
+      `/views/archived?orgId=${orgId}`,
+    );
+    return data;
   },
 );
 
@@ -127,7 +117,7 @@ export const getViewDetail = createAsyncThunk<
     dispatch(viewActions.addEditingView(tempViewModel));
 
     try {
-      let { data } = await request<View>(`/views/${viewId}`);
+      let { data } = await request2<View>(`/views/${viewId}`);
       data = migrationViewConfig(data);
       data.config = migrateViewConfig(data.config);
       data.model = beginViewModelMigration(data?.model, data.type);
@@ -247,7 +237,7 @@ export const saveView = createAsyncThunk<
 
   try {
     if (isNewView(currentEditingView.id) || isSaveAs) {
-      const { data } = await request<View>({
+      const { data } = await request2<View>({
         url: '/views',
         method: 'POST',
         data: getSaveParamsFromViewModel(
@@ -272,7 +262,7 @@ export const saveView = createAsyncThunk<
         isSaveAs,
       };
     } else {
-      await request<View>({
+      await request2<View>({
         url: `/views/${currentEditingView.id}`,
         method: 'PUT',
         data: getSaveParamsFromViewModel(
@@ -301,7 +291,7 @@ export const saveFolder = createAsyncThunk<
   const orgId = selectOrgId(getState());
   try {
     if (!(folder as ViewSimple).id) {
-      const { data } = await request<View>({
+      const { data } = await request2<View>({
         url: '/views',
         method: 'POST',
         data: { orgId, isFolder: true, ...folder },
@@ -309,7 +299,7 @@ export const saveFolder = createAsyncThunk<
       resolve && resolve();
       return data;
     } else {
-      await request<View>({
+      await request2<View>({
         url: `/views/${(folder as ViewSimple).id}`,
         method: 'PUT',
         data: folder,
@@ -327,7 +317,7 @@ export const updateViewBase = createAsyncThunk<ViewBase, UpdateViewBaseParams>(
   'view/updateViewBase',
   async ({ view, resolve }) => {
     try {
-      await request<boolean>({
+      await request2<boolean>({
         url: `/views/${view.id}/base`,
         method: 'PUT',
         data: view,
@@ -384,7 +374,7 @@ export const unarchiveView = createAsyncThunk<
   'view/unarchiveView',
   async ({ view: { id, name, parentId, index }, resolve }, { dispatch }) => {
     try {
-      await request<null>({
+      await request2<null>({
         url: `/views/unarchive/${id}`,
         method: 'PUT',
         params: { name, parentId, index },

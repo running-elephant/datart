@@ -20,6 +20,8 @@ import {
   InteractionAction,
   InteractionCategory,
   InteractionFieldMapper,
+  InteractionFieldRelation,
+  InteractionMouseEvent,
   InteractionRelationType,
 } from '../../constants';
 
@@ -71,9 +73,7 @@ export type InteractionRule = {
 export type CrossFilteringInteractionRule = {
   id: string;
   relId?: string;
-  relName?: string;
   enable?: boolean;
-  name?: string;
   relation?: InteractionFieldRelation;
   [InteractionFieldRelation.Customize]: CustomizeRelation[];
 };

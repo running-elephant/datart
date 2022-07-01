@@ -109,8 +109,8 @@ public class PoiConvertUtils {
         for (int i = 0; i < dataColumns.size(); i++) {
             for (int j = tableHeaders.size()-1; j >= 0; j--) {
                 Column column = tableHeaders.get(j).get(i);
-                if (StringUtils.isNotBlank(column.getName())) {
-                    column.setName(aliasMap.getOrDefault(column.getName(), column.getName()));
+                if (StringUtils.isNotBlank(column.columnName())) {
+                    column.setName(aliasMap.getOrDefault(column.getName(), column.columnName()));
                     break;
                 }
             }

@@ -19,7 +19,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { StorageKeys } from 'globalConstants';
 import { removeToken, setToken, setTokenExpiration } from 'utils/auth';
-import { request, request2 } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { appActions } from '.';
 import {
@@ -50,19 +50,14 @@ export const setup = createAsyncThunk<boolean, SetupParams>(
 export const login = createAsyncThunk<User, LoginParams>(
   'app/login',
   async ({ params, resolve }) => {
-    try {
-      const { data } = await request<User>({
-        url: '/users/login',
-        method: 'POST',
-        data: params,
-      });
-      localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(data));
-      resolve();
-      return data;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    const { data } = await request2<User>({
+      url: '/users/login',
+      method: 'POST',
+      data: params,
+    });
+    localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(data));
+    resolve();
+    return data;
   },
 );
 
@@ -88,18 +83,13 @@ export const getUserInfoByToken = createAsyncThunk<
 export const register = createAsyncThunk<null, RegisterParams>(
   'app/register',
   async ({ data, resolve }) => {
-    try {
-      await request<User>({
-        url: '/users/register',
-        method: 'POST',
-        data,
-      });
-      resolve();
-      return null;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    await request2<User>({
+      url: '/users/register',
+      method: 'POST',
+      data,
+    });
+    resolve();
+    return null;
   },
 );
 
@@ -150,19 +140,14 @@ export const saveProfile = createAsyncThunk<User, SaveProfileParams>(
   async ({ user, resolve }) => {
     const loggedInUser = localStorage.getItem(StorageKeys.LoggedInUser) || '{}';
     const merged = { ...JSON.parse(loggedInUser), ...user };
-    try {
-      await request({
-        url: '/users',
-        method: 'PUT',
-        data: merged,
-      });
-      resolve();
-      localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(merged));
-      return merged;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    await request2({
+      url: '/users',
+      method: 'PUT',
+      data: merged,
+    });
+    resolve();
+    localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(merged));
+    return merged;
   },
 );
 
@@ -170,47 +155,32 @@ export const modifyAccountPassword = createAsyncThunk<
   void,
   ModifyPasswordParams
 >('app/modifyAccountPassword', async ({ params, resolve }) => {
-  try {
-    await request({
-      url: '/users/change/password',
-      method: 'PUT',
-      data: params,
-    });
-    resolve();
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
+  await request2({
+    url: '/users/change/password',
+    method: 'PUT',
+    data: params,
+  });
+  resolve();
 });
 
 export const getSystemInfo = createAsyncThunk<SystemInfo>(
   'app/getSystemInfo',
   async () => {
-    try {
-      const { data } = await request<SystemInfo>('/sys/info');
-      // minute -> millisecond
-      const tokenTimeout = Number(data.tokenTimeout) * 60 * 1000;
-      setTokenExpiration(tokenTimeout);
-      return data;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    const { data } = await request2<SystemInfo>('/sys/info');
+    // minute -> millisecond
+    const tokenTimeout = Number(data.tokenTimeout) * 60 * 1000;
+    setTokenExpiration(tokenTimeout);
+    return data;
   },
 );
 
 export const getOauth2Clients = createAsyncThunk<[]>(
   'app/getOauth2Clients',
   async () => {
-    try {
-      const { data } = await request<[]>({
-        url: '/tpa/getOauth2Clients',
-        method: 'GET',
-      });
-      return data;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    const { data } = await request2<[]>({
+      url: '/tpa/getOauth2Clients',
+      method: 'GET',
+    });
+    return data;
   },
 );

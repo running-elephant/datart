@@ -188,7 +188,11 @@ export const widgetClickJumpAction =
   };
 
 export const widgetLinkEventAction =
-  (renderMode, widget: Widget, params: Array<{ filters; rule }>) =>
+  (
+    renderMode,
+    widget: Widget,
+    params: Array<{ isUnSelectedAll: boolean; filters; rule }>,
+  ) =>
   async (dispatch, getState) => {
     const targetLinkDataChartIds = (params || []).map(p => p.rule?.relId);
     const rootState = getState() as RootState;
@@ -234,9 +238,11 @@ export const widgetLinkEventAction =
         renderMode === 'read'
           ? viewBoardState?.selectedItems?.[targetWidget.id]
           : editBoardState.selectedItemsMap.selectedItems?.[targetWidget.id];
-      const filterObj = params?.find(
+      const clickEventParam = params?.find(
         p => p?.rule?.relId === targetWidget.datachartId,
-      )?.filters;
+      );
+      const filterObj = clickEventParam?.filters;
+      const isUnSelectedAll = clickEventParam?.isUnSelectedAll;
 
       const clickFilters: PendingChartDataRequestFilter[] = Object.entries(
         filterObj || {},
@@ -258,7 +264,6 @@ export const widgetLinkEventAction =
           isEmptyArray(widgetSelectedItems) ||
           !dimensionNames?.includes(JSON.stringify(f.column)),
       );
-
       const widgetInfo = boardWidgetInfoRecord?.[targetWidget.id];
       const { filterParams: controllerFilters, variableParams } =
         getTheWidgetFiltersAndParams<PendingChartDataRequestFilter>({
@@ -267,40 +272,29 @@ export const widgetLinkEventAction =
           params: undefined,
         });
 
+      const fetchChartDataParam = {
+        boardId: targetWidget.dashboardId,
+        widgetId: targetWidget.id,
+        option: widgetInfo,
+        extraFilters: isUnSelectedAll
+          ? controllerFilters || []
+          : (clickFilters || [])
+              .concat(controllerFilters || [])
+              .concat(sourceLinkFilters || [])
+              .concat(sourceControllerFilters || []),
+        variableParams: isUnSelectedAll
+          ? variableParams || {}
+          : Object.assign(
+              variableParams,
+              sourceWidgetRuntimeLinkInfo?.variables,
+              sourceVariableParams,
+            ),
+      };
+
       if (renderMode === 'read') {
-        dispatch(
-          syncBoardWidgetChartDataAsync({
-            boardId: targetWidget.dashboardId,
-            widgetId: targetWidget.id,
-            option: widgetInfo,
-            extraFilters: (clickFilters || [])
-              .concat(controllerFilters || [])
-              .concat(sourceLinkFilters || [])
-              .concat(sourceControllerFilters || []),
-            variableParams: Object.assign(
-              variableParams,
-              sourceWidgetRuntimeLinkInfo?.variables,
-              sourceVariableParams,
-            ),
-          }),
-        );
+        dispatch(syncBoardWidgetChartDataAsync(fetchChartDataParam));
       } else if (renderMode === 'edit') {
-        dispatch(
-          syncEditBoardWidgetChartDataAsync({
-            boardId: targetWidget.dashboardId,
-            widgetId: targetWidget.id,
-            option: widgetInfo,
-            extraFilters: (clickFilters || [])
-              .concat(controllerFilters || [])
-              .concat(sourceLinkFilters || [])
-              .concat(sourceControllerFilters || []),
-            variableParams: Object.assign(
-              variableParams,
-              sourceWidgetRuntimeLinkInfo?.variables,
-              sourceVariableParams,
-            ),
-          }),
-        );
+        dispatch(syncEditBoardWidgetChartDataAsync(fetchChartDataParam));
       }
     });
   };

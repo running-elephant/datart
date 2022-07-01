@@ -1,10 +1,10 @@
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { IUserInfo } from './types';
 
 export const checkScheduleName = async (orgId: string, name: string) => {
   try {
-    const { data } = await request<boolean>({
+    const { data } = await request2<boolean>({
       url: '/schedules/check/name',
       method: 'POST',
       data: { orgId, name },
@@ -18,7 +18,7 @@ export const checkScheduleName = async (orgId: string, name: string) => {
 
 export const searchUserEmails = async (keyword: string) => {
   try {
-    const { data } = await request<IUserInfo[]>({
+    const { data } = await request2<IUserInfo[]>({
       url: '/users/search',
       method: 'GET',
       params: { keyword },
@@ -32,7 +32,7 @@ export const searchUserEmails = async (keyword: string) => {
 
 export const executeSchedule = async scheduleId => {
   try {
-    const { data } = await request<boolean>({
+    const { data } = await request2<boolean>({
       url: `/schedules/execute/${scheduleId}`,
       method: 'POST',
     });
@@ -45,7 +45,7 @@ export const executeSchedule = async scheduleId => {
 
 export const startSchedule = async scheduleId => {
   try {
-    const { data } = await request<boolean>({
+    const { data } = await request2<boolean>({
       url: `/schedules/start/${scheduleId}`,
       method: 'PUT',
     });
@@ -58,22 +58,9 @@ export const startSchedule = async scheduleId => {
 
 export const stopSchedule = async scheduleId => {
   try {
-    const { data } = await request<boolean>({
+    const { data } = await request2<boolean>({
       url: `/schedules/stop/${scheduleId}`,
       method: 'PUT',
-    });
-    return data;
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
-};
-
-export const getScheduleLogs = async scheduleId => {
-  try {
-    const { data } = await request<boolean>({
-      url: `/schedules/logs/${scheduleId}`,
-      method: 'GET',
     });
     return data;
   } catch (error) {

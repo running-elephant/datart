@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
+import { ChartDataViewFieldCategory } from 'app/constants';
 import { StateModalSize } from 'app/hooks/useStateModal';
 import { ChartDataConfig } from 'app/types/ChartConfig';
-import { ChartDataViewFieldCategory } from 'app/types/ChartDataView';
 import { ReactNode } from 'react';
 
 export interface ChartDataConfigSectionProps {

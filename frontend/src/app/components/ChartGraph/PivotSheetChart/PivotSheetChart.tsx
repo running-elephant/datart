@@ -357,7 +357,7 @@ class PivotSheetChart extends ReactChart {
         Object.keys(this.collapsedRows).forEach(k => {
           this.collapsedRows[k] = this.hierarchyCollapse;
         });
-        this.changeDrillConfig(rowSectionConfigRows, drillOption);
+        this.changeDrillConfig(rowSectionConfigRows, drillOption, true);
       },
       onSelected: (cells: DataCell[]) => {
         const state = this.chart?.interaction.getState();
@@ -378,17 +378,55 @@ class PivotSheetChart extends ReactChart {
     chartDataSet: IChartDataSet<string>,
   ) {
     const selectedItems: SelectedItem[] = [];
-    // TODO(tianlei): delete this line,  const a  = chartDataSet.getOriginFieldInfo('Area');
+
+    const _getDataConfig = (data?) => {
+      if (!data) return;
+      const dataConfig = Object.keys(data).reduce((acc, cur) => {
+        if (chartDataSet.getOriginFieldInfo(cur)) {
+          return {
+            ...acc,
+            [getColumnRenderName(chartDataSet.getOriginFieldInfo(cur))]:
+              data[cur],
+          };
+        }
+        return acc;
+      }, {});
+      return Object.keys(dataConfig).length ? dataConfig : undefined;
+    };
+
+    const _getIndex = (colConfig?) => {
+      const config = _getDataConfig(colConfig);
+      if (config) {
+        return Object.values(config).join(',');
+      }
+      return '';
+    };
 
     cells.forEach(v => {
-      const { rowIndex, data } = v.getMeta();
-      if (!selectedItems.find(v => v.index === rowIndex) && data) {
+      const { data, rowQuery, colQuery } = v.getMeta();
+      const index: string = _getIndex(rowQuery) + ',' + _getIndex(colQuery);
+      const selectedItemIndex = selectedItems.findIndex(v => v.index === index);
+      if (
+        selectedItemIndex < 0 &&
+        data &&
+        (_getDataConfig(rowQuery) || _getDataConfig(colQuery))
+      ) {
         selectedItems.push({
-          index: rowIndex,
+          index,
           data: {
-            rowData: chartDataSet[rowIndex].convertToCaseSensitiveObject(),
+            rowData: _getDataConfig(data)!,
           },
         });
+      } else if (selectedItemIndex >= 0) {
+        selectedItems[selectedItemIndex] = {
+          index: selectedItems[selectedItemIndex].index,
+          data: {
+            rowData: {
+              ...selectedItems[selectedItemIndex].data.rowData,
+              ..._getDataConfig(data)!,
+            },
+          },
+        };
       }
     });
     if (compareSelectedItems(selectedItems, this.selectedItems)) {
@@ -407,6 +445,7 @@ class PivotSheetChart extends ReactChart {
   changeDrillConfig(
     rowSectionConfigRows: ChartDataSectionField[],
     drillOption: ChartDrillOption,
+    isCollapse: boolean = false,
   ) {
     const collapsedConfig: Record<string, boolean[]> = {};
     Object.keys(this.collapsedRows).forEach(k => {
@@ -418,15 +457,20 @@ class PivotSheetChart extends ReactChart {
       }
     });
     let level: number = 0;
-    while (level < rowSectionConfigRows.length) {
+    while (level < rowSectionConfigRows.length - 1) {
       if (
-        collapsedConfig[level + 2] &&
-        collapsedConfig[level + 2].every(c => c)
+        (!isCollapse && !collapsedConfig[level + 2]) ||
+        collapsedConfig[level + 2]?.every(c => c) ||
+        (isCollapse &&
+          collapsedConfig[level + 2] &&
+          collapsedConfig[level + 2].every(c => c))
       ) {
         break;
       }
       level++;
     }
+
+    if (this.drillLevel === level) return;
     if (this.drillLevel < level) {
       let index = 0;
       while (level - this.drillLevel > index) {

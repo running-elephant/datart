@@ -936,9 +936,10 @@ export const getVariablesByInteractionRule = (
   if (rule?.[rule.category!]?.['relation'] === InteractionFieldRelation.Auto) {
     return undefined;
   }
-  const customizeRelations: CustomizeRelation[] = rule?.[rule.category!]?.[
-    InteractionFieldRelation.Customize
-  ]?.filter(r => r.type === InteractionRelationType.Variable);
+  const customizeRelations: CustomizeRelation[] =
+    rule?.[rule.category!]?.[InteractionFieldRelation.Customize]?.filter(
+      r => r.type === InteractionRelationType.Variable,
+    ) || [];
 
   if (isEmptyArray(customizeRelations)) {
     return undefined;

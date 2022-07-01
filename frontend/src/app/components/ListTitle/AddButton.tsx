@@ -24,9 +24,6 @@ export function AddButton({
     </Tooltip>
   ) : (
     <Dropdown
-      getPopupContainer={triggerNode =>
-        triggerNode.parentElement as HTMLElement
-      }
       trigger={['click']}
       overlay={
         <Menu onClick={callback}>

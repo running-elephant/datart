@@ -35,7 +35,7 @@ import {
   fetchDataViewsAction,
   fetchViewDetailAction,
 } from './thunks';
-import { ChartConfigPayloadType, WorkbenchState } from './type';
+import { ChartConfigPayloadType, WorkbenchState } from './types';
 
 export const initState: WorkbenchState = {
   lang: 'zh',
