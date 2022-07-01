@@ -76,7 +76,7 @@ class WaterfallChart extends Chart {
     );
   }
 
-  onUpdated(props): void {
+  onUpdated(props, context): void {
     if (!props.dataset || !props.dataset.columns || !props.config) {
       return;
     }
@@ -84,7 +84,7 @@ class WaterfallChart extends Chart {
       this.chart?.clear();
       return;
     }
-    const newOptions = this.getOptions(props.dataset, props.config);
+    const newOptions = this.getOptions(props.dataset, props.config, context);
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
@@ -94,10 +94,11 @@ class WaterfallChart extends Chart {
 
   onResize(opt: any, context): void {
     this.chart?.resize({ width: context?.width, height: context?.height });
-    hadAxisLabelOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
+    hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
+      this.onUpdated(opt, context);
   }
 
-  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
+  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig, context) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
@@ -118,6 +119,7 @@ class WaterfallChart extends Chart {
       chartDataSet,
       aggregateConfigs,
       groupConfigs,
+      context?.translator,
     );
 
     return {
@@ -136,6 +138,7 @@ class WaterfallChart extends Chart {
     chartDataSet: IChartDataSet<string>,
     aggregateConfigs: ChartDataSectionField[],
     group: ChartDataSectionField[],
+    t?: (key: string, disablePrefix?: boolean, options?: any) => any,
   ) {
     const xAxisColumns: XAxisColumns = {
       type: 'category',
@@ -157,6 +160,7 @@ class WaterfallChart extends Chart {
       dataList,
       xAxisColumns,
       styles,
+      t,
     );
 
     const baseDataObj = {
@@ -178,7 +182,7 @@ class WaterfallChart extends Chart {
     };
 
     const ascendOrderObj = {
-      name: '升',
+      name: t?.('common.ascend'),
       type: 'bar',
       sampling: 'average',
       stack: 'stack',
@@ -191,7 +195,7 @@ class WaterfallChart extends Chart {
     };
 
     const descendOrderObj = {
-      name: '降',
+      name: t?.('common.descend'),
       type: 'bar',
       sampling: 'average',
       stack: 'stack',
@@ -234,7 +238,7 @@ class WaterfallChart extends Chart {
             )}`;
           });
           const xAxis = param[0]['axisValue'];
-          if (xAxis === '累计') {
+          if (xAxis === t?.('common.accumulative')) {
             return '';
           } else {
             text.unshift(xAxis as string);
@@ -265,6 +269,7 @@ class WaterfallChart extends Chart {
     dataList: string[],
     xAxisColumns: XAxisColumns,
     styles: ChartStyleConfig[],
+    t?: (key: string, disablePrefix?: boolean, options?: any) => any,
   ): WaterfallDataListConfig {
     const [totalColor] = getStyles(styles, ['bar'], ['totalColor']);
     const baseData: Array<number | string> = [];
@@ -312,7 +317,7 @@ class WaterfallChart extends Chart {
       }
     });
     if (isIncrement && xAxisColumns?.data?.length) {
-      xAxisColumns.data.push('累计');
+      xAxisColumns.data.push(t?.('common.accumulative'));
       const resultData = parseFloat(
         dataList[dataList.length - 1] + baseData[baseData.length - 1],
       );
