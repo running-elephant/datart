@@ -1396,8 +1396,11 @@
       "typeAndCategory": "类型与分类"
     },
     "structView": {
+      "title": "请选择数据视图类型",
       "STRUCT": "表视图",
       "SQL": "SQL 视图",
+      "STRUCT_DESC": "通过配置表关系创建数据视图",
+      "SQL_DESC": "使用 SQL 语句创建数据视图",
       "file": "文件夹",
       "main": "主表：",
       "join": "表连接：",
