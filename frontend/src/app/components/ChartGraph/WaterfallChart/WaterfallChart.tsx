@@ -182,7 +182,7 @@ class WaterfallChart extends Chart {
     };
 
     const ascendOrderObj = {
-      name: t?.('common.ascend'),
+      name: t?.('common.increase'),
       type: 'bar',
       sampling: 'average',
       stack: 'stack',
@@ -195,7 +195,7 @@ class WaterfallChart extends Chart {
     };
 
     const descendOrderObj = {
-      name: t?.('common.descend'),
+      name: t?.('common.decrease'),
       type: 'bar',
       sampling: 'average',
       stack: 'stack',
@@ -238,7 +238,7 @@ class WaterfallChart extends Chart {
             )}`;
           });
           const xAxis = param[0]['axisValue'];
-          if (xAxis === t?.('common.accumulative')) {
+          if (xAxis === t?.('common.total')) {
             return '';
           } else {
             text.unshift(xAxis as string);
@@ -317,7 +317,7 @@ class WaterfallChart extends Chart {
       }
     });
     if (isIncrement && xAxisColumns?.data?.length) {
-      xAxisColumns.data.push(t?.('common.accumulative'));
+      xAxisColumns.data.push(t?.('common.total'));
       const resultData = parseFloat(
         dataList[dataList.length - 1] + baseData[baseData.length - 1],
       );
