@@ -520,9 +520,9 @@ const config: ChartConfig = {
             break: 'Break',
             breakAll: 'BreakAll',
           },
-          ascend: 'Ascend',
-          descend: 'Descend',
-          accumulative: 'accumulative',
+          ascend: 'Increase',
+          descend: 'Decrease',
+          accumulative: 'Total',
         },
         label: {
           title: 'Label',
