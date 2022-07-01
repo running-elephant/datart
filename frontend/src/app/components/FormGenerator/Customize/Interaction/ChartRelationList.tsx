@@ -30,7 +30,7 @@ import { errorHandle, uuidv4 } from 'utils/utils';
 import { InteractionRelationType } from '../../constants';
 import { CustomizeRelation, I18nTranslator } from './types';
 
-const RelationList: FC<
+const ChartRelationList: FC<
   {
     targetRelId?: string;
     relations?: CustomizeRelation[];
@@ -182,7 +182,7 @@ const RelationList: FC<
   );
 };
 
-export default RelationList;
+export default ChartRelationList;
 
 const StyledRelationList = styled.div`
   background: ${p => p.theme.emphasisBackground};
