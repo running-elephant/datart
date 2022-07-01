@@ -59,11 +59,11 @@ const CrossFilteringRuleList: FC<
           id: uuidv4(),
           enable: false,
           relId: bvz.datachartId,
-          relName: bvz?.config?.name,
           relation: InteractionFieldRelation.Auto,
-        };
+        } as CrossFilteringInteractionRule;
       });
-  }, [boardVizs, rules]);
+  }, [boardVizs, rules, widgetId]);
+
   const selectedRuleKeys = useMemo(
     () => currentRules?.filter(r => r.enable)?.map(r => r.id),
     [currentRules],
@@ -72,8 +72,12 @@ const CrossFilteringRuleList: FC<
     () => [
       {
         title: t('crossFiltering.rule.header.relId'),
-        dataIndex: 'relName',
-        key: 'relName',
+        dataIndex: 'relId',
+        key: 'relId',
+        render: (_, record) => {
+          const viz = boardVizs?.find(v => v?.datachartId === record?.relId);
+          return viz?.config?.name;
+        },
       },
       {
         title: t('crossFiltering.rule.header.relation'),
@@ -136,7 +140,15 @@ const CrossFilteringRuleList: FC<
         },
       },
     ],
-    [rules, dataview, onRuleChange, t],
+    [
+      t,
+      boardVizs,
+      rules,
+      onRuleChange,
+      dataview?.meta,
+      dataview?.computedFields,
+      dataview?.variables,
+    ],
   );
 
   return (

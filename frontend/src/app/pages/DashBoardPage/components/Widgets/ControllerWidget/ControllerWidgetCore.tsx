@@ -359,8 +359,9 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     onRangeTimeChange,
     onTimeChange,
   ]);
+
   return (
-    <Wrapper>
+    <Wrapper formFrontColor={title?.font?.color}>
       <Form form={form} className="control-form" onFinish={onFinish}>
         {centerControlLabel}
         {control}
@@ -368,12 +369,22 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     </Wrapper>
   );
 });
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ formFrontColor: string }>`
   display: flex;
   flex: 1;
   align-items: center;
   .control-form {
     flex: 1;
+
+    .ant-select,
+    .ant-checkbox-wrapper,
+    .ant-input,
+    .ant-input-number,
+    .ant-slider,
+    .ant-picker input,
+    .ant-radio-wrapper {
+      color: ${p => p.formFrontColor} !important;
+    }
   }
   .ant-form-item {
     margin-bottom: 0;

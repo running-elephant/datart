@@ -25,7 +25,7 @@ import { InteractionMouseEvent } from '../../constants';
 import { ItemLayoutProps } from '../../types';
 import { itemLayoutComparer } from '../../utils';
 import CrossFilteringRuleList from './CrossFilteringRuleList';
-import { CrossFilteringSetting, InteractionRule } from './types';
+import { CrossFilteringInteractionRule, CrossFilteringSetting } from './types';
 
 const CrossFilteringPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange, context }) => {
@@ -56,7 +56,7 @@ const CrossFilteringPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
 
     const handleSettingChange = (
       newEvent?: InteractionMouseEvent,
-      newRules?: InteractionRule[],
+      newRules?: CrossFilteringInteractionRule[],
     ) => {
       let newSetting: CrossFilteringSetting = {
         event,

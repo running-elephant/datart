@@ -24,7 +24,7 @@ import {
   ColumnPermissionRaw,
   StructViewQueryProps,
   ViewSimple,
-  viewType,
+  ViewType,
 } from '../pages/MainPage/pages/ViewPage/slice/types';
 
 export interface View extends ViewSimple {
@@ -34,5 +34,5 @@ export interface View extends ViewSimple {
   variables: Variable[];
   relVariableSubjects: RowPermissionRaw[];
   relSubjectColumns: ColumnPermissionRaw[];
-  type?: viewType;
+  type?: ViewType;
 }

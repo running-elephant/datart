@@ -44,7 +44,7 @@ import {
   SPACE_MD,
   SPACE_TIMES,
 } from 'styles/StyleConstants';
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle, uuidv4 } from 'utils/utils';
 import {
   selectDataProviderConfigTemplateLoading,
@@ -201,7 +201,7 @@ export function SourceDetailPage() {
 
     try {
       setTestLoading(true);
-      await request<QueryResult>({
+      await request2<QueryResult>({
         url: '/data-provider/test',
         method: 'POST',
         data: { name, type, properties: config },
@@ -220,7 +220,7 @@ export function SourceDetailPage() {
       const { name } = dataProviders[providerType];
       try {
         setTestLoading(true);
-        const { data } = await request<QueryResult>({
+        const { data } = await request2<QueryResult>({
           url: '/data-provider/test',
           method: 'POST',
           data: {

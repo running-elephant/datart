@@ -34,7 +34,7 @@ import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { request2 } from 'utils/request';
 import { rejectHandle } from 'utils/utils';
 import workbenchSlice, { initState } from '.';
-import { ChartConfigPayloadType } from './type';
+import { ChartConfigPayloadType } from './types';
 
 export const initWorkbenchAction = createAsyncThunk(
   'workbench/initWorkbenchAction',

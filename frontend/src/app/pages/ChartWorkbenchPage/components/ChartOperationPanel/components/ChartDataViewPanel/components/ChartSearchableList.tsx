@@ -50,11 +50,7 @@ const ChartSearchableList: FC<{
 
   return (
     <StyledChartSearchableList direction="vertical">
-      <Input.Search
-        value={searchValue}
-        onChange={e => handleSearch(e.target.value)}
-        enterButton
-      />
+      <Input.Search onChange={e => handleSearch(e.target.value)} enterButton />
       <Divider />
       <List
         className="searchable-list-container"

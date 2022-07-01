@@ -333,8 +333,12 @@ const useChartInteractions = (props: {
           rule,
         );
         const variables = getVariablesByInteractionRule(queryVariables, rule);
+        const isUnSelectedAll = !Boolean(
+          clickEventParams?.selectedItems?.length,
+        );
         return {
           rule,
+          isUnSelectedAll,
           filters,
           variables,
         };

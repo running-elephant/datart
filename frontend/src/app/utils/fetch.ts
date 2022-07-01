@@ -31,7 +31,7 @@ import {
 } from 'app/utils/internalChartHelper';
 import { saveAs } from 'file-saver';
 import i18next from 'i18next';
-import { request, request2, requestWithHeader } from 'utils/request';
+import { request2, requestWithHeader } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { convertToChartDto } from './ChartDtoHelper';
 
@@ -93,7 +93,7 @@ export const makeDownloadDataTask =
   async () => {
     const { downloadParams, fileName, resolve, downloadType, imageWidth } =
       params;
-    const res = await request<{}>({
+    const res = await request2<{}>({
       url: `download/submit/task`,
       method: 'POST',
       data: {
@@ -129,7 +129,7 @@ export const makeShareDownloadDataTask =
       password,
       shareToken,
     } = params;
-    const { success } = await request<{}>({
+    const { success } = await request2<{}>({
       url: `shares/download`,
       method: 'POST',
       data: {
@@ -168,7 +168,7 @@ export async function checkComputedFieldAsync(sourceId, expression) {
 }
 
 export async function fetchAvailableSourceFunctionsAsync(sourceId) {
-  const response = await request<string[]>({
+  const response = await request2<string[]>({
     method: 'POST',
     url: `data-provider/function/support/${sourceId}`,
   });

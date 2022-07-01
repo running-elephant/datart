@@ -16,22 +16,20 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionType } from 'app/types/ChartConfig';
+import { SelectedItem } from 'app/types/ChartConfig';
+import { ECharts } from 'echarts';
+import { ChartMouseEvent } from './Chart';
 
-export type ChartRequirement = {
-  [key in Lowercase<keyof PartialSqlAssemblyType>]?: number[] | number;
-};
+export interface ChartSelectionOptions {
+  chart: ECharts;
+  mouseEvents?: ChartMouseEvent[];
+}
 
-export type ChartMetadata = {
-  id: string;
-  name: string;
-  icon?: string;
-  requirements?: ChartRequirement[];
-};
-
-type PartialSqlAssemblyType = Pick<
-  typeof ChartDataSectionType,
-  'GROUP' | 'AGGREGATE'
->;
-
-export default ChartMetadata;
+export interface IChartSelection {
+  selectedItems: SelectedItem[];
+  doSelect: (params: SelectedItem) => void;
+  clearAll: () => void;
+  removeEvent: () => void;
+  addEvent: () => void;
+  setOptions: (options: ChartSelectionOptions) => void;
+}

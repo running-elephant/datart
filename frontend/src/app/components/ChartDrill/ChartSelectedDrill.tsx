@@ -17,7 +17,7 @@
  */
 
 import { ArrowDownOutlined } from '@ant-design/icons';
-import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import classnames from 'classnames';
 import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
