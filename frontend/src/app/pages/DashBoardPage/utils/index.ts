@@ -29,7 +29,10 @@ import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
-import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import {
+  ChartDataRequestFilter,
+  PendingChartDataRequestFilter,
+} from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
 import { findPathByNameInMeta, getStyles } from 'app/utils/chartHelper';
@@ -150,14 +153,19 @@ export const getChartGroupColumns = (datas: ChartDataConfig[] | undefined) => {
   return groupColumns;
 };
 
-export function getTheWidgetFiltersAndParams<T>(obj: {
+export function getTheWidgetFiltersAndParams<
+  T extends ChartDataRequestFilter | PendingChartDataRequestFilter,
+>(obj: {
   chartWidget: Widget;
   widgetMap: Record<string, Widget>;
   params: Record<string, string[]> | undefined;
   view?: ChartDataView;
-}) {
+}): {
+  filterParams: T[];
+  variableParams: Record<string, any[]>;
+} {
   // TODO chart 本身携带了变量，board没有相关配置的时候要拿到 chart本身的 变量值 Params
-  const { chartWidget, widgetMap, params: chartParams, view } = obj;
+  const { chartWidget, widgetMap, view } = obj;
   const controllerWidgets = Object.values(widgetMap).filter(
     widget => widget.config.type === 'controller',
   );
@@ -212,7 +220,7 @@ export function getTheWidgetFiltersAndParams<T>(obj: {
 
     // 关联字段 逻辑
     if (relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Field) {
-      let path = typeof view ? ([] as string[]) : ('' as string);
+      let path = view ? ([] as string[]) : '';
       if (view) {
         const row = findPathByNameInMeta(
           view?.meta,
@@ -227,8 +235,8 @@ export function getTheWidgetFiltersAndParams<T>(obj: {
         column: path,
         sqlOperator: controllerConfig.sqlOperator,
         values: values,
-      } as T;
-      filterParams.push(filter);
+      };
+      filterParams.push(filter as T);
     }
   });
   // filter 去重

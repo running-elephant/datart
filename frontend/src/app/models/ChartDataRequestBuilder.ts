@@ -60,6 +60,7 @@ import {
 import isEqual from 'lodash/isEqual';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 import { DrillMode } from './ChartDrillOption';
+
 export class ChartDataRequestBuilder {
   extraSorters: ChartDataRequest['orders'] = [];
   extraRuntimeFilters: ChartDataRequestFilter[] = [];
@@ -89,7 +90,6 @@ export class ChartDataRequestBuilder {
     this.script = script || false;
     this.aggregation = aggregation;
   }
-
   public addExtraSorters(sorters: ChartDataRequest['orders'] = []) {
     if (!isEmptyArray(sorters)) {
       this.extraSorters = this.extraSorters.concat(sorters!);
@@ -107,7 +107,7 @@ export class ChartDataRequestBuilder {
       this.extraRuntimeFilters = filters.map(v => {
         return {
           ...v,
-          column: this.buildColumnName(v),
+          column: this.buildColumnName({ v, colName: v.column }, 'filter'),
         };
       });
     }
@@ -184,8 +184,11 @@ export class ChartDataRequestBuilder {
     return c.colName;
   }
 
-  private buildColumnName(col) {
-    if (col.category === ChartDataViewFieldCategory.Field) {
+  private buildColumnName(col, type?) {
+    if (
+      col.category === ChartDataViewFieldCategory.Field ||
+      type === 'filter'
+    ) {
       const row = findPathByNameInMeta(this.dataView.meta, col.colName);
 
       try {
@@ -387,6 +390,12 @@ export class ChartDataRequestBuilder {
       .flatMap(c => {
         return c[RUNTIME_FILTER_KEY] || [];
       })
+      .map(v => {
+        return {
+          ...v,
+          column: this.buildColumnName({ colName: v.column }, 'filter'),
+        };
+      })
       .concat(this.extraRuntimeFilters);
   }
 
@@ -567,6 +576,7 @@ export class ChartDataRequestBuilder {
     const dataViewFieldsNames = (
       (getAllColumnInMeta(this.dataView?.meta) as ChartDataViewMeta[]) || []
     ).map(c => c?.name);
+
     return (filters || []).filter(f => {
       return dataViewFieldsNames.includes(f.column.join('.'));
     });
@@ -574,7 +584,6 @@ export class ChartDataRequestBuilder {
 
   public build(): ChartDataRequest {
     const validFilters = this.removeInvalidFilter(this.buildFilters());
-
     return {
       ...this.buildViewConfigs(),
       viewId: this.dataView?.id,
@@ -594,6 +603,7 @@ export class ChartDataRequestBuilder {
     const validFilters = this.removeInvalidFilter(
       this.buildFilters().filter(f => !f.aggOperator),
     );
+
     return {
       ...this.buildViewConfigs(),
       viewId: this.dataView?.id,
