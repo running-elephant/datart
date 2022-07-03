@@ -220,7 +220,7 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
 
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(scheduleId)
-                .withSchedule(CronScheduleBuilder.cronSchedule(schedule.getCronExpression()))
+                .withSchedule(CronScheduleBuilder.cronSchedule(schedule.getCronExpression()).withMisfireHandlingInstructionDoNothing())
                 .startAt(schedule.getStartDate())
                 .endAt(schedule.getEndDate())
                 .build();
