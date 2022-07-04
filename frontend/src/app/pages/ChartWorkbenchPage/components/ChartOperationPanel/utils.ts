@@ -61,13 +61,13 @@ export const getAllFieldsOfEachType = (args: {
     dateFields,
     availableSourceFunctions,
   });
-  const stringComFields = computedFields.filter(
+  const stringComputedFields = computedFields.filter(
     f => f.type === DataViewFieldType.STRING,
   );
-  const numericComFields = computedFields.filter(
+  const numericComputedFields = computedFields.filter(
     f => f.type === DataViewFieldType.NUMERIC,
   );
-  const dateComFields = computedFields.filter(
+  const dateComputedFields = computedFields.filter(
     f => f.type === DataViewFieldType.DATE,
   );
   hierarchyFields = updateBy(hierarchyFields, draft => {
@@ -87,9 +87,9 @@ export const getAllFieldsOfEachType = (args: {
     stringFields,
     numericFields,
     dateLevelFields,
-    stringComFields,
-    numericComFields,
-    dateComFields,
+    stringComputedFields,
+    numericComputedFields,
+    dateComputedFields,
   };
 };
 

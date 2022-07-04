@@ -336,9 +336,9 @@ const ChartDataViewPanel: FC<{
         stringFields,
         numericFields,
         dateLevelFields,
-        stringComFields,
-        numericComFields,
-        dateComFields,
+        stringComputedFields,
+        numericComputedFields,
+        dateComputedFields,
       } = getAllFieldsOfEachType({
         sortType,
         dataView,
@@ -353,9 +353,9 @@ const ChartDataViewPanel: FC<{
       return [
         ...hierarchyFields,
         ...columnTreeData,
-        ...stringComFields,
-        ...numericComFields,
-        ...dateComFields,
+        ...stringComputedFields,
+        ...numericComputedFields,
+        ...dateComputedFields,
       ];
     },
     [availableSourceFunctions, dataView],
@@ -368,9 +368,9 @@ const ChartDataViewPanel: FC<{
         dateLevelFields,
         stringFields,
         numericFields,
-        stringComFields,
-        numericComFields,
-        dateComFields,
+        stringComputedFields,
+        numericComputedFields,
+        dateComputedFields,
       } = getAllFieldsOfEachType({
         sortType,
         dataView,
@@ -379,11 +379,11 @@ const ChartDataViewPanel: FC<{
       return [
         ...hierarchyFields,
         ...stringFields,
-        ...stringComFields,
-        ...dateComFields,
+        ...stringComputedFields,
+        ...dateComputedFields,
         ...dateLevelFields,
         ...numericFields,
-        ...numericComFields,
+        ...numericComputedFields,
       ];
     },
     [availableSourceFunctions, dataView],

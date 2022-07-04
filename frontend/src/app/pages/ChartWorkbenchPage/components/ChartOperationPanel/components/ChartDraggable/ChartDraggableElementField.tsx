@@ -70,9 +70,9 @@ const ChartDraggableElementField: FC<{
         stringFields,
         dateLevelFields,
         numericFields,
-        stringComFields,
-        numericComFields,
-        dateComFields,
+        stringComputedFields,
+        numericComputedFields,
+        dateComputedFields,
       } = getAllFieldsOfEachType({
         sortType: 'byNameSort',
         dataView,
@@ -83,9 +83,9 @@ const ChartDraggableElementField: FC<{
         ...stringFields,
         ...dateLevelFields,
         ...numericFields,
-        ...stringComFields,
-        ...numericComFields,
-        ...dateComFields,
+        ...stringComputedFields,
+        ...numericComputedFields,
+        ...dateComputedFields,
       ];
       return getCanReplaceViewFields(viewFields, columnConfig);
     }, [availableSourceFunctions, columnConfig, dataView]);
