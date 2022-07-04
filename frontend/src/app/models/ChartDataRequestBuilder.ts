@@ -19,7 +19,6 @@
 import {
   AggregateFieldActionType,
   ChartDataSectionType,
-  ChartDataViewFieldCategory,
   DataViewFieldType,
   FilterConditionType,
   SortActionType,
@@ -107,7 +106,7 @@ export class ChartDataRequestBuilder {
       this.extraRuntimeFilters = filters.map(v => {
         return {
           ...v,
-          column: this.buildColumnName({ v, colName: v.column }, 'filter'),
+          column: this.buildColumnName({ v, colName: v.column }),
         };
       });
     }
@@ -184,12 +183,9 @@ export class ChartDataRequestBuilder {
     return c.colName;
   }
 
-  private buildColumnName(col, type?) {
-    if (
-      col.category === ChartDataViewFieldCategory.Field ||
-      (type && type === 'filter')
-    ) {
-      const row = findPathByNameInMeta(this.dataView.meta, col.colName);
+  private buildColumnName(col) {
+    const row = findPathByNameInMeta(this.dataView.meta, col.colName);
+    if (row) {
       try {
         return row?.path || [];
       } catch (e) {
@@ -393,7 +389,7 @@ export class ChartDataRequestBuilder {
       .map(v => {
         return {
           ...v,
-          column: this.buildColumnName({ colName: v.column }, 'filter'),
+          column: this.buildColumnName({ colName: v.column }),
         };
       })
       .concat(this.extraRuntimeFilters);
@@ -444,10 +440,16 @@ export class ChartDataRequestBuilder {
       aggOperator: aggCol.aggregate,
     }));
 
-    const _extraSorters = this.extraSorters?.filter(
-      ({ column, operator }) => column && operator,
-    );
-    if (!isEmptyArray(_extraSorters)) {
+    const _extraSorters = this.extraSorters
+      ?.filter(({ column, operator }) => column && operator)
+      .map(v => {
+        return {
+          ...v,
+          column: this.buildColumnName({ colName: v.column }),
+        };
+      });
+
+      if (!isEmptyArray(_extraSorters)) {
       return _extraSorters;
     }
     return originalSorters.filter(sorter => Boolean(sorter?.operator));
