@@ -26,6 +26,7 @@ import { Button, Space, Spin, Tooltip } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CommonFormTypes } from 'globalConstants';
 import produce from 'immer';
+import isEqual from 'lodash/isEqual';
 import { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -103,7 +104,9 @@ export const StructView = memo(
                 ? {
                     table: table.table,
                     columns: table.columns,
-                    joins: [],
+                    joins: isEqual(structure.table, table.table)
+                      ? structure.joins
+                      : [],
                   }
                 : produce(structure, draft => {
                     draft.joins[index!] = table;
