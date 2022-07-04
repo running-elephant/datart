@@ -118,7 +118,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
 
         PasswordToken passwordToken = new PasswordToken(user.getUsername(), user.getPassword(), System.currentTimeMillis());
         login(passwordToken);
-        return JwtUtils.toJwtString(jwtToken);
+        return JwtUtils.toJwtString(passwordToken);
     }
 
     @Override
