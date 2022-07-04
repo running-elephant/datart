@@ -51,7 +51,7 @@ import {
 } from 'styles/StyleConstants';
 import { isEmpty } from 'utils/object';
 import { stopPPG } from 'utils/utils';
-import { dateLevelFieldsProps, renderMataProps } from '../../../../slice/types';
+import { renderMataProps } from '../../../../slice/types';
 import DateLevelFieldContainer from './DateLevelFieldContainer';
 
 const { Panel } = Collapse;
@@ -62,15 +62,15 @@ export const ChartDraggableSourceContainer: FC<
     viewType?: string;
     isViewComputerField?: boolean;
     availableSourceFunctions?: string[];
-    dateLevelFields?: dateLevelFieldsProps[];
     selectedItemsIds?: string[];
+    displayName?: string;
+    folderRole?: string;
     onDeleteComputedField?: (fieldName) => void;
     onEditComputedField?: (fieldName) => void;
     onSelectionChange?: (dataItemId, cmdKeyActive, shiftKeyActive) => void;
     onClearCheckedList?: () => void;
   } & renderMataProps
 > = memo(function ChartDraggableSourceContainer({
-  id,
   name: colName,
   type,
   subType,
@@ -83,7 +83,8 @@ export const ChartDraggableSourceContainer: FC<
   children,
   isViewComputerField,
   viewType,
-  dateLevelFields,
+  displayName,
+  folderRole,
   onDeleteComputedField,
   onEditComputedField,
   onSelectionChange,
@@ -93,6 +94,7 @@ export const ChartDraggableSourceContainer: FC<
   const [showChild, setShowChild] = useToggle(false);
   const isHierarchyFieldOrTable =
     role === ColumnRole.Hierarchy || role === ColumnRole.Table;
+  const isHierarchy = role === ColumnRole.Hierarchy;
   const [, drag] = useDrag(
     () => ({
       type: isHierarchyFieldOrTable
@@ -102,7 +104,7 @@ export const ChartDraggableSourceContainer: FC<
       item: selectedItems?.length
         ? selectedItems.map(item => buildDragItem(item))
         : buildDragItem(
-            { id, type, subType, category, name: colName },
+            { id: colName, type, subType, category, name: colName },
             children,
           ),
       collect: monitor => ({
@@ -138,7 +140,7 @@ export const ChartDraggableSourceContainer: FC<
     };
 
     const _getIconStyle = () => {
-      if (role === ColumnRole.Hierarchy) {
+      if (isHierarchy) {
         return WARNING;
       }
       if (
@@ -174,7 +176,7 @@ export const ChartDraggableSourceContainer: FC<
         color: _getIconStyle(),
       },
     };
-    if (role === ColumnRole.Hierarchy) {
+    if (isHierarchy) {
       if (!showChild) {
         icon = (
           <FolderAddOutlined
@@ -219,7 +221,45 @@ export const ChartDraggableSourceContainer: FC<
       }
     }
 
-    if (type !== 'DATE') {
+    if (type === 'DATE' && category === 'field') {
+      return (
+        <Row align="middle" style={{ width: '100%' }}>
+          <CollapseWrapper
+            defaultActiveKey={[colName]}
+            ghost
+            expandIconPosition="right"
+            expandIcon={({ isActive }) => {
+              return <DownOutlined rotate={isActive ? -180 : 0} />;
+            }}
+          >
+            <Panel
+              key={colName}
+              header={
+                <div ref={drag}>
+                  <IW fontSize={FONT_SIZE_TITLE}>{icon}</IW>
+                  <p>
+                    {!folderRole || folderRole === ColumnRole.Hierarchy
+                      ? colName
+                      : displayName}
+                  </p>
+                </div>
+              }
+            >
+              {(children || []).map((item, i) => {
+                return (
+                  <DateLevelFieldContainer
+                    key={i}
+                    item={item as any}
+                    folderRole={folderRole}
+                    onClearCheckedList={onClearCheckedList}
+                  />
+                );
+              })}
+            </Panel>
+          </CollapseWrapper>
+        </Row>
+      );
+    } else {
       return (
         <Row
           align="middle"
@@ -230,7 +270,14 @@ export const ChartDraggableSourceContainer: FC<
           className={styleClasses.join(' ')}
         >
           <IW fontSize={FONT_SIZE_TITLE}>{icon}</IW>
-          <StyledFieldContent>{colName}</StyledFieldContent>
+          <StyledFieldContent>
+            {' '}
+            {isHierarchyFieldOrTable ||
+            !folderRole ||
+            folderRole === ColumnRole.Hierarchy
+              ? colName
+              : displayName}
+          </StyledFieldContent>
           <div onClick={stopPPG}>
             <Dropdown
               disabled={_isAllowMoreAction()}
@@ -247,70 +294,46 @@ export const ChartDraggableSourceContainer: FC<
           </div>
         </Row>
       );
-    } else if (type === 'DATE' && category === 'field') {
-      return (
-        <Row align="middle" style={{ width: '100%' }}>
-          <CollapseWrapper
-            defaultActiveKey={[colName]}
-            ghost
-            expandIconPosition="right"
-            expandIcon={({ isActive }) => {
-              return <DownOutlined rotate={isActive ? -180 : 0} />;
-            }}
-          >
-            <Panel
-              key={colName}
-              header={
-                <div ref={drag}>
-                  <IW fontSize={FONT_SIZE_TITLE}>{icon}</IW>
-                  <p>{colName}</p>
-                </div>
-              }
-            >
-              {(children || []).map((item, i) => {
-                return (
-                  <DateLevelFieldContainer
-                    key={i}
-                    item={item as any}
-                    onClearCheckedList={onClearCheckedList}
-                  />
-                );
-              })}
-            </Panel>
-          </CollapseWrapper>
-        </Row>
-      );
     }
   }, [
+    t,
+    drag,
     role,
     type,
     category,
     colName,
-    drag,
     children,
-    onDeleteComputedField,
-    onEditComputedField,
     isViewComputerField,
-    t,
+    isHierarchyFieldOrTable,
+    displayName,
+    folderRole,
     showChild,
     setShowChild,
+    isHierarchy,
+    styleClasses,
+    onDeleteComputedField,
+    onEditComputedField,
     onClearCheckedList,
     onSelectionChange,
-    styleClasses,
   ]);
 
   const renderChildren = useMemo(() => {
     return (children || [])
-      .filter(item => !isEmpty(item.name))
+      .filter(
+        item =>
+          !isEmpty(item.name) && !(item.category === 'dateLevelComputedField'),
+      )
       .map(item => (
         <ChartDraggableSourceContainer
           key={item.id}
           id={item.id}
           name={item.name}
+          displayName={item.displayName}
           category={item.category}
           expression={item.expression}
           type={item.type}
           role={item.role}
+          folderRole={role}
           children={item.children}
           viewType={viewType}
           isViewComputerField={item.isViewComputedFields}
@@ -323,6 +346,7 @@ export const ChartDraggableSourceContainer: FC<
         />
       ));
   }, [
+    role,
     children,
     onDeleteComputedField,
     onClearCheckedList,
@@ -401,10 +425,10 @@ const CollapseWrapper = styled(Collapse)`
     padding: 0 !important;
   }
   .ant-collapse-content .ant-collapse-content-box {
-    padding-left: 8px;
-    padding-right: 8px;
     padding-top: 0 !important;
+    padding-right: 8px;
     padding-bottom: 0 !important;
+    padding-left: 8px;
     & > div {
       line-height: 32px;
     }

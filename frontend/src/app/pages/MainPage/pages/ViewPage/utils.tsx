@@ -475,18 +475,18 @@ export function buildAntdTreeNodeModel<T extends TreeDataNode & { value: any }>(
 export function buildRequestColumns(tableJSON: StructViewQueryProps) {
   const columns: any = [];
   tableJSON.columns.forEach((v, i) => {
-    const tableName = tableJSON.table[tableJSON.table.length - 1];
+    const table = tableJSON.table || [];
     columns.push({
-      alias: JSON.stringify([tableName, v]),
-      column: [tableName, v],
+      alias: JSON.stringify([...table, v]),
+      column: [...table, v],
     });
   });
   tableJSON.joins.forEach(join => {
-    const tableName = join.table?.[join.table?.length - 1];
+    const table = join.table || [];
     join.columns?.forEach(column => {
       columns.push({
-        alias: JSON.stringify([tableName, column]),
-        column: [tableName, column],
+        alias: JSON.stringify([...table, column]),
+        column: [...table, column],
       });
     });
   });

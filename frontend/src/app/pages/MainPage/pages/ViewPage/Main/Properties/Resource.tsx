@@ -79,7 +79,7 @@ export const Resource = memo(() => {
       table?.columns?.map(column => {
         return buildAntdTreeNodeModel(
           ancestors.concat(table.tableName),
-          column?.name,
+          column?.name[0],
           [],
           true,
         );

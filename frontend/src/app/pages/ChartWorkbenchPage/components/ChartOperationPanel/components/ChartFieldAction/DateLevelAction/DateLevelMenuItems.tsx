@@ -92,6 +92,8 @@ const DateLevelMenuItems = memo(
       <>
         <Menu.Item
           icon={!config.expression ? <CheckOutlined /> : ''}
+          key="defaultDateComputerField"
+          eventKey="defaultDateComputerField"
           onClick={() => {
             config.field &&
               handleChangeFn({

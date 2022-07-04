@@ -411,23 +411,28 @@ export function newIssueUrl({ type, ...options }) {
   return url.toString();
 }
 
-export function moduleListFormsTreeByTableName(model, type) {
+export function modelListFormsTreeByTableName(model, type) {
   const tableNameList: string[] = [];
   const columnNameObj: { [key: string]: any } = {};
   const columnTreeData: any = [];
 
   model?.forEach(v => {
-    const tableName = type === 'viewPage' ? v.path[0] : JSON.parse(v.id)[0];
+    const path = v.path;
+    const tableName = path.slice(0, path.length - 1).join('.');
     if (!tableNameList.includes(tableName)) {
       tableNameList.push(tableName);
     }
   });
 
   model?.forEach(v => {
-    const tableName = type === 'viewPage' ? v.path[0] : JSON.parse(v.id)[0];
+    const path = v.path;
+    const tableName = path.slice(0, path.length - 1).join('.');
+    const fieldName = path[path.length - 1];
     if (tableNameList.includes(tableName)) {
-      const columnNameArr = columnNameObj[tableName];
-      columnNameObj[tableName] = columnNameArr ? [...columnNameArr, v] : [v];
+      const columnNameArr = columnNameObj[tableName] || [];
+      columnNameObj[tableName] = columnNameArr.concat([
+        { ...v, displayName: fieldName },
+      ]);
     }
   });
 
@@ -452,5 +457,6 @@ export function moduleListFormsTreeByTableName(model, type) {
 
     columnTreeData.push(treeData);
   });
+
   return columnTreeData;
 }

@@ -29,10 +29,13 @@ import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import { RelatedView } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
-import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import {
+  ChartDataRequestFilter,
+  PendingChartDataRequestFilter,
+} from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
-import { getStyles } from 'app/utils/chartHelper';
+import { findPathByNameInMeta, getStyles } from 'app/utils/chartHelper';
 import { getTime, splitRangerDateFilters } from 'app/utils/time';
 import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
@@ -150,18 +153,24 @@ export const getChartGroupColumns = (datas: ChartDataConfig[] | undefined) => {
   return groupColumns;
 };
 
-export const getTheWidgetFiltersAndParams = (obj: {
+export function getTheWidgetFiltersAndParams<
+  T extends ChartDataRequestFilter | PendingChartDataRequestFilter,
+>(obj: {
   chartWidget: Widget;
   widgetMap: Record<string, Widget>;
   params: Record<string, string[]> | undefined;
-}) => {
+  view?: ChartDataView;
+}): {
+  filterParams: T[];
+  variableParams: Record<string, any[]>;
+} {
   // TODO chart 本身携带了变量，board没有相关配置的时候要拿到 chart本身的 变量值 Params
-  const { chartWidget, widgetMap, params: chartParams } = obj;
+  const { chartWidget, widgetMap, view } = obj;
   const controllerWidgets = Object.values(widgetMap).filter(
     widget => widget.config.type === 'controller',
   );
 
-  let filterParams: ChartDataRequestFilter[] = [];
+  let filterParams: T[] = [];
   let variableParams: Record<string, any[]> = {};
 
   controllerWidgets.forEach(filterWidget => {
@@ -211,13 +220,23 @@ export const getTheWidgetFiltersAndParams = (obj: {
 
     // 关联字段 逻辑
     if (relatedViewItem.relatedCategory === ChartDataViewFieldCategory.Field) {
-      const filter: ChartDataRequestFilter = {
+      let path = view ? ([] as string[]) : '';
+      if (view) {
+        const row = findPathByNameInMeta(
+          view?.meta,
+          relatedViewItem.fieldValue,
+        );
+        path = row?.path || [];
+      } else {
+        path = relatedViewItem.fieldValue as string;
+      }
+      const filter = {
         aggOperator: null,
-        column: JSON.parse(relatedViewItem.fieldValue as string),
+        column: path,
         sqlOperator: controllerConfig.sqlOperator,
         values: values,
       };
-      filterParams.push(filter);
+      filterParams.push(filter as T);
     }
   });
   // filter 去重
@@ -228,7 +247,7 @@ export const getTheWidgetFiltersAndParams = (obj: {
     variableParams: variableParams,
   };
   return res;
-};
+}
 
 export const getWidgetControlValues = (opt: {
   type: ControllerFacadeTypes;
@@ -401,11 +420,13 @@ export const getChartWidgetRequestParams = (obj: {
     option: option,
     drillOption,
   });
-  const { filterParams, variableParams } = getTheWidgetFiltersAndParams({
-    chartWidget: curWidget,
-    widgetMap,
-    params: requestParams.params,
-  });
+  const { filterParams, variableParams } =
+    getTheWidgetFiltersAndParams<ChartDataRequestFilter>({
+      chartWidget: curWidget,
+      widgetMap,
+      params: requestParams.params,
+      view: chartDataView,
+    });
 
   // 全局过滤 filter
   // TODO
@@ -503,15 +524,13 @@ export const getBoardChartRequests = (params: {
   return chartRequest;
 };
 //  filter 去重
-export const getDistinctFiltersByColumn = (
-  filter: ChartDataRequestFilter[],
-) => {
+export const getDistinctFiltersByColumn = filter => {
   if (!filter) {
-    return [] as ChartDataRequestFilter[];
+    return [];
   }
-  const filterMap: Record<string, ChartDataRequestFilter> = {};
+  const filterMap: Record<string, any> = {};
   filter.forEach(item => {
-    filterMap[item.column[0]] = item;
+    filterMap[item.column] = item;
   });
   return Object.values(filterMap);
 };

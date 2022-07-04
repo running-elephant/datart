@@ -32,7 +32,7 @@ import styled from 'styled-components/macro';
 import { SPACE_LG } from 'styles/StyleConstants';
 import { Nullable } from 'types';
 import { CloneValueDeep, isEmpty, isEmptyArray } from 'utils/object';
-import { moduleListFormsTreeByTableName } from 'utils/utils';
+import { modelListFormsTreeByTableName } from 'utils/utils';
 import { ViewViewModelStages } from '../../../constants';
 import { useViewSlice } from '../../../slice';
 import {
@@ -109,7 +109,7 @@ const DataModelTree: FC = memo(() => {
           return { title: v, key: [...tableName, v] };
         });
         joinTable.push({
-          title: tableName,
+          title: tableName?.join('.'),
           key: tableName,
           selectable: false,
           children: childrenData,
@@ -117,8 +117,8 @@ const DataModelTree: FC = memo(() => {
       }
       const treeData = [
         {
-          title: tableName[tableName.length - 1],
-          key: tableName[tableName.length - 1],
+          title: tableName?.join('.'),
+          key: tableName,
           selectable: false,
           children: childrenData,
         },
@@ -130,7 +130,7 @@ const DataModelTree: FC = memo(() => {
       if (currentEditingView?.model?.columns) {
         setFields(
           Object.values(currentEditingView.model.columns).map(v => {
-            return { id: v.name, name: v.name };
+            return { id: v.name, name: v.name, displayName: v.name };
           }),
         );
       }
@@ -140,7 +140,10 @@ const DataModelTree: FC = memo(() => {
   const tableColumns = useMemo<Column[]>(() => {
     return Object.entries(hierarchy || {})
       .map(([name, column], index) => {
-        return Object.assign({ index }, column, { name: column.name || name });
+        return Object.assign({ index }, column, {
+          name: column.name || name,
+          displayName: column.name || name,
+        });
       })
       .sort(dataModelColumnSorter);
   }, [hierarchy]);
@@ -659,7 +662,7 @@ const DataModelTree: FC = memo(() => {
     const copyTableColumn = CloneValueDeep(TableColumn).filter(
       v => v.role !== ColumnRole.Hierarchy,
     );
-    const columnTreeData = moduleListFormsTreeByTableName(
+    const columnTreeData = modelListFormsTreeByTableName(
       copyTableColumn,
       'viewPage',
     );

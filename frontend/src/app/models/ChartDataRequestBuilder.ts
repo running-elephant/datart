@@ -19,7 +19,6 @@
 import {
   AggregateFieldActionType,
   ChartDataSectionType,
-  ChartDataViewFieldCategory,
   DataViewFieldType,
   FilterConditionType,
   SortActionType,
@@ -33,12 +32,18 @@ import { ChartStyleConfigDTO } from 'app/types/ChartConfigDTO';
 import {
   ChartDataRequest,
   ChartDataRequestFilter,
+  PendingChartDataRequestFilter,
 } from 'app/types/ChartDataRequest';
 import { ChartDatasetPageInfo } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import { getRuntimeDateLevelFields, getValue } from 'app/utils/chartHelper';
+import {
+  findPathByNameInMeta,
+  getAllColumnInMeta,
+  getRuntimeDateLevelFields,
+  getValue,
+} from 'app/utils/chartHelper';
 import { transformToViewConfig } from 'app/utils/internalChartHelper';
 import {
   formatTime,
@@ -54,6 +59,7 @@ import {
 import isEqual from 'lodash/isEqual';
 import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
 import { DrillMode } from './ChartDrillOption';
+
 export class ChartDataRequestBuilder {
   extraSorters: ChartDataRequest['orders'] = [];
   extraRuntimeFilters: ChartDataRequestFilter[] = [];
@@ -83,7 +89,6 @@ export class ChartDataRequestBuilder {
     this.script = script || false;
     this.aggregation = aggregation;
   }
-
   public addExtraSorters(sorters: ChartDataRequest['orders'] = []) {
     if (!isEmptyArray(sorters)) {
       this.extraSorters = this.extraSorters.concat(sorters!);
@@ -96,9 +101,14 @@ export class ChartDataRequestBuilder {
     return this;
   }
 
-  public addRuntimeFilters(filters: ChartDataRequestFilter[] = []) {
+  public addRuntimeFilters(filters: PendingChartDataRequestFilter[] = []) {
     if (!isEmptyArray(filters)) {
-      this.extraRuntimeFilters = filters;
+      this.extraRuntimeFilters = filters.map(v => {
+        return {
+          ...v,
+          column: this.buildColumnName({ v, colName: v.column }),
+        };
+      });
     }
     return this;
   }
@@ -108,6 +118,18 @@ export class ChartDataRequestBuilder {
       this.variableParams = params;
     }
     return this;
+  }
+
+  public getColNameStringFilter(): PendingChartDataRequestFilter[] {
+    return this.buildFilters().map(v => {
+      const row = getAllColumnInMeta(this.dataView.meta)?.find(val =>
+        isEqual(val.path, v.column),
+      );
+      return {
+        ...v,
+        column: row?.name || '',
+      };
+    });
   }
 
   private buildAggregators() {
@@ -162,15 +184,17 @@ export class ChartDataRequestBuilder {
   }
 
   private buildColumnName(col) {
-    if (col.category === ChartDataViewFieldCategory.Field && col.id) {
+    const row = findPathByNameInMeta(this.dataView.meta, col.colName);
+    if (row) {
       try {
-        return JSON.parse(col.id);
+        return row?.path || [];
       } catch (e) {
-        console.log('error buildColumnName JSON parse col.id=' + col.id);
+        console.log('error buildColumnName row ' + col.colName);
+        return row?.path || [];
       }
+    } else {
+      return [col.colName];
     }
-
-    return [col.id];
   }
 
   private buildGroups() {
@@ -250,6 +274,7 @@ export class ChartDataRequestBuilder {
         return true;
       })
       .map(col => col);
+
     return this.normalizeFilters(fields)
       .concat(this.normalizeDrillFilters())
       .concat(this.normalizeRuntimeFilters());
@@ -361,6 +386,12 @@ export class ChartDataRequestBuilder {
       .flatMap(c => {
         return c[RUNTIME_FILTER_KEY] || [];
       })
+      .map(v => {
+        return {
+          ...v,
+          column: this.buildColumnName({ colName: v.column }),
+        };
+      })
       .concat(this.extraRuntimeFilters);
   }
 
@@ -409,10 +440,16 @@ export class ChartDataRequestBuilder {
       aggOperator: aggCol.aggregate,
     }));
 
-    const _extraSorters = this.extraSorters?.filter(
-      ({ column, operator }) => column && operator,
-    );
-    if (!isEmptyArray(_extraSorters)) {
+    const _extraSorters = this.extraSorters
+      ?.filter(({ column, operator }) => column && operator)
+      .map(v => {
+        return {
+          ...v,
+          column: this.buildColumnName({ colName: v.column }),
+        };
+      });
+
+      if (!isEmptyArray(_extraSorters)) {
       return _extraSorters;
     }
     return originalSorters.filter(sorter => Boolean(sorter?.operator));
@@ -539,10 +576,11 @@ export class ChartDataRequestBuilder {
 
   private removeInvalidFilter(filters: ChartDataRequestFilter[]) {
     const dataViewFieldsNames = (
-      (this.dataView?.meta as ChartDataViewMeta[]) || []
-    ).map(c => c?.id);
+      (getAllColumnInMeta(this.dataView?.meta) as ChartDataViewMeta[]) || []
+    ).map(c => c?.name);
+
     return (filters || []).filter(f => {
-      return dataViewFieldsNames.includes(JSON.stringify(f.column));
+      return dataViewFieldsNames.includes(f.column.join('.'));
     });
   }
 
@@ -567,6 +605,7 @@ export class ChartDataRequestBuilder {
     const validFilters = this.removeInvalidFilter(
       this.buildFilters().filter(f => !f.aggOperator),
     );
+
     return {
       ...this.buildViewConfigs(),
       viewId: this.dataView?.id,

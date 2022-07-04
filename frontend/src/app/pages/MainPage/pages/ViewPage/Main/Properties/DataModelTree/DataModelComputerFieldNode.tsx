@@ -99,7 +99,7 @@ const DataModelComputerFieldNode: FC<{
                   key="exit"
                   prefix={<EditOutlined className="icon" />}
                 >
-                  {t('edix')}
+                  {t('edit')}
                 </MenuListItem>
                 <MenuListItem
                   key="del"

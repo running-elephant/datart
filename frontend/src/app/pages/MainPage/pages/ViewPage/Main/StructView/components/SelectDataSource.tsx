@@ -201,7 +201,7 @@ const SelectDataSource = memo(
         const databaseSchemas = allDatabaseSchemas[currentSources!.id];
         const nodeList = node.value;
         const sheetName = node.value[node.value.length - 1];
-        const columns = node.columns.map(v => v.name);
+        const columns = node.columns.map(v => v.name[0]);
         const tableSchema: any = {
           table: databaseSchemas.length === 1 ? [sheetName] : nodeList,
           columns: columns,

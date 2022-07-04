@@ -29,6 +29,16 @@ export type ChartDataRequestFilter = {
   }>;
 };
 
+export type PendingChartDataRequestFilter = {
+  aggOperator?: AggregateFieldActionType | null;
+  column: string;
+  sqlOperator: string;
+  values?: Array<{
+    value: string;
+    valueType: string;
+  }>;
+};
+
 export type ChartDataRequest = {
   viewId: string;
   aggregators: Array<{ column: string[]; sqlOperator: string }>;

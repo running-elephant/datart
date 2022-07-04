@@ -34,6 +34,7 @@ import i18next from 'i18next';
 import { request2, requestWithHeader } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { convertToChartDto } from './ChartDtoHelper';
+import { getAllColumnInMeta } from './chartHelper';
 
 export const getDistinctFields = async (
   viewId: string,
@@ -46,10 +47,13 @@ export const getDistinctFields = async (
     aggregators: [],
     filters: [],
     groups: [],
-    columns: [...new Set(columns)].map(v => {
+    columns: [...new Set(columns)].map(columnName => {
+      const row = getAllColumnInMeta(view?.meta)?.find(
+        v => v.name === columnName,
+      );
       return {
-        alias: v,
-        column: JSON.parse(v),
+        alias: columnName,
+        column: row?.path || [],
       };
     }),
     pageInfo: {

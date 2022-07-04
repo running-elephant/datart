@@ -38,7 +38,7 @@ describe('chartDtoHelper Test', () => {
         meta: [
           {
             name: 'name',
-            id: '["name"]',
+            id: 'name',
             path: ['name'],
             subType: undefined,
             category: 'field',

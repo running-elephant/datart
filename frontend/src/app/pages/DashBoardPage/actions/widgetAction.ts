@@ -18,7 +18,7 @@
 
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartMouseEventParams } from 'app/types/Chart';
-import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
 import { RootState } from 'types';
@@ -207,11 +207,10 @@ export const widgetLinkEventAction =
     const widgetMap = widgetMapMap?.[widget?.dashboardId] || {};
     const sourceWidgetInfo = boardWidgetInfoRecord?.[widget.id];
     const sourceWidgetRuntimeLinkInfo = sourceWidgetInfo?.linkInfo || {};
-
     const {
       filterParams: sourceControllerFilters,
       variableParams: sourceVariableParams,
-    } = getTheWidgetFiltersAndParams({
+    } = getTheWidgetFiltersAndParams<PendingChartDataRequestFilter>({
       chartWidget: widget,
       widgetMap: widgetMap,
       params: undefined,
@@ -245,13 +244,13 @@ export const widgetLinkEventAction =
       const filterObj = clickEventParam?.filters;
       const isUnSelectedAll = clickEventParam?.isUnSelectedAll;
 
-      const clickFilters: ChartDataRequestFilter[] = Object.entries(
+      const clickFilters: PendingChartDataRequestFilter[] = Object.entries(
         filterObj || {},
       )
         .map(([k, v]) => {
           return {
             sqlOperator: FilterSqlOperator.In,
-            column: JSON.parse(k),
+            column: k,
             values: (v as any)?.map(vv => ({ value: vv, valueType: 'STRING' })),
           };
         })
@@ -267,7 +266,7 @@ export const widgetLinkEventAction =
       );
       const widgetInfo = boardWidgetInfoRecord?.[targetWidget.id];
       const { filterParams: controllerFilters, variableParams } =
-        getTheWidgetFiltersAndParams({
+        getTheWidgetFiltersAndParams<PendingChartDataRequestFilter>({
           chartWidget: targetWidget,
           widgetMap: widgetMap,
           params: undefined,

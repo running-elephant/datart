@@ -110,6 +110,7 @@ const DataModelBranch: FC<{
             {node?.children?.map(childNode => (
               <DataModelNode
                 className="in-hierarchy"
+                branchRole={node.role}
                 node={childNode}
                 key={childNode.name}
                 onCreateHierarchy={
