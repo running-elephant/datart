@@ -454,6 +454,9 @@ const config: ChartConfig = {
             break: '换行',
             breakAll: '强制换行',
           },
+          increase: '升',
+          decrease: '降',
+          total: '累计',
         },
         label: {
           title: '标签',
@@ -517,6 +520,9 @@ const config: ChartConfig = {
             break: 'Break',
             breakAll: 'BreakAll',
           },
+          increase: 'Increase',
+          decrease: 'Decrease',
+          total: 'Total',
         },
         label: {
           title: 'Label',

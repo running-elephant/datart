@@ -41,6 +41,7 @@
       "minute": "分钟",
       "hour": "小时",
       "day": "天",
+      "week": "周",
       "month": "月",
       "year": "年",
       "m": "分",
@@ -1395,19 +1396,26 @@
       "typeAndCategory": "类型与分类"
     },
     "structView": {
-      "STRUCT": "结构视图",
+      "title": "请选择数据视图类型",
+      "STRUCT": "表视图",
       "SQL": "SQL 视图",
+      "STRUCT_DESC": "通过配置表关系创建数据视图",
+      "SQL_DESC": "使用 SQL 语句创建数据视图",
       "file": "文件夹",
-      "sourcedata": "数据",
-      "join": "关联",
-      "selectJoinColumn": "选择关联字段",
-      "addJoin": "添加关联项",
-      "run": "执行片段",
+      "main": "主表：",
+      "join": "表连接：",
+      "selectJoinColumn": "关联字段",
+      "addJoin": "添加表连接",
+      "run": "执行",
+      "runStep": "执行当前步骤",
       "searchTable": "搜索数据表",
       "searchSource": "搜索数据源",
-      "selectSource": "选择一个数据源",
+      "selectTable": "选择表格",
       "all": "全选",
-      "selectField": "选择一个字段"
+      "selectField": "选择字段",
+      "RIGHT": "右连接",
+      "LEFT": "左连接",
+      "INNER": "内连接"
     }
   },
   "source": {

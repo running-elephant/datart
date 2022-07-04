@@ -102,7 +102,7 @@ public class MailServiceImpl extends BaseService implements MailService {
     @Value("${datart.user.invite.expire-hours:48}")
     private int inviteExpireHours;
 
-    public MailServiceImpl(TemplateEngine templateEngine,MessageSource messageSource) {
+    public MailServiceImpl(TemplateEngine templateEngine, MessageSource messageSource) {
         SpringMessageResolver springMessageResolver = new SpringMessageResolver();
         springMessageResolver.setMessageSource(messageSource);
         templateEngine.setMessageResolver(springMessageResolver);
@@ -188,6 +188,7 @@ public class MailServiceImpl extends BaseService implements MailService {
         passwordToken.setSubject(user.getUsername());
         passwordToken.setCreateTime(System.currentTimeMillis());
         passwordToken.setExp(DateUtils.addHours(new Date(), activeExpireHours));
+        passwordToken.setPassword(user.getPassword());
         String tokenString = JwtUtils.toJwtString(passwordToken);
 
         Context context = new Context(LocaleContextHolder.getLocale());

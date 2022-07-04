@@ -1738,9 +1738,14 @@ export const compareSelectedItems = (
     newSelectedItems.length === oldSelectedItems.length &&
     newSelectedItems.length
   ) {
-    const selectedIndexList = oldSelectedItems.map(v => v.index);
-    return !!newSelectedItems.filter(v => !selectedIndexList.includes(v.index))
-      .length;
+    return !!newSelectedItems.filter(v => {
+      const item = oldSelectedItems.find(oldItem => oldItem.index === v.index);
+      return !item ||
+        Object.values(item.data.rowData).length !==
+          Object.values(v.data.rowData).length
+        ? true
+        : false;
+    }).length;
   }
   return false;
 };

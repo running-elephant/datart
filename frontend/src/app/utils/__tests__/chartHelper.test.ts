@@ -2872,6 +2872,51 @@ describe('Chart Helper ', () => {
     [
       [
         {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      false,
+    ],
+    [
+      [
+        {
+          index: '1,1',
+          data: { rowData: { a: 1 } },
+        },
+      ],
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      true,
+    ],
+    [
+      [
+        {
+          index: '1,1',
+          data: { rowData: { a: 1 } },
+        },
+      ],
+      [
+        {
+          index: '1,1',
+          data: { rowData: { a: 1, b: 1 } },
+        },
+      ],
+      true,
+    ],
+    [
+      [
+        {
           index: '1,2',
           data: { rowData: {} },
         },

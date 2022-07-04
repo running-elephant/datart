@@ -20,7 +20,18 @@ import { ConsoleSqlOutlined, PartitionOutlined } from '@ant-design/icons';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { memo } from 'react';
 import styled from 'styled-components/macro';
-import { SPACE_TIMES } from 'styles/StyleConstants';
+import {
+  BORDER_RADIUS,
+  FONT_SIZE_HEADING,
+  FONT_SIZE_TITLE,
+  FONT_WEIGHT_MEDIUM,
+  LINE_HEIGHT_HEADING,
+  LINE_HEIGHT_LABEL,
+  SPACE_LG,
+  SPACE_MD,
+  SPACE_TIMES,
+  SPACE_XS,
+} from 'styles/StyleConstants';
 
 interface selectViewTypeProps {
   selectViewType: (viewType: string) => void;
@@ -31,45 +42,74 @@ const SelectViewType = memo(({ selectViewType }: selectViewTypeProps) => {
   const t = useI18NPrefix('view.structView');
 
   return (
-    <SelectViewTypeWrapper>
-      {viewTypeList.map((v, i) => {
-        return (
-          <ViewTypeWrapper onClick={() => selectViewType(v)} key={i}>
-            {v === 'STRUCT' ? <PartitionOutlined /> : <ConsoleSqlOutlined />}
-            <span>{t(v)}</span>
-          </ViewTypeWrapper>
-        );
-      })}
-    </SelectViewTypeWrapper>
+    <Wrapper>
+      <Title>{t('title')}</Title>
+      <ViewTypeList>
+        {viewTypeList.map((v, i) => {
+          return (
+            <ViewTypeItem onClick={() => selectViewType(v)} key={i}>
+              {v === 'STRUCT' ? (
+                <PartitionOutlined className="icon" />
+              ) : (
+                <ConsoleSqlOutlined className="icon" />
+              )}
+              <h4>{t(v)}</h4>
+              <p>{t(`${v}_DESC`)}</p>
+            </ViewTypeItem>
+          );
+        })}
+      </ViewTypeList>
+    </Wrapper>
   );
 });
 
 export default SelectViewType;
 
-const SelectViewTypeWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  width: 100%;
-  height: 100%;
-  background-color: #fff;
+const Wrapper = styled.div`
+  flex: 1;
+  padding: ${SPACE_XS} ${SPACE_LG};
+  background-color: ${p => p.theme.componentBackground};
 `;
 
-const ViewTypeWrapper = styled.div`
+const Title = styled.h2`
+  padding: ${SPACE_MD} 0;
+  font-size: ${FONT_SIZE_TITLE};
+`;
+
+const ViewTypeList = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 200px;
-  height: 200px;
+`;
+
+const ViewTypeItem = styled.div`
+  position: relative;
+  width: ${SPACE_TIMES(64)};
+  padding: ${SPACE_MD} ${SPACE_MD} ${SPACE_LG} ${SPACE_TIMES(12)};
+  margin-right: ${SPACE_MD};
   cursor: pointer;
-  border: 1px solid ${p => p.theme.borderColorBase};
-  &:hover {
-    color: ${p => p.theme.blue};
-    border-color: ${p => p.theme.blue};
+  border: 1px solid ${p => p.theme.borderColorSplit};
+  border-radius: ${BORDER_RADIUS};
+
+  .icon {
+    position: absolute;
+    top: ${SPACE_LG};
+    left: ${SPACE_MD};
+    margin-right: ${SPACE_XS};
+    font-size: ${FONT_SIZE_HEADING};
+    color: ${p => p.theme.primary};
   }
-  > span:nth-child(1) {
-    margin-bottom: ${SPACE_TIMES(3)};
-    font-size: 40px;
+
+  h4 {
+    font-weight: ${FONT_WEIGHT_MEDIUM};
+    line-height: ${LINE_HEIGHT_HEADING};
+    color: ${p => p.theme.textColorSnd};
+  }
+
+  p {
+    line-height: ${LINE_HEIGHT_LABEL};
+    color: ${p => p.theme.textColorLight};
+  }
+
+  &:hover {
+    border: 1px solid ${p => p.theme.primary};
   }
 `;

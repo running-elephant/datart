@@ -34,6 +34,7 @@ import org.springframework.util.CollectionUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -73,17 +74,18 @@ public class ResponseJsonParser implements HttpResponseParser {
 
         dataframe.setColumns(columns);
 
+        Set<String> columnKeySet = columns.stream().map(Column::columnName)
+                .collect(Collectors.toSet());
+
         List<List<Object>> rows = array.toJavaList(JSONObject.class).parallelStream()
                 .map(item -> {
-                    return item.keySet()
-                            .stream()
-                            .map(key -> {
-                                Object val = item.get(key);
-                                if (val instanceof JSONObject || val instanceof JSONArray) {
-                                    val = val.toString();
-                                }
-                                return val;
-                            }).collect(Collectors.toList());
+                    return columnKeySet.stream().map(key -> {
+                        Object val = item.get(key);
+                        if (val instanceof JSONObject || val instanceof JSONArray) {
+                            val = val.toString();
+                        }
+                        return val;
+                    }).collect(Collectors.toList());
                 }).collect(Collectors.toList());
         dataframe.setRows(rows);
         return dataframe;

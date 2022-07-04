@@ -106,9 +106,6 @@ export function ListTitle({
           {add && <AddButton dataSource={add} />}
           {more && (
             <Popup
-              getPopupContainer={triggerNode =>
-                triggerNode.parentElement as HTMLElement
-              }
               trigger={['click']}
               placement="bottomRight"
               content={
