@@ -18,7 +18,6 @@
 
 import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
-import migrationDataChartConfig from 'app/migration/vizDataChartConfig/migrationDataChartConfig';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -40,13 +39,9 @@ export function convertToChartDto(data): ChartDTO {
   if (data?.view?.model) {
     data.view.model = beginViewModelMigration(data.view.model, data.view.type);
   }
-  const config = JSON.parse(data?.config);
-  if (config && config.chartConfig) {
-    config.chartConfig = migrationDataChartConfig(config.chartConfig);
-  }
 
   return Object.assign({}, data, {
-    config: config,
+    config: JSON.parse(data?.config),
     view: {
       ...Omit(data?.view, ['model']),
       meta: transformHierarchyMeta(data?.view?.model),

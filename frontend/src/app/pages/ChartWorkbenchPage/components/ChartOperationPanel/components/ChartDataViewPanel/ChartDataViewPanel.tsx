@@ -60,7 +60,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { ORANGE, SPACE, SPACE_XS } from 'styles/StyleConstants';
-import { getPath, moduleListFormsTreeByTableName } from 'utils/utils';
+import { getPath, modelListFormsTreeByTableName } from 'utils/utils';
 import { getAllFieldsOfEachType } from '../../utils';
 import { ChartDraggableSourceGroupContainer } from '../ChartDraggable';
 import ChartComputedFieldSettingPanel from './components/ChartComputedFieldSettingPanel';
@@ -260,19 +260,22 @@ const ChartDataViewPanel: FC<{
         const columnTreeData: any = [];
 
         allColumn?.forEach((v, i) => {
-          const tableName = JSON.parse(v.id)[0];
+          const path = v.path;
+          const tableName = path?.slice(0, path?.length - 1).join('.') || '';
           if (!tableNameList.includes(tableName)) {
             tableNameList.push(tableName);
           }
         });
 
         allColumn?.forEach((v, i) => {
-          const tableName = JSON.parse(v.id)[0];
+          const path = v.path;
+          const tableName = path?.slice(0, path?.length - 1).join('.') || '';
           if (tableNameList.includes(tableName)) {
+            const fieldName = path?.[path.length - 1];
             const columnNameArr = columnNameObj[tableName];
             columnNameObj[tableName] = columnNameArr
-              ? [...columnNameArr, { title: v.name, key: JSON.parse(v.id) }]
-              : [{ title: v.name, key: JSON.parse(v.id) }];
+              ? [...columnNameArr, { title: fieldName, key: path }]
+              : [{ title: fieldName, key: path }];
           }
         });
 
@@ -333,17 +336,16 @@ const ChartDataViewPanel: FC<{
         stringFields,
         numericFields,
         dateLevelFields,
-        stringComFields,
-        numericComFields,
-        dateComFields,
+        stringComputedFields,
+        numericComputedFields,
+        dateComputedFields,
       } = getAllFieldsOfEachType({
-        isGroup: true,
         sortType,
         dataView,
         availableSourceFunctions,
       });
 
-      const columnTreeData = moduleListFormsTreeByTableName(
+      const columnTreeData = modelListFormsTreeByTableName(
         [...stringFields, ...dateLevelFields, ...numericFields],
         'analysisPage',
       );
@@ -351,9 +353,9 @@ const ChartDataViewPanel: FC<{
       return [
         ...hierarchyFields,
         ...columnTreeData,
-        ...stringComFields,
-        ...numericComFields,
-        ...dateComFields,
+        ...stringComputedFields,
+        ...numericComputedFields,
+        ...dateComputedFields,
       ];
     },
     [availableSourceFunctions, dataView],
@@ -361,19 +363,27 @@ const ChartDataViewPanel: FC<{
 
   const noGroupMetaFields = useCallback(
     sortType => {
-      const { hierarchyFields, dateLevelFields, stringFields, numericFields } =
-        getAllFieldsOfEachType({
-          isGroup: false,
-          sortType,
-          dataView,
-          availableSourceFunctions,
-        });
-
+      const {
+        hierarchyFields,
+        dateLevelFields,
+        stringFields,
+        numericFields,
+        stringComputedFields,
+        numericComputedFields,
+        dateComputedFields,
+      } = getAllFieldsOfEachType({
+        sortType,
+        dataView,
+        availableSourceFunctions,
+      });
       return [
         ...hierarchyFields,
         ...stringFields,
+        ...stringComputedFields,
+        ...dateComputedFields,
         ...dateLevelFields,
         ...numericFields,
+        ...numericComputedFields,
       ];
     },
     [availableSourceFunctions, dataView],

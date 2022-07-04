@@ -116,6 +116,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
               key={item.id}
               id={item.id}
               name={item.name}
+              displayName={item.displayName}
               category={item.category}
               expression={item.expression}
               type={item.type}

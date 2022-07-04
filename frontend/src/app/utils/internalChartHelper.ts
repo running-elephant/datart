@@ -47,7 +47,7 @@ import {
   ChartCommonConfig,
   ChartStyleConfigDTO,
 } from 'app/types/ChartConfigDTO';
-import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { FilterSqlOperator } from 'globalConstants';
@@ -386,13 +386,15 @@ export function transformMeta(model?: string) {
     if (!isEmptyArray(column?.children)) {
       return column.children.map(c => ({
         ...c,
-        id: JSON.stringify(c.path),
+        id: c.name,
+        path: c.path,
         category: ChartDataViewFieldCategory.Field,
       }));
     }
     return {
       ...column,
-      id: JSON.stringify(column.path) || colKey,
+      id: colKey,
+      path: column.path || colKey,
       category: ChartDataViewFieldCategory.Field,
     };
   });
@@ -421,7 +423,7 @@ function getMeta(key, column) {
   }
   return {
     ...column,
-    id: JSON.stringify(column.path) || key,
+    id: key,
     subType: column?.category,
     category: isHierarchy
       ? ChartDataViewFieldCategory.Hierarchy
@@ -673,7 +675,7 @@ export const transformToViewConfig = (
 
 export const buildDragItem = (item, children: any[] = []) => {
   return {
-    id: item?.id,
+    id: item?.name,
     colName: item?.name,
     type: item?.type,
     subType: item?.subType,
@@ -733,7 +735,7 @@ export const buildClickEventBaseFilters = (
   rule?: InteractionRule,
   drillOption?: IChartDrillOption,
   dataConfigs?: ChartDataConfig[],
-): ChartDataRequestFilter[] => {
+): PendingChartDataRequestFilter[] => {
   const groupConfigs: ChartDataSectionField[] = getDrillableRows(
     dataConfigs || [],
     drillOption,
@@ -749,7 +751,7 @@ export const buildClickEventBaseFilters = (
   return groupConfigs
     .concat(colorConfigs)
     .concat(mixConfigs)
-    .reduce<ChartDataRequestFilter[]>((acc, c) => {
+    .reduce<PendingChartDataRequestFilter[]>((acc, c) => {
       const filterValues = rowDatas
         ?.map(rowData => rowData?.[c.colName])
         ?.filter(Boolean)
@@ -761,7 +763,7 @@ export const buildClickEventBaseFilters = (
       const filter = {
         aggOperator: null,
         sqlOperator: FilterSqlOperator.In,
-        column: JSON.parse(c.id),
+        column: c.colName,
         values: filterValues,
       };
       acc.push(filter);
@@ -770,9 +772,9 @@ export const buildClickEventBaseFilters = (
 };
 
 export const getJumpFiltersByInteractionRule = (
-  clickEventFilters: ChartDataRequestFilter[] = [],
-  chartFilters: ChartDataRequestFilter[] = [],
-  variableFilters: ChartDataRequestFilter[] = [],
+  clickEventFilters: PendingChartDataRequestFilter[] = [],
+  chartFilters: PendingChartDataRequestFilter[] = [],
+  variableFilters: PendingChartDataRequestFilter[] = [],
   rule?: InteractionRule,
 ): Record<string, string | any> => {
   return clickEventFilters
@@ -801,31 +803,31 @@ export const getJumpFiltersByInteractionRule = (
           return null;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === JSON.stringify(f?.column) && r?.target,
+          r => r.source === f?.column && r?.target,
         );
         if (isEmpty(targetRelation)) {
           return null;
         }
         return Object.assign({}, f, {
           column: targetRelation?.target,
-        }) as ChartDataRequestFilter;
+        }) as PendingChartDataRequestFilter;
       }
     })
     .filter(Boolean)
     .reduce((acc, cur) => {
       if (cur?.column) {
         const currentValues = cur?.values?.map(v => v.value) || [];
-        const strColumn = String(cur.column!);
+        const column = cur.column;
 
-        if (JSON.stringify(cur.column!) in acc) {
-          const oldValues: string[] = acc[strColumn] || [];
+        if (column in acc) {
+          const oldValues: string[] = acc[column] || [];
           if (isEmptyArray(oldValues)) {
-            acc[strColumn] = currentValues;
+            acc[column] = currentValues;
           } else {
-            acc[strColumn] = currentValues.filter(cv => oldValues.includes(cv));
+            acc[column] = currentValues.filter(cv => oldValues.includes(cv));
           }
         } else {
-          acc[String(cur.column!)] = currentValues;
+          acc[column] = currentValues;
         }
       }
       return acc;
@@ -833,9 +835,9 @@ export const getJumpFiltersByInteractionRule = (
 };
 
 export const getLinkFiltersByInteractionRule = (
-  clickEventFilters: ChartDataRequestFilter[] = [],
-  chartFilters: ChartDataRequestFilter[] = [],
-  variableFilters: ChartDataRequestFilter[] = [],
+  clickEventFilters: PendingChartDataRequestFilter[] = [],
+  chartFilters: PendingChartDataRequestFilter[] = [],
+  variableFilters: PendingChartDataRequestFilter[] = [],
   rule?: InteractionRule,
 ): Record<string, string | any> => {
   return clickEventFilters
@@ -858,30 +860,30 @@ export const getLinkFiltersByInteractionRule = (
           return null;
         }
         const targetRelation = customizeRelations?.find(
-          r => r.source === JSON.stringify(f?.column) && r?.target,
+          r => r.source === f?.column && r?.target,
         );
         if (isEmpty(targetRelation)) {
           return null;
         }
         return Object.assign({}, f, {
           column: targetRelation?.target,
-        }) as ChartDataRequestFilter;
+        }) as PendingChartDataRequestFilter;
       }
     })
     .filter(Boolean)
     .reduce((acc, cur) => {
       if (cur?.column) {
         const currentValues = cur?.values?.map(v => v.value) || [];
-        const strColumn = JSON.stringify(cur.column);
-        if (strColumn in acc) {
-          const oldValues: string[] = acc[strColumn] || [];
+        const column = cur.column!;
+        if (column! in acc) {
+          const oldValues: string[] = acc[column] || [];
           if (isEmptyArray(oldValues)) {
-            acc[strColumn] = currentValues;
+            acc[column] = currentValues;
           } else {
-            acc[strColumn] = currentValues.filter(cv => oldValues.includes(cv));
+            acc[column] = currentValues.filter(cv => oldValues.includes(cv));
           }
         } else {
-          acc[strColumn] = currentValues;
+          acc[column] = currentValues;
         }
       }
       return acc;
@@ -889,13 +891,13 @@ export const getLinkFiltersByInteractionRule = (
 };
 
 export const getJumpOperationFiltersByInteractionRule = (
-  clickEventFilters: ChartDataRequestFilter[] = [],
-  chartFilters: ChartDataRequestFilter[] = [],
+  clickEventFilters: PendingChartDataRequestFilter[] = [],
+  chartFilters: PendingChartDataRequestFilter[] = [],
   rule?: InteractionRule,
-): ChartDataRequestFilter[] => {
+): PendingChartDataRequestFilter[] => {
   return clickEventFilters
     .concat(chartFilters)
-    .reduce<ChartDataRequestFilter[]>((acc, f) => {
+    .reduce<PendingChartDataRequestFilter[]>((acc, f) => {
       if (isEmpty(f)) {
         return acc;
       }
@@ -916,14 +918,14 @@ export const getJumpOperationFiltersByInteractionRule = (
         }
 
         const targetRelation = customizeRelations?.find(
-          r => r.source === JSON.stringify(f?.column) && r?.target,
+          r => r.source === f?.column && r?.target,
         );
         if (isEmpty(targetRelation)) {
           return acc;
         }
         return acc.concat(
           Object.assign({}, f, {
-            column: targetRelation?.target && JSON.parse(targetRelation.target),
+            column: targetRelation?.target,
           }),
         );
       }
@@ -959,11 +961,11 @@ export const getVariablesByInteractionRule = (
 
 export const variableToFilter = (
   queryVariables?: Record<string, any[]>,
-): ChartDataRequestFilter[] => {
+): PendingChartDataRequestFilter[] => {
   return Object.entries(queryVariables || {}).map(([k, v]) => {
     return {
       sqlOperator: FilterSqlOperator.In,
-      column: [k],
+      column: k,
       values: v?.map(value => ({ value, valueType: 'STRING' })),
     };
   });

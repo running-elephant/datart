@@ -151,6 +151,7 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
             if (!drillOption) {
               return;
             }
+
             if (key === 'selectDrillStatus') {
               drillOption?.toggleSelectedDrill(!drillOption?.isSelectedDrill);
               onDrillOptionChange?.(drillOption);

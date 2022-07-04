@@ -135,6 +135,7 @@ export interface Column extends Schema {
   role?: ColumnRole;
   children?: Column[];
   path?: string[];
+  displayName?: string;
 }
 
 export interface Model {

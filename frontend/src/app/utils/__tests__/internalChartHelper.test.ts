@@ -1380,7 +1380,9 @@ describe('Internal Chart Helper ', () => {
     test('should transform meta without hierarchy and no children', () => {
       const model = JSON.stringify({ a: { type: 'STRING' } });
       const metas = transformMeta(model);
-      expect(metas).toEqual([{ category: 'field', id: 'a', type: 'STRING' }]);
+      expect(metas).toEqual([
+        { category: 'field', id: 'a', path: 'a', type: 'STRING' },
+      ]);
     });
 
     test('should transform meta without hierarchy but have children', () => {
@@ -1395,8 +1397,8 @@ describe('Internal Chart Helper ', () => {
       });
       const metas = transformMeta(model);
       expect(metas).toEqual([
-        { name: 1, id: '[1]', path: [1], category: 'field' },
-        { name: 2, id: '[2]', path: [2], category: 'field' },
+        { name: 1, id: 1, path: [1], category: 'field' },
+        { name: 2, id: 2, path: [2], category: 'field' },
       ]);
     });
 
@@ -1414,8 +1416,8 @@ describe('Internal Chart Helper ', () => {
       });
       const metas = transformMeta(model);
       expect(metas).toEqual([
-        { name: 'b', value: 1, id: '["b"]', path: ['b'], category: 'field' },
-        { name: 'c', value: 2, id: '["c"]', path: ['c'], category: 'field' },
+        { name: 'b', value: 1, id: 'b', path: ['b'], category: 'field' },
+        { name: 'c', value: 2, id: 'c', path: ['c'], category: 'field' },
       ]);
     });
   });

@@ -25,7 +25,7 @@ import { BoardConfig } from 'app/pages/DashBoardPage/types/boardTypes';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
-import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDatasetMeta } from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { DeltaStatic } from 'quill';
@@ -442,6 +442,6 @@ export interface getDataOption {
 export type WidgetErrorType = 'request' | 'interaction';
 
 export type WidgetLinkInfo = {
-  filters?: ChartDataRequestFilter[];
+  filters?: PendingChartDataRequestFilter[];
   variables?: Record<string, any[]>;
 };

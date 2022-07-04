@@ -10,9 +10,11 @@ import { dateLevelFieldsProps } from '../../../../slice/types';
 
 function DateLevelFieldContainer({
   onClearCheckedList,
+  folderRole,
   item,
 }: {
   onClearCheckedList?: () => any;
+  folderRole?: string;
   item: dateLevelFieldsProps;
 }) {
   const t = useI18NPrefix(`viz.workbench.dataview`);
@@ -20,7 +22,14 @@ function DateLevelFieldContainer({
     () => ({
       type: CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
       canDrag: true,
-      item,
+      item: {
+        id: item?.id,
+        colName: item?.name,
+        type: item?.type,
+        category: item?.category,
+        expression: item?.expression,
+        path: item?.path,
+      },
       collect: monitor => ({
         isDragging: monitor.isDragging(),
       }),
@@ -35,7 +44,7 @@ function DateLevelFieldContainer({
         <IW fontSize={FONT_SIZE_TITLE}>
           {<CalendarOutlined style={{ color: INFO }} />}
         </IW>
-        <p>{`${item.colName} ${t(item.expression)}`}</p>
+        <p>{`${item.displayName}（${t(item.expression)}）`}</p>
       </Row>
     </ItemWrapper>
   );
