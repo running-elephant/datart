@@ -151,6 +151,7 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
             if (!drillOption) {
               return;
             }
+            console.log(key, 'key');
             if (key === 'selectDrillStatus') {
               drillOption?.toggleSelectedDrill(!drillOption?.isSelectedDrill);
               onDrillOptionChange?.(drillOption);
@@ -163,7 +164,7 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
             } else if (key === 'rollUp') {
               drillOption?.rollUp();
               onDrillOptionChange?.(drillOption);
-            } else if (key.includes('drillThrough')) {
+            } else if (key?.includes('drillThrough')) {
               onDrillThroughChange?.(key.split(DATARTSEPERATOR)?.[1]);
             } else if (key === 'viewData') {
               onViewDataChange?.();

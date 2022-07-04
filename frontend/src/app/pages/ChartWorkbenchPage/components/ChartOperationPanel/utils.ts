@@ -114,7 +114,7 @@ export const buildDateLevelFields = (args: {
             type: item.type,
             category: item.category,
             expression: item.expression,
-            colPath: v.path,
+            path: v.path,
             displayName: v.path[v.path.length - 1],
           };
         }

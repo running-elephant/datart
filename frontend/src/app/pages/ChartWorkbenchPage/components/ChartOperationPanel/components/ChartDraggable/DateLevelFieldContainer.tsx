@@ -28,7 +28,7 @@ function DateLevelFieldContainer({
         type: item?.type,
         category: item?.category,
         expression: item?.expression,
-        colPath: item?.colPath,
+        path: item?.path,
       },
       collect: monitor => ({
         isDragging: monitor.isDragging(),

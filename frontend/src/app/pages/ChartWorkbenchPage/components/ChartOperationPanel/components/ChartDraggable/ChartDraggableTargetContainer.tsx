@@ -109,10 +109,10 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 ) {
                   config.colName = `${val.colName}（${t(val.expression)}）`;
                   config.expression = `${val.expression}(${FieldTemplate(
-                    val.colPath,
+                    val.path,
                   )})`;
                   config.field = val.colName;
-                  delete config.colPath;
+                  delete config.path;
                 }
                 return config;
               }),
