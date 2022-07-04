@@ -1395,13 +1395,16 @@
       "typeAndCategory": "Type & Category"
     },
     "structView": {
+      "title": "Choose a view type",
       "STRUCT": "Table View",
       "SQL": "SQL View",
+      "STRUCT_DESC": "Create view by configuring table relationships",
+      "SQL_DESC": "Create view by SQL",
       "file": "File",
       "main": "Main: ",
       "join": "Join: ",
       "selectJoinColumn": "Relations",
-      "addJoin": "Add join data",
+      "addJoin": "Add join table",
       "run": "Run",
       "runStep": "Run step",
       "searchTable": "Search Tables",

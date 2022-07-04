@@ -22,7 +22,7 @@ import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { FC, memo, useState } from 'react';
 import { isEmpty } from 'utils/object';
 import { InteractionFieldRelation } from '../../constants';
-import RelationList from './RelationList';
+import ChartRelationList from './ChartRelationList';
 import { I18nTranslator, JumpToChartRule, VizType } from './types';
 
 const JumpToChart: FC<
@@ -83,7 +83,7 @@ const JumpToChart: FC<
           isEmpty(value?.relId)
         }
         overlay={() => (
-          <RelationList
+          <ChartRelationList
             translate={t}
             targetRelId={value?.relId}
             sourceFields={

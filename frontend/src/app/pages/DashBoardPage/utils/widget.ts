@@ -27,7 +27,7 @@ import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/sl
 import { ChartsEventData } from 'app/types/Chart';
 import ChartDataView from 'app/types/ChartDataView';
 import { formatTime } from 'app/utils/time';
-import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
+import { BOARD_COPY_CHART_SUFFIX, BOARD_SELF_CHART_PREFIX, FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import produce from 'immer';
 import { CSSProperties } from 'react';
 import { CloneValueDeep } from 'utils/object';
@@ -593,7 +593,7 @@ export const getWidgetMap = (
     .forEach(widget => {
       let dataChart = (widget.config.content as any).dataChart as DataChart;
 
-      const ownedDataChartId = `widget_${widget.dashboardId}_${widget.id}`;
+      const ownedDataChartId = `${BOARD_SELF_CHART_PREFIX}${widget.dashboardId}_${widget.id}`;
       if (dataChart) {
         dataChart.id = ownedDataChartId;
 
@@ -700,7 +700,7 @@ export function cloneWidgets(args: {
     newWidget.config.clientId =
       newWidgetMapping[widget.id]?.newClientId || initClientId();
     newWidget.relations = [];
-    newWidget.config.name += '_copy';
+    newWidget.config.name += BOARD_COPY_CHART_SUFFIX;
     // group
     newWidget.config.children = newWidget.config.children?.map(id => {
       return newWidgetMapping[id].newId;
@@ -727,7 +727,7 @@ export function cloneWidgets(args: {
       let dataChart = dataChartMap[newWidget.datachartId];
       const newDataChart: DataChart = CloneValueDeep({
         ...dataChart,
-        id: dataChart.id + Date.now() + '_copy',
+        id: dataChart.id + Date.now() + BOARD_COPY_CHART_SUFFIX,
       });
       newWidget.config.originalType = ORIGINAL_TYPE_MAP.ownedChart;
       newWidget.datachartId = newDataChart.id;

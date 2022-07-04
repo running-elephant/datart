@@ -46,7 +46,7 @@ const JumpToUrl: FC<
     });
   };
 
-  const hanldeUpdateUrl = useCallback(url => {
+  const handleUpdateUrl = useCallback(url => {
     setUrl(url);
     onValueChange({
       ...value,
@@ -60,7 +60,7 @@ const JumpToUrl: FC<
         style={{ width: 200 }}
         value={url}
         placeholder={t('drillThrough.rule.inputUrl')}
-        onChange={e => hanldeUpdateUrl(e.target.value)}
+        onChange={e => handleUpdateUrl(e.target.value)}
       />
       <Dropdown
         destroyPopupOnHide
