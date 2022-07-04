@@ -386,6 +386,7 @@ export function transformMeta(model?: string) {
     if (!isEmptyArray(column?.children)) {
       return column.children.map(c => ({
         ...c,
+        id: c.name,
         path: c.path,
         category: ChartDataViewFieldCategory.Field,
       }));
@@ -421,6 +422,7 @@ function getMeta(key, column) {
   }
   return {
     ...column,
+    id: key,
     subType: column?.category,
     category: isHierarchy
       ? ChartDataViewFieldCategory.Hierarchy

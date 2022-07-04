@@ -187,18 +187,18 @@ export class ChartDataRequestBuilder {
   private buildColumnName(col, type?) {
     if (
       col.category === ChartDataViewFieldCategory.Field ||
-      type === 'filter'
+      (type && type === 'filter')
     ) {
       const row = findPathByNameInMeta(this.dataView.meta, col.colName);
-
       try {
         return row?.path || [];
       } catch (e) {
         console.log('error buildColumnName row ' + col.colName);
+        return row?.path || [];
       }
+    } else {
+      return [col.colName];
     }
-
-    return [col.id];
   }
 
   private buildGroups() {

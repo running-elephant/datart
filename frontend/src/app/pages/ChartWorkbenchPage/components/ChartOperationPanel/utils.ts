@@ -17,6 +17,7 @@
  */
 
 import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
+import { prefixI18N } from 'app/hooks/useI18NPrefix';
 import { ColumnRole } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
@@ -24,13 +25,14 @@ import { updateBy } from 'app/utils/mutation';
 import { CloneValueDeep } from 'utils/object';
 import { DATE_LEVELS } from '../../slice/constant';
 
+const Prefix = 'viz.workbench.dataview.';
+
 export const getAllFieldsOfEachType = (args: {
-  isGroup: boolean;
   sortType;
   dataView;
   availableSourceFunctions;
 }) => {
-  const { isGroup, sortType, dataView, availableSourceFunctions } = args;
+  const { sortType, dataView, availableSourceFunctions } = args;
   const computedFields =
     dataView?.computedFields
       ?.filter(
@@ -40,9 +42,7 @@ export const getAllFieldsOfEachType = (args: {
         return { ...v, name: v.id };
       }) || [];
 
-  const allFields = isGroup
-    ? dataView?.meta || []
-    : (dataView?.meta || []).concat(computedFields);
+  const allFields = dataView?.meta || [];
 
   let hierarchyFields = allFields.filter(f => f.role === ColumnRole.Hierarchy);
   const allNoHierarchyFields = fieldsSortByType(
@@ -110,7 +110,7 @@ export const buildDateLevelFields = (args: {
         ) {
           return {
             id: `${v.name}（${item.expression}）`,
-            colName: v.name,
+            name: v.name,
             type: item.type,
             category: item.category,
             expression: item.expression,
@@ -209,8 +209,12 @@ export const findSameFieldInView = (
       bool = findSameFieldInView(item.children, field);
     }
     if (bool) return true;
+    const itemName =
+      item.category === 'dateLevelComputedField'
+        ? `${item.name}（${prefixI18N(Prefix + item.expression)}）`
+        : item.name;
     if (
-      String(item.name) === String(field.colName) &&
+      itemName === field.colName &&
       item.category === field.category &&
       item.type === field.type
     ) {

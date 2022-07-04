@@ -118,6 +118,7 @@ export type ChartDataSectionField = {
   filter?: FilterFieldAction;
   color?: ColorFieldAction;
   size?: number;
+  colPath?: string[];
 };
 
 export type SortFieldAction = {

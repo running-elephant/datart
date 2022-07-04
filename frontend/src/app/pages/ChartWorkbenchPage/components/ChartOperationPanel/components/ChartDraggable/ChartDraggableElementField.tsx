@@ -65,18 +65,27 @@ const ChartDraggableElementField: FC<{
   }) => {
     const { dataView } = useContext(ChartDataViewContext);
     const canReplaceViewFields = useMemo(() => {
-      const { hierarchyFields, stringFields, dateLevelFields, numericFields } =
-        getAllFieldsOfEachType({
-          isGroup: false,
-          sortType: 'byNameSort',
-          dataView,
-          availableSourceFunctions,
-        });
+      const {
+        hierarchyFields,
+        stringFields,
+        dateLevelFields,
+        numericFields,
+        stringComFields,
+        numericComFields,
+        dateComFields,
+      } = getAllFieldsOfEachType({
+        sortType: 'byNameSort',
+        dataView,
+        availableSourceFunctions,
+      });
       const viewFields = [
         ...hierarchyFields,
         ...stringFields,
         ...dateLevelFields,
         ...numericFields,
+        ...stringComFields,
+        ...numericComFields,
+        ...dateComFields,
       ];
       return getCanReplaceViewFields(viewFields, columnConfig);
     }, [availableSourceFunctions, columnConfig, dataView]);

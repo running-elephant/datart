@@ -221,7 +221,45 @@ export const ChartDraggableSourceContainer: FC<
       }
     }
 
-    if (type !== 'DATE') {
+    if (type === 'DATE' && category === 'field') {
+      return (
+        <Row align="middle" style={{ width: '100%' }}>
+          <CollapseWrapper
+            defaultActiveKey={[colName]}
+            ghost
+            expandIconPosition="right"
+            expandIcon={({ isActive }) => {
+              return <DownOutlined rotate={isActive ? -180 : 0} />;
+            }}
+          >
+            <Panel
+              key={colName}
+              header={
+                <div ref={drag}>
+                  <IW fontSize={FONT_SIZE_TITLE}>{icon}</IW>
+                  <p>
+                    {!folderRole || folderRole === ColumnRole.Hierarchy
+                      ? colName
+                      : displayName}
+                  </p>
+                </div>
+              }
+            >
+              {(children || []).map((item, i) => {
+                return (
+                  <DateLevelFieldContainer
+                    key={i}
+                    item={item as any}
+                    folderRole={folderRole}
+                    onClearCheckedList={onClearCheckedList}
+                  />
+                );
+              })}
+            </Panel>
+          </CollapseWrapper>
+        </Row>
+      );
+    } else {
       return (
         <Row
           align="middle"
@@ -256,43 +294,6 @@ export const ChartDraggableSourceContainer: FC<
           </div>
         </Row>
       );
-    } else if (type === 'DATE' && category === 'field') {
-      return (
-        <Row align="middle" style={{ width: '100%' }}>
-          <CollapseWrapper
-            defaultActiveKey={[colName]}
-            ghost
-            expandIconPosition="right"
-            expandIcon={({ isActive }) => {
-              return <DownOutlined rotate={isActive ? -180 : 0} />;
-            }}
-          >
-            <Panel
-              key={colName}
-              header={
-                <div ref={drag}>
-                  <IW fontSize={FONT_SIZE_TITLE}>{icon}</IW>
-                  <p>
-                    {!folderRole || folderRole === ColumnRole.Hierarchy
-                      ? colName
-                      : displayName}
-                  </p>
-                </div>
-              }
-            >
-              {(children || []).map((item, i) => {
-                return (
-                  <DateLevelFieldContainer
-                    key={i}
-                    item={item as any}
-                    onClearCheckedList={onClearCheckedList}
-                  />
-                );
-              })}
-            </Panel>
-          </CollapseWrapper>
-        </Row>
-      );
     }
   }, [
     t,
@@ -318,11 +319,14 @@ export const ChartDraggableSourceContainer: FC<
 
   const renderChildren = useMemo(() => {
     return (children || [])
-      .filter(item => !isEmpty(item.name))
+      .filter(
+        item =>
+          !isEmpty(item.name) && !(item.category === 'dateLevelComputedField'),
+      )
       .map(item => (
         <ChartDraggableSourceContainer
           key={item.id}
-          id={item.name}
+          id={item.id}
           name={item.name}
           displayName={item.displayName}
           category={item.category}

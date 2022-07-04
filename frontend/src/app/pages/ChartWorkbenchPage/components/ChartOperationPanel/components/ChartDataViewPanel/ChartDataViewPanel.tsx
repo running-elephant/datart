@@ -340,7 +340,6 @@ const ChartDataViewPanel: FC<{
         numericComFields,
         dateComFields,
       } = getAllFieldsOfEachType({
-        isGroup: true,
         sortType,
         dataView,
         availableSourceFunctions,
@@ -364,19 +363,27 @@ const ChartDataViewPanel: FC<{
 
   const noGroupMetaFields = useCallback(
     sortType => {
-      const { hierarchyFields, dateLevelFields, stringFields, numericFields } =
-        getAllFieldsOfEachType({
-          isGroup: false,
-          sortType,
-          dataView,
-          availableSourceFunctions,
-        });
-
+      const {
+        hierarchyFields,
+        dateLevelFields,
+        stringFields,
+        numericFields,
+        stringComFields,
+        numericComFields,
+        dateComFields,
+      } = getAllFieldsOfEachType({
+        sortType,
+        dataView,
+        availableSourceFunctions,
+      });
       return [
         ...hierarchyFields,
         ...stringFields,
+        ...stringComFields,
+        ...dateComFields,
         ...dateLevelFields,
         ...numericFields,
+        ...numericComFields,
       ];
     },
     [availableSourceFunctions, dataView],
