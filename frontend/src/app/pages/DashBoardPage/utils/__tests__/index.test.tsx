@@ -141,6 +141,7 @@ describe('should getDataChartRequestParams', () => {
         type: 'STRING',
         category: 'field',
         id: 'actor',
+        path: ['actor'],
       },
       {
         type: 'STRING',
@@ -234,7 +235,7 @@ describe('should getDataChartRequestParams', () => {
     return {
       ...v,
       name: v.id,
-      id: JSON.stringify([v.id]),
+      path: [v.id],
     };
   });
   it('should chart no filter', () => {
@@ -261,14 +262,14 @@ describe('should getDataChartRequestParams', () => {
                   id: '665bc9f0-355c-442b-87be-efb39b0d47b5',
                   index: 0,
                   uid: '665bc9f0-355c-442b-87be-efb39b0d47b5',
-                  colName: JSON.stringify(['total']),
+                  colName: 'total',
                   category: 'field',
                   type: 'NUMERIC',
                   aggregate: 'SUM',
                 },
                 {
                   uid: 'e4a13a2f-3984-4eea-ba38-34b80b83c63c',
-                  colName: JSON.stringify(['actor']),
+                  colName: 'actor',
                   category: 'field',
                   type: 'STRING',
                 },
@@ -316,11 +317,6 @@ describe('should getDataChartRequestParams', () => {
       description: '',
     };
 
-    dataChart.config.chartConfig.datas.forEach(v => {
-      v.rows?.forEach(v => {
-        v.id = JSON.stringify([v.colName]);
-      });
-    });
     const viewConfig = JSON.parse(view.config);
 
     const res = getDataChartRequestParams({
@@ -433,11 +429,7 @@ describe('should getDataChartRequestParams', () => {
         ],
       },
     ];
-    dataChart.config.chartConfig.datas.forEach(v => {
-      v.rows?.forEach(v => {
-        v.id = JSON.stringify([v.colName]);
-      });
-    });
+
     const res = getDataChartRequestParams({
       dataChart: dataChart as DataChart,
       view: view as unknown as ChartDataView,

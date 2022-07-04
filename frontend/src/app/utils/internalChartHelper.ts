@@ -393,6 +393,7 @@ export function transformMeta(model?: string) {
     }
     return {
       ...column,
+      id: colKey,
       path: column.path || colKey,
       category: ChartDataViewFieldCategory.Field,
     };
