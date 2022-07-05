@@ -411,6 +411,7 @@ export const StructView = memo(
                                       }
                                       conditionsIndex={ind}
                                       joinIndex={i}
+                                      sourceId={sourceId}
                                     />
                                     <Space className="action">
                                       {!!left.length &&
