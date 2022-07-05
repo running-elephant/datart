@@ -102,7 +102,7 @@ function unAuthorizationErrorHandler(error) {
     removeToken();
     return true;
   }
-  return error;
+  throw error;
 }
 
 function standardErrorMessageTransformer(error) {
