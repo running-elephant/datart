@@ -24,7 +24,7 @@ import { FC, memo, useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { stopPPG } from 'utils/utils';
 import { dropLayerNodeAction } from '../../slice/actions/actions';
-import { selectLayerTree } from '../../slice/selectors';
+import { selectLayerTree, selectSelectedIds } from '../../slice/selectors';
 import { LayerTreeItem } from './LayerTreeItem';
 
 export const LayerTree: FC<{}> = memo(() => {
@@ -32,6 +32,7 @@ export const LayerTree: FC<{}> = memo(() => {
   const treeData = useSelector(selectLayerTree);
   const renderTreeItem = useCallback(n => <LayerTreeItem node={n} />, []);
   const { onEditSelectWidget } = useContext(WidgetActionContext);
+  const selectedKeys = useSelector(selectSelectedIds);
 
   const treeSelect = useCallback(
     (_, { node, nativeEvent }) => {
@@ -58,7 +59,7 @@ export const LayerTree: FC<{}> = memo(() => {
     <Tree
       className="small"
       draggable
-      selectable
+      multiple
       loading={false}
       titleRender={renderTreeItem}
       icon={icon}
@@ -66,6 +67,7 @@ export const LayerTree: FC<{}> = memo(() => {
       onClick={stopPPG}
       onDrop={onDrop}
       treeData={treeData}
+      selectedKeys={selectedKeys}
       defaultExpandAll
     />
   );
