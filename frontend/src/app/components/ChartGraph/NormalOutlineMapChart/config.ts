@@ -263,6 +263,9 @@ const config: ChartConfig = {
           nameGap: '标题与轴线距离',
           min: '最小值',
           max: '最大值',
+          reset: '重置',
+          zoomOut: '缩小',
+          zoomIn: '放大',
         },
         metricsAndColor: '指标(颜色)',
         label: {
@@ -311,6 +314,9 @@ const config: ChartConfig = {
           nameGap: 'Name Gap',
           min: 'Min',
           max: 'Max',
+          reset: 'Reset',
+          zoomOut: 'Zoom Out',
+          zoomIn: 'Zoom In',
         },
         metricsAndColor: 'Metrics and Color',
         label: {
