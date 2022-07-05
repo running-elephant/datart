@@ -34,6 +34,7 @@ import { fetchChartDataSet } from 'app/utils/fetch';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
+import { errorHandle } from 'utils/utils';
 
 const { TabPane } = Tabs;
 
@@ -53,22 +54,37 @@ const filterTableColumnsByViewDetailSetting = (
 
 const TemplateTable: FC<{
   requestParams: ChartDataRequest;
-}> = memo(({ requestParams }) => {
+  chartConfig?: ChartConfig;
+}> = memo(({ chartConfig, requestParams }) => {
   const [datas, setSDatas] = useState<any>();
   const [columns, setColumns] = useState();
 
   useMount(async () => {
-    const response = await fetchChartDataSet(requestParams);
-    setSDatas(response?.rows);
-    setColumns(getTableColumns(response?.columns));
+    try {
+      const response = await fetchChartDataSet(requestParams);
+      setSDatas(response?.rows);
+      setColumns(getTableColumns(response?.columns));
+    } catch (error) {
+      errorHandle(error);
+    }
   });
 
   const getTableColumns = columns => {
-    return (columns || []).map((col, index) => ({
-      title: Array.isArray(col?.name) ? col?.name?.join('.') : col?.name,
-      dataIndex: index,
-    }));
+    const allConfigFields = chartConfig?.datas?.flatMap(d => d.rows || []);
+    return (columns || []).map((col, index) => {
+      const renderName = getRenderTitle(col);
+      const currentConfig = allConfigFields?.find(
+        f => f.colName === renderName,
+      );
+      return {
+        title: currentConfig?.alias?.name || renderName,
+        dataIndex: index,
+      };
+    });
   };
+
+  const getRenderTitle = column =>
+    Array.isArray(column?.name) ? column?.name?.join('.') : column?.name;
 
   return (
     <div>
@@ -145,11 +161,13 @@ const useDisplayViewDetail = () => {
           <StyledTabs defaultActiveKey="summary">
             <TabPane tab={t('summary')} key="summary">
               <TemplateTable
+                chartConfig={props?.chartConfig}
                 requestParams={getSummaryTableRequestParams(props)}
               />
             </TabPane>
             <TabPane tab={t('details')} key="details">
               <TemplateTable
+                chartConfig={props?.chartConfig}
                 requestParams={getDetailsTableRequestParams(props)}
               />
             </TabPane>
