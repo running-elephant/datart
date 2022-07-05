@@ -262,8 +262,9 @@ export const widgetLinkEventAction =
       const sourceLinkFilters = sourceWidgetRuntimeLinkInfo?.filters?.filter(
         f =>
           isEmptyArray(widgetSelectedItems) ||
-          !dimensionNames?.includes(JSON.stringify(f.column)),
+          !dimensionNames?.includes(f.column),
       );
+
       const widgetInfo = boardWidgetInfoRecord?.[targetWidget.id];
       const { filterParams: controllerFilters, variableParams } =
         getTheWidgetFiltersAndParams<PendingChartDataRequestFilter>({
@@ -276,6 +277,7 @@ export const widgetLinkEventAction =
         boardId: targetWidget.dashboardId,
         widgetId: targetWidget.id,
         option: widgetInfo,
+        isUnSelectedAll,
         extraFilters: isUnSelectedAll
           ? controllerFilters || []
           : (clickFilters || [])
