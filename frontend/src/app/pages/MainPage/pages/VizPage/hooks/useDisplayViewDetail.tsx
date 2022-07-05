@@ -27,14 +27,13 @@ import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import { ChartConfig, ChartDataConfig } from 'app/types/ChartConfig';
 import {
   ChartDataRequest,
-  ChartDataRequestFilter,
+  PendingChartDataRequestFilter,
 } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { fetchChartDataSet } from 'app/utils/fetch';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
-import { isEmptyArray } from 'utils/object';
 
 const { TabPane } = Tabs;
 
@@ -91,7 +90,7 @@ type DisplayViewDetailProps = {
   chartConfig?: ChartConfig;
   drillOption?: ChartDrillOption;
   viewDetailSetting?: ViewDetailSetting;
-  clickFilters?: ChartDataRequestFilter[];
+  clickFilters?: PendingChartDataRequestFilter[];
 };
 
 const useDisplayViewDetail = () => {
@@ -112,13 +111,10 @@ const useDisplayViewDetail = () => {
         viewDetailSetting,
       ),
     );
-    const requestParams = builder.addDrillOption(drillOption).build();
-    if (!isEmptyArray(clickFilters) && requestParams) {
-      Object.assign(requestParams, {
-        filters: clickFilters?.concat(requestParams.filters || []),
-      });
-    }
-    return requestParams;
+    return builder
+      .addRuntimeFilters(clickFilters)
+      .addDrillOption(drillOption)
+      .build();
   };
 
   const getDetailsTableRequestParams = ({
@@ -135,13 +131,10 @@ const useDisplayViewDetail = () => {
         viewDetailSetting,
       ),
     );
-    const requestParams = builder.addDrillOption(drillOption).buildDetails();
-    if (!isEmptyArray(clickFilters) && requestParams) {
-      Object.assign(requestParams, {
-        filters: clickFilters?.concat(requestParams.filters || []),
-      });
-    }
-    return requestParams;
+    return builder
+      .addRuntimeFilters(clickFilters)
+      .addDrillOption(drillOption)
+      .buildDetails();
   };
 
   const openModal = (props: DisplayViewDetailProps) => {

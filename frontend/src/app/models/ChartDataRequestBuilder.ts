@@ -120,18 +120,6 @@ export class ChartDataRequestBuilder {
     return this;
   }
 
-  public getColNameStringFilter(): PendingChartDataRequestFilter[] {
-    return this.buildFilters().map(v => {
-      const row = getAllColumnInMeta(this.dataView.meta)?.find(val =>
-        isEqual(val.path, v.column),
-      );
-      return {
-        ...v,
-        column: row?.name || '',
-      };
-    });
-  }
-
   private buildAggregators() {
     if (this.aggregation === false) {
       return [];
@@ -449,7 +437,7 @@ export class ChartDataRequestBuilder {
         };
       });
 
-      if (!isEmptyArray(_extraSorters)) {
+    if (!isEmptyArray(_extraSorters)) {
       return _extraSorters;
     }
     return originalSorters.filter(sorter => Boolean(sorter?.operator));
@@ -619,5 +607,17 @@ export class ChartDataRequestBuilder {
       script: this.script,
       params: this.variableParams,
     };
+  }
+
+  public getColNameStringFilter(): PendingChartDataRequestFilter[] {
+    return this.buildFilters().map(v => {
+      const row = getAllColumnInMeta(this.dataView.meta)?.find(val =>
+        isEqual(val.path, v.column),
+      );
+      return {
+        ...v,
+        column: row?.name || '',
+      };
+    });
   }
 }
