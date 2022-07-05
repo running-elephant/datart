@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
+import { message } from 'antd';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { BASE_API_URL } from 'globalConstants';
+import i18next from 'i18next';
 import { APIResponse } from 'types';
 import { getToken, removeToken, setToken } from './auth';
 
@@ -75,9 +77,7 @@ export function request2<T>(
   const axiosPromise =
     typeof url === 'string' ? instance(url, config) : instance(url);
   return axiosPromise
-    .then(extra?.onFulfilled || defaultFulfilled, error => {
-      throw unAuthorizationErrorHandler(error);
-    })
+    .then(extra?.onFulfilled || defaultFulfilled, unAuthorizationErrorHandler)
     .catch(extra?.onRejected || defaultRejected);
 }
 
@@ -98,9 +98,11 @@ export const getServerDomain = () => {
 
 function unAuthorizationErrorHandler(error) {
   if (error?.response?.status === 401) {
+    message.error({ key: '401', content: i18next.t('global.401') });
     removeToken();
+    return true;
   }
-  return error;
+  throw error;
 }
 
 function standardErrorMessageTransformer(error) {

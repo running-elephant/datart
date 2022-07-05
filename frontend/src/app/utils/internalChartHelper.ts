@@ -753,8 +753,10 @@ export const buildClickEventBaseFilters = (
     .concat(mixConfigs)
     .reduce<PendingChartDataRequestFilter[]>((acc, c) => {
       const filterValues = rowDatas
-        ?.map(rowData => rowData?.[c.colName])
-        ?.filter(Boolean)
+        ?.map(rowData => {
+          return rowData?.[c.colName];
+        })
+        ?.filter(value => !isEmpty(value))
         ?.map(value => ({ value, valueType: c.type }));
 
       if (isEmptyArray(filterValues) || isEmpty(c.colName)) {

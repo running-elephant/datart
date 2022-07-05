@@ -129,8 +129,8 @@ class BasicPieChart extends Chart {
   }
 
   onUnMount(): void {
-    this.chart?.dispose();
     this.selection?.removeEvent();
+    this.chart?.dispose();
   }
 
   onResize(opt: any, context): void {

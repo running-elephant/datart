@@ -27,14 +27,14 @@ import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import { ChartConfig, ChartDataConfig } from 'app/types/ChartConfig';
 import {
   ChartDataRequest,
-  ChartDataRequestFilter,
+  PendingChartDataRequestFilter,
 } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { fetchChartDataSet } from 'app/utils/fetch';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
-import { isEmptyArray } from 'utils/object';
+import { errorHandle } from 'utils/utils';
 
 const { TabPane } = Tabs;
 
@@ -54,22 +54,37 @@ const filterTableColumnsByViewDetailSetting = (
 
 const TemplateTable: FC<{
   requestParams: ChartDataRequest;
-}> = memo(({ requestParams }) => {
+  chartConfig?: ChartConfig;
+}> = memo(({ chartConfig, requestParams }) => {
   const [datas, setSDatas] = useState<any>();
   const [columns, setColumns] = useState();
 
   useMount(async () => {
-    const response = await fetchChartDataSet(requestParams);
-    setSDatas(response.rows);
-    setColumns(getTableColumns(response.columns));
+    try {
+      const response = await fetchChartDataSet(requestParams);
+      setSDatas(response?.rows);
+      setColumns(getTableColumns(response?.columns));
+    } catch (error) {
+      errorHandle(error);
+    }
   });
 
   const getTableColumns = columns => {
-    return (columns || []).map((col, index) => ({
-      title: col?.name,
-      dataIndex: index,
-    }));
+    const allConfigFields = chartConfig?.datas?.flatMap(d => d.rows || []);
+    return (columns || []).map((col, index) => {
+      const renderName = getRenderTitle(col);
+      const currentConfig = allConfigFields?.find(
+        f => f.colName === renderName,
+      );
+      return {
+        title: currentConfig?.alias?.name || renderName,
+        dataIndex: index,
+      };
+    });
   };
+
+  const getRenderTitle = column =>
+    Array.isArray(column?.name) ? column?.name?.join('.') : column?.name;
 
   return (
     <div>
@@ -91,7 +106,7 @@ type DisplayViewDetailProps = {
   chartConfig?: ChartConfig;
   drillOption?: ChartDrillOption;
   viewDetailSetting?: ViewDetailSetting;
-  clickFilters?: ChartDataRequestFilter[];
+  clickFilters?: PendingChartDataRequestFilter[];
 };
 
 const useDisplayViewDetail = () => {
@@ -112,13 +127,10 @@ const useDisplayViewDetail = () => {
         viewDetailSetting,
       ),
     );
-    const requestParams = builder.addDrillOption(drillOption).build();
-    if (!isEmptyArray(clickFilters) && requestParams) {
-      Object.assign(requestParams, {
-        filters: clickFilters?.concat(requestParams.filters || []),
-      });
-    }
-    return requestParams;
+    return builder
+      .addRuntimeFilters(clickFilters)
+      .addDrillOption(drillOption)
+      .build();
   };
 
   const getDetailsTableRequestParams = ({
@@ -135,13 +147,10 @@ const useDisplayViewDetail = () => {
         viewDetailSetting,
       ),
     );
-    const requestParams = builder.addDrillOption(drillOption).buildDetails();
-    if (!isEmptyArray(clickFilters) && requestParams) {
-      Object.assign(requestParams, {
-        filters: clickFilters?.concat(requestParams.filters || []),
-      });
-    }
-    return requestParams;
+    return builder
+      .addRuntimeFilters(clickFilters)
+      .addDrillOption(drillOption)
+      .buildDetails();
   };
 
   const openModal = (props: DisplayViewDetailProps) => {
@@ -152,11 +161,13 @@ const useDisplayViewDetail = () => {
           <StyledTabs defaultActiveKey="summary">
             <TabPane tab={t('summary')} key="summary">
               <TemplateTable
+                chartConfig={props?.chartConfig}
                 requestParams={getSummaryTableRequestParams(props)}
               />
             </TabPane>
             <TabPane tab={t('details')} key="details">
               <TemplateTable
+                chartConfig={props?.chartConfig}
                 requestParams={getDetailsTableRequestParams(props)}
               />
             </TabPane>

@@ -227,11 +227,17 @@ const boardSlice = createSlice({
 
     setWidgetData(
       state,
-      action: PayloadAction<{ wid: string; data: WidgetData | undefined }>,
+      action: PayloadAction<{
+        wid: string;
+        data: WidgetData | undefined;
+        selectedItems?: [];
+      }>,
     ) {
       const { wid, data } = action.payload;
       state.widgetDataMap[wid] = data;
-      state.selectedItems[wid] = [];
+      if (action.payload.selectedItems !== undefined) {
+        state.selectedItems[wid] = action.payload.selectedItems;
+      }
     },
     changeBoardVisible(
       state,

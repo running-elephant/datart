@@ -104,7 +104,7 @@ export function transformQueryResultToModelAndDataSource(
   model: HierarchyModel;
   dataSource: object[];
 } {
-  const { rows, columns } = data;
+  const { rows = [], columns = [] } = data || {};
   const newColumns = columns.reduce((obj, { name, type, primaryKey }) => {
     const hierarchyColumn = getHierarchyColumn(
       name,
