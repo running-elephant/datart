@@ -147,7 +147,6 @@ class BasicOutlineMapChart extends Chart {
       props.selectedItems,
       context,
     );
-    console.log(newOptions);
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
