@@ -21,6 +21,7 @@ package datart.server.controller;
 import datart.core.base.annotations.SkipLogin;
 import datart.core.common.FileUtils;
 import datart.core.data.provider.Dataframe;
+import datart.core.data.provider.StdSqlOperator;
 import datart.core.entity.Download;
 import datart.server.base.dto.ResponseData;
 import datart.server.base.dto.ShareInfo;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/shares")
@@ -85,6 +87,15 @@ public class ShareController extends BaseController {
                                                   @RequestBody ShareToken shareToken) {
         shareToken.setId(shareId);
         return ResponseData.success(shareService.getShareViz(shareToken));
+    }
+
+
+    @ApiOperation(value = "support std functions")
+    @PostMapping("/function/support/{sourceId}")
+    @SkipLogin
+    public ResponseData<Set<StdSqlOperator>> supportFunctions(@PathVariable String sourceId,
+                                                              @RequestBody ShareToken executeToken) {
+        return ResponseData.success(shareService.supportedStdFunctions(executeToken, sourceId));
     }
 
     @ApiOperation(value = "execute with share token")

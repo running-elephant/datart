@@ -28,6 +28,7 @@ import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
 import datart.core.common.UUIDGenerator;
 import datart.core.data.provider.Dataframe;
+import datart.core.data.provider.StdSqlOperator;
 import datart.core.entity.*;
 import datart.core.mappers.ext.ShareMapperExt;
 import datart.core.mappers.ext.UserMapperExt;
@@ -235,7 +236,6 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         }).collect(Collectors.toList());
     }
 
-
     @Override
     public ShareVizDetail getShareViz(ShareToken shareToken) {
         ShareAuthorizedToken authorizedToken = parseToken(shareToken);
@@ -284,6 +284,13 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         ShareAuthorizedToken authorizedToken = parseToken(shareToken);
         validateExpiration(authorizedToken);
         return downloadService.downloadFile(downloadId);
+    }
+
+    @Override
+    public Set<StdSqlOperator> supportedStdFunctions(ShareToken shareToken, String sourceId) {
+        ShareAuthorizedToken authorizedToken = parseToken(shareToken);
+        validateExpiration(authorizedToken);
+        return dataProviderService.supportedStdFunctions(sourceId);
     }
 
     private ShareVizDetail getVizDetail(ShareAuthorizedToken authorizedToken) {
