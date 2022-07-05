@@ -349,18 +349,6 @@ const ChartPreviewBoard: FC<{
                 buildViewDataEventParams(param, InteractionMouseEvent.Left),
               );
 
-              // TODO(Stephen): to be remove duplicate if function
-              if (
-                drillOptionRef.current?.isSelectedDrill &&
-                !drillOptionRef.current.isBottomLevel
-              ) {
-                const option = drillOptionRef.current;
-                option.drillDown(param.data.rowData);
-                handleDrillOptionChange(option);
-                return;
-              }
-              // TODO(Stephen): to be remove duplicate if function
-
               if (
                 drillOptionRef.current?.isSelectedDrill &&
                 !drillOptionRef.current.isBottomLevel
