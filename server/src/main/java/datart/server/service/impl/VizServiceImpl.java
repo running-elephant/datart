@@ -571,10 +571,12 @@ public class VizServiceImpl extends BaseService implements VizService {
                 Storyboard storyboard = storyboardService.retrieve(vizId);
                 storyboardService.requirePermission(storyboard, Const.MANAGE);
                 // check name
-                Storyboard check = new Storyboard();
-                check.setOrgId(storyboard.getOrgId());
-                check.setName(newName);
-                storyboardService.checkUnique(check);
+                if (!storyboard.getName().equals(newName)) {
+                    Storyboard check = new Storyboard();
+                    check.setOrgId(storyboard.getOrgId());
+                    check.setName(newName);
+                    storyboardService.checkUnique(check);
+                }
                 storyboard.setName(newName);
                 storyboard.setStatus(Const.DATA_STATUS_ACTIVE);
                 return 1 == storyboardService.getDefaultMapper().updateByPrimaryKey(storyboard);
