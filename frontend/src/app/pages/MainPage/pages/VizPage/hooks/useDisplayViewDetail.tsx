@@ -65,7 +65,7 @@ const TemplateTable: FC<{
 
   const getTableColumns = columns => {
     return (columns || []).map((col, index) => ({
-      title: col?.name,
+      title: Array.isArray(col?.name) ? col?.name?.join('.') : col?.name,
       dataIndex: index,
     }));
   };

@@ -538,16 +538,20 @@ export class ChartDataRequestBuilder {
       },
       [],
     );
-    return Array.from(
-      new Set(
-        selectColumns.map(col => {
-          return {
-            alias: this.buildAliasName(col),
-            column: this.buildColumnName(col),
-          };
-        }),
-      ),
-    );
+
+    return selectColumns
+      ?.reduce<ChartDataSectionField[]>((acc, cur) => {
+        if (acc.find(x => x?.colName === cur.colName)) {
+          return acc;
+        }
+        return acc.concat(cur);
+      }, [])
+      ?.map(col => {
+        return {
+          alias: this.buildAliasName(col),
+          column: this.buildColumnName(col),
+        };
+      });
   }
 
   private buildViewConfigs() {
@@ -593,7 +597,6 @@ export class ChartDataRequestBuilder {
     const validFilters = this.removeInvalidFilter(
       this.buildFilters().filter(f => !f.aggOperator),
     );
-
     return {
       ...this.buildViewConfigs(),
       viewId: this.dataView?.id,

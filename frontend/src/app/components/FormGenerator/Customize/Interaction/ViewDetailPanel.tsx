@@ -110,13 +110,16 @@ const ViewDetailPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
                 allowClear
                 onChange={handleViewDetailCustomFieldsChange}
               >
-                {context?.dataview?.meta?.map(f => {
-                  return (
-                    <Select.Option key={f.id} value={f.name}>
-                      {f.name}
-                    </Select.Option>
-                  );
-                })}
+                {context?.dataview?.meta
+                  ?.flatMap(f => {
+                    if (f.role === 'hierachy') {
+                      return f.children || [];
+                    }
+                    return f;
+                  })
+                  ?.map(f => {
+                    return <Select.Option value={f.id}>{f.name}</Select.Option>;
+                  })}
               </Select>
             </Form.Item>
           )}
