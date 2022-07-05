@@ -119,15 +119,15 @@ export const Resource = memo(() => {
     }
   }, [dispatch, sourceId, databaseTreeModel, editorCompletionItemProviderRef]);
 
-  const renderIcon = useCallback(a => {
-    if (Array.isArray(a.value)) {
-      switch (a.value.length) {
+  const renderIcon = useCallback(({ value, type }) => {
+    if (Array.isArray(value)) {
+      switch (value.length) {
         case 1:
           return <DatabaseOutlined />;
         case 2:
           return <TableOutlined />;
         case 3:
-          switch (a.type as DataViewFieldType) {
+          switch (type as DataViewFieldType) {
             case DataViewFieldType.STRING:
               return <FieldStringOutlined />;
             case DataViewFieldType.NUMERIC:
