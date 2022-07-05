@@ -102,18 +102,19 @@ export const StructView = memo(
             script:
               type === 'MAIN'
                 ? {
-                    table: table.table,
-                    columns: table.columns,
-                    joins: isEqual(structure.table, table.table)
-                      ? structure.joins
-                      : [],
+                    ...structure,
+                    ...table,
+                    joins:
+                      !table.table || isEqual(structure.table, table.table)
+                        ? structure.joins
+                        : [],
                   }
                 : produce(structure, draft => {
                     draft.joins[index!] = table;
                   }),
           }),
         );
-        if (type === 'MAIN') {
+        if (type === 'MAIN' && table.sourceId) {
           dispatch(
             actions.changeCurrentEditingView({
               sourceId: table.sourceId,

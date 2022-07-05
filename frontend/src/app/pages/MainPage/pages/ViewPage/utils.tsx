@@ -502,7 +502,7 @@ export function findAllColumnsOrIsCheckAll(
   if (table.length === 1) {
     const foundColumns = database?.[0]?.tables
       ?.find(v => v.tableName === table[0])
-      ?.['columns'].map(v => v.name);
+      ?.['columns'].map(v => v.name[0]);
 
     return {
       columns: foundColumns,
@@ -545,7 +545,7 @@ export function handleStringScriptToObject(
           columns:
             JSON.parse(join.columns) === 'all'
               ? columns
-              : JSON.parse(scriptJSON.columns),
+              : JSON.parse(join.columns),
         };
       }),
     };
@@ -578,3 +578,27 @@ export function handleObjectScriptToString(
     throw err;
   }
 }
+
+export const getTableAllColumns = (
+  joinTableName: Array<string>,
+  currentDatabaseSchemas: DatabaseSchema[],
+): string[] | [] => {
+  if (!currentDatabaseSchemas) {
+    return [];
+  }
+
+  const column =
+    joinTableName.length === 1
+      ? currentDatabaseSchemas[0].tables
+          .find(v => v.tableName === joinTableName[0])
+          ?.columns.map(v => {
+            return v.name[0];
+          })
+      : currentDatabaseSchemas
+          ?.find(v => v.dbName === joinTableName?.[0])
+          ?.tables.find(v => v.tableName === joinTableName[1])
+          ?.columns.map(v => {
+            return v.name[0];
+          });
+  return column || [];
+};
