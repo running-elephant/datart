@@ -21,8 +21,6 @@ import { FONT_SIZE_LABEL, SPACE_SM } from 'styles/StyleConstants';
 
 export const Hardcoded = createGlobalStyle`
   body {
-    -webkit-font-smoothing: antialiased;
-
     .ant-form-item-label > label {
       color: ${p => p.theme.textColorLight};
     }
