@@ -138,11 +138,12 @@ export const ColumnPermissions = memo(() => {
               placement="bottomRight"
               content={
                 <Tree
-                  className="dropdown"
+                  className="check-list medium"
                   treeData={columnDropdownData}
                   checkedKeys={checkedKeys}
                   loading={false}
                   selectable={false}
+                  showIcon={false}
                   onCheck={checkColumnPermission(id)}
                   disabled={status === ViewStatus.Archived}
                   blockNode

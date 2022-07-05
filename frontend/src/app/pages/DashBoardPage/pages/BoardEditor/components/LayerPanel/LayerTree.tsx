@@ -15,10 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Tree } from 'antd';
-import { FC, memo, useCallback } from 'react';
+
+import { Tree } from 'app/components';
+import { renderIcon } from 'app/hooks/useGetVizIcon';
+import { WidgetActionContext } from 'app/pages/DashBoardPage/components/ActionProvider/WidgetActionProvider';
+import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
+import { FC, memo, useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import styled from 'styled-components/macro';
+import { stopPPG } from 'utils/utils';
 import { dropLayerNodeAction } from '../../slice/actions/actions';
 import { selectLayerTree } from '../../slice/selectors';
 import { LayerTreeItem } from './LayerTreeItem';
@@ -27,30 +31,42 @@ export const LayerTree: FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const treeData = useSelector(selectLayerTree);
   const renderTreeItem = useCallback(n => <LayerTreeItem node={n} />, []);
+  const { onEditSelectWidget } = useContext(WidgetActionContext);
+
+  const treeSelect = useCallback(
+    (_, { node, nativeEvent }) => {
+      onEditSelectWidget({
+        multipleKey: nativeEvent.shiftKey,
+        id: node.key as string,
+        selected: true,
+      });
+    },
+    [onEditSelectWidget],
+  );
+
+  const icon = useCallback(
+    node => renderIcon(widgetManager.meta(node.originalType).icon),
+    [],
+  );
+
   const onDrop = useCallback(
     info => dispatch(dropLayerNodeAction(info)),
     [dispatch],
   );
+
   return (
-    <StyledWrapper onClick={e => e.stopPropagation()}>
-      <Tree
-        onClick={e => e.stopPropagation()}
-        className="widget-tree"
-        draggable
-        blockNode
-        titleRender={renderTreeItem}
-        onDrop={onDrop}
-        treeData={treeData}
-        defaultExpandAll
-      />
-    </StyledWrapper>
+    <Tree
+      className="small"
+      draggable
+      selectable
+      loading={false}
+      titleRender={renderTreeItem}
+      icon={icon}
+      onSelect={treeSelect}
+      onClick={stopPPG}
+      onDrop={onDrop}
+      treeData={treeData}
+      defaultExpandAll
+    />
   );
 });
-const StyledWrapper = styled.div`
-  .widget-tree.ant-tree .ant-tree-node-content-wrapper:hover {
-    background-color: ${p => p.theme.componentBackground};
-  }
-  .widget-tree.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected {
-    background-color: ${p => p.theme.componentBackground};
-  }
-`;
