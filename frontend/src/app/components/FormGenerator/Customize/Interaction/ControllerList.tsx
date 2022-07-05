@@ -45,7 +45,6 @@ const ControllerList: FC<
   translate: t,
 }) => {
   const [controllerNames, setControllerNames] = useState<string[]>([]);
-
   const getControllerNames = data => {
     return (data?.widgets || [])
       .map(w => JSON.parse(w.config))

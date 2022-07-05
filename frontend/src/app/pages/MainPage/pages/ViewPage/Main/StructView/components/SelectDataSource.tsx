@@ -46,7 +46,7 @@ import {
   JoinTableProps,
   StructViewQueryProps,
 } from '../../../slice/types';
-import { buildAntdTreeNodeModel } from '../../../utils';
+import { buildAntdTreeNodeModel, getTableAllColumns } from '../../../utils';
 
 const CheckboxGroup = Checkbox.Group;
 
@@ -79,11 +79,28 @@ const SelectDataSource = memo(
         ? { table: structure.table, columns: structure.columns }
         : null,
     );
-    const [checkedList, setCheckedList] = useState<Array<string> | []>([]);
-    const [indeterminate, setIndeterminate] = useState<boolean>(true);
-    const [checkAll, setCheckAll] = useState<boolean>(false);
     const [sources, setSources] = useState<Source[]>(propsSources);
     const [visible, setVisible] = useState<boolean>(false);
+
+    const currentTableAllColumns = useMemo(() => {
+      if (type === 'JOINS') {
+        return getTableAllColumns(
+          joinTable?.table || [],
+          allDatabaseSchemas[sourceId!],
+        );
+      } else {
+        return getTableAllColumns(
+          structure?.table || [],
+          allDatabaseSchemas[sourceId!],
+        );
+      }
+    }, [
+      allDatabaseSchemas,
+      sourceId,
+      structure?.table,
+      joinTable?.table,
+      type,
+    ]);
 
     const handleCurrentSources = useCallback(
       ({ key }) => {
@@ -94,7 +111,7 @@ const SelectDataSource = memo(
       [sources, dispatch],
     );
 
-    const FilterSources = useCallback(
+    const filterSources = useCallback(
       e => {
         const searchValue = e.target.value;
         if (searchValue) {
@@ -106,16 +123,13 @@ const SelectDataSource = memo(
       [sources, propsSources],
     );
 
-    const buildTableNode = useCallback(
-      (database: DatabaseSchema, databaseSchemas: DatabaseSchema[]) => {
-        const children =
-          database?.tables?.map(table => {
-            return buildTableColumnNode([database.dbName], table);
-          }) || [];
-        return buildAntdTreeNodeModel([], database.dbName, children, false);
-      },
-      [],
-    );
+    const buildTableNode = useCallback((database: DatabaseSchema) => {
+      const children =
+        database?.tables?.map(table => {
+          return buildTableColumnNode([database.dbName], table);
+        }) || [];
+      return buildAntdTreeNodeModel([], database.dbName, children, false);
+    }, []);
 
     const buildTableColumnNode = (ancestors: string[] = [], table) => {
       return {
@@ -143,9 +157,7 @@ const SelectDataSource = memo(
             buildTableColumnNode([databaseSchemas[0].dbName], v),
           );
         } else {
-          return (databaseSchemas || []).map(v =>
-            buildTableNode(v, databaseSchemas),
-          );
+          return (databaseSchemas || []).map(v => buildTableNode(v));
         }
       }
       return [];
@@ -161,26 +173,26 @@ const SelectDataSource = memo(
 
     const handleColumnCheck = useCallback(
       list => {
-        const plainOptions = selectedTableSchema.columns;
-
-        setCheckedList(list);
-        setIndeterminate(!!list.length && list.length < plainOptions.length);
-        setCheckAll(list.length === plainOptions.length);
-        onChange?.({ ...selectedTableSchema, columns: list }, type);
+        setSelectedTableSchema({
+          ...selectedTableSchema,
+          columns: list,
+        });
+        onChange?.({ columns: list }, type);
       },
       [onChange, selectedTableSchema, type],
     );
 
     const handleCheckAllColumns = useCallback(
-      (checked, tableSchema) => {
-        const checkedList = checked ? tableSchema.columns : [];
+      (checked, allColumn) => {
+        const checkedList = checked ? allColumn : [];
 
-        setCheckedList(checkedList);
-        setIndeterminate(false);
-        setCheckAll(checked);
-        onChange?.({ ...tableSchema, columns: checkedList }, type);
+        onChange?.({ columns: checkedList }, type);
+        setSelectedTableSchema({
+          ...selectedTableSchema,
+          columns: checkedList,
+        });
       },
-      [onChange, type],
+      [onChange, type, selectedTableSchema],
     );
 
     const handleTableSelect = useCallback(
@@ -202,19 +214,11 @@ const SelectDataSource = memo(
         if (type === 'JOINS') {
           delete tableSchema.sourceId;
         }
-
         setSelectedTableSchema(tableSchema);
         onChange?.(tableSchema, type);
-        handleCheckAllColumns(true, tableSchema);
         setVisible(false);
       },
-      [
-        type,
-        onChange,
-        handleCheckAllColumns,
-        allDatabaseSchemas,
-        currentSources,
-      ],
+      [type, onChange, allDatabaseSchemas, currentSources],
     );
 
     const handleVisibleChange = useCallback(visible => {
@@ -255,7 +259,6 @@ const SelectDataSource = memo(
           table: structure.table,
           columns: structure.columns,
         });
-        setCheckedList(structure.columns);
       }
 
       if (type === 'JOINS' && joinTable?.table && !selectedTableSchema) {
@@ -263,7 +266,6 @@ const SelectDataSource = memo(
           table: joinTable['table'],
           columns: joinTable['columns'],
         });
-        setCheckedList(joinTable['columns']!);
       }
     }, []);
 
@@ -311,7 +313,7 @@ const SelectDataSource = memo(
                 <SearchBox>
                   <Input
                     placeholder={t('searchSource')}
-                    onChange={FilterSources}
+                    onChange={filterSources}
                   />
                 </SearchBox>
                 <SourceList>
@@ -358,22 +360,29 @@ const SelectDataSource = memo(
             content={
               <PopoverBody>
                 <Checkbox
-                  indeterminate={indeterminate}
+                  indeterminate={
+                    !!selectedTableSchema?.columns.length &&
+                    selectedTableSchema?.columns.length <
+                      currentTableAllColumns.length
+                  }
                   onChange={e => {
                     handleCheckAllColumns(
                       e.target.checked,
-                      selectedTableSchema,
+                      currentTableAllColumns,
                     );
                   }}
-                  checked={checkAll}
+                  checked={
+                    selectedTableSchema?.columns.length ===
+                    currentTableAllColumns.length
+                  }
                 >
                   {t('all')}
                 </Checkbox>
                 <SmallDivider />
                 <ColumnList
-                  value={checkedList}
+                  value={selectedTableSchema?.columns}
                   onChange={handleColumnCheck}
-                  options={selectedTableSchema.columns}
+                  options={currentTableAllColumns}
                 />
               </PopoverBody>
             }

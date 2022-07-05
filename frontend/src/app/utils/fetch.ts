@@ -31,6 +31,7 @@ import {
 } from 'app/utils/internalChartHelper';
 import { saveAs } from 'file-saver';
 import i18next from 'i18next';
+import qs from 'qs';
 import { request2, requestWithHeader } from 'utils/request';
 import { errorHandle } from 'utils/utils';
 import { convertToChartDto } from './ChartDtoHelper';
@@ -154,18 +155,15 @@ export const makeShareDownloadDataTask =
   };
 
 export async function checkComputedFieldAsync(sourceId, expression) {
-  const _removeSquareBrackets = expression => {
-    if (!expression) {
-      return '';
-    }
-    return expression.replaceAll('[', '').replaceAll(']', '');
-  };
   const response = await request2<boolean>({
     method: 'POST',
     url: `data-provider/function/validate`,
     params: {
       sourceId,
-      snippet: _removeSquareBrackets(expression),
+      snippet: expression,
+    },
+    paramsSerializer: function (params) {
+      return qs.stringify(params, { arrayFormat: 'brackets' });
     },
   });
   return !!response?.data;

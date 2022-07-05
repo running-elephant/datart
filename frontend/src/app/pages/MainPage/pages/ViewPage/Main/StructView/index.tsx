@@ -26,6 +26,7 @@ import { Button, Space, Spin, Tooltip } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CommonFormTypes } from 'globalConstants';
 import produce from 'immer';
+import isEqual from 'lodash/isEqual';
 import { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -101,16 +102,19 @@ export const StructView = memo(
             script:
               type === 'MAIN'
                 ? {
-                    table: table.table,
-                    columns: table.columns,
-                    joins: [],
+                    ...structure,
+                    ...table,
+                    joins:
+                      !table.table || isEqual(structure.table, table.table)
+                        ? structure.joins
+                        : [],
                   }
                 : produce(structure, draft => {
                     draft.joins[index!] = table;
                   }),
           }),
         );
-        if (type === 'MAIN') {
+        if (type === 'MAIN' && table.sourceId) {
           dispatch(
             actions.changeCurrentEditingView({
               sourceId: table.sourceId,
@@ -408,6 +412,7 @@ export const StructView = memo(
                                       }
                                       conditionsIndex={ind}
                                       joinIndex={i}
+                                      sourceId={sourceId}
                                     />
                                     <Space className="action">
                                       {!!left.length &&
