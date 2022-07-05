@@ -15,17 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { MoreOutlined } from '@ant-design/icons';
 import { TreeDataNode } from 'antd';
-import { renderIcon } from 'app/hooks/useGetVizIcon';
 import { WidgetDropdownList } from 'app/pages/DashBoardPage/components/WidgetComponents/WidgetDropdownList';
-import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
-import classNames from 'classnames';
-import { FC, memo, useCallback, useContext, useMemo } from 'react';
+import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
-import { PRIMARY } from 'styles/StyleConstants';
-import { WidgetActionContext } from '../../../../components/ActionProvider/WidgetActionProvider';
+import { stopPPG } from 'utils/utils';
 
 export interface LayerNode extends TreeDataNode {
   key: string;
@@ -55,85 +52,41 @@ export const LayerTreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
   );
 });
 export const TreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
-  const { title, selected } = node;
+  const { title } = node;
   const widget = useContext(WidgetContext);
-  const { onEditSelectWidget } = useContext(WidgetActionContext);
-  const menuSelect = useCallback(
-    (node: LayerNode) => e => {
-      e.stopPropagation();
 
-      onEditSelectWidget({
-        multipleKey: e.shiftKey,
-        id: node.key as string,
-        selected: true,
-      });
-    },
-    [onEditSelectWidget],
-  );
-  const icon = useMemo(() => {
-    const iconStr = widgetManager.meta(widget.config.originalType).icon;
-    return renderIcon(iconStr);
-  }, [widget.config.originalType]);
   return (
-    <StyledWrapper>
-      <div
-        onClick={menuSelect(node)}
-        className={classNames('layer-item', { selected: selected })}
-      >
-        <span className="widget-name" title={title as string}>
-          <span className="widget-name-icon">{icon}</span>
-          <span className="widget-name-text">
-            {String(title) || 'untitled-widget'}
-          </span>
-        </span>
-
-        <WidgetDropdownList widget={widget} />
-      </div>
-    </StyledWrapper>
+    <Item>
+      <h4 title={title as string}>{String(title) || 'untitled-widget'}</h4>
+      <WidgetDropdownList
+        widget={widget}
+        buttonProps={{
+          size: 'small',
+          icon: <MoreOutlined />,
+          onClick: stopPPG,
+        }}
+      />
+    </Item>
   );
 });
-const StyledWrapper = styled.div`
-  overflow: hidden;
-  line-height: 32px;
-  .layer-item {
-    display: flex;
-    flex: 1;
-    padding: 0;
+const Item = styled.div`
+  display: flex;
+  flex: 1;
 
-    .widget-name {
-      display: flex;
-      flex: 1;
-      flex-direction: row;
-      width: 0px;
-    }
-    .widget-name-icon {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 20px;
-      cursor: move;
-    }
-    .widget-name-text {
-      flex: 1;
-      width: 0px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+  h4 {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .widget-tool-dropdown {
     display: none;
   }
 
-  &:hover .widget-tool-dropdown {
-    display: block;
-  }
-  .layer-item.selected {
-    color: ${p => p.theme.componentBackground};
-    background-color: ${PRIMARY};
-  }
   &:hover {
-    color: ${PRIMARY};
+    .widget-tool-dropdown {
+      display: block;
+    }
   }
 `;
