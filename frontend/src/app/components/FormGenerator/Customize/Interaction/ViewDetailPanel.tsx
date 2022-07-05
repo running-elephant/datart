@@ -118,7 +118,9 @@ const ViewDetailPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
                     return f;
                   })
                   ?.map(f => {
-                    return <Select.Option value={f.id}>{f.name}</Select.Option>;
+                    return (
+                      <Select.Option value={f.name}>{f.name}</Select.Option>
+                    );
                   })}
               </Select>
             </Form.Item>
