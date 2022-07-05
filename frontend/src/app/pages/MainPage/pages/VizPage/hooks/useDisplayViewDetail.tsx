@@ -59,8 +59,8 @@ const TemplateTable: FC<{
 
   useMount(async () => {
     const response = await fetchChartDataSet(requestParams);
-    setSDatas(response.rows);
-    setColumns(getTableColumns(response.columns));
+    setSDatas(response?.rows);
+    setColumns(getTableColumns(response?.columns));
   });
 
   const getTableColumns = columns => {
