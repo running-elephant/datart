@@ -81,8 +81,22 @@ export type MetricAndSizeSeriesStyle = {
 } & LabelStyle;
 
 export interface MapOption {
-  geo: GeoInfo;
-  visualMap: GeoVisualMapStyle[];
-  series: GeoSeries[];
-  tooltip: { trigger: string; formatter: (params: any) => string };
+  geo?: GeoInfo;
+  visualMap?: GeoVisualMapStyle[];
+  series?: GeoSeries[];
+  tooltip?: { trigger: string; formatter: (params: any) => string };
+  toolbox?: {
+    orient: string;
+    top: string;
+    feature: {
+      [p: string]: {
+        onclick: () => void;
+        show: boolean;
+        icon: string;
+        title: any;
+      };
+    };
+    left: string;
+    show: boolean;
+  };
 }
