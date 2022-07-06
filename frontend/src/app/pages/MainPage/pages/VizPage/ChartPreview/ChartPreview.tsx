@@ -56,6 +56,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
+import { isEmptyArray } from 'utils/object';
 import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 import useDisplayViewDetail from '../hooks/useDisplayViewDetail';
 import useQSLibUrlHelper from '../hooks/useQSLibUrlHelper';
@@ -327,10 +328,17 @@ const ChartPreviewBoard: FC<{
         chartPreview?.chartConfig?.interactions,
         [],
       );
-      return viewDetailSetting?.event === InteractionMouseEvent.Right
+      const hasSelectedItems = !isEmptyArray(selectedItems?.[backendChartId]);
+      return viewDetailSetting?.event === InteractionMouseEvent.Right &&
+        hasSelectedItems
         ? viewDetailSetting
         : undefined;
-    }, [chartPreview?.chartConfig?.interactions, getViewDetailSetting]);
+    }, [
+      backendChartId,
+      chartPreview?.chartConfig?.interactions,
+      getViewDetailSetting,
+      selectedItems,
+    ]);
 
     const handleViewDataChange = useCallback(() => {
       if (!chartRightClickViewDetailSetting) {

@@ -50,6 +50,7 @@ import React, {
 } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
+import { isEmptyArray } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { changeSelectedItems } from '../../../pages/BoardEditor/slice/actions/actions';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
@@ -321,10 +322,16 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       dataChart?.config?.chartConfig?.interactions,
       widgetRef?.current?.config?.customConfig?.interactions,
     );
-    return viewDetailSetting?.event === InteractionMouseEvent.Right
+    const hasSelectedItems = !isEmptyArray(selectedItems);
+    return viewDetailSetting?.event === InteractionMouseEvent.Right &&
+      hasSelectedItems
       ? viewDetailSetting
       : undefined;
-  }, [dataChart?.config?.chartConfig?.interactions, getViewDetailSetting]);
+  }, [
+    dataChart?.config?.chartConfig?.interactions,
+    getViewDetailSetting,
+    selectedItems,
+  ]);
 
   const handleViewDataChange = useCallback(() => {
     if (!boardRightClickViewDetailSetting) {
