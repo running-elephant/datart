@@ -23,6 +23,7 @@ import { ExecuteToken } from 'app/pages/SharePage/slice/types';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import { RootState } from 'types';
+import { UniqWith } from 'utils/object';
 import { boardActions } from '.';
 import { getBoardChartRequests } from '../../../utils';
 import {
@@ -85,12 +86,11 @@ export const handleServerBoardAction =
     const viewViews = getChartDataView(serverViews, allDataCharts);
 
     if (viewViews) {
-      const idList = Array.from(
-        new Set(
-          Object.values(viewViews).map(v => {
-            return { sourceId: v.sourceId, viewId: v.id };
-          }),
-        ),
+      const idList = UniqWith(
+        Object.values(viewViews).map(v => {
+          return { sourceId: v.sourceId, viewId: v.id };
+        }),
+        (a, b) => a.sourceId === b.sourceId,
       );
 
       idList.forEach(({ sourceId, viewId }) => {
