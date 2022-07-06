@@ -26,7 +26,10 @@ import { shareActions } from 'app/pages/SharePage/slice';
 import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';
 import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { fetchAvailableSourceFunctionsAsync } from 'app/utils/fetch';
+import {
+  fetchAvailableSourceFunctionsAsync,
+  fetchAvailableSourceFunctionsAsyncForShare,
+} from 'app/utils/fetch';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
 import { request2 } from 'utils/request';
@@ -154,6 +157,7 @@ export const fetchBoardDetailInShare = createAsyncThunk<
           params: params.filterSearchParams,
           isMatchByName: true,
         },
+        executeToken: data.executeToken,
       }),
     );
 
@@ -527,19 +531,30 @@ export const getControllerOptions = createAsyncThunk<
 
 export const fetchAvailableSourceFunctions = createAsyncThunk<
   { value: string[]; sourceId: string } | false,
-  string,
+  { sourceId: string; authorizedToken: string; renderMode: VizRenderMode },
   { state: RootState }
->('workbench/fetchAvailableSourceFunctions', async (sourceId, { getState }) => {
-  const boardState = getState() as { board: BoardState };
-  const availableSourceFunctionsMap =
-    boardState.board.availableSourceFunctionsMap;
-  if (!availableSourceFunctionsMap[sourceId]) {
-    try {
-      const functions = await fetchAvailableSourceFunctionsAsync(sourceId);
-      return { value: functions, sourceId: sourceId };
-    } catch (err) {
-      throw err;
+>(
+  'workbench/fetchAvailableSourceFunctions',
+  async ({ sourceId, authorizedToken, renderMode }, { getState }) => {
+    const boardState = getState() as { board: BoardState };
+    const availableSourceFunctionsMap =
+      boardState.board.availableSourceFunctionsMap;
+    if (!availableSourceFunctionsMap[sourceId]) {
+      try {
+        let functions: string[] = [];
+        if (renderMode === 'share') {
+          functions = await fetchAvailableSourceFunctionsAsyncForShare(
+            sourceId,
+            authorizedToken,
+          );
+        } else {
+          functions = await fetchAvailableSourceFunctionsAsync(sourceId);
+        }
+        return { value: functions, sourceId: sourceId };
+      } catch (err) {
+        throw err;
+      }
     }
-  }
-  return false;
-});
+    return false;
+  },
+);

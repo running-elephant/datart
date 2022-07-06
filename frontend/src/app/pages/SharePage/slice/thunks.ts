@@ -30,7 +30,7 @@ import { handleServerStoryAction } from 'app/pages/StoryBoardPage/slice/actions'
 import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { convertToChartDto } from 'app/utils/ChartDtoHelper';
-import { fetchAvailableSourceFunctionsAsync } from 'app/utils/fetch';
+import { fetchAvailableSourceFunctionsAsyncForShare } from 'app/utils/fetch';
 import { RootState } from 'types';
 import persistence from 'utils/persistence';
 import { request2 } from 'utils/request';
@@ -123,6 +123,7 @@ export const fetchShareVizInfo = createAsyncThunk(
               params: filterSearchParams,
               isMatchByName: true,
             },
+            executeToken: data.executeToken,
           }),
         );
         break;
@@ -271,11 +272,17 @@ export const getOauth2Clients = createAsyncThunk<[]>(
   },
 );
 
-export const fetchAvailableSourceFunctions = createAsyncThunk<string[], string>(
-  'workbench/fetchAvailableSourceFunctions',
-  async sourceId => {
+export const fetchAvailableSourceFunctionsForShare = createAsyncThunk<
+  string[],
+  { sourceId: string; executeToken: string }
+>(
+  'workbench/fetchAvailableSourceFunctionsAsyncForShare',
+  async ({ sourceId, executeToken }) => {
     try {
-      return await fetchAvailableSourceFunctionsAsync(sourceId);
+      return await fetchAvailableSourceFunctionsAsyncForShare(
+        sourceId,
+        executeToken,
+      );
     } catch (err) {
       throw err;
     }

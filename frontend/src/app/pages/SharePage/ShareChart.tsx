@@ -38,10 +38,11 @@ import {
   selectAvailableSourceFunctions,
   selectChartPreview,
   selectNeedVerify,
+  selectShareExecuteTokenMap,
   selectShareVizType,
 } from './slice/selectors';
 import {
-  fetchAvailableSourceFunctions,
+  fetchAvailableSourceFunctionsForShare,
   fetchShareVizInfo,
 } from './slice/thunks';
 export function ShareChart() {
@@ -59,6 +60,7 @@ export function ShareChart() {
   const chartPreview = useSelector(selectChartPreview);
   const vizType = useSelector(selectShareVizType);
   const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
+  const shareExecuteTokenMap = useSelector(selectShareExecuteTokenMap);
 
   const shareType = useRouteQuery({
     key: 'type',
@@ -97,10 +99,22 @@ export function ShareChart() {
 
   useEffect(() => {
     const sourceId = chartPreview?.backendChart?.view.sourceId;
-    if (sourceId) {
-      dispatch(fetchAvailableSourceFunctions(sourceId));
+    const viewId = chartPreview?.backendChart?.view.id;
+
+    if (sourceId && viewId) {
+      dispatch(
+        fetchAvailableSourceFunctionsForShare({
+          sourceId: sourceId,
+          executeToken: shareExecuteTokenMap[viewId].authorizedToken,
+        }),
+      );
     }
-  }, [chartPreview?.backendChart?.view.sourceId, dispatch]);
+  }, [
+    chartPreview?.backendChart?.view.sourceId,
+    chartPreview?.backendChart?.view.id,
+    dispatch,
+    shareExecuteTokenMap,
+  ]);
 
   const fetchShareVizInfoImpl = useCallback(
     (

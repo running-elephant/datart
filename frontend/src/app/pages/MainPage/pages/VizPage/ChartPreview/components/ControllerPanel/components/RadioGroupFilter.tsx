@@ -26,7 +26,7 @@ import { IsKeyIn } from 'utils/object';
 import { PresentControllerFilterProps } from '.';
 
 const RadioGroupFilter: FC<PresentControllerFilterProps> = memo(
-  ({ viewId, view, condition, options, onConditionChange }) => {
+  ({ viewId, view, condition, options, executeToken, onConditionChange }) => {
     const [originalNodes, setOriginalNodes] = useState<RelationFilterValue[]>(
       condition?.value as RelationFilterValue[],
     );
@@ -42,7 +42,13 @@ const RadioGroupFilter: FC<PresentControllerFilterProps> = memo(
       }
     });
 
-    useFetchFilterDataByCondition(viewId, condition, setOriginalNodes, view);
+    useFetchFilterDataByCondition(
+      viewId,
+      condition,
+      setOriginalNodes,
+      view,
+      executeToken,
+    );
 
     const handleSelectedNodeChange = (nodeKey: string) => {
       if (selectedNode === nodeKey) {

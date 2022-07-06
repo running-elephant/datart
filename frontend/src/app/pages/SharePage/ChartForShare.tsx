@@ -44,6 +44,7 @@ import { shareActions } from './slice';
 import {
   selectHeadlessBrowserRenderSign,
   selectSelectedItems,
+  selectShareExecuteTokenMap,
 } from './slice/selectors';
 import {
   fetchShareDataSetByPreviewChartAction,
@@ -82,6 +83,7 @@ const ChartForShare: FC<{
     selectHeadlessBrowserRenderSign,
   );
   const selectedItems = useSelector(selectSelectedItems);
+  const shareExecuteTokenMap = useSelector(selectShareExecuteTokenMap);
 
   useMount(() => {
     if (!chartPreview) {
@@ -217,6 +219,7 @@ const ChartForShare: FC<{
     chartPreview?.backendChart?.viewId,
     chartPreview?.dataset,
   ]);
+
   return (
     <StyledChartPreviewBoard>
       <div ref={controlRef}>
@@ -224,6 +227,8 @@ const ChartForShare: FC<{
           viewId={chartPreview?.backendChart?.viewId}
           chartConfig={chartPreview?.chartConfig}
           onChange={handleFilterChange}
+          view={chartPreview?.backendChart?.view}
+          executeToken={shareExecuteTokenMap}
         />
       </div>
       <ChartDrillContext.Provider
