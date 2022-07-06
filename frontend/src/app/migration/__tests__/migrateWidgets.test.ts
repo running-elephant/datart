@@ -20,10 +20,15 @@ import { FONT_DEFAULT } from 'app/constants';
 import { ServerRelation } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   beta0,
+  beta4_2,
   convertWidgetRelationsToObj,
 } from '../BoardConfig/migrateWidgets';
 import { WidgetBeta3 } from '../BoardConfig/types';
-import { APP_VERSION_BETA_0 } from '../constants';
+import {
+  APP_VERSION_BETA_0,
+  APP_VERSION_BETA_4_1,
+  APP_VERSION_BETA_4_2,
+} from '../constants';
 
 describe('test migrateWidgets ', () => {
   test('should return undefined  when widget.config.type === filter', () => {
@@ -96,5 +101,57 @@ describe('test migrateWidgets ', () => {
       },
     ] as ServerRelation[];
     expect(convertWidgetRelationsToObj(relations1)).toMatchObject(relations2);
+  });
+
+  test('should migrate when widget is owned chart for version APP_VERSION_BETA_4_2', () => {
+    const widget1 = {
+      config: {
+        version: APP_VERSION_BETA_4_1,
+        originalType: 'ownedChart',
+        customConfig: {},
+      },
+    } as any;
+    const result = beta4_2('auto', widget1 as any);
+    expect(result?.config?.version).toBe(APP_VERSION_BETA_4_2);
+    expect(result?.config?.customConfig?.interactions?.length).toBe(3);
+  });
+
+  test('should migrate when widget is linked chart for version APP_VERSION_BETA_4_2', () => {
+    const widget1 = {
+      config: {
+        version: APP_VERSION_BETA_4_1,
+        originalType: 'linkedChart',
+        customConfig: {},
+      },
+    } as any;
+    const result = beta4_2('auto', widget1 as any);
+    expect(result?.config?.version).toBe(APP_VERSION_BETA_4_2);
+    expect(result?.config?.customConfig?.interactions?.length).toBe(3);
+  });
+
+  test('should not migrate when widget version is APP_VERSION_BETA_4_2', () => {
+    const widget1 = {
+      config: {
+        version: APP_VERSION_BETA_4_2,
+        originalType: 'linkedChart',
+        customConfig: {},
+      },
+    } as any;
+    const result = beta4_2('auto', widget1 as any);
+    expect(result?.config?.version).toBe(APP_VERSION_BETA_4_2);
+    expect(result?.config?.customConfig?.interactions?.length).toBe(undefined);
+  });
+
+  test('should not migrate when widget is not chart', () => {
+    const widget1 = {
+      config: {
+        version: APP_VERSION_BETA_4_2,
+        originalType: 'controller',
+        customConfig: {},
+      },
+    } as any;
+    const result = beta4_2('auto', widget1 as any);
+    expect(result?.config?.version).toBe(APP_VERSION_BETA_4_2);
+    expect(result?.config?.customConfig?.interactions?.length).toBe(undefined);
   });
 });

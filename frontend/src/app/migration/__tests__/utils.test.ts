@@ -34,10 +34,6 @@ describe('test versionCanDo ', () => {
     expect(versionCanDo(v1, v2)).toBe(false);
   });
 
-  test(`v2 canDo v2 `, () => {
-    expect(versionCanDo(v2, v2)).toBe(true);
-  });
-
   test(`should set current version`, () => {
     expect(setLatestVersion({ version: 'v1' }).version).toBe(
       APP_CURRENT_VERSION,

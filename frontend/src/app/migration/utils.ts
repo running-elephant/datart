@@ -33,7 +33,7 @@ export const versionCanDo = (curVersion: string, testVersion?: string) => {
   let testVersionIndex = APP_SEMANTIC_VERSIONS.indexOf(testVersion || '');
   if (testVersionIndex === -1) return true;
   let curVersionIndex = APP_SEMANTIC_VERSIONS.indexOf(curVersion);
-  return curVersionIndex >= testVersionIndex;
+  return curVersionIndex > testVersionIndex;
 };
 
 export const setLatestVersion = <T extends { version?: string }>(
