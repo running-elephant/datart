@@ -308,12 +308,18 @@ const ChartPreviewBoard: FC<{
       buildDrillThroughEventParams,
     ]);
 
-    const handleViewDataChange = useCallback(() => {
+    const chartRightClickViewDetailSetting = useMemo(() => {
       const viewDetailSetting = getViewDetailSetting(
         chartPreview?.chartConfig?.interactions,
         [],
       );
-      if (!viewDetailSetting) {
+      return viewDetailSetting?.event === InteractionMouseEvent.Right
+        ? viewDetailSetting
+        : undefined;
+    }, [chartPreview?.chartConfig?.interactions, getViewDetailSetting]);
+
+    const handleViewDataChange = useCallback(() => {
+      if (!chartRightClickViewDetailSetting) {
         return;
       }
       return () => {
@@ -328,12 +334,11 @@ const ChartPreviewBoard: FC<{
         );
       };
     }, [
-      chartPreview?.chartConfig?.interactions,
+      chartRightClickViewDetailSetting,
       selectedItems,
       backendChartId,
       handleViewDataEvent,
       buildViewDataEventParams,
-      getViewDetailSetting,
     ]);
 
     const registerChartEvents = useCallback(
@@ -661,6 +666,7 @@ const ChartPreviewBoard: FC<{
             value={{
               drillOption: drillOptionRef.current,
               availableSourceFunctions,
+              viewDetailSetting: chartRightClickViewDetailSetting,
               onDrillOptionChange: handleDrillOptionChange,
               onDateLevelChange: handleDateLevelChange,
               onDrillThroughChange: handleDrillThroughChange(),

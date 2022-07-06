@@ -307,12 +307,18 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     onWidgetLinkEvent,
   ]);
 
-  const handleViewDataChange = useCallback(() => {
+  const boardRightClickViewDetailSetting = useMemo(() => {
     const viewDetailSetting = getViewDetailSetting(
       dataChart?.config?.chartConfig?.interactions,
       widgetRef?.current?.config?.customConfig?.interactions,
     );
-    if (!viewDetailSetting) {
+    return viewDetailSetting?.event === InteractionMouseEvent.Right
+      ? viewDetailSetting
+      : undefined;
+  }, [dataChart?.config?.chartConfig?.interactions, getViewDetailSetting]);
+
+  const handleViewDataChange = useCallback(() => {
+    if (!boardRightClickViewDetailSetting) {
       return;
     }
     return () => {
@@ -324,9 +330,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       );
     };
   }, [
-    dataChart?.config?.chartConfig?.interactions,
+    boardRightClickViewDetailSetting,
     selectedItems,
-    getViewDetailSetting,
     handleViewDataEvent,
     buildViewDataEventParams,
   ]);
@@ -505,6 +510,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     drillOption: drillOptionRef.current,
     availableSourceFunctions,
     crossFilteringSetting: boardRightClickCrossFilteringSetting,
+    viewDetailSetting: boardRightClickViewDetailSetting,
     onDrillOptionChange: handleDrillOptionChange,
     onDateLevelChange: handleDateLevelChange,
     onDrillThroughChange: handleDrillThroughChange(),
