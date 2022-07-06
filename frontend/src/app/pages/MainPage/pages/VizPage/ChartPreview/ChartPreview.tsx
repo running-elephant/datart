@@ -220,6 +220,20 @@ const ChartPreviewBoard: FC<{
       [backendChartId, chartPreview, dispatch],
     );
 
+    const chartRightClickDrillThroughSetting = useMemo(() => {
+      const drillThroughSetting = getDrillThroughSetting(
+        chartConfigRef?.current?.interactions,
+        [],
+      );
+      return Boolean(
+        drillThroughSetting?.rules?.filter(
+          r => r.event === InteractionMouseEvent.Right,
+        ).length,
+      )
+        ? drillThroughSetting!
+        : undefined;
+    }, [getDrillThroughSetting]);
+
     const buildDrillThroughEventParams = useCallback(
       (
         clickEventParams,
@@ -667,6 +681,7 @@ const ChartPreviewBoard: FC<{
               drillOption: drillOptionRef.current,
               availableSourceFunctions,
               viewDetailSetting: chartRightClickViewDetailSetting,
+              drillThroughSetting: chartRightClickDrillThroughSetting,
               onDrillOptionChange: handleDrillOptionChange,
               onDateLevelChange: handleDateLevelChange,
               onDrillThroughChange: handleDrillThroughChange(),

@@ -18,6 +18,7 @@
 
 import {
   CrossFilteringSetting,
+  DrillThroughSetting,
   ViewDetailSetting,
 } from 'app/components/FormGenerator/Customize/Interaction/types';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
@@ -28,6 +29,7 @@ const ChartDrillContext = createContext<{
   availableSourceFunctions?: string[];
   crossFilteringSetting?: CrossFilteringSetting;
   viewDetailSetting?: ViewDetailSetting;
+  drillThroughSetting?: DrillThroughSetting;
   onDrillOptionChange?: (option: IChartDrillOption) => void;
   onDateLevelChange?: (type: string, option: any) => void;
   onViewDataChange?: () => void;

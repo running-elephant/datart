@@ -245,12 +245,22 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     [dataChart?.config?.chartConfig, chartDataView, getViewDetailSetting],
   );
 
-  const handleDrillThroughChange = useCallback(() => {
+  const boardRightClickDrillThroughSetting = useMemo(() => {
     const drillThroughSetting = getDrillThroughSetting(
       dataChart?.config?.chartConfig?.interactions,
       widgetRef?.current?.config?.customConfig?.interactions,
     );
-    if (!drillThroughSetting) {
+    return Boolean(
+      drillThroughSetting?.rules?.filter(
+        r => r.event === InteractionMouseEvent.Right,
+      ).length,
+    )
+      ? drillThroughSetting!
+      : undefined;
+  }, [dataChart?.config?.chartConfig?.interactions, getDrillThroughSetting]);
+
+  const handleDrillThroughChange = useCallback(() => {
+    if (!boardRightClickDrillThroughSetting) {
       return;
     }
     return ruleId => {
@@ -266,9 +276,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       );
     };
   }, [
-    dataChart?.config?.chartConfig?.interactions,
+    boardRightClickDrillThroughSetting,
     selectedItems,
-    getDrillThroughSetting,
     handleDrillThroughEvent,
     buildDrillThroughEventParams,
   ]);
@@ -511,6 +520,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     availableSourceFunctions,
     crossFilteringSetting: boardRightClickCrossFilteringSetting,
     viewDetailSetting: boardRightClickViewDetailSetting,
+    drillThroughSetting: boardRightClickDrillThroughSetting,
     onDrillOptionChange: handleDrillOptionChange,
     onDateLevelChange: handleDateLevelChange,
     onDrillThroughChange: handleDrillThroughChange(),
