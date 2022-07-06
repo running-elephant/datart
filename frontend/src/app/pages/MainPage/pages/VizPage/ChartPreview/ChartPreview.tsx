@@ -660,8 +660,8 @@ const ChartPreviewBoard: FC<{
           <ChartDrillContext.Provider
             value={{
               drillOption: drillOptionRef.current,
-              onDrillOptionChange: handleDrillOptionChange,
               availableSourceFunctions,
+              onDrillOptionChange: handleDrillOptionChange,
               onDateLevelChange: handleDateLevelChange,
               onDrillThroughChange: handleDrillThroughChange(),
               onViewDataChange: handleViewDataChange(),
