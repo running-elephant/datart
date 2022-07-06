@@ -333,7 +333,9 @@ export const StructView = memo(
                       <Button
                         className="run-fragment"
                         icon={<CaretRightOutlined />}
-                        onClick={() => handleInterimRunSql('MAIN')}
+                        onClick={() =>
+                          allowManage && handleInterimRunSql('MAIN')
+                        }
                       />
                     </Tooltip>
                     {t('main')}
@@ -344,6 +346,7 @@ export const StructView = memo(
                         type="MAIN"
                         sourceId={sourceId}
                         structure={structure}
+                        allowManage={allowManage}
                         onChange={handleStructureChange}
                       />
                     </Space>
@@ -358,7 +361,9 @@ export const StructView = memo(
                           <Button
                             className="run-fragment"
                             icon={<CaretRightOutlined />}
-                            onClick={() => handleInterimRunSql('JOINS', i)}
+                            onClick={() =>
+                              allowManage && handleInterimRunSql('JOINS', i)
+                            }
                           />
                         </Tooltip>
                         {t('join')}
@@ -368,12 +373,13 @@ export const StructView = memo(
                           <SelectDataSource
                             joinTable={join}
                             structure={structure}
+                            allowManage={allowManage}
                             renderType="READONLY"
                           />
                           <SelectJoinType
                             type={join.joinType!}
                             onChange={type => {
-                              handleTableJoinType(type, i);
+                              allowManage && handleTableJoinType(type, i);
                             }}
                           />
                           <SelectDataSource
@@ -381,6 +387,7 @@ export const StructView = memo(
                             joinTable={join}
                             sourceId={sourceId}
                             structure={structure}
+                            allowManage={allowManage}
                             onChange={(table, type) =>
                               handleTableJoin(table, type, i)
                             }
@@ -413,6 +420,7 @@ export const StructView = memo(
                                       conditionsIndex={ind}
                                       joinIndex={i}
                                       sourceId={sourceId}
+                                      allowManage={allowManage}
                                     />
                                     <Space className="action">
                                       {!!left.length &&
@@ -423,6 +431,7 @@ export const StructView = memo(
                                             size="small"
                                             icon={<PlusOutlined />}
                                             onClick={() =>
+                                              allowManage &&
                                               handleTableJoinAddColumns(i)
                                             }
                                           />
@@ -435,6 +444,7 @@ export const StructView = memo(
                                             size="small"
                                             icon={<CloseOutlined />}
                                             onClick={() =>
+                                              allowManage &&
                                               handleDeleteConditions(i, ind)
                                             }
                                           />
@@ -453,7 +463,9 @@ export const StructView = memo(
                           size="small"
                           className="delete-item"
                           icon={<DeleteOutlined />}
-                          onClick={() => handleDeleteJoinsItem(i)}
+                          onClick={() =>
+                            allowManage && handleDeleteJoinsItem(i)
+                          }
                         />
                       </ProcessItemAction>
                     </ProcessItem>
@@ -467,7 +479,7 @@ export const StructView = memo(
                     type="link"
                     className="join"
                     icon={<PlusOutlined />}
-                    onClick={handleAddTableJoin}
+                    onClick={allowManage ? handleAddTableJoin : undefined}
                   >
                     {t('addJoin')}
                   </Button>
