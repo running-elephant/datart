@@ -370,6 +370,12 @@ const useChartInteractions = (props: {
           drillOption,
           chartConfig?.datas,
         );
+        const hasNoSelectedItems = isEmptyArray(
+          clickEventParams?.selectedItems,
+        );
+        if (hasNoSelectedItems) {
+          return;
+        }
         (props?.openViewDetailPanel as any)({
           currentDataView: view,
           chartConfig: chartConfig,
