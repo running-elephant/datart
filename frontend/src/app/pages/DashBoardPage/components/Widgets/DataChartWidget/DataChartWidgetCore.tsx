@@ -251,14 +251,19 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       dataChart?.config?.chartConfig?.interactions,
       widgetRef?.current?.config?.customConfig?.interactions,
     );
+    const hasSelectedItems = !isEmptyArray(selectedItems);
     return Boolean(
       drillThroughSetting?.rules?.filter(
         r => r.event === InteractionMouseEvent.Right,
       ).length,
-    )
+    ) && hasSelectedItems
       ? drillThroughSetting!
       : undefined;
-  }, [dataChart?.config?.chartConfig?.interactions, getDrillThroughSetting]);
+  }, [
+    dataChart?.config?.chartConfig?.interactions,
+    getDrillThroughSetting,
+    selectedItems,
+  ]);
 
   const handleDrillThroughChange = useCallback(() => {
     if (!boardRightClickDrillThroughSetting) {

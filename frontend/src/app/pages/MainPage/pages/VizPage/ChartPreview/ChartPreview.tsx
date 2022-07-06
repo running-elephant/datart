@@ -226,14 +226,15 @@ const ChartPreviewBoard: FC<{
         chartConfigRef?.current?.interactions,
         [],
       );
+      const hasSelectedItems = !isEmptyArray(selectedItems?.[backendChartId]);
       return Boolean(
         drillThroughSetting?.rules?.filter(
           r => r.event === InteractionMouseEvent.Right,
         ).length,
-      )
+      ) && hasSelectedItems
         ? drillThroughSetting!
         : undefined;
-    }, [getDrillThroughSetting]);
+    }, [backendChartId, getDrillThroughSetting, selectedItems]);
 
     const buildDrillThroughEventParams = useCallback(
       (
