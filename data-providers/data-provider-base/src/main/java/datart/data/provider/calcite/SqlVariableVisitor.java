@@ -124,8 +124,6 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
         int startIndex = logicExpressionCall.getParserPosition().getColumnNum();
         int endIndex = logicExpressionCall.getParserPosition().getEndColumnNum();
         // 处理calcite不把左右括号算进index，导致的index错位问题
-        System.out.println(srcSql.charAt(startIndex - 1));
-        System.out.println(srcSql.charAt(startIndex));
         if (startIndex > 1 && srcSql.charAt(startIndex - 2) == '(') {
             startIndex = startIndex - 1;
         }

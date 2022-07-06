@@ -207,11 +207,12 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
           placement="bottomRight"
           content={
             <Tree
-              className="dropdown"
+              className="check-list medium"
               treeData={roleDropdownData}
               checkedKeys={checkedKeys}
               loading={false}
               selectable={false}
+              showIcon={false}
               onCheck={checkRoleColumnPermission(name)}
               blockNode
               checkable

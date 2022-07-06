@@ -24,12 +24,12 @@ import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
 import { VizHeader } from 'app/components/VizHeader';
 import { ChartDataViewFieldCategory } from 'app/constants';
+import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import useChartInteractions from 'app/hooks/useChartInteractions';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import ChartManager from 'app/models/ChartManager';
-import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
 import { selectAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { fetchAvailableSourceFunctionsForChart } from 'app/pages/ChartWorkbenchPage/slice/thunks';
@@ -119,6 +119,7 @@ const ChartPreviewBoard: FC<{
       selectAvailableSourceFunctions,
     );
     const [chartPreview, setChartPreview] = useState<ChartPreview>();
+    const chartConfigRef = useRef(chartPreview?.chartConfig);
     const [chart, setChart] = useState<IChart>();
     const [loadingStatus, setLoadingStatus] = useState<boolean>(false);
     const drillOptionRef = useRef<IChartDrillOption>();
@@ -178,6 +179,7 @@ const ChartPreviewBoard: FC<{
         setVersion(newChartPreview.version);
         setChartPreview(newChartPreview);
 
+        chartConfigRef.current = newChartPreview?.chartConfig;
         drillOptionRef.current = getChartDrillOption(
           newChartPreview?.chartConfig?.datas,
           drillOptionRef?.current,
@@ -225,7 +227,7 @@ const ChartPreviewBoard: FC<{
         ruleId?: string,
       ) => {
         const drillThroughSetting = getDrillThroughSetting(
-          chartPreview?.chartConfig?.interactions,
+          chartConfigRef?.current?.interactions,
           [],
         );
         return {
@@ -244,7 +246,7 @@ const ChartPreviewBoard: FC<{
           queryVariables: chartPreview?.backendChart?.queryVariables || [],
           computedFields: chartPreview?.backendChart?.config.computedFields,
           aggregation: chartPreview?.backendChart?.config?.aggregation,
-          chartConfig: chartPreview?.chartConfig,
+          chartConfig: chartConfigRef?.current,
           ruleId,
         };
       },
@@ -254,7 +256,7 @@ const ChartPreviewBoard: FC<{
     const buildViewDataEventParams = useCallback(
       (clickEventParams, targetEvent: InteractionMouseEvent) => {
         const viewDetailSetting = getViewDetailSetting(
-          chartPreview?.chartConfig?.interactions,
+          chartConfigRef?.current?.interactions,
           [],
         );
         const view = {
@@ -269,15 +271,11 @@ const ChartPreviewBoard: FC<{
           clickEventParams,
           targetEvent,
           viewDetailSetting,
-          chartConfig: chartPreview?.chartConfig,
+          chartConfig: chartConfigRef?.current,
           view,
         };
       },
-      [
-        chartPreview?.chartConfig,
-        chartPreview?.backendChart,
-        getViewDetailSetting,
-      ],
+      [chartPreview?.backendChart, getViewDetailSetting],
     );
 
     const handleDrillThroughChange = useCallback(() => {
@@ -350,15 +348,6 @@ const ChartPreviewBoard: FC<{
               handleViewDataEvent(
                 buildViewDataEventParams(param, InteractionMouseEvent.Left),
               );
-              if (
-                drillOptionRef.current?.isSelectedDrill &&
-                !drillOptionRef.current.isBottomLevel
-              ) {
-                const option = drillOptionRef.current;
-                option.drillDown(param.data.rowData);
-                handleDrillOptionChange(option);
-                return;
-              }
 
               if (
                 drillOptionRef.current?.isSelectedDrill &&

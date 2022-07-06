@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { EllipsisOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Menu } from 'antd';
+import { Button, ButtonProps, Dropdown, Menu } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import useWidgetAction from 'app/pages/DashBoardPage/hooks/useWidgetAction';
@@ -31,7 +31,8 @@ import { BoardContext } from '../BoardProvider/BoardProvider';
 
 export const WidgetDropdownList: React.FC<{
   widget: Widget;
-}> = memo(({ widget }) => {
+  buttonProps?: ButtonProps;
+}> = memo(({ widget, buttonProps }) => {
   const { renderMode } = useContext(BoardContext);
   const actions: WidgetActionListItem<widgetActionType>[] =
     widgetManager
@@ -77,7 +78,7 @@ export const WidgetDropdownList: React.FC<{
       trigger={['click']}
       arrow
     >
-      <Button icon={<EllipsisOutlined />} type="link" />
+      <Button icon={<EllipsisOutlined />} type="link" {...buttonProps} />
     </Dropdown>
   );
 });

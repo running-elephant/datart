@@ -21,17 +21,8 @@ import {
   DatabaseOutlined,
   TableOutlined,
 } from '@ant-design/icons';
-import {
-  Button,
-  Checkbox,
-  Divider,
-  Empty,
-  Input,
-  Menu,
-  Popover,
-  Tree,
-} from 'antd';
-import { MenuListItem } from 'app/components';
+import { Button, Checkbox, Divider, Empty, Input, Menu, Popover } from 'antd';
+import { MenuListItem, Tree } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
 import classnames from 'classnames';
@@ -309,9 +300,8 @@ const SelectDataSource = memo(
                   <Tree
                     autoExpandParent
                     defaultExpandParent
-                    showIcon
-                    blockNode
-                    // loading={!tableSchema}
+                    className="medium without-indent"
+                    loading={!tableSchema}
                     icon={renderIcon}
                     treeData={tableSchema}
                     onSelect={handleTableSelect}
@@ -443,7 +433,7 @@ const SourceList = styled.div`
 
 const DatabaseTableList = styled.div`
   flex: 1;
-  padding: 0 ${SPACE_XS};
+  padding: 0 0 ${SPACE_XS};
   overflow-y: auto;
 `;
 

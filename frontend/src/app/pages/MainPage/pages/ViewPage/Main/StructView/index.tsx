@@ -331,7 +331,7 @@ export const StructView = memo(
                   <ProcessItemLabel>
                     <Tooltip title={t('runStep')} placement="left">
                       <Button
-                        className="runFragment"
+                        className="run-fragment"
                         icon={<CaretRightOutlined />}
                         onClick={() => handleInterimRunSql('MAIN')}
                       />
@@ -356,7 +356,7 @@ export const StructView = memo(
                       <ProcessItemLabel>
                         <Tooltip title={t('runStep')} placement="left">
                           <Button
-                            className="runFragment"
+                            className="run-fragment"
                             icon={<CaretRightOutlined />}
                             onClick={() => handleInterimRunSql('JOINS', i)}
                           />
@@ -451,7 +451,7 @@ export const StructView = memo(
                         <Button
                           danger
                           size="small"
-                          className="deleteItem"
+                          className="delete-item"
                           icon={<DeleteOutlined />}
                           onClick={() => handleDeleteJoinsItem(i)}
                         />
@@ -583,14 +583,14 @@ const ProcessItem = styled.div`
   position: relative;
   display: flex;
 
-  .runFragment {
+  .run-fragment {
     position: absolute;
     top: ${SPACE_SM};
     left: ${SPACE_MD};
     display: none;
   }
 
-  .deleteItem {
+  .delete-item {
     display: none;
     font-size: ${FONT_SIZE_ICON_MD};
   }
@@ -598,10 +598,10 @@ const ProcessItem = styled.div`
   &:hover {
     background-color: ${p => p.theme.bodyBackground};
 
-    .runFragment {
+    .run-fragment {
       display: inline-block;
     }
-    .deleteItem {
+    .delete-item {
       display: inline-block;
     }
   }

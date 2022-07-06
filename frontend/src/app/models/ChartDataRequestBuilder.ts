@@ -120,18 +120,6 @@ export class ChartDataRequestBuilder {
     return this;
   }
 
-  public getColNameStringFilter(): PendingChartDataRequestFilter[] {
-    return this.buildFilters().map(v => {
-      const row = getAllColumnInMeta(this.dataView.meta)?.find(val =>
-        isEqual(val.path, v.column),
-      );
-      return {
-        ...v,
-        column: row?.name || '',
-      };
-    });
-  }
-
   private buildAggregators() {
     if (this.aggregation === false) {
       return [];
@@ -449,7 +437,7 @@ export class ChartDataRequestBuilder {
         };
       });
 
-      if (!isEmptyArray(_extraSorters)) {
+    if (!isEmptyArray(_extraSorters)) {
       return _extraSorters;
     }
     return originalSorters.filter(sorter => Boolean(sorter?.operator));
@@ -550,16 +538,20 @@ export class ChartDataRequestBuilder {
       },
       [],
     );
-    return Array.from(
-      new Set(
-        selectColumns.map(col => {
-          return {
-            alias: this.buildAliasName(col),
-            column: this.buildColumnName(col),
-          };
-        }),
-      ),
-    );
+
+    return selectColumns
+      ?.reduce<ChartDataSectionField[]>((acc, cur) => {
+        if (acc.find(x => x?.colName === cur.colName)) {
+          return acc;
+        }
+        return acc.concat(cur);
+      }, [])
+      ?.map(col => {
+        return {
+          alias: this.buildAliasName(col),
+          column: this.buildColumnName(col),
+        };
+      });
   }
 
   private buildViewConfigs() {
@@ -605,7 +597,6 @@ export class ChartDataRequestBuilder {
     const validFilters = this.removeInvalidFilter(
       this.buildFilters().filter(f => !f.aggOperator),
     );
-
     return {
       ...this.buildViewConfigs(),
       viewId: this.dataView?.id,
@@ -619,5 +610,17 @@ export class ChartDataRequestBuilder {
       script: this.script,
       params: this.variableParams,
     };
+  }
+
+  public getColNameStringFilter(): PendingChartDataRequestFilter[] {
+    return this.buildFilters().map(v => {
+      const row = getAllColumnInMeta(this.dataView.meta)?.find(val =>
+        isEqual(val.path, v.column),
+      );
+      return {
+        ...v,
+        column: row?.name || '',
+      };
+    });
   }
 }

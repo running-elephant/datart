@@ -19,8 +19,8 @@
 import {
   CalendarOutlined,
   DatabaseOutlined,
-  FieldNumberOutlined,
   FieldStringOutlined,
+  NumberOutlined,
   SearchOutlined,
   TableOutlined,
 } from '@ant-design/icons';
@@ -77,11 +77,14 @@ export const Resource = memo(() => {
   const buildTableColumnNode = (ancestors: string[] = [], table) => {
     const children =
       table?.columns?.map(column => {
-        return buildAntdTreeNodeModel(
-          ancestors.concat(table.tableName),
-          column?.name[0],
-          [],
-          true,
+        return Object.assign(
+          buildAntdTreeNodeModel(
+            ancestors.concat(table.tableName),
+            column?.name[0],
+            [],
+            true,
+          ),
+          { type: column?.type },
         );
       }) || [];
     return buildAntdTreeNodeModel(ancestors, table.tableName, children, false);
@@ -116,22 +119,22 @@ export const Resource = memo(() => {
     }
   }, [dispatch, sourceId, databaseTreeModel, editorCompletionItemProviderRef]);
 
-  const renderIcon = useCallback(({ value }) => {
+  const renderIcon = useCallback(({ value, type }) => {
     if (Array.isArray(value)) {
       switch (value.length) {
         case 1:
           return <DatabaseOutlined />;
         case 2:
           return <TableOutlined />;
-      }
-    } else {
-      switch (value.type as DataViewFieldType) {
-        case DataViewFieldType.STRING:
-          return <FieldStringOutlined />;
-        case DataViewFieldType.NUMERIC:
-          return <FieldNumberOutlined />;
-        case DataViewFieldType.DATE:
-          return <CalendarOutlined />;
+        case 3:
+          switch (type as DataViewFieldType) {
+            case DataViewFieldType.STRING:
+              return <FieldStringOutlined />;
+            case DataViewFieldType.NUMERIC:
+              return <NumberOutlined />;
+            case DataViewFieldType.DATE:
+              return <CalendarOutlined />;
+          }
       }
     }
   }, []);
