@@ -103,6 +103,7 @@ const DataModelTree: FC = memo(() => {
         return { title: v, key: [...tableName, v] };
       });
       const joinTable: any = [];
+
       for (let i = 0; i < script.joins.length; i++) {
         const tableName = script.joins[i].table!;
         const childrenData = script.joins[i]['columns']?.map((v, i) => {
@@ -115,6 +116,7 @@ const DataModelTree: FC = memo(() => {
           children: childrenData,
         });
       }
+
       const treeData = [
         {
           title: tableName?.join('.'),

@@ -1767,15 +1767,9 @@ export const getChartSelection = (
 export function getAllColumnInMeta(
   meta?: ChartDataViewMeta[],
 ): ChartDataViewMeta[] | undefined {
-  if (!meta) {
-    return meta;
-  }
-
-  const allColumn: any = meta.reduce<ChartDataViewMeta[]>((arr, cur) => {
+  return meta?.reduce<ChartDataViewMeta[]>((arr, cur) => {
     return cur.children ? arr.concat(cur.children) : arr.concat([cur]);
   }, []);
-
-  return allColumn;
 }
 
 /**

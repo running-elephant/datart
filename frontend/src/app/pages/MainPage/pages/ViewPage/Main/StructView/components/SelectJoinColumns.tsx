@@ -18,38 +18,54 @@
 
 import { TreeSelect } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { memo, useCallback, useEffect } from 'react';
+import { DatabaseSchema } from 'app/pages/MainPage/pages/ViewPage/slice/types';
+import { memo, useCallback, useEffect, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { SPACE_SM } from 'styles/StyleConstants';
+import { selectAllSourceDatabaseSchemas } from '../../../slice/selectors';
 import { JoinTableProps, StructViewQueryProps } from '../../../slice/types';
-
+import { getTableAllColumns } from '../../../utils';
 interface SelectJoinColumnsProps {
   structure: StructViewQueryProps;
   joinTable: JoinTableProps;
   conditionsIndex: number;
   joinIndex: number;
+  sourceId: string;
   onChange: (field, type, index) => void;
 }
 
 const SelectJoinColumns = memo(
   ({
     structure,
-    onChange,
     joinTable,
     conditionsIndex,
     joinIndex,
+    sourceId,
+    onChange,
   }: SelectJoinColumnsProps) => {
     const t = useI18NPrefix(`view.structView`);
+    const allDatabaseSchemas = useSelector(selectAllSourceDatabaseSchemas);
+
+    const currentDatabaseSchemas = useMemo((): DatabaseSchema[] => {
+      return allDatabaseSchemas[sourceId];
+    }, [allDatabaseSchemas, sourceId]);
 
     const handleLeftColumn = useCallback(() => {
       const tableName = structure.table;
-      const childrenData = structure['columns']?.map((v, i) => {
+      const mainColumn = getTableAllColumns(tableName, currentDatabaseSchemas);
+      const childrenData = mainColumn?.map((v, i) => {
         return { title: v, key: [...tableName, v] };
       });
       const joinTable: any = [];
+
       for (let i = 0; i < joinIndex; i++) {
         const tableName = structure.joins[i].table!;
-        const childrenData = structure.joins[i]['columns']?.map((v, i) => {
+        const joinColumn = getTableAllColumns(
+          tableName,
+          currentDatabaseSchemas,
+        );
+        const childrenData = joinColumn?.map((v, i) => {
           return { title: v, key: [...tableName, v] };
         });
         joinTable.push({
@@ -59,6 +75,7 @@ const SelectJoinColumns = memo(
           children: childrenData,
         });
       }
+
       const treeData = [
         {
           title: tableName[tableName.length - 1],
@@ -68,12 +85,17 @@ const SelectJoinColumns = memo(
         },
         ...joinTable,
       ];
+
       return treeData;
-    }, [joinIndex, structure]);
+    }, [joinIndex, structure, currentDatabaseSchemas]);
 
     const handleRightColumn = useCallback((): any => {
       const joinTableName = joinTable.table!;
-      const childrenData = joinTable.columns?.map((v, i) => {
+      const joinColumn = getTableAllColumns(
+        joinTableName,
+        currentDatabaseSchemas,
+      );
+      const childrenData = joinColumn?.map((v, i) => {
         return { title: v, key: [...joinTableName, v] };
       });
       const treeData: any = [
@@ -85,7 +107,7 @@ const SelectJoinColumns = memo(
         },
       ];
       return treeData;
-    }, [joinTable.table, joinTable.columns]);
+    }, [joinTable.table, currentDatabaseSchemas]);
 
     useEffect(() => {
       handleLeftColumn();

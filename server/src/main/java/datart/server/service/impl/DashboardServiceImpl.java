@@ -306,7 +306,9 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         createParam.setOrgId(orgId);
         createParam.setConfig(model.getDashboard().getConfig());
         createParam.setName(name);
-        createParam.setParentId(parent.getId());
+        if (parent != null) {
+            createParam.setParentId(parent.getId());
+        }
         createParam.setStatus((short) Const.DATA_STATUS_ACTIVE);
         Folder folder = createWithFolder(createParam);
         if (CollectionUtils.isNotEmpty(model.getWidgets())) {

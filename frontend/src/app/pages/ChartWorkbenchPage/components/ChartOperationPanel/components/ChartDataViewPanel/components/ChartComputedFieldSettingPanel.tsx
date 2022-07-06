@@ -221,6 +221,7 @@ const ChartComputedFieldSettingPanel: FC<{
             <Tabs.TabPane tab={`${t('field')}`} key="field">
               {viewType === 'STRUCT' ? (
                 <Tree
+                  className="medium"
                   loading={false}
                   showIcon={false}
                   treeData={fields as TreeDataNode[]}

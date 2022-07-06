@@ -22,6 +22,7 @@ import datart.core.base.consts.Const;
 import datart.core.base.exception.Exceptions;
 import datart.core.base.exception.NotFoundException;
 import datart.core.base.exception.ParamException;
+import datart.core.common.Application;
 import datart.core.common.DateUtils;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
@@ -357,6 +358,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
                 rscMapper.batchInsert(columnPermission);
             }
         }
+        Application.getBean(DataProviderService.class).updateSource(retrieve(view.getSourceId(), Source.class, false));
         return ViewService.super.update(updateParam);
     }
 

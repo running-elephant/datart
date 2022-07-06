@@ -15,40 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ListTitle } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { FC, memo } from 'react';
+import { FC, memo, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { LayerTree } from './LayerTree';
+
 export const LayerTreePanel: FC<{}> = memo(() => {
   const t = useI18NPrefix(`viz.board.action`);
+  const titleProps = useMemo(
+    () => ({
+      title: t('widgetList'),
+      // search: true,
+      // onSearch: null,
+    }),
+    [t],
+  );
+
   return (
-    <StyledWrapper>
-      <h3 className="title">{t('widgetList')}</h3>
-      <div className="layerTree-box">
-        <LayerTree />
-      </div>
-      <div className="bottom"> </div>
-    </StyledWrapper>
+    <Panel>
+      <ListTitle {...titleProps} />
+      <LayerTree />
+    </Panel>
   );
 });
-const StyledWrapper = styled.div`
+const Panel = styled.div`
   display: flex;
   flex-direction: column;
-  width: 190px;
-  min-width: 190px;
-  max-width: 190px;
-  overflow-y: auto;
+  width: 200px;
   background-color: ${p => p.theme.componentBackground};
   box-shadow: ${p => p.theme.shadowSider};
-  & .title {
-    text-align: center;
-  }
-  & .layerTree-box {
-    min-height: 0;
-    overflow-y: auto;
-  }
-  & .bottom {
-    padding: 5px;
-    text-align: center;
-  }
 `;
