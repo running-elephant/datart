@@ -50,6 +50,7 @@ import React, {
 } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
+import { isEmptyArray } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
 import { changeSelectedItems } from '../../../pages/BoardEditor/slice/actions/actions';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
@@ -245,12 +246,27 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     [dataChart?.config?.chartConfig, chartDataView, getViewDetailSetting],
   );
 
-  const handleDrillThroughChange = useCallback(() => {
+  const boardRightClickDrillThroughSetting = useMemo(() => {
     const drillThroughSetting = getDrillThroughSetting(
       dataChart?.config?.chartConfig?.interactions,
       widgetRef?.current?.config?.customConfig?.interactions,
     );
-    if (!drillThroughSetting) {
+    const hasSelectedItems = !isEmptyArray(selectedItems);
+    return Boolean(
+      drillThroughSetting?.rules?.filter(
+        r => r.event === InteractionMouseEvent.Right,
+      ).length,
+    ) && hasSelectedItems
+      ? drillThroughSetting!
+      : undefined;
+  }, [
+    dataChart?.config?.chartConfig?.interactions,
+    getDrillThroughSetting,
+    selectedItems,
+  ]);
+
+  const handleDrillThroughChange = useCallback(() => {
+    if (!boardRightClickDrillThroughSetting) {
       return;
     }
     return ruleId => {
@@ -266,19 +282,24 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       );
     };
   }, [
-    dataChart?.config?.chartConfig?.interactions,
+    boardRightClickDrillThroughSetting,
     selectedItems,
-    getDrillThroughSetting,
     handleDrillThroughEvent,
     buildDrillThroughEventParams,
   ]);
 
-  const handleCrossFilteringChange = useCallback(() => {
+  const boardRightClickCrossFilteringSetting = useMemo(() => {
     const crossFilteringSetting = getCrossFilteringSetting(
       dataChart?.config?.chartConfig?.interactions,
       widgetRef?.current?.config?.customConfig?.interactions,
     );
-    if (!crossFilteringSetting) {
+    return crossFilteringSetting?.event === InteractionMouseEvent.Right
+      ? crossFilteringSetting
+      : undefined;
+  }, [dataChart?.config?.chartConfig?.interactions, getCrossFilteringSetting]);
+
+  const handleCrossFilteringChange = useCallback(() => {
+    if (!boardRightClickCrossFilteringSetting) {
       return;
     }
     return () => {
@@ -294,20 +315,31 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       );
     };
   }, [
-    dataChart?.config?.chartConfig?.interactions,
+    boardRightClickCrossFilteringSetting,
     selectedItems,
-    getCrossFilteringSetting,
     handleCrossFilteringEvent,
     buildCrossFilteringEventParams,
     onWidgetLinkEvent,
   ]);
 
-  const handleViewDataChange = useCallback(() => {
+  const boardRightClickViewDetailSetting = useMemo(() => {
     const viewDetailSetting = getViewDetailSetting(
       dataChart?.config?.chartConfig?.interactions,
       widgetRef?.current?.config?.customConfig?.interactions,
     );
-    if (!viewDetailSetting) {
+    const hasSelectedItems = !isEmptyArray(selectedItems);
+    return viewDetailSetting?.event === InteractionMouseEvent.Right &&
+      hasSelectedItems
+      ? viewDetailSetting
+      : undefined;
+  }, [
+    dataChart?.config?.chartConfig?.interactions,
+    getViewDetailSetting,
+    selectedItems,
+  ]);
+
+  const handleViewDataChange = useCallback(() => {
+    if (!boardRightClickViewDetailSetting) {
       return;
     }
     return () => {
@@ -319,9 +351,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       );
     };
   }, [
-    dataChart?.config?.chartConfig?.interactions,
+    boardRightClickViewDetailSetting,
     selectedItems,
-    getViewDetailSetting,
     handleViewDataEvent,
     buildViewDataEventParams,
   ]);
@@ -495,10 +526,14 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     widgetSpecialConfig,
     scale,
   ]);
+
   const drillContextVal = {
     drillOption: drillOptionRef.current,
-    onDrillOptionChange: handleDrillOptionChange,
     availableSourceFunctions,
+    crossFilteringSetting: boardRightClickCrossFilteringSetting,
+    viewDetailSetting: boardRightClickViewDetailSetting,
+    drillThroughSetting: boardRightClickDrillThroughSetting,
+    onDrillOptionChange: handleDrillOptionChange,
     onDateLevelChange: handleDateLevelChange,
     onDrillThroughChange: handleDrillThroughChange(),
     onCrossFilteringChange: handleCrossFilteringChange(),

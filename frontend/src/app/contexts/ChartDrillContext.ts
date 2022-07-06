@@ -16,12 +16,20 @@
  * limitations under the License.
  */
 
+import {
+  CrossFilteringSetting,
+  DrillThroughSetting,
+  ViewDetailSetting,
+} from 'app/components/FormGenerator/Customize/Interaction/types';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { createContext } from 'react';
 
 const ChartDrillContext = createContext<{
   drillOption?: IChartDrillOption;
   availableSourceFunctions?: string[];
+  crossFilteringSetting?: CrossFilteringSetting;
+  viewDetailSetting?: ViewDetailSetting;
+  drillThroughSetting?: DrillThroughSetting;
   onDrillOptionChange?: (option: IChartDrillOption) => void;
   onDateLevelChange?: (type: string, option: any) => void;
   onViewDataChange?: () => void;

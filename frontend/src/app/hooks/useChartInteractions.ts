@@ -38,7 +38,7 @@ import {
 } from 'app/utils/internalChartHelper';
 import qs from 'qs';
 import { useCallback } from 'react';
-import { isEmpty } from 'utils/object';
+import { isEmpty, isEmptyArray } from 'utils/object';
 import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 
 const useChartInteractions = (props: {
@@ -172,6 +172,12 @@ const useChartInteractions = (props: {
         const sourceChartNonAggFilters = (sourceChartFilters || []).filter(
           f => !Boolean(f.aggOperator),
         );
+        const hasNoSelectedItems = isEmptyArray(
+          clickEventParams?.selectedItems,
+        );
+        if (hasNoSelectedItems) {
+          return;
+        }
 
         (drillThroughSetting?.rules || [])
           .filter(rule => rule.event === targetEvent)
@@ -364,6 +370,12 @@ const useChartInteractions = (props: {
           drillOption,
           chartConfig?.datas,
         );
+        const hasNoSelectedItems = isEmptyArray(
+          clickEventParams?.selectedItems,
+        );
+        if (hasNoSelectedItems) {
+          return;
+        }
         (props?.openViewDetailPanel as any)({
           currentDataView: view,
           chartConfig: chartConfig,

@@ -97,9 +97,14 @@ export const FullScreenPanel: React.FC<{}> = memo(() => {
           <FullHeader>
             <div onClick={toggle}>
               {collapsed ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+              &nbsp;
               <span>{widgetMap[itemId].config.name}</span>
             </div>
-            <Button className="close-fullscreen" onClick={closeFullScreen}>
+            <Button
+              size="small"
+              className="close-fullscreen"
+              onClick={closeFullScreen}
+            >
               {t('exitFullScreen')}
             </Button>
           </FullHeader>
@@ -142,11 +147,11 @@ const FullScreenWrap = styled.div<{ show: boolean }>`
   .full-container {
     display: flex;
     flex: 1;
+    position: relative;
   }
 
   .full-menu {
     position: absolute;
-    top: 64px;
     left: ${p => (p.show ? '0' : '-300px')};
     z-index: ${LEVEL_10};
     width: 300px;

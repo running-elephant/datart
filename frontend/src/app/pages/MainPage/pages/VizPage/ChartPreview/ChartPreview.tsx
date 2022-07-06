@@ -56,6 +56,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
+import { isEmptyArray } from 'utils/object';
 import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 import useDisplayViewDetail from '../hooks/useDisplayViewDetail';
 import useQSLibUrlHelper from '../hooks/useQSLibUrlHelper';
@@ -220,6 +221,21 @@ const ChartPreviewBoard: FC<{
       [backendChartId, chartPreview, dispatch],
     );
 
+    const chartRightClickDrillThroughSetting = useMemo(() => {
+      const drillThroughSetting = getDrillThroughSetting(
+        chartConfigRef?.current?.interactions,
+        [],
+      );
+      const hasSelectedItems = !isEmptyArray(selectedItems?.[backendChartId]);
+      return Boolean(
+        drillThroughSetting?.rules?.filter(
+          r => r.event === InteractionMouseEvent.Right,
+        ).length,
+      ) && hasSelectedItems
+        ? drillThroughSetting!
+        : undefined;
+    }, [backendChartId, getDrillThroughSetting, selectedItems]);
+
     const buildDrillThroughEventParams = useCallback(
       (
         clickEventParams,
@@ -308,12 +324,25 @@ const ChartPreviewBoard: FC<{
       buildDrillThroughEventParams,
     ]);
 
-    const handleViewDataChange = useCallback(() => {
+    const chartRightClickViewDetailSetting = useMemo(() => {
       const viewDetailSetting = getViewDetailSetting(
         chartPreview?.chartConfig?.interactions,
         [],
       );
-      if (!viewDetailSetting) {
+      const hasSelectedItems = !isEmptyArray(selectedItems?.[backendChartId]);
+      return viewDetailSetting?.event === InteractionMouseEvent.Right &&
+        hasSelectedItems
+        ? viewDetailSetting
+        : undefined;
+    }, [
+      backendChartId,
+      chartPreview?.chartConfig?.interactions,
+      getViewDetailSetting,
+      selectedItems,
+    ]);
+
+    const handleViewDataChange = useCallback(() => {
+      if (!chartRightClickViewDetailSetting) {
         return;
       }
       return () => {
@@ -328,12 +357,11 @@ const ChartPreviewBoard: FC<{
         );
       };
     }, [
-      chartPreview?.chartConfig?.interactions,
+      chartRightClickViewDetailSetting,
       selectedItems,
       backendChartId,
       handleViewDataEvent,
       buildViewDataEventParams,
-      getViewDetailSetting,
     ]);
 
     const registerChartEvents = useCallback(
@@ -660,8 +688,10 @@ const ChartPreviewBoard: FC<{
           <ChartDrillContext.Provider
             value={{
               drillOption: drillOptionRef.current,
-              onDrillOptionChange: handleDrillOptionChange,
               availableSourceFunctions,
+              viewDetailSetting: chartRightClickViewDetailSetting,
+              drillThroughSetting: chartRightClickDrillThroughSetting,
+              onDrillOptionChange: handleDrillOptionChange,
               onDateLevelChange: handleDateLevelChange,
               onDrillThroughChange: handleDrillThroughChange(),
               onViewDataChange: handleViewDataChange(),
