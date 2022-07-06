@@ -1,4 +1,6 @@
 import { FONT_DEFAULT } from 'app/constants';
+import { initInteractionTpl } from 'app/pages/DashBoardPage/components/WidgetManager/utils/init';
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import {
   BoardType,
   ControllerWidgetContent,
@@ -13,6 +15,7 @@ import {
   APP_VERSION_BETA_0,
   APP_VERSION_BETA_2,
   APP_VERSION_BETA_4,
+  APP_VERSION_BETA_4_2,
 } from './../constants';
 import { WidgetBeta3 } from './types';
 import {
@@ -102,6 +105,33 @@ export const beta4 = (boardType: BoardType, widget?: Widget | WidgetBeta3) => {
   return beta4Widget as Widget;
 };
 
+export const beta4_2 = (
+  boardType: BoardType,
+  widget?: Widget | WidgetBeta3,
+) => {
+  if (!widget) {
+    return undefined;
+  }
+  if (!versionCanDo(APP_VERSION_BETA_4_2, widget?.config.version)) {
+    return widget as Widget;
+  }
+  let beta4Widget = widget as any;
+  const allowedOriginalTypes = [
+    ORIGINAL_TYPE_MAP.ownedChart,
+    ORIGINAL_TYPE_MAP.linkedChart,
+  ];
+  if (!allowedOriginalTypes.includes(beta4Widget?.config?.originalType)) {
+    return beta4Widget as Widget;
+  }
+  if (!beta4Widget?.config?.customConfig?.interactions) {
+    if (beta4Widget?.config?.customConfig) {
+      beta4Widget.config.customConfig.interactions = [...initInteractionTpl()];
+      beta4Widget.config.version = APP_VERSION_BETA_4_2;
+    }
+  }
+  return beta4Widget as Widget;
+};
+
 const finaleWidget = (widget?: Widget) => {
   if (!widget) return undefined;
   widget.config = setLatestVersion(widget.config);
@@ -144,9 +174,9 @@ export const migrateWidgets = (
 
       let beta4Widget = beta4(boardType, resWidget);
 
-      beta4Widget = finaleWidget(beta4Widget as Widget);
+      beta4_2(boardType, resWidget);
 
-      return beta4Widget;
+      return finaleWidget(beta4Widget as Widget);
     })
     .filter(widget => !!widget);
   return targetWidgets as Widget[];
