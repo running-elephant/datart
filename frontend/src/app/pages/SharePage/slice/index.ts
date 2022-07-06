@@ -32,7 +32,7 @@ import { FilterSqlOperator } from 'globalConstants';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { Omit } from 'utils/object';
 import {
-  fetchAvailableSourceFunctions,
+  fetchAvailableSourceFunctionsForShare,
   fetchShareDataSetByPreviewChartAction,
   fetchShareVizInfo,
   getOauth2Clients,
@@ -228,7 +228,7 @@ export const slice = createSlice({
         }));
       })
       .addCase(
-        fetchAvailableSourceFunctions.fulfilled,
+        fetchAvailableSourceFunctionsForShare.fulfilled,
         (state, { payload }) => {
           state.availableSourceFunctions = payload;
         },

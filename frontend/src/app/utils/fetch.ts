@@ -41,7 +41,7 @@ export const getDistinctFields = async (
   viewId: string,
   columns: string[],
   view: ChartDTO['view'] | undefined,
-  executeToken: ExecuteToken | undefined,
+  executeToken: Record<string, ExecuteToken> | undefined,
 ) => {
   const viewConfigs = transformToViewConfig(view?.config);
   const requestParams: ChartDataRequest = {
@@ -67,12 +67,13 @@ export const getDistinctFields = async (
     viewId,
     ...viewConfigs,
   };
+
   if (executeToken) {
     const { data } = await request2<ChartDataSetDTO>({
       method: 'POST',
       url: `shares/execute`,
       params: {
-        executeToken: executeToken?.authorizedToken,
+        executeToken: executeToken[viewId].authorizedToken,
       },
       data: requestParams,
     });
@@ -173,6 +174,20 @@ export async function fetchAvailableSourceFunctionsAsync(sourceId) {
   const response = await request2<string[]>({
     method: 'POST',
     url: `data-provider/function/support/${sourceId}`,
+  });
+  return response?.data;
+}
+
+export async function fetchAvailableSourceFunctionsAsyncForShare(
+  sourceId,
+  executeToken,
+) {
+  const response = await request2<string[]>({
+    method: 'POST',
+    url: `shares/function/support/${sourceId}`,
+    data: {
+      authorizedToken: executeToken,
+    },
   });
   return response?.data;
 }

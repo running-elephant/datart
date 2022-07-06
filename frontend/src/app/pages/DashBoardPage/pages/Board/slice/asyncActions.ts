@@ -19,9 +19,11 @@ import { DownloadFileType } from 'app/constants';
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
+import { ExecuteToken } from 'app/pages/SharePage/slice/types';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import { RootState } from 'types';
+import { UniqWith } from 'utils/object';
 import { boardActions } from '.';
 import { getBoardChartRequests } from '../../../utils';
 import {
@@ -51,9 +53,10 @@ export const handleServerBoardAction =
     data: ServerDashboard;
     renderMode: VizRenderMode;
     filterSearchMap?: FilterSearchParamsWithMatch;
+    executeToken?: Record<string, ExecuteToken>;
   }) =>
   async (dispatch, getState) => {
-    const { data, renderMode, filterSearchMap } = params;
+    const { data, renderMode, filterSearchMap, executeToken } = params;
     const dashboard = getDashBoardByResBoard(data);
     const { datacharts, views: serverViews, widgets: serverWidgets } = data;
 
@@ -83,12 +86,21 @@ export const handleServerBoardAction =
     const viewViews = getChartDataView(serverViews, allDataCharts);
 
     if (viewViews) {
-      const sourceIdList = Array.from(
-        new Set(Object.values(viewViews).map(v => v.sourceId)),
+      const idList = UniqWith(
+        Object.values(viewViews).map(v => {
+          return { sourceId: v.sourceId, viewId: v.id };
+        }),
+        (a, b) => a.sourceId === b.sourceId,
       );
 
-      sourceIdList.forEach(sourceId => {
-        dispatch(fetchAvailableSourceFunctions(sourceId));
+      idList.forEach(({ sourceId, viewId }) => {
+        dispatch(
+          fetchAvailableSourceFunctions({
+            sourceId: sourceId,
+            authorizedToken: executeToken?.[viewId]?.authorizedToken || '',
+            renderMode,
+          }),
+        );
       });
     }
 

@@ -188,87 +188,87 @@ export const Toolbar = memo(
 
     return (
       <Container>
-        {type === 'SQL' ? (
-          <Operates>
-            <Space split={<Divider type="vertical" className="divider" />}>
-              {allowManage && (
-                <Select
-                  placeholder={t('source')}
-                  value={sourceId}
-                  bordered={false}
-                  disabled={isArchived}
-                  onChange={sourceChange}
-                  className="source"
-                >
-                  {sources.map(({ id, name }) => (
-                    <Select.Option key={id} value={id}>
-                      {name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              )}
-              <Space>
-                <Tooltip
-                  title={
-                    <TipTitle
-                      title={[
-                        `${fragment ? t('runSelection') : t('run')}`,
-                        t('runWinTip'),
-                        t('runMacTip'),
-                      ]}
-                    />
-                  }
-                  placement="bottom"
-                >
-                  <ToolbarButton
-                    icon={
-                      stage === ViewViewModelStages.Running ? (
-                        <PauseOutlined />
-                      ) : (
-                        <CaretRightOutlined />
-                      )
-                    }
-                    color={fragment ? WARNING : INFO}
-                    onClick={onRun}
-                  />
-                </Tooltip>
-                <Tooltip title={t('beautify')} placement="bottom">
-                  <ToolbarButton
-                    icon={<AlignCenterOutlined />}
+        <Operates>
+          <Space split={<Divider type="vertical" className="divider" />}>
+            {type === 'SQL' && (
+              <>
+                {allowManage && (
+                  <Select
+                    placeholder={t('source')}
+                    value={sourceId}
+                    bordered={false}
                     disabled={isArchived}
-                    onClick={formatSQL}
-                  />
-                </Tooltip>
-              </Space>
-              <Dropdown
-                trigger={['click']}
-                overlay={
-                  <Menu onClick={sizeMenuClick}>
-                    {PREVIEW_SIZE_LIST.map(s => (
-                      <Menu.Item key={s}>{s}</Menu.Item>
+                    onChange={sourceChange}
+                    className="source"
+                  >
+                    {sources.map(({ id, name }) => (
+                      <Select.Option key={id} value={id}>
+                        {name}
+                      </Select.Option>
                     ))}
-                  </Menu>
-                }
-              >
-                <ToolbarButton size="small">{`Limit: ${size}`}</ToolbarButton>
-              </Dropdown>
-              <Chronograph
-                running={stage === ViewViewModelStages.Running}
-                status={
-                  error
-                    ? 'error'
-                    : stage >= ViewViewModelStages.Running
-                    ? stage === ViewViewModelStages.Running
-                      ? 'processing'
-                      : 'success'
-                    : 'default'
-                }
-              />
-            </Space>
-          </Operates>
-        ) : (
-          <Operates></Operates>
-        )}
+                  </Select>
+                )}
+                <Space>
+                  <Tooltip
+                    title={
+                      <TipTitle
+                        title={[
+                          `${fragment ? t('runSelection') : t('run')}`,
+                          t('runWinTip'),
+                          t('runMacTip'),
+                        ]}
+                      />
+                    }
+                    placement="bottom"
+                  >
+                    <ToolbarButton
+                      icon={
+                        stage === ViewViewModelStages.Running ? (
+                          <PauseOutlined />
+                        ) : (
+                          <CaretRightOutlined />
+                        )
+                      }
+                      color={fragment ? WARNING : INFO}
+                      onClick={onRun}
+                    />
+                  </Tooltip>
+                  <Tooltip title={t('beautify')} placement="bottom">
+                    <ToolbarButton
+                      icon={<AlignCenterOutlined />}
+                      disabled={isArchived}
+                      onClick={formatSQL}
+                    />
+                  </Tooltip>
+                </Space>
+              </>
+            )}
+            <Dropdown
+              trigger={['click']}
+              overlay={
+                <Menu onClick={sizeMenuClick}>
+                  {PREVIEW_SIZE_LIST.map(s => (
+                    <Menu.Item key={s}>{s}</Menu.Item>
+                  ))}
+                </Menu>
+              }
+            >
+              <ToolbarButton size="small">{`Limit: ${size}`}</ToolbarButton>
+            </Dropdown>
+            <Chronograph
+              running={stage === ViewViewModelStages.Running}
+              status={
+                error
+                  ? 'error'
+                  : stage >= ViewViewModelStages.Running
+                  ? stage === ViewViewModelStages.Running
+                    ? 'processing'
+                    : 'success'
+                  : 'default'
+              }
+            />
+          </Space>
+        </Operates>
 
         <Actions>
           <Space>
