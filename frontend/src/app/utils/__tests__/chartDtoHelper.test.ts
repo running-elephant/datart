@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { APP_VERSION_BETA_4 } from 'app/migration/constants';
 import {
   buildUpdateChartRequest,
   convertToChartConfigDTO,
@@ -45,8 +46,77 @@ describe('chartDtoHelper Test', () => {
             children: undefined,
           },
         ],
+        computedFields: undefined,
         type: 'SQL',
         version: '1.0.0-beta.4',
+      },
+    });
+  });
+
+  test('should convert to chart dto for computedFields', () => {
+    const data = {
+      config: JSON.stringify({ id: 1 }),
+      view: {
+        model: JSON.stringify({
+          version: APP_VERSION_BETA_4,
+          hierarchy: {
+            'root.age': {
+              category: 'UNCATEGORIZED',
+              displayName: 'root.age',
+              index: 1,
+              name: 'root.age',
+              path: ['root', 'age'],
+              type: 'STRING',
+            },
+          },
+          columns: {
+            'root.age': {
+              category: 'UNCATEGORIZED',
+              name: 'root.age',
+              type: 'STRING',
+            },
+          },
+          computedFields: [
+            {
+              category: 'computedField',
+              expression: '[root].[name]',
+              id: 'viewComputerField1',
+              isViewComputedFields: true,
+              type: 'STRING',
+            },
+          ],
+        }),
+        type: 'STRUCT',
+      },
+    };
+    const dto = convertToChartDto(data);
+    expect(dto).toEqual({
+      config: { id: 1 },
+      view: {
+        meta: [
+          {
+            category: 'field',
+            children: undefined,
+            displayName: 'root.age',
+            index: 1,
+            id: 'root.age',
+            name: 'root.age',
+            path: ['root', 'age'],
+            subType: 'UNCATEGORIZED',
+            type: 'STRING',
+          },
+        ],
+        computedFields: [
+          {
+            category: 'computedField',
+            expression: '[root].[name]',
+            id: 'viewComputerField1',
+            isViewComputedFields: true,
+            type: 'STRING',
+          },
+        ],
+        type: 'STRUCT',
+        version: APP_VERSION_BETA_4,
       },
     });
   });

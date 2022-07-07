@@ -539,7 +539,9 @@ export const ChartEditor: FC<ChartEditorProps> = ({
                 aggregation,
                 chartConfig: chartConfig,
                 chartGraphId: chart?.meta?.id,
-                computedFields: dataview?.computedFields,
+                computedFields: dataview?.computedFields?.filter(
+                  v => !v.isViewComputedFields,
+                ),
               }),
               viewId: dataview?.id,
               avatar: chart?.meta?.id,
