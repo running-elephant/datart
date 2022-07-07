@@ -36,7 +36,6 @@ import {
   RoseChart,
   ScatterOutlineMapChart,
   Scorecard,
-  ScoreChart,
   StackAreaChart,
   StackBarChart,
   StackColumnChart,
@@ -111,7 +110,6 @@ class ChartManager {
     return [
       new MingXiTableChart(),
       new PivotSheetChart(),
-      new ScoreChart(),
       new Scorecard(),
       new ClusterColumnChart(),
       new ClusterBarChart(),
