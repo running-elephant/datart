@@ -30,6 +30,7 @@ import org.apache.calcite.sql.fun.SqlBetweenOperator;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParserPos;
+import org.apache.calcite.sql.pretty.SqlPrettyWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -55,6 +56,8 @@ public class SqlBuilder {
 
     private String namePrefix;
 
+    private String srcSql;
+
     private SqlBuilder() {
     }
 
@@ -78,6 +81,10 @@ public class SqlBuilder {
         return this;
     }
 
+    public SqlBuilder withSrc(String srcSql) {
+        this.srcSql = srcSql;
+        return this;
+    }
 
     public SqlBuilder withExecuteParam(ExecuteParam executeParam) {
         this.executeParam = executeParam;
@@ -205,22 +212,38 @@ public class SqlBuilder {
         if (selectList.size() == 0) {
             selectList.add(SqlIdentifier.star(SqlParserPos.ZERO));
         }
-
-        SqlSelect sqlSelect = new SqlSelect(SqlParserPos.ZERO,
-                keywordList,
-                selectList,
-                from,
-                where,
-                groupBy.size() > 0 ? groupBy : null,
-                having,
-                null,
-                orderBy.size() > 0 ? orderBy : null,
-                offset,
-                fetch,
-                null);
-        return SqlNodeUtils.toSql(sqlSelect, this.dialect, quoteIdentifiers);
+        if (onlySql()){
+            SqlNode simpleSqlNode = SqlParserUtils.createParser(srcSql, this.dialect).parseQuery();
+            SqlPrettyWriter sqlPrettyWriter = new SqlPrettyWriter(this.dialect);
+            sqlPrettyWriter.startList(SqlWriter.FrameTypeEnum.SELECT);
+            sqlPrettyWriter.fetchOffset(fetch,offset);
+            return SqlNodeUtils.toSql(simpleSqlNode, this.dialect, quoteIdentifiers) + sqlPrettyWriter.toSqlString();
+        }else {
+            SqlSelect sqlSelect = new SqlSelect(SqlParserPos.ZERO,
+                    keywordList,
+                    selectList,
+                    from,
+                    where,
+                    groupBy.size() > 0 ? groupBy : null,
+                    having,
+                    null,
+                    orderBy.size() > 0 ? orderBy : null,
+                    offset,
+                    fetch,
+                    null);
+            return SqlNodeUtils.toSql(sqlSelect, this.dialect, quoteIdentifiers);
+        }
     }
 
+    private boolean onlySql() {
+        return CollectionUtils.isEmpty(executeParam.getAggregators()) &&
+                CollectionUtils.isEmpty(executeParam.getColumns()) &&
+                CollectionUtils.isEmpty(executeParam.getFunctionColumns()) &&
+                CollectionUtils.isEmpty(executeParam.getFilters()) &&
+                CollectionUtils.isEmpty(executeParam.getGroups()) &&
+                CollectionUtils.isEmpty(executeParam.getKeywords()) &&
+                CollectionUtils.isEmpty(executeParam.getOrders());
+    }
     private SqlNode createAggNode(AggregateOperator operator) {
         SqlNode sqlNode;
         String columnKey = operator.getColumnKey();
