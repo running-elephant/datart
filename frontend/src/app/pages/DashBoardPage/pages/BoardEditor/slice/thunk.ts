@@ -440,7 +440,6 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
   {
     boardId: string;
     widgetId: string;
-    isUnSelectedAll?: boolean;
     option?: getDataOption;
     extraFilters?: PendingChartDataRequestFilter[];
     variableParams?: Record<string, any[]>;
@@ -449,14 +448,7 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
 >(
   'board/syncEditBoardWidgetChartDataAsync',
   async (
-    {
-      boardId,
-      widgetId,
-      isUnSelectedAll,
-      option,
-      extraFilters,
-      variableParams,
-    },
+    { boardId, widgetId, option, extraFilters, variableParams },
     { getState, dispatch },
   ) => {
     const boardState = getState() as { board: BoardState };

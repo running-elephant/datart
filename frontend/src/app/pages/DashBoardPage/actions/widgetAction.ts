@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { ChartDataSectionType } from 'app/constants';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartMouseEventParams } from 'app/types/Chart';
 import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
@@ -228,13 +229,16 @@ export const widgetLinkEventAction =
       const dataChart = dataChartMap?.[targetWidget.datachartId];
       const dimensionNames = dataChart?.config?.chartConfig?.datas?.flatMap(
         d => {
-          if (d.type === 'group' || d.type === 'color') {
+          if (
+            d.type === ChartDataSectionType.Group ||
+            d.type === ChartDataSectionType.Color
+          ) {
             return d.rows?.map(r => r.colName) || [];
           }
           return [];
         },
       );
-      const widgetSelectedItems =
+      const targetWidgetSelectedItems =
         renderMode === 'read'
           ? viewBoardState?.selectedItems?.[targetWidget.id]
           : editBoardState.selectedItemsMap.selectedItems?.[targetWidget.id];
@@ -243,7 +247,6 @@ export const widgetLinkEventAction =
       );
       const filterObj = clickEventParam?.filters;
       const isUnSelectedAll = clickEventParam?.isUnSelectedAll;
-
       const clickFilters: PendingChartDataRequestFilter[] = Object.entries(
         filterObj || {},
       )
@@ -254,17 +257,21 @@ export const widgetLinkEventAction =
             values: (v as any)?.map(vv => ({ value: vv, valueType: 'STRING' })),
           };
         })
-        .filter(
-          f =>
-            isEmptyArray(widgetSelectedItems) ||
-            !dimensionNames?.includes(f.column),
+        .filter(f =>
+          moveFilterIfHasSelectedItems(
+            targetWidgetSelectedItems,
+            dimensionNames,
+            f.column,
+          ),
         );
       const sourceLinkFilters = sourceWidgetRuntimeLinkInfo?.filters?.filter(
         f =>
-          isEmptyArray(widgetSelectedItems) ||
-          !dimensionNames?.includes(f.column),
+          moveFilterIfHasSelectedItems(
+            targetWidgetSelectedItems,
+            dimensionNames,
+            f.column,
+          ),
       );
-
       const widgetInfo = boardWidgetInfoRecord?.[targetWidget.id];
       const { filterParams: controllerFilters, variableParams } =
         getTheWidgetFiltersAndParams<PendingChartDataRequestFilter>({
@@ -277,7 +284,6 @@ export const widgetLinkEventAction =
         boardId: targetWidget.dashboardId,
         widgetId: targetWidget.id,
         option: widgetInfo,
-        isUnSelectedAll,
         extraFilters: isUnSelectedAll
           ? controllerFilters || []
           : (clickFilters || [])
@@ -665,3 +671,11 @@ export const changeEditGroupRectAction =
       );
     }
   };
+
+const moveFilterIfHasSelectedItems = (
+  selectedItems,
+  dimensionNames,
+  filterName,
+) => {
+  return isEmptyArray(selectedItems) || !dimensionNames?.includes(filterName);
+};
