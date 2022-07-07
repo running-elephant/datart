@@ -50,7 +50,6 @@ export interface renderMataProps extends Omit<ChartDataViewMeta, 'children'> {
   dateLevelFields?: Array<dateLevelFieldsProps>;
   children?: Array<renderMataProps>;
   selectedItems?: Array<renderMataProps>;
-  isViewComputedFields?: boolean;
   displayName?: string;
 }
 
