@@ -144,7 +144,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       });
     });
     if (selectedItems?.length !== newSelectedItems?.length) {
-      // TODO(Stephen): to be rewrite chart selected implement.
+      // TODO(Stephen): to be finish rewrite chart selected implement.
       // onUpdateWidgetSelectedItems(widgetRef.current, newSelectedItems);
     }
   }, [

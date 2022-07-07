@@ -29,7 +29,6 @@ import ChartDataView from 'app/types/ChartDataView';
 import { formatTime } from 'app/utils/time';
 import {
   BOARD_COPY_CHART_SUFFIX,
-  BOARD_SELF_CHART_PREFIX,
   FilterSqlOperator,
   TIME_FORMATTER,
 } from 'globalConstants';
@@ -597,16 +596,10 @@ export const getWidgetMap = (
     .filter(w => w.config.originalType === ORIGINAL_TYPE_MAP.ownedChart)
     .forEach(widget => {
       let dataChart = (widget.config.content as any).dataChart as DataChart;
-      // TODO(Stephen): to be check if need regenerate uuid id
-      const ownedDataChartId =
-        dataChart?.id ||
-        `${BOARD_SELF_CHART_PREFIX}${widget.dashboardId}_${widget.id}`;
       if (dataChart) {
-        dataChart.id = ownedDataChartId;
-
         wrappedDataCharts.push(dataChart!);
       }
-      widget.datachartId = ownedDataChartId;
+      widget.datachartId = dataChart?.id;
     });
 
   // 处理 widget包含关系 tab Widget 被包含的 widget.parentId 不为空

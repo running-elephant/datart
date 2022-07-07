@@ -261,7 +261,6 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
     )
       .addVariableParams(variableParams)
       .addExtraSorters(option?.sorters as any[])
-      // TODO(Stephen): filter out same link filters
       .addRuntimeFilters(extraFilters)
       .addDrillOption(drillOption)
       .build();
