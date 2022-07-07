@@ -67,7 +67,6 @@ export const getDistinctFields = async (
     viewId,
     ...viewConfigs,
   };
-
   if (executeToken) {
     const { data } = await request2<ChartDataSetDTO>({
       method: 'POST',
@@ -79,12 +78,12 @@ export const getDistinctFields = async (
     });
     return filterSqlOperatorName(requestParams, data);
   } else {
-    const { data } = await request2<ChartDataSetDTO>({
+    const response = await request2<ChartDataSetDTO>({
       method: 'POST',
       url: `data-provider/execute`,
       data: requestParams,
     });
-    return filterSqlOperatorName(requestParams, data);
+    return filterSqlOperatorName(requestParams, response?.data);
   }
 };
 

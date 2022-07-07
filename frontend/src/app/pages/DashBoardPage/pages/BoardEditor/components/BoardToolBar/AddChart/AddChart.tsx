@@ -86,7 +86,7 @@ export const AddChart = () => {
       />
       {widgetChartVisible && (
         <ChartEditor
-          dataChartId={`${BOARD_SELF_CHART_PREFIX}` + uuidv4()}
+          dataChartId={`${BOARD_SELF_CHART_PREFIX}${boardId}_${uuidv4()}`} // TODO(Stephen): widget id issue: generate uuid from frontend for own/link chart
           orgId={orgId}
           chartType="widgetChart"
           container="widget"

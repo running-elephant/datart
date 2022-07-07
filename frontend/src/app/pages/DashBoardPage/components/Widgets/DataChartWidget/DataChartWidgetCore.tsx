@@ -20,7 +20,10 @@ import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMe
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
-import { ChartDataViewFieldCategory } from 'app/constants';
+import {
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+} from 'app/constants';
 import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import useChartInteractions from 'app/hooks/useChartInteractions';
@@ -37,6 +40,7 @@ import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import {
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
+  transformToDataSet,
 } from 'app/utils/chartHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import produce from 'immer';
@@ -89,6 +93,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     onWidgetLinkEvent,
     onWidgetGetData,
     onWidgetDataUpdate,
+    onUpdateWidgetSelectedItems,
   } = useContext(WidgetActionContext);
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
   const widgetRef = useRef<Widget>(widget);
@@ -107,6 +112,47 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     openViewDetailPanel: openViewDetailPanel as any,
     openJumpDialogModal: jumpDialogModal.info,
   });
+
+  useEffect(() => {
+    if (isEmptyArray(selectedItems)) {
+      return;
+    }
+    // recomputed selected items with dataset values
+    const dataConfigs = dataChart?.config?.chartConfig?.datas;
+    const chartDataSet = transformToDataSet(
+      dataset?.rows,
+      dataset?.columns,
+      dataConfigs,
+    );
+    const dimensionFields = (dataConfigs || [])
+      .filter(
+        c =>
+          c.type === ChartDataSectionType.Group ||
+          c.type === ChartDataSectionType.Color,
+      )
+      .flatMap(c => c.rows || []);
+    const dimensionValuesByField = dimensionFields?.map(field => {
+      return {
+        fieldName: field.colName,
+        values: chartDataSet?.map(row => row.getCell(field)),
+      };
+    });
+    const newSelectedItems = selectedItems?.filter(item => {
+      const rowData = item?.data?.rowData || {};
+      return dimensionValuesByField.every(({ fieldName, values }) => {
+        return (values || []).includes(rowData[fieldName]);
+      });
+    });
+    if (selectedItems?.length !== newSelectedItems?.length) {
+      // TODO(Stephen): to be finish rewrite chart selected implement.
+      // onUpdateWidgetSelectedItems(widgetRef.current, newSelectedItems);
+    }
+  }, [
+    dataChart?.config?.chartConfig?.datas,
+    dataset,
+    onUpdateWidgetSelectedItems,
+    selectedItems,
+  ]);
 
   useEffect(() => {
     widgetRef.current = widget;

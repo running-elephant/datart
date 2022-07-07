@@ -47,6 +47,7 @@ import {
   editBoardStackActions,
   editDashBoardInfoActions,
   editWidgetInfoActions,
+  editWidgetSelectedItemsActions,
 } from '../../pages/BoardEditor/slice';
 import {
   clearActiveWidgets,
@@ -97,7 +98,6 @@ export const WidgetActionProvider: FC<{
           },
           60,
         ),
-
         onEditDeleteActiveWidgets: debounce((ids?: string[]) => {
           dispatch(deleteWidgetsAction(ids));
         }, 200),
@@ -150,7 +150,6 @@ export const WidgetActionProvider: FC<{
           }
           dispatch(editBoardStackActions.updateWidgetConfigByKey(ops));
         },
-
         onWidgetUpdate: (widget: Widget) => {
           if (boardEditing) {
             dispatch(editBoardStackActions.updateWidget(widget));
@@ -167,7 +166,23 @@ export const WidgetActionProvider: FC<{
             }),
           );
         },
-        //
+        onUpdateWidgetSelectedItems: (widget: Widget, selectedItems) => {
+          if (boardEditing) {
+            dispatch(
+              editWidgetSelectedItemsActions.changeSelectedItemsInEditor({
+                wid: widget?.id,
+                data: selectedItems,
+              }),
+            );
+          } else {
+            dispatch(
+              boardActions.changeSelectedItems({
+                wid: widget?.id,
+                data: selectedItems,
+              }),
+            );
+          }
+        },
         onWidgetChartClick: (widget: Widget, params: ChartMouseEventParams) => {
           dispatch(
             widgetChartClickAction({
@@ -180,7 +195,6 @@ export const WidgetActionProvider: FC<{
             }),
           );
         },
-
         onWidgetClearLinkage: (widget: Widget) => {
           dispatch(
             widgetToClearLinkageAction(boardEditing, widget, renderMode),
@@ -197,7 +211,6 @@ export const WidgetActionProvider: FC<{
         onWidgetGetData: (widget: Widget) => {
           dispatch(widgetGetDataAction(boardEditing, widget, renderMode));
         },
-
         onEditChartWidget: (widget: Widget) => {
           const originalType = widget.config.originalType;
           const chartType =
@@ -231,14 +244,6 @@ export const WidgetActionProvider: FC<{
             }),
           );
         },
-        // onEditWidgetLinkage: (widgetId: string) => {},
-
-        // onEditWidgetCloseLinkage: (widget: Widget) => {
-        //   dispatch(closeLinkageAction(widget));
-        // },
-        // onEditWidgetCloseJump: (widget: Widget) => {
-        //   dispatch(closeJumpAction(widget));
-        // },
         onEditWidgetLock: (id: string) => {
           dispatch(editBoardStackActions.toggleLockWidget({ id, lock: true }));
         },
@@ -290,8 +295,8 @@ export interface WidgetActionContextProps {
   onWidgetsQuery: () => void;
   onRenderedWidgetById: (wid: string) => void;
   onChangeGroupRect: (args: { wid: string; w: number; h: number }) => void;
-
   onWidgetLinkEvent: (widget: Widget) => (params) => void;
+  onUpdateWidgetSelectedItems: (widget: Widget, selectedItems) => void;
 
   onWidgetDataUpdate: ({
     computedFields,
