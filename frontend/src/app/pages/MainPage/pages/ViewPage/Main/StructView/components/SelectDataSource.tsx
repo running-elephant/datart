@@ -56,6 +56,7 @@ interface SelectDataSourceProps {
   structure?: StructViewQueryProps;
   sourceId?: string;
   joinTable?: JoinTableProps;
+  allowManage: boolean;
   onChange?: (data: any, type) => void;
 }
 
@@ -66,6 +67,7 @@ const SelectDataSource = memo(
     structure,
     sourceId,
     joinTable,
+    allowManage,
     onChange,
   }: SelectDataSourceProps) => {
     const dispatch = useDispatch();
@@ -275,7 +277,7 @@ const SelectDataSource = memo(
           trigger={['click']}
           placement="bottomLeft"
           overlayClassName="datart-popup"
-          visible={visible}
+          visible={allowManage && visible}
           onVisibleChange={
             renderType === 'MANAGE' ? handleVisibleChange : undefined
           }
@@ -366,10 +368,11 @@ const SelectDataSource = memo(
                       currentTableAllColumns.length
                   }
                   onChange={e => {
-                    handleCheckAllColumns(
-                      e.target.checked,
-                      currentTableAllColumns,
-                    );
+                    allowManage &&
+                      handleCheckAllColumns(
+                        e.target.checked,
+                        currentTableAllColumns,
+                      );
                   }}
                   checked={
                     selectedTableSchema?.columns.length ===
@@ -381,7 +384,7 @@ const SelectDataSource = memo(
                 <SmallDivider />
                 <ColumnList
                   value={selectedTableSchema?.columns}
-                  onChange={handleColumnCheck}
+                  onChange={allowManage ? handleColumnCheck : undefined}
                   options={currentTableAllColumns}
                 />
               </PopoverBody>

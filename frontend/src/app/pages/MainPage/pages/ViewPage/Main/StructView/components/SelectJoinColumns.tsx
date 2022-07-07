@@ -32,6 +32,7 @@ interface SelectJoinColumnsProps {
   conditionsIndex: number;
   joinIndex: number;
   sourceId: string;
+  allowManage: boolean;
   onChange: (field, type, index) => void;
 }
 
@@ -42,6 +43,7 @@ const SelectJoinColumns = memo(
     conditionsIndex,
     joinIndex,
     sourceId,
+    allowManage,
     onChange,
   }: SelectJoinColumnsProps) => {
     const t = useI18NPrefix(`view.structView`);
@@ -122,7 +124,7 @@ const SelectJoinColumns = memo(
           treeDefaultExpandAll={true}
           value={joinTable.conditions?.[conditionsIndex]?.left.slice(-1)}
           onChange={columnName => {
-            onChange(columnName || [], 'left', conditionsIndex);
+            allowManage && onChange(columnName || [], 'left', conditionsIndex);
           }}
           treeData={handleLeftColumn()}
         />
@@ -134,7 +136,7 @@ const SelectJoinColumns = memo(
           treeDefaultExpandAll={true}
           value={joinTable.conditions?.[conditionsIndex]?.right.slice(-1)}
           onChange={columnName => {
-            onChange(columnName || [], 'right', conditionsIndex);
+            allowManage && onChange(columnName || [], 'right', conditionsIndex);
           }}
           treeData={handleRightColumn()}
         />

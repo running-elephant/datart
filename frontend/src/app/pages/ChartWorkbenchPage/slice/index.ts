@@ -24,6 +24,7 @@ import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import { mergeChartAndViewComputedField } from 'app/utils/chartHelper';
 import { transformHierarchyMeta } from 'app/utils/internalChartHelper';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
@@ -175,13 +176,11 @@ const workbenchSlice = createSlice({
         }
         if (payload.model) {
           const model = JSON.parse(payload.model);
-          const viewComputerFields = (model.computedFields || []).map(v => {
-            return {
-              ...v,
-              isViewComputedFields: true,
-            };
-          });
-          computedFields = computedFields.concat(viewComputerFields);
+          const viewComputerFields = model.computedFields || [];
+          computedFields = mergeChartAndViewComputedField(
+            computedFields,
+            viewComputerFields,
+          );
         }
 
         if (index !== undefined) {
@@ -216,11 +215,13 @@ const workbenchSlice = createSlice({
         if (!state.shadowChartConfig) {
           state.shadowChartConfig = state.chartConfig;
         }
-
         state.currentDataView = {
           ...payload.view,
           variables: payload.queryVariables || [],
-          computedFields: chartConfigDTO?.computedFields || [],
+          computedFields: mergeChartAndViewComputedField(
+            chartConfigDTO?.computedFields,
+            payload.view.computedFields,
+          ),
         };
         state.backendChart = payload;
         state.aggregation =

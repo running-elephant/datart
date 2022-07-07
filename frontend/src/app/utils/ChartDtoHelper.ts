@@ -45,6 +45,7 @@ export function convertToChartDto(data): ChartDTO {
     view: {
       ...Omit(data?.view, ['model']),
       meta: transformHierarchyMeta(data?.view?.model),
+      computedFields: JSON.parse(data?.view?.model).computedFields,
     },
   });
 }
