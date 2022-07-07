@@ -126,7 +126,8 @@ export const BoardEditor: React.FC<{
         if (widgetInfo) {
           let subType: 'widgetChart' | 'dataChart' = 'dataChart';
           if (!widgetInfo.dataChart.id) {
-            widgetInfo.dataChart.id = `${BOARD_SELF_CHART_PREFIX}` + uuidv4();
+            // TODO(Stephen): to be extract to util to generate own chart id
+            widgetInfo.dataChart.id = `${BOARD_SELF_CHART_PREFIX}${boardId}_${uuidv4()}`;
             subType = 'widgetChart';
           }
           dispatch(

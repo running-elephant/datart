@@ -452,8 +452,9 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
     { getState, dispatch },
   ) => {
     const boardState = getState() as { board: BoardState };
-    const widgetMapMap = boardState.board.widgetRecord;
-    const widgetMap = widgetMapMap[boardId];
+    const rootState = getState() as RootState;
+    const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
+    const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
     const curWidget = widgetMap[widgetId];
     if (!curWidget) {
       return null;

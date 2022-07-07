@@ -202,14 +202,17 @@ export const widgetLinkEventAction =
     const targetLinkDataChartIds = (params || []).map(p => p.rule?.relId);
     const rootState = getState() as RootState;
     const viewBoardState = rootState.board as BoardState;
-    const editBoardState = rootState.editBoard as EditBoardState;
-    const widgetMapMap = viewBoardState?.widgetRecord;
+    const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
+    const widgetMapMap =
+      renderMode === 'read'
+        ? viewBoardState?.widgetRecord?.[widget?.dashboardId]
+        : editBoardState.stack?.present?.widgetRecord;
     const boardWidgetInfoRecord =
       renderMode === 'read'
         ? viewBoardState?.widgetInfoRecord?.[widget?.dashboardId]
         : editBoardState.widgetInfoRecord;
     const dataChartMap = viewBoardState.dataChartMap;
-    const widgetMap = widgetMapMap?.[widget?.dashboardId] || {};
+    const widgetMap = widgetMapMap || {};
     const sourceWidgetInfo = boardWidgetInfoRecord?.[widget.id];
     const sourceWidgetRuntimeLinkInfo = sourceWidgetInfo?.linkInfo || {};
     const {
@@ -220,15 +223,11 @@ export const widgetLinkEventAction =
       widgetMap: widgetMap,
       params: undefined,
     });
-
-    const boardLinkWidgets = Object.entries(
-      widgetMapMap?.[widget?.dashboardId] || {},
-    )
+    const boardLinkWidgets = Object.entries(widgetMapMap || {})
       .filter(([k, v]) => {
         return targetLinkDataChartIds.includes(v.datachartId);
       })
       .map(([k, v]) => v);
-
     boardLinkWidgets.forEach(targetWidget => {
       const dataChart = dataChartMap?.[targetWidget.datachartId];
       const dimensionNames = dataChart?.config?.chartConfig?.datas?.flatMap(
