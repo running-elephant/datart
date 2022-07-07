@@ -60,7 +60,6 @@ export const ChartDraggableSourceContainer: FC<
   {
     isActive?: boolean;
     viewType?: string;
-    isViewComputerField?: boolean;
     availableSourceFunctions?: string[];
     selectedItemsIds?: string[];
     displayName?: string;
@@ -81,7 +80,7 @@ export const ChartDraggableSourceContainer: FC<
   availableSourceFunctions,
   role,
   children,
-  isViewComputerField,
+  isViewComputedFields,
   viewType,
   displayName,
   folderRole,
@@ -162,7 +161,7 @@ export const ChartDraggableSourceContainer: FC<
       return (
         <Menu onClick={e => _handleMenuClick(e, colName)}>
           <Menu.Item key="edit">{t('editField')}</Menu.Item>
-          <Menu.Item disabled={isViewComputerField} key="delete">
+          <Menu.Item disabled={isViewComputedFields} key="delete">
             {t('deleteField')}
           </Menu.Item>
         </Menu>
@@ -303,7 +302,7 @@ export const ChartDraggableSourceContainer: FC<
     category,
     colName,
     children,
-    isViewComputerField,
+    isViewComputedFields,
     isHierarchyFieldOrTable,
     displayName,
     folderRole,
@@ -336,7 +335,7 @@ export const ChartDraggableSourceContainer: FC<
           folderRole={role}
           children={item.children}
           viewType={viewType}
-          isViewComputerField={item.isViewComputedFields}
+          isViewComputedFields={item.isViewComputedFields}
           isActive={selectedItemsIds?.includes(item.name)}
           availableSourceFunctions={availableSourceFunctions}
           onDeleteComputedField={onDeleteComputedField}
