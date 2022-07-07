@@ -20,6 +20,10 @@ import { ChartDataSectionType } from 'app/constants';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartMouseEventParams } from 'app/types/Chart';
 import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import {
+  filterFiltersByInteractionRule,
+  filterVariablesByInteractionRule,
+} from 'app/utils/internalChartHelper';
 import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
 import { RootState } from 'types';
@@ -264,14 +268,14 @@ export const widgetLinkEventAction =
             f.column,
           ),
         );
-      const sourceLinkFilters = sourceWidgetRuntimeLinkInfo?.filters?.filter(
-        f =>
+      const sourceLinkFilters =
+        sourceWidgetRuntimeLinkInfo?.filters?.filter(f =>
           moveFilterIfHasSelectedItems(
             targetWidgetSelectedItems,
             dimensionNames,
             f.column,
           ),
-      );
+        ) || [];
       const widgetInfo = boardWidgetInfoRecord?.[targetWidget.id];
       const { filterParams: controllerFilters, variableParams } =
         getTheWidgetFiltersAndParams<PendingChartDataRequestFilter>({
@@ -279,6 +283,20 @@ export const widgetLinkEventAction =
           widgetMap: widgetMap,
           params: undefined,
         });
+      const sourceLinkAndControllerFilterByRule =
+        filterFiltersByInteractionRule(
+          clickEventParam?.rule,
+          ...sourceLinkFilters,
+          ...sourceControllerFilters,
+        );
+      const sourceLinkAndControllerVariablesByRule =
+        filterVariablesByInteractionRule(
+          clickEventParam?.rule,
+          Object.assign(
+            sourceWidgetRuntimeLinkInfo?.variables || {},
+            sourceVariableParams,
+          ),
+        );
 
       const fetchChartDataParam = {
         boardId: targetWidget.dashboardId,
@@ -288,14 +306,12 @@ export const widgetLinkEventAction =
           ? controllerFilters || []
           : (clickFilters || [])
               .concat(controllerFilters || [])
-              .concat(sourceLinkFilters || [])
-              .concat(sourceControllerFilters || []),
+              .concat(sourceLinkAndControllerFilterByRule || []),
         variableParams: isUnSelectedAll
           ? variableParams || {}
           : Object.assign(
               variableParams,
-              sourceWidgetRuntimeLinkInfo?.variables,
-              sourceVariableParams,
+              sourceLinkAndControllerVariablesByRule,
             ),
       };
 
