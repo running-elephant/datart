@@ -146,7 +146,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const expensiveQuery = useMemo(() => {
     try {
       return dataview?.config
-        ? Boolean(JSON.parse(dataview.config).expensiveQuery)
+        ? Boolean(JSON.parse(dataview.config || '{}').expensiveQuery)
         : false;
     } catch (error) {
       console.log(error);

@@ -127,6 +127,7 @@ export const fieldsSortByType = (fields, sortType) => {
   return fields.sort((a, b) => {
     if (sortType === 'byNameSort') {
       if (a.type === ChartDataViewFieldCategory.Field) {
+        // TODO(Stephen): why use json parse for id
         const aId = JSON.parse(a.id);
         const bId = JSON.parse(b.id);
 

@@ -16,24 +16,23 @@
  * limitations under the License.
  */
 
-import { createListenerMiddleware } from '@reduxjs/toolkit';
+import { createListenerMiddleware, isRejected } from '@reduxjs/toolkit';
 import message from 'antd/lib/message';
 
 const rejectedErrorHandlerMiddleware = createListenerMiddleware();
 
 rejectedErrorHandlerMiddleware.startListening({
-  predicate: action => true,
+  predicate: isRejected,
   effect: async (action: any, listenerApi) => {
     listenerApi.cancelActiveListeners();
     await listenerApi.delay(100);
 
-    // TODO(Stephen): confirm if it needed now
-    // process some special action rejected model
-    if (action?.type === 'workbench/fetchDataSetAction/rejected') {
+    if (action?.payload?.message) {
       message.error(action?.payload?.message);
     } else if (action?.error) {
       message.error((action as any)?.error?.message);
     }
+    console.error(`Redux Rejection Error | `, action);
   },
 });
 

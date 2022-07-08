@@ -44,7 +44,7 @@ import { ChartDTO } from 'app/types/ChartDTO';
  * @description 'server task 定时任务 调用'
  */
 const getBoardQueryData = (dataStr: string) => {
-  var data = JSON.parse(dataStr) as ServerDashboard;
+  var data = JSON.parse(dataStr || '{}') as ServerDashboard;
 
   // const renderMode: VizRenderMode = 'schedule';
   const dashboard = getDashBoardByResBoard(data);
@@ -81,8 +81,10 @@ const getBoardQueryData = (dataStr: string) => {
 
 const getChartQueryData = (dataStr: string) => {
   // see  handleCreateDownloadDataTask
-  const data: ChartDTO = JSON.parse(dataStr);
-  const dataConfig: ChartDetailConfigDTO = JSON.parse(data.config as any);
+  const data: ChartDTO = JSON.parse(dataStr || '{}');
+  const dataConfig: ChartDetailConfigDTO = JSON.parse(
+    (data.config as any) || '{}',
+  );
   const chartConfig: ChartConfig = dataConfig.chartConfig as ChartConfig;
   const builder = new ChartDataRequestBuilder(
     {

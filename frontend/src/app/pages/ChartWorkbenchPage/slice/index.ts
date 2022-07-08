@@ -175,7 +175,7 @@ const workbenchSlice = createSlice({
           computedFields = state?.backendChart?.config?.computedFields || [];
         }
         if (payload.model) {
-          const model = JSON.parse(payload.model);
+          const model = JSON.parse(payload.model || '{}');
           const viewComputerFields = model.computedFields || [];
           computedFields = mergeChartAndViewComputedField(
             computedFields,
