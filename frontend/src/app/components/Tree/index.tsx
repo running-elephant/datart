@@ -69,7 +69,7 @@ const StyledDirectoryTree = styled(AntTree)`
       width: ${SPACE};
       height: ${SPACE};
       content: '';
-      background-color: ${p => p.theme.borderColorBase};
+      background-color: ${p => p.theme.borderColorEmphasis};
       border-radius: 50%;
       transform: translate(-50%, -50%);
     }
