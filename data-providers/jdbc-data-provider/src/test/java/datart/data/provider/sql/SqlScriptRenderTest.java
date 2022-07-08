@@ -36,7 +36,6 @@ import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParserPos;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -88,17 +87,17 @@ public class SqlScriptRenderTest {
         for (SqlTestEntity sqlTest : list) {
             QueryScript queryScript = ParamFactory.getQueryScriptExample(sqlTest.getSql());
             SqlScriptRender render = new SqlScriptRender(queryScript, sqlTest.getExecuteParam(), sqlTest.getSqlDialect(), enableSpecialSql);
-            boolean withExecParam = sqlTest.getExecuteParam()!=null;
+            boolean withExecParam = sqlTest.getExecuteParam() != null;
             String parsedSql = render.render(withExecParam, false, false);
-            if (sqlTest.getExecuteParam()==null) {
+            if (sqlTest.getExecuteParam() == null) {
                 sqlTest.setDesireSql(covertDesiredSql(sqlTest.getDesireSql(), sqlTest.getSqlDialect()));
             } else {
                 parsedSql = SqlStringUtils.cleanupSql(parsedSql);
             }
             boolean result = parsedSql.equalsIgnoreCase(sqlTest.getDesireSql());
-            if (!result){
+            if (!result) {
                 Exceptions.msg("sql validate failed! \n" + sqlTest +
-                        " the parsed sql: "+parsedSql);
+                        " the parsed sql: " + parsedSql);
             }
         }
     }
@@ -110,18 +109,18 @@ public class SqlScriptRenderTest {
             try {
                 render.render(false, false, false);
             } catch (DataProviderException e) {
-                if ("message.sql.op.forbidden".equals(e.getMessage())){
+                if ("message.sql.op.forbidden".equals(e.getMessage())) {
                     continue;
                 }
                 Exceptions.e(e);
             }
-            Exceptions.msg("The forbidden sql test passed, should be forbid, enableSpecialSqlState: "+enableSpecialSql+"\n"+sqlTest);
+            Exceptions.msg("The forbidden sql test passed, should be forbid, enableSpecialSqlState: " + enableSpecialSql + "\n" + sqlTest);
         }
     }
 
     private String covertDesiredSql(String sql, SqlDialect sqlDialect) {
         SqlBasicCall sqlBasicCall = new SqlBasicCall(SqlStdOperatorTable.AS
-                , new SqlNode[]{new SqlFragment("( " + sql + " )"), new SqlIdentifier(T, SqlParserPos.ZERO.withQuoting(true))}
+                , new SqlNode[]{new SqlFragment("SELECT *  FROM  ( " + sql + " )"), new SqlIdentifier(T, SqlParserPos.ZERO.withQuoting(true))}
                 , SqlParserPos.ZERO);
         return sqlBasicCall.toSqlString(sqlDialect).getSql().trim();
     }
