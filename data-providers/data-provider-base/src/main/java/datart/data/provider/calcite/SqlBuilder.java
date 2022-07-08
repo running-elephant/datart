@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 
 public class SqlBuilder {
 
-    private SqlNode from;
+    private QueryScriptProcessResult queryScriptProcessResult;
 
     private final Map<String, SqlNode> functionColumnMap = new HashMap<>();
 
@@ -56,7 +56,6 @@ public class SqlBuilder {
 
     private String namePrefix;
 
-    private String srcSql;
 
     private SqlBuilder() {
     }
@@ -76,13 +75,9 @@ public class SqlBuilder {
         return this;
     }
 
-    public SqlBuilder withFrom(SqlNode from) {
-        this.from = from;
-        return this;
-    }
 
-    public SqlBuilder withSrc(String srcSql) {
-        this.srcSql = srcSql;
+    public SqlBuilder withQueryScriptProcessResult(QueryScriptProcessResult queryScriptProcessResult) {
+        this.queryScriptProcessResult = queryScriptProcessResult;
         return this;
     }
 
@@ -213,7 +208,7 @@ public class SqlBuilder {
             selectList.add(SqlIdentifier.star(SqlParserPos.ZERO));
         }
         if (onlySql()){
-            SqlNode simpleSqlNode = SqlParserUtils.createParser(srcSql, this.dialect).parseQuery();
+            SqlNode simpleSqlNode = SqlParserUtils.createParser(queryScriptProcessResult.getSrcSql(), this.dialect).parseQuery();
             SqlPrettyWriter sqlPrettyWriter = new SqlPrettyWriter(this.dialect);
             sqlPrettyWriter.startList(SqlWriter.FrameTypeEnum.SELECT);
             sqlPrettyWriter.fetchOffset(fetch,offset);
@@ -222,7 +217,7 @@ public class SqlBuilder {
             SqlSelect sqlSelect = new SqlSelect(SqlParserPos.ZERO,
                     keywordList,
                     selectList,
-                    from,
+                    queryScriptProcessResult.getFrom(),
                     where,
                     groupBy.size() > 0 ? groupBy : null,
                     having,
