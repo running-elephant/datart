@@ -72,6 +72,7 @@ export const TreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
 const Item = styled.div`
   display: flex;
   flex: 1;
+  align-items: center;
 
   h4 {
     flex: 1;
