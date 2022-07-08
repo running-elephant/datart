@@ -103,7 +103,7 @@ export const RichTextWidgetCore: React.FC<RichTextWidgetProps> = ({
             widget.config.content,
             draft => {
               (draft as any).richText = {
-                content: JSON.parse(strContents),
+                content: JSON.parse(strContents || '{}'),
               };
             },
           ) as any;

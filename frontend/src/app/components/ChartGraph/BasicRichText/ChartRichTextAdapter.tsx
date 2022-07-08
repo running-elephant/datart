@@ -98,7 +98,7 @@ const ChartRichTextAdapter: FC<{
     >('color');
 
     useEffect(() => {
-      const value = (initContent && JSON.parse(initContent)) || '';
+      const value = (initContent && JSON.parse(initContent || '{}')) || '';
       setQuillValue(value);
     }, [initContent]);
 

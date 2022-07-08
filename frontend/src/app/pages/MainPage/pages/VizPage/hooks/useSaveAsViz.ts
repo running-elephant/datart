@@ -55,7 +55,7 @@ export function useSaveAsViz() {
       let vizData = await getVizDetail(vizId, type).then(data => {
         return data;
       });
-      const boardType = JSON.parse(vizData.config)?.type;
+      const boardType = JSON.parse(vizData.config || '{}')?.type;
 
       showSaveForm({
         vizType: type,

@@ -379,7 +379,7 @@ export function transformMeta(model?: string) {
   if (!model) {
     return undefined;
   }
-  const jsonObj = JSON.parse(model);
+  const jsonObj = JSON.parse(model || '{}');
   const HierarchyModel = 'hierarchy' in jsonObj ? jsonObj.hierarchy : jsonObj;
   return Object.keys(HierarchyModel || {}).flatMap(colKey => {
     const column = HierarchyModel[colKey];
@@ -404,7 +404,7 @@ export function transformHierarchyMeta(model?: string): ChartDataViewMeta[] {
   if (!model) {
     return [];
   }
-  const modelObj = JSON.parse(model);
+  const modelObj = JSON.parse(model || '{}');
   const hierarchyMeta = !Object.keys(modelObj?.hierarchy || {}).length
     ? modelObj.columns
     : modelObj.hierarchy;
@@ -659,7 +659,7 @@ export const transformToViewConfig = (
 } => {
   let viewConfigMap = viewConfig;
   if (typeof viewConfig === 'string') {
-    viewConfigMap = JSON.parse(viewConfig);
+    viewConfigMap = JSON.parse(viewConfig || '{}');
   }
   const fields = [
     'cache',
@@ -989,7 +989,7 @@ export const getVariablesByInteractionRule = (
       ?.filter(v => v.type === VariableTypes.Query)
       ?.find(v => v.name === cur.source)?.defaultValue;
     if (sourceVariableValueStr && cur.target) {
-      acc[cur.target] = JSON.parse(sourceVariableValueStr);
+      acc[cur.target] = JSON.parse(sourceVariableValueStr || '{}');
       return acc;
     }
     return acc;
