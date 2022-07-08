@@ -87,6 +87,7 @@ const ChartComputedFieldSettingPanel: FC<{
   const handleFieldNameChange = name => {
     const newField = Object.assign({}, myComputedFieldRef.current, {
       id: name,
+      name: name,
     });
     handleChange(newField);
   };

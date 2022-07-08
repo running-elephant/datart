@@ -236,14 +236,19 @@ const SelectDataSource = memo(
         const leftContainer = joinTable?.conditions?.[0].left;
 
         if (leftContainer) {
-          structure?.joins.forEach(v => {
-            if (v.table?.every(val => leftContainer?.includes(val))) {
-              setSelectedTableSchema({
-                table: v?.['table'],
-                columns: v?.['columns'],
-              });
-            }
-          });
+          if (structure?.table?.every(val => leftContainer?.includes(val))) {
+            setSelectedTableSchema({
+              table: structure?.['table'],
+            });
+          } else {
+            structure?.joins.forEach(v => {
+              if (v.table?.every(val => leftContainer?.includes(val))) {
+                setSelectedTableSchema({
+                  table: v?.['table'],
+                });
+              }
+            });
+          }
         }
       }
     }, [structure, renderType, joinTable?.conditions]);
