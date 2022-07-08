@@ -31,4 +31,6 @@ public class QueryScriptProcessResult {
 
     private boolean withDefaultPrefix;
 
+    private String srcSql;
+
 }
