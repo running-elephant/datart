@@ -22,7 +22,7 @@ import styled from 'styled-components/macro';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { WidgetWrapProvider } from '../../WidgetProvider/WidgetWrapProvider';
 
-export const GroupWidgetCore: React.FC<{ widgetIds: string[] }> = memo(
+export const GroupWidgetCore1: React.FC<{ widgetIds: string[] }> = memo(
   ({ widgetIds }) => {
     const { editing, boardId } = useContext(BoardContext);
     return (

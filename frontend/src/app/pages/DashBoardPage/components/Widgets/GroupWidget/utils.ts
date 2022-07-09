@@ -1,7 +1,3 @@
-import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
-import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { current } from 'immer';
-import { Widget } from '../../../types/widgetTypes';
 /**
  * Datart
  *
@@ -19,6 +15,11 @@ import { Widget } from '../../../types/widgetTypes';
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
+import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from '../../../types/widgetTypes';
+
 export const getParentRect = (args: {
   childIds: string[] | undefined;
   widgetMap: Record<string, Widget>;
