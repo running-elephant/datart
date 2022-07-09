@@ -31,30 +31,36 @@ export const GroupWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const { onEditDeleteActiveWidgets } = useContext(WidgetActionContext);
   const boardType = widget.config.boardType;
+  // Only board type is auto and no parent id use auto board widget, otherwise is free board widget.
+  const isAutoGroupWidget = boardType === 'auto' && !widget.parentId;
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(
-      editBoardStackActions.adjustGroupWidgets({ groupIds: [widget.id] }),
+      editBoardStackActions.adjustGroupWidgets({
+        groupIds: [widget.id],
+        isAutoGroupWidget,
+      }),
     );
     if (!widget.config.children?.length) {
       onEditDeleteActiveWidgets([widget.id]);
     }
   }, [
     dispatch,
+    isAutoGroupWidget,
     onEditDeleteActiveWidgets,
     widget.config.children?.length,
+    widget.config?.name,
     widget.id,
   ]);
-  if (boardType === 'auto' && !widget.parentId) {
-    return <AutoGroupWidget />;
-  } else {
-    return <FreeGroupWidget />;
-  }
+
+  return isAutoGroupWidget ? <AutoGroupWidget /> : <FreeGroupWidget />;
 });
+
 export const FreeGroupWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const wid = widget.id;
-  const { editing } = useContext(BoardContext);
+  const { editing, boardType } = useContext(BoardContext);
   const rect = widget.config.rect;
   const { onChangeGroupRect } = useContext(WidgetActionContext);
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
@@ -62,9 +68,14 @@ export const FreeGroupWidget: React.FC<{}> = memo(() => {
   });
   useEffect(() => {
     if (cacheW > 1 && cacheH > 1) {
-      onChangeGroupRect({ wid, w: cacheW, h: cacheH });
+      onChangeGroupRect({
+        wid,
+        w: cacheW,
+        h: cacheH,
+        isAutoGroupWidget: false,
+      });
     }
-  }, [cacheW, cacheH, wid, onChangeGroupRect]);
+  }, [cacheW, cacheH, wid, onChangeGroupRect, boardType]);
 
   return (
     <StyleWrapper className="group-wrapper" ref={cacheWhRef}>
@@ -82,7 +93,7 @@ export const FreeGroupWidget: React.FC<{}> = memo(() => {
 export const AutoGroupWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const wid = widget.id;
-  const { editing } = useContext(BoardContext);
+  const { editing, boardType } = useContext(BoardContext);
   const { onChangeGroupRect } = useContext(WidgetActionContext);
 
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
@@ -90,9 +101,14 @@ export const AutoGroupWidget: React.FC<{}> = memo(() => {
   });
   useEffect(() => {
     if (cacheW > 1 && cacheH > 1) {
-      onChangeGroupRect({ wid, w: cacheW, h: cacheH });
+      onChangeGroupRect({
+        wid,
+        w: cacheW,
+        h: cacheH,
+        isAutoGroupWidget: true,
+      });
     }
-  }, [cacheW, cacheH, wid, onChangeGroupRect, editing]);
+  }, [cacheW, cacheH, wid, onChangeGroupRect, editing, boardType]);
 
   return (
     <StyleWrapper className="group-wrapper" ref={cacheWhRef}>

@@ -45,7 +45,7 @@ export const RectSet: FC<{ wid: string; rect: RectConfig }> = memo(
     const debounceSetVal = useMemo(
       () =>
         debounce(value => {
-          onEditFreeWidgetRect(value, wid);
+          onEditFreeWidgetRect(value, wid, false);
         }, 300),
       [onEditFreeWidgetRect, wid],
     );

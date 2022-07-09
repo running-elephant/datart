@@ -308,6 +308,7 @@ export const editBoardStackSlice = createSlice({
         boardId?: string;
         wid: string;
         rect: RectConfig;
+        isAutoGroupWidget: boolean;
       }>,
     ) {
       const { wid, rect: newRect } = action.payload;
@@ -322,6 +323,7 @@ export const editBoardStackSlice = createSlice({
         height: newRect.height - oldRect.height,
       };
       targetWidget.config.rect = newRect;
+      const isAutoGroupWidget = action.payload.isAutoGroupWidget;
 
       if (
         !targetWidget.parentId &&
@@ -341,8 +343,13 @@ export const editBoardStackSlice = createSlice({
         // handle parents : collect all parents and resetParentsRect
         const parentIds: string[] = [];
         findParentIds({ widget: targetWidget, widgetMap, parentIds });
-        adjustGroupWidgets({ groupIds: parentIds, widgetMap });
+        adjustGroupWidgets({
+          groupIds: parentIds,
+          widgetMap,
+          isAutoGroupWidget,
+        });
       }
+
       if (hasResizeEvent) {
         // handle children : collect all children and resize them
         const childIds: string[] = [];
@@ -351,18 +358,23 @@ export const editBoardStackSlice = createSlice({
         // handle parents : collect all parents and resetParentsRect
         const parentIds: string[] = [];
         findParentIds({ widget: targetWidget, widgetMap, parentIds });
-        adjustGroupWidgets({ groupIds: parentIds, widgetMap });
+        adjustGroupWidgets({
+          groupIds: parentIds,
+          widgetMap,
+          isAutoGroupWidget,
+        });
       }
     },
     adjustGroupWidgets(
       state,
       action: PayloadAction<{
         groupIds: string[];
+        isAutoGroupWidget?: boolean;
       }>,
     ) {
-      const { groupIds } = action.payload;
+      const { groupIds, isAutoGroupWidget } = action.payload;
       const widgetMap = state.widgetRecord;
-      adjustGroupWidgets({ groupIds: groupIds, widgetMap });
+      adjustGroupWidgets({ groupIds: groupIds, widgetMap, isAutoGroupWidget });
     },
     /* tabs widget */
     addWidgetToTabWidget(

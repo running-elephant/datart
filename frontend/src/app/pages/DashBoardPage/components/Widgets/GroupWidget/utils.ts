@@ -1,5 +1,6 @@
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { RectConfig } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { current } from 'immer';
 import { Widget } from '../../../types/widgetTypes';
 /**
  * Datart
@@ -88,12 +89,14 @@ export const findParentIds = (args: {
 export const adjustGroupWidgets = (args: {
   groupIds: string[];
   widgetMap: Record<string, Widget>;
+  isAutoGroupWidget?: boolean;
 }) => {
   const { groupIds, widgetMap } = args;
   groupIds.forEach(gid => {
     const curGroup = widgetMap[gid];
     if (!curGroup) return;
     if (curGroup.config.originalType !== ORIGINAL_TYPE_MAP.group) return;
+    if (args.isAutoGroupWidget) return;
     if (!curGroup.config.children) {
       delete widgetMap[gid];
       return;
