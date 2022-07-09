@@ -45,6 +45,7 @@ export const getAllFieldsOfEachType = (args: {
   const allFields = dataView?.meta || [];
 
   let hierarchyFields = allFields.filter(f => f.role === ColumnRole.Hierarchy);
+
   const allNoHierarchyFields = fieldsSortByType(
     allFields.filter(f => f.role !== ColumnRole.Hierarchy),
     sortType,
@@ -128,6 +129,7 @@ export const fieldsSortByType = (fields, sortType) => {
     if (sortType === 'byNameSort') {
       if (a.type === ChartDataViewFieldCategory.Field) {
         // TODO(Stephen): why use json parse for id
+        // TODO: @lyp000119 请确认a.id是否是JSON.stringify的字符数组，此处是否是遗留代码。
         const aId = JSON.parse(a.id);
         const bId = JSON.parse(b.id);
 
