@@ -21,7 +21,7 @@ import { WidgetDataProvider } from '../WidgetProvider/WidgetDataProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import { ControllerWidget } from '../Widgets/ControllerWidget/ControllerWidget';
 import { DataChartWidget } from '../Widgets/DataChartWidget/DataChartWidget';
-import { GroupWidget } from '../Widgets/GroupWidget/groupWidget';
+import { GroupWidget } from '../Widgets/GroupWidget';
 import { IframeWidget } from '../Widgets/IframeWidget/IframeWidget';
 import { ImageWidget } from '../Widgets/ImageWidget/ImageWidget';
 import { QueryBtnWidget } from '../Widgets/QueryBtnWidget/QueryBtnWidget';

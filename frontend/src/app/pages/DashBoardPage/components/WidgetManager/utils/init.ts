@@ -18,6 +18,7 @@
 
 import { FONT_DEFAULT } from 'app/constants';
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
+import { LAYOUT_COLS_MAP } from 'app/pages/DashBoardPage/constants';
 import type {
   BoardType,
   RectConfig,
@@ -453,11 +454,12 @@ export const initBorderTpl = () => {
   return borderTpl;
 };
 
+// TODO(Stephen): set width/height same as free widget?
 export const initAutoWidgetRect = (): RectConfig => ({
   x: 0,
   y: 0,
-  width: 6,
-  height: 6,
+  width: LAYOUT_COLS_MAP.lg / 2, // NOTE: auto board use grid system, the total is 12, default is half panel, means 6
+  height: LAYOUT_COLS_MAP.lg / 2,
 });
 export const initFreeWidgetRect = (): RectConfig => ({
   x: Math.ceil(Math.random() * 200),

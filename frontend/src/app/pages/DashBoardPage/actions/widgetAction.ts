@@ -596,13 +596,15 @@ export const changeGroupRectAction =
     wid: string;
     w: number;
     h: number;
+    isAutoGroupWidget: boolean;
   }) =>
   dispatch => {
     const { renderMode } = args;
     if (renderMode === 'edit') {
       dispatch(changeEditGroupRectAction(args));
     } else {
-      dispatch(changeViewGroupRectAction(args));
+      // NOTE: it should not be calculate group rect for non edit mode.
+      // dispatch(changeViewGroupRectAction(args));
     }
   };
 
@@ -613,6 +615,7 @@ export const changeViewGroupRectAction =
     wid: string;
     w: number;
     h: number;
+    isAutoGroupWidget: boolean;
   }) =>
   (dispatch, getState) => {
     const { wid, w, h, boardId } = args;
@@ -636,6 +639,7 @@ export const changeViewGroupRectAction =
     const parentIsAutoBoard =
       widget.config.boardType === 'auto' && !widget.parentId;
 
+    // TODO(Stephen): to be fix board is auto board
     if (parentIsContainer || parentIsAutoBoard) {
       dispatch(
         boardActions.changeFreeWidgetRect({
@@ -654,6 +658,7 @@ export const changeEditGroupRectAction =
     wid: string;
     w: number;
     h: number;
+    isAutoGroupWidget: boolean;
   }) =>
   (dispatch, getState) => {
     const { wid, w, h } = args;
@@ -682,6 +687,7 @@ export const changeEditGroupRectAction =
         editBoardStackActions.changeFreeWidgetRect({
           wid,
           rect,
+          isAutoGroupWidget: args.isAutoGroupWidget,
         }),
       );
     }
