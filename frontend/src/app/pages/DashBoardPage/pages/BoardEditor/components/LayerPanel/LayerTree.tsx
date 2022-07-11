@@ -57,7 +57,7 @@ export const LayerTree: FC<{}> = memo(() => {
 
   return (
     <Tree
-      className="small"
+      className="medium"
       draggable
       multiple
       loading={false}

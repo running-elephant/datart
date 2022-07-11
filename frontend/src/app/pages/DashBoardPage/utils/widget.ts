@@ -679,6 +679,7 @@ export const getValueByRowData = (
   data: ChartsEventData | undefined,
   fieldName: string,
 ) => {
+  // TODO: Not used for now, you can delete it
   let toCaseField = JSON.parse(fieldName).join('.');
 
   return data?.rowData[toCaseField];

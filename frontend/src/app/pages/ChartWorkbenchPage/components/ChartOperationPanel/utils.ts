@@ -127,14 +127,12 @@ export const buildDateLevelFields = (args: {
 export const fieldsSortByType = (fields, sortType) => {
   return fields.sort((a, b) => {
     if (sortType === 'byNameSort') {
-      if (a.type === ChartDataViewFieldCategory.Field) {
-        // TODO(Stephen): why use json parse for id
-        // TODO: @lyp000119 请确认a.id是否是JSON.stringify的字符数组，此处是否是遗留代码。
-        const aId = JSON.parse(a.id);
-        const bId = JSON.parse(b.id);
+      if (a.category === ChartDataViewFieldCategory.Field) {
+        const aPath = a.path;
+        const bPath = b.path;
 
-        const aFileName = aId[aId.length - 1];
-        const bFileName = bId[bId.length - 1];
+        const aFileName = aPath[aPath.length - 1];
+        const bFileName = bPath[bPath.length - 1];
 
         return aFileName.localeCompare(bFileName);
       } else {
