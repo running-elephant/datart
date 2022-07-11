@@ -278,6 +278,9 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
         }),
       );
       await dispatch(
+        boardActions.renderedWidgets({ boardId, widgetIds: [widgetId] }),
+      );
+      await dispatch(
         boardActions.changeWidgetLinkInfo({
           boardId,
           widgetId,
