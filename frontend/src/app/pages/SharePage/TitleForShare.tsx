@@ -70,7 +70,7 @@ const TitleForShare: FC<TitleHeaderProps> = memo(
               onShareDownloadData?.();
             }}
           >
-            <Tooltip title={t('share.downloadData')} placement="bottom">
+            <Tooltip title={t('share.exportData')} placement="bottom">
               <DownloadOutlined style={{ fontSize: 20 }} />
             </Tooltip>
           </Popconfirm>

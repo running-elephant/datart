@@ -15,21 +15,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { request2 } from 'utils/request';
-export async function onImport(args: {
-  file: FormData;
-  strategy: string;
-  orgId: string;
-}) {
-  const { file, strategy, orgId } = args;
-  try {
-    const response = await request2<any>({
-      method: 'POST',
-      url: `viz/import?strategy=${strategy}&orgId=${orgId}`,
-      data: file,
-    });
-    return true;
-  } catch (error) {
-    return error;
-  }
-}
+
+export { GroupWidget1 as GroupWidget } from './GroupWidget1';

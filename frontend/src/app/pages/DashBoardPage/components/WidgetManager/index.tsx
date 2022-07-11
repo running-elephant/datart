@@ -28,7 +28,7 @@ import timeProto from '../Widgets/ControllerWidget/config/timeProto';
 import valueProto from '../Widgets/ControllerWidget/config/valueProto';
 import linkedChartProto from '../Widgets/DataChartWidget/linkedChartConfig';
 import ownedChartProto from '../Widgets/DataChartWidget/ownedChartConfig';
-import groupProto from '../Widgets/GroupWidget/groupConfig';
+import groupProto from '../Widgets/GroupWidget/config';
 import iframeProto from '../Widgets/IframeWidget/iframeConfig';
 import imageProto from '../Widgets/ImageWidget/imageConfig';
 import queryBtnProto from '../Widgets/QueryBtnWidget/queryBtnConfig';

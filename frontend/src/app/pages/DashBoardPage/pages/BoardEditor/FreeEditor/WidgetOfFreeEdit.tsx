@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetMapper } from 'app/pages/DashBoardPage/components/WidgetMapper/WidgetMapper';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { WIDGET_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
@@ -47,6 +48,7 @@ export enum DragTriggerTypes {
 export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const selectedIds = useSelector(selectSelectedIds);
   const widget = useContext(WidgetContext);
+  const { boardType } = useContext(BoardContext);
   const { editing: widgetEditing } = useContext(WidgetInfoContext);
   const { onEditFreeWidgetRect } = useContext(WidgetActionContext);
   const scale = useContext(BoardScaleContext);
@@ -83,8 +85,8 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
       x: Number(curXY[0].toFixed(1)),
       y: Number(curXY[1].toFixed(1)),
     };
-    onEditFreeWidgetRect(nextRect, widget.id);
-  }, [curXY, onEditFreeWidgetRect, widget.config, widget.id]);
+    onEditFreeWidgetRect(nextRect, widget.id, false);
+  }, [curXY, onEditFreeWidgetRect, widget.config.rect, widget.id]);
   useEffect(() => {
     widgetMove.on(move);
     widgetMoveEnd.on(moveEnd);
@@ -139,7 +141,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
         width: Number(size.width.toFixed(1)),
         height: Number(size.height.toFixed(1)),
       };
-      onEditFreeWidgetRect(nextRect, widget.id);
+      onEditFreeWidgetRect(nextRect, widget.id, false);
     },
     [onEditFreeWidgetRect, widget.config.rect, widget.id],
   );

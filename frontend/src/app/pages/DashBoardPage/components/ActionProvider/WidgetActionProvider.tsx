@@ -92,9 +92,23 @@ export const WidgetActionProvider: FC<{
           dispatch(pasteWidgetsAction());
         },
         onChangeGroupRect: debounce(
-          (args: { wid: string; w: number; h: number }) => {
-            const { wid, w, h } = args;
-            dispatch(changeGroupRectAction({ renderMode, boardId, wid, w, h }));
+          (args: {
+            wid: string;
+            w: number;
+            h: number;
+            isAutoGroupWidget: boolean;
+          }) => {
+            const { wid, w, h, isAutoGroupWidget } = args;
+            dispatch(
+              changeGroupRectAction({
+                renderMode,
+                boardId,
+                wid,
+                w,
+                h,
+                isAutoGroupWidget,
+              }),
+            );
           },
           60,
         ),
@@ -139,8 +153,14 @@ export const WidgetActionProvider: FC<{
         onUpdateWidgetConfig: (config: WidgetConf, wid: string) => {
           dispatch(editBoardStackActions.updateWidgetConfig({ wid, config }));
         },
-        onEditFreeWidgetRect: (rect, wid) => {
-          dispatch(editBoardStackActions.changeFreeWidgetRect({ rect, wid }));
+        onEditFreeWidgetRect: (rect, wid, isAutoGroupWidget) => {
+          dispatch(
+            editBoardStackActions.changeFreeWidgetRect({
+              rect,
+              wid,
+              isAutoGroupWidget,
+            }),
+          );
         },
         onUpdateWidgetConfigByKey: ops => {
           if (boardEditing) {
@@ -294,7 +314,12 @@ export interface WidgetActionContextProps {
   onRefreshWidgetsByController: (widget: Widget) => void;
   onWidgetsQuery: () => void;
   onRenderedWidgetById: (wid: string) => void;
-  onChangeGroupRect: (args: { wid: string; w: number; h: number }) => void;
+  onChangeGroupRect: (args: {
+    wid: string;
+    w: number;
+    h: number;
+    isAutoGroupWidget: boolean;
+  }) => void;
   onWidgetLinkEvent: (widget: Widget) => (params) => void;
   onUpdateWidgetSelectedItems: (widget: Widget, selectedItems) => void;
 
@@ -337,7 +362,11 @@ export interface WidgetActionContextProps {
   onEditPasteWidgets: () => void;
   onEditComposeGroup: (wid?: string) => void;
   onEditUnGroupAction: (wid?: string) => void;
-  onEditFreeWidgetRect: (rect: RectConfig, wid: string) => void;
+  onEditFreeWidgetRect: (
+    rect: RectConfig,
+    wid: string,
+    isAutoGroupWidget: boolean,
+  ) => void;
   //
 }
 export const WidgetActionContext = createContext<WidgetActionContextProps>(
