@@ -21,10 +21,8 @@ import { BoardType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   ITimeDefault,
   Widget,
-  WidgetConf,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { IFontDefault } from 'types';
-import { CloneValueDeep } from 'utils/object';
 import widgetManagerInstance from '../../../pages/DashBoardPage/components/WidgetManager';
 import { RectConfig } from '../../../pages/DashBoardPage/pages/Board/slice/types';
 import { WidgetBeta3 } from '../types';

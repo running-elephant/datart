@@ -309,7 +309,6 @@ export const onComposeGroupAction = (wid?: string) => (dispatch, getState) => {
   const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
   const stackState = editBoardState.stack.present;
   const curBoard = stackState.dashBoard;
-  const cutBoardType = curBoard.config.type;
   const widgetMap = stackState.widgetRecord;
   const widgetInfos = Object.values(editBoardState.widgetInfoRecord || {});
   let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);
@@ -354,8 +353,6 @@ export const onUnGroupAction = (wid?: string) => (dispatch, getState) => {
   const rootState = getState() as RootState;
   const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
   const stackState = editBoardState.stack.present;
-  const curBoard = stackState.dashBoard;
-  const cutBoardType = curBoard.config.type;
   const widgetMap = stackState.widgetRecord;
   const widgetInfos = Object.values(editBoardState.widgetInfoRecord || {});
   let selectedIds = widgetInfos.filter(it => it.selected).map(it => it.id);

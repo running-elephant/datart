@@ -115,7 +115,7 @@ export const exportBoardTpl = createAsyncThunk<
   }
 >('board/exportBoardTpl', async (params, { dispatch, rejectWithValue }) => {
   const { dashboard, widgets, callBack } = params;
-  const { data } = await request2<any>({
+  await request2<any>({
     url: `viz/export/dashboard/template`,
     method: 'POST',
     data: { dashboard, widgets },

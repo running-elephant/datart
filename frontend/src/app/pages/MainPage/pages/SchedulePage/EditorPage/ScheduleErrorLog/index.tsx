@@ -3,7 +3,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { BORDER_RADIUS, SPACE_MD } from 'styles/StyleConstants';
+import { BORDER_RADIUS } from 'styles/StyleConstants';
 import { LogStatus, LOG_STATUS_TEXT } from '../../constants';
 import { useScheduleSlice } from '../../slice';
 import {

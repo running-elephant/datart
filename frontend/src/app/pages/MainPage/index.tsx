@@ -80,6 +80,7 @@ export function MainPage() {
     return () => {
       dispatch(actions.clear());
     };
+    /* eslint-disable-next-line */
   }, []);
 
   useEffect(() => {

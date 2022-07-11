@@ -4,7 +4,7 @@ import { FC } from 'react';
 import { WECHART_FILE_TYPE_OPTIONS } from '../constants';
 
 interface WeChartSetttingFormProps {}
-export const WeChartSetttingForm: FC<WeChartSetttingFormProps> = ({}) => {
+export const WeChartSetttingForm: FC<WeChartSetttingFormProps> = () => {
   const t = useI18NPrefix(
     'main.pages.schedulePage.sidebar.editorPage.weChartSetttingForm',
   );
