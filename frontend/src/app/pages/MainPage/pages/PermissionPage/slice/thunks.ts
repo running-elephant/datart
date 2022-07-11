@@ -18,8 +18,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { RootState } from 'types';
-import { request } from 'utils/request';
-import { errorHandle } from 'utils/utils';
+import { request2 } from 'utils/request';
 import { getMembers, getRoles } from '../../MemberPage/slice/thunks';
 import { getSchedules } from '../../SchedulePage/slice/thunks';
 import { getSources } from '../../SourcePage/slice/thunks';
@@ -54,34 +53,24 @@ export const getResourcePermission = createAsyncThunk<
   ResourcePermissions,
   GetPermissionParams<ResourceTypes>
 >('permission/getResourcePermission', async ({ orgId, type, id }) => {
-  try {
-    const { data } = await request<ResourcePermissions>({
-      url: '/roles/permission/resource',
-      method: 'GET',
-      params: { orgId, resourceType: type, resourceId: id },
-    });
-    return data;
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
+  const { data } = await request2<ResourcePermissions>({
+    url: '/roles/permission/resource',
+    method: 'GET',
+    params: { orgId, resourceType: type, resourceId: id },
+  });
+  return data;
 });
 
 export const getSubjectPermission = createAsyncThunk<
   SubjectPermissions,
   GetPermissionParams<SubjectTypes>
 >('permission/getSubjectPermission', async ({ orgId, type, id }) => {
-  try {
-    const { data } = await request<SubjectPermissions>({
-      url: '/roles/permission/subject',
-      method: 'GET',
-      params: { orgId, subjectType: type, subjectId: id },
-    });
-    return data;
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
+  const { data } = await request2<SubjectPermissions>({
+    url: '/roles/permission/subject',
+    method: 'GET',
+    params: { orgId, subjectType: type, subjectId: id },
+  });
+  return data;
 });
 
 export const getDataSource = createAsyncThunk<
@@ -150,16 +139,11 @@ export const grantPermissions = createAsyncThunk<
   Privilege[],
   GrantPermissionParams
 >('permission/grantPermissions', async ({ params, options, resolve }) => {
-  try {
-    const { data } = await request<Privilege[]>({
-      url: '/roles/permission/grant',
-      method: 'POST',
-      data: params,
-    });
-    resolve();
-    return options.reserved.concat(data);
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
+  const { data } = await request2<Privilege[]>({
+    url: '/roles/permission/grant',
+    method: 'POST',
+    data: params,
+  });
+  resolve();
+  return options.reserved.concat(data);
 });

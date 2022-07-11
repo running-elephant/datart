@@ -68,7 +68,7 @@ const ChartGraphIcon: FC<{
 
   const renderChartRequirements = requirements => {
     const lintMessages = requirements?.flatMap((requirement, index) => {
-      return [ChartDataSectionType.GROUP, ChartDataSectionType.AGGREGATE].map(
+      return [ChartDataSectionType.Group, ChartDataSectionType.Aggregate].map(
         type => {
           const limit = requirement[type.toLocaleLowerCase()];
           const getMaxValueStr = limit =>
@@ -159,9 +159,9 @@ const Base64ImageRender = ({ iconStr, isMatchRequirement, isActive }) => {
 };
 
 const StyledChartIconWrapper = styled(IW)`
+  margin: ${SPACE_TIMES(0.5)};
   cursor: pointer;
   border-radius: ${BORDER_RADIUS};
-  margin: ${SPACE_TIMES(0.5)};
 
   &:hover,
   &.active {

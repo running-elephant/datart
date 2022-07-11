@@ -17,8 +17,7 @@
  */
 import { useCallback, useContext } from 'react';
 import { WidgetActionContext } from '../components/ActionProvider/WidgetActionProvider';
-import { widgetActionType } from '../components/WidgetComponents/config';
-import { Widget } from '../pages/Board/slice/types';
+import { Widget, widgetActionType } from '../types/widgetTypes';
 
 export default function useWidgetAction() {
   const {
@@ -27,14 +26,12 @@ export default function useWidgetAction() {
     onEditChartWidget,
     onEditMediaWidget,
     onEditContainerWidget,
-    onEditWidgetLinkage,
-    onEditWidgetJump,
     onEditControllerWidget,
-    onEditWidgetCloseLinkage,
-    onEditWidgetCloseJump,
     onEditWidgetLock,
     onEditWidgetUnLock,
     onEditDeleteActiveWidgets,
+    onEditComposeGroup,
+    onEditUnGroupAction,
   } = useContext(WidgetActionContext);
 
   const onWidgetEdit = useCallback(
@@ -74,23 +71,17 @@ export default function useWidgetAction() {
       case 'edit':
         onWidgetEdit(widget);
         break;
-      case 'makeLinkage':
-        onEditWidgetLinkage(widget.id);
-        break;
-      case 'closeLinkage':
-        onEditWidgetCloseLinkage(widget);
-        break;
-      case 'makeJump':
-        onEditWidgetJump(widget.id);
-        break;
-      case 'closeJump':
-        onEditWidgetCloseJump(widget);
-        break;
       case 'lock':
         onEditWidgetLock(widget.id);
         break;
       case 'unlock':
         onEditWidgetUnLock(widget.id);
+        break;
+      case 'group':
+        onEditComposeGroup(widget.id);
+        break;
+      case 'unGroup':
+        onEditUnGroupAction(widget.id);
         break;
       default:
         console.log('__ not found __ action', key);

@@ -58,6 +58,7 @@ const LegendPosition: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       translate: t,
       onChange,
       dataConfigs,
+      flatten: true,
     };
 
     return <ItemLayout {...props} />;

@@ -19,7 +19,12 @@
 package datart.core.common;
 
 import datart.core.base.consts.TenantManagementMode;
+import datart.core.entity.Organization;
+import datart.core.entity.User;
+import datart.core.mappers.ext.OrganizationMapperExt;
+import datart.core.mappers.ext.UserMapperExt;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -27,6 +32,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 import static datart.core.base.consts.TenantManagementMode.PLATFORM;
 
@@ -37,6 +44,8 @@ public class Application implements ApplicationContextAware {
     private static ApplicationContext context;
 
     private static TenantManagementMode currMode;
+
+    private static Boolean initialized;
 
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
@@ -98,13 +107,6 @@ public class Application implements ApplicationContextAware {
         return BooleanUtils.toBoolean(getProperty("datart.user.register", "true"));
     }
 
-    public static String getAdminId() {
-        if (getCurrMode().equals(TenantManagementMode.TEAM)){
-            return getProperty("datart.admin-id", "datart-admin");
-        }
-        return "";
-    }
-
     public static TenantManagementMode getCurrMode() {
         if (currMode == null) {
             String mode = Application.getProperty("datart.tenant-management-mode");
@@ -118,4 +120,31 @@ public class Application implements ApplicationContextAware {
         return currMode;
     }
 
+    public static void setCurrMode(TenantManagementMode mode) {
+        currMode = mode;
+    }
+
+    public static Boolean isInitialized() {
+        if (initialized != null) {
+            return initialized;
+        }
+        updateInitialized();
+        return initialized;
+    }
+
+    public static void updateInitialized() {
+        UserMapperExt userMapper = getBean(UserMapperExt.class);
+        if (getCurrMode().equals(PLATFORM)) {
+            initialized = userMapper.selectUserCount()>0;
+        }
+        OrganizationMapperExt orgMapper = getBean(OrganizationMapperExt.class);
+        List<Organization> organizations = orgMapper.list();
+        int orgCount = CollectionUtils.size(organizations);
+        if (orgCount==0) {
+            initialized = false;
+        } else if (orgCount==1) {
+            List<User> users = orgMapper.listOrgMembers(organizations.get(0).getId());
+            initialized = users.size()>0;
+        }
+    }
 }

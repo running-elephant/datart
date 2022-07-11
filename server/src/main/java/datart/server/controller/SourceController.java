@@ -22,9 +22,7 @@ package datart.server.controller;
 import datart.core.data.provider.SchemaInfo;
 import datart.core.entity.Source;
 import datart.server.base.dto.ResponseData;
-import datart.server.base.params.CheckNameParam;
-import datart.server.base.params.SourceCreateParam;
-import datart.server.base.params.SourceUpdateParam;
+import datart.server.base.params.*;
 import datart.server.service.SourceService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
@@ -46,10 +44,7 @@ public class SourceController extends BaseController {
     @ApiOperation(value = "check source name is unique")
     @PostMapping("/check/name")
     public ResponseData<Boolean> checkSourceName(@Validated @RequestBody CheckNameParam param) {
-        Source source = new Source();
-        source.setName(param.getName());
-        source.setOrgId(param.getOrgId());
-        return ResponseData.success(sourceService.checkUnique(source));
+        return ResponseData.success(sourceService.checkUnique(param.getOrgId(), param.getParentId(), param.getName()));
     }
 
     @ApiOperation(value = "Get Org available sources")
@@ -77,6 +72,14 @@ public class SourceController extends BaseController {
     public ResponseData<Boolean> updateSource(@PathVariable String sourceId,
                                               @Validated @RequestBody SourceUpdateParam updateParam) {
         return ResponseData.success(sourceService.updateSource(updateParam));
+    }
+
+    @ApiOperation(value = "update a source base info")
+    @PutMapping(value = "/{sourceId}/base")
+    public ResponseData<Boolean> updateSourceBaseInfo(@PathVariable String sourceId,
+                                                      @Validated @RequestBody SourceBaseUpdateParam updateParam) {
+        checkBlank(sourceId, "sourceId");
+        return ResponseData.success(sourceService.updateBase(updateParam));
     }
 
     @ApiOperation(value = "delete a source")
@@ -107,7 +110,7 @@ public class SourceController extends BaseController {
 
     @ApiOperation(value = "sync source schemas ")
     @GetMapping(value = "/sync/schemas/{sourceId}")
-    public ResponseData<SchemaInfo> syncSourceSchemas(@PathVariable String sourceId) throws Exception{
+    public ResponseData<SchemaInfo> syncSourceSchemas(@PathVariable String sourceId) throws Exception {
         return ResponseData.success(sourceService.syncSourceSchema(sourceId));
     }
 

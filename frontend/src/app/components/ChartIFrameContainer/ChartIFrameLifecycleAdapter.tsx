@@ -22,7 +22,7 @@ import { useFrame } from 'app/components/ReactFrameComponent';
 import { ChartLifecycle } from 'app/constants';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -44,6 +44,7 @@ const ChartIFrameLifecycleAdapter: FC<{
   style: CSSProperties;
   isShown?: boolean;
   drillOption?: IChartDrillOption;
+  selectedItems?: SelectedItem[];
   widgetSpecialConfig?: any;
 }> = ({
   dataset,
@@ -52,18 +53,19 @@ const ChartIFrameLifecycleAdapter: FC<{
   style,
   isShown = true,
   drillOption,
+  selectedItems,
   widgetSpecialConfig,
 }) => {
   const [chartResourceLoader] = useState(() => new ChartIFrameResourceLoader());
+  const eventBrokerRef = useRef<ChartIFrameEventBroker>();
   const [containerStatus, setContainerStatus] = useState(ContainerStatus.INIT);
   const { document, window } = useFrame();
   const [containerId] = useState(() => uuidv4());
-  const eventBrokerRef = useRef<ChartIFrameEventBroker>();
   const translator = usePrefixI18N();
 
   /**
    * Chart Mount Event
-   * Dependency: 'chart?.meta?.id', 'eventBrokerRef', 'isShown'
+   * Dependency: 'chart?.meta?.id', 'isShown'
    */
   useEffect(() => {
     if (
@@ -86,8 +88,15 @@ const ChartIFrameLifecycleAdapter: FC<{
           const newBrokerRef = new ChartIFrameEventBroker();
           newBrokerRef.register(chart);
           newBrokerRef.publish(
-            ChartLifecycle.MOUNTED,
-            { containerId, dataset, config, widgetSpecialConfig, drillOption },
+            ChartLifecycle.Mounted,
+            {
+              containerId,
+              dataset,
+              config,
+              widgetSpecialConfig,
+              drillOption,
+              selectedItems,
+            },
             {
               document,
               window,
@@ -106,16 +115,16 @@ const ChartIFrameLifecycleAdapter: FC<{
 
     return function cleanup() {
       setContainerStatus(ContainerStatus.INIT);
-      eventBrokerRef?.current?.publish(ChartLifecycle.UNMOUNTED, {});
+      eventBrokerRef?.current?.publish(ChartLifecycle.UnMount, {});
       eventBrokerRef?.current?.dispose();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chart?.meta?.id, eventBrokerRef, isShown, translator]);
+  }, [chart?.meta?.id, isShown]);
 
   /**
    * Chart Update Event
    * Dependency: 'config', 'dataset', 'widgetSpecialConfig',
-   * 'containerStatus', 'document', 'window', 'isShown', 'drillOption'
+   * 'containerStatus', 'document', 'window', 'isShown', 'drillOption', 'selectedItems'
    */
   useEffect(() => {
     if (
@@ -129,12 +138,13 @@ const ChartIFrameLifecycleAdapter: FC<{
       return;
     }
     eventBrokerRef.current?.publish(
-      ChartLifecycle.UPDATED,
+      ChartLifecycle.Updated,
       {
         dataset,
         config,
         widgetSpecialConfig,
         drillOption,
+        selectedItems,
       },
       {
         document,
@@ -153,8 +163,8 @@ const ChartIFrameLifecycleAdapter: FC<{
     document,
     window,
     isShown,
-    translator,
     drillOption,
+    selectedItems,
   ]);
 
   /**
@@ -174,12 +184,13 @@ const ChartIFrameLifecycleAdapter: FC<{
     }
 
     eventBrokerRef.current?.publish(
-      ChartLifecycle.RESIZE,
+      ChartLifecycle.Resize,
       {
         dataset,
         config,
         widgetSpecialConfig,
         drillOption,
+        selectedItems,
       },
       {
         document,
@@ -196,7 +207,7 @@ const ChartIFrameLifecycleAdapter: FC<{
     document,
     window,
     isShown,
-    translator,
+    containerStatus,
     drillOption,
   ]);
 

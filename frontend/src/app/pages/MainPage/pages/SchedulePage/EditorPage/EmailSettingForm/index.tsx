@@ -18,7 +18,7 @@ export const EmailSettingForm: FC<EmailSettingFormProps> = ({
   const t = useI18NPrefix(
     'main.pages.schedulePage.sidebar.editorPage.emailSettingForm.index',
   );
-  const hasImgeWidth = useMemo(() => {
+  const hasImageWidth = useMemo(() => {
     return fileType && fileType?.length > 0
       ? fileType?.includes(FileTypes.Image)
       : false;
@@ -58,7 +58,7 @@ export const EmailSettingForm: FC<EmailSettingFormProps> = ({
           </Form.Item>
         </Col>
         <Col span={9}>
-          {hasImgeWidth ? (
+          {hasImageWidth ? (
             <div className="image_width_form_item_wrapper">
               <Form.Item
                 label={t('picWidth')}

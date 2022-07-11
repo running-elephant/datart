@@ -21,7 +21,7 @@ import {
   AxisLineStyle,
   ChartDataSectionField,
   FontStyle,
-  IFieldFormatConfig,
+  FormatFieldAction,
   LabelStyle,
   LineStyle,
   MarkArea,
@@ -56,6 +56,9 @@ export type DoubleYChartYAxis = {
   showTitleAndUnit: boolean;
   splitLine: AxisLineStyle;
   type: string;
+  min?: number | string;
+  max?: number | string;
+  interval?: number;
 };
 
 export type Series = {
@@ -66,7 +69,7 @@ export type Series = {
       rowData: { [key: string]: any };
       value: number | string;
       total?: number;
-      format: IFieldFormatConfig | undefined;
+      format: FormatFieldAction | undefined;
     } & ChartDataSectionField
   >;
   color?: string;
@@ -82,3 +85,12 @@ export type Series = {
   markLine: MarkLine;
   markArea: MarkArea;
 } & LabelStyle;
+
+export interface IntervalConfig {
+  leftMin?: number;
+  leftMax?: number;
+  rightMin?: number;
+  rightMax?: number;
+  leftInterval?: number;
+  rightInterval?: number;
+}

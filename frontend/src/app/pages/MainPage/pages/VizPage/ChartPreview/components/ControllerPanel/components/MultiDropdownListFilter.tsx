@@ -26,12 +26,18 @@ import { IsKeyIn } from 'utils/object';
 import { PresentControllerFilterProps } from '.';
 
 const MultiDropdownListFilter: FC<PresentControllerFilterProps> = memo(
-  ({ viewId, view, condition, onConditionChange }) => {
+  ({ viewId, view, condition, executeToken, onConditionChange }) => {
     const [originalNodes, setOriginalNodes] = useState<RelationFilterValue[]>(
       condition?.value as RelationFilterValue[],
     );
 
-    useFetchFilterDataByCondition(viewId, condition, setOriginalNodes, view);
+    useFetchFilterDataByCondition(
+      viewId,
+      condition,
+      setOriginalNodes,
+      view,
+      executeToken,
+    );
 
     const handleSelectedChange = (keys: any) => {
       const newCondition = updateBy(condition!, draft => {

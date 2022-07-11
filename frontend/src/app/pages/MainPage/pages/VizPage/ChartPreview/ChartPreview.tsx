@@ -17,21 +17,25 @@
  */
 
 import { message, Spin } from 'antd';
+import useModal from 'antd/lib/modal/useModal';
 import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
+import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
 import { VizHeader } from 'app/components/VizHeader';
 import { ChartDataViewFieldCategory } from 'app/constants';
+import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
+import useChartInteractions from 'app/hooks/useChartInteractions';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import ChartManager from 'app/models/ChartManager';
-import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { useWorkbenchSlice } from 'app/pages/ChartWorkbenchPage/slice';
 import { selectAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/slice/selectors';
-import { fetchAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/slice/thunks';
+import { fetchAvailableSourceFunctionsForChart } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
   getRuntimeComputedFields,
@@ -39,16 +43,29 @@ import {
 } from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
-import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  FC,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
+import { isEmptyArray } from 'utils/object';
+import { urlSearchTransfer } from 'utils/urlSearchTransfer';
+import useDisplayViewDetail from '../hooks/useDisplayViewDetail';
+import useQSLibUrlHelper from '../hooks/useQSLibUrlHelper';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
 import { useVizSlice } from '../slice';
 import {
   selectPreviewCharts,
   selectPublishLoading,
+  selectSelectedItems,
   selectVizs,
 } from '../slice/selectors';
 import {
@@ -61,7 +78,6 @@ import {
   updateGroupAndFetchDataset,
 } from '../slice/thunks';
 import { ChartPreview } from '../slice/types';
-import { urlSearchTransfer } from '../utils';
 import ControllerPanel from './components/ControllerPanel';
 
 const ChartPreviewBoard: FC<{
@@ -86,19 +102,25 @@ const ChartPreviewBoard: FC<{
       cacheWhRef: ref,
       cacheW,
       cacheH,
-    } = useCacheWidthHeight(defaultChartContainerWH, defaultChartContainerWH);
+    } = useCacheWidthHeight({
+      initH: defaultChartContainerWH,
+      initW: defaultChartContainerWH,
+    });
     useWorkbenchSlice();
     const { actions: vizAction } = useVizSlice();
     const { actions } = useMainSlice();
     const chartManager = ChartManager.instance();
     const dispatch = useDispatch();
+    const { parse } = useQSLibUrlHelper();
     const [version, setVersion] = useState<string>();
     const previewCharts = useSelector(selectPreviewCharts);
     const publishLoading = useSelector(selectPublishLoading);
+    const selectedItems = useSelector(selectSelectedItems);
     const availableSourceFunctions = useSelector(
       selectAvailableSourceFunctions,
     );
     const [chartPreview, setChartPreview] = useState<ChartPreview>();
+    const chartConfigRef = useRef(chartPreview?.chartConfig);
     const [chart, setChart] = useState<IChart>();
     const [loadingStatus, setLoadingStatus] = useState<boolean>(false);
     const drillOptionRef = useRef<IChartDrillOption>();
@@ -107,28 +129,46 @@ const ChartPreviewBoard: FC<{
     const saveAsViz = useSaveAsViz();
     const history = useHistory();
     const vizs = useSelector(selectVizs);
+    const [openViewDetailPanel, viewDetailPanelContextHolder] =
+      useDisplayViewDetail();
+    const [jumpDialogModal, jumpDialogContextHolder] = useModal();
+    const {
+      getDrillThroughSetting,
+      getViewDetailSetting,
+      handleDrillThroughEvent,
+      handleViewDataEvent,
+    } = useChartInteractions({
+      openViewDetailPanel: openViewDetailPanel as any,
+      openJumpDialogModal: jumpDialogModal.info,
+    });
 
     useEffect(() => {
+      const jumpFilterParams: ChartDataRequestFilter[] = parse(
+        filterSearchUrl,
+        { ignoreQueryPrefix: true },
+      )?.filters;
+      const jumpVariableParams: Record<string, any[]> = parse(filterSearchUrl, {
+        ignoreQueryPrefix: true,
+      })?.variables;
       const filterSearchParams = filterSearchUrl
         ? urlSearchTransfer.toParams(filterSearchUrl)
         : undefined;
+
       dispatch(
         initChartPreviewData({
           backendChartId,
           orgId,
           filterSearchParams,
+          jumpFilterParams,
+          jumpVariableParams,
         }),
       );
-    }, [dispatch, orgId, backendChartId, filterSearchUrl]);
+    }, [dispatch, orgId, backendChartId, filterSearchUrl, parse]);
 
     useEffect(() => {
       const sourceId = chartPreview?.backendChart?.view.sourceId;
       if (sourceId) {
-        dispatch(
-          fetchAvailableSourceFunctions({
-            sourceId: sourceId,
-          }),
-        );
+        dispatch(fetchAvailableSourceFunctionsForChart(sourceId));
       }
     }, [chartPreview?.backendChart?.view.sourceId, dispatch]);
 
@@ -140,6 +180,7 @@ const ChartPreviewBoard: FC<{
         setVersion(newChartPreview.version);
         setChartPreview(newChartPreview);
 
+        chartConfigRef.current = newChartPreview?.chartConfig;
         drillOptionRef.current = getChartDrillOption(
           newChartPreview?.chartConfig?.datas,
           drillOptionRef?.current,
@@ -153,11 +194,9 @@ const ChartPreviewBoard: FC<{
           const newChart = chartManager.getById(
             newChartPreview?.backendChart?.config?.chartGraphId,
           );
-          registerChartEvents(newChart, backendChartId);
           setChart(newChart);
         }
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
       backendChartId,
       chart,
@@ -167,44 +206,248 @@ const ChartPreviewBoard: FC<{
       version,
     ]);
 
-    const registerChartEvents = (chart, backendChartId) => {
-      chart?.registerMouseEvents([
-        {
-          name: 'click',
-          callback: param => {
-            if (
-              drillOptionRef.current?.isSelectedDrill &&
-              !drillOptionRef.current.isBottomLevel
-            ) {
-              const option = drillOptionRef.current;
-              option.drillDown(param.data.rowData);
-              drillOptionRef.current = option;
-              handleDrillOptionChange(option);
-              return;
-            }
-            if (
-              param.componentType === 'table' &&
-              param.seriesType === 'paging-sort-filter'
-            ) {
-              dispatch(
-                fetchDataSetByPreviewChartAction({
-                  backendChartId,
-                  sorter: {
-                    column: param?.seriesName!,
-                    operator: param?.value?.direction,
-                    aggOperator: param?.value?.aggOperator,
-                  },
-                  pageInfo: {
-                    pageNo: param?.value?.pageNo,
-                  },
-                }),
-              );
-              return;
-            }
+    const handleDrillOptionChange = useCallback(
+      (option: IChartDrillOption) => {
+        drillOptionRef.current = option;
+        dispatch(
+          updateFilterAndFetchDataset({
+            backendChartId,
+            chartPreview,
+            payload: null,
+            drillOption: drillOptionRef?.current,
+          }),
+        );
+      },
+      [backendChartId, chartPreview, dispatch],
+    );
+
+    const chartRightClickDrillThroughSetting = useMemo(() => {
+      const drillThroughSetting = getDrillThroughSetting(
+        chartConfigRef?.current?.interactions,
+        [],
+      );
+      const hasSelectedItems = !isEmptyArray(selectedItems?.[backendChartId]);
+      return Boolean(
+        drillThroughSetting?.rules?.filter(
+          r => r.event === InteractionMouseEvent.Right,
+        ).length,
+      ) && hasSelectedItems
+        ? drillThroughSetting!
+        : undefined;
+    }, [backendChartId, getDrillThroughSetting, selectedItems]);
+
+    const buildDrillThroughEventParams = useCallback(
+      (
+        clickEventParams,
+        targetEvent: InteractionMouseEvent,
+        ruleId?: string,
+      ) => {
+        const drillThroughSetting = getDrillThroughSetting(
+          chartConfigRef?.current?.interactions,
+          [],
+        );
+        return {
+          drillOption: drillOptionRef?.current,
+          drillThroughSetting,
+          clickEventParams,
+          targetEvent,
+          orgId,
+          view: {
+            id: chartPreview?.backendChart?.view?.id || '',
+            config: chartPreview?.backendChart?.view.config || {},
+            meta: chartPreview?.backendChart?.view.meta,
+            computedFields:
+              chartPreview?.backendChart?.config.computedFields || [],
           },
-        },
-      ]);
-    };
+          queryVariables: chartPreview?.backendChart?.queryVariables || [],
+          computedFields: chartPreview?.backendChart?.config.computedFields,
+          aggregation: chartPreview?.backendChart?.config?.aggregation,
+          chartConfig: chartConfigRef?.current,
+          ruleId,
+        };
+      },
+      [orgId, chartPreview, getDrillThroughSetting],
+    );
+
+    const buildViewDataEventParams = useCallback(
+      (clickEventParams, targetEvent: InteractionMouseEvent) => {
+        const viewDetailSetting = getViewDetailSetting(
+          chartConfigRef?.current?.interactions,
+          [],
+        );
+        const view = {
+          id: chartPreview?.backendChart?.view?.id || '',
+          config: chartPreview?.backendChart?.view.config || {},
+          meta: chartPreview?.backendChart?.view.meta,
+          computedFields:
+            chartPreview?.backendChart?.config.computedFields || [],
+        };
+        return {
+          drillOption: drillOptionRef.current,
+          clickEventParams,
+          targetEvent,
+          viewDetailSetting,
+          chartConfig: chartConfigRef?.current,
+          view,
+        };
+      },
+      [chartPreview?.backendChart, getViewDetailSetting],
+    );
+
+    const handleDrillThroughChange = useCallback(() => {
+      const drillThroughSetting = getDrillThroughSetting(
+        chartPreview?.chartConfig?.interactions,
+        [],
+      );
+      if (!drillThroughSetting) {
+        return;
+      }
+
+      return ruleId => {
+        const rightClickEvent = {
+          selectedItems: selectedItems?.[backendChartId],
+        };
+        handleDrillThroughEvent(
+          buildDrillThroughEventParams(
+            rightClickEvent,
+            InteractionMouseEvent.Right,
+            ruleId,
+          ),
+        );
+      };
+    }, [
+      backendChartId,
+      chartPreview?.chartConfig?.interactions,
+      selectedItems,
+      getDrillThroughSetting,
+      handleDrillThroughEvent,
+      buildDrillThroughEventParams,
+    ]);
+
+    const chartRightClickViewDetailSetting = useMemo(() => {
+      const viewDetailSetting = getViewDetailSetting(
+        chartPreview?.chartConfig?.interactions,
+        [],
+      );
+      const hasSelectedItems = !isEmptyArray(selectedItems?.[backendChartId]);
+      return viewDetailSetting?.event === InteractionMouseEvent.Right &&
+        hasSelectedItems
+        ? viewDetailSetting
+        : undefined;
+    }, [
+      backendChartId,
+      chartPreview?.chartConfig?.interactions,
+      getViewDetailSetting,
+      selectedItems,
+    ]);
+
+    const handleViewDataChange = useCallback(() => {
+      if (!chartRightClickViewDetailSetting) {
+        return;
+      }
+      return () => {
+        const rightClickEvent = {
+          selectedItems: selectedItems?.[backendChartId],
+        };
+        handleViewDataEvent(
+          buildViewDataEventParams(
+            rightClickEvent,
+            InteractionMouseEvent.Right,
+          ),
+        );
+      };
+    }, [
+      chartRightClickViewDetailSetting,
+      selectedItems,
+      backendChartId,
+      handleViewDataEvent,
+      buildViewDataEventParams,
+    ]);
+
+    const registerChartEvents = useCallback(
+      (chart, backendChartId) => {
+        chart?.registerMouseEvents([
+          {
+            name: 'click',
+            callback: param => {
+              handleDrillThroughEvent(
+                buildDrillThroughEventParams(param, InteractionMouseEvent.Left),
+              );
+              handleViewDataEvent(
+                buildViewDataEventParams(param, InteractionMouseEvent.Left),
+              );
+
+              if (
+                drillOptionRef.current?.isSelectedDrill &&
+                !drillOptionRef.current.isBottomLevel
+              ) {
+                const option = drillOptionRef.current;
+                option.drillDown(param.data.rowData);
+                drillOptionRef.current = option;
+                handleDrillOptionChange(option);
+                return;
+              }
+              if (
+                param.chartType === 'table' &&
+                param.interactionType === 'paging-sort-filter'
+              ) {
+                dispatch(
+                  fetchDataSetByPreviewChartAction({
+                    backendChartId,
+                    sorter: {
+                      column: param?.seriesName!,
+                      operator: param?.value?.direction,
+                      aggOperator: param?.value?.aggOperator,
+                    },
+                    pageInfo: {
+                      pageNo: param?.value?.pageNo,
+                    },
+                  }),
+                );
+                return;
+              }
+
+              // NOTE 透视表树形结构展开下钻特殊处理方法
+              if (
+                param.chartType === 'pivotSheet' &&
+                param.interactionType === 'drilled'
+              ) {
+                handleDrillOptionChange?.(param.drillOption);
+                return;
+              }
+
+              // NOTE 直接修改selectedItems结果集处理方法
+              if (param.interactionType === 'select') {
+                dispatch(
+                  vizAction.changeSelectedItems({
+                    backendChartId,
+                    data: param.selectedItems,
+                  }),
+                );
+              }
+            },
+          },
+          {
+            name: 'contextmenu',
+            callback: param => {},
+          },
+        ]);
+      },
+      [
+        dispatch,
+        handleDrillOptionChange,
+        handleDrillThroughEvent,
+        handleViewDataEvent,
+        buildDrillThroughEventParams,
+        buildViewDataEventParams,
+        vizAction,
+        drillOptionRef,
+      ],
+    );
+
+    useEffect(() => {
+      registerChartEvents(chart, backendChartId);
+    }, [backendChartId, chart, registerChartEvents]);
 
     const handleGotoWorkbenchPage = () => {
       history.push({
@@ -258,8 +501,10 @@ const ChartPreviewBoard: FC<{
         {
           id: chartPreview?.backendChart?.view?.id || '',
           config: chartPreview?.backendChart?.view.config || {},
+          meta: chartPreview?.backendChart?.view?.meta,
           computedFields:
             chartPreview?.backendChart?.config.computedFields || [],
+          type: chartPreview?.backendChart?.view?.type || 'SQL',
         },
         chartPreview?.chartConfig?.datas,
         chartPreview?.chartConfig?.settings,
@@ -379,29 +624,17 @@ const ChartPreviewBoard: FC<{
       );
     }, [backendChartId, dispatch, redirect, tg]);
 
-    const handleDrillOptionChange = (option: IChartDrillOption) => {
-      drillOptionRef.current = option;
-      dispatch(
-        updateFilterAndFetchDataset({
-          backendChartId,
-          chartPreview,
-          payload: null,
-          drillOption: drillOptionRef?.current,
-        }),
-      );
-    };
-
     const handleDateLevelChange = (type, payload) => {
       const rows = getRuntimeDateLevelFields(payload.value?.rows);
       const dateLevelComputedFields = rows.filter(
         v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
       );
-      const replacedColName = payload.value.replacedColName;
+      const replacedConfig = payload.value.replacedConfig;
       const computedFields = getRuntimeComputedFields(
         dateLevelComputedFields,
-        replacedColName,
+        replacedConfig,
         chartPreview?.backendChart?.config?.computedFields,
-        chartPreview?.chartConfig,
+        true,
       );
 
       dispatch(
@@ -418,7 +651,19 @@ const ChartPreviewBoard: FC<{
         }),
       );
     };
-
+    const dataset = useMemo(() => {
+      if (
+        !chartPreview?.backendChart?.viewId &&
+        chartPreview?.backendChart?.config.sampleData
+      ) {
+        return chartPreview?.backendChart?.config.sampleData;
+      }
+      return chartPreview?.dataset;
+    }, [
+      chartPreview?.backendChart?.config.sampleData,
+      chartPreview?.backendChart?.viewId,
+      chartPreview?.dataset,
+    ]);
     return (
       <StyledChartPreviewBoard>
         <VizHeader
@@ -443,9 +688,13 @@ const ChartPreviewBoard: FC<{
           <ChartDrillContext.Provider
             value={{
               drillOption: drillOptionRef.current,
-              onDrillOptionChange: handleDrillOptionChange,
               availableSourceFunctions,
+              viewDetailSetting: chartRightClickViewDetailSetting,
+              drillThroughSetting: chartRightClickDrillThroughSetting,
+              onDrillOptionChange: handleDrillOptionChange,
               onDateLevelChange: handleDateLevelChange,
+              onDrillThroughChange: handleDrillThroughChange(),
+              onViewDataChange: handleViewDataChange(),
             }}
           >
             <div>
@@ -462,10 +711,11 @@ const ChartPreviewBoard: FC<{
                   <ChartIFrameContainer
                     key={backendChartId}
                     containerId={backendChartId}
-                    dataset={chartPreview?.dataset}
+                    dataset={dataset}
                     chart={chart!}
                     config={chartPreview?.chartConfig!}
                     drillOption={drillOptionRef.current}
+                    selectedItems={selectedItems[backendChartId]}
                     width={cacheW}
                     height={cacheH}
                   />
@@ -473,11 +723,13 @@ const ChartPreviewBoard: FC<{
               </Spin>
             </ChartWrapper>
             <StyledChartDrillPathsContainer>
-              <ChartDrillPaths />
+              <ChartDrillPaths chartConfig={chartPreview?.chartConfig!} />
             </StyledChartDrillPathsContainer>
             <StyledChartDrillPathsContainer />
           </ChartDrillContext.Provider>
         </PreviewBlock>
+        {viewDetailPanelContextHolder}
+        {jumpDialogContextHolder}
       </StyledChartPreviewBoard>
     );
   },

@@ -46,7 +46,7 @@ import { logout } from 'app/slice/thunks';
 import { downloadFile } from 'app/utils/fetch';
 import { BASE_RESOURCE_URL } from 'globalConstants';
 import { changeLang } from 'locales/i18n';
-import React, { cloneElement, useCallback, useMemo, useState } from 'react';
+import { cloneElement, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory, useRouteMatch } from 'react-router-dom';
@@ -130,6 +130,12 @@ export function Navbar() {
         name: 'orgSettings',
         title: t('subNavs.orgSettings.title'),
         icon: <SettingOutlined />,
+        module: ResourceTypes.Manager,
+      },
+      {
+        name: 'resourceMigration',
+        title: t('subNavs.resourceMigration.title'),
+        icon: <ExportOutlined />,
         module: ResourceTypes.Manager,
       },
     ],

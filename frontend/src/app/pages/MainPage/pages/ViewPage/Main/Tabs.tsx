@@ -21,7 +21,7 @@ import {
   InfoCircleOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
-import { Button, Space } from 'antd';
+import { Button, Dropdown, Menu, Space } from 'antd';
 import { Confirm, TabPane, Tabs as TabsComponent } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
@@ -36,7 +36,12 @@ import {
   selectCurrentEditingViewAttr,
   selectEditingViews,
 } from '../slice/selectors';
-import { removeEditingView, runSql } from '../slice/thunks';
+import {
+  closeAllEditingViews,
+  closeOtherEditingViews,
+  removeEditingView,
+  runSql,
+} from '../slice/thunks';
 import { ViewViewModel } from '../slice/types';
 
 const errorColor = css`
@@ -56,10 +61,11 @@ export const Tabs = memo(() => {
   const id = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'id' }),
   ) as string;
+
   const t = useI18NPrefix('view.tabs');
 
   const redirect = useCallback(
-    currentEditingViewKey => {
+    (currentEditingViewKey?: string) => {
       if (currentEditingViewKey) {
         history.push(`/organizations/${orgId}/views/${currentEditingViewKey}`);
       } else {
@@ -115,6 +121,34 @@ export const Tabs = memo(() => {
     dispatch(runSql({ id, isFragment: !!fragment }));
   }, [dispatch, id, editorInstance]);
 
+  const handleClickMenu = (e: any, id: string) => {
+    e.domEvent.stopPropagation();
+    if (e.key === 'CLOSE_OTHER') {
+      dispatch(closeOtherEditingViews({ id, resolve: redirect }));
+      return;
+    }
+    dispatch(closeAllEditingViews({ resolve: redirect }));
+  };
+
+  const menu = (id: string) => (
+    <Menu onClick={e => handleClickMenu(e, id)}>
+    <Menu.Item key="CLOSE_OTHER">
+        <span>{t('closeOther')}</span>
+      </Menu.Item>
+      <Menu.Item key="CLOSE_ALL">
+        <span>{t('closeAll')}</span>
+      </Menu.Item>
+    </Menu>
+  );
+
+  const Tab = (id: string, name: string) => (
+    <span>
+      <Dropdown overlay={menu(id)} trigger={['contextMenu']}>
+        <span className="ant-dropdown-link">{name}</span>
+      </Dropdown>
+    </span>
+  );
+
   return (
     <Wrapper>
       <TabsComponent
@@ -127,7 +161,7 @@ export const Tabs = memo(() => {
         {editingViews.map(({ id, name, touched, stage, error }) => (
           <TabPane
             key={id}
-            tab={error ? <span css={errorColor}>{name}</span> : name}
+            tab={error ? <span css={errorColor}>{name}</span> : Tab(id, name)}
             closeIcon={
               <CloseIcon touched={touched} stage={stage} error={!!error} />
             }

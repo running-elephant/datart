@@ -18,7 +18,7 @@
 
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import { AuthForm } from 'app/components';
+import * as AuthLayout from 'app/components/styles/AuthLayout';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -40,7 +40,7 @@ export const WithoutActivation: FC<WithoutActivationProps> = ({
   }, [history]);
 
   return (
-    <AuthForm>
+    <AuthLayout.Form>
       <Success />
       <Title>{t('registerSuccess')}</Title>
       <Content>
@@ -53,7 +53,7 @@ export const WithoutActivation: FC<WithoutActivationProps> = ({
           {t('continue')}
         </Button>
       </Content>
-    </AuthForm>
+    </AuthLayout.Form>
   );
 };
 

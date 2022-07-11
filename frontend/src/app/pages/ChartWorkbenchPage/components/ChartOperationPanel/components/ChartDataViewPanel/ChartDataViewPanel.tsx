@@ -16,14 +16,20 @@
  * limitations under the License.
  */
 
-import { FormOutlined, PlusOutlined } from '@ant-design/icons';
-import { message, Popover, Tooltip, TreeSelect } from 'antd';
-import { ToolbarButton } from 'app/components';
-import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
+import {
+  FormOutlined,
+  InfoCircleOutlined,
+  MoreOutlined,
+} from '@ant-design/icons';
+import { Button, Menu, message, Space, Tooltip, TreeSelect } from 'antd';
+import { MenuListItem, Popup, ToolbarButton } from 'app/components';
+import { Confirm, ConfirmProps } from 'app/components/Confirm';
+import { ChartDataViewFieldCategory } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
 import useToggle from 'app/hooks/useToggle';
+import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import workbenchSlice from 'app/pages/ChartWorkbenchPage/slice';
 import {
   dataviewsSelector,
@@ -35,18 +41,27 @@ import {
   PermissionLevels,
   ResourceTypes,
 } from 'app/pages/MainPage/pages/PermissionPage/constants';
-import { ColumnRole } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { checkComputedFieldAsync } from 'app/utils/fetch';
 import { updateByKey } from 'app/utils/mutation';
-import { FC, memo, useCallback, useMemo } from 'react';
+import {
+  FC,
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
-import { SPACE, SPACE_XS } from 'styles/StyleConstants';
-import { getPath } from 'utils/utils';
+import { ORANGE, SPACE, SPACE_XS } from 'styles/StyleConstants';
+import { getPath, modelListFormsTreeByTableName } from 'utils/utils';
+import { getAllFieldsOfEachType } from '../../utils';
 import { ChartDraggableSourceGroupContainer } from '../ChartDraggable';
 import ChartComputedFieldSettingPanel from './components/ChartComputedFieldSettingPanel';
 
@@ -54,18 +69,25 @@ const ChartDataViewPanel: FC<{
   dataView?: ChartDataView;
   defaultViewId?: string;
   chartConfig?: ChartConfig;
-  onDataViewChange?: () => void;
+  onDataViewChange?: (clear?: boolean) => void;
 }> = memo(({ dataView, defaultViewId, chartConfig, onDataViewChange }) => {
   const t = useI18NPrefix(`viz.workbench.dataview`);
   const dispatch = useDispatch();
+  const history = useHistory();
+  const [showModal, modalContextHolder] = useStateModal({});
+  const { availableSourceFunctions } = useContext(ChartDataViewContext);
   const dataviewTreeSelector = useMemo(makeDataviewTreeSelector, []);
   const getSelectable = useCallback(v => !v.isFolder, []);
   const dataviewTreeData = useSelector(state =>
     dataviewTreeSelector(state, getSelectable),
   );
-  const [showModal, modalContextHolder] = useStateModal({});
+  const [confirmProps, setConfirmProps] = useState<ConfirmProps>({});
+
   const [isDisplayAddNewModal, setIsDisplayAddNewModal] = useToggle();
   const views = useSelector(dataviewsSelector);
+  const [allMetaFields, setAllMetaFields] = useState<any>([]);
+  const [isGroup, setIsGroup] = useState<boolean>(true);
+  const [sortType, setSortType] = useState<string>('byNameSort');
 
   const path = useMemo(() => {
     return views?.length && dataView
@@ -89,7 +111,6 @@ const ChartDataViewPanel: FC<{
     id: '',
     level: PermissionLevels.Enable,
   })(true);
-  const history = useHistory();
 
   const handleDataViewChange = useCallback(
     value => {
@@ -98,28 +119,44 @@ const ChartDataViewPanel: FC<{
       }
       let Data = chartConfig?.datas?.filter(v => v.rows && v.rows.length);
       if (Data?.length) {
-        (showModal as Function)({
-          title: '',
-          modalSize: StateModalSize.XSMALL,
-          content: () => t('toggleViewTip'),
-          onOk: () => {
-            onDataViewChange?.();
-            dispatch(fetchViewDetailAction(value));
-          },
+        setConfirmProps({
+          visible: true,
+          title: t('toggleViewTip'),
+          width: 500,
+          icon: <InfoCircleOutlined style={{ color: ORANGE }} />,
+          footer: (
+            <Space>
+              <Button onClick={() => setConfirmProps({ visible: false })}>
+                {'取消'}
+              </Button>
+              <Button
+                onClick={() => {
+                  onDataViewChange?.(true);
+                  setConfirmProps({ visible: false });
+                  dispatch(fetchViewDetailAction(value));
+                }}
+              >
+                {'清空'}
+              </Button>
+              <Button
+                onClick={() => {
+                  onDataViewChange?.();
+                  setConfirmProps({ visible: false });
+                  dispatch(fetchViewDetailAction(value));
+                }}
+                type="primary"
+              >
+                {'保留'}
+              </Button>
+            </Space>
+          ),
         });
       } else {
         onDataViewChange?.();
         dispatch(fetchViewDetailAction(value));
       }
     },
-    [
-      chartConfig?.datas,
-      dataView?.id,
-      dispatch,
-      onDataViewChange,
-      showModal,
-      t,
-    ],
+    [chartConfig?.datas, dataView?.id, dispatch, onDataViewChange, t],
   );
 
   const filterDateViewTreeNode = useCallback(
@@ -128,70 +165,75 @@ const ChartDataViewPanel: FC<{
     [],
   );
 
-  const handleAddNewOrUpdateComputedField = async (
-    field?: ChartDataViewMeta,
-    originId?: string,
-  ) => {
-    if (!field) {
-      return Promise.reject('field is empty');
-    }
+  const handleAddNewOrUpdateComputedField = useCallback(
+    async (field?: ChartDataViewMeta, originId?: string) => {
+      if (!field) {
+        return Promise.reject('field is empty');
+      }
 
-    let validComputedField = true;
-    try {
-      validComputedField = await checkComputedFieldAsync(
-        dataView?.sourceId,
-        field.expression,
+      let validComputedField = true;
+      try {
+        validComputedField = await checkComputedFieldAsync(
+          dataView?.sourceId,
+          field.expression,
+        );
+      } catch (error) {
+        validComputedField = false;
+      }
+
+      if (!validComputedField) {
+        message.error('validate function computed field failed');
+        return Promise.reject('validate function computed field failed');
+      }
+      const otherComputedFields = dataView?.computedFields?.filter(
+        f => f.id !== originId,
       );
-    } catch (error) {
-      validComputedField = false;
-    }
-
-    if (!validComputedField) {
-      message.error('validate function computed field failed');
-      return Promise.reject('validate function computed field failed');
-    }
-    const otherComputedFields = dataView?.computedFields?.filter(
-      f => f.id !== originId,
-    );
-    const isNameConflict = !!otherComputedFields?.find(f => f.id === field?.id);
-    if (isNameConflict) {
-      message.error(
-        'The computed field has already been exist, please choose anohter one!',
+      const isNameConflict = !!otherComputedFields?.find(
+        f => f.id === field?.id,
       );
-      return Promise.reject(
-        'The computed field has already been exist, please choose anohter one!',
+      if (isNameConflict) {
+        message.error(
+          'The computed field has already been exist, please choose another one!',
+        );
+        return Promise.reject(
+          'The computed field has already been exist, please choose another one!',
+        );
+      }
+
+      const currentFieldIndex = (dataView?.computedFields || []).findIndex(
+        f => f.id === originId,
       );
-    }
 
-    const currentFieldIndex = (dataView?.computedFields || []).findIndex(
-      f => f.id === originId,
-    );
-
-    if (currentFieldIndex >= 0) {
-      const newComputedFields = updateByKey(
-        dataView?.computedFields,
-        currentFieldIndex,
+      if (currentFieldIndex >= 0) {
+        const newComputedFields = updateByKey(
+          dataView?.computedFields,
+          currentFieldIndex,
+          field,
+        );
+        dispatch(
+          workbenchSlice.actions.updateCurrentDataViewComputedFields(
+            newComputedFields!,
+          ),
+        );
+        return;
+      }
+      const newComputedFields = (dataView?.computedFields || []).concat([
         field,
-      );
+      ]);
       dispatch(
         workbenchSlice.actions.updateCurrentDataViewComputedFields(
-          newComputedFields!,
+          newComputedFields,
         ),
       );
-      return;
-    }
-    const newComputedFields = (dataView?.computedFields || []).concat([field]);
-    dispatch(
-      workbenchSlice.actions.updateCurrentDataViewComputedFields(
-        newComputedFields,
-      ),
-    );
-  };
+    },
+    [dispatch, dataView?.computedFields, dataView?.sourceId],
+  );
 
   const handleDeleteComputedField = fieldId => {
     const newComputedFields = (dataView?.computedFields || []).filter(
       f => f.id !== fieldId,
     );
+
     dispatch(
       workbenchSlice.actions.updateCurrentDataViewComputedFields(
         newComputedFields,
@@ -203,56 +245,160 @@ const ChartDataViewPanel: FC<{
     const editField = (dataView?.computedFields || []).find(
       f => f.id === fieldId,
     );
+
     handleAddOrEditComputedField(editField);
   };
 
-  const handleAddOrEditComputedField = field => {
-    (showModal as Function)({
-      title: t('createComputedFields'),
-      modalSize: StateModalSize.MIDDLE,
-      content: onChange => (
-        <ChartComputedFieldSettingPanel
-          computedField={field}
-          sourceId={dataView?.sourceId}
-          fields={dataView?.meta}
-          variables={dataView?.meta?.filter(
-            c => c.category === ChartDataViewFieldCategory.Variable,
-          )}
-          allComputedFields={dataView?.computedFields}
-          onChange={onChange}
-        />
-      ),
-      onOk: newField => handleAddNewOrUpdateComputedField(newField, field?.id),
-    });
-  };
+  const buildFieldsForComputedFieldSettingPanel = useCallback(
+    meta => {
+      if (dataView?.type === 'SQL') {
+        return getAllColumnInMeta(meta);
+      } else {
+        const allColumn = getAllColumnInMeta(meta);
+        const tableNameList: string[] = [];
+        const columnNameObj: { [key: string]: any } = {};
+        const columnTreeData: any = [];
 
-  const sortedMetaFields = useMemo(() => {
-    const computedFields = dataView?.computedFields?.filter(
-      v => v.category !== ChartDataViewFieldCategory.DateLevelComputedField,
-    );
-    const allFields = (dataView?.meta || []).concat(computedFields || []);
-    const hierarchyFields = allFields.filter(
-      f => f.role === ColumnRole.Hierarchy,
-    );
-    const allNonHierarchyFields = allFields.filter(
-      f => f.role !== ColumnRole.Hierarchy,
-    );
-    const stringFields = allNonHierarchyFields.filter(
-      f => f.type === DataViewFieldType.STRING,
-    );
-    const numericFields = allNonHierarchyFields.filter(
-      f => f.type === DataViewFieldType.NUMERIC,
-    );
-    const dateFields = allNonHierarchyFields.filter(
-      f => f.type === DataViewFieldType.DATE,
-    );
-    return [
-      ...hierarchyFields,
-      ...dateFields,
-      ...stringFields,
-      ...numericFields,
-    ];
-  }, [dataView?.meta, dataView?.computedFields]);
+        allColumn?.forEach((v, i) => {
+          const path = v.path;
+          const tableName = path?.slice(0, path?.length - 1).join('.') || '';
+          if (!tableNameList.includes(tableName)) {
+            tableNameList.push(tableName);
+          }
+        });
+
+        allColumn?.forEach((v, i) => {
+          const path = v.path;
+          const tableName = path?.slice(0, path?.length - 1).join('.') || '';
+          if (tableNameList.includes(tableName)) {
+            const fieldName = path?.[path.length - 1];
+            const columnNameArr = columnNameObj[tableName];
+            columnNameObj[tableName] = columnNameArr
+              ? [...columnNameArr, { title: fieldName, key: path }]
+              : [{ title: fieldName, key: path }];
+          }
+        });
+
+        tableNameList.forEach(v => {
+          columnTreeData.push({
+            title: v,
+            key: v,
+            selectable: false,
+            children: columnNameObj[v],
+          });
+        });
+
+        return columnTreeData;
+      }
+    },
+    [dataView?.type],
+  );
+
+  const handleAddOrEditComputedField = useCallback(
+    field => {
+      (showModal as Function)({
+        title: t('createComputedFields'),
+        modalSize: StateModalSize.MIDDLE,
+        content: onChange => (
+          <ChartComputedFieldSettingPanel
+            computedField={field}
+            sourceId={dataView?.sourceId}
+            fields={buildFieldsForComputedFieldSettingPanel(dataView?.meta)}
+            variables={dataView?.meta?.filter(
+              c => c.category === ChartDataViewFieldCategory.Variable,
+            )}
+            allComputedFields={dataView?.computedFields}
+            viewType={dataView?.type}
+            onChange={onChange}
+          />
+        ),
+        onOk: newField =>
+          handleAddNewOrUpdateComputedField(newField, field?.id),
+        onButtonProps: { display: field?.isViewComputedFields },
+      });
+    },
+    [
+      buildFieldsForComputedFieldSettingPanel,
+      dataView?.computedFields,
+      dataView?.meta,
+      dataView?.type,
+      dataView?.sourceId,
+      handleAddNewOrUpdateComputedField,
+      showModal,
+      t,
+    ],
+  );
+
+  const GroupMetaFields = useCallback(
+    sortType => {
+      const {
+        hierarchyFields,
+        stringFields,
+        numericFields,
+        dateLevelFields,
+        stringComputedFields,
+        numericComputedFields,
+        dateComputedFields,
+      } = getAllFieldsOfEachType({
+        sortType,
+        dataView,
+        availableSourceFunctions,
+      });
+
+      const columnTreeData = modelListFormsTreeByTableName(
+        [...stringFields, ...dateLevelFields, ...numericFields],
+        'analysisPage',
+      );
+
+      return [
+        ...hierarchyFields,
+        ...columnTreeData,
+        ...stringComputedFields,
+        ...numericComputedFields,
+        ...dateComputedFields,
+      ];
+    },
+    [availableSourceFunctions, dataView],
+  );
+
+  const noGroupMetaFields = useCallback(
+    sortType => {
+      const {
+        hierarchyFields,
+        dateLevelFields,
+        stringFields,
+        numericFields,
+        stringComputedFields,
+        numericComputedFields,
+        dateComputedFields,
+      } = getAllFieldsOfEachType({
+        sortType,
+        dataView,
+        availableSourceFunctions,
+      });
+      return [
+        ...hierarchyFields,
+        ...stringFields,
+        ...stringComputedFields,
+        ...dateComputedFields,
+        ...dateLevelFields,
+        ...numericFields,
+        ...numericComputedFields,
+      ];
+    },
+    [availableSourceFunctions, dataView],
+  );
+
+  const buildAllMetaFields = useCallback(
+    (isGroup: boolean, sortType) => {
+      if (dataView?.type === 'SQL' || !isGroup) {
+        setAllMetaFields(noGroupMetaFields(sortType));
+      } else {
+        setAllMetaFields(GroupMetaFields(sortType));
+      }
+    },
+    [noGroupMetaFields, GroupMetaFields, dataView?.type],
+  );
 
   const editView = useCallback(() => {
     let orgId = dataView?.orgId as string;
@@ -269,11 +415,51 @@ const ChartDataViewPanel: FC<{
     });
   }, [editView, showModal, t]);
 
+  const handleClickMenu = useCallback(
+    ({ key }) => {
+      switch (key) {
+        case 'createComputedFields':
+          setIsDisplayAddNewModal();
+          handleAddOrEditComputedField(null);
+          break;
+        case 'byGroup':
+          setIsGroup(true);
+          buildAllMetaFields(true, sortType);
+          break;
+        case 'byNoGroup':
+          setIsGroup(false);
+          buildAllMetaFields(false, sortType);
+          break;
+        case 'byNameSort':
+          setSortType(key);
+          buildAllMetaFields(isGroup, key);
+          break;
+        case 'byOriginalFieldSort':
+          setSortType(key);
+          buildAllMetaFields(isGroup, key);
+          break;
+        default:
+          break;
+      }
+    },
+    [
+      handleAddOrEditComputedField,
+      setIsDisplayAddNewModal,
+      buildAllMetaFields,
+      isGroup,
+      sortType,
+    ],
+  );
+
   useMount(() => {
     if (defaultViewId) {
       handleDataViewChange(defaultViewId);
     }
   });
+
+  useEffect(() => {
+    buildAllMetaFields(dataView?.type === 'STRUCT', 'byNameSort');
+  }, [dataView?.type, buildAllMetaFields]);
 
   return (
     <StyledChartDataViewPanel>
@@ -297,31 +483,50 @@ const ChartDataViewPanel: FC<{
           filterTreeNode={filterDateViewTreeNode}
           bordered={false}
         />
-        <Popover
+        <Popup
           placement="bottomRight"
           visible={isDisplayAddNewModal}
           onVisibleChange={() => setIsDisplayAddNewModal()}
           trigger="click"
           content={
-            <ul>
-              <li
-                onClick={() => {
-                  setIsDisplayAddNewModal();
-                  handleAddOrEditComputedField(null);
-                }}
-              >
+            <Menu
+              onClick={handleClickMenu}
+              defaultSelectedKeys={[
+                'byNameSort',
+                isGroup ? 'byGroup' : 'byNoGroup',
+              ]}
+            >
+              <MenuListItem key="createComputedFields">
                 {t('createComputedFields')}
-              </li>
-              {/* <li>{t('createVariableFields')}</li> */}
-            </ul>
+              </MenuListItem>
+              <MenuListItem
+                disabled={dataView?.type !== 'STRUCT'}
+                title={t('Group')}
+                key="group"
+                sub
+              >
+                <MenuListItem key="byGroup">
+                  {t('byDataBaseGroup')}
+                </MenuListItem>
+                <MenuListItem key="byNoGroup">{t('noGroup')}</MenuListItem>
+              </MenuListItem>
+              <MenuListItem title={t('Sort')} key="sort" sub>
+                <MenuListItem key="byNameSort">{t('byNameSort')}</MenuListItem>
+                <MenuListItem key="byOriginalFieldSort">
+                  {t('noSort')}
+                </MenuListItem>
+              </MenuListItem>
+            </Menu>
           }
         >
-          <ToolbarButton icon={<PlusOutlined />} size="small" />
-        </Popover>
+          <ToolbarButton icon={<MoreOutlined />} size="small" />
+        </Popup>
         {modalContextHolder}
       </Header>
+      <Confirm {...confirmProps} />
+
       <ChartDraggableSourceGroupContainer
-        meta={sortedMetaFields}
+        meta={allMetaFields}
         onDeleteComputedField={handleDeleteComputedField}
         onEditComputedField={handleEditComputedField}
       />

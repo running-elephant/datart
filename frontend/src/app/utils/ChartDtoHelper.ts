@@ -16,8 +16,13 @@
  * limitations under the License.
  */
 
+import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
-import { ChartConfig, ChartStyleConfig } from 'app/types/ChartConfig';
+import {
+  ChartConfig,
+  ChartDataConfig,
+  ChartStyleConfig,
+} from 'app/types/ChartConfig';
 import { ChartConfigDTO, ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
@@ -28,14 +33,19 @@ import {
 import { Omit } from 'utils/object';
 
 export function convertToChartDto(data): ChartDTO {
-  if (data?.view?.model) {
-    data.view.model = beginViewModelMigration(data.view.model);
+  if (data?.view) {
+    data.view = migrationViewConfig(data.view);
   }
+  if (data?.view?.model) {
+    data.view.model = beginViewModelMigration(data.view.model, data.view.type);
+  }
+
   return Object.assign({}, data, {
-    config: JSON.parse(data?.config),
+    config: JSON.parse(data?.config || '{}'),
     view: {
       ...Omit(data?.view, ['model']),
       meta: transformHierarchyMeta(data?.view?.model),
+      computedFields: JSON.parse(data?.view?.model || '{}').computedFields,
     },
   });
 }
@@ -76,6 +86,7 @@ function extractChartConfigValueModel(config: ChartConfig): ChartConfigDTO {
     datas: config?.datas,
     styles: getStyleValueModel(config?.styles),
     settings: getStyleValueModel(config?.settings),
+    interactions: getStyleValueModel(config?.interactions),
   };
 }
 
@@ -101,10 +112,10 @@ export function mergeToChartConfig(
   if (!source) {
     return target;
   }
-  target.datas = mergeChartDataConfigs(
+  target.datas = mergeChartDataConfigs<ChartDataConfig>(
     target?.datas,
     source?.chartConfig?.datas,
-  );
+  ) as ChartDataConfig[];
   target.styles = mergeChartStyleConfigs(
     target?.styles,
     source?.chartConfig?.styles,
@@ -112,6 +123,10 @@ export function mergeToChartConfig(
   target.settings = mergeChartStyleConfigs(
     target?.settings,
     source?.chartConfig?.settings,
+  );
+  target.interactions = mergeChartStyleConfigs(
+    target?.interactions,
+    source?.chartConfig?.interactions,
   );
   return target;
 }
@@ -123,5 +138,6 @@ export function convertToChartConfigDTO(
     datas: source?.chartConfig?.datas,
     styles: source?.chartConfig?.styles,
     settings: source?.chartConfig?.settings,
+    interactions: source?.chartConfig?.interactions,
   };
 }

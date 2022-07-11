@@ -16,6 +16,12 @@
  * limitations under the License.
  */
 
+import {
+  AggregateFieldSubAggregateType,
+  ChartDataSectionFieldActionType,
+  ChartDataSectionType,
+  ChartDataViewFieldCategory,
+} from 'app/constants';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
 
@@ -23,7 +29,7 @@ export const updateDataConfigByField = (
   uid: string,
   config: ChartDataConfig,
   field: ChartDataSectionField,
-  replacedColName?: string,
+  replacedConfig?: ChartDataSectionField,
 ): ChartDataConfig => {
   return updateBy(config, draft => {
     draft.rows = (draft.rows || []).map(r => {
@@ -32,9 +38,48 @@ export const updateDataConfigByField = (
       }
       return r;
     });
-    if (replacedColName) {
-      draft.replacedColName = replacedColName;
+    if (replacedConfig) {
+      draft.replacedConfig = replacedConfig;
     }
     return draft;
   });
+};
+export const getDefaultAggregate = (
+  item: ChartDataSectionField,
+  config: ChartDataConfig,
+) => {
+  if (
+    config?.type === ChartDataSectionType.Aggregate ||
+    config?.type === ChartDataSectionType.Size ||
+    config?.type === ChartDataSectionType.Info ||
+    config?.type === ChartDataSectionType.Mixed
+  ) {
+    if (
+      config.disableAggregate ||
+      item.category === ChartDataViewFieldCategory.AggregateComputedField
+    ) {
+      return;
+    }
+    if (item.aggregate) {
+      return item.aggregate;
+    }
+
+    let aggType: string = '';
+    if (config?.actions instanceof Array) {
+      config?.actions?.find(
+        type =>
+          type === ChartDataSectionFieldActionType.Aggregate ||
+          type === ChartDataSectionFieldActionType.AggregateLimit,
+      );
+    } else if (config?.actions instanceof Object) {
+      aggType = config?.actions?.[item?.type]?.find(
+        type =>
+          type === ChartDataSectionFieldActionType.Aggregate ||
+          type === ChartDataSectionFieldActionType.AggregateLimit,
+      );
+    }
+    if (aggType) {
+      return AggregateFieldSubAggregateType?.[aggType]?.[0];
+    }
+  }
 };

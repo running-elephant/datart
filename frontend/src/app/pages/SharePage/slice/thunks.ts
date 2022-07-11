@@ -30,7 +30,7 @@ import { handleServerStoryAction } from 'app/pages/StoryBoardPage/slice/actions'
 import { ServerStoryBoard } from 'app/pages/StoryBoardPage/slice/types';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { convertToChartDto } from 'app/utils/ChartDtoHelper';
-import { fetchAvailableSourceFunctionsAsync } from 'app/utils/fetch';
+import { fetchAvailableSourceFunctionsAsyncForShare } from 'app/utils/fetch';
 import { RootState } from 'types';
 import persistence from 'utils/persistence';
 import { request2 } from 'utils/request';
@@ -59,7 +59,9 @@ export const fetchShareVizInfo = createAsyncThunk(
     },
     thunkAPI,
   ) => {
-    const authenticationMode = filterSearchParams?.type.join();
+    const authenticationMode = filterSearchParams?.type?.join();
+    const isMatchByName = !!filterSearchParams?.isMatchByName;
+
     let data = {} as ShareVizInfo;
     try {
       const response = await request2<ShareVizInfo>({
@@ -103,7 +105,11 @@ export const fetchShareVizInfo = createAsyncThunk(
           vizDetail: convertToChartDto(data.vizDetail),
         };
         thunkAPI.dispatch(
-          shareActions.setDataChart({ data: shareVizInfo, filterSearchParams }),
+          shareActions.setDataChart({
+            data: shareVizInfo,
+            filterSearchParams,
+            isMatchByName,
+          }),
         );
         break;
       case 'DASHBOARD':
@@ -117,6 +123,7 @@ export const fetchShareVizInfo = createAsyncThunk(
               params: filterSearchParams,
               isMatchByName: true,
             },
+            executeToken: data.executeToken,
           }),
         );
         break;
@@ -150,17 +157,23 @@ export const fetchShareDataSetByPreviewChartAction = createAsyncThunk(
       pageInfo?: any;
       sorter?: { column: string; operator: string; aggOperator?: string };
       drillOption?: IChartDrillOption;
+      filterSearchParams?: FilterSearchParams;
     },
     thunkAPI,
   ) => {
     const state = thunkAPI.getState() as RootState;
     const shareState = state.share;
+    if (!args.preview?.backendChart?.view.id) {
+      return;
+    }
     const builder = new ChartDataRequestBuilder(
       {
         id: args.preview?.backendChart?.view.id || '',
         config: args.preview?.backendChart?.view.config || {},
+        meta: args?.preview?.backendChart?.view?.meta,
         computedFields:
           args.preview?.backendChart?.config?.computedFields || [],
+        type: args.preview?.backendChart?.view.type || 'SQL',
       },
       args.preview?.chartConfig?.datas,
       args.preview?.chartConfig?.settings,
@@ -259,13 +272,19 @@ export const getOauth2Clients = createAsyncThunk<[]>(
   },
 );
 
-export const fetchAvailableSourceFunctions = createAsyncThunk<
+export const fetchAvailableSourceFunctionsForShare = createAsyncThunk<
   string[],
-  { sourceId: string }
->('workbench/fetchAvailableSourceFunctions', async arg => {
-  try {
-    return await fetchAvailableSourceFunctionsAsync(arg.sourceId);
-  } catch (err) {
-    throw err;
-  }
-});
+  { sourceId: string; executeToken: string }
+>(
+  'workbench/fetchAvailableSourceFunctionsAsyncForShare',
+  async ({ sourceId, executeToken }) => {
+    try {
+      return await fetchAvailableSourceFunctionsAsyncForShare(
+        sourceId,
+        executeToken,
+      );
+    } catch (err) {
+      throw err;
+    }
+  },
+);

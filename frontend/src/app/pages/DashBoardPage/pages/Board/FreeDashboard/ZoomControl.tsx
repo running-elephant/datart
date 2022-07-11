@@ -17,6 +17,7 @@
  */
 import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import { Button, Slider, Space, Tooltip } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { useMemo } from 'react';
 import styled from 'styled-components/macro';
 
@@ -38,11 +39,12 @@ const ZoomControl: React.FC<ZoomControlProps> = props => {
     }
     return scale.map((s: number) => `${Math.floor(s * 100)}%`).join('/');
   }, [scale]);
+  const t = useI18NPrefix(`viz.board.action`);
   return (
     <Wrapper>
       <div className="bottom-box">
         <Space>
-          <Tooltip title="缩小视图">
+          <Tooltip title={t('zoomIn')}>
             <Button
               size="small"
               type="text"
@@ -56,7 +58,7 @@ const ZoomControl: React.FC<ZoomControlProps> = props => {
             onChange={sliderChange}
             value={sliderValue}
           />
-          <Tooltip title="放大视图">
+          <Tooltip title={t('zoomOut')}>
             <Button
               size="small"
               type="text"

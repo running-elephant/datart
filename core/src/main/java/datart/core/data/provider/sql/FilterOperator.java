@@ -20,13 +20,13 @@ package datart.core.data.provider.sql;
 
 import datart.core.data.provider.SingleTypedValue;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Arrays;
 
 @Data
-public class FilterOperator implements Operator {
-
-    private String column;
+@EqualsAndHashCode(callSuper = true)
+public class FilterOperator extends ColumnOperator {
 
     private AggregateOperator.SqlOperator aggOperator;
 
@@ -63,7 +63,7 @@ public class FilterOperator implements Operator {
     @Override
     public String toString() {
         return "FilterOperator{" +
-                "column='" + column + '\'' +
+                "column='" + getColumnKey() + '\'' +
                 ", aggOperator=" + aggOperator +
                 ", sqlOperator=" + sqlOperator +
                 ", values=" + Arrays.toString(values) +

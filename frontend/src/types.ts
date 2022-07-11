@@ -1,4 +1,4 @@
-import { WorkbenchState } from 'app/pages/ChartWorkbenchPage/slice/type';
+import { WorkbenchState } from 'app/pages/ChartWorkbenchPage/slice/types';
 import { BoardState } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { EditBoardState } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
 import { MemberState } from 'app/pages/MainPage/pages/MemberPage/slice/types';
@@ -66,3 +66,11 @@ export declare type Currency<TAmount> = {
 export type ValueOf<T> = T[keyof T];
 
 export type Nullable<T> = T | null | undefined;
+
+export interface IFontDefault {
+  fontFamily: string;
+  fontSize: number | string;
+  fontWeight: number | string;
+  fontStyle: string;
+  color: string;
+}

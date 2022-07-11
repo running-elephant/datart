@@ -40,6 +40,7 @@ import { MemberPage } from './pages/MemberPage';
 import { OrgSettingPage } from './pages/OrgSettingPage';
 import { PermissionPage } from './pages/PermissionPage';
 import { ResourceTypes } from './pages/PermissionPage/constants';
+import { ResourceMigrationPage } from './pages/ResourceMigrationPage';
 import { SchedulePage } from './pages/SchedulePage';
 import { SourcePage } from './pages/SourcePage';
 import { VariablePage } from './pages/VariablePage';
@@ -78,6 +79,7 @@ export function MainPage() {
     return () => {
       dispatch(actions.clear());
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -224,6 +226,14 @@ export function MainPage() {
             render={() => (
               <AccessRoute module={ResourceTypes.Manager}>
                 <OrgSettingPage />
+              </AccessRoute>
+            )}
+          />
+          <Route
+            path="/organizations/:orgId/resourceMigration"
+            render={() => (
+              <AccessRoute module={ResourceTypes.Manager}>
+                <ResourceMigrationPage />
               </AccessRoute>
             )}
           />

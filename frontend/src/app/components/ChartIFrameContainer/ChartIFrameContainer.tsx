@@ -22,13 +22,14 @@ import {
 } from 'app/components/ReactFrameComponent';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
 import { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
 import ChartIFrameLifecycleAdapter from './ChartIFrameLifecycleAdapter';
+
 const ChartIFrameContainer: FC<{
   dataset: any;
   chart: IChart;
@@ -38,6 +39,7 @@ const ChartIFrameContainer: FC<{
   height?: any;
   isShown?: boolean;
   drillOption?: IChartDrillOption;
+  selectedItems?: SelectedItem[];
   widgetSpecialConfig?: any;
   scale?: [number, number];
 }> = memo(props => {
@@ -80,6 +82,7 @@ const ChartIFrameContainer: FC<{
               widgetSpecialConfig={props.widgetSpecialConfig}
               isShown={props.isShown}
               drillOption={props?.drillOption}
+              selectedItems={props?.selectedItems}
             />
           </div>
         </div>
@@ -142,6 +145,7 @@ const ChartIFrameContainer: FC<{
                   widgetSpecialConfig={props.widgetSpecialConfig}
                   isShown={props.isShown}
                   drillOption={props.drillOption}
+                  selectedItems={props?.selectedItems}
                 />
               </div>
             </StyleSheetManager>

@@ -20,24 +20,31 @@ import {
   ChartDataSectionType,
   ChartDataViewFieldCategory,
   DataViewFieldType,
+  RUNTIME_DATE_LEVEL_KEY,
 } from 'app/constants';
 import { ChartDataSetRow } from 'app/models/ChartDataSet';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
-import { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   ChartDataConfig,
   ChartDataSectionField,
   ChartStyleConfig,
-  IFieldFormatConfig,
-} from '../../types/ChartConfig';
+  FormatFieldAction,
+} from 'app/types/ChartConfig';
+import { IChartDataSet } from 'app/types/ChartDataSet';
 import {
+  clearRuntimeDateLevelFieldsInChartConfig,
+  compareSelectedItems,
+  getChartSelection,
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getDataColumnMaxAndMin2,
   getDrillableRows,
   getGridStyle,
   getReference2,
+  getRuntimeComputedFields,
+  getRuntimeDateLevelFields,
   getScatterSymbolSizeFn,
+  getSelectedItemStyles,
   getSeriesTooltips4Polar2,
   getSeriesTooltips4Rectangular2,
   getSettingValue,
@@ -48,6 +55,7 @@ import {
   getValue,
   getValueByColumnKey,
   isMatchRequirement,
+  setRuntimeDateLevelFieldsInChartConfig,
   toFormattedValue,
   transformToDataSet,
   transformToObjectArray,
@@ -752,7 +760,7 @@ describe('Chart Helper ', () => {
       ],
     ])('toFormattedValue Test - numeric', (value, format, expected) => {
       test(`format aggregate data`, () => {
-        expect(toFormattedValue(value, format as IFieldFormatConfig)).toEqual(
+        expect(toFormattedValue(value, format as FormatFieldAction)).toEqual(
           expected,
         );
       });
@@ -787,7 +795,7 @@ describe('Chart Helper ', () => {
       ],
     ])('toFormattedValue Test - currency', (value, format, expected) => {
       test(`format aggregate data`, () => {
-        expect(toFormattedValue(value, format as IFieldFormatConfig)).toEqual(
+        expect(toFormattedValue(value, format as FormatFieldAction)).toEqual(
           expected,
         );
       });
@@ -926,7 +934,7 @@ describe('Chart Helper ', () => {
       ],
     ])('toFormattedValue Test - other', (value, format, expected) => {
       test(`format aggregate data`, () => {
-        expect(toFormattedValue(value, format as IFieldFormatConfig)).toEqual(
+        expect(toFormattedValue(value, format as FormatFieldAction)).toEqual(
           expected,
         );
       });
@@ -2093,7 +2101,7 @@ describe('Chart Helper ', () => {
     test('should get group section rows when drill option is null', () => {
       const config = [
         {
-          type: ChartDataSectionType.GROUP,
+          type: ChartDataSectionType.Group,
           rows: [1, 2],
         },
       ] as any[];
@@ -2104,7 +2112,7 @@ describe('Chart Helper ', () => {
     test('should not get group section rows when is not group section', () => {
       const config = [
         {
-          type: ChartDataSectionType.AGGREGATE,
+          type: ChartDataSectionType.Aggregate,
           rows: [1, 2],
         },
       ] as any[];
@@ -2115,18 +2123,20 @@ describe('Chart Helper ', () => {
     test('should get group section rows when drillale is false and drillOption is not empty', () => {
       const config = [
         {
-          type: ChartDataSectionType.GROUP,
+          type: ChartDataSectionType.Group,
           key: 'col1',
           rows: [
             {
               uid: '1',
               colName: 'col1',
+              id: '["col1"]',
               type: DataViewFieldType.STRING,
               category: ChartDataViewFieldCategory.Field,
             },
             {
               uid: '2',
               colName: 'col2',
+              id: '["col2"]',
               type: DataViewFieldType.STRING,
               category: ChartDataViewFieldCategory.Field,
             },
@@ -2136,27 +2146,41 @@ describe('Chart Helper ', () => {
       const drillOption = new ChartDrillOption(config[0].rows);
       const drillRows = getDrillableRows(config, drillOption);
       expect(drillRows).toEqual([
-        { uid: '1', colName: 'col1', type: 'STRING', category: 'field' },
-        { uid: '2', colName: 'col2', type: 'STRING', category: 'field' },
+        {
+          uid: '1',
+          colName: 'col1',
+          type: 'STRING',
+          category: 'field',
+          id: '["col1"]',
+        },
+        {
+          uid: '2',
+          colName: 'col2',
+          type: 'STRING',
+          category: 'field',
+          id: '["col2"]',
+        },
       ]);
     });
 
     test('should get drillable group section rows with drillOption', () => {
       const config = [
         {
-          type: ChartDataSectionType.GROUP,
+          type: ChartDataSectionType.Group,
           key: 'col1',
           drillable: true,
           rows: [
             {
               uid: '1',
               colName: 'col1',
+              id: '["col1"]',
               type: DataViewFieldType.STRING,
               category: ChartDataViewFieldCategory.Field,
             },
             {
               uid: '2',
               colName: 'col2',
+              id: '["col2"]',
               type: DataViewFieldType.STRING,
               category: ChartDataViewFieldCategory.Field,
             },
@@ -2167,26 +2191,34 @@ describe('Chart Helper ', () => {
       drillOption.drillDown();
       const drillRows = getDrillableRows(config, drillOption);
       expect(drillRows).toEqual([
-        { uid: '2', colName: 'col2', type: 'STRING', category: 'field' },
+        {
+          uid: '2',
+          colName: 'col2',
+          type: 'STRING',
+          category: 'field',
+          id: '["col2"]',
+        },
       ]);
     });
 
     test('should get drillable group section first row without drillOption', () => {
       const config = [
         {
-          type: ChartDataSectionType.GROUP,
+          type: ChartDataSectionType.Group,
           key: 'col1',
           drillable: true,
           rows: [
             {
               uid: '1',
               colName: 'col1',
+              id: '["col1"]',
               type: DataViewFieldType.STRING,
               category: ChartDataViewFieldCategory.Field,
             },
             {
               uid: '2',
               colName: 'col2',
+              id: '["col2"]',
               type: DataViewFieldType.STRING,
               category: ChartDataViewFieldCategory.Field,
             },
@@ -2196,8 +2228,767 @@ describe('Chart Helper ', () => {
       const drillOption = new ChartDrillOption(config[0].rows);
       const drillRows = getDrillableRows(config, drillOption);
       expect(drillRows).toEqual([
-        { uid: '1', colName: 'col1', type: 'STRING', category: 'field' },
+        {
+          uid: '1',
+          colName: 'col1',
+          type: 'STRING',
+          category: 'field',
+          id: '["col1"]',
+        },
       ]);
+    });
+  });
+
+  describe('getRuntimeDateLevelFields Test', () => {
+    test('test have RUNTIME_DATE_LEVEL_KEY', () => {
+      const config = [
+        {
+          [RUNTIME_DATE_LEVEL_KEY]: { name: 'lyp', age: '12', sex: 'male' },
+        },
+        {},
+      ];
+      expect(getRuntimeDateLevelFields(config)).toEqual([
+        { name: 'lyp', age: '12', sex: 'male' },
+        {},
+      ]);
+    });
+
+    test('test does not contain RUNTIME_DATE_LEVEL_KEY', () => {
+      const config = [
+        {
+          name: 'liutao',
+          age: '22',
+          sex: 'Female',
+        },
+        { name: 'dilireba', age: '23', sex: 'Female' },
+      ];
+      expect(getRuntimeDateLevelFields(config)).toEqual(config);
+    });
+  });
+
+  describe('getRuntimeComputedFields Test', () => {
+    test('Test to modify the first runtime date level', () => {
+      const dateLevelComputedFields = [
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          colName: '签署日期（按周）',
+          id: '签署日期（按周）',
+          expression: 'AGG_DATE_WEEK(签署日期)',
+          field: '签署日期',
+          type: DataViewFieldType.DATE,
+          uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+          [RUNTIME_DATE_LEVEL_KEY]: null,
+        },
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          colName: '合同截止日期（按月）',
+          id: '合同截止日期（按月）',
+          expression: 'AGG_DATE_MONTH(合同截止日期)',
+          field: '合同截止日期',
+          type: DataViewFieldType.DATE,
+          uid: 'fe3f3810-7fe1-41dc-b745-298aaa8b4b95',
+        },
+      ];
+      const replacedConfig = {
+        category: ChartDataViewFieldCategory.DateLevelComputedField,
+        colName: '签署日期（按月）',
+        id: '签署日期（按月）',
+        expression: 'AGG_DATE_MONTH(签署日期)',
+        field: '签署日期',
+        type: DataViewFieldType.DATE,
+        uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+        [RUNTIME_DATE_LEVEL_KEY]: {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          colName: '签署日期（按周）',
+          id: '签署日期（按周）',
+          expression: 'AGG_DATE_WEEK(签署日期)',
+          field: '签署日期',
+          type: DataViewFieldType.DATE,
+          uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+          [RUNTIME_DATE_LEVEL_KEY]: null,
+        },
+      };
+
+      const computedFields = [
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(签署日期)',
+          id: '签署日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(合同截止日期)',
+          id: '合同截止日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+      ];
+      expect(
+        getRuntimeComputedFields(
+          dateLevelComputedFields,
+          replacedConfig,
+          computedFields,
+          true,
+        ),
+      ).toEqual([
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(签署日期)',
+          id: '签署日期（按月）',
+          type: DataViewFieldType.DATE,
+          [RUNTIME_DATE_LEVEL_KEY]: {
+            category: ChartDataViewFieldCategory.DateLevelComputedField,
+            expression: 'AGG_DATE_WEEK(签署日期)',
+            id: '签署日期（按周）',
+            type: DataViewFieldType.DATE,
+          },
+        },
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(合同截止日期)',
+          id: '合同截止日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+      ]);
+    });
+
+    test('Test to modify the second runtime date level', () => {
+      const dateLevelComputedFields = [
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          colName: '签署日期（按月）',
+          expression: 'AGG_DATE_MONTH(签署日期)',
+          field: '签署日期',
+          id: '签署日期（按月）',
+          type: DataViewFieldType.DATE,
+          uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+          [RUNTIME_DATE_LEVEL_KEY]: null,
+        },
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          colName: '合同截止日期（按周）',
+          id: '合同截止日期（按周）',
+          expression: 'AGG_DATE_WEEK(合同截止日期)',
+          field: '合同截止日期',
+          type: DataViewFieldType.DATE,
+          uid: 'fe3f3810-7fe1-41dc-b745-298aaa8b4b95',
+        },
+      ];
+      const replacedConfig = {
+        category: ChartDataViewFieldCategory.DateLevelComputedField,
+        colName: '合同截止日期（按月）',
+        expression: 'AGG_DATE_MONTH(合同截止日期)',
+        field: '合同截止日期',
+        type: DataViewFieldType.DATE,
+        id: '合同截止日期（按月）',
+        uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+      };
+
+      const computedFields = [
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(签署日期)',
+          id: '签署日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(合同截止日期)',
+          id: '合同截止日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+      ];
+      expect(
+        getRuntimeComputedFields(
+          dateLevelComputedFields,
+          replacedConfig,
+          computedFields,
+          true,
+        ),
+      ).toEqual([
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(签署日期)',
+          id: '签署日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(合同截止日期)',
+          id: '合同截止日期（按月）',
+          type: DataViewFieldType.DATE,
+          [RUNTIME_DATE_LEVEL_KEY]: {
+            category: ChartDataViewFieldCategory.DateLevelComputedField,
+            expression: 'AGG_DATE_WEEK(合同截止日期)',
+            id: '合同截止日期（按周）',
+            type: DataViewFieldType.DATE,
+          },
+        },
+      ]);
+    });
+
+    test('Test select default date level', () => {
+      const dateLevelComputedFields = [
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          colName: '合同截止日期（按周）',
+          expression: 'AGG_DATE_WEEK(合同截止日期)',
+          field: '合同截止日期',
+          type: DataViewFieldType.DATE,
+          uid: 'fe3f3810-7fe1-41dc-b745-298aaa8b4b95',
+        },
+      ];
+      const replacedConfig = {
+        category: ChartDataViewFieldCategory.DateLevelComputedField,
+        colName: '签署日期（按月）',
+        expression: 'AGG_DATE_MONTH(签署日期)',
+        field: '签署日期',
+        id: '签署日期（按月）',
+        type: DataViewFieldType.DATE,
+        uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+      };
+
+      const computedFields = [
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(签署日期)',
+          id: '签署日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(合同截止日期)',
+          id: '合同截止日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+      ];
+      expect(
+        getRuntimeComputedFields(
+          dateLevelComputedFields,
+          replacedConfig,
+          computedFields,
+          true,
+        ),
+      ).toEqual([
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(签署日期)',
+          id: '签署日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(合同截止日期)',
+          id: '合同截止日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+      ]);
+    });
+
+    test('Test from default level to other date levels for default', () => {
+      const dateLevelComputedFields = [
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          colName: '合同截止日期（按周）',
+          expression: 'AGG_DATE_WEEK(合同截止日期)',
+          field: '合同截止日期',
+          id: '合同截止日期（按周）',
+          type: DataViewFieldType.DATE,
+          uid: 'fe3f3810-7fe1-41dc-b745-298aaa8b4b95',
+        },
+      ];
+      const replacedConfig = {
+        category: ChartDataViewFieldCategory.Field,
+        colName: '签署日期',
+        id: '签署日期',
+        type: DataViewFieldType.DATE,
+        uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+      };
+
+      const computedFields = [
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(签署日期)',
+          id: '签署日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(合同截止日期)',
+          id: '合同截止日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+      ];
+      expect(
+        getRuntimeComputedFields(
+          dateLevelComputedFields,
+          replacedConfig,
+          computedFields,
+          true,
+        ),
+      ).toEqual([
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(签署日期)',
+          id: '签署日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(合同截止日期)',
+          id: '合同截止日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_WEEK(合同截止日期)',
+          id: '合同截止日期（按周）',
+          type: DataViewFieldType.DATE,
+        },
+      ]);
+    });
+
+    test('Test are not run when modifying the date level', () => {
+      const dateLevelComputedFields = [
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          colName: '签署日期（按周）',
+          id: '签署日期（按周）',
+          expression: 'AGG_DATE_WEEK(签署日期)',
+          field: '签署日期',
+          type: DataViewFieldType.DATE,
+          uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+        },
+      ];
+      const replacedConfig = {
+        category: ChartDataViewFieldCategory.DateLevelComputedField,
+        colName: '签署日期（按月）',
+        id: '签署日期（按月）',
+        expression: 'AGG_DATE_MONTH(签署日期)',
+        field: '签署日期',
+        type: DataViewFieldType.DATE,
+        uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+      };
+      const computedFields = [
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(签署日期)',
+          id: '签署日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+      ];
+
+      expect(
+        getRuntimeComputedFields(
+          dateLevelComputedFields,
+          replacedConfig,
+          computedFields,
+        ),
+      ).toEqual([
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_WEEK(签署日期)',
+          id: '签署日期（按周）',
+          type: DataViewFieldType.DATE,
+        },
+      ]);
+    });
+
+    test('Test are not run when modifying the date level', () => {
+      const dateLevelComputedFields = [];
+      const replacedConfig = {
+        category: ChartDataViewFieldCategory.DateLevelComputedField,
+        colName: '签署日期（按月）',
+        id: '签署日期（按月）',
+        expression: 'AGG_DATE_MONTH(签署日期)',
+        field: '签署日期',
+        type: DataViewFieldType.DATE,
+        uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+      };
+      const computedFields = [
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_MONTH(签署日期)',
+          id: '签署日期（按月）',
+          type: DataViewFieldType.DATE,
+        },
+      ];
+
+      expect(
+        getRuntimeComputedFields(
+          dateLevelComputedFields,
+          replacedConfig,
+          computedFields,
+        ),
+      ).toEqual([]);
+    });
+  });
+
+  describe('clearRuntimeDateLevelFieldsInChartConfig Test', () => {
+    test('Clear all runtime state in chart config', () => {
+      const chartConfig: any = {
+        datas: [
+          {
+            drillable: true,
+            key: 'dimension',
+            label: 'dimension',
+            limit: [0, 1],
+            required: true,
+            type: 'group',
+            rows: [
+              {
+                category: 'dateLevelComputedField',
+                colName: '签署日期（按月）',
+                expression: 'AGG_DATE_MONTH(签署日期)',
+                field: '签署日期',
+                type: DataViewFieldType.DATE,
+                uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+                [RUNTIME_DATE_LEVEL_KEY]: {
+                  category: 'dateLevelComputedField',
+                  colName: '签署日期（按季度）',
+                  expression: 'AGG_DATE_QUARTER(签署日期)',
+                  field: '签署日期',
+                  type: 'DATE',
+                  uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+                },
+              },
+            ],
+          },
+        ],
+      };
+      expect(clearRuntimeDateLevelFieldsInChartConfig(chartConfig)).toEqual({
+        datas: [
+          {
+            drillable: true,
+            key: 'dimension',
+            label: 'dimension',
+            limit: [0, 1],
+            required: true,
+            type: 'group',
+            rows: [
+              {
+                category: 'dateLevelComputedField',
+                colName: '签署日期（按月）',
+                expression: 'AGG_DATE_MONTH(签署日期)',
+                field: '签署日期',
+                type: DataViewFieldType.DATE,
+                uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+              },
+            ],
+          },
+        ],
+      });
+    });
+  });
+
+  describe('setRuntimeDateLevelFieldsInChartConfig Test', () => {
+    test('set all runtime state in chart config', () => {
+      const chartConfig: any = {
+        datas: [
+          {
+            drillable: true,
+            key: 'dimension',
+            label: 'dimension',
+            limit: [0, 1],
+            required: true,
+            type: 'group',
+            rows: [
+              {
+                category: 'dateLevelComputedField',
+                colName: '签署日期（按月）',
+                expression: 'AGG_DATE_MONTH(签署日期)',
+                field: '签署日期',
+                type: DataViewFieldType.DATE,
+                uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+                [RUNTIME_DATE_LEVEL_KEY]: {
+                  category: 'dateLevelComputedField',
+                  colName: '签署日期（按季度）',
+                  expression: 'AGG_DATE_QUARTER(签署日期)',
+                  field: '签署日期',
+                  type: DataViewFieldType.DATE,
+                  uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+                },
+              },
+            ],
+          },
+        ],
+      };
+      expect(setRuntimeDateLevelFieldsInChartConfig(chartConfig)).toEqual({
+        datas: [
+          {
+            drillable: true,
+            key: 'dimension',
+            label: 'dimension',
+            limit: [0, 1],
+            required: true,
+            type: 'group',
+            rows: [
+              {
+                category: 'dateLevelComputedField',
+                colName: '签署日期（按季度）',
+                expression: 'AGG_DATE_QUARTER(签署日期)',
+                field: '签署日期',
+                type: DataViewFieldType.DATE,
+                uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
+              },
+            ],
+          },
+        ],
+      });
+    });
+  });
+
+  describe.each([
+    [
+      1,
+      1,
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: {} },
+    ],
+    [
+      1,
+      1,
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: { color: '#FFF' } },
+      {
+        color: '#FFF',
+      },
+    ],
+    [
+      1,
+      'name_level1',
+      [
+        {
+          index: '1,name_level1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: {} },
+    ],
+    [
+      1,
+      'name_level1',
+      [
+        {
+          index: '1,name_level1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: { color: '#FFF' } },
+      {
+        color: '#FFF',
+      },
+    ],
+    [
+      0,
+      1,
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: { opacity: 0.5 } },
+    ],
+    [
+      0,
+      1,
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: { color: '#FFF', opacity: 0.5 } },
+      {
+        color: '#FFF',
+      },
+    ],
+    [
+      0,
+      'name_level1',
+      [
+        {
+          index: '1,name_level1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: { opacity: 0.5 } },
+    ],
+    [
+      0,
+      'name_level1',
+      [
+        {
+          index: '1,name_level1',
+          data: { rowData: {} },
+        },
+      ],
+      { itemStyle: { color: '#FFF', opacity: 0.5 } },
+      {
+        color: '#FFF',
+      },
+    ],
+  ])(
+    'getSelectedItemStyles Test - ',
+    (comIndex, dcIndex, selectionList, expected, itemStyle?) => {
+      test(`Get select style`, () => {
+        expect(
+          JSON.stringify(
+            getSelectedItemStyles(comIndex, dcIndex, selectionList, itemStyle),
+          ),
+        ).toEqual(JSON.stringify(expected));
+      });
+    },
+  );
+
+  describe.each([
+    [[], [], false],
+    [
+      [
+        {
+          index: '1,2',
+          data: { rowData: {} },
+        },
+      ],
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      true,
+    ],
+    [
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      false,
+    ],
+    [
+      [
+        {
+          index: '1,1',
+          data: { rowData: { a: 1 } },
+        },
+      ],
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      true,
+    ],
+    [
+      [
+        {
+          index: '1,1',
+          data: { rowData: { a: 1 } },
+        },
+      ],
+      [
+        {
+          index: '1,1',
+          data: { rowData: { a: 1, b: 1 } },
+        },
+      ],
+      true,
+    ],
+    [
+      [
+        {
+          index: '1,2',
+          data: { rowData: {} },
+        },
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+        {
+          index: '1,2',
+          data: { rowData: {} },
+        },
+      ],
+      false,
+    ],
+    [
+      [
+        {
+          index: '1,2',
+          data: { rowData: {} },
+        },
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      [
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      true,
+    ],
+    [
+      [
+        {
+          index: '1,2',
+          data: { rowData: {} },
+        },
+        {
+          index: '1,1',
+          data: { rowData: {} },
+        },
+      ],
+      undefined,
+      true,
+    ],
+    [[], undefined, true],
+  ])(
+    'compareSelectedItems Test - ',
+    (newSelectedItems, oldSelectedItems, expected) => {
+      test(`Get compare whether update`, () => {
+        expect(
+          JSON.stringify(
+            compareSelectedItems(newSelectedItems, oldSelectedItems),
+          ),
+        ).toEqual(JSON.stringify(expected));
+      });
+    },
+  );
+
+  describe('getChartSelection Test - ', () => {
+    test(`Get chart selection`, () => {
+      const option = getChartSelection(window);
+      expect(option).not.toBeNull();
+      expect(option.selectedItems).toEqual([]);
     });
   });
 });

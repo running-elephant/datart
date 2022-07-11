@@ -25,8 +25,8 @@ export const WidgetOfAutoEditor: React.FC<{}> = memo(() => {
   };
 
   return (
-    <Wrapper onClick={ssp}>
-      <WidgetMapper boardType={'auto'} boardEditing={true} />
+    <Wrapper onClick={ssp} className="autoItem">
+      <WidgetMapper boardEditing={true} hideTitle={false} />
     </Wrapper>
   );
 });

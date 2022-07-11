@@ -17,16 +17,17 @@
  */
 
 import { List } from 'antd';
-import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
+import { renderMataProps } from 'app/pages/ChartWorkbenchPage/slice/types';
+import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { FC, memo, useCallback, useContext, useState } from 'react';
 import styled from 'styled-components/macro';
 import { stopPPG } from 'utils/utils';
-import ChartDataViewContext from '../../../../contexts/ChartDataViewContext';
 import { ChartDraggableSourceContainer } from './ChartDraggableSourceContainer';
 import ChartDragLayer from './ChartDragLayer';
 
 export const ChartDraggableSourceGroupContainer: FC<{
-  meta?: ChartDataViewMeta[];
+  meta?: renderMataProps[];
   onDeleteComputedField: (fieldName) => void;
   onEditComputedField: (fieldName) => void;
 }> = memo(function ChartDraggableSourceGroupContainer({
@@ -34,10 +35,11 @@ export const ChartDraggableSourceGroupContainer: FC<{
   onDeleteComputedField,
   onEditComputedField,
 }) {
-  const [selectedItems, setSelectedItems] = useState<ChartDataViewMeta[]>([]);
+  const [selectedItems, setSelectedItems] = useState<renderMataProps[]>([]);
   const [selectedItemsIds, setSelectedItemsIds] = useState<Array<string>>([]);
   const [activeItemId, setActiveItemId] = useState<string>('');
-  const { availableSourceFunctions } = useContext(ChartDataViewContext);
+  const { availableSourceFunctions, dataView } =
+    useContext(ChartDataViewContext);
 
   const onDataItemSelectionChange = (
     dataItemId: string,
@@ -46,7 +48,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
   ) => {
     let interimSelectedItemsIds: Array<string> = [];
     let interimActiveItemId = '';
-    const dataViewMeta = meta?.slice() || [];
+    const dataViewMeta = getAllColumnInMeta(meta) || [];
     const previousSelectedItemsIds: Array<any> = selectedItemsIds.slice();
     const previousActiveItemId = activeItemId;
 
@@ -63,21 +65,21 @@ export const ChartDraggableSourceGroupContainer: FC<{
       }
     } else if (shiftKeyActive && dataItemId !== previousActiveItemId) {
       const activeCardIndex: any = dataViewMeta.findIndex(
-        c => c.id === previousActiveItemId,
+        c => c.name === previousActiveItemId,
       );
-      const cardIndex = dataViewMeta.findIndex(c => c.id === dataItemId);
+      const cardIndex = dataViewMeta.findIndex(c => c.name === dataItemId);
       const lowerIndex = Math.min(activeCardIndex, cardIndex);
       const upperIndex = Math.max(activeCardIndex, cardIndex);
       interimSelectedItemsIds = dataViewMeta
         .slice(lowerIndex, upperIndex + 1)
-        .map(c => c.id);
+        .map(c => c.name);
     } else {
       interimSelectedItemsIds = [dataItemId];
       interimActiveItemId = dataItemId;
     }
 
     const selectedCards = dataViewMeta.filter(c =>
-      interimSelectedItemsIds.includes(c.id),
+      interimSelectedItemsIds.includes(c.name),
     );
 
     setSelectedItemsIds(interimSelectedItemsIds);
@@ -107,26 +109,30 @@ export const ChartDraggableSourceGroupContainer: FC<{
       <ChartDragLayer />
       <List
         dataSource={meta}
-        rowKey={item => item.id}
+        rowKey={item => item.name}
         renderItem={item => (
           <Item onClick={stopPPG}>
             <ChartDraggableSourceContainer
               key={item.id}
               id={item.id}
-              name={item.id}
+              name={item.name}
+              displayName={item.displayName}
               category={item.category}
               expression={item.expression}
               type={item.type}
               selectedItems={selectedItems}
+              selectedItemsIds={selectedItemsIds}
               availableSourceFunctions={availableSourceFunctions}
               subType={item.subType}
               role={item.role}
               children={item.children}
+              viewType={dataView?.type}
+              isViewComputedFields={item.isViewComputedFields}
               onDeleteComputedField={onDeleteComputedField}
               onEditComputedField={handleEditComputedField}
               onSelectionChange={onDataItemSelectionChange}
               onClearCheckedList={onClearCheckedList}
-              isActive={selectedItemsIds.includes(item.id)}
+              isActive={selectedItemsIds.includes(item.name)}
             />
           </Item>
         )}

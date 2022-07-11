@@ -49,7 +49,8 @@ export function itemLayoutComparer<T>(
   if (
     prevProps.data !== nextProps.data ||
     prevProps.translate !== nextProps.translate ||
-    prevProps.dataConfigs !== nextProps.dataConfigs
+    prevProps.dataConfigs !== nextProps.dataConfigs ||
+    prevProps.context !== nextProps.context
   ) {
     return false;
   }
@@ -76,14 +77,10 @@ export function removeSomeObjectConfigByKey(
   return (
     obj &&
     Object.keys(obj).reduce((data, key) => {
-      if (removeKeyList.includes(key)) {
-        return data;
-      } else {
-        return {
-          ...data,
-          key: obj?.[key],
-        };
+      if (!removeKeyList.includes(key)) {
+        data[key] = obj[key];
       }
+      return data;
     }, {})
   );
 }

@@ -19,9 +19,11 @@ import { DownloadFileType } from 'app/constants';
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
+import { ExecuteToken } from 'app/pages/SharePage/slice/types';
 import { ChartDataRequest } from 'app/types/ChartDataRequest';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import { RootState } from 'types';
+import { UniqWith } from 'utils/object';
 import { boardActions } from '.';
 import { getBoardChartRequests } from '../../../utils';
 import {
@@ -33,25 +35,40 @@ import {
 } from '../../../utils/board';
 import { getWidgetInfoMapByServer, getWidgetMap } from '../../../utils/widget';
 import { PageInfo } from './../../../../MainPage/pages/ViewPage/slice/types';
-import { getChartWidgetDataAsync, getWidgetData } from './thunk';
-import { BoardState, DataChart, ServerDashboard, VizRenderMode } from './types';
+import {
+  fetchAvailableSourceFunctions,
+  getChartWidgetDataAsync,
+  getWidgetData,
+} from './thunk';
+import {
+  BoardState,
+  DataChart,
+  ServerDashboard,
+  VizRenderMode,
+  WidgetData,
+} from './types';
 
 export const handleServerBoardAction =
   (params: {
     data: ServerDashboard;
     renderMode: VizRenderMode;
     filterSearchMap?: FilterSearchParamsWithMatch;
+    executeToken?: Record<string, ExecuteToken>;
   }) =>
   async (dispatch, getState) => {
-    const { data, renderMode, filterSearchMap } = params;
+    const { data, renderMode, filterSearchMap, executeToken } = params;
     const dashboard = getDashBoardByResBoard(data);
     const { datacharts, views: serverViews, widgets: serverWidgets } = data;
 
     const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
-    const migratedWidgets = migrateWidgets(serverWidgets);
+    const migratedWidgets = migrateWidgets(
+      serverWidgets,
+      dashboard.config.type,
+    );
     const { widgetMap, wrappedDataCharts, controllerWidgets } = getWidgetMap(
       migratedWidgets,
       dataCharts,
+      dashboard.config.type,
       filterSearchMap,
     );
     const widgetIds = Object.values(widgetMap).map(w => w.id);
@@ -63,11 +80,29 @@ export const handleServerBoardAction =
     if (renderMode === 'schedule') {
       boardInfo = getScheduleBoardInfo(boardInfo, widgetMap);
     }
+
     const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
-
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
-
     const viewViews = getChartDataView(serverViews, allDataCharts);
+
+    if (viewViews) {
+      const idList = UniqWith(
+        Object.values(viewViews).map(v => {
+          return { sourceId: v.sourceId, viewId: v.id };
+        }),
+        (a, b) => a.sourceId === b.sourceId,
+      );
+
+      idList.forEach(({ sourceId, viewId }) => {
+        dispatch(
+          fetchAvailableSourceFunctions({
+            sourceId: sourceId,
+            authorizedToken: executeToken?.[viewId]?.authorizedToken || '',
+            renderMode,
+          }),
+        );
+      });
+    }
 
     await dispatch(
       boardActions.setBoardState({
@@ -85,7 +120,42 @@ export const handleServerBoardAction =
       }),
     );
   };
+export const getWidgetChartDatasAction =
+  (boardId: string) => (dispatch, getState) => {
+    const boardState = getState() as { board: BoardState };
+    const boardMapWidgetMap = boardState.board.widgetRecord;
+    const WidgetDataMap = boardState.board.widgetDataMap;
+    const widgetMap = boardMapWidgetMap[boardId];
+    const dataMap = Object.values(widgetMap || {})
+      .filter(w => w.config.type === 'chart')
+      .map(w => {
+        const item = {
+          id: w.id,
+          name: w.config.name,
+          data: WidgetDataMap[w.id],
+        };
+        return item;
+      })
+      .reduce((acc, cur) => {
+        acc[cur.id] = cur;
+        return acc;
+      }, {} as Record<string, WidgetData | undefined>);
 
+    return dataMap;
+  };
+export const getBoardStateAction =
+  (boardId: string) => (dispatch, getState) => {
+    const boardState = getState() as { board: BoardState };
+    const boardMapWidgetMap = boardState.board.widgetRecord;
+    const widgetMap = boardMapWidgetMap[boardId];
+    const board = boardState.board.boardRecord[boardId];
+    const dataChartMap = boardState.board.dataChartMap;
+    return {
+      board,
+      widgetMap,
+      dataChartMap,
+    };
+  };
 export const boardDownLoadAction =
   (params: { boardId: string; downloadType: DownloadFileType }) =>
   async (dispatch, getState) => {

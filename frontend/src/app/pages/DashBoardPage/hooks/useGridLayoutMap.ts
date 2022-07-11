@@ -17,18 +17,17 @@
  */
 import { useMemo } from 'react';
 import { Layouts } from 'react-grid-layout';
-import { Widget } from '../pages/Board/slice/types';
-export default function useGridLayoutMap(
-  layoutWidgetMap: Record<string, Widget>,
-) {
+import { Widget } from '../types/widgetTypes';
+
+export default function useGridLayoutMap(layoutWidgets: Widget[]) {
   const layoutMap = useMemo(() => {
     const layoutMap: Layouts = {
       lg: [],
       sm: [],
     };
-    Object.values(layoutWidgetMap).forEach(widget => {
-      const lg = widget.config.rect || widget.config.mobileRect || {};
-      const sm = widget.config.mobileRect || widget.config.rect || {};
+    layoutWidgets.forEach(widget => {
+      const lg = widget.config.pRect || widget.config.mRect || {};
+      const sm = widget.config.mRect || widget.config.pRect || {};
       const lock = widget.config.lock;
       layoutMap.lg.push({
         i: widget.id,
@@ -48,6 +47,6 @@ export default function useGridLayoutMap(
       });
     });
     return layoutMap;
-  }, [layoutWidgetMap]);
+  }, [layoutWidgets]);
   return layoutMap;
 }

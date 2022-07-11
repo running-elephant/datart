@@ -30,10 +30,10 @@ import {
   getRuntimeDateLevelFields,
 } from 'app/utils/chartHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
-import { FC, memo, useRef, useState } from 'react';
+import { FC, memo, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import ChartDrillContext from '../ChartWorkbenchPage/contexts/ChartDrillContext';
+import ChartDrillContext from '../../contexts/ChartDrillContext';
 import ControllerPanel from '../MainPage/pages/VizPage/ChartPreview/components/ControllerPanel';
 import {
   ChartPreview,
@@ -41,7 +41,11 @@ import {
 } from '../MainPage/pages/VizPage/slice/types';
 import { HeadlessBrowserIdentifier } from './HeadlessBrowserIdentifier';
 import { shareActions } from './slice';
-import { selectHeadlessBrowserRenderSign } from './slice/selectors';
+import {
+  selectHeadlessBrowserRenderSign,
+  selectSelectedItems,
+  selectShareExecuteTokenMap,
+} from './slice/selectors';
 import {
   fetchShareDataSetByPreviewChartAction,
   updateFilterAndFetchDatasetForShare,
@@ -53,7 +57,7 @@ const ChartForShare: FC<{
   chartPreview?: ChartPreview;
   filterSearchParams?: FilterSearchParams;
   availableSourceFunctions?: string[];
-}> = memo(({ chartPreview, availableSourceFunctions }) => {
+}> = memo(({ chartPreview, filterSearchParams, availableSourceFunctions }) => {
   const dispatch = useDispatch();
   const drillOptionRef = useRef<IChartDrillOption>();
   const [chart] = useState<IChart | undefined>(() => {
@@ -78,6 +82,9 @@ const ChartForShare: FC<{
   const headlessBrowserRenderSign = useSelector(
     selectHeadlessBrowserRenderSign,
   );
+  const selectedItems = useSelector(selectSelectedItems);
+  const shareExecuteTokenMap = useSelector(selectShareExecuteTokenMap);
+
   useMount(() => {
     if (!chartPreview) {
       return;
@@ -86,7 +93,12 @@ const ChartForShare: FC<{
       chartPreview?.chartConfig?.datas,
       drillOptionRef?.current,
     );
-    dispatch(fetchShareDataSetByPreviewChartAction({ preview: chartPreview }));
+    dispatch(
+      fetchShareDataSetByPreviewChartAction({
+        preview: chartPreview,
+        filterSearchParams,
+      }),
+    );
     registerChartEvents(chart);
   });
 
@@ -106,8 +118,8 @@ const ChartForShare: FC<{
             return;
           }
           if (
-            param.componentType === 'table' &&
-            param.seriesType === 'paging-sort-filter'
+            param.chartType === 'table' &&
+            param.interactionType === 'paging-sort-filter'
           ) {
             dispatch(
               fetchShareDataSetByPreviewChartAction({
@@ -120,9 +132,24 @@ const ChartForShare: FC<{
                 pageInfo: {
                   pageNo: param?.value?.pageNo,
                 },
+                filterSearchParams,
               }),
             );
             return;
+          }
+
+          // NOTE 透视表树形结构展开下钻特殊处理方法
+          if (
+            param.chartType === 'pivotSheet' &&
+            param.interactionType === 'drilled'
+          ) {
+            handleDrillOptionChange?.(param.drillOption);
+            return;
+          }
+
+          // NOTE 直接修改selectedItems结果集处理方法
+          if (param.interactionType === 'select') {
+            dispatch(shareActions.changeSelectedItems(param.selectedItems));
           }
         },
       },
@@ -157,12 +184,12 @@ const ChartForShare: FC<{
     const dateLevelComputedFields = rows.filter(
       v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
     );
-    const replacedColName = payload.value.replacedColName;
+    const replacedConfig = payload.value.replacedConfig;
     const computedFields = getRuntimeComputedFields(
       dateLevelComputedFields,
-      replacedColName,
+      replacedConfig,
       chartPreview?.backendChart?.config?.computedFields,
-      chartPreview?.chartConfig,
+      true,
     );
 
     dispatch(
@@ -179,6 +206,19 @@ const ChartForShare: FC<{
       }),
     );
   };
+  const dataset = useMemo(() => {
+    if (
+      !chartPreview?.backendChart?.viewId &&
+      chartPreview?.backendChart?.config.sampleData
+    ) {
+      return chartPreview?.backendChart?.config.sampleData;
+    }
+    return chartPreview?.dataset;
+  }, [
+    chartPreview?.backendChart?.config.sampleData,
+    chartPreview?.backendChart?.viewId,
+    chartPreview?.dataset,
+  ]);
 
   return (
     <StyledChartPreviewBoard>
@@ -187,6 +227,8 @@ const ChartForShare: FC<{
           viewId={chartPreview?.backendChart?.viewId}
           chartConfig={chartPreview?.chartConfig}
           onChange={handleFilterChange}
+          view={chartPreview?.backendChart?.view}
+          executeToken={shareExecuteTokenMap}
         />
       </div>
       <ChartDrillContext.Provider
@@ -202,16 +244,17 @@ const ChartForShare: FC<{
             <ChartIFrameContainer
               key={chartPreview?.backendChart?.id!}
               containerId={chartPreview?.backendChart?.id!}
-              dataset={chartPreview?.dataset}
+              dataset={dataset}
               chart={chart!}
               config={chartPreview?.chartConfig!}
               drillOption={drillOptionRef.current}
+              selectedItems={selectedItems}
               width={width}
               height={height}
             />
           </ChartDrillContextMenu>
         </div>
-        <ChartDrillPaths />
+        <ChartDrillPaths chartConfig={chartPreview?.chartConfig} />
       </ChartDrillContext.Provider>
       <HeadlessBrowserIdentifier
         renderSign={headlessBrowserRenderSign}

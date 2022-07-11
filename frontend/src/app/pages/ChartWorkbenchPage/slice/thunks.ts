@@ -17,6 +17,7 @@
  */
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { ChartConfig, ChartDataConfig } from 'app/types/ChartConfig';
@@ -33,7 +34,7 @@ import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { request2 } from 'utils/request';
 import { rejectHandle } from 'utils/utils';
 import workbenchSlice, { initState } from '.';
-import { ChartConfigPayloadType } from './type';
+import { ChartConfigPayloadType } from './types';
 
 export const initWorkbenchAction = createAsyncThunk(
   'workbench/initWorkbenchAction',
@@ -113,9 +114,16 @@ export const fetchViewDetailAction = createAsyncThunk(
       method: 'GET',
       url: `views/${arg}`,
     });
-    if (response?.data?.model) {
-      response.data.model = beginViewModelMigration(response.data?.model);
+    if (response?.data) {
+      response.data = migrationViewConfig(response.data);
     }
+    if (response?.data?.model) {
+      response.data.model = beginViewModelMigration(
+        response.data?.model,
+        response.data.type,
+      );
+    }
+
     return response.data;
   },
 );
@@ -169,6 +177,7 @@ export const refreshDatasetAction = createAsyncThunk(
       return;
     }
     const datas = arg?.dataOption || workbenchState.chartConfig?.datas;
+
     const builder = new ChartDataRequestBuilder(
       workbenchState.currentDataView,
       datas,
@@ -182,36 +191,6 @@ export const refreshDatasetAction = createAsyncThunk(
       .addDrillOption(arg?.drillOption)
       .build();
     return thunkAPI.dispatch(fetchDataSetAction(requestParams));
-  },
-);
-
-export const updateRichTextAction = createAsyncThunk(
-  'workbench/updateRichTextAction',
-  async (delta: string | undefined, thunkAPI) => {
-    try {
-      const state = thunkAPI.getState() as any;
-      const workbenchState = state.workbench as typeof initState;
-      if (!workbenchState.currentDataView?.id) {
-        return;
-      }
-      await thunkAPI.dispatch(
-        workbenchSlice.actions.updateChartConfig({
-          type: 'style',
-          payload: {
-            ancestors: [1, 0],
-            value: {
-              label: 'delta.richText',
-              key: 'richText',
-              default: '',
-              comType: 'text',
-              value: delta,
-            },
-          },
-        }),
-      );
-    } catch (error) {
-      return rejectHandle(error, thunkAPI.rejectWithValue);
-    }
   },
 );
 
@@ -240,6 +219,10 @@ export const updateChartAction = createAsyncThunk(
   ) => {
     const state = thunkAPI.getState() as any;
     const workbenchState = state.workbench as typeof initState;
+    const computedFields =
+      workbenchState.currentDataView?.computedFields?.filter(
+        v => !v.isViewComputedFields,
+      );
 
     const requestBody = buildUpdateChartRequest({
       chartId: arg.chartId,
@@ -250,7 +233,7 @@ export const updateChartAction = createAsyncThunk(
       parentId: arg.parentId,
       name: arg.name,
       viewId: arg.viewId,
-      computedFields: workbenchState.currentDataView?.computedFields,
+      computedFields,
     });
 
     const response = await request2<{
@@ -264,12 +247,13 @@ export const updateChartAction = createAsyncThunk(
   },
 );
 
-export const fetchAvailableSourceFunctions = createAsyncThunk<
+export const fetchAvailableSourceFunctionsForChart = createAsyncThunk<
   string[],
-  { sourceId: string }
->('workbench/fetchAvailableSourceFunctions', async arg => {
+  string
+>('workbench/fetchAvailableSourceFunctionsForChart', async sourceId => {
   try {
-    return await fetchAvailableSourceFunctionsAsync(arg.sourceId);
+    const data = await fetchAvailableSourceFunctionsAsync(sourceId);
+    return data;
   } catch (err) {
     throw err;
   }

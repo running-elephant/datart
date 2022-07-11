@@ -24,6 +24,7 @@ import datart.core.base.exception.Exceptions;
 import datart.core.common.MessageResolver;
 import datart.core.entity.User;
 import datart.core.mappers.ext.UserMapperExt;
+import datart.security.base.JwtToken;
 import datart.security.base.PasswordToken;
 import datart.security.base.Permission;
 import datart.security.base.RoleType;
@@ -82,7 +83,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
         try {
             subject.login(usernamePasswordToken);
         } catch (Exception e) {
-            log.error("Login error ({} {})", token.getSubject(), token.getPassword());
+            log.error("Login error ({})", token.getSubject());
             Exceptions.msg("login.fail");
         }
     }
@@ -97,20 +98,25 @@ public class ShiroSecurityManager implements DatartSecurityManager {
     }
 
     @Override
-    public String login(String jwtToken) throws AuthException {
+    public String login(String tokenString) throws AuthException {
         logoutCurrent();
-        PasswordToken passwordToken = JwtUtils.toPasswordToken(jwtToken);
-        if (!JwtUtils.validTimeout(passwordToken)) {
+        JwtToken jwtToken = JwtUtils.toJwtToken(tokenString);
+        if (!JwtUtils.validTimeout(jwtToken)) {
             Exceptions.tr(AuthException.class, "login.session.timeout");
         }
-        User user = userMapper.selectByNameOrEmail(passwordToken.getSubject());
+        User user = userMapper.selectByNameOrEmail(jwtToken.getSubject());
         if (user == null) {
             Exceptions.tr(AuthException.class, "login.session.timeout");
         }
         if (!user.getActive()) {
             Exceptions.tr(BaseException.class, "message.user.not.active");
         }
-        passwordToken = new PasswordToken(user.getUsername(), user.getPassword(), System.currentTimeMillis());
+
+        if (jwtToken.getPwdHash() != user.getPassword().hashCode()) {
+            Exceptions.tr(BaseException.class, "login.fail.pwd.hash");
+        }
+
+        PasswordToken passwordToken = new PasswordToken(user.getUsername(), user.getPassword(), System.currentTimeMillis());
         login(passwordToken);
         return JwtUtils.toJwtString(passwordToken);
     }

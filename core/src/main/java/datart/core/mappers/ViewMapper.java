@@ -22,7 +22,7 @@ public interface ViewMapper extends CRUDMapper {
     @Insert({
         "insert into view (id, `name`, ",
         "description, org_id, ",
-        "source_id, script, ",
+        "source_id, script, `type`, ",
         "model, config, create_by, ",
         "create_time, update_by, ",
         "update_time, parent_id, ",
@@ -30,7 +30,7 @@ public interface ViewMapper extends CRUDMapper {
         "`status`)",
         "values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, ",
         "#{description,jdbcType=VARCHAR}, #{orgId,jdbcType=VARCHAR}, ",
-        "#{sourceId,jdbcType=VARCHAR}, #{script,jdbcType=VARCHAR}, ",
+        "#{sourceId,jdbcType=VARCHAR}, #{script,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, ",
         "#{model,jdbcType=VARCHAR}, #{config,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, ",
         "#{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, ",
         "#{updateTime,jdbcType=TIMESTAMP}, #{parentId,jdbcType=VARCHAR}, ",
@@ -44,7 +44,7 @@ public interface ViewMapper extends CRUDMapper {
 
     @Select({
         "select",
-        "id, `name`, description, org_id, source_id, script, model, config, create_by, ",
+        "id, `name`, description, org_id, source_id, script, `type`, model, config, create_by, ",
         "create_time, update_by, update_time, parent_id, is_folder, `index`, `status`",
         "from view",
         "where id = #{id,jdbcType=VARCHAR}"
@@ -56,6 +56,7 @@ public interface ViewMapper extends CRUDMapper {
         @Result(column="org_id", property="orgId", jdbcType=JdbcType.VARCHAR),
         @Result(column="source_id", property="sourceId", jdbcType=JdbcType.VARCHAR),
         @Result(column="script", property="script", jdbcType=JdbcType.VARCHAR),
+        @Result(column="type", property="type", jdbcType=JdbcType.VARCHAR),
         @Result(column="model", property="model", jdbcType=JdbcType.VARCHAR),
         @Result(column="config", property="config", jdbcType=JdbcType.VARCHAR),
         @Result(column="create_by", property="createBy", jdbcType=JdbcType.VARCHAR),
@@ -79,6 +80,7 @@ public interface ViewMapper extends CRUDMapper {
           "org_id = #{orgId,jdbcType=VARCHAR},",
           "source_id = #{sourceId,jdbcType=VARCHAR},",
           "script = #{script,jdbcType=VARCHAR},",
+          "`type` = #{type,jdbcType=VARCHAR},",
           "model = #{model,jdbcType=VARCHAR},",
           "config = #{config,jdbcType=VARCHAR},",
           "create_by = #{createBy,jdbcType=VARCHAR},",

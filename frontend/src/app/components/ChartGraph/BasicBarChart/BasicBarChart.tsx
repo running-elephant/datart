@@ -18,6 +18,7 @@
 
 import { ChartDataSectionType } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { ChartSelection } from 'app/models/ChartSelection';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -25,12 +26,14 @@ import {
   ChartStyleConfig,
   LabelStyle,
   LegendStyle,
+  SelectedItem,
   XAxis,
   XAxisColumns,
   YAxis,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
+  getChartSelection,
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getDrillableRows,
@@ -38,6 +41,7 @@ import {
   getExtraSeriesRowData,
   getGridStyle,
   getReference2,
+  getSelectedItemStyles,
   getSeriesTooltips4Rectangular2,
   getStyles,
   hadAxisLabelOverflowConfig,
@@ -47,6 +51,7 @@ import {
 } from 'app/utils/chartHelper';
 import { toPrecision } from 'app/utils/number';
 import { init } from 'echarts';
+import { transparentize } from 'polished';
 import { UniqArray } from 'utils/object';
 import Chart from '../../../models/Chart';
 import { ChartRequirement } from '../../../types/ChartMetadata';
@@ -60,6 +65,14 @@ class BasicBarChart extends Chart {
   protected isHorizonDisplay = false;
   protected isStackMode = false;
   protected isPercentageYAxis = false;
+  private selection: null | ChartSelection = null;
+  protected dataZoomConfig: {
+    setConfig: any;
+    showConfig: any;
+  } = {
+    setConfig: null,
+    showConfig: null,
+  };
 
   constructor(props?: {
     id: string;
@@ -81,7 +94,11 @@ class BasicBarChart extends Chart {
   }
 
   onMount(options, context): void {
-    if (options.containerId === undefined || !context.document) {
+    if (
+      options.containerId === undefined ||
+      !context.document ||
+      !context.window
+    ) {
       return;
     }
 
@@ -89,8 +106,35 @@ class BasicBarChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
+    this.selection = getChartSelection(context.window, {
+      chart: this.chart,
+      mouseEvents: this.mouseEvents,
+    });
+    this.chart.on('datazoom', ({ end, start }) => {
+      this.dataZoomConfig.showConfig = {
+        end,
+        start,
+      };
+    });
     this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
+      switch (event.name) {
+        case 'click':
+          this.chart.on(event.name, params => {
+            this.selection?.doSelect({
+              index: params.componentIndex + ',' + params.dataIndex,
+              data: params.data,
+            });
+            event.callback({
+              ...params,
+              interactionType: 'select',
+              selectedItems: this.selection?.selectedItems,
+            });
+          });
+          break;
+        default:
+          this.chart.on(event.name, event.callback);
+          break;
+      }
     });
   }
 
@@ -98,19 +142,28 @@ class BasicBarChart extends Chart {
     if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
+
     if (!this.isMatchRequirement(options.config)) {
       this.chart?.clear();
       return;
+    }
+    if (
+      this.selection?.selectedItems.length &&
+      !options.selectedItems?.length
+    ) {
+      this.selection?.clearAll();
     }
     const newOptions = this.getOptions(
       options.dataset,
       options.config,
       options.drillOption,
+      options.selectedItems,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
   onUnMount(): void {
+    this.selection?.removeEvent();
     this.chart?.dispose();
   }
 
@@ -123,7 +176,8 @@ class BasicBarChart extends Chart {
   getOptions(
     dataset: ChartDataSetDTO,
     config: ChartConfig,
-    drillOption: ChartDrillOption,
+    drillOption?: ChartDrillOption,
+    selectedItems?: SelectedItem[],
   ) {
     const styleConfigs: ChartStyleConfig[] = config.styles || [];
     const dataConfigs: ChartDataConfig[] = config.datas || [];
@@ -134,13 +188,13 @@ class BasicBarChart extends Chart {
       drillOption,
     );
     const aggregateConfigs: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
     const colorConfigs: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.COLOR)
+      .filter(c => c.type === ChartDataSectionType.Color)
       .flatMap(config => config.rows || []);
     const infoConfigs: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.INFO)
+      .filter(c => c.type === ChartDataSectionType.Info)
       .flatMap(config => config.rows || []);
 
     const chartDataSet = transformToDataSet(
@@ -174,6 +228,7 @@ class BasicBarChart extends Chart {
       aggregateConfigs,
       infoConfigs,
       xAxisColumns,
+      selectedItems,
     );
 
     const axisInfo = {
@@ -215,8 +270,101 @@ class BasicBarChart extends Chart {
         ),
       },
       legend: this.getLegendStyle(styleConfigs, series),
+      dataZoom: this.getDataZoom(styleConfigs),
       ...option,
     };
+  }
+
+  private getDataZoom(styles: ChartStyleConfig[]) {
+    const [
+      showZoomSlider,
+      zoomSliderColor,
+      usePercentage,
+      start,
+      end,
+      startValue,
+      endValue,
+    ] = getStyles(
+      styles,
+      ['xAxis', 'dataZoomPanel'],
+      [
+        'showZoomSlider',
+        'zoomSliderColor',
+        'usePercentage',
+        'zoomStartPercentage',
+        'zoomEndPercentage',
+        'zoomStartIndex',
+        'zoomEndIndex',
+      ],
+    );
+
+    const _getDataZoomStartAndEnd = setConfig => {
+      if (
+        JSON.stringify(this.dataZoomConfig.setConfig) !==
+          JSON.stringify(setConfig) ||
+        !this.dataZoomConfig.showConfig
+      ) {
+        this.dataZoomConfig.setConfig = {
+          ...setConfig,
+        };
+        return setConfig.usePercentage
+          ? {
+              start: setConfig.start,
+              end: setConfig.end,
+            }
+          : {
+              startValue: setConfig.startValue,
+              endValue: setConfig.endValue,
+            };
+      }
+      return this.dataZoomConfig.showConfig;
+    };
+
+    return showZoomSlider
+      ? [
+          {
+            type: 'slider',
+            handleSize: '100%',
+            show: true,
+            orient: this.isHorizonDisplay ? 'vertical' : 'horizontal',
+            dataBackground: {
+              lineStyle: {
+                color: transparentize(0.7, zoomSliderColor),
+              },
+              areaStyle: {
+                color: transparentize(0.7, zoomSliderColor),
+              },
+            },
+            selectedDataBackground: {
+              lineStyle: {
+                color: zoomSliderColor,
+              },
+              areaStyle: {
+                color: zoomSliderColor,
+              },
+            },
+            brushStyle: {
+              color: transparentize(0.85, zoomSliderColor),
+            },
+            emphasis: {
+              handleStyle: {
+                color: zoomSliderColor,
+              },
+              moveHandleStyle: {
+                color: zoomSliderColor,
+              },
+            },
+            fillerColor: transparentize(0.85, zoomSliderColor),
+            ..._getDataZoomStartAndEnd({
+              usePercentage,
+              start,
+              end,
+              startValue,
+              endValue,
+            }),
+          },
+        ]
+      : [];
   }
 
   private makePercentageYAxis(axisInfo: { xAxis: XAxis; yAxis: YAxis }) {
@@ -241,9 +389,10 @@ class BasicBarChart extends Chart {
     aggregateConfigs: ChartDataSectionField[],
     infoConfigs: ChartDataSectionField[],
     xAxisColumns: XAxisColumns[],
+    selectedItems?: SelectedItem[],
   ): Series[] {
     if (!colorConfigs.length) {
-      return aggregateConfigs.map(aggConfig => {
+      return aggregateConfigs.map((aggConfig, sIndex) => {
         return {
           ...this.getBarSeriesImpl(
             styleConfigs,
@@ -252,12 +401,15 @@ class BasicBarChart extends Chart {
             aggConfig,
           ),
           name: getColumnRenderName(aggConfig),
-          data: chartDataSet?.map(dc => ({
-            ...getExtraSeriesRowData(dc),
-            ...getExtraSeriesDataFormat(aggConfig?.format),
-            name: getColumnRenderName(aggConfig),
-            value: dc.getCell(aggConfig),
-          })),
+          data: chartDataSet?.map((dc, dIndex) => {
+            return {
+              ...getExtraSeriesRowData(dc),
+              ...getExtraSeriesDataFormat(aggConfig?.format),
+              ...getSelectedItemStyles(sIndex, dIndex, selectedItems || []),
+              name: getColumnRenderName(aggConfig),
+              value: dc.getCell(aggConfig),
+            };
+          }),
         };
       });
     }
@@ -267,40 +419,46 @@ class BasicBarChart extends Chart {
       colorConfigs[0],
     );
 
-    const colorizeGroupedSeries = aggregateConfigs.flatMap(aggConfig => {
-      return secondGroupInfos.map(sgCol => {
-        const k = Object.keys(sgCol)[0];
-        const dataSet = sgCol[k];
+    const xAxisConfig = groupConfigs?.[0];
+    const colorizeGroupedSeries = aggregateConfigs.flatMap(
+      (aggConfig, acIndex) => {
+        return secondGroupInfos.map((sgCol, sgIndex) => {
+          const k = Object.keys(sgCol)[0];
+          const dataSet = sgCol[k];
 
-        const itemStyleColor = colorConfigs?.[0]?.color?.colors?.find(
-          c => c.key === k,
-        );
+          const itemStyleColor = colorConfigs?.[0]?.color?.colors?.find(
+            c => c.key === k,
+          );
 
-        return {
-          ...this.getBarSeriesImpl(
-            styleConfigs,
-            settingConfigs,
-            chartDataSet,
-            aggConfig,
-          ),
-          name: k,
-          data: xAxisColumns?.[0]?.data?.map(d => {
-            const row = dataSet.find(
-              r => r.getMultiCell(...groupConfigs) === d,
-            )!;
-            return {
-              ...getExtraSeriesRowData(row),
-              ...getExtraSeriesDataFormat(aggConfig?.format),
-              name: getColumnRenderName(aggConfig),
-              value: row?.getCell(aggConfig),
-            };
-          }),
-          itemStyle: this.getSeriesItemStyle(styleConfigs, {
-            color: itemStyleColor?.value,
-          }),
-        };
-      });
-    });
+          return {
+            ...this.getBarSeriesImpl(
+              styleConfigs,
+              settingConfigs,
+              chartDataSet,
+              aggConfig,
+            ),
+            name: k,
+            data: xAxisColumns?.[0]?.data?.map((d, dIndex) => {
+              const row = dataSet.find(r => r.getCell(xAxisConfig) === d)!;
+              return {
+                ...getExtraSeriesRowData(row),
+                ...getExtraSeriesDataFormat(aggConfig?.format),
+                name: getColumnRenderName(aggConfig),
+                value: row?.getCell(aggConfig),
+                ...getSelectedItemStyles(
+                  acIndex * secondGroupInfos.length + sgIndex,
+                  dIndex,
+                  selectedItems || [],
+                ),
+              };
+            }),
+            itemStyle: this.getSeriesItemStyle(styleConfigs, {
+              color: itemStyleColor?.value,
+            }),
+          };
+        });
+      },
+    );
     return colorizeGroupedSeries;
   }
 

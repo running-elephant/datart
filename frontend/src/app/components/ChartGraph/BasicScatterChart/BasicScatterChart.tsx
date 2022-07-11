@@ -17,16 +17,21 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
+import Chart from 'app/models/Chart';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { ChartSelection } from 'app/models/ChartSelection';
 import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
   LabelStyle,
   LegendStyle,
+  SelectedItem,
   YAxis,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
+  getChartSelection,
   getColumnRenderName,
   getDataColumnMaxAndMin2,
   getDrillableRows,
@@ -34,13 +39,12 @@ import {
   getGridStyle,
   getReference2,
   getScatterSymbolSizeFn,
+  getSelectedItemStyles,
   getSeriesTooltips4Polar2,
   getStyles,
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
-import Chart from '../../../models/Chart';
-import { ChartDrillOption } from '../../../models/ChartDrillOption';
 import Config from './config';
 import { ScatterMetricAndSizeSerie } from './types';
 
@@ -48,6 +52,8 @@ class BasicScatterChart extends Chart {
   dependency = [];
   config = Config;
   chart: any = null;
+
+  private selection: null | ChartSelection = null;
 
   constructor() {
     super('scatter', 'viz.palette.graph.names.scatterChart', 'sandiantu');
@@ -60,7 +66,11 @@ class BasicScatterChart extends Chart {
   }
 
   onMount(options, context): void {
-    if (options.containerId === undefined || !context.document) {
+    if (
+      options.containerId === undefined ||
+      !context.document ||
+      !context.window
+    ) {
       return;
     }
 
@@ -68,8 +78,29 @@ class BasicScatterChart extends Chart {
       context.document.getElementById(options.containerId),
       'default',
     );
+    this.selection = getChartSelection(context.window, {
+      chart: this.chart,
+      mouseEvents: this.mouseEvents,
+    });
     this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
+      switch (event.name) {
+        case 'click':
+          this.chart.on(event.name, params => {
+            this.selection?.doSelect({
+              index: params.componentIndex + ',' + params.dataIndex,
+              data: params.data,
+            });
+            event.callback({
+              ...params,
+              interactionType: 'select',
+              selectedItems: this.selection?.selectedItems,
+            });
+          });
+          break;
+        default:
+          this.chart.on(event.name, event.callback);
+          break;
+      }
     });
   }
 
@@ -82,15 +113,20 @@ class BasicScatterChart extends Chart {
       this.chart?.clear();
       return;
     }
+    if (this.selection?.selectedItems.length && !props.selectedItems?.length) {
+      this.selection?.clearAll();
+    }
     const newOptions = this.getOptions(
       props.dataset,
       props.config,
       props.drillOption,
+      props.selectedItems,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
   onUnMount(): void {
+    this.selection?.removeEvent();
     this.chart?.dispose();
   }
 
@@ -101,7 +137,8 @@ class BasicScatterChart extends Chart {
   private getOptions(
     dataset: ChartDataSetDTO,
     config: ChartConfig,
-    drillOption: ChartDrillOption,
+    drillOption?: ChartDrillOption,
+    selectedItems?: SelectedItem[],
   ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -111,16 +148,16 @@ class BasicScatterChart extends Chart {
       drillOption,
     );
     const aggregateConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
     const sizeConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.SIZE)
+      .filter(c => c.type === ChartDataSectionType.Size)
       .flatMap(config => config.rows || []);
     const infoConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.INFO)
+      .filter(c => c.type === ChartDataSectionType.Info)
       .flatMap(config => config.rows || []);
     const colorConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.COLOR)
+      .filter(c => c.type === ChartDataSectionType.Color)
       .flatMap(config => config.rows || []);
 
     const chartDataSet = transformToDataSet(
@@ -145,6 +182,7 @@ class BasicScatterChart extends Chart {
       infoConfigs,
       styleConfigs,
       settingConfigs,
+      selectedItems,
     );
 
     return {
@@ -178,6 +216,7 @@ class BasicScatterChart extends Chart {
     infoConfigs: ChartDataSectionField[],
     styleConfigs: ChartStyleConfig[],
     settingConfigs: ChartStyleConfig[],
+    selectedItems?: SelectedItem[],
   ): ScatterMetricAndSizeSerie[] {
     const { min, max } = getDataColumnMaxAndMin2(
       chartDataSetRows,
@@ -197,6 +236,7 @@ class BasicScatterChart extends Chart {
           infoConfigs,
           styleConfigs,
           settingConfigs,
+          selectedItems,
         ),
       ];
     }
@@ -220,7 +260,7 @@ class BasicScatterChart extends Chart {
       return acc;
     }, {});
 
-    return Object.keys(groupedObjDataColumns).map(k => {
+    return Object.keys(groupedObjDataColumns).map((k, gcIndex) => {
       return this.getMetricAndSizeSerie(
         {
           max,
@@ -233,8 +273,10 @@ class BasicScatterChart extends Chart {
         infoConfigs,
         styleConfigs,
         settingConfigs,
+        selectedItems,
         k,
         groupedObjDataColumns?.[k]?.color,
+        gcIndex,
       );
     });
   }
@@ -248,8 +290,10 @@ class BasicScatterChart extends Chart {
     infoConfigs: ChartDataSectionField[],
     styleConfigs: ChartStyleConfig[],
     settingConfigs: ChartStyleConfig[],
+    selectedItems?: SelectedItem[],
     colorSeriesName?: string,
     color?: string,
+    comIndex: number = 0,
   ): ScatterMetricAndSizeSerie {
     const [cycleRatio] = getStyles(styleConfigs, ['scatter'], ['cycleRatio']);
     const seriesName = groupConfigs
@@ -262,6 +306,7 @@ class BasicScatterChart extends Chart {
         : defaultSizeValue;
       return {
         ...getExtraSeriesRowData(row),
+        ...getSelectedItemStyles(comIndex, dcIndex, selectedItems || []),
         name: groupConfigs?.map(row.getCell, row).join('-'),
         value: aggregateConfigs
           .map(row.getCell, row)

@@ -16,7 +16,7 @@ public class Source extends BaseEntity {
 
     private String parentId;
 
-    private Byte isFolder;
+    private Boolean isFolder;
 
     private Double index;
 

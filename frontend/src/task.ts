@@ -44,17 +44,18 @@ import { ChartDTO } from 'app/types/ChartDTO';
  * @description 'server task 定时任务 调用'
  */
 const getBoardQueryData = (dataStr: string) => {
-  var data = JSON.parse(dataStr) as ServerDashboard;
+  var data = JSON.parse(dataStr || '{}') as ServerDashboard;
 
   // const renderMode: VizRenderMode = 'schedule';
   const dashboard = getDashBoardByResBoard(data);
   const { datacharts, views: serverViews, widgets: serverWidgets } = data;
 
   const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
-  const migratedWidgets = migrateWidgets(serverWidgets);
+  const migratedWidgets = migrateWidgets(serverWidgets, dashboard.config.type);
   const { widgetMap, wrappedDataCharts } = getWidgetMap(
-    migratedWidgets,
+    migratedWidgets, // TODO
     dataCharts,
+    dashboard.config.type,
   );
 
   const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
@@ -80,8 +81,10 @@ const getBoardQueryData = (dataStr: string) => {
 
 const getChartQueryData = (dataStr: string) => {
   // see  handleCreateDownloadDataTask
-  const data: ChartDTO = JSON.parse(dataStr);
-  const dataConfig: ChartDetailConfigDTO = JSON.parse(data.config as any);
+  const data: ChartDTO = JSON.parse(dataStr || '{}');
+  const dataConfig: ChartDetailConfigDTO = JSON.parse(
+    (data.config as any) || '{}',
+  );
   const chartConfig: ChartConfig = dataConfig.chartConfig as ChartConfig;
   const builder = new ChartDataRequestBuilder(
     {

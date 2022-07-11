@@ -187,13 +187,15 @@ const slice = createSlice({
       );
       state.folderListLoading = false;
       state.folders = [root].concat(
-        action.payload.map(({ id, name, parentId, index, relType }) => ({
+        action.payload.map(({ id, name, parentId, index, relType, relId }) => ({
           id,
           name,
           type: root.type,
           parentId: parentId === null ? root.id : parentId,
           index,
           isFolder: relType === 'FOLDER',
+          relType: relType,
+          relId: relId,
           permissionArray: getDefaultPermissionArray(),
         })),
       );

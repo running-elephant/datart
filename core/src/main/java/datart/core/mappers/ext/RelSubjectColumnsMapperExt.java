@@ -37,7 +37,7 @@ public interface RelSubjectColumnsMapperExt extends RelSubjectColumnsMapper {
     List<RelSubjectColumns> listByUser(String viewId, String userId);
 
     @Select({
-            "SELECT * FROM rel_subject_columns rsc WHERE rsc.role_id=#{roleId}"
+            "SELECT * FROM rel_subject_columns rsc WHERE rsc.subject_id=#{roleId}"
     })
     List<RelSubjectColumns> listByRole(String roleId);
 

@@ -36,7 +36,6 @@ import {
   RoseChart,
   ScatterOutlineMapChart,
   Scorecard,
-  ScoreChart,
   StackAreaChart,
   StackBarChart,
   StackColumnChart,
@@ -67,7 +66,7 @@ class ChartManager {
       return;
     }
     const pluginsPaths = await getChartPluginPaths();
-    Debugger.instance.measure('Plugin Charts | ', async () => {
+    return Debugger.instance.measure('Plugin Charts | ', async () => {
       await this._loadCustomizeCharts(pluginsPaths);
     });
   }
@@ -111,7 +110,6 @@ class ChartManager {
     return [
       new MingXiTableChart(),
       new PivotSheetChart(),
-      new ScoreChart(),
       new Scorecard(),
       new ClusterColumnChart(),
       new ClusterBarChart(),

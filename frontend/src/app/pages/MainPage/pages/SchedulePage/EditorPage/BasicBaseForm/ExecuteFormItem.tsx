@@ -7,6 +7,7 @@ const timeModeOptions = [
   { label: prefixI18N('global.time.minute'), value: TimeModes.Minute },
   { label: prefixI18N('global.time.hour'), value: TimeModes.Hour },
   { label: prefixI18N('global.time.day'), value: TimeModes.Day },
+  { label: prefixI18N('global.time.week'), value: TimeModes.Week },
   { label: prefixI18N('global.time.month'), value: TimeModes.Month },
   { label: prefixI18N('global.time.year'), value: TimeModes.Year },
 ];
@@ -81,14 +82,14 @@ export const ExecuteFormItem: FC<ExecuteFormItemProps> = ({
   const hourSelect = useMemo(() => {
     return (
       <Form.Item name="hour">
-        <Select options={hourOptions} style={{ width: 80 }} />
+        <Select options={hourOptions} style={{ width: 100 }} />
       </Form.Item>
     );
   }, []);
   const minuteSelect = useMemo(() => {
     return (
       <Form.Item name="minute">
-        <Select options={minuteOptions} style={{ width: 80 }} />
+        <Select options={minuteOptions} style={{ width: 100 }} />
       </Form.Item>
     );
   }, []);
@@ -99,7 +100,7 @@ export const ExecuteFormItem: FC<ExecuteFormItemProps> = ({
           <>
             {t('per')}
             <Form.Item name="minute">
-              <Select options={minutePeriodOptions} style={{ width: 80 }} />
+              <Select options={minutePeriodOptions} style={{ width: 100 }} />
             </Form.Item>
             {modeSelect}
           </>
@@ -124,8 +125,10 @@ export const ExecuteFormItem: FC<ExecuteFormItemProps> = ({
           <>
             {t('per')} {modeSelect} {t('of')}
             <Form.Item name="weekDay">
-              <Select options={weekOptions} style={{ width: 80 }} />
+              <Select options={weekOptions} style={{ width: 100 }} />
             </Form.Item>
+            {hourSelect}
+            {minuteSelect}
           </>
         );
       case TimeModes.Month:

@@ -119,7 +119,7 @@ export const toEchoFormValues = ({
   endDate,
   cronExpression,
 }: Schedule): FormValues => {
-  const configObj: any = config ? JSON.parse(config) : {},
+  const configObj: any = config ? JSON.parse(config || '{}') : {},
     vizContents: VizContentsItem[] = configObj?.vizContents || [],
     folderContent = vizContents.filter(v => v?.vizType !== VizTypes.StoryBoard),
     demoContent = vizContents.filter(v => v?.vizType === VizTypes.StoryBoard),

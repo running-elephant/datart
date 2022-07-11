@@ -24,7 +24,9 @@ import {
   RUNTIME_DATE_LEVEL_KEY,
 } from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
-import { ChartDrillOption, DrillMode } from 'app/models/ChartDrillOption';
+import { DrillMode } from 'app/models/ChartDrillOption';
+import { ChartSelection } from 'app/models/ChartSelection';
+import { ChartMouseEvent } from 'app/types/Chart';
 import {
   AxisLabel,
   AxisLineStyle,
@@ -34,12 +36,13 @@ import {
   ChartStyleConfig,
   ChartStyleSectionGroup,
   FontStyle,
+  FormatFieldAction,
   GridStyle,
-  IFieldFormatConfig,
   LineStyle,
   MarkArea,
   MarkDataConfig,
   MarkLine,
+  SelectedItem,
   XAxis,
 } from 'app/types/ChartConfig';
 import {
@@ -51,6 +54,8 @@ import {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { updateBy } from 'app/utils/mutation';
 import { ECharts } from 'echarts';
@@ -64,6 +69,7 @@ import {
   isEmptyArray,
   meanValue,
   pipe,
+  UniqWith,
 } from 'utils/object';
 import { TableColumnsList } from '../components/ChartGraph/BasicTableChart/types';
 import {
@@ -74,6 +80,7 @@ import {
   getRequiredGroupedSections,
   isInRange,
 } from './internalChartHelper';
+import { isNumber } from './number';
 
 /**
  * [中文] 获取格式聚合数据
@@ -91,18 +98,18 @@ import {
  * console.log(formattedData); // '100.00%';
  * @export
  * @param {(number | string)} [value]
- * @param {IFieldFormatConfig} [format]
+ * @param {FormatFieldAction} [format]
  * @return {*}
  */
 export function toFormattedValue(
   value?: number | string,
-  format?: IFieldFormatConfig,
+  format?: FormatFieldAction,
 ) {
   if (value === null || value === undefined) {
     return '-';
   }
 
-  if (!format || format.type === FieldFormatType.DEFAULT) {
+  if (!format || format.type === FieldFormatType.Default) {
     return value;
   }
 
@@ -114,7 +121,7 @@ export function toFormattedValue(
 
   if (
     typeof value === 'string' &&
-    formatType !== FieldFormatType.DATE &&
+    formatType !== FieldFormatType.Date &&
     (!value || isNaN(+value))
   ) {
     return value;
@@ -127,35 +134,35 @@ export function toFormattedValue(
 
   let formattedValue;
   switch (formatType) {
-    case FieldFormatType.NUMERIC:
+    case FieldFormatType.Numeric:
       const numericConfig =
-        config as IFieldFormatConfig[FieldFormatType.NUMERIC];
+        config as FormatFieldAction[FieldFormatType.Numeric];
       formattedValue = pipe(
         unitFormater,
         decimalPlacesFormater,
         numericFormater,
       )(value, numericConfig);
       break;
-    case FieldFormatType.CURRENCY:
+    case FieldFormatType.Currency:
       const currencyConfig =
-        config as IFieldFormatConfig[FieldFormatType.CURRENCY];
+        config as FormatFieldAction[FieldFormatType.Currency];
       formattedValue = pipe(currencyFormater)(value, currencyConfig);
       break;
-    case FieldFormatType.PERCENTAGE:
+    case FieldFormatType.Percentage:
       const percentageConfig =
-        config as IFieldFormatConfig[FieldFormatType.PERCENTAGE];
+        config as FormatFieldAction[FieldFormatType.Percentage];
       formattedValue = pipe(percentageFormater)(value, percentageConfig);
       break;
-    case FieldFormatType.SCIENTIFIC:
+    case FieldFormatType.Scientific:
       const scientificNotationConfig =
-        config as IFieldFormatConfig[FieldFormatType.SCIENTIFIC];
+        config as FormatFieldAction[FieldFormatType.Scientific];
       formattedValue = pipe(scientificNotationFormater)(
         value,
         scientificNotationConfig,
       );
       break;
-    case FieldFormatType.DATE:
-      const dateConfig = config as IFieldFormatConfig[FieldFormatType.DATE];
+    case FieldFormatType.Date:
+      const dateConfig = config as FormatFieldAction[FieldFormatType.Date];
       formattedValue = pipe(dateFormater)(value, dateConfig);
       break;
     default:
@@ -169,8 +176,8 @@ export function toFormattedValue(
 function decimalPlacesFormater(
   value,
   config?:
-    | IFieldFormatConfig[FieldFormatType.NUMERIC]
-    | IFieldFormatConfig[FieldFormatType.CURRENCY],
+    | FormatFieldAction[FieldFormatType.Numeric]
+    | FormatFieldAction[FieldFormatType.Currency],
 ) {
   if (isEmpty(config?.decimalPlaces)) {
     return value;
@@ -188,8 +195,8 @@ function decimalPlacesFormater(
 function unitFormater(
   value: any,
   config?:
-    | IFieldFormatConfig[FieldFormatType.NUMERIC]
-    | IFieldFormatConfig[FieldFormatType.CURRENCY],
+    | FormatFieldAction[FieldFormatType.Numeric]
+    | FormatFieldAction[FieldFormatType.Currency],
 ) {
   if (isEmpty(config?.unitKey)) {
     return value;
@@ -204,7 +211,7 @@ function unitFormater(
 
 function numericFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.NUMERIC],
+  config?: FormatFieldAction[FieldFormatType.Numeric],
 ) {
   if (isNaN(+value)) {
     return value;
@@ -221,7 +228,7 @@ function numericFormater(
 
 function thousandSeperatorFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.NUMERIC],
+  config?: FormatFieldAction[FieldFormatType.Numeric],
 ) {
   if (isNaN(+value) || !config?.useThousandSeparator) {
     return value;
@@ -235,7 +242,7 @@ function thousandSeperatorFormater(
 
 function currencyFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.CURRENCY],
+  config?: FormatFieldAction[FieldFormatType.Currency],
 ) {
   if (isNaN(+value)) {
     return value;
@@ -256,7 +263,7 @@ function currencyFormater(
 
 function percentageFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.PERCENTAGE],
+  config?: FormatFieldAction[FieldFormatType.Percentage],
 ) {
   if (isNaN(+value)) {
     return value;
@@ -275,7 +282,7 @@ function percentageFormater(
 
 function scientificNotationFormater(
   value,
-  config?: IFieldFormatConfig[FieldFormatType.SCIENTIFIC],
+  config?: FormatFieldAction[FieldFormatType.Scientific],
 ) {
   if (isNaN(+value)) {
     return value;
@@ -291,10 +298,7 @@ function scientificNotationFormater(
   return (+value).toExponential(fractionDigits);
 }
 
-function dateFormater(
-  value,
-  config?: IFieldFormatConfig[FieldFormatType.DATE],
-) {
+function dateFormater(value, config?: FormatFieldAction[FieldFormatType.Date]) {
   if (isNaN(+value) || isEmpty(config?.format)) {
     return value;
   }
@@ -1334,8 +1338,8 @@ export function getExtraSeriesRowData(
   };
 }
 
-export function getExtraSeriesDataFormat(format?: IFieldFormatConfig): {
-  format: IFieldFormatConfig | undefined;
+export function getExtraSeriesDataFormat(format?: FormatFieldAction): {
+  format: FormatFieldAction | undefined;
 } {
   return {
     format,
@@ -1411,8 +1415,8 @@ export function isMatchRequirement(
   ).flatMap(config => config.rows || []);
   const requirements = meta.requirements || [];
   return requirements.some(r => {
-    const group = r?.[ChartDataSectionType.GROUP];
-    const aggregate = r?.[ChartDataSectionType.AGGREGATE];
+    const group = r?.[ChartDataSectionType.Group];
+    const aggregate = r?.[ChartDataSectionType.Aggregate];
     return (
       isInRange(group, groupedFieldConfigs.length) &&
       isInRange(aggregate, aggregateFieldConfigs.length)
@@ -1552,10 +1556,10 @@ export const getAutoFunnelTopPosition = (config: {
  */
 export const getDrillableRows = (
   configs: ChartDataConfig[],
-  option?: ChartDrillOption,
+  option?: IChartDrillOption,
 ): ChartDataSectionField[] => {
   return configs
-    ?.filter(c => c.type === ChartDataSectionType.GROUP)
+    ?.filter(c => c.type === ChartDataSectionType.Group)
     .flatMap(config => {
       if (Boolean(config.drillable)) {
         if (
@@ -1577,17 +1581,9 @@ export const getDrillableRows = (
     });
 };
 
-export const getChartsAllRows = (configs?: ChartDataConfig[]) => {
-  const datas = configs || [];
-  return datas
-    .filter(v => v.rows)
-    .reduce((acc: ChartDataSectionField[], cur) => {
-      return acc.concat(cur.rows || []);
-    }, []);
-};
-
 export const getRuntimeDateLevelFields = (rows: any) => {
   const _rows = CloneValueDeep(rows);
+
   _rows?.forEach((v, i) => {
     const symbolData = v?.[RUNTIME_DATE_LEVEL_KEY];
     if (symbolData) {
@@ -1602,41 +1598,61 @@ export const getRuntimeDateLevelFields = (rows: any) => {
  */
 export const getRuntimeComputedFields = (
   dateLevelComputedFields,
-  replacedColName,
-  computedFields,
-  chartConfig,
+  replacedConfig?: ChartDataSectionField,
+  computedFields?,
+  isRuntime?: boolean,
 ) => {
   let _computedFields = computedFields ? CloneValueDeep(computedFields) : [];
 
-  if (dateLevelComputedFields.length) {
-    const expressionList: any = [];
+  if (isRuntime && replacedConfig?.field) {
+    const index = getRuntimeDateLevelFields(_computedFields).findIndex(
+      v => v.id === replacedConfig?.colName,
+    );
+    const replacedConfigIndex = dateLevelComputedFields.findIndex(
+      v => v.field === replacedConfig?.field,
+    );
+    _computedFields = updateBy(_computedFields, draft => {
+      const dateLevelConfig = dateLevelComputedFields[replacedConfigIndex];
 
-    _computedFields.forEach(v => {
-      if (v.category === ChartDataViewFieldCategory.DateLevelComputedField) {
-        expressionList.push(v.expression);
+      if (dateLevelConfig) {
+        draft[index][RUNTIME_DATE_LEVEL_KEY] = {
+          category: dateLevelConfig.category,
+          id: dateLevelConfig.colName,
+          type: dateLevelConfig.type,
+          expression: dateLevelConfig.expression,
+        };
       }
     });
+  } else {
+    if (dateLevelComputedFields.length) {
+      const expressionList: any = [];
 
-    dateLevelComputedFields.forEach(v => {
-      if (!expressionList.includes(v.expression)) {
-        _computedFields.push({
-          category: v.category,
-          id: v.colName,
-          type: v.type,
-          expression: v.expression,
-        });
-      }
-    });
-  }
+      _computedFields.forEach(v => {
+        if (v.category === ChartDataViewFieldCategory.DateLevelComputedField) {
+          expressionList.push(v.expression);
+        }
+      });
 
-  if (replacedColName) {
-    const allRows = getChartsAllRows(chartConfig?.datas);
-    const replacedRows = allRows.filter(v => v.colName === replacedColName);
-
-    if (replacedRows.length < 2) {
-      _computedFields = _computedFields.filter(v => v.id !== replacedColName);
+      dateLevelComputedFields.forEach(v => {
+        if (!expressionList.includes(v.expression)) {
+          _computedFields = updateBy(_computedFields, draft => {
+            draft.push({
+              category: v.category,
+              id: v.colName,
+              type: v.type,
+              expression: v.expression,
+            });
+          });
+        }
+      });
+    }
+    if (replacedConfig) {
+      _computedFields = _computedFields.filter(
+        v => v.id !== replacedConfig.colName,
+      );
     }
   }
+
   return _computedFields;
 };
 
@@ -1646,7 +1662,7 @@ export const clearRuntimeDateLevelFieldsInChartConfig = (
   return updateBy(config, draft => {
     if (draft?.datas) {
       const index = draft.datas.findIndex(
-        v => v.type === ChartDataSectionType.GROUP,
+        v => v.type === ChartDataSectionType.Group,
       );
       const groupRows = draft.datas[index]?.rows;
       groupRows?.forEach((v, i) => {
@@ -1662,7 +1678,7 @@ export const setRuntimeDateLevelFieldsInChartConfig = (config: ChartConfig) => {
   return updateBy(config, draft => {
     if (draft?.datas) {
       const index = draft.datas.findIndex(
-        v => v.type === ChartDataSectionType.GROUP,
+        v => v.type === ChartDataSectionType.Group,
       );
       const groupRows = draft.datas[index]?.rows;
       groupRows?.forEach((v, i) => {
@@ -1674,3 +1690,136 @@ export const setRuntimeDateLevelFieldsInChartConfig = (config: ChartConfig) => {
     }
   });
 };
+
+/**
+ * Get common selected styles
+ *
+ * @param {string | number} comIndex
+ * @param {string | number} dcIndex
+ * @param {SelectedItem[]} selectionList
+ * @param {[x: string]: any} [itemStyle = {}]
+ * @return {itemStyle: [x: string]: any} itemStyle
+ */
+export const getSelectedItemStyles = (
+  comIndex: string | number,
+  dcIndex: string | number,
+  selectionList: SelectedItem[],
+  itemStyle: { [x: string]: any } = {},
+): { itemStyle: { opacity?: number; [x: string]: any } } => {
+  if (selectionList.length) {
+    const selectionConfig = selectionList.find(
+      v => v.index === comIndex + ',' + dcIndex,
+    );
+    return {
+      itemStyle: Object.assign(
+        itemStyle,
+        selectionConfig ? {} : { opacity: 0.5 },
+      ),
+    };
+  }
+  return {
+    itemStyle,
+  };
+};
+
+/**
+ * Comparing old and new selectedItems
+ *
+ * @param {SelectedItem[]} newSelectedItems
+ * @param {SelectedItem[]} [oldSelectedItems]
+ * @return {boolean}
+ */
+export const compareSelectedItems = (
+  newSelectedItems: SelectedItem[],
+  oldSelectedItems?: SelectedItem[],
+): boolean => {
+  if (newSelectedItems.length !== oldSelectedItems?.length) {
+    return true;
+  } else if (
+    newSelectedItems.length === oldSelectedItems.length &&
+    newSelectedItems.length
+  ) {
+    return !!newSelectedItems.filter(v => {
+      const item = oldSelectedItems.find(oldItem => oldItem.index === v.index);
+      return !item ||
+        Object.values(item.data.rowData).length !==
+          Object.values(v.data.rowData).length
+        ? true
+        : false;
+    }).length;
+  }
+  return false;
+};
+
+/**
+ * Get chart select option class.
+ *
+ * @param {Window} window
+ * @param {ChartSelectionOptions} [options]
+ * @return {Object}  ChartSelection
+ */
+export const getChartSelection = (
+  window: Window,
+  options?: { chart: ECharts; mouseEvents?: ChartMouseEvent[] },
+) => {
+  return new ChartSelection(window, options);
+};
+
+export function getAllColumnInMeta(
+  meta?: ChartDataViewMeta[],
+): ChartDataViewMeta[] | undefined {
+  return meta?.reduce<ChartDataViewMeta[]>((arr, cur) => {
+    return cur.children ? arr.concat(cur.children) : arr.concat([cur]);
+  }, []);
+}
+
+/**
+ * Get precision number.
+ *
+ * @param {number | string} x
+ * @param {number} [precision]
+ * @return {number}  x
+ */
+export function round(x: number | string, precision?: number): number {
+  if (precision == null) {
+    precision = 10;
+  }
+  precision = Math.min(Math.max(0, precision), 20);
+  x = (+x).toFixed(precision);
+  return +x;
+}
+
+/**
+ * Get min and max number.
+ *
+ * @param {ChartDataSectionField[]} configs
+ * @param {IChartDataSet<string>} [chartDataset]
+ * @return {[number, number]}  minAndMax
+ */
+export function getMinAndMaxNumber(
+  configs: ChartDataSectionField[],
+  chartDataset: IChartDataSet<string>,
+) {
+  const datas = configs
+    .reduce(
+      (acc, cur) => acc.concat(chartDataset.map(dc => Number(dc.getCell(cur)))),
+      [] as any[],
+    )
+    .filter(isNumber) as number[];
+  return [Math.min(0, ...datas), Math.max(0, ...datas)];
+}
+
+export function findPathByNameInMeta(meta, colName) {
+  return getAllColumnInMeta(meta)?.find(v => v.name === colName);
+}
+
+export function mergeChartAndViewComputedField(
+  viewComputer?: ChartDataViewMeta[],
+  chartComputer?: ChartDataViewMeta[],
+) {
+  viewComputer = viewComputer || [];
+  return UniqWith(
+    viewComputer.concat(chartComputer || []),
+    (a, b) => a?.id === b?.id,
+  );
+}

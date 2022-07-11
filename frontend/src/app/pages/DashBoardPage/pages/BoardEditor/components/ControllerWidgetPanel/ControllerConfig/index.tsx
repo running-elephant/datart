@@ -21,8 +21,8 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   BoardType,
   ControllerWidgetContent,
-  Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import ChartDataView from 'app/types/ChartDataView';
 import React, { memo, useMemo } from 'react';
 import styled from 'styled-components/macro';

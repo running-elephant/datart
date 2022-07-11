@@ -17,6 +17,7 @@
  */
 
 import { DataViewFieldType } from 'app/constants';
+import { ChartSelection } from 'app/models/ChartSelection';
 import ReactChart from 'app/models/ReactChart';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import {
@@ -26,10 +27,14 @@ import {
   ChartOptions,
   ChartStyleConfig,
   ChartStyleSectionGroup,
+  SelectedItem,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import {
+  compareSelectedItems,
+  getChartSelection,
   getColumnRenderName,
+  getExtraSeriesRowData,
   getStyles,
   getUnusedHeaderRows,
   getValue,
@@ -37,6 +42,7 @@ import {
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { DATARTSEPERATOR } from 'globalConstants';
+import { darken, getLuminance, lighten } from 'polished';
 import { Debugger } from 'utils/debugger';
 import { CloneValueDeep, isEmptyArray, Omit } from 'utils/object';
 import { ConditionalStyleFormValues } from '../../FormGenerator/Customize/ConditionalStyle';
@@ -65,22 +71,26 @@ class BasicTableChart extends ReactChart {
   useIFrame = false;
   isISOContainer = 'react-table';
   config = Config;
-  utilCanvas;
-  dataColumnWidths = {};
-  tablePadding = 16;
-  tableCellBorder = 1;
-  cachedAntTableOptions: any = {};
-  cachedDatartConfig: ChartConfig = {};
-  cacheContext: any = null;
-  showSummaryRow = false;
-  rowNumberUniqKey = `@datart@rowNumberKey`;
-  totalWidth = 0;
-  exceedMaxContent = false;
-  pageInfo: Partial<PageInfo> | undefined = {
+
+  protected rowNumberUniqKey = `@datart@rowNumberKey`;
+
+  private utilCanvas;
+  private dataColumnWidths = {};
+  private tablePadding = 16;
+  private tableCellBorder = 1;
+  private cachedAntTableOptions: any = {};
+  private cachedDatartConfig: ChartConfig = {};
+  private cacheContext: any = null;
+  private showSummaryRow = false;
+  private totalWidth = 0;
+  private exceedMaxContent = false;
+  private pageInfo: Partial<PageInfo> | undefined = {
     pageNo: 0,
     pageSize: 0,
     total: 0,
   };
+  private selection: null | ChartSelection = null;
+  private selectedRows: SelectedItem[] = [];
 
   constructor(props?) {
     super(AntdTableWrapper, {
@@ -97,10 +107,33 @@ class BasicTableChart extends ReactChart {
     ];
   }
 
+  onMount(options, context?) {
+    if (
+      options.containerId === undefined ||
+      !context.document ||
+      !context.window
+    ) {
+      return;
+    }
+    this.selection = getChartSelection(context.window);
+    this.adapter?.mounted(
+      context.document.getElementById(options.containerId),
+      options,
+      context,
+    );
+  }
+
   onUpdated(options: ChartOptions, context: ChartContext): void {
     if (!this.isMatchRequirement(options.config)) {
       this.adapter?.unmount();
       return;
+    }
+    if (
+      this.selection?.selectedItems.length &&
+      !options.selectedItems?.length
+    ) {
+      this.selection?.clearAll();
+      this.selectedRows = [];
     }
 
     Debugger.instance.measure(
@@ -126,6 +159,8 @@ class BasicTableChart extends ReactChart {
     this.cachedAntTableOptions = {};
     this.cachedDatartConfig = {};
     this.cacheContext = null;
+    this.selectedRows = [];
+    this.selection?.removeEvent();
   }
 
   public onResize(options, context?): void {
@@ -133,6 +168,7 @@ class BasicTableChart extends ReactChart {
       options.config,
       options.dataset,
       context,
+      options.widgetSpecialConfig,
     );
     const tableOptions = Object.assign(
       this.cachedAntTableOptions,
@@ -195,6 +231,7 @@ class BasicTableChart extends ReactChart {
       settingConfigs,
       chartDataSet,
       context,
+      widgetSpecialConfig,
     );
     return {
       rowKey: 'id',
@@ -242,6 +279,7 @@ class BasicTableChart extends ReactChart {
     config: ChartConfig,
     dataset: ChartDataSetDTO,
     context,
+    widgetSpecialConfig: { env: string | undefined; [x: string]: any },
   ): TableColumnsList[] {
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
@@ -274,6 +312,7 @@ class BasicTableChart extends ReactChart {
       settingConfigs,
       chartDataSet,
       context,
+      widgetSpecialConfig,
     );
   }
 
@@ -586,6 +625,11 @@ class BasicTableChart extends ReactChart {
         ];
       }
     });
+    const [oddBgColor, evenBgColor] = getStyles(
+      styleConfigs,
+      ['tableBodyStyle'],
+      ['oddBgColor', 'evenBgColor'],
+    );
     return {
       header: {
         cell: props => {
@@ -619,7 +663,7 @@ class BasicTableChart extends ReactChart {
       },
       body: {
         cell: props => {
-          const { style, key, rowData, ...rest } = props;
+          const { style, key, rowData, sensitiveFieldName, ...rest } = props;
           const uid = props.uid;
           const [conditionalStyle] = getStyles(
             getAllColumnListInfo,
@@ -635,7 +679,6 @@ class BasicTableChart extends ReactChart {
             props?.cellValue,
             conditionalStyle,
           );
-          const sensitiveFieldName = Object.keys(rowData || {})?.[0];
           const useColumnWidth =
             this.dataColumnWidths?.[props.dataIndex]?.getUseColumnWidth;
           const _getBodyTextAlignStyle = alignValue => {
@@ -653,12 +696,35 @@ class BasicTableChart extends ReactChart {
             }
             return bodyTextAlign;
           };
+          let highlightStyle = {};
+          if (
+            this.selection?.selectedItems.find(
+              v => v.index === rest.rowIndex + ',' + sensitiveFieldName,
+            )
+          ) {
+            const backgroundColor = conditionalCellStyle?.backgroundColor
+              ? conditionalCellStyle.backgroundColor
+              : rest.rowIndex % 2 === 0
+              ? oddBgColor
+              : evenBgColor;
+            highlightStyle = {
+              backgroundColor:
+                getLuminance(backgroundColor) > 0.5
+                  ? darken(0.1, backgroundColor)
+                  : lighten(0.1, backgroundColor),
+            };
+          }
           return (
             <TableComponentsTd
               {...rest}
-              style={Object.assign(style || {}, conditionalCellStyle, {
-                textAlign: _getBodyTextAlignStyle(align),
-              })}
+              style={Object.assign(
+                style || {},
+                conditionalCellStyle,
+                {
+                  textAlign: _getBodyTextAlignStyle(align),
+                },
+                highlightStyle,
+              )}
               isLinkCell={linkFields?.includes(sensitiveFieldName)}
               isJumpCell={jumpField === sensitiveFieldName}
               useColumnWidth={useColumnWidth}
@@ -707,6 +773,7 @@ class BasicTableChart extends ReactChart {
     settingConfigs: ChartStyleConfig[],
     chartDataSet: IChartDataSet<string>,
     context: ChartContext,
+    widgetSpecialConfig: { env: string | undefined; [x: string]: any },
   ): TableColumnsList[] {
     const [enableRowNumber, leftFixedColumns, rightFixedColumns] = getStyles(
       styleConfigs,
@@ -725,12 +792,15 @@ class BasicTableChart extends ReactChart {
             mixedSectionConfigRows,
             chartDataSet,
             styleConfigs,
+            widgetSpecialConfig,
+            mixedSectionConfigRows,
           )
         : this.getGroupColumns(
             mixedSectionConfigRows,
             tableHeaderStyles,
             chartDataSet,
             styleConfigs,
+            widgetSpecialConfig,
           );
     const rowNumbers: TableColumnsList[] = enableRowNumber
       ? [
@@ -755,6 +825,8 @@ class BasicTableChart extends ReactChart {
     dataConfigs: TableHeaderConfig[],
     chartDataSet: IChartDataSet<string>,
     styleConfigs: ChartStyleConfig[],
+    widgetSpecialConfig: { env: string | undefined; [x: string]: any },
+    mixedSectionConfigRows: ChartDataSectionField[],
   ): TableColumnsList[] {
     const [autoMergeFields] = getStyles(
       styleConfigs,
@@ -836,17 +908,24 @@ class BasicTableChart extends ReactChart {
         onCell: (record, rowIndex) => {
           const row = chartDataSet[rowIndex];
           const cellValue = row.getCell(c);
-          const rowData = { [chartDataSet.getFieldOriginKey(c)]: cellValue };
+          const seriesName = chartDataSet.getFieldOriginKey(c);
+          const { rowData } = getExtraSeriesRowData(row);
           return {
             uid: c.uid,
             cellValue,
             dataIndex: row.getFieldKey(c),
+            sensitiveFieldName: chartDataSet.getFieldOriginKey(c),
             rowData,
+            rowIndex,
             ...this.registerTableCellEvents(
               colName,
+              seriesName,
               cellValue,
               rowIndex,
               rowData,
+              styleConfigs,
+              widgetSpecialConfig,
+              mixedSectionConfigRows,
               c.aggregate,
             ),
           };
@@ -952,6 +1031,7 @@ class BasicTableChart extends ReactChart {
     tableHeader: TableHeaderConfig[],
     chartDataSet: IChartDataSet<string>,
     styleConfigs: ChartStyleConfig[],
+    widgetSpecialConfig: { env: string | undefined; [x: string]: any },
   ): TableColumnsList[] {
     const dataConfigs = this.getGroupColumnsOfFlattenedColumns(
       tableHeader,
@@ -962,13 +1042,13 @@ class BasicTableChart extends ReactChart {
       dataConfigs,
       chartDataSet,
       styleConfigs,
+      widgetSpecialConfig,
+      mixedSectionConfigRows,
     );
     const groupedHeaderColumns: TableColumnsList[] =
       tableHeader
-        ?.map(
-          style =>
-            this.getHeaderColumnGroup(chartDataSet, style, flattenedColumns) ||
-            [],
+        ?.map(style =>
+          this.getHeaderColumnGroup(chartDataSet, style, flattenedColumns),
         )
         ?.filter(Boolean) || [];
     const unusedHeaderRows: TableColumnsList[] = getUnusedHeaderRows(
@@ -1101,27 +1181,16 @@ class BasicTableChart extends ReactChart {
       : false;
   }
 
-  private createEventParams = params => ({
-    type: 'click',
-    componentType: 'table',
-    seriesType: undefined,
-    data: undefined,
-    dataIndex: undefined,
-    event: undefined,
-    name: undefined,
-    seriesName: undefined,
-    value: undefined,
-    ...params,
-  });
-
   private invokePagingRelatedEvents(
     seriesName: string,
     value: any,
     pageNo: number,
     aggOperator?: string,
   ) {
-    const eventParams = this.createEventParams({
-      seriesType: 'paging-sort-filter',
+    const eventParams = {
+      type: 'click',
+      chartType: 'table',
+      interactionType: 'paging-sort-filter',
       seriesName,
       value: {
         aggOperator: aggOperator,
@@ -1129,7 +1198,7 @@ class BasicTableChart extends ReactChart {
           value === undefined ? undefined : value === 'ascend' ? 'ASC' : 'DESC',
         pageNo,
       },
-    });
+    };
     this.mouseEvents?.forEach(cur => {
       if (cur.name === 'click') {
         cur.callback?.(eventParams);
@@ -1137,19 +1206,68 @@ class BasicTableChart extends ReactChart {
     });
   }
 
+  private changeSelected(
+    params,
+    styleConfigs: ChartStyleConfig[],
+    widgetSpecialConfig: { env: string | undefined; [x: string]: any },
+    mixedSectionConfigRows: ChartDataSectionField[],
+    callback?,
+  ) {
+    const { data, dataIndex, seriesName } = params;
+    const option = {
+      index: dataIndex + ',' + seriesName,
+      data,
+    };
+    this.selection?.doSelect(option);
+    const newSelectedItems = this.selection?.selectedItems.reduce(
+      (selectedItems, item) => {
+        const dataIndex = item.index.toString().split(',')[0];
+        if (!selectedItems.find(v => v.index === dataIndex)) {
+          selectedItems.push({
+            index: dataIndex,
+            data: item.data,
+          });
+        }
+        return selectedItems;
+      },
+      [] as SelectedItem[],
+    );
+    if (compareSelectedItems(newSelectedItems || [], this.selectedRows)) {
+      this.selectedRows = newSelectedItems || [];
+      params.selectedItems = this.selectedRows;
+      params.interactionType = 'select';
+    } else {
+      const tableOptions = Object.assign(this.cachedAntTableOptions, {
+        components: this.getTableComponents(
+          styleConfigs,
+          widgetSpecialConfig,
+          mixedSectionConfigRows,
+        ),
+      });
+      this.adapter?.updated(tableOptions, this.cacheContext);
+    }
+    callback?.(params);
+  }
+
   private registerTableCellEvents(
+    name: string,
     seriesName: string,
     value: any,
     dataIndex: number,
     rowData: any,
+    styleConfigs: ChartStyleConfig[],
+    widgetSpecialConfig: { env: string | undefined; [x: string]: any },
+    mixedSectionConfigRows: ChartDataSectionField[],
     aggOperator?: string,
   ): TableCellEvents {
-    const eventParams = this.createEventParams({
-      seriesType: 'body',
-      name: seriesName,
+    const eventParams = {
+      type: 'click',
+      chartType: 'table',
+      interactionType: 'click',
+      name,
       data: {
         format: undefined,
-        name: seriesName,
+        name,
         aggOperator,
         rowData,
         value: value,
@@ -1157,12 +1275,20 @@ class BasicTableChart extends ReactChart {
       seriesName, // column name/index
       dataIndex, // row index
       value, // cell value
-    });
+    };
     return this.mouseEvents?.reduce((acc, cur) => {
       cur.name && (eventParams.type = cur.name);
       if (cur.name === 'click') {
         Object.assign(acc, {
-          onClick: event => cur.callback?.({ ...eventParams, event }),
+          onClick: event => {
+            this.changeSelected(
+              { ...eventParams, event },
+              styleConfigs,
+              widgetSpecialConfig,
+              mixedSectionConfigRows,
+              cur.callback,
+            );
+          },
         });
       }
       if (cur.name === 'dblclick') {

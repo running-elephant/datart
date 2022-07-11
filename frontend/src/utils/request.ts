@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
+import { message } from 'antd';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { BASE_API_URL } from 'globalConstants';
+import i18next from 'i18next';
 import { APIResponse } from 'types';
 import { getToken, removeToken, setToken } from './auth';
 
@@ -44,23 +46,6 @@ instance.interceptors.response.use(response => {
   }
   return response;
 });
-
-/**
- * @deprecated should be use @see {@link request2} in all places
- * @export
- * @template T
- * @param {(string | AxiosRequestConfig)} url
- * @param {AxiosRequestConfig} [config]
- * @return {*}  {Promise<APIResponse<T>>}
- */
-export function request<T>(
-  url: string | AxiosRequestConfig,
-  config?: AxiosRequestConfig,
-): Promise<APIResponse<T>> {
-  const axiosPromise =
-    typeof url === 'string' ? instance(url, config) : instance(url);
-  return axiosPromise.then(response => response.data as APIResponse<T>);
-}
 
 /**
  * New Http Request Util
@@ -92,9 +77,7 @@ export function request2<T>(
   const axiosPromise =
     typeof url === 'string' ? instance(url, config) : instance(url);
   return axiosPromise
-    .then(extra?.onFulfilled || defaultFulfilled, error => {
-      throw unAuthorizationErrorHandler(error);
-    })
+    .then(extra?.onFulfilled || defaultFulfilled, unAuthorizationErrorHandler)
     .catch(extra?.onRejected || defaultRejected);
 }
 
@@ -115,14 +98,17 @@ export const getServerDomain = () => {
 
 function unAuthorizationErrorHandler(error) {
   if (error?.response?.status === 401) {
+    message.error({ key: '401', content: i18next.t('global.401') });
     removeToken();
+    return true;
   }
-  return error;
+  throw error;
 }
 
 function standardErrorMessageTransformer(error) {
   if (error?.response?.data?.message) {
-    return new Error(error?.response?.data?.message);
+    console.log('Unhandled Exception | ', error?.response?.data?.message);
+    return;
   }
   return error;
 }

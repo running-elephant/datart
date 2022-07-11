@@ -83,7 +83,7 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
           return false;
         }
         try {
-          handleOk(selectId, JSON.parse(data?.config)?.type);
+          handleOk(selectId, JSON.parse(data?.config || '{}')?.type);
         } catch (error) {
           console.log(error);
         }

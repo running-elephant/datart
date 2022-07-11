@@ -22,14 +22,15 @@ import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
 import datart.core.base.exception.Exceptions;
 import datart.core.base.exception.NotAllowedException;
-import datart.core.common.Application;
 import datart.core.common.FileUtils;
 import datart.core.common.TaskExecutor;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.Download;
 import datart.core.mappers.ext.DownloadMapperExt;
 import datart.server.base.params.DownloadCreateParam;
-import datart.server.service.*;
+import datart.server.service.AttachmentService;
+import datart.server.service.BaseService;
+import datart.server.service.DownloadService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -90,8 +91,7 @@ public class DownloadServiceImpl extends BaseService implements DownloadService 
                     if (null == downloadParams.getDownloadType()) {
                         downloadParams.setDownloadType(AttachmentType.EXCEL);
                     }
-                    String beanName = downloadParams.getDownloadType().name().toLowerCase() + "AttachmentService";
-                    AttachmentService attachmentService = Application.getBean(beanName, AttachmentService.class);
+                    AttachmentService attachmentService = AttachmentService.matchAttachmentService(downloadParams.getDownloadType());
                     File file = attachmentService.getFile(downloadParams, FileUtils.withBasePath(FileOwner.DOWNLOAD.getPath()), fileName);
                     download.setPath(FileUtils.concatPath(FileOwner.DOWNLOAD.getPath(), file.getName()));
                     download.setStatus((byte) 1);

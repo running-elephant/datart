@@ -23,7 +23,10 @@ import {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
-import { getValueByColumnKey } from 'app/utils/chartHelper';
+import {
+  getColumnRenderName,
+  getValueByColumnKey,
+} from 'app/utils/chartHelper';
 import { isEmptyArray } from 'utils/object';
 
 type ColumnIndexTable = { [key: string]: number };
@@ -43,6 +46,21 @@ class ChartDataSetBase extends Array {
 
   protected toOriginKey(field: ChartDataSectionField): string {
     return getValueByColumnKey(field);
+  }
+
+  protected createOriginalFields(
+    metas?: ChartDatasetMeta[],
+    fields?: ChartDataSectionField[],
+  ) {
+    return (metas || []).reduce((acc, cur) => {
+      const field = fields?.find(
+        v => getColumnRenderName(v) === cur?.name?.[0],
+      );
+      if (field) {
+        acc = acc.concat(field);
+      }
+      return acc;
+    }, [] as ChartDataSectionField[]);
   }
 
   protected createColumnIndexTable(metas?: ChartDatasetMeta[]): {
@@ -77,7 +95,7 @@ export class ChartDataSet<T>
   ) {
     super();
     this.length = columns?.length || 0;
-    this.originalFields = fields;
+    this.originalFields = super.createOriginalFields(metas, fields);
     this.columnIndexTable = super.createColumnIndexTable(metas);
 
     for (let i = 0; i < this.length; i++) {
@@ -95,6 +113,12 @@ export class ChartDataSet<T>
     }
   }
 
+  public getOriginFieldInfo(key: string) {
+    return this.originalFields?.[
+      this.toIndex(this.columnIndexTable, key)
+    ] as ChartDataSectionField;
+  }
+
   public getFieldKey(field: ChartDataSectionField) {
     return this.toKey(field);
   }
@@ -108,8 +132,8 @@ export class ChartDataSet<T>
     const orderConfigs = dataConfigs
       .filter(
         c =>
-          c.type === ChartDataSectionType.AGGREGATE ||
-          c.type === ChartDataSectionType.GROUP,
+          c.type === ChartDataSectionType.Aggregate ||
+          c.type === ChartDataSectionType.Group,
       )
       .flatMap(config => config.rows || []);
 
@@ -121,7 +145,7 @@ export class ChartDataSet<T>
       return;
     }
     const sort = order.sort;
-    if (!sort || sort.type !== SortActionType.CUSTOMIZE) {
+    if (!sort || sort.type !== SortActionType.Customize) {
       return;
     }
     const sortValues = order.sort.value || [];

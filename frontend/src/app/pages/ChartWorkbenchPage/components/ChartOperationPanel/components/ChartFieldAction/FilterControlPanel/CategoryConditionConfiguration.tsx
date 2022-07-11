@@ -36,7 +36,13 @@ import {
 } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
-import { isEmpty, isEmptyArray, IsKeyIn, isTreeModel } from 'utils/object';
+import {
+  isEmpty,
+  isEmptyArray,
+  isEmptyString,
+  IsKeyIn,
+  isTreeModel,
+} from 'utils/object';
 import { FilterOptionForwardRef } from '.';
 import CategoryConditionEditableTable from './CategoryConditionEditableTable';
 import CategoryConditionRelationSelector from './CategoryConditionRelationSelector';
@@ -116,7 +122,7 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
           FilterSqlOperator.NotEqual,
         ].includes(args?.operator as FilterSqlOperator)
       ) {
-        return !isEmpty(args?.value);
+        return !isEmptyString(args?.value);
       } else if (
         [FilterSqlOperator.Null, FilterSqlOperator.NotNull].includes(
           args?.operator as FilterSqlOperator,
@@ -141,13 +147,14 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
   const isChecked = (selectedKeys, eventKey) =>
     selectedKeys.indexOf(eventKey) !== -1;
 
-  const fetchNewDataset = async (viewId, colName: string) => {
+  const fetchNewDataset = async (viewId, colName: string, dataView) => {
     const fieldDataset = await getDistinctFields(
       viewId,
       [colName],
-      undefined,
+      dataView,
       undefined,
     );
+
     return fieldDataset;
   };
 
@@ -217,7 +224,7 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
   };
 
   const handleFetchData = () => {
-    fetchNewDataset?.(dataView?.id, colName).then(dataset => {
+    fetchNewDataset?.(dataView?.id, colName, dataView).then(dataset => {
       if (isTree) {
         // setTreeDatas(convertToTree(dataset?.columns, selectedKeys));
         // setListDatas(convertToList(dataset?.columns, selectedKeys));

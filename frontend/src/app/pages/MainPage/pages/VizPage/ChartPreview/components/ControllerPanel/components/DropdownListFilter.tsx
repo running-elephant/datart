@@ -26,7 +26,7 @@ import { IsKeyIn } from 'utils/object';
 import { PresentControllerFilterProps } from '.';
 
 const DropdownListFilter: FC<PresentControllerFilterProps> = memo(
-  ({ viewId, view, condition, onConditionChange }) => {
+  ({ viewId, view, condition, executeToken, onConditionChange }) => {
     const [originalNodes, setOriginalNodes] = useState<RelationFilterValue[]>(
       condition?.value as RelationFilterValue[],
     );
@@ -42,7 +42,13 @@ const DropdownListFilter: FC<PresentControllerFilterProps> = memo(
       }
     });
 
-    useFetchFilterDataByCondition(viewId, condition, setOriginalNodes, view);
+    useFetchFilterDataByCondition(
+      viewId,
+      condition,
+      setOriginalNodes,
+      view,
+      executeToken,
+    );
 
     const handleSelectedChange = value => {
       const newCondition = updateBy(condition!, draft => {

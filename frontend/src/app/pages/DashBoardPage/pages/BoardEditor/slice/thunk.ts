@@ -1,9 +1,13 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
+import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import {
   boardDrillManager,
   EDIT_PREFIX,
 } from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
+import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
+import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/components/Widgets/ControllerWidget/config';
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
@@ -12,9 +16,9 @@ import {
   getDataOption,
   SaveDashboard,
   ServerDatachart,
-  Widget,
   WidgetData,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { getChartWidgetRequestParams } from 'app/pages/DashBoardPage/utils';
 import {
   getChartDataView,
@@ -25,28 +29,27 @@ import {
 import {
   convertWrapChartWidget,
   createToSaveWidgetGroup,
-  createWidgetInfoMap,
-  getWidgetInfoMapByServer,
+  createWidgetInfo,
   getWidgetMap,
 } from 'app/pages/DashBoardPage/utils/widget';
-import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
-import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
 import { request2 } from 'utils/request';
-import { uuidv4 } from 'utils/utils';
+import { getErrorMessage, uuidv4 } from 'utils/utils';
 import {
   editBoardStackActions,
   editDashBoardInfoActions,
   editWidgetDataActions,
   editWidgetInfoActions,
+  editWidgetSelectedItemsActions,
 } from '.';
 import { BoardInfo, BoardType, ServerDashboard } from '../../Board/slice/types';
 import { getDataChartMap } from './../../../utils/board';
-import { updateWidgetsRect } from './../../../utils/widget';
+import { adjustWidgetsToBoard } from './../../../utils/widget';
 import { addVariablesToBoard } from './actions/actions';
 import {
   boardInfoState,
@@ -99,7 +102,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
     );
 
     const dashboard = getDashBoardByResBoard(data);
-
+    const boardType = dashboard.config.type;
     const {
       datacharts: serverDataCharts,
       views: serverViews,
@@ -107,12 +110,13 @@ export const fetchEditBoardDetail = createAsyncThunk<
     } = data;
     // TODO
     const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
-    const migratedWidgets = migrateWidgets(serverWidgets);
+    const migratedWidgets = migrateWidgets(serverWidgets, boardType);
     const { widgetMap, wrappedDataCharts } = getWidgetMap(
-      migratedWidgets,
+      migratedWidgets, //todo
       dataCharts,
+      boardType,
     );
-    const widgetInfoMap = getWidgetInfoMapByServer(widgetMap);
+    const widgetInfos = Object.keys(widgetMap).map(id => createWidgetInfo(id));
     // TODO xld migration about filter
 
     const widgetIds = serverWidgets.map(w => w.id);
@@ -123,14 +127,13 @@ export const fetchEditBoardDetail = createAsyncThunk<
 
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
     dispatch(boardActions.setDataChartToMap(allDataCharts));
-
     const viewViews = getChartDataView(serverViews, allDataCharts);
 
     dispatch(boardActions.updateViewMap(viewViews));
     // BoardInfo
     dispatch(editDashBoardInfoActions.initEditBoardInfo(boardInfo));
     // widgetInfoRecord
-    dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
+    dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfos));
     //dashBoard,widgetRecord
     dispatch(
       editBoardStackActions.setBoardToEditStack({
@@ -204,15 +207,46 @@ export const addWidgetsToEditBoard = createAsyncThunk<
   const { layouts } = boardInfoState(
     getState() as { editBoard: EditBoardState },
   );
-  const widgetInfoMap = createWidgetInfoMap(widgets);
-  const updatedWidgets = updateWidgetsRect(widgets, dashBoard.config, layouts);
+  const widgetInfos = widgets.map(item => createWidgetInfo(item.id));
+  const updatedWidgets = adjustWidgetsToBoard({
+    widgets,
+    boardType: dashBoard.config.type,
+    boardId: dashBoard.id,
+    layouts,
+  });
   // widgetInfoRecord
-  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfoMap));
+  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfos));
   // WidgetRecord
   dispatch(editBoardStackActions.addWidgets(updatedWidgets));
   return null;
 });
 
+export const addGroupWidgetToEditBoard = createAsyncThunk<
+  null,
+  Widget[],
+  { state: RootState }
+>('editBoard/addGroupWidgetToEditBoard', (widgets, { getState, dispatch }) => {
+  const { dashBoard } = editBoardStackState(
+    getState() as unknown as {
+      editBoard: HistoryEditBoard;
+    },
+  );
+  const { layouts } = boardInfoState(
+    getState() as { editBoard: EditBoardState },
+  );
+  const widgetInfos = widgets.map(t => createWidgetInfo(t.id));
+  const updatedWidgets = adjustWidgetsToBoard({
+    widgets,
+    boardType: dashBoard.config.type,
+    boardId: dashBoard.id,
+    layouts,
+  });
+  // widgetInfoRecord
+  dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfos));
+  // WidgetRecord
+  dispatch(editBoardStackActions.addWidgets(updatedWidgets));
+  return null;
+});
 // addDataChartWidgets
 export const addDataChartWidgets = createAsyncThunk<
   null,
@@ -238,13 +272,15 @@ export const addDataChartWidgets = createAsyncThunk<
     dispatch(boardActions.setViewMap(viewViews));
 
     const widgets = chartIds.map(dcId => {
-      let widget = widgetToolKit.chart.create({
-        dashboardId: boardId,
+      const dataChart = dataChartMap[dcId];
+      const viewIds = dataChart.viewId ? [dataChart.viewId] : [];
+      let widget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.linkedChart).create({
         boardType: boardType,
-        dataChartId: dcId,
-        dataChartConfig: dataChartMap[dcId],
-        viewId: dataChartMap[dcId].viewId,
-        subType: 'dataChart',
+        datachartId: dcId,
+        relations: [],
+        name: dataChart.name,
+        content: dataChartMap[dcId],
+        viewIds: viewIds,
       });
       return widget;
     });
@@ -278,13 +314,13 @@ export const addWrapChartWidget = createAsyncThunk<
     const viewViews = view ? [view] : [];
     dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
-    let widget = widgetToolKit.chart.create({
-      dashboardId: boardId,
+    let widget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.ownedChart).create({
       boardType: boardType,
-      dataChartId: chartId,
-      viewId: view?.id || '',
-      dataChartConfig: dataChart,
-      subType: 'widgetChart',
+      datachartId: chartId,
+      relations: [],
+      name: dataChart.name,
+      content: dataChart,
+      viewIds: view?.id ? [view.id] : [],
     });
     dispatch(addWidgetsToEditBoard([widget]));
     dispatch(addVariablesToBoard(view?.variables));
@@ -314,14 +350,20 @@ export const addChartWidget = createAsyncThunk<
     const viewViews = [view];
     dispatch(boardActions.setDataChartToMap(dataCharts));
     dispatch(boardActions.setViewMap(viewViews));
-    let widget = widgetToolKit.chart.create({
-      dashboardId: boardId,
+
+    const originalType =
+      subType === 'dataChart'
+        ? ORIGINAL_TYPE_MAP.linkedChart
+        : ORIGINAL_TYPE_MAP.ownedChart;
+
+    let widget = widgetManager.toolkit(originalType).create({
       boardType: boardType,
-      dataChartId: chartId,
-      viewId: view.id,
-      dataChartConfig: dataChart,
-      subType,
+      datachartId: chartId,
+      relations: [],
+      content: dataChart,
+      viewIds: view.id ? [view.id] : [],
     });
+
     dispatch(addWidgetsToEditBoard([widget]));
     dispatch(addVariablesToBoard(view.variables));
     return null;
@@ -353,7 +395,7 @@ export const renderedEditWidgetAsync = createAsyncThunk<
 
 //
 export const uploadBoardImage = createAsyncThunk<
-  null,
+  string,
   {
     boardId: string;
     fileName: string;
@@ -371,7 +413,7 @@ export const uploadBoardImage = createAsyncThunk<
       data: formData,
     });
     resolve(data);
-    return null;
+    return data;
   },
 );
 
@@ -388,6 +430,114 @@ export const getEditWidgetData = createAsyncThunk<
     }
     if (widget.config.type === 'controller') {
       dispatch(getEditControllerOptions(widget.id));
+    }
+    return null;
+  },
+);
+
+export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
+  null,
+  {
+    boardId: string;
+    widgetId: string;
+    option?: getDataOption;
+    extraFilters?: PendingChartDataRequestFilter[];
+    variableParams?: Record<string, any[]>;
+  },
+  { state: RootState }
+>(
+  'board/syncEditBoardWidgetChartDataAsync',
+  async (
+    { boardId, widgetId, option, extraFilters, variableParams },
+    { getState, dispatch },
+  ) => {
+    const boardState = getState() as { board: BoardState };
+    const rootState = getState() as RootState;
+    const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
+    const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
+    const curWidget = widgetMap[widgetId];
+    if (!curWidget) {
+      return null;
+    }
+    const viewMap = boardState.board.viewMap;
+    const dataChartMap = boardState.board.dataChartMap;
+    const drillOption = boardDrillManager.getWidgetDrill({
+      bid: curWidget.dashboardId,
+      wid: widgetId,
+    });
+    const dataChart = dataChartMap?.[curWidget.datachartId];
+    const chartDataView = viewMap?.[dataChart?.viewId];
+    const requestParams = new ChartDataRequestBuilder(
+      {
+        id: chartDataView?.id || '',
+        config: chartDataView?.config || {},
+        meta: chartDataView?.meta,
+        computedFields: dataChart?.config?.computedFields || [],
+      },
+      dataChart?.config?.chartConfig?.datas,
+      dataChart?.config?.chartConfig?.settings,
+      {},
+      false,
+      dataChart?.config?.aggregation,
+    )
+      .addVariableParams(variableParams)
+      .addExtraSorters(option?.sorters as any[])
+      .addRuntimeFilters(extraFilters)
+      .addDrillOption(drillOption)
+      .build();
+
+    try {
+      const { data } = await request2<WidgetData>({
+        method: 'POST',
+        url: `data-provider/execute`,
+        data: requestParams,
+      });
+      await dispatch(
+        editWidgetDataActions.setWidgetData({
+          wid: widgetId,
+          data: { ...data, id: widgetId },
+        }),
+      );
+      await dispatch(
+        editWidgetInfoActions.changeWidgetLinkInfo({
+          boardId,
+          widgetId,
+          linkInfo: {
+            filters: extraFilters,
+            variables: variableParams,
+          },
+        }),
+      );
+      await dispatch(
+        editWidgetInfoActions.changePageInfo({
+          boardId,
+          widgetId,
+          pageInfo: data?.pageInfo,
+        }),
+      );
+      await dispatch(
+        editWidgetInfoActions.setWidgetErrInfo({
+          boardId,
+          widgetId,
+          errInfo: undefined,
+          errorType: 'request',
+        }),
+      );
+    } catch (error) {
+      await dispatch(
+        editWidgetInfoActions.setWidgetErrInfo({
+          boardId,
+          widgetId,
+          errInfo: getErrorMessage(error),
+          errorType: 'request',
+        }),
+      );
+      await dispatch(
+        editWidgetDataActions.setWidgetData({
+          wid: widgetId,
+          data: undefined,
+        }),
+      );
     }
     return null;
   },
@@ -441,11 +591,12 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
         url: `data-provider/execute`,
         data: requestParams,
       });
-      widgetData = { ...data, id: widgetId };
+      widgetData = data;
       dispatch(
-        editWidgetDataActions.setWidgetData(
-          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
-        ),
+        editWidgetDataActions.setWidgetData({
+          wid: widgetId,
+          data: filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        }),
       );
       dispatch(
         editWidgetInfoActions.changePageInfo({
@@ -469,11 +620,14 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
         }),
       );
       dispatch(
-        editWidgetDataActions.setWidgetData({
-          id: widgetId,
-          columns: [],
-          rows: [],
-        } as WidgetData),
+        editWidgetDataActions.setWidgetData({ wid: widgetId, data: undefined }),
+      );
+    } finally {
+      dispatch(
+        editWidgetSelectedItemsActions.changeSelectedItemsInEditor({
+          wid: widgetId,
+          data: [],
+        }),
       );
     }
     return null;
@@ -489,7 +643,6 @@ export const getEditControllerOptions = createAsyncThunk<
   async (widgetId, { getState, dispatch }) => {
     dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
     const rootState = getState() as RootState;
-
     const stackEditBoard = rootState.editBoard as unknown as HistoryEditBoard;
     const { widgetRecord: widgetMap } = stackEditBoard.stack.present;
     const widget = widgetMap[widgetId];
@@ -510,7 +663,6 @@ export const getEditControllerOptions = createAsyncThunk<
       curWidget: widget,
       widgetMap,
     });
-
     if (!requestParams) {
       return null;
     }
@@ -520,11 +672,12 @@ export const getEditControllerOptions = createAsyncThunk<
       url: `data-provider/execute`,
       data: requestParams,
     });
-    widgetData = { ...data, id: widget.id };
+    widgetData = data;
     dispatch(
-      editWidgetDataActions.setWidgetData(
-        filterSqlOperatorName(requestParams, widgetData) as WidgetData,
-      ),
+      editWidgetDataActions.setWidgetData({
+        wid: widgetId,
+        data: filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+      }),
     );
 
     return null;

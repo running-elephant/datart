@@ -75,7 +75,7 @@ public class POIUtils {
     public static void withSheet(Workbook workbook, String sheetName, Dataframe sheetData, POISettings poiSettings) {
         Sheet sheet = workbook.createSheet(sheetName);
         int rowNum = writeHeaderRows(sheet, poiSettings.getHeaderRows());
-        fillSheetWithSetting(sheet, sheetData, poiSettings.getColumnSetting(), rowNum+1);
+        fillSheetWithSetting(sheet, sheetData, poiSettings.getColumnSetting(), rowNum + 1);
         mergeSheetCell(sheet, poiSettings.getMergeCells());
         setColumnWidth(sheet, poiSettings.getColumnSetting());
     }
@@ -92,14 +92,14 @@ public class POIUtils {
         for (int i = 0; i < headerRows.size(); i++) {
             writeHeader(sheet, headerRows.get(i), i, cellStyle);
         }
-        return headerRows.size()-1;
+        return headerRows.size() - 1;
     }
 
     private static void writeHeader(Sheet sheet, List<Column> columns, int rowNum, CellStyle cellStyle) {
         Row row = sheet.createRow(rowNum);
         for (int i = 0; i < columns.size(); i++) {
             Cell cell = row.createCell(i);
-            cell.setCellValue(columns.get(i).getName());
+            cell.setCellValue(columns.get(i).columnKey());
             cell.setCellStyle(cellStyle);
         }
     }
@@ -125,20 +125,20 @@ public class POIUtils {
                 int columnIndex = i;
                 String fmt = "";
                 CellStyle cellStyle = null;
-                if (columnSetting.containsKey(i)){
+                if (columnSetting.containsKey(i)) {
                     ColumnSetting setting = columnSetting.get(i);
                     columnIndex = setting.getIndex();
                     PoiNumFormat numFormat = setting.getNumFormat();
                     fmt = numFormat.getFormat();
-                    setting.setLength(val==null ? 0 : Math.max(val.toString().length(), setting.getLength()));
+                    setting.setLength(val == null ? 0 : Math.max(val.toString().length(), setting.getLength()));
                     val = numFormat.parseValue(val);
-                    cellStyle = setting.getCellStyle()==null ? getCellStyle(sheet, val, fmt) : setting.getCellStyle();
+                    cellStyle = setting.getCellStyle() == null ? getCellStyle(sheet, val, fmt) : setting.getCellStyle();
                     setting.setCellStyle(cellStyle);
                 } else {
                     ColumnSetting setting = new ColumnSetting();
                     setting.setIndex(i);
                     setting.setNumFormat(new PoiNumFormat());
-                    setting.setLength(val==null ? 0 : val.toString().length());
+                    setting.setLength(val == null ? 0 : val.toString().length());
                     setting.setCellStyle(getCellStyle(sheet, val, fmt));
                     columnSetting.put(i, setting);
                 }
@@ -197,7 +197,7 @@ public class POIUtils {
         }
         switch (cell.getCellType()) {
             case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell)){
+                if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getDateCellValue();
                 }
                 return cell.getNumericCellValue();
@@ -208,22 +208,20 @@ public class POIUtils {
         }
     }
 
-    private static CellStyle getCellStyle(Sheet sheet, Object val, String fmt){
+    private static CellStyle getCellStyle(Sheet sheet, Object val, String fmt) {
         CellStyle cellStyle = sheet.getWorkbook().createCellStyle();
         DataFormat dataFormat = sheet.getWorkbook().createDataFormat();
-        if (StringUtils.isNotBlank(fmt)){
+        if (StringUtils.isNotBlank(fmt)) {
             cellStyle.setDataFormat(dataFormat.getFormat(fmt));
-        } else if (val instanceof Number){
-            cellStyle.setDataFormat(dataFormat.getFormat("0"));
-        } else if (val instanceof Date){
-            cellStyle.setDataFormat(dataFormat.getFormat(DateUtils.inferDateFormat(val.toString())));
+        } else if (val instanceof Number) {
+        } else if (val instanceof Date) {
         } else {
             cellStyle.setDataFormat(dataFormat.getFormat("General"));
         }
         return cellStyle;
     }
 
-    private static CellStyle getHeaderCellStyle(Sheet sheet){
+    private static CellStyle getHeaderCellStyle(Sheet sheet) {
         XSSFCellStyle cellStyle = (XSSFCellStyle) sheet.getWorkbook().createCellStyle();
         cellStyle.setBorderTop(BorderStyle.THIN);
         cellStyle.setBorderRight(BorderStyle.THIN);
@@ -241,10 +239,10 @@ public class POIUtils {
         return cellStyle;
     }
 
-    private static void setCellValue(Cell cell, Object val){
+    private static void setCellValue(Cell cell, Object val) {
         if (val == null) {
             cell.setCellValue("");
-            return ;
+            return;
         }
         try {
             JavaType javaType = JavaType.valueOf(val.getClass().getSimpleName().toUpperCase());

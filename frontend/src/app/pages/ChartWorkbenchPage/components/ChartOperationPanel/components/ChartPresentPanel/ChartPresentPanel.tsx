@@ -23,10 +23,10 @@ import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContainer';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
-import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
 import { FC, memo, useContext, useState } from 'react';
@@ -58,6 +58,7 @@ const ChartPresentPanel: FC<{
   allowQuery: boolean;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
+  selectedItems?: SelectedItem[];
 }> = memo(
   ({
     containerHeight,
@@ -69,6 +70,7 @@ const ChartPresentPanel: FC<{
     allowQuery,
     onRefreshDataset,
     onCreateDownloadDataTask,
+    selectedItems,
   }) => {
     const translate = useI18NPrefix(`viz.palette.present`);
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
@@ -87,6 +89,7 @@ const ChartPresentPanel: FC<{
         return <Chart404Graph chart={chart} chartConfig={chartConfig} />;
       }
       chartConfig = setRuntimeDateLevelFieldsInChartConfig(chartConfig);
+
       return (
         !!chart &&
         chartDispatcher.getContainers(
@@ -96,6 +99,7 @@ const ChartPresentPanel: FC<{
           chartConfig!,
           style,
           drillOption,
+          selectedItems,
         )
       );
     };
@@ -120,7 +124,7 @@ const ChartPresentPanel: FC<{
               <ChartDrillContextMenu chartConfig={chartConfig}>
                 {renderGraph(containerId, chart, chartConfig, style)}
               </ChartDrillContextMenu>
-              <ChartDrillPaths />
+              <ChartDrillPaths chartConfig={chartConfig} />
             </>
           )}
           {ChartPresentType.RAW === chartType && (

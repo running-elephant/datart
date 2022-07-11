@@ -102,7 +102,7 @@ export function ArrayConfig({
                   ...model,
                   [column.name]: {
                     ...column,
-                    category: ColumnCategories.Uncategorized, // FIXEME
+                    category: ColumnCategories.UnCategorized, // FIXEME
                   },
                 }),
                 {},

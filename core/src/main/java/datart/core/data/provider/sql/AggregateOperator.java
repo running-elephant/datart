@@ -20,16 +20,17 @@ package datart.core.data.provider.sql;
 
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
 @Data
-public class AggregateOperator implements Operator {
+@EqualsAndHashCode(callSuper = true)
+public class AggregateOperator extends ColumnOperator implements Alias {
 
     private SqlOperator sqlOperator;
 
-    private String column;
-
+    private String alias;
 
     public enum SqlOperator implements Serializable {
 
@@ -50,7 +51,7 @@ public class AggregateOperator implements Operator {
     public String toString() {
         return "AggregateOperator{" +
                 "sqlOperator=" + sqlOperator +
-                ", column='" + column + '\'' +
+                ", column='" + getColumnKey() + '\'' +
                 '}';
     }
 }

@@ -1,5 +1,5 @@
 import { TreeNodeProps } from 'antd';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { ReactElement } from 'react';
@@ -9,6 +9,7 @@ export type VizType = [
   'DASHBOARD',
   'FOLDER',
   'STORYBOARD',
+  'TEMPLATE',
 ][number];
 
 export interface VizState {
@@ -30,6 +31,7 @@ export interface VizState {
   selectedTab: string;
   dataChartListLoading: boolean;
   chartPreviews: ChartPreview[];
+  selectedItems: Record<string, SelectedItem[]>;
 }
 
 export interface Folder {
@@ -99,6 +101,7 @@ export interface AddVizParams {
     description?: string;
     parentId?: string | null;
     orgId: string;
+    file?: FormData;
   };
   type: VizType;
 }

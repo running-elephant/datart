@@ -29,9 +29,19 @@ import {
 } from '@ant-design/icons';
 import Dropdown from 'antd/lib/dropdown';
 import { SortActionType } from 'app/constants';
+import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import { getColumnRenderName } from 'app/utils/chartHelper';
-import { FC, memo } from 'react';
+import classnames from 'classnames';
+import { FC, memo, useContext, useMemo } from 'react';
+import styled, { keyframes } from 'styled-components/macro';
+import { ERROR, WARNING, WHITE } from 'styles/StyleConstants';
+import {
+  findSameFieldInView,
+  getAllFieldsOfEachType,
+  getCanReplaceViewFields,
+} from '../../utils';
 import ChartDataConfigSectionActionMenu from './ChartDataConfigSectionActionMenu';
+import { ChartDataConfigSectionReplaceMenu } from './ChartDataConfigSectionReplaceMenu';
 
 const ChartDraggableElementField: FC<{
   modalSize;
@@ -53,12 +63,56 @@ const ChartDraggableElementField: FC<{
     onConfigChanged,
     handleOpenActionModal,
   }) => {
-    const renderActionExtensionMenu = (uid: string, type: string, category) => {
+    const { dataView } = useContext(ChartDataViewContext);
+    const canReplaceViewFields = useMemo(() => {
+      const {
+        hierarchyFields,
+        stringFields,
+        dateLevelFields,
+        numericFields,
+        stringComputedFields,
+        numericComputedFields,
+        dateComputedFields,
+      } = getAllFieldsOfEachType({
+        sortType: 'byNameSort',
+        dataView,
+        availableSourceFunctions,
+      });
+      const viewFields = [
+        ...hierarchyFields,
+        ...stringFields,
+        ...dateLevelFields,
+        ...numericFields,
+        ...stringComputedFields,
+        ...numericComputedFields,
+        ...dateComputedFields,
+      ];
+      return getCanReplaceViewFields(viewFields, columnConfig);
+    }, [availableSourceFunctions, columnConfig, dataView]);
+    const showReplaceMenu = useMemo(() => {
+      return !findSameFieldInView(canReplaceViewFields, columnConfig);
+    }, [canReplaceViewFields, columnConfig]);
+
+    const renderActionExtensionMenu = () => {
+      if (showReplaceMenu) {
+        return (
+          <ChartDataConfigSectionReplaceMenu
+            uid={columnConfig.uid!}
+            viewFields={canReplaceViewFields}
+            type={columnConfig.type}
+            columnConfig={columnConfig}
+            ancestors={ancestors}
+            config={config}
+            onConfigChanged={onConfigChanged}
+          />
+        );
+      }
+
       return (
         <ChartDataConfigSectionActionMenu
-          uid={uid}
-          type={type}
-          category={category}
+          uid={columnConfig.uid!}
+          type={columnConfig.type}
+          category={columnConfig.category}
           ancestors={ancestors}
           config={config}
           modalSize={modalSize}
@@ -105,15 +159,11 @@ const ChartDraggableElementField: FC<{
         key={columnConfig.uid}
         disabled={!config?.actions}
         destroyPopupOnHide={true}
-        overlay={renderActionExtensionMenu(
-          columnConfig.uid!,
-          columnConfig.type,
-          columnConfig.category,
-        )}
+        overlay={renderActionExtensionMenu()}
         overlayClassName="datart-data-section-dropdown"
         trigger={['click']}
       >
-        <div>
+        <StyledWrapper className={classnames({ replace: showReplaceMenu })}>
           {config?.actions && <DownOutlined style={{ marginRight: '10px' }} />}
           <span>
             {aggregation === false
@@ -123,10 +173,22 @@ const ChartDraggableElementField: FC<{
           <div style={{ display: 'inline-block', marginLeft: '5px' }}>
             {enableActionsIcons(columnConfig)}
           </div>
-        </div>
+        </StyledWrapper>
       </Dropdown>
     );
   },
 );
 
 export default ChartDraggableElementField;
+
+const warningColor = keyframes`
+  0% { color: ${ERROR}; }
+  25% { color: ${WARNING}; }
+  50% { color: ${WHITE};}
+  100% { color: ${ERROR};}
+`;
+const StyledWrapper = styled.div`
+  &.replace {
+    animation: ${warningColor} 2s linear infinite;
+  }
+`;

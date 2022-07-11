@@ -18,15 +18,17 @@
 
 package datart.server.service;
 
+import datart.core.entity.Folder;
 import datart.core.entity.View;
 import datart.core.mappers.ext.ViewMapperExt;
 import datart.server.base.dto.ViewDetailDTO;
-import datart.server.base.transfer.model.ViewTransferModel;
+import datart.server.base.transfer.model.TransferModel;
+import datart.server.base.transfer.model.ViewResourceModel;
 import datart.server.base.params.ViewBaseUpdateParam;
 
 import java.util.List;
 
-public interface ViewService extends VizCRUDService<View, ViewMapperExt>,ResourceTransferService<View,ViewTransferModel> {
+public interface ViewService extends VizCRUDService<View, ViewMapperExt>, ResourceTransferService<View, ViewResourceModel, TransferModel, Folder> {
 
     ViewDetailDTO getViewDetail(String viewId);
 
@@ -35,5 +37,7 @@ public interface ViewService extends VizCRUDService<View, ViewMapperExt>,Resourc
     boolean unarchive(String id, String newName, String parentId, double index);
 
     boolean updateBase(ViewBaseUpdateParam updateParam);
+
+    boolean checkUnique(String orgId, String parentId, String name);
 
 }

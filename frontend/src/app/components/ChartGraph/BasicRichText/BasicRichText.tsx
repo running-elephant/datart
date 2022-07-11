@@ -92,10 +92,10 @@ class BasicRichText extends ReactChart {
     const dataConfigs = config.datas || [];
     const stylesConfigs = config.styles || [];
     const groupConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
+      .filter(c => c.type === ChartDataSectionType.Group)
       .flatMap(config => config.rows || []);
     const aggregateConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
     const chartDataSet = transformToDataSet(
       dataset.rows,
@@ -146,7 +146,9 @@ class BasicRichText extends ReactChart {
         Object.assign(acc, {
           onChange: delta =>
             cur.callback?.({
-              seriesName: 'richText',
+              type: 'change',
+              chartType: 'rich-text',
+              interactionType: 'rich-text-change-context',
               value: delta,
             }),
         });

@@ -17,22 +17,87 @@
  */
 
 import { DataChart } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { createContext, FC, memo, useContext } from 'react';
-import { useSelector } from 'react-redux';
-import { selectDataChartById } from '../../pages/Board/slice/selector';
+import ChartDataView from 'app/types/ChartDataView';
+import { createContext, FC, memo, useContext, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setWidgetSampleDataAction } from '../../actions/widgetAction';
+import {
+  selectAvailableSourceFunctionsMap,
+  selectDataChartById,
+  selectViewMap,
+} from '../../pages/Board/slice/selector';
 import { BoardState } from '../../pages/Board/slice/types';
 import { WidgetContext } from './WidgetProvider';
 
-export const WidgetChartContext = createContext<DataChart | undefined>(
-  {} as DataChart,
-);
-export const WidgetChartProvider: FC = memo(({ children }) => {
+// 支持作为 点击事件的 触发器的图表ID
+export const SupportTriggerChartIds: string[] = [
+  'cluster-column-chart',
+  'cluster-bar-chart',
+  'stack-column-chart',
+  'stack-bar-chart',
+  'percentage-stack-column-chart',
+  'percentage-stack-bar-chart',
+  'line-chart',
+  'area-chart',
+  'stack-area-chart',
+  'scatter',
+  'pie-chart',
+  'doughnut-chart',
+  'rose-chart',
+  'funnel-chart',
+  'double-y',
+  'normal-outline-map-chart',
+  'scatter-outline-map-chart',
+  'fenzu-table',
+  'mingxi-table',
+];
+export const WidgetChartContext = createContext<{
+  dataChart: DataChart | undefined;
+  chartDataView?: ChartDataView;
+  availableSourceFunctions?: string[];
+  supportTrigger: boolean;
+}>({
+  dataChart: {} as DataChart,
+  availableSourceFunctions: undefined,
+  supportTrigger: true,
+});
+
+export const WidgetChartProvider: FC<{
+  boardEditing: boolean;
+  widgetId: string;
+}> = memo(({ boardEditing, widgetId, children }) => {
   const { datachartId } = useContext(WidgetContext);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!datachartId) return;
+    if (!widgetId) return;
+    dispatch(
+      setWidgetSampleDataAction({ boardEditing, datachartId, wid: widgetId }),
+    );
+  }, [boardEditing, datachartId, dispatch, widgetId]);
   const dataChart = useSelector((state: { board: BoardState }) =>
     selectDataChartById(state, datachartId),
   );
+  const availableSourceFunctionsMap = useSelector(
+    selectAvailableSourceFunctionsMap,
+  );
+  const viewMap = useSelector(selectViewMap);
+  const availableSourceFunctions =
+    availableSourceFunctionsMap[viewMap[dataChart?.viewId]?.sourceId];
+  const supportTrigger = SupportTriggerChartIds.includes(
+    dataChart?.config?.chartGraphId,
+  );
+  const chartDataView = viewMap[dataChart?.viewId];
+
   return (
-    <WidgetChartContext.Provider value={dataChart}>
+    <WidgetChartContext.Provider
+      value={{
+        dataChart,
+        availableSourceFunctions,
+        supportTrigger,
+        chartDataView,
+      }}
+    >
       {children}
     </WidgetChartContext.Provider>
   );

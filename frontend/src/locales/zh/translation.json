@@ -6,6 +6,7 @@
     "title": {
       "action": "操作"
     },
+    "version": "版本",
     "button": {
       "create": "新建",
       "save": "保存",
@@ -40,6 +41,7 @@
       "minute": "分钟",
       "hour": "小时",
       "day": "天",
+      "week": "周",
       "month": "月",
       "year": "年",
       "m": "分",
@@ -71,6 +73,18 @@
       "city": "城市",
       "county": "区县"
     }
+  },
+  "setup": {
+    "welcome": "欢迎使用 datart",
+    "welcomeDesc": "在首次使用之前，请设置一位初始用户",
+    "success": "设置成功",
+    "successDesc": "已成功设置初始用户，点击这里",
+    "goLogin": "去登录",
+    "username": "用户名",
+    "email": "邮箱",
+    "password": "密码",
+    "name": "姓名",
+    "initialize": "初始化"
   },
   "login": {
     "username": "用户名 / 邮箱",
@@ -183,6 +197,29 @@
       },
       "orgSettings": {
         "title": "组织设置"
+      },
+      "resourceMigration": {
+        "title": "资源迁移管理"
+      },
+      "export": {
+        "title": "数据导出",
+        "selectText": "选择要导出的数据",
+        "submit": "提交"
+      },
+      "import": {
+        "title": "数据导入",
+        "submit": "提交",
+        "upload": "上传文件",
+        "file": "文件",
+        "strategy": "策略",
+        "new": "新建",
+        "overwrite": "更新",
+        "rollback": "增量更新",
+        "desc": {
+          "new": "新建：导入的所有资源都会重新创建",
+          "overwrite": "更新：会按照 ID 检测导入资源在数据库中是否已存在，如果存在则做更新处理，如果不存在则新建",
+          "rollback": "增量更新：会按照 ID 检测导入资源在数据库中是否已存在，如果检测到已存在的资源，则报错并回滚本次导入操作；仅在所有检测都通过的情况下才能完成本次导入"
+        }
       }
     },
     "background": {
@@ -345,6 +382,14 @@
           "slider": "滑块",
           "rangeSlider": "范围滑块"
         },
+        "controllerPlaceHolders": {
+          "multiSelectController": "请选择",
+          "numberController": "请输入数值",
+          "rangeNumberControllerMin": "最小值",
+          "rangeNumberControllerMax": "最大值",
+          "selectController": "请选择",
+          "textController": "请输入"
+        },
         "controllerVisibilityTypes": {
           "hide": "隐藏",
           "show": "显示",
@@ -480,20 +525,28 @@
         "deleteField": "删除",
         "editViewTip": "回到数据视图会丢失当前编辑状态，是否继续？",
         "editView": "编辑数据视图",
-        "toggleViewTip": "切换数据视图将会清空所有图表配置，确认继续？",
+        "toggleViewTip": "切换数据视图是否清空当前图表配置？",
         "AGG_DATE_YEAR": "按年",
         "AGG_DATE_QUARTER": "按季度",
         "AGG_DATE_MONTH": "按月",
         "AGG_DATE_WEEK": "按周",
         "AGG_DATE_DAY": "按日",
-        "default": "默认"
+        "default": "默认",
+        "cannotDeleteComputerField": "视图中创建的计算字段不能删除",
+        "byDataBaseGroup": "按数据库名分组",
+        "noGroup": "不分组",
+        "byNameSort": "按名称排序",
+        "noSort": "按原始字段顺序排序",
+        "Group": "分组方式",
+        "Sort": "排序方式"
       }
     },
     "palette": {
       "title": {
         "content": "数据",
         "design": "样式",
-        "setting": "分析"
+        "setting": "分析",
+        "interaction": "交互"
       },
       "style": {
         "font": "字体",
@@ -591,7 +644,16 @@
           "normal": "常规字号",
           "bold": "粗体",
           "bolder": "特粗体",
-          "lighter": "细体"
+          "lighter": "细体",
+          "100": "100",
+          "200": "200",
+          "300": "300",
+          "400": "400",
+          "500": "500",
+          "600": "600",
+          "700": "700",
+          "800": "800",
+          "900": "900"
         },
         "fontStyle": {
           "normal": "常规体",
@@ -616,7 +678,20 @@
           "insideTopLeft": "内左上",
           "insideBottomLeft": "内左下",
           "insideTopRight": "内右上",
-          "insideBottomRight": "内右下"
+          "insideBottomRight": "内右下",
+          "leftTop": "左上",
+          "leftBottom": "左下",
+          "rightTop": "右上",
+          "rightBottom": "右下"
+        },
+        "dataZoomSlider": {
+          "showZoomSlider": "是否开启缩放滑块",
+          "zoomSliderColor": "选中颜色",
+          "usePercentage": "缩放使用百分比",
+          "zoomStartPercentage": "起始百分比",
+          "zoomEndPercentage": "结束百分比",
+          "zoomStartIndex": "起始下标",
+          "zoomEndIndex": "结束下标"
         }
       },
       "data": {
@@ -744,6 +819,71 @@
           "pageSize": "总行数"
         }
       },
+      "interaction": {
+        "drillThrough": {
+          "title": "跳转设置",
+          "rule": {
+            "title": "规则设置",
+            "addRule": "+ 点击新建",
+            "inputUrl": "请输入URL",
+            "header": {
+              "name": "名称",
+              "category": "类型",
+              "open": "打开方式",
+              "relation": "关系设置",
+              "operation": "操作",
+              "event": "交互事件"
+            },
+            "event": {
+              "title": "交互事件",
+              "left": "左键单击",
+              "right": "右键菜单"
+            },
+            "category": {
+              "title": "类型",
+              "jumpToChart": "跳转到图表",
+              "jumpToDashboard": "跳转到仪表板",
+              "jumpToUrl": "跳转到URL"
+            },
+            "action": {
+              "title": "打开方式",
+              "redirect": "从当前页打开",
+              "window": "打开新窗口",
+              "dialog": "打开对话框"
+            },
+            "reference": {
+              "title": "关联图表"
+            },
+            "relation": {
+              "setting": "字段关系配置",
+              "title": "字段关系",
+              "auto": "自动",
+              "customize": "自定义",
+              "type": "类型",
+              "source": "源字段/变量",
+              "target": "目标字段/变量",
+              "addRelation": "+ 点击新建",
+              "field": "字段",
+              "variable": "变量",
+              "controller": "控制器"
+            },
+            "operation": {
+              "delete": "删除"
+            }
+          }
+        },
+        "viewDetail": {
+          "title": "查看数据",
+          "event": "交互事件",
+          "leftClick": "左键单击",
+          "rightClick": "右键菜单",
+          "field": "选择字段",
+          "all": "全部",
+          "customize": "自定义",
+          "summary": "汇总",
+          "details": "明细"
+        }
+      },
       "present": {
         "graph": "图表",
         "raw": "原始数据",
@@ -815,17 +955,21 @@
         "expandNextLevel": "展开下一层级",
         "selectDrillOn": "已开启“点击下钻”",
         "selectDrillOff": "开启“点击下钻”",
-        "rollUp": "上卷"
+        "rollUp": "上卷",
+        "drillThrough": "跳转",
+        "viewData": "查看数据",
+        "crossFiltering": "联动"
       }
     },
     "action": {
       "common": {
-        "downloadForExcel": "下载为 Excel",
+        "exportForExcel": "导出到 Excel",
         "confirm": "请确认",
         "ok": "确认",
         "cancel": "取消",
         "save": "保存"
       },
+      "downloadTaskSuccess": "下载任务创建成功",
       "edit": "编辑",
       "run": "运行",
       "publish": "发布",
@@ -845,9 +989,10 @@
         "enablePassword": "启用密码",
         "generateLink": "生成链接",
         "shareLink": "分享管理",
-        "downloadData": "下载为 Excel",
-        "downloadPDF": "下载为 PDF",
-        "downloadPicture": "下载为 图片",
+        "exportData": "导出到 Excel",
+        "exportPDF": "导出到 PDF",
+        "exportPicture": "导出到 图片",
+        "exportTpl": "导出为 模版",
         "NONE": "无",
         "CODE": "口令",
         "LOGIN": "登录",
@@ -879,7 +1024,7 @@
     "board": {
       "action": {
         "dataChart": "数据图表",
-        "ImportExistingDataCharts": "引入已有数据图表",
+        "importExistingDataCharts": "引入已有数据图表",
         "createDataChartInBoard": "新建数据图表",
         "searchValue": "搜索名称关键字",
         "media": "媒体组件",
@@ -902,7 +1047,12 @@
         "deviceSwitch": "设备切换",
         "allowOverlap": "允许组件重叠",
         "forbidOverlap": "禁止组件重叠",
-        "multiSelect": "多选"
+        "multiSelect": "多选",
+        "zoomIn": "缩小视图",
+        "zoomOut": "放大视图",
+        "widgetList": "组件列表",
+        "group": "成组",
+        "unGroup": "取消成组"
       },
       "controlTypes": {
         "common": "常规",
@@ -911,6 +1061,7 @@
         "button": "按钮"
       },
       "setting": {
+        "interaction": "交互",
         "setting": "设置",
         "board": "面板",
         "widget": "组件",
@@ -925,6 +1076,7 @@
         "px": "像素",
         "width": "宽",
         "height": "高",
+        "font": "字体",
         "background": "背景",
         "color": "颜色",
         "image": "图片",
@@ -956,7 +1108,11 @@
         "duration": "停留时间(秒)",
         "delPagesTip": "确认删除所有选中的故事页",
         "delPageTip": "确认删除此故事页？",
-        "enterHere": "请输入"
+        "enterHere": "请输入",
+        "storyName": "名称",
+        "storyDescription": "描述",
+        "format": "格式",
+        "interval": "间隔"
       }
     },
     "widget": {
@@ -971,8 +1127,8 @@
         "media": "媒体",
         "container": "容器",
         "controller": "控制器",
-        "query": "查询",
-        "reset": "重置",
+        "queryBtn": "查询",
+        "resetBtn": "重置",
         "image": "图片",
         "richText": "富文本",
         "timer": "时间器",
@@ -983,6 +1139,7 @@
       "action": {
         "refresh": "同步数据",
         "fullScreen": "全屏",
+        "exitFullScreen": "取消全屏",
         "lock": "锁定拖拽",
         "edit": "编辑",
         "delete": "删除",
@@ -992,7 +1149,9 @@
         "makeLinkage": "联动设置",
         "closeLinkage": "关闭联动",
         "makeJump": "跳转设置",
-        "closeJump": "关闭跳转"
+        "closeJump": "关闭跳转",
+        "group": "成组",
+        "unGroup": "取消成组"
       },
       "tips": {
         "unlock": "已锁定拖拽,点击解锁",
@@ -1035,6 +1194,7 @@
         "folderTitle": "仪表板 & 数据图表",
         "dashboard": "新建仪表板",
         "dataChart": "新建数据图表",
+        "template": "导入模板",
         "folder": "新建目录",
         "recycle": "回收站",
         "open": "展开",
@@ -1068,7 +1228,8 @@
     "tips": {
       "noStartValue": "请填写 起始值",
       "noEndValue": "请填写 结束值",
-      "endGTStartErr": "起始值 该小于 结束值"
+      "endGTStartErr": "起始值 该小于 结束值",
+      "hasChartConfig": "图表已启用配置，当前仪表板启用后会覆盖图表配置。"
     },
     "control": {
       "title": "控制器标题",
@@ -1083,7 +1244,14 @@
       "showMark": "显示标签",
       "common": "常规",
       "custom": "自定义",
-      "optionLabelField": "取值文本字段"
+      "optionLabelField": "取值文本字段",
+      "value": "备选项值",
+      "label": "备选项标签",
+      "action": "操作",
+      "unsetDefault": "取消默认值",
+      "setDefault": "设为默认值",
+      "delete": "删除",
+      "populate": "从字段填充备选项"
     },
     "date": {
       "year": "年",
@@ -1104,19 +1272,27 @@
         "freeTips": "自由布局：固定布局，用于制作大屏",
         "requiredMessage": "请选择一种布局方式"
       },
+      "template": {
+        "label": "模版文件",
+        "requiredMessage": "导入模板文件",
+        "upload": "上传模板"
+      },
       "parent": "所属目录",
       "root": "根目录",
       "vizType": {
         "datachart": "数据图表",
         "dashboard": "仪表板",
         "folder": "目录",
+        "template": "通过模板",
         "storyboard": "故事板"
       }
     },
     "main": {
       "publishSuccess": "发布成功",
       "unpublishSuccess": "取消发布成功",
-      "empty": "请在左侧列表选择可视化"
+      "empty": "请在左侧列表选择可视化",
+      "closeOther": "关闭其他",
+      "closeAll": "关闭所有"
     }
   },
   "view": {
@@ -1135,7 +1311,9 @@
       "discard": "放弃",
       "cancel": "取消",
       "execute": "执行",
-      "warning": "有未执行的修改，是否执行？"
+      "warning": "有未执行的修改，是否执行？",
+      "closeOther": "关闭其他",
+      "closeAll": "关闭所有"
     },
     "editor": {
       "startAnalysis": "开始分析",
@@ -1179,7 +1357,11 @@
       "permission": "列权限",
       "newHierarchy": "新建层次结构",
       "addToHierarchy": "添加到层次结构",
-      "hierarchyName": "层级名称"
+      "hierarchyName": "层级名称",
+      "createComputedFields": "新建计算字段",
+      "duplicateName": "名称重复，请检查!",
+      "deleteSure": "确定要删除吗？",
+      "edit": "编辑"
     },
     "columnPermission": {
       "title": "列权限",
@@ -1215,6 +1397,28 @@
       "category": "分类",
       "type": "类型",
       "typeAndCategory": "类型与分类"
+    },
+    "structView": {
+      "title": "请选择数据视图类型",
+      "STRUCT": "表视图",
+      "SQL": "SQL 视图",
+      "STRUCT_DESC": "通过配置表关系创建数据视图",
+      "SQL_DESC": "使用 SQL 语句创建数据视图",
+      "file": "文件夹",
+      "main": "主表：",
+      "join": "表连接：",
+      "selectJoinColumn": "关联字段",
+      "addJoin": "添加表连接",
+      "run": "执行",
+      "runStep": "执行当前步骤",
+      "searchTable": "搜索数据表",
+      "searchSource": "搜索数据源",
+      "selectTable": "选择表格",
+      "all": "全选",
+      "selectField": "选择字段",
+      "RIGHT": "右连接",
+      "LEFT": "左连接",
+      "INNER": "内连接"
     }
   },
   "source": {
@@ -1264,7 +1468,7 @@
       "email": "邮箱",
       "password": "密码",
       "changePassword": "点击修改密码",
-      "name": "用户姓名",
+      "name": "姓名",
       "description": "描述",
       "roles": "角色列表",
       "assignRole": "为用户指定角色",
@@ -1281,7 +1485,7 @@
       "searchMember": "搜索成员关键字",
       "username": "用户名",
       "email": "邮箱",
-      "name": "用户姓名",
+      "name": "姓名",
       "remove": "移除"
     },
     "form": {
@@ -1416,11 +1620,14 @@
     "join": "成功加入组织",
     "confirming": "确认邀请中"
   },
-  "active": {
-    "activating": "激活中"
-  },
   "authorization": {
-    "processing": "处理中"
+    "authenticating": "认证中",
+    "authenticatingDesc": "正在认证，请等待认证通过",
+    "activating": "激活中",
+    "activatingDesc": "正在激活，请等待激活完成",
+    "activatingError": "激活失败",
+    "error": "认证失败",
+    "errorDesc": "发生错误，请检查并重新尝试"
   },
   "notfound": {
     "title": "没有这个页面"

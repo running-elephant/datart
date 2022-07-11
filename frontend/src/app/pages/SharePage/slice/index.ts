@@ -24,17 +24,19 @@ import {
   VizType,
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transferChartConfig } from 'app/pages/MainPage/pages/VizPage/slice/utils';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import { FilterSqlOperator } from 'globalConstants';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
+import { Omit } from 'utils/object';
 import {
-  fetchAvailableSourceFunctions,
+  fetchAvailableSourceFunctionsForShare,
   fetchShareDataSetByPreviewChartAction,
   fetchShareVizInfo,
   getOauth2Clients,
 } from './thunks';
-// import { fetchShareDataSetByPreviewChartAction } from './thunk';
 import { ExecuteToken, SharePageState, ShareVizInfo } from './types';
 
 export const initialState: SharePageState = {
@@ -51,6 +53,7 @@ export const initialState: SharePageState = {
   loginLoading: false,
   oauth2Clients: [],
   availableSourceFunctions: [],
+  selectedItems: [],
 };
 
 export const slice = createSlice({
@@ -93,15 +96,28 @@ export const slice = createSlice({
       action: PayloadAction<{
         data: ShareVizInfo;
         filterSearchParams?: FilterSearchParams;
+        isMatchByName?: boolean;
       }>,
     ) => {
-      const { data, filterSearchParams } = action.payload;
+      const { data, filterSearchParams, isMatchByName } = action.payload;
       const vizDetail = data.vizDetail as ChartDTO;
       const chartConfigDTO = vizDetail.config;
       const currentChart = ChartManager.instance().getById(
         chartConfigDTO?.chartGraphId,
       );
       let chartConfig = currentChart?.config as ChartConfig;
+      const jumpFilters: ChartDataRequestFilter[] = Object.entries(
+        Omit(filterSearchParams, ['type', 'isMatchByName']),
+      ).map(entity => {
+        return {
+          column: entity[0]?.split('.'),
+          sqlOperator: FilterSqlOperator.In,
+          values: entity[1]?.map(v => ({
+            value: v,
+            valueType: 'STRING',
+          })),
+        };
+      });
       if (currentChart) {
         chartConfig = transferChartConfig(
           mergeToChartConfig(
@@ -109,6 +125,8 @@ export const slice = createSlice({
             migrateChartConfig(chartConfigDTO),
           ),
           filterSearchParams,
+          isMatchByName,
+          jumpFilters,
         );
       }
       const executeToken = data.executeToken;
@@ -129,7 +147,7 @@ export const slice = createSlice({
       const chartPreview = state.chartPreview;
       if (chartPreview) {
         const filterSection = chartPreview?.chartConfig?.datas?.find(
-          section => section.type === ChartDataSectionType.FILTER,
+          section => section.type === ChartDataSectionType.Filter,
         );
         if (filterSection) {
           const filterRowIndex = filterSection.rows?.findIndex(
@@ -155,7 +173,7 @@ export const slice = createSlice({
     ) {
       if (state.chartPreview) {
         const groupSection = state.chartPreview?.chartConfig?.datas?.find(
-          section => section.type === ChartDataSectionType.GROUP,
+          section => section.type === ChartDataSectionType.Group,
         );
         if (groupSection) {
           groupSection.rows = action.payload.payload?.value?.rows;
@@ -173,6 +191,9 @@ export const slice = createSlice({
         state.chartPreview.backendChart.config.computedFields =
           action.payload.computedFields;
       }
+    },
+    changeSelectedItems(state, { payload }: PayloadAction<SelectedItem[]>) {
+      state.selectedItems = payload;
     },
   },
   extraReducers: builder => {
@@ -193,6 +214,7 @@ export const slice = createSlice({
             ...state.chartPreview,
             dataset: payload as any,
           };
+          state.selectedItems = [];
           state.headlessBrowserRenderSign = true;
         },
       )
@@ -206,7 +228,7 @@ export const slice = createSlice({
         }));
       })
       .addCase(
-        fetchAvailableSourceFunctions.fulfilled,
+        fetchAvailableSourceFunctionsForShare.fulfilled,
         (state, { payload }) => {
           state.availableSourceFunctions = payload;
         },

@@ -21,6 +21,7 @@ package datart.server.service.impl;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
 import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.NotAllowedException;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
 import datart.core.entity.ext.RoleBaseInfo;
@@ -32,7 +33,6 @@ import datart.security.util.JwtUtils;
 import datart.security.util.PermissionHelper;
 import datart.server.base.dto.InviteMemberResponse;
 import datart.server.base.dto.OrganizationBaseInfo;
-import datart.core.base.exception.NotAllowedException;
 import datart.server.base.params.OrgCreateParam;
 import datart.server.base.params.OrgUpdateParam;
 import datart.server.service.BaseService;
@@ -41,7 +41,9 @@ import datart.server.service.MailService;
 import datart.server.service.OrgService;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -268,15 +270,28 @@ public class OrgServiceImpl extends BaseService implements OrgService {
         ruoMapper.insert(relUserOrganization);
     }
 
+    @Override
+    public Organization checkTeamOrg() {
+        List<Organization> organizations = organizationMapper.list();
+        if (CollectionUtils.isEmpty(organizations)) {
+            return null;
+        } else if (organizations.size() == 1) {
+            return organizations.get(0);
+        } else {
+            Exceptions.base("There is more than one organization in team tenant-management-mode, please initialize database or switch to platform tenant-management-mode.");
+        }
+        return null;
+    }
+
     private void sendInviteMail(User user, String orgId) throws UnsupportedEncodingException, MessagingException {
         mailService.sendInviteMail(user, organizationMapper.selectByPrimaryKey(orgId));
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public boolean removeUser(String orgId, String userId) {
+        Organization organization = organizationMapper.selectForUpdate(orgId);
         securityManager.requireOrgOwner(orgId);
-        Organization organization = organizationMapper.selectByPrimaryKey(orgId);
 
         if (organization.getCreateBy().equals(userId)) {
             Exceptions.tr(NotAllowedException.class,"message.org.member.delete-creator");

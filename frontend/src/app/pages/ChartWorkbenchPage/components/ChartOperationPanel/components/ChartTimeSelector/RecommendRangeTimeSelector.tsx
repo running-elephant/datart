@@ -62,7 +62,7 @@ const RecommendRangeTimeSelector: FC<
             {[
               RECOMMEND_TIME.TODAY,
               RECOMMEND_TIME.YESTERDAY,
-              RECOMMEND_TIME.THISWEEK,
+              RECOMMEND_TIME.THIS_WEEK,
             ].map(time => (
               <Radio key={time} value={time}>
                 {t(time)}

@@ -24,7 +24,17 @@ import { FONT_SIZE_LABEL } from 'styles/StyleConstants';
 import { AndvS2Config } from './types';
 
 const AntVS2Wrapper: FC<AndvS2Config> = memo(
-  ({ dataCfg, options, theme, palette }) => {
+  ({
+    dataCfg,
+    options,
+    theme,
+    palette,
+    onCollapseRowsAll,
+    onRowCellCollapseTreeRows,
+    onSelected,
+    getSpreadSheet,
+    onDataCellClick,
+  }) => {
     if (!dataCfg) {
       return <div></div>;
     }
@@ -50,7 +60,12 @@ const AntVS2Wrapper: FC<AndvS2Config> = memo(
         dataCfg={dataCfg}
         options={options}
         themeCfg={{ theme, palette }}
+        onCollapseRowsAll={onCollapseRowsAll}
+        onRowCellCollapseTreeRows={onRowCellCollapseTreeRows}
         onDataCellHover={onDataCellHover}
+        onSelected={onSelected}
+        getSpreadSheet={getSpreadSheet}
+        onDataCellClick={onDataCellClick}
       />
     );
   },

@@ -16,21 +16,23 @@
  * limitations under the License.
  */
 
-import { Col, Input, Row, Select, Space, Tabs } from 'antd';
-import { FormItemEx } from 'app/components';
+import { Col, Input, Row, Select, Space, Tabs, TreeDataNode } from 'antd';
+import { FormItemEx, Tree } from 'app/components';
 import {
   AggregateFieldActionType,
   ChartDataViewFieldCategory,
   DataViewFieldType,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { ViewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { ChartComputedFieldHandle } from 'app/types/ComputedFieldEditor';
-import { FC, useRef, useState } from 'react';
+import { FC, useCallback, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
 import ChartComputedFieldEditor from './ChartComputedFieldEditor/ChartComputedFieldEditor';
 import ChartSearchableList from './ChartSearchableList';
 import ComputedFunctionDescriptions from './computed-function-description-map';
+import { FieldTemplate, FunctionTemplate, VariableTemplate } from './utils';
 
 enum TextType {
   Field = 'field',
@@ -38,18 +40,13 @@ enum TextType {
   Function = 'function',
 }
 
-const FieldTemplate = f => `[${f}]`;
-
-const VariableTemplate = v => `$${v}$`;
-
-const FunctionTemplate = f => `${f}()`;
-
 const ChartComputedFieldSettingPanel: FC<{
   sourceId?: string;
   computedField?: ChartDataViewMeta;
   allComputedFields?: ChartDataViewMeta[];
-  fields?: ChartDataViewMeta[];
+  fields?: ChartDataViewMeta[] | TreeDataNode[];
   variables?: ChartDataViewMeta[];
+  viewType?: ViewType;
   onChange?: (computedField?: ChartDataViewMeta) => void;
 }> = ({
   sourceId,
@@ -57,6 +54,7 @@ const ChartComputedFieldSettingPanel: FC<{
   allComputedFields,
   fields,
   variables,
+  viewType,
   onChange,
 }) => {
   const t = useI18NPrefix(`viz.workbench.dataview`);
@@ -66,16 +64,15 @@ const ChartComputedFieldSettingPanel: FC<{
   const [selectedFunctionCategory, setSelectedFunctionCategory] = useState(
     defaultFunctionCategory,
   );
-
   const hasAggregationFunction = (exp?: string) => {
     return [
-      AggregateFieldActionType.AVG,
-      AggregateFieldActionType.COUNT,
-      AggregateFieldActionType.COUNT_DISTINCT,
-      AggregateFieldActionType.MAX,
-      AggregateFieldActionType.MIN,
-      AggregateFieldActionType.SUM,
-    ].some(agg => exp?.includes(agg));
+      AggregateFieldActionType.Avg,
+      AggregateFieldActionType.Count,
+      AggregateFieldActionType.Count_Distinct,
+      AggregateFieldActionType.Max,
+      AggregateFieldActionType.Min,
+      AggregateFieldActionType.Sum,
+    ].some(agg => new RegExp(`${agg}\\(`, 'i').test(exp || ''));
   };
 
   const handleChange = (field: ChartDataViewMeta) => {
@@ -90,6 +87,7 @@ const ChartComputedFieldSettingPanel: FC<{
   const handleFieldNameChange = name => {
     const newField = Object.assign({}, myComputedFieldRef.current, {
       id: name,
+      name: name,
     });
     handleChange(newField);
   };
@@ -152,7 +150,7 @@ const ChartComputedFieldSettingPanel: FC<{
     }
   };
 
-  const handleFieldFuncionSelected = funName => {
+  const handleFieldFunctionSelected = funName => {
     const functionDescription = ComputedFunctionDescriptions.find(
       f => f.name === funName,
     );
@@ -163,13 +161,23 @@ const ChartComputedFieldSettingPanel: FC<{
     );
   };
 
-  const handleFieldSelected = field => {
+  const handleFieldSelected = useCallback(field => {
     editorRef.current?.insertField(getInputText(field, TextType.Field));
-  };
+  }, []);
 
   const handleVariableSelected = variable => {
     editorRef.current?.insertField(getInputText(variable, TextType.Variable));
   };
+
+  const handleOnSelectValue = useCallback(
+    selectKeys => {
+      if (selectKeys?.length) {
+        const selectKey = selectKeys[0] as any;
+        handleFieldSelected(selectKey);
+      }
+    },
+    [handleFieldSelected],
+  );
 
   return (
     <StyledChartComputedFieldSettingPanel direction="vertical">
@@ -212,13 +220,25 @@ const ChartComputedFieldSettingPanel: FC<{
         <Col span={4}>
           <Tabs defaultActiveKey="field" onChange={() => {}}>
             <Tabs.TabPane tab={`${t('field')}`} key="field">
-              <ChartSearchableList
-                source={(fields || []).map(f => ({
-                  value: f.id,
-                  label: f.id,
-                }))}
-                onItemSelected={handleFieldSelected}
-              />
+              {viewType === 'STRUCT' ? (
+                <Tree
+                  className="medium"
+                  loading={false}
+                  showIcon={false}
+                  treeData={fields as TreeDataNode[]}
+                  defaultExpandAll={true}
+                  height={500}
+                  onSelect={handleOnSelectValue}
+                />
+              ) : (
+                <ChartSearchableList
+                  source={(fields || []).map(f => ({
+                    value: f.name,
+                    label: f.name,
+                  }))}
+                  onItemSelected={handleFieldSelected}
+                />
+              )}
             </Tabs.TabPane>
             <Tabs.TabPane tab={`${t('variable')}`} key="variable">
               <ChartSearchableList
@@ -249,7 +269,7 @@ const ChartComputedFieldSettingPanel: FC<{
             />
             <ChartSearchableList
               source={getFunctionList()}
-              onItemSelected={handleFieldFuncionSelected}
+              onItemSelected={handleFieldFunctionSelected}
             />
           </Space>
         </Col>

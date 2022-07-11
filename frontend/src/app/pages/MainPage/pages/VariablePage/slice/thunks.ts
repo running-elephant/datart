@@ -17,8 +17,7 @@
  */
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { request } from 'utils/request';
-import { errorHandle } from 'utils/utils';
+import { request2 } from 'utils/request';
 import {
   AddVariableParams,
   DeleteVariableParams,
@@ -29,70 +28,50 @@ import {
 export const getVariables = createAsyncThunk<Variable[], string>(
   'variable/getVariables',
   async orgId => {
-    try {
-      const { data } = await request<Variable[]>({
-        url: '/variables/org',
-        method: 'GET',
-        params: { orgId },
-      });
-      return data;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    const { data } = await request2<Variable[]>({
+      url: '/variables/org',
+      method: 'GET',
+      params: { orgId },
+    });
+    return data;
   },
 );
 
 export const addVariable = createAsyncThunk<Variable, AddVariableParams>(
   'variable/addVariable',
   async ({ variable, resolve }) => {
-    try {
-      const { data } = await request<Variable>({
-        url: '/variables',
-        method: 'POST',
-        data: variable,
-      });
-      resolve();
-      return data;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    const { data } = await request2<Variable>({
+      url: '/variables',
+      method: 'POST',
+      data: variable,
+    });
+    resolve();
+    return data;
   },
 );
 
 export const editVariable = createAsyncThunk<Variable, EditVariableParams>(
   'variable/editVariable',
   async ({ variable, resolve }) => {
-    try {
-      await request<boolean>({
-        url: '/variables',
-        method: 'PUT',
-        data: [variable],
-      });
-      resolve();
-      return variable;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    await request2<boolean>({
+      url: '/variables',
+      method: 'PUT',
+      data: [variable],
+    });
+    resolve();
+    return variable;
   },
 );
 
 export const deleteVariable = createAsyncThunk<null, DeleteVariableParams>(
   'variable/deleteVariable',
   async ({ ids, resolve }) => {
-    try {
-      await request<Variable>({
-        url: '/variables',
-        method: 'DELETE',
-        params: { variables: ids.join(',') },
-      });
-      resolve();
-      return null;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    await request2<Variable>({
+      url: '/variables',
+      method: 'DELETE',
+      params: { variables: ids.join(',') },
+    });
+    resolve();
+    return null;
   },
 );

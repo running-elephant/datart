@@ -20,6 +20,7 @@ import {
   DeleteOutlined,
   EditOutlined,
   FolderOpenOutlined,
+  TableOutlined,
 } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
 import { IW } from 'app/components';
@@ -28,6 +29,7 @@ import { FC, memo, useState } from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components/macro';
 import {
+  BLUE,
   FONT_SIZE_BASE,
   FONT_SIZE_HEADING,
   SPACE,
@@ -35,8 +37,8 @@ import {
   SPACE_XS,
   YELLOW,
 } from 'styles/StyleConstants';
-import { Column } from '../../../slice/types';
-import { TreeNodeHierarchy } from './constant';
+import { Column, ColumnRole } from '../../../slice/types';
+import { ROOT_CONTAINER_ID, TreeNodeHierarchy } from './constant';
 import DataModelNode from './DataModelNode';
 
 const DataModelBranch: FC<{
@@ -46,6 +48,7 @@ const DataModelBranch: FC<{
   onEditBranch;
   onDelete: (node: Column) => void;
   onDeleteFromHierarchy: (parent: Column) => (node: Column) => void;
+  onCreateHierarchy?: (node: Column) => void;
 }> = memo(
   ({
     node,
@@ -54,14 +57,18 @@ const DataModelBranch: FC<{
     onEditBranch,
     onDelete,
     onDeleteFromHierarchy,
+    onCreateHierarchy,
   }) => {
     const t = useI18NPrefix('view.model');
     const [isHover, setIsHover] = useState(false);
 
     const renderNode = (node, isDragging) => {
-      let icon = (
-        <FolderOpenOutlined style={{ alignSelf: 'center', color: YELLOW }} />
-      );
+      let icon =
+        node.role === ColumnRole.Hierarchy ? (
+          <FolderOpenOutlined style={{ alignSelf: 'center', color: YELLOW }} />
+        ) : (
+          <TableOutlined style={{ alignSelf: 'center', color: BLUE }} />
+        );
 
       return (
         <>
@@ -76,36 +83,46 @@ const DataModelBranch: FC<{
           >
             <IW fontSize={FONT_SIZE_HEADING}>{icon}</IW>
             <span>{node.name}</span>
-            <div className="action">
-              {isHover && !isDragging && (
-                <Tooltip title={t('rename')}>
-                  <Button
-                    type="link"
-                    onClick={() => onEditBranch(node)}
-                    icon={<EditOutlined />}
-                  />
-                </Tooltip>
-              )}
-              {isHover && !isDragging && (
-                <Tooltip title={t('delete')}>
-                  <Button
-                    type="link"
-                    onClick={() => onDelete(node)}
-                    icon={<DeleteOutlined />}
-                  />
-                </Tooltip>
-              )}
-            </div>
+            {node.role === ColumnRole.Hierarchy && (
+              <div className="action">
+                {isHover && !isDragging && (
+                  <Tooltip title={t('rename')}>
+                    <Button
+                      type="link"
+                      onClick={() => onEditBranch(node)}
+                      icon={<EditOutlined />}
+                    />
+                  </Tooltip>
+                )}
+                {isHover && !isDragging && (
+                  <Tooltip title={t('delete')}>
+                    <Button
+                      type="link"
+                      onClick={() => onDelete(node)}
+                      icon={<DeleteOutlined />}
+                    />
+                  </Tooltip>
+                )}
+              </div>
+            )}
           </div>
           <div className="children">
             {node?.children?.map(childNode => (
               <DataModelNode
                 className="in-hierarchy"
+                branchRole={node.role}
                 node={childNode}
                 key={childNode.name}
+                onCreateHierarchy={
+                  node.role === ColumnRole.Table ? onCreateHierarchy : undefined
+                }
                 onMoveToHierarchy={onMoveToHierarchy}
                 onNodeTypeChange={onNodeTypeChange}
-                onDeleteFromHierarchy={onDeleteFromHierarchy(node)}
+                onDeleteFromHierarchy={
+                  node.role === ColumnRole.Hierarchy
+                    ? onDeleteFromHierarchy(node)
+                    : undefined
+                }
               />
             ))}
           </div>
@@ -128,7 +145,11 @@ const DataModelBranch: FC<{
               {...draggableProvided.dragHandleProps}
             >
               <Droppable
-                droppableId={node?.name}
+                droppableId={
+                  node.role === ColumnRole.Table
+                    ? ROOT_CONTAINER_ID
+                    : node?.name
+                }
                 type={TreeNodeHierarchy.Branch}
                 isCombineEnabled={false}
               >

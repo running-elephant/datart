@@ -1,4 +1,5 @@
 import { message, TreeDataNode, TreeNodeProps } from 'antd';
+import { ColumnRole } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { AxiosError, AxiosResponse } from 'axios';
 import classnames from 'classnames';
 import i18next from 'i18next';
@@ -11,6 +12,7 @@ import {
 import { APIResponse } from 'types';
 import { SaveFormModel } from '../app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { removeToken } from './auth';
+
 export { default as uuidv4 } from 'uuid/dist/umd/uuidv4.min';
 
 export function errorHandle(error) {
@@ -407,4 +409,54 @@ export function newIssueUrl({ type, ...options }) {
   }
 
   return url.toString();
+}
+
+export function modelListFormsTreeByTableName(model, type) {
+  const tableNameList: string[] = [];
+  const columnNameObj: { [key: string]: any } = {};
+  const columnTreeData: any = [];
+
+  model?.forEach(v => {
+    const path = v.path;
+    const tableName = path.slice(0, path.length - 1).join('.');
+    if (!tableNameList.includes(tableName)) {
+      tableNameList.push(tableName);
+    }
+  });
+
+  model?.forEach(v => {
+    const path = v.path;
+    const tableName = path.slice(0, path.length - 1).join('.');
+    const fieldName = path[path.length - 1];
+    if (tableNameList.includes(tableName)) {
+      const columnNameArr = columnNameObj[tableName] || [];
+      columnNameObj[tableName] = columnNameArr.concat([
+        { ...v, displayName: fieldName },
+      ]);
+    }
+  });
+
+  tableNameList.sort((a, b) => a.localeCompare(b));
+
+  tableNameList.forEach((v, i) => {
+    const treeData = {
+      name: v,
+      category: 'hierarchy',
+      role: ColumnRole.Table,
+      subType: undefined,
+      type: 'STRING',
+      children: columnNameObj[v],
+    } as any;
+
+    if (type === 'analysisPage') {
+      treeData.id = v;
+    }
+    if (type === 'viewPage') {
+      treeData.index = i;
+    }
+
+    columnTreeData.push(treeData);
+  });
+
+  return columnTreeData;
 }

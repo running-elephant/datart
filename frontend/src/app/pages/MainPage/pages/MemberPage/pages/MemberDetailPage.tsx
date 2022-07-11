@@ -104,7 +104,7 @@ export function MemberDetailPage() {
     if (editingMember) {
       form.setFieldsValue({
         ...editingMember.info,
-        roleIds: editingMember.roles.map(({ id }) => id),
+        roleIds: editingMember?.roles?.map(({ id }) => id),
       });
     }
   }, [form, editingMember]);
@@ -351,7 +351,7 @@ export function MemberDetailPage() {
                   loading={roleListLoading}
                   onDropdownVisibleChange={roleListVisibleChange}
                 >
-                  {roles.map(({ id, name }) => (
+                  {roles?.map(({ id, name }) => (
                     <Select.Option key={id} value={id}>
                       {name}
                     </Select.Option>

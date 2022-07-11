@@ -48,7 +48,7 @@ import { init } from 'echarts';
 import Chart from '../../../models/Chart';
 import Config from './config';
 import { DoubleYChartXAxis, DoubleYChartYAxis, Series } from './types';
-
+import { getYAxisIntervalConfig } from './utils';
 class BasicDoubleYChart extends Chart {
   dependency = [];
   config = Config;
@@ -109,20 +109,20 @@ class BasicDoubleYChart extends Chart {
       dataConfigs,
     );
     const groupConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
+      .filter(c => c.type === ChartDataSectionType.Group)
       .flatMap(config => config.rows || []);
     const infoConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.INFO)
+      .filter(c => c.type === ChartDataSectionType.Info)
       .flatMap(config => config.rows || []);
 
     const leftMetricsConfigs = dataConfigs
       .filter(
-        c => c.type === ChartDataSectionType.AGGREGATE && c.key === 'metricsL',
+        c => c.type === ChartDataSectionType.Aggregate && c.key === 'metricsL',
       )
       .flatMap(config => config.rows || []);
     const rightMetricsConfigs = dataConfigs
       .filter(
-        c => c.type === ChartDataSectionType.AGGREGATE && c.key === 'metricsR',
+        c => c.type === ChartDataSectionType.Aggregate && c.key === 'metricsR',
       )
       .flatMap(config => config.rows || []);
 
@@ -142,6 +142,7 @@ class BasicDoubleYChart extends Chart {
         styleConfigs,
         leftMetricsConfigs,
         rightMetricsConfigs,
+        chartDataSet,
       ),
       grid: getGridStyle(styleConfigs),
       series: this.getSeries(
@@ -325,11 +326,18 @@ class BasicDoubleYChart extends Chart {
     styles: ChartStyleConfig[],
     leftDeminsionConfigs: ChartDataSectionField[],
     rightDeminsionConfigs: ChartDataSectionField[],
+    chartDataSet: IChartDataSet<string>,
   ): DoubleYChartYAxis[] {
     const [showHorizonLine, horizonLineStyle] = getStyles(
       styles,
       ['splitLine'],
       ['showHorizonLine', 'horizonLineStyle'],
+    );
+
+    const yAxisIntervalConfig = getYAxisIntervalConfig(
+      leftDeminsionConfigs,
+      rightDeminsionConfigs,
+      chartDataSet,
     );
 
     const _yAxisTemplate = (position, name): DoubleYChartYAxis => {
@@ -352,6 +360,9 @@ class BasicDoubleYChart extends Chart {
           fontFamily: 'PingFang SC',
           fontSize: 12,
         },
+        min: yAxisIntervalConfig[position + 'Min'],
+        max: yAxisIntervalConfig[position + 'Max'],
+        interval: yAxisIntervalConfig[position + 'Interval'],
         inverse,
         axisLine: getAxisLine(showAxis),
         axisLabel: getAxisLabel(showLabel, font),

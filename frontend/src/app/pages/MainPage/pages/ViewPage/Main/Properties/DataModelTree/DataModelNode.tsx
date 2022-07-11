@@ -44,12 +44,13 @@ import {
   WARNING,
 } from 'styles/StyleConstants';
 import { ColumnCategories } from '../../../constants';
-import { Column } from '../../../slice/types';
+import { Column, ColumnRole } from '../../../slice/types';
 import { ALLOW_COMBINE_COLUMN_TYPES } from './constant';
 
 const DataModelNode: FC<{
   node: Column;
   className?: string;
+  branchRole?: ColumnRole;
   onNodeTypeChange: (type: any, name: string) => void;
   onMoveToHierarchy: (node: Column) => void;
   onCreateHierarchy?: (node: Column) => void;
@@ -58,6 +59,7 @@ const DataModelNode: FC<{
   ({
     node,
     className,
+    branchRole,
     onCreateHierarchy,
     onMoveToHierarchy,
     onNodeTypeChange,
@@ -148,7 +150,9 @@ const DataModelNode: FC<{
               <StyledIW fontSize={FONT_SIZE_TITLE}>{icon}</StyledIW>
             </Tooltip>
           </Dropdown>
-          <span>{node.name}</span>
+          <span>
+            {branchRole === ColumnRole.Hierarchy ? node.name : node.displayName}
+          </span>
           <div className="action">
             {isHover &&
               !isDragging &&

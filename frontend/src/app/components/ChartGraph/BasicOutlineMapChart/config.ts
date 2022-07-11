@@ -70,12 +70,6 @@ const config: ChartConfig = {
           },
         },
         {
-          label: 'map.enableZoom',
-          key: 'enableZoom',
-          default: true,
-          comType: 'checkbox',
-        },
-        {
           label: 'map.areaColor',
           key: 'areaColor',
           default: '#e9ecef',
@@ -117,7 +111,7 @@ const config: ChartConfig = {
           comType: 'checkbox',
         },
         {
-          label: 'label.position',
+          label: 'viz.palette.style.position.title',
           key: 'position',
           comType: 'labelPosition',
           default: 'top',
@@ -173,6 +167,29 @@ const config: ChartConfig = {
               { label: 'viz.palette.style.position.top', value: 'top' },
               { label: 'viz.palette.style.position.bottom', value: 'bottom' },
               { label: 'viz.palette.style.position.left', value: 'left' },
+            ],
+          },
+        },
+        {
+          label: 'viz.palette.style.position.title',
+          key: 'position',
+          comType: 'select',
+          default: 'right,bottom',
+          options: {
+            translateItemLabel: true,
+            items: [
+              {
+                label: 'viz.palette.style.position.leftTop',
+                value: 'left,top',
+              },
+              {
+                label: 'viz.palette.style.position.rightTop',
+                value: 'right,top',
+              },
+              {
+                label: 'viz.palette.style.position.rightBottom',
+                value: 'right,bottom',
+              },
             ],
           },
         },
@@ -238,7 +255,6 @@ const config: ChartConfig = {
           showLabel: '显示标签',
           unitFont: '刻度字体',
           rotate: '旋转角度',
-          position: '位置',
           showInterval: '显示刻度',
           interval: '刻度间隔',
           showTitleAndUnit: '显示标题和刻度',
@@ -247,12 +263,14 @@ const config: ChartConfig = {
           nameGap: '标题与轴线距离',
           min: '最小值',
           max: '最大值',
+          reset: '重置',
+          zoomOut: '缩小',
+          zoomIn: '放大',
         },
         metricsAndColor: '指标(颜色)',
         label: {
           title: '标签',
           showLabel: '显示标签',
-          position: '位置',
         },
         levelType: {
           china: '中国-省级地图',
@@ -265,7 +283,6 @@ const config: ChartConfig = {
         map: {
           title: '地图设置',
           level: '默认地图等级',
-          enableZoom: '开启缩放',
           backgroundColor: '底图背景色',
           borderStyle: '轮廓样式',
           focusArea: '聚焦选中区域',
@@ -289,7 +306,6 @@ const config: ChartConfig = {
           showLabel: 'Show Label',
           unitFont: 'Unit Font',
           rotate: 'Rotate',
-          position: 'Position',
           showInterval: 'Show Interval',
           interval: 'Interval',
           showTitleAndUnit: 'Show Title and Unit',
@@ -298,12 +314,14 @@ const config: ChartConfig = {
           nameGap: 'Name Gap',
           min: 'Min',
           max: 'Max',
+          reset: 'Reset',
+          zoomOut: 'Zoom Out',
+          zoomIn: 'Zoom In',
         },
         metricsAndColor: 'Metrics and Color',
         label: {
           title: 'Label',
           showLabel: 'Show Label',
-          position: 'Position',
           height: 'Height',
         },
         levelType: {
@@ -317,7 +335,6 @@ const config: ChartConfig = {
         map: {
           title: 'Map',
           level: 'Level',
-          enableZoom: 'Enabel Zoom',
           backgroundColor: 'Background Color',
           borderStyle: 'Border Style',
           focusArea: 'Focus Area',

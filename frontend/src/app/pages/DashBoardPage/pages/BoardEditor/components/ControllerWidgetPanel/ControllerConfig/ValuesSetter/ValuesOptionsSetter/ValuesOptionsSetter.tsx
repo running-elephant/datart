@@ -18,8 +18,13 @@
 
 import { Form, FormInstance, Radio, Select, Space } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
-import { ControllerFacadeTypes } from 'app/constants';
+import {
+  ChartDataViewFieldCategory,
+  ControllerFacadeTypes,
+} from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
+import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import {
   OPERATOR_TYPE_OPTION,
   ValueOptionType,
@@ -68,20 +73,37 @@ const ValuesOptionsSetter: FC<{
     });
   }, []);
   const getViewOption = useCallback(async (viewId: string) => {
-    if (!viewId) return [];
+    if (!viewId) return { option: [], dataView: undefined };
     try {
-      const { data } = await request2<View>(`/views/${viewId}`);
+      let { data } = await request2<View>(`/views/${viewId}`);
+      if (data) {
+        data = migrationViewConfig(data);
+      }
+      if (data?.model) {
+        data.model = beginViewModelMigration(data.model, data.type);
+      }
       let meta = transformMeta(data?.model);
-      if (!meta) return [];
-      const option: CascaderOptionType[] = meta.map(item => {
-        return {
-          value: item.id,
-          label: item.id,
-        };
-      });
-      return option;
+      //TODO: Support after beta4
+      // const viewComputerField = JSON.parse(data.model)?.computedFields || [];
+
+      if (!meta) return { option: [], dataView: undefined };
+      const option: CascaderOptionType[] = meta
+        // .concat(viewComputerField)
+        .map(item => {
+          const fieldName =
+            item.category === ChartDataViewFieldCategory.ComputedField
+              ? item.id
+              : item.name;
+          return {
+            value: fieldName,
+            label: fieldName,
+          };
+        });
+
+      return { option, dataView: { ...data, meta } };
     } catch (error) {
       errorHandle(error);
+      return { option: [], data: undefined };
     }
   }, []);
   const onTargetKeyChange = useCallback(
@@ -98,16 +120,16 @@ const ValuesOptionsSetter: FC<{
     [form, getControllerConfig],
   );
   const fetchNewDataset = useCallback(
-    async (viewId: string, columns: string[]) => {
+    async (viewId: string, columns: string[], dataView?: ChartDataView) => {
       const fieldDataset = await getDistinctFields(
         viewId,
         columns,
-        viewMap[viewId],
+        dataView,
         undefined,
       );
       return fieldDataset;
     },
-    [viewMap],
+    [],
   );
   const onViewFieldChange = useCallback(
     async (value: string[]) => {
@@ -133,11 +155,10 @@ const ValuesOptionsSetter: FC<{
         },
       });
 
-      const options = await getViewOption(value[0]);
+      const { option: options, dataView } = await getViewOption(value[0]);
       setLabelOptions(options);
-
       const [viewId, ...columns] = value;
-      const dataset = await fetchNewDataset(viewId, columns);
+      const dataset = await fetchNewDataset(viewId, columns, dataView);
       setOptionValues(convertToList(dataset?.rows));
     },
     [convertToList, fetchNewDataset, form, getControllerConfig, getViewOption],
@@ -166,11 +187,11 @@ const ValuesOptionsSetter: FC<{
   const onInitOptions = useCallback(
     async (value: string[]) => {
       const [viewId, ...columns] = value;
-      const dataset = await fetchNewDataset(viewId, columns);
+      const { option: options, dataView } = await getViewOption(viewId);
+      const dataset = await fetchNewDataset(viewId, columns, dataView);
       const config: ControllerConfig = getControllerConfig();
       setOptionValues(convertToList(dataset?.rows));
       if (config.valueOptionType === 'common') {
-        const options = await getViewOption(value[0]);
         setLabelOptions(options);
         setLabelKey(config.assistViewFields?.[2]);
         if (config?.controllerValues) {
@@ -255,7 +276,7 @@ const ValuesOptionsSetter: FC<{
                           key={item.value}
                           value={item.value as string}
                         >
-                          {item.value}
+                          {item.label}
                         </Select.Option>
                       ))}
                     </Select>

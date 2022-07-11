@@ -23,7 +23,8 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import { BOARD_SELF_CHART_PREFIX } from 'globalConstants';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { uuidv4 } from 'utils/utils';
 import { addDataChartWidgets, addWrapChartWidget } from '../../../slice/thunk';
@@ -85,7 +86,7 @@ export const AddChart = () => {
       />
       {widgetChartVisible && (
         <ChartEditor
-          dataChartId={'widget_' + uuidv4()}
+          dataChartId={`${BOARD_SELF_CHART_PREFIX}${boardId}_${uuidv4()}`} // TODO(Stephen): widget id issue: generate uuid from frontend for own/link chart
           orgId={orgId}
           chartType="widgetChart"
           container="widget"

@@ -28,6 +28,7 @@ import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
 import datart.core.common.UUIDGenerator;
 import datart.core.data.provider.Dataframe;
+import datart.core.data.provider.StdSqlOperator;
 import datart.core.entity.*;
 import datart.core.mappers.ext.ShareMapperExt;
 import datart.core.mappers.ext.UserMapperExt;
@@ -151,10 +152,9 @@ public class ShareServiceImpl extends BaseService implements ShareService {
 
     @Override
     public ShareInfo updateShare(ShareUpdateParam updateParam) {
-        Share retrieve = retrieve(updateParam.getId());
-        requirePermission(retrieve, Const.MANAGE);
+        Share update = retrieve(updateParam.getId());
+        requirePermission(update, Const.MANAGE);
 
-        Share update = new Share();
         BeanUtils.copyProperties(updateParam, update);
         if (updateParam.getRowPermissionBy() != null) {
             update.setRowPermissionBy(updateParam.getRowPermissionBy().name());
@@ -171,7 +171,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         }
         if (!CollectionUtils.isEmpty(updateParam.getUsers())) {
             for (String user : updateParam.getUsers()) {
-                Role role = roleService.getPerUserRole(retrieve.getOrgId(), user);
+                Role role = roleService.getPerUserRole(update.getOrgId(), user);
                 roleIds.add('u' + role.getId());
             }
         }
@@ -183,7 +183,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         update.setRoles(JSON.toJSONString(roleIds));
         update.setUpdateBy(getCurrentUser().getId());
         update.setUpdateTime(new Date());
-        shareMapper.updateByPrimaryKeySelective(update);
+        shareMapper.updateByPrimaryKey(update);
 
         ShareInfo shareInfo = new ShareInfo();
         BeanUtils.copyProperties(update, shareInfo);
@@ -236,7 +236,6 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         }).collect(Collectors.toList());
     }
 
-
     @Override
     public ShareVizDetail getShareViz(ShareToken shareToken) {
         ShareAuthorizedToken authorizedToken = parseToken(shareToken);
@@ -285,6 +284,13 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         ShareAuthorizedToken authorizedToken = parseToken(shareToken);
         validateExpiration(authorizedToken);
         return downloadService.downloadFile(downloadId);
+    }
+
+    @Override
+    public Set<StdSqlOperator> supportedStdFunctions(ShareToken shareToken, String sourceId) {
+        ShareAuthorizedToken authorizedToken = parseToken(shareToken);
+        validateExpiration(authorizedToken);
+        return dataProviderService.supportedStdFunctions(sourceId);
     }
 
     private ShareVizDetail getVizDetail(ShareAuthorizedToken authorizedToken) {
@@ -461,6 +467,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
                 break;
             case STORYBOARD:
                 retrieve(vizId, Storyboard.class, true);
+                break;
             default:
                 Exceptions.tr(BaseException.class, "message.share.unsupported", vizType.name());
         }

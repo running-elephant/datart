@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ChartDataSectionType } from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/models/ChartManager';
+import { SelectedItem } from 'app/types/ChartConfig';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { CloneValueDeep } from 'utils/object';
@@ -47,6 +48,7 @@ export const initialState: VizState = {
   selectedTab: '',
   dataChartListLoading: false,
   chartPreviews: [],
+  selectedItems: {} as Record<string, SelectedItem[]>,
 };
 
 const slice = createSlice({
@@ -72,6 +74,15 @@ const slice = createSlice({
             : '';
       }
     },
+    closeOtherTabs(state: VizState, action: PayloadAction<string>) {
+      const currentTab = state.tabs.find(t => t.id === action.payload);
+      state.tabs = state.tabs.filter(t => t.id === action.payload);
+      state.selectedTab = currentTab?.id || '';
+    },
+    closeAllTabs(state) {
+      state.tabs = [];
+      state.selectedTab = '';
+    },
     updateChartPreviewFilter(
       state,
       action: PayloadAction<{ backendChartId: string; payload }>,
@@ -81,7 +92,7 @@ const slice = createSlice({
       );
       if (chartPreview) {
         const filterSection = chartPreview?.chartConfig?.datas?.find(
-          section => section.type === ChartDataSectionType.FILTER,
+          section => section.type === ChartDataSectionType.Filter,
         );
         if (filterSection) {
           const filterRowIndex = filterSection.rows?.findIndex(
@@ -111,7 +122,7 @@ const slice = createSlice({
 
       if (chartPreview) {
         const groupSection = chartPreview?.chartConfig?.datas?.find(
-          section => section.type === ChartDataSectionType.GROUP,
+          section => section.type === ChartDataSectionType.Group,
         );
         if (groupSection) {
           groupSection.rows = action.payload.payload?.value?.rows;
@@ -138,6 +149,14 @@ const slice = createSlice({
       Object.entries(initialState).forEach(([key, value]) => {
         state[key] = value;
       });
+    },
+    changeSelectedItems(
+      state,
+      {
+        payload,
+      }: PayloadAction<{ backendChartId: string; data: SelectedItem[] }>,
+    ) {
+      state.selectedItems[payload.backendChartId] = payload.data;
     },
   },
   extraReducers: builder => {
@@ -521,14 +540,16 @@ const slice = createSlice({
     });
     builder.addCase(fetchVizChartAction.fulfilled, (state, action) => {
       const newChartDto = CloneValueDeep(action.payload.data);
-
+      const jumpFilterParams = action.payload.jumpFilterParams;
       const filterSearchParams = action.payload.filterSearchParams;
       const index = state.chartPreviews?.findIndex(
         c => c.backendChartId === newChartDto?.id,
       );
+
       const currentChart = ChartManager.instance().getById(
         newChartDto?.config?.chartGraphId,
       );
+
       if (index < 0) {
         state.chartPreviews.push({
           backendChartId: newChartDto?.id,
@@ -540,6 +561,8 @@ const slice = createSlice({
                   migrateChartConfig(newChartDto?.config),
                 ),
                 filterSearchParams,
+                false,
+                jumpFilterParams,
               )
             : undefined,
         });
@@ -550,10 +573,12 @@ const slice = createSlice({
           backendChart: newChartDto,
           chartConfig: transferChartConfig(
             mergeToChartConfig(
-              prevChartPreview?.chartConfig || currentChart?.config,
+              currentChart?.config,
               migrateChartConfig(newChartDto?.config),
             ),
             filterSearchParams,
+            false,
+            jumpFilterParams,
           ),
         };
       }
@@ -564,6 +589,7 @@ const slice = createSlice({
         const index = state.chartPreviews?.findIndex(
           c => c.backendChartId === action.payload?.backendChartId,
         );
+        state.selectedItems[action.payload?.backendChartId] = [];
         if (index < 0) {
           state.chartPreviews.push({
             backendChartId: action.payload?.backendChartId,

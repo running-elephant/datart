@@ -87,7 +87,7 @@ describe('MigrationEventDispatcher Tests', () => {
       return m;
     });
     const event1 = new MigrationEvent(APP_VERSION_BETA_1, m => {
-      throw new Error('some error occor');
+      throw new Error('some error occur');
     });
     const event2 = new MigrationEvent(APP_VERSION_BETA_2, m => m);
     const dispatcher = new MigrationEventDispatcher(event0, event1, event2);
@@ -103,7 +103,7 @@ describe('MigrationEventDispatcher Tests', () => {
       return m;
     });
     const event1 = new MigrationEvent(APP_VERSION_BETA_1, m => {
-      throw new Error('some error occor');
+      throw new Error('some error occur');
     });
     const event2 = new MigrationEvent(APP_VERSION_BETA_2, m => m);
     const dispatcher = new MigrationEventDispatcher(event0, event1, event2);

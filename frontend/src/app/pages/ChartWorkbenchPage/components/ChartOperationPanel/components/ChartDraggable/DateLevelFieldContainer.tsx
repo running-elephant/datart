@@ -1,23 +1,21 @@
 import { CalendarOutlined } from '@ant-design/icons';
+import { Row } from 'antd';
+import { IW } from 'app/components/IconWrapper';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CHART_DRAG_ELEMENT_TYPE } from 'globalConstants';
 import { useDrag } from 'react-dnd';
 import styled from 'styled-components/macro';
-import { INFO } from 'styles/StyleConstants';
+import { FONT_SIZE_TITLE, INFO } from 'styles/StyleConstants';
+import { dateLevelFieldsProps } from '../../../../slice/types';
 
 function DateLevelFieldContainer({
   onClearCheckedList,
+  folderRole,
   item,
-  colName,
 }: {
   onClearCheckedList?: () => any;
-  item: {
-    category: string;
-    expression: string;
-    id: string;
-    type: string;
-  };
-  colName: string;
+  folderRole?: string;
+  item: dateLevelFieldsProps;
 }) {
   const t = useI18NPrefix(`viz.workbench.dataview`);
   const [, drag] = useDrag(
@@ -25,10 +23,12 @@ function DateLevelFieldContainer({
       type: CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN,
       canDrag: true,
       item: {
-        colName: `${colName}`,
-        type: item.type,
-        category: item.category,
-        expression: `${item.expression}`,
+        id: item?.id,
+        colName: item?.name,
+        type: item?.type,
+        category: item?.category,
+        expression: item?.expression,
+        path: item?.path,
       },
       collect: monitor => ({
         isDragging: monitor.isDragging(),
@@ -37,13 +37,15 @@ function DateLevelFieldContainer({
     }),
     [],
   );
+
   return (
     <ItemWrapper ref={drag}>
-      <CalendarOutlined style={{ color: INFO }} />
-      &nbsp;
-      <span>
-        {colName}（{t(item.expression)}）
-      </span>
+      <Row>
+        <IW fontSize={FONT_SIZE_TITLE}>
+          {<CalendarOutlined style={{ color: INFO }} />}
+        </IW>
+        <p>{`${item.displayName}（${t(item.expression)}）`}</p>
+      </Row>
     </ItemWrapper>
   );
 }

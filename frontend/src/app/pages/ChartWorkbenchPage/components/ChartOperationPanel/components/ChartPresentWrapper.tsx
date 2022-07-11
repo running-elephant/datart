@@ -19,7 +19,7 @@
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { FC, memo, useMemo } from 'react';
 import styled from 'styled-components/macro';
@@ -38,6 +38,7 @@ const ChartPresentWrapper: FC<{
   onChartChange: (c: IChart) => void;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
+  selectedItems?: SelectedItem[];
 }> = memo(
   ({
     containerHeight,
@@ -50,6 +51,7 @@ const ChartPresentWrapper: FC<{
     onChartChange,
     onRefreshDataset,
     onCreateDownloadDataTask,
+    selectedItems,
   }) => {
     const { ref: ChartGraphPanelRef } = useResizeObserver<any>({
       refreshMode: 'debounce',
@@ -84,6 +86,7 @@ const ChartPresentWrapper: FC<{
             chartConfig={chartConfig}
             onRefreshDataset={onRefreshDataset}
             onCreateDownloadDataTask={onCreateDownloadDataTask}
+            selectedItems={selectedItems}
           />
         </ChartI18NContext.Provider>
       </StyledChartPresentWrapper>

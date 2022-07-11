@@ -49,7 +49,7 @@ import {
   SPACE_MD,
   WARNING,
 } from 'styles/StyleConstants';
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle, getDiffParams } from 'utils/utils';
 import { selectOrgId } from '../../slice/selectors';
 import { useMemberSlice } from '../MemberPage/slice';
@@ -139,7 +139,7 @@ export function VariablePage() {
 
       try {
         setRowPermissionLoading(true);
-        const { data } = await request<RowPermissionRaw[]>(
+        const { data } = await request2<RowPermissionRaw[]>(
           `/variables/value?variableId=${id}`,
         );
         setRowPermissions(
@@ -254,7 +254,7 @@ export function VariablePage() {
         if (created.length > 0 || updated.length > 0 || deleted.length > 0) {
           try {
             setUpdateRowPermissionLoading(true);
-            await request<null>({
+            await request2<null>({
               url: '/variables/rel',
               method: 'PUT',
               data: {

@@ -16,12 +16,20 @@
  * limitations under the License.
  */
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { boardDrillManager } from 'app/pages/DashBoardPage/components/BoardDrillManager/BoardDrillManager';
-import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/utils/widgetToolKit/chart';
+import { getControlOptionQueryParams } from 'app/pages/DashBoardPage/components/Widgets/ControllerWidget/config';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { FilterSearchParams } from 'app/pages/MainPage/pages/VizPage/slice/types';
+import { mainActions } from 'app/pages/MainPage/slice';
 import { shareActions } from 'app/pages/SharePage/slice';
 import { ExecuteToken, ShareVizInfo } from 'app/pages/SharePage/slice/types';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
+import {
+  fetchAvailableSourceFunctionsAsync,
+  fetchAvailableSourceFunctionsAsyncForShare,
+} from 'app/utils/fetch';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
 import { request2 } from 'utils/request';
@@ -33,12 +41,13 @@ import { selectBoardById, selectBoardWidgetMap } from './selector';
 import {
   BoardState,
   ControllerWidgetContent,
+  Dashboard,
   getDataOption,
   ServerDashboard,
   VizRenderMode,
-  Widget,
   WidgetData,
 } from './types';
+
 /**
  * @param ''
  * @description '先拿本地缓存，没有缓存再去服务端拉数据'
@@ -88,13 +97,33 @@ export const fetchBoardDetail = createAsyncThunk<
     handleServerBoardAction({
       data,
       renderMode: 'read',
-      filterSearchMap: { params: params?.filterSearchParams },
+      filterSearchMap: {
+        params: params?.filterSearchParams,
+        isMatchByName: !!params?.filterSearchParams?.isMatchByName?.[0],
+      },
     }),
   );
 
   return null;
 });
-
+export const exportBoardTpl = createAsyncThunk<
+  null,
+  {
+    dashboard: Partial<Dashboard>;
+    widgets: Partial<Widget>[];
+    callBack: () => void;
+  }
+>('board/exportBoardTpl', async (params, { dispatch, rejectWithValue }) => {
+  const { dashboard, widgets, callBack } = params;
+  const { data } = await request2<any>({
+    url: `viz/export/dashboard/template`,
+    method: 'POST',
+    data: { dashboard, widgets },
+  });
+  callBack();
+  dispatch(mainActions.setDownloadPolling(true));
+  return null;
+});
 export const fetchBoardDetailInShare = createAsyncThunk<
   null,
   {
@@ -128,6 +157,7 @@ export const fetchBoardDetailInShare = createAsyncThunk<
           params: params.filterSearchParams,
           isMatchByName: true,
         },
+        executeToken: data.executeToken,
       }),
     );
 
@@ -184,6 +214,121 @@ export const getWidgetData = createAsyncThunk<
     }
   },
 );
+
+export const syncBoardWidgetChartDataAsync = createAsyncThunk<
+  null,
+  {
+    boardId: string;
+    widgetId: string;
+    option?: getDataOption;
+    extraFilters?: PendingChartDataRequestFilter[];
+    variableParams?: Record<string, any[]>;
+  },
+  { state: RootState }
+>(
+  'board/syncBoardWidgetChartDataAsync',
+  async (
+    { boardId, widgetId, option, extraFilters, variableParams },
+    { getState, dispatch },
+  ) => {
+    const boardState = getState() as { board: BoardState };
+    const widgetMapMap = boardState.board.widgetRecord;
+    const widgetMap = widgetMapMap[boardId];
+    const curWidget = widgetMap[widgetId];
+    if (!curWidget) {
+      return null;
+    }
+    const viewMap = boardState.board.viewMap;
+    const dataChartMap = boardState.board.dataChartMap;
+    const drillOption = boardDrillManager.getWidgetDrill({
+      bid: curWidget.dashboardId,
+      wid: widgetId,
+    });
+    const dataChart = dataChartMap?.[curWidget.datachartId];
+    const chartDataView = viewMap?.[dataChart?.viewId];
+    const requestParams = new ChartDataRequestBuilder(
+      {
+        id: chartDataView?.id || '',
+        config: chartDataView?.config || {},
+        meta: chartDataView?.meta,
+        computedFields: dataChart?.config?.computedFields || [],
+      },
+      dataChart?.config?.chartConfig?.datas,
+      dataChart?.config?.chartConfig?.settings,
+      {},
+      false,
+      dataChart?.config?.aggregation,
+    )
+      .addVariableParams(variableParams)
+      .addExtraSorters(option?.sorters as any[])
+      .addRuntimeFilters(extraFilters)
+      .addDrillOption(drillOption)
+      .build();
+
+    try {
+      const { data } = await request2<WidgetData>({
+        method: 'POST',
+        url: `data-provider/execute`,
+        data: requestParams,
+      });
+      await dispatch(
+        boardActions.setWidgetData({
+          wid: widgetId,
+          data: { ...data, id: widgetId },
+        }),
+      );
+      await dispatch(
+        boardActions.changeWidgetLinkInfo({
+          boardId,
+          widgetId,
+          linkInfo: {
+            filters: extraFilters,
+            variables: variableParams,
+          },
+        }),
+      );
+      await dispatch(
+        boardActions.changePageInfo({
+          boardId,
+          widgetId,
+          pageInfo: data?.pageInfo,
+        }),
+      );
+      await dispatch(
+        boardActions.setWidgetErrInfo({
+          boardId,
+          widgetId,
+          errInfo: undefined,
+          errorType: 'request',
+        }),
+      );
+    } catch (error) {
+      await dispatch(
+        boardActions.setWidgetErrInfo({
+          boardId,
+          widgetId,
+          errInfo: getErrorMessage(error),
+          errorType: 'request',
+        }),
+      );
+      await dispatch(
+        boardActions.setWidgetData({
+          wid: widgetId,
+          data: undefined,
+        }),
+      );
+    } finally {
+      await dispatch(
+        boardActions.changeSelectedItems({
+          wid: widgetId,
+          data: [],
+        }),
+      );
+    }
+    return null;
+  },
+);
+
 export const getChartWidgetDataAsync = createAsyncThunk<
   null,
   {
@@ -224,6 +369,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
       boardLinkFilters,
       drillOption,
     });
+
     if (!requestParams) {
       return null;
     }
@@ -235,7 +381,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
           url: `data-provider/execute`,
           data: requestParams,
         });
-        widgetData = { ...data, id: widgetId };
+        widgetData = data;
       } else {
         const executeTokenMap = (getState() as RootState)?.share
           ?.executeTokenMap;
@@ -251,12 +397,13 @@ export const getChartWidgetDataAsync = createAsyncThunk<
           },
           data: requestParams,
         });
-        widgetData = { ...data, id: widgetId };
+        widgetData = data;
       }
       dispatch(
-        boardActions.setWidgetData(
-          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
-        ),
+        boardActions.setWidgetData({
+          wid: widgetId,
+          data: filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        }),
       );
       dispatch(
         boardActions.changePageInfo({
@@ -282,13 +429,18 @@ export const getChartWidgetDataAsync = createAsyncThunk<
           errorType: 'request',
         }),
       );
-
       dispatch(
         boardActions.setWidgetData({
-          id: widgetId,
-          columns: [],
-          rows: [],
-        } as WidgetData),
+          wid: widgetId,
+          data: undefined,
+        }),
+      );
+    } finally {
+      await dispatch(
+        boardActions.changeSelectedItems({
+          wid: widgetId,
+          data: [],
+        }),
       );
     }
     dispatch(
@@ -355,19 +507,20 @@ export const getControllerOptions = createAsyncThunk<
           },
           data: requestParams,
         });
-        widgetData = { ...data, id: widget.id };
+        widgetData = data;
       } else {
         const { data } = await request2<WidgetData>({
           method: 'POST',
           url: `data-provider/execute`,
           data: requestParams,
         });
-        widgetData = { ...data, id: widget.id };
+        widgetData = data;
       }
       dispatch(
-        boardActions.setWidgetData(
-          filterSqlOperatorName(requestParams, widgetData) as WidgetData,
-        ),
+        boardActions.setWidgetData({
+          wid: widgetId,
+          data: filterSqlOperatorName(requestParams, widgetData) as WidgetData,
+        }),
       );
       dispatch(
         boardActions.setWidgetErrInfo({
@@ -394,5 +547,35 @@ export const getControllerOptions = createAsyncThunk<
       }),
     );
     return null;
+  },
+);
+
+export const fetchAvailableSourceFunctions = createAsyncThunk<
+  { value: string[]; sourceId: string } | false,
+  { sourceId: string; authorizedToken: string; renderMode: VizRenderMode },
+  { state: RootState }
+>(
+  'workbench/fetchAvailableSourceFunctions',
+  async ({ sourceId, authorizedToken, renderMode }, { getState }) => {
+    const boardState = getState() as { board: BoardState };
+    const availableSourceFunctionsMap =
+      boardState.board.availableSourceFunctionsMap;
+    if (!availableSourceFunctionsMap[sourceId]) {
+      try {
+        let functions: string[] = [];
+        if (renderMode === 'share') {
+          functions = await fetchAvailableSourceFunctionsAsyncForShare(
+            sourceId,
+            authorizedToken,
+          );
+        } else {
+          functions = await fetchAvailableSourceFunctionsAsync(sourceId);
+        }
+        return { value: functions, sourceId: sourceId };
+      } catch (err) {
+        throw err;
+      }
+    }
+    return false;
   },
 );

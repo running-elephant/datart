@@ -16,26 +16,29 @@
  * limitations under the License.
  */
 
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetMapper } from 'app/pages/DashBoardPage/components/WidgetMapper/WidgetMapper';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { WIDGET_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
 import { fillPx } from 'app/pages/DashBoardPage/utils';
 import { getFreeWidgetStyle } from 'app/pages/DashBoardPage/utils/widget';
-import produce from 'immer';
 import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
 import { DraggableCore, DraggableEventHandler } from 'react-draggable';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components/macro';
+import { WHITE } from 'styles/StyleConstants';
 import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
 import { BoardScaleContext } from '../../../components/FreeBoardBackground';
-import { editBoardStackActions } from '../slice';
+import { WidgetInfoContext } from '../../../components/WidgetProvider/WidgetInfoProvider';
+import { ORIGINAL_TYPE_MAP } from '../../../constants';
 import { widgetMove, widgetMoveEnd } from '../slice/events';
 import { selectSelectedIds } from '../slice/selectors';
 export enum DragTriggerTypes {
@@ -45,10 +48,15 @@ export enum DragTriggerTypes {
 export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const selectedIds = useSelector(selectSelectedIds);
   const widget = useContext(WidgetContext);
-  const { onUpdateWidgetConfig } = useContext(WidgetActionContext);
-
-  const dispatch = useDispatch();
+  const { boardType } = useContext(BoardContext);
+  const { editing: widgetEditing } = useContext(WidgetInfoContext);
+  const { onEditFreeWidgetRect } = useContext(WidgetActionContext);
   const scale = useContext(BoardScaleContext);
+  const hideHandle = useMemo(() => {
+    return (
+      widgetEditing && widget.config.originalType === ORIGINAL_TYPE_MAP.group
+    );
+  }, [widget.config.originalType, widgetEditing]);
   const { x, y, width, height } = widget.config.rect;
   const [curXY, setCurXY] = useState<[number, number]>([
     widget.config.rect.x,
@@ -72,12 +80,13 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
     [widget.id],
   );
   const moveEnd = useCallback(() => {
-    const nextConf = produce(widget.config, draft => {
-      draft.rect.x = curXY[0];
-      draft.rect.y = curXY[1];
-    });
-    onUpdateWidgetConfig(nextConf, widget.id);
-  }, [curXY, onUpdateWidgetConfig, widget.config, widget.id]);
+    const nextRect = {
+      ...widget.config.rect,
+      x: Number(curXY[0].toFixed(1)),
+      y: Number(curXY[1].toFixed(1)),
+    };
+    onEditFreeWidgetRect(nextRect, widget.id, false);
+  }, [curXY, onEditFreeWidgetRect, widget.config.rect, widget.id]);
   useEffect(() => {
     widgetMove.on(move);
     widgetMoveEnd.on(moveEnd);
@@ -127,15 +136,14 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const resizeStop = useCallback(
     (e: React.SyntheticEvent, { size }: ResizeCallbackData) => {
       e.stopPropagation();
-      dispatch(
-        editBoardStackActions.resizeWidgetEnd({
-          id: widget.id,
-          width: Number(size.width.toFixed(1)),
-          height: Number(size.height.toFixed(1)),
-        }),
-      );
+      const nextRect = {
+        ...widget.config.rect,
+        width: Number(size.width.toFixed(1)),
+        height: Number(size.height.toFixed(1)),
+      };
+      onEditFreeWidgetRect(nextRect, widget.id, false);
     },
-    [dispatch, widget.id],
+    [onEditFreeWidgetRect, widget.config.rect, widget.id],
   );
   const widgetStyle = getFreeWidgetStyle(widget);
   const style: React.CSSProperties = {
@@ -174,8 +182,8 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
         // resizeHandles={['se']}
         lockAspectRatio={false}
       >
-        <ItemWrap style={style} onClick={ssp}>
-          <WidgetMapper boardType="free" boardEditing={true} />
+        <ItemWrap style={style} onClick={ssp} hideHandle={hideHandle}>
+          <WidgetMapper boardEditing={true} hideTitle={false} />
         </ItemWrap>
       </Resizable>
     </DraggableCore>
@@ -184,7 +192,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
 
 export default WidgetOfFreeEdit;
 
-const ItemWrap = styled.div`
+const ItemWrap = styled.div<{ hideHandle?: boolean }>`
   box-sizing: border-box;
 
   & > span:last-child {
@@ -197,9 +205,10 @@ const ItemWrap = styled.div`
     position: relative;
   }
 
-  .react-resizable-handle {
+  & > .react-resizable-handle {
     position: absolute;
     box-sizing: border-box;
+    display: ${p => (p.hideHandle ? 'none' : 'block')};
     width: 20px;
     height: 20px;
     padding: 0 3px 3px 0;
@@ -209,9 +218,11 @@ const ItemWrap = styled.div`
     background-position: bottom right;
     background-origin: content-box;
   }
+
   &:hover .react-resizable-handle {
-    background-color: #fff;
+    background-color: ${WHITE};
   }
+
   .react-resizable-handle-se {
     right: 0;
     bottom: 0;

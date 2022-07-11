@@ -32,6 +32,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { TITLE_SUFFIX } from 'globalConstants';
 import { FC, memo, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
+import { ChartMockDataPanel } from '../ChartMockDataPanel';
 import { DetailPageHeader } from '../DetailPageHeader';
 
 const VizHeader: FC<{
@@ -89,6 +90,7 @@ const VizHeader: FC<{
     const t = useI18NPrefix(`viz.action`);
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    const [mockDataModal, setMockDataModal] = useState(false);
     const isArchived = Number(status) === 0;
 
     const handleCloseShareLinkModal = useCallback(() => {
@@ -122,7 +124,7 @@ const VizHeader: FC<{
           allowDownload={allowDownload}
           allowShare={allowShare}
           allowManage={allowManage}
-          isArchived={isArchived}
+          openMockData={() => setMockDataModal(true)}
           onPublish={Number(status) === 2 ? onPublish : ''}
           onRecycleViz={onRecycleViz}
         />
@@ -165,9 +167,11 @@ const VizHeader: FC<{
                   {t('edit')}
                 </Button>
               )}
-              <Dropdown key="more" arrow overlay={getOverlays()}>
-                <Button icon={<MoreOutlined />} />
-              </Dropdown>
+              {!isArchived && (
+                <Dropdown key="more" arrow overlay={getOverlays()}>
+                  <Button icon={<MoreOutlined />} />
+                </Dropdown>
+              )}
             </>
           }
         />
@@ -191,6 +195,12 @@ const VizHeader: FC<{
             handleOk={handleModalOk}
             handleCancel={handleModalCancel}
           ></SaveToDashboard>
+        )}
+        {mockDataModal && (
+          <ChartMockDataPanel
+            chartId={backendChartId || ''}
+            onClose={() => setMockDataModal(false)}
+          />
         )}
       </Wrapper>
     );

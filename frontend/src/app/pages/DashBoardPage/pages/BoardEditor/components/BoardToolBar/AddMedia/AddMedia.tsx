@@ -20,8 +20,8 @@ import { AppstoreAddOutlined } from '@ant-design/icons';
 import { Dropdown, Menu, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import widgetManagerInstance from 'app/pages/DashBoardPage/components/WidgetManager';
 import { LightWidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
 import { useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { addWidgetsToEditBoard } from '../../../slice/thunk';
@@ -30,18 +30,16 @@ import { BoardToolBarContext } from '../context/BoardToolBarContext';
 export const AddMedia: React.FC<{}> = () => {
   const t = useI18NPrefix(`viz.board.action`);
   const dispatch = useDispatch();
-  const { boardId, boardType } = useContext(BoardToolBarContext);
+  const { boardType } = useContext(BoardToolBarContext);
   const onSelectMediaWidget = useCallback(
     ({ keyPath }) => {
       const [mediaType] = keyPath;
-      const widget = widgetToolKit.media.create({
-        dashboardId: boardId,
+      const widget = widgetManagerInstance.toolkit(mediaType).create({
         boardType,
-        type: mediaType,
       });
       dispatch(addWidgetsToEditBoard([widget]));
     },
-    [boardId, boardType, dispatch],
+    [boardType, dispatch],
   );
   type TinyWidgetItems = {
     name: string;

@@ -22,9 +22,11 @@ import {
   Dashboard,
   DataChart,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { mainActions } from 'app/pages/MainPage/slice';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { getLoggedInUserPermissions } from 'app/pages/MainPage/slice/thunks';
 import { StoryBoard } from 'app/pages/StoryBoardPage/slice/types';
+import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { convertToChartDto } from 'app/utils/ChartDtoHelper';
@@ -150,13 +152,25 @@ export const deleteStoryboard = createAsyncThunk<
 
 export const addViz = createAsyncThunk<Folder, AddVizParams>(
   'viz/addViz',
-  async ({ viz, type }) => {
-    const { data } = await request2<Folder>({
-      url: `/viz/${type.toLowerCase()}s`,
-      method: 'POST',
-      data: viz,
-    });
-    return data;
+  async ({ viz, type }, { dispatch }) => {
+    if (type === 'TEMPLATE') {
+      const { data } = await request2<Folder>({
+        url: `/viz/import/template?parentId=${viz.parentId || ''}&orgId=${
+          viz.orgId
+        }&name=${viz.name}`,
+        method: 'POST',
+        data: viz.file,
+      });
+      dispatch(getFolders(viz.orgId as string));
+      return data;
+    } else {
+      const { data } = await request2<Folder>({
+        url: `/viz/${type.toLowerCase()}s`,
+        method: 'POST',
+        data: viz,
+      });
+      return data;
+    }
   },
 );
 
@@ -229,23 +243,59 @@ export const removeTab = createAsyncThunk<
   return null;
 });
 
+export const closeAllTabs = createAsyncThunk<
+  null,
+  { resolve: (selectedTab: string) => void },
+  { state: RootState }
+>('viz/closeAllTabs', async ({ resolve }, { getState, dispatch }) => {
+  dispatch(vizActions.closeAllTabs());
+  resolve('');
+  return null;
+});
+
+export const closeOtherTabs = createAsyncThunk<
+  null,
+  { id: string; resolve: (selectedTab: string) => void },
+  { state: RootState }
+>('viz/closeOtherTabs', async ({ id, resolve }, { getState, dispatch }) => {
+  dispatch(vizActions.closeOtherTabs(id));
+  const selectedTab = selectSelectedTab(getState());
+  resolve(selectedTab ? selectedTab.id : '');
+  return null;
+});
+
 export const initChartPreviewData = createAsyncThunk<
   { backendChartId: string },
   {
     backendChartId: string;
     orgId: string;
     filterSearchParams?: FilterSearchParams;
+    jumpFilterParams?: ChartDataRequestFilter[];
+    jumpVariableParams?: Record<string, any[]>;
   }
 >(
   'viz/initChartPreviewData',
-  async ({ backendChartId, filterSearchParams }, thunkAPI) => {
+  async (
+    {
+      backendChartId,
+      filterSearchParams,
+      jumpFilterParams,
+      jumpVariableParams,
+    },
+    thunkAPI,
+  ) => {
     await thunkAPI.dispatch(
-      fetchVizChartAction({ backendChartId, filterSearchParams }),
+      fetchVizChartAction({
+        backendChartId,
+        filterSearchParams,
+        jumpFilterParams,
+      }),
     );
     if (backendChartId) {
       await thunkAPI.dispatch(
         fetchDataSetByPreviewChartAction({
           backendChartId,
+          jumpVariableParams,
         }),
       );
     }
@@ -255,7 +305,11 @@ export const initChartPreviewData = createAsyncThunk<
 
 export const fetchVizChartAction = createAsyncThunk(
   'viz/fetchVizChartAction',
-  async (arg: { backendChartId; filterSearchParams?: FilterSearchParams }) => {
+  async (arg: {
+    backendChartId;
+    filterSearchParams?: FilterSearchParams;
+    jumpFilterParams?: ChartDataRequestFilter[];
+  }) => {
     const response = await request2<
       Omit<ChartDTO, 'config'> & { config: string }
     >({
@@ -265,10 +319,34 @@ export const fetchVizChartAction = createAsyncThunk(
     return {
       data: convertToChartDto(response?.data),
       filterSearchParams: arg.filterSearchParams,
+      jumpFilterParams: arg.jumpFilterParams,
     };
   },
 );
-
+export const exportChartTpl = createAsyncThunk(
+  'viz/exportChartTpl',
+  async (arg: { chartId; dataset; callBack }, thunkAPI) => {
+    const vizState = (thunkAPI.getState() as RootState)?.viz as VizState;
+    const { chartId, dataset, callBack } = arg;
+    const dataChart = vizState.chartPreviews.find(
+      item => item.backendChartId === chartId,
+    );
+    const newConf = { ...dataChart?.backendChart?.config };
+    newConf.sampleData = dataset;
+    // newConf.
+    const newChart = {
+      avatar: newConf.chartGraphId, //
+      config: JSON.stringify(newConf),
+    };
+    await request2<any>({
+      url: `viz/export/datachart/template`,
+      method: 'POST',
+      data: { datachart: newChart },
+    });
+    callBack();
+    thunkAPI.dispatch(mainActions.setDownloadPolling(true));
+  },
+);
 export const fetchDataSetByPreviewChartAction = createAsyncThunk(
   'viz/fetchDataSetByPreviewChartAction',
   async (
@@ -277,6 +355,7 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
       pageInfo?;
       sorter?: { column: string; operator: string; aggOperator?: string };
       drillOption?: IChartDrillOption;
+      jumpVariableParams?: Record<string, any[]>;
     },
     thunkAPI,
   ) => {
@@ -284,12 +363,20 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
     const currentChartPreview = vizState?.chartPreviews?.find(
       c => c.backendChartId === arg.backendChartId,
     );
+    if (!currentChartPreview?.backendChart?.view.id) {
+      return {
+        backendChartId: currentChartPreview?.backendChartId,
+        data: currentChartPreview?.backendChart?.config.sampleData || [],
+      };
+    }
     const builder = new ChartDataRequestBuilder(
       {
         id: currentChartPreview?.backendChart?.view.id || '',
         config: currentChartPreview?.backendChart?.view.config || {},
+        meta: currentChartPreview?.backendChart?.view.meta,
         computedFields:
           currentChartPreview?.backendChart?.config?.computedFields || [],
+        type: currentChartPreview?.backendChart?.view.type || 'SQL',
       },
       currentChartPreview?.chartConfig?.datas,
       currentChartPreview?.chartConfig?.settings,
@@ -297,9 +384,11 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
       false,
       currentChartPreview?.backendChart?.config?.aggregation,
     );
+
     const data = builder
       .addExtraSorters(arg?.sorter ? [arg?.sorter as any] : [])
       .addDrillOption(arg?.drillOption)
+      .addVariableParams(arg?.jumpVariableParams)
       .build();
 
     const response = await request2({

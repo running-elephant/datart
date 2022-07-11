@@ -26,10 +26,10 @@ import { useLocation, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
 import { getToken } from 'utils/auth';
 import persistence from 'utils/persistence';
+import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
 import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
-import { urlSearchTransfer } from '../MainPage/pages/VizPage/utils';
 import ChartForShare from './ChartForShare';
 import PasswordModal from './PasswordModal';
 import ShareLoginModal from './ShareLoginModal';
@@ -38,10 +38,11 @@ import {
   selectAvailableSourceFunctions,
   selectChartPreview,
   selectNeedVerify,
+  selectShareExecuteTokenMap,
   selectShareVizType,
 } from './slice/selectors';
 import {
-  fetchAvailableSourceFunctions,
+  fetchAvailableSourceFunctionsForShare,
   fetchShareVizInfo,
 } from './slice/thunks';
 export function ShareChart() {
@@ -59,6 +60,7 @@ export function ShareChart() {
   const chartPreview = useSelector(selectChartPreview);
   const vizType = useSelector(selectShareVizType);
   const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
+  const shareExecuteTokenMap = useSelector(selectShareExecuteTokenMap);
 
   const shareType = useRouteQuery({
     key: 'type',
@@ -72,6 +74,7 @@ export function ShareChart() {
   const searchParams = useMemo(() => {
     return urlSearchTransfer.toParams(search);
   }, [search]);
+
   const loadVizData = () => {
     if (shareType === 'CODE') {
       const previousPassword = persistence.session.get(shareToken);
@@ -90,21 +93,28 @@ export function ShareChart() {
   useMount(() => {
     ChartManager.instance()
       .load()
+      .then(() => loadVizData())
       .catch(err => console.error('Fail to load customize charts with ', err));
-
-    loadVizData();
   });
 
   useEffect(() => {
     const sourceId = chartPreview?.backendChart?.view.sourceId;
-    if (sourceId) {
+    const viewId = chartPreview?.backendChart?.view.id;
+
+    if (sourceId && viewId) {
       dispatch(
-        fetchAvailableSourceFunctions({
+        fetchAvailableSourceFunctionsForShare({
           sourceId: sourceId,
+          executeToken: shareExecuteTokenMap[viewId].authorizedToken,
         }),
       );
     }
-  }, [chartPreview?.backendChart?.view.sourceId, dispatch]);
+  }, [
+    chartPreview?.backendChart?.view.sourceId,
+    chartPreview?.backendChart?.view.id,
+    dispatch,
+    shareExecuteTokenMap,
+  ]);
 
   const fetchShareVizInfoImpl = useCallback(
     (
@@ -170,6 +180,7 @@ export function ShareChart() {
       {!Boolean(needVerify) && chartPreview && chartPreview?.backendChart && (
         <ChartForShare
           chartPreview={chartPreview}
+          filterSearchParams={searchParams}
           availableSourceFunctions={availableSourceFunctions}
         />
       )}

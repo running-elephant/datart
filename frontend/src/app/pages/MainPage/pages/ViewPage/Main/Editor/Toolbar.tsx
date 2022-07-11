@@ -65,263 +65,273 @@ import { isNewView } from '../../utils';
 interface ToolbarProps {
   allowManage: boolean;
   allowEnableViz: boolean | undefined;
+  type: 'STRUCT' | 'SQL';
 }
 
-export const Toolbar = memo(({ allowManage, allowEnableViz }: ToolbarProps) => {
-  const { actions } = useViewSlice();
-  const dispatch = useDispatch();
-  const { onRun, onSave } = useContext(EditorContext);
-  const { showSaveForm } = useContext(SaveFormContext);
-  const sources = useSelector(selectSources);
-  const history = useHistory();
-  const histState = history.location.state as any;
-  const viewsData = useSelector(selectViews);
-  const t = useI18NPrefix('view.editor');
-  const saveAsView = useSaveAsView();
-  const startAnalysis = useStartAnalysis();
-  const id = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'id' }),
-  ) as string;
-  const name = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'name' }),
-  ) as string;
-  const parentId = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'parentId' }),
-  ) as string;
-  const config = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'config' }),
-  ) as object;
-  const sourceId = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'sourceId' }),
-  ) as string;
-  const stage = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'stage' }),
-  ) as ViewViewModelStages;
-  const status = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'status' }),
-  ) as ViewStatus;
-  const script = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'script' }),
-  ) as string;
-  const fragment = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'fragment' }),
-  ) as string;
-  const size = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'size' }),
-  ) as number;
-  const error = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'error' }),
-  ) as string;
-  const ViewIndex = useSelector(state =>
-    selectCurrentEditingViewAttr(state, { name: 'index' }),
-  ) as number;
-  const isArchived = status === ViewStatus.Archived;
+export const Toolbar = memo(
+  ({ allowManage, allowEnableViz, type }: ToolbarProps) => {
+    const { actions } = useViewSlice();
+    const dispatch = useDispatch();
+    const { onRun, onSave } = useContext(EditorContext);
+    const { showSaveForm } = useContext(SaveFormContext);
+    const sources = useSelector(selectSources);
+    const history = useHistory();
+    const histState = history.location.state as any;
+    const viewsData = useSelector(selectViews);
+    const t = useI18NPrefix('view.editor');
+    const saveAsView = useSaveAsView();
+    const startAnalysis = useStartAnalysis();
+    const id = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'id' }),
+    ) as string;
+    const name = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'name' }),
+    ) as string;
+    const parentId = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'parentId' }),
+    ) as string;
+    const config = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'config' }),
+    ) as object;
+    const sourceId = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'sourceId' }),
+    ) as string;
+    const stage = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'stage' }),
+    ) as ViewViewModelStages;
+    const status = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'status' }),
+    ) as ViewStatus;
+    const script = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'script' }),
+    ) as string;
+    const fragment = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'fragment' }),
+    ) as string;
+    const size = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'size' }),
+    ) as number;
+    const error = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'error' }),
+    ) as string;
+    const ViewIndex = useSelector(state =>
+      selectCurrentEditingViewAttr(state, { name: 'index' }),
+    ) as number;
+    const isArchived = status === ViewStatus.Archived;
 
-  const formatSQL = useCallback(() => {
-    dispatch(
-      actions.changeCurrentEditingView({
-        script: format(script),
-      }),
+    const formatSQL = useCallback(() => {
+      dispatch(
+        actions.changeCurrentEditingView({
+          script: format(script),
+        }),
+      );
+    }, [dispatch, actions, script]);
+
+    const showEdit = useCallback(() => {
+      showSaveForm({
+        type: CommonFormTypes.Edit,
+        visible: true,
+        initialValues: {
+          name,
+          parentId,
+          config,
+        },
+        parentIdLabel: t('folder'),
+        onSave: (values, onClose) => {
+          let index = ViewIndex;
+
+          if (isParentIdEqual(parentId, values.parentId)) {
+            index = getInsertedNodeIndex(values, viewsData);
+          }
+
+          dispatch(
+            actions.changeCurrentEditingView({
+              ...values,
+              parentId: values.parentId || null,
+              index,
+            }),
+          );
+          dispatch(saveView({ resolve: onClose }));
+        },
+      });
+    }, [
+      showSaveForm,
+      actions,
+      dispatch,
+      name,
+      parentId,
+      config,
+      viewsData,
+      ViewIndex,
+      t,
+    ]);
+
+    const sourceChange = useCallback(
+      value => {
+        dispatch(actions.changeCurrentEditingView({ sourceId: value }));
+      },
+      [dispatch, actions],
     );
-  }, [dispatch, actions, script]);
 
-  const showEdit = useCallback(() => {
-    showSaveForm({
-      type: CommonFormTypes.Edit,
-      visible: true,
-      initialValues: {
-        name,
-        parentId,
-        config,
+    const sizeMenuClick = useCallback(
+      ({ key }) => {
+        dispatch(actions.changeCurrentEditingView({ size: Number(key) }));
       },
-      parentIdLabel: t('folder'),
-      onSave: (values, onClose) => {
-        let index = ViewIndex;
+      [dispatch, actions],
+    );
 
-        if (isParentIdEqual(parentId, values.parentId)) {
-          index = getInsertedNodeIndex(values, viewsData);
-        }
+    useEffect(() => {
+      if (histState?.sourcesId && sources) {
+        sourceChange(histState.sourcesId);
+      }
+    }, [histState?.sourcesId, sourceChange, sources]);
 
-        dispatch(
-          actions.changeCurrentEditingView({
-            ...values,
-            parentId: values.parentId || null,
-            index,
-          }),
-        );
-        dispatch(saveView({ resolve: onClose }));
-      },
-    });
-  }, [
-    showSaveForm,
-    actions,
-    dispatch,
-    name,
-    parentId,
-    config,
-    viewsData,
-    ViewIndex,
-    t,
-  ]);
-
-  const sourceChange = useCallback(
-    value => {
-      dispatch(actions.changeCurrentEditingView({ sourceId: value }));
-    },
-    [dispatch, actions],
-  );
-
-  const sizeMenuClick = useCallback(
-    ({ key }) => {
-      dispatch(actions.changeCurrentEditingView({ size: Number(key) }));
-    },
-    [dispatch, actions],
-  );
-
-  useEffect(() => {
-    if (histState?.sourcesId && sources) {
-      sourceChange(histState.sourcesId);
-    }
-  }, [histState?.sourcesId, sourceChange, sources]);
-
-  return (
-    <Container>
-      <Operates>
-        <Space split={<Divider type="vertical" className="divider" />}>
-          {allowManage && (
-            <Select
-              placeholder={t('source')}
-              value={sourceId}
-              bordered={false}
-              disabled={isArchived}
-              onChange={sourceChange}
-              className="source"
-            >
-              {sources.map(({ id, name }) => (
-                <Select.Option key={id} value={id}>
-                  {name}
-                </Select.Option>
-              ))}
-            </Select>
-          )}
-          <Space>
-            <Tooltip
-              title={
-                <TipTitle
-                  title={[
-                    `${fragment ? t('runSelection') : t('run')}`,
-                    t('runWinTip'),
-                    t('runMacTip'),
-                  ]}
-                />
+    return (
+      <Container>
+        <Operates>
+          <Space split={<Divider type="vertical" className="divider" />}>
+            {type === 'SQL' && (
+              <>
+                {allowManage && (
+                  <Select
+                    placeholder={t('source')}
+                    value={sourceId}
+                    bordered={false}
+                    disabled={isArchived}
+                    onChange={sourceChange}
+                    className="source"
+                  >
+                    {sources.map(({ id, name }) => (
+                      <Select.Option key={id} value={id}>
+                        {name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                )}
+                <Space>
+                  <Tooltip
+                    title={
+                      <TipTitle
+                        title={[
+                          `${fragment ? t('runSelection') : t('run')}`,
+                          t('runWinTip'),
+                          t('runMacTip'),
+                        ]}
+                      />
+                    }
+                    placement="bottom"
+                  >
+                    <ToolbarButton
+                      icon={
+                        stage === ViewViewModelStages.Running ? (
+                          <PauseOutlined />
+                        ) : (
+                          <CaretRightOutlined />
+                        )
+                      }
+                      color={fragment ? WARNING : INFO}
+                      onClick={onRun}
+                    />
+                  </Tooltip>
+                  <Tooltip title={t('beautify')} placement="bottom">
+                    <ToolbarButton
+                      icon={<AlignCenterOutlined />}
+                      disabled={isArchived}
+                      onClick={formatSQL}
+                    />
+                  </Tooltip>
+                </Space>
+              </>
+            )}
+            <Dropdown
+              trigger={['click']}
+              overlay={
+                <Menu onClick={sizeMenuClick}>
+                  {PREVIEW_SIZE_LIST.map(s => (
+                    <Menu.Item key={s}>{s}</Menu.Item>
+                  ))}
+                </Menu>
               }
-              placement="bottom"
             >
-              <ToolbarButton
-                icon={
-                  stage === ViewViewModelStages.Running ? (
-                    <PauseOutlined />
-                  ) : (
-                    <CaretRightOutlined />
-                  )
-                }
-                color={fragment ? WARNING : INFO}
-                onClick={onRun}
-              />
-            </Tooltip>
-            <Tooltip title={t('beautify')} placement="bottom">
-              <ToolbarButton
-                icon={<AlignCenterOutlined />}
-                disabled={isArchived}
-                onClick={formatSQL}
-              />
-            </Tooltip>
+              <ToolbarButton size="small">{`Limit: ${size}`}</ToolbarButton>
+            </Dropdown>
+            <Chronograph
+              running={stage === ViewViewModelStages.Running}
+              status={
+                error
+                  ? 'error'
+                  : stage >= ViewViewModelStages.Running
+                  ? stage === ViewViewModelStages.Running
+                    ? 'processing'
+                    : 'success'
+                  : 'default'
+              }
+            />
           </Space>
-          <Dropdown
-            trigger={['click']}
-            overlay={
-              <Menu onClick={sizeMenuClick}>
-                {PREVIEW_SIZE_LIST.map(s => (
-                  <Menu.Item key={s}>{s}</Menu.Item>
-                ))}
-              </Menu>
-            }
-          >
-            <ToolbarButton size="small">{`Limit: ${size}`}</ToolbarButton>
-          </Dropdown>
-          <Chronograph
-            running={stage === ViewViewModelStages.Running}
-            status={
-              error
-                ? 'error'
-                : stage >= ViewViewModelStages.Running
-                ? stage === ViewViewModelStages.Running
-                  ? 'processing'
-                  : 'success'
-                : 'default'
-            }
-          />
-        </Space>
-      </Operates>
-      <Actions>
-        <Space>
-          {allowManage && (
-            <Tooltip
-              title={
-                <TipTitle
-                  title={[t('save'), t('saveWinTip'), t('saveMacTip')]}
+        </Operates>
+
+        <Actions>
+          <Space>
+            {allowManage && (
+              <Tooltip
+                title={
+                  <TipTitle
+                    title={[t('save'), t('saveWinTip'), t('saveMacTip')]}
+                  />
+                }
+                placement="bottom"
+              >
+                <ToolbarButton
+                  icon={<SaveFilled />}
+                  disabled={
+                    isArchived || stage !== ViewViewModelStages.Saveable
+                  }
+                  color={INFO}
+                  onClick={onSave}
                 />
-              }
-              placement="bottom"
-            >
-              <ToolbarButton
-                icon={<SaveFilled />}
-                disabled={isArchived || stage !== ViewViewModelStages.Saveable}
-                color={INFO}
-                onClick={onSave}
-              />
-            </Tooltip>
-          )}
-          {allowManage && (
-            <Tooltip title={t('info')} placement="bottom">
-              <ToolbarButton
-                icon={<SettingFilled />}
-                disabled={isArchived || isNewView(id)}
-                color={INFO}
-                onClick={showEdit}
-              />
-            </Tooltip>
-          )}
-          {allowManage && (
-            <Tooltip title={t('saveAs')} placement="bottom">
-              <ToolbarButton
-                icon={<CopyFilled />}
-                onClick={() => saveAsView(id)}
-                disabled={isNewView(id)}
-                color={INFO}
-              />
-            </Tooltip>
-          )}
-          {/* <Tooltip title={t('saveFragment')} placement="bottom">
+              </Tooltip>
+            )}
+            {allowManage && (
+              <Tooltip title={t('info')} placement="bottom">
+                <ToolbarButton
+                  icon={<SettingFilled />}
+                  disabled={isArchived || isNewView(id)}
+                  color={INFO}
+                  onClick={showEdit}
+                />
+              </Tooltip>
+            )}
+            {allowManage && (
+              <Tooltip title={t('saveAs')} placement="bottom">
+                <ToolbarButton
+                  icon={<CopyFilled />}
+                  onClick={() => saveAsView(id)}
+                  disabled={isNewView(id)}
+                  color={INFO}
+                />
+              </Tooltip>
+            )}
+            {/* <Tooltip title={t('saveFragment')} placement="bottom">
             <ToolbarButton icon={<SnippetsFilled />} />
           </Tooltip> */}
-          {allowEnableViz && (
-            <Tooltip title={t('startAnalysis')} placement="bottom">
-              <ToolbarButton
-                disabled={isNewView(id)}
-                icon={<MonitorOutlined />}
-                color={INFO}
-                onClick={() => {
-                  startAnalysis(id);
-                }}
-              />
-            </Tooltip>
-          )}
-        </Space>
-      </Actions>
-    </Container>
-  );
-});
+            {allowEnableViz && (
+              <Tooltip title={t('startAnalysis')} placement="bottom">
+                <ToolbarButton
+                  disabled={isNewView(id)}
+                  icon={<MonitorOutlined />}
+                  color={INFO}
+                  onClick={() => {
+                    startAnalysis(id);
+                  }}
+                />
+              </Tooltip>
+            )}
+          </Space>
+        </Actions>
+      </Container>
+    );
+  },
+);
 
 const Container = styled.div`
   z-index: ${LEVEL_1};

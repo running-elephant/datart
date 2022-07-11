@@ -19,7 +19,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CommonFormTypes } from 'globalConstants';
 import { useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle, getInsertedNodeIndex } from 'utils/utils';
 import { SaveFormContext, SaveFormModel } from '../SaveFormContext';
 import { selectVizs } from '../slice/selectors';
@@ -35,7 +35,7 @@ export function useSaveAsViz() {
   const getVizDetail = useCallback(
     async (backendChartId: string, type: string) => {
       try {
-        const { data } = await request<any>({
+        const { data } = await request2<any>({
           method: 'GET',
           url: `viz/${type.toLowerCase()}s/${backendChartId}`,
         });
@@ -55,7 +55,7 @@ export function useSaveAsViz() {
       let vizData = await getVizDetail(vizId, type).then(data => {
         return data;
       });
-      const boardType = JSON.parse(vizData.config)?.type;
+      const boardType = JSON.parse(vizData.config || '{}')?.type;
 
       showSaveForm({
         vizType: type,

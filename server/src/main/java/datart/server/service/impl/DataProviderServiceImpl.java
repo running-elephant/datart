@@ -36,6 +36,7 @@ import datart.core.entity.RelSubjectColumns;
 import datart.core.entity.Source;
 import datart.core.entity.View;
 import datart.core.mappers.ext.RelSubjectColumnsMapperExt;
+import datart.core.data.provider.ScriptType;
 import datart.security.util.AESUtil;
 import datart.server.base.dto.VariableValue;
 import datart.server.base.params.TestExecuteParam;
@@ -192,6 +193,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                 .test(true)
                 .sourceId(source.getId())
                 .script(testExecuteParam.getScript())
+                .scriptType(testExecuteParam.getScriptType())
                 .variables(variables)
                 .build();
         DataProviderSource providerSource = parseDataProviderConfig(source);
@@ -199,7 +201,8 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         ExecuteParam executeParam = ExecuteParam
                 .builder()
                 .pageInfo(PageInfo.builder().pageNo(1).pageSize(testExecuteParam.getSize()).countTotal(false).build())
-                .includeColumns(Collections.singleton("*"))
+                .includeColumns(Collections.singleton(SelectColumn.of(null, "*")))
+                .columns(testExecuteParam.getColumns())
                 .serverAggregate((boolean) providerSource.getProperties().getOrDefault(SERVER_AGGREGATE, false))
                 .cacheEnable(false)
                 .build();
@@ -231,7 +234,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         RequestContext.setScriptPermission(scriptPermission);
 
         //permission and variables
-        Set<String> columns = parseColumnPermission(view);
+        Set<SelectColumn> columns = parseColumnPermission(view);
         List<ScriptVariable> variables = parseVariables(view, viewExecuteParam);
 
         if (securityManager.isOrgOwner(view.getOrgId())) {
@@ -242,6 +245,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                 .test(false)
                 .sourceId(source.getId())
                 .script(view.getScript())
+                .scriptType(view.getType() == null ? ScriptType.SQL : ScriptType.valueOf(view.getType()))
                 .variables(variables)
                 .schema(parseSchema(view.getModel()))
                 .build();
@@ -301,8 +305,11 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         if (!value.startsWith(Const.ENCRYPT_FLAG)) {
             return value;
         }
-        String res = AESUtil.decrypt(value.replaceFirst(Const.ENCRYPT_FLAG, ""));
-        return res;
+        try {
+            return AESUtil.decrypt(value.replaceFirst(Const.ENCRYPT_FLAG, ""));
+        } catch (Exception e) {
+            return value;
+        }
     }
 
     @Override
@@ -391,16 +398,22 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                 var.isExpression());
     }
 
-    private Set<String> parseColumnPermission(View view) {
+    private Set<SelectColumn> parseColumnPermission(View view) {
         if (securityManager.isOrgOwner(view.getOrgId())) {
-            return Collections.singleton("*");
+            return Collections.singleton(SelectColumn.of(null, "*"));
         }
         try {
-            Set<String> columns = new HashSet<>();
+            Set<SelectColumn> columns = new HashSet<>();
             List<RelSubjectColumns> relSubjectColumns = rscMapper.listByUser(view.getId(), getCurrentUser().getId());
             for (RelSubjectColumns relSubjectColumn : relSubjectColumns) {
                 List<String> cols = (List<String>) objectMapper.readValue(relSubjectColumn.getColumnPermission(), ArrayList.class);
-                columns.addAll(cols);
+                if (!CollectionUtils.isEmpty(cols)) {
+                    for (String col : cols) {
+                        if (StringUtils.isNotBlank(col)) {
+                            columns.add(SelectColumn.of(null, col.split("\\.")));
+                        }
+                    }
+                }
             }
             return columns;
         } catch (Exception e) {
@@ -431,18 +444,18 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                         if (children != null && children.size() > 0) {
                             for (int i = 0; i < children.size(); i++) {
                                 JSONObject child = children.getJSONObject(i);
-                                schema.put(child.getString("name"), new Column(child.getString("name"), ValueType.valueOf(child.getString("type"))));
+                                schema.put(child.getString("name"), Column.of(ValueType.valueOf(child.getString("type")), child.getString("name").split("\\.")));
                             }
                         }
                     } else {
-                        schema.put(key, new Column(key, ValueType.valueOf(item.getString("type"))));
+                        schema.put(key, Column.of(ValueType.valueOf(item.getString("type")), key));
                     }
                 }
             } else {
                 // 兼容1.0.0-beta.1以前的版本
                 for (String key : jsonObject.keySet()) {
                     ValueType type = ValueType.valueOf(jsonObject.getJSONObject(key).getString("type"));
-                    schema.put(key, new Column(key, type));
+                    schema.put(key, Column.of(type, key));
                 }
             }
         } catch (Exception e) {
