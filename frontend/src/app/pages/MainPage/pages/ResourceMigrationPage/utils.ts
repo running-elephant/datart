@@ -33,3 +33,18 @@ export async function onImport(args: {
     return error;
   }
 }
+
+export async function onExport(idList) {
+  try {
+    const response = await request2<any>({
+      method: 'POST',
+      url: `viz/export`,
+      data: {
+        resources: idList,
+      },
+    });
+    return true;
+  } catch (error) {
+    return error;
+  }
+}

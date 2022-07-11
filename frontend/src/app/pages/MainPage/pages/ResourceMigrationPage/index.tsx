@@ -15,18 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { request2 } from 'utils/request';
-export async function onExport(idList) {
-  try {
-    const response = await request2<any>({
-      method: 'POST',
-      url: `viz/export`,
-      data: {
-        resources: idList,
-      },
-    });
-    return true;
-  } catch (error) {
-    return error;
-  }
-}
+
+import { FC, memo } from 'react';
+import styled from 'styled-components/macro';
+import { ExportPage } from './ExportPage';
+import { ImportPage } from './ImportPage';
+
+export const ResourceMigrationPage: FC<{}> = memo(() => {
+  return (
+    <StyledWrapper>
+      <ExportPage />
+      <ImportPage />
+    </StyledWrapper>
+  );
+});
+const StyledWrapper = styled.div`
+  flex: 1;
+  overflow-y: auto;
+`;

@@ -18,8 +18,8 @@ import {
   selectOrgId,
   selectPermissionMap,
 } from '../../slice/selectors';
-import { FileUpload } from '../ImportPage/FileUpload';
 import { PermissionLevels, ResourceTypes } from '../PermissionPage/constants';
+import { FileUpload } from '../ResourceMigrationPage/FileUpload';
 import { SaveFormContext } from './SaveFormContext';
 import {
   makeSelectVizFolderTree,
