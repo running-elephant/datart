@@ -97,7 +97,9 @@ export const adjustGroupWidgets = (args: {
     const curGroup = widgetMap[gid];
     if (!curGroup) return;
     if (curGroup.config.originalType !== ORIGINAL_TYPE_MAP.group) return;
-    if (args.isAutoGroupWidget) return;
+    if (args.isAutoGroupWidget) {
+      return;
+    }
     if (!curGroup.config.children) {
       delete widgetMap[gid];
       return;

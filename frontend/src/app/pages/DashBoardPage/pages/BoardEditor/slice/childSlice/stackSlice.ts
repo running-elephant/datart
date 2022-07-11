@@ -323,7 +323,12 @@ export const editBoardStackSlice = createSlice({
         height: newRect.height - oldRect.height,
       };
       targetWidget.config.rect = newRect;
+
+      // NOTE: if group is auto, should not adjust all children and itself rect.
       const isAutoGroupWidget = action.payload.isAutoGroupWidget;
+      if (isAutoGroupWidget) {
+        return;
+      }
 
       if (
         !targetWidget.parentId &&
@@ -346,7 +351,6 @@ export const editBoardStackSlice = createSlice({
         adjustGroupWidgets({
           groupIds: parentIds,
           widgetMap,
-          isAutoGroupWidget,
         });
       }
 
@@ -361,7 +365,6 @@ export const editBoardStackSlice = createSlice({
         adjustGroupWidgets({
           groupIds: parentIds,
           widgetMap,
-          isAutoGroupWidget,
         });
       }
     },
