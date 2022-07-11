@@ -220,7 +220,7 @@ const workbenchSlice = createSlice({
           variables: payload.queryVariables || [],
           computedFields: mergeChartAndViewComputedField(
             chartConfigDTO?.computedFields,
-            payload.view.computedFields,
+            payload?.view?.computedFields,
           ),
         };
         state.backendChart = payload;
