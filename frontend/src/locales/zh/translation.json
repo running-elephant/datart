@@ -198,6 +198,9 @@
       "orgSettings": {
         "title": "组织设置"
       },
+      "resourceMigration": {
+        "title": "资源迁移管理"
+      },
       "export": {
         "title": "数据导出",
         "selectText": "选择要导出的数据",
@@ -960,7 +963,7 @@
     },
     "action": {
       "common": {
-        "downloadForExcel": "下载为 Excel",
+        "exportForExcel": "导出到 Excel",
         "confirm": "请确认",
         "ok": "确认",
         "cancel": "取消",
@@ -986,9 +989,9 @@
         "enablePassword": "启用密码",
         "generateLink": "生成链接",
         "shareLink": "分享管理",
-        "downloadData": "下载为 Excel",
-        "downloadPDF": "下载为 PDF",
-        "downloadPicture": "下载为 图片",
+        "exportData": "导出到 Excel",
+        "exportPDF": "导出到 PDF",
+        "exportPicture": "导出到 图片",
         "exportTpl": "导出为 模版",
         "NONE": "无",
         "CODE": "口令",
