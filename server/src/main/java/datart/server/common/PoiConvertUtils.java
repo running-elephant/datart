@@ -30,6 +30,17 @@ public class PoiConvertUtils {
         boolean isNormalTable = "mingxi-table".equals(chartConfigDTO.getChartGraphId());
         List<ChartColumn> chartColumns = getColumnsFromConfig(chartConfigDTO.getChartConfig().getDatas()); //获取列信息
 
+        //支持钻取的图表，数据集列数量少于图表配置列数量
+        if (chartColumns.size() != dataframe.getColumns().size()) {
+            Map<String, Void> nameMap = new CaseInsensitiveMap<>();
+            for (Column column : dataframe.getColumns()) {
+                nameMap.put(column.columnKey(), null);
+            }
+            chartColumns = chartColumns
+                    .stream()
+                    .filter(chartColumn -> nameMap.containsKey(chartColumn.getDisplayName()))
+                    .collect(Collectors.toList());
+        }
         List<ChartColumn> groupColumns = Lists.newArrayList();
         Map<Integer, ColumnSetting> columnSetting = new HashMap<>();
         if (isNormalTable) { // 若为普通表格，获取表头分组信息
