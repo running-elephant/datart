@@ -111,7 +111,7 @@ const VizOperationMenu: FC<{
 
       if (allowDownload && onDownloadDataLinkClick) {
         menus.push(
-          <Menu.Item key="downloadData" icon={<CloudDownloadOutlined />}>
+          <Menu.Item key="exportData" icon={<CloudDownloadOutlined />}>
             <Popconfirm
               placement="left"
               title={t('common.confirm')}
@@ -121,10 +121,10 @@ const VizOperationMenu: FC<{
               okText={t('common.ok')}
               cancelText={t('common.cancel')}
             >
-              {t('share.downloadData')}
+              {t('share.exportData')}
             </Popconfirm>
           </Menu.Item>,
-          <Menu.Item key="downloadPDF" icon={<CloudDownloadOutlined />}>
+          <Menu.Item key="exportPDF" icon={<CloudDownloadOutlined />}>
             <Popconfirm
               placement="left"
               title={t('common.confirm')}
@@ -134,10 +134,10 @@ const VizOperationMenu: FC<{
               okText={t('common.ok')}
               cancelText={t('common.cancel')}
             >
-              {t('share.downloadPDF')}
+              {t('share.exportPDF')}
             </Popconfirm>
           </Menu.Item>,
-          <Menu.Item key="downloadPicture" icon={<CloudDownloadOutlined />}>
+          <Menu.Item key="exportPicture" icon={<CloudDownloadOutlined />}>
             <Popconfirm
               placement="left"
               title={t('common.confirm')}
@@ -147,7 +147,7 @@ const VizOperationMenu: FC<{
               okText={t('common.ok')}
               cancelText={t('common.cancel')}
             >
-              {t('share.downloadPicture')}
+              {t('share.exportPicture')}
             </Popconfirm>
           </Menu.Item>,
           <Menu.Item key="exportTpl" icon={<CloudDownloadOutlined />}>
