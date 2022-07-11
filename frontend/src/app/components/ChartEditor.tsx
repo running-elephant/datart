@@ -685,7 +685,6 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       dataview?.computedFields,
       true,
     );
-
     dispatch(actions.updateCurrentDataViewComputedFields(computedFields));
 
     dispatch(

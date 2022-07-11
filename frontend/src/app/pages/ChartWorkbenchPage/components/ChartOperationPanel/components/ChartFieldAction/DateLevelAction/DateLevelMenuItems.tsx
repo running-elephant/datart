@@ -22,18 +22,26 @@ import {
   RUNTIME_DATE_LEVEL_KEY,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { FieldTemplate } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartDataViewPanel/components/utils';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import React, { memo, useCallback } from 'react';
 import { DATE_LEVELS } from '../../../../../slice/constant';
-
 interface DateLevelMenuItemsProps {
   availableSourceFunctions?: string[];
   config;
+  metas?: ChartDataViewMeta[];
   onChange;
 }
 
 const DateLevelMenuItems = memo(
-  ({ availableSourceFunctions, config, onChange }: DateLevelMenuItemsProps) => {
+  ({
+    availableSourceFunctions,
+    config,
+    metas,
+    onChange,
+  }: DateLevelMenuItemsProps) => {
     const t = useI18NPrefix(`viz.workbench.dataview`);
     const handleChangeFn = useCallback(
       selectedConfig => {
@@ -105,16 +113,14 @@ const DateLevelMenuItems = memo(
           {t('default')}
         </Menu.Item>
         {DATE_LEVELS.map(item => {
-          if (
-            availableSourceFunctions &&
-            availableSourceFunctions.includes(item.expression)
-          ) {
-            const colName = t(item.expression);
-            const expression = `${item.expression}(${
-              config.category === ChartDataViewFieldCategory.Field
-                ? config.colName
-                : config.field
-            })`;
+          if (availableSourceFunctions?.includes(item.expression)) {
+            const colName = item.name;
+            const row = getAllColumnInMeta(metas)?.find(
+              v => v.name === config.field,
+            );
+            const expression = `${item.expression}(${FieldTemplate(
+              row?.path,
+            )})`;
 
             return (
               <Menu.Item

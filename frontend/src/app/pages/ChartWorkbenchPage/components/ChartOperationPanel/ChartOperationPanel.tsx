@@ -92,6 +92,7 @@ const ChartOperationPanel: FC<{
             containerWidth={
               layout.getNodeById('present-wrapper').getRect().width
             }
+            dataView={dataView}
             chart={chart}
             dataset={dataset}
             expensiveQuery={expensiveQuery}
