@@ -157,32 +157,36 @@ export const TimeSetter: React.FC<{
     },
     [form, getControllerConfig],
   );
-  const renderROE = useCallback((name, onChange: (value: any) => void) => {
-    return (
-      <Form.Item
-        name={name}
-        noStyle
-        shouldUpdate
-        validateTrigger={['onBlur']}
-        rules={[{ required: true }]}
-      >
-        <Select style={{ width: '100px' }} onChange={onChange}>
-          <Select.Option
-            key={TimeFilterValueCategory.Exact}
-            value={TimeFilterValueCategory.Exact}
-          >
-            {filterDataT('exact')}
-          </Select.Option>
-          <Select.Option
-            key={TimeFilterValueCategory.Relative}
-            value={TimeFilterValueCategory.Relative}
-          >
-            {filterDataT('relative')}
-          </Select.Option>
-        </Select>
-      </Form.Item>
-    );
-  }, []);
+  const renderROE = useCallback(
+    (name, onChange: (value: any) => void) => {
+      return (
+        <Form.Item
+          name={name}
+          noStyle
+          shouldUpdate
+          validateTrigger={['onBlur']}
+          rules={[{ required: true }]}
+        >
+          <Select style={{ width: '100px' }} onChange={onChange}>
+            <Select.Option
+              key={TimeFilterValueCategory.Exact}
+              value={TimeFilterValueCategory.Exact}
+            >
+              {filterDataT('exact')}
+            </Select.Option>
+            <Select.Option
+              key={TimeFilterValueCategory.Relative}
+              value={TimeFilterValueCategory.Relative}
+            >
+              {filterDataT('relative')}
+            </Select.Option>
+          </Select>
+        </Form.Item>
+      );
+    },
+    [filterDataT],
+  );
+
   const renderExact = useCallback((name, getPickerType: () => any) => {
     return (
       <Form.Item

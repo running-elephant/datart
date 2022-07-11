@@ -21,10 +21,10 @@ import { updateBy } from 'app/utils/mutation';
 import { FC, memo, useEffect } from 'react';
 import styled from 'styled-components/macro';
 import { CloneValueDeep, mergeDefaultToValue } from 'utils/object';
+import { FormGroupLayoutMode } from '../constants';
 import { GroupLayout } from '../Layout';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
-import { FormGroupLayoutMode } from '../constants';
 
 const template = {
   label: '',
@@ -154,7 +154,7 @@ const DataZoomPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
       onChange,
       dataConfigs,
       flatten: true,
-      mode: FormGroupLayoutMode.INNER
+      mode: FormGroupLayoutMode.INNER,
     };
 
     return (

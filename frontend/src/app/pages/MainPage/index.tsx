@@ -17,6 +17,7 @@
  */
 
 import ChartEditor, { ChartEditorBaseProps } from 'app/components/ChartEditor';
+import useMount from 'app/hooks/useMount';
 import ChartManager from 'app/models/ChartManager';
 import { useAppSlice } from 'app/slice';
 import React, { useCallback, useEffect } from 'react';
@@ -71,16 +72,21 @@ export function MainPage() {
   const orgId = useSelector(selectOrgId);
   const history = useHistory();
   // loaded first time
-  useEffect(() => {
-    ChartManager.instance()
-      .load()
-      .catch(err => console.error('Fail to load customize charts with ', err));
-    dispatch(getUserSettings(organizationMatch?.params.orgId));
-    dispatch(getDataProviders());
-    return () => {
+
+  useMount(
+    () => {
+      ChartManager.instance()
+        .load()
+        .catch(err =>
+          console.error('Fail to load customize charts with ', err),
+        );
+      dispatch(getUserSettings(organizationMatch?.params.orgId));
+      dispatch(getDataProviders());
+    },
+    () => {
       dispatch(actions.clear());
-    };
-  }, []);
+    },
+  );
 
   useEffect(() => {
     if (orgId) {

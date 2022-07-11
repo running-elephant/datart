@@ -18,7 +18,7 @@
 import { request2 } from 'utils/request';
 export async function onExport(idList) {
   try {
-    const response = await request2<any>({
+    await request2<any>({
       method: 'POST',
       url: `viz/export`,
       data: {

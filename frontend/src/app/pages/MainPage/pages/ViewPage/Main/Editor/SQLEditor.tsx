@@ -182,7 +182,7 @@ export const SQLEditor = memo(() => {
       editorInstance?.dispose();
       editorCompletionItemProviderRef?.current?.dispose();
     };
-  }, [editorInstance]);
+  }, [editorCompletionItemProviderRef, editorInstance]);
 
   useEffect(() => {
     return () => {

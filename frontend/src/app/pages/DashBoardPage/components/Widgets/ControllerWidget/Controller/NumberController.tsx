@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 import { Form, InputNumber } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 
 export interface TextControllerProps {
   value?: any;

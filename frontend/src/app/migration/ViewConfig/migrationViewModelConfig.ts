@@ -23,16 +23,6 @@ import MigrationEvent from '../MigrationEvent';
 import MigrationEventDispatcher from '../MigrationEventDispatcher';
 
 /**
- * Initialize method to setup version used by @see MigrationEvent
- *
- * @param {object} [model]
- * @return {*}  {(object | undefined)}
- */
-const init = (model?: object): object | undefined => {
-  return model;
-};
-
-/**
  * Migrate @see View config in beta.2 version
  * Changes:
  * - migrate model to ...

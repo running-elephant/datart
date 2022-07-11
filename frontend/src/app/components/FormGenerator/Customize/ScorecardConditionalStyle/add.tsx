@@ -80,7 +80,7 @@ export default function Add({
     } else {
       setOperatorSelect([]);
     }
-  }, []);
+  }, [type]);
 
   useEffect(() => {
     // !重置form
