@@ -45,7 +45,7 @@ import {
   SPACE_TIMES,
 } from 'styles/StyleConstants';
 import { request2 } from 'utils/request';
-import { errorHandle, uuidv4 } from 'utils/utils';
+import { uuidv4 } from 'utils/utils';
 import {
   selectDataProviderConfigTemplateLoading,
   selectDataProviderListLoading,
@@ -198,48 +198,35 @@ export function SourceDetailPage() {
     await form.validateFields();
     const { type, config } = form.getFieldsValue();
     const { name } = dataProviders[type];
-
-    try {
-      setTestLoading(true);
-      await request2<QueryResult>({
-        url: '/data-provider/test',
-        method: 'POST',
-        data: { name, type, properties: config },
-      });
-      message.success(t('testSuccess'));
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    } finally {
-      setTestLoading(false);
-    }
+    setTestLoading(true);
+    await request2<QueryResult>({
+      url: '/data-provider/test',
+      method: 'POST',
+      data: { name, type, properties: config },
+    });
+    message.success(t('testSuccess'));
+    setTestLoading(false);
   }, [form, dataProviders, t]);
 
   const subFormTest = useCallback(
     async (config, callback) => {
       const { name } = dataProviders[providerType];
-      try {
-        setTestLoading(true);
-        const { data } = await request2<QueryResult>({
-          url: '/data-provider/test',
-          method: 'POST',
-          data: {
-            name,
-            type: providerType,
-            properties:
-              providerType === 'FILE'
-                ? { path: config.path, format: config.format }
-                : config,
-            sourceId: editingSource?.id,
-          },
-        });
-        callback(data);
-      } catch (error) {
-        errorHandle(error);
-        throw error;
-      } finally {
-        setTestLoading(false);
-      }
+      setTestLoading(true);
+      const { data } = await request2<QueryResult>({
+        url: '/data-provider/test',
+        method: 'POST',
+        data: {
+          name,
+          type: providerType,
+          properties:
+            providerType === 'FILE'
+              ? { path: config.path, format: config.format }
+              : config,
+          sourceId: editingSource?.id,
+        },
+      });
+      setTestLoading(false);
+      callback(data);
     },
     [dataProviders, providerType, editingSource],
   );

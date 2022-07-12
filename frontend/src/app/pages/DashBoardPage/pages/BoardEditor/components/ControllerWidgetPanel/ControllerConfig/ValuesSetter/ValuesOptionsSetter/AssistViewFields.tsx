@@ -28,7 +28,6 @@ import React, {
   useState,
 } from 'react';
 import { request2 } from 'utils/request';
-import { errorHandle } from 'utils/utils';
 
 export interface AssistViewFieldsProps
   extends Omit<CascaderProps, 'options' | 'onChange'> {
@@ -50,31 +49,24 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
 
     const setViews = useCallback(
       async orgId => {
-        try {
-          const { data } = await request2<ViewSimple[]>(
-            `/views?orgId=${orgId}`,
-          );
-          const views: CascaderOptionType[] = data.map(item => {
-            return {
-              value: item.id,
-              label: item.name,
-              isLeaf: false,
-            };
-          });
-          if (Array.isArray(propsValue) && propsValue.length) {
-            const { option } = await getViewOption(propsValue[0]);
+        const { data } = await request2<ViewSimple[]>(`/views?orgId=${orgId}`);
+        const views: CascaderOptionType[] = data.map(item => {
+          return {
+            value: item.id,
+            label: item.name,
+            isLeaf: false,
+          };
+        });
+        if (Array.isArray(propsValue) && propsValue.length) {
+          const { option } = await getViewOption(propsValue[0]);
 
-            views.forEach(view => {
-              if (view.value === propsValue[0]) {
-                view.children = option;
-              }
-            });
-          }
-          setOptions([...views]);
-        } catch (error) {
-          errorHandle(error);
-          throw error;
+          views.forEach(view => {
+            if (view.value === propsValue[0]) {
+              view.children = option;
+            }
+          });
         }
+        setOptions([...views]);
       },
       [getViewOption, propsValue],
     );

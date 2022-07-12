@@ -16,20 +16,17 @@
  * limitations under the License.
  */
 import { request2 } from 'utils/request';
+
 export async function onImport(args: {
   file: FormData;
   strategy: string;
   orgId: string;
 }) {
   const { file, strategy, orgId } = args;
-  try {
-    await request2<any>({
-      method: 'POST',
-      url: `viz/import?strategy=${strategy}&orgId=${orgId}`,
-      data: file,
-    });
-    return true;
-  } catch (error) {
-    return error;
-  }
+  await request2<any>({
+    method: 'POST',
+    url: `viz/import?strategy=${strategy}&orgId=${orgId}`,
+    data: file,
+  });
+  return true;
 }

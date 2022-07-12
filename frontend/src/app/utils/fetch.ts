@@ -33,7 +33,6 @@ import { saveAs } from 'file-saver';
 import i18next from 'i18next';
 import qs from 'qs';
 import { request2, requestWithHeader } from 'utils/request';
-import { errorHandle } from 'utils/utils';
 import { convertToChartDto } from './ChartDtoHelper';
 import { getAllColumnInMeta } from './chartHelper';
 
@@ -258,23 +257,18 @@ export async function getChartPluginPaths() {
 }
 
 export async function loadShareTask(params) {
-  try {
-    const { data } = await request2<DownloadTask[]>({
-      url: `/shares/download/task`,
-      method: 'GET',
-      params,
-    });
-    const isNeedStopPolling = !(data || []).some(
-      v => v.status === DownloadTaskState.CREATED,
-    );
-    return {
-      isNeedStopPolling,
-      data: data || [],
-    };
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
+  const { data } = await request2<DownloadTask[]>({
+    url: `/shares/download/task`,
+    method: 'GET',
+    params,
+  });
+  const isNeedStopPolling = !(data || []).some(
+    v => v.status === DownloadTaskState.CREATED,
+  );
+  return {
+    isNeedStopPolling,
+    data: data || [],
+  };
 }
 interface DownloadShareDashChartFileParams {
   downloadId: string;

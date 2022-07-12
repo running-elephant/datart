@@ -116,16 +116,15 @@ export const getViewDetail = createAsyncThunk<
 
     dispatch(viewActions.addEditingView(tempViewModel));
 
-    try {
-      let { data } = await request2<View>(`/views/${viewId}`);
-      data = migrationViewConfig(data);
-      data.config = migrateViewConfig(data.config);
-      data.model = beginViewModelMigration(data?.model, data.type);
-
-      return transformModelToViewModel(data, null, tempViewModel);
-    } catch (error) {
-      return rejectHandle(error, rejectWithValue);
-    }
+    let { data } = await request2<View>(`/views/${viewId}`, undefined, {
+      onRejected: error => {
+        return rejectHandle(error, rejectWithValue);
+      },
+    });
+    data = migrationViewConfig(data);
+    data.config = migrateViewConfig(data.config);
+    data.model = beginViewModelMigration(data?.model, data.type);
+    return transformModelToViewModel(data, null, tempViewModel);
   },
 );
 
@@ -250,51 +249,45 @@ export const saveView = createAsyncThunk<
   const orgId = selectOrgId(getState());
   const allDatabaseSchemas = selectAllSourceDatabaseSchemas(getState());
 
-  try {
-    if (isNewView(currentEditingView.id) || isSaveAs) {
-      const { data } = await request2<View>({
-        url: '/views',
-        method: 'POST',
-        data: getSaveParamsFromViewModel(
-          orgId,
-          currentEditingView,
-          false,
-          allDatabaseSchemas[currentEditingView.sourceId!],
-          isSaveAs,
-        ),
-      });
-      resolve && resolve();
-
-      return {
-        ...currentEditingView,
-        ...data,
-        config: currentEditingView.config,
-        model: currentEditingView.model,
-        variables: data.variables.map(v => ({
-          ...v,
-          relVariableSubjects: data.relVariableSubjects,
-        })),
+  if (isNewView(currentEditingView.id) || isSaveAs) {
+    const { data } = await request2<View>({
+      url: '/views',
+      method: 'POST',
+      data: getSaveParamsFromViewModel(
+        orgId,
+        currentEditingView,
+        false,
+        allDatabaseSchemas[currentEditingView.sourceId!],
         isSaveAs,
-      };
-    } else {
-      await request2<View>({
-        url: `/views/${currentEditingView.id}`,
-        method: 'PUT',
-        data: getSaveParamsFromViewModel(
-          orgId,
-          currentEditingView,
-          true,
-          allDatabaseSchemas[currentEditingView.sourceId!],
-          isSaveAs,
-        ),
-      });
-      resolve && resolve();
-      return currentEditingView;
-    }
-  } catch (error) {
-    console.log(error, 'error');
-    errorHandle(error);
-    throw error;
+      ),
+    });
+    resolve && resolve();
+
+    return {
+      ...currentEditingView,
+      ...data,
+      config: currentEditingView.config,
+      model: currentEditingView.model,
+      variables: data.variables.map(v => ({
+        ...v,
+        relVariableSubjects: data.relVariableSubjects,
+      })),
+      isSaveAs,
+    };
+  } else {
+    await request2<View>({
+      url: `/views/${currentEditingView.id}`,
+      method: 'PUT',
+      data: getSaveParamsFromViewModel(
+        orgId,
+        currentEditingView,
+        true,
+        allDatabaseSchemas[currentEditingView.sourceId!],
+        isSaveAs,
+      ),
+    });
+    resolve && resolve();
+    return currentEditingView;
   }
 });
 
@@ -304,45 +297,35 @@ export const saveFolder = createAsyncThunk<
   { state: RootState }
 >('view/saveFolder', async ({ folder, resolve }, { getState }) => {
   const orgId = selectOrgId(getState());
-  try {
-    if (!(folder as ViewSimple).id) {
-      const { data } = await request2<View>({
-        url: '/views',
-        method: 'POST',
-        data: { orgId, isFolder: true, ...folder },
-      });
-      resolve && resolve();
-      return data;
-    } else {
-      await request2<View>({
-        url: `/views/${(folder as ViewSimple).id}`,
-        method: 'PUT',
-        data: folder,
-      });
-      resolve && resolve();
-      return folder as ViewSimple;
-    }
-  } catch (error) {
-    errorHandle(error);
-    throw error;
+  if (!(folder as ViewSimple).id) {
+    const { data } = await request2<View>({
+      url: '/views',
+      method: 'POST',
+      data: { orgId, isFolder: true, ...folder },
+    });
+    resolve && resolve();
+    return data;
+  } else {
+    await request2<View>({
+      url: `/views/${(folder as ViewSimple).id}`,
+      method: 'PUT',
+      data: folder,
+    });
+    resolve && resolve();
+    return folder as ViewSimple;
   }
 });
 
 export const updateViewBase = createAsyncThunk<ViewBase, UpdateViewBaseParams>(
   'view/updateViewBase',
   async ({ view, resolve }) => {
-    try {
-      await request2<boolean>({
-        url: `/views/${view.id}/base`,
-        method: 'PUT',
-        data: view,
-      });
-      resolve();
-      return view;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    await request2<boolean>({
+      url: `/views/${view.id}/base`,
+      method: 'PUT',
+      data: view,
+    });
+    resolve();
+    return view;
   },
 );
 
