@@ -156,7 +156,6 @@ const CrossFilteringRuleList: FC<
   );
 
   return (
-
     <Table
       bordered
       rowSelection={{
