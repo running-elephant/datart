@@ -119,4 +119,8 @@ export default CrossFilteringPanel;
 
 const StyledCrossFilteringPanel = styled(Space)`
   width: 100%;
+
+  .ant-form .ant-form-item:last-child {
+    margin-bottom: 0;
+  }
 `;

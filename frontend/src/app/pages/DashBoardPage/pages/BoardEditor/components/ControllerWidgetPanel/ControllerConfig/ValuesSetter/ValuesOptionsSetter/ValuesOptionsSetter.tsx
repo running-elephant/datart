@@ -37,7 +37,6 @@ import { transformMeta } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { request2 } from 'utils/request';
-import { errorHandle } from 'utils/utils';
 import { ControllerConfig } from '../../../types';
 import { AssistViewFields } from './AssistViewFields';
 import { CustomOptions } from './CustomOptions';
@@ -74,37 +73,35 @@ const ValuesOptionsSetter: FC<{
   }, []);
   const getViewOption = useCallback(async (viewId: string) => {
     if (!viewId) return { option: [], dataView: undefined };
-    try {
-      let { data } = await request2<View>(`/views/${viewId}`);
-      if (data) {
-        data = migrationViewConfig(data);
-      }
-      if (data?.model) {
-        data.model = beginViewModelMigration(data.model, data.type);
-      }
-      let meta = transformMeta(data?.model);
-      //TODO: Support after beta4
-      // const viewComputerField = JSON.parse(data.model)?.computedFields || [];
-
-      if (!meta) return { option: [], dataView: undefined };
-      const option: CascaderOptionType[] = meta
-        // .concat(viewComputerField)
-        .map(item => {
-          const fieldName =
-            item.category === ChartDataViewFieldCategory.ComputedField
-              ? item.id
-              : item.name;
-          return {
-            value: fieldName,
-            label: fieldName,
-          };
-        });
-
-      return { option, dataView: { ...data, meta } };
-    } catch (error) {
-      errorHandle(error);
+    let { data } = await request2<View>(`/views/${viewId}`);
+    if (!data) {
       return { option: [], data: undefined };
     }
+    if (data) {
+      data = migrationViewConfig(data);
+    }
+    if (data?.model) {
+      data.model = beginViewModelMigration(data.model, data.type);
+    }
+    let meta = transformMeta(data?.model);
+    //TODO: Support after beta4
+    // const viewComputerField = JSON.parse(data.model)?.computedFields || [];
+
+    if (!meta) return { option: [], dataView: undefined };
+    const option: CascaderOptionType[] = meta
+      // .concat(viewComputerField)
+      .map(item => {
+        const fieldName =
+          item.category === ChartDataViewFieldCategory.ComputedField
+            ? item.id
+            : item.name;
+        return {
+          value: fieldName,
+          label: fieldName,
+        };
+      });
+
+    return { option, dataView: { ...data, meta } };
   }, []);
   const onTargetKeyChange = useCallback(
     nextTargetKeys => {

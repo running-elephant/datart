@@ -33,13 +33,17 @@ export default function useBoardScroll(boardId: string) {
   );
 
   useEffect(() => {
+    const shadowGridWrapRef = gridWrapRef?.current;
     setImmediate(() => {
-      gridWrapRef?.current?.removeEventListener('scroll', thEmitScroll, false);
-      if (!gridWrapRef.current) return;
-      gridWrapRef.current.addEventListener('scroll', thEmitScroll, false);
+      shadowGridWrapRef?.removeEventListener('scroll', thEmitScroll, false);
+      if (shadowGridWrapRef) {
+        shadowGridWrapRef.addEventListener('scroll', thEmitScroll, false);
+      }
     });
     return () => {
-      gridWrapRef?.current?.removeEventListener('scroll', thEmitScroll, false);
+      if (shadowGridWrapRef) {
+        shadowGridWrapRef.removeEventListener('scroll', thEmitScroll, false);
+      }
     };
   }, [thEmitScroll]);
 

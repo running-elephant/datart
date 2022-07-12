@@ -20,6 +20,7 @@ import { Button, Input, Select, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import ChartDataView from 'app/types/ChartDataView';
 import { FC } from 'react';
+import styled from 'styled-components/macro';
 import {
   InteractionAction,
   InteractionCategory,
@@ -150,6 +151,7 @@ const RuleList: FC<
       title: t('drillThrough.rule.header.operation'),
       key: 'operation',
       width: 50,
+      fixed: 'right',
       render: (_, record) => (
         <Button type="link" onClick={() => onDeleteRule(record.id)}>
           {t('drillThrough.rule.operation.delete')}
@@ -159,14 +161,23 @@ const RuleList: FC<
   ];
 
   return (
-    <Table
-      style={{ height: 400, overflow: 'auto' }}
-      rowKey="id"
-      columns={columns}
-      dataSource={rules}
-      pagination={{ hideOnSinglePage: true, pageSize: 5 }}
-    />
+    <StyledRuleListContainer>
+      <Table
+        bordered
+        style={{ height: 400, overflow: 'auto' }}
+        rowKey="id"
+        columns={columns}
+        dataSource={rules}
+        pagination={{ hideOnSinglePage: true, pageSize: 5 }}
+      />
+    </StyledRuleListContainer>
   );
 };
 
 export default RuleList;
+
+const StyledRuleListContainer = styled.div`
+  & thead .ant-table-cell {
+    word-break: keep-all;
+  }
+`;
