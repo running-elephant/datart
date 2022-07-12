@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import styled from 'styled-components';
-import { SPACE_LG, SPACE_TIMES } from 'styles/StyleConstants';
+import { SPACE_TIMES } from 'styles/StyleConstants';
 import { Brand } from './Brand';
 
 interface LayoutWithBrandProps {

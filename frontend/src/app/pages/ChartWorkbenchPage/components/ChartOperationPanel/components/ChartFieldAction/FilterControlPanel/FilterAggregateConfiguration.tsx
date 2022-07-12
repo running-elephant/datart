@@ -17,10 +17,7 @@
  */
 
 import { Select } from 'antd';
-import {
-  AggregateFieldActionType,
-  DataViewFieldType,
-} from 'app/constants';
+import { AggregateFieldActionType, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { FC, memo } from 'react';

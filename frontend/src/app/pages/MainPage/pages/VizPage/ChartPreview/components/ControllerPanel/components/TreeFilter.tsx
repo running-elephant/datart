@@ -23,7 +23,7 @@ import { PresentControllerFilterProps } from '.';
 const TreeFilter: FC<PresentControllerFilterProps> = memo(
   ({ condition, onConditionChange }) => {
     const getSelectedKeysFromTreeModel = (list, collector: string[]) => {
-      list?.map(l => {
+      list?.forEach(l => {
         if (l.isSelected) {
           collector.push(l.key);
         }

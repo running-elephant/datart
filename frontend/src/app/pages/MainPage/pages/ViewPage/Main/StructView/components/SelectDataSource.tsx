@@ -274,6 +274,7 @@ const SelectDataSource = memo(
           columns: joinTable['columns'],
         });
       }
+      /* eslint-disable-next-line */
     }, []);
 
     return (
