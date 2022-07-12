@@ -86,7 +86,6 @@ const ChartComputedFieldSettingPanel: FC<{
 
   const handleFieldNameChange = name => {
     const newField = Object.assign({}, myComputedFieldRef.current, {
-      id: name,
       name: name,
     });
     handleChange(newField);
@@ -188,7 +187,7 @@ const ChartComputedFieldSettingPanel: FC<{
               label={`${t('fieldName')}`}
               name="fieldName"
               rules={[{ required: true }]}
-              initialValue={myComputedFieldRef.current?.id}
+              initialValue={myComputedFieldRef.current?.name}
             >
               <Input onChange={e => handleFieldNameChange(e.target.value)} />
             </FormItemEx>
@@ -243,8 +242,8 @@ const ChartComputedFieldSettingPanel: FC<{
             <Tabs.TabPane tab={`${t('variable')}`} key="variable">
               <ChartSearchableList
                 source={(variables || []).map(f => ({
-                  value: f.id,
-                  label: f.id,
+                  value: f.name,
+                  label: f.name,
                 }))}
                 onItemSelected={handleVariableSelected}
               />

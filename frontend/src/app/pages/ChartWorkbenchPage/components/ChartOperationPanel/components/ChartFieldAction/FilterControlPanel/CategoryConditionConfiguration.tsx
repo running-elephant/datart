@@ -325,7 +325,7 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
                   value={treeOptions?.[0]}
                   options={getDataOptionFields()?.map(f => ({
                     label: f.name,
-                    value: f.id,
+                    value: f.name,
                   }))}
                   onChange={value =>
                     handleTreeOptionChange(value, treeOptions?.[1])
@@ -336,7 +336,7 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
                   value={treeOptions?.[1]}
                   options={getDataOptionFields()?.map(f => ({
                     label: f.name,
-                    value: f.id,
+                    value: f.name,
                   }))}
                   onChange={value =>
                     handleTreeOptionChange(treeOptions?.[0], value)

@@ -1820,6 +1820,6 @@ export function mergeChartAndViewComputedField(
   viewComputer = viewComputer || [];
   return UniqWith(
     viewComputer.concat(chartComputer || []),
-    (a, b) => a?.id === b?.id,
+    (a, b) => a?.name === b?.name,
   );
 }

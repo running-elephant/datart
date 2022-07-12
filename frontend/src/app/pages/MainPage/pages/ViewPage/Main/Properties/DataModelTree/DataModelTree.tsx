@@ -561,10 +561,10 @@ const DataModelTree: FC = memo(() => {
         return Promise.reject('validate function computed field failed');
       }
       const otherComputedFields = computedFields?.filter(
-        f => f.id !== originId,
+        f => f.name !== originId,
       );
       const isNameConflict = !!otherComputedFields?.find(
-        f => f.id === field?.id,
+        f => f.name === field?.name,
       );
       if (isNameConflict) {
         message.error(
@@ -576,7 +576,7 @@ const DataModelTree: FC = memo(() => {
       }
 
       const currentFieldIndex = (computedFields || []).findIndex(
-        f => f.id === originId,
+        f => f.name === originId,
       );
 
       if (currentFieldIndex >= 0) {
@@ -584,10 +584,7 @@ const DataModelTree: FC = memo(() => {
           computedFields,
           currentFieldIndex,
           {
-            type: field.type,
-            id: field.id,
-            expression: field.expression,
-            category: field.category,
+            ...field,
             isViewComputedFields: true,
           },
         );
@@ -604,7 +601,7 @@ const DataModelTree: FC = memo(() => {
   );
 
   const addCallback = useCallback(
-    field => {
+    (field?: ChartDataViewMeta) => {
       (showModal as Function)({
         title: t('model.createComputedFields'),
         modalSize: StateModalSize.MIDDLE,
@@ -620,7 +617,7 @@ const DataModelTree: FC = memo(() => {
           />
         ),
         onOk: newField =>
-          handleAddNewOrUpdateComputedField(newField, field?.id),
+          handleAddNewOrUpdateComputedField(newField, field?.name),
       });
     },
     [
@@ -637,7 +634,7 @@ const DataModelTree: FC = memo(() => {
   const titleAdd = useMemo(() => {
     return {
       items: [{ key: 'computerField', text: t('model.createComputedFields') }],
-      callback: () => addCallback(null),
+      callback: () => addCallback(),
     };
   }, [addCallback, t]);
 
@@ -647,7 +644,7 @@ const DataModelTree: FC = memo(() => {
         addCallback(node);
       } else if (key === 'delete') {
         const newComputedFields = updateBy(computedFields, draft => {
-          const index = draft!.findIndex(v => v.id === node.id);
+          const index = draft!.findIndex(v => v.name === node.name);
           draft!.splice(index, 1);
         });
 

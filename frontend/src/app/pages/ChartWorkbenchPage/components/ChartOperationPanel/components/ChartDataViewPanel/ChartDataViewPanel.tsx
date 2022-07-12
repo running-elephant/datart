@@ -186,10 +186,10 @@ const ChartDataViewPanel: FC<{
         return Promise.reject('validate function computed field failed');
       }
       const otherComputedFields = dataView?.computedFields?.filter(
-        f => f.id !== originId,
+        f => f.name !== originId,
       );
       const isNameConflict = !!otherComputedFields?.find(
-        f => f.id === field?.id,
+        f => f.name === field?.name,
       );
       if (isNameConflict) {
         message.error(
@@ -201,7 +201,7 @@ const ChartDataViewPanel: FC<{
       }
 
       const currentFieldIndex = (dataView?.computedFields || []).findIndex(
-        f => f.id === originId,
+        f => f.name === originId,
       );
 
       if (currentFieldIndex >= 0) {
@@ -231,7 +231,7 @@ const ChartDataViewPanel: FC<{
 
   const handleDeleteComputedField = fieldId => {
     const newComputedFields = (dataView?.computedFields || []).filter(
-      f => f.id !== fieldId,
+      f => f.name !== fieldId,
     );
 
     dispatch(
@@ -243,7 +243,7 @@ const ChartDataViewPanel: FC<{
 
   const handleEditComputedField = fieldId => {
     const editField = (dataView?.computedFields || []).find(
-      f => f.id === fieldId,
+      f => f.name === fieldId,
     );
 
     handleAddOrEditComputedField(editField);
@@ -295,7 +295,7 @@ const ChartDataViewPanel: FC<{
   );
 
   const handleAddOrEditComputedField = useCallback(
-    field => {
+    (field?: ChartDataViewMeta) => {
       (showModal as Function)({
         title: t('createComputedFields'),
         modalSize: StateModalSize.MIDDLE,
@@ -313,7 +313,7 @@ const ChartDataViewPanel: FC<{
           />
         ),
         onOk: newField =>
-          handleAddNewOrUpdateComputedField(newField, field?.id),
+          handleAddNewOrUpdateComputedField(newField, field?.name),
         onButtonProps: { display: field?.isViewComputedFields },
       });
     },
@@ -420,7 +420,7 @@ const ChartDataViewPanel: FC<{
       switch (key) {
         case 'createComputedFields':
           setIsDisplayAddNewModal();
-          handleAddOrEditComputedField(null);
+          handleAddOrEditComputedField();
           break;
         case 'byGroup':
           setIsGroup(true);

@@ -386,14 +386,12 @@ export function transformMeta(model?: string) {
     if (!isEmptyArray(column?.children)) {
       return column.children.map(c => ({
         ...c,
-        id: c.name,
         path: c.path,
         category: ChartDataViewFieldCategory.Field,
       }));
     }
     return {
       ...column,
-      id: colKey,
       path: column.path || colKey,
       category: ChartDataViewFieldCategory.Field,
     };
@@ -423,7 +421,6 @@ function getMeta(key, column) {
   }
   return {
     ...column,
-    id: key,
     subType: column?.category,
     category: isHierarchy
       ? ChartDataViewFieldCategory.Hierarchy
@@ -675,7 +672,6 @@ export const transformToViewConfig = (
 
 export const buildDragItem = (item, children: any[] = []) => {
   return {
-    id: item?.name,
     colName: item?.name,
     type: item?.type,
     subType: item?.subType,

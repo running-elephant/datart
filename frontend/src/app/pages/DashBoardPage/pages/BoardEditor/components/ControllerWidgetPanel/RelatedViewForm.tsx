@@ -144,7 +144,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                 <Option
                   key={item.name}
                   fieldvaluetype={item.type}
-                  value={item.id}
+                  value={item.name}
                 >
                   <div
                     style={{ display: 'flex', justifyContent: 'space-between' }}
