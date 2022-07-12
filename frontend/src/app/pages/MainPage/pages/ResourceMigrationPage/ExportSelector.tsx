@@ -111,7 +111,7 @@ const StyledWrapper = styled.div`
     flex: 1;
   }
   .export-tree {
-    width: 400px;
+    min-width: 400px;
   }
   .export-btn {
     width: 160px;

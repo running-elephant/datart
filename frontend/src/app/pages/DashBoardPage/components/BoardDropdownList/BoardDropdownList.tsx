@@ -84,8 +84,8 @@ export const BoardDropdownList: FC<Props> = memo(
         )}
         {allowDownload && (
           <>
-            <Menu.Divider key={'downloadDataLine'} />
-            <Menu.Item key={'downloadData'} icon={<CloudDownloadOutlined />}>
+            <Menu.Divider key={'exportDataLine'} />
+            <Menu.Item key={'exportData'} icon={<CloudDownloadOutlined />}>
               <Popconfirm
                 placement="left"
                 title={t('common.confirm')}
@@ -95,10 +95,10 @@ export const BoardDropdownList: FC<Props> = memo(
                   onBoardToDownLoad?.(DownloadFileType.Excel);
                 }}
               >
-                {t('share.downloadData')}
+                {t('share.exportData')}
               </Popconfirm>
             </Menu.Item>
-            <Menu.Item key={'downloadPDF'} icon={<CloudDownloadOutlined />}>
+            <Menu.Item key={'exportPDF'} icon={<CloudDownloadOutlined />}>
               <Popconfirm
                 placement="left"
                 title={t('common.confirm')}
@@ -108,10 +108,10 @@ export const BoardDropdownList: FC<Props> = memo(
                   onBoardToDownLoad?.(DownloadFileType.Pdf);
                 }}
               >
-                {t('share.downloadPDF')}
+                {t('share.exportPDF')}
               </Popconfirm>
             </Menu.Item>
-            <Menu.Item key={'downloadPicture'} icon={<CloudDownloadOutlined />}>
+            <Menu.Item key={'exportPicture'} icon={<CloudDownloadOutlined />}>
               <Popconfirm
                 placement="left"
                 title={t('common.confirm')}
@@ -121,7 +121,7 @@ export const BoardDropdownList: FC<Props> = memo(
                   onBoardToDownLoad?.(DownloadFileType.Image);
                 }}
               >
-                {t('share.downloadPicture')}
+                {t('share.exportPicture')}
               </Popconfirm>
             </Menu.Item>
             <Menu.Item key="exportTpl" icon={<CloudDownloadOutlined />}>

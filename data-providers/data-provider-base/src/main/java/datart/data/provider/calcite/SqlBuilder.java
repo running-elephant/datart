@@ -207,13 +207,13 @@ public class SqlBuilder {
         if (selectList.size() == 0) {
             selectList.add(SqlIdentifier.star(SqlParserPos.ZERO));
         }
-        if (onlySql()){
+        if (onlySql()) {
             SqlNode simpleSqlNode = SqlParserUtils.createParser(queryScriptProcessResult.getSrcSql(), this.dialect).parseQuery();
             SqlPrettyWriter sqlPrettyWriter = new SqlPrettyWriter(this.dialect);
             sqlPrettyWriter.startList(SqlWriter.FrameTypeEnum.SELECT);
-            sqlPrettyWriter.fetchOffset(fetch,offset);
+            sqlPrettyWriter.fetchOffset(fetch, offset);
             return SqlNodeUtils.toSql(simpleSqlNode, this.dialect, quoteIdentifiers) + sqlPrettyWriter.toSqlString();
-        }else {
+        } else {
             SqlSelect sqlSelect = new SqlSelect(SqlParserPos.ZERO,
                     keywordList,
                     selectList,
@@ -231,14 +231,15 @@ public class SqlBuilder {
     }
 
     private boolean onlySql() {
-        return CollectionUtils.isEmpty(executeParam.getAggregators()) &&
+        return executeParam == null || (CollectionUtils.isEmpty(executeParam.getAggregators()) &&
                 CollectionUtils.isEmpty(executeParam.getColumns()) &&
                 CollectionUtils.isEmpty(executeParam.getFunctionColumns()) &&
                 CollectionUtils.isEmpty(executeParam.getFilters()) &&
                 CollectionUtils.isEmpty(executeParam.getGroups()) &&
                 CollectionUtils.isEmpty(executeParam.getKeywords()) &&
-                CollectionUtils.isEmpty(executeParam.getOrders());
+                CollectionUtils.isEmpty(executeParam.getOrders()));
     }
+
     private SqlNode createAggNode(AggregateOperator operator) {
         SqlNode sqlNode;
         String columnKey = operator.getColumnKey();

@@ -85,7 +85,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         ViewCreateParam viewCreateParam = (ViewCreateParam) createParam;
         View view = new View();
         BeanUtils.copyProperties(createParam, view);
-        view.setType(viewCreateParam.getType().name());
+        view.setType(viewCreateParam.getType() == null ? null : viewCreateParam.getType().name());
         view.setCreateBy(getCurrentUser().getId());
         view.setCreateTime(new Date());
         view.setId(UUIDGenerator.generate());
