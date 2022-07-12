@@ -498,6 +498,7 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
           data: { ...data, id: widgetId },
         }),
       );
+      await dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
       await dispatch(
         editWidgetInfoActions.changeWidgetLinkInfo({
           boardId,
