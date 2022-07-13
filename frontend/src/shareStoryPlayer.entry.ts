@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { AppRouter } from 'app/AppRouter';
+import { Router } from 'app/pages/SharePage/StoryPlayer';
 import { generateEntryPoint } from 'entryPointFactory';
 
-generateEntryPoint(AppRouter);
+generateEntryPoint(Router);

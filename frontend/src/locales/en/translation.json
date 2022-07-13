@@ -824,6 +824,7 @@
           "title": "Drill Through",
           "rule": {
             "title": "Rule",
+            "tip": "Drill through only support jump to url",
             "addRule": "+ Add New",
             "inputUrl": "Please input url",
             "header": {

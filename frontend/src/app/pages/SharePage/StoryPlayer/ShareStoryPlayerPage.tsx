@@ -20,47 +20,43 @@ import useMount from 'app/hooks/useMount';
 import useRouteQuery from 'app/hooks/useRouteQuery';
 import ChartManager from 'app/models/ChartManager';
 import { login } from 'app/slice/thunks';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
 import { getToken } from 'utils/auth';
 import persistence from 'utils/persistence';
 import { urlSearchTransfer } from 'utils/urlSearchTransfer';
-import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
-import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
-import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
-import ChartForShare from './ChartForShare';
-import PasswordModal from './PasswordModal';
-import ShareLoginModal from './ShareLoginModal';
-import { useShareSlice } from './slice';
-import {
-  selectAvailableSourceFunctions,
-  selectChartPreview,
-  selectNeedVerify,
-  selectShareExecuteTokenMap,
-  selectShareVizType,
-} from './slice/selectors';
-import {
-  fetchAvailableSourceFunctionsForShare,
-  fetchShareVizInfo,
-} from './slice/thunks';
-export function ShareChart() {
+import { BoardLoading } from '../../DashBoardPage/components/BoardLoading';
+import { useBoardSlice } from '../../DashBoardPage/pages/Board/slice';
+import { VizRenderMode } from '../../DashBoardPage/pages/Board/slice/types';
+import { useEditBoardSlice } from '../../DashBoardPage/pages/BoardEditor/slice';
+import { FilterSearchParams } from '../../MainPage/pages/VizPage/slice/types';
+import { useStoryBoardSlice } from '../../StoryBoardPage/slice';
+import { selectShareStoryBoard } from '../../StoryBoardPage/slice/selectors';
+import PasswordModal from '../components/PasswordModal';
+import ShareLoginModal from '../components/ShareLoginModal';
+import { useShareSlice } from '../slice';
+import { selectNeedVerify, selectShareVizType } from '../slice/selectors';
+import { fetchShareVizInfo } from '../slice/thunks';
+import { StoryPlayerForShare } from './StoryPlayerForShare';
+
+function ShareStoryPlayerPage() {
   const { shareActions: actions } = useShareSlice();
+  useStoryBoardSlice();
+  useBoardSlice();
+  useEditBoardSlice();
 
   const dispatch = useDispatch();
   const location = useLocation();
-
   const { params }: { params: { token: string } } = useRouteMatch();
   const search = location.search;
   const shareToken = params.token;
   const logged = !!getToken();
 
   const needVerify = useSelector(selectNeedVerify);
-  const chartPreview = useSelector(selectChartPreview);
+  const shareStory = useSelector(selectShareStoryBoard);
   const vizType = useSelector(selectShareVizType);
-  const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
-  const shareExecuteTokenMap = useSelector(selectShareExecuteTokenMap);
 
   const shareType = useRouteQuery({
     key: 'type',
@@ -96,25 +92,6 @@ export function ShareChart() {
       .then(() => loadVizData())
       .catch(err => console.error('Fail to load customize charts with ', err));
   });
-
-  useEffect(() => {
-    const sourceId = chartPreview?.backendChart?.view.sourceId;
-    const viewId = chartPreview?.backendChart?.view.id;
-
-    if (sourceId && viewId) {
-      dispatch(
-        fetchAvailableSourceFunctionsForShare({
-          sourceId: sourceId,
-          executeToken: shareExecuteTokenMap[viewId].authorizedToken,
-        }),
-      );
-    }
-  }, [
-    chartPreview?.backendChart?.view.sourceId,
-    chartPreview?.backendChart?.view.id,
-    dispatch,
-    shareExecuteTokenMap,
-  ]);
 
   const fetchShareVizInfoImpl = useCallback(
     (
@@ -163,13 +140,13 @@ export function ShareChart() {
   return (
     <StyledWrapper className="datart-viz">
       <ShareLoginModal
-        visible={shareType === 'LOGIN' && Boolean(needVerify)}
+        visible={Boolean(needVerify) && shareType === 'LOGIN'}
         onChange={handleLogin}
       />
       <PasswordModal
         visible={Boolean(needVerify) && shareType === 'CODE'}
         onChange={sharePassword => {
-          fetchShareVizInfoImpl(shareToken, sharePassword, searchParams);
+          fetchShareVizInfoImpl(shareToken, sharePassword);
         }}
       />
       {!vizType && !needVerify && (
@@ -177,17 +154,14 @@ export function ShareChart() {
           <BoardLoading />
         </div>
       )}
-      {!Boolean(needVerify) && chartPreview && chartPreview?.backendChart && (
-        <ChartForShare
-          chartPreview={chartPreview}
-          filterSearchParams={searchParams}
-          availableSourceFunctions={availableSourceFunctions}
-        />
+
+      {!Boolean(needVerify) && shareStory && (
+        <StoryPlayerForShare storyBoard={shareStory} shareToken={shareToken} />
       )}
     </StyledWrapper>
   );
 }
-export default ShareChart;
+export default ShareStoryPlayerPage;
 const StyledWrapper = styled.div`
   width: 100%;
   height: 100vh;
