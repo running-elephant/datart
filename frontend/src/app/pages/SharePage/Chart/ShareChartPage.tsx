@@ -44,7 +44,7 @@ import {
   fetchAvailableSourceFunctionsForShare,
   fetchShareVizInfo,
 } from '../slice/thunks';
-import ChartForShare from './ChartForShare';
+import ChartPreviewBoardForShare from './ChartPreviewBoardForShare';
 
 export function ShareChartPage() {
   const { shareActions: actions } = useShareSlice();
@@ -179,7 +179,7 @@ export function ShareChartPage() {
         </div>
       )}
       {!Boolean(needVerify) && chartPreview && chartPreview?.backendChart && (
-        <ChartForShare
+        <ChartPreviewBoardForShare
           chartPreview={chartPreview}
           filterSearchParams={searchParams}
           availableSourceFunctions={availableSourceFunctions}

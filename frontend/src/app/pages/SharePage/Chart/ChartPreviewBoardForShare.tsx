@@ -53,7 +53,8 @@ import {
 } from '../slice/thunks';
 
 const TitleHeight = 100;
-const ChartForShare: FC<{
+
+const ChartPreviewBoardForShare: FC<{
   chartPreview?: ChartPreview;
   filterSearchParams?: FilterSearchParams;
   availableSourceFunctions?: string[];
@@ -221,7 +222,7 @@ const ChartForShare: FC<{
   ]);
 
   return (
-    <StyledChartPreviewBoard>
+    <StyledChartPreviewBoardForShare>
       <div ref={controlRef}>
         <ControllerPanel
           viewId={chartPreview?.backendChart?.viewId}
@@ -254,20 +255,22 @@ const ChartForShare: FC<{
             />
           </ChartDrillContextMenu>
         </div>
-        <ChartDrillPaths chartConfig={chartPreview?.chartConfig} />
+        <StyledChartDrillPathsContainer>
+          <ChartDrillPaths chartConfig={chartPreview?.chartConfig} />
+        </StyledChartDrillPathsContainer>
       </ChartDrillContext.Provider>
       <HeadlessBrowserIdentifier
         renderSign={headlessBrowserRenderSign}
         width={Number(width) || 0}
         height={Number(width) + Number(controlH) + TitleHeight || 0}
       />
-    </StyledChartPreviewBoard>
+    </StyledChartPreviewBoardForShare>
   );
 });
 
-export default ChartForShare;
+export default ChartPreviewBoardForShare;
 
-const StyledChartPreviewBoard = styled.div`
+const StyledChartPreviewBoardForShare = styled.div`
   display: flex;
   flex-flow: column;
   width: 100%;
@@ -280,4 +283,8 @@ const StyledChartPreviewBoard = styled.div`
   iframe {
     flex-grow: 1000;
   }
+`;
+
+const StyledChartDrillPathsContainer = styled.div`
+  background-color: ${p => p.theme.componentBackground};
 `;
