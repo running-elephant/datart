@@ -175,6 +175,12 @@ const useChartInteractions = (props: {
         const hasNoSelectedItems = isEmptyArray(
           clickEventParams?.selectedItems,
         );
+
+        console.log(
+          `drillThroughSetting ---> `,
+          clickEventParams?.selectedItems,
+        );
+
         if (hasNoSelectedItems) {
           return;
         }

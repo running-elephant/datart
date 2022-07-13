@@ -16,4 +16,4 @@
  * limitations under the License.
  */
 
-export { default as ChartPreview } from './ChartPreviewBoard';
+export { default as ChartPreviewBoard } from './ChartPreviewBoard';

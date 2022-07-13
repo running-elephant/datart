@@ -181,6 +181,7 @@ export function ShareChartPage() {
       {!Boolean(needVerify) && chartPreview && chartPreview?.backendChart && (
         <ChartPreviewBoardForShare
           chartPreview={chartPreview}
+          orgId={chartPreview?.backendChart?.orgId}
           filterSearchParams={searchParams}
           availableSourceFunctions={availableSourceFunctions}
         />
