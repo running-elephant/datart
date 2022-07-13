@@ -588,7 +588,10 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
 
   return (
     <ChartDrillContext.Provider value={drillContextVal}>
-      <ChartDrillContextMenu chartConfig={dataChart?.config.chartConfig}>
+      <ChartDrillContextMenu
+        chartConfig={dataChart?.config.chartConfig}
+        metas={chartDataView?.meta}
+      >
         <StyledWrapper>
           <ChartFrameBox ref={cacheWhRef}>{chartFrame}</ChartFrameBox>
           <ChartDrillPaths chartConfig={dataChart?.config.chartConfig} />
