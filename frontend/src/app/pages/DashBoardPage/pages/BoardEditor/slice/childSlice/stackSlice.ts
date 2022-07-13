@@ -427,7 +427,7 @@ export const editBoardStackSlice = createSlice({
         mode: string;
       }>,
     ) {
-      const { parentId, sourceTabId, mode } = action.payload;
+      const { parentId, sourceTabId } = action.payload;
       const tabWidget = state.widgetRecord[parentId];
       const tabContent = tabWidget.config.content as TabWidgetContent;
 

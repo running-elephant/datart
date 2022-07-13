@@ -66,13 +66,6 @@ const SingleFilter: FC<{
       onConditionChange(filter);
     };
 
-    const handleChangeFromSingleRowToMultiRow = () => {
-      setOperator(condition.operator);
-      setInputValue(condition.value);
-      condition.appendChild();
-      onConditionChange(condition);
-    };
-
     const renderInputNumber = op => {
       if (op === FilterSqlOperator.Null || op === FilterSqlOperator.NotNull) {
         return null;

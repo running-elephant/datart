@@ -28,7 +28,6 @@ import { Sidebar } from './Sidebar';
 
 export function Container() {
   const { editorInstance } = useContext(EditorContext);
-  const t = useI18NPrefix('view.saveForm');
   const tg = useI18NPrefix('global');
   const [isDragging, setIsDragging] = useState(false);
   const [sliderVisible, setSliderVisible] = useState<boolean>(false);

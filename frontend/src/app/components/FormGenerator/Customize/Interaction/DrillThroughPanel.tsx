@@ -102,4 +102,8 @@ export default DrillThroughPanel;
 
 const StyledDrillThroughPanel = styled(Space)`
   width: 100%;
+
+  .ant-form .ant-form-item:last-child {
+    margin-bottom: 0;
+  }
 `;

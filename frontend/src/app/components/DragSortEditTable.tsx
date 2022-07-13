@@ -19,14 +19,7 @@
 import { Form, Input, Table, TableProps } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { RelationFilterValue } from 'app/types/ChartConfig';
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -58,12 +51,6 @@ export const DragSortEditTable: React.FC<DragEditTableProps> = ({
     },
   };
 
-  const onMoveRow = useCallback((a, b) => {
-    // const dragRow = rows[dragIndex];
-    // rows.splice(dragIndex, 1);
-    // rows.splice(hoverIndex, 0, dragRow);
-    // setRows([...rows]);
-  }, []);
   return (
     <DndProvider backend={HTML5Backend}>
       <Table

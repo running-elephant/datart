@@ -157,6 +157,7 @@ const CrossFilteringRuleList: FC<
 
   return (
     <Table
+      bordered
       rowSelection={{
         type: 'checkbox',
         selectedRowKeys: selectedRuleKeys,

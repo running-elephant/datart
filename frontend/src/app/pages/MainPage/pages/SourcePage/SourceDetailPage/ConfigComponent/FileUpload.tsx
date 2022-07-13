@@ -81,6 +81,7 @@ export function FileUpload({
           headers={{ authorization: getToken()! }}
           showUploadList={false}
           onChange={uploadChange}
+          disabled={uploadFileLoading || loading}
         >
           <Button
             icon={<UploadOutlined />}

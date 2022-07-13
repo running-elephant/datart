@@ -20,10 +20,8 @@ import { CheckOutlined } from '@ant-design/icons';
 import { Col, Menu, Radio, Row, Space } from 'antd';
 import { SortActionType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import DraggableList from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/SortAction/DraggableList';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { transformToDataSet } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -46,13 +44,6 @@ const SortAction: FC<{
   const [direction, setDirection] = useState(
     config?.sort?.type || SortActionType.None,
   );
-  const [sortValue, setSortValue] = useState(() => {
-    const objDataColumns = transformToDataSet(dataset?.rows, dataset?.columns);
-    return (
-      config?.sort?.value ||
-      Array.from(new Set(objDataColumns?.map(c => c.getCell(config))))
-    );
-  });
 
   const handleSortTypeChange = direction => {
     setDirection(direction);
@@ -66,36 +57,6 @@ const SortAction: FC<{
           actionNeedNewRequest,
         );
     }
-  };
-
-  const handleCustomSortListChange = values => {
-    setSortValue(values);
-    onConfigChange &&
-      onConfigChange(
-        updateBy(config, draft => {
-          draft.sort = { type: SortActionType.Customize, value: values };
-        }),
-        !actionNeedNewRequest,
-      );
-  };
-
-  const renderColumnsDataList = () => {
-    if (
-      !config.colName ||
-      SortActionType.Customize !== direction ||
-      !Array.isArray(sortValue)
-    ) {
-      return null;
-    }
-
-    const items =
-      sortValue.map((value, index) => ({
-        id: index,
-        text: value,
-      })) || [];
-    return (
-      <DraggableList source={items} onChange={handleCustomSortListChange} />
-    );
   };
 
   const renderOptions = mode => {

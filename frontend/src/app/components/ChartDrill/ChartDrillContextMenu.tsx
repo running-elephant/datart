@@ -225,6 +225,7 @@ const ChartDrillContextMenu: FC<{ chartConfig?: ChartConfig }> = memo(
     }, [
       hasContextMenu,
       onDrillThroughChange,
+      hasDrillThroughSetting,
       t,
       drillThroughRules,
       onCrossFilteringChange,
