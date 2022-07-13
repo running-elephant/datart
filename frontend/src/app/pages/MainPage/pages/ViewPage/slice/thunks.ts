@@ -174,25 +174,37 @@ export const runSql = createAsyncThunk<
     }
   }
 
-  try {
-    if (!sourceId) {
-      throw Error(i18n.t('view.selectSource'));
-    }
+  if (!sourceId) {
+    dispatch(
+      viewActions.changeCurrentEditingView({
+        stage: ViewViewModelStages.Initialized,
+        error: getErrorMessage(Error(i18n.t('view.selectSource'))),
+      }),
+    );
+    return {} as any;
+  }
 
-    if (type === 'SQL' && !(sql as string).trim()) {
-      throw Error(i18n.t('view.sqlRequired'));
-    }
+  if (type === 'SQL' && !(sql as string).trim()) {
+    dispatch(
+      viewActions.changeCurrentEditingView({
+        stage: ViewViewModelStages.Initialized,
+        error: getErrorMessage(Error(i18n.t('view.sqlRequired'))),
+      }),
+    );
+    return {} as any;
+  }
 
-    if (type === 'SQL') {
-      script = fragment || sql;
-    } else {
-      script = handleObjectScriptToString(
-        structure!,
-        allDatabaseSchemas[currentEditingView.sourceId!],
-      );
-    }
+  if (type === 'SQL') {
+    script = fragment || sql;
+  } else {
+    script = handleObjectScriptToString(
+      structure!,
+      allDatabaseSchemas[currentEditingView.sourceId!],
+    );
+  }
 
-    const { data, warnings } = await request2<QueryResult>({
+  const response = await request2<QueryResult>(
+    {
       url: '/data-provider/execute/test',
       method: 'POST',
       data: {
@@ -211,17 +223,20 @@ export const runSql = createAsyncThunk<
           }),
         ),
       },
-    });
-    return { ...data, warnings };
-  } catch (error) {
-    dispatch(
-      viewActions.changeCurrentEditingView({
-        stage: ViewViewModelStages.Initialized,
-        error: getErrorMessage(error),
-      }),
-    );
-    return null;
-  }
+    },
+    undefined,
+    {
+      onRejected: error => {
+        dispatch(
+          viewActions.changeCurrentEditingView({
+            stage: ViewViewModelStages.Initialized,
+            error: getErrorMessage(error),
+          }),
+        );
+      },
+    },
+  );
+  return { ...response?.data, warnings: response?.warnings };
 });
 
 export const saveView = createAsyncThunk<
