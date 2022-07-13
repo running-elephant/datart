@@ -55,7 +55,8 @@ export const ScheduleErrorLog: FC<ScheduleErrorLogProps> = ({ scheduleId }) => {
         },
       },
     ];
-  }, []);
+  }, [t]);
+
   if (logs?.length > 0) {
     return (
       <FormCard title={t('log')}>

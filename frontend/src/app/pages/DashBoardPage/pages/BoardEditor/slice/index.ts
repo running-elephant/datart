@@ -93,7 +93,7 @@ const editDashBoardInfoSlice = createSlice({
         linkFilters?: BoardLinkFilter[];
       }>,
     ) {
-      const { boardId, triggerId, linkFilters } = action.payload;
+      const { triggerId, linkFilters } = action.payload;
       state.linkFilter = state.linkFilter.filter(
         link => link.triggerWidgetId !== triggerId,
       );

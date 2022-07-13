@@ -73,8 +73,8 @@ export const EditorPage: FC = () => {
     return scheduleId === 'add';
   }, [scheduleId]);
   const active = useMemo(() => {
-    return editingSchedule?.active;
-  }, [editingSchedule]);
+    return isAdd ? false : editingSchedule?.active;
+  }, [editingSchedule, isAdd]);
   const refreshScheduleList = useCallback(() => {
     dispatch(getSchedules(orgId));
   }, [dispatch, orgId]);

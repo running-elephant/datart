@@ -72,7 +72,7 @@ const ControllerWidgetPanel: React.FC<WidgetControllerPanelParams> = memo(
     const t = useI18NPrefix('viz.common.enum.controllerFacadeTypes');
     const tGMT = useI18NPrefix(`global.modal.title`);
 
-    const { boardId, boardType, queryVariables } = useContext(BoardContext);
+    const { boardType, queryVariables } = useContext(BoardContext);
 
     const hasQueryControl = false;
     const { onRefreshWidgetsByController } = useContext(WidgetActionContext);

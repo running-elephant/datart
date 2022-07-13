@@ -36,6 +36,7 @@ import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParserPos;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -43,6 +44,7 @@ import java.util.List;
 
 @SpringBootTest(classes = DataProviderTestApplication.class)
 @Slf4j
+@Disabled
 public class SqlScriptRenderTest {
 
     private static final String T = "DATART_VTABLE";

@@ -88,6 +88,7 @@ export const PIVOT_THEME_LIST = [
 /**
  * 这只是个栗子！
  * */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const dictionaries = [
   '#FFFFFF', // 0: 标题字体颜色
   '#F8F5FE', // 1: 奇行颜色

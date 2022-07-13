@@ -57,8 +57,8 @@ import {
 export const getFolders = createAsyncThunk<Folder[], string>(
   'viz/getFolders',
   async orgId => {
-    const { data } = await request2<Folder[]>(`/viz/folders?orgId=${orgId}`);
-    return data;
+    const response = await request2<Folder[]>(`/viz/folders?orgId=${orgId}`);
+    return response?.data;
   },
 );
 

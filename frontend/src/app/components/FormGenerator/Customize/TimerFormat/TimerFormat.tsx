@@ -70,7 +70,7 @@ const TIME_FORMATS = [
 ];
 export const TimerFormat: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({ ancestors, translate: t = title => title, data, onChange, ...rest }) => {
-    const { value, options } = data;
+    const { value } = data;
 
     const gt = useI18NPrefix(`viz.board.setting`);
     const valRef = useRef<ITimeDefault>();

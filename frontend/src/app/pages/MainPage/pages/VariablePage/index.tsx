@@ -137,23 +137,17 @@ export function VariablePage() {
       setEditingVariable(variable);
       setSubjectFormVisible(true);
 
-      try {
-        setRowPermissionLoading(true);
-        const { data } = await request2<RowPermissionRaw[]>(
-          `/variables/value?variableId=${id}`,
-        );
-        setRowPermissions(
-          data.map(d => ({
-            ...d,
-            value: d.value && JSON.parse(d.value),
-          })),
-        );
-      } catch (error) {
-        errorHandle(error);
-        throw error;
-      } finally {
-        setRowPermissionLoading(false);
-      }
+      setRowPermissionLoading(true);
+      const { data } = await request2<RowPermissionRaw[]>(
+        `/variables/value?variableId=${id}`,
+      );
+      setRowPermissions(
+        data.map(d => ({
+          ...d,
+          value: d.value && JSON.parse(d.value),
+        })),
+      );
+      setRowPermissionLoading(false);
     },
     [variables],
   );
@@ -252,31 +246,25 @@ export function VariablePage() {
         );
 
         if (created.length > 0 || updated.length > 0 || deleted.length > 0) {
-          try {
-            setUpdateRowPermissionLoading(true);
-            await request2<null>({
-              url: '/variables/rel',
-              method: 'PUT',
-              data: {
-                relToCreate: created.map(r => ({
-                  ...r,
-                  value: JSON.stringify(r.value),
-                })),
-                relToUpdate: updated.map(r => ({
-                  ...r,
-                  value: JSON.stringify(r.value),
-                })),
-                relToDelete: deleted.map(({ id }) => id),
-              },
-            });
-            message.success(tg('operation.updateSuccess'));
-            setSubjectFormVisible(false);
-          } catch (error) {
-            errorHandle(error);
-            throw error;
-          } finally {
-            setUpdateRowPermissionLoading(false);
-          }
+          setUpdateRowPermissionLoading(true);
+          await request2<null>({
+            url: '/variables/rel',
+            method: 'PUT',
+            data: {
+              relToCreate: created.map(r => ({
+                ...r,
+                value: JSON.stringify(r.value),
+              })),
+              relToUpdate: updated.map(r => ({
+                ...r,
+                value: JSON.stringify(r.value),
+              })),
+              relToDelete: deleted.map(({ id }) => id),
+            },
+          });
+          message.success(tg('operation.updateSuccess'));
+          setUpdateRowPermissionLoading(false);
+          setSubjectFormVisible(false);
         } else {
           setSubjectFormVisible(false);
         }

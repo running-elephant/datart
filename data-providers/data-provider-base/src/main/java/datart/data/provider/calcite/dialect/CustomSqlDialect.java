@@ -56,7 +56,8 @@ public class CustomSqlDialect extends SqlDialect {
     public void unparseOffsetFetch(SqlWriter writer, SqlNode offset, SqlNode fetch) {
         if (driverInfo.getSupportSqlLimit() != null && driverInfo.getSupportSqlLimit()) {
             unparseFetchUsingLimit(writer, offset, fetch);
+        } else {
+            super.unparseOffsetFetch(writer, offset, fetch);
         }
-        super.unparseOffsetFetch(writer, offset, fetch);
     }
 }

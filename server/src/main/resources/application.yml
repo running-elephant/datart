@@ -68,11 +68,11 @@ shiro:
     enabled: false
 
 datart:
+  migration:
+    enable: false
+
   server:
     path-prefix: /api/v1
-
-  migration:
-    enable: true
 
 server:
   port: 8080
