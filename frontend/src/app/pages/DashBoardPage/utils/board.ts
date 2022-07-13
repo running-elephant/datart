@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { migrateBoardConfig } from 'app/migration/BoardConfig/migrateBoardConfig';
+import migrateChartConfig from 'app/migration/ChartConfig/migrateChartConfig';
 import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import {
@@ -164,7 +165,8 @@ export const getInitBoardConfig = (boardType?: BoardType) => {
 // dataCharts
 export const getDataChartsByServer = (serverDataCharts: ServerDatachart[]) => {
   const dataCharts: DataChart[] = serverDataCharts.map(item => {
-    const config = JSON.parse(item.config);
+    item.config = migrateChartConfig(item.config);
+    const config = JSON.parse(item.config || '{}');
     return {
       ...item,
       config,

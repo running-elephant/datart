@@ -33,14 +33,9 @@ export const getAllFieldsOfEachType = (args: {
   availableSourceFunctions;
 }) => {
   const { sortType, dataView, availableSourceFunctions } = args;
-  const computedFields =
-    dataView?.computedFields
-      ?.filter(
-        v => v.category !== ChartDataViewFieldCategory.DateLevelComputedField,
-      )
-      .map(v => {
-        return { ...v, name: v.id };
-      }) || [];
+  const computedFields = dataView?.computedFields?.filter(
+    v => v.category !== ChartDataViewFieldCategory.DateLevelComputedField,
+  );
 
   const allFields = dataView?.meta || [];
 

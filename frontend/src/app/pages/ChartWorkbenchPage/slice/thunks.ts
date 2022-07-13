@@ -123,7 +123,6 @@ export const fetchViewDetailAction = createAsyncThunk(
         response.data.type,
       );
     }
-
     return response.data;
   },
 );

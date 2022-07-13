@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import migrateChartConfig from 'app/migration/ChartConfig/migrateChartConfig';
 import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import {
@@ -39,6 +40,7 @@ export function convertToChartDto(data): ChartDTO {
   if (data?.view?.model) {
     data.view.model = beginViewModelMigration(data.view.model, data.view.type);
   }
+  data.config = migrateChartConfig(data?.config);
 
   return Object.assign({}, data, {
     config: JSON.parse(data?.config || '{}'),

@@ -73,7 +73,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import styled from 'styled-components/macro';
 import { LEVEL_100 } from 'styles/StyleConstants';
-import { CloneValueDeep, isEmptyArray } from 'utils/object';
+import { CloneValueDeep, isEmptyArray, isEqualObject } from 'utils/object';
 import ChartWorkbench from '../pages/ChartWorkbenchPage/components/ChartWorkbench/ChartWorkbench';
 import {
   DataChart,
@@ -419,10 +419,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           });
         }
 
-        if (
-          JSON.stringify(computedFields) !==
-          JSON.stringify(dataview?.computedFields)
-        ) {
+        if (!isEqualObject(computedFields, dataview?.computedFields)) {
           dispatch(actions.updateCurrentDataViewComputedFields(computedFields));
         }
       }

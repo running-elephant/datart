@@ -1818,6 +1818,7 @@ export function mergeChartAndViewComputedField(
   chartComputer?: ChartDataViewMeta[],
 ) {
   viewComputer = viewComputer || [];
+
   return UniqWith(
     viewComputer.concat(chartComputer || []),
     (a, b) => a?.name === b?.name,

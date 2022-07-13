@@ -56,8 +56,7 @@ import {
   RUNTIME_FILTER_KEY,
   TIME_FORMATTER,
 } from 'globalConstants';
-import isEqual from 'lodash/isEqual';
-import { isEmptyArray, IsKeyIn, UniqWith } from 'utils/object';
+import { isEmptyArray, isEqualObject, IsKeyIn, UniqWith } from 'utils/object';
 import { DrillMode } from './ChartDrillOption';
 
 export class ChartDataRequestBuilder {
@@ -157,7 +156,8 @@ export class ChartDataRequestBuilder {
         column: this.buildColumnName(aggCol),
         sqlOperator: aggCol.aggregate!,
       })),
-      (a, b) => isEqual(a.column, b.column) && a.sqlOperator === b.sqlOperator,
+      (a, b) =>
+        isEqualObject(a.column, b.column) && a.sqlOperator === b.sqlOperator,
     );
   }
 
@@ -615,7 +615,7 @@ export class ChartDataRequestBuilder {
   public getColNameStringFilter(): PendingChartDataRequestFilter[] {
     return this.buildFilters().map(v => {
       const row = getAllColumnInMeta(this.dataView.meta)?.find(val =>
-        isEqual(val.path, v.column),
+        isEqualObject(val.path, v.column),
       );
       return {
         ...v,
