@@ -113,7 +113,7 @@ export const buildDateLevelFields = (args: {
             type: item.type,
             category: item.category,
             expression: `${item.expression}(${FieldTemplate(v.path)})`,
-            displayName: v.path[v.path.length - 1] + `（${item.name}）`,
+            displayName: v.path[v.path?.length - 1] + `（${item.name}）`,
           };
         }
         return null;
