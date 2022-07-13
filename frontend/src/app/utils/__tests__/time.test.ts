@@ -21,7 +21,7 @@ import { splitRangerDateFilters } from '../time';
 describe('test splitRangerDateFilters', () => {
   const rangerDateFilter = {
     aggOperator: null,
-    column: '日期',
+    column: ['日期'],
     sqlOperator: 'BETWEEN',
     values: [
       {
@@ -36,7 +36,7 @@ describe('test splitRangerDateFilters', () => {
   };
   const badRangerDateFilter = {
     aggOperator: null,
-    column: '日期',
+    column: ['日期'],
     sqlOperator: 'BETWEEN',
     values: [
       {
@@ -47,7 +47,7 @@ describe('test splitRangerDateFilters', () => {
   };
   const otherFilter1 = {
     aggOperator: null,
-    column: '日期',
+    column: ['日期'],
     sqlOperator: 'LT',
     values: [
       {
@@ -56,11 +56,10 @@ describe('test splitRangerDateFilters', () => {
       },
     ],
   };
-
   const splittedDateFilters = [
     {
       aggOperator: null,
-      column: '日期',
+      column: ['日期'],
       sqlOperator: 'GTE',
       values: [
         {
@@ -71,7 +70,7 @@ describe('test splitRangerDateFilters', () => {
     },
     {
       aggOperator: null,
-      column: '日期',
+      column: ['日期'],
       sqlOperator: 'LT',
       values: [
         {
@@ -90,12 +89,14 @@ describe('test splitRangerDateFilters', () => {
     const res3 = splitRangerDateFilters([otherFilter1]);
     expect(res3).toEqual([otherFilter1]);
   });
+
   test('should splitRangerDateFilters del bad rangeDateFilter', () => {
     const res4 = splitRangerDateFilters([badRangerDateFilter]);
     expect(res4).toEqual([]);
     const res5 = splitRangerDateFilters([badRangerDateFilter, otherFilter1]);
     expect(res5).toEqual([otherFilter1]);
   });
+
   test('should splitRangerDateFilters not arr to []', () => {
     const res1 = splitRangerDateFilters(null as any);
     expect(res1).toEqual([]);

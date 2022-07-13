@@ -27,7 +27,11 @@ import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/sl
 import { ChartsEventData } from 'app/types/Chart';
 import ChartDataView from 'app/types/ChartDataView';
 import { formatTime } from 'app/utils/time';
-import { BOARD_COPY_CHART_SUFFIX, BOARD_SELF_CHART_PREFIX, FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
+import {
+  BOARD_COPY_CHART_SUFFIX,
+  FilterSqlOperator,
+  TIME_FORMATTER,
+} from 'globalConstants';
 import produce from 'immer';
 import { CSSProperties } from 'react';
 import { CloneValueDeep } from 'utils/object';
@@ -592,14 +596,10 @@ export const getWidgetMap = (
     .filter(w => w.config.originalType === ORIGINAL_TYPE_MAP.ownedChart)
     .forEach(widget => {
       let dataChart = (widget.config.content as any).dataChart as DataChart;
-
-      const ownedDataChartId = `${BOARD_SELF_CHART_PREFIX}${widget.dashboardId}_${widget.id}`;
       if (dataChart) {
-        dataChart.id = ownedDataChartId;
-
         wrappedDataCharts.push(dataChart!);
       }
-      widget.datachartId = ownedDataChartId;
+      widget.datachartId = dataChart?.id;
     });
 
   // 处理 widget包含关系 tab Widget 被包含的 widget.parentId 不为空
@@ -679,6 +679,7 @@ export const getValueByRowData = (
   data: ChartsEventData | undefined,
   fieldName: string,
 ) => {
+  // TODO: Not used for now, you can delete it
   let toCaseField = JSON.parse(fieldName).join('.');
 
   return data?.rowData[toCaseField];

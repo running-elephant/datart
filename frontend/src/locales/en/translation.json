@@ -198,6 +198,9 @@
       "orgSettings": {
         "title": "Organization Settings"
       },
+      "resourceMigration": {
+        "title": "Resource Migration"
+      },
       "export": {
         "title": "Export",
         "selectText": "Select the data to export",
@@ -960,7 +963,7 @@
     },
     "action": {
       "common": {
-        "downloadForExcel": "Download Excel",
+        "exportForExcel": "Export Excel",
         "confirm": "Please Confirm",
         "ok": "OK",
         "cancel": "Cancel",
@@ -986,9 +989,9 @@
         "enablePassword": "Password",
         "generateLink": "Generate Link",
         "shareLink": "Share Management",
-        "downloadData": "Download Excel",
-        "downloadPDF": "Download PDF",
-        "downloadPicture": "Download Picture",
+        "exportData": "Export Excel",
+        "exportPDF": "Export PDF",
+        "exportPicture": "Export Picture",
         "exportTpl": "Export Template",
         "NONE": "None",
         "CODE": "Code",

@@ -121,12 +121,15 @@ export const BoardEditor: React.FC<{
     const histState = history.location.state as any;
     try {
       if (histState?.widgetInfo) {
+        // TODO(Stephen): to be confirm if use history state widget info and for what
+        console.error(
+          'if you see the error on board editor, please contact to administrator',
+        );
         const widgetInfo = JSON.parse(histState.widgetInfo);
-
         if (widgetInfo) {
           let subType: 'widgetChart' | 'dataChart' = 'dataChart';
           if (!widgetInfo.dataChart.id) {
-            widgetInfo.dataChart.id = `${BOARD_SELF_CHART_PREFIX}` + uuidv4();
+            widgetInfo.dataChart.id = `${BOARD_SELF_CHART_PREFIX}${boardId}_${uuidv4()}`;
             subType = 'widgetChart';
           }
           dispatch(

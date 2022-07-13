@@ -35,4 +35,5 @@ export type ChartDataViewMeta = {
   expression?: string;
   role?: string;
   children?: ChartDataViewMeta[];
+  isViewComputedFields?: boolean;
 };

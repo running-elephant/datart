@@ -3,6 +3,7 @@ import { Empty, Tree as AntTree, TreeProps as AntTreeProps } from 'antd';
 import classnames from 'classnames';
 import styled from 'styled-components/macro';
 import {
+  FONT_SIZE_BODY,
   FONT_SIZE_TITLE,
   FONT_WEIGHT_MEDIUM,
   FONT_WEIGHT_REGULAR,
@@ -68,14 +69,14 @@ const StyledDirectoryTree = styled(AntTree)`
       width: ${SPACE};
       height: ${SPACE};
       content: '';
-      background-color: ${p => p.theme.borderColorBase};
+      background-color: ${p => p.theme.borderColorEmphasis};
       border-radius: 50%;
       transform: translate(-50%, -50%);
     }
 
     .ant-tree-treenode {
       align-items: center;
-      padding: 0 0 ${SPACE} ${SPACE_XS};
+      padding: 2px 0 2px ${SPACE_XS};
 
       .ant-tree-node-content-wrapper {
         display: flex;
@@ -161,8 +162,8 @@ const StyledDirectoryTree = styled(AntTree)`
       }
 
       .ant-tree-switcher-noop:before {
-        width: ${SPACE_TIMES(0.75)};
-        height: ${SPACE_TIMES(0.75)};
+        width: 3px;
+        height: 3px;
       }
 
       .ant-tree-treenode {
@@ -171,6 +172,11 @@ const StyledDirectoryTree = styled(AntTree)`
 
           .ant-tree-iconEle {
             width: ${SPACE_TIMES(5)};
+
+            .iconfont,
+            .anticon {
+              font-size: ${FONT_SIZE_TITLE};
+            }
           }
         }
       }
@@ -189,8 +195,8 @@ const StyledDirectoryTree = styled(AntTree)`
       }
 
       .ant-tree-switcher-noop:before {
-        width: ${SPACE_TIMES(0.75)};
-        height: ${SPACE_TIMES(0.75)};
+        width: 3px;
+        height: 3px;
       }
 
       .ant-tree-treenode {
@@ -200,9 +206,9 @@ const StyledDirectoryTree = styled(AntTree)`
           .ant-tree-iconEle {
             width: ${SPACE_TIMES(4)};
 
-            .anticon,
-            .iconfont {
-              font-size: ${FONT_SIZE_TITLE};
+            .iconfont,
+            .anticon {
+              font-size: ${FONT_SIZE_BODY};
             }
           }
         }

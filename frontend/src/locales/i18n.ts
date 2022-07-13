@@ -58,5 +58,3 @@ export const antdLocales = {
   en: antd_en_US,
   zh: antd_zh_CN,
 };
-
-

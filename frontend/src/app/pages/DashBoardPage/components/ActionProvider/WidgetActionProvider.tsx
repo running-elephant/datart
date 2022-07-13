@@ -47,6 +47,7 @@ import {
   editBoardStackActions,
   editDashBoardInfoActions,
   editWidgetInfoActions,
+  editWidgetSelectedItemsActions,
 } from '../../pages/BoardEditor/slice';
 import {
   clearActiveWidgets,
@@ -91,13 +92,26 @@ export const WidgetActionProvider: FC<{
           dispatch(pasteWidgetsAction());
         },
         onChangeGroupRect: debounce(
-          (args: { wid: string; w: number; h: number }) => {
-            const { wid, w, h } = args;
-            dispatch(changeGroupRectAction({ renderMode, boardId, wid, w, h }));
+          (args: {
+            wid: string;
+            w: number;
+            h: number;
+            isAutoGroupWidget: boolean;
+          }) => {
+            const { wid, w, h, isAutoGroupWidget } = args;
+            dispatch(
+              changeGroupRectAction({
+                renderMode,
+                boardId,
+                wid,
+                w,
+                h,
+                isAutoGroupWidget,
+              }),
+            );
           },
           60,
         ),
-
         onEditDeleteActiveWidgets: debounce((ids?: string[]) => {
           dispatch(deleteWidgetsAction(ids));
         }, 200),
@@ -139,8 +153,14 @@ export const WidgetActionProvider: FC<{
         onUpdateWidgetConfig: (config: WidgetConf, wid: string) => {
           dispatch(editBoardStackActions.updateWidgetConfig({ wid, config }));
         },
-        onEditFreeWidgetRect: (rect, wid) => {
-          dispatch(editBoardStackActions.changeFreeWidgetRect({ rect, wid }));
+        onEditFreeWidgetRect: (rect, wid, isAutoGroupWidget) => {
+          dispatch(
+            editBoardStackActions.changeFreeWidgetRect({
+              rect,
+              wid,
+              isAutoGroupWidget,
+            }),
+          );
         },
         onUpdateWidgetConfigByKey: ops => {
           if (boardEditing) {
@@ -150,7 +170,6 @@ export const WidgetActionProvider: FC<{
           }
           dispatch(editBoardStackActions.updateWidgetConfigByKey(ops));
         },
-
         onWidgetUpdate: (widget: Widget) => {
           if (boardEditing) {
             dispatch(editBoardStackActions.updateWidget(widget));
@@ -167,7 +186,23 @@ export const WidgetActionProvider: FC<{
             }),
           );
         },
-        //
+        onUpdateWidgetSelectedItems: (widget: Widget, selectedItems) => {
+          if (boardEditing) {
+            dispatch(
+              editWidgetSelectedItemsActions.changeSelectedItemsInEditor({
+                wid: widget?.id,
+                data: selectedItems,
+              }),
+            );
+          } else {
+            dispatch(
+              boardActions.changeSelectedItems({
+                wid: widget?.id,
+                data: selectedItems,
+              }),
+            );
+          }
+        },
         onWidgetChartClick: (widget: Widget, params: ChartMouseEventParams) => {
           dispatch(
             widgetChartClickAction({
@@ -180,7 +215,6 @@ export const WidgetActionProvider: FC<{
             }),
           );
         },
-
         onWidgetClearLinkage: (widget: Widget) => {
           dispatch(
             widgetToClearLinkageAction(boardEditing, widget, renderMode),
@@ -197,7 +231,6 @@ export const WidgetActionProvider: FC<{
         onWidgetGetData: (widget: Widget) => {
           dispatch(widgetGetDataAction(boardEditing, widget, renderMode));
         },
-
         onEditChartWidget: (widget: Widget) => {
           const originalType = widget.config.originalType;
           const chartType =
@@ -231,14 +264,6 @@ export const WidgetActionProvider: FC<{
             }),
           );
         },
-        // onEditWidgetLinkage: (widgetId: string) => {},
-
-        // onEditWidgetCloseLinkage: (widget: Widget) => {
-        //   dispatch(closeLinkageAction(widget));
-        // },
-        // onEditWidgetCloseJump: (widget: Widget) => {
-        //   dispatch(closeJumpAction(widget));
-        // },
         onEditWidgetLock: (id: string) => {
           dispatch(editBoardStackActions.toggleLockWidget({ id, lock: true }));
         },
@@ -289,9 +314,14 @@ export interface WidgetActionContextProps {
   onRefreshWidgetsByController: (widget: Widget) => void;
   onWidgetsQuery: () => void;
   onRenderedWidgetById: (wid: string) => void;
-  onChangeGroupRect: (args: { wid: string; w: number; h: number }) => void;
-
+  onChangeGroupRect: (args: {
+    wid: string;
+    w: number;
+    h: number;
+    isAutoGroupWidget: boolean;
+  }) => void;
   onWidgetLinkEvent: (widget: Widget) => (params) => void;
+  onUpdateWidgetSelectedItems: (widget: Widget, selectedItems) => void;
 
   onWidgetDataUpdate: ({
     computedFields,
@@ -332,7 +362,11 @@ export interface WidgetActionContextProps {
   onEditPasteWidgets: () => void;
   onEditComposeGroup: (wid?: string) => void;
   onEditUnGroupAction: (wid?: string) => void;
-  onEditFreeWidgetRect: (rect: RectConfig, wid: string) => void;
+  onEditFreeWidgetRect: (
+    rect: RectConfig,
+    wid: string,
+    isAutoGroupWidget: boolean,
+  ) => void;
   //
 }
 export const WidgetActionContext = createContext<WidgetActionContextProps>(

@@ -225,8 +225,8 @@ const ChartDrillContextMenu: FC<{
   }, [
     hasContextMenu,
     onDrillThroughChange,
-    t,
     metas,
+    t,
     drillThroughRules,
     onCrossFilteringChange,
     hasCrossFiltering,

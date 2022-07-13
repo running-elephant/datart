@@ -588,13 +588,16 @@ const DataModelTree: FC = memo(() => {
             id: field.id,
             expression: field.expression,
             category: field.category,
+            isViewComputedFields: true,
           },
         );
         handleDataModelComputerFieldChange(newComputedFields);
 
         return;
       }
-      const newComputedFields = (computedFields || []).concat([field]);
+      const newComputedFields = (computedFields || []).concat([
+        { ...field, isViewComputedFields: true },
+      ]);
       handleDataModelComputerFieldChange(newComputedFields);
     },
     [computedFields, sourceId, handleDataModelComputerFieldChange],

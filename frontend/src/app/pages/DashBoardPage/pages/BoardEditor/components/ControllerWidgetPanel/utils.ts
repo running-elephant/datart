@@ -18,8 +18,8 @@
 
 import {
   ChartDataViewFieldCategory,
-  DataViewFieldType,
   ControllerFacadeTypes,
+  DataViewFieldType,
   TimeFilterValueCategory,
 } from 'app/constants';
 import {

@@ -16,9 +16,14 @@
  * limitations under the License.
  */
 
+import { ChartDataSectionType } from 'app/constants';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartMouseEventParams } from 'app/types/Chart';
 import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import {
+  filterFiltersByInteractionRule,
+  filterVariablesByInteractionRule,
+} from 'app/utils/internalChartHelper';
 import { FilterSqlOperator } from 'globalConstants';
 import i18next from 'i18next';
 import { RootState } from 'types';
@@ -197,14 +202,17 @@ export const widgetLinkEventAction =
     const targetLinkDataChartIds = (params || []).map(p => p.rule?.relId);
     const rootState = getState() as RootState;
     const viewBoardState = rootState.board as BoardState;
-    const editBoardState = rootState.editBoard as EditBoardState;
-    const widgetMapMap = viewBoardState?.widgetRecord;
+    const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
+    const widgetMapMap =
+      renderMode === 'read'
+        ? viewBoardState?.widgetRecord?.[widget?.dashboardId]
+        : editBoardState.stack?.present?.widgetRecord;
     const boardWidgetInfoRecord =
       renderMode === 'read'
         ? viewBoardState?.widgetInfoRecord?.[widget?.dashboardId]
         : editBoardState.widgetInfoRecord;
     const dataChartMap = viewBoardState.dataChartMap;
-    const widgetMap = widgetMapMap?.[widget?.dashboardId] || {};
+    const widgetMap = widgetMapMap || {};
     const sourceWidgetInfo = boardWidgetInfoRecord?.[widget.id];
     const sourceWidgetRuntimeLinkInfo = sourceWidgetInfo?.linkInfo || {};
     const {
@@ -215,26 +223,25 @@ export const widgetLinkEventAction =
       widgetMap: widgetMap,
       params: undefined,
     });
-
-    const boardLinkWidgets = Object.entries(
-      widgetMapMap?.[widget?.dashboardId] || {},
-    )
+    const boardLinkWidgets = Object.entries(widgetMapMap || {})
       .filter(([k, v]) => {
         return targetLinkDataChartIds.includes(v.datachartId);
       })
       .map(([k, v]) => v);
-
     boardLinkWidgets.forEach(targetWidget => {
       const dataChart = dataChartMap?.[targetWidget.datachartId];
       const dimensionNames = dataChart?.config?.chartConfig?.datas?.flatMap(
         d => {
-          if (d.type === 'group' || d.type === 'color') {
+          if (
+            d.type === ChartDataSectionType.Group ||
+            d.type === ChartDataSectionType.Color
+          ) {
             return d.rows?.map(r => r.colName) || [];
           }
           return [];
         },
       );
-      const widgetSelectedItems =
+      const targetWidgetSelectedItems =
         renderMode === 'read'
           ? viewBoardState?.selectedItems?.[targetWidget.id]
           : editBoardState.selectedItemsMap.selectedItems?.[targetWidget.id];
@@ -243,7 +250,6 @@ export const widgetLinkEventAction =
       );
       const filterObj = clickEventParam?.filters;
       const isUnSelectedAll = clickEventParam?.isUnSelectedAll;
-
       const clickFilters: PendingChartDataRequestFilter[] = Object.entries(
         filterObj || {},
       )
@@ -254,17 +260,21 @@ export const widgetLinkEventAction =
             values: (v as any)?.map(vv => ({ value: vv, valueType: 'STRING' })),
           };
         })
-        .filter(
-          f =>
-            isEmptyArray(widgetSelectedItems) ||
-            !dimensionNames?.includes(f.column),
+        .filter(f =>
+          moveFilterIfHasSelectedItems(
+            targetWidgetSelectedItems,
+            dimensionNames,
+            f.column,
+          ),
         );
-      const sourceLinkFilters = sourceWidgetRuntimeLinkInfo?.filters?.filter(
-        f =>
-          isEmptyArray(widgetSelectedItems) ||
-          !dimensionNames?.includes(f.column),
-      );
-
+      const sourceLinkFilters =
+        sourceWidgetRuntimeLinkInfo?.filters?.filter(f =>
+          moveFilterIfHasSelectedItems(
+            targetWidgetSelectedItems,
+            dimensionNames,
+            f.column,
+          ),
+        ) || [];
       const widgetInfo = boardWidgetInfoRecord?.[targetWidget.id];
       const { filterParams: controllerFilters, variableParams } =
         getTheWidgetFiltersAndParams<PendingChartDataRequestFilter>({
@@ -272,24 +282,35 @@ export const widgetLinkEventAction =
           widgetMap: widgetMap,
           params: undefined,
         });
+      const sourceLinkAndControllerFilterByRule =
+        filterFiltersByInteractionRule(
+          clickEventParam?.rule,
+          ...sourceLinkFilters,
+          ...sourceControllerFilters,
+        );
+      const sourceLinkAndControllerVariablesByRule =
+        filterVariablesByInteractionRule(
+          clickEventParam?.rule,
+          Object.assign(
+            sourceWidgetRuntimeLinkInfo?.variables || {},
+            sourceVariableParams,
+          ),
+        );
 
       const fetchChartDataParam = {
         boardId: targetWidget.dashboardId,
         widgetId: targetWidget.id,
         option: widgetInfo,
-        isUnSelectedAll,
         extraFilters: isUnSelectedAll
           ? controllerFilters || []
           : (clickFilters || [])
               .concat(controllerFilters || [])
-              .concat(sourceLinkFilters || [])
-              .concat(sourceControllerFilters || []),
+              .concat(sourceLinkAndControllerFilterByRule || []),
         variableParams: isUnSelectedAll
           ? variableParams || {}
           : Object.assign(
               variableParams,
-              sourceWidgetRuntimeLinkInfo?.variables,
-              sourceVariableParams,
+              sourceLinkAndControllerVariablesByRule,
             ),
       };
 
@@ -575,13 +596,15 @@ export const changeGroupRectAction =
     wid: string;
     w: number;
     h: number;
+    isAutoGroupWidget: boolean;
   }) =>
   dispatch => {
     const { renderMode } = args;
     if (renderMode === 'edit') {
       dispatch(changeEditGroupRectAction(args));
     } else {
-      dispatch(changeViewGroupRectAction(args));
+      // NOTE: it should not be calculate group rect for non edit mode.
+      // dispatch(changeViewGroupRectAction(args));
     }
   };
 
@@ -592,6 +615,7 @@ export const changeViewGroupRectAction =
     wid: string;
     w: number;
     h: number;
+    isAutoGroupWidget: boolean;
   }) =>
   (dispatch, getState) => {
     const { wid, w, h, boardId } = args;
@@ -615,6 +639,7 @@ export const changeViewGroupRectAction =
     const parentIsAutoBoard =
       widget.config.boardType === 'auto' && !widget.parentId;
 
+    // TODO(Stephen): to be fix board is auto board
     if (parentIsContainer || parentIsAutoBoard) {
       dispatch(
         boardActions.changeFreeWidgetRect({
@@ -633,6 +658,7 @@ export const changeEditGroupRectAction =
     wid: string;
     w: number;
     h: number;
+    isAutoGroupWidget: boolean;
   }) =>
   (dispatch, getState) => {
     const { wid, w, h } = args;
@@ -661,7 +687,16 @@ export const changeEditGroupRectAction =
         editBoardStackActions.changeFreeWidgetRect({
           wid,
           rect,
+          isAutoGroupWidget: args.isAutoGroupWidget,
         }),
       );
     }
   };
+
+const moveFilterIfHasSelectedItems = (
+  selectedItems,
+  dimensionNames,
+  filterName,
+) => {
+  return isEmptyArray(selectedItems) || !dimensionNames?.includes(filterName);
+};

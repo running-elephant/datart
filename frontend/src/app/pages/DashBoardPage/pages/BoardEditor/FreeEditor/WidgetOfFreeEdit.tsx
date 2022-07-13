@@ -83,8 +83,8 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
       x: Number(curXY[0].toFixed(1)),
       y: Number(curXY[1].toFixed(1)),
     };
-    onEditFreeWidgetRect(nextRect, widget.id);
-  }, [curXY, onEditFreeWidgetRect, widget.config, widget.id]);
+    onEditFreeWidgetRect(nextRect, widget.id, false);
+  }, [curXY, onEditFreeWidgetRect, widget.config.rect, widget.id]);
   useEffect(() => {
     widgetMove.on(move);
     widgetMoveEnd.on(moveEnd);
@@ -139,7 +139,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
         width: Number(size.width.toFixed(1)),
         height: Number(size.height.toFixed(1)),
       };
-      onEditFreeWidgetRect(nextRect, widget.id);
+      onEditFreeWidgetRect(nextRect, widget.id, false);
     },
     [onEditFreeWidgetRect, widget.config.rect, widget.id],
   );

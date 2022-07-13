@@ -16,14 +16,4 @@
  * limitations under the License.
  */
 
-import ScoreChart from '../ScoreChart';
-
-describe('<ScoreChart />', () => {
-  let component;
-  beforeEach(() => {
-    component = new ScoreChart();
-  });
-  test('it should mount', () => {
-    expect(component).toBeDatartChartModel();
-  });
-});
+export { GroupWidget1 as GroupWidget } from './GroupWidget1';

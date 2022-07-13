@@ -18,6 +18,7 @@
 import { Col, Form, Input, InputNumber, Modal, Row, Select } from 'antd';
 import { ColorPickerPopover } from 'app/components/ColorPicker';
 import { DataViewFieldType } from 'app/constants';
+import useMount from 'app/hooks/useMount';
 import { memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { G70 } from 'styles/StyleConstants';
@@ -69,7 +70,7 @@ export default function Add({
   const [form] = Form.useForm<ScorecardConditionalStyleFormValues>();
   const [type] = useState(DataViewFieldType.NUMERIC);
 
-  useEffect(() => {
+  useMount(() => {
     if (type) {
       setOperatorSelect(
         ConditionalOperatorTypes[type]?.map(item => ({
@@ -80,7 +81,7 @@ export default function Add({
     } else {
       setOperatorSelect([]);
     }
-  }, []);
+  });
 
   useEffect(() => {
     // !重置form

@@ -24,6 +24,7 @@ import {
 import { Button, Checkbox, Divider, Empty, Input, Menu, Popover } from 'antd';
 import { MenuListItem, Tree } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useMount from 'app/hooks/useMount';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
 import classnames from 'classnames';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
@@ -56,6 +57,7 @@ interface SelectDataSourceProps {
   structure?: StructViewQueryProps;
   sourceId?: string;
   joinTable?: JoinTableProps;
+  allowManage: boolean;
   onChange?: (data: any, type) => void;
 }
 
@@ -66,6 +68,7 @@ const SelectDataSource = memo(
     structure,
     sourceId,
     joinTable,
+    allowManage,
     onChange,
   }: SelectDataSourceProps) => {
     const dispatch = useDispatch();
@@ -234,14 +237,19 @@ const SelectDataSource = memo(
         const leftContainer = joinTable?.conditions?.[0].left;
 
         if (leftContainer) {
-          structure?.joins.forEach(v => {
-            if (v.table?.every(val => leftContainer?.includes(val))) {
-              setSelectedTableSchema({
-                table: v?.['table'],
-                columns: v?.['columns'],
-              });
-            }
-          });
+          if (structure?.table?.every(val => leftContainer?.includes(val))) {
+            setSelectedTableSchema({
+              table: structure?.['table'],
+            });
+          } else {
+            structure?.joins.forEach(v => {
+              if (v.table?.every(val => leftContainer?.includes(val))) {
+                setSelectedTableSchema({
+                  table: v?.['table'],
+                });
+              }
+            });
+          }
         }
       }
     }, [structure, renderType, joinTable?.conditions]);
@@ -252,7 +260,7 @@ const SelectDataSource = memo(
       }
     }, [sourceId, sources, type]);
 
-    useEffect(() => {
+    useMount(() => {
       if (type === 'MAIN' && structure?.table.length && !selectedTableSchema) {
         setCurrentSources(sources.find(v => v.id === sourceId) || null);
         setSelectedTableSchema({
@@ -267,7 +275,7 @@ const SelectDataSource = memo(
           columns: joinTable['columns'],
         });
       }
-    }, []);
+    });
 
     return (
       <>
@@ -275,7 +283,7 @@ const SelectDataSource = memo(
           trigger={['click']}
           placement="bottomLeft"
           overlayClassName="datart-popup"
-          visible={visible}
+          visible={allowManage && visible}
           onVisibleChange={
             renderType === 'MANAGE' ? handleVisibleChange : undefined
           }
@@ -366,10 +374,11 @@ const SelectDataSource = memo(
                       currentTableAllColumns.length
                   }
                   onChange={e => {
-                    handleCheckAllColumns(
-                      e.target.checked,
-                      currentTableAllColumns,
-                    );
+                    allowManage &&
+                      handleCheckAllColumns(
+                        e.target.checked,
+                        currentTableAllColumns,
+                      );
                   }}
                   checked={
                     selectedTableSchema?.columns.length ===
@@ -381,7 +390,7 @@ const SelectDataSource = memo(
                 <SmallDivider />
                 <ColumnList
                   value={selectedTableSchema?.columns}
-                  onChange={handleColumnCheck}
+                  onChange={allowManage ? handleColumnCheck : undefined}
                   options={currentTableAllColumns}
                 />
               </PopoverBody>

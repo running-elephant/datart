@@ -146,7 +146,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   const expensiveQuery = useMemo(() => {
     try {
       return dataview?.config
-        ? Boolean(JSON.parse(dataview.config).expensiveQuery)
+        ? Boolean(JSON.parse(dataview.config || '{}').expensiveQuery)
         : false;
     } catch (error) {
       console.log(error);
@@ -539,7 +539,9 @@ export const ChartEditor: FC<ChartEditorProps> = ({
                 aggregation,
                 chartConfig: chartConfig,
                 chartGraphId: chart?.meta?.id,
-                computedFields: dataview?.computedFields,
+                computedFields: dataview?.computedFields?.filter(
+                  v => !v.isViewComputedFields,
+                ),
               }),
               viewId: dataview?.id,
               avatar: chart?.meta?.id,

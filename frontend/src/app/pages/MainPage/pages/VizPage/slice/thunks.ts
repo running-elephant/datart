@@ -57,8 +57,8 @@ import {
 export const getFolders = createAsyncThunk<Folder[], string>(
   'viz/getFolders',
   async orgId => {
-    const { data } = await request2<Folder[]>(`/viz/folders?orgId=${orgId}`);
-    return data;
+    const response = await request2<Folder[]>(`/viz/folders?orgId=${orgId}`);
+    return response?.data;
   },
 );
 
@@ -366,7 +366,7 @@ export const fetchDataSetByPreviewChartAction = createAsyncThunk(
     if (!currentChartPreview?.backendChart?.view.id) {
       return {
         backendChartId: currentChartPreview?.backendChartId,
-        data: currentChartPreview?.backendChart?.config.sampleData,
+        data: currentChartPreview?.backendChart?.config.sampleData || [],
       };
     }
     const builder = new ChartDataRequestBuilder(

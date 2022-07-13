@@ -15,46 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { editBoardStackActions } from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
 import { memo, useContext, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { LEVEL_10 } from 'styles/StyleConstants';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { EditMask } from '../../WidgetComponents/EditMask';
-import { GroupWidgetCore } from './groupWidgetCore';
+import { GroupWidgetCore1 } from './GroupWidgetCore1';
 
-export const GroupWidget: React.FC<{}> = memo(() => {
-  const widget = useContext(WidgetContext);
-  const { onEditDeleteActiveWidgets } = useContext(WidgetActionContext);
-  const boardType = widget.config.boardType;
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(
-      editBoardStackActions.adjustGroupWidgets({ groupIds: [widget.id] }),
-    );
-    if (!widget.config.children?.length) {
-      onEditDeleteActiveWidgets([widget.id]);
-    }
-  }, [
-    dispatch,
-    onEditDeleteActiveWidgets,
-    widget.config.children?.length,
-    widget.id,
-  ]);
-  if (boardType === 'auto' && !widget.parentId) {
-    return <AutoGroupWidget />;
-  } else {
-    return <FreeGroupWidget />;
-  }
-});
 export const FreeGroupWidget: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
   const wid = widget.id;
-  const { editing } = useContext(BoardContext);
+  const { editing, boardType } = useContext(BoardContext);
   const rect = widget.config.rect;
   const { onChangeGroupRect } = useContext(WidgetActionContext);
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
@@ -62,15 +37,20 @@ export const FreeGroupWidget: React.FC<{}> = memo(() => {
   });
   useEffect(() => {
     if (cacheW > 1 && cacheH > 1) {
-      onChangeGroupRect({ wid, w: cacheW, h: cacheH });
+      onChangeGroupRect({
+        wid,
+        w: cacheW,
+        h: cacheH,
+        isAutoGroupWidget: false,
+      });
     }
-  }, [cacheW, cacheH, wid, onChangeGroupRect]);
+  }, [cacheW, cacheH, wid, onChangeGroupRect, boardType]);
 
   return (
     <StyleWrapper className="group-wrapper" ref={cacheWhRef}>
       <AbsoluteWrapper className="group-absolute" x={rect.x} y={rect.y}>
         <RelativeWrapper className="group-relative">
-          <GroupWidgetCore widgetIds={widget.config.children || []} />
+          <GroupWidgetCore1 widgetIds={widget.config.children || []} />
         </RelativeWrapper>
       </AbsoluteWrapper>
 
@@ -79,33 +59,6 @@ export const FreeGroupWidget: React.FC<{}> = memo(() => {
   );
 });
 
-export const AutoGroupWidget: React.FC<{}> = memo(() => {
-  const widget = useContext(WidgetContext);
-  const wid = widget.id;
-  const { editing } = useContext(BoardContext);
-  const { onChangeGroupRect } = useContext(WidgetActionContext);
-
-  const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight({
-    refreshRate: 60,
-  });
-  useEffect(() => {
-    if (cacheW > 1 && cacheH > 1) {
-      onChangeGroupRect({ wid, w: cacheW, h: cacheH });
-    }
-  }, [cacheW, cacheH, wid, onChangeGroupRect, editing]);
-
-  return (
-    <StyleWrapper className="group-wrapper" ref={cacheWhRef}>
-      <AbsoluteWrapper className="group-absolute" x={0} y={0}>
-        <RelativeWrapper className="group-relative">
-          <GroupWidgetCore widgetIds={widget.config.children || []} />
-        </RelativeWrapper>
-      </AbsoluteWrapper>
-
-      {editing && <EditMask />}
-    </StyleWrapper>
-  );
-});
 const AbsoluteWrapper = styled.div<{ x: number; y: number }>`
   position: absolute;
   top: ${p => -p.y + 'px'};

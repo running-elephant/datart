@@ -111,7 +111,7 @@ export const ImportPage: FC<{}> = memo(() => {
 });
 const StyledWrapper = styled.div`
   flex: 1;
-  padding: ${SPACE_LG};
+  padding: 0 ${SPACE_LG} ${SPACE_LG} ${SPACE_LG};
   overflow-y: auto;
 
   .ant-card {

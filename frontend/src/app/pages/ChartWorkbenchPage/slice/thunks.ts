@@ -219,6 +219,10 @@ export const updateChartAction = createAsyncThunk(
   ) => {
     const state = thunkAPI.getState() as any;
     const workbenchState = state.workbench as typeof initState;
+    const computedFields =
+      workbenchState.currentDataView?.computedFields?.filter(
+        v => !v.isViewComputedFields,
+      );
 
     const requestBody = buildUpdateChartRequest({
       chartId: arg.chartId,
@@ -229,7 +233,7 @@ export const updateChartAction = createAsyncThunk(
       parentId: arg.parentId,
       name: arg.name,
       viewId: arg.viewId,
-      computedFields: workbenchState.currentDataView?.computedFields,
+      computedFields,
     });
 
     const response = await request2<{

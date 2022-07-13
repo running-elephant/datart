@@ -41,10 +41,11 @@ export function convertToChartDto(data): ChartDTO {
   }
 
   return Object.assign({}, data, {
-    config: JSON.parse(data?.config),
+    config: JSON.parse(data?.config || '{}'),
     view: {
       ...Omit(data?.view, ['model']),
       meta: transformHierarchyMeta(data?.view?.model),
+      computedFields: JSON.parse(data?.view?.model || '{}').computedFields,
     },
   });
 }

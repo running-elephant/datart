@@ -379,7 +379,7 @@ export function transformMeta(model?: string) {
   if (!model) {
     return undefined;
   }
-  const jsonObj = JSON.parse(model);
+  const jsonObj = JSON.parse(model || '{}');
   const HierarchyModel = 'hierarchy' in jsonObj ? jsonObj.hierarchy : jsonObj;
   return Object.keys(HierarchyModel || {}).flatMap(colKey => {
     const column = HierarchyModel[colKey];
@@ -404,7 +404,7 @@ export function transformHierarchyMeta(model?: string): ChartDataViewMeta[] {
   if (!model) {
     return [];
   }
-  const modelObj = JSON.parse(model);
+  const modelObj = JSON.parse(model || '{}');
   const hierarchyMeta = !Object.keys(modelObj?.hierarchy || {}).length
     ? modelObj.columns
     : modelObj.hierarchy;
@@ -659,7 +659,7 @@ export const transformToViewConfig = (
 } => {
   let viewConfigMap = viewConfig;
   if (typeof viewConfig === 'string') {
-    viewConfigMap = JSON.parse(viewConfig);
+    viewConfigMap = JSON.parse(viewConfig || '{}');
   }
   const fields = [
     'cache',
@@ -836,15 +836,14 @@ export const getJumpFiltersByInteractionRule = (
     }, {});
 };
 
-export const getLinkFiltersByInteractionRule = (
-  clickEventFilters: PendingChartDataRequestFilter[] = [],
-  chartFilters: PendingChartDataRequestFilter[] = [],
-  variableFilters: PendingChartDataRequestFilter[] = [],
+export const filterFiltersByInteractionRule = (
   rule?: InteractionRule,
-): Record<string, string | any> => {
-  return clickEventFilters
-    .concat(chartFilters)
-    .concat(variableFilters)
+  ...filters: PendingChartDataRequestFilter[]
+): PendingChartDataRequestFilter[] => {
+  if (!rule) {
+    return filters;
+  }
+  return (filters || [])
     .map(f => {
       if (isEmpty(f)) {
         return null;
@@ -872,24 +871,38 @@ export const getLinkFiltersByInteractionRule = (
         }) as PendingChartDataRequestFilter;
       }
     })
-    .filter(Boolean)
-    .reduce((acc, cur) => {
-      if (cur?.column) {
-        const currentValues = cur?.values?.map(v => v.value) || [];
-        const column = cur.column!;
-        if (column! in acc) {
-          const oldValues: string[] = acc[column] || [];
-          if (isEmptyArray(oldValues)) {
-            acc[column] = currentValues;
-          } else {
-            acc[column] = currentValues.filter(cv => oldValues.includes(cv));
-          }
-        } else {
+    .filter(Boolean) as PendingChartDataRequestFilter[];
+};
+
+export const getLinkFiltersByInteractionRule = (
+  clickEventFilters: PendingChartDataRequestFilter[] = [],
+  chartFilters: PendingChartDataRequestFilter[] = [],
+  variableFilters: PendingChartDataRequestFilter[] = [],
+  rule?: InteractionRule,
+): Record<string, string | any> => {
+  const ruleFilters = filterFiltersByInteractionRule(
+    rule,
+    ...clickEventFilters,
+    ...chartFilters,
+    ...variableFilters,
+  );
+  return ruleFilters.reduce((acc, cur) => {
+    if (cur?.column) {
+      const currentValues = cur?.values?.map(v => v.value) || [];
+      const column = cur.column!;
+      if (column! in acc) {
+        const oldValues: string[] = acc[column] || [];
+        if (isEmptyArray(oldValues)) {
           acc[column] = currentValues;
+        } else {
+          acc[column] = currentValues.filter(cv => oldValues.includes(cv));
         }
+      } else {
+        acc[column] = currentValues;
       }
-      return acc;
-    }, {});
+    }
+    return acc;
+  }, {});
 };
 
 export const getJumpOperationFiltersByInteractionRule = (
@@ -934,6 +947,28 @@ export const getJumpOperationFiltersByInteractionRule = (
     }, []);
 };
 
+export const filterVariablesByInteractionRule = (
+  rule?: InteractionRule,
+  variables?: Record<string, any[]>,
+) => {
+  if (rule?.[rule.category!]?.['relation'] === InteractionFieldRelation.Auto) {
+    return undefined;
+  }
+  const customizeRelations: CustomizeRelation[] =
+    rule?.[rule.category!]?.[InteractionFieldRelation.Customize]?.filter(
+      r => r.type === InteractionRelationType.Variable,
+    ) || [];
+  if (isEmptyArray(customizeRelations)) {
+    return undefined;
+  }
+  return Object.keys(variables || {}).reduce((acc, cur) => {
+    if (customizeRelations.some(r => r.source === cur)) {
+      acc[cur] = variables?.[cur];
+    }
+    return acc;
+  }, {});
+};
+
 export const getVariablesByInteractionRule = (
   queryVariables?: Variable[],
   rule?: InteractionRule,
@@ -954,7 +989,7 @@ export const getVariablesByInteractionRule = (
       ?.filter(v => v.type === VariableTypes.Query)
       ?.find(v => v.name === cur.source)?.defaultValue;
     if (sourceVariableValueStr && cur.target) {
-      acc[cur.target] = JSON.parse(sourceVariableValueStr);
+      acc[cur.target] = JSON.parse(sourceVariableValueStr || '{}');
       return acc;
     }
     return acc;

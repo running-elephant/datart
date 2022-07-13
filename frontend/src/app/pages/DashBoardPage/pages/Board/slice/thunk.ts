@@ -115,7 +115,7 @@ export const exportBoardTpl = createAsyncThunk<
   }
 >('board/exportBoardTpl', async (params, { dispatch, rejectWithValue }) => {
   const { dashboard, widgets, callBack } = params;
-  const { data } = await request2<any>({
+  await request2<any>({
     url: `viz/export/dashboard/template`,
     method: 'POST',
     data: { dashboard, widgets },
@@ -220,7 +220,6 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
   {
     boardId: string;
     widgetId: string;
-    isUnSelectedAll?: boolean;
     option?: getDataOption;
     extraFilters?: PendingChartDataRequestFilter[];
     variableParams?: Record<string, any[]>;
@@ -229,14 +228,7 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
 >(
   'board/syncBoardWidgetChartDataAsync',
   async (
-    {
-      boardId,
-      widgetId,
-      isUnSelectedAll,
-      option,
-      extraFilters,
-      variableParams,
-    },
+    { boardId, widgetId, option, extraFilters, variableParams },
     { getState, dispatch },
   ) => {
     const boardState = getState() as { board: BoardState };
@@ -283,8 +275,10 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
         boardActions.setWidgetData({
           wid: widgetId,
           data: { ...data, id: widgetId },
-          selectedItems: isUnSelectedAll ? [] : undefined,
         }),
+      );
+      await dispatch(
+        boardActions.renderedWidgets({ boardId, widgetIds: [widgetId] }),
       );
       await dispatch(
         boardActions.changeWidgetLinkInfo({
@@ -324,7 +318,13 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
         boardActions.setWidgetData({
           wid: widgetId,
           data: undefined,
-          selectedItems: [],
+        }),
+      );
+    } finally {
+      await dispatch(
+        boardActions.changeSelectedItems({
+          wid: widgetId,
+          data: [],
         }),
       );
     }
@@ -432,8 +432,19 @@ export const getChartWidgetDataAsync = createAsyncThunk<
           errorType: 'request',
         }),
       );
-
-      dispatch(boardActions.setWidgetData({ wid: widgetId, data: undefined }));
+      dispatch(
+        boardActions.setWidgetData({
+          wid: widgetId,
+          data: undefined,
+        }),
+      );
+    } finally {
+      await dispatch(
+        boardActions.changeSelectedItems({
+          wid: widgetId,
+          data: [],
+        }),
+      );
     }
     dispatch(
       boardActions.addFetchedItem({

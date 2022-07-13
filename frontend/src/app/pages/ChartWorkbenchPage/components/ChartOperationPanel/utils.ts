@@ -43,6 +43,7 @@ export const getAllFieldsOfEachType = (args: {
   const allFields = dataView?.meta || [];
 
   let hierarchyFields = allFields.filter(f => f.role === ColumnRole.Hierarchy);
+
   const allNoHierarchyFields = fieldsSortByType(
     allFields.filter(f => f.role !== ColumnRole.Hierarchy),
     sortType,

@@ -69,6 +69,7 @@ import {
   isEmptyArray,
   meanValue,
   pipe,
+  UniqWith,
 } from 'utils/object';
 import { TableColumnsList } from '../components/ChartGraph/BasicTableChart/types';
 import {
@@ -1810,4 +1811,15 @@ export function getMinAndMaxNumber(
 
 export function findPathByNameInMeta(meta, colName) {
   return getAllColumnInMeta(meta)?.find(v => v.name === colName);
+}
+
+export function mergeChartAndViewComputedField(
+  viewComputer?: ChartDataViewMeta[],
+  chartComputer?: ChartDataViewMeta[],
+) {
+  viewComputer = viewComputer || [];
+  return UniqWith(
+    viewComputer.concat(chartComputer || []),
+    (a, b) => a?.id === b?.id,
+  );
 }
