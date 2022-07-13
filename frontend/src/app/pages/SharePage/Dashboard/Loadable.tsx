@@ -19,6 +19,6 @@
 import { defaultLazyLoad } from 'utils/loadable';
 
 export const LazyShareDashboard = defaultLazyLoad(
-  () => import('./ShareDashboard'),
+  () => import('./ShareDashboardPage'),
   module => module.default,
 );

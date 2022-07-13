@@ -27,25 +27,26 @@ import styled from 'styled-components';
 import { getToken } from 'utils/auth';
 import persistence from 'utils/persistence';
 import { urlSearchTransfer } from 'utils/urlSearchTransfer';
-import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
-import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
-import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
-import ChartForShare from './ChartForShare';
-import PasswordModal from './PasswordModal';
-import ShareLoginModal from './ShareLoginModal';
-import { useShareSlice } from './slice';
+import { BoardLoading } from '../../DashBoardPage/components/BoardLoading';
+import { VizRenderMode } from '../../DashBoardPage/pages/Board/slice/types';
+import { FilterSearchParams } from '../../MainPage/pages/VizPage/slice/types';
+import PasswordModal from '../components/PasswordModal';
+import ShareLoginModal from '../components/ShareLoginModal';
+import { useShareSlice } from '../slice';
 import {
   selectAvailableSourceFunctions,
   selectChartPreview,
   selectNeedVerify,
   selectShareExecuteTokenMap,
   selectShareVizType,
-} from './slice/selectors';
+} from '../slice/selectors';
 import {
   fetchAvailableSourceFunctionsForShare,
   fetchShareVizInfo,
-} from './slice/thunks';
-export function ShareChart() {
+} from '../slice/thunks';
+import ChartForShare from './ChartForShare';
+
+export function ShareChartPage() {
   const { shareActions: actions } = useShareSlice();
 
   const dispatch = useDispatch();
@@ -187,7 +188,7 @@ export function ShareChart() {
     </StyledWrapper>
   );
 }
-export default ShareChart;
+export default ShareChartPage;
 const StyledWrapper = styled.div`
   width: 100%;
   height: 100vh;

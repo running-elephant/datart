@@ -27,21 +27,21 @@ import styled from 'styled-components';
 import { getToken } from 'utils/auth';
 import persistence from 'utils/persistence';
 import { urlSearchTransfer } from 'utils/urlSearchTransfer';
-import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
-import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';
-import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
-import { useEditBoardSlice } from '../DashBoardPage/pages/BoardEditor/slice';
-import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
-import { useStoryBoardSlice } from '../StoryBoardPage/slice';
-import { selectShareStoryBoard } from '../StoryBoardPage/slice/selectors';
-import PasswordModal from './PasswordModal';
-import ShareLoginModal from './ShareLoginModal';
-import { useShareSlice } from './slice';
-import { selectNeedVerify, selectShareVizType } from './slice/selectors';
-import { fetchShareVizInfo } from './slice/thunks';
+import { BoardLoading } from '../../DashBoardPage/components/BoardLoading';
+import { useBoardSlice } from '../../DashBoardPage/pages/Board/slice';
+import { VizRenderMode } from '../../DashBoardPage/pages/Board/slice/types';
+import { useEditBoardSlice } from '../../DashBoardPage/pages/BoardEditor/slice';
+import { FilterSearchParams } from '../../MainPage/pages/VizPage/slice/types';
+import { useStoryBoardSlice } from '../../StoryBoardPage/slice';
+import { selectShareStoryBoard } from '../../StoryBoardPage/slice/selectors';
+import PasswordModal from '../components/PasswordModal';
+import ShareLoginModal from '../components/ShareLoginModal';
+import { useShareSlice } from '../slice';
+import { selectNeedVerify, selectShareVizType } from '../slice/selectors';
+import { fetchShareVizInfo } from '../slice/thunks';
 import { StoryPlayerForShare } from './StoryPlayerForShare';
 
-function ShareStoryPlayer() {
+function ShareStoryPlayerPage() {
   const { shareActions: actions } = useShareSlice();
   useStoryBoardSlice();
   useBoardSlice();
@@ -161,7 +161,7 @@ function ShareStoryPlayer() {
     </StyledWrapper>
   );
 }
-export default ShareStoryPlayer;
+export default ShareStoryPlayerPage;
 const StyledWrapper = styled.div`
   width: 100%;
   height: 100vh;

@@ -16,7 +16,4 @@
  * limitations under the License.
  */
 
-import { AppRouter } from 'app/AppRouter';
-import { generateEntryPoint } from 'entryPointFactory';
-
-generateEntryPoint(AppRouter);
+export { Router } from './Router';

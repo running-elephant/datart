@@ -35,25 +35,25 @@ import { getToken } from 'utils/auth';
 import persistence from 'utils/persistence';
 import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 import { uuidv4 } from 'utils/utils';
-import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
-import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';
-import { selectShareBoard } from '../DashBoardPage/pages/Board/slice/selector';
-import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
-import { useEditBoardSlice } from '../DashBoardPage/pages/BoardEditor/slice';
-import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
-import BoardForShare from './BoardForShare';
-import PasswordModal from './PasswordModal';
-import ShareLoginModal from './ShareLoginModal';
-import { useShareSlice } from './slice';
+import { BoardLoading } from '../../DashBoardPage/components/BoardLoading';
+import { useBoardSlice } from '../../DashBoardPage/pages/Board/slice';
+import { selectShareBoard } from '../../DashBoardPage/pages/Board/slice/selector';
+import { VizRenderMode } from '../../DashBoardPage/pages/Board/slice/types';
+import { useEditBoardSlice } from '../../DashBoardPage/pages/BoardEditor/slice';
+import { FilterSearchParams } from '../../MainPage/pages/VizPage/slice/types';
+import PasswordModal from '../components/PasswordModal';
+import ShareLoginModal from '../components/ShareLoginModal';
+import { useShareSlice } from '../slice';
 import {
   selectNeedVerify,
   selectShareExecuteTokenMap,
   selectSharePassword,
   selectShareVizType,
-} from './slice/selectors';
-import { fetchShareVizInfo } from './slice/thunks';
+} from '../slice/selectors';
+import { fetchShareVizInfo } from '../slice/thunks';
+import DashboardForShare from './DashboardForShare';
 
-function ShareDashboard() {
+function ShareDashboardPage() {
   const { shareActions: actions } = useShareSlice();
   useEditBoardSlice();
   useBoardSlice();
@@ -227,7 +227,7 @@ function ShareDashboard() {
       )}
 
       {!Boolean(needVerify) && shareBoard && (
-        <BoardForShare
+        <DashboardForShare
           dashboard={shareBoard}
           allowDownload={true}
           loadVizData={loadVizData}
@@ -241,7 +241,7 @@ function ShareDashboard() {
     </StyledWrapper>
   );
 }
-export default ShareDashboard;
+export default ShareDashboardPage;
 const StyledWrapper = styled.div`
   width: 100%;
   height: 100vh;

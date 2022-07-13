@@ -16,7 +16,9 @@
  * limitations under the License.
  */
 
-import { AppRouter } from 'app/AppRouter';
-import { generateEntryPoint } from 'entryPointFactory';
+import { defaultLazyLoad } from 'utils/loadable';
 
-generateEntryPoint(AppRouter);
+export const LazyShareChart = defaultLazyLoad(
+  () => import('./ShareChartPage'),
+  module => module.default,
+);

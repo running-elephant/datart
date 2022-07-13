@@ -33,24 +33,24 @@ import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import { FC, memo, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import ChartDrillContext from '../../contexts/ChartDrillContext';
-import ControllerPanel from '../MainPage/pages/VizPage/ChartPreview/components/ControllerPanel';
+import ChartDrillContext from '../../../contexts/ChartDrillContext';
+import ControllerPanel from '../../MainPage/pages/VizPage/ChartPreview/components/ControllerPanel';
 import {
   ChartPreview,
   FilterSearchParams,
-} from '../MainPage/pages/VizPage/slice/types';
-import { HeadlessBrowserIdentifier } from './HeadlessBrowserIdentifier';
-import { shareActions } from './slice';
+} from '../../MainPage/pages/VizPage/slice/types';
+import { HeadlessBrowserIdentifier } from '../components/HeadlessBrowserIdentifier';
+import { shareActions } from '../slice';
 import {
   selectHeadlessBrowserRenderSign,
   selectSelectedItems,
   selectShareExecuteTokenMap,
-} from './slice/selectors';
+} from '../slice/selectors';
 import {
   fetchShareDataSetByPreviewChartAction,
   updateFilterAndFetchDatasetForShare,
   updateGroupAndFetchDatasetForShare,
-} from './slice/thunks';
+} from '../slice/thunks';
 
 const TitleHeight = 100;
 const ChartForShare: FC<{
