@@ -54,10 +54,10 @@ public class DatabaseMigration {
     private static final TreeSet<Migration> allMigrations = new TreeSet<>();
 
     private static final String TABLE_CREATE_SQL = "CREATE TABLE `migration_history`  (" +
-            "  `id` varchar(255) NOT NULL," +
-            "  `version` varchar(255) NOT NULL," +
+            "  `id` varchar(32) NOT NULL," +
+            "  `version` varchar(128) NOT NULL," +
             "  `file_name` varchar(255) NOT NULL," +
-            "  `execute_user` varchar(255) NOT NULL," +
+            "  `execute_user` varchar(128) NOT NULL," +
             "  `execute_date` timestamp NOT NULL," +
             "  `success` tinyint(1) NOT NULL," +
             "  PRIMARY KEY (`id`)" +
