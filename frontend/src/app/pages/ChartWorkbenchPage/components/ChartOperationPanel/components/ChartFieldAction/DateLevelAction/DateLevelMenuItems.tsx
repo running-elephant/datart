@@ -114,9 +114,13 @@ const DateLevelMenuItems = memo(
         </Menu.Item>
         {DATE_LEVELS.map(item => {
           if (availableSourceFunctions?.includes(item.expression)) {
-            const colName = item.name;
+            const configColName =
+              config.category === ChartDataViewFieldCategory.Field
+                ? config.colName
+                : config.field;
+
             const row = getAllColumnInMeta(metas)?.find(
-              v => v.name === config.field,
+              v => v.name === configColName,
             );
             const expression = `${item.expression}(${FieldTemplate(
               row?.path,
@@ -130,12 +134,12 @@ const DateLevelMenuItems = memo(
                 onClick={() =>
                   handleChangeFn({
                     category: ChartDataViewFieldCategory.DateLevelComputedField,
-                    colName,
+                    colName: item.name,
                     expression,
                   })
                 }
               >
-                {colName}
+                {item.name}
               </Menu.Item>
             );
           }
