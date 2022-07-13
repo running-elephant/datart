@@ -151,6 +151,7 @@ const ChartPreviewBoardForShare: FC<{
           aggregation: chartPreview?.backendChart?.config?.aggregation,
           chartConfig: chartConfigRef?.current,
           ruleId,
+          isJumpUrlOnly: true,
         };
       },
       [orgId, chartPreview, getDrillThroughSetting],
@@ -203,7 +204,6 @@ const ChartPreviewBoardForShare: FC<{
         [],
       );
       const hasSelectedItems = !isEmptyArray(selectedItems);
-
       return Boolean(
         drillThroughSetting?.rules?.filter(
           r => r.event === InteractionMouseEvent.Right,

@@ -126,6 +126,7 @@ export const InteractionI18N = {
       title: '跳转设置',
       rule: {
         title: '规则设置',
+        tip: '分享页仅支持跳转到URL一种方式',
         addRule: '+ 点击新建',
         inputUrl: '请输入URL',
         header: {
@@ -210,6 +211,7 @@ export const InteractionI18N = {
       title: 'Drill Through',
       rule: {
         title: 'Rule',
+        tip: 'Drill through only support jump to url',
         addRule: '+ Add New',
         inputUrl: 'Please input url',
         header: {
