@@ -62,7 +62,6 @@ function useStateModal({ initState }: { initState?: any }) {
             Object.create(null),
             ...spreadParmas,
           );
-          // @TM 清空
           stateRef.current = {};
           if (isPromise(okCBResult)) return okCBResult;
         } catch (e) {
@@ -76,7 +75,6 @@ function useStateModal({ initState }: { initState?: any }) {
   };
 
   const handleClickCancelButton = () => {
-    // @TM 清空
     stateRef.current = {};
     cancelCallbackRef.current?.call(Object.create(null), null);
   };
