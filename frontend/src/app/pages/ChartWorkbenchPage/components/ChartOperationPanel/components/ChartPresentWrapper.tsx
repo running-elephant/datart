@@ -21,6 +21,7 @@ import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NCont
 import { IChart } from 'app/types/Chart';
 import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
+import ChartDataView from 'app/types/ChartDataView';
 import { FC, memo, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
@@ -38,6 +39,7 @@ const ChartPresentWrapper: FC<{
   onChartChange: (c: IChart) => void;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
+  dataView?: ChartDataView;
   selectedItems?: SelectedItem[];
 }> = memo(
   ({
@@ -48,6 +50,7 @@ const ChartPresentWrapper: FC<{
     expensiveQuery,
     chartConfig,
     allowQuery,
+    dataView,
     onChartChange,
     onRefreshDataset,
     onCreateDownloadDataTask,
@@ -87,6 +90,7 @@ const ChartPresentWrapper: FC<{
             onRefreshDataset={onRefreshDataset}
             onCreateDownloadDataTask={onCreateDownloadDataTask}
             selectedItems={selectedItems}
+            dataView={dataView}
           />
         </ChartI18NContext.Provider>
       </StyledChartPresentWrapper>

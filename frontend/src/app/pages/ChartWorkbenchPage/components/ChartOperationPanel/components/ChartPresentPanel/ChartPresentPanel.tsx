@@ -28,6 +28,7 @@ import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selec
 import { IChart } from 'app/types/Chart';
 import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
+import ChartDataView from 'app/types/ChartDataView';
 import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
 import { FC, memo, useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -59,6 +60,7 @@ const ChartPresentPanel: FC<{
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
   selectedItems?: SelectedItem[];
+  dataView?: ChartDataView;
 }> = memo(
   ({
     containerHeight,
@@ -71,6 +73,7 @@ const ChartPresentPanel: FC<{
     onRefreshDataset,
     onCreateDownloadDataTask,
     selectedItems,
+    dataView,
   }) => {
     const translate = useI18NPrefix(`viz.palette.present`);
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
@@ -121,7 +124,10 @@ const ChartPresentPanel: FC<{
         <StyledReusableChartContainer>
           {ChartPresentType.GRAPH === chartType && (
             <>
-              <ChartDrillContextMenu chartConfig={chartConfig}>
+              <ChartDrillContextMenu
+                chartConfig={chartConfig}
+                metas={dataView?.meta}
+              >
                 {renderGraph(containerId, chart, chartConfig, style)}
               </ChartDrillContextMenu>
               <ChartDrillPaths chartConfig={chartConfig} />
