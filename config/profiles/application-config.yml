@@ -80,6 +80,8 @@ server:
     keyAlias: tomcat
 
 datart:
+  migration:
+    enable: true # 是否开启数据库自动升级
   server:
     address: ${datart.address:http://127.0.0.1:8080}
 

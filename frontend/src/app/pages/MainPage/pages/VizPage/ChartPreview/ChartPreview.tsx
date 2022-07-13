@@ -707,7 +707,10 @@ const ChartPreviewBoard: FC<{
             </div>
             <ChartWrapper ref={ref}>
               <Spin wrapperClassName="spinWrapper" spinning={loadingStatus}>
-                <ChartDrillContextMenu chartConfig={chartPreview?.chartConfig!}>
+                <ChartDrillContextMenu
+                  chartConfig={chartPreview?.chartConfig!}
+                  metas={chartPreview?.backendChart?.view?.meta}
+                >
                   <ChartIFrameContainer
                     key={backendChartId}
                     containerId={backendChartId}

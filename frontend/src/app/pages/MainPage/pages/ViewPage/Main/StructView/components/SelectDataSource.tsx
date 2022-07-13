@@ -24,6 +24,7 @@ import {
 import { Button, Checkbox, Divider, Empty, Input, Menu, Popover } from 'antd';
 import { MenuListItem, Tree } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useMount from 'app/hooks/useMount';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
 import classnames from 'classnames';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
@@ -259,7 +260,7 @@ const SelectDataSource = memo(
       }
     }, [sourceId, sources, type]);
 
-    useEffect(() => {
+    useMount(() => {
       if (type === 'MAIN' && structure?.table.length && !selectedTableSchema) {
         setCurrentSources(sources.find(v => v.id === sourceId) || null);
         setSelectedTableSchema({
@@ -274,7 +275,7 @@ const SelectDataSource = memo(
           columns: joinTable['columns'],
         });
       }
-    }, []);
+    });
 
     return (
       <>

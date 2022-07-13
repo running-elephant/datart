@@ -17,15 +17,13 @@
  */
 
 import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
-import { prefixI18N } from 'app/hooks/useI18NPrefix';
+import { FieldTemplate } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartDataViewPanel/components/utils';
 import { ColumnRole } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { updateBy } from 'app/utils/mutation';
 import { CloneValueDeep } from 'utils/object';
 import { DATE_LEVELS } from '../../slice/constant';
-
-const Prefix = 'viz.workbench.dataview.';
 
 export const getAllFieldsOfEachType = (args: {
   sortType;
@@ -105,13 +103,12 @@ export const buildDateLevelFields = (args: {
           availableSourceFunctions.includes(item.expression)
         ) {
           return {
-            id: `${v.name}（${item.expression}）`,
-            name: v.name,
+            name: v.name + `（${item.name}）`,
+            field: v.name,
             type: item.type,
             category: item.category,
-            expression: item.expression,
-            path: v.path,
-            displayName: v.path[v.path.length - 1],
+            expression: `${item.expression}(${FieldTemplate(v.path)})`,
+            displayName: v.path[v.path?.length - 1] + `（${item.name}）`,
           };
         }
         return null;
@@ -138,6 +135,7 @@ export const fieldsSortByType = (fields, sortType) => {
     }
   });
 };
+
 export const getCanReplaceViewFields = (
   viewFields: ChartDataViewMeta[],
   target: ChartDataSectionField,
@@ -205,12 +203,9 @@ export const findSameFieldInView = (
       bool = findSameFieldInView(item.children, field);
     }
     if (bool) return true;
-    const itemName =
-      item.category === 'dateLevelComputedField'
-        ? `${item.name}（${prefixI18N(Prefix + item.expression)}）`
-        : item.name;
+
     if (
-      itemName === field.colName &&
+      item.name === field.colName &&
       item.category === field.category &&
       item.type === field.type
     ) {

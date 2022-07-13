@@ -26,10 +26,8 @@ const ChartSearchableList: FC<{
   onItemSelected: (itemKey) => void;
 }> = memo(({ source, onItemSelected }) => {
   const [listItems, setListItems] = useState(source);
-  const [searchValue, setSearchValue] = useState<string>();
 
   useEffect(() => {
-    setSearchValue('');
     setListItems(source);
   }, [source]);
 
@@ -38,7 +36,6 @@ const ChartSearchableList: FC<{
   };
 
   const handleSearch = debounce((value: string) => {
-    setSearchValue(value);
     if (!value || !value.trim()) {
       setListItems(source);
     }

@@ -24,7 +24,6 @@ import {
 } from 'app/constants';
 import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import useFieldActionModal from 'app/hooks/useFieldActionModal';
-import { FieldTemplate } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartDataViewPanel/components/utils';
 import ChartAggregationContext from 'app/pages/ChartWorkbenchPage/contexts/ChartAggregationContext';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import VizDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
@@ -103,17 +102,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                   ...val,
                   aggregate: getDefaultAggregate(val, currentConfig),
                 };
-                if (
-                  val.category ===
-                  ChartDataViewFieldCategory.DateLevelComputedField
-                ) {
-                  config.colName = `${val.colName}（${t(val.expression)}）`;
-                  config.expression = `${val.expression}(${FieldTemplate(
-                    val.path,
-                  )})`;
-                  config.field = val.colName;
-                  delete config.path;
-                }
+
                 return config;
               }),
             );

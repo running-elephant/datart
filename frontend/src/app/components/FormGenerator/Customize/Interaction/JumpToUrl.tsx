@@ -46,13 +46,16 @@ const JumpToUrl: FC<
     });
   };
 
-  const handleUpdateUrl = useCallback(url => {
-    setUrl(url);
-    onValueChange({
-      ...value,
-      url,
-    });
-  }, []);
+  const handleUpdateUrl = useCallback(
+    url => {
+      setUrl(url);
+      onValueChange({
+        ...value,
+        url,
+      });
+    },
+    [onValueChange, value],
+  );
 
   return (
     <Space>

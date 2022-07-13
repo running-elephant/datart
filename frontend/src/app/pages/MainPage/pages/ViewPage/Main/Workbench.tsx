@@ -93,6 +93,7 @@ export const Workbench = memo(() => {
     editorInstance?.layout();
   }, [editorInstance, allowManage]);
 
+  /* eslint-disable-next-line */
   const onResize = useCallback(
     debounce(() => {
       editorInstance?.layout();

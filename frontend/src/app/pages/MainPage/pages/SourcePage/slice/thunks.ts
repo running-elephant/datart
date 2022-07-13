@@ -83,18 +83,21 @@ export const addSource = createAsyncThunk<
 export const editSource = createAsyncThunk<Source, EditSourceParams>(
   'source/editSource',
   async ({ source, resolve, reject }) => {
-    try {
-      await request2<boolean>({
+    await request2<boolean>(
+      {
         url: `/sources/${source.id}`,
         method: 'PUT',
         data: source,
-      });
-      resolve();
-      return source;
-    } catch (error) {
-      reject && reject();
-      throw error;
-    }
+      },
+      undefined,
+      {
+        onRejected(error) {
+          reject && reject();
+        },
+      },
+    );
+    resolve();
+    return source;
   },
 );
 

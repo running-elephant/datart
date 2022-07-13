@@ -17,16 +17,10 @@
  */
 
 import { request2 } from 'utils/request';
-import { errorHandle } from 'utils/utils';
 export const confirmInvite = async (token: string) => {
-  try {
-    const { data } = await request2<string>({
-      url: `/orgs/invite/confirm?token=${token}`,
-      method: 'GET',
-    });
-    return data;
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
+  const { data } = await request2<string>({
+    url: `/orgs/invite/confirm?token=${token}`,
+    method: 'GET',
+  });
+  return data;
 };
