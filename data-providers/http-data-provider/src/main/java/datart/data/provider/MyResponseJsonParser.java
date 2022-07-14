@@ -84,7 +84,7 @@ public class MyResponseJsonParser implements HttpResponseParser {
                         }).collect(Collectors.toList());
             } else {
                 //如果不是
-                columns = getSchema(array.get(0));
+                columns = getSchema(array.get(0), mappingFieldMap);
                 rows = array.parallelStream()
                         .map(Collections::singletonList).collect(Collectors.toList());
             }
@@ -97,10 +97,20 @@ public class MyResponseJsonParser implements HttpResponseParser {
         return dataframe;
     }
 
-    private ArrayList<Column> getSchema(Object value) {
+    private ArrayList<Column> getSchema(Object value, TreeMap<String, String> mappingFieldMap) {
         ArrayList<Column> columns = new ArrayList<>();
         Column column = new Column();
         column.setName("defaultKey");
+        //if mappingFieldMap will reset column's  name
+        if (null != mappingFieldMap &&
+                !mappingFieldMap.isEmpty() ) {
+            Map.Entry<String, String> defaultEntry = mappingFieldMap.firstEntry();
+            if (null != defaultEntry) {
+                //if value is blank , defaultEntry's key instead of column's name
+                String name = (defaultEntry.getValue() != null && StringUtils.isNotBlank(defaultEntry.getValue())) ? defaultEntry.getValue() : defaultEntry.getKey();
+                column.setName(name);
+            }
+        }
         if (value != null) {
             if (value instanceof JSONObject || value instanceof JSONArray) {
                 value = value.toString();
