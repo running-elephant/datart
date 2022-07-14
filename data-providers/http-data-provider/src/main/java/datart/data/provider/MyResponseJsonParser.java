@@ -1,4 +1,4 @@
-/*
+package datart.data.provider;/*
  * Datart
  * <p>
  * Copyright 2021
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package datart.data.provider;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -25,6 +24,7 @@ import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.Column;
 import datart.core.data.provider.Dataframe;
+import datart.data.provider.HttpResponseParser;
 import datart.data.provider.jdbc.DataTypeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -32,14 +32,11 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class ResponseJsonParser implements HttpResponseParser {
+public class MyResponseJsonParser implements HttpResponseParser {
 
     private static final String PROPERTY_SPLIT = "\\.";
 
@@ -68,35 +65,65 @@ public class ResponseJsonParser implements HttpResponseParser {
         if (array == null || array.size() == 0) {
             return dataframe;
         }
-
+        List<List<Object>> rows = new ArrayList<>();
         if (CollectionUtils.isEmpty(columns)) {
-            columns = getSchema(array.getJSONObject(0));
+            //返回类型如果是JSONObject
+            if (array.get(0) instanceof JSONObject) {
+                columns = getSchema(array.getJSONObject(0), mappingFieldMap);
+                rows = array.toJavaList(JSONObject.class).parallelStream()
+                        .map(item -> {
+                            return item.keySet()
+                                    .stream()
+                                    .map(key -> {
+                                        Object val = item.get(key);
+                                        if (val instanceof JSONObject || val instanceof JSONArray) {
+                                            val = val.toString();
+                                        }
+                                        return val;
+                                    }).collect(Collectors.toList());
+                        }).collect(Collectors.toList());
+            } else {
+                //如果不是
+                columns = getSchema(array.get(0));
+                rows = array.parallelStream()
+                        .map(Collections::singletonList).collect(Collectors.toList());
+            }
         }
 
         dataframe.setColumns(columns);
 
-        Set<String> columnKeySet = columns.stream().map(Column::columnName)
-                .collect(Collectors.toSet());
 
-        List<List<Object>> rows = array.toJavaList(JSONObject.class).parallelStream()
-                .map(item -> {
-                    return columnKeySet.stream().map(key -> {
-                        Object val = item.get(key);
-                        if (val instanceof JSONObject || val instanceof JSONArray) {
-                            val = val.toString();
-                        }
-                        return val;
-                    }).collect(Collectors.toList());
-                }).collect(Collectors.toList());
         dataframe.setRows(rows);
         return dataframe;
     }
 
-    private ArrayList<Column> getSchema(JSONObject jsonObject) {
+    private ArrayList<Column> getSchema(Object value) {
+        ArrayList<Column> columns = new ArrayList<>();
+        Column column = new Column();
+        column.setName("defaultKey");
+        if (value != null) {
+            if (value instanceof JSONObject || value instanceof JSONArray) {
+                value = value.toString();
+            }
+            column.setType(DataTypeUtils.javaType2DataType(value));
+        } else {
+            column.setType(ValueType.STRING);
+        }
+        columns.add(column);
+        return columns;
+    }
+
+    private ArrayList<Column> getSchema(JSONObject jsonObject, TreeMap<String, String> mappingFieldMap) {
         ArrayList<Column> columns = new ArrayList<>();
         for (String key : jsonObject.keySet()) {
             Column column = new Column();
-            column.setName(key);
+            if (null != mappingFieldMap &&
+                    !mappingFieldMap.isEmpty() &&
+                    StringUtils.isNotBlank(mappingFieldMap.get(key))) {
+                column.setName(mappingFieldMap.get(key));
+            } else {
+                column.setName(key);
+            }
             Object val = jsonObject.get(key);
             if (val != null) {
                 if (val instanceof JSONObject || val instanceof JSONArray) {
