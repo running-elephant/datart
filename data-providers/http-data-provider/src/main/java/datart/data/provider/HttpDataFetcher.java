@@ -80,7 +80,8 @@ public class HttpDataFetcher {
         } catch (Exception e) {
             parser = new ResponseJsonParser();
         }
-        return parser.parseResponse(param.getTargetPropertyName(), response, param.getColumns());
+        //parser = new MyResponseJsonParser();
+        return parser.parseResponse(param.getTargetPropertyName(), response, param.getColumns(),param.getMappingFieldMap());
 
     }
 
