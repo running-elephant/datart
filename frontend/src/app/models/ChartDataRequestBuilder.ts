@@ -359,7 +359,7 @@ export class ChartDataRequestBuilder {
       .map(f => {
         return {
           aggOperator: null,
-          column: this.buildColumnName(f.condition?.name!),
+          column: this.buildColumnName({ colName: f.condition?.name! }),
           sqlOperator: f.condition?.operator! as FilterSqlOperator,
           values: [
             { value: f.condition?.value as string, valueType: 'STRING' },
