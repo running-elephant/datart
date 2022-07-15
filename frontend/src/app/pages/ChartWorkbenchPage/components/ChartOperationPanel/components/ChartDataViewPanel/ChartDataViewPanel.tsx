@@ -171,20 +171,13 @@ const ChartDataViewPanel: FC<{
         return Promise.reject('field is empty');
       }
 
-      let validComputedField = true;
       try {
-        validComputedField = await checkComputedFieldAsync(
-          dataView?.sourceId,
-          field.expression,
-        );
+        await checkComputedFieldAsync(dataView?.sourceId, field.expression);
       } catch (error) {
-        validComputedField = false;
+        message.error(error as any);
+        return;
       }
 
-      if (!validComputedField) {
-        message.error('validate function computed field failed');
-        return Promise.reject('validate function computed field failed');
-      }
       const otherComputedFields = dataView?.computedFields?.filter(
         f => f.id !== originId,
       );

@@ -165,7 +165,7 @@ export async function checkComputedFieldAsync(sourceId, expression) {
       return qs.stringify(params, { arrayFormat: 'brackets' });
     },
   });
-  return !!response?.data;
+  return !!response;
 }
 
 export async function fetchAvailableSourceFunctionsAsync(sourceId) {

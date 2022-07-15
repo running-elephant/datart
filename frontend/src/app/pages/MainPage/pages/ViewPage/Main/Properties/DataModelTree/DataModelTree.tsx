@@ -546,20 +546,13 @@ const DataModelTree: FC = memo(() => {
         return Promise.reject('field is empty');
       }
 
-      let validComputedField = true;
       try {
-        validComputedField = await checkComputedFieldAsync(
-          sourceId,
-          field.expression,
-        );
+        await checkComputedFieldAsync(sourceId, field.expression);
       } catch (error) {
-        validComputedField = false;
+        message.error(error as any);
+        return;
       }
 
-      if (!validComputedField) {
-        message.error('validate function computed field failed');
-        return Promise.reject('validate function computed field failed');
-      }
       const otherComputedFields = computedFields?.filter(
         f => f.id !== originId,
       );
