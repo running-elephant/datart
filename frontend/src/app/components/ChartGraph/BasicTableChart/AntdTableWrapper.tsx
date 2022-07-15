@@ -106,13 +106,13 @@ const StyledTable = styled(Table)<{ tableStyleConfig?: TableStyleConfigProps }>`
   }
 
   .ant-table .ant-table-container .ant-table-body .datart-basic-table-odd {
-    color: ${p => p?.tableStyleConfig?.odd?.color || 'auto'};
+    color: ${p => p?.tableStyleConfig?.odd?.color || 'inherit'};
     background: ${p =>
       p?.tableStyleConfig?.odd?.backgroundColor || 'transparent'};
   }
 
   .ant-table .ant-table-container .ant-table-body .datart-basic-table-even {
-    color: ${p => p?.tableStyleConfig?.even?.color || 'auto'};
+    color: ${p => p?.tableStyleConfig?.even?.color || 'inherit'};
     background: ${p =>
       p?.tableStyleConfig?.even?.backgroundColor || 'transparent'};
   }
