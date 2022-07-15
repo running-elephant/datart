@@ -260,7 +260,7 @@ export function SourceDetailPage() {
         case CommonFormTypes.Add:
           dispatch(
             addSource({
-              source: { ...rest, orgId, config: configStr },
+              source: { ...rest, orgId, config: configStr, },
               resolve: id => {
                 message.success(t('createSuccess'));
                 history.push(`/organizations/${orgId}/sources/${id}`);
@@ -481,8 +481,7 @@ export function SourceDetailPage() {
               </Form.Item>
               {dataProviderConfigTemplateLoading && <LoadingOutlined />}
 
-              {(providerType !== 'FILE' || formType === CommonFormTypes.Edit) &&
-                config?.attributes.map(attr => (
+              {config?.attributes.map(attr => (
                   <ConfigComponent
                     key={`${providerType}_${attr.name}`}
                     attr={attr}
@@ -527,7 +526,7 @@ const Content = styled.div`
   }
 
   .detailForm {
-    max-width: ${SPACE_TIMES(240)};
+    max-width: ${SPACE_TIMES(400)};
     padding-top: ${SPACE_MD};
   }
 `;
