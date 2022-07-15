@@ -48,7 +48,9 @@ public class RegexVariableResolver {
         while (matcher.find()) {
             String group = matcher.group();
             ScriptVariable scriptVariable = variableMap.get(group);
-            variablePlaceholderMap.put(group, scriptVariable);
+            if (scriptVariable != null) {
+                variablePlaceholderMap.put(group, scriptVariable);
+            }
         }
         if (variablePlaceholderMap.isEmpty()) {
             return Collections.emptyList();
