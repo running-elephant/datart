@@ -763,13 +763,22 @@ class BasicTableChart extends ReactChart {
     };
   }
 
+  private setColumnWidthByColumnIndex(columns, index, width) {
+    columns.forEach(v => {
+      if (v?.columnIndex === index) {
+        v.width = width;
+        return;
+      }
+      if (v?.children && v?.children?.length) {
+        this.setColumnWidthByColumnIndex(v.children, index, width);
+      }
+    });
+  }
+
   private updateTableColumns(e, { size }, index) {
     const { columns } = this.cachedAntTableOptions;
     const nextColumns = [...columns];
-    nextColumns[index] = {
-      ...nextColumns[index],
-      width: size.width,
-    };
+    this.setColumnWidthByColumnIndex(nextColumns, index, size.width);
     const tableOptions = Object.assign(this.cachedAntTableOptions, {
       columns: nextColumns,
     });
@@ -889,6 +898,7 @@ class BasicTableChart extends ReactChart {
           uid: chartDataSet.getFieldKey(c),
         }),
         dataIndex: chartDataSet.getFieldIndex(c),
+        columnIndex: cIndex,
         key: chartDataSet.getFieldKey(c),
         aggregate: c?.aggregate,
         colName,
