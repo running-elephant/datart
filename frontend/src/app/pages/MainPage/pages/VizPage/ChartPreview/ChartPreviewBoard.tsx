@@ -728,7 +728,6 @@ const ChartPreviewBoard: FC<{
             <StyledChartDrillPathsContainer>
               <ChartDrillPaths chartConfig={chartPreview?.chartConfig!} />
             </StyledChartDrillPathsContainer>
-            <StyledChartDrillPathsContainer />
           </ChartDrillContext.Provider>
         </PreviewBlock>
         {viewDetailPanelContextHolder}

@@ -24,7 +24,6 @@ import datart.core.common.MessageResolver;
 import datart.core.common.RequestContext;
 import datart.core.data.provider.ExecuteParam;
 import datart.core.data.provider.QueryScript;
-import datart.core.data.provider.ScriptType;
 import datart.core.data.provider.ScriptVariable;
 import datart.data.provider.calcite.*;
 import datart.data.provider.script.ReplacementPair;
@@ -77,12 +76,9 @@ public class SqlScriptRender extends ScriptRender {
         this.quoteIdentifiers = quoteIdentifiers;
     }
 
-
     public String render(boolean withExecuteParam, boolean withPage, boolean onlySelectStatement) throws SqlParseException {
         //get the original value before processing the script
-        String srcSql = queryScript.getScript();
         QueryScriptProcessResult result = getScriptProcessor().process(queryScript);
-        result.setSrcSql(srcSql);
         String selectSql;
         // build with execute params
         if (withExecuteParam) {

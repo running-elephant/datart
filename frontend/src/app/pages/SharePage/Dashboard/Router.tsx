@@ -24,11 +24,11 @@ import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { GlobalStyles } from 'styles/globalStyles';
-import { LazyShareDashboard } from './pages/SharePage/LoadableDashbaord';
+import { LazyShareDashboard } from './Loadable';
 
 registerTheme('default', echartsDefaultTheme);
 
-export function ShareDashboardPage() {
+export function Router() {
   const { i18n } = useTranslation();
 
   return (
