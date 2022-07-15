@@ -54,6 +54,7 @@ import {
   deleteStoryPage,
   getPageContentDetail,
   getStoryDetail,
+  updateStroyBoardPagesByMoveEvent,
 } from '../slice/thunks';
 import { StoryBoardState } from '../slice/types';
 import { StoryToolBar } from './StoryToolBar';
@@ -232,6 +233,19 @@ export const StoryEditor: React.FC<{}> = memo(() => {
     }
   }, [dispatch, histState, storyId, history]);
 
+  const handleMoveCard = useCallback(
+    async (dragId, dropId) => {
+      dispatch(
+        updateStroyBoardPagesByMoveEvent({
+          storyId,
+          sortedPages,
+          event: { dragId, dropId },
+        }),
+      );
+    },
+    [dispatch, sortedPages, storyId],
+  );
+
   useEffect(() => {
     addPages();
   }, [addPages]);
@@ -260,9 +274,11 @@ export const StoryEditor: React.FC<{}> = memo(() => {
           >
             <PageListWrapper>
               <PageThumbnailList
+                canDrag={true}
                 sortedPages={sortedPages}
                 onPageClick={onPageClick}
                 onDeletePages={onDeletePages}
+                onMoveCard={handleMoveCard}
               />
             </PageListWrapper>
             <Content>
