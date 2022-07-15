@@ -70,11 +70,11 @@ public class ViewController extends BaseController {
 
     @ApiOperation(value = "update a view")
     @PutMapping(value = "/{viewId}")
-    public ResponseData<Boolean> updateView(@PathVariable String viewId,
-                                            @Validated @RequestBody ViewUpdateParam updateParam) {
+    public ResponseData<View> updateView(@PathVariable String viewId,
+                                         @Validated @RequestBody ViewUpdateParam updateParam) {
         checkBlank(viewId, "viewId");
         updateParam.setId(viewId);
-        return ResponseData.success(viewService.update(updateParam));
+        return ResponseData.success(viewService.updateView(updateParam));
     }
 
     @ApiOperation(value = "update a view base info")
