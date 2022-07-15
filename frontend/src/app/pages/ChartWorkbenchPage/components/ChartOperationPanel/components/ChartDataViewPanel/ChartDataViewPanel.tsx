@@ -72,6 +72,7 @@ const ChartDataViewPanel: FC<{
   onDataViewChange?: (clear?: boolean) => void;
 }> = memo(({ dataView, defaultViewId, chartConfig, onDataViewChange }) => {
   const t = useI18NPrefix(`viz.workbench.dataview`);
+  const tView = useI18NPrefix('view');
   const dispatch = useDispatch();
   const history = useHistory();
   const [showModal, modalContextHolder] = useStateModal({});
@@ -171,20 +172,13 @@ const ChartDataViewPanel: FC<{
         return Promise.reject('field is empty');
       }
 
-      let validComputedField = true;
       try {
-        validComputedField = await checkComputedFieldAsync(
-          dataView?.sourceId,
-          field.expression,
-        );
+        await checkComputedFieldAsync(dataView?.sourceId, field.expression);
       } catch (error) {
-        validComputedField = false;
+        message.error(error as any);
+        return;
       }
 
-      if (!validComputedField) {
-        message.error('validate function computed field failed');
-        return Promise.reject('validate function computed field failed');
-      }
       const otherComputedFields = dataView?.computedFields?.filter(
         f => f.id !== originId,
       );
@@ -192,12 +186,9 @@ const ChartDataViewPanel: FC<{
         f => f.id === field?.id,
       );
       if (isNameConflict) {
-        message.error(
-          'The computed field has already been exist, please choose another one!',
-        );
-        return Promise.reject(
-          'The computed field has already been exist, please choose another one!',
-        );
+        const nameConflictError = tView('computedFieldNameExistWarning');
+        message.error(nameConflictError);
+        return Promise.reject(nameConflictError);
       }
 
       const currentFieldIndex = (dataView?.computedFields || []).findIndex(
@@ -226,7 +217,7 @@ const ChartDataViewPanel: FC<{
         ),
       );
     },
-    [dispatch, dataView?.computedFields, dataView?.sourceId],
+    [dataView?.computedFields, dataView?.sourceId, dispatch, tView],
   );
 
   const handleDeleteComputedField = fieldId => {

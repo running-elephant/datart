@@ -67,6 +67,11 @@ export const StoryPagePreview: React.FC<{
     return sortedPages;
   }, [pageMap]);
 
+  const currentPage = useMemo(() => {
+    const currentPage = sortedPages[currentPageIndex];
+    return currentPage;
+  }, [currentPageIndex, sortedPages]);
+
   const onPageClick = useCallback(
     (index: number, pageId: string, multiple: boolean) => {
       setCurrentPageIndex(index);
@@ -80,10 +85,6 @@ export const StoryPagePreview: React.FC<{
     },
     [dispatch, storyId],
   );
-  const currentPage = useMemo(() => {
-    const currentPage = sortedPages[currentPageIndex];
-    return currentPage;
-  }, [currentPageIndex, sortedPages]);
 
   const toggleEdit = useCallback(() => {
     history.push(`/organizations/${orgId}/vizs/storyEditor/${storyId}`);
@@ -92,6 +93,7 @@ export const StoryPagePreview: React.FC<{
   const playStory = useCallback(() => {
     window.open(`storyPlayer/${storyId}`, '_blank');
   }, [storyId]);
+
   const { publishStory } = usePublishBoard(
     storyId,
     'STORYBOARD',
@@ -174,6 +176,7 @@ export const StoryPagePreview: React.FC<{
           >
             <PageListWrapper>
               <PageThumbnailList
+                canDrag={false}
                 sortedPages={sortedPages}
                 onPageClick={onPageClick}
               />

@@ -230,15 +230,11 @@ export class ChartDataRequestBuilder {
       },
       [],
     );
-
-    return Array.from(
-      new Set(
-        groupColumns.map(groupCol => ({
-          alias: this.buildAliasName(groupCol),
-          column: this.buildColumnName(groupCol),
-        })),
-      ),
-    );
+    const newGroupColumns = groupColumns.map(groupCol => ({
+      alias: this.buildAliasName(groupCol),
+      column: this.buildColumnName(groupCol),
+    }));
+    return UniqWith(newGroupColumns, (a, b) => isEqual(a.column, b.column));
   }
 
   private buildFilters(): ChartDataRequestFilter[] {
