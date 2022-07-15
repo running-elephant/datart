@@ -72,6 +72,7 @@ const ChartDataViewPanel: FC<{
   onDataViewChange?: (clear?: boolean) => void;
 }> = memo(({ dataView, defaultViewId, chartConfig, onDataViewChange }) => {
   const t = useI18NPrefix(`viz.workbench.dataview`);
+  const tView = useI18NPrefix('view');
   const dispatch = useDispatch();
   const history = useHistory();
   const [showModal, modalContextHolder] = useStateModal({});
@@ -185,12 +186,9 @@ const ChartDataViewPanel: FC<{
         f => f.id === field?.id,
       );
       if (isNameConflict) {
-        message.error(
-          'The computed field has already been exist, please choose another one!',
-        );
-        return Promise.reject(
-          'The computed field has already been exist, please choose another one!',
-        );
+        const nameConflictError = tView('computedFieldNameExistWarning');
+        message.error(nameConflictError);
+        return Promise.reject(nameConflictError);
       }
 
       const currentFieldIndex = (dataView?.computedFields || []).findIndex(
@@ -219,7 +217,7 @@ const ChartDataViewPanel: FC<{
         ),
       );
     },
-    [dispatch, dataView?.computedFields, dataView?.sourceId],
+    [dataView?.computedFields, dataView?.sourceId, dispatch, tView],
   );
 
   const handleDeleteComputedField = fieldId => {

@@ -560,12 +560,9 @@ const DataModelTree: FC = memo(() => {
         f => f.id === field?.id,
       );
       if (isNameConflict) {
-        message.error(
-          'The computed field has already been exist, please choose another one!',
-        );
-        return Promise.reject(
-          'The computed field has already been exist, please choose another one!',
-        );
+        const errorMsg = message.error(t('computedFieldNameExistWarning'));
+        message.error(errorMsg);
+        return Promise.reject(errorMsg);
       }
 
       const currentFieldIndex = (computedFields || []).findIndex(
@@ -593,7 +590,7 @@ const DataModelTree: FC = memo(() => {
       ]);
       handleDataModelComputerFieldChange(newComputedFields);
     },
-    [computedFields, sourceId, handleDataModelComputerFieldChange],
+    [computedFields, handleDataModelComputerFieldChange, sourceId, t],
   );
 
   const addCallback = useCallback(
