@@ -249,6 +249,20 @@ export const saveView = createAsyncThunk<
   const orgId = selectOrgId(getState());
   const allDatabaseSchemas = selectAllSourceDatabaseSchemas(getState());
 
+  const transformResponse = (currentView, data, isSaveAs) => {
+    return {
+      ...currentView,
+      ...data,
+      config: currentView.config,
+      model: currentView.model,
+      variables: (data.variables || []).map(v => ({
+        ...v,
+        relVariableSubjects: data.relVariableSubjects,
+      })),
+      isSaveAs,
+    };
+  };
+
   if (isNewView(currentEditingView.id) || isSaveAs) {
     const { data } = await request2<View>({
       url: '/views',
@@ -262,20 +276,9 @@ export const saveView = createAsyncThunk<
       ),
     });
     resolve && resolve();
-
-    return {
-      ...currentEditingView,
-      ...data,
-      config: currentEditingView.config,
-      model: currentEditingView.model,
-      variables: data.variables.map(v => ({
-        ...v,
-        relVariableSubjects: data.relVariableSubjects,
-      })),
-      isSaveAs,
-    };
+    return transformResponse(currentEditingView, data, isSaveAs);
   } else {
-    await request2<View>({
+    const { data } = await request2<View>({
       url: `/views/${currentEditingView.id}`,
       method: 'PUT',
       data: getSaveParamsFromViewModel(
@@ -287,7 +290,7 @@ export const saveView = createAsyncThunk<
       ),
     });
     resolve && resolve();
-    return currentEditingView;
+    return transformResponse(currentEditingView, data, isSaveAs);
   }
 });
 
