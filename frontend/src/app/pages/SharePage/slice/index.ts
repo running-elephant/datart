@@ -195,6 +195,9 @@ export const slice = createSlice({
     changeSelectedItems(state, { payload }: PayloadAction<SelectedItem[]>) {
       state.selectedItems = payload;
     },
+    savePageTitle: (state, action: PayloadAction<{ title: string }>) => {
+      state.title = action.payload.title;
+    },
   },
   extraReducers: builder => {
     builder

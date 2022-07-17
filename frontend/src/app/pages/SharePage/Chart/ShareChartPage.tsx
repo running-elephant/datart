@@ -32,7 +32,7 @@ import { VizRenderMode } from '../../DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParams } from '../../MainPage/pages/VizPage/slice/types';
 import PasswordModal from '../components/PasswordModal';
 import ShareLoginModal from '../components/ShareLoginModal';
-import { useShareSlice } from '../slice';
+import { shareActions, useShareSlice } from '../slice';
 import {
   selectAvailableSourceFunctions,
   selectChartPreview,
@@ -62,6 +62,14 @@ export function ShareChartPage() {
   const vizType = useSelector(selectShareVizType);
   const availableSourceFunctions = useSelector(selectAvailableSourceFunctions);
   const shareExecuteTokenMap = useSelector(selectShareExecuteTokenMap);
+
+  useEffect(() => {
+    if (chartPreview?.backendChart?.name) {
+      dispatch(
+        shareActions.savePageTitle({ title: chartPreview?.backendChart?.name }),
+      );
+    }
+  }, [chartPreview?.backendChart?.name, dispatch]);
 
   const shareType = useRouteQuery({
     key: 'type',
