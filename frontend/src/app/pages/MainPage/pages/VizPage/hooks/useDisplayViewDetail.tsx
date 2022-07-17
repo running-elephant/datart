@@ -55,13 +55,14 @@ const filterTableColumnsByViewDetailSetting = (
 const TemplateTable: FC<{
   requestParams: ChartDataRequest;
   chartConfig?: ChartConfig;
-}> = memo(({ chartConfig, requestParams }) => {
+  token?: any;
+}> = memo(({ chartConfig, requestParams, token }) => {
   const [datas, setSDatas] = useState<any>();
   const [columns, setColumns] = useState();
 
   useMount(async () => {
     try {
-      const response = await fetchChartDataSet(requestParams);
+      const response = await fetchChartDataSet(requestParams, token);
       setSDatas(response?.rows);
       setColumns(getTableColumns(response?.columns));
     } catch (error) {
@@ -107,6 +108,7 @@ type DisplayViewDetailProps = {
   drillOption?: ChartDrillOption;
   viewDetailSetting?: ViewDetailSetting;
   clickFilters?: PendingChartDataRequestFilter[];
+  authToken?: any;
 };
 
 const useDisplayViewDetail = () => {
@@ -162,12 +164,14 @@ const useDisplayViewDetail = () => {
             <TabPane tab={t('summary')} key="summary">
               <TemplateTable
                 chartConfig={props?.chartConfig}
+                token={props.authToken}
                 requestParams={getSummaryTableRequestParams(props)}
               />
             </TabPane>
             <TabPane tab={t('details')} key="details">
               <TemplateTable
                 chartConfig={props?.chartConfig}
+                token={props.authToken}
                 requestParams={getDetailsTableRequestParams(props)}
               />
             </TabPane>
