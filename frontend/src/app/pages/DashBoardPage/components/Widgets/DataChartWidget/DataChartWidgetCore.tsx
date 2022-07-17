@@ -242,7 +242,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         aggregation: dataChart?.config?.aggregation,
         chartConfig: dataChart?.config?.chartConfig,
         ruleId,
-        renderMode,
+        isJumpUrlOnly: renderMode === 'share',
       };
     },
     [
