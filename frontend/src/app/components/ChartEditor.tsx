@@ -60,6 +60,7 @@ import {
   clearRuntimeDateLevelFieldsInChartConfig,
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
+  getValue,
 } from 'app/utils/chartHelper';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import {
@@ -313,6 +314,14 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       ? ChartManager.instance().getById(chart?.meta?.id)
       : ChartManager.instance().getDefaultChart();
     let targetChartConfig = CloneValueDeep(currentChart?.config);
+
+    // clear操作不希望重置paging信息
+    getValue(targetChartConfig?.settings || [], ['paging'], 'rows').forEach(
+      v => {
+        v.value = getValue(chartConfig?.settings || [], ['paging', v.key]);
+      },
+    );
+
     registerChartEvents(currentChart);
     setChart(currentChart);
 
@@ -340,6 +349,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     chart?.meta?.id,
     registerChartEvents,
     chartConfig?.datas,
+    chartConfig?.settings,
     actions,
   ]);
 
