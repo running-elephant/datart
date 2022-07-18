@@ -90,3 +90,8 @@ export const selectSelectedItems = createSelector(
   [selectDomain],
   shareState => shareState.selectedItems,
 );
+
+export const selectPageTitle = createSelector(
+  [selectDomain],
+  shareState => shareState.title,
+);

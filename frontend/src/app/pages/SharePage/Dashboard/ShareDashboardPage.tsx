@@ -27,7 +27,7 @@ import {
   makeShareDownloadDataTask,
 } from 'app/utils/fetch';
 import { StorageKeys } from 'globalConstants';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
@@ -43,7 +43,7 @@ import { useEditBoardSlice } from '../../DashBoardPage/pages/BoardEditor/slice';
 import { FilterSearchParams } from '../../MainPage/pages/VizPage/slice/types';
 import PasswordModal from '../components/PasswordModal';
 import ShareLoginModal from '../components/ShareLoginModal';
-import { useShareSlice } from '../slice';
+import { shareActions, useShareSlice } from '../slice';
 import {
   selectNeedVerify,
   selectShareExecuteTokenMap,
@@ -83,6 +83,12 @@ function ShareDashboardPage() {
   const searchParams = useMemo(() => {
     return urlSearchTransfer.toParams(search);
   }, [search]);
+
+  useEffect(() => {
+    if (shareBoard?.name) {
+      dispatch(shareActions.savePageTitle({ title: shareBoard?.name }));
+    }
+  }, [shareBoard?.name, dispatch]);
 
   const loadVizData = () => {
     if (shareType === 'CODE') {

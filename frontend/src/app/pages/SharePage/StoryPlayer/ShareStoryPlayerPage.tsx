@@ -20,7 +20,7 @@ import useMount from 'app/hooks/useMount';
 import useRouteQuery from 'app/hooks/useRouteQuery';
 import ChartManager from 'app/models/ChartManager';
 import { login } from 'app/slice/thunks';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
@@ -36,7 +36,7 @@ import { useStoryBoardSlice } from '../../StoryBoardPage/slice';
 import { selectShareStoryBoard } from '../../StoryBoardPage/slice/selectors';
 import PasswordModal from '../components/PasswordModal';
 import ShareLoginModal from '../components/ShareLoginModal';
-import { useShareSlice } from '../slice';
+import { shareActions, useShareSlice } from '../slice';
 import { selectNeedVerify, selectShareVizType } from '../slice/selectors';
 import { fetchShareVizInfo } from '../slice/thunks';
 import { StoryPlayerForShare } from './StoryPlayerForShare';
@@ -66,6 +66,12 @@ function ShareStoryPlayerPage() {
     key: 'eager',
   });
   const renderMode: VizRenderMode = eager ? 'schedule' : 'share';
+
+  useEffect(() => {
+    if (shareStory?.name) {
+      dispatch(shareActions.savePageTitle({ title: shareStory?.name }));
+    }
+  }, [shareStory?.name, dispatch]);
 
   const searchParams = useMemo(() => {
     return urlSearchTransfer.toParams(search);

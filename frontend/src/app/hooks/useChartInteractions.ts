@@ -369,6 +369,7 @@ const useChartInteractions = (props: {
       viewDetailSetting,
       chartConfig,
       view,
+      authToken,
     }) => {
       if (viewDetailSetting?.event === targetEvent) {
         const clickFilters = buildClickEventBaseFilters(
@@ -389,6 +390,7 @@ const useChartInteractions = (props: {
           drillOption: drillOption,
           viewDetailSetting: viewDetailSetting,
           clickFilters: clickFilters,
+          authToken,
         });
       }
     },

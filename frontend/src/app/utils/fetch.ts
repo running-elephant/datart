@@ -300,7 +300,22 @@ export async function fetchDataChart(id: string) {
   return convertToChartDto(response?.data);
 }
 
-export async function fetchChartDataSet(requestParams) {
+export async function fetchChartDataSet(
+  requestParams,
+  authorizedToken?: ExecuteToken,
+) {
+  if (authorizedToken) {
+    const { data } = await request2<ChartDataSetDTO>({
+      method: 'POST',
+      url: `shares/execute`,
+      params: {
+        executeToken: authorizedToken,
+      },
+      data: requestParams,
+    });
+    return data;
+  }
+
   const { data } = await request2<ChartDataSetDTO>({
     method: 'POST',
     url: `data-provider/execute`,

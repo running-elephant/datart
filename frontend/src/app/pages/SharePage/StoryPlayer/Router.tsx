@@ -20,10 +20,10 @@ import { ConfigProvider } from 'antd';
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import { registerTheme } from 'echarts';
 import { antdLocales } from 'locales/i18n';
-import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { GlobalStyles } from 'styles/globalStyles';
+import HelmetPageTitle from '../components/HelmetPageTitle';
 import { LazyShareStoryPlayer } from './Loadable';
 
 registerTheme('default', echartsDefaultTheme);
@@ -34,12 +34,7 @@ export function Router() {
   return (
     <ConfigProvider locale={antdLocales[i18n.language]}>
       <BrowserRouter>
-        <Helmet
-          title="Datart Share Link"
-          htmlAttributes={{ lang: i18n.language }}
-        >
-          <meta name="description" content="Data Art" />
-        </Helmet>
+        <HelmetPageTitle lang={i18n.language} />
         <Switch>
           <Route
             path="/shareStoryPlayer/:token"
