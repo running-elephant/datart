@@ -415,8 +415,15 @@ export const clearActiveWidgets = () => dispatch => {
 export const widgetClearLinkageAction =
   (widget: Widget, renderMode: VizRenderMode) => (dispatch, getState) => {
     const { id, dashboardId } = widget;
+    const rootState = getState();
     const boardWidgetInfoRecord = selectWidgetInfoMap(getState(), dashboardId);
+    const executeTokenMap = rootState?.share?.executeTokenMap || {};
     const currentWidgetInfo = boardWidgetInfoRecord?.[id];
+
+    let executeToken;
+    if (renderMode === 'share') {
+      executeToken = executeTokenMap?.[widget?.viewIds?.[0]]?.authorizedToken;
+    }
     if (!currentWidgetInfo?.inLinking) {
       return;
     }
@@ -437,7 +444,7 @@ export const widgetClearLinkageAction =
           boardId: dashboardId,
           sourceWidgetId: '',
           widgetId: targetWidget.id,
-          executeToken: undefined, // TODO: add execute token for share
+          executeToken,
         }),
       );
     });
