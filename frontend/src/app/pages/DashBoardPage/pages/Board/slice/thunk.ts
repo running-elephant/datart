@@ -220,6 +220,7 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
   null,
   {
     boardId: string;
+    sourceWidgetId: string;
     widgetId: string;
     option?: getDataOption;
     extraFilters?: PendingChartDataRequestFilter[];
@@ -231,7 +232,15 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
 >(
   'board/syncBoardWidgetChartDataAsync',
   async (
-    { boardId, widgetId, option, extraFilters, variableParams, executeToken },
+    {
+      boardId,
+      sourceWidgetId,
+      widgetId,
+      option,
+      extraFilters,
+      variableParams,
+      executeToken,
+    },
     { getState, dispatch },
   ) => {
     const boardState = getState() as { board: BoardState };
@@ -284,6 +293,7 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
           boardId,
           widgetId,
           linkInfo: {
+            sourceWidgetId,
             filters: extraFilters,
             variables: variableParams,
           },

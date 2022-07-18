@@ -55,10 +55,15 @@ import { RootState } from 'types';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions, editDashBoardInfoActions } from '..';
 import { ORIGINAL_TYPE_MAP } from '../../../../constants';
-import { getChartWidgetDataAsync } from '../../../Board/slice/thunk';
+import { selectWidgetInfoMap } from '../../../Board/slice/selector';
+import { syncBoardWidgetChartDataAsync } from '../../../Board/slice/thunk';
 import { EventLayerNode } from '../../components/LayerPanel/LayerTreeItem';
 import { getNewDragNodeValue } from '../../components/LayerPanel/utils';
-import { getEditChartWidgetDataAsync } from '../thunk';
+import { selectAllWidgetInfoMap } from '../selectors';
+import {
+  getEditChartWidgetDataAsync,
+  syncEditBoardWidgetChartDataAsync,
+} from '../thunk';
 import { EditBoardState, HistoryEditBoard } from '../types';
 import { editWidgetsQueryAction } from './controlActions';
 
@@ -406,9 +411,15 @@ export const clearActiveWidgets = () => dispatch => {
   dispatch(editWidgetInfoActions.clearSelectedWidgets());
   dispatch(editDashBoardInfoActions.changeShowBlockMask(true));
 };
+
 export const widgetClearLinkageAction =
-  (widget: Widget, renderMode: VizRenderMode) => dispatch => {
+  (widget: Widget, renderMode: VizRenderMode) => (dispatch, getState) => {
     const { id, dashboardId } = widget;
+    const boardWidgetInfoRecord = selectWidgetInfoMap(getState(), dashboardId);
+    const currentWidgetInfo = boardWidgetInfoRecord?.[id];
+    if (!currentWidgetInfo?.inLinking) {
+      return;
+    }
     dispatch(
       boardActions.changeWidgetInLinking({
         boardId: dashboardId,
@@ -416,59 +427,57 @@ export const widgetClearLinkageAction =
         toggle: false,
       }),
     );
-    dispatch(
-      boardActions.changeBoardLinkFilter({
-        boardId: dashboardId,
-        triggerId: id,
-        linkFilters: [],
-      }),
+    dispatch(boardActions.changeSelectedItems({ wid: id, data: [] }));
+    const linkTargetWidgets = Object.values(boardWidgetInfoRecord || {}).filter(
+      widgetInfo => widgetInfo?.linkInfo?.sourceWidgetId === id,
     );
-    const linkRelations = widget.relations.filter(
-      re => re.config.type === 'widgetToWidget',
-    );
-    linkRelations.forEach(link => {
+    linkTargetWidgets.forEach(targetWidget => {
       dispatch(
-        getChartWidgetDataAsync({
+        syncBoardWidgetChartDataAsync({
           boardId: dashboardId,
-          widgetId: link.targetId,
-          renderMode,
-          option: {
-            pageInfo: { pageNo: 1 },
-          },
+          sourceWidgetId: '',
+          widgetId: targetWidget.id,
+          executeToken: undefined, // TODO: add execute token for share
         }),
       );
     });
   };
-export const editorWidgetClearLinkageAction = (widget: Widget) => dispatch => {
-  const { id, dashboardId } = widget;
-  dispatch(
-    editWidgetInfoActions.changeWidgetInLinking({
-      boardId: dashboardId,
-      widgetId: id,
-      toggle: false,
-    }),
-  );
-  dispatch(
-    editDashBoardInfoActions.changeBoardLinkFilter({
-      boardId: dashboardId,
-      triggerId: id,
-      linkFilters: [],
-    }),
-  );
-  const linkRelations = widget.relations.filter(
-    re => re.config.type === 'widgetToWidget',
-  );
-  linkRelations.forEach(link => {
+
+export const editorWidgetClearLinkageAction =
+  (widget: Widget) => (dispatch, getState) => {
+    const { id, dashboardId } = widget;
+    const boardWidgetInfoRecord = selectAllWidgetInfoMap(getState());
+    const currentWidgetInfo = boardWidgetInfoRecord?.[id];
+    if (!currentWidgetInfo?.inLinking) {
+      return;
+    }
+
     dispatch(
-      getEditChartWidgetDataAsync({
-        widgetId: link.targetId,
-        option: {
-          pageInfo: { pageNo: 1 },
-        },
+      editWidgetInfoActions.changeWidgetInLinking({
+        boardId: dashboardId,
+        widgetId: id,
+        toggle: false,
       }),
     );
-  });
-};
+    dispatch(
+      editWidgetSelectedItemsActions.changeSelectedItemsInEditor({
+        wid: id,
+        data: [],
+      }),
+    );
+    const linkTargetWidgets = Object.values(boardWidgetInfoRecord || {}).filter(
+      widgetInfo => widgetInfo?.linkInfo?.sourceWidgetId === id,
+    );
+    linkTargetWidgets.forEach(targetWidget => {
+      dispatch(
+        syncEditBoardWidgetChartDataAsync({
+          boardId: dashboardId,
+          sourceWidgetId: '',
+          widgetId: targetWidget.id,
+        }),
+      );
+    });
+  };
 
 export const dropLayerNodeAction = info => (dispatch, getState) => {
   const dragNode = info.dragNode as EventLayerNode;

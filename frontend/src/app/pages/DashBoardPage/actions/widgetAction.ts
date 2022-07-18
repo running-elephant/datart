@@ -300,6 +300,7 @@ export const widgetLinkEventAction =
 
       const fetchChartDataParam = {
         boardId: targetWidget.dashboardId,
+        sourceWidgetId: widget.id,
         widgetId: targetWidget.id,
         option: widgetInfo,
         extraFilters: isUnSelectedAll
@@ -331,6 +332,16 @@ export const widgetLinkEventAction =
         );
       }
     });
+
+    // set current widget to is linking status
+    dispatch(
+      toggleLinkageAction(
+        renderMode === 'edit',
+        widget?.dashboardId,
+        widget.id,
+        !params?.[0]?.isUnSelectedAll,
+      ),
+    );
   };
 
 export const widgetClickLinkageAction =
