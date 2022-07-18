@@ -769,13 +769,13 @@ class BasicBarChart extends Chart {
         ...font,
         formatter: params => {
           const { value, data } = params;
-          if (!value || !Number(value)) {
+          if ((!value || !Number(value)) && value !== 0) {
             return '';
           }
-          const formattedValue = toFormattedValue(value, data.format);
-          const labels: string[] = [];
-          labels.push(formattedValue);
-          return labels.join('\n');
+          if (this.isPercentageYAxis) {
+            return value;
+          }
+          return toFormattedValue(value, data.format);
         },
       },
       labelLayout: { hideOverlap: true },
