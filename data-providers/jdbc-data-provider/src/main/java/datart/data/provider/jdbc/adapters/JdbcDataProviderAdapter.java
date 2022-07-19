@@ -178,6 +178,11 @@ public class JdbcDataProviderAdapter implements Closeable {
             }
             return columnSet;
         }
+        catch (SQLException e){
+            log.error("Unable to read the column information of table" + table,e);
+        }
+        // 读不到列信息，返回空列表
+        return new HashSet<>();
     }
 
     public String getQueryKey(QueryScript script, ExecuteParam executeParam) throws SqlParseException {
