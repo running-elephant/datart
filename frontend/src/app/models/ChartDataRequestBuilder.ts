@@ -458,9 +458,15 @@ export class ChartDataRequestBuilder {
     const computedFields = getRuntimeDateLevelFields(
       this.dataView.computedFields,
     );
+    const fieldsNameList = (this.chartDataConfigs || [])
+      .flatMap(config => config.rows || [])
+      .flatMap(row => row?.colName || []);
+    const currentUsedComputedFields = computedFields?.filter(v =>
+      fieldsNameList.includes(v.name),
+    );
 
-    return (computedFields || []).map(f => ({
-      alias: f.id!,
+    return (currentUsedComputedFields || []).map(f => ({
+      alias: f.name!,
       snippet: f.expression,
     }));
   }
@@ -568,8 +574,10 @@ export class ChartDataRequestBuilder {
 
   private removeInvalidFilter(filters: ChartDataRequestFilter[]) {
     const dataViewFieldsNames = (
-      (getAllColumnInMeta(this.dataView?.meta) as ChartDataViewMeta[]) || []
-    ).map(c => c?.name);
+      getAllColumnInMeta(this.dataView?.meta) as ChartDataViewMeta[]
+    )
+      .concat(this.dataView?.computedFields || [])
+      .map(c => c?.name);
 
     return (filters || []).filter(f => {
       return dataViewFieldsNames.includes(f.column.join('.'));

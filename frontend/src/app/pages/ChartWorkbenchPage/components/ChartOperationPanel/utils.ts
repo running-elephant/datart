@@ -31,10 +31,10 @@ export const getAllFieldsOfEachType = (args: {
   availableSourceFunctions;
 }) => {
   const { sortType, dataView, availableSourceFunctions } = args;
-  const computedFields = dataView?.computedFields?.filter(
-    v => v.category !== ChartDataViewFieldCategory.DateLevelComputedField,
-  );
-
+  const computedFields =
+    dataView?.computedFields?.filter(
+      v => v.category !== ChartDataViewFieldCategory.DateLevelComputedField,
+    ) || [];
   const allFields = dataView?.meta || [];
 
   let hierarchyFields = allFields.filter(f => f.role === ColumnRole.Hierarchy);

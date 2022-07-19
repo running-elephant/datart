@@ -164,8 +164,8 @@ function setColorFn(
 }
 
 const StyledUL = styled.ul`
-  padding-inline-start: 0;
   max-height: 300px;
+  padding-inline-start: 0;
   overflow: auto;
   li {
     display: flex;

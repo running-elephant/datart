@@ -32,6 +32,10 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataView } from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
+import {
+  createDateLevelComputedFieldForConfigComputedFields,
+  mergeChartAndViewComputedField,
+} from 'app/utils/chartHelper';
 import { transformMeta } from 'app/utils/internalChartHelper';
 import { adaptBoardImageUrl } from '.';
 import { BoardConfigValue } from '../components/BoardProvider/BoardConfigProvider';
@@ -163,10 +167,23 @@ export const getInitBoardConfig = (boardType?: BoardType) => {
   }
 };
 // dataCharts
-export const getDataChartsByServer = (serverDataCharts: ServerDatachart[]) => {
+export const getDataChartsByServer = (
+  serverDataCharts: ServerDatachart[],
+  view: View[],
+) => {
   const dataCharts: DataChart[] = serverDataCharts.map(item => {
     item.config = migrateChartConfig(item.config);
+
     const config = JSON.parse(item.config || '{}');
+    const viewComputerFields =
+      JSON.parse(view.find(v => v.id === item.viewId)?.model || '{}')
+        ?.computedFields || [];
+
+    config.computedFields = mergeChartAndViewComputedField(
+      viewComputerFields,
+      config.computedFields,
+    );
+
     return {
       ...item,
       config,
@@ -186,21 +203,28 @@ export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
   const viewViews: ChartDataView[] = [];
   views.forEach(view => {
     const dataChart = dataCharts.find(dc => dc.viewId === view.id);
-    const viewComputerField = JSON.parse(view.model)?.computedFields || [];
+
     if (view) {
       view = migrationViewConfig(view);
     }
     if (view?.model) {
       view.model = beginViewModelMigration(view.model, view.type);
     }
-
+    const meta = transformMeta(view.model);
+    const viewComputedFields =
+      JSON.parse(view.model || '{}').computedFields || [];
+    const computedFields = createDateLevelComputedFieldForConfigComputedFields(
+      meta,
+      mergeChartAndViewComputedField(
+        viewComputedFields,
+        dataChart?.config.computedFields,
+      ),
+    );
     let viewView = {
       ...view,
-      meta: transformMeta(view.model),
+      meta,
       model: '',
-      computedFields: viewComputerField.concat(
-        dataChart?.config.computedFields || [],
-      ),
+      computedFields,
     };
     viewViews.push(viewView);
   });

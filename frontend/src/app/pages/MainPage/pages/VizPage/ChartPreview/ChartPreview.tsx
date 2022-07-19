@@ -275,12 +275,15 @@ const ChartPreviewBoard: FC<{
           chartConfigRef?.current?.interactions,
           [],
         );
+        const computedFields = (
+          chartPreview?.backendChart?.config.computedFields || []
+        ).concat(chartPreview?.backendChart?.view.computedFields || []);
+
         const view = {
           id: chartPreview?.backendChart?.view?.id || '',
           config: chartPreview?.backendChart?.view.config || {},
           meta: chartPreview?.backendChart?.view.meta,
-          computedFields:
-            chartPreview?.backendChart?.config.computedFields || [],
+          computedFields,
         };
         return {
           drillOption: drillOptionRef.current,

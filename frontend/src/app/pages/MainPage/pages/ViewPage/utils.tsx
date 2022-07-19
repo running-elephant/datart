@@ -21,7 +21,7 @@ import { DataViewFieldType } from 'app/constants';
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import { FONT_WEIGHT_MEDIUM, SPACE_UNIT } from 'styles/StyleConstants';
 import { Nullable } from 'types';
-import { CloneValueDeep, isEmptyArray,isEqualObject } from 'utils/object';
+import { CloneValueDeep, isEmptyArray, isEqualObject } from 'utils/object';
 import { getDiffParams, getTextWidth } from 'utils/utils';
 import {
   ColumnCategories,
