@@ -651,6 +651,7 @@ const ChartPreviewBoard: FC<{
         }),
       );
     };
+
     const dataset = useMemo(() => {
       if (
         !chartPreview?.backendChart?.viewId &&
@@ -664,6 +665,7 @@ const ChartPreviewBoard: FC<{
       chartPreview?.backendChart?.viewId,
       chartPreview?.dataset,
     ]);
+
     return (
       <StyledChartPreviewBoard>
         <VizHeader

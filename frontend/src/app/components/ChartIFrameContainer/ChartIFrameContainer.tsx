@@ -85,6 +85,7 @@ const ChartIFrameContainer: FC<{
               isShown={props.isShown}
               drillOption={props?.drillOption}
               selectedItems={props?.selectedItems}
+              isLoadingData={props?.isLoadingData}
             />
           </div>
         </div>
@@ -148,6 +149,7 @@ const ChartIFrameContainer: FC<{
                   isShown={props.isShown}
                   drillOption={props.drillOption}
                   selectedItems={props?.selectedItems}
+                  isLoadingData={props?.isLoadingData}
                 />
               </div>
             </StyleSheetManager>

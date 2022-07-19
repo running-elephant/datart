@@ -46,6 +46,7 @@ const ChartIFrameLifecycleAdapter: FC<{
   drillOption?: IChartDrillOption;
   selectedItems?: SelectedItem[];
   widgetSpecialConfig?: any;
+  isLoadingData?: boolean;
 }> = ({
   dataset,
   chart,
@@ -55,6 +56,7 @@ const ChartIFrameLifecycleAdapter: FC<{
   drillOption,
   selectedItems,
   widgetSpecialConfig,
+  isLoadingData = false,
 }) => {
   const [chartResourceLoader] = useState(() => new ChartIFrameResourceLoader());
   const eventBrokerRef = useRef<ChartIFrameEventBroker>();
@@ -133,6 +135,7 @@ const ChartIFrameLifecycleAdapter: FC<{
       !window ||
       !config ||
       !dataset ||
+      isLoadingData ||
       containerStatus !== ContainerStatus.SUCCESS
     ) {
       return;
@@ -165,6 +168,7 @@ const ChartIFrameLifecycleAdapter: FC<{
     isShown,
     drillOption,
     selectedItems,
+    isLoadingData,
   ]);
 
   /**
@@ -178,6 +182,7 @@ const ChartIFrameLifecycleAdapter: FC<{
       !window ||
       !config ||
       !dataset ||
+      isLoadingData ||
       containerStatus !== ContainerStatus.SUCCESS
     ) {
       return;
@@ -209,6 +214,7 @@ const ChartIFrameLifecycleAdapter: FC<{
     isShown,
     containerStatus,
     drillOption,
+    dataset,
   ]);
 
   return (
