@@ -260,7 +260,7 @@ export function SourceDetailPage() {
         case CommonFormTypes.Add:
           dispatch(
             addSource({
-              source: { ...rest, orgId, config: configStr, },
+              source: { ...rest, orgId, config: configStr },
               resolve: id => {
                 message.success(t('createSuccess'));
                 history.push(`/organizations/${orgId}/sources/${id}`);
@@ -482,19 +482,19 @@ export function SourceDetailPage() {
               {dataProviderConfigTemplateLoading && <LoadingOutlined />}
 
               {config?.attributes.map(attr => (
-                  <ConfigComponent
-                    key={`${providerType}_${attr.name}`}
-                    attr={attr}
-                    form={form}
-                    sourceId={editingSource?.id}
-                    testLoading={testLoading}
-                    disabled={isArchived}
-                    allowManage={allowManage}
-                    onTest={test}
-                    onSubFormTest={subFormTest}
-                    onDbTypeChange={dbTypeChange}
-                  />
-                ))}
+                <ConfigComponent
+                  key={`${providerType}_${attr.name}`}
+                  attr={attr}
+                  form={form}
+                  sourceId={editingSource?.id}
+                  testLoading={testLoading}
+                  disabled={isArchived}
+                  allowManage={allowManage}
+                  onTest={test}
+                  onSubFormTest={subFormTest}
+                  onDbTypeChange={dbTypeChange}
+                />
+              ))}
             </Form>
           </Card>
         </Content>
