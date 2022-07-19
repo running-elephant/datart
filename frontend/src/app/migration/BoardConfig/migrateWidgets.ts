@@ -218,13 +218,13 @@ export const migrateWidgets = (
 
       resWidget = beta2(resWidget);
 
-      beta4(boardType, resWidget);
+      let beta4Widget = beta4(boardType, resWidget);
 
-      let beta4_2Widget = beta4_2(boardType, resWidget);
+      beta4_2(boardType, resWidget);
 
-      RC0(beta4_2Widget);
+      RC0(beta4Widget);
 
-      return finaleWidget(beta4_2Widget as Widget);
+      return finaleWidget(beta4Widget as Widget);
     })
     .filter(widget => !!widget);
   return targetWidgets as Widget[];
