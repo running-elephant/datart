@@ -52,6 +52,9 @@ public class StructScriptProcessor implements QueryScriptProcessor {
             SqlNode conditionNode = null;
             if (!CollectionUtils.isEmpty(tableJoin.getConditions())) {
                 for (JoinCondition joinCondition : tableJoin.getConditions()) {
+                    if (!joinCondition.isValid()) {
+                        continue;
+                    }
                     SqlBasicCall condition = new SqlBasicCall(SqlStdOperatorTable.EQUALS
                             , new SqlNode[]{SqlNodeUtils.createSqlIdentifier(joinCondition.getLeft())
                             , SqlNodeUtils.createSqlIdentifier(joinCondition.getRight())}

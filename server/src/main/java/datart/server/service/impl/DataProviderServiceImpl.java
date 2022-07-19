@@ -20,6 +20,7 @@ package datart.server.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -435,7 +436,21 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
 
         JSONObject jsonObject = JSON.parseObject(model);
         try {
-            if (jsonObject.containsKey("hierarchy")) {
+            if (jsonObject.containsKey("columns")) {
+                jsonObject = jsonObject.getJSONObject("columns");
+                for (String key : jsonObject.keySet()) {
+                    JSONObject item = jsonObject.getJSONObject(key);
+                    String nameString = item.getJSONArray("name").getString(0);
+                    String[] names;
+                    try {
+                        names = JSONObject.parseArray(nameString).toArray(new String[0]);
+                    } catch (JSONException e) {
+                        names = new String[]{nameString};
+                    }
+                    Column column = Column.of(ValueType.valueOf(item.getString("type")), names);
+                    schema.put(column.columnKey(), column);
+                }
+            } else if (jsonObject.containsKey("hierarchy")) {
                 jsonObject = jsonObject.getJSONObject("hierarchy");
                 for (String key : jsonObject.keySet()) {
                     JSONObject item = jsonObject.getJSONObject(key);
@@ -448,7 +463,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                             }
                         }
                     } else {
-                        schema.put(key, Column.of(ValueType.valueOf(item.getString("type")), key));
+                        schema.put(key, Column.of(ValueType.valueOf(item.getString("type")), key.split("\\.")));
                     }
                 }
             } else {

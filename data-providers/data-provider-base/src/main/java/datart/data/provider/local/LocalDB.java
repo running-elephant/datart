@@ -171,7 +171,7 @@ public class LocalDB {
      * @return 查询脚本+执行参数 执行后结果
      */
     public static Dataframe executeLocalQuery(QueryScript queryScript, ExecuteParam executeParam, Dataframes dataframes, boolean persistent, Date expire) throws Exception {
-        if (queryScript == null) {
+        if (dataframes.size() == 1 && dataframes.getDataframes().get(0).getName() == null) {
             // 直接以指定数据源为表进行查询，生成一个默认的SQL查询全部数据
             queryScript = new QueryScript();
             queryScript.setScript(String.format(SELECT_START_SQL, dataframes.getDataframes().get(0).getName()));
@@ -268,6 +268,7 @@ public class LocalDB {
     }
 
     private static Dataframe execute(Connection connection, QueryScript queryScript, ExecuteParam executeParam) throws Exception {
+
         SqlScriptRender render = new SqlScriptRender(queryScript
                 , executeParam
                 , SQL_DIALECT);
