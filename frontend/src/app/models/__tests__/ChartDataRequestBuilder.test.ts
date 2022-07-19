@@ -1552,12 +1552,18 @@ describe('ChartDataRequestBuild Test', () => {
     const dataView = {
       id: 'view-id',
       computedFields: [
-        { id: 'f1', expression: '[a' },
-        { id: 'f2', expression: '[b]' },
-        { id: 'f3', expression: '' },
+        { name: 'f1', expression: '[a' },
+        { name: 'f2', expression: '[b]' },
+        { name: 'f3', expression: '' },
       ],
     } as any;
-    const chartDataConfigs = [];
+    const chartDataConfigs = [
+      {
+        key: 'dimension',
+
+        rows: [{ colName: 'f1' }, { colName: 'f2' }, { colName: 'f3' }],
+      },
+    ] as any;
     const chartSettingConfigs = [];
     const pageInfo = {};
     const enableScript = false;
@@ -1585,12 +1591,17 @@ describe('ChartDataRequestBuild Test', () => {
       id: 'view-id',
       type: 'STRUCT',
       computedFields: [
-        { id: 'f1', expression: '[dad].[a]' },
-        { id: 'f2', expression: '[dad].[b]' },
-        { id: 'f3', expression: '' },
+        { name: 'f1', expression: '[dad].[a]' },
+        { name: 'f2', expression: '[dad].[b]' },
+        { name: 'f3', expression: '' },
       ],
     } as any;
-    const chartDataConfigs = [];
+    const chartDataConfigs = [
+      {
+        key: 'DATA',
+        rows: [{ colName: 'f1' }, { colName: 'f2' }, { colName: 'f3' }],
+      },
+    ] as any;
     const chartSettingConfigs = [];
     const pageInfo = {};
     const enableScript = false;

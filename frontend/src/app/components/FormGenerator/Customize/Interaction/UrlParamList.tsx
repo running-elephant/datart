@@ -109,6 +109,7 @@ const UrlParamList: FC<
           style={{ width: '150px' }}
           value={value}
           onChange={value => handleRelationChange(index, 'source', value)}
+          dropdownMatchSelectWidth={false}
         >
           {(isFieldType(record) ? sourceFields : sourceVariables)?.map(sf => {
             return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;

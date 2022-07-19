@@ -34,21 +34,19 @@ describe('chartDtoHelper Test', () => {
     };
     const dto = convertToChartDto(data);
     expect(dto).toEqual({
-      config: { id: 1 },
+      config: { id: 1, computedFields: [], version: '1.0.0-RC.0' },
       view: {
         meta: [
           {
             name: 'name',
-            id: 'name',
             path: ['name'],
             subType: undefined,
             category: 'field',
             children: undefined,
           },
         ],
-        computedFields: undefined,
         type: 'SQL',
-        version: '1.0.0-beta.4',
+        version: APP_VERSION_BETA_4,
       },
     });
   });
@@ -91,7 +89,19 @@ describe('chartDtoHelper Test', () => {
     };
     const dto = convertToChartDto(data);
     expect(dto).toEqual({
-      config: { id: 1 },
+      config: {
+        id: 1,
+        computedFields: [
+          {
+            category: 'computedField',
+            expression: '[root].[name]',
+            id: 'viewComputerField1',
+            isViewComputedFields: true,
+            type: 'STRING',
+          },
+        ],
+        version: '1.0.0-RC.0',
+      },
       view: {
         meta: [
           {
@@ -99,19 +109,9 @@ describe('chartDtoHelper Test', () => {
             children: undefined,
             displayName: 'root.age',
             index: 1,
-            id: 'root.age',
             name: 'root.age',
             path: ['root', 'age'],
             subType: 'UNCATEGORIZED',
-            type: 'STRING',
-          },
-        ],
-        computedFields: [
-          {
-            category: 'computedField',
-            expression: '[root].[name]',
-            id: 'viewComputerField1',
-            isViewComputedFields: true,
             type: 'STRING',
           },
         ],

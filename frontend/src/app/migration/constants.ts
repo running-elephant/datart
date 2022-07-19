@@ -24,6 +24,7 @@ export const APP_VERSION_BETA_3 = '1.0.0-beta.3';
 export const APP_VERSION_BETA_4 = '1.0.0-beta.4'; // NEXT: 1.0.0-beta4+100 or 1.0.0-beta5
 export const APP_VERSION_BETA_4_1 = '1.0.0-beta.4+1';
 export const APP_VERSION_BETA_4_2 = '1.0.0-beta.4+2';
+export const APP_VERSION_RC_0 = '1.0.0-RC.0';
 
 export const APP_SEMANTIC_VERSIONS = [
   APP_VERSION_INIT,
@@ -34,6 +35,7 @@ export const APP_SEMANTIC_VERSIONS = [
   APP_VERSION_BETA_4,
   APP_VERSION_BETA_4_1,
   APP_VERSION_BETA_4_2,
+  APP_VERSION_RC_0,
 ];
 
 export const APP_CURRENT_VERSION =

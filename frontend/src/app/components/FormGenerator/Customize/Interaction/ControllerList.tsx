@@ -127,6 +127,7 @@ const ControllerList: FC<
           style={{ width: '150px' }}
           value={value}
           onChange={value => handleRelationChange(index, 'source', value)}
+          dropdownMatchSelectWidth={false}
         >
           {(isFieldType(record) ? sourceFields : sourceVariables)?.map(sf => {
             return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;
@@ -143,6 +144,7 @@ const ControllerList: FC<
           style={{ width: '150px' }}
           value={value}
           onChange={value => handleRelationChange(index, 'target', value)}
+          dropdownMatchSelectWidth={false}
         >
           {controllerNames?.map(name => {
             return <Select.Option value={name}>{name}</Select.Option>;

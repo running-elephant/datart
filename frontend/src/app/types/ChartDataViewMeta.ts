@@ -23,7 +23,6 @@ import {
 } from 'app/constants';
 
 export type ChartDataViewMeta = {
-  id: string;
   name: string;
   path?: string[];
   isActive?: boolean;

@@ -24,7 +24,10 @@ import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
-import { mergeChartAndViewComputedField } from 'app/utils/chartHelper';
+import {
+  createDateLevelComputedFieldForConfigComputedFields,
+  mergeChartAndViewComputedField,
+} from 'app/utils/chartHelper';
 import { transformHierarchyMeta } from 'app/utils/internalChartHelper';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
@@ -170,10 +173,15 @@ const workbenchSlice = createSlice({
         const index = state.dataviews?.findIndex(
           view => view.id === payload.id,
         );
+        const meta = transformHierarchyMeta(payload.model);
         let computedFields: ChartDataViewMeta[] = [];
         if (payload.id === state?.backendChart?.view?.id) {
           computedFields = state?.backendChart?.config?.computedFields || [];
         }
+        computedFields = createDateLevelComputedFieldForConfigComputedFields(
+          meta,
+          computedFields,
+        );
         if (payload.model) {
           const model = JSON.parse(payload.model || '{}');
           const viewComputerFields = model.computedFields || [];
@@ -187,7 +195,7 @@ const workbenchSlice = createSlice({
           state.currentDataView = {
             ...payload,
             config: migrateViewConfig(payload.config),
-            meta: transformHierarchyMeta(payload.model),
+            meta,
             computedFields,
           };
         }
@@ -218,10 +226,7 @@ const workbenchSlice = createSlice({
         state.currentDataView = {
           ...payload.view,
           variables: payload.queryVariables || [],
-          computedFields: mergeChartAndViewComputedField(
-            chartConfigDTO?.computedFields,
-            payload?.view?.computedFields,
-          ),
+          computedFields: chartConfigDTO?.computedFields,
         };
         state.backendChart = payload;
         state.aggregation =

@@ -26,7 +26,6 @@ import { Button, Space, Spin, Tooltip } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CommonFormTypes } from 'globalConstants';
 import produce from 'immer';
-import isEqual from 'lodash/isEqual';
 import { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -42,6 +41,7 @@ import {
   SPACE_XL,
   SPACE_XS,
 } from 'styles/StyleConstants';
+import { isEqualObject } from 'utils/object';
 import { getInsertedNodeIndex } from 'utils/utils';
 import {
   StructViewJoinType,
@@ -105,7 +105,8 @@ export const StructView = memo(
                     ...structure,
                     ...table,
                     joins:
-                      !table.table || isEqual(structure.table, table.table)
+                      !table.table ||
+                      isEqualObject(structure.table, table.table)
                         ? structure.joins
                         : [],
                   }

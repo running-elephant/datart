@@ -18,15 +18,12 @@
 
 import { Col, Input, Row, Select, Space, Tabs, TreeDataNode } from 'antd';
 import { FormItemEx, Tree } from 'app/components';
-import {
-  AggregateFieldActionType,
-  ChartDataViewFieldCategory,
-  DataViewFieldType,
-} from 'app/constants';
+import { ChartDataViewFieldCategory, DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ViewType } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { ChartComputedFieldHandle } from 'app/types/ComputedFieldEditor';
+import { hasAggregationFunction } from 'app/utils/chartHelper';
 import { FC, useCallback, useRef, useState } from 'react';
 import styled from 'styled-components/macro';
 import ChartComputedFieldEditor from './ChartComputedFieldEditor/ChartComputedFieldEditor';
@@ -64,16 +61,6 @@ const ChartComputedFieldSettingPanel: FC<{
   const [selectedFunctionCategory, setSelectedFunctionCategory] = useState(
     defaultFunctionCategory,
   );
-  const hasAggregationFunction = (exp?: string) => {
-    return [
-      AggregateFieldActionType.Avg,
-      AggregateFieldActionType.Count,
-      AggregateFieldActionType.Count_Distinct,
-      AggregateFieldActionType.Max,
-      AggregateFieldActionType.Min,
-      AggregateFieldActionType.Sum,
-    ].some(agg => new RegExp(`${agg}\\(`, 'i').test(exp || ''));
-  };
 
   const handleChange = (field: ChartDataViewMeta) => {
     const hasAggregation = hasAggregationFunction(field?.expression);
@@ -86,7 +73,6 @@ const ChartComputedFieldSettingPanel: FC<{
 
   const handleFieldNameChange = name => {
     const newField = Object.assign({}, myComputedFieldRef.current, {
-      id: name,
       name: name,
     });
     handleChange(newField);
@@ -188,7 +174,7 @@ const ChartComputedFieldSettingPanel: FC<{
               label={`${t('fieldName')}`}
               name="fieldName"
               rules={[{ required: true }]}
-              initialValue={myComputedFieldRef.current?.id}
+              initialValue={myComputedFieldRef.current?.name}
             >
               <Input onChange={e => handleFieldNameChange(e.target.value)} />
             </FormItemEx>
@@ -243,8 +229,8 @@ const ChartComputedFieldSettingPanel: FC<{
             <Tabs.TabPane tab={`${t('variable')}`} key="variable">
               <ChartSearchableList
                 source={(variables || []).map(f => ({
-                  value: f.id,
-                  label: f.id,
+                  value: f.name,
+                  label: f.name,
                 }))}
                 onItemSelected={handleVariableSelected}
               />

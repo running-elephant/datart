@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import migrateChartConfig from 'app/migration/ChartConfig/migrateChartConfig';
 import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import {
@@ -25,6 +26,10 @@ import {
 } from 'app/types/ChartConfig';
 import { ChartConfigDTO, ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDTO } from 'app/types/ChartDTO';
+import {
+  createDateLevelComputedFieldForConfigComputedFields,
+  mergeChartAndViewComputedField,
+} from 'app/utils/chartHelper';
 import {
   mergeChartDataConfigs,
   mergeChartStyleConfigs,
@@ -39,13 +44,24 @@ export function convertToChartDto(data): ChartDTO {
   if (data?.view?.model) {
     data.view.model = beginViewModelMigration(data.view.model, data.view.type);
   }
+  data.config = migrateChartConfig(data?.config);
+
+  const config = JSON.parse(data?.config || '{}');
+  const meta = transformHierarchyMeta(data?.view?.model);
+
+  config.computedFields = createDateLevelComputedFieldForConfigComputedFields(
+    meta,
+    mergeChartAndViewComputedField(
+      config.computedFields,
+      JSON.parse(data?.view?.model || '{}').computedFields,
+    ),
+  );
 
   return Object.assign({}, data, {
-    config: JSON.parse(data?.config || '{}'),
+    config,
     view: {
       ...Omit(data?.view, ['model']),
-      meta: transformHierarchyMeta(data?.view?.model),
-      computedFields: JSON.parse(data?.view?.model || '{}').computedFields,
+      meta,
     },
   });
 }

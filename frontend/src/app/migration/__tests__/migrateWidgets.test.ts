@@ -22,12 +22,14 @@ import {
   beta0,
   beta4_2,
   convertWidgetRelationsToObj,
+  RC0,
 } from '../BoardConfig/migrateWidgets';
 import { WidgetBeta3 } from '../BoardConfig/types';
 import {
   APP_VERSION_BETA_0,
   APP_VERSION_BETA_4_1,
   APP_VERSION_BETA_4_2,
+  APP_VERSION_RC_0,
 } from '../constants';
 
 describe('test migrateWidgets ', () => {
@@ -153,5 +155,56 @@ describe('test migrateWidgets ', () => {
     const result = beta4_2('auto', widget1 as any);
     expect(result?.config?.version).toBe(APP_VERSION_BETA_4_2);
     expect(result?.config?.customConfig?.interactions?.length).toBe(undefined);
+  });
+
+  test('should add name fields for widget computedFields ', () => {
+    const widget = {
+      config: {
+        content: {
+          dataChart: {
+            config: {
+              computedFields: [{ id: '1' }],
+            },
+          },
+        },
+      },
+    };
+    const result = RC0(widget as any);
+    expect(result?.config?.content?.dataChart?.config?.version).toBe(
+      APP_VERSION_RC_0,
+    );
+    expect(result).toMatchObject({
+      config: {
+        content: {
+          dataChart: {
+            config: {
+              computedFields: [{ id: '1', name: '1' }],
+              version: APP_VERSION_RC_0,
+            },
+          },
+        },
+      },
+    });
+
+    const widget1 = {
+      config: {
+        content: {
+          dataChart: {
+            config: {},
+          },
+        },
+      },
+    };
+    const result1 = RC0(widget1 as any);
+
+    expect(result1).toMatchObject({
+      config: {
+        content: {
+          dataChart: {
+            config: {},
+          },
+        },
+      },
+    });
   });
 });

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { ChartDataViewFieldCategory } from 'app/constants';
-import { prefixI18N } from 'app/hooks/useI18NPrefix';
+import i18n from 'i18next';
 
 const prefix = 'viz.workbench.dataview.';
 
@@ -33,31 +33,31 @@ export const DATE_LEVELS = [
   {
     category: ChartDataViewFieldCategory.DateLevelComputedField,
     expression: 'AGG_DATE_YEAR',
-    name: prefixI18N(prefix + 'AGG_DATE_YEAR'),
+    name: i18n.t(prefix + 'AGG_DATE_YEAR'),
     type: 'DATE',
   },
   {
     category: ChartDataViewFieldCategory.DateLevelComputedField,
     expression: 'AGG_DATE_QUARTER',
-    name: prefixI18N(prefix + 'AGG_DATE_QUARTER'),
+    name: i18n.t(prefix + 'AGG_DATE_QUARTER'),
     type: 'DATE',
   },
   {
     category: ChartDataViewFieldCategory.DateLevelComputedField,
     expression: 'AGG_DATE_MONTH',
-    name: prefixI18N(prefix + 'AGG_DATE_MONTH'),
+    name: i18n.t(prefix + 'AGG_DATE_MONTH'),
     type: 'DATE',
   },
   {
     category: ChartDataViewFieldCategory.DateLevelComputedField,
     expression: 'AGG_DATE_WEEK',
-    name: prefixI18N(prefix + 'AGG_DATE_WEEK'),
+    name: i18n.t(prefix + 'AGG_DATE_WEEK'),
     type: 'DATE',
   },
   {
     category: ChartDataViewFieldCategory.DateLevelComputedField,
     expression: 'AGG_DATE_DAY',
-    name: prefixI18N(prefix + 'AGG_DATE_DAY'),
+    name: i18n.t(prefix + 'AGG_DATE_DAY'),
     type: 'DATE',
   },
 ];
