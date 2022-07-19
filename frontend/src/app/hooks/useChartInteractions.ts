@@ -151,6 +151,7 @@ const useChartInteractions = (props: {
       computedFields,
       aggregation,
       chartConfig,
+      isJumpUrlOnly,
     }) => {
       if (drillThroughSetting) {
         const sourceChartFilters = new ChartDataRequestBuilder(
@@ -175,6 +176,7 @@ const useChartInteractions = (props: {
         const hasNoSelectedItems = isEmptyArray(
           clickEventParams?.selectedItems,
         );
+
         if (hasNoSelectedItems) {
           return;
         }
@@ -182,6 +184,11 @@ const useChartInteractions = (props: {
         (drillThroughSetting?.rules || [])
           .filter(rule => rule.event === targetEvent)
           .filter(rule => isEmpty(ruleId) || rule.id === ruleId)
+          .filter(
+            rule =>
+              !isJumpUrlOnly ||
+              rule?.category === InteractionCategory.JumpToUrl,
+          )
           .forEach(rule => {
             const clickFilters = buildClickEventBaseFilters(
               clickEventParams?.selectedItems?.map(item => item?.data?.rowData),
@@ -362,6 +369,7 @@ const useChartInteractions = (props: {
       viewDetailSetting,
       chartConfig,
       view,
+      authToken,
     }) => {
       if (viewDetailSetting?.event === targetEvent) {
         const clickFilters = buildClickEventBaseFilters(
@@ -382,6 +390,7 @@ const useChartInteractions = (props: {
           drillOption: drillOption,
           viewDetailSetting: viewDetailSetting,
           clickFilters: clickFilters,
+          authToken,
         });
       }
     },

@@ -41,7 +41,7 @@ import { getSystemInfo, logout, setLoggedInUser } from './slice/thunks';
 
 registerTheme('default', echartsDefaultTheme);
 
-export function App() {
+export function AppRouter() {
   const dispatch = useDispatch();
   const { i18n } = useTranslation();
   const logged = !!getToken();

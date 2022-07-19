@@ -165,6 +165,12 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     }
 
     @Override
+    public View updateView(BaseUpdateParam updateParam) {
+        boolean update = update(updateParam);
+        return getViewDetail(updateParam.getId());
+    }
+
+    @Override
     public RoleService getRoleService() {
         return roleService;
     }

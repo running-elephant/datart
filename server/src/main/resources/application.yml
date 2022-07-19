@@ -69,7 +69,7 @@ shiro:
 
 datart:
   migration:
-    enable: false
+    enable: true
 
   server:
     path-prefix: /api/v1

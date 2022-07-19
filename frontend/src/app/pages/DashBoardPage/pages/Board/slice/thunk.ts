@@ -29,6 +29,7 @@ import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   fetchAvailableSourceFunctionsAsync,
   fetchAvailableSourceFunctionsAsyncForShare,
+  fetchChartDataSet,
 } from 'app/utils/fetch';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
@@ -223,12 +224,14 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
     option?: getDataOption;
     extraFilters?: PendingChartDataRequestFilter[];
     variableParams?: Record<string, any[]>;
+  } & {
+    executeToken?: any;
   },
   { state: RootState }
 >(
   'board/syncBoardWidgetChartDataAsync',
   async (
-    { boardId, widgetId, option, extraFilters, variableParams },
+    { boardId, widgetId, option, extraFilters, variableParams, executeToken },
     { getState, dispatch },
   ) => {
     const boardState = getState() as { board: BoardState };
@@ -266,11 +269,7 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
       .build();
 
     try {
-      const { data } = await request2<WidgetData>({
-        method: 'POST',
-        url: `data-provider/execute`,
-        data: requestParams,
-      });
+      const data = await fetchChartDataSet(requestParams, executeToken);
       await dispatch(
         boardActions.setWidgetData({
           wid: widgetId,

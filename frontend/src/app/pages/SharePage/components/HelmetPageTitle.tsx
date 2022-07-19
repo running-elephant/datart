@@ -16,7 +16,24 @@
  * limitations under the License.
  */
 
-import { AppRouter } from 'app/AppRouter';
-import { generateEntryPoint } from 'entryPointFactory';
+import { FC, memo } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useSelector } from 'react-redux';
+import { selectPageTitle } from '../slice/selectors';
 
-generateEntryPoint(AppRouter);
+const HelmetPageTitle: FC<{ lang: string }> = memo(({ lang }) => {
+  const pageTitle = useSelector(selectPageTitle);
+
+  return (
+    <>
+      <Helmet titleTemplate="Datart Share | %s" htmlAttributes={{ lang }}>
+        <meta name="description" content="Data Art" />
+      </Helmet>
+      <Helmet>
+        <title>{pageTitle}</title>
+      </Helmet>
+    </>
+  );
+});
+
+export default HelmetPageTitle;

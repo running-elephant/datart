@@ -546,20 +546,13 @@ const DataModelTree: FC = memo(() => {
         return Promise.reject('field is empty');
       }
 
-      let validComputedField = true;
       try {
-        validComputedField = await checkComputedFieldAsync(
-          sourceId,
-          field.expression,
-        );
+        await checkComputedFieldAsync(sourceId, field.expression);
       } catch (error) {
-        validComputedField = false;
+        message.error(error as any);
+        return;
       }
 
-      if (!validComputedField) {
-        message.error('validate function computed field failed');
-        return Promise.reject('validate function computed field failed');
-      }
       const otherComputedFields = computedFields?.filter(
         f => f.name !== originId,
       );
@@ -567,12 +560,9 @@ const DataModelTree: FC = memo(() => {
         f => f.name === field?.name,
       );
       if (isNameConflict) {
-        message.error(
-          'The computed field has already been exist, please choose another one!',
-        );
-        return Promise.reject(
-          'The computed field has already been exist, please choose another one!',
-        );
+        const errorMsg = message.error(t('computedFieldNameExistWarning'));
+        message.error(errorMsg);
+        return Promise.reject(errorMsg);
       }
 
       const currentFieldIndex = (computedFields || []).findIndex(
@@ -597,7 +587,7 @@ const DataModelTree: FC = memo(() => {
       ]);
       handleDataModelComputerFieldChange(newComputedFields);
     },
-    [computedFields, sourceId, handleDataModelComputerFieldChange],
+    [computedFields, handleDataModelComputerFieldChange, sourceId, t],
   );
 
   const addCallback = useCallback(

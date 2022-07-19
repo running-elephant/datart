@@ -201,16 +201,17 @@ export const widgetLinkEventAction =
   async (dispatch, getState) => {
     const targetLinkDataChartIds = (params || []).map(p => p.rule?.relId);
     const rootState = getState() as RootState;
+    const executeTokenMap = rootState.share?.executeTokenMap || {};
     const viewBoardState = rootState.board as BoardState;
     const editBoardState = rootState.editBoard as unknown as HistoryEditBoard;
     const widgetMapMap =
-      renderMode === 'read'
-        ? viewBoardState?.widgetRecord?.[widget?.dashboardId]
-        : editBoardState.stack?.present?.widgetRecord;
+      renderMode === 'edit'
+        ? editBoardState.stack?.present?.widgetRecord
+        : viewBoardState?.widgetRecord?.[widget?.dashboardId];
     const boardWidgetInfoRecord =
-      renderMode === 'read'
-        ? viewBoardState?.widgetInfoRecord?.[widget?.dashboardId]
-        : editBoardState.widgetInfoRecord;
+      renderMode === 'edit'
+        ? editBoardState.widgetInfoRecord
+        : viewBoardState?.widgetInfoRecord?.[widget?.dashboardId];
     const dataChartMap = viewBoardState.dataChartMap;
     const widgetMap = widgetMapMap || {};
     const sourceWidgetInfo = boardWidgetInfoRecord?.[widget.id];
@@ -314,10 +315,20 @@ export const widgetLinkEventAction =
             ),
       };
 
-      if (renderMode === 'read') {
-        dispatch(syncBoardWidgetChartDataAsync(fetchChartDataParam));
-      } else if (renderMode === 'edit') {
+      if (renderMode === 'edit') {
         dispatch(syncEditBoardWidgetChartDataAsync(fetchChartDataParam));
+      } else {
+        // set auth token if exist
+        let executeToken;
+        if (renderMode === 'share') {
+          executeToken =
+            executeTokenMap?.[targetWidget?.viewIds?.[0]]?.authorizedToken;
+        }
+        dispatch(
+          syncBoardWidgetChartDataAsync(
+            Object.assign(fetchChartDataParam, { executeToken }),
+          ),
+        );
       }
     });
   };

@@ -108,7 +108,7 @@ function unAuthorizationErrorHandler(error) {
 function standardErrorMessageTransformer(error) {
   if (error?.response?.data?.message) {
     console.log('Unhandled Exception | ', error?.response?.data?.message);
-    return;
+    return error?.response?.data?.message;
   }
   return error;
 }

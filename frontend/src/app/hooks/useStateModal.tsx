@@ -62,6 +62,7 @@ function useStateModal({ initState }: { initState?: any }) {
             Object.create(null),
             ...spreadParmas,
           );
+          stateRef.current = {};
           if (isPromise(okCBResult)) return okCBResult;
         } catch (e) {
           console.error('useStateModal | exception message ---> ', e);
@@ -74,6 +75,7 @@ function useStateModal({ initState }: { initState?: any }) {
   };
 
   const handleClickCancelButton = () => {
+    stateRef.current = {};
     cancelCallbackRef.current?.call(Object.create(null), null);
   };
 

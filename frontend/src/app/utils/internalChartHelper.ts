@@ -550,8 +550,8 @@ export function getRequiredAggregatedSections(dataConfigs?) {
   );
 }
 
-// TODO(Stephen): to be delete after use ChartDataSet Model in charts
-// 兼容 impala 聚合函数小写问题
+// @deprecate 兼容 impala 聚合函数小写问题
+// TODO(Stephen): should be remove and test in RC.1
 export const filterSqlOperatorName = (requestParams, widgetData) => {
   const sqlOperatorNameList = requestParams.aggregators.map(aggConfig =>
     aggConfig.sqlOperator?.toLocaleLowerCase(),

@@ -411,8 +411,8 @@ export interface BoardInfo {
   originControllerWidgets: Widget[]; // use for reset button
 }
 export enum DeviceType {
-  Desktop = 'desktop',
-  Mobile = 'mobile',
+  Desktop = 'Desktop',
+  Mobile = 'Mobile',
 }
 export interface BoardLinkFilter {
   triggerWidgetId: string;

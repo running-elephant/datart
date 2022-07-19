@@ -78,7 +78,11 @@ const DrillThroughPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           layout="horizontal"
           size="middle"
         >
-          <Form.Item label={t('drillThrough.rule.title')} name="rule">
+          <Form.Item
+            label={t('drillThrough.rule.title')}
+            name="rule"
+            tooltip={t('drillThrough.rule.tip')}
+          >
             <Button type="link" onClick={handleAddRule}>
               {t('drillThrough.rule.addRule')}
             </Button>
