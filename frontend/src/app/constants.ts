@@ -232,6 +232,7 @@ export const ChartStyleSectionComponentType = {
   INTERACTION_CROSS_FILTERING: 'interaction.crossFiltering',
   INTERACTION_VIEW_DETAIL_PANEL: 'interaction.viewDetail',
   DATA_ZOOM_PANEL: 'dataZoomPanel',
+  Y_AXIS_NUMBER_FORMAT_PANEL: 'YAxisNumberFormatPanel',
 };
 
 export enum DownloadFileType {

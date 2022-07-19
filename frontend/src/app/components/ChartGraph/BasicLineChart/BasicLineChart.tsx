@@ -481,6 +481,11 @@ class BasicLineChart extends Chart {
       ['splitLine'],
       ['showHorizonLine', 'horizonLineStyle'],
     );
+    const [format] = getStyles(
+      styles,
+      ['yAxis', 'modal'],
+      ['YAxisNumberFormat'],
+    );
     const name = showTitleAndUnit ? yAxisNames.join(' / ') : null;
 
     return {
@@ -492,7 +497,11 @@ class BasicLineChart extends Chart {
       inverse,
       min,
       max,
-      axisLabel: getAxisLabel(showLabel, font),
+      axisLabel: {
+        show: showLabel,
+        formatter: v => toFormattedValue(v, format),
+        ...font,
+      },
       axisLine: getAxisLine(showAxis, lineStyle),
       axisTick: getAxisTick(showLabel, lineStyle),
       nameTextStyle: getNameTextStyle(
