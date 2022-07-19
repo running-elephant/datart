@@ -1113,7 +1113,9 @@
         "storyName": "Name",
         "storyDescription": "Description",
         "format": "Format",
-        "interval": "Interval"
+        "interval": "Interval",
+        "requiredWidgetName": "Widget name cannot be empty, please input a name",
+        "duplicateWidgetName": "Widget name is duplicate with others, please change another one."
       }
     },
     "widget": {

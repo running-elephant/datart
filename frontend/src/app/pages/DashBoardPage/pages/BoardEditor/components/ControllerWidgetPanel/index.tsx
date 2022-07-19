@@ -328,6 +328,8 @@ const ControllerWidgetPanel: React.FC<WidgetControllerPanelParams> = memo(
                   boardType={boardType}
                   viewMap={viewMap}
                   form={form}
+                  boardVizs={allWidgets}
+                  wid={widgetId}
                 />
               )}
             </div>

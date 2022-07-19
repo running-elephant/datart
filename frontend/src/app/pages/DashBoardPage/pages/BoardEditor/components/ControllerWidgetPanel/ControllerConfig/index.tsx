@@ -68,15 +68,32 @@ export interface RelatedViewFormProps {
   viewMap: Record<string, ChartDataView>;
   otherStrFilterWidgets: Widget[];
   boardType: BoardType;
+  boardVizs?: Widget[];
+  wid?: string;
 }
 
 export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
-  ({ controllerType, form, viewMap, otherStrFilterWidgets }) => {
+  ({
+    controllerType,
+    form,
+    viewMap,
+    otherStrFilterWidgets,
+    boardVizs,
+    wid,
+  }) => {
+    const t = useI18NPrefix(`viz.board.setting`);
     const tc = useI18NPrefix('viz.control');
     const tgb = useI18NPrefix('global.button');
     const hasRadio = useMemo(() => {
       return controllerType === ControllerFacadeTypes.RadioGroup;
     }, [controllerType]);
+
+    const boardAllWidgetNames = useMemo(() => {
+      return (boardVizs || [])
+        .filter(bvz => bvz?.id !== wid)
+        .map(bvz => bvz?.config?.name)
+        .filter(Boolean);
+    }, [boardVizs, wid]);
 
     const sliderTypes = useMemo(() => {
       const sliderTypes = [
@@ -87,7 +104,28 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
     }, [controllerType]);
     return (
       <Wrapper>
-        <Form.Item name="name" label={tc('title')} rules={[{ required: true }]}>
+        <Form.Item
+          name="name"
+          label={tc('title')}
+          rules={[
+            {
+              required: true,
+              message: t('requiredWidgetName'),
+            },
+            () => ({
+              validator(_, value) {
+                if (
+                  value &&
+                  boardAllWidgetNames?.some(name => name === value)
+                ) {
+                  return Promise.reject(new Error(t('duplicateWidgetName')));
+                } else {
+                  return Promise.resolve();
+                }
+              },
+            }),
+          ]}
+        >
           <Input />
         </Form.Item>
         <ValuesSetter

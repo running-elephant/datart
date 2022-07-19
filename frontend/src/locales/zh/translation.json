@@ -1113,7 +1113,9 @@
         "storyName": "名称",
         "storyDescription": "描述",
         "format": "格式",
-        "interval": "间隔"
+        "interval": "间隔",
+        "requiredWidgetName": "组件名称不允许为空，请修改",
+        "duplicateWidgetName": "组件名称重复，请修改"
       }
     },
     "widget": {
