@@ -22,6 +22,7 @@ import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMe
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContainer';
 import ChartDrillContext from 'app/contexts/ChartDrillContext';
+import useDebouncedLoadingStatus from 'app/hooks/useDebouncedLoadingStatus';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
@@ -80,6 +81,9 @@ const ChartPresentPanel: FC<{
     const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
     const datasetLoadingStatus = useSelector(datasetLoadingSelector);
     const { drillOption } = useContext(ChartDrillContext);
+    const lazyLoadingStatus = useDebouncedLoadingStatus({
+      isLoading: datasetLoadingStatus,
+    });
 
     useMount(undefined, () => {
       Debugger.instance.measure(`ChartPresentPanel | Dispose Event`, () => {
@@ -103,7 +107,7 @@ const ChartPresentPanel: FC<{
           style,
           drillOption,
           selectedItems,
-          datasetLoadingStatus,
+          lazyLoadingStatus,
         )
       );
     };
