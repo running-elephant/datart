@@ -61,6 +61,7 @@ public class HttpDataProvider extends DefaultDataProvider {
     private static final String DEFAULT_PARSER = "datart.data.provider.ResponseJsonParser";
 
     private static final String QUERY_PARAM = "queryParam";
+    private static final String MAPPING_FIELD_MAP = "mappingFieldMap";
 
     private static final String BODY = "body";
 
@@ -197,6 +198,9 @@ public class HttpDataProvider extends DefaultDataProvider {
             httpRequestParam.setBody(body.toString());
         }
         httpRequestParam.setQueryParam(new TreeMap<>((Map<String, String>) schema.get(QUERY_PARAM)));
+
+        //httpRequestParam.setMappingFieldMap(new TreeMap<>((Map<String, String>) schema.get(MAPPING_FIELD_MAP)));
+        Optional.ofNullable(schema.get(MAPPING_FIELD_MAP)).ifPresent(mapping-> httpRequestParam.setMappingFieldMap(new TreeMap<>((Map<String, String>) mapping)));
 
         httpRequestParam.setHeaders(new TreeMap<>((Map<String, String>) schema.get(HEADER)));
 

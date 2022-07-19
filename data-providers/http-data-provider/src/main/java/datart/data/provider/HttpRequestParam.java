@@ -54,6 +54,8 @@ public class HttpRequestParam {
 
     private List<Column> columns;
 
+    private TreeMap<String, String> mappingFieldMap;
+
     public String toCacheKey() {
         return new StringJoiner(":").add(url)
                 .add(headers.toString())
