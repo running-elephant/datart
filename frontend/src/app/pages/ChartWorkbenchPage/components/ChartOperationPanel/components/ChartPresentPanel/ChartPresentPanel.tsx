@@ -103,6 +103,7 @@ const ChartPresentPanel: FC<{
           style,
           drillOption,
           selectedItems,
+          datasetLoadingStatus,
         )
       );
     };
