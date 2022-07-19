@@ -234,7 +234,9 @@ export class ChartDataRequestBuilder {
       alias: this.buildAliasName(groupCol),
       column: this.buildColumnName(groupCol),
     }));
-    return UniqWith(newGroupColumns, (a, b) => isEqual(a.column, b.column));
+    return UniqWith(newGroupColumns, (a, b) =>
+      isEqualObject(a.column, b.column),
+    );
   }
 
   private buildFilters(): ChartDataRequestFilter[] {
