@@ -19,12 +19,10 @@ package datart.data.provider;/*
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.jayway.jsonpath.JsonPath;
 import datart.core.base.consts.ValueType;
-import datart.core.base.exception.BaseException;
-import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.Column;
 import datart.core.data.provider.Dataframe;
-import datart.data.provider.HttpResponseParser;
 import datart.data.provider.jdbc.DataTypeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -36,9 +34,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class MyResponseJsonParser implements HttpResponseParser {
+public class HttpResponseJsonPathParser implements HttpResponseParser {
 
-    private static final String PROPERTY_SPLIT = "\\.";
+    private static final String PROPERTY_SPLIT = ".";
+
+
+    private static final String PROPERTY_SUFFIX="[*]";
 
     @Override
     public Dataframe parseResponse(String targetPropertyName, HttpResponse response, List<Column> columns, TreeMap<String, String> mappingFieldMap) throws IOException {
@@ -48,31 +49,25 @@ public class MyResponseJsonParser implements HttpResponseParser {
         if (StringUtils.isEmpty(targetPropertyName)) {
             array = JSON.parseArray(jsonString);
         } else {
-            JSONObject jsonObject = JSON.parseObject(jsonString);
-            String[] split = targetPropertyName.split(PROPERTY_SPLIT);
-            for (int i = 0; i < split.length - 1; i++) {
-                jsonObject = jsonObject.getJSONObject(split[i]);
-                if (jsonObject == null) {
-                    Exceptions.tr(BaseException.class, "message.provider.http.property.miss", targetPropertyName);
-                }
-            }
-            array = jsonObject.getJSONArray(split[split.length - 1]);
-            if (array == null) {
-                Exceptions.tr(BaseException.class, "message.provider.http.property.miss", targetPropertyName);
-            }
+            //The target value of the request must be an array of objects ，so targetPropertyName must be end with [*]
+          /*  if (!targetPropertyName.endsWith(PROPERTY_SUFFIX)) {
+                targetPropertyName += PROPERTY_SPLIT + PROPERTY_SUFFIX;
+            }*/
+            targetPropertyName = targetPropertyName.endsWith(PROPERTY_SUFFIX)?targetPropertyName: targetPropertyName + PROPERTY_SPLIT + PROPERTY_SUFFIX;
+            List<Object> targetObjectList = JsonPath.read(jsonString, targetPropertyName);
+            array = new JSONArray(targetObjectList);
         }
         Dataframe dataframe = new Dataframe();
-        if (array == null || array.size() == 0) {
+        if (array == null || array.isEmpty()) {
             return dataframe;
         }
         List<List<Object>> rows = new ArrayList<>();
         if (CollectionUtils.isEmpty(columns)) {
-            //返回类型如果是JSONObject
-            if (array.get(0) instanceof JSONObject) {
-                columns = getSchema(array.getJSONObject(0), mappingFieldMap);
+            //
+            if(array.get(0) instanceof  LinkedHashMap){
+                columns = getSchema(array.getJSONObject(0),mappingFieldMap);
                 rows = array.toJavaList(JSONObject.class).parallelStream()
-                        .map(item -> {
-                            return item.keySet()
+                        .map(item -> item.keySet()
                                     .stream()
                                     .map(key -> {
                                         Object val = item.get(key);
@@ -80,11 +75,11 @@ public class MyResponseJsonParser implements HttpResponseParser {
                                             val = val.toString();
                                         }
                                         return val;
-                                    }).collect(Collectors.toList());
-                        }).collect(Collectors.toList());
-            } else {
-                //如果不是
-                columns = getSchema(array.get(0));
+                                    }).collect(Collectors.toList())
+                        ).collect(Collectors.toList());
+            }else {
+                //If it is pure data eg (The target value of the request is ["a","b","c"])
+                columns =getSchema(array.get(0),mappingFieldMap);
                 rows = array.parallelStream()
                         .map(Collections::singletonList).collect(Collectors.toList());
             }
@@ -97,10 +92,20 @@ public class MyResponseJsonParser implements HttpResponseParser {
         return dataframe;
     }
 
-    private ArrayList<Column> getSchema(Object value) {
+    private ArrayList<Column> getSchema(Object value, TreeMap<String, String> mappingFieldMap) {
         ArrayList<Column> columns = new ArrayList<>();
         Column column = new Column();
         column.setName("defaultKey");
+        //if mappingFieldMap is not null ,will reset column's  name
+        if (null != mappingFieldMap &&
+                !mappingFieldMap.isEmpty() ) {
+            Map.Entry<String, String> defaultEntry = mappingFieldMap.firstEntry();
+            if (null != defaultEntry) {
+                //if value is blank , defaultEntry's key instead of column's name,otherwise defaultEntry's value
+                String name = (defaultEntry.getValue() != null && StringUtils.isNotBlank(defaultEntry.getValue())) ? defaultEntry.getValue() : defaultEntry.getKey();
+                column.setName(name);
+            }
+        }
         if (value != null) {
             if (value instanceof JSONObject || value instanceof JSONArray) {
                 value = value.toString();
@@ -113,6 +118,12 @@ public class MyResponseJsonParser implements HttpResponseParser {
         return columns;
     }
 
+
+    /**
+     * get column's type and name
+     * @param jsonObject
+     * @param mappingFieldMap if not null the key is property name of the request result object ，value is the attribute the user wants to map to
+     * */
     private ArrayList<Column> getSchema(JSONObject jsonObject, TreeMap<String, String> mappingFieldMap) {
         ArrayList<Column> columns = new ArrayList<>();
         for (String key : jsonObject.keySet()) {

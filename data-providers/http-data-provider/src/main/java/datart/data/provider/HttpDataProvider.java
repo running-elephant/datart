@@ -199,7 +199,8 @@ public class HttpDataProvider extends DefaultDataProvider {
         }
         httpRequestParam.setQueryParam(new TreeMap<>((Map<String, String>) schema.get(QUERY_PARAM)));
 
-        httpRequestParam.setMappingFieldMap(new TreeMap<>((Map<String, String>) schema.get(MAPPING_FIELD_MAP)));
+        //httpRequestParam.setMappingFieldMap(new TreeMap<>((Map<String, String>) schema.get(MAPPING_FIELD_MAP)));
+        Optional.ofNullable(schema.get(MAPPING_FIELD_MAP)).ifPresent(mapping-> httpRequestParam.setMappingFieldMap(new TreeMap<>((Map<String, String>) mapping)));
 
         httpRequestParam.setHeaders(new TreeMap<>((Map<String, String>) schema.get(HEADER)));
 

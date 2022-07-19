@@ -10,6 +10,6 @@ import java.util.TreeMap;
 
 public interface HttpResponseParser {
 
-    Dataframe parseResponse(String targetPropertyName, HttpResponse response, List<Column> columns, TreeMap<String, String> mappingFieldMap) throws IOException;
+    Dataframe parseResponse(String targetPropertyName, HttpResponse response, List<Column> columns,TreeMap<String, String> mappingFieldMap) throws IOException;
 
 }
