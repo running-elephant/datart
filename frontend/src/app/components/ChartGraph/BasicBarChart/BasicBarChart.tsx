@@ -596,6 +596,12 @@ class BasicBarChart extends Chart {
         'max',
       ],
     );
+
+    const [format] = getStyles(
+      styles,
+      ['yAxis', 'modal'],
+      ['YAxisNumberFormat'],
+    );
     const name = showTitleAndUnit ? yAxisNames.join(' / ') : null;
     const [showHorizonLine, horizonLineStyle] = getStyles(
       styles,
@@ -614,6 +620,7 @@ class BasicBarChart extends Chart {
       max,
       axisLabel: {
         show: showLabel,
+        formatter: v => toFormattedValue(v, format),
         ...font,
       },
       axisLine: {

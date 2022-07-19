@@ -42,6 +42,7 @@ import {
   getSelectedItemStyles,
   getSeriesTooltips4Polar2,
   getStyles,
+  toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
@@ -386,6 +387,12 @@ class BasicScatterChart extends Chart {
       [splitLineProps[0], splitLineProps[1]],
     );
 
+    const [format] = getStyles(
+      styles,
+      [axisKey, 'modal'],
+      ['YAxisNumberFormat'],
+    );
+
     return {
       type: 'value',
       inverse,
@@ -397,6 +404,7 @@ class BasicScatterChart extends Chart {
       max,
       axisLabel: {
         show: showLabel,
+        formatter: v => toFormattedValue(v, format),
         ...font,
       },
       axisLine: {

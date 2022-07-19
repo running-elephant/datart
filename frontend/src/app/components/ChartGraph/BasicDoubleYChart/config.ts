@@ -253,6 +253,24 @@ const config: ChartConfig = {
             color: '#495057',
           },
         },
+        {
+          label: 'yAxis.open',
+          key: 'modal',
+          comType: 'group',
+          options: {
+            type: 'modal',
+            modalSize: 'middle',
+            flatten: true,
+            title: 'yAxis.numberFormat',
+          },
+          rows: [
+            {
+              label: 'yAxis.open',
+              key: 'YAxisNumberFormat',
+              comType: 'YAxisNumberFormatPanel',
+            },
+          ],
+        },
       ],
     },
     {
@@ -312,6 +330,24 @@ const config: ChartConfig = {
             fontStyle: 'normal',
             color: '#495057',
           },
+        },
+        {
+          label: 'yAxis.open',
+          key: 'modal',
+          comType: 'group',
+          options: {
+            type: 'modal',
+            modalSize: 'middle',
+            flatten: true,
+            title: 'yAxis.numberFormat',
+          },
+          rows: [
+            {
+              label: 'yAxis.open',
+              key: 'YAxisNumberFormat',
+              comType: 'YAxisNumberFormatPanel',
+            },
+          ],
         },
       ],
     },
@@ -581,6 +617,10 @@ const config: ChartConfig = {
           graph: '显示图形',
           title: '右Y轴',
         },
+        yAxis: {
+          numberFormat: '数据格式设置',
+          open: '打开',
+        },
         xAxis: {
           title: 'X轴',
         },
@@ -659,6 +699,10 @@ const config: ChartConfig = {
         rightY: {
           graph: 'Show Graph',
           title: 'Right Y Axis',
+        },
+        yAxis: {
+          numberFormat: 'Number Format',
+          open: 'Open',
         },
         graphType: {
           line: 'Line',
