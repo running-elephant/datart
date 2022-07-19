@@ -502,7 +502,7 @@ export function mergeChartStyleConfigs(
 
     if (tEle?.template && !isEmptyArray(sEle?.rows)) {
       const template = tEle.template;
-      tEle['rows'] = sEle.rows?.map(row => {
+      tEle['rows'] = sEle?.rows?.map(row => {
         const tRows = CloneValueDeep(template?.rows);
         return {
           ...template,
