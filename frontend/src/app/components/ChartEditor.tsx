@@ -324,7 +324,6 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       targetChartConfig,
     );
 
-    // dispatch(actions.updateCurrentDataViewComputedFields([]));
     dispatch(actions.updateShadowChartConfig({}));
     dispatch(
       actions.updateChartConfig({
