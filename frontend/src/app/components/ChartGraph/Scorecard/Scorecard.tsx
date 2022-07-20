@@ -18,6 +18,7 @@
 
 import { ChartDataSectionType } from 'app/constants';
 import ReactChart from 'app/models/ReactChart';
+import { ChartMouseEventParams, ChartsEventData } from 'app/types/Chart';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -28,6 +29,7 @@ import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getColumnRenderName,
+  getExtraSeriesRowData,
   getStyles,
   toFormattedValue,
   transformToDataSet,
@@ -110,7 +112,7 @@ class Scorecard extends ReactChart {
       aggregateConfigs,
       chartDataSet,
     );
-    const labelConfig = this.getLabelConfig(
+    const nameConfig = this.getNameConfig(
       aggColorConfig,
       styleConfigs,
       fontSizeFn,
@@ -120,13 +122,14 @@ class Scorecard extends ReactChart {
       styleConfigs,
       fontSizeFn,
     );
-    const data = [
+    const data: ChartsEventData[] = [
       {
-        label: getColumnRenderName(aggregateConfigs[0]),
+        name: getColumnRenderName(aggregateConfigs[0]),
         value: toFormattedValue(
           chartDataSet?.[0]?.getCell?.(aggregateConfigs[0]),
           aggregateConfigs[0]?.format,
         ),
+        ...getExtraSeriesRowData(chartDataSet?.[0]),
       },
     ];
     return {
@@ -135,11 +138,58 @@ class Scorecard extends ReactChart {
         height: context.height,
       },
       dataConfig,
-      labelConfig,
+      nameConfig,
       padding,
       data,
       background: aggColorConfig?.[0]?.backgroundColor || 'transparent',
+      event: data.map((d, i) => this.registerEvents(data[i], i)),
     };
+  }
+
+  private registerEvents(data: ChartsEventData, index: number) {
+    const eventParams: ChartMouseEventParams = {
+      type: 'click',
+      chartType: 'scorecard',
+      interactionType: 'select',
+      data,
+      selectedItems: [
+        {
+          index,
+          data,
+        },
+      ],
+    };
+    return this.mouseEvents?.reduce((acc, cur) => {
+      cur.name && (eventParams.type = cur.name);
+      if (cur.name === 'click') {
+        Object.assign(acc, {
+          onClick: event => {
+            cur.callback?.(eventParams);
+          },
+        });
+      }
+      if (cur.name === 'dblclick') {
+        Object.assign(acc, {
+          onDoubleClick: event => cur.callback?.(eventParams),
+        });
+      }
+      if (cur.name === 'contextmenu') {
+        Object.assign(acc, {
+          onContextMenu: event => cur.callback?.(eventParams),
+        });
+      }
+      if (cur.name === 'mouseover') {
+        Object.assign(acc, {
+          onMouseEnter: event => cur.callback?.(eventParams),
+        });
+      }
+      if (cur.name === 'mouseout') {
+        Object.assign(acc, {
+          onMouseLeave: event => cur.callback?.(eventParams),
+        });
+      }
+      return acc;
+    }, {});
   }
 
   getColorConfig(
@@ -195,7 +245,7 @@ class Scorecard extends ReactChart {
     };
   }
 
-  getLabelConfig(
+  getNameConfig(
     aggColorConfig: CSSProperties[],
     style: ChartStyleConfig[],
     fontSizeFn: (path: string[]) => string,

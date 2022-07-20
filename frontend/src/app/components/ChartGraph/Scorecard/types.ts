@@ -11,7 +11,7 @@ interface FontConfig {
 
 export interface ScorecardConfig {
   dataConfig: FontConfig;
-  labelConfig: {
+  nameConfig: {
     show: boolean;
     font: FontConfig;
     position: string;
@@ -24,10 +24,13 @@ export interface ScorecardConfig {
   };
   width: number;
   data: {
-    label: string;
+    name: string;
     value: number | string;
   };
   background: string;
+  event: {
+    [eventName: string]: (value: any) => void;
+  }[];
 }
 
 export interface ScorecardBoxProp {
