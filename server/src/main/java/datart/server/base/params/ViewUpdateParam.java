@@ -19,6 +19,7 @@
 package datart.server.base.params;
 
 
+import datart.core.data.provider.ScriptType;
 import datart.core.entity.RelSubjectColumns;
 import datart.core.entity.RelVariableSubject;
 import datart.core.entity.Variable;
@@ -45,6 +46,8 @@ public class ViewUpdateParam extends VizUpdateParam {
     private Double index;
 
     private String script;
+
+    private ScriptType type;
 
     private String model;
 
