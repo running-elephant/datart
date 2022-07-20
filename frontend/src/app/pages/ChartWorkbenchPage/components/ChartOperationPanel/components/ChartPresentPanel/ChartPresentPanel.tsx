@@ -81,7 +81,7 @@ const ChartPresentPanel: FC<{
     const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
     const datasetLoadingStatus = useSelector(datasetLoadingSelector);
     const { drillOption } = useContext(ChartDrillContext);
-    const lazyLoadingStatus = useDebouncedLoadingStatus({
+    const isLoadingData = useDebouncedLoadingStatus({
       isLoading: datasetLoadingStatus,
     });
 
@@ -107,7 +107,7 @@ const ChartPresentPanel: FC<{
           style,
           drillOption,
           selectedItems,
-          lazyLoadingStatus,
+          isLoadingData,
         )
       );
     };

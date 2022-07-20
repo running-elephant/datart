@@ -83,6 +83,7 @@ export interface ChartPreview {
   backendChart?: ChartDTO;
   dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
+  isLoadingData?: boolean;
 }
 
 export interface VizTab {

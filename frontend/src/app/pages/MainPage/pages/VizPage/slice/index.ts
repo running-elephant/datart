@@ -584,6 +584,30 @@ const slice = createSlice({
       }
     });
     builder.addCase(
+      fetchDataSetByPreviewChartAction.pending,
+      (state, action: { meta: { arg: { backendChartId: string } } }) => {
+        const index = state.chartPreviews?.findIndex(
+          c => c.backendChartId === action?.meta?.arg?.backendChartId,
+        );
+        if (index !== undefined) {
+          state.chartPreviews[index].isLoadingData = true;
+          state.chartPreviews[index].version = uuidv4();
+        }
+      },
+    );
+    builder.addCase(
+      fetchDataSetByPreviewChartAction.rejected,
+      (state, action: { meta: { arg: { backendChartId: string } } }) => {
+        const index = state.chartPreviews?.findIndex(
+          c => c.backendChartId === action?.meta?.arg?.backendChartId,
+        );
+        if (index !== undefined) {
+          state.chartPreviews[index].isLoadingData = false;
+          state.chartPreviews[index].version = uuidv4();
+        }
+      },
+    );
+    builder.addCase(
       fetchDataSetByPreviewChartAction.fulfilled,
       (state, action: PayloadAction<{ backendChartId; data }>) => {
         const index = state.chartPreviews?.findIndex(
@@ -600,6 +624,7 @@ const slice = createSlice({
         state.chartPreviews[index] = {
           ...state.chartPreviews[index],
           dataset: action.payload?.data,
+          isLoadingData: false,
           version: uuidv4(),
         };
       },

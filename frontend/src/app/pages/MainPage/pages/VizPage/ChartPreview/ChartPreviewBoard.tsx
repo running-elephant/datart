@@ -27,6 +27,7 @@ import { ChartDataViewFieldCategory } from 'app/constants';
 import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import useChartInteractions from 'app/hooks/useChartInteractions';
+import useDebouncedLoadingStatus from 'app/hooks/useDebouncedLoadingStatus';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import ChartManager from 'app/models/ChartManager';
@@ -140,6 +141,9 @@ const ChartPreviewBoard: FC<{
     } = useChartInteractions({
       openViewDetailPanel: openViewDetailPanel as any,
       openJumpDialogModal: jumpDialogModal.info,
+    });
+    const isLoadingData = useDebouncedLoadingStatus({
+      isLoading: chartPreview?.isLoadingData,
     });
 
     useEffect(() => {
@@ -723,6 +727,7 @@ const ChartPreviewBoard: FC<{
                     selectedItems={selectedItems[backendChartId]}
                     width={cacheW}
                     height={cacheH}
+                    isLoadingData={isLoadingData}
                   />
                 </ChartDrillContextMenu>
               </Spin>
