@@ -321,7 +321,7 @@ const ToolbarStyle = styled.div`
   .ql-background .ql-picker-options {
     width: 232px !important;
   }
-  .ql-size .ql-picker-options{
+  .ql-size .ql-picker-options {
     height: 200px;
     overflow-y: auto;
   }
