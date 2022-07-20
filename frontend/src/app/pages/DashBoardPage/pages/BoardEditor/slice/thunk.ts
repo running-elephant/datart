@@ -443,6 +443,7 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
   null,
   {
     boardId: string;
+    sourceWidgetId: string;
     widgetId: string;
     option?: getDataOption;
     extraFilters?: PendingChartDataRequestFilter[];
@@ -452,7 +453,7 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
 >(
   'board/syncEditBoardWidgetChartDataAsync',
   async (
-    { boardId, widgetId, option, extraFilters, variableParams },
+    { boardId, sourceWidgetId, widgetId, option, extraFilters, variableParams },
     { getState, dispatch },
   ) => {
     const boardState = getState() as { board: BoardState };
@@ -490,59 +491,65 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
       .addDrillOption(drillOption)
       .build();
 
-    try {
-      const { data } = await request2<WidgetData>({
+    const { data } = await request2<WidgetData>(
+      {
         method: 'POST',
         url: `data-provider/execute`,
         data: requestParams,
-      });
-      await dispatch(
-        editWidgetDataActions.setWidgetData({
-          wid: widgetId,
-          data: { ...data, id: widgetId },
-        }),
-      );
-      await dispatch(
-        editWidgetInfoActions.changeWidgetLinkInfo({
-          boardId,
-          widgetId,
-          linkInfo: {
-            filters: extraFilters,
-            variables: variableParams,
-          },
-        }),
-      );
-      await dispatch(
-        editWidgetInfoActions.changePageInfo({
-          boardId,
-          widgetId,
-          pageInfo: data?.pageInfo,
-        }),
-      );
-      await dispatch(
-        editWidgetInfoActions.setWidgetErrInfo({
-          boardId,
-          widgetId,
-          errInfo: undefined,
-          errorType: 'request',
-        }),
-      );
-    } catch (error) {
-      await dispatch(
-        editWidgetInfoActions.setWidgetErrInfo({
-          boardId,
-          widgetId,
-          errInfo: getErrorMessage(error),
-          errorType: 'request',
-        }),
-      );
-      await dispatch(
-        editWidgetDataActions.setWidgetData({
-          wid: widgetId,
-          data: undefined,
-        }),
-      );
-    }
+      },
+      undefined,
+      {
+        onRejected: async error => {
+          await dispatch(
+            editWidgetInfoActions.setWidgetErrInfo({
+              boardId,
+              widgetId,
+              errInfo: getErrorMessage(error),
+              errorType: 'request',
+            }),
+          );
+          await dispatch(
+            editWidgetDataActions.setWidgetData({
+              wid: widgetId,
+              data: undefined,
+            }),
+          );
+        },
+      },
+    );
+    await dispatch(
+      editWidgetDataActions.setWidgetData({
+        wid: widgetId,
+        data: { ...data, id: widgetId },
+      }),
+    );
+    await dispatch(editWidgetInfoActions.renderedWidgets([widgetId]));
+    await dispatch(
+      editWidgetInfoActions.changeWidgetLinkInfo({
+        boardId,
+        widgetId,
+        linkInfo: {
+          sourceWidgetId,
+          filters: extraFilters,
+          variables: variableParams,
+        },
+      }),
+    );
+    await dispatch(
+      editWidgetInfoActions.changePageInfo({
+        boardId,
+        widgetId,
+        pageInfo: data?.pageInfo,
+      }),
+    );
+    await dispatch(
+      editWidgetInfoActions.setWidgetErrInfo({
+        boardId,
+        widgetId,
+        errInfo: undefined,
+        errorType: 'request',
+      }),
+    );
     return null;
   },
 );

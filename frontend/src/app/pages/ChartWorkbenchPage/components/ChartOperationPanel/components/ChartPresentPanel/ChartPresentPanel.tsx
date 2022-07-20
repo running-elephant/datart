@@ -192,9 +192,13 @@ const StyledChartPresentPanel = styled.div`
   flex-direction: column;
   background-color: ${p => p.theme.componentBackground};
   border-radius: ${BORDER_RADIUS};
+  min-height: 0;
 `;
 
-const StyledReusableChartContainer = styled.div``;
+const StyledReusableChartContainer = styled.div`
+  flex: 1;
+  overflow-y: auto;
+`;
 
 const TableWrapper = styled.div`
   padding: ${SPACE_LG};
@@ -204,7 +208,6 @@ const SqlWrapper = styled.div`
   flex: 1;
   padding: ${SPACE_MD};
   margin: 0 ${SPACE_LG} ${SPACE_LG};
-  overflow-y: auto;
   background-color: ${p => p.theme.emphasisBackground};
   border-radius: ${BORDER_RADIUS};
   > code {

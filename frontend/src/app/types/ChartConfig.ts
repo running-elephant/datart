@@ -312,6 +312,7 @@ export type AxisLabel = {
   rotate?: number | null;
   show: boolean;
   width?: string | number;
+  formatter?: string;
   font?: FontStyle;
 } & FontStyle;
 

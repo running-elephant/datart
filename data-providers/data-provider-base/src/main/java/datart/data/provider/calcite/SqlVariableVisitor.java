@@ -159,6 +159,9 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
             }
             while (left != 0) {
                 startIndex--;
+                if (startIndex < 0) {
+                    Exceptions.msg("There are mismatched parentheses nearby " + originalSqlFragment);
+                }
                 if (srcSql.charAt(startIndex) == ' ') {
                     continue;
                 }
@@ -168,6 +171,9 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
             }
             while (right != 0) {
                 endIndex++;
+                if (endIndex >= srcSql.length()) {
+                    Exceptions.msg("There are mismatched parentheses nearby " + originalSqlFragment);
+                }
                 if (srcSql.charAt(endIndex) == ' ') {
                     continue;
                 }

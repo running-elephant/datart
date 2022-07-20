@@ -254,7 +254,7 @@ export const StoryEditor: React.FC<{}> = memo(() => {
     <DndProvider backend={HTML5Backend}>
       <StoryContext.Provider
         value={{
-          name: story.name,
+          name: story?.name,
           storyId: storyId,
           editing: false,
           orgId: orgId,

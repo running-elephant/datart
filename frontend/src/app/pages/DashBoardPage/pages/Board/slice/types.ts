@@ -442,6 +442,7 @@ export interface getDataOption {
 export type WidgetErrorType = 'request' | 'interaction';
 
 export type WidgetLinkInfo = {
+  sourceWidgetId?: string;
   filters?: PendingChartDataRequestFilter[];
   variables?: Record<string, any[]>;
 };

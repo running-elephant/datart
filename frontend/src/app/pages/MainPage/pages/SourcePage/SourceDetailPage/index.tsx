@@ -468,21 +468,20 @@ export function SourceDetailPage() {
               </Form.Item>
               {dataProviderConfigTemplateLoading && <LoadingOutlined />}
 
-              {(providerType !== 'FILE' || formType === CommonFormTypes.Edit) &&
-                config?.attributes.map(attr => (
-                  <ConfigComponent
-                    key={`${providerType}_${attr.name}`}
-                    attr={attr}
-                    form={form}
-                    sourceId={editingSource?.id}
-                    testLoading={testLoading}
-                    disabled={isArchived}
-                    allowManage={allowManage}
-                    onTest={test}
-                    onSubFormTest={subFormTest}
-                    onDbTypeChange={dbTypeChange}
-                  />
-                ))}
+              {config?.attributes.map(attr => (
+                <ConfigComponent
+                  key={`${providerType}_${attr.name}`}
+                  attr={attr}
+                  form={form}
+                  sourceId={editingSource?.id}
+                  testLoading={testLoading}
+                  disabled={isArchived}
+                  allowManage={allowManage}
+                  onTest={test}
+                  onSubFormTest={subFormTest}
+                  onDbTypeChange={dbTypeChange}
+                />
+              ))}
             </Form>
           </Card>
         </Content>
@@ -514,7 +513,7 @@ const Content = styled.div`
   }
 
   .detailForm {
-    max-width: ${SPACE_TIMES(240)};
+    max-width: ${SPACE_TIMES(400)};
     padding-top: ${SPACE_MD};
   }
 `;
