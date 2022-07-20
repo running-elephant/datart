@@ -23,7 +23,6 @@ import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
 import { VizHeader } from 'app/components/VizHeader';
-import { ChartDataViewFieldCategory } from 'app/constants';
 import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import useChartInteractions from 'app/hooks/useChartInteractions';
@@ -38,10 +37,6 @@ import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import {
-  getRuntimeComputedFields,
-  getRuntimeDateLevelFields,
-} from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import {
@@ -279,12 +274,15 @@ const ChartPreviewBoard: FC<{
           chartConfigRef?.current?.interactions,
           [],
         );
+        const computedFields = (
+          chartPreview?.backendChart?.config.computedFields || []
+        ).concat(chartPreview?.backendChart?.view.computedFields || []);
+
         const view = {
           id: chartPreview?.backendChart?.view?.id || '',
           config: chartPreview?.backendChart?.view.config || {},
           meta: chartPreview?.backendChart?.view.meta,
-          computedFields:
-            chartPreview?.backendChart?.config.computedFields || [],
+          computedFields,
         };
         return {
           drillOption: drillOptionRef.current,
@@ -629,24 +627,6 @@ const ChartPreviewBoard: FC<{
     }, [backendChartId, dispatch, redirect, tg]);
 
     const handleDateLevelChange = (type, payload) => {
-      const rows = getRuntimeDateLevelFields(payload.value?.rows);
-      const dateLevelComputedFields = rows.filter(
-        v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
-      );
-      const replacedConfig = payload.value.replacedConfig;
-      const computedFields = getRuntimeComputedFields(
-        dateLevelComputedFields,
-        replacedConfig,
-        chartPreview?.backendChart?.config?.computedFields,
-        true,
-      );
-
-      dispatch(
-        vizAction.updateComputedFields({
-          backendChartId,
-          computedFields,
-        }),
-      );
       dispatch(
         updateGroupAndFetchDataset({
           backendChartId,

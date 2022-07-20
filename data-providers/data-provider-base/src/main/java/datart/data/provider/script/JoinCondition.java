@@ -27,4 +27,8 @@ public class JoinCondition {
 
     private String[] right;
 
+    public boolean isValid() {
+        return left != null && left.length > 0 && right != null && right.length > 0;
+    }
+
 }

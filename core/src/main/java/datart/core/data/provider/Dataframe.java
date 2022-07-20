@@ -23,8 +23,8 @@ import datart.core.common.UUIDGenerator;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Data
@@ -61,5 +61,52 @@ public class Dataframe implements Serializable {
         dataframe.setRows(Collections.emptyList());
         return dataframe;
     }
+
+    // 按照指定的列定义，将数据集按照表名称进行分割，以还原原始表结构
+    public Dataframes splitByTable(Map<String, Column> newSchema) {
+        Map<Integer, String> tableColumnIndex = new HashMap<>();
+        for (int i = 0; i < columns.size(); i++) {
+            Column column = columns.get(i);
+            Column schemaColumn = newSchema.get(column.columnKey());
+            tableColumnIndex.put(i, schemaColumn.tableName());
+        }
+        Map<String, List<List<Object>>> tableRows = newSchema
+                .values()
+                .stream()
+                .map(Column::tableName)
+                .distinct()
+                .collect(Collectors.toMap(k -> k, v -> new ArrayList()));
+        for (List<Object> row : rows) {
+            int i = 0;
+            Map<String, List<Object>> tableRowMap = new HashMap<>();
+            for (Object item : row) {
+                String tableName = tableColumnIndex.get(i);
+                tableRowMap.computeIfAbsent(tableName, v -> new ArrayList<>()).add(item);
+                i++;
+            }
+            for (String key : tableRowMap.keySet()) {
+                tableRows.get(key).add(tableRowMap.get(key));
+            }
+        }
+        Map<String, List<Column>> tableColumns = new HashMap<>();
+        for (int i = 0; i < columns.size(); i++) {
+            Column column = columns.get(i);
+            Column newColumn = newSchema.get(column.columnKey());
+            String tableName = newColumn.tableName();
+            newColumn.setName(newColumn.columnName());
+            tableColumns.computeIfAbsent(tableName, v -> new ArrayList<>())
+                    .add(newColumn);
+        }
+        Dataframe[] dataframes = tableColumns.keySet().stream()
+                .map(tableName -> {
+                    Dataframe df = new Dataframe();
+                    df.setName(tableName);
+                    df.setColumns(tableColumns.get(tableName));
+                    df.setRows(tableRows.get(tableName));
+                    return df;
+                }).toArray(Dataframe[]::new);
+        return Dataframes.of(id, dataframes);
+    }
+
 
 }

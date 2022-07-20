@@ -43,17 +43,27 @@ export const getDistinctFields = async (
   executeToken: Record<string, ExecuteToken> | undefined,
 ) => {
   const viewConfigs = transformToViewConfig(view?.config);
+  const _columns = [...new Set(columns)];
   const requestParams: ChartDataRequest = {
     aggregators: [],
     filters: [],
     groups: [],
-    columns: [...new Set(columns)].map(columnName => {
+    functionColumns:
+      view?.computedFields
+        ?.filter(v => _columns.includes(v.name))
+        ?.map(field => {
+          return {
+            alias: field?.name || '',
+            snippet: field?.expression || '',
+          };
+        }) || [],
+    columns: _columns.map(columnName => {
       const row = getAllColumnInMeta(view?.meta)?.find(
         v => v.name === columnName,
       );
       return {
         alias: columnName,
-        column: row?.path || [],
+        column: row?.path || [columnName],
       };
     }),
     pageInfo: {

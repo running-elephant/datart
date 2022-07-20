@@ -51,6 +51,7 @@ import java.lang.reflect.Constructor;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Setter
@@ -405,18 +406,38 @@ public class JdbcDataProviderAdapter implements Closeable {
      * 本地执行，从数据源拉取全量数据，在本地执行聚合操作
      */
     public Dataframe executeInLocal(QueryScript script, ExecuteParam executeParam) throws Exception {
+
+        List<SelectColumn> selectColumns = null;
+        // 构建执行参数，查询源表全量数据
+        if (!CollectionUtils.isEmpty(script.getSchema())) {
+            selectColumns = script.getSchema().values().parallelStream().map(column -> {
+                SelectColumn selectColumn = new SelectColumn();
+                selectColumn.setColumn(column.getName());
+                selectColumn.setAlias(column.columnKey());
+                return selectColumn;
+            }).collect(Collectors.toList());
+        }
+        ExecuteParam tempExecuteParam = ExecuteParam.builder()
+                .columns(selectColumns)
+                .concurrencyOptimize(true)
+                .cacheEnable(executeParam.isCacheEnable())
+                .cacheExpires(executeParam.getCacheExpires())
+                .concurrencyOptimize(executeParam.isConcurrencyOptimize())
+                .build();
+
         SqlScriptRender render = new SqlScriptRender(script
-                , executeParam
+                , tempExecuteParam
                 , getSqlDialect());
-        String sql = render.render(false, false, false);
+        String sql = render.render(true, false, false);
         Dataframe data = execute(sql);
+
         if (!CollectionUtils.isEmpty(script.getSchema())) {
             for (Column column : data.getColumns()) {
-                column.setType(script.getSchema().getOrDefault(column.getName(), column).getType());
+                column.setType(script.getSchema().getOrDefault(column.columnKey(), column).getType());
             }
         }
         data.setName(script.toQueryKey());
-        return LocalDB.executeLocalQuery(null, executeParam, Dataframes.of(script.getSourceId(), data));
+        return LocalDB.executeLocalQuery(script, executeParam, data.splitByTable(script.getSchema()));
     }
 
     /**
@@ -460,5 +481,4 @@ public class JdbcDataProviderAdapter implements Closeable {
         }
         return obj;
     }
-
 }

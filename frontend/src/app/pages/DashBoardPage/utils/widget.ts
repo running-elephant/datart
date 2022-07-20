@@ -26,6 +26,12 @@ import {
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ChartsEventData } from 'app/types/Chart';
 import ChartDataView from 'app/types/ChartDataView';
+import { View } from 'app/types/View';
+import {
+  filterCurrentUsedComputedFields,
+  mergeChartAndViewComputedField,
+} from 'app/utils/chartHelper';
+import { updateBy } from 'app/utils/mutation';
 import { formatTime } from 'app/utils/time';
 import {
   BOARD_COPY_CHART_SUFFIX,
@@ -237,6 +243,19 @@ export const createToSaveWidgetGroup = (
   widgets: Widget[],
   widgetIds: string[],
 ) => {
+  widgets = updateBy(widgets, draft => {
+    draft.forEach(v => {
+      if (v.config.type === 'chart') {
+        v.config.content.dataChart.config.computedFields =
+          filterCurrentUsedComputedFields(
+            v.config?.content?.dataChart?.config?.chartConfig,
+            v.config?.content?.dataChart?.config?.computedFields.filter(
+              v => !v.isViewComputedFields,
+            ),
+          );
+      }
+    });
+  });
   const curWidgetIds = widgets.map(widget => widget.id);
 
   // 删除的
@@ -511,6 +530,7 @@ export const getWidgetMap = (
   widgets: Widget[],
   dataCharts: DataChart[],
   boardType: BoardType,
+  serverViews: View[],
   filterSearchParamsMap?: FilterSearchParamsWithMatch,
 ) => {
   const filterSearchParams = filterSearchParamsMap?.params,
@@ -523,6 +543,17 @@ export const getWidgetMap = (
     // issues #601
     const chartViewId = dataChartMap[cur.datachartId]?.viewId;
     const viewIds = chartViewId ? [chartViewId] : cur.viewIds;
+    const viewComputerFields =
+      JSON.parse(serverViews.find(v => v.id === viewIds[0])?.model || '{}')
+        ?.computedFields || [];
+    if (cur.config.type === 'chart' && cur.config?.content?.dataChart?.config) {
+      cur.config.content.dataChart.config.computedFields =
+        mergeChartAndViewComputedField(
+          viewComputerFields,
+          cur.config?.content?.dataChart?.config?.computedFields,
+        );
+    }
+
     acc[cur.id] = {
       ...cur,
       viewIds,

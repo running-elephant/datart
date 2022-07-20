@@ -29,6 +29,7 @@ import {
   buildUpdateChartRequest,
   convertToChartDto,
 } from 'app/utils/ChartDtoHelper';
+import { filterCurrentUsedComputedFields } from 'app/utils/chartHelper';
 import { fetchAvailableSourceFunctionsAsync } from 'app/utils/fetch';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { request2 } from 'utils/request';
@@ -123,7 +124,6 @@ export const fetchViewDetailAction = createAsyncThunk(
         response.data.type,
       );
     }
-
     return response.data;
   },
 );
@@ -219,10 +219,12 @@ export const updateChartAction = createAsyncThunk(
   ) => {
     const state = thunkAPI.getState() as any;
     const workbenchState = state.workbench as typeof initState;
-    const computedFields =
+    const computedFields = filterCurrentUsedComputedFields(
+      workbenchState.chartConfig,
       workbenchState.currentDataView?.computedFields?.filter(
         v => !v.isViewComputedFields,
-      );
+      ),
+    );
 
     const requestBody = buildUpdateChartRequest({
       chartId: arg.chartId,

@@ -109,12 +109,16 @@ export const fetchEditBoardDetail = createAsyncThunk<
       widgets: serverWidgets,
     } = data;
     // TODO
-    const dataCharts: DataChart[] = getDataChartsByServer(serverDataCharts);
+    const dataCharts: DataChart[] = getDataChartsByServer(
+      serverDataCharts,
+      serverViews,
+    );
     const migratedWidgets = migrateWidgets(serverWidgets, boardType);
     const { widgetMap, wrappedDataCharts } = getWidgetMap(
       migratedWidgets, //todo
       dataCharts,
       boardType,
+      serverViews,
     );
     const widgetInfos = Object.keys(widgetMap).map(id => createWidgetInfo(id));
     // TODO xld migration about filter
@@ -265,7 +269,7 @@ export const addDataChartWidgets = createAsyncThunk<
       url: `viz/datacharts?datachartIds=${chartIds.join()}`,
       method: 'get',
     });
-    const dataCharts: DataChart[] = getDataChartsByServer(datacharts);
+    const dataCharts: DataChart[] = getDataChartsByServer(datacharts, views);
     const dataChartMap = getDataChartMap(dataCharts);
     const viewViews = getChartDataView(views, dataCharts);
     dispatch(boardActions.setDataChartToMap(dataCharts));
