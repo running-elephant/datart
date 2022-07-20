@@ -346,7 +346,11 @@ class BasicDoubleYChart extends Chart {
         [`${position}Y`],
         ['showAxis', 'inverseAxis', 'font', 'showLabel'],
       );
-
+      const [format] = getStyles(
+        styles,
+        [`${position}Y`, 'modal'],
+        ['YAxisNumberFormat'],
+      );
       return {
         type: 'value',
         position,
@@ -365,7 +369,11 @@ class BasicDoubleYChart extends Chart {
         interval: yAxisIntervalConfig[position + 'Interval'],
         inverse,
         axisLine: getAxisLine(showAxis),
-        axisLabel: getAxisLabel(showLabel, font),
+        axisLabel: {
+          show: showLabel,
+          formatter: v => toFormattedValue(v, format),
+          ...font,
+        },
         splitLine: getSplitLine(showHorizonLine, horizonLineStyle),
       };
     };

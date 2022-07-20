@@ -17,7 +17,7 @@
       "info": "Info",
       "open": "Open",
       "close": "Close",
-      "saveAs": "Save as",
+      "saveAs": "Save As",
       "cancel": "Cancel",
       "ok": "OK",
       "shortcuts": "Shortcuts"
@@ -95,7 +95,7 @@
     "authTitle": "OR",
     "alreadyLoggedIn": "Your account is already logged in",
     "enter": "Click to enter",
-    "switch": "Switch accounts"
+    "switch": "Switch account"
   },
   "register": {
     "sendSuccess": "Email sent successfully",
@@ -203,7 +203,7 @@
       },
       "export": {
         "title": "Export",
-        "selectText": "Select the data to export",
+        "selectText": "Select the resources to export",
         "submit": "Submit"
       },
       "import": {
@@ -216,9 +216,9 @@
         "overwrite": "OverWrite",
         "rollback": "Rollback",
         "desc": {
-          "new": "New:All imported resources are recreated",
-          "overwrite": "OverWrite:The system checks whether the imported resource exists in the database by ID. If yes, the system updates the resource. If no, the system creates a new resource",
-          "rollback": "Rollback:The system checks whether the imported resource exists in the database by ID. If the imported resource exists, an error message is displayed and the import operation is rolled back. The import can be completed only if all checks pass"
+          "new": "New: All imported resources are recreated.",
+          "overwrite": "Overwrite: The system checks whether the imported resource exists in the database by ID. If yes, the system updates the resource. Otherwise, the system creates a new resource.",
+          "rollback": "Rollback: The system checks whether the imported resource exists in the database by ID. If the imported resource exists, an error message is displayed and the import operation is rolled back. The import can be completed only if all the checks pass."
         }
       }
     },
@@ -262,7 +262,7 @@
               "success": "Success",
               "moveToTrash": "Move to recycle bin",
               "delete": "Delete",
-              "newTimedTask": "New timed task",
+              "newTimedTask": "New scheduled task",
               "sureToRestore": "Are you sure to restore?",
               "restore": "Restore",
               "sureToDelete": "Confirm delete?",
@@ -1293,8 +1293,8 @@
       "publishSuccess": "Publish success",
       "unpublishSuccess": "Unpublish success",
       "empty": "Select vizs in the sidebar",
-      "closeOther": "close Other Tabs",
-      "closeAll": "close All Tabs"
+      "closeOther": "Close Other Tabs",
+      "closeAll": "Close All Tabs"
     }
   },
   "view": {
@@ -1315,15 +1315,15 @@
       "cancel": "Cancel",
       "execute": "Execute",
       "warning": "There are unexecuted changes, still execute?",
-      "closeOther": "close Other Tabs",
-      "closeAll": "close All Tabs"
+      "closeOther": "Close Other Tabs",
+      "closeAll": "Close All Tabs"
     },
     "editor": {
       "startAnalysis": "Start Analysis",
       "folder": "Folder",
-      "source": "Select source",
+      "source": "Select Source",
       "run": "Run",
-      "runSelection": "Run selection",
+      "runSelection": "Run Selection",
       "runWinTip": "Win: [Ctrl + Enter]",
       "runMacTip": "Mac: [Command + Enter]",
       "beautify": "Beautify",
@@ -1331,7 +1331,7 @@
       "saveWinTip": "Win: [Ctrl + S]",
       "saveMacTip": "Mac: [Command + S]",
       "info": "Info",
-      "saveAs": "Save as",
+      "saveAs": "Save As",
       "saveFragment": "Save Fragment",
       "readonlyTip": "Not editable in recycle"
     },
@@ -1375,8 +1375,8 @@
     },
     "sidebar": {
       "title": "Views",
-      "addView": "Create view",
-      "addFolder": "Create folder",
+      "addView": "Create View",
+      "addFolder": "Create Folder",
       "parent": "Parent",
       "recycle": "Recycle",
       "open": "Open",
@@ -1436,28 +1436,28 @@
     "lastUpdateTime": "Last Update Time",
     "sidebar": {
       "title": "Sources",
-      "add": "Create source",
+      "add": "Create Source",
       "recycle": "Recycle"
     },
     "form": {
       "name": "Name",
       "type": "Type",
-      "test": "Test connection",
+      "test": "Test Connection",
       "file": "File",
-      "selectFile": "Select file",
-      "addProperty": "Add property",
-      "editProperty": "Edit property",
-      "addConfig": "Add configuration",
-      "editConfig": "Edit configuration",
-      "duplicate": "Duplicate key",
-      "duplicateName": "Duplicate name"
+      "selectFile": "Select File",
+      "addProperty": "Add Property",
+      "editProperty": "Edit Property",
+      "addConfig": "Add Configuration",
+      "editConfig": "Edit Configuration",
+      "duplicate": "Duplicate Key",
+      "duplicateName": "Duplicate Name"
     }
   },
   "member": {
     "memberDetail": {
       "titleAdd": "Add Member",
       "titleDetail": "Member detail",
-      "grantOwner": "Granted to organization owner",
+      "grantOwner": "Grant as organization owner",
       "revokeOwner": "Revoke owner",
       "remove": "Remove",
       "removeConfirm": "Remove confirm",

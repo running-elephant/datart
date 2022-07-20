@@ -35,3 +35,4 @@ export { default as ScorecardConditionalStylePanel } from './ScorecardConditiona
 export { default as TimerFormat } from './TimerFormat';
 export { default as UnControlledTableHeaderPanel } from './UnControlledTableHeaderPanel';
 export { default as WidgetBorder } from './WidgetBorder';
+export { default as YAxisNumberFormatPanel } from './YAxisNumberFormatPanel';

@@ -250,6 +250,24 @@ const config: ChartConfig = {
           key: 'max',
           comType: 'inputNumber',
         },
+        {
+          label: 'yAxis.open',
+          key: 'modal',
+          comType: 'group',
+          options: {
+            type: 'modal',
+            modalSize: 'middle',
+            flatten: true,
+            title: 'yAxis.numberFormat',
+          },
+          rows: [
+            {
+              label: 'yAxis.open',
+              key: 'YAxisNumberFormat',
+              comType: 'YAxisNumberFormatPanel',
+            },
+          ],
+        },
       ],
     },
     {
@@ -344,6 +362,24 @@ const config: ChartConfig = {
           label: 'common.max',
           key: 'max',
           comType: 'inputNumber',
+        },
+        {
+          label: 'yAxis.open',
+          key: 'modal',
+          comType: 'group',
+          options: {
+            type: 'modal',
+            modalSize: 'middle',
+            flatten: true,
+            title: 'yAxis.numberFormat',
+          },
+          rows: [
+            {
+              label: 'yAxis.open',
+              key: 'YAxisNumberFormat',
+              comType: 'YAxisNumberFormatPanel',
+            },
+          ],
         },
       ],
     },
@@ -534,6 +570,8 @@ const config: ChartConfig = {
         },
         yAxis: {
           title: 'Y轴',
+          numberFormat: '数据格式设置',
+          open: '打开',
         },
         splitLine: {
           title: '分割线',
@@ -597,6 +635,8 @@ const config: ChartConfig = {
         },
         yAxis: {
           title: 'Y Axis',
+          numberFormat: 'Number Format',
+          open: 'Open',
         },
         splitLine: {
           title: 'Split Line',
