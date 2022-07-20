@@ -68,6 +68,7 @@ import { getEditorProvideCompletionItems } from '../../slice/thunks';
 import { VariableHierarchy } from '../../slice/types';
 import { comparePermissionChange } from '../../utils';
 import Container from './Container';
+import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 
 export const Variables = memo(() => {
   const { actions } = useViewSlice();
@@ -292,6 +293,12 @@ export const Variables = memo(() => {
     [variables, publicVariables, t],
   );
 
+  const { filteredData, debouncedSearch } = useDebouncedSearch(listSource,
+    (keywords, data) => {
+      return data.name.includes(keywords)
+    }
+  );
+
   const titleProps = useMemo(
     () => ({
       title: 'variable',
@@ -300,6 +307,7 @@ export const Variables = memo(() => {
         items: [{ key: 'variable', text: t('add') }],
         callback: showAddForm,
       },
+      onSearch: debouncedSearch
     }),
     [showAddForm, t],
   );
@@ -308,7 +316,7 @@ export const Variables = memo(() => {
     <Container {...titleProps}>
       <ListWrapper>
         <List
-          dataSource={listSource}
+          dataSource={filteredData}
           loading={
             stage === ViewViewModelStages.Loading && {
               indicator: <LoadingOutlined />,
