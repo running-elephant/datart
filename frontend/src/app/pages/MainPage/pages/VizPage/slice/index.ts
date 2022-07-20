@@ -617,6 +617,7 @@ const slice = createSlice({
         if (index < 0) {
           state.chartPreviews.push({
             backendChartId: action.payload?.backendChartId,
+            isLoadingData: false,
             dataset: action.payload?.data,
           });
           return;
