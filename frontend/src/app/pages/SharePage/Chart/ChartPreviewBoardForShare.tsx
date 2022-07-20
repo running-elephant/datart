@@ -22,6 +22,7 @@ import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
 import useChartInteractions from 'app/hooks/useChartInteractions';
+import useDebouncedLoadingStatus from 'app/hooks/useDebouncedLoadingStatus';
 import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import ChartManager from 'app/models/ChartManager';
@@ -99,6 +100,9 @@ const ChartPreviewBoardForShare: FC<{
     } = useChartInteractions({
       openViewDetailPanel: openViewDetailPanel as any,
       openJumpDialogModal: jumpDialogModal.info,
+    });
+    const isLoadingData = useDebouncedLoadingStatus({
+      isLoading: chartPreview?.isLoadingData,
     });
 
     useMount(() => {
@@ -401,6 +405,7 @@ const ChartPreviewBoardForShare: FC<{
                 selectedItems={selectedItems}
                 width={width}
                 height={height}
+                isLoadingData={isLoadingData}
               />
             </ChartDrillContextMenu>
           </div>

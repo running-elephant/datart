@@ -46,7 +46,7 @@ export const initialState: SharePageState = {
   executeToken: '',
   executeTokenMap: {},
   sharePassword: undefined,
-  chartPreview: {},
+  chartPreview: { isLoadingData: false },
   headlessBrowserRenderSign: false,
   pageWidthHeight: [0, 0],
   shareDownloadPolling: false,
@@ -210,20 +210,29 @@ export const slice = createSlice({
       .addCase(fetchShareVizInfo.rejected, state => {
         state.loginLoading = false;
       })
+      .addCase(fetchShareDataSetByPreviewChartAction.pending, state => {
+        if (state.chartPreview) {
+          state.chartPreview.isLoadingData = true;
+        }
+      })
+      .addCase(fetchShareDataSetByPreviewChartAction.rejected, state => {
+        if (state.chartPreview) {
+          state.chartPreview.isLoadingData = false;
+        }
+        state.headlessBrowserRenderSign = true;
+      })
       .addCase(
         fetchShareDataSetByPreviewChartAction.fulfilled,
         (state, { payload }) => {
           state.chartPreview = {
             ...state.chartPreview,
+            isLoadingData: false,
             dataset: payload as any,
           };
           state.selectedItems = [];
           state.headlessBrowserRenderSign = true;
         },
       )
-      .addCase(fetchShareDataSetByPreviewChartAction.rejected, state => {
-        state.headlessBrowserRenderSign = true;
-      })
       .addCase(getOauth2Clients.fulfilled, (state, action) => {
         state.oauth2Clients = action.payload.map(x => ({
           name: Object.keys(x)[0],
