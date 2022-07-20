@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { ReactComponent as Loading } from 'app/assets/images/loading.svg';
 import {
   Frame,
   FrameContextConsumer,
@@ -26,7 +27,7 @@ import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
-import { StyleSheetManager } from 'styled-components/macro';
+import styled, { StyleSheetManager } from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
 import ChartIFrameLifecycleAdapter from './ChartIFrameLifecycleAdapter';
 
@@ -42,6 +43,7 @@ const ChartIFrameContainer: FC<{
   selectedItems?: SelectedItem[];
   widgetSpecialConfig?: any;
   scale?: [number, number];
+  isLoadingData?: boolean;
 }> = memo(props => {
   const iframeContainerId = `chart-iframe-root-${props.containerId}`;
   const config = setRuntimeDateLevelFieldsInChartConfig(props.config);
@@ -83,6 +85,7 @@ const ChartIFrameContainer: FC<{
               isShown={props.isShown}
               drillOption={props?.drillOption}
               selectedItems={props?.selectedItems}
+              isLoadingData={props?.isLoadingData}
             />
           </div>
         </div>
@@ -146,6 +149,7 @@ const ChartIFrameContainer: FC<{
                   isShown={props.isShown}
                   drillOption={props.drillOption}
                   selectedItems={props?.selectedItems}
+                  isLoadingData={props?.isLoadingData}
                 />
               </div>
             </StyleSheetManager>
@@ -157,9 +161,28 @@ const ChartIFrameContainer: FC<{
 
   return (
     <ChartI18NContext.Provider value={{ i18NConfigs: props?.config?.i18ns }}>
-      {render()}
+      <StyledDataLoadingContainer>
+        {props.isLoadingData && <Loading />}
+      </StyledDataLoadingContainer>
+      <StyledChartRendererContainer isLoading={props.isLoadingData}>
+        {render()}
+      </StyledChartRendererContainer>
     </ChartI18NContext.Provider>
   );
 });
 
 export default ChartIFrameContainer;
+
+const StyledDataLoadingContainer = styled.div`
+  display: flex;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+`;
+
+const StyledChartRendererContainer = styled.div<{ isLoading?: boolean }>`
+  width: 100%;
+  height: 100%;
+  opacity: ${p => (p.isLoading ? 0.3 : 1)};
+`;
