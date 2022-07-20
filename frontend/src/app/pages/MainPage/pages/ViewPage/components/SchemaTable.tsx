@@ -26,6 +26,7 @@ import { ToolbarButton } from 'app/components';
 import { VirtualTable } from 'app/components/VirtualTable';
 import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { TABLEDATAINDEX } from 'globalConstants';
 import { memo, ReactElement, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -71,7 +72,12 @@ export const SchemaTable = memo(
     ...tableProps
   }: SchemaTableProps) => {
     const dataSourceWithKey = useMemo(
-      () => dataSource?.map(o => ({ ...o, [ROW_KEY]: uuidv4() })),
+      () =>
+        dataSource?.map((o, index) => ({
+          ...o,
+          [ROW_KEY]: uuidv4(),
+          [TABLEDATAINDEX]: index + 1,
+        })),
       [dataSource],
     );
     const columnWidthMap = useMemo(
@@ -80,7 +86,7 @@ export const SchemaTable = memo(
     );
     const t = useI18NPrefix('view.schemaTable');
     const tg = useI18NPrefix('global');
-
+    const indexColumnWidth = 50;
     const {
       columns,
       tableWidth,
@@ -172,7 +178,18 @@ export const SchemaTable = memo(
               : ('left' as const),
         };
       });
-      return { columns, tableWidth };
+
+      return {
+        columns: [
+          {
+            align: 'left',
+            dataIndex: TABLEDATAINDEX,
+            width: indexColumnWidth,
+          },
+          ...columns,
+        ],
+        tableWidth,
+      };
     }, [
       model,
       hierarchy,
@@ -183,6 +200,7 @@ export const SchemaTable = memo(
       t,
       tg,
     ]);
+
     return (
       <VirtualTable
         {...tableProps}
@@ -191,7 +209,7 @@ export const SchemaTable = memo(
         components={{ header: { cell: TableHeader } }}
         dataSource={dataSourceWithKey}
         columns={columns}
-        scroll={{ x: tableWidth, y: height }}
+        scroll={{ x: tableWidth + indexColumnWidth, y: height }}
         width={propsWidth}
       />
     );
