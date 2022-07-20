@@ -310,7 +310,7 @@ export const Variables = memo(() => {
       },
       onSearch: debouncedSearch,
     }),
-    [showAddForm, t],
+    [showAddForm, t, debouncedSearch],
   );
 
   return (
