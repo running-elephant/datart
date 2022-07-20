@@ -26,6 +26,7 @@ import {
 } from '@ant-design/icons';
 import { Button, List, Popconfirm } from 'antd';
 import { ListItem } from 'app/components';
+import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { getRoles } from 'app/pages/MainPage/pages/MemberPage/slice/thunks';
 import {
@@ -68,7 +69,6 @@ import { getEditorProvideCompletionItems } from '../../slice/thunks';
 import { VariableHierarchy } from '../../slice/types';
 import { comparePermissionChange } from '../../utils';
 import Container from './Container';
-import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 
 export const Variables = memo(() => {
   const { actions } = useViewSlice();
@@ -293,10 +293,11 @@ export const Variables = memo(() => {
     [variables, publicVariables, t],
   );
 
-  const { filteredData, debouncedSearch } = useDebouncedSearch(listSource,
+  const { filteredData, debouncedSearch } = useDebouncedSearch(
+    listSource,
     (keywords, data) => {
-      return data.name.includes(keywords)
-    }
+      return data.name.includes(keywords);
+    },
   );
 
   const titleProps = useMemo(
@@ -307,7 +308,7 @@ export const Variables = memo(() => {
         items: [{ key: 'variable', text: t('add') }],
         callback: showAddForm,
       },
-      onSearch: debouncedSearch
+      onSearch: debouncedSearch,
     }),
     [showAddForm, t],
   );
