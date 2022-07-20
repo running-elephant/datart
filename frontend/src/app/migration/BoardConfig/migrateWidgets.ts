@@ -1,3 +1,21 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { FONT_DEFAULT } from 'app/constants';
 import { initInteractionTpl } from 'app/pages/DashBoardPage/components/WidgetManager/utils/init';
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
@@ -16,6 +34,7 @@ import {
   APP_VERSION_BETA_2,
   APP_VERSION_BETA_4,
   APP_VERSION_BETA_4_2,
+  APP_VERSION_RC_0,
 } from './../constants';
 import { WidgetBeta3 } from './types';
 import {
@@ -132,6 +151,33 @@ export const beta4_2 = (
   return beta4Widget as Widget;
 };
 
+export const RC0 = (widget?: Widget) => {
+  if (!widget) {
+    return undefined;
+  }
+  if (
+    !versionCanDo(APP_VERSION_RC_0, widget?.config?.content?.dataChart?.config)
+  ) {
+    return widget as Widget;
+  }
+  let RC0Widget = widget as any;
+
+  if (RC0Widget?.config?.content?.dataChart?.config?.computedFields) {
+    RC0Widget.config.content.dataChart.config.computedFields =
+      RC0Widget.config.content.dataChart.config.computedFields.map(v => {
+        if (!v.name) {
+          return {
+            ...v,
+            name: v.id,
+          };
+        }
+        return v;
+      });
+    RC0Widget.config.content.dataChart.config.version = APP_VERSION_RC_0;
+  }
+  return RC0Widget as Widget;
+};
+
 const finaleWidget = (widget?: Widget) => {
   if (!widget) return undefined;
   widget.config = setLatestVersion(widget.config);
@@ -175,6 +221,8 @@ export const migrateWidgets = (
       let beta4Widget = beta4(boardType, resWidget);
 
       beta4_2(boardType, resWidget);
+
+      RC0(beta4Widget);
 
       return finaleWidget(beta4Widget as Widget);
     })

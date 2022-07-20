@@ -108,6 +108,19 @@ const ChartDataConfigSectionActionMenu: FC<
           ].includes(action),
       );
     }
+
+    if (
+      type === 'DATE' &&
+      ![
+        ChartDataViewFieldCategory.Field,
+        ChartDataViewFieldCategory.DateLevelComputedField,
+      ].includes(category)
+    ) {
+      modalActions = modalActions.filter(
+        action => ![ChartDataSectionFieldActionType.DateLevel].includes(action),
+      );
+    }
+
     return modalActions;
   };
 

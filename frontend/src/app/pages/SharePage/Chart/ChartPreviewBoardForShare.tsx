@@ -21,7 +21,6 @@ import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMe
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
-import { ChartDataViewFieldCategory } from 'app/constants';
 import useChartInteractions from 'app/hooks/useChartInteractions';
 import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
@@ -29,10 +28,6 @@ import ChartManager from 'app/models/ChartManager';
 import useDisplayViewDetail from 'app/pages/MainPage/pages/VizPage/hooks/useDisplayViewDetail';
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import {
-  getRuntimeComputedFields,
-  getRuntimeDateLevelFields,
-} from 'app/utils/chartHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -349,24 +344,6 @@ const ChartPreviewBoardForShare: FC<{
     };
 
     const handleDateLevelChange = (type, payload) => {
-      const rows = getRuntimeDateLevelFields(payload.value?.rows);
-      const dateLevelComputedFields = rows.filter(
-        v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
-      );
-      const replacedConfig = payload.value.replacedConfig;
-      const computedFields = getRuntimeComputedFields(
-        dateLevelComputedFields,
-        replacedConfig,
-        chartPreview?.backendChart?.config?.computedFields,
-        true,
-      );
-
-      dispatch(
-        shareActions.updateComputedFields({
-          backendChartId: chartPreview?.backendChart?.id!,
-          computedFields,
-        }),
-      );
       dispatch(
         updateGroupAndFetchDatasetForShare({
           backendChartId: chartPreview?.backendChart?.id!,

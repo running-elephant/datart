@@ -18,10 +18,7 @@
 
 import { Form, FormInstance, Radio, Select, Space } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
-import {
-  ChartDataViewFieldCategory,
-  ControllerFacadeTypes,
-} from 'app/constants';
+import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
@@ -32,6 +29,7 @@ import {
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
+import { hasAggregationFunction } from 'app/utils/chartHelper';
 import { getDistinctFields } from 'app/utils/fetch';
 import { transformMeta } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -84,24 +82,25 @@ const ValuesOptionsSetter: FC<{
       data.model = beginViewModelMigration(data.model, data.type);
     }
     let meta = transformMeta(data?.model);
-    //TODO: Support after beta4
-    // const viewComputerField = JSON.parse(data.model)?.computedFields || [];
+    const viewComputedField =
+      JSON.parse(data.model || '{}')?.computedFields?.filter(
+        field => !hasAggregationFunction(field?.expression),
+      ) || [];
 
     if (!meta) return { option: [], dataView: undefined };
     const option: CascaderOptionType[] = meta
-      // .concat(viewComputerField)
+      .concat(viewComputedField)
       .map(item => {
-        const fieldName =
-          item.category === ChartDataViewFieldCategory.ComputedField
-            ? item.id
-            : item.name;
         return {
-          value: fieldName,
-          label: fieldName,
+          value: item.name,
+          label: item.name,
         };
       });
 
-    return { option, dataView: { ...data, meta } };
+    return {
+      option,
+      dataView: { ...data, meta, computedFields: viewComputedField },
+    };
   }, []);
   const onTargetKeyChange = useCallback(
     nextTargetKeys => {
@@ -288,7 +287,7 @@ const ValuesOptionsSetter: FC<{
                     >
                       {optionValues.map(item => (
                         <Select.Option
-                          key={item.key + item.label}
+                          key={String(item.key) + String(item.label)}
                           value={item.key}
                         >
                           <div

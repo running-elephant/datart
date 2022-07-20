@@ -34,9 +34,11 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
+import { hasAggregationFunction } from 'app/utils/chartHelper';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { filterValueTypeByControl, isRangeTypeController } from './utils';
+
 export interface RelatedViewFormProps {
   viewMap: Record<string, ChartDataView>;
   form: FormInstance<ControllerWidgetContent> | undefined;
@@ -134,8 +136,16 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
               </Option>
             ));
         } else {
+          let viewComputedField =
+            viewMap?.[relatedViews[index].viewId]?.computedFields?.filter(
+              field =>
+                !hasAggregationFunction(field?.expression) &&
+                field.isViewComputedFields,
+            ) || [];
+
           // 字段
           return viewMap?.[relatedViews[index].viewId]?.meta
+            ?.concat(viewComputedField)
             ?.filter(v => {
               return filterValueTypeByControl(controllerType, v.type);
             })
@@ -144,7 +154,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
                 <Option
                   key={item.name}
                   fieldvaluetype={item.type}
-                  value={item.id}
+                  value={item.name}
                 >
                   <div
                     style={{ display: 'flex', justifyContent: 'space-between' }}
