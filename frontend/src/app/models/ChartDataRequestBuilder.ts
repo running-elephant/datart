@@ -457,7 +457,7 @@ export class ChartDataRequestBuilder {
       this.dataView.computedFields,
     );
     const fieldsNameList = (this.chartDataConfigs || [])
-      .flatMap(config => config.rows || [])
+      .flatMap(config => getRuntimeDateLevelFields(config.rows) || [])
       .flatMap(row => row?.colName || []);
     const currentUsedComputedFields = computedFields?.filter(v =>
       fieldsNameList.includes(v.name),

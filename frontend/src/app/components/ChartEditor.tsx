@@ -18,11 +18,7 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
-import {
-  ChartDataViewFieldCategory,
-  DownloadFileType,
-  RUNTIME_DATE_LEVEL_KEY,
-} from 'app/constants';
+import { DownloadFileType, RUNTIME_DATE_LEVEL_KEY } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
@@ -58,8 +54,6 @@ import { ChartDTO } from 'app/types/ChartDTO';
 import {
   clearRuntimeDateLevelFieldsInChartConfig,
   filterCurrentUsedComputedFields,
-  getRuntimeComputedFields,
-  getRuntimeDateLevelFields,
   getValue,
 } from 'app/utils/chartHelper';
 import { makeDownloadDataTask } from 'app/utils/fetch';
@@ -660,19 +654,6 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   ]);
 
   const handleDateLevelChange = (type, payload) => {
-    const rows = getRuntimeDateLevelFields(payload.value?.rows);
-    const dateLevelComputedFields = rows.filter(
-      v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
-    );
-    const replacedConfig = payload.value.replacedConfig;
-    const computedFields = getRuntimeComputedFields(
-      dateLevelComputedFields,
-      replacedConfig,
-      dataview?.computedFields,
-      true,
-    );
-    dispatch(actions.updateCurrentDataViewComputedFields(computedFields));
-
     dispatch(
       updateChartConfigAndRefreshDatasetAction({
         type,

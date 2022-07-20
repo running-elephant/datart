@@ -167,6 +167,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
       );
       const replacedConfig = payload.value.replacedConfig;
+      // TODO delete computedFields,
       const computedFields = getRuntimeComputedFields(
         dateLevelComputedFields,
         replacedConfig,
