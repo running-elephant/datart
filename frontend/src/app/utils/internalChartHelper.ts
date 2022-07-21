@@ -501,11 +501,25 @@ export function mergeChartStyleConfigs(
       const template = tEle.template;
       tEle['rows'] = sEle?.rows?.map(row => {
         const tRows = CloneValueDeep(template?.rows);
-        return {
+        const newRow = {
           ...template,
+          /**
+           * template overwrite principle:
+           * 1. child key allow change by row key, eg. key is field uuid.
+           * 2. child value allow change by row
+           * 3. child disabled status allow change by row
+           * 4. child action should be use template row action
+           */
           key: row.key,
           rows: mergeChartStyleConfigs(tRows, row?.rows, options),
         };
+        if (!isUndefined(row?.value)) {
+          newRow.value = getUpdatedChartStyleValue(row.value, newRow?.value);
+        }
+        if (!isUndefined(row?.disabled)) {
+          newRow.disabled = row.disabled;
+        }
+        return newRow;
       });
     } else if (!isEmptyArray(tEle?.rows)) {
       tEle['rows'] = mergeChartStyleConfigs(tEle.rows, sEle?.rows, options);
