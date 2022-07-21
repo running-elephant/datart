@@ -282,6 +282,99 @@ describe('Internal Chart Helper ', () => {
       ],
       { useDefault: false },
     ],
+    [
+      [{ key: 'a', value: null }],
+      [{ key: 'a', value: 3, disabled: true }],
+      [{ key: 'a', value: 3, disabled: true }],
+      { useDefault: false },
+    ],
+    [
+      [{ key: 'a', value: null }],
+      [{ key: 'a', value: 3 }],
+      [{ key: 'a', value: 3 }],
+      { useDefault: false },
+    ],
+    [
+      [{ key: 'a', value: null }],
+      [{ key: 'a', value: 3, disabled: undefined }],
+      [{ key: 'a', value: 3 }],
+      { useDefault: false },
+    ],
+    [
+      [{ key: 'a', value: null }],
+      [{ key: 'a', value: 3, disabled: false }],
+      [{ key: 'a', value: 3, disabled: false }],
+      { useDefault: false },
+    ],
+    [
+      [
+        {
+          key: 'a',
+        },
+        {
+          key: 'b',
+          disabled: false,
+        },
+        {
+          key: 'c',
+          disabled: true,
+        },
+      ],
+      [
+        {
+          key: 'a',
+          disabled: false,
+        },
+        {
+          key: 'b',
+          disabled: true,
+        },
+        {
+          key: 'c',
+          disabled: false,
+        },
+      ],
+      [
+        {
+          key: 'a',
+          disabled: false,
+        },
+        {
+          key: 'b',
+          disabled: true,
+        },
+        {
+          key: 'c',
+          disabled: false,
+        },
+      ],
+      { useDefault: false },
+    ],
+    [
+      [
+        {
+          key: 'a',
+          rows: [{ key: 'a-1', value: undefined }],
+        },
+      ],
+      [
+        {
+          key: 'a',
+          value: 1,
+          disabled: false,
+          rows: [{ key: 'a-1', value: 2, disabled: true }],
+        },
+      ],
+      [
+        {
+          key: 'a',
+          value: 1,
+          disabled: false,
+          rows: [{ key: 'a-1', value: 2, disabled: true }],
+        },
+      ],
+      { useDefault: false },
+    ],
   ])('mergeChartStyleConfigs Test - ', (target, source, expected, options?) => {
     test(`deep merge target: ${JSON.stringify(
       target,
@@ -293,7 +386,7 @@ describe('Internal Chart Helper ', () => {
         source as ChartStyleConfigDTO[],
         options,
       );
-      expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+      expect(result).toEqual(expected);
     });
   });
 
