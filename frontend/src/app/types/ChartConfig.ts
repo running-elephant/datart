@@ -322,6 +322,13 @@ export type AxisLabel = {
   font?: FontStyle;
 } & FontStyle;
 
+export type EmphasisStyle = {
+  label?: {
+    show?: boolean;
+    font?: FontStyle;
+  };
+};
+
 export type LabelStyle = {
   label?: {
     position?: string;
@@ -330,6 +337,7 @@ export type LabelStyle = {
     formatter?: string | ((params) => string);
   } & FontStyle;
   labelLayout?: { hideOverlap: boolean };
+  emphasis?: EmphasisStyle;
 };
 
 export interface LegendStyle {

@@ -24,6 +24,7 @@ import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
+  EmphasisStyle,
   LabelStyle,
   LegendStyle,
   SelectedItem,
@@ -339,6 +340,8 @@ class BasicPieChart extends Chart {
       ['showLabel', 'position', 'font'],
     );
     const formatter = this.getLabelFormatter(styles);
+    const emphasisStyle = this.getEmphasisStyle(styles);
+
     return {
       label: {
         show: position === 'center' ? false : show,
@@ -347,6 +350,7 @@ class BasicPieChart extends Chart {
         formatter,
       },
       labelLayout: { hideOverlap: true },
+      emphasis: emphasisStyle,
     };
   }
 
@@ -388,6 +392,24 @@ class BasicPieChart extends Chart {
           : ''
       }`;
     };
+  }
+
+  private getEmphasisStyle(styles: ChartStyleConfig[]): EmphasisStyle {
+    const [show, position, font] = getStyles(
+      styles,
+      ['label'],
+      ['showLabel', 'position', 'font'],
+    );
+    const needEmphasisStyle = position === 'center' && show;
+    const emphasisStyle = needEmphasisStyle
+      ? {
+          label: {
+            show: true,
+            ...font,
+          },
+        }
+      : {};
+    return emphasisStyle;
   }
 
   private getSeriesStyle(styles: ChartStyleConfig[]): PieSeries {
