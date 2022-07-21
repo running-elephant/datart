@@ -77,7 +77,25 @@ class BasicGaugeChart extends Chart {
       'default',
     );
     this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
+      switch (event.name) {
+        case 'click':
+          this.chart.on(event.name, params => {
+            event.callback({
+              ...params,
+              interactionType: 'select',
+              selectedItems: [
+                {
+                  index: params.componentIndex + ',' + params.dataIndex,
+                  data: params.data,
+                },
+              ],
+            });
+          });
+          break;
+        default:
+          this.chart.on(event.name, event.callback);
+          break;
+      }
     });
   }
 
