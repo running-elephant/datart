@@ -21,7 +21,7 @@ import { ChartConfig, ChartStyleConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
-  getDefaultThemeColor,
+  getDefaultThemeColor, getExtraSeriesRowData,
   getStyles,
   transformToDataSet,
 } from 'app/utils/chartHelper';
@@ -61,7 +61,25 @@ class WordCloudChart extends Chart {
       'default',
     );
     this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
+      switch (event.name) {
+        case 'click':
+          this.chart.on(event.name, params => {
+            event.callback({
+              ...params,
+              interactionType: 'select',
+              selectedItems: [
+                {
+                  index: params.componentIndex + ',' + params.dataIndex,
+                  data: params.data,
+                },
+              ],
+            });
+          });
+          break;
+        default:
+          this.chart.on(event.name, event.callback);
+          break;
+      }
     });
   }
 
@@ -116,6 +134,7 @@ class WordCloudChart extends Chart {
             return {
               name: dc.getCell(groupConfigs[0]),
               value: dc.getCell(aggregateConfigs[0]),
+              ...getExtraSeriesRowData(dc),
             };
           }),
         },
