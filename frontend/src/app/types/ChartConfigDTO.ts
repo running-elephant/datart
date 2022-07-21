@@ -25,6 +25,7 @@ export type ChartStyleConfigDTO = {
   value?: any;
   rows?: ChartStyleConfigDTO[];
   comType?: string;
+  disabled?: boolean;
 };
 
 export type ChartDataConfigDTO = ChartDataConfig & {};
