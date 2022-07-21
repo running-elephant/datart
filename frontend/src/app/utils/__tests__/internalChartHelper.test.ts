@@ -201,83 +201,177 @@ describe('Internal Chart Helper ', () => {
     [
       [
         {
+          label: 'a',
           key: 'a',
-          value: 1,
-          rows: [{ key: 'aa', value: 1, rows: [{ key: 'aaa', value: 1 }] }],
+          comType: 'tabs',
+          template: {
+            label: 'a-t-l',
+            key: 'a-t-k',
+            comType: 'group',
+            rows: [
+              {
+                label: 'a-t-1-l',
+                key: 'a-t-1-k',
+                comType: 'group',
+                options: {
+                  translateItemLabel: true,
+                },
+                rows: [
+                  {
+                    label: 'a-t-1-1-l',
+                    key: 'a-t-1-1-k',
+                    default: false,
+                    comType: 'checkbox',
+                    options: {
+                      getItems: cols => {
+                        return cols?.map(c => c.name)?.includes('id');
+                      },
+                    },
+                  },
+                  {
+                    label: 'a-t-1-2-l',
+                    key: 'a-t-1-2-k',
+                    default: false,
+                    comType: 'checkbox',
+                    watcher: {
+                      deps: ['a-t-1-1-k'],
+                      action: props => {
+                        return {
+                          disabled: !props.disabled,
+                        };
+                      },
+                    },
+                  },
+                ],
+              },
+            ],
+          },
         },
       ],
       [
-        { key: 'b', value: 2, rows: [{ key: 'aa', value: 2 }] },
         {
+          label: 'a',
           key: 'a',
-          value: 3,
-          rows: [{ key: 'aa', value: 3, rows: [{ key: 'aaa', value: 3 }] }],
+          value: 'a',
+          comType: 'tabs',
+          rows: [
+            {
+              label: 'a-t-l',
+              key: 'a-k', // this level key could be change
+              value: 'a-1',
+              comType: 'group',
+              rows: [
+                {
+                  label: 'a-t-1-l',
+                  key: 'a-t-1-k', // this level key could not be change, use template key
+                  value: 'a-1-1',
+                  comType: 'group',
+                  rows: [
+                    {
+                      label: 'a-t-1-1-l',
+                      key: 'a-t-1-1-k',
+                      value: true,
+                      default: false,
+                      disabled: false,
+                      comType: 'checkbox',
+                    },
+                    {
+                      label: 'a-t-1-2-l',
+                      key: 'a-t-1-2-k',
+                      default: false,
+                      comType: 'checkbox',
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         },
       ],
       [
         {
+          label: 'a',
           key: 'a',
-          value: 3,
-          rows: [{ key: 'aa', value: 3, rows: [{ key: 'aaa', value: 3 }] }],
-        },
-      ],
-    ],
-    [
-      [{ key: 'a', value: null, default: 0 }],
-      [],
-      [{ key: 'a', value: null, default: 0 }],
-      { useDefault: true },
-    ],
-    [
-      [{ key: 'a', value: undefined, default: 0 }],
-      [],
-      [{ key: 'a', value: 0, default: 0 }],
-      { useDefault: true },
-    ],
-    [
-      [{ key: 'a', value: null, default: 0 }],
-      [
-        { key: 'b', value: 2, default: 'n' },
-        { key: 'a', value: 3, default: 'm' },
-      ],
-      [{ key: 'a', value: 3, default: 0 }],
-      { useDefault: true },
-    ],
-    [
-      [
-        {
-          key: 'a',
-          value: undefined,
-          default: 0,
-          rows: [{ value: undefined, default: 0 }],
-        },
-      ],
-      [],
-      [{ key: 'a', value: 0, default: 0, rows: [{ value: 0, default: 0 }] }],
-      { useDefault: true },
-    ],
-    [
-      [{ key: 'a', value: undefined, default: 0 }],
-      [],
-      [{ key: 'a', value: undefined, default: 0 }],
-      { useDefault: false },
-    ],
-    [
-      [
-        {
-          key: 'a',
-          value: undefined,
-          default: 0,
-          rows: [{ value: undefined, default: 0 }],
-        },
-      ],
-      [],
-      [
-        {
-          key: 'a',
-          value: undefined,
-          default: 0,
-          rows: [{ value: undefined, default: 0 }],
+          value: 'a',
+          comType: 'tabs',
+          template: {
+            label: 'a-t-l',
+            key: 'a-t-k',
+            comType: 'group',
+            rows: [
+              {
+                label: 'a-t-1-l',
+                key: 'a-t-1-k',
+                comType: 'group',
+                options: {
+                  translateItemLabel: true,
+                },
+                rows: [
+                  {
+                    label: 'a-t-1-1-l',
+                    key: 'a-t-1-1-k',
+                    default: false,
+                    comType: 'checkbox',
+                    options: {
+                      getItems: expect.any(Function),
+                    },
+                  },
+                  {
+                    label: 'a-t-1-2-l',
+                    key: 'a-t-1-2-k',
+                    default: false,
+                    comType: 'checkbox',
+                    watcher: {
+                      deps: ['a-t-1-1-k'],
+                      action: expect.any(Function),
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+          rows: [
+            {
+              label: 'a-t-l',
+              key: 'a-k',
+              value: 'a-1',
+              comType: 'group',
+              rows: [
+                {
+                  label: 'a-t-1-l',
+                  key: 'a-t-1-k',
+                  value: 'a-1-1',
+                  comType: 'group',
+                  options: {
+                    translateItemLabel: true,
+                  },
+                  rows: [
+                    {
+                      label: 'a-t-1-1-l',
+                      key: 'a-t-1-1-k',
+                      value: true,
+                      default: false,
+                      disabled: false,
+                      comType: 'checkbox',
+                      options: {
+                        getItems: expect.any(Function),
+                      },
+                    },
+                    {
+                      label: 'a-t-1-2-l',
+                      key: 'a-t-1-2-k',
+                      default: false,
+                      comType: 'checkbox',
+                      watcher: {
+                        deps: ['a-t-1-1-k'],
+                        action: expect.any(Function),
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         },
       ],
       { useDefault: false },
@@ -293,7 +387,7 @@ describe('Internal Chart Helper ', () => {
         source as ChartStyleConfigDTO[],
         options,
       );
-      expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+      expect(result).toEqual(expected);
     });
   });
 
