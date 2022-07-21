@@ -1657,6 +1657,7 @@
       "searchValue": "Search keywords"
     },
     "saveToDashOrStory": {
+      "createDashboard": "Create Dashboard",
       "searchValue": "Search keywords",
       "haveCharts": "The chart already exists in the dashboard and cannot be added repeatedly"
     }
