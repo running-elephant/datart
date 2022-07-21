@@ -325,8 +325,7 @@ export type AxisLabel = {
 export type EmphasisStyle = {
   label?: {
     show?: boolean;
-    font?: FontStyle;
-  };
+  } & FontStyle;
 };
 
 export type LabelStyle = {
