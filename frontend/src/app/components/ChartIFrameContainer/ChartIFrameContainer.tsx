@@ -161,7 +161,7 @@ const ChartIFrameContainer: FC<{
 
   return (
     <ChartI18NContext.Provider value={{ i18NConfigs: props?.config?.i18ns }}>
-      <StyledDataLoadingContainer>
+      <StyledDataLoadingContainer isLoading={props.isLoadingData}>
         {props.isLoadingData && <Loading />}
       </StyledDataLoadingContainer>
       <StyledChartRendererContainer isLoading={props.isLoadingData}>
@@ -173,12 +173,12 @@ const ChartIFrameContainer: FC<{
 
 export default ChartIFrameContainer;
 
-const StyledDataLoadingContainer = styled.div`
-  display: flex;
+const StyledDataLoadingContainer = styled.div<{ isLoading?: boolean }>`
   position: absolute;
+  z-index: 999;
+  display: ${p => (p.isLoading ? 'flex' : 'none')};
   width: 100%;
   height: 100%;
-  z-index: 999;
 `;
 
 const StyledChartRendererContainer = styled.div<{ isLoading?: boolean }>`
