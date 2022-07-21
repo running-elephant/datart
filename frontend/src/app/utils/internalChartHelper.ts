@@ -52,6 +52,7 @@ import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { FilterSqlOperator } from 'globalConstants';
 import {
+  CloneValueDeep,
   cond,
   curry,
   isEmpty,
@@ -491,7 +492,22 @@ export function mergeChartStyleConfigs(
     if (!isUndefined(sEle?.['value'])) {
       tEle['value'] = getUpdatedChartStyleValue(tEle['value'], sEle?.['value']);
     }
-    if (!isEmptyArray(tEle?.rows)) {
+
+    if (!isUndefined(sEle?.['disabled'])) {
+      tEle['disabled'] = sEle?.['disabled'];
+    }
+
+    if (tEle?.template && !isEmptyArray(sEle?.rows)) {
+      const template = tEle.template;
+      tEle['rows'] = sEle?.rows?.map(row => {
+        const tRows = CloneValueDeep(template?.rows);
+        return {
+          ...template,
+          key: row.key,
+          rows: mergeChartStyleConfigs(tRows, row?.rows, options),
+        };
+      });
+    } else if (!isEmptyArray(tEle?.rows)) {
       tEle['rows'] = mergeChartStyleConfigs(tEle.rows, sEle?.rows, options);
     } else if (sEle && !isEmptyArray(sEle?.rows)) {
       // Note: we merge all rows data when target rows is empty
