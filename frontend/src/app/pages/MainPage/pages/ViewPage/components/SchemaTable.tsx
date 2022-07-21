@@ -26,7 +26,7 @@ import { ToolbarButton } from 'app/components';
 import { VirtualTable } from 'app/components/VirtualTable';
 import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { TABLEDATAINDEX } from 'globalConstants';
+import { TABLE_DATA_INDEX } from 'globalConstants';
 import { memo, ReactElement, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -76,7 +76,7 @@ export const SchemaTable = memo(
         dataSource?.map((o, index) => ({
           ...o,
           [ROW_KEY]: uuidv4(),
-          [TABLEDATAINDEX]: index + 1,
+          [TABLE_DATA_INDEX]: index + 1,
         })),
       [dataSource],
     );
@@ -183,7 +183,7 @@ export const SchemaTable = memo(
         columns: [
           {
             align: 'left',
-            dataIndex: TABLEDATAINDEX,
+            dataIndex: TABLE_DATA_INDEX,
             width: indexColumnWidth,
           },
           ...columns,

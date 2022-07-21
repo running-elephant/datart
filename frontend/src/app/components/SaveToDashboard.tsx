@@ -160,7 +160,7 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
         visible={isModalVisible}
         footer={
           <Space>
-            <Button onClick={createDashboard}>{t('creatdDashboard')}</Button>
+            <Button onClick={createDashboard}>{t('createDashboard')}</Button>
             <Button onClick={handleCancel}>{tgb('cancel')}</Button>
             <Button
               onClick={() => {

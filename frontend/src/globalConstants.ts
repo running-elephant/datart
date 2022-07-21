@@ -25,7 +25,7 @@ export const EVENT_ACTION_DELAY_MS = 200;
 export const RUNTIME_FILTER_KEY = Symbol('@filters@');
 export const BOARD_COPY_CHART_SUFFIX = '_copy';
 export const BOARD_SELF_CHART_PREFIX = 'widget_';
-export const TABLEDATAINDEX = '@datartTableIndex@';
+export const TABLE_DATA_INDEX = '@datartTableIndex@';
 
 export enum StorageKeys {
   AuthorizationToken = 'AUTHORIZATION_TOKEN',

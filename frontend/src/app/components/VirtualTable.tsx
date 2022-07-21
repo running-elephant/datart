@@ -18,7 +18,7 @@
 
 import { Empty, Table, TableProps } from 'antd';
 import classNames from 'classnames';
-import { TABLEDATAINDEX } from 'globalConstants';
+import { TABLE_DATA_INDEX } from 'globalConstants';
 import React, {
   memo,
   useCallback,
@@ -55,7 +55,7 @@ export const VirtualTable = memo((props: VirtualTableProps) => {
   const gridRef: any = useRef();
   const isFull = useRef<boolean>(false);
   const widthColumnCount = widthColumns.filter(
-    ({ width, dataIndex }) => !width || dataIndex !== TABLEDATAINDEX,
+    ({ width, dataIndex }) => !width || dataIndex !== TABLE_DATA_INDEX,
   ).length;
   const [connectObject] = useState(() => {
     const obj = {};
@@ -76,7 +76,7 @@ export const VirtualTable = memo((props: VirtualTableProps) => {
   if (isFull.current === true) {
     widthColumns.forEach((v, i) => {
       return (widthColumns[i].width =
-        widthColumns[i].dataIndex === TABLEDATAINDEX
+        widthColumns[i].dataIndex === TABLE_DATA_INDEX
           ? widthColumns[i].width
           : widthColumns[i].width + (boxWidth - scroll.x) / widthColumnCount);
     });
