@@ -36,7 +36,6 @@ import org.h2.jdbc.JdbcSQLNonTransientException;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.SimpleResultSet;
 
-import javax.validation.constraints.NotNull;
 import java.sql.*;
 import java.util.Date;
 import java.util.*;
@@ -172,7 +171,7 @@ public class LocalDB {
      * @param persistent   原始数据是持久化
      * @return 查询脚本+执行参数 执行后结果
      */
-    public static Dataframe executeLocalQuery(@NotNull QueryScript queryScript, ExecuteParam executeParam, Dataframes dataframes, boolean persistent, Date expire) throws Exception {
+    public static Dataframe executeLocalQuery(QueryScript queryScript, ExecuteParam executeParam, Dataframes dataframes, boolean persistent, Date expire) throws Exception {
         if (queryScript == null || (dataframes.size() == 1 && dataframes.getDataframes().get(0).getName() == null)) {
             // 直接以指定数据源为表进行查询，生成一个默认的SQL查询全部数据
             queryScript = new QueryScript();
