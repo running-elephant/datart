@@ -17,6 +17,8 @@ import java.util.Calendar;
 
 public interface AttachmentService {
 
+    String SHARE_USER = "SCHEDULER";
+
     File getFile(DownloadCreateParam downloadCreateParam, String path, String fileName) throws Exception;
 
     default String generateFileName(String path, String fileName, AttachmentType attachmentType) {
@@ -36,7 +38,7 @@ public interface AttachmentService {
             case PDF:
                 return Application.getBean(AttachmentPdfServiceImpl.class);
             default:
-                Exceptions.msg("unsupported download type."+type);
+                Exceptions.msg("unsupported download type." + type);
                 return null;
         }
     }
