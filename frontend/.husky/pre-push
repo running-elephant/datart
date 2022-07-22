@@ -3,3 +3,4 @@
 
 cd frontend
 npm run test:ci
+npm run lint:style
