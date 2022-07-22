@@ -174,11 +174,11 @@ const ChartIFrameContainer: FC<{
 export default ChartIFrameContainer;
 
 const StyledDataLoadingContainer = styled.div`
-  display: flex;
   position: absolute;
+  z-index: 999;
+  display: flex;
   width: 100%;
   height: 100%;
-  z-index: 999;
 `;
 
 const StyledChartRendererContainer = styled.div<{ isLoading?: boolean }>`

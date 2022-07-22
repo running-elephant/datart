@@ -4,6 +4,10 @@
     "stylelint-config-styled-components",
     "stylelint-config-recess-order"
   ],
+  "rules": {
+    "function-no-unknown": null,
+    "font-family-no-missing-generic-family-keyword": null
+  },
   "overrides": [
     {
       "files": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"],
