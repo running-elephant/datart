@@ -38,5 +38,7 @@ public class UserProfile extends UserBaseInfo {
     
     public UserProfile(User user) {
         super(user);
+        this.name = user.getName();
+        this.description = user.getDescription();
     }
 }
