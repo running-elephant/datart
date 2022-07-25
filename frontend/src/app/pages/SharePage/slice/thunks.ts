@@ -63,23 +63,19 @@ export const fetchShareVizInfo = createAsyncThunk(
     const isMatchByName = !!filterSearchParams?.isMatchByName;
 
     let data = {} as ShareVizInfo;
-    try {
-      const response = await request2<ShareVizInfo>({
-        url: `/shares/${shareToken}/viz`,
-        method: 'POST',
-        data: {
-          authenticationMode,
-          authenticationCode: sharePassword,
-          id: shareToken,
-          username: userName,
-          password: passWord,
-          authorizedToken,
-        },
-      });
-      data = response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await request2<ShareVizInfo>({
+      url: `/shares/${shareToken}/viz`,
+      method: 'POST',
+      data: {
+        authenticationMode,
+        authenticationCode: sharePassword,
+        id: shareToken,
+        username: userName,
+        password: passWord,
+        authorizedToken,
+      },
+    });
+    data = response.data;
     await thunkAPI.dispatch(shareActions.setVizType(data.vizType));
     if (authenticationMode === 'CODE') {
       persistence.session.save(shareToken, sharePassword);

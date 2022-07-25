@@ -21,7 +21,10 @@ import { ColumnsType } from 'antd/lib/table';
 import useMount from 'app/hooks/useMount';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
-import { getAllColumnInMeta } from 'app/utils/chartHelper';
+import {
+  createDateLevelComputedFieldForConfigComputedFields,
+  getAllColumnInMeta,
+} from 'app/utils/chartHelper';
 import { fetchDataChart } from 'app/utils/fetch';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
@@ -54,7 +57,10 @@ const ChartRelationList: FC<
       const data = await fetchDataChart(targetRelId).catch(errorHandle);
       setTargetFields(
         getAllColumnInMeta(data?.view?.meta)?.concat(
-          data?.config?.computedFields || [],
+          createDateLevelComputedFieldForConfigComputedFields(
+            data?.view?.meta,
+            data?.config?.computedFields,
+          ),
         ) || [],
       );
       setTargetVariables(data?.queryVariables || []);
@@ -131,6 +137,7 @@ const ChartRelationList: FC<
           style={{ width: '150px' }}
           value={value}
           onChange={value => handleRelationChange(index, 'source', value)}
+          dropdownMatchSelectWidth={false}
         >
           {(isFieldType(record) ? sourceFields : sourceVariables)?.map(sf => {
             return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;
@@ -147,6 +154,7 @@ const ChartRelationList: FC<
           style={{ width: '150px' }}
           value={value}
           onChange={value => handleRelationChange(index, 'target', value)}
+          dropdownMatchSelectWidth={false}
         >
           {(isFieldType(record) ? targetFields : targetVariables)?.map(sf => {
             return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;

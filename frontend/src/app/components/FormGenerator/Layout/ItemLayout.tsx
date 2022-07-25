@@ -68,6 +68,7 @@ import {
   UnControlledTableHeaderPanel,
   ViewDetailPanel,
   WidgetBorder,
+  YAxisNumberFormatPanel,
 } from '../Customize';
 import { FormGeneratorLayoutProps } from '../types';
 import { groupLayoutComparer, invokeDependencyWatcher } from '../utils';
@@ -213,6 +214,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <ViewDetailPanel {...props} />;
         case ChartStyleSectionComponentType.DATA_ZOOM_PANEL:
           return <DataZoomPanel {...props} />;
+        case ChartStyleSectionComponentType.Y_AXIS_NUMBER_FORMAT_PANEL:
+          return <YAxisNumberFormatPanel {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

@@ -23,10 +23,10 @@ import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
 import { VizHeader } from 'app/components/VizHeader';
-import { ChartDataViewFieldCategory } from 'app/constants';
 import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import useChartInteractions from 'app/hooks/useChartInteractions';
+import useDebouncedLoadingStatus from 'app/hooks/useDebouncedLoadingStatus';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import ChartManager from 'app/models/ChartManager';
@@ -37,10 +37,6 @@ import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import {
-  getRuntimeComputedFields,
-  getRuntimeDateLevelFields,
-} from 'app/utils/chartHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import {
@@ -140,6 +136,9 @@ const ChartPreviewBoard: FC<{
     } = useChartInteractions({
       openViewDetailPanel: openViewDetailPanel as any,
       openJumpDialogModal: jumpDialogModal.info,
+    });
+    const isLoadingData = useDebouncedLoadingStatus({
+      isLoading: chartPreview?.isLoadingData,
     });
 
     useEffect(() => {
@@ -275,12 +274,15 @@ const ChartPreviewBoard: FC<{
           chartConfigRef?.current?.interactions,
           [],
         );
+        const computedFields = (
+          chartPreview?.backendChart?.config.computedFields || []
+        ).concat(chartPreview?.backendChart?.view.computedFields || []);
+
         const view = {
           id: chartPreview?.backendChart?.view?.id || '',
           config: chartPreview?.backendChart?.view.config || {},
           meta: chartPreview?.backendChart?.view.meta,
-          computedFields:
-            chartPreview?.backendChart?.config.computedFields || [],
+          computedFields,
         };
         return {
           drillOption: drillOptionRef.current,
@@ -625,24 +627,6 @@ const ChartPreviewBoard: FC<{
     }, [backendChartId, dispatch, redirect, tg]);
 
     const handleDateLevelChange = (type, payload) => {
-      const rows = getRuntimeDateLevelFields(payload.value?.rows);
-      const dateLevelComputedFields = rows.filter(
-        v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
-      );
-      const replacedConfig = payload.value.replacedConfig;
-      const computedFields = getRuntimeComputedFields(
-        dateLevelComputedFields,
-        replacedConfig,
-        chartPreview?.backendChart?.config?.computedFields,
-        true,
-      );
-
-      dispatch(
-        vizAction.updateComputedFields({
-          backendChartId,
-          computedFields,
-        }),
-      );
       dispatch(
         updateGroupAndFetchDataset({
           backendChartId,
@@ -651,6 +635,7 @@ const ChartPreviewBoard: FC<{
         }),
       );
     };
+
     const dataset = useMemo(() => {
       if (
         !chartPreview?.backendChart?.viewId &&
@@ -664,6 +649,7 @@ const ChartPreviewBoard: FC<{
       chartPreview?.backendChart?.viewId,
       chartPreview?.dataset,
     ]);
+
     return (
       <StyledChartPreviewBoard>
         <VizHeader
@@ -707,7 +693,10 @@ const ChartPreviewBoard: FC<{
             </div>
             <ChartWrapper ref={ref}>
               <Spin wrapperClassName="spinWrapper" spinning={loadingStatus}>
-                <ChartDrillContextMenu chartConfig={chartPreview?.chartConfig!}>
+                <ChartDrillContextMenu
+                  chartConfig={chartPreview?.chartConfig!}
+                  metas={chartPreview?.backendChart?.view?.meta}
+                >
                   <ChartIFrameContainer
                     key={backendChartId}
                     containerId={backendChartId}
@@ -718,6 +707,7 @@ const ChartPreviewBoard: FC<{
                     selectedItems={selectedItems[backendChartId]}
                     width={cacheW}
                     height={cacheH}
+                    isLoadingData={isLoadingData}
                   />
                 </ChartDrillContextMenu>
               </Spin>
@@ -725,7 +715,6 @@ const ChartPreviewBoard: FC<{
             <StyledChartDrillPathsContainer>
               <ChartDrillPaths chartConfig={chartPreview?.chartConfig!} />
             </StyledChartDrillPathsContainer>
-            <StyledChartDrillPathsContainer />
           </ChartDrillContext.Provider>
         </PreviewBlock>
         {viewDetailPanelContextHolder}

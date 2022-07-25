@@ -72,6 +72,7 @@ const ChartDataViewPanel: FC<{
   onDataViewChange?: (clear?: boolean) => void;
 }> = memo(({ dataView, defaultViewId, chartConfig, onDataViewChange }) => {
   const t = useI18NPrefix(`viz.workbench.dataview`);
+  const tView = useI18NPrefix('view');
   const dispatch = useDispatch();
   const history = useHistory();
   const [showModal, modalContextHolder] = useStateModal({});
@@ -171,37 +172,27 @@ const ChartDataViewPanel: FC<{
         return Promise.reject('field is empty');
       }
 
-      let validComputedField = true;
       try {
-        validComputedField = await checkComputedFieldAsync(
-          dataView?.sourceId,
-          field.expression,
-        );
+        await checkComputedFieldAsync(dataView?.sourceId, field.expression);
       } catch (error) {
-        validComputedField = false;
+        message.error(error as any);
+        return;
       }
 
-      if (!validComputedField) {
-        message.error('validate function computed field failed');
-        return Promise.reject('validate function computed field failed');
-      }
       const otherComputedFields = dataView?.computedFields?.filter(
-        f => f.id !== originId,
+        f => f.name !== originId,
       );
       const isNameConflict = !!otherComputedFields?.find(
-        f => f.id === field?.id,
+        f => f.name === field?.name,
       );
       if (isNameConflict) {
-        message.error(
-          'The computed field has already been exist, please choose another one!',
-        );
-        return Promise.reject(
-          'The computed field has already been exist, please choose another one!',
-        );
+        const nameConflictError = tView('computedFieldNameExistWarning');
+        message.error(nameConflictError);
+        return Promise.reject(nameConflictError);
       }
 
       const currentFieldIndex = (dataView?.computedFields || []).findIndex(
-        f => f.id === originId,
+        f => f.name === originId,
       );
 
       if (currentFieldIndex >= 0) {
@@ -226,12 +217,12 @@ const ChartDataViewPanel: FC<{
         ),
       );
     },
-    [dispatch, dataView?.computedFields, dataView?.sourceId],
+    [dataView?.computedFields, dataView?.sourceId, dispatch, tView],
   );
 
   const handleDeleteComputedField = fieldId => {
     const newComputedFields = (dataView?.computedFields || []).filter(
-      f => f.id !== fieldId,
+      f => f.name !== fieldId,
     );
 
     dispatch(
@@ -243,7 +234,7 @@ const ChartDataViewPanel: FC<{
 
   const handleEditComputedField = fieldId => {
     const editField = (dataView?.computedFields || []).find(
-      f => f.id === fieldId,
+      f => f.name === fieldId,
     );
 
     handleAddOrEditComputedField(editField);
@@ -295,7 +286,7 @@ const ChartDataViewPanel: FC<{
   );
 
   const handleAddOrEditComputedField = useCallback(
-    field => {
+    (field?: ChartDataViewMeta) => {
       (showModal as Function)({
         title: t('createComputedFields'),
         modalSize: StateModalSize.MIDDLE,
@@ -313,7 +304,7 @@ const ChartDataViewPanel: FC<{
           />
         ),
         onOk: newField =>
-          handleAddNewOrUpdateComputedField(newField, field?.id),
+          handleAddNewOrUpdateComputedField(newField, field?.name),
         onButtonProps: { display: field?.isViewComputedFields },
       });
     },
@@ -420,7 +411,7 @@ const ChartDataViewPanel: FC<{
       switch (key) {
         case 'createComputedFields':
           setIsDisplayAddNewModal();
-          handleAddOrEditComputedField(null);
+          handleAddOrEditComputedField();
           break;
         case 'byGroup':
           setIsGroup(true);

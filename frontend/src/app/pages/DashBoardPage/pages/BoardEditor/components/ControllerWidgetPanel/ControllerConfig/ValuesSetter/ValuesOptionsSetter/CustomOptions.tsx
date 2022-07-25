@@ -17,11 +17,11 @@
  */
 import { Button, FormInstance, Space } from 'antd';
 import { DragSortEditTable } from 'app/components/DragSortEditTable';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ControllerConfig } from '../../../types';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 
 export interface CustomOptionsProps {
   form: FormInstance<{ config: ControllerConfig }> | undefined;

@@ -6,9 +6,9 @@ import { FC, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
-import { DownloadTask } from '../MainPage/slice/types';
-import { useShareSlice } from './slice';
-import { selectShareDownloadPolling } from './slice/selectors';
+import { DownloadTask } from '../../MainPage/slice/types';
+import { useShareSlice } from '../slice';
+import { selectShareDownloadPolling } from '../slice/selectors';
 const SHARE_HEADER_HEIGHT = 50;
 
 interface DownloadTaskContainerProps {

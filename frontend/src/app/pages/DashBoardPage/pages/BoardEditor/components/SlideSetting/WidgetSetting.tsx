@@ -123,7 +123,11 @@ export const WidgetSetting: FC<{ boardId?: string }> = memo(({ boardId }) => {
       <TabPane tab={t('style')} key="style">
         <SettingPanel title={`${t('widget')}${t('setting')}`}>
           <>
-            <NameSet wid={widget.id} name={widget.config.name} />
+            <NameSet
+              wid={widget.id}
+              name={widget.config.name}
+              boardVizs={allWidgets}
+            />
             {showRect && <RectSet wid={widget.id} rect={widget.config.rect} />}
             <WidgetConfigPanel
               configs={widget.config.customConfig.props || []}

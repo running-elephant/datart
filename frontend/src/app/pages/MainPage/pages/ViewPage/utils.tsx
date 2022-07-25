@@ -19,10 +19,9 @@
 import { TreeDataNode } from 'antd';
 import { DataViewFieldType } from 'app/constants';
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
-import isEqual from 'lodash/isEqual';
 import { FONT_WEIGHT_MEDIUM, SPACE_UNIT } from 'styles/StyleConstants';
 import { Nullable } from 'types';
-import { CloneValueDeep, isEmptyArray } from 'utils/object';
+import { CloneValueDeep, isEmptyArray, isEqualObject } from 'utils/object';
 import { getDiffParams, getTextWidth } from 'utils/utils';
 import {
   ColumnCategories,
@@ -506,7 +505,7 @@ export function findAllColumnsOrIsCheckAll(
 
     return {
       columns: foundColumns,
-      isCheckAll: isEqual(foundColumns, columns),
+      isCheckAll: isEqualObject(foundColumns, columns),
     };
   }
 
@@ -517,7 +516,7 @@ export function findAllColumnsOrIsCheckAll(
 
   return {
     columns: foundColumns,
-    isCheckAll: isEqual(foundColumns, columns),
+    isCheckAll: isEqualObject(foundColumns, columns),
   };
 }
 

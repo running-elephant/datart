@@ -165,6 +165,12 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     }
 
     @Override
+    public View updateView(BaseUpdateParam updateParam) {
+        boolean update = update(updateParam);
+        return getViewDetail(updateParam.getId());
+    }
+
+    @Override
     public RoleService getRoleService() {
         return roleService;
     }
@@ -327,6 +333,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     public boolean update(BaseUpdateParam updateParam) {
         ViewUpdateParam viewUpdateParam = (ViewUpdateParam) updateParam;
         View view = retrieve(viewUpdateParam.getId());
+        requirePermission(view, Const.MANAGE);
         if (!CollectionUtils.isEmpty(viewUpdateParam.getVariablesToCreate())) {
             List<VariableCreateParam> variablesToCreate = viewUpdateParam.getVariablesToCreate();
             for (VariableCreateParam variableCreateParam : variablesToCreate) {
@@ -359,7 +366,11 @@ public class ViewServiceImpl extends BaseService implements ViewService {
             }
         }
         Application.getBean(DataProviderService.class).updateSource(retrieve(view.getSourceId(), Source.class, false));
-        return ViewService.super.update(updateParam);
+        BeanUtils.copyProperties(updateParam, view);
+        view.setType(viewUpdateParam.getType().name());
+        view.setUpdateBy(getCurrentUser().getId());
+        view.setUpdateTime(new Date());
+        return 1 == viewMapper.updateByPrimaryKey(view);
     }
 
     @Override

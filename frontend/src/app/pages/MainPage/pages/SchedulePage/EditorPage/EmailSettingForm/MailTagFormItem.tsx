@@ -6,13 +6,11 @@ import debounce from 'lodash/debounce';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { SPACE_XS } from 'styles/StyleConstants';
+import { EMAIL_REG } from '../../constants';
 import { searchUserEmails } from '../../services';
 import { IUserInfo } from '../../types';
 
 const { Option } = AutoComplete;
-
-const regexEmail =
-  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 interface MailTagFormItemProps {
   onFocus?: () => void;
@@ -81,7 +79,7 @@ export const MailTagFormItem: FC<MailTagFormItemProps> = ({
   const appendOptions = useMemo(() => {
     const newEmail = keyword as string;
     if (
-      !regexEmail.test(newEmail) ||
+      !EMAIL_REG.test(newEmail) ||
       ~dataSource.findIndex(({ email }) => email === newEmail) < 0
     ) {
       return [];

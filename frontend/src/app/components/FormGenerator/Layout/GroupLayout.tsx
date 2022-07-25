@@ -22,6 +22,7 @@ import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { SPACE_MD } from 'styles/StyleConstants';
+import { BW } from '../Basic/components/BasicWrapper';
 import { FormGroupLayoutMode, FormItemComponentType } from '../constants';
 import { FormGeneratorLayoutProps } from '../types';
 import { groupLayoutComparer } from '../utils';
@@ -75,7 +76,7 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
       }
       if (comType === FormItemComponentType.MODAL) {
         return (
-          <>
+          <BW label={data.options?.title ? t(data.options?.title, true) : ''}>
             <Button
               className="datart-modal-button"
               type="ghost"
@@ -86,7 +87,7 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
               <CollapseHeader title={t(data.label, true)} />
             </Button>
             {contextHolder}
-          </>
+          </BW>
         );
       }
 
@@ -125,7 +126,7 @@ const GroupLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
     return (
       <StyledGroupLayout
         className="chart-config-group-layout"
-        flatten={flatten}
+        flatten={flatten || data?.options?.flatten}
       >
         {renderGroupByMode(mode, type, data)}
       </StyledGroupLayout>

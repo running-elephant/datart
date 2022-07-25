@@ -23,23 +23,24 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { LEVEL_50 } from 'styles/StyleConstants';
-import { BoardInitProvider } from '../DashBoardPage/components/BoardProvider/BoardInitProvider';
-import { FullScreenPanel } from '../DashBoardPage/components/FullScreenPanel/FullScreenPanel';
-import { AutoBoardCore } from '../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
-import { FreeBoardCore } from '../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
-import { getBoardDownloadParams } from '../DashBoardPage/pages/Board/slice/asyncActions';
-import { selectShareBoardInfo } from '../DashBoardPage/pages/Board/slice/selector';
+import { BoardInitProvider } from '../../DashBoardPage/components/BoardProvider/BoardInitProvider';
+import { FullScreenPanel } from '../../DashBoardPage/components/FullScreenPanel/FullScreenPanel';
+import { AutoBoardCore } from '../../DashBoardPage/pages/Board/AutoDashboard/AutoBoardCore';
+import { FreeBoardCore } from '../../DashBoardPage/pages/Board/FreeDashboard/FreeBoardCore';
+import { getBoardDownloadParams } from '../../DashBoardPage/pages/Board/slice/asyncActions';
+import { selectShareBoardInfo } from '../../DashBoardPage/pages/Board/slice/selector';
 import {
   Dashboard,
   VizRenderMode,
-} from '../DashBoardPage/pages/Board/slice/types';
-import { getJsonConfigs } from '../DashBoardPage/utils';
-import { OnLoadTasksType } from '../MainPage/Navbar/DownloadListPopup';
-import { DownloadTask } from '../MainPage/slice/types';
-import { DownloadTaskContainer } from './DownloadTaskContainer';
-import { HeadlessBrowserIdentifier } from './HeadlessBrowserIdentifier';
-import TitleForShare from './TitleForShare';
+} from '../../DashBoardPage/pages/Board/slice/types';
+import { getJsonConfigs } from '../../DashBoardPage/utils';
+import { OnLoadTasksType } from '../../MainPage/Navbar/DownloadListPopup';
+import { DownloadTask } from '../../MainPage/slice/types';
+import { DownloadTaskContainer } from '../components/DownloadTaskContainer';
+import { HeadlessBrowserIdentifier } from '../components/HeadlessBrowserIdentifier';
+import TitleForShare from '../components/TitleForShare';
 const TitleHeight = 60;
+
 export interface ShareBoardProps {
   dashboard: Dashboard;
   renderMode: VizRenderMode;
@@ -54,7 +55,7 @@ export interface ShareBoardProps {
   ) => void;
 }
 
-export const BoardForShare: React.FC<ShareBoardProps> = memo(
+export const DashboardForShare: React.FC<ShareBoardProps> = memo(
   ({
     dashboard,
     renderMode,
@@ -165,7 +166,7 @@ export const BoardForShare: React.FC<ShareBoardProps> = memo(
   },
 );
 
-export default BoardForShare;
+export default DashboardForShare;
 const Wrapper = styled.div<{}>`
   position: fixed;
   top: 0;

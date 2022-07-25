@@ -18,12 +18,7 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
-import {
-  ChartDataSectionType,
-  ChartDataViewFieldCategory,
-  DownloadFileType,
-  RUNTIME_DATE_LEVEL_KEY,
-} from 'app/constants';
+import { DownloadFileType, RUNTIME_DATE_LEVEL_KEY } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
@@ -58,8 +53,8 @@ import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
   clearRuntimeDateLevelFieldsInChartConfig,
-  getRuntimeComputedFields,
-  getRuntimeDateLevelFields,
+  filterCurrentUsedComputedFields,
+  getValue,
 } from 'app/utils/chartHelper';
 import { makeDownloadDataTask } from 'app/utils/fetch';
 import {
@@ -313,6 +308,14 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       ? ChartManager.instance().getById(chart?.meta?.id)
       : ChartManager.instance().getDefaultChart();
     let targetChartConfig = CloneValueDeep(currentChart?.config);
+
+    // clear操作不希望重置paging信息
+    getValue(targetChartConfig?.settings || [], ['paging'], 'rows').forEach(
+      v => {
+        v.value = getValue(chartConfig?.settings || [], ['paging', v.key]);
+      },
+    );
+
     registerChartEvents(currentChart);
     setChart(currentChart);
 
@@ -321,7 +324,6 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       targetChartConfig,
     );
 
-    dispatch(actions.updateCurrentDataViewComputedFields([]));
     dispatch(actions.updateShadowChartConfig({}));
     dispatch(
       actions.updateChartConfig({
@@ -340,6 +342,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     chart?.meta?.id,
     registerChartEvents,
     chartConfig?.datas,
+    chartConfig?.settings,
     actions,
   ]);
 
@@ -397,35 +400,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         setAllowQuery(payload.needRefresh);
         return true;
       }
-      // generate runtime computed fields(date level)
-      if (
-        payload.value.type === ChartDataSectionType.Group ||
-        payload.value.type === ChartDataSectionType.Mixed
-      ) {
-        const dateLevelComputedFields = payload.value.rows.filter(
-          v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
-        );
 
-        const replacedConfig = payload.value.replacedConfig;
-        const computedFields = getRuntimeComputedFields(
-          dateLevelComputedFields,
-          replacedConfig,
-          dataview?.computedFields,
-        );
-
-        if (replacedConfig) {
-          payload = updateBy(payload, draft => {
-            delete draft.value.replacedConfig;
-          });
-        }
-
-        if (
-          JSON.stringify(computedFields) !==
-          JSON.stringify(dataview?.computedFields)
-        ) {
-          dispatch(actions.updateCurrentDataViewComputedFields(computedFields));
-        }
-      }
       if (payload.value.key === 'enableExpandRow') {
         dispatch(
           updateChartConfigAndRefreshDatasetAction({
@@ -464,7 +439,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         }),
       );
     },
-    [dispatch, expensiveQuery, dataview, chartConfig?.datas, actions],
+    [dispatch, expensiveQuery, chartConfig?.datas, actions],
   );
 
   const handleDataViewChanged = useCallback(
@@ -529,6 +504,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         );
         onSaveInDataChart?.(orgId, dataChartId);
       } else {
+        const computedFields = filterCurrentUsedComputedFields(
+          chartConfig,
+          dataview?.computedFields?.filter(v => !v.isViewComputedFields) || [],
+        );
         try {
           addVizFn({
             vizType: 'DATACHART',
@@ -539,9 +518,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
                 aggregation,
                 chartConfig: chartConfig,
                 chartGraphId: chart?.meta?.id,
-                computedFields: dataview?.computedFields?.filter(
-                  v => !v.isViewComputedFields,
-                ),
+                computedFields,
               }),
               viewId: dataview?.id,
               avatar: chart?.meta?.id,
@@ -676,20 +653,6 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   ]);
 
   const handleDateLevelChange = (type, payload) => {
-    const rows = getRuntimeDateLevelFields(payload.value?.rows);
-    const dateLevelComputedFields = rows.filter(
-      v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
-    );
-    const replacedConfig = payload.value.replacedConfig;
-    const computedFields = getRuntimeComputedFields(
-      dateLevelComputedFields,
-      replacedConfig,
-      dataview?.computedFields,
-      true,
-    );
-
-    dispatch(actions.updateCurrentDataViewComputedFields(computedFields));
-
     dispatch(
       updateChartConfigAndRefreshDatasetAction({
         type,

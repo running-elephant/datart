@@ -20,57 +20,43 @@ import useMount from 'app/hooks/useMount';
 import useRouteQuery from 'app/hooks/useRouteQuery';
 import ChartManager from 'app/models/ChartManager';
 import { login } from 'app/slice/thunks';
-import { ChartDataRequest } from 'app/types/ChartDataRequest';
-import {
-  downloadShareDataChartFile,
-  loadShareTask,
-  makeShareDownloadDataTask,
-} from 'app/utils/fetch';
-import { StorageKeys } from 'globalConstants';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
 import { getToken } from 'utils/auth';
 import persistence from 'utils/persistence';
 import { urlSearchTransfer } from 'utils/urlSearchTransfer';
-import { uuidv4 } from 'utils/utils';
-import { BoardLoading } from '../DashBoardPage/components/BoardLoading';
-import { useBoardSlice } from '../DashBoardPage/pages/Board/slice';
-import { selectShareBoard } from '../DashBoardPage/pages/Board/slice/selector';
-import { VizRenderMode } from '../DashBoardPage/pages/Board/slice/types';
-import { useEditBoardSlice } from '../DashBoardPage/pages/BoardEditor/slice';
-import { FilterSearchParams } from '../MainPage/pages/VizPage/slice/types';
-import BoardForShare from './BoardForShare';
-import PasswordModal from './PasswordModal';
-import ShareLoginModal from './ShareLoginModal';
-import { useShareSlice } from './slice';
-import {
-  selectNeedVerify,
-  selectShareExecuteTokenMap,
-  selectSharePassword,
-  selectShareVizType,
-} from './slice/selectors';
-import { fetchShareVizInfo } from './slice/thunks';
+import { BoardLoading } from '../../DashBoardPage/components/BoardLoading';
+import { useBoardSlice } from '../../DashBoardPage/pages/Board/slice';
+import { VizRenderMode } from '../../DashBoardPage/pages/Board/slice/types';
+import { useEditBoardSlice } from '../../DashBoardPage/pages/BoardEditor/slice';
+import { FilterSearchParams } from '../../MainPage/pages/VizPage/slice/types';
+import { useStoryBoardSlice } from '../../StoryBoardPage/slice';
+import { selectShareStoryBoard } from '../../StoryBoardPage/slice/selectors';
+import PasswordModal from '../components/PasswordModal';
+import ShareLoginModal from '../components/ShareLoginModal';
+import { shareActions, useShareSlice } from '../slice';
+import { selectNeedVerify, selectShareVizType } from '../slice/selectors';
+import { fetchShareVizInfo } from '../slice/thunks';
+import { StoryPlayerForShare } from './StoryPlayerForShare';
 
-function ShareDashboard() {
+function ShareStoryPlayerPage() {
   const { shareActions: actions } = useShareSlice();
-  useEditBoardSlice();
+  useStoryBoardSlice();
   useBoardSlice();
+  useEditBoardSlice();
 
   const dispatch = useDispatch();
   const location = useLocation();
   const { params }: { params: { token: string } } = useRouteMatch();
   const search = location.search;
   const shareToken = params.token;
-
-  const [shareClientId, setShareClientId] = useState('');
-  const executeTokenMap = useSelector(selectShareExecuteTokenMap);
-  const needVerify = useSelector(selectNeedVerify);
-  const sharePassword = useSelector(selectSharePassword);
-  const shareBoard = useSelector(selectShareBoard);
-  const vizType = useSelector(selectShareVizType);
   const logged = !!getToken();
+
+  const needVerify = useSelector(selectNeedVerify);
+  const shareStory = useSelector(selectShareStoryBoard);
+  const vizType = useSelector(selectShareVizType);
 
   const shareType = useRouteQuery({
     key: 'type',
@@ -80,6 +66,13 @@ function ShareDashboard() {
     key: 'eager',
   });
   const renderMode: VizRenderMode = eager ? 'schedule' : 'share';
+
+  useEffect(() => {
+    if (shareStory?.name) {
+      dispatch(shareActions.savePageTitle({ title: shareStory?.name }));
+    }
+  }, [shareStory?.name, dispatch]);
+
   const searchParams = useMemo(() => {
     return urlSearchTransfer.toParams(search);
   }, [search]);
@@ -130,64 +123,6 @@ function ShareDashboard() {
     [dispatch, renderMode],
   );
 
-  const onLoadShareTask = useMemo(() => {
-    const clientId = localStorage.getItem(StorageKeys.ShareClientId);
-    if (clientId) {
-      setShareClientId(clientId);
-    } else {
-      const id = uuidv4();
-      setShareClientId(id);
-      localStorage.setItem(StorageKeys.ShareClientId, uuidv4());
-    }
-    const executeToken = Object.values(executeTokenMap)[0]?.authorizedToken;
-    return () =>
-      loadShareTask({
-        shareToken: executeToken,
-        clientId: shareClientId,
-      });
-  }, [executeTokenMap, shareClientId]);
-
-  const onMakeShareDownloadDataTask = useCallback(
-    (downloadParams: ChartDataRequest[], fileName: string) => {
-      if (shareClientId && executeTokenMap) {
-        dispatch(
-          makeShareDownloadDataTask({
-            clientId: shareClientId,
-            executeToken: executeTokenMap,
-            downloadParams: downloadParams,
-            shareToken,
-            fileName: fileName,
-            resolve: () => {
-              dispatch(actions.setShareDownloadPolling(true));
-            },
-            password: sharePassword,
-          }),
-        );
-      }
-    },
-    [
-      shareClientId,
-      shareToken,
-      sharePassword,
-      executeTokenMap,
-      dispatch,
-      actions,
-    ],
-  );
-
-  const onDownloadFile = useCallback(
-    task => {
-      const executeToken = Object.values(executeTokenMap)[0]?.authorizedToken;
-      downloadShareDataChartFile({
-        downloadId: task.id,
-        shareToken: executeToken,
-      }).then(() => {
-        dispatch(actions.setShareDownloadPolling(true));
-      });
-    },
-    [executeTokenMap, dispatch, actions],
-  );
-
   const handleLogin = useCallback(
     values => {
       dispatch(
@@ -217,7 +152,7 @@ function ShareDashboard() {
       <PasswordModal
         visible={Boolean(needVerify) && shareType === 'CODE'}
         onChange={sharePassword => {
-          fetchShareVizInfoImpl(shareToken, sharePassword, searchParams);
+          fetchShareVizInfoImpl(shareToken, sharePassword);
         }}
       />
       {!vizType && !needVerify && (
@@ -226,22 +161,13 @@ function ShareDashboard() {
         </div>
       )}
 
-      {!Boolean(needVerify) && shareBoard && (
-        <BoardForShare
-          dashboard={shareBoard}
-          allowDownload={true}
-          loadVizData={loadVizData}
-          onMakeShareDownloadDataTask={onMakeShareDownloadDataTask}
-          renderMode={renderMode}
-          filterSearchUrl={''}
-          onLoadShareTask={onLoadShareTask}
-          onDownloadFile={onDownloadFile}
-        />
+      {!Boolean(needVerify) && shareStory && (
+        <StoryPlayerForShare storyBoard={shareStory} shareToken={shareToken} />
       )}
     </StyledWrapper>
   );
 }
-export default ShareDashboard;
+export default ShareStoryPlayerPage;
 const StyledWrapper = styled.div`
   width: 100%;
   height: 100vh;

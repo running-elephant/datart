@@ -33,7 +33,6 @@ import { saveAs } from 'file-saver';
 import i18next from 'i18next';
 import qs from 'qs';
 import { request2, requestWithHeader } from 'utils/request';
-import { errorHandle } from 'utils/utils';
 import { convertToChartDto } from './ChartDtoHelper';
 import { getAllColumnInMeta } from './chartHelper';
 
@@ -44,17 +43,27 @@ export const getDistinctFields = async (
   executeToken: Record<string, ExecuteToken> | undefined,
 ) => {
   const viewConfigs = transformToViewConfig(view?.config);
+  const _columns = [...new Set(columns)];
   const requestParams: ChartDataRequest = {
     aggregators: [],
     filters: [],
     groups: [],
-    columns: [...new Set(columns)].map(columnName => {
+    functionColumns:
+      view?.computedFields
+        ?.filter(v => _columns.includes(v.name))
+        ?.map(field => {
+          return {
+            alias: field?.name || '',
+            snippet: field?.expression || '',
+          };
+        }) || [],
+    columns: _columns.map(columnName => {
       const row = getAllColumnInMeta(view?.meta)?.find(
         v => v.name === columnName,
       );
       return {
         alias: columnName,
-        column: row?.path || [],
+        column: row?.path || [columnName],
       };
     }),
     pageInfo: {
@@ -166,7 +175,7 @@ export async function checkComputedFieldAsync(sourceId, expression) {
       return qs.stringify(params, { arrayFormat: 'brackets' });
     },
   });
-  return !!response?.data;
+  return !!response;
 }
 
 export async function fetchAvailableSourceFunctionsAsync(sourceId) {
@@ -258,23 +267,18 @@ export async function getChartPluginPaths() {
 }
 
 export async function loadShareTask(params) {
-  try {
-    const { data } = await request2<DownloadTask[]>({
-      url: `/shares/download/task`,
-      method: 'GET',
-      params,
-    });
-    const isNeedStopPolling = !(data || []).some(
-      v => v.status === DownloadTaskState.CREATED,
-    );
-    return {
-      isNeedStopPolling,
-      data: data || [],
-    };
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
+  const { data } = await request2<DownloadTask[]>({
+    url: `/shares/download/task`,
+    method: 'GET',
+    params,
+  });
+  const isNeedStopPolling = !(data || []).some(
+    v => v.status === DownloadTaskState.CREATED,
+  );
+  return {
+    isNeedStopPolling,
+    data: data || [],
+  };
 }
 interface DownloadShareDashChartFileParams {
   downloadId: string;
@@ -306,7 +310,22 @@ export async function fetchDataChart(id: string) {
   return convertToChartDto(response?.data);
 }
 
-export async function fetchChartDataSet(requestParams) {
+export async function fetchChartDataSet(
+  requestParams,
+  authorizedToken?: ExecuteToken,
+) {
+  if (authorizedToken) {
+    const { data } = await request2<ChartDataSetDTO>({
+      method: 'POST',
+      url: `shares/execute`,
+      params: {
+        executeToken: authorizedToken,
+      },
+      data: requestParams,
+    });
+    return data;
+  }
+
   const { data } = await request2<ChartDataSetDTO>({
     method: 'POST',
     url: `data-provider/execute`,

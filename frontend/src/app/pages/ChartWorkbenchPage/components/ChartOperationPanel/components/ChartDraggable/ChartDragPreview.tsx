@@ -32,11 +32,7 @@ const DragPreview = ({ dataItem }) => {
             transform: `rotateZ(${-i * 1.5}deg)`,
           }}
         >
-          <ChartDraggableSourceContainer
-            type={v.type}
-            id={v.colName}
-            name={v.colName}
-          />
+          <ChartDraggableSourceContainer type={v.type} name={v.colName} />
         </Preview>
       ))}
     </div>

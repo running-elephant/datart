@@ -419,7 +419,6 @@ class BasicBarChart extends Chart {
       colorConfigs[0],
     );
 
-    const xAxisConfig = groupConfigs?.[0];
     const colorizeGroupedSeries = aggregateConfigs.flatMap(
       (aggConfig, acIndex) => {
         return secondGroupInfos.map((sgCol, sgIndex) => {
@@ -439,7 +438,11 @@ class BasicBarChart extends Chart {
             ),
             name: k,
             data: xAxisColumns?.[0]?.data?.map((d, dIndex) => {
-              const row = dataSet.find(r => r.getCell(xAxisConfig) === d)!;
+              const row = dataSet.find(
+                r =>
+                  groupConfigs?.map(gc => String(r.getCell(gc))).join('-') ===
+                  d,
+              )!;
               return {
                 ...getExtraSeriesRowData(row),
                 ...getExtraSeriesDataFormat(aggConfig?.format),
@@ -594,6 +597,12 @@ class BasicBarChart extends Chart {
         'max',
       ],
     );
+
+    const [format] = getStyles(
+      styles,
+      ['yAxis', 'modal'],
+      ['YAxisNumberFormat'],
+    );
     const name = showTitleAndUnit ? yAxisNames.join(' / ') : null;
     const [showHorizonLine, horizonLineStyle] = getStyles(
       styles,
@@ -612,6 +621,7 @@ class BasicBarChart extends Chart {
       max,
       axisLabel: {
         show: showLabel,
+        formatter: v => toFormattedValue(v, format),
         ...font,
       },
       axisLine: {
@@ -760,13 +770,13 @@ class BasicBarChart extends Chart {
         ...font,
         formatter: params => {
           const { value, data } = params;
-          if (!value || !Number(value)) {
+          if ((!value || !Number(value)) && value !== 0) {
             return '';
           }
-          const formattedValue = toFormattedValue(value, data.format);
-          const labels: string[] = [];
-          labels.push(formattedValue);
-          return labels.join('\n');
+          if (this.isPercentageYAxis) {
+            return value;
+          }
+          return toFormattedValue(value, data.format);
         },
       },
       labelLayout: { hideOverlap: true },

@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import { WidgetMapper } from 'app/pages/DashBoardPage/components/WidgetMapper/WidgetMapper';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { WIDGET_DRAG_HANDLE } from 'app/pages/DashBoardPage/constants';
@@ -48,7 +47,6 @@ export enum DragTriggerTypes {
 export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const selectedIds = useSelector(selectSelectedIds);
   const widget = useContext(WidgetContext);
-  const { boardType } = useContext(BoardContext);
   const { editing: widgetEditing } = useContext(WidgetInfoContext);
   const { onEditFreeWidgetRect } = useContext(WidgetActionContext);
   const scale = useContext(BoardScaleContext);

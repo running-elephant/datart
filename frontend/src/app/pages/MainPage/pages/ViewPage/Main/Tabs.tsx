@@ -132,7 +132,7 @@ export const Tabs = memo(() => {
 
   const menu = (id: string) => (
     <Menu onClick={e => handleClickMenu(e, id)}>
-    <Menu.Item key="CLOSE_OTHER">
+      <Menu.Item key="CLOSE_OTHER">
         <span>{t('closeOther')}</span>
       </Menu.Item>
       <Menu.Item key="CLOSE_ALL">

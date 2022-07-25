@@ -48,7 +48,7 @@ const DataModelComputerFieldNode: FC<{
 }> = memo(({ node, menuClick }) => {
   const t = useI18NPrefix('view.model');
 
-  const renderNode = node => {
+  const renderNode = (node: ChartDataViewMeta) => {
     let icon;
     switch (node.type) {
       case DataViewFieldType.NUMERIC:
@@ -83,7 +83,7 @@ const DataModelComputerFieldNode: FC<{
           <Tooltip title={t('createComputedFields')} placement="left">
             <StyledIW fontSize={FONT_SIZE_TITLE}>{icon}</StyledIW>
           </Tooltip>
-          <span>{node.id}</span>
+          <span>{node.name}</span>
         </div>
         <div className="action">
           <Popup

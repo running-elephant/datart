@@ -58,7 +58,6 @@ import {
   setRuntimeDateLevelFieldsInChartConfig,
   toFormattedValue,
   transformToDataSet,
-  transformToObjectArray,
   valueFormatter,
 } from '../chartHelper';
 
@@ -428,20 +427,6 @@ describe('Chart Helper ', () => {
         ],
       } as any;
       expect(isMatchRequirement(meta, config)).toBeFalsy();
-    });
-  });
-
-  describe('transformToObjectArray Test', () => {
-    test('should transform data to object array style', () => {
-      const metas = [{ name: 'name' }, { name: 'age' }];
-      const columns = [
-        ['r1-c1-v', 'r1-c2-v'],
-        ['r2-c1-v', 'r2-c2-v'],
-      ];
-      expect(transformToObjectArray(columns, metas)).toEqual([
-        { name: 'r1-c1-v', age: 'r1-c2-v' },
-        { name: 'r2-c1-v', age: 'r2-c2-v' },
-      ]);
     });
   });
 
@@ -2272,7 +2257,6 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           colName: '签署日期（按周）',
-          id: '签署日期（按周）',
           expression: 'AGG_DATE_WEEK(签署日期)',
           field: '签署日期',
           type: DataViewFieldType.DATE,
@@ -2282,7 +2266,6 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           colName: '合同截止日期（按月）',
-          id: '合同截止日期（按月）',
           expression: 'AGG_DATE_MONTH(合同截止日期)',
           field: '合同截止日期',
           type: DataViewFieldType.DATE,
@@ -2292,7 +2275,6 @@ describe('Chart Helper ', () => {
       const replacedConfig = {
         category: ChartDataViewFieldCategory.DateLevelComputedField,
         colName: '签署日期（按月）',
-        id: '签署日期（按月）',
         expression: 'AGG_DATE_MONTH(签署日期)',
         field: '签署日期',
         type: DataViewFieldType.DATE,
@@ -2300,7 +2282,6 @@ describe('Chart Helper ', () => {
         [RUNTIME_DATE_LEVEL_KEY]: {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           colName: '签署日期（按周）',
-          id: '签署日期（按周）',
           expression: 'AGG_DATE_WEEK(签署日期)',
           field: '签署日期',
           type: DataViewFieldType.DATE,
@@ -2313,13 +2294,13 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(签署日期)',
-          id: '签署日期（按月）',
+          name: '签署日期（按月）',
           type: DataViewFieldType.DATE,
         },
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(合同截止日期)',
-          id: '合同截止日期（按月）',
+          name: '合同截止日期（按月）',
           type: DataViewFieldType.DATE,
         },
       ];
@@ -2334,19 +2315,19 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(签署日期)',
-          id: '签署日期（按月）',
+          name: '签署日期（按月）',
           type: DataViewFieldType.DATE,
           [RUNTIME_DATE_LEVEL_KEY]: {
             category: ChartDataViewFieldCategory.DateLevelComputedField,
             expression: 'AGG_DATE_WEEK(签署日期)',
-            id: '签署日期（按周）',
+            name: '签署日期（按周）',
             type: DataViewFieldType.DATE,
           },
         },
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(合同截止日期)',
-          id: '合同截止日期（按月）',
+          name: '合同截止日期（按月）',
           type: DataViewFieldType.DATE,
         },
       ]);
@@ -2359,7 +2340,6 @@ describe('Chart Helper ', () => {
           colName: '签署日期（按月）',
           expression: 'AGG_DATE_MONTH(签署日期)',
           field: '签署日期',
-          id: '签署日期（按月）',
           type: DataViewFieldType.DATE,
           uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
           [RUNTIME_DATE_LEVEL_KEY]: null,
@@ -2367,7 +2347,6 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           colName: '合同截止日期（按周）',
-          id: '合同截止日期（按周）',
           expression: 'AGG_DATE_WEEK(合同截止日期)',
           field: '合同截止日期',
           type: DataViewFieldType.DATE,
@@ -2380,7 +2359,6 @@ describe('Chart Helper ', () => {
         expression: 'AGG_DATE_MONTH(合同截止日期)',
         field: '合同截止日期',
         type: DataViewFieldType.DATE,
-        id: '合同截止日期（按月）',
         uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
       };
 
@@ -2388,13 +2366,13 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(签署日期)',
-          id: '签署日期（按月）',
+          name: '签署日期（按月）',
           type: DataViewFieldType.DATE,
         },
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(合同截止日期)',
-          id: '合同截止日期（按月）',
+          name: '合同截止日期（按月）',
           type: DataViewFieldType.DATE,
         },
       ];
@@ -2409,18 +2387,18 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(签署日期)',
-          id: '签署日期（按月）',
+          name: '签署日期（按月）',
           type: DataViewFieldType.DATE,
         },
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(合同截止日期)',
-          id: '合同截止日期（按月）',
+          name: '合同截止日期（按月）',
           type: DataViewFieldType.DATE,
           [RUNTIME_DATE_LEVEL_KEY]: {
             category: ChartDataViewFieldCategory.DateLevelComputedField,
             expression: 'AGG_DATE_WEEK(合同截止日期)',
-            id: '合同截止日期（按周）',
+            name: '合同截止日期（按周）',
             type: DataViewFieldType.DATE,
           },
         },
@@ -2452,13 +2430,13 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(签署日期)',
-          id: '签署日期（按月）',
+          name: '签署日期（按月）',
           type: DataViewFieldType.DATE,
         },
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(合同截止日期)',
-          id: '合同截止日期（按月）',
+          name: '合同截止日期（按月）',
           type: DataViewFieldType.DATE,
         },
       ];
@@ -2473,13 +2451,13 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(签署日期)',
-          id: '签署日期（按月）',
+          name: '签署日期（按月）',
           type: DataViewFieldType.DATE,
         },
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(合同截止日期)',
-          id: '合同截止日期（按月）',
+          name: '合同截止日期（按月）',
           type: DataViewFieldType.DATE,
         },
       ]);
@@ -2492,7 +2470,6 @@ describe('Chart Helper ', () => {
           colName: '合同截止日期（按周）',
           expression: 'AGG_DATE_WEEK(合同截止日期)',
           field: '合同截止日期',
-          id: '合同截止日期（按周）',
           type: DataViewFieldType.DATE,
           uid: 'fe3f3810-7fe1-41dc-b745-298aaa8b4b95',
         },
@@ -2500,7 +2477,6 @@ describe('Chart Helper ', () => {
       const replacedConfig = {
         category: ChartDataViewFieldCategory.Field,
         colName: '签署日期',
-        id: '签署日期',
         type: DataViewFieldType.DATE,
         uid: 'd8a3ca7e-7513-4b31-b09c-ea3611bc3c54',
       };
@@ -2509,13 +2485,13 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(签署日期)',
-          id: '签署日期（按月）',
+          name: '签署日期（按月）',
           type: DataViewFieldType.DATE,
         },
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(合同截止日期)',
-          id: '合同截止日期（按月）',
+          name: '合同截止日期（按月）',
           type: DataViewFieldType.DATE,
         },
       ];
@@ -2530,19 +2506,19 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(签署日期)',
-          id: '签署日期（按月）',
+          name: '签署日期（按月）',
           type: DataViewFieldType.DATE,
         },
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(合同截止日期)',
-          id: '合同截止日期（按月）',
+          name: '合同截止日期（按月）',
           type: DataViewFieldType.DATE,
         },
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_WEEK(合同截止日期)',
-          id: '合同截止日期（按周）',
+          name: '合同截止日期（按周）',
           type: DataViewFieldType.DATE,
         },
       ]);
@@ -2553,7 +2529,6 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           colName: '签署日期（按周）',
-          id: '签署日期（按周）',
           expression: 'AGG_DATE_WEEK(签署日期)',
           field: '签署日期',
           type: DataViewFieldType.DATE,
@@ -2563,7 +2538,6 @@ describe('Chart Helper ', () => {
       const replacedConfig = {
         category: ChartDataViewFieldCategory.DateLevelComputedField,
         colName: '签署日期（按月）',
-        id: '签署日期（按月）',
         expression: 'AGG_DATE_MONTH(签署日期)',
         field: '签署日期',
         type: DataViewFieldType.DATE,
@@ -2573,7 +2547,7 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(签署日期)',
-          id: '签署日期（按月）',
+          name: '签署日期（按月）',
           type: DataViewFieldType.DATE,
         },
       ];
@@ -2588,7 +2562,7 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_WEEK(签署日期)',
-          id: '签署日期（按周）',
+          name: '签署日期（按周）',
           type: DataViewFieldType.DATE,
         },
       ]);
@@ -2599,7 +2573,6 @@ describe('Chart Helper ', () => {
       const replacedConfig = {
         category: ChartDataViewFieldCategory.DateLevelComputedField,
         colName: '签署日期（按月）',
-        id: '签署日期（按月）',
         expression: 'AGG_DATE_MONTH(签署日期)',
         field: '签署日期',
         type: DataViewFieldType.DATE,
@@ -2609,7 +2582,7 @@ describe('Chart Helper ', () => {
         {
           category: ChartDataViewFieldCategory.DateLevelComputedField,
           expression: 'AGG_DATE_MONTH(签署日期)',
-          id: '签署日期（按月）',
+          name: '签署日期（按月）',
           type: DataViewFieldType.DATE,
         },
       ];

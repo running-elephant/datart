@@ -34,11 +34,14 @@ import RevealZoom from 'reveal.js/plugin/zoom/plugin';
 import styled from 'styled-components/macro';
 import { LEVEL_20, WHITE } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
-import { storyActions } from '../../StoryBoardPage/slice';
-import { makeSelectStoryPagesById } from '../../StoryBoardPage/slice/selectors';
-import { getPageContentDetail } from '../../StoryBoardPage/slice/thunks';
-import { StoryBoard, StoryBoardState } from '../../StoryBoardPage/slice/types';
-import { selectSubVizTokenMap } from '../slice/selectors';
+import { storyActions } from '../../../StoryBoardPage/slice';
+import { makeSelectStoryPagesById } from '../../../StoryBoardPage/slice/selectors';
+import { getPageContentDetail } from '../../../StoryBoardPage/slice/thunks';
+import {
+  StoryBoard,
+  StoryBoardState,
+} from '../../../StoryBoardPage/slice/types';
+import { selectSubVizTokenMap } from '../../slice/selectors';
 import StoryPageItem from './StoryPageItem';
 
 const { Content } = Layout;

@@ -30,7 +30,7 @@ public class Dataframes implements Serializable {
 
     private final String key;
 
-    List<Dataframe> dataframes;
+    private final List<Dataframe> dataframes;
 
     private Dataframes(String key) {
         this.key = "DB" + key;
@@ -53,5 +53,9 @@ public class Dataframes implements Serializable {
 
     public void add(Dataframe df) {
         dataframes.add(df);
+    }
+
+    public int size() {
+        return dataframes.size();
     }
 }

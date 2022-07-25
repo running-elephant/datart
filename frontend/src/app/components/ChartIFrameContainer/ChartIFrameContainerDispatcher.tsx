@@ -37,6 +37,7 @@ class ChartIFrameContainerDispatcher {
       any,
       IChartDrillOption | undefined,
       SelectedItem[] | undefined,
+      boolean | undefined,
     ]
   >();
   private editorEnv = { env: 'workbench' };
@@ -62,6 +63,7 @@ class ChartIFrameContainerDispatcher {
     style?: CSSProperties,
     drillOption?: IChartDrillOption,
     selectedItems?: SelectedItem[],
+    isLoadingData?: boolean,
   ): Function[] {
     this.switchContainer(
       containerId,
@@ -70,6 +72,7 @@ class ChartIFrameContainerDispatcher {
       config,
       drillOption,
       selectedItems,
+      isLoadingData,
     );
     const renders: Function[] = [];
     this.chartContainerMap.forEach((chartRenderer: Function, key) => {
@@ -94,6 +97,7 @@ class ChartIFrameContainerDispatcher {
     config: ChartConfig,
     drillOption?: IChartDrillOption,
     selectedItems?: SelectedItem[],
+    isLoadingData?: boolean,
   ) {
     this.chartMetadataMap.set(containerId, [
       chart,
@@ -101,6 +105,7 @@ class ChartIFrameContainerDispatcher {
       config,
       drillOption,
       selectedItems,
+      isLoadingData,
     ]);
     this.createNewIfNotExist(containerId);
   }
@@ -109,13 +114,7 @@ class ChartIFrameContainerDispatcher {
     if (!this.chartContainerMap.has(containerId)) {
       const newContainer =
         (style, isShown) =>
-        (
-          chart,
-          dataset,
-          config,
-          drillOption,
-          selectedItems?: SelectedItem[],
-        ) => {
+        (chart, dataset, config, drillOption, selectedItems, isLoadingData) => {
           return (
             <div key={containerId} style={style}>
               <ChartIFrameContainer
@@ -129,6 +128,7 @@ class ChartIFrameContainerDispatcher {
                 height={style?.height}
                 widgetSpecialConfig={this.editorEnv}
                 isShown={isShown}
+                isLoadingData={isLoadingData}
               />
             </div>
           );

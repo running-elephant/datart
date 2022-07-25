@@ -38,6 +38,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -111,7 +112,7 @@ public class SqlStringUtils {
         int currPos = 0;
         while (true) {
             SqlSimpleParser.Token token = tokenizer.nextToken();
-            if (token==null) {
+            if (token == null) {
                 break;
             } else {
                 Object tokenType = ReflectUtils.getFieldValue(token, "type");
@@ -124,15 +125,16 @@ public class SqlStringUtils {
         }
         int removeLength = 0;
         for (SqlParserPos pos : posList) {
-            String pattern = sql.substring(pos.getColumnNum()-removeLength, pos.getEndColumnNum()-removeLength);
+            String pattern = sql.substring(pos.getColumnNum() - removeLength, pos.getEndColumnNum() - removeLength);
             sql = StringUtils.replaceOnce(sql, pattern, "");
-            removeLength = removeLength+pattern.length();
+            removeLength = removeLength + pattern.length();
         }
         return sql.trim();
     }
 
     /**
      * 处理sql with语句
+     *
      * @param sql
      * @return
      */
@@ -154,6 +156,39 @@ public class SqlStringUtils {
             }
         }
         return sql;
+    }
+
+    public static char[] findMissedParentheses(String str) {
+        Stack<Integer> stack = new Stack<>();
+        Stack<Integer> toRemove = new Stack<>();
+        for (int i = 0; i < str.length(); i++) {
+            char chr = str.charAt(i);
+            if ('(' == chr) {
+                stack.push(i);
+            } else if (')' == chr) {
+                if (stack.isEmpty()) {
+                    toRemove.push(i);
+                } else {
+                    stack.pop();
+                }
+            }
+        }
+        while (!stack.isEmpty()) {
+            toRemove.add(stack.pop());
+        }
+        if (toRemove.isEmpty()) {
+            return new char[0];
+        }
+        char[] missedParentheses = new char[toRemove.size()];
+        for (int i = 0; i < toRemove.size(); i++) {
+            char c = str.charAt(toRemove.get(i));
+            if (c == '(') {
+                missedParentheses[i] = ')';
+            } else {
+                missedParentheses[i] = '(';
+            }
+        }
+        return missedParentheses;
     }
 
 }

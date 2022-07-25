@@ -64,6 +64,7 @@ const ChartDraggableElementField: FC<{
     handleOpenActionModal,
   }) => {
     const { dataView } = useContext(ChartDataViewContext);
+
     const canReplaceViewFields = useMemo(() => {
       const {
         hierarchyFields,
@@ -117,6 +118,7 @@ const ChartDraggableElementField: FC<{
           config={config}
           modalSize={modalSize}
           availableSourceFunctions={availableSourceFunctions}
+          metas={dataView?.meta}
           onConfigChanged={onConfigChanged}
           onOpenModal={handleOpenActionModal}
         />
