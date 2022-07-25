@@ -1092,6 +1092,9 @@ class BasicTableChart extends ReactChart {
       uid: tableHeader.uid,
       colName: tableHeader?.colName,
       title: tableHeader.label,
+      ellipsis: {
+        showTitle: false,
+      },
       onHeaderCell: record => {
         return {
           ...Omit(record, ['dataIndex', 'onHeaderCell', 'onCell', 'colName']),
