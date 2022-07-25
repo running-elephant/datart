@@ -16,6 +16,8 @@ public class User extends BaseEntity {
 
     private String name;
 
+    private String department;
+
     private String description;
 
     private String avatar;

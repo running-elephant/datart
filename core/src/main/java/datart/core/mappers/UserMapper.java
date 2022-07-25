@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 
 public interface UserMapper extends CRUDMapper {
+    @Override
     @Delete({
         "delete from user",
         "where id = #{id,jdbcType=VARCHAR}"
@@ -22,14 +23,14 @@ public interface UserMapper extends CRUDMapper {
     @Insert({
         "insert into user (id, email, ",
         "username, `password`, ",
-        "active, `name`, description, ",
-        "avatar, create_time, ",
+        "active, `name`,department, ",
+        "description, avatar, create_time, ",
         "create_by, update_time, ",
         "update_by)",
         "values (#{id,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, ",
         "#{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, ",
-        "#{active,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, ",
-        "#{avatar,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, ",
+        "#{active,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, #{department,jdbcType=VARCHAR}, ",
+        "#{description,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, ",
         "#{createBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, ",
         "#{updateBy,jdbcType=VARCHAR})"
     })
@@ -38,9 +39,10 @@ public interface UserMapper extends CRUDMapper {
     @InsertProvider(type=UserSqlProvider.class, method="insertSelective")
     int insertSelective(User record);
 
+    @Override
     @Select({
         "select",
-        "id, email, username, `password`, active, `name`, description, avatar, create_time, ",
+        "id, email, username, `password`, active, `name`, department, description, avatar, create_time, ",
         "create_by, update_time, update_by",
         "from user",
         "where id = #{id,jdbcType=VARCHAR}"
@@ -52,6 +54,7 @@ public interface UserMapper extends CRUDMapper {
         @Result(column="password", property="password", jdbcType=JdbcType.VARCHAR),
         @Result(column="active", property="active", jdbcType=JdbcType.TINYINT),
         @Result(column="name", property="name", jdbcType=JdbcType.VARCHAR),
+        @Result(column="department", property="department", jdbcType=JdbcType.VARCHAR),
         @Result(column="description", property="description", jdbcType=JdbcType.VARCHAR),
         @Result(column="avatar", property="avatar", jdbcType=JdbcType.VARCHAR),
         @Result(column="create_time", property="createTime", jdbcType=JdbcType.TIMESTAMP),
@@ -71,6 +74,7 @@ public interface UserMapper extends CRUDMapper {
           "`password` = #{password,jdbcType=VARCHAR},",
           "active = #{active,jdbcType=TINYINT},",
           "`name` = #{name,jdbcType=VARCHAR},",
+          "department = #{department,jdbcType=VARCHAR},",
           "description = #{description,jdbcType=VARCHAR},",
           "avatar = #{avatar,jdbcType=VARCHAR},",
           "create_time = #{createTime,jdbcType=TIMESTAMP},",
