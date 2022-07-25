@@ -35,6 +35,8 @@ public class UserBaseInfo {
 
     private String name;
 
+    private String department;
+
     private String description;
 
     private boolean orgOwner;
@@ -47,6 +49,7 @@ public class UserBaseInfo {
         this.email = user.getEmail();
         this.username = user.getUsername();
         this.name = user.getName();
+        this.department = user.getDepartment();
         this.description = user.getDescription();
         this.avatar = user.getAvatar();
     }

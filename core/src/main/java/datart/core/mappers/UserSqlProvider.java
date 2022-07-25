@@ -31,7 +31,11 @@ public class UserSqlProvider {
         if (record.getName() != null) {
             sql.VALUES("`name`", "#{name,jdbcType=VARCHAR}");
         }
-        
+
+        if (record.getDepartment() != null) {
+            sql.VALUES("department", "#{department,jdbcType=VARCHAR}");
+        }
+
         if (record.getDescription() != null) {
             sql.VALUES("description", "#{description,jdbcType=VARCHAR}");
         }
@@ -82,7 +86,11 @@ public class UserSqlProvider {
         if (record.getName() != null) {
             sql.SET("`name` = #{name,jdbcType=VARCHAR}");
         }
-        
+
+        if (record.getDepartment() != null) {
+            sql.SET("department = #{department,jdbcType=VARCHAR}");
+        }
+
         if (record.getDescription() != null) {
             sql.SET("description = #{description,jdbcType=VARCHAR}");
         }

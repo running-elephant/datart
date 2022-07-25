@@ -22,10 +22,12 @@ package datart.server.base.dto;
 import datart.core.entity.User;
 import datart.core.entity.ext.UserBaseInfo;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class UserProfile extends UserBaseInfo {
 
     private String name;
@@ -36,5 +38,7 @@ public class UserProfile extends UserBaseInfo {
     
     public UserProfile(User user) {
         super(user);
+        this.name = user.getName();
+        this.description = user.getDescription();
     }
 }
