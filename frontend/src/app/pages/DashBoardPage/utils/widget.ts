@@ -245,7 +245,10 @@ export const createToSaveWidgetGroup = (
 ) => {
   widgets = updateBy(widgets, draft => {
     draft.forEach(v => {
-      if (v.config.type === 'chart') {
+      if (
+        v.config.type === 'chart' &&
+        v.config?.content?.dataChart?.config?.computedFields
+      ) {
         v.config.content.dataChart.config.computedFields =
           filterCurrentUsedComputedFields(
             v.config?.content?.dataChart?.config?.chartConfig,

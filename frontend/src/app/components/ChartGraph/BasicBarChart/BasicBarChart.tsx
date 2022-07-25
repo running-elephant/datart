@@ -419,7 +419,6 @@ class BasicBarChart extends Chart {
       colorConfigs[0],
     );
 
-    const xAxisConfig = groupConfigs?.[0];
     const colorizeGroupedSeries = aggregateConfigs.flatMap(
       (aggConfig, acIndex) => {
         return secondGroupInfos.map((sgCol, sgIndex) => {
@@ -440,7 +439,9 @@ class BasicBarChart extends Chart {
             name: k,
             data: xAxisColumns?.[0]?.data?.map((d, dIndex) => {
               const row = dataSet.find(
-                r => String(r.getCell(xAxisConfig)) === d,
+                r =>
+                  groupConfigs?.map(gc => String(r.getCell(gc))).join('-') ===
+                  d,
               )!;
               return {
                 ...getExtraSeriesRowData(row),
@@ -769,13 +770,13 @@ class BasicBarChart extends Chart {
         ...font,
         formatter: params => {
           const { value, data } = params;
-          if (!value || !Number(value)) {
+          if ((!value || !Number(value)) && value !== 0) {
             return '';
           }
-          const formattedValue = toFormattedValue(value, data.format);
-          const labels: string[] = [];
-          labels.push(formattedValue);
-          return labels.join('\n');
+          if (this.isPercentageYAxis) {
+            return value;
+          }
+          return toFormattedValue(value, data.format);
         },
       },
       labelLayout: { hideOverlap: true },

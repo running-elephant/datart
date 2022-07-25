@@ -148,7 +148,7 @@ export const Workbench = memo(() => {
         className="datart-split"
         onDrag={editorResize}
       >
-        <Wrapper>
+        <EditorWrap>
           {!viewType ? (
             unpersistedNewView ? (
               <SelectView selectViewType={handleSelectViewType} />
@@ -165,7 +165,7 @@ export const Workbench = memo(() => {
               allowEnableViz={allowEnableViz}
             />
           )}
-        </Wrapper>
+        </EditorWrap>
         <Outputs />
       </Development>
       <Properties viewType={viewType} allowManage={allowManage} />
@@ -178,7 +178,11 @@ const Wrapper = styled.div`
   flex: 1;
   min-height: 0;
 `;
-
+const EditorWrap = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+`;
 const Development = styled(Split)`
   display: flex;
   flex: 1;
@@ -187,8 +191,8 @@ const Development = styled(Split)`
 
 const LoadingWrap = styled.div`
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  width: 100%;
   background-color: ${p => p.theme.componentBackground};
 `;

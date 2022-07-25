@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { TreeSelect } from 'antd';
+import { Form, TreeSelect } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { DatabaseSchema } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { memo, useCallback, useEffect, useMemo } from 'react';
@@ -26,6 +26,7 @@ import { SPACE_SM } from 'styles/StyleConstants';
 import { selectAllSourceDatabaseSchemas } from '../../../slice/selectors';
 import { JoinTableProps, StructViewQueryProps } from '../../../slice/types';
 import { getTableAllColumns } from '../../../utils';
+
 interface SelectJoinColumnsProps {
   structure: StructViewQueryProps;
   joinTable: JoinTableProps;
@@ -117,35 +118,51 @@ const SelectJoinColumns = memo(
 
     return (
       <Line key={conditionsIndex}>
-        <ColumnSelect
-          dropdownMatchSelectWidth={false}
-          allowClear
-          placeholder={t('selectField')}
-          treeDefaultExpandAll={true}
-          value={joinTable.conditions?.[conditionsIndex]?.left.slice(-1)}
-          onChange={columnName => {
-            allowManage && onChange(columnName || [], 'left', conditionsIndex);
-          }}
-          treeData={handleLeftColumn()}
-        />
+        <FormItem
+          name={'left' + conditionsIndex + joinIndex}
+          rules={[{ required: true, message: t('selectField') }]}
+        >
+          <ColumnSelect
+            dropdownMatchSelectWidth={false}
+            allowClear
+            placeholder={t('selectField')}
+            treeDefaultExpandAll={true}
+            value={joinTable.conditions?.[conditionsIndex]?.left.slice(-1)}
+            onChange={columnName => {
+              allowManage &&
+                onChange(columnName || [], 'left', conditionsIndex);
+            }}
+            treeData={handleLeftColumn()}
+          />
+        </FormItem>
         <Equal>=</Equal>
-        <ColumnSelect
-          dropdownMatchSelectWidth={false}
-          allowClear
-          placeholder={t('selectField')}
-          treeDefaultExpandAll={true}
-          value={joinTable.conditions?.[conditionsIndex]?.right.slice(-1)}
-          onChange={columnName => {
-            allowManage && onChange(columnName || [], 'right', conditionsIndex);
-          }}
-          treeData={handleRightColumn()}
-        />
+        <FormItem
+          name={'right' + conditionsIndex + joinIndex}
+          rules={[{ required: true, message: t('selectField') }]}
+        >
+          <ColumnSelect
+            dropdownMatchSelectWidth={false}
+            allowClear
+            placeholder={t('selectField')}
+            treeDefaultExpandAll={true}
+            value={joinTable.conditions?.[conditionsIndex]?.right.slice(-1)}
+            onChange={columnName => {
+              allowManage &&
+                onChange(columnName || [], 'right', conditionsIndex);
+            }}
+            treeData={handleRightColumn()}
+          />
+        </FormItem>
       </Line>
     );
   },
 );
 
 const Line = styled.div``;
+
+const FormItem = styled(Form.Item)`
+  display: inline-block;
+`;
 
 const ColumnSelect = styled(TreeSelect)`
   min-width: 120px;

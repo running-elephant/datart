@@ -180,6 +180,7 @@ export const toUpdateDashboard = createAsyncThunk<
     const group = createToSaveWidgetGroup(widgets, boardInfo.widgetIds);
     const updateData: SaveDashboard = {
       ...dashBoard,
+      subType: dashBoard?.config?.type,
       config: JSON.stringify(dashBoard.config),
       widgetToCreate: group.widgetToCreate,
       widgetToUpdate: group.widgetToUpdate,
