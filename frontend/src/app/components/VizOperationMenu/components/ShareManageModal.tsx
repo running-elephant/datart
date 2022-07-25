@@ -79,6 +79,7 @@ const ShareManageModal: FC<{
           method: 'PUT',
           data: paramsData,
         });
+        setManipulatedData(null);
         if (data) {
           setListData(
             produce(listData, draft => {
