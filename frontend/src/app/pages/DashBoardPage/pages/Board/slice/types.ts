@@ -71,6 +71,7 @@ export interface Dashboard {
 }
 export interface SaveDashboard extends Omit<Dashboard, 'config'> {
   config: string;
+  subType: BoardType;
   widgetToCreate?: ServerWidget[];
   widgetToUpdate?: ServerWidget[];
   widgetToDelete?: string[];
