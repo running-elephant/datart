@@ -36,6 +36,8 @@ public class UserUpdateParam extends BaseUpdateParam {
 
     private String name;
 
+    private String department;
+
     private String description;
 
 }
