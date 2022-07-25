@@ -145,9 +145,9 @@ const FullScreenWrap = styled.div<{ show: boolean }>`
   transition: all 3s ease-out;
 
   .full-container {
+    position: relative;
     display: flex;
     flex: 1;
-    position: relative;
   }
 
   .full-menu {

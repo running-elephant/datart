@@ -80,8 +80,9 @@ const ChromeColorWrap = styled.div`
 `;
 
 const BtnWrap = styled.div`
-  text-align: right;
   margin-top: ${SPACE_TIMES(2.5)};
+  text-align: right;
+
   > button:first-child {
     margin-right: ${SPACE_TIMES(2.5)};
   }
