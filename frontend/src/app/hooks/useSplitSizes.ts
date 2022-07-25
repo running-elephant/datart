@@ -25,7 +25,7 @@ interface UseSplitSizesProps {
 
 export function useSplitSizes({ limitedSide, range }: UseSplitSizesProps) {
   const [sizes, setSizes] = useState([0, 0]);
-  const [minSize, maxSize] = range;
+  const [minSize] = range;
 
   const onResize = useCallback(() => {
     const minPct = Math.floor(

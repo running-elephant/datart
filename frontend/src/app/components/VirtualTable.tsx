@@ -18,6 +18,7 @@
 
 import { Empty, Table, TableProps } from 'antd';
 import classNames from 'classnames';
+import { TABLE_DATA_INDEX } from 'globalConstants';
 import React, {
   memo,
   useCallback,
@@ -48,10 +49,14 @@ interface VirtualTableProps extends TableProps<object> {
  */
 export const VirtualTable = memo((props: VirtualTableProps) => {
   const { columns, scroll, width: boxWidth, dataSource } = props;
-  const widthColumns = columns.map(v => v.width);
+  const widthColumns = columns.map(v => {
+    return { width: v.width, dataIndex: v.dataIndex };
+  });
   const gridRef: any = useRef();
   const isFull = useRef<boolean>(false);
-  const widthColumnCount = widthColumns.filter(width => !width).length;
+  const widthColumnCount = widthColumns.filter(
+    ({ width, dataIndex }) => !width || dataIndex !== TABLE_DATA_INDEX,
+  ).length;
   const [connectObject] = useState(() => {
     const obj = {};
     Object.defineProperty(obj, 'scrollLeft', {
@@ -70,8 +75,10 @@ export const VirtualTable = memo((props: VirtualTableProps) => {
 
   if (isFull.current === true) {
     widthColumns.forEach((v, i) => {
-      return (widthColumns[i] =
-        widthColumns[i] + (boxWidth - scroll.x) / widthColumns.length);
+      return (widthColumns[i].width =
+        widthColumns[i].dataIndex === TABLE_DATA_INDEX
+          ? widthColumns[i].width
+          : widthColumns[i].width + (boxWidth - scroll.x) / widthColumnCount);
     });
   }
 
@@ -80,7 +87,7 @@ export const VirtualTable = memo((props: VirtualTableProps) => {
       return {
         ...column,
         width: column.width
-          ? widthColumns[i]
+          ? widthColumns[i].width
           : Math.floor(boxWidth / widthColumnCount),
       };
     });
@@ -101,7 +108,7 @@ export const VirtualTable = memo((props: VirtualTableProps) => {
       const totalHeight = rawData.length * 39;
 
       if (!dataSource?.length) {
-        //如果数据为空 If the data is empty
+        //If the data is empty
         return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
       }
 

@@ -16,9 +16,4 @@
  * limitations under the License.
  */
 
-import { defaultLazyLoad } from 'utils/loadable';
-
-export const LazyShareChart = defaultLazyLoad(
-  () => import('./ShareChart'),
-  module => module.default,
-);
+export { Router } from './Router';

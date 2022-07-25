@@ -21,6 +21,7 @@ import datart.core.base.PageInfo;
 import datart.core.base.consts.Const;
 import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
+import datart.core.common.UUIDGenerator;
 import datart.core.data.provider.*;
 import datart.data.provider.calcite.dialect.H2Dialect;
 import datart.data.provider.jdbc.DataTypeUtils;
@@ -36,8 +37,8 @@ import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.SimpleResultSet;
 
 import java.sql.*;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -171,9 +172,12 @@ public class LocalDB {
      * @return 查询脚本+执行参数 执行后结果
      */
     public static Dataframe executeLocalQuery(QueryScript queryScript, ExecuteParam executeParam, Dataframes dataframes, boolean persistent, Date expire) throws Exception {
-        if (queryScript == null) {
+        if (queryScript == null || (dataframes.size() == 1 && dataframes.getDataframes().get(0).getName() == null)) {
             // 直接以指定数据源为表进行查询，生成一个默认的SQL查询全部数据
             queryScript = new QueryScript();
+            if (dataframes.getDataframes().get(0).getName() == null) {
+                dataframes.getDataframes().get(0).setName("Q" + UUIDGenerator.generate());
+            }
             queryScript.setScript(String.format(SELECT_START_SQL, dataframes.getDataframes().get(0).getName()));
             queryScript.setVariables(Collections.emptyList());
             queryScript.setSourceId(dataframes.getKey());
@@ -268,6 +272,7 @@ public class LocalDB {
     }
 
     private static Dataframe execute(Connection connection, QueryScript queryScript, ExecuteParam executeParam) throws Exception {
+
         SqlScriptRender render = new SqlScriptRender(queryScript
                 , executeParam
                 , SQL_DIALECT);

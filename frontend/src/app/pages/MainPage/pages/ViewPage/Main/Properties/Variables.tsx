@@ -26,6 +26,7 @@ import {
 } from '@ant-design/icons';
 import { Button, List, Popconfirm } from 'antd';
 import { ListItem } from 'app/components';
+import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { getRoles } from 'app/pages/MainPage/pages/MemberPage/slice/thunks';
 import {
@@ -292,6 +293,13 @@ export const Variables = memo(() => {
     [variables, publicVariables, t],
   );
 
+  const { filteredData, debouncedSearch } = useDebouncedSearch(
+    listSource,
+    (keywords, data) => {
+      return data.name.includes(keywords);
+    },
+  );
+
   const titleProps = useMemo(
     () => ({
       title: 'variable',
@@ -300,15 +308,16 @@ export const Variables = memo(() => {
         items: [{ key: 'variable', text: t('add') }],
         callback: showAddForm,
       },
+      onSearch: debouncedSearch,
     }),
-    [showAddForm, t],
+    [showAddForm, t, debouncedSearch],
   );
 
   return (
     <Container {...titleProps}>
       <ListWrapper>
         <List
-          dataSource={listSource}
+          dataSource={filteredData}
           loading={
             stage === ViewViewModelStages.Loading && {
               indicator: <LoadingOutlined />,

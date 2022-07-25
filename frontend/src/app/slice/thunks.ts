@@ -66,18 +66,22 @@ export const getUserInfoByToken = createAsyncThunk<
   UserInfoByTokenParams
 >('app/getUserInfoByToken', async ({ token, resolve, reject }) => {
   setToken(token);
-  try {
-    const { data } = await request2<User>({
+  const { data } = await request2<User>(
+    {
       url: '/users',
       method: 'GET',
-    });
-    localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(data));
-    resolve();
-    return data;
-  } catch (error) {
-    reject();
-    removeToken();
-  }
+    },
+    undefined,
+    {
+      onRejected(error) {
+        reject();
+        removeToken();
+      },
+    },
+  );
+  localStorage.setItem(StorageKeys.LoggedInUser, JSON.stringify(data));
+  resolve();
+  return data;
 });
 
 export const register = createAsyncThunk<null, RegisterParams>(

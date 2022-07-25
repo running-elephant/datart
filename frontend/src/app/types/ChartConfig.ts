@@ -193,7 +193,13 @@ export type ChartDataConfig = ChartConfigBase & {
   [RUNTIME_FILTER_KEY]?: ChartDataRequestFilter[];
 };
 
-export type ChartStyleConfig = ChartConfigBase & ChartStyleSectionGroup & {};
+export type ChartStyleSectionTemplate = {
+  template?: ChartStyleSectionRow;
+};
+
+export type ChartStyleConfig = ChartConfigBase &
+  ChartStyleSectionGroup &
+  ChartStyleSectionTemplate;
 
 export type ChartStyleSectionGroup = ChartStyleSectionRow & {
   rows?: ChartStyleSectionGroup[];
@@ -312,6 +318,7 @@ export type AxisLabel = {
   rotate?: number | null;
   show: boolean;
   width?: string | number;
+  formatter?: string;
   font?: FontStyle;
 } & FontStyle;
 

@@ -17,8 +17,10 @@
  */
 package datart.data.provider.calcite;
 
+import datart.core.base.exception.Exceptions;
 import datart.core.data.provider.ScriptVariable;
 import datart.data.provider.jdbc.SimpleVariablePlaceholder;
+import datart.data.provider.script.SqlStringUtils;
 import datart.data.provider.script.VariablePlaceholder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.*;
@@ -121,16 +123,10 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
         }
 
         logicExpressionCall = SpecialSqlCallConverter.convert(logicExpressionCall);
-        int startIndex = logicExpressionCall.getParserPosition().getColumnNum();
-        int endIndex = logicExpressionCall.getParserPosition().getEndColumnNum();
-        // 处理calcite不把左右括号算进index，导致的index错位问题
-        if (startIndex > 1 && srcSql.charAt(startIndex - 2) == '(') {
-            startIndex = startIndex - 1;
-        }
-        if (endIndex < srcSql.length() && srcSql.charAt(endIndex) == ')') {
-            endIndex = endIndex + 1;
-        }
-        String originalSqlFragment = srcSql.substring(startIndex - 1, endIndex).trim();
+        int startIndex = logicExpressionCall.getParserPosition().getColumnNum() - 1;
+        int endIndex = logicExpressionCall.getParserPosition().getEndColumnNum() - 1;
+
+        String originalSqlFragment = fixMissedParentheses(srcSql, startIndex, endIndex);
 
         List<ScriptVariable> variables = new LinkedList<>();
         for (SqlIdentifier identifier : variableIdentifier) {
@@ -143,6 +139,52 @@ public class SqlVariableVisitor extends SqlBasicVisitor<Object> {
             }
         }
         variablePlaceholders.add(new VariablePlaceholder(variables, sqlDialect, logicExpressionCall, originalSqlFragment));
+    }
+
+    // 处理calcite某些情况下不把左右括号算进index，导致的index错位问题
+    private String fixMissedParentheses(String srcSql, int startIndex, int endIndex) {
+
+        String originalSqlFragment = srcSql.substring(startIndex, endIndex + 1).trim();
+
+        char[] missedParentheses = SqlStringUtils.findMissedParentheses(originalSqlFragment);
+        if (missedParentheses.length != 0) {
+            int left = 0;
+            int right = 0;
+            for (char parenthesis : missedParentheses) {
+                if (parenthesis == '(') {
+                    left++;
+                } else {
+                    right++;
+                }
+            }
+            while (left != 0) {
+                startIndex--;
+                if (startIndex < 0) {
+                    Exceptions.msg("There are mismatched parentheses nearby " + originalSqlFragment);
+                }
+                if (srcSql.charAt(startIndex) == ' ') {
+                    continue;
+                }
+                if (srcSql.charAt(startIndex) == '(') {
+                    left--;
+                }
+            }
+            while (right != 0) {
+                endIndex++;
+                if (endIndex >= srcSql.length()) {
+                    Exceptions.msg("There are mismatched parentheses nearby " + originalSqlFragment);
+                }
+                if (srcSql.charAt(endIndex) == ' ') {
+                    continue;
+                }
+                if (srcSql.charAt(endIndex) == ')') {
+                    right--;
+                } else {
+                    Exceptions.msg("There are mismatched parentheses nearby " + originalSqlFragment);
+                }
+            }
+        }
+        return srcSql.substring(startIndex, endIndex + 1).trim();
     }
 
 }

@@ -35,7 +35,6 @@ import {
   LINE_HEIGHT_ICON_SM,
   SPACE_MD,
   SPACE_SM,
-  SPACE_TIMES,
   SPACE_XS,
 } from 'styles/StyleConstants';
 import {
@@ -156,20 +155,5 @@ const Wrapper = styled.div`
     font-size: ${FONT_SIZE_ICON_SM};
     font-weight: ${FONT_WEIGHT_MEDIUM};
     line-height: ${LINE_HEIGHT_ICON_SM};
-  }
-`;
-
-const GoBack = styled.div`
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: ${SPACE_TIMES(8)};
-  height: ${SPACE_TIMES(8)};
-  font-size: ${FONT_SIZE_ICON_SM};
-  color: ${p => p.theme.textColorLight};
-
-  &:hover {
-    color: ${p => p.theme.textColorSnd};
   }
 `;

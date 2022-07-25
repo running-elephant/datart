@@ -392,7 +392,6 @@ class BasicLineChart extends Chart {
       chartDataSet,
       colorConfigs[0],
     );
-    const xAxisConfig = groupConfigs?.[0];
     return aggregateConfigs.flatMap((aggConfig, acIndex) => {
       return secondGroupInfos.map((sgCol, sgcIndex) => {
         const k = Object.keys(sgCol)[0];
@@ -411,7 +410,10 @@ class BasicLineChart extends Chart {
             normal: { color: itemStyleColor?.value },
           },
           data: xAxisColumns[0].data.map((d, dcIndex) => {
-            const row = dataSet.find(r => r.getCell(xAxisConfig) === d)!;
+            const row = dataSet.find(
+              r =>
+                groupConfigs?.map(gc => String(r.getCell(gc))).join('-') === d,
+            )!;
             return {
               ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),
@@ -479,6 +481,11 @@ class BasicLineChart extends Chart {
       ['splitLine'],
       ['showHorizonLine', 'horizonLineStyle'],
     );
+    const [format] = getStyles(
+      styles,
+      ['yAxis', 'modal'],
+      ['YAxisNumberFormat'],
+    );
     const name = showTitleAndUnit ? yAxisNames.join(' / ') : null;
 
     return {
@@ -490,7 +497,11 @@ class BasicLineChart extends Chart {
       inverse,
       min,
       max,
-      axisLabel: getAxisLabel(showLabel, font),
+      axisLabel: {
+        show: showLabel,
+        formatter: v => toFormattedValue(v, format),
+        ...font,
+      },
       axisLine: getAxisLine(showAxis, lineStyle),
       axisTick: getAxisTick(showLabel, lineStyle),
       nameTextStyle: getNameTextStyle(

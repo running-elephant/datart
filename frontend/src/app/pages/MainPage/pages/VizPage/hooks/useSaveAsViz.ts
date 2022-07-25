@@ -20,7 +20,7 @@ import { CommonFormTypes } from 'globalConstants';
 import { useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { request2 } from 'utils/request';
-import { errorHandle, getInsertedNodeIndex } from 'utils/utils';
+import { getInsertedNodeIndex } from 'utils/utils';
 import { SaveFormContext, SaveFormModel } from '../SaveFormContext';
 import { selectVizs } from '../slice/selectors';
 import { addViz, saveAsDashboard } from '../slice/thunks';
@@ -34,18 +34,19 @@ export function useSaveAsViz() {
 
   const getVizDetail = useCallback(
     async (backendChartId: string, type: string) => {
-      try {
-        const { data } = await request2<any>({
+      const { data } = await request2<any>(
+        {
           method: 'GET',
           url: `viz/${type.toLowerCase()}s/${backendChartId}`,
-        });
-
-        return data;
-      } catch (error) {
-        errorHandle(error);
-
-        return {} as any;
-      }
+        },
+        undefined,
+        {
+          onRejected(error) {
+            return {} as any;
+          },
+        },
+      );
+      return data;
     },
     [],
   );

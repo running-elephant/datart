@@ -71,6 +71,7 @@ export interface Dashboard {
 }
 export interface SaveDashboard extends Omit<Dashboard, 'config'> {
   config: string;
+  subType: BoardType;
   widgetToCreate?: ServerWidget[];
   widgetToUpdate?: ServerWidget[];
   widgetToDelete?: string[];
@@ -411,8 +412,8 @@ export interface BoardInfo {
   originControllerWidgets: Widget[]; // use for reset button
 }
 export enum DeviceType {
-  Desktop = 'desktop',
-  Mobile = 'mobile',
+  Desktop = 'Desktop',
+  Mobile = 'Mobile',
 }
 export interface BoardLinkFilter {
   triggerWidgetId: string;
@@ -442,6 +443,7 @@ export interface getDataOption {
 export type WidgetErrorType = 'request' | 'interaction';
 
 export type WidgetLinkInfo = {
+  sourceWidgetId?: string;
   filters?: PendingChartDataRequestFilter[];
   variables?: Record<string, any[]>;
 };

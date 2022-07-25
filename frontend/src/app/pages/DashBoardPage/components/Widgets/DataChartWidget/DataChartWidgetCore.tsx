@@ -32,6 +32,7 @@ import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import useDisplayViewDetail from 'app/pages/MainPage/pages/VizPage/hooks/useDisplayViewDetail';
+import { selectShareExecuteTokenMap } from 'app/pages/SharePage/slice/selectors';
 import { IChart } from 'app/types/Chart';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
@@ -52,7 +53,7 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { isEmptyArray } from 'utils/object';
 import { uuidv4 } from 'utils/utils';
@@ -77,6 +78,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const { data: dataset } = useContext(WidgetDataContext);
   const { renderMode, orgId, queryVariables } = useContext(BoardContext);
   const selectedItems = useContext(WidgetSelectionContext);
+  const executeTokenMap = useSelector(selectShareExecuteTokenMap);
   const widget = useContext(WidgetContext);
   const { dashboardId, id: wid } = widget;
   const bid = useMemo(() => {
@@ -165,6 +167,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
       );
       const replacedConfig = payload.value.replacedConfig;
+      // TODO delete computedFields,
       const computedFields = getRuntimeComputedFields(
         dateLevelComputedFields,
         replacedConfig,
@@ -240,6 +243,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         aggregation: dataChart?.config?.aggregation,
         chartConfig: dataChart?.config?.chartConfig,
         ruleId,
+        isJumpUrlOnly: renderMode === 'share',
       };
     },
     [
@@ -250,6 +254,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
       queryVariables,
       orgId,
       chartDataView,
+      renderMode,
     ],
   );
 
@@ -269,9 +274,18 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         computedFields: dataChart?.config?.computedFields,
         aggregation: dataChart?.config?.aggregation,
         chartConfig: dataChart?.config?.chartConfig,
+        renderMode,
       };
     },
-    [chartDataView, orgId, dataChart?.config, getCrossFilteringSetting],
+    [
+      getCrossFilteringSetting,
+      dataChart?.config?.chartConfig,
+      dataChart?.config?.computedFields,
+      dataChart?.config?.aggregation,
+      orgId,
+      chartDataView,
+      renderMode,
+    ],
   );
 
   const buildViewDataEventParams = useCallback(
@@ -280,6 +294,10 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         dataChart?.config?.chartConfig?.interactions,
         widgetRef?.current?.config?.customConfig?.interactions,
       );
+      let authToken;
+      if (renderMode === 'share') {
+        authToken = executeTokenMap?.[chartDataView?.id!]?.authorizedToken;
+      }
       return {
         drillOption: drillOptionRef.current,
         viewDetailSetting,
@@ -287,9 +305,16 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         targetEvent,
         chartConfig: dataChart?.config?.chartConfig,
         view: chartDataView,
+        authToken,
       };
     },
-    [dataChart?.config?.chartConfig, chartDataView, getViewDetailSetting],
+    [
+      getViewDetailSetting,
+      dataChart?.config?.chartConfig,
+      renderMode,
+      chartDataView,
+      executeTokenMap,
+    ],
   );
 
   const boardRightClickDrillThroughSetting = useMemo(() => {
@@ -588,7 +613,10 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
 
   return (
     <ChartDrillContext.Provider value={drillContextVal}>
-      <ChartDrillContextMenu chartConfig={dataChart?.config.chartConfig}>
+      <ChartDrillContextMenu
+        chartConfig={dataChart?.config.chartConfig}
+        metas={chartDataView?.meta}
+      >
         <StyledWrapper>
           <ChartFrameBox ref={cacheWhRef}>{chartFrame}</ChartFrameBox>
           <ChartDrillPaths chartConfig={dataChart?.config.chartConfig} />

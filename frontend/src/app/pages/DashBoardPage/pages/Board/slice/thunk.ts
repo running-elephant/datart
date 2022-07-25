@@ -29,6 +29,7 @@ import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   fetchAvailableSourceFunctionsAsync,
   fetchAvailableSourceFunctionsAsyncForShare,
+  fetchChartDataSet,
 } from 'app/utils/fetch';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { RootState } from 'types';
@@ -115,7 +116,7 @@ export const exportBoardTpl = createAsyncThunk<
   }
 >('board/exportBoardTpl', async (params, { dispatch, rejectWithValue }) => {
   const { dashboard, widgets, callBack } = params;
-  const { data } = await request2<any>({
+  await request2<any>({
     url: `viz/export/dashboard/template`,
     method: 'POST',
     data: { dashboard, widgets },
@@ -219,16 +220,27 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
   null,
   {
     boardId: string;
+    sourceWidgetId: string;
     widgetId: string;
     option?: getDataOption;
     extraFilters?: PendingChartDataRequestFilter[];
     variableParams?: Record<string, any[]>;
+  } & {
+    executeToken?: any;
   },
   { state: RootState }
 >(
   'board/syncBoardWidgetChartDataAsync',
   async (
-    { boardId, widgetId, option, extraFilters, variableParams },
+    {
+      boardId,
+      sourceWidgetId,
+      widgetId,
+      option,
+      extraFilters,
+      variableParams,
+      executeToken,
+    },
     { getState, dispatch },
   ) => {
     const boardState = getState() as { board: BoardState };
@@ -266,11 +278,7 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
       .build();
 
     try {
-      const { data } = await request2<WidgetData>({
-        method: 'POST',
-        url: `data-provider/execute`,
-        data: requestParams,
-      });
+      const data = await fetchChartDataSet(requestParams, executeToken);
       await dispatch(
         boardActions.setWidgetData({
           wid: widgetId,
@@ -285,6 +293,7 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
           boardId,
           widgetId,
           linkInfo: {
+            sourceWidgetId,
             filters: extraFilters,
             variables: variableParams,
           },

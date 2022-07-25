@@ -22,11 +22,10 @@ import {
   DeleteOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { Button, Space, Spin, Tooltip } from 'antd';
+import { Button, Form, Space, Spin, Tooltip } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CommonFormTypes } from 'globalConstants';
 import produce from 'immer';
-import isEqual from 'lodash/isEqual';
 import { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -42,6 +41,7 @@ import {
   SPACE_XL,
   SPACE_XS,
 } from 'styles/StyleConstants';
+import { isEqualObject } from 'utils/object';
 import { getInsertedNodeIndex } from 'utils/utils';
 import {
   StructViewJoinType,
@@ -94,6 +94,7 @@ export const StructView = memo(
     ) as ViewStatus;
     const viewsData = useSelector(selectViews);
     const allDatabaseSchemas = useSelector(selectAllSourceDatabaseSchemas);
+    const [form] = Form.useForm();
 
     const handleStructureChange = useCallback(
       (table: any, type: 'MAIN' | 'JOINS', index?: number) => {
@@ -105,7 +106,8 @@ export const StructView = memo(
                     ...structure,
                     ...table,
                     joins:
-                      !table.table || isEqual(structure.table, table.table)
+                      !table.table ||
+                      isEqualObject(structure.table, table.table)
                         ? structure.joins
                         : [],
                   }
@@ -210,26 +212,30 @@ export const StructView = memo(
     );
 
     const handleInterimRunSql = useCallback(
-      (type?: 'MAIN' | 'JOINS', joinIndex?: number) => {
-        let script: StructViewQueryProps = {
-          table: [],
-          columns: [],
-          joins: [],
-        };
+      async (type?: 'MAIN' | 'JOINS', joinIndex?: number) => {
+        try {
+          await form.validateFields();
 
-        if (type === 'MAIN') {
-          script.table = structure.table;
-          script.columns = structure.columns;
-        } else if (type === 'JOINS' && joinIndex !== undefined) {
-          script.table = structure.table;
-          script.columns = structure.columns;
-          script.joins = [structure.joins[joinIndex]];
-        } else {
-          script = structure;
-        }
-        dispatch(runSql({ id, isFragment: !!type, script }));
+          let script: StructViewQueryProps = {
+            table: [],
+            columns: [],
+            joins: [],
+          };
+
+          if (type === 'MAIN') {
+            script.table = structure.table;
+            script.columns = structure.columns;
+          } else if (type === 'JOINS' && joinIndex !== undefined) {
+            script.table = structure.table;
+            script.columns = structure.columns;
+            script.joins = [structure.joins[joinIndex]];
+          } else {
+            script = structure;
+          }
+          dispatch(runSql({ id, isFragment: !!type, script }));
+        } catch (errorInfo) {}
       },
-      [dispatch, id, structure],
+      [dispatch, id, structure, form],
     );
 
     const handleDeleteConditions = useCallback(
@@ -326,173 +332,183 @@ export const StructView = memo(
               allowEnableViz={allowEnableViz}
             />
             <ConfigPanel>
-              <ProcessLine>
-                <ProcessItem>
-                  <ProcessItemLabel>
-                    <Tooltip title={t('runStep')} placement="left">
-                      <Button
-                        className="run-fragment"
-                        icon={<CaretRightOutlined />}
-                        onClick={() =>
-                          allowManage && handleInterimRunSql('MAIN')
-                        }
-                      />
-                    </Tooltip>
-                    {t('main')}
-                  </ProcessItemLabel>
-                  <ProcessItemContent>
-                    <Space>
-                      <SelectDataSource
-                        type="MAIN"
-                        sourceId={sourceId}
-                        structure={structure}
-                        allowManage={allowManage}
-                        onChange={handleStructureChange}
-                      />
-                    </Space>
-                  </ProcessItemContent>
-                </ProcessItem>
-
-                {structure.joins.map((join, i) => {
-                  return (
-                    <ProcessItem>
-                      <ProcessItemLabel>
-                        <Tooltip title={t('runStep')} placement="left">
-                          <Button
-                            className="run-fragment"
-                            icon={<CaretRightOutlined />}
-                            onClick={() =>
-                              allowManage && handleInterimRunSql('JOINS', i)
-                            }
-                          />
-                        </Tooltip>
-                        {t('join')}
-                      </ProcessItemLabel>
-                      <ProcessItemContent>
-                        <TableRelation>
-                          <SelectDataSource
-                            joinTable={join}
-                            structure={structure}
-                            allowManage={allowManage}
-                            renderType="READONLY"
-                          />
-                          <SelectJoinType
-                            type={join.joinType!}
-                            onChange={type => {
-                              allowManage && handleTableJoinType(type, i);
-                            }}
-                          />
-                          <SelectDataSource
-                            type="JOINS"
-                            joinTable={join}
-                            sourceId={sourceId}
-                            structure={structure}
-                            allowManage={allowManage}
-                            onChange={(table, type) =>
-                              handleTableJoin(table, type, i)
-                            }
-                          />
-                        </TableRelation>
-                        {join.table && (
-                          <>
-                            <SelectJoinColumnLabel>
-                              {t('selectJoinColumn')}
-                            </SelectJoinColumnLabel>
-                            <JoinConditionWrapper>
-                              {join.conditions?.map(({ left, right }, ind) => {
-                                return (
-                                  <JoinConditionLine>
-                                    <SelectJoinColumns
-                                      structure={structure}
-                                      joinTable={join}
-                                      onChange={(
-                                        columnName,
-                                        type,
-                                        joinConditionIndex,
-                                      ) =>
-                                        handleTableJoinColumns(
-                                          columnName,
-                                          type,
-                                          i,
-                                          joinConditionIndex,
-                                        )
-                                      }
-                                      conditionsIndex={ind}
-                                      joinIndex={i}
-                                      sourceId={sourceId}
-                                      allowManage={allowManage}
-                                    />
-                                    <Space className="action">
-                                      {!!left.length &&
-                                        !!right.length &&
-                                        ind === join.conditions!.length - 1 && (
-                                          <Button
-                                            type="link"
-                                            size="small"
-                                            icon={<PlusOutlined />}
-                                            onClick={() =>
-                                              allowManage &&
-                                              handleTableJoinAddColumns(i)
-                                            }
-                                          />
-                                        )}
-                                      {ind === join.conditions!.length - 1 &&
-                                        ind > 0 && (
-                                          <Button
-                                            danger
-                                            type="link"
-                                            size="small"
-                                            icon={<CloseOutlined />}
-                                            onClick={() =>
-                                              allowManage &&
-                                              handleDeleteConditions(i, ind)
-                                            }
-                                          />
-                                        )}
-                                    </Space>
-                                  </JoinConditionLine>
-                                );
-                              })}
-                            </JoinConditionWrapper>
-                          </>
-                        )}
-                      </ProcessItemContent>
-                      <ProcessItemAction>
+              <Form form={form} name="dynamic_rule">
+                <ProcessLine>
+                  <ProcessItem>
+                    <ProcessItemLabel>
+                      <Tooltip title={t('runStep')} placement="left">
                         <Button
-                          danger
-                          size="small"
-                          className="delete-item"
-                          icon={<DeleteOutlined />}
+                          className="run-fragment"
+                          icon={<CaretRightOutlined />}
                           onClick={() =>
-                            allowManage && handleDeleteJoinsItem(i)
+                            allowManage && handleInterimRunSql('MAIN')
                           }
                         />
-                      </ProcessItemAction>
-                    </ProcessItem>
-                  );
-                })}
-              </ProcessLine>
+                      </Tooltip>
+                      {t('main')}
+                    </ProcessItemLabel>
+                    <ProcessItemContent>
+                      <Space>
+                        <SelectDataSource
+                          type="MAIN"
+                          sourceId={sourceId}
+                          structure={structure}
+                          allowManage={allowManage}
+                          onChange={handleStructureChange}
+                        />
+                      </Space>
+                    </ProcessItemContent>
+                  </ProcessItem>
 
-              {!!structure.table.length && (
-                <>
-                  <Button
-                    type="link"
-                    className="join"
-                    icon={<PlusOutlined />}
-                    onClick={allowManage ? handleAddTableJoin : undefined}
-                  >
-                    {t('addJoin')}
-                  </Button>
-                  <Button
-                    type="primary"
-                    className="run"
-                    icon={<CaretRightOutlined />}
-                    onClick={() => handleInterimRunSql()}
-                  >
-                    {t('run')}
-                  </Button>
-                </>
-              )}
+                  {structure.joins.map((join, i) => {
+                    return (
+                      <ProcessItem>
+                        <ProcessItemLabel>
+                          <Tooltip title={t('runStep')} placement="left">
+                            <Button
+                              className="run-fragment"
+                              icon={<CaretRightOutlined />}
+                              onClick={() =>
+                                allowManage && handleInterimRunSql('JOINS', i)
+                              }
+                            />
+                          </Tooltip>
+                          {t('join')}
+                        </ProcessItemLabel>
+                        <ProcessItemContent>
+                          <TableRelation>
+                            <SelectDataSource
+                              joinTable={join}
+                              structure={structure}
+                              allowManage={allowManage}
+                              renderType="READONLY"
+                            />
+                            <SelectJoinType
+                              type={join.joinType!}
+                              onChange={type => {
+                                allowManage && handleTableJoinType(type, i);
+                              }}
+                            />
+                            <SelectDataSource
+                              type="JOINS"
+                              joinTable={join}
+                              sourceId={sourceId}
+                              structure={structure}
+                              allowManage={allowManage}
+                              onChange={(table, type) =>
+                                handleTableJoin(table, type, i)
+                              }
+                            />
+                          </TableRelation>
+                          {join.table && (
+                            <>
+                              <SelectJoinColumnLabel>
+                                {t('selectJoinColumn')}
+                              </SelectJoinColumnLabel>
+                              <JoinConditionWrapper>
+                                {join.conditions?.map(
+                                  ({ left, right }, ind) => {
+                                    return (
+                                      <JoinConditionLine>
+                                        <SelectJoinColumns
+                                          structure={structure}
+                                          joinTable={join}
+                                          onChange={(
+                                            columnName,
+                                            type,
+                                            joinConditionIndex,
+                                          ) =>
+                                            handleTableJoinColumns(
+                                              columnName,
+                                              type,
+                                              i,
+                                              joinConditionIndex,
+                                            )
+                                          }
+                                          conditionsIndex={ind}
+                                          joinIndex={i}
+                                          sourceId={sourceId}
+                                          allowManage={allowManage}
+                                        />
+                                        <Space className="action">
+                                          {!!left.length &&
+                                            !!right.length &&
+                                            ind ===
+                                              join.conditions!.length - 1 && (
+                                              <Button
+                                                type="link"
+                                                size="small"
+                                                icon={<PlusOutlined />}
+                                                onClick={() =>
+                                                  allowManage &&
+                                                  handleTableJoinAddColumns(i)
+                                                }
+                                              />
+                                            )}
+                                          {ind ===
+                                            join.conditions!.length - 1 &&
+                                            ind > 0 && (
+                                              <Button
+                                                danger
+                                                type="link"
+                                                size="small"
+                                                icon={<CloseOutlined />}
+                                                onClick={() =>
+                                                  allowManage &&
+                                                  handleDeleteConditions(i, ind)
+                                                }
+                                              />
+                                            )}
+                                        </Space>
+                                      </JoinConditionLine>
+                                    );
+                                  },
+                                )}
+                              </JoinConditionWrapper>
+                            </>
+                          )}
+                        </ProcessItemContent>
+                        <ProcessItemAction>
+                          <Button
+                            danger
+                            size="small"
+                            className="delete-item"
+                            icon={<DeleteOutlined />}
+                            onClick={() =>
+                              allowManage && handleDeleteJoinsItem(i)
+                            }
+                          />
+                        </ProcessItemAction>
+                      </ProcessItem>
+                    );
+                  })}
+                </ProcessLine>
+
+                {!!structure.table.length && (
+                  <>
+                    <Button
+                      disabled={
+                        !!structure.joins.length &&
+                        !structure.joins[structure.joins.length - 1]?.table
+                      }
+                      type="link"
+                      className="join"
+                      icon={<PlusOutlined />}
+                      onClick={allowManage ? handleAddTableJoin : undefined}
+                    >
+                      {t('addJoin')}
+                    </Button>
+                    <Button
+                      type="primary"
+                      className="run"
+                      icon={<CaretRightOutlined />}
+                      onClick={() => handleInterimRunSql()}
+                    >
+                      {t('run')}
+                    </Button>
+                  </>
+                )}
+              </Form>
             </ConfigPanel>
           </>
         )}

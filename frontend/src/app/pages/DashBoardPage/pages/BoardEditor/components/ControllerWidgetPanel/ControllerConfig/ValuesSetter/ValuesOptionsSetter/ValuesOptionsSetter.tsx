@@ -18,10 +18,7 @@
 
 import { Form, FormInstance, Radio, Select, Space } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
-import {
-  ChartDataViewFieldCategory,
-  ControllerFacadeTypes,
-} from 'app/constants';
+import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
@@ -32,12 +29,12 @@ import {
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
+import { hasAggregationFunction } from 'app/utils/chartHelper';
 import { getDistinctFields } from 'app/utils/fetch';
 import { transformMeta } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components/macro';
 import { request2 } from 'utils/request';
-import { errorHandle } from 'utils/utils';
 import { ControllerConfig } from '../../../types';
 import { AssistViewFields } from './AssistViewFields';
 import { CustomOptions } from './CustomOptions';
@@ -74,37 +71,36 @@ const ValuesOptionsSetter: FC<{
   }, []);
   const getViewOption = useCallback(async (viewId: string) => {
     if (!viewId) return { option: [], dataView: undefined };
-    try {
-      let { data } = await request2<View>(`/views/${viewId}`);
-      if (data) {
-        data = migrationViewConfig(data);
-      }
-      if (data?.model) {
-        data.model = beginViewModelMigration(data.model, data.type);
-      }
-      let meta = transformMeta(data?.model);
-      //TODO: Support after beta4
-      // const viewComputerField = JSON.parse(data.model)?.computedFields || [];
-
-      if (!meta) return { option: [], dataView: undefined };
-      const option: CascaderOptionType[] = meta
-        // .concat(viewComputerField)
-        .map(item => {
-          const fieldName =
-            item.category === ChartDataViewFieldCategory.ComputedField
-              ? item.id
-              : item.name;
-          return {
-            value: fieldName,
-            label: fieldName,
-          };
-        });
-
-      return { option, dataView: { ...data, meta } };
-    } catch (error) {
-      errorHandle(error);
+    let { data } = await request2<View>(`/views/${viewId}`);
+    if (!data) {
       return { option: [], data: undefined };
     }
+    if (data) {
+      data = migrationViewConfig(data);
+    }
+    if (data?.model) {
+      data.model = beginViewModelMigration(data.model, data.type);
+    }
+    let meta = transformMeta(data?.model);
+    const viewComputedField =
+      JSON.parse(data.model || '{}')?.computedFields?.filter(
+        field => !hasAggregationFunction(field?.expression),
+      ) || [];
+
+    if (!meta) return { option: [], dataView: undefined };
+    const option: CascaderOptionType[] = meta
+      .concat(viewComputedField)
+      .map(item => {
+        return {
+          value: item.name,
+          label: item.name,
+        };
+      });
+
+    return {
+      option,
+      dataView: { ...data, meta, computedFields: viewComputedField },
+    };
   }, []);
   const onTargetKeyChange = useCallback(
     nextTargetKeys => {
@@ -291,7 +287,7 @@ const ValuesOptionsSetter: FC<{
                     >
                       {optionValues.map(item => (
                         <Select.Option
-                          key={item.key + item.label}
+                          key={String(item.key) + String(item.label)}
                           value={item.key}
                         >
                           <div

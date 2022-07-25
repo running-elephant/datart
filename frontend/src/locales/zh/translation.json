@@ -824,6 +824,7 @@
           "title": "跳转设置",
           "rule": {
             "title": "规则设置",
+            "tip": "分享页仅支持跳转到URL一种方式",
             "addRule": "+ 点击新建",
             "inputUrl": "请输入URL",
             "header": {
@@ -1112,7 +1113,9 @@
         "storyName": "名称",
         "storyDescription": "描述",
         "format": "格式",
-        "interval": "间隔"
+        "interval": "间隔",
+        "requiredWidgetName": "组件名称不允许为空，请修改",
+        "duplicateWidgetName": "组件名称重复，请修改"
       }
     },
     "widget": {
@@ -1307,6 +1310,7 @@
     "detail": "查看详情",
     "warningDescription": "Datart 默认使用 calcite 解析 SQL 语句；calcite 拥有的非常棒的语法解析器，但依然做不到解析所有数据库的所有语法。当发生解析异常时，datart 对 SQL 语句进行必要的处理之后仍然会发送到数据库执行，如果可以执行成功，我们会认为解析器需要针对该条 SQL 语句的语法进行优化。在这种情况下，datart 会显示该警告信息，方便用户将解析异常的语句提交到 github 或 gitee issue，帮助我们优化解析器。",
     "close": "关闭",
+    "computedFieldNameExistWarning": "计算字段名称已经存在，请重新输入",
     "tabs": {
       "discard": "放弃",
       "cancel": "取消",
@@ -1654,6 +1658,7 @@
       "searchValue": "搜索名称关键字"
     },
     "saveToDashOrStory": {
+      "createDashboard": "新建仪表板",
       "searchValue": "搜索名称关键字",
       "haveCharts": "仪表板中已有该图表，不能重复添加"
     }

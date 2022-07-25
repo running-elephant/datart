@@ -15,17 +15,17 @@ const {
 const rewireEntries = [
   {
     name: 'shareChart',
-    entry: path.resolve(__dirname, './src/shareChart.tsx'),
+    entry: path.resolve(__dirname, './src/shareChart.entry.ts'),
     outPath: 'shareChart.html',
   },
   {
     name: 'shareDashboard',
-    entry: path.resolve(__dirname, './src/shareDashboard.tsx'),
+    entry: path.resolve(__dirname, './src/shareDashboard.entry.ts'),
     outPath: 'shareDashboard.html',
   },
   {
     name: 'shareStoryPlayer',
-    entry: path.resolve(__dirname, './src/shareStoryPlayer.tsx'),
+    entry: path.resolve(__dirname, './src/shareStoryPlayer.entry.ts'),
     outPath: 'shareStoryPlayer.html',
   },
 ];

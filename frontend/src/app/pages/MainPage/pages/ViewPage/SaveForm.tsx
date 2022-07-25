@@ -234,7 +234,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
               label={t('cacheExpires')}
               initialValue={0}
             >
-              <InputNumber disabled={!cache} />
+              <InputNumber disabled={!cache} min={0} />
             </Form.Item>
             <Form.Item
               wrapperCol={{ span: 13, offset: 9 }}

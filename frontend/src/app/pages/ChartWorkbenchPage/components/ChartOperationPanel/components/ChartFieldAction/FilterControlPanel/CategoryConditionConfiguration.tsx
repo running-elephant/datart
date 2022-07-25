@@ -98,7 +98,7 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
     return values || [];
   });
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
-  const [isTree, setIsTree] = useState(isTreeModel(condition?.value));
+  const [isTree] = useState(isTreeModel(condition?.value));
   const [treeOptions, setTreeOptions] = useState<string[]>([]);
   const [listDatas, setListDatas] = useState<RelationFilterValue[]>([]);
   const [treeDatas, setTreeDatas] = useState<RelationFilterValue[]>([]);
@@ -244,45 +244,6 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
     }));
   };
 
-  const convertToTree = (collection, selectedKeys) => {
-    const associateField = treeOptions?.[0];
-    const labelField = treeOptions?.[1];
-
-    if (!associateField || !labelField) {
-      return [];
-    }
-
-    const associateKeys = Array.from(
-      new Set(collection?.map(c => c[associateField])),
-    );
-    const treeNodes = associateKeys
-      .map(key => {
-        const associateItem = collection?.find(c => c[colName] === key);
-        if (!associateItem) {
-          return null;
-        }
-        const associateChildren = collection
-          .filter(c => c[associateField] === key)
-          .map(c => {
-            const itemKey = c[labelField];
-            return {
-              key: itemKey,
-              label: itemKey,
-              isSelected: isChecked(selectedKeys, itemKey),
-            };
-          });
-        const itemKey = associateItem?.[colName];
-        return {
-          key: itemKey,
-          label: itemKey,
-          isSelected: isChecked(selectedKeys, itemKey),
-          children: associateChildren,
-        };
-      })
-      .filter(i => Boolean(i)) as RelationFilterValue[];
-    return treeNodes;
-  };
-
   const handleTabChange = (activeKey: string) => {
     const conditionType = +activeKey;
     setCurTab(conditionType);
@@ -325,7 +286,7 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
                   value={treeOptions?.[0]}
                   options={getDataOptionFields()?.map(f => ({
                     label: f.name,
-                    value: f.id,
+                    value: f.name,
                   }))}
                   onChange={value =>
                     handleTreeOptionChange(value, treeOptions?.[1])
@@ -336,7 +297,7 @@ const CategoryConditionConfiguration: ForwardRefRenderFunction<
                   value={treeOptions?.[1]}
                   options={getDataOptionFields()?.map(f => ({
                     label: f.name,
-                    value: f.id,
+                    value: f.name,
                   }))}
                   onChange={value =>
                     handleTreeOptionChange(treeOptions?.[0], value)

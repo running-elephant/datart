@@ -41,6 +41,7 @@ import {
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
+import { isNumber } from 'app/utils/number';
 import { DATARTSEPERATOR } from 'globalConstants';
 import { darken, getLuminance, lighten } from 'polished';
 import { Debugger } from 'utils/debugger';
@@ -405,7 +406,15 @@ class BasicTableChart extends ReactChart {
                   ? context?.translator?.('viz.palette.graph.summary') + ': '
                   : '') +
                 toFormattedValue(
-                  total.reduce((acc, cur) => acc + cur, 0),
+                  total.reduce((acc, cur) => {
+                    const num: number =
+                      !isNumber(cur) || isNaN(cur)
+                        ? typeof cur === 'string' && !isNaN(Number(cur))
+                          ? Number(cur)
+                          : 0
+                        : cur;
+                    return acc + num;
+                  }, 0),
                   currentSummaryField.format,
                 )
               );
@@ -754,13 +763,22 @@ class BasicTableChart extends ReactChart {
     };
   }
 
+  private setColumnWidthByColumnIndex(columns, index, width) {
+    columns.forEach(v => {
+      if (v?.columnIndex === index) {
+        v.width = width;
+        return;
+      }
+      if (v?.children && v?.children?.length) {
+        this.setColumnWidthByColumnIndex(v.children, index, width);
+      }
+    });
+  }
+
   private updateTableColumns(e, { size }, index) {
     const { columns } = this.cachedAntTableOptions;
     const nextColumns = [...columns];
-    nextColumns[index] = {
-      ...nextColumns[index],
-      width: size.width,
-    };
+    this.setColumnWidthByColumnIndex(nextColumns, index, size.width);
     const tableOptions = Object.assign(this.cachedAntTableOptions, {
       columns: nextColumns,
     });
@@ -880,6 +898,7 @@ class BasicTableChart extends ReactChart {
           uid: chartDataSet.getFieldKey(c),
         }),
         dataIndex: chartDataSet.getFieldIndex(c),
+        columnIndex: cIndex,
         key: chartDataSet.getFieldKey(c),
         aggregate: c?.aggregate,
         colName,
