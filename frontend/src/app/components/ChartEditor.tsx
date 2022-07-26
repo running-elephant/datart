@@ -451,9 +451,76 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     [clearDataConfig],
   );
 
+  const handleAllFieldConfig = function (
+    draft: any,
+    handleConfig: { (config: any): void },
+  ) {
+    let datas = draft?.datas || [];
+    datas.forEach(data => {
+      data?.rows?.forEach(config => {
+        handleConfig?.(config);
+      });
+    });
+  };
+
+  const clearAggregate = useCallback(draft => {
+    handleAllFieldConfig(draft, config => {
+      if (config.aggregate) {
+        config.oldAggregate = config.aggregate;
+        delete config.aggregate;
+      }
+      if (config.aggregateLimit) {
+        config.oldAggregateLimit = config.aggregateLimit;
+        delete config.aggregateLimit;
+      }
+    });
+  }, []);
+
+  const recoverAggregate = useCallback(draft => {
+    handleAllFieldConfig(draft, config => {
+      if (config.oldAggregate) {
+        config.aggregate = config.oldAggregate;
+        delete config.oldAggregate;
+      }
+      if (config.oldAggregateLimit) {
+        config.aggregateLimit = config.oldAggregateLimit;
+        delete config.oldAggregateLimit;
+      }
+    });
+  }, []);
+
   const handleAggregationState = useCallback(() => {
-    clearDataConfig();
-  }, [clearDataConfig]);
+    const newConfig = updateBy(chartConfig, draft => {
+      if (!aggregation) {
+        recoverAggregate(draft);
+      } else {
+        clearAggregate(draft);
+      }
+    });
+
+    dispatch(
+      actions.updateChartConfig({
+        type: ChartConfigReducerActionType.INIT,
+        payload: {
+          init: newConfig,
+        },
+      }),
+    );
+
+    handleChartConfigChange(ChartConfigReducerActionType.DATA, {
+      ancestors: [0],
+      value: newConfig?.datas?.[0],
+      needRefresh: true,
+    });
+  }, [
+    chartConfig,
+    aggregation,
+    handleChartConfigChange,
+    dispatch,
+    actions,
+    recoverAggregate,
+    clearAggregate,
+  ]);
 
   const buildDataChart = useCallback(() => {
     const dataChartConfig: DataChartConfig = {

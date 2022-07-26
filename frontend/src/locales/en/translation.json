@@ -499,7 +499,7 @@
         "saveToDashboard": "Save to dashboard",
         "login": "Login",
         "aggregationSwitch": "Aggregation",
-        "aggregationSwitchTip": "All chart configurations will be cleared before enabling/disabling data aggregation, continue?",
+        "aggregationSwitchTip": "All aggregation configurations will be reset before enabling/disabling data aggregation, continue?",
         "open": "Open",
         "close": "Close",
         "cancel": "Cancel",
