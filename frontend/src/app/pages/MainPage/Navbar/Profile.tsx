@@ -141,7 +141,7 @@ export function Profile({ visible, onCancel }: ModalProps) {
         <FormItem label={t('name')} name="name">
           <Input />
         </FormItem>
-        <FormItem label={t('department')} name="department">
+        <FormItem label={t('description')} name="description">
           <Input />
         </FormItem>
         <Form.Item wrapperCol={{ offset: 7, span: 12 }}>

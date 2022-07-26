@@ -170,7 +170,8 @@
           "username": "Username",
           "email": "Email",
           "name": "Name",
-          "department": "Department"
+          "department": "Department",
+          "description": "Description"
         },
         "changePassword": {
           "title": "Password",
