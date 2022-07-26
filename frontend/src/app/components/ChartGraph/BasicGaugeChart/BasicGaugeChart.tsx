@@ -23,6 +23,7 @@ import {
   ChartStyleConfig,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getColumnRenderName,
   getStyles,
@@ -66,13 +67,13 @@ class BasicGaugeChart extends Chart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (options.containerId === undefined || !context.document) {
       return;
     }
 
     this.chart = init(
-      context.document.getElementById(options.containerId),
+      context.document.getElementById(options.containerId)!,
       'default',
     );
     this.mouseEvents?.forEach(event => {
@@ -80,23 +81,23 @@ class BasicGaugeChart extends Chart {
     });
   }
 
-  onUpdated(props): void {
-    if (!props.dataset || !props.dataset.columns || !props.config) {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
+    if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
-    if (!this.isMatchRequirement(props.config)) {
+    if (!this.isMatchRequirement(options.config)) {
       this.chart?.clear();
       return;
     }
-    const newOptions = this.getOptions(props.dataset, props.config);
+    const newOptions = this.getOptions(options.dataset, options.config);
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {
+  onUnMount(options: BrokerOption, context: BrokerContext): void {
     this.chart?.dispose();
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext): void {
     this.chart?.resize(context);
   }
 

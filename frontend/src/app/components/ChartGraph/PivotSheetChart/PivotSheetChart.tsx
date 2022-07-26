@@ -39,6 +39,7 @@ import {
   SelectedItem,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   compareSelectedItems,
   getColumnRenderName,
@@ -82,7 +83,7 @@ class PivotSheetChart extends ReactChart {
     this.meta.requirements = [{}];
   }
 
-  onUpdated(options, context): void {
+  onUpdated(options: BrokerOption, context: BrokerContext): void {
     if (!this.isMatchRequirement(options.config)) {
       this.adapter?.unmount();
       return;
@@ -90,15 +91,15 @@ class PivotSheetChart extends ReactChart {
 
     this.updateOptions = this.getOptions(
       context,
-      options.dataset,
-      options.config,
-      options.drillOption,
+      options.dataset!,
+      options.config!,
+      options.drillOption!,
       options.selectedItems,
     );
     this.adapter?.updated(this.updateOptions);
   }
 
-  onResize(_, context) {
+  onResize(options: BrokerOption, context: BrokerContext) {
     if (this.updateOptions?.options) {
       this.updateOptions.options = Object.assign(
         {
@@ -110,7 +111,7 @@ class PivotSheetChart extends ReactChart {
     }
   }
 
-  onUnMount(options: any, context?: any): void {
+  onUnMount(options: BrokerOption, context: BrokerContext): void {
     this.lastRowsConfig = [];
     this.hierarchyCollapse = true;
     this.drillLevel = 0;

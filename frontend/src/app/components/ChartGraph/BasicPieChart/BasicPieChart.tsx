@@ -33,6 +33,7 @@ import ChartDataSetDTO, {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getChartSelection,
   getColumnRenderName,
@@ -70,7 +71,7 @@ class BasicPieChart extends Chart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (
       options.containerId === undefined ||
       !context.document ||
@@ -80,7 +81,7 @@ class BasicPieChart extends Chart {
     }
 
     this.chart = init(
-      context.document.getElementById(options.containerId),
+      context.document.getElementById(options.containerId)!,
       'default',
     );
     this.selection = getChartSelection(context.window, {
@@ -109,32 +110,35 @@ class BasicPieChart extends Chart {
     });
   }
 
-  onUpdated(props, context): void {
-    if (!props.dataset || !props.dataset.columns || !props.config) {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
+    if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
-    if (!this.isMatchRequirement(props.config)) {
+    if (!this.isMatchRequirement(options.config)) {
       this.chart?.clear();
       return;
     }
-    if (this.selection?.selectedItems.length && !props.selectedItems?.length) {
+    if (
+      this.selection?.selectedItems.length &&
+      !options.selectedItems?.length
+    ) {
       this.selection?.clearAll();
     }
     const newOptions = this.getOptions(
-      props.dataset,
-      props.config,
-      props.drillOption,
-      props.selectedItems,
+      options.dataset,
+      options.config,
+      options.drillOption,
+      options.selectedItems,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {
+  onUnMount(options: BrokerOption, context: BrokerContext) {
     this.selection?.removeEvent();
     this.chart?.dispose();
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext) {
     this.chart?.resize(context);
   }
 

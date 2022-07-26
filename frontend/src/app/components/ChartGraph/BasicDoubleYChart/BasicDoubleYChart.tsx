@@ -27,6 +27,7 @@ import {
   SeriesStyle,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getAxisLabel,
   getAxisLine,
@@ -64,13 +65,13 @@ class BasicDoubleYChart extends Chart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (options.containerId === undefined || !context.document) {
       return;
     }
 
     this.chart = init(
-      context.document.getElementById(options.containerId),
+      context.document.getElementById(options.containerId)!,
       'default',
     );
     this.mouseEvents?.forEach(event => {
@@ -78,24 +79,25 @@ class BasicDoubleYChart extends Chart {
     });
   }
 
-  onUpdated(props): void {
-    if (!props.dataset || !props.dataset.columns || !props.config) {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
+    if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
-    if (!this.isMatchRequirement(props.config)) {
+    if (!this.isMatchRequirement(options.config)) {
       return this.chart?.clear();
     }
-    const newOptions = this.getOptions(props.dataset, props.config);
+    const newOptions = this.getOptions(options.dataset, options.config);
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {
+  onUnMount(options: BrokerOption, context: BrokerContext) {
     this.chart?.dispose();
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext) {
     this.chart?.resize(context);
-    hadAxisLabelOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
+    hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
+      this.onUpdated(options, context);
   }
 
   private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {

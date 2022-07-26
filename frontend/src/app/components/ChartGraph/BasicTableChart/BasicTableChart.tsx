@@ -22,14 +22,13 @@ import ReactChart from 'app/models/ReactChart';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import {
   ChartConfig,
-  ChartContext,
   ChartDataSectionField,
-  ChartOptions,
   ChartStyleConfig,
   ChartStyleSectionGroup,
   SelectedItem,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   compareSelectedItems,
   getChartSelection,
@@ -108,7 +107,7 @@ class BasicTableChart extends ReactChart {
     ];
   }
 
-  onMount(options, context?) {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (
       options.containerId === undefined ||
       !context.document ||
@@ -124,7 +123,7 @@ class BasicTableChart extends ReactChart {
     );
   }
 
-  onUpdated(options: ChartOptions, context: ChartContext): void {
+  onUpdated(options: BrokerOption, context: BrokerContext): void {
     if (!this.isMatchRequirement(options.config)) {
       this.adapter?.unmount();
       return;
@@ -148,7 +147,7 @@ class BasicTableChart extends ReactChart {
         );
         // this.cachedAntTableOptions = Omit(tableOptions, ['dataSource']);
         this.cachedAntTableOptions = Omit(tableOptions, []);
-        this.cachedDatartConfig = options.config;
+        this.cachedDatartConfig = options.config!;
         this.cacheContext = context;
         this.adapter?.updated(tableOptions, context);
       },
@@ -156,7 +155,7 @@ class BasicTableChart extends ReactChart {
     );
   }
 
-  public onUnMount(options, context?): void {
+  public onUnMount(options: BrokerOption, context: BrokerContext) {
     this.cachedAntTableOptions = {};
     this.cachedDatartConfig = {};
     this.cacheContext = null;
@@ -164,12 +163,12 @@ class BasicTableChart extends ReactChart {
     this.selection?.removeEvent();
   }
 
-  public onResize(options, context?): void {
+  public onResize(options: BrokerOption, context: BrokerContext) {
     const columns = this.getDataColumnWidths(
-      options.config,
-      options.dataset,
+      options.config!,
+      options.dataset!,
       context,
-      options.widgetSpecialConfig,
+      options.widgetSpecialConfig as any,
     );
     const tableOptions = Object.assign(
       this.cachedAntTableOptions,
@@ -186,7 +185,7 @@ class BasicTableChart extends ReactChart {
   }
 
   protected getOptions(
-    context: ChartContext,
+    context: BrokerContext,
     dataset?: ChartDataSetDTO,
     config?: ChartConfig,
     widgetSpecialConfig?: any,
@@ -221,7 +220,7 @@ class BasicTableChart extends ReactChart {
       (a, b) => a + (b.columnWidthValue || 0),
       0,
     );
-    this.exceedMaxContent = this.totalWidth >= context.width;
+    this.exceedMaxContent = this.totalWidth >= context.width!;
     const tablePagination = this.getPagingOptions(
       settingConfigs,
       dataset?.pageInfo,
@@ -355,7 +354,7 @@ class BasicTableChart extends ReactChart {
     chartDataSet: IChartDataSet<string>,
     tableColumns: TableColumnsList[],
     aggregateConfigs: ChartDataSectionField[],
-    context: ChartContext,
+    context: BrokerContext,
   ): ((value) => { summarys: Array<string | null> }) | undefined {
     const [aggregateFields] = getStyles(
       settingConfigs,
@@ -389,7 +388,8 @@ class BasicTableChart extends ReactChart {
       [],
     );
 
-    return (_): { summarys: Array<string | null> } => {
+    // TODO(Stephen): @tianlei please check the warning message on this `summarys`
+    return (_): { summarys: any } => {
       return {
         summarys: flatHeaderColumns
           .map(c => c.key)
@@ -432,7 +432,7 @@ class BasicTableChart extends ReactChart {
     mixedSectionConfigRows: ChartDataSectionField[],
     chartDataSet: IChartDataSet<string>,
     styleConfigs: ChartStyleConfig[],
-    context: ChartContext,
+    context: BrokerContext,
     settingConfigs: ChartStyleConfig[],
   ): {
     [x: string]: {
@@ -489,14 +489,14 @@ class BasicTableChart extends ReactChart {
       this.tableCellBorder * 2;
     const rowNumberUniqKeyHeaderWidth = this.getTextWidth(
       context,
-      context?.translator?.('viz.palette.graph.number'),
+      context?.translator?.('viz.palette.graph.number') || '',
       headerFont?.fontWeight,
       headerFont?.fontSize,
       headerFont?.fontFamily,
     );
     const rowSummaryWidth = this.getTextWidth(
       context,
-      context?.translator?.('viz.palette.graph.summary'),
+      context?.translator?.('viz.palette.graph.summary') || '',
       summaryFont?.fontWeight,
       summaryFont?.fontSize,
       summaryFont?.fontFamily,
@@ -790,7 +790,7 @@ class BasicTableChart extends ReactChart {
     styleConfigs: ChartStyleConfig[],
     settingConfigs: ChartStyleConfig[],
     chartDataSet: IChartDataSet<string>,
-    context: ChartContext,
+    context: BrokerContext,
     widgetSpecialConfig: { env: string | undefined; [x: string]: any },
   ): TableColumnsList[] {
     const [enableRowNumber, leftFixedColumns, rightFixedColumns] = getStyles(
@@ -1111,7 +1111,7 @@ class BasicTableChart extends ReactChart {
   protected getAntdTableStyleOptions(
     styleConfigs?: ChartStyleConfig[],
     settingConfigs?: ChartStyleConfig[],
-    context?: ChartContext,
+    context?: BrokerContext,
   ): TableStyleOptions {
     const [enablePaging] = getStyles(
       settingConfigs || [],
@@ -1338,7 +1338,7 @@ class BasicTableChart extends ReactChart {
   }
 
   private getTextWidth = (
-    context: ChartContext,
+    context: BrokerContext,
     text: string,
     fontWeight: string,
     fontSize: string,
@@ -1346,7 +1346,7 @@ class BasicTableChart extends ReactChart {
   ): number => {
     const canvas =
       this.utilCanvas ||
-      (this.utilCanvas = context.document.createElement('canvas'));
+      (this.utilCanvas = context.document?.createElement('canvas'));
     const measureLayer = canvas.getContext('2d');
     measureLayer.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
     const metrics = measureLayer.measureText(text);
