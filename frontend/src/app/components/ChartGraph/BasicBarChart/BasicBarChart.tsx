@@ -18,7 +18,7 @@
 
 import { ChartDataSectionType } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
-import { ChartSelectedItemManager } from 'app/models/ChartSelectedItemManager';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import { IChartLifecycle } from 'app/types/Chart';
 import {
   ChartConfig,
@@ -62,7 +62,7 @@ import { BarBorderStyle, BarSeriesImpl, Series } from './types';
 class BasicBarChart extends Chart implements IChartLifecycle {
   config = Config;
   chart: any = null;
-  selectionManager?: ChartSelectedItemManager;
+  selectionManager?: ChartSelectionManager;
 
   protected isHorizonDisplay = false;
   protected isStackMode = false;
@@ -108,7 +108,7 @@ class BasicBarChart extends Chart implements IChartLifecycle {
       'default',
     );
 
-    this.selectionManager = new ChartSelectedItemManager(this.mouseEvents);
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
     this.selectionManager.attachWindowListeners(context.window);
     this.selectionManager.attachZRenderListeners(this.chart);
     this.selectionManager.attachEChartsListeners(this.chart);

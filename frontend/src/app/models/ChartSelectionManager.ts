@@ -23,7 +23,7 @@ import { EChartsType } from 'echarts';
 import { KEYBOARD_EVENT_NAME } from 'globalConstants';
 import { isEmptyArray } from 'utils/object';
 
-export class ChartSelectedItemManager {
+export class ChartSelectionManager {
   private _selectedItems: Array<SelectedItem> = [];
   private _multipleSelect: boolean = false;
   private _clickCallbacks: Function[] = [];
@@ -41,21 +41,13 @@ export class ChartSelectedItemManager {
     return this._multipleSelect;
   }
 
-  public updateSelectedItems(items?) {
+  public updateSelectedItems(items?: SelectedItem[]) {
     this._selectedItems = items || [];
   }
 
   public attachWindowListeners(window: Window) {
     window?.addEventListener('keydown', this.windowKeyEventHandler.bind(this));
     window?.addEventListener('keyup', this.windowKeyEventHandler.bind(this));
-  }
-
-  public attachZRenderListeners(chart: EChartsType) {
-    chart?.getZr().on('click', this.zRenderMouseEventHandler.bind(this));
-  }
-
-  public attachEChartsListeners(chart: EChartsType) {
-    chart?.on('click', this.echartsClickEventHandler.bind(this));
   }
 
   public removeWindowListeners(window: Window) {
@@ -66,8 +58,16 @@ export class ChartSelectedItemManager {
     window?.removeEventListener('keyup', this.windowKeyEventHandler.bind(this));
   }
 
+  public attachZRenderListeners(chart: EChartsType) {
+    chart?.getZr().on('click', this.zRenderMouseEventHandler.bind(this));
+  }
+
   public removeZRenderListeners(chart: EChartsType) {
     chart?.getZr().off('click', this.zRenderMouseEventHandler.bind(this));
+  }
+
+  public attachEChartsListeners(chart: EChartsType) {
+    chart?.on('click', this.echartsClickEventHandler.bind(this));
   }
 
   private zRenderMouseEventHandler(e: Event) {
@@ -99,7 +99,11 @@ export class ChartSelectedItemManager {
     }
   }
 
-  private echartsClickEventHandler(params) {
+  private echartsClickEventHandler(params: {
+    componentIndex: string | number;
+    dataIndex: string | number;
+    data: any;
+  }) {
     const item = {
       index: params.componentIndex + ',' + params.dataIndex,
       data: params.data,
