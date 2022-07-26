@@ -87,7 +87,7 @@ export class ChartSelection implements IChartSelection {
     );
   }
 
-  public setOptions(options: ChartSelectionOptions) {
+  private setOptions(options: ChartSelectionOptions) {
     this.options = options;
     this.options.chart
       .getZr()

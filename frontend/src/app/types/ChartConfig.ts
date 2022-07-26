@@ -423,7 +423,7 @@ export interface GridStyle {
 }
 
 export interface SelectedItem {
-  index: string | number;
+  index: string;
   data: {
     rowData: {
       [p: string]: any;

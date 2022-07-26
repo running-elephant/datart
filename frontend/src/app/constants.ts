@@ -258,3 +258,9 @@ export enum AuthorizationStatus {
   Success = 'success',
   Error = 'error',
 }
+
+export enum ChartInteractionEvent {
+  Select = 'select',
+  UnSelect = 'unSelect',
+  Drill = 'drill',
+}

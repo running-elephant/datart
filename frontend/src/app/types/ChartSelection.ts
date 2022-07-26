@@ -31,5 +31,4 @@ export interface IChartSelection {
   clearAll: () => void;
   removeEvent: () => void;
   addEvent: () => void;
-  setOptions: (options: ChartSelectionOptions) => void;
 }
