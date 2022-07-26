@@ -18,6 +18,7 @@
 
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { ChartConfig } from './ChartConfig';
+import { BrokerContext, BrokerOption } from './ChartLifecycleBroker';
 import ChartMetadata from './ChartMetadata';
 
 export type ChartStatus =
@@ -87,41 +88,41 @@ export interface IChartLifecycle {
    * Mount event with params `option` and `context`
    *
    * @abstract
-   * @param {*} options
-   * @param {*} [context]
+   * @param {BrokerOption} options
+   * @param {BrokerContext} context
    * @memberof DatartChartBase
    */
-  onMount(options, context?): void;
+  onMount(options: BrokerOption, context: BrokerContext): void;
 
   /**
    * Update event with params `option` and `context`
    *
    * @abstract
-   * @param {*} options
-   * @param {*} [context]
+   * @param {BrokerOption} options
+   * @param {BrokerContext} context
    * @memberof DatartChartBase
    */
-  onUpdated(options, context?): void;
+  onUpdated(options: BrokerOption, context: BrokerContext): void;
 
   /**
    * UnMount event with params `option` and `context`
    *
    * @abstract
-   * @param {*} options
-   * @param {*} [context]
+   * @param {BrokerOption} options
+   * @param {BrokerContext} context
    * @memberof DatartChartBase
    */
-  onUnMount(options, context?): void;
+  onUnMount(options: BrokerOption, context: BrokerContext): void;
 
   /**
    * Resize event with params `option` and `context`
    *
    * @abstract
-   * @param {*} options
-   * @param {*} [context]
+   * @param {BrokerOption} options
+   * @param {BrokerContext} context
    * @memberof DatartChartBase
    */
-  onResize(options, context?): void;
+  onResize(options: BrokerOption, context: BrokerContext): void;
 }
 
 export interface IChart extends IChartLifecycle {

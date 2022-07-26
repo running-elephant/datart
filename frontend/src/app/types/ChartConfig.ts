@@ -31,7 +31,6 @@ import {
   SortActionType,
 } from 'app/constants';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
-import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   FilterSqlOperator,
   NumberUnitKey,
@@ -39,7 +38,6 @@ import {
   RUNTIME_FILTER_KEY,
 } from 'globalConstants';
 import { ValueOf } from 'types';
-import { IChartDrillOption } from './ChartDrillOption';
 
 export type FilterFieldAction = {
   condition?: FilterCondition;
@@ -274,22 +272,6 @@ export type ChartConfig = {
   interactions?: ChartStyleConfig[];
   i18ns?: ChartI18NSectionConfig[];
 };
-
-export interface ChartOptions {
-  config: ChartConfig;
-  dataset: ChartDataSetDTO;
-  widgetSpecialConfig: { env: string | undefined; [x: string]: any };
-  drillOption?: IChartDrillOption;
-  selectedItems?: SelectedItem[];
-}
-
-export interface ChartContext {
-  document: Document;
-  height: number;
-  width: number;
-  translator: (key: string, disablePrefix?: boolean, options?: any) => any;
-  window: Window;
-}
 
 export interface LineStyle {
   color: string;

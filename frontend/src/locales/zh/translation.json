@@ -170,7 +170,8 @@
           "username": "用户名",
           "email": "邮箱",
           "name": "姓名",
-          "department": "部门"
+          "department": "部门",
+          "description": "描述"
         },
         "changePassword": {
           "title": "修改密码",

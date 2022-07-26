@@ -32,6 +32,7 @@ import ChartDataSetDTO, {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getAutoFunnelTopPosition,
   getChartSelection,
@@ -71,7 +72,7 @@ class BasicFunnelChart extends Chart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (
       options.containerId === undefined ||
       !context.document ||
@@ -81,7 +82,7 @@ class BasicFunnelChart extends Chart {
     }
 
     this.chart = init(
-      context.document.getElementById(options.containerId),
+      context.document.getElementById(options.containerId)!,
       'default',
     );
     this.selection = getChartSelection(context.window, {
@@ -110,7 +111,7 @@ class BasicFunnelChart extends Chart {
     });
   }
 
-  onUpdated(options, context): void {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
     if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
@@ -134,12 +135,12 @@ class BasicFunnelChart extends Chart {
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {
+  onUnMount(options: BrokerOption, context: BrokerContext) {
     this.selection?.removeEvent();
     this.chart?.dispose();
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext): void {
     this.chart?.resize({ width: context?.width, height: context?.height });
   }
 

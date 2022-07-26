@@ -21,12 +21,12 @@ import Chart from 'app/models/Chart';
 import { ChartSelection } from 'app/models/ChartSelection';
 import {
   ChartConfig,
-  ChartContext,
   ChartDataSectionField,
   ChartStyleConfig,
   SelectedItem,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getChartSelection,
   getDataColumnMaxAndMin2,
@@ -89,7 +89,7 @@ class BasicOutlineMapChart extends Chart {
     geoConfig.zoom = newOption?.geo?.[0].zoom;
   }
 
-  onMount(options, context?) {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (
       options.containerId === undefined ||
       !context.document ||
@@ -130,33 +130,36 @@ class BasicOutlineMapChart extends Chart {
     });
   }
 
-  onUpdated(props, context?: ChartContext): void {
-    if (!props.dataset || !props.dataset.columns || !props.config) {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
+    if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
-    if (!this.isMatchRequirement(props.config)) {
+    if (!this.isMatchRequirement(options.config)) {
       this.chart?.clear();
       return;
     }
-    if (this.selection?.selectedItems.length && !props.selectedItems?.length) {
+    if (
+      this.selection?.selectedItems.length &&
+      !options.selectedItems?.length
+    ) {
       this.selection?.clearAll();
     }
     const newOptions = this.getOptions(
-      props.dataset,
-      props.config,
-      props.selectedItems,
+      options.dataset,
+      options.config,
+      options.selectedItems,
       context,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext) {
     this.chart?.resize({ width: context?.width, height: context?.height });
     hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
-      this.onUpdated(opt, context);
+      this.onUpdated(options, context);
   }
 
-  onUnMount(options, context?) {
+  onUnMount(options: BrokerOption, context: BrokerContext) {
     this.container?.removeEventListener('mouseup', () =>
       this.getOptionsConfig(this.geoConfig, this.chart),
     );
@@ -168,7 +171,7 @@ class BasicOutlineMapChart extends Chart {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     selectedItems?: SelectedItem[],
-    context?: ChartContext,
+    context?: BrokerContext,
   ): MapOption {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -234,7 +237,7 @@ class BasicOutlineMapChart extends Chart {
     };
   }
 
-  private getToolbox(styles: ChartStyleConfig[], context?: ChartContext) {
+  private getToolbox(styles: ChartStyleConfig[], context?: BrokerContext) {
     return {
       show: true,
       orient: 'vertical',
@@ -243,7 +246,7 @@ class BasicOutlineMapChart extends Chart {
       feature: {
         myResetZoom: {
           show: true,
-          title: context?.translator('common.reset'),
+          title: context?.translator?.('common.reset'),
           onclick: () => {
             this.geoConfig = {
               center: undefined,
@@ -259,7 +262,7 @@ class BasicOutlineMapChart extends Chart {
         },
         myZoomIn: {
           show: true,
-          title: context?.translator('common.zoomIn'),
+          title: context?.translator?.('common.zoomIn'),
           onclick: () => {
             this.geoConfig = {
               center: this.geoConfig.center,
@@ -275,7 +278,7 @@ class BasicOutlineMapChart extends Chart {
         },
         myZoomOut: {
           show: true,
-          title: context?.translator('common.zoomOut'),
+          title: context?.translator?.('common.zoomOut'),
           onclick: () => {
             this.geoConfig = {
               center: this.geoConfig.center,

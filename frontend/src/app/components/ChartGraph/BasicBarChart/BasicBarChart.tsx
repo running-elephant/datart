@@ -19,6 +19,7 @@
 import { ChartDataSectionType } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import { ChartSelection } from 'app/models/ChartSelection';
+import { IChartLifecycle } from 'app/types/Chart';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -32,6 +33,7 @@ import {
   YAxis,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getChartSelection,
   getColorizeGroupSeriesColumns,
@@ -58,7 +60,7 @@ import { ChartRequirement } from '../../../types/ChartMetadata';
 import Config from './config';
 import { BarBorderStyle, BarSeriesImpl, Series } from './types';
 
-class BasicBarChart extends Chart {
+class BasicBarChart extends Chart implements IChartLifecycle {
   config = Config;
   chart: any = null;
 
@@ -93,7 +95,7 @@ class BasicBarChart extends Chart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (
       options.containerId === undefined ||
       !context.document ||
@@ -103,7 +105,7 @@ class BasicBarChart extends Chart {
     }
 
     this.chart = init(
-      context.document.getElementById(options.containerId),
+      context.document.getElementById(options.containerId)!,
       'default',
     );
     this.selection = getChartSelection(context.window, {
@@ -138,7 +140,7 @@ class BasicBarChart extends Chart {
     });
   }
 
-  onUpdated(options, context): void {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
     if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
@@ -162,15 +164,15 @@ class BasicBarChart extends Chart {
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {
+  onUnMount(options: BrokerOption, context: BrokerContext) {
     this.selection?.removeEvent();
     this.chart?.dispose();
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext) {
     this.chart?.resize({ width: context?.width, height: context?.height });
     hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
-      this.onUpdated(opt, context);
+      this.onUpdated(options, context);
   }
 
   getOptions(
