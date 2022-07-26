@@ -33,3 +33,7 @@ jobs:
       working-directory: ./frontend
     - run: npm run test:ci
       working-directory: ./frontend
+    - run: npm run lint:css
+      working-directory: ./frontend
+    - run: npm run lint:style
+      working-directory: ./frontend
