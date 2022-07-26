@@ -18,7 +18,7 @@
 
 import { ChartDataSectionType } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
-import { ChartSelection } from 'app/models/ChartSelection';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -37,7 +37,6 @@ import {
   getAxisLabel,
   getAxisLine,
   getAxisTick,
-  getChartSelection,
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getDrillableRows,
@@ -64,8 +63,7 @@ import { Series } from './types';
 class BasicLineChart extends Chart {
   config = Config;
   chart: any = null;
-
-  private selection: null | ChartSelection = null;
+  selectionManager?: ChartSelectionManager;
 
   protected isArea = false;
   protected isStack = false;
@@ -104,35 +102,15 @@ class BasicLineChart extends Chart {
       context.document.getElementById(options.containerId)!,
       'default',
     );
-    this.selection = getChartSelection(context.window, {
-      chart: this.chart,
-      mouseEvents: this.mouseEvents,
-    });
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
+    this.selectionManager.attachWindowListeners(context.window);
+    this.selectionManager.attachZRenderListeners(this.chart);
+    this.selectionManager.attachEChartsListeners(this.chart);
     this.chart.on('datazoom', ({ end, start }) => {
       this.dataZoomConfig.showConfig = {
         end,
         start,
       };
-    });
-    this.mouseEvents?.forEach(event => {
-      switch (event.name) {
-        case 'click':
-          this.chart.on(event.name, params => {
-            this.selection?.doSelect({
-              index: params.componentIndex + ',' + params.dataIndex,
-              data: params.data,
-            });
-            event.callback({
-              ...params,
-              interactionType: 'select',
-              selectedItems: this.selection?.selectedItems,
-            });
-          });
-          break;
-        default:
-          this.chart.on(event.name, event.callback);
-          break;
-      }
     });
   }
 
@@ -144,12 +122,7 @@ class BasicLineChart extends Chart {
       this.chart?.clear();
       return;
     }
-    if (
-      this.selection?.selectedItems.length &&
-      !options.selectedItems?.length
-    ) {
-      this.selection?.clearAll();
-    }
+    this.selectionManager?.updateSelectedItems(options?.selectedItems);
     const newOptions = this.getOptions(
       options.dataset,
       options.config,
@@ -166,7 +139,8 @@ class BasicLineChart extends Chart {
   }
 
   onUnMount(options: BrokerOption, context: BrokerContext) {
-    this.selection?.removeEvent();
+    this.selectionManager?.removeWindowListeners(context.window);
+    this.selectionManager?.removeZRenderListeners(this.chart);
     this.chart?.dispose();
   }
 
