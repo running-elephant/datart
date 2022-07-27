@@ -31,7 +31,7 @@ export const tablePagingAndSortEventListener = (
   ) {
     callback?.({
       sorter: {
-        column: param?.seriesName!,
+        column: param?.seriesName,
         operator: param?.value?.direction,
         aggOperator: param?.value?.aggOperator,
       },
