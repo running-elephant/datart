@@ -18,11 +18,7 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
-import {
-  ChartInteractionEvent,
-  DownloadFileType,
-  RUNTIME_DATE_LEVEL_KEY,
-} from 'app/constants';
+import { DownloadFileType, RUNTIME_DATE_LEVEL_KEY } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
@@ -56,6 +52,7 @@ import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
+  chartSelectionEventListener,
   pivotTableDrillEventListener,
   richTextContextEventListener,
   tablePagingAndSortEventListener,
@@ -265,10 +262,9 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             pivotTableDrillEventListener(param, p => {
               handleDrillOptionChange(p);
             });
-            // NOTE 直接修改selectedItems结果集处理方法
-            if (param.interactionType === ChartInteractionEvent.Select) {
-              dispatch(actions.changeSelectedItems(param.selectedItems));
-            }
+            chartSelectionEventListener(param, p => {
+              dispatch(actions.changeSelectedItems(p));
+            });
           },
         },
       ]);

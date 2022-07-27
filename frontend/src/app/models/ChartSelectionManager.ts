@@ -74,7 +74,7 @@ export class ChartSelectionManager {
     if (!e.target && !isEmptyArray(this._selectedItems)) {
       this._clickCallbacks.forEach(cb => {
         cb?.({
-          interactionType: ChartInteractionEvent.Select, // TODO(Stephen): should refactor to UnSelect event
+          interactionType: ChartInteractionEvent.UnSelect,
           selectedItems: [],
         });
       });

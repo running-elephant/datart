@@ -23,7 +23,6 @@ import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
 import { VizHeader } from 'app/components/VizHeader';
-import { ChartInteractionEvent } from 'app/constants';
 import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import useChartInteractions from 'app/hooks/useChartInteractions';
@@ -39,6 +38,7 @@ import { IChart } from 'app/types/Chart';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
+  chartSelectionEventListener,
   pivotTableDrillEventListener,
   tablePagingAndSortEventListener,
 } from 'app/utils/ChartEventListenerHelper';
@@ -405,15 +405,14 @@ const ChartPreviewBoard: FC<{
               pivotTableDrillEventListener(param, p => {
                 handleDrillOptionChange(p);
               });
-              // NOTE 直接修改selectedItems结果集处理方法
-              if (param.interactionType === ChartInteractionEvent.Select) {
+              chartSelectionEventListener(param, p => {
                 dispatch(
                   vizAction.changeSelectedItems({
                     backendChartId,
-                    data: param.selectedItems,
+                    data: p,
                   }),
                 );
-              }
+              });
             },
           },
           {

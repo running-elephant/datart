@@ -23,7 +23,6 @@ import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
 import {
   ChartDataSectionType,
   ChartDataViewFieldCategory,
-  ChartInteractionEvent,
 } from 'app/constants';
 import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
@@ -39,7 +38,10 @@ import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
-import { pivotTableDrillEventListener } from 'app/utils/ChartEventListenerHelper';
+import {
+  chartSelectionEventListener,
+  pivotTableDrillEventListener,
+} from 'app/utils/ChartEventListenerHelper';
 import {
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
@@ -473,20 +475,12 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                   handleDrillOptionChange(option);
                   return;
                 }
-
                 pivotTableDrillEventListener(params, p => {
                   handleDrillOptionChange(p);
                 });
-
-                // NOTE 直接修改selectedItems结果集处理方法
-                if (params.interactionType === ChartInteractionEvent.Select) {
-                  changeSelectedItems(
-                    dispatch,
-                    renderMode,
-                    params.selectedItems,
-                    wid,
-                  );
-                }
+                chartSelectionEventListener(params, p => {
+                  changeSelectedItems(dispatch, renderMode, p, wid);
+                });
                 onWidgetChartClick(widgetRef.current, params);
               },
             },

@@ -126,7 +126,7 @@ describe('ChartSelectionManager Test', () => {
     zRenderHandler({});
     expect(mockMouseEvents[0].callback.mock.calls.length).toBe(1);
     expect(mockMouseEvents[0].callback.mock.calls[0][0]).toEqual({
-      interactionType: ChartInteractionEvent.Select,
+      interactionType: ChartInteractionEvent.UnSelect,
       selectedItems: [],
     });
   });

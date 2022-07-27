@@ -21,7 +21,6 @@ import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMe
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
-import { ChartInteractionEvent } from 'app/constants';
 import useChartInteractions from 'app/hooks/useChartInteractions';
 import useDebouncedLoadingStatus from 'app/hooks/useDebouncedLoadingStatus';
 import useMount from 'app/hooks/useMount';
@@ -31,6 +30,7 @@ import useDisplayViewDetail from 'app/pages/MainPage/pages/VizPage/hooks/useDisp
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
+  chartSelectionEventListener,
   pivotTableDrillEventListener,
   tablePagingAndSortEventListener,
 } from 'app/utils/ChartEventListenerHelper';
@@ -302,10 +302,9 @@ const ChartPreviewBoardForShare: FC<{
             pivotTableDrillEventListener(param, p => {
               handleDrillOptionChange(p);
             });
-            // NOTE 直接修改selectedItems结果集处理方法
-            if (param.interactionType === ChartInteractionEvent.Select) {
-              dispatch(shareActions.changeSelectedItems(param.selectedItems));
-            }
+            chartSelectionEventListener(param, p => {
+              dispatch(shareActions.changeSelectedItems(p));
+            });
           },
         },
       ]);

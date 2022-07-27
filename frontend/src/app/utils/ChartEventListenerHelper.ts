@@ -78,3 +78,15 @@ export const richTextContextEventListener = (
     });
   }
 };
+
+export const chartSelectionEventListener = (
+  param?: ChartMouseEventParams,
+  callback?: (newParams) => void,
+) => {
+  if (
+    param?.interactionType === ChartInteractionEvent.Select ||
+    param?.interactionType === ChartInteractionEvent.UnSelect
+  ) {
+    callback?.(param?.selectedItems);
+  }
+};
