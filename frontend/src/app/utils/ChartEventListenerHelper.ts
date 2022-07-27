@@ -19,7 +19,7 @@
 import { ChartInteractionEvent } from 'app/constants';
 import { ChartMouseEventParams } from 'app/types/Chart';
 
-export const tablePagingAndSortListener = (
+export const tablePagingAndSortEventListener = (
   param?: ChartMouseEventParams,
   callback?: (newParams) => void,
 ) => {
@@ -37,5 +37,18 @@ export const tablePagingAndSortListener = (
         pageNo: param?.value?.pageNo,
       },
     });
+  }
+};
+
+export const pivotTableDrillEventListener = (
+  param?: ChartMouseEventParams,
+  callback?: (newParams) => void,
+) => {
+  // NOTE 透视表树形结构展开下钻特殊处理方法
+  if (
+    param?.chartType === 'pivotSheet' &&
+    param?.interactionType === ChartInteractionEvent.Drilled
+  ) {
+    callback?.(param.drillOption);
   }
 };

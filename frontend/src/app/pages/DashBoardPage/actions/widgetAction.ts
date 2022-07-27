@@ -20,7 +20,7 @@ import { ChartDataSectionType } from 'app/constants';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartMouseEventParams } from 'app/types/Chart';
 import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
-import { tablePagingAndSortListener } from 'app/utils/ChartEventListenerHelper';
+import { tablePagingAndSortEventListener } from 'app/utils/ChartEventListenerHelper';
 import {
   filterFiltersByInteractionRule,
   filterVariablesByInteractionRule,
@@ -448,7 +448,7 @@ export const widgetChartClickAction =
   dispatch => {
     const { boardId, editing, renderMode, widget, params, history } = obj;
     //is tableChart
-    tablePagingAndSortListener(params, p => {
+    tablePagingAndSortEventListener(params, p => {
       tableChartClickAction(boardId, editing, renderMode, widget, params);
     });
     // jump

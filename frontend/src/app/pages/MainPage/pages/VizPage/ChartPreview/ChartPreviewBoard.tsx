@@ -38,7 +38,10 @@ import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import { tablePagingAndSortListener } from 'app/utils/ChartEventListenerHelper';
+import {
+  pivotTableDrillEventListener,
+  tablePagingAndSortEventListener,
+} from 'app/utils/ChartEventListenerHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import {
@@ -391,7 +394,7 @@ const ChartPreviewBoard: FC<{
                 handleDrillOptionChange(option);
                 return;
               }
-              tablePagingAndSortListener(param, p => {
+              tablePagingAndSortEventListener(param, p => {
                 dispatch(
                   fetchDataSetByPreviewChartAction({
                     ...p,
@@ -399,15 +402,9 @@ const ChartPreviewBoard: FC<{
                   }),
                 );
               });
-              // NOTE 透视表树形结构展开下钻特殊处理方法
-              if (
-                param.chartType === 'pivotSheet' &&
-                param.interactionType === ChartInteractionEvent.Drilled
-              ) {
-                handleDrillOptionChange?.(param.drillOption);
-                return;
-              }
-
+              pivotTableDrillEventListener(param, p => {
+                handleDrillOptionChange(p);
+              });
               // NOTE 直接修改selectedItems结果集处理方法
               if (param.interactionType === ChartInteractionEvent.Select) {
                 dispatch(

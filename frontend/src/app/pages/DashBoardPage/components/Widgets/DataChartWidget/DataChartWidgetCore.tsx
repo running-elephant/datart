@@ -39,6 +39,7 @@ import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import { pivotTableDrillEventListener } from 'app/utils/ChartEventListenerHelper';
 import {
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
@@ -473,14 +474,9 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                   return;
                 }
 
-                // NOTE 透视表树形结构展开下钻特殊处理方法
-                if (
-                  params.chartType === 'pivotSheet' &&
-                  params.interactionType === ChartInteractionEvent.Drilled
-                ) {
-                  handleDrillOptionChange?.(params.drillOption);
-                  return;
-                }
+                pivotTableDrillEventListener(params, p => {
+                  handleDrillOptionChange(p);
+                });
 
                 // NOTE 直接修改selectedItems结果集处理方法
                 if (params.interactionType === ChartInteractionEvent.Select) {
