@@ -99,7 +99,7 @@ export class ChartSelectionManager {
     }
   }
 
-  private echartsClickEventHandler(params: {
+  public echartsClickEventHandler(params: {
     componentIndex: string | number;
     dataIndex: string | number;
     data: any;
