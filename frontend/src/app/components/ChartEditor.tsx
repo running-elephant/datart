@@ -536,7 +536,6 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       if (chartType === 'widgetChart') {
         saveToWidget();
       } else {
-        
         // dataChart
         confirm({
           title: tg('button.saveConfirm'),
