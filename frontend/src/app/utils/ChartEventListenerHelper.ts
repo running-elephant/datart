@@ -17,6 +17,7 @@
  */
 
 import { ChartInteractionEvent } from 'app/constants';
+import { ChartConfigReducerActionType } from 'app/pages/ChartWorkbenchPage/slice/constant';
 import { ChartMouseEventParams } from 'app/types/Chart';
 
 export const tablePagingAndSortEventListener = (
@@ -44,11 +45,36 @@ export const pivotTableDrillEventListener = (
   param?: ChartMouseEventParams,
   callback?: (newParams) => void,
 ) => {
-  // NOTE 透视表树形结构展开下钻特殊处理方法
   if (
     param?.chartType === 'pivotSheet' &&
     param?.interactionType === ChartInteractionEvent.Drilled
   ) {
     callback?.(param.drillOption);
+  }
+};
+
+export const richTextContextEventListener = (
+  row: any,
+  param?: ChartMouseEventParams,
+  callback?: (newParams) => void,
+) => {
+  if (
+    param?.chartType === 'rich-text' &&
+    param?.interactionType === ChartInteractionEvent.ChangeContext
+  ) {
+    callback?.({
+      type: ChartConfigReducerActionType.STYLE,
+      payload: {
+        ancestors: [1, 0],
+        value: {
+          ...row,
+          value: param.value,
+        },
+      },
+      needRefresh: false,
+      updateDrillOption: config => {
+        return undefined;
+      },
+    });
   }
 };

@@ -57,6 +57,7 @@ import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
   pivotTableDrillEventListener,
+  richTextContextEventListener,
   tablePagingAndSortEventListener,
 } from 'app/utils/ChartEventListenerHelper';
 import {
@@ -254,28 +255,13 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             tablePagingAndSortEventListener(param, p => {
               dispatch(refreshDatasetAction(p));
             });
-            if (
-              param.chartType === 'rich-text' &&
-              param.interactionType === ChartInteractionEvent.ChangeContext
-            ) {
-              dispatch(
-                updateChartConfigAndRefreshDatasetAction({
-                  type: ChartConfigReducerActionType.STYLE,
-                  payload: {
-                    ancestors: [1, 0],
-                    value: {
-                      ...chart.config.styles[1].rows[0],
-                      value: param.value,
-                    },
-                  },
-                  needRefresh: false,
-                  updateDrillOption: config => {
-                    return undefined;
-                  },
-                }),
-              );
-              return;
-            }
+            richTextContextEventListener(
+              chart.config.styles[1].rows[0] || {},
+              param,
+              p => {
+                dispatch(updateChartConfigAndRefreshDatasetAction(p));
+              },
+            );
             pivotTableDrillEventListener(param, p => {
               handleDrillOptionChange(p);
             });
