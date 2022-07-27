@@ -38,6 +38,7 @@ import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import { tablePagingAndSortListener } from 'app/utils/ChartEventListenerHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import {
@@ -390,26 +391,14 @@ const ChartPreviewBoard: FC<{
                 handleDrillOptionChange(option);
                 return;
               }
-              if (
-                param.chartType === 'table' &&
-                param.interactionType === ChartInteractionEvent.PagingOrSort
-              ) {
+              tablePagingAndSortListener(param, p => {
                 dispatch(
                   fetchDataSetByPreviewChartAction({
+                    ...p,
                     backendChartId,
-                    sorter: {
-                      column: param?.seriesName!,
-                      operator: param?.value?.direction,
-                      aggOperator: param?.value?.aggOperator,
-                    },
-                    pageInfo: {
-                      pageNo: param?.value?.pageNo,
-                    },
                   }),
                 );
-                return;
-              }
-
+              });
               // NOTE 透视表树形结构展开下钻特殊处理方法
               if (
                 param.chartType === 'pivotSheet' &&

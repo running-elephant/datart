@@ -55,6 +55,7 @@ import {
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
+import { tablePagingAndSortListener } from 'app/utils/ChartEventListenerHelper';
 import {
   clearRuntimeDateLevelFieldsInChartConfig,
   filterCurrentUsedComputedFields,
@@ -247,24 +248,9 @@ export const ChartEditor: FC<ChartEditorProps> = ({
               handleDrillOptionChange?.(option);
               return;
             }
-            if (
-              param.chartType === 'table' &&
-              param.interactionType === ChartInteractionEvent.PagingOrSort
-            ) {
-              dispatch(
-                refreshDatasetAction({
-                  sorter: {
-                    column: param?.seriesName!,
-                    operator: param?.value?.direction,
-                    aggOperator: param?.value?.aggOperator,
-                  },
-                  pageInfo: {
-                    pageNo: param?.value?.pageNo,
-                  },
-                }),
-              );
-              return;
-            }
+            tablePagingAndSortListener(param, p => {
+              dispatch(refreshDatasetAction(p));
+            });
             if (
               param.chartType === 'rich-text' &&
               param.interactionType === ChartInteractionEvent.ChangeContext

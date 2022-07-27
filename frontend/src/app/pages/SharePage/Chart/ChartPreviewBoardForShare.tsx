@@ -30,6 +30,7 @@ import ChartManager from 'app/models/ChartManager';
 import useDisplayViewDetail from 'app/pages/MainPage/pages/VizPage/hooks/useDisplayViewDetail';
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import { tablePagingAndSortListener } from 'app/utils/ChartEventListenerHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -286,27 +287,15 @@ const ChartPreviewBoardForShare: FC<{
               handleDrillOptionChange(option);
               return;
             }
-            if (
-              param.chartType === 'table' &&
-              param.interactionType === ChartInteractionEvent.PagingOrSort
-            ) {
+            tablePagingAndSortListener(param, p => {
               dispatch(
                 fetchShareDataSetByPreviewChartAction({
+                  ...p,
                   preview: chartPreview!,
-                  sorter: {
-                    column: param?.seriesName!,
-                    operator: param?.value?.direction,
-                    aggOperator: param?.value?.aggOperator,
-                  },
-                  pageInfo: {
-                    pageNo: param?.value?.pageNo,
-                  },
                   filterSearchParams,
                 }),
               );
-              return;
-            }
-
+            });
             // NOTE 透视表树形结构展开下钻特殊处理方法
             if (
               param.chartType === 'pivotSheet' &&
