@@ -21,6 +21,7 @@ import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMe
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
+import { ChartInteractionEvent } from 'app/constants';
 import useChartInteractions from 'app/hooks/useChartInteractions';
 import useDebouncedLoadingStatus from 'app/hooks/useDebouncedLoadingStatus';
 import useMount from 'app/hooks/useMount';
@@ -287,7 +288,7 @@ const ChartPreviewBoardForShare: FC<{
             }
             if (
               param.chartType === 'table' &&
-              param.interactionType === 'paging-sort-filter'
+              param.interactionType === ChartInteractionEvent.PagingOrSort
             ) {
               dispatch(
                 fetchShareDataSetByPreviewChartAction({
@@ -309,14 +310,14 @@ const ChartPreviewBoardForShare: FC<{
             // NOTE 透视表树形结构展开下钻特殊处理方法
             if (
               param.chartType === 'pivotSheet' &&
-              param.interactionType === 'drilled'
+              param.interactionType === ChartInteractionEvent.Drilled
             ) {
               handleDrillOptionChange?.(param.drillOption);
               return;
             }
 
             // NOTE 直接修改selectedItems结果集处理方法
-            if (param.interactionType === 'select') {
+            if (param.interactionType === ChartInteractionEvent.Select) {
               dispatch(shareActions.changeSelectedItems(param.selectedItems));
             }
           },

@@ -18,7 +18,11 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
-import { DownloadFileType, RUNTIME_DATE_LEVEL_KEY } from 'app/constants';
+import {
+  ChartInteractionEvent,
+  DownloadFileType,
+  RUNTIME_DATE_LEVEL_KEY,
+} from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
@@ -245,7 +249,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             }
             if (
               param.chartType === 'table' &&
-              param.interactionType === 'paging-sort-filter'
+              param.interactionType === ChartInteractionEvent.PagingOrSort
             ) {
               dispatch(
                 refreshDatasetAction({
@@ -263,7 +267,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             }
             if (
               param.chartType === 'rich-text' &&
-              param.interactionType === 'rich-text-change-context'
+              param.interactionType === ChartInteractionEvent.ChangeContext
             ) {
               dispatch(
                 updateChartConfigAndRefreshDatasetAction({
@@ -286,14 +290,14 @@ export const ChartEditor: FC<ChartEditorProps> = ({
             // NOTE 透视表树形结构展开下钻特殊处理方法
             if (
               param.chartType === 'pivotSheet' &&
-              param.interactionType === 'drilled'
+              param.interactionType === ChartInteractionEvent.Drilled
             ) {
               handleDrillOptionChange?.(param.drillOption);
               return;
             }
 
             // NOTE 直接修改selectedItems结果集处理方法
-            if (param.interactionType === 'select') {
+            if (param.interactionType === ChartInteractionEvent.Select) {
               dispatch(actions.changeSelectedItems(param.selectedItems));
             }
           },

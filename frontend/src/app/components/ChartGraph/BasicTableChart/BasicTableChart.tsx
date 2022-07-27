@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { DataViewFieldType } from 'app/constants';
+import { ChartInteractionEvent, DataViewFieldType } from 'app/constants';
 import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import ReactChart from 'app/models/ReactChart';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
@@ -118,8 +118,6 @@ class BasicTableChart extends ReactChart {
     );
     this.selectionManager = new ChartSelectionManager(this.mouseEvents);
     this.selectionManager.attachWindowListeners(context.window);
-    // this.selectionManager.attachZRenderListeners(this.chart);
-    // this.selectionManager.attachEChartsListeners(this.chart);
   }
 
   onUpdated(options: BrokerOption, context: BrokerContext): void {
@@ -1200,7 +1198,7 @@ class BasicTableChart extends ReactChart {
     const eventParams = {
       type: 'click',
       chartType: 'table',
-      interactionType: 'paging-sort-filter',
+      interactionType: ChartInteractionEvent.PagingOrSort,
       seriesName,
       value: {
         aggOperator: aggOperator,

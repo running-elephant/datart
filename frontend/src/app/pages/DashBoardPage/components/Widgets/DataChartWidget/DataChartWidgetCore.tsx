@@ -23,6 +23,7 @@ import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
 import {
   ChartDataSectionType,
   ChartDataViewFieldCategory,
+  ChartInteractionEvent,
 } from 'app/constants';
 import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
@@ -475,14 +476,14 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                 // NOTE 透视表树形结构展开下钻特殊处理方法
                 if (
                   params.chartType === 'pivotSheet' &&
-                  params.interactionType === 'drilled'
+                  params.interactionType === ChartInteractionEvent.Drilled
                 ) {
                   handleDrillOptionChange?.(params.drillOption);
                   return;
                 }
 
                 // NOTE 直接修改selectedItems结果集处理方法
-                if (params.interactionType === 'select') {
+                if (params.interactionType === ChartInteractionEvent.Select) {
                   changeSelectedItems(
                     dispatch,
                     renderMode,

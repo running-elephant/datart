@@ -262,5 +262,7 @@ export enum AuthorizationStatus {
 export enum ChartInteractionEvent {
   Select = 'select',
   UnSelect = 'unSelect',
-  Drill = 'drill',
+  Drilled = 'drilled',
+  PagingOrSort = 'paging-sort-filter',
+  ChangeContext = 'rich-text-change-context',
 }

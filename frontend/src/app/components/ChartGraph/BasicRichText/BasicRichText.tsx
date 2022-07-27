@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionType } from 'app/constants';
+import { ChartDataSectionType, ChartInteractionEvent } from 'app/constants';
 import ReactChart from 'app/models/ReactChart';
 import { ChartConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
@@ -149,7 +149,7 @@ class BasicRichText extends ReactChart {
             cur.callback?.({
               type: 'change',
               chartType: 'rich-text',
-              interactionType: 'rich-text-change-context',
+              interactionType: ChartInteractionEvent.ChangeContext,
               value: delta,
             }),
         });

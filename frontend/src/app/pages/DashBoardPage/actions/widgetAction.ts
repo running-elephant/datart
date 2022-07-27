@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionType } from 'app/constants';
+import { ChartDataSectionType, ChartInteractionEvent } from 'app/constants';
 import { PageInfo } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartMouseEventParams } from 'app/types/Chart';
 import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
@@ -449,7 +449,7 @@ export const widgetChartClickAction =
     //is tableChart
     if (
       params.chartType === 'table' &&
-      params.interactionType === 'paging-sort-filter'
+      params.interactionType === ChartInteractionEvent.PagingOrSort
     ) {
       dispatch(
         tableChartClickAction(boardId, editing, renderMode, widget, params),
