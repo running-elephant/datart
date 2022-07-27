@@ -375,7 +375,7 @@ describe('ChartSelectionManager Test', () => {
     expect(manager.selectedItems).toEqual([]);
   });
 
-  test('should get callback data when ECharts click event invoke', () => {
+  test('should get callback dat with selected state when ECharts click event invoke', () => {
     const mockMouseEvents = [
       {
         name: 'click' as any,
@@ -397,6 +397,32 @@ describe('ChartSelectionManager Test', () => {
       data: [1, 2],
       interactionType: ChartInteractionEvent.Select,
       selectedItems: [{ index: 'a,b', data: [1, 2] }],
+    });
+  });
+
+  test('should get callback data with unselected state when current selected items is empty', () => {
+    const mockMouseEvents = [
+      {
+        name: 'click' as any,
+        callback: jest.fn(),
+      },
+    ];
+    const manager = new ChartSelectionManager(mockMouseEvents);
+    let clickEventHandler;
+    const mockChart = {
+      on: (_, handler) => (clickEventHandler = handler),
+    } as any;
+    manager.attachEChartsListeners(mockChart);
+    clickEventHandler({ componentIndex: 'a', dataIndex: 'b', data: [1, 2] });
+    clickEventHandler({ componentIndex: 'a', dataIndex: 'b', data: [1, 2] });
+    expect(manager.selectedItems).toEqual([]);
+    expect(mockMouseEvents[0].callback.mock.calls.length).toBe(2);
+    expect(mockMouseEvents[0].callback.mock.calls[1][0]).toEqual({
+      componentIndex: 'a',
+      dataIndex: 'b',
+      data: [1, 2],
+      interactionType: ChartInteractionEvent.UnSelect,
+      selectedItems: [],
     });
   });
 });

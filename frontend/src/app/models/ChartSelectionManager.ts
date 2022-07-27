@@ -128,7 +128,9 @@ export class ChartSelectionManager {
     this._clickCallbacks.forEach(cb => {
       cb?.({
         ...params,
-        interactionType: ChartInteractionEvent.Select,
+        interactionType: isEmptyArray(this._selectedItems)
+          ? ChartInteractionEvent.UnSelect
+          : ChartInteractionEvent.Select,
         selectedItems: this._selectedItems,
       });
     });
