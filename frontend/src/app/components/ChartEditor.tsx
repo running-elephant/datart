@@ -536,9 +536,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       if (chartType === 'widgetChart') {
         saveToWidget();
       } else {
+        
         // dataChart
         confirm({
-          title: '保存修改后不能撤销，确定继续保存吗？',
+          title: tg('button.saveConfirm'),
           icon: <ExclamationCircleOutlined />,
           async onOk() {
             dispatch(

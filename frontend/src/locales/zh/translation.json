@@ -20,7 +20,8 @@
       "saveAs": "另存为",
       "cancel": "取消",
       "ok": "确定",
-      "shortcuts": "快捷键"
+      "shortcuts": "快捷键",
+      "saveConfirm": "保存修改后不能撤销，确定继续保存吗？"
     },
     "operation": {
       "archiveConfirm": "确定移至回收站？",
