@@ -108,23 +108,26 @@ export class ChartSelectionManager {
       index: params.componentIndex + ',' + params.dataIndex,
       data: params.data,
     };
-    let list = this._selectedItems.concat();
-    const index = list.findIndex(v => v.index === item.index);
-    if (this._multipleSelect) {
-      if (index < 0) {
-        list.push(item);
+    let newSelectedItems = this._selectedItems.concat();
+    const existingItemIndex = newSelectedItems.findIndex(
+      v => v.index === item.index,
+    );
+    if (this.isMultiSelect) {
+      if (existingItemIndex < 0) {
+        newSelectedItems.push(item);
       } else {
-        list.splice(index, 1);
+        newSelectedItems.splice(existingItemIndex, 1);
       }
     } else {
-      if (index < 0 || list.length > 1) {
-        list = [item];
+      if (existingItemIndex < 0) {
+        newSelectedItems = [item];
+      } else if (newSelectedItems.length > 1) {
+        newSelectedItems = [item];
       } else {
-        list = [];
+        newSelectedItems = [];
       }
     }
-    this._selectedItems = list;
-
+    this._selectedItems = newSelectedItems;
     this._clickCallbacks.forEach(cb => {
       cb?.({
         ...params,
