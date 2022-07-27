@@ -56,7 +56,13 @@ import {
   RUNTIME_FILTER_KEY,
   TIME_FORMATTER,
 } from 'globalConstants';
-import { isEmptyArray, isEqualObject, IsKeyIn, UniqWith } from 'utils/object';
+import {
+  isEmptyArray,
+  isEmptyString,
+  isEqualObject,
+  IsKeyIn,
+  UniqWith,
+} from 'utils/object';
 import { DrillMode } from './ChartDrillOption';
 
 export class ChartDataRequestBuilder {
@@ -256,11 +262,26 @@ export class ChartDataRequestBuilder {
           return true;
         } else if (Array.isArray(col.filter?.condition?.value)) {
           return Boolean(col.filter?.condition?.value?.length);
+        } else if (
+          [
+            FilterSqlOperator.Contain,
+            FilterSqlOperator.NotContain,
+            FilterSqlOperator.Equal,
+            FilterSqlOperator.NotEqual,
+            FilterSqlOperator.In,
+            FilterSqlOperator.NotIn,
+            FilterSqlOperator.PrefixContain,
+            FilterSqlOperator.NotPrefixContain,
+            FilterSqlOperator.SuffixContain,
+            FilterSqlOperator.NotSuffixContain,
+          ].includes(col.filter?.condition?.operator as FilterSqlOperator)
+        ) {
+          return !isEmptyString(col.filter?.condition?.value);
+        } else {
+          return true;
         }
-        return true;
       })
       .map(col => col);
-
     return this.normalizeFilters(fields)
       .concat(this.normalizeDrillFilters())
       .concat(this.normalizeRuntimeFilters());
