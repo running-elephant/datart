@@ -20,6 +20,8 @@ package datart.server.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import datart.core.base.consts.VariableTypeEnum;
+import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.ParamException;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.RelVariableSubject;
 import datart.core.entity.Role;
@@ -67,11 +69,10 @@ public class VariableServiceImpl extends BaseService implements VariableService 
 
     @Override
     public boolean checkUnique(String orgId, String viewId, String name) {
-        Variable variable = new Variable();
-        variable.setOrgId(orgId);
-        variable.setName(name);
-        variable.setViewId(viewId);
-        return checkUnique(variable);
+        if (variableMapper.checkVariableName(orgId, viewId, name) != 0) {
+            Exceptions.tr(ParamException.class, "error.param.exists.name");
+        }
+        return true;
     }
 
     @Override
@@ -267,7 +268,7 @@ public class VariableServiceImpl extends BaseService implements VariableService 
         VariableUpdateParam param = (VariableUpdateParam) updateParam;
         Variable retrieve = retrieve(updateParam.getId());
         if (!param.getName().equalsIgnoreCase(retrieve.getName())) {
-            checkUnique(retrieve.getOrgId(), null, param.getName());
+            checkUnique(retrieve.getOrgId(), retrieve.getViewId(), param.getName());
         }
         if (param.getRelVariableSubjects() != null) {
             rvsMapper.deleteByVariables(Collections.singleton(param.getId()));
