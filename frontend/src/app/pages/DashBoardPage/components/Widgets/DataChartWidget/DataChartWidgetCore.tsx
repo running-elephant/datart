@@ -40,6 +40,7 @@ import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import {
   chartSelectionEventListener,
+  drillDownEventListener,
   pivotTableDrillEventListener,
 } from 'app/utils/ChartEventListenerHelper';
 import {
@@ -466,15 +467,10 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                 handleViewDataEvent(
                   buildViewDataEventParams(params, InteractionMouseEvent.Left),
                 );
-                if (
-                  drillOptionRef.current?.isSelectedDrill &&
-                  !drillOptionRef.current.isBottomLevel
-                ) {
-                  const option = drillOptionRef.current;
-                  option.drillDown(params.data.rowData);
-                  handleDrillOptionChange(option);
-                  return;
-                }
+                drillDownEventListener(drillOptionRef?.current, params, p => {
+                  drillOptionRef.current = p;
+                  handleDrillOptionChange?.(p);
+                });
                 pivotTableDrillEventListener(params, p => {
                   handleDrillOptionChange(p);
                 });

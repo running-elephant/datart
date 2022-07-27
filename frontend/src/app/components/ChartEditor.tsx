@@ -53,6 +53,7 @@ import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
   chartSelectionEventListener,
+  drillDownEventListener,
   pivotTableDrillEventListener,
   richTextContextEventListener,
   tablePagingAndSortEventListener,
@@ -239,16 +240,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         {
           name: 'click',
           callback: param => {
-            if (
-              drillOptionRef.current?.isSelectedDrill &&
-              !drillOptionRef.current.isBottomLevel
-            ) {
-              const option = drillOptionRef.current;
-              option.drillDown(param.data.rowData);
-              drillOptionRef.current = option;
-              handleDrillOptionChange?.(option);
-              return;
-            }
+            drillDownEventListener(drillOptionRef?.current, param, p => {
+              drillOptionRef.current = p;
+              handleDrillOptionChange?.(p);
+            });
             tablePagingAndSortEventListener(param, p => {
               dispatch(refreshDatasetAction(p));
             });

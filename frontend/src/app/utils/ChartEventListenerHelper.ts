@@ -19,6 +19,7 @@
 import { ChartInteractionEvent } from 'app/constants';
 import { ChartConfigReducerActionType } from 'app/pages/ChartWorkbenchPage/slice/constant';
 import { ChartMouseEventParams } from 'app/types/Chart';
+import { IChartDrillOption } from 'app/types/ChartDrillOption';
 
 export const tablePagingAndSortEventListener = (
   param?: ChartMouseEventParams,
@@ -38,6 +39,17 @@ export const tablePagingAndSortEventListener = (
         pageNo: param?.value?.pageNo,
       },
     });
+  }
+};
+
+export const drillDownEventListener = (
+  drillOption?: IChartDrillOption,
+  param?: ChartMouseEventParams,
+  callback?: (newParams) => void,
+) => {
+  if (drillOption?.isSelectedDrill && !drillOption?.isBottomLevel) {
+    drillOption?.drillDown(param?.data?.rowData);
+    callback?.(drillOption);
   }
 };
 

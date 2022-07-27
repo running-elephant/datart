@@ -31,6 +31,7 @@ import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
   chartSelectionEventListener,
+  drillDownEventListener,
   pivotTableDrillEventListener,
   tablePagingAndSortEventListener,
 } from 'app/utils/ChartEventListenerHelper';
@@ -279,17 +280,10 @@ const ChartPreviewBoardForShare: FC<{
             handleViewDataEvent(
               buildViewDataEventParams(param, InteractionMouseEvent.Left),
             );
-
-            if (
-              drillOptionRef.current?.isSelectedDrill &&
-              !drillOptionRef.current.isBottomLevel
-            ) {
-              const option = drillOptionRef.current;
-              option.drillDown(param.data.rowData);
-              drillOptionRef.current = option;
-              handleDrillOptionChange(option);
-              return;
-            }
+            drillDownEventListener(drillOptionRef?.current, param, p => {
+              drillOptionRef.current = p;
+              handleDrillOptionChange?.(p);
+            });
             tablePagingAndSortEventListener(param, p => {
               dispatch(
                 fetchShareDataSetByPreviewChartAction({
