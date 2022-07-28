@@ -576,6 +576,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     chartConfig,
     dataview?.computedFields,
     history,
+    tg,
   ]);
 
   const saveChartToDashBoard = useCallback(
