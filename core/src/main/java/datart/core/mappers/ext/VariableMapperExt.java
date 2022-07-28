@@ -19,6 +19,19 @@ public interface VariableMapperExt extends VariableMapper {
     List<Variable> selectByIds(Collection<String> ids);
 
     @Select({
+            "<script>",
+            "SELECT count(1) FROM variable WHERE org_id=#{orgId} AND `name` = #{name}",
+            "<if test=\"viewId==null\">",
+            " AND view_id IS NULL ",
+            "</if>",
+            "<if test=\"viewId!=null\">",
+            " AND view_id=#{viewId} ",
+            "</if>",
+            "</script>",
+    })
+    int checkVariableName(String orgId, String viewId, String name);
+
+    @Select({
             "SELECT * FROM variable WHERE view_id = #{viewId}"
     })
     List<Variable> selectViewVariables(String viewId);
