@@ -39,6 +39,11 @@ import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import {
+  chartSelectionEventListener,
+  drillDownEventListener,
+  pivotTableDrillEventListener,
+} from 'app/utils/ChartEventListenerHelper';
+import {
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
   transformToDataSet,
@@ -462,34 +467,16 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                 handleViewDataEvent(
                   buildViewDataEventParams(params, InteractionMouseEvent.Left),
                 );
-                if (
-                  drillOptionRef.current?.isSelectedDrill &&
-                  !drillOptionRef.current.isBottomLevel
-                ) {
-                  const option = drillOptionRef.current;
-                  option.drillDown(params.data.rowData);
-                  handleDrillOptionChange(option);
-                  return;
-                }
-
-                // NOTE 透视表树形结构展开下钻特殊处理方法
-                if (
-                  params.chartType === 'pivotSheet' &&
-                  params.interactionType === 'drilled'
-                ) {
-                  handleDrillOptionChange?.(params.drillOption);
-                  return;
-                }
-
-                // NOTE 直接修改selectedItems结果集处理方法
-                if (params.interactionType === 'select') {
-                  changeSelectedItems(
-                    dispatch,
-                    renderMode,
-                    params.selectedItems,
-                    wid,
-                  );
-                }
+                drillDownEventListener(drillOptionRef?.current, params, p => {
+                  drillOptionRef.current = p;
+                  handleDrillOptionChange?.(p);
+                });
+                pivotTableDrillEventListener(params, p => {
+                  handleDrillOptionChange(p);
+                });
+                chartSelectionEventListener(params, p => {
+                  changeSelectedItems(dispatch, renderMode, p, wid);
+                });
                 onWidgetChartClick(widgetRef.current, params);
               },
             },

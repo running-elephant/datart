@@ -19,7 +19,7 @@
 import { ChartDataSectionType } from 'app/constants';
 import Chart from 'app/models/Chart';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
-import { ChartSelection } from 'app/models/ChartSelection';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -35,7 +35,6 @@ import ChartDataSetDTO, {
 import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getAutoFunnelTopPosition,
-  getChartSelection,
   getColumnRenderName,
   getDrillableRows,
   getExtraSeriesDataFormat,
@@ -55,8 +54,7 @@ import { Series, SeriesData } from './types';
 class BasicFunnelChart extends Chart {
   config = Config;
   chart: any = null;
-
-  private selection: null | ChartSelection = null;
+  selectionManager?: ChartSelectionManager;
 
   constructor() {
     super(
@@ -85,30 +83,10 @@ class BasicFunnelChart extends Chart {
       context.document.getElementById(options.containerId)!,
       'default',
     );
-    this.selection = getChartSelection(context.window, {
-      chart: this.chart,
-      mouseEvents: this.mouseEvents,
-    });
-    this.mouseEvents?.forEach(event => {
-      switch (event.name) {
-        case 'click':
-          this.chart.on(event.name, params => {
-            this.selection?.doSelect({
-              index: params.componentIndex + ',' + params.dataIndex,
-              data: params.data,
-            });
-            event.callback({
-              ...params,
-              interactionType: 'select',
-              selectedItems: this.selection?.selectedItems,
-            });
-          });
-          break;
-        default:
-          this.chart.on(event.name, event.callback);
-          break;
-      }
-    });
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
+    this.selectionManager.attachWindowListeners(context.window);
+    this.selectionManager.attachZRenderListeners(this.chart);
+    this.selectionManager.attachEChartsListeners(this.chart);
   }
 
   onUpdated(options: BrokerOption, context: BrokerContext) {
@@ -120,12 +98,7 @@ class BasicFunnelChart extends Chart {
     if (!this.isMatchRequirement(options.config)) {
       return;
     }
-    if (
-      this.selection?.selectedItems.length &&
-      !options.selectedItems?.length
-    ) {
-      this.selection?.clearAll();
-    }
+    this.selectionManager?.updateSelectedItems(options?.selectedItems);
     const newOptions = this.getOptions(
       options.dataset,
       options.config,
@@ -136,7 +109,8 @@ class BasicFunnelChart extends Chart {
   }
 
   onUnMount(options: BrokerOption, context: BrokerContext) {
-    this.selection?.removeEvent();
+    this.selectionManager?.removeWindowListeners(context.window);
+    this.selectionManager?.removeZRenderListeners(this.chart);
     this.chart?.dispose();
   }
 

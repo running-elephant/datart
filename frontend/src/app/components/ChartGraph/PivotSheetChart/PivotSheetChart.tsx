@@ -28,7 +28,11 @@ import {
   TargetCellInfo,
   ViewMeta,
 } from '@antv/s2';
-import { ChartDataSectionType, SortActionType } from 'app/constants';
+import {
+  ChartDataSectionType,
+  ChartInteractionEvent,
+  SortActionType,
+} from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ReactChart from 'app/models/ReactChart';
 import {
@@ -436,7 +440,7 @@ class PivotSheetChart extends ReactChart {
         ?.find(v => v.name === 'click')
         ?.callback({
           selectedItems,
-          interactionType: 'select',
+          interactionType: ChartInteractionEvent.Select,
           type: 'click',
           chartType: 'pivotSheet',
         });
@@ -485,7 +489,7 @@ class PivotSheetChart extends ReactChart {
     this.mouseEvents
       ?.find(v => v.name === 'click')
       ?.callback({
-        interactionType: 'drilled',
+        interactionType: ChartInteractionEvent.Drilled,
         drillOption,
         type: 'click',
         chartType: 'pivotSheet',

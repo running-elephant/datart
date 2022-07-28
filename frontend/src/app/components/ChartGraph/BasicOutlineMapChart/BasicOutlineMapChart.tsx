@@ -18,7 +18,7 @@
 
 import { ChartDataSectionType } from 'app/constants';
 import Chart from 'app/models/Chart';
-import { ChartSelection } from 'app/models/ChartSelection';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -28,7 +28,6 @@ import {
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
-  getChartSelection,
   getDataColumnMaxAndMin2,
   getExtraSeriesRowData,
   getScatterSymbolSizeFn,
@@ -59,9 +58,9 @@ registerMap('china-city', geoChinaCity as any);
 class BasicOutlineMapChart extends Chart {
   config = Config;
   chart: any = null;
+  selectionManager?: ChartSelectionManager;
 
   protected isNormalGeoMap = false;
-  private selection: null | ChartSelection = null;
   private geoMap;
   private container: HTMLElement | null = null;
   private geoConfig: GeoInfo = {
@@ -99,35 +98,13 @@ class BasicOutlineMapChart extends Chart {
     }
     this.container = context.document.getElementById(options.containerId);
     this.chart = init(this.container!, 'default');
-    this.selection = getChartSelection(context.window, {
-      chart: this.chart,
-      mouseEvents: this.mouseEvents,
-    });
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
+    this.selectionManager.attachWindowListeners(context.window);
+    this.selectionManager.attachZRenderListeners(this.chart);
+    this.selectionManager.attachEChartsListeners(this.chart);
     this.container?.addEventListener('mouseup', () =>
       this.getOptionsConfig(this.geoConfig, this.chart),
     );
-    this.mouseEvents?.forEach(event => {
-      switch (event.name) {
-        case 'click':
-          this.chart.on(event.name, (params: any) => {
-            if (params.componentType === 'series' || this.isNormalGeoMap) {
-              this.selection?.doSelect({
-                index: params.componentIndex + ',' + params.dataIndex,
-                data: params.data,
-              });
-              event.callback({
-                ...params,
-                interactionType: 'select',
-                selectedItems: this.selection?.selectedItems,
-              });
-            }
-          });
-          break;
-        default:
-          this.chart.on(event.name, event?.callback as any);
-          break;
-      }
-    });
   }
 
   onUpdated(options: BrokerOption, context: BrokerContext) {
@@ -138,12 +115,7 @@ class BasicOutlineMapChart extends Chart {
       this.chart?.clear();
       return;
     }
-    if (
-      this.selection?.selectedItems.length &&
-      !options.selectedItems?.length
-    ) {
-      this.selection?.clearAll();
-    }
+    this.selectionManager?.updateSelectedItems(options?.selectedItems);
     const newOptions = this.getOptions(
       options.dataset,
       options.config,
@@ -163,7 +135,8 @@ class BasicOutlineMapChart extends Chart {
     this.container?.removeEventListener('mouseup', () =>
       this.getOptionsConfig(this.geoConfig, this.chart),
     );
-    this.selection?.removeEvent();
+    this.selectionManager?.removeWindowListeners(context.window);
+    this.selectionManager?.removeZRenderListeners(this.chart);
     this.chart?.dispose();
   }
 

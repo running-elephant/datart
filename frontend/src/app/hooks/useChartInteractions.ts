@@ -25,6 +25,7 @@ import {
   DrillThroughSetting,
   ViewDetailSetting,
 } from 'app/components/FormGenerator/Customize/Interaction/types';
+import { ChartInteractionEvent } from 'app/constants';
 import useDrillThrough from 'app/hooks/useDrillThrough';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
 import { getStyles, getValue } from 'app/utils/chartHelper';
@@ -346,9 +347,8 @@ const useChartInteractions = (props: {
           rule,
         );
         const variables = getVariablesByInteractionRule(queryVariables, rule);
-        const isUnSelectedAll = !Boolean(
-          clickEventParams?.selectedItems?.length,
-        );
+        const isUnSelectedAll =
+          clickEventParams?.interactionType === ChartInteractionEvent.UnSelect;
         return {
           rule,
           isUnSelectedAll,

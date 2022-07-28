@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { ChartInteractionEvent } from 'app/constants';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { ChartConfig } from './ChartConfig';
 import { BrokerContext, BrokerOption } from './ChartLifecycleBroker';
@@ -55,7 +56,7 @@ export interface ChartMouseEventParams {
   // 图标类型 'table', 'pivotSheet', 'bar',
   chartType?: string;
   // 交互类型 'select', 'drilled', 'paging-sort-filter', 'rich-text-change-context'
-  interactionType?: string;
+  interactionType?: ChartInteractionEvent;
 
   // 当前点击的图形元素所属的组件名称，
   // 其值如 'series'、'markLine'、'markPoint'、'timeLine' 等。

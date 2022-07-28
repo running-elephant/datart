@@ -37,6 +37,12 @@ import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import {
+  chartSelectionEventListener,
+  drillDownEventListener,
+  pivotTableDrillEventListener,
+  tablePagingAndSortEventListener,
+} from 'app/utils/ChartEventListenerHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import {
@@ -378,55 +384,29 @@ const ChartPreviewBoard: FC<{
               handleViewDataEvent(
                 buildViewDataEventParams(param, InteractionMouseEvent.Left),
               );
-
-              if (
-                drillOptionRef.current?.isSelectedDrill &&
-                !drillOptionRef.current.isBottomLevel
-              ) {
-                const option = drillOptionRef.current;
-                option.drillDown(param.data.rowData);
-                drillOptionRef.current = option;
-                handleDrillOptionChange(option);
-                return;
-              }
-              if (
-                param.chartType === 'table' &&
-                param.interactionType === 'paging-sort-filter'
-              ) {
+              drillDownEventListener(drillOptionRef?.current, param, p => {
+                drillOptionRef.current = p;
+                handleDrillOptionChange?.(p);
+              });
+              tablePagingAndSortEventListener(param, p => {
                 dispatch(
                   fetchDataSetByPreviewChartAction({
+                    ...p,
                     backendChartId,
-                    sorter: {
-                      column: param?.seriesName!,
-                      operator: param?.value?.direction,
-                      aggOperator: param?.value?.aggOperator,
-                    },
-                    pageInfo: {
-                      pageNo: param?.value?.pageNo,
-                    },
                   }),
                 );
-                return;
-              }
-
-              // NOTE 透视表树形结构展开下钻特殊处理方法
-              if (
-                param.chartType === 'pivotSheet' &&
-                param.interactionType === 'drilled'
-              ) {
-                handleDrillOptionChange?.(param.drillOption);
-                return;
-              }
-
-              // NOTE 直接修改selectedItems结果集处理方法
-              if (param.interactionType === 'select') {
+              });
+              pivotTableDrillEventListener(param, p => {
+                handleDrillOptionChange(p);
+              });
+              chartSelectionEventListener(param, p => {
                 dispatch(
                   vizAction.changeSelectedItems({
                     backendChartId,
-                    data: param.selectedItems,
+                    data: p,
                   }),
                 );
-              }
+              });
             },
           },
           {
