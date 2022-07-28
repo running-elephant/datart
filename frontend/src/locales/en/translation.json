@@ -20,7 +20,8 @@
       "saveAs": "Save As",
       "cancel": "Cancel",
       "ok": "OK",
-      "shortcuts": "Shortcuts"
+      "shortcuts": "Shortcuts",
+      "saveConfirm": "After saving the changes, it cannot be undone. Are you sure you want to continue saving?"
     },
     "operation": {
       "archiveConfirm": "Archive confirm",
