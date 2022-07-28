@@ -60,6 +60,7 @@ import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
 import { isEmptyArray } from 'utils/object';
 import { urlSearchTransfer } from 'utils/urlSearchTransfer';
+import useDisplayJumpVizDialog from '../hooks/useDisplayJumpVizDialog';
 import useDisplayViewDetail from '../hooks/useDisplayViewDetail';
 import useQSLibUrlHelper from '../hooks/useQSLibUrlHelper';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
@@ -89,6 +90,7 @@ const ChartPreviewBoard: FC<{
   allowDownload?: boolean;
   allowShare?: boolean;
   allowManage?: boolean;
+  hideTitle?: boolean;
 }> = memo(
   ({
     backendChartId,
@@ -97,6 +99,7 @@ const ChartPreviewBoard: FC<{
     allowDownload,
     allowShare,
     allowManage,
+    hideTitle,
   }) => {
     // NOTE: avoid initialize width or height is zero that cause echart sampling calculation issue.
     const defaultChartContainerWH = 1;
@@ -133,6 +136,8 @@ const ChartPreviewBoard: FC<{
     const vizs = useSelector(selectVizs);
     const [openViewDetailPanel, viewDetailPanelContextHolder] =
       useDisplayViewDetail();
+    const [openJumpVizDialogModal, openJumpVizDialogModalContextHolder] =
+      useDisplayJumpVizDialog();
     const [jumpDialogModal, jumpDialogContextHolder] = useModal();
     const {
       getDrillThroughSetting,
@@ -140,8 +145,9 @@ const ChartPreviewBoard: FC<{
       handleDrillThroughEvent,
       handleViewDataEvent,
     } = useChartInteractions({
-      openViewDetailPanel: openViewDetailPanel as any,
-      openJumpDialogModal: jumpDialogModal.info,
+      openViewDetailPanel: openViewDetailPanel as Function,
+      openJumpUrlDialogModal: jumpDialogModal.info,
+      openJumpVizDialogModal: openJumpVizDialogModal as Function,
     });
     const isLoadingData = useDebouncedLoadingStatus({
       isLoading: chartPreview?.isLoadingData,
@@ -632,24 +638,26 @@ const ChartPreviewBoard: FC<{
 
     return (
       <StyledChartPreviewBoard>
-        <VizHeader
-          chartName={chartPreview?.backendChart?.name}
-          status={chartPreview?.backendChart?.status}
-          publishLoading={publishLoading}
-          onGotoEdit={handleGotoWorkbenchPage}
-          onPublish={handlePublish}
-          onGenerateShareLink={handleGenerateShareLink}
-          onDownloadData={handleCreateDownloadDataTask}
-          onSaveAsVizs={handleSaveAsVizs}
-          onReloadData={handleReloadData}
-          onAddToDashBoard={handleAddToDashBoard}
-          onRecycleViz={handleRecycleViz}
-          allowDownload={allowDownload}
-          allowShare={allowShare}
-          allowManage={allowManage}
-          orgId={orgId}
-          backendChartId={backendChartId}
-        />
+        {!hideTitle && (
+          <VizHeader
+            chartName={chartPreview?.backendChart?.name}
+            status={chartPreview?.backendChart?.status}
+            publishLoading={publishLoading}
+            onGotoEdit={handleGotoWorkbenchPage}
+            onPublish={handlePublish}
+            onGenerateShareLink={handleGenerateShareLink}
+            onDownloadData={handleCreateDownloadDataTask}
+            onSaveAsVizs={handleSaveAsVizs}
+            onReloadData={handleReloadData}
+            onAddToDashBoard={handleAddToDashBoard}
+            onRecycleViz={handleRecycleViz}
+            allowDownload={allowDownload}
+            allowShare={allowShare}
+            allowManage={allowManage}
+            orgId={orgId}
+            backendChartId={backendChartId}
+          />
+        )}
         <PreviewBlock>
           <ChartDrillContext.Provider
             value={{
@@ -699,6 +707,7 @@ const ChartPreviewBoard: FC<{
         </PreviewBlock>
         {viewDetailPanelContextHolder}
         {jumpDialogContextHolder}
+        {openJumpVizDialogModalContextHolder}
       </StyledChartPreviewBoard>
     );
   },

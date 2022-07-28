@@ -44,16 +44,17 @@ import { urlSearchTransfer } from 'utils/urlSearchTransfer';
 
 const useChartInteractions = (props: {
   openViewDetailPanel?: Function;
-  openJumpDialogModal?: Function;
+  openJumpVizDialogModal?: Function;
+  openJumpUrlDialogModal?: Function;
 }) => {
-  const [
+  const {
     openNewTab,
     openBrowserTab,
     getDialogContent,
     redirectByUrl,
     openNewByUrl,
     getDialogContentByUrl,
-  ] = useDrillThrough();
+  } = useDrillThrough();
 
   const getDrillThroughSetting = (
     chartInteractions,
@@ -222,9 +223,10 @@ const useChartInteractions = (props: {
                 const modalContent = getDialogContent(
                   orgId,
                   relId,
+                  'DATACHART',
                   urlFiltersStr,
                 );
-                props?.openJumpDialogModal?.(modalContent as any);
+                props?.openJumpVizDialogModal?.(modalContent as any);
               }
             } else if (rule.category === InteractionCategory.JumpToDashboard) {
               const variableFilters = variableToFilter(
@@ -249,9 +251,10 @@ const useChartInteractions = (props: {
                 const modalContent = getDialogContent(
                   orgId,
                   relId,
+                  'DASHBOARD',
                   urlFiltersStr,
                 );
-                props?.openJumpDialogModal?.(modalContent as any);
+                props?.openJumpVizDialogModal?.(modalContent as any);
               }
             } else if (rule.category === InteractionCategory.JumpToUrl) {
               const variableFilters = variableToFilter(
@@ -275,7 +278,7 @@ const useChartInteractions = (props: {
               }
               if (rule?.action === InteractionAction.Dialog) {
                 const modalContent = getDialogContentByUrl(url, urlFiltersStr);
-                props?.openJumpDialogModal?.(modalContent as any);
+                props?.openJumpUrlDialogModal?.(modalContent as any);
               }
             }
           });
