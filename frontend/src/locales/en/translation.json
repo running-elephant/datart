@@ -1034,7 +1034,7 @@
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",
-        "iframe": "iFrame",
+        "iframe": "IFrame",
         "video": "Video",
         "container": "Container",
         "tab": "Tab",
