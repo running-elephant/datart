@@ -140,14 +140,14 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         return dataProviderManager.readTableColumns(parseDataProviderConfig(source), database, table);
     }
 
-
+    @Override
     public DataProviderSource parseDataProviderConfig(Source source) {
         DataProviderSource providerSource = new DataProviderSource();
         try {
             providerSource.setSourceId(source.getId());
             providerSource.setType(source.getType());
             providerSource.setName(source.getName());
-            Map<String, Object> properties = new HashMap<>();
+            Map<String, Object> properties = new HashMap<>(16);
             if (StringUtils.isNotBlank(source.getConfig())) {
                 properties = objectMapper.readValue(source.getConfig(), HashMap.class);
             }
