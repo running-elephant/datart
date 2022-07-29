@@ -20,6 +20,8 @@ export const LEVEL_50 = 50;
 export const LEVEL_100 = 100;
 export const LEVEL_1000 = 1000;
 
+export const LEVEL_DASHBOARD_EDIT_OVERLAY = LEVEL_50;
+
 // base color
 export const BLUE = '#1B9AEE';
 export const GREEN = '#15AD31';

@@ -23,7 +23,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { LEVEL_50 } from 'styles/StyleConstants';
+import { LEVEL_10 } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import {
   boardDrillManager,
@@ -98,7 +98,6 @@ export const BoardEditor: React.FC<{
         {widgetControllerPanelParams.type !== 'hide' && (
           <ControllerWidgetPanel {...widgetControllerPanelParams} />
         )}
-
         {boardChartEditorProps && (
           <ChartEditor
             {...boardChartEditorProps}
@@ -164,22 +163,23 @@ export const BoardEditor: React.FC<{
   }, [onCloseChartEditor]);
 
   return (
-    <Wrapper>
+    <StyledBoardEditor>
       <DndProvider backend={HTML5Backend}>
         {boardEditor}
         {boardLoading && <BoardLoading />}
       </DndProvider>
-    </Wrapper>
+    </StyledBoardEditor>
   );
 });
 export default BoardEditor;
-const Wrapper = styled.div`
+
+const StyledBoardEditor = styled.div`
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: ${LEVEL_50};
+  z-index: ${LEVEL_10};
   display: flex;
   flex-direction: column;
   padding-bottom: 0;

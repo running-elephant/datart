@@ -1137,7 +1137,7 @@
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",
-        "iframe": "iFrame",
+        "iframe": "IFrame",
         "video": "Video",
         "tab": "Tab"
       },
@@ -1146,6 +1146,7 @@
         "fullScreen": "FullScreen",
         "exitFullScreen": "Exit FullScreen",
         "lock": "Lock",
+        "unlock": "Unlock",
         "edit": "Edit",
         "delete": "Delete",
         "confirmDel": "Confirm Delete",

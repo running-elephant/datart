@@ -1137,7 +1137,7 @@
         "image": "图片",
         "richText": "富文本",
         "timer": "时间器",
-        "iframe": "iframe",
+        "iframe": "IFrame",
         "video": "视频",
         "tab": "Tab"
       },
@@ -1146,6 +1146,7 @@
         "fullScreen": "全屏",
         "exitFullScreen": "取消全屏",
         "lock": "锁定拖拽",
+        "unlock": "解锁拖拽",
         "edit": "编辑",
         "delete": "删除",
         "confirmDel": "确认删除",
