@@ -22,7 +22,7 @@ import {
   DeleteOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { Button, Form, Space, Spin, Tooltip } from 'antd';
+import { Button, Form, message, Space, Spin, Tooltip } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CommonFormTypes } from 'globalConstants';
 import produce from 'immer';
@@ -57,7 +57,7 @@ import {
   selectViews,
 } from '../../slice/selectors';
 import { runSql, saveView } from '../../slice/thunks';
-import { StructViewQueryProps } from '../../slice/types';
+import { JoinTableProps, StructViewQueryProps } from '../../slice/types';
 import { handleStringScriptToObject, isNewView } from '../../utils';
 import { Toolbar } from '../Editor/Toolbar';
 import SelectDataSource from './components/SelectDataSource';
@@ -200,6 +200,13 @@ export const StructView = memo(
 
     const handleDeleteJoinsItem = useCallback(
       index => {
+        structure.joins[index]?.conditions?.forEach((_, i) => {
+          form.setFieldsValue({
+            ['left' + index + i]: '',
+            ['right' + index + i]: '',
+          });
+        });
+
         dispatch(
           actions.changeCurrentEditingView({
             script: produce(structure, draft => {
@@ -208,14 +215,42 @@ export const StructView = memo(
           }),
         );
       },
-      [structure, dispatch, actions],
+      [structure, dispatch, actions, form],
     );
 
     const handleInterimRunSql = useCallback(
       async (type?: 'MAIN' | 'JOINS', joinIndex?: number) => {
         try {
-          await form.validateFields();
+          let joins: JoinTableProps[] = [];
 
+          if (joinIndex !== undefined) {
+            joins = structure.joins.slice(0, joinIndex + 1);
+          } else {
+            joins = structure.joins;
+          }
+          for (let j = 0; j < joins.length; j++) {
+            const join = joins[j];
+            if (!join.table || !join.table.length) {
+              throw new Error('请选择表格');
+            }
+            if (type === 'JOINS' && join.conditions) {
+              for (let i = 0; i < join.conditions.length; i++) {
+                const condition = join.conditions[i];
+                if (
+                  !condition.left ||
+                  !condition.left.length ||
+                  !condition.right ||
+                  !condition.right.length
+                ) {
+                  await form.validateFields();
+                }
+              }
+            }
+          }
+
+          if (!type) {
+            await form.validateFields();
+          }
           let script: StructViewQueryProps = {
             table: [],
             columns: [],
@@ -233,7 +268,9 @@ export const StructView = memo(
             script = structure;
           }
           dispatch(runSql({ id, isFragment: !!type, script }));
-        } catch (errorInfo) {}
+        } catch (errorInfo: any) {
+          errorInfo.message && message.error(errorInfo.message);
+        }
       },
       [dispatch, id, structure, form],
     );
@@ -247,8 +284,12 @@ export const StructView = memo(
             }),
           }),
         );
+        form.setFieldsValue({
+          ['left' + joinIndex + conditionsIndex]: '',
+          ['right' + joinIndex + conditionsIndex]: '',
+        });
       },
-      [actions, dispatch, structure],
+      [actions, dispatch, structure, form],
     );
 
     const save = useCallback(
