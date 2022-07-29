@@ -49,24 +49,34 @@ export const WidgetDropdownList: React.FC<{
   );
 
   const dropdownList = useMemo(() => {
-    const menuItems = actionList.map(item => {
-      return (
-        <React.Fragment key={item.key}>
-          {item.divider && <Menu.Divider />}
-          <Menu.Item
-            danger={item.danger}
-            icon={item.icon}
-            disabled={item.disabled}
-            key={item.key}
-          >
-            {t(item.label || '')}
-          </Menu.Item>
-        </React.Fragment>
-      );
-    });
+    const menuItems = actionList
+      .filter(item => {
+        if (item.key === 'lock') {
+          return !widget?.config?.lock;
+        } else if (item.key === 'unlock') {
+          return widget?.config?.lock;
+        }
+        return true;
+      })
+      .map(item => {
+        return (
+          <React.Fragment key={item.key}>
+            {item.divider && <Menu.Divider />}
+            <Menu.Item
+              danger={item.danger}
+              icon={item.icon}
+              disabled={item.disabled}
+              key={item.key}
+            >
+              {t(item.label || '')}
+            </Menu.Item>
+          </React.Fragment>
+        );
+      });
 
     return <Menu onClick={menuClick}>{menuItems}</Menu>;
-  }, [actionList, menuClick, t]);
+  }, [actionList, widget?.config?.lock, menuClick, t]);
+
   if (actionList.length === 0) {
     return null;
   }

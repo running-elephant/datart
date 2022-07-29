@@ -44,17 +44,21 @@ import {
 } from 'react';
 import RGL, { Layout, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
   LEVEL_100,
+  LEVEL_DASHBOARD_EDIT_OVERLAY,
   SPACE_MD,
   SPACE_XS,
 } from 'styles/StyleConstants';
+import { isEmptyArray } from 'utils/object';
+import BoardOverlay from '../components/BoardOverlay';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
+import { selectEditingWidgetIds } from '../slice/selectors';
 import { WidgetOfAutoEditor } from './WidgetOfAutoEditor';
 
 const ReactGridLayout = WidthProvider(RGL);
@@ -65,7 +69,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const boardConfig = useContext(BoardConfigValContext);
   const { background, allowOverlap } = boardConfig;
   const { deviceType } = useContext(BoardInfoContext);
-
+  const editingWidgetIds = useSelector(selectEditingWidgetIds);
   const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
 
   const { curMargin, curPadding } = useMemo(() => {
@@ -119,8 +123,16 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
 
   const boardChildren = useMemo(() => {
     return sortedLayoutWidgets.map(item => {
+      // TODO(Stephen): 将外层div与内层WidgetWrapProvider合并，同时修改FreeBoardEditor
       return (
-        <div key={item.id}>
+        <div
+          style={{
+            zIndex: editingWidgetIds?.includes(item?.id)
+              ? LEVEL_DASHBOARD_EDIT_OVERLAY + 1
+              : 'auto',
+          }}
+          key={item.id}
+        >
           <WidgetWrapProvider
             id={item.id}
             boardEditing={true}
@@ -131,7 +143,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
         </div>
       );
     });
-  }, [boardId, sortedLayoutWidgets]);
+  }, [boardId, editingWidgetIds, sortedLayoutWidgets]);
 
   /**
    * https://www.npmjs.com/package/react-grid-layout
@@ -148,26 +160,29 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
         ref={ref}
       >
         {sortedLayoutWidgets.length ? (
-          <div className="grid-wrap" ref={gridWrapRef}>
-            <ReactGridLayout
-              layout={layoutMap[colsKey]}
-              cols={LAYOUT_COLS_MAP[colsKey]}
-              margin={curMargin}
-              containerPadding={curPadding}
-              rowHeight={widgetRowHeight}
-              useCSSTransforms={true}
-              measureBeforeMount={false}
-              onDragStop={changeWidgetLayouts}
-              onResizeStop={changeWidgetLayouts}
-              isBounded={false}
-              onLayoutChange={onLayoutChange}
-              isDraggable={true}
-              isResizable={true}
-              allowOverlap={allowOverlap}
-              draggableHandle={`.${WIDGET_DRAG_HANDLE}`}
-            >
-              {boardChildren}
-            </ReactGridLayout>
+          <div style={{ position: 'relative' }}>
+            <div className="grid-wrap" ref={gridWrapRef}>
+              <ReactGridLayout
+                layout={layoutMap[colsKey]}
+                cols={LAYOUT_COLS_MAP[colsKey]}
+                margin={curMargin}
+                containerPadding={curPadding}
+                rowHeight={widgetRowHeight}
+                useCSSTransforms={true}
+                measureBeforeMount={false}
+                onDragStop={changeWidgetLayouts}
+                onResizeStop={changeWidgetLayouts}
+                isBounded={false}
+                onLayoutChange={onLayoutChange}
+                isDraggable={true}
+                isResizable={true}
+                allowOverlap={allowOverlap}
+                draggableHandle={`.${WIDGET_DRAG_HANDLE}`}
+              >
+                {boardChildren}
+              </ReactGridLayout>
+            </div>
+            {!isEmptyArray(editingWidgetIds) && <BoardOverlay />}
           </div>
         ) : (
           <div className="empty">

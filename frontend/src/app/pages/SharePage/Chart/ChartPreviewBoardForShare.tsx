@@ -26,6 +26,7 @@ import useDebouncedLoadingStatus from 'app/hooks/useDebouncedLoadingStatus';
 import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import ChartManager from 'app/models/ChartManager';
+import useDisplayJumpVizDialog from 'app/pages/MainPage/pages/VizPage/hooks/useDisplayJumpVizDialog';
 import useDisplayViewDetail from 'app/pages/MainPage/pages/VizPage/hooks/useDisplayViewDetail';
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
@@ -97,6 +98,8 @@ const ChartPreviewBoardForShare: FC<{
     const chartConfigRef = useRef(chartPreview?.chartConfig);
     const [openViewDetailPanel, viewDetailPanelContextHolder] =
       useDisplayViewDetail();
+    const [openJumpVizDialogModal, openJumpVizDialogModalContextHolder] =
+      useDisplayJumpVizDialog();
     const [jumpDialogModal, jumpDialogContextHolder] = useModal();
     const {
       getDrillThroughSetting,
@@ -104,8 +107,9 @@ const ChartPreviewBoardForShare: FC<{
       handleDrillThroughEvent,
       handleViewDataEvent,
     } = useChartInteractions({
-      openViewDetailPanel: openViewDetailPanel as any,
-      openJumpDialogModal: jumpDialogModal.info,
+      openViewDetailPanel: openViewDetailPanel as Function,
+      openJumpUrlDialogModal: jumpDialogModal.info,
+      openJumpVizDialogModal: openJumpVizDialogModal as Function,
     });
     const isLoadingData = useDebouncedLoadingStatus({
       isLoading: chartPreview?.isLoadingData,
@@ -395,6 +399,7 @@ const ChartPreviewBoardForShare: FC<{
         </ChartDrillContext.Provider>
         {viewDetailPanelContextHolder}
         {jumpDialogContextHolder}
+        {openJumpVizDialogModalContextHolder}
         <HeadlessBrowserIdentifier
           renderSign={headlessBrowserRenderSign}
           width={Number(width) || 0}

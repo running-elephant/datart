@@ -136,7 +136,7 @@ class ChartIFrameEventBroker {
         () => {
           this._listeners.get(event)?.call?.(this._chart, options, context);
         },
-        true,
+        false,
       );
     } catch (e) {
       console.error(`ChartEventBroker | ${event} exception ----> `, e);

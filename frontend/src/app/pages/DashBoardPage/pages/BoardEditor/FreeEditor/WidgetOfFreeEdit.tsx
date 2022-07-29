@@ -33,22 +33,24 @@ import { DraggableCore, DraggableEventHandler } from 'react-draggable';
 import { useSelector } from 'react-redux';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 import styled from 'styled-components/macro';
-import { WHITE } from 'styles/StyleConstants';
+import { LEVEL_DASHBOARD_EDIT_OVERLAY, WHITE } from 'styles/StyleConstants';
 import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
 import { BoardScaleContext } from '../../../components/FreeBoardBackground';
 import { WidgetInfoContext } from '../../../components/WidgetProvider/WidgetInfoProvider';
 import { ORIGINAL_TYPE_MAP } from '../../../constants';
 import { widgetMove, widgetMoveEnd } from '../slice/events';
-import { selectSelectedIds } from '../slice/selectors';
+import { selectEditingWidgetIds, selectSelectedIds } from '../slice/selectors';
 export enum DragTriggerTypes {
   MouseMove = 'mousemove',
   KeyDown = 'keydown',
 }
+
 export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const selectedIds = useSelector(selectSelectedIds);
   const widget = useContext(WidgetContext);
   const { editing: widgetEditing } = useContext(WidgetInfoContext);
   const { onEditFreeWidgetRect } = useContext(WidgetActionContext);
+  const editingWidgetIds = useSelector(selectEditingWidgetIds);
   const scale = useContext(BoardScaleContext);
   const hideHandle = useMemo(() => {
     return (
@@ -155,6 +157,11 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
   const ssp = e => {
     e.stopPropagation();
   };
+
+  if (editingWidgetIds?.includes(widget?.id)) {
+    style['zIndex'] = LEVEL_DASHBOARD_EDIT_OVERLAY + 1;
+  }
+
   return (
     <DraggableCore
       allowAnyClick

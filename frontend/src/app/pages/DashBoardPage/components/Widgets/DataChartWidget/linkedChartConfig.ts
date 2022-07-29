@@ -76,6 +76,10 @@ export const linkedChartToolkit: WidgetToolkit = {
         renderMode: ['edit'],
       },
       {
+        key: 'unlock',
+        renderMode: ['edit'],
+      },
+      {
         key: 'group',
         renderMode: ['edit'],
       },

@@ -76,6 +76,10 @@ const widgetToolkit: OwnedChartToolkit = {
         renderMode: ['edit'],
       },
       {
+        key: 'unlock',
+        renderMode: ['edit'],
+      },
+      {
         key: 'group',
         renderMode: ['edit'],
       },
