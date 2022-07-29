@@ -17,12 +17,13 @@
  */
 import { Tabs } from 'antd';
 import { TabWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { memo, useCallback, useContext, useState } from 'react';
+import { memo, useCallback, useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { PRIMARY } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions } from '../../../pages/BoardEditor/slice';
+import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { DropHolder } from '../../WidgetComponents/DropHolder';
 import { WidgetMapper } from '../../WidgetMapper/WidgetMapper';
@@ -36,6 +37,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const widget = useContext(WidgetContext);
   const { editing } = useContext(WidgetInfoContext);
+  const { onEditSelectWidget } = useContext(WidgetActionContext);
   const {
     boardType,
     editing: boardEditing,
@@ -47,7 +49,19 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
   const [activeKey, SetActiveKey] = useState<string | number>(
     tabsCons[0]?.index || 0,
   );
-  const onTabClick = useCallback((activeKey: string, event) => {
+
+  useEffect(() => {
+    const tab = tabsCons?.find(t => String(t.index) === String(activeKey));
+    if (tab && editing) {
+      onEditSelectWidget({
+        multipleKey: false,
+        id: tab.childWidgetId,
+        selected: true,
+      });
+    }
+  }, [activeKey, editing, onEditSelectWidget, tabsCons]);
+
+  const onTabClick = useCallback((activeKey: any, event) => {
     SetActiveKey(activeKey);
   }, []);
 

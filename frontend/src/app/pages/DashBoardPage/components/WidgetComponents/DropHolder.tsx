@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CONTAINER_TAB } from 'app/pages/DashBoardPage/constants';
 import { memo, useMemo } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
@@ -31,6 +32,7 @@ export interface DropHolderProps {
 export const DropHolder: React.FC<DropHolderProps> = memo(
   ({ tabItem, tabWidgetId }) => {
     const dispatch = useDispatch();
+    const t = useI18NPrefix(`viz.widget.tips`);
     const [{ isOver, canDrop }, refDrop] = useDrop(
       () => ({
         accept: CONTAINER_TAB,
@@ -70,7 +72,7 @@ export const DropHolder: React.FC<DropHolderProps> = memo(
     }, [isOver, canDrop]);
     return (
       <DropWrap ref={refDrop} bgColor={bgColor}>
-        <div className="center">将组件拖入该区域</div>
+        <div className="center">{t('selectFromRightPanel')}</div>
       </DropWrap>
     );
   },

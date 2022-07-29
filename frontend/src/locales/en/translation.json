@@ -1163,7 +1163,8 @@
         "unlock": "Locking drag and click to unlock",
         "waiting": "Waiting for loadData",
         "cancelLinkage": "Cancel Linkage",
-        "canLinkage": "Click the Widget to link"
+        "canLinkage": "Click the Widget to link",
+        "selectFromRightPanel": "Please select one widget from right panel"
       }
     },
     "linkage": {
