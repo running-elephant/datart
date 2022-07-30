@@ -1164,7 +1164,7 @@
         "waiting": "等待加载",
         "cancelLinkage": "取消联动",
         "canLinkage": "点击图表可联动",
-        "selectFromRightPanel": "请从右侧面板中选择一个图表"
+        "dragChartFromLeftPanel": "请从左侧面板中拖拽一个图表到当前位置"
       }
     },
     "linkage": {

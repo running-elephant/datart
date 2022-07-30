@@ -1164,7 +1164,7 @@
         "waiting": "Waiting for loadData",
         "cancelLinkage": "Cancel Linkage",
         "canLinkage": "Click the Widget to link",
-        "selectFromRightPanel": "Please select one widget from right panel"
+        "dragChartFromLeftPanel": "Please drag one widget from left panel and drop here"
       }
     },
     "linkage": {

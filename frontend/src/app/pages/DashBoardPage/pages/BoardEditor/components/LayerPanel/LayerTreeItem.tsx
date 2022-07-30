@@ -17,6 +17,7 @@
  */
 import { MoreOutlined } from '@ant-design/icons';
 import { TreeDataNode } from 'antd';
+import { WidgetDndHandleMask } from 'app/pages/DashBoardPage/components/WidgetComponents/WidgetDndHandleMask';
 import { WidgetDropdownList } from 'app/pages/DashBoardPage/components/WidgetComponents/WidgetDropdownList';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
@@ -34,11 +35,13 @@ export interface LayerNode extends TreeDataNode {
   originalType: string;
   boardId: string;
 }
+
 export type EventLayerNode = LayerNode & {
   dragOver: boolean;
   dragOverGapTop: boolean;
   dragOverGapBottom: boolean;
 };
+
 export const LayerTreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
   return (
     <WidgetWrapProvider
@@ -51,6 +54,7 @@ export const LayerTreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
     </WidgetWrapProvider>
   );
 });
+
 export const TreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
   const { title } = node;
   const widget = useContext(WidgetContext);
@@ -58,6 +62,7 @@ export const TreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
   return (
     <Item>
       <h4 title={title as string}>{String(title) || 'untitled-widget'}</h4>
+      <WidgetDndHandleMask widgetId={widget?.id} canWrapped={true} />
       <WidgetDropdownList
         widget={widget}
         buttonProps={{
@@ -69,6 +74,7 @@ export const TreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
     </Item>
   );
 });
+
 const Item = styled.div`
   display: flex;
   flex: 1;

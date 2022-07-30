@@ -72,7 +72,7 @@ export const DropHolder: React.FC<DropHolderProps> = memo(
     }, [isOver, canDrop]);
     return (
       <DropWrap ref={refDrop} bgColor={bgColor}>
-        <div className="center">{t('selectFromRightPanel')}</div>
+        <div className="center">{t('dragChartFromLeftPanel')}</div>
       </DropWrap>
     );
   },
