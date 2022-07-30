@@ -37,7 +37,7 @@ const { TabPane } = Tabs;
 export const TabWidgetCore: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const widget = useContext(WidgetContext);
-  const { align } = (tabProto.toolkit as TabToolkit).getCustomConfig(
+  const { align, position } = (tabProto.toolkit as TabToolkit).getCustomConfig(
     widget.config.customConfig.props,
   );
   const { editing } = useContext(WidgetInfoContext);
@@ -119,6 +119,8 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
       <Tabs
         onTabClick={editing ? onTabClick : undefined}
         size="small"
+        tabBarGutter={1}
+        tabPosition={position as any}
         activeKey={editing ? String(activeKey) : undefined}
         tabBarStyle={{ fontSize: '16px' }}
         type={editing ? 'editable-card' : undefined}
@@ -205,5 +207,9 @@ const TabsBoxWrap = styled.div<{ tabsAlign: string }>`
 
   & .ant-tabs .ant-tabs-nav-wrap {
     justify-content: ${p => p.tabsAlign};
+
+    & > .ant-tabs-nav-list {
+      flex: none;
+    }
   }
 `;

@@ -402,6 +402,19 @@
           "left": "左对齐",
           "center": "居中",
           "right": "右对齐"
+        },
+        "alignment": {
+          "center": "居中",
+          "left": "左对齐",
+          "right": "右对齐",
+          "start": "起始位置",
+          "end": "结束位置"
+        },
+        "position": {
+          "left": "左侧",
+          "right": "右侧",
+          "top": "上部",
+          "bottom": "底部"
         }
       },
       "filter": {

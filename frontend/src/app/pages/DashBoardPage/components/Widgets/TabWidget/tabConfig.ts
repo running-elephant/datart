@@ -48,10 +48,12 @@ const tabsI18N = {
   zh: {
     tabGroup: '标签页配置',
     alignTitle: '对齐方式',
+    position: '标签位置',
   },
   en: {
     tabGroup: 'Tab Config',
     alignTitle: 'Align',
+    position: 'Position',
   },
 };
 
@@ -105,14 +107,29 @@ const initTabsTpl = () => {
       {
         label: 'tab.alignTitle',
         key: 'align',
-        default: 'center',
+        default: 'start',
         comType: 'select',
         options: {
           translateItemLabel: true,
           items: [
-            { label: 'viz.common.enum.fontAlignment.center', value: 'center' },
-            { label: 'viz.common.enum.fontAlignment.left', value: 'left' },
-            { label: 'viz.common.enum.fontAlignment.right', value: 'right' },
+            { label: 'viz.common.enum.alignment.start', value: 'start' },
+            { label: 'viz.common.enum.alignment.center', value: 'center' },
+            { label: 'viz.common.enum.alignment.end', value: 'end' },
+          ],
+        },
+      },
+      {
+        label: 'tab.position',
+        key: 'position',
+        default: 'top',
+        comType: 'select',
+        options: {
+          translateItemLabel: true,
+          items: [
+            { label: 'viz.common.enum.position.top', value: 'top' },
+            { label: 'viz.common.enum.position.bottom', value: 'bottom' },
+            { label: 'viz.common.enum.position.left', value: 'left' },
+            { label: 'viz.common.enum.position.right', value: 'right' },
           ],
         },
       },
@@ -123,6 +140,7 @@ const initTabsTpl = () => {
 export type TabToolkit = WidgetToolkit & {
   getCustomConfig: (props) => {
     align: string;
+    position: string;
   };
 };
 export const widgetToolkit: TabToolkit = {
@@ -194,10 +212,14 @@ export const widgetToolkit: TabToolkit = {
   // getWidgetName() {},
   // //
   getCustomConfig(props) {
-    const [align, font] = getJsonConfigs(props, ['tabGroup'], ['align']);
+    const [align, position] = getJsonConfigs(
+      props,
+      ['tabGroup'],
+      ['align', 'position'],
+    );
     return {
       align,
-      font,
+      position,
     };
   },
 };

@@ -402,6 +402,21 @@
           "left": "Left",
           "center": "Center",
           "right": "Right"
+        },
+        "alignment": {
+          "center": "Center",
+          "left": "Left",
+          "right": "Right",
+          "top": "Top",
+          "bottom": "Bottom",
+          "start": "Start",
+          "end": "End"
+        },
+        "position": {
+          "left": "Left",
+          "right": "Right",
+          "top": "Top",
+          "bottom": "Bottom"
         }
       },
       "filter": {
