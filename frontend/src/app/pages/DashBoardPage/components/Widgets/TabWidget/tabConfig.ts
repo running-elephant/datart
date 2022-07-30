@@ -24,6 +24,7 @@ import type {
   WidgetProto,
   WidgetToolkit,
 } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { getJsonConfigs } from 'app/pages/DashBoardPage/utils';
 import { WHITE } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import {
@@ -42,6 +43,18 @@ const NameI18N = {
   zh: '标签卡',
   en: 'Tab',
 };
+
+const tabsI18N = {
+  zh: {
+    tabGroup: '标签页配置',
+    alignTitle: '对齐方式',
+  },
+  en: {
+    tabGroup: 'Tab Config',
+    alignTitle: 'Align',
+  },
+};
+
 export const widgetMeta: WidgetMeta = {
   icon: 'tab-widget',
   originalType: ORIGINAL_TYPE_MAP.tab,
@@ -63,6 +76,7 @@ export const widgetMeta: WidgetMeta = {
         padding: PaddingI18N.zh,
         loopFetch: LoopFetchI18N.zh,
         border: { borderGroup: '边框' },
+        tab: tabsI18N.zh,
       },
     },
     {
@@ -76,12 +90,41 @@ export const widgetMeta: WidgetMeta = {
         padding: PaddingI18N.en,
         loopFetch: LoopFetchI18N.en,
         border: { borderGroup: 'Border' },
+        tab: tabsI18N.en,
       },
     },
   ],
 };
 
-export type TabToolkit = WidgetToolkit & {};
+const initTabsTpl = () => {
+  return {
+    label: 'tab.tabGroup',
+    key: 'tabGroup',
+    comType: 'group',
+    rows: [
+      {
+        label: 'tab.alignTitle',
+        key: 'align',
+        default: 'center',
+        comType: 'select',
+        options: {
+          translateItemLabel: true,
+          items: [
+            { label: 'viz.common.enum.fontAlignment.center', value: 'center' },
+            { label: 'viz.common.enum.fontAlignment.left', value: 'left' },
+            { label: 'viz.common.enum.fontAlignment.right', value: 'right' },
+          ],
+        },
+      },
+    ],
+  };
+};
+
+export type TabToolkit = WidgetToolkit & {
+  getCustomConfig: (props) => {
+    align: string;
+  };
+};
 export const widgetToolkit: TabToolkit = {
   create: opt => {
     const widget = widgetTpl();
@@ -94,6 +137,7 @@ export const widgetToolkit: TabToolkit = {
     widget.config.name = opt.name || '';
 
     widget.config.customConfig.props = [
+      { ...initTabsTpl() },
       { ...initTitleTpl() },
       { ...initPaddingTpl() },
       { ...initBackgroundTpl(WHITE) },
@@ -149,33 +193,15 @@ export const widgetToolkit: TabToolkit = {
   // getMeta() {},
   // getWidgetName() {},
   // //
+  getCustomConfig(props) {
+    const [align, font] = getJsonConfigs(props, ['tabGroup'], ['align']);
+    return {
+      align,
+      font,
+    };
+  },
 };
-// {
-//     "content": {
-//         "type": "tab",
-//         "itemMap": {
-//             "e0b91da7-8f66-4fa5-bcc3-d66806b5d29f": {
-//                 'index': 0,
-//                 "tabId": "e0b91da7-8f66-4fa5-bcc3-d66806b5d29f",
-//                 "name": "时间筛选",
-//                 "childWidgetId": "newWidget_54b6abfc-b71d-423c-8c0d-d3641ff45b61",
-//             },
-//             "d93cb3dd-0c15-4568-97e5-aaafe85e3f17": {
-//                 'index': 1,
-//                 "tabId": "d93cb3dd-0c15-4568-97e5-aaafe85e3f17",
-//                 "name": "图片_14",
-//                 "childWidgetId": "newWidget_a2bc9c3c-22ef-4bbd-8345-3b2e8567d986",
-//             },
-//             "eac42b77-41be-4389-be43-202b70c4c2fd": {
-//                 'index': 2,
-//                 "tabId": "eac42b77-41be-4389-be43-202b70c4c2fd",
-//                 "name": "iframe_17",
-//                 "childWidgetId": "newWidget_3ceb5e04-f3d4-4dea-8675-680f5b7c8201",
-//             }
-//         },
-//         "tabConfig": {}
-//     }
-// }
+
 const tabProto: WidgetProto = {
   originalType: widgetMeta.originalType,
   meta: widgetMeta,
