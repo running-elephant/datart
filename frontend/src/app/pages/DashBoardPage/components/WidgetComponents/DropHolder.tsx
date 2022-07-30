@@ -17,7 +17,8 @@
  */
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { CONTAINER_TAB } from 'app/pages/DashBoardPage/constants';
-import { memo, useMemo } from 'react';
+import { rgba } from 'polished';
+import { memo } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -59,32 +60,31 @@ export const DropHolder: React.FC<DropHolderProps> = memo(
       }),
       [],
     );
-    const bgColor = useMemo(() => {
-      let color = 'transparent';
-      if (canDrop) {
-        color = '#f1e648c7';
-        if (isOver) {
-          color = '#1bcf81d3';
-        }
-      }
 
-      return color;
-    }, [isOver, canDrop]);
     return (
-      <DropWrap ref={refDrop} bgColor={bgColor}>
+      <DropWrap ref={refDrop} canDrop={canDrop} isOver={isOver}>
         <div className="center">{t('dragChartFromLeftPanel')}</div>
       </DropWrap>
     );
   },
 );
 
-const DropWrap = styled.div<{ bgColor: string }>`
+const DropWrap = styled.div<{
+  bgColor?: string;
+  canDrop: boolean;
+  isOver: boolean;
+}>`
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
-  background-color: ${p => p.bgColor};
+  background-color: ${props =>
+    props.canDrop
+      ? rgba(props.theme.success, 0.25)
+      : props.isOver
+      ? rgba(props.theme.error, 0.25)
+      : props.theme.emphasisBackground};
 
   .center {
     text-align: center;
