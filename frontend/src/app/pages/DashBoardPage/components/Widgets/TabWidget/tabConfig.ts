@@ -98,7 +98,7 @@ export const widgetMeta: WidgetMeta = {
   ],
 };
 
-const initTabsTpl = () => {
+export const initTabsTpl = () => {
   return {
     label: 'tab.tabGroup',
     key: 'tabGroup',
@@ -108,6 +108,7 @@ const initTabsTpl = () => {
         label: 'tab.alignTitle',
         key: 'align',
         default: 'start',
+        value: 'start',
         comType: 'select',
         options: {
           translateItemLabel: true,
@@ -122,6 +123,7 @@ const initTabsTpl = () => {
         label: 'tab.position',
         key: 'position',
         default: 'top',
+        value: 'top',
         comType: 'select',
         options: {
           translateItemLabel: true,
