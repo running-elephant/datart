@@ -194,7 +194,6 @@ module.exports = {
     },
     modulePaths: ['../'],
   },
-
   devServer: {
     before: function (app, server, compiler) {
       app.get('/api/v1/plugins/custom/charts', function (req, res) {
@@ -202,7 +201,7 @@ module.exports = {
         const dir = fs.readdirSync(`./public/${pluginPath}`);
         res.json({
           data: (dir || [])
-            .filter(file => path.extname(file) == '.js')
+            .filter(file => path.extname(file) === '.js')
             .map(file => `${pluginPath}/${file}`),
           errCode: 0,
           success: true,
