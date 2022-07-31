@@ -2,7 +2,6 @@ const path = require('path');
 const fs = require('fs');
 const WebpackBar = require('webpackbar');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-// const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 // const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const {
   when,
@@ -46,7 +45,6 @@ module.exports = {
     plugins: [
       new WebpackBar(),
       new MonacoWebpackPlugin({ languages: [''] }),
-      // new MiniCssExtractPlugin(),
       // new BundleAnalyzerPlugin(),
     ],
     configure: (webpackConfig, { env, paths }) => {
@@ -138,10 +136,10 @@ module.exports = {
         },
       };
 
-      // const instanceOfMiniCssExtractPlugin = webpackConfig.plugins.filter(
-      //   plugin => plugin.constructor.name === 'MiniCssExtractPlugin',
-      // )[0];
-      // instanceOfMiniCssExtractPlugin.options.ignoreOrder = true;
+      const instanceOfMiniCssExtractPlugin = webpackConfig.plugins.find(
+        plugin => plugin.constructor.name === 'MiniCssExtractPlugin',
+      );
+      instanceOfMiniCssExtractPlugin.options.ignoreOrder = true;
 
       const defaultEntryHTMLPlugin = webpackConfig.plugins.filter(plugin => {
         return plugin.constructor.name === 'HtmlWebpackPlugin';
