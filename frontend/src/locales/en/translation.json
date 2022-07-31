@@ -402,6 +402,21 @@
           "left": "Left",
           "center": "Center",
           "right": "Right"
+        },
+        "alignment": {
+          "center": "Center",
+          "left": "Left",
+          "right": "Right",
+          "top": "Top",
+          "bottom": "Bottom",
+          "start": "Start",
+          "end": "End"
+        },
+        "position": {
+          "left": "Left",
+          "right": "Right",
+          "top": "Top",
+          "bottom": "Bottom"
         }
       },
       "filter": {
@@ -1034,7 +1049,7 @@
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",
-        "iframe": "iFrame",
+        "iframe": "IFrame",
         "video": "Video",
         "container": "Container",
         "tab": "Tab",
@@ -1163,7 +1178,8 @@
         "unlock": "Locking drag and click to unlock",
         "waiting": "Waiting for loadData",
         "cancelLinkage": "Cancel Linkage",
-        "canLinkage": "Click the Widget to link"
+        "canLinkage": "Click the Widget to link",
+        "dragChartFromLeftPanel": "Please drag one widget from left panel and drop here"
       }
     },
     "linkage": {
