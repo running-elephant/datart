@@ -136,10 +136,10 @@ module.exports = {
         },
       };
 
-      const instanceOfMiniCssExtractPlugin = webpackConfig.plugins.find(
-        plugin => plugin.constructor.name === 'MiniCssExtractPlugin',
-      );
-      instanceOfMiniCssExtractPlugin.options.ignoreOrder = true;
+      // const instanceOfMiniCssExtractPlugin = webpackConfig.plugins.find(
+      //   plugin => plugin.constructor.name === 'MiniCssExtractPlugin',
+      // );
+      // instanceOfMiniCssExtractPlugin.options.ignoreOrder = true;
 
       const defaultEntryHTMLPlugin = webpackConfig.plugins.filter(plugin => {
         return plugin.constructor.name === 'HtmlWebpackPlugin';
