@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionType } from 'app/constants';
+import { ChartDataSectionType, ChartInteractionEvent } from 'app/constants';
 import ReactChart from 'app/models/ReactChart';
 import { ChartMouseEventParams, ChartsEventData } from 'app/types/Chart';
 import {
@@ -150,7 +150,7 @@ class Scorecard extends ReactChart {
     const eventParams: ChartMouseEventParams = {
       type: 'click',
       chartType: 'scorecard',
-      interactionType: 'select',
+      interactionType: ChartInteractionEvent.Select,
       data,
       selectedItems: [
         {

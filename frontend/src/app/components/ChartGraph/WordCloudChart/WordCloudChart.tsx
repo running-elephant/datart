@@ -21,7 +21,8 @@ import { ChartConfig, ChartStyleConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
-  getDefaultThemeColor, getExtraSeriesRowData,
+  getDefaultThemeColor,
+  getExtraSeriesRowData,
   getStyles,
   transformToDataSet,
 } from 'app/utils/chartHelper';
