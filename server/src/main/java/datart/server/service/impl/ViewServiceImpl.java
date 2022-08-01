@@ -106,6 +106,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         List<RelSubjectColumns> columnPermission = viewCreateParam.getColumnPermission();
         if (!CollectionUtils.isEmpty(columnPermission)) {
             for (RelSubjectColumns relSubjectColumns : columnPermission) {
+                relSubjectColumns.setViewId(view.getId());
                 relSubjectColumns.setId(UUIDGenerator.generate());
                 relSubjectColumns.setCreateBy(getCurrentUser().getId());
                 relSubjectColumns.setCreateTime(new Date());
