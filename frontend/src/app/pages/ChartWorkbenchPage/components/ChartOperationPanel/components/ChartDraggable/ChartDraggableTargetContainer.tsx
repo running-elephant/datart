@@ -204,7 +204,8 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           if (
             monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
           ) {
-            return true;
+            const exists = currentConfig.rows?.map(col => col.colName);
+            return items.every(i => !exists?.includes(i.colName));
           }
 
           if (currentConfig.allowSameField) {
