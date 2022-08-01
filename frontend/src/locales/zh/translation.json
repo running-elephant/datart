@@ -538,7 +538,11 @@
         "byNameSort": "按名称排序",
         "noSort": "按原始字段顺序排序",
         "Group": "分组方式",
-        "Sort": "排序方式"
+        "Sort": "排序方式",
+        "cancel": "取消",
+        "empty": "清空",
+        "reserve": "保留",
+        "searchField": "搜索字段名称"
       }
     },
     "palette": {

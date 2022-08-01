@@ -538,7 +538,11 @@
         "byNameSort": "Sort by name",
         "noSort": "Sort by original field order",
         "Group": "Group",
-        "Sort": "Sort"
+        "Sort": "Sort",
+        "cancel": "Cancel",
+        "empty": "Empty",
+        "reserve": "Reserve",
+        "searchField": "Search Field Name"
       }
     },
     "palette": {
