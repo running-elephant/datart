@@ -235,7 +235,7 @@ function ShareDashboardPage() {
       {!Boolean(needVerify) && shareBoard && (
         <DashboardForShare
           dashboard={shareBoard}
-          allowDownload={true}
+          allowDownload={false}
           loadVizData={loadVizData}
           onMakeShareDownloadDataTask={onMakeShareDownloadDataTask}
           renderMode={renderMode}

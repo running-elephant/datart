@@ -19,7 +19,7 @@
 import { ChartDataSectionType } from 'app/constants';
 import Chart from 'app/models/Chart';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
-import { ChartSelection } from 'app/models/ChartSelection';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -33,8 +33,8 @@ import ChartDataSetDTO, {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
-  getChartSelection,
   getColumnRenderName,
   getDrillableRows,
   getExtraSeriesDataFormat,
@@ -53,8 +53,7 @@ import { PieSeries, PieSeriesImpl, PieSeriesStyle } from './types';
 class BasicPieChart extends Chart {
   config = Config;
   chart: any = null;
-
-  private selection: null | ChartSelection = null;
+  selectionManager?: ChartSelectionManager;
 
   protected isCircle = false;
   protected isRose = false;
@@ -70,7 +69,7 @@ class BasicPieChart extends Chart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (
       options.containerId === undefined ||
       !context.document ||
@@ -80,61 +79,40 @@ class BasicPieChart extends Chart {
     }
 
     this.chart = init(
-      context.document.getElementById(options.containerId),
+      context.document.getElementById(options.containerId)!,
       'default',
     );
-    this.selection = getChartSelection(context.window, {
-      chart: this.chart,
-      mouseEvents: this.mouseEvents,
-    });
-    this.mouseEvents?.forEach(event => {
-      switch (event.name) {
-        case 'click':
-          this.chart.on(event.name, params => {
-            this.selection?.doSelect({
-              index: params.componentIndex + ',' + params.dataIndex,
-              data: params.data,
-            });
-            event.callback({
-              ...params,
-              interactionType: 'select',
-              selectedItems: this.selection?.selectedItems,
-            });
-          });
-          break;
-        default:
-          this.chart.on(event.name, event.callback);
-          break;
-      }
-    });
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
+    this.selectionManager.attachWindowListeners(context.window);
+    this.selectionManager.attachZRenderListeners(this.chart);
+    this.selectionManager.attachEChartsListeners(this.chart);
   }
 
-  onUpdated(props, context): void {
-    if (!props.dataset || !props.dataset.columns || !props.config) {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
+    if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
-    if (!this.isMatchRequirement(props.config)) {
+    if (!this.isMatchRequirement(options.config)) {
       this.chart?.clear();
       return;
     }
-    if (this.selection?.selectedItems.length && !props.selectedItems?.length) {
-      this.selection?.clearAll();
-    }
+    this.selectionManager?.updateSelectedItems(options?.selectedItems);
     const newOptions = this.getOptions(
-      props.dataset,
-      props.config,
-      props.drillOption,
-      props.selectedItems,
+      options.dataset,
+      options.config,
+      options.drillOption,
+      options.selectedItems,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {
-    this.selection?.removeEvent();
+  onUnMount(options: BrokerOption, context: BrokerContext) {
+    this.selectionManager?.removeWindowListeners(context.window);
+    this.selectionManager?.removeZRenderListeners(this.chart);
     this.chart?.dispose();
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext) {
     this.chart?.resize(context);
   }
 

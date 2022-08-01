@@ -22,11 +22,16 @@ import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetPro
 import { memo, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { isEmptyArray } from 'utils/object';
 import SlideBackground from '../../../components/FreeBoardBackground';
 import useClientRect from '../../../hooks/useClientRect';
 import useSlideStyle from '../../../hooks/useSlideStyle';
 import ZoomControl from '../../Board/FreeDashboard/ZoomControl';
-import { selectLayoutWidgetMap } from '../slice/selectors';
+import BoardOverlay from '../components/BoardOverlay';
+import {
+  selectEditingWidgetIds,
+  selectLayoutWidgetMap,
+} from '../slice/selectors';
 import { WidgetOfFreeEdit } from './WidgetOfFreeEdit';
 
 export const FreeBoardEditor: React.FC<{}> = memo(() => {
@@ -36,7 +41,7 @@ export const FreeBoardEditor: React.FC<{}> = memo(() => {
     scaleMode,
   } = useContext(BoardConfigValContext);
   const { autoFit, boardId } = useContext(BoardContext);
-
+  const editingWidgetIds = useSelector(selectEditingWidgetIds);
   const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
   const sortedLayoutWidgets = Object.values(layoutWidgetMap).sort(
     (a, b) => a.config.index - b.config.index,
@@ -71,6 +76,7 @@ export const FreeBoardEditor: React.FC<{}> = memo(() => {
               <WidgetOfFreeEdit />
             </WidgetWrapProvider>
           ))}
+          {!isEmptyArray(editingWidgetIds) && <BoardOverlay />}
         </SlideBackground>
       </div>
 

@@ -15,12 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import { memo, useContext } from 'react';
 import widgetManagerInstance from '../WidgetManager';
 import { WidgetInfoContext } from '../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../WidgetProvider/WidgetProvider';
 import { BlockMaskLayer } from './BlockMaskLayer';
 import { WidgetDndHandleMask } from './WidgetDndHandleMask';
+
 export const EditMask: React.FC<{ group?: boolean }> = memo(({ group }) => {
   const widget = useContext(WidgetContext);
   const canWrapped = widgetManagerInstance.meta(

@@ -17,25 +17,31 @@
  */
 import { Tabs } from 'antd';
 import { TabWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { memo, useCallback, useContext, useState } from 'react';
+import { memo, useCallback, useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { PRIMARY } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions } from '../../../pages/BoardEditor/slice';
+import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { DropHolder } from '../../WidgetComponents/DropHolder';
 import { WidgetMapper } from '../../WidgetMapper/WidgetMapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { WidgetWrapProvider } from '../../WidgetProvider/WidgetWrapProvider';
+import tabProto, { TabToolkit } from './tabConfig';
 
 const { TabPane } = Tabs;
 
 export const TabWidgetCore: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const widget = useContext(WidgetContext);
+  const { align, position } = (tabProto.toolkit as TabToolkit).getCustomConfig(
+    widget.config.customConfig.props,
+  );
   const { editing } = useContext(WidgetInfoContext);
+  const { onEditSelectWidget } = useContext(WidgetActionContext);
   const {
     boardType,
     editing: boardEditing,
@@ -43,11 +49,22 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
   } = useContext(BoardContext);
   const { itemMap } = widget.config.content as TabWidgetContent;
   const tabsCons = Object.values(itemMap).sort((a, b) => a.index - b.index);
-
   const [activeKey, SetActiveKey] = useState<string | number>(
     tabsCons[0]?.index || 0,
   );
-  const onTabClick = useCallback((activeKey: string, event) => {
+
+  useEffect(() => {
+    const tab = tabsCons?.find(t => String(t.index) === String(activeKey));
+    if (tab && editing) {
+      onEditSelectWidget({
+        multipleKey: false,
+        id: tab.childWidgetId,
+        selected: true,
+      });
+    }
+  }, [activeKey, editing, onEditSelectWidget, tabsCons]);
+
+  const onTabClick = useCallback((activeKey: any, event) => {
     SetActiveKey(activeKey);
   }, []);
 
@@ -70,6 +87,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
       SetActiveKey(nextIndex);
     });
   }, [dispatch, tabsCons, widget.id]);
+
   const tabRemove = useCallback(
     targetKey => {
       const tabId =
@@ -88,19 +106,22 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
 
     [dispatch, widget.id, boardType, tabsCons],
   );
+
   const tabEdit = useCallback(
     (targetKey, action: 'add' | 'remove') => {
       action === 'add' ? tabAdd() : tabRemove(targetKey);
     },
     [tabAdd, tabRemove],
   );
+
   return (
-    <TabsBoxWrap className="TabsBoxWrap">
+    <TabsBoxWrap className="TabsBoxWrap" tabsAlign={align}>
       <Tabs
         onTabClick={editing ? onTabClick : undefined}
         size="small"
+        tabBarGutter={1}
+        tabPosition={position as any}
         activeKey={editing ? String(activeKey) : undefined}
-        centered
         tabBarStyle={{ fontSize: '16px' }}
         type={editing ? 'editable-card' : undefined}
         onEdit={editing ? tabEdit : undefined}
@@ -142,7 +163,7 @@ const MapWrapper = styled.div`
   width: 100%;
   height: 100%;
 `;
-const TabsBoxWrap = styled.div<{}>`
+const TabsBoxWrap = styled.div<{ tabsAlign: string }>`
   width: 100%;
   height: 100%;
 
@@ -182,5 +203,13 @@ const TabsBoxWrap = styled.div<{}>`
     margin: 0 20px;
     background: none;
     border: none;
+  }
+
+  & .ant-tabs .ant-tabs-nav-wrap {
+    justify-content: ${p => p.tabsAlign};
+
+    & > .ant-tabs-nav-list {
+      flex: none;
+    }
   }
 `;

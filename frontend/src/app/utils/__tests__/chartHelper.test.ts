@@ -34,7 +34,6 @@ import { IChartDataSet } from 'app/types/ChartDataSet';
 import {
   clearRuntimeDateLevelFieldsInChartConfig,
   compareSelectedItems,
-  getChartSelection,
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getDataColumnMaxAndMin2,
@@ -2956,12 +2955,4 @@ describe('Chart Helper ', () => {
       });
     },
   );
-
-  describe('getChartSelection Test - ', () => {
-    test(`Get chart selection`, () => {
-      const option = getChartSelection(window);
-      expect(option).not.toBeNull();
-      expect(option.selectedItems).toEqual([]);
-    });
-  });
 });

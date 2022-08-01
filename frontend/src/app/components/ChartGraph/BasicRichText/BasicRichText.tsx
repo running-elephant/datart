@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionType } from 'app/constants';
+import { ChartDataSectionType, ChartInteractionEvent } from 'app/constants';
 import ReactChart from 'app/models/ReactChart';
 import { ChartConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getColumnRenderName,
   getStyles,
@@ -55,7 +56,7 @@ class BasicRichText extends ReactChart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (options.containerId === undefined || !context.document) {
       return;
     }
@@ -67,7 +68,7 @@ class BasicRichText extends ReactChart {
     );
   }
 
-  onUpdated(options, context): void {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
     this.richTextOptions = Object.assign(this.richTextOptions, options);
     if (!this.isMatchRequirement(options.config)) {
       this.adapter?.unmount();
@@ -80,7 +81,7 @@ class BasicRichText extends ReactChart {
     );
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext) {
     this.onUpdated(this.richTextOptions, context);
   }
 
@@ -148,7 +149,7 @@ class BasicRichText extends ReactChart {
             cur.callback?.({
               type: 'change',
               chartType: 'rich-text',
-              interactionType: 'rich-text-change-context',
+              interactionType: ChartInteractionEvent.ChangeContext,
               value: delta,
             }),
         });

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import { init } from 'echarts';
 import Chart from '../../../models/Chart';
 import Config from './config';
@@ -45,26 +46,26 @@ class BasicAreaChart extends Chart {
     super('area', 'viz.palette.graph.names.areaChart', 'area-chart');
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (options.containerId === undefined || !context.document) {
       return;
     }
 
     this.chart = init(
-      context.document.getElementById(options.containerId),
+      context.document.getElementById(options.containerId)!,
       'default',
     );
   }
 
-  onUpdated({ config }: { config: any }): void {
-    this.chart?.setOption(Object.assign({}, config), true);
+  onUpdated(options: BrokerOption, context: BrokerContext) {
+    this.chart?.setOption(Object.assign({}, options?.config), true);
   }
 
-  onUnMount(): void {
+  onUnMount(options: BrokerOption, context: BrokerContext) {
     this.chart?.dispose();
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext) {
     this.chart?.resize(context);
   }
 }

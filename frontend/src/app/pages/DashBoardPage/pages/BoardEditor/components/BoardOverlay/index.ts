@@ -16,19 +16,6 @@
  * limitations under the License.
  */
 
-import { SelectedItem } from 'app/types/ChartConfig';
-import { ECharts } from 'echarts';
-import { ChartMouseEvent } from './Chart';
+import BoardOverlay from './BoardOverlay';
 
-export interface ChartSelectionOptions {
-  chart: ECharts;
-  mouseEvents?: ChartMouseEvent[];
-}
-
-export interface IChartSelection {
-  selectedItems: SelectedItem[];
-  doSelect: (params: SelectedItem) => void;
-  clearAll: () => void;
-  removeEvent: () => void;
-  addEvent: () => void;
-}
+export default BoardOverlay;

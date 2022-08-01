@@ -16,19 +16,22 @@
  * limitations under the License.
  */
 
-import { SelectedItem } from 'app/types/ChartConfig';
-import { ECharts } from 'echarts';
-import { ChartMouseEvent } from './Chart';
+import { FC, memo } from 'react';
+import styled from 'styled-components/macro';
+import { LEVEL_DASHBOARD_EDIT_OVERLAY } from 'styles/StyleConstants';
 
-export interface ChartSelectionOptions {
-  chart: ECharts;
-  mouseEvents?: ChartMouseEvent[];
-}
+const BoardOverlay: FC = memo(() => {
+  return <Overlay />;
+});
 
-export interface IChartSelection {
-  selectedItems: SelectedItem[];
-  doSelect: (params: SelectedItem) => void;
-  clearAll: () => void;
-  removeEvent: () => void;
-  addEvent: () => void;
-}
+export default BoardOverlay;
+
+const Overlay = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: ${LEVEL_DASHBOARD_EDIT_OVERLAY};
+  background-color: rgba(0, 0, 0, 0.6);
+`;

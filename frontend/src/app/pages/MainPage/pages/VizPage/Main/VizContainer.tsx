@@ -18,10 +18,11 @@ interface VizContainerProps {
   orgId: string;
   vizs: FolderViewModel[];
   selectedId?: string;
+  hideTitle?: boolean;
 }
 
 export const VizContainer = memo(
-  ({ tab, orgId, vizs, selectedId }: VizContainerProps) => {
+  ({ tab, orgId, vizs, selectedId, hideTitle }: VizContainerProps) => {
     const { id, name, type, search, parentId, permissionId } = tab;
     const path = useMemo(
       () =>
@@ -65,6 +66,7 @@ export const VizContainer = memo(
             showZoomCtrl={true}
             allowManage={allowManage}
             renderMode="read"
+            hideTitle={hideTitle}
           />
         );
         break;
@@ -78,6 +80,7 @@ export const VizContainer = memo(
             allowDownload={allowDownload}
             allowShare={allowShare}
             allowManage={allowManage}
+            hideTitle={hideTitle}
           />
         );
         break;
@@ -114,6 +117,7 @@ const Container = styled.div`
   display: none;
   flex: 1;
   flex-direction: column;
+  height: 100%;
 
   &.selected {
     display: flex;
