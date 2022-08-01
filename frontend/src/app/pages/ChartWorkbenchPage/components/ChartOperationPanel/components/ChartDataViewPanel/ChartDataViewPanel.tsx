@@ -544,7 +544,7 @@ const ChartDataViewPanel: FC<{
         </Popover>
         {modalContextHolder}
       </Header>
-      <Searchbar visible={isShowSearch}>
+      <StyleSearchbar visible={isShowSearch}>
         <Input
           autoFocus
           className="search-input"
@@ -553,11 +553,11 @@ const ChartDataViewPanel: FC<{
           bordered={false}
           onChange={treeSearch}
         />
-      </Searchbar>
+      </StyleSearchbar>
       <Confirm {...confirmProps} />
 
       <ChartDraggableSourceGroupContainer
-        meta={filteredTreeData as any}
+        meta={filteredTreeData as ChartDataViewMeta[]}
         onDeleteComputedField={handleDeleteComputedField}
         onEditComputedField={handleEditComputedField}
       />
@@ -585,7 +585,7 @@ const Header = styled.div`
   }
 `;
 
-const Searchbar = styled.div<{ visible: boolean }>`
+const StyleSearchbar = styled.div<{ visible: boolean }>`
   display: ${p => (p.visible ? 'block' : 'none')};
   padding: ${SPACE} 0;
 
