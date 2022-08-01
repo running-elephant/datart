@@ -18,7 +18,8 @@
 
 import { ChartDataSectionType } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
-import { ChartSelection } from 'app/models/ChartSelection';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
+import { IChartLifecycle } from 'app/types/Chart';
 import {
   ChartConfig,
   ChartDataConfig,
@@ -32,8 +33,8 @@ import {
   YAxis,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
-  getChartSelection,
   getColorizeGroupSeriesColumns,
   getColumnRenderName,
   getDrillableRows,
@@ -58,14 +59,14 @@ import { ChartRequirement } from '../../../types/ChartMetadata';
 import Config from './config';
 import { BarBorderStyle, BarSeriesImpl, Series } from './types';
 
-class BasicBarChart extends Chart {
+class BasicBarChart extends Chart implements IChartLifecycle {
   config = Config;
   chart: any = null;
+  selectionManager?: ChartSelectionManager;
 
   protected isHorizonDisplay = false;
   protected isStackMode = false;
   protected isPercentageYAxis = false;
-  private selection: null | ChartSelection = null;
   protected dataZoomConfig: {
     setConfig: any;
     showConfig: any;
@@ -93,7 +94,7 @@ class BasicBarChart extends Chart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (
       options.containerId === undefined ||
       !context.document ||
@@ -103,42 +104,25 @@ class BasicBarChart extends Chart {
     }
 
     this.chart = init(
-      context.document.getElementById(options.containerId),
+      context.document.getElementById(options.containerId)!,
       'default',
     );
-    this.selection = getChartSelection(context.window, {
-      chart: this.chart,
-      mouseEvents: this.mouseEvents,
-    });
+
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
+    this.selectionManager.attachWindowListeners(context.window);
+    this.selectionManager.attachZRenderListeners(this.chart);
+    this.selectionManager.attachEChartsListeners(this.chart);
+
+    // TODO(Stephen): refactor to chart data zoom manager model
     this.chart.on('datazoom', ({ end, start }) => {
       this.dataZoomConfig.showConfig = {
         end,
         start,
       };
     });
-    this.mouseEvents?.forEach(event => {
-      switch (event.name) {
-        case 'click':
-          this.chart.on(event.name, params => {
-            this.selection?.doSelect({
-              index: params.componentIndex + ',' + params.dataIndex,
-              data: params.data,
-            });
-            event.callback({
-              ...params,
-              interactionType: 'select',
-              selectedItems: this.selection?.selectedItems,
-            });
-          });
-          break;
-        default:
-          this.chart.on(event.name, event.callback);
-          break;
-      }
-    });
   }
 
-  onUpdated(options, context): void {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
     if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
@@ -147,12 +131,8 @@ class BasicBarChart extends Chart {
       this.chart?.clear();
       return;
     }
-    if (
-      this.selection?.selectedItems.length &&
-      !options.selectedItems?.length
-    ) {
-      this.selection?.clearAll();
-    }
+
+    this.selectionManager?.updateSelectedItems(options?.selectedItems);
     const newOptions = this.getOptions(
       options.dataset,
       options.config,
@@ -162,15 +142,16 @@ class BasicBarChart extends Chart {
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {
-    this.selection?.removeEvent();
+  onUnMount(options: BrokerOption, context: BrokerContext) {
+    this.selectionManager?.removeWindowListeners(context.window);
+    this.selectionManager?.removeZRenderListeners(this.chart);
     this.chart?.dispose();
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext) {
     this.chart?.resize({ width: context?.width, height: context?.height });
     hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
-      this.onUpdated(opt, context);
+      this.onUpdated(options, context);
   }
 
   getOptions(

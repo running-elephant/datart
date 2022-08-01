@@ -86,6 +86,14 @@ export const BlockMaskLayer: React.FC<BlockMaskLayerProps> = memo(
 );
 
 const MaskLayer = styled.div<{ front: boolean; hideBorder: boolean }>`
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  z-index: ${p => (p.front ? LEVEL_20 : LEVEL_5)};
+  width: calc(100% + 10px);
+  height: calc(100% + 10px);
+  cursor: move;
+
   &:hover,
   &:active {
     border-color: ${p => p.theme.primary};
@@ -110,11 +118,4 @@ const MaskLayer = styled.div<{ front: boolean; hideBorder: boolean }>`
       border-width: ${p => (p.hideBorder ? 0 : '2px')};
     }
   }
-  position: absolute;
-  top: -5px;
-  left: -5px;
-  z-index: ${p => (p.front ? LEVEL_20 : LEVEL_5)};
-  width: calc(100% + 10px);
-  height: calc(100% + 10px);
-  cursor: move;
 `;

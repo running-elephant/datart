@@ -176,7 +176,7 @@
     "@types/webpack": "4.41.22",
     "@types/webpack-env": "1.15.2",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.0",
-    "babel-plugin-styled-components": "2.0.2",
+    "babel-plugin-styled-components": "^2.0.7",
     "cross-env": "7.0.3",
     "cz-conventional-changelog": "^3.3.0",
     "docdash": "^1.2.0",

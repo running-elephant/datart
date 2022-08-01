@@ -109,6 +109,11 @@ export const selectLayoutWidgetMap = createSelector(
 export const selectAllWidgetInfoMap = (state: { editBoard: EditBoardState }) =>
   state.editBoard.widgetInfoRecord || undefined;
 
+export const selectEditingWidgetIds = (state: { editBoard: EditBoardState }) =>
+  Object.values(state.editBoard.widgetInfoRecord)
+    ?.filter(r => r.editing)
+    ?.map(r => r.id) || [];
+
 export const selectWidgetInfoById = createSelector(
   [selectAllWidgetInfoMap, (_, widgetId: string) => widgetId],
   (allWidgetInfoMap, wId) => allWidgetInfoMap[wId] || undefined,

@@ -31,6 +31,7 @@ import { migrateChartConfig } from 'app/migration';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ChartManager from 'app/models/ChartManager';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import useDisplayJumpVizDialog from 'app/pages/MainPage/pages/VizPage/hooks/useDisplayJumpVizDialog';
 import useDisplayViewDetail from 'app/pages/MainPage/pages/VizPage/hooks/useDisplayViewDetail';
 import { selectShareExecuteTokenMap } from 'app/pages/SharePage/slice/selectors';
 import { IChart } from 'app/types/Chart';
@@ -38,6 +39,11 @@ import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import {
+  chartSelectionEventListener,
+  drillDownEventListener,
+  pivotTableDrillEventListener,
+} from 'app/utils/ChartEventListenerHelper';
 import {
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
@@ -102,6 +108,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const drillOptionRef = useRef<IChartDrillOption>();
   const [openViewDetailPanel, viewDetailPanelContextHolder] =
     useDisplayViewDetail();
+  const [openJumpVizDialogModal, openJumpVizDialogModalContextHolder] =
+    useDisplayJumpVizDialog();
   const [jumpDialogModal, jumpDialogContextHolder] = useModal();
   const {
     getDrillThroughSetting,
@@ -111,8 +119,9 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     handleCrossFilteringEvent,
     handleViewDataEvent,
   } = useChartInteractions({
-    openViewDetailPanel: openViewDetailPanel as any,
-    openJumpDialogModal: jumpDialogModal.info,
+    openViewDetailPanel: openViewDetailPanel as Function,
+    openJumpUrlDialogModal: jumpDialogModal.info,
+    openJumpVizDialogModal: openJumpVizDialogModal as Function,
   });
 
   useEffect(() => {
@@ -462,34 +471,16 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                 handleViewDataEvent(
                   buildViewDataEventParams(params, InteractionMouseEvent.Left),
                 );
-                if (
-                  drillOptionRef.current?.isSelectedDrill &&
-                  !drillOptionRef.current.isBottomLevel
-                ) {
-                  const option = drillOptionRef.current;
-                  option.drillDown(params.data.rowData);
-                  handleDrillOptionChange(option);
-                  return;
-                }
-
-                // NOTE 透视表树形结构展开下钻特殊处理方法
-                if (
-                  params.chartType === 'pivotSheet' &&
-                  params.interactionType === 'drilled'
-                ) {
-                  handleDrillOptionChange?.(params.drillOption);
-                  return;
-                }
-
-                // NOTE 直接修改selectedItems结果集处理方法
-                if (params.interactionType === 'select') {
-                  changeSelectedItems(
-                    dispatch,
-                    renderMode,
-                    params.selectedItems,
-                    wid,
-                  );
-                }
+                drillDownEventListener(drillOptionRef?.current, params, p => {
+                  drillOptionRef.current = p;
+                  handleDrillOptionChange?.(p);
+                });
+                pivotTableDrillEventListener(params, p => {
+                  handleDrillOptionChange(p);
+                });
+                chartSelectionEventListener(params, p => {
+                  changeSelectedItems(dispatch, renderMode, p, wid);
+                });
                 onWidgetChartClick(widgetRef.current, params);
               },
             },
@@ -622,6 +613,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
           <ChartDrillPaths chartConfig={dataChart?.config.chartConfig} />
           {viewDetailPanelContextHolder}
           {jumpDialogContextHolder}
+          {openJumpVizDialogModalContextHolder}
         </StyledWrapper>
       </ChartDrillContextMenu>
     </ChartDrillContext.Provider>

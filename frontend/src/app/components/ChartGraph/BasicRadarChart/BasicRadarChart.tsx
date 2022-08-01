@@ -18,6 +18,7 @@
 
 import { ChartConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import { init } from 'echarts';
 import Chart from '../../../models/Chart';
 import Config from './config';
@@ -90,13 +91,13 @@ class BasicRadarChart extends Chart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (options.containerId === undefined || !context.document) {
       return;
     }
 
     this.chart = init(
-      context.document.getElementById(options.containerId),
+      context.document.getElementById(options.containerId)!,
       'default',
     );
     this.mouseEvents?.forEach(event => {
@@ -104,7 +105,7 @@ class BasicRadarChart extends Chart {
     });
   }
 
-  onUpdated(options): void {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
     if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
@@ -116,11 +117,11 @@ class BasicRadarChart extends Chart {
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {
+  onUnMount(options: BrokerOption, context: BrokerContext) {
     this.chart?.dispose();
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext) {
     this.chart?.resize(context);
   }
 

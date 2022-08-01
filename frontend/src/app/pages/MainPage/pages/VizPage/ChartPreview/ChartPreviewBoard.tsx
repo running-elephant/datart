@@ -37,6 +37,12 @@ import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import {
+  chartSelectionEventListener,
+  drillDownEventListener,
+  pivotTableDrillEventListener,
+  tablePagingAndSortEventListener,
+} from 'app/utils/ChartEventListenerHelper';
 import { generateShareLinkAsync, makeDownloadDataTask } from 'app/utils/fetch';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import {
@@ -54,6 +60,7 @@ import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG } from 'styles/StyleConstants';
 import { isEmptyArray } from 'utils/object';
 import { urlSearchTransfer } from 'utils/urlSearchTransfer';
+import useDisplayJumpVizDialog from '../hooks/useDisplayJumpVizDialog';
 import useDisplayViewDetail from '../hooks/useDisplayViewDetail';
 import useQSLibUrlHelper from '../hooks/useQSLibUrlHelper';
 import { useSaveAsViz } from '../hooks/useSaveAsViz';
@@ -83,6 +90,7 @@ const ChartPreviewBoard: FC<{
   allowDownload?: boolean;
   allowShare?: boolean;
   allowManage?: boolean;
+  hideTitle?: boolean;
 }> = memo(
   ({
     backendChartId,
@@ -91,6 +99,7 @@ const ChartPreviewBoard: FC<{
     allowDownload,
     allowShare,
     allowManage,
+    hideTitle,
   }) => {
     // NOTE: avoid initialize width or height is zero that cause echart sampling calculation issue.
     const defaultChartContainerWH = 1;
@@ -127,6 +136,8 @@ const ChartPreviewBoard: FC<{
     const vizs = useSelector(selectVizs);
     const [openViewDetailPanel, viewDetailPanelContextHolder] =
       useDisplayViewDetail();
+    const [openJumpVizDialogModal, openJumpVizDialogModalContextHolder] =
+      useDisplayJumpVizDialog();
     const [jumpDialogModal, jumpDialogContextHolder] = useModal();
     const {
       getDrillThroughSetting,
@@ -134,8 +145,9 @@ const ChartPreviewBoard: FC<{
       handleDrillThroughEvent,
       handleViewDataEvent,
     } = useChartInteractions({
-      openViewDetailPanel: openViewDetailPanel as any,
-      openJumpDialogModal: jumpDialogModal.info,
+      openViewDetailPanel: openViewDetailPanel as Function,
+      openJumpUrlDialogModal: jumpDialogModal.info,
+      openJumpVizDialogModal: openJumpVizDialogModal as Function,
     });
     const isLoadingData = useDebouncedLoadingStatus({
       isLoading: chartPreview?.isLoadingData,
@@ -378,55 +390,29 @@ const ChartPreviewBoard: FC<{
               handleViewDataEvent(
                 buildViewDataEventParams(param, InteractionMouseEvent.Left),
               );
-
-              if (
-                drillOptionRef.current?.isSelectedDrill &&
-                !drillOptionRef.current.isBottomLevel
-              ) {
-                const option = drillOptionRef.current;
-                option.drillDown(param.data.rowData);
-                drillOptionRef.current = option;
-                handleDrillOptionChange(option);
-                return;
-              }
-              if (
-                param.chartType === 'table' &&
-                param.interactionType === 'paging-sort-filter'
-              ) {
+              drillDownEventListener(drillOptionRef?.current, param, p => {
+                drillOptionRef.current = p;
+                handleDrillOptionChange?.(p);
+              });
+              tablePagingAndSortEventListener(param, p => {
                 dispatch(
                   fetchDataSetByPreviewChartAction({
+                    ...p,
                     backendChartId,
-                    sorter: {
-                      column: param?.seriesName!,
-                      operator: param?.value?.direction,
-                      aggOperator: param?.value?.aggOperator,
-                    },
-                    pageInfo: {
-                      pageNo: param?.value?.pageNo,
-                    },
                   }),
                 );
-                return;
-              }
-
-              // NOTE 透视表树形结构展开下钻特殊处理方法
-              if (
-                param.chartType === 'pivotSheet' &&
-                param.interactionType === 'drilled'
-              ) {
-                handleDrillOptionChange?.(param.drillOption);
-                return;
-              }
-
-              // NOTE 直接修改selectedItems结果集处理方法
-              if (param.interactionType === 'select') {
+              });
+              pivotTableDrillEventListener(param, p => {
+                handleDrillOptionChange(p);
+              });
+              chartSelectionEventListener(param, p => {
                 dispatch(
                   vizAction.changeSelectedItems({
                     backendChartId,
-                    data: param.selectedItems,
+                    data: p,
                   }),
                 );
-              }
+              });
             },
           },
           {
@@ -652,24 +638,26 @@ const ChartPreviewBoard: FC<{
 
     return (
       <StyledChartPreviewBoard>
-        <VizHeader
-          chartName={chartPreview?.backendChart?.name}
-          status={chartPreview?.backendChart?.status}
-          publishLoading={publishLoading}
-          onGotoEdit={handleGotoWorkbenchPage}
-          onPublish={handlePublish}
-          onGenerateShareLink={handleGenerateShareLink}
-          onDownloadData={handleCreateDownloadDataTask}
-          onSaveAsVizs={handleSaveAsVizs}
-          onReloadData={handleReloadData}
-          onAddToDashBoard={handleAddToDashBoard}
-          onRecycleViz={handleRecycleViz}
-          allowDownload={allowDownload}
-          allowShare={allowShare}
-          allowManage={allowManage}
-          orgId={orgId}
-          backendChartId={backendChartId}
-        />
+        {!hideTitle && (
+          <VizHeader
+            chartName={chartPreview?.backendChart?.name}
+            status={chartPreview?.backendChart?.status}
+            publishLoading={publishLoading}
+            onGotoEdit={handleGotoWorkbenchPage}
+            onPublish={handlePublish}
+            onGenerateShareLink={handleGenerateShareLink}
+            onDownloadData={handleCreateDownloadDataTask}
+            onSaveAsVizs={handleSaveAsVizs}
+            onReloadData={handleReloadData}
+            onAddToDashBoard={handleAddToDashBoard}
+            onRecycleViz={handleRecycleViz}
+            allowDownload={allowDownload}
+            allowShare={allowShare}
+            allowManage={allowManage}
+            orgId={orgId}
+            backendChartId={backendChartId}
+          />
+        )}
         <PreviewBlock>
           <ChartDrillContext.Provider
             value={{
@@ -719,6 +707,7 @@ const ChartPreviewBoard: FC<{
         </PreviewBlock>
         {viewDetailPanelContextHolder}
         {jumpDialogContextHolder}
+        {openJumpVizDialogModalContextHolder}
       </StyledChartPreviewBoard>
     );
   },

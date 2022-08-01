@@ -18,6 +18,13 @@
 
 import { useHistory } from 'react-router-dom';
 
+const defaultBodyStyle: React.CSSProperties = {
+  height: 600,
+  maxHeight: 1000,
+  overflowY: 'auto',
+  overflowX: 'auto',
+};
+
 const useDrillThrough = () => {
   const history = useHistory();
 
@@ -47,18 +54,12 @@ const useDrillThrough = () => {
     window.open(url, url);
   };
 
-  const getDialogContent = (orgId, relId, params?: string) => {
+  const getDialogContent = (orgId, relId, vizType, params?: string) => {
     return {
-      width: 1000,
-      content: (
-        <iframe
-          title="Datart Iframe Window"
-          height={600}
-          width="100%"
-          frameBorder="none"
-          src={`/organizations/${orgId}/vizs/${relId}?${params}`}
-        />
-      ),
+      orgId,
+      vizId: relId,
+      vizType,
+      params,
     };
   };
 
@@ -74,7 +75,8 @@ const useDrillThrough = () => {
   const getDialogContentByUrl = (url, params?: string) => {
     const finalUrl = appendUrlParams(url, params);
     return {
-      width: 1000,
+      width: '80%',
+      bodyStyle: defaultBodyStyle,
       content: (
         <iframe
           title="Datart Iframe Window"
@@ -87,14 +89,14 @@ const useDrillThrough = () => {
     };
   };
 
-  return [
+  return {
     openNewTab,
     openBrowserTab,
     getDialogContent,
     redirectByUrl,
     openNewByUrl,
     getDialogContentByUrl,
-  ];
+  };
 };
 
 export default useDrillThrough;

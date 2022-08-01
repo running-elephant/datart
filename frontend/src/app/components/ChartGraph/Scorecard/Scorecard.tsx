@@ -20,12 +20,12 @@ import { ChartDataSectionType } from 'app/constants';
 import ReactChart from 'app/models/ReactChart';
 import {
   ChartConfig,
-  ChartContext,
   ChartDataSectionField,
   ChartStyleConfig,
   FontStyle,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getColumnRenderName,
   getStyles,
@@ -58,7 +58,7 @@ class Scorecard extends ReactChart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (options.containerId === undefined || !context.document) {
       return;
     }
@@ -69,23 +69,23 @@ class Scorecard extends ReactChart {
     );
   }
 
-  onUpdated(options, context): void {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
     if (!this.isMatchRequirement(options.config)) {
       this.adapter?.unmount();
       return;
     }
     this.adapter?.updated(
-      this.getOptions(context, options.dataset, options.config),
+      this.getOptions(context, options.dataset!, options.config!),
       context,
     );
   }
 
-  onResize(opt: any, context): void {
-    this.onUpdated(opt, context);
+  onResize(options: BrokerOption, context: BrokerContext) {
+    this.onUpdated(options, context);
   }
 
   getOptions(
-    context: ChartContext,
+    context: BrokerContext,
     dataset: ChartDataSetDTO,
     config: ChartConfig,
   ) {
@@ -102,7 +102,7 @@ class Scorecard extends ReactChart {
     );
     const { padding, width } = this.getPaddingConfig(
       styleConfigs,
-      context.width,
+      context.width!,
     );
     const fontSizeFn = this.getFontSize(width, styleConfigs);
     const aggColorConfig = this.getColorConfig(

@@ -252,7 +252,7 @@ export const WidgetActionProvider: FC<{
         },
         onEditContainerWidget: (id: string) => {
           dispatch(editWidgetInfoActions.openWidgetEditing({ id }));
-          dispatch(editDashBoardInfoActions.changeShowBlockMask(false));
+          dispatch(editDashBoardInfoActions.changeShowBlockMask(false)); // TODO(Stephen): to be check, this is only used for tab container?
         },
         onEditControllerWidget: (widget: Widget) => {
           dispatch(
