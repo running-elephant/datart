@@ -24,7 +24,8 @@ import {
 } from '@ant-design/icons';
 import { Popconfirm, Space, Tooltip } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import React, { FC, memo, useState } from 'react';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
+import React, { FC, memo, useContext, useState } from 'react';
 import styled from 'styled-components/macro';
 import {
   FONT_SIZE_ICON_SM,
@@ -45,10 +46,12 @@ const IconStyle = {
   fontSize: 20,
   cursor: 'pointer',
 };
+
 const TitleForShare: FC<TitleHeaderProps> = memo(
   ({ name, onShareDownloadData, loadVizData, children }) => {
     const t = useI18NPrefix(`viz.action`);
     const [showTitle, setShowTitle] = useState<boolean>(false);
+    const { allowDownload } = useContext(BoardContext);
 
     if (!showTitle) {
       return (
@@ -60,20 +63,24 @@ const TitleForShare: FC<TitleHeaderProps> = memo(
     return (
       <Wrapper>
         <Space>
-          {children}
-          <Popconfirm
-            placement="left"
-            title={t('common.confirm')}
-            okText={t('common.ok')}
-            cancelText={t('common.cancel')}
-            onConfirm={() => {
-              onShareDownloadData?.();
-            }}
-          >
-            <Tooltip title={t('share.exportData')} placement="bottom">
-              <DownloadOutlined style={{ fontSize: 20 }} />
-            </Tooltip>
-          </Popconfirm>
+          {allowDownload && (
+            <>
+              {children}
+              <Popconfirm
+                placement="left"
+                title={t('common.confirm')}
+                okText={t('common.ok')}
+                cancelText={t('common.cancel')}
+                onConfirm={() => {
+                  onShareDownloadData?.();
+                }}
+              >
+                <Tooltip title={t('share.exportData')} placement="bottom">
+                  <DownloadOutlined style={{ fontSize: 20 }} />
+                </Tooltip>
+              </Popconfirm>
+            </>
+          )}
           <Tooltip title={t('syncData')} placement="bottom">
             <ReloadOutlined style={IconStyle} onClick={loadVizData} />
           </Tooltip>

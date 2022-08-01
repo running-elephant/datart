@@ -11,7 +11,7 @@ import { CascadeAccess } from 'app/pages/MainPage/Access';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { LocalTreeDataNode } from 'app/pages/MainPage/slice/types';
 import { CommonFormTypes } from 'globalConstants';
-import React, { useCallback, useContext, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { getInsertedNodeIndex, onDropTreeFn, stopPPG } from 'utils/utils';
@@ -43,6 +43,7 @@ export function FolderTree({
   const tg = useI18NPrefix('global');
   const dispatch = useDispatch();
   const history = useHistory();
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
   const orgId = useSelector(selectOrgId);
   const loading = useSelector(selectVizListLoading);
   const vizsData = useSelector(selectVizs);
@@ -66,11 +67,17 @@ export function FolderTree({
 
   const menuSelect = useCallback(
     (_, { node }) => {
-      if (node.relType !== 'FOLDER') {
+      if (node.relType === 'FOLDER') {
+        if (expandedKeys?.includes(node.key)) {
+          setExpandedKeys(expandedKeys.filter(k => k !== node.key));
+        } else {
+          setExpandedKeys([node.key].concat(expandedKeys));
+        }
+      } else {
         history.push(`/organizations/${orgId}/vizs/${node.relId}`);
       }
     },
-    [history, orgId],
+    [expandedKeys, history, orgId],
   );
 
   const archiveViz = useCallback(
@@ -227,11 +234,18 @@ export function FolderTree({
       },
     });
   };
+
+  const handleExpandTreeNode = expandedKeys => {
+    setExpandedKeys(expandedKeys);
+  };
+
   return (
     <Tree
       loading={loading}
       treeData={treeData}
+      expandedKeys={expandedKeys}
       titleRender={renderTreeTitle}
+      onExpand={handleExpandTreeNode}
       onSelect={menuSelect}
       onDrop={onDrop}
       {...(selectedId && { selectedKeys: [selectedId] })}

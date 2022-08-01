@@ -70,7 +70,7 @@ const ChartIFrameLifecycleAdapter: FC<{
   const eventBrokerRef = useRef<ChartIFrameEventBroker>();
   const [containerStatus, setContainerStatus] = useState(ContainerStatus.INIT);
   const { document, window } = useFrame();
-  const [containerId] = useState(() => uuidv4());
+  const [containerId] = useState(() => `datart-${uuidv4()}`);
   const translator = usePrefixI18N();
 
   const buildBrokerOption = useCallback(() => {

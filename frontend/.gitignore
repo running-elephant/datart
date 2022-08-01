@@ -34,5 +34,6 @@ yarn-error.log*
 # docs
 /types
 
+/public/custom-chart-plugins/
 /public/task
 /public/antd/theme.less
