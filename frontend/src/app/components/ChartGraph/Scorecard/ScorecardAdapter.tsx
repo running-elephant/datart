@@ -21,19 +21,23 @@ import styled from 'styled-components/macro';
 import { AggregateBoxProp, ScorecardBoxProp, ScorecardConfig } from './types';
 
 const ScorecardAdapter: FC<ScorecardConfig> = memo(
-  ({ dataConfig, labelConfig, padding, data, background }) => {
+  ({ dataConfig, nameConfig, padding, data, background, event }) => {
     const ssp = e => {
       e.stopPropagation();
     };
     return (
       <ScorecardBox padding={padding} onClick={ssp} style={{ background }}>
         <AggregateBox
-          alignment={labelConfig?.alignment || 'center'}
-          position={labelConfig?.position || 'column'}
+          alignment={nameConfig?.alignment || 'center'}
+          position={nameConfig?.position || 'column'}
         >
-          <ValueBox style={dataConfig?.[0].font}>{data?.[0]?.value}</ValueBox>
-          {labelConfig?.show && (
-            <LabelBox style={labelConfig?.font}>{data?.[0]?.label}</LabelBox>
+          <ValueBox style={dataConfig?.[0].font} {...event?.[0]}>
+            {data?.[0]?.value}
+          </ValueBox>
+          {nameConfig?.show && (
+            <NameBox style={nameConfig?.font} {...event?.[0]}>
+              {data?.[0]?.name}
+            </NameBox>
           )}
         </AggregateBox>
       </ScorecardBox>
@@ -70,11 +74,13 @@ const ValueBox = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: pointer;
 `;
 
-const LabelBox = styled.div`
+const NameBox = styled.div`
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: pointer;
 `;

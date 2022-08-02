@@ -44,6 +44,7 @@ interface ConfigComponentProps {
   disabled?: boolean;
   allowManage?: boolean;
   schemaDataSource?: object[];
+  dataTables?: object[];
   subFormRowKey?: string;
   subFormRowKeyValidator?: (val: string) => boolean;
   onTest?: () => void;
@@ -62,6 +63,7 @@ export function ConfigComponent({
   disabled,
   allowManage,
   schemaDataSource,
+  dataTables,
   subFormRowKey,
   subFormRowKeyValidator,
   onTest,
@@ -123,6 +125,7 @@ export function ConfigComponent({
           sourceId={sourceId}
           loading={testLoading}
           onTest={onTest}
+          dataTables={dataTables}
         />
       );
       break;

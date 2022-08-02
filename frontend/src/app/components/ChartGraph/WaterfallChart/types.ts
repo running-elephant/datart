@@ -9,8 +9,9 @@ export type OrderConfig =
   | string
   | {
       value: number;
-      itemStyle: {
-        color: string;
+      itemStyle?: {
+        color?: string;
+        opacity?: number;
       };
     };
 
