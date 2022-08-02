@@ -220,7 +220,6 @@ class BasicTableChart extends ReactChart {
       settingConfigs,
       chartDataSet,
       context,
-      widgetSpecialConfig,
     );
     return {
       rowKey: 'id',
@@ -301,7 +300,6 @@ class BasicTableChart extends ReactChart {
       settingConfigs,
       chartDataSet,
       context,
-      widgetSpecialConfig,
     );
   }
 
@@ -780,7 +778,6 @@ class BasicTableChart extends ReactChart {
     settingConfigs: ChartStyleConfig[],
     chartDataSet: IChartDataSet<string>,
     context: BrokerContext,
-    widgetSpecialConfig: { env: string | undefined; [x: string]: any },
   ): TableColumnsList[] {
     const [enableRowNumber, leftFixedColumns, rightFixedColumns] = getStyles(
       styleConfigs,
@@ -799,15 +796,12 @@ class BasicTableChart extends ReactChart {
             mixedSectionConfigRows,
             chartDataSet,
             styleConfigs,
-            widgetSpecialConfig,
-            mixedSectionConfigRows,
           )
         : this.getGroupColumns(
             mixedSectionConfigRows,
             tableHeaderStyles,
             chartDataSet,
             styleConfigs,
-            widgetSpecialConfig,
           );
     const rowNumbers: TableColumnsList[] = enableRowNumber
       ? [
@@ -832,8 +826,6 @@ class BasicTableChart extends ReactChart {
     dataConfigs: TableHeaderConfig[],
     chartDataSet: IChartDataSet<string>,
     styleConfigs: ChartStyleConfig[],
-    widgetSpecialConfig: { env: string | undefined; [x: string]: any },
-    mixedSectionConfigRows: ChartDataSectionField[],
   ): TableColumnsList[] {
     const [autoMergeFields] = getStyles(
       styleConfigs,
@@ -1036,7 +1028,6 @@ class BasicTableChart extends ReactChart {
     tableHeader: TableHeaderConfig[],
     chartDataSet: IChartDataSet<string>,
     styleConfigs: ChartStyleConfig[],
-    widgetSpecialConfig: { env: string | undefined; [x: string]: any },
   ): TableColumnsList[] {
     const dataConfigs = this.getGroupColumnsOfFlattenedColumns(
       tableHeader,
@@ -1047,8 +1038,6 @@ class BasicTableChart extends ReactChart {
       dataConfigs,
       chartDataSet,
       styleConfigs,
-      widgetSpecialConfig,
-      mixedSectionConfigRows,
     );
     const groupedHeaderColumns: TableColumnsList[] =
       tableHeader
