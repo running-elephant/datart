@@ -17,18 +17,25 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
-import { ChartConfig, ChartStyleConfig } from 'app/types/ChartConfig';
-import ChartDataSetDTO from 'app/types/ChartDataSet';
+import Chart from 'app/models/Chart';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
+import {
+  ChartConfig,
+  ChartDataSectionField,
+  ChartStyleConfig,
+  SelectedItem,
+} from 'app/types/ChartConfig';
+import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
 import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getDefaultThemeColor,
   getExtraSeriesRowData,
+  getSelectedItemStyles,
   getStyles,
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import 'echarts-wordcloud';
-import Chart from '../../../models/Chart';
 import Config from './config';
 import { WordCloudConfig, WordCloudLabelConfig } from './types';
 
@@ -37,6 +44,7 @@ class WordCloudChart extends Chart {
   chart: any = null;
   config = Config;
   dependency = [];
+  selectionManager?: ChartSelectionManager;
 
   constructor(props?) {
     super(
@@ -61,27 +69,10 @@ class WordCloudChart extends Chart {
       context.document.getElementById(options.containerId)!,
       'default',
     );
-    this.mouseEvents?.forEach(event => {
-      switch (event.name) {
-        case 'click':
-          this.chart.on(event.name, params => {
-            event.callback({
-              ...params,
-              interactionType: 'select',
-              selectedItems: [
-                {
-                  index: params.componentIndex + ',' + params.dataIndex,
-                  data: params.data,
-                },
-              ],
-            });
-          });
-          break;
-        default:
-          this.chart.on(event.name, event.callback);
-          break;
-      }
-    });
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
+    this.selectionManager.attachWindowListeners(context.window);
+    this.selectionManager.attachZRenderListeners(this.chart);
+    this.selectionManager.attachEChartsListeners(this.chart);
   }
 
   onUpdated(options: BrokerOption, context: BrokerContext) {
@@ -92,22 +83,37 @@ class WordCloudChart extends Chart {
       this.chart?.clear();
       return;
     }
-    const newOptions = this.getOptions(options.dataset, options.config);
+    this.selectionManager?.updateSelectedItems(options?.selectedItems);
+    const newOptions = this.getOptions(
+      options.dataset,
+      options.config,
+      options.selectedItems,
+    );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
   onUnMount(options: BrokerOption, context: BrokerContext) {
+    this.selectionManager?.removeWindowListeners(context.window);
+    this.selectionManager?.removeZRenderListeners(this.chart);
     this.chart?.dispose();
   }
 
   onResize(options: BrokerOption, context: BrokerContext) {
     this.chart?.clear();
     this.chart?.resize(context);
-    const newOptions = this.getOptions(options.dataset!, options.config!);
+    const newOptions = this.getOptions(
+      options.dataset!,
+      options.config!,
+      options.selectedItems,
+    );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
+  getOptions(
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    selectedItems?: SelectedItem[],
+  ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
@@ -123,21 +129,21 @@ class WordCloudChart extends Chart {
       dataConfigs,
     );
     const wordCloud = this.getWordCloud(styleConfigs);
-    const label = this.getLabel(styleConfigs);
+    const label = this.getLabel(
+      styleConfigs,
+      chartDataSet,
+      groupConfigs,
+      aggregateConfigs,
+      selectedItems,
+    );
+
     return {
       series: [
         {
           type: 'wordCloud',
-          layoutAnimation: true,
+          layoutAnimation: false,
           ...wordCloud,
           ...label,
-          data: chartDataSet?.map(dc => {
-            return {
-              name: dc.getCell(groupConfigs[0]),
-              value: dc.getCell(aggregateConfigs[0]),
-              ...getExtraSeriesRowData(dc),
-            };
-          }),
         },
       ],
     };
@@ -166,7 +172,13 @@ class WordCloudChart extends Chart {
     };
   }
 
-  getLabel(style: ChartStyleConfig[]): WordCloudLabelConfig {
+  getLabel(
+    style: ChartStyleConfig[],
+    chartDataSet: IChartDataSet<string>,
+    groupConfigs: ChartDataSectionField[],
+    aggregateConfigs: ChartDataSectionField[],
+    selectedItems?: SelectedItem[],
+  ): WordCloudLabelConfig {
     const [
       fontFamily,
       fontWeight,
@@ -201,14 +213,6 @@ class WordCloudChart extends Chart {
       rotationRange: [rotationRangeStart, rotationRangeEnd],
       rotationStep,
       gridSize,
-      textStyle: {
-        fontFamily,
-        fontWeight,
-        color: function (value) {
-          const colorArr = getDefaultThemeColor();
-          return colorArr[value.dataIndex % (colorArr.length - 1)];
-        },
-      },
       emphasis: {
         focus: focus ? 'self' : 'none',
         textStyle: {
@@ -216,6 +220,21 @@ class WordCloudChart extends Chart {
           textShadowColor,
         },
       },
+      data: chartDataSet?.map((dc, dIndex) => {
+        return {
+          name: dc.getCell(groupConfigs[0]),
+          value: dc.getCell(aggregateConfigs[0]),
+          ...getExtraSeriesRowData(dc),
+          textStyle: getSelectedItemStyles(0, dIndex, selectedItems || [], {
+            fontFamily,
+            fontWeight,
+            color:
+              getDefaultThemeColor()[
+                dIndex % (getDefaultThemeColor().length - 1)
+              ],
+          }).itemStyle,
+        };
+      }),
     };
   }
 }
