@@ -89,13 +89,14 @@ class WaterfallChart extends Chart {
     this.selectionManager = new ChartSelectionManager(this.mouseEvents);
     this.selectionManager.attachWindowListeners(context.window);
     this.selectionManager.attachZRenderListeners(this.chart);
-    this.chart.on('click', eventParams => {
-      if (this.rowDataList.length <= eventParams.dataIndex) return;
+    this.chart.on('click', ({ dataIndex, componentIndex, ...rest }) => {
+      // NOTE: 1. 累计不响应事件； 2. 下部透明柱状图不响应事件
+      if (this.rowDataList.length <= dataIndex || componentIndex === 0) return;
       this.selectionManager?.echartsClickEventHandler({
-        ...eventParams,
-        dataIndex: eventParams.dataIndex,
+        ...rest,
+        dataIndex: dataIndex,
         componentIndex: '',
-        data: { ...this.rowDataList[eventParams.dataIndex] },
+        data: { ...this.rowDataList[dataIndex] },
       });
     });
   }
