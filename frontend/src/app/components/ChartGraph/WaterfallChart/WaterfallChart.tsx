@@ -120,6 +120,8 @@ class WaterfallChart extends Chart {
   }
 
   onUnMount(options: BrokerOption, context: BrokerContext): void {
+    this.selectionManager?.removeWindowListeners(context.window);
+    this.selectionManager?.removeZRenderListeners(this.chart);
     this.chart?.dispose();
   }
 

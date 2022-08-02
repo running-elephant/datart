@@ -17,6 +17,7 @@
  */
 
 import { ChartDataSectionType, ChartInteractionEvent } from 'app/constants';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import ReactChart from 'app/models/ReactChart';
 import { ChartMouseEventParams, ChartsEventData } from 'app/types/Chart';
 import {
@@ -41,10 +42,12 @@ import ScorecardAdapter from './ScorecardAdapter';
 import { LabelConfig, PaddingConfig } from './types';
 
 class Scorecard extends ReactChart {
+  chart: any = null;
   isISOContainer = 'react-scorecard';
   config = Config;
   protected isAutoMerge = false;
   useIFrame = false;
+  selectionManager?: ChartSelectionManager;
 
   constructor(props?) {
     super(ScorecardAdapter, {
@@ -69,6 +72,8 @@ class Scorecard extends ReactChart {
       options,
       context,
     );
+
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
   }
 
   onUpdated(options: BrokerOption, context: BrokerContext) {
@@ -159,37 +164,16 @@ class Scorecard extends ReactChart {
         },
       ],
     };
-    return this.mouseEvents?.reduce((acc, cur) => {
-      cur.name && (eventParams.type = cur.name);
-      if (cur.name === 'click') {
-        Object.assign(acc, {
-          onClick: event => {
-            cur.callback?.(eventParams);
-          },
+    return {
+      onClick: event => {
+        this.selectionManager?.echartsClickEventHandler({
+          ...eventParams,
+          dataIndex: index,
+          componentIndex: '',
+          data: eventParams.data,
         });
-      }
-      if (cur.name === 'dblclick') {
-        Object.assign(acc, {
-          onDoubleClick: event => cur.callback?.(eventParams),
-        });
-      }
-      if (cur.name === 'contextmenu') {
-        Object.assign(acc, {
-          onContextMenu: event => cur.callback?.(eventParams),
-        });
-      }
-      if (cur.name === 'mouseover') {
-        Object.assign(acc, {
-          onMouseEnter: event => cur.callback?.(eventParams),
-        });
-      }
-      if (cur.name === 'mouseout') {
-        Object.assign(acc, {
-          onMouseLeave: event => cur.callback?.(eventParams),
-        });
-      }
-      return acc;
-    }, {});
+      },
+    };
   }
 
   getColorConfig(

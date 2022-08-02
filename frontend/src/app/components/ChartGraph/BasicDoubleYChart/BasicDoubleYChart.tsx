@@ -101,6 +101,8 @@ class BasicDoubleYChart extends Chart {
   }
 
   onUnMount(options: BrokerOption, context: BrokerContext) {
+    this.selectionManager?.removeWindowListeners(context.window);
+    this.selectionManager?.removeZRenderListeners(this.chart);
     this.chart?.dispose();
   }
 

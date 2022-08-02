@@ -33,6 +33,7 @@ import {
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import Chart from '../../../models/Chart';
+import { ChartSelectionManager } from '../../../models/ChartSelectionManager';
 import Config from './config';
 import {
   DataConfig,
@@ -49,6 +50,7 @@ import {
 class BasicGaugeChart extends Chart {
   config = Config;
   chart: any = null;
+  selectionManager?: ChartSelectionManager;
 
   protected isArea = false;
   protected isStack = false;
@@ -76,27 +78,9 @@ class BasicGaugeChart extends Chart {
       context.document.getElementById(options.containerId)!,
       'default',
     );
-    this.mouseEvents?.forEach(event => {
-      switch (event.name) {
-        case 'click':
-          this.chart.on(event.name, params => {
-            event.callback({
-              ...params,
-              interactionType: 'select',
-              selectedItems: [
-                {
-                  index: params.componentIndex + ',' + params.dataIndex,
-                  data: params.data,
-                },
-              ],
-            });
-          });
-          break;
-        default:
-          this.chart.on(event.name, event.callback);
-          break;
-      }
-    });
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
+    this.selectionManager.attachZRenderListeners(this.chart);
+    this.selectionManager.attachEChartsListeners(this.chart);
   }
 
   onUpdated(options: BrokerOption, context: BrokerContext) {
@@ -112,6 +96,7 @@ class BasicGaugeChart extends Chart {
   }
 
   onUnMount(options: BrokerOption, context: BrokerContext): void {
+    this.selectionManager?.removeZRenderListeners(this.chart);
     this.chart?.dispose();
   }
 
