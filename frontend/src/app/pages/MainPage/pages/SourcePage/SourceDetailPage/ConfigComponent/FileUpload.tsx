@@ -54,6 +54,16 @@ export function FileUpload({
     return e && e.fileList;
   }, []);
 
+  const getUniqueName = useCallback(
+    (name: string, names: (string | undefined)[]) => {
+      if (names.includes(name)) {
+        return getUniqueName(name + '_' + tg('copy'), names);
+      }
+      return name;
+    },
+    [tg],
+  );
+
   const beforeUpload = useCallback(
     file => {
       const tableName = form?.getFieldValue('config')?.tableName;
@@ -69,15 +79,8 @@ export function FileUpload({
           tableName: uniqueTableName,
         },
       });
-
-      function getUniqueName(name: string, names: (string | undefined)[]) {
-        if (names.includes(name)) {
-          return getUniqueName(name + '_' + tg('copy'), names);
-        }
-        return name;
-      }
     },
-    [dataTables, tg, form],
+    [dataTables, form, getUniqueName],
   );
 
   const uploadChange = useCallback(
