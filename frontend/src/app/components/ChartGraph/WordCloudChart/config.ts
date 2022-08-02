@@ -225,6 +225,36 @@ const config: ChartConfig = {
       ],
     },
   ],
+  interactions: [
+    {
+      label: 'drillThrough.title',
+      key: 'drillThrough',
+      comType: 'checkboxModal',
+      default: false,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'drillThrough.title',
+          key: 'setting',
+          comType: 'interaction.drillThrough',
+        },
+      ],
+    },
+    {
+      label: 'viewDetail.title',
+      key: 'viewDetail',
+      comType: 'checkboxModal',
+      default: false,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'viewDetail.title',
+          key: 'setting',
+          comType: 'interaction.viewDetail',
+        },
+      ],
+    },
+  ],
   i18ns: [
     {
       lang: 'zh-CN',
