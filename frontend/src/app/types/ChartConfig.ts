@@ -244,6 +244,12 @@ export type ChartStyleSectionRowOption = {
   translateItemLabel?: boolean;
 
   /**
+   * Only GroupLayout is used
+   * */
+  flatten?: boolean;
+  title?: string;
+
+  /**
    * Other Free Property
    */
   [key: string]: any;
