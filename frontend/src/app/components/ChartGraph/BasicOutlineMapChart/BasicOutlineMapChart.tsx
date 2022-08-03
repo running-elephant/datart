@@ -449,8 +449,8 @@ class BasicOutlineMapChart extends Chart {
   }
 
   protected mappingGeoName(sourceName: string): string {
-    const targetName = this.geoMap.features.find(f =>
-      f.properties.name.includes(sourceName),
+    const targetName = this.geoMap.features.find(
+      f => f.properties.name === sourceName,
     )?.properties.name;
     return targetName;
   }
@@ -459,8 +459,8 @@ class BasicOutlineMapChart extends Chart {
     sourceName: string,
     ...values: Array<number | string>
   ): Array<number[] | number | string> {
-    const properties = this.geoMap.features.find(f =>
-      f.properties.name.includes(sourceName),
+    const properties = this.geoMap.features.find(
+      f => f.properties.name === sourceName,
     )?.properties;
 
     return (properties?.cp || properties?.center)?.concat(values) || [];
