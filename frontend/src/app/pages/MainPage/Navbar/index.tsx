@@ -45,7 +45,7 @@ import { selectLoggedInUser, selectSystemInfo } from 'app/slice/selectors';
 import { logout } from 'app/slice/thunks';
 import { downloadFile } from 'app/utils/fetch';
 import { BASE_RESOURCE_URL } from 'globalConstants';
-import { changeLang } from 'locales/i18n';
+import { changeLang, getLang } from 'locales/i18n';
 import { cloneElement, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -83,6 +83,7 @@ export function Navbar() {
   const { actions } = useMainSlice();
   const [profileVisible, setProfileVisible] = useState(false);
   const [modifyPasswordVisible, setModifyPasswordVisible] = useState(false);
+  const lang = getLang();
   const dispatch = useDispatch();
   const history = useHistory();
   const { i18n } = useTranslation();
@@ -325,6 +326,7 @@ export function Navbar() {
               <Menu
                 prefixCls="ant-dropdown-menu"
                 selectable={false}
+                selectedKeys={[lang!, themeKey]}
                 onClick={userMenuSelect}
               >
                 <MenuListItem
