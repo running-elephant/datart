@@ -1260,6 +1260,7 @@
     "control": {
       "title": "Control Title",
       "valueConfig": "Value Config",
+      "selectView": "Select View",
       "selectViewField": "Select View Field",
       "selectDefaultValue": "Select Default Value",
       "defaultValue": "Default Value",

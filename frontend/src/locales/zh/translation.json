@@ -1258,7 +1258,8 @@
     "control": {
       "title": "控制器标题",
       "valueConfig": "取值配置",
-      "selectViewField": "选择数据源字段",
+      "selectView": "选择视图",
+      "selectViewField": "选择视图字段",
       "selectDefaultValue": "选择默认值",
       "defaultValue": "默认值",
       "visibility": "是否显示",
