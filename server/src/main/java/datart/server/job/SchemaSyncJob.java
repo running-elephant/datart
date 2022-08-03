@@ -59,7 +59,7 @@ public class SchemaSyncJob implements Job, Closeable {
         try {
             Source source = null;
             try {
-                source = Application.getBean(SourceService.class).retrieve(sourceId);
+                source = Application.getBean(SourceService.class).retrieve(sourceId, false);
             } catch (Exception ignored) {
             }
             // remove job if source not exists

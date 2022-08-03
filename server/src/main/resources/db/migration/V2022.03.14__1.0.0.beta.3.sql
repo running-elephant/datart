@@ -18,7 +18,7 @@ CREATE TABLE `share`  (
                           `create_time` timestamp NULL DEFAULT NULL,
                           PRIMARY KEY (`id`) USING BTREE,
                           KEY `viz_id` (`viz_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 ALTER TABLE `source`
     ADD COLUMN `parent_id` varchar(32) NULL AFTER `org_id`,
