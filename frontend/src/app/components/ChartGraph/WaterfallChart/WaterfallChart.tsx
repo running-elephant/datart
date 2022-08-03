@@ -37,11 +37,11 @@ import {
   getSelectedItemStyles,
   getStyles,
   hadAxisLabelOverflowConfig,
-  round,
   setOptionsByAxisLabelOverflow,
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
+import currency from 'currency.js';
 import { init } from 'echarts';
 import { UniqArray } from 'utils/object';
 import Chart from '../../../models/Chart';
@@ -122,6 +122,7 @@ class WaterfallChart extends Chart {
   onUnMount(options: BrokerOption, context: BrokerContext): void {
     this.selectionManager?.removeWindowListeners(context.window);
     this.selectionManager?.removeZRenderListeners(this.chart);
+    this.rowDataList = [];
     this.chart?.dispose();
   }
 
@@ -162,12 +163,12 @@ class WaterfallChart extends Chart {
     );
 
     return {
-      barWidth: this.getSerieBarWidth(styleConfigs),
+      barWidth: this.getSeriesBarWidth(styleConfigs),
       ...series,
     };
   }
 
-  private getSerieBarWidth(styles: ChartStyleConfig[]): number {
+  private getSeriesBarWidth(styles: ChartStyleConfig[]): number {
     const [width] = getStyles(styles, ['bar'], ['width']);
     return width;
   }
@@ -192,7 +193,7 @@ class WaterfallChart extends Chart {
       ['isIncrement', 'ascendColor', 'descendColor'],
     );
     const label = this.getLabel(styles, aggregateConfigs[0].format);
-
+    this.rowDataList = [];
     const dataList = chartDataSet.map(dc => {
       this.rowDataList.push(getExtraSeriesRowData(dc));
       return dc.getCell(aggregateConfigs[0]);
@@ -317,16 +318,21 @@ class WaterfallChart extends Chart {
     selectedItems?: SelectedItem[],
   ): WaterfallDataListConfig {
     const [totalColor] = getStyles(styles, ['bar'], ['totalColor']);
-    const baseData: Array<number | string> = [];
+    const baseData: Array<number> = [];
     const ascendOrder: OrderConfig[] = [];
     const descendOrder: OrderConfig[] = [];
     dataList.forEach((data, index) => {
-      const newData: number = parseFloat(data);
+      const newData: number = isNaN(currency(data).value)
+        ? 0
+        : currency(data).value;
+      const lastData: number = isNaN(currency(dataList[index - 1]).value)
+        ? 0
+        : currency(dataList[index - 1]).value;
       if (index > 0) {
         if (isIncrement) {
-          const result: number | string =
-            Number(dataList[index - 1]) >= 0
-              ? round(dataList[index - 1] + baseData[index - 1])
+          const result: number =
+            lastData >= 0
+              ? currency(lastData).add(baseData[index - 1]).value
               : baseData[index - 1];
           if (newData >= 0) {
             baseData.push(result);
@@ -336,7 +342,7 @@ class WaterfallChart extends Chart {
             });
             descendOrder.push('-');
           } else {
-            baseData.push(round(Number(result) + newData));
+            baseData.push(currency(result).add(newData).value);
             ascendOrder.push('-');
             descendOrder.push({
               value: Math.abs(newData),
@@ -344,23 +350,21 @@ class WaterfallChart extends Chart {
             });
           }
         } else {
-          const result = round(Number(data) - parseFloat(dataList[index - 1]));
+          const result: number = currency(newData).subtract(lastData).value;
           if (result >= 0) {
             ascendOrder.push({
               value: result,
               ...getSelectedItemStyles('', index, selectedItems || []),
             });
             descendOrder.push('-');
-            baseData.push(parseFloat(dataList[index - 1]));
+            baseData.push(lastData);
           } else {
             ascendOrder.push('-');
             descendOrder.push({
               value: Math.abs(result),
               ...getSelectedItemStyles('', index, selectedItems || []),
             });
-            baseData.push(
-              round(parseFloat(dataList[index - 1]) - Math.abs(result)),
-            );
+            baseData.push(currency(lastData).subtract(Math.abs(result)).value);
           }
         }
       } else {
@@ -383,9 +387,11 @@ class WaterfallChart extends Chart {
     });
     if (isIncrement && xAxisColumns?.data?.length) {
       xAxisColumns.data.push(t?.('common.total'));
-      const resultData = round(
-        dataList[dataList.length - 1] + baseData[baseData.length - 1],
-      );
+      const resultData = currency(
+        isNaN(Number(dataList[dataList.length - 1]))
+          ? 0
+          : dataList[dataList.length - 1],
+      ).add(baseData[baseData.length - 1]).value;
       if (resultData > 0) {
         ascendOrder.push({
           value: resultData,

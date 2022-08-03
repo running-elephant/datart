@@ -38,6 +38,7 @@ import {
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { isNumber } from 'app/utils/number';
+import currency from 'currency.js';
 import { DATARTSEPERATOR } from 'globalConstants';
 import { darken, getLuminance, lighten } from 'polished';
 import { Debugger } from 'utils/debugger';
@@ -400,7 +401,7 @@ class BasicTableChart extends ReactChart {
                           ? Number(cur)
                           : 0
                         : cur;
-                    return acc + num;
+                    return currency(acc).add(num).value;
                   }, 0),
                   currentSummaryField.format,
                 )
