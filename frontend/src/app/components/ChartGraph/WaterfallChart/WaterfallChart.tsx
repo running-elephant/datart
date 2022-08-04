@@ -17,6 +17,8 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
+import Chart from 'app/models/Chart';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -37,15 +39,15 @@ import {
   getSelectedItemStyles,
   getStyles,
   hadAxisLabelOverflowConfig,
-  round,
   setOptionsByAxisLabelOverflow,
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
+import { precisionCalculation } from 'app/utils/number';
+import currency from 'currency.js';
 import { init } from 'echarts';
+import { CalculationType } from 'globalConstants';
 import { UniqArray } from 'utils/object';
-import Chart from '../../../models/Chart';
-import { ChartSelectionManager } from '../../../models/ChartSelectionManager';
 import Config from './config';
 import {
   OrderConfig,
@@ -122,6 +124,7 @@ class WaterfallChart extends Chart {
   onUnMount(options: BrokerOption, context: BrokerContext): void {
     this.selectionManager?.removeWindowListeners(context.window);
     this.selectionManager?.removeZRenderListeners(this.chart);
+    this.rowDataList = [];
     this.chart?.dispose();
   }
 
@@ -162,12 +165,12 @@ class WaterfallChart extends Chart {
     );
 
     return {
-      barWidth: this.getSerieBarWidth(styleConfigs),
+      barWidth: this.getSeriesBarWidth(styleConfigs),
       ...series,
     };
   }
 
-  private getSerieBarWidth(styles: ChartStyleConfig[]): number {
+  private getSeriesBarWidth(styles: ChartStyleConfig[]): number {
     const [width] = getStyles(styles, ['bar'], ['width']);
     return width;
   }
@@ -192,7 +195,7 @@ class WaterfallChart extends Chart {
       ['isIncrement', 'ascendColor', 'descendColor'],
     );
     const label = this.getLabel(styles, aggregateConfigs[0].format);
-
+    this.rowDataList = [];
     const dataList = chartDataSet.map(dc => {
       this.rowDataList.push(getExtraSeriesRowData(dc));
       return dc.getCell(aggregateConfigs[0]);
@@ -274,7 +277,10 @@ class WaterfallChart extends Chart {
           const text = param.map((pa, index) => {
             let data = pa.value;
             if (!index && typeof param[1].value === 'number') {
-              data += param[1].value;
+              data = precisionCalculation(CalculationType.ADD, [
+                data,
+                param[1].value,
+              ]);
             }
             return `${pa.seriesName}: ${toFormattedValue(
               data,
@@ -317,16 +323,24 @@ class WaterfallChart extends Chart {
     selectedItems?: SelectedItem[],
   ): WaterfallDataListConfig {
     const [totalColor] = getStyles(styles, ['bar'], ['totalColor']);
-    const baseData: Array<number | string> = [];
+    const baseData: Array<number> = [];
     const ascendOrder: OrderConfig[] = [];
     const descendOrder: OrderConfig[] = [];
     dataList.forEach((data, index) => {
-      const newData: number = parseFloat(data);
+      const newData: number = isNaN(currency(data).value)
+        ? 0
+        : currency(data).value;
+      const lastData: number = isNaN(currency(dataList[index - 1]).value)
+        ? 0
+        : currency(dataList[index - 1]).value;
       if (index > 0) {
         if (isIncrement) {
-          const result: number | string =
-            Number(dataList[index - 1]) >= 0
-              ? round(dataList[index - 1] + baseData[index - 1])
+          const result: number =
+            lastData >= 0
+              ? precisionCalculation(CalculationType.ADD, [
+                  lastData,
+                  baseData[index - 1],
+                ])
               : baseData[index - 1];
           if (newData >= 0) {
             baseData.push(result);
@@ -336,7 +350,9 @@ class WaterfallChart extends Chart {
             });
             descendOrder.push('-');
           } else {
-            baseData.push(round(Number(result) + newData));
+            baseData.push(
+              precisionCalculation(CalculationType.ADD, [result, newData]),
+            );
             ascendOrder.push('-');
             descendOrder.push({
               value: Math.abs(newData),
@@ -344,14 +360,17 @@ class WaterfallChart extends Chart {
             });
           }
         } else {
-          const result = round(Number(data) - parseFloat(dataList[index - 1]));
+          const result: number = precisionCalculation(
+            CalculationType.SUBTRACT,
+            [newData, lastData],
+          );
           if (result >= 0) {
             ascendOrder.push({
               value: result,
               ...getSelectedItemStyles('', index, selectedItems || []),
             });
             descendOrder.push('-');
-            baseData.push(parseFloat(dataList[index - 1]));
+            baseData.push(lastData);
           } else {
             ascendOrder.push('-');
             descendOrder.push({
@@ -359,7 +378,10 @@ class WaterfallChart extends Chart {
               ...getSelectedItemStyles('', index, selectedItems || []),
             });
             baseData.push(
-              round(parseFloat(dataList[index - 1]) - Math.abs(result)),
+              precisionCalculation(CalculationType.SUBTRACT, [
+                lastData,
+                Math.abs(result),
+              ]),
             );
           }
         }
@@ -383,9 +405,10 @@ class WaterfallChart extends Chart {
     });
     if (isIncrement && xAxisColumns?.data?.length) {
       xAxisColumns.data.push(t?.('common.total'));
-      const resultData = round(
-        dataList[dataList.length - 1] + baseData[baseData.length - 1],
-      );
+      const resultData = precisionCalculation(CalculationType.ADD, [
+        dataList[dataList.length - 1],
+        baseData[baseData.length - 1],
+      ]);
       if (resultData > 0) {
         ascendOrder.push({
           value: resultData,
