@@ -232,3 +232,10 @@ export enum DatartFileSuffixes {
   Template = '.drt',
   Resource = '.drr',
 }
+
+export enum CalculationType {
+  ADD = 'add',
+  SUBTRACT = 'subtract',
+  MULTIPLY = 'multiply',
+  DIVIDE = 'divide',
+}

@@ -17,6 +17,8 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
+import Chart from 'app/models/Chart';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -41,11 +43,11 @@ import {
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
+import { precisionCalculation } from 'app/utils/number';
 import currency from 'currency.js';
 import { init } from 'echarts';
+import { CalculationType } from 'globalConstants';
 import { UniqArray } from 'utils/object';
-import Chart from '../../../models/Chart';
-import { ChartSelectionManager } from '../../../models/ChartSelectionManager';
 import Config from './config';
 import {
   OrderConfig,
@@ -275,7 +277,10 @@ class WaterfallChart extends Chart {
           const text = param.map((pa, index) => {
             let data = pa.value;
             if (!index && typeof param[1].value === 'number') {
-              data += param[1].value;
+              data = precisionCalculation(CalculationType.ADD, [
+                data,
+                param[1].value,
+              ]);
             }
             return `${pa.seriesName}: ${toFormattedValue(
               data,
@@ -332,7 +337,10 @@ class WaterfallChart extends Chart {
         if (isIncrement) {
           const result: number =
             lastData >= 0
-              ? currency(lastData).add(baseData[index - 1]).value
+              ? precisionCalculation(CalculationType.ADD, [
+                  lastData,
+                  baseData[index - 1],
+                ])
               : baseData[index - 1];
           if (newData >= 0) {
             baseData.push(result);
@@ -342,7 +350,9 @@ class WaterfallChart extends Chart {
             });
             descendOrder.push('-');
           } else {
-            baseData.push(currency(result).add(newData).value);
+            baseData.push(
+              precisionCalculation(CalculationType.ADD, [result, newData]),
+            );
             ascendOrder.push('-');
             descendOrder.push({
               value: Math.abs(newData),
@@ -350,7 +360,10 @@ class WaterfallChart extends Chart {
             });
           }
         } else {
-          const result: number = currency(newData).subtract(lastData).value;
+          const result: number = precisionCalculation(
+            CalculationType.SUBTRACT,
+            [newData, lastData],
+          );
           if (result >= 0) {
             ascendOrder.push({
               value: result,
@@ -364,7 +377,12 @@ class WaterfallChart extends Chart {
               value: Math.abs(result),
               ...getSelectedItemStyles('', index, selectedItems || []),
             });
-            baseData.push(currency(lastData).subtract(Math.abs(result)).value);
+            baseData.push(
+              precisionCalculation(CalculationType.SUBTRACT, [
+                lastData,
+                Math.abs(result),
+              ]),
+            );
           }
         }
       } else {
@@ -387,11 +405,10 @@ class WaterfallChart extends Chart {
     });
     if (isIncrement && xAxisColumns?.data?.length) {
       xAxisColumns.data.push(t?.('common.total'));
-      const resultData = currency(
-        isNaN(Number(dataList[dataList.length - 1]))
-          ? 0
-          : dataList[dataList.length - 1],
-      ).add(baseData[baseData.length - 1]).value;
+      const resultData = precisionCalculation(CalculationType.ADD, [
+        dataList[dataList.length - 1],
+        baseData[baseData.length - 1],
+      ]);
       if (resultData > 0) {
         ascendOrder.push({
           value: resultData,
