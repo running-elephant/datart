@@ -1367,7 +1367,10 @@
     },
     "resource": {
       "title": "Source info",
-      "search": "Search database / table / column"
+      "search": "Search database / table / column",
+      "sortType": "Sort",
+      "byName": "By Name",
+      "byField": "By Field"
     },
     "variable": {
       "title": "Variables",

@@ -1366,7 +1366,10 @@
     },
     "resource": {
       "title": "数据源信息",
-      "search": "搜索数据库 / 表 / 字段关键字"
+      "search": "搜索数据库 / 表 / 字段关键字",
+      "sortType": "排序方式",
+      "byName": "按名称",
+      "byField": "按字段"
     },
     "variable": {
       "title": "变量配置",

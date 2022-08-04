@@ -181,13 +181,13 @@ export const Resource = memo(() => {
   const getOverlays = useCallback(() => {
     return (
       <Menu onClick={handleMenuClick}>
-        <Menu.SubMenu key="sort" title="排序方式">
-          <Menu.Item key="byNameSort">按名称</Menu.Item>
-          <Menu.Item key="byOriginalFieldSort">按字段</Menu.Item>
+        <Menu.SubMenu key="sort" title={t('sortType')}>
+          <Menu.Item key="byNameSort">{t('byName')}</Menu.Item>
+          <Menu.Item key="byOriginalFieldSort">{t('byField')}</Menu.Item>
         </Menu.SubMenu>
       </Menu>
     );
-  }, [handleMenuClick]);
+  }, [handleMenuClick, t]);
 
   return (
     <Container title="reference">
