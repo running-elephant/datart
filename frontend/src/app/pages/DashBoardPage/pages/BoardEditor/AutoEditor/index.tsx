@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import React, { memo, useContext } from 'react';
+import { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { LEVEL_1 } from 'styles/StyleConstants';
 import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
