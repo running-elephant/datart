@@ -426,7 +426,7 @@ public class VizServiceImpl extends BaseService implements VizService {
                     download.setUpdateTime(new Date());
                     downloadMapper.updateByPrimaryKey(download);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("download task update error", e);
                 }
                 try {
                     securityManager.releaseRunAs();

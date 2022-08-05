@@ -17,7 +17,7 @@ import java.util.Calendar;
 
 public interface AttachmentService {
 
-    String SHARE_USER = "SCHEDULER";
+    String SHARE_USER = "SCHEDULER_";
 
     File getFile(DownloadCreateParam downloadCreateParam, String path, String fileName) throws Exception;
 
