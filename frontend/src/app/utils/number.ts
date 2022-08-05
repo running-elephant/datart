@@ -79,11 +79,10 @@ export function precisionCalculation(
       return 0;
     case CalculationType.ADD:
     case CalculationType.SUBTRACT:
-    case CalculationType.MULTIPLY:
-    case CalculationType.DIVIDE:
       return numberList.reduce((acc, cur) => {
-        const num = isNaN(Number(cur)) ? 0 : cur;
-        return currency(num)[type](acc).value;
+        const num = isNaN(Number(cur)) ? 0 : Number(cur);
+        const result = Number(currency(num)[type](acc).value);
+        return isNaN(result) ? 0 : result;
       }, 0) as number;
   }
 }
