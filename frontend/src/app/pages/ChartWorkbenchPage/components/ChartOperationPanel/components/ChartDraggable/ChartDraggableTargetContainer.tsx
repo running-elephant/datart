@@ -161,6 +161,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         },
         canDrop: (item: ChartDataSectionField, monitor) => {
           let items = Array.isArray(item) ? item : [item];
+          const currentRowNames = currentConfig.rows?.map(col => col.colName);
           if (
             [CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN_GROUP].includes(
               monitor.getItemType() as any,
@@ -172,6 +173,10 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             ].includes(currentConfig.type as ChartDataSectionType)
           ) {
             return false;
+          }
+
+          if (currentConfig.allowSameField && !aggregation) {
+            return true;
           }
 
           if (
@@ -195,25 +200,19 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             ) {
               return false;
             }
-            const colNames = currentConfig.rows?.map(col => col.colName);
-            return colNames
-              ? colNames.every(v => !v?.includes(items[0].colName))
+            return currentRowNames
+              ? currentRowNames.every(v => !v?.includes(items[0].colName))
               : true;
           }
 
-          if (
-            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
-          ) {
-            const exists = currentConfig.rows?.map(col => col.colName);
-            return items.every(i => !exists?.includes(i.colName));
-          }
-
-          if (currentConfig.allowSameField) {
+          if (aggregation) {
             return true;
           }
 
-          const exists = currentConfig.rows?.map(col => col.colName);
-          return items.every(i => !exists?.includes(i.colName));
+          const isNotExist = items.every(
+            i => !currentRowNames?.includes(i.colName),
+          );
+          return isNotExist;
         },
         collect: (monitor: DropTargetMonitor) => ({
           isOver: monitor.isOver(),
