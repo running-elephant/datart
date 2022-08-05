@@ -18,12 +18,12 @@
 
 import React, { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
+import { LEVEL_1 } from 'styles/StyleConstants';
 import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
 import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
 import { LayerTreePanel } from '../components/LayerPanel/LayerTreePanel';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { AutoBoardEditor } from './AutoBoardEditor';
-import { LEVEL_1 } from 'styles/StyleConstants';
 export const AutoEditor: React.FC<{}> = memo(() => {
   const { onEditClearActiveWidgets } = useContext(WidgetActionContext);
   return (

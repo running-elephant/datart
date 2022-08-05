@@ -17,7 +17,7 @@
  */
 
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import styled from 'styled-components/macro';
 import { LEVEL_5, SPACE, SPACE_XL } from 'styles/StyleConstants';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
