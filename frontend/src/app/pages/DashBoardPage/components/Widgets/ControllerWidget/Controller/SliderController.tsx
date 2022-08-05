@@ -48,15 +48,11 @@ export const SlideControllerForm: React.FC<SelectControllerProps> = memo(
 export const SlideController: React.FC<SelectControllerProps> = memo(
   ({ onChange, value, minValue, maxValue, step, showMarks }) => {
     const [val, setVal] = useState<any>();
-    const _onChange = _val => {
-      setVal(_val);
-    };
-    const _onChangeEnter = value => {
-      onChange(value);
-    };
+
     useEffect(() => {
       setVal(value);
     }, [value]);
+
     const marks = {
       [minValue]: minValue,
       [maxValue]: maxValue,
@@ -66,8 +62,8 @@ export const SlideController: React.FC<SelectControllerProps> = memo(
       <StyledWrap>
         <Slider
           value={val}
-          onChange={_onChange}
-          onAfterChange={_onChangeEnter}
+          onChange={setVal}
+          onAfterChange={onChange}
           min={minValue}
           max={maxValue}
           step={step}

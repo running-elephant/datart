@@ -143,6 +143,9 @@ const config: ChartConfig = {
           label: 'bar.radius',
           key: 'radius',
           comType: 'inputNumber',
+          options: {
+            min: 0,
+          },
         },
         {
           label: 'bar.width',

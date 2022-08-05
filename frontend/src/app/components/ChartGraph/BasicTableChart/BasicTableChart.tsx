@@ -37,8 +37,8 @@ import {
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
-import { isNumber } from 'app/utils/number';
-import { DATARTSEPERATOR } from 'globalConstants';
+import { precisionCalculation } from 'app/utils/number';
+import { CalculationType, DATARTSEPERATOR } from 'globalConstants';
 import { darken, getLuminance, lighten } from 'polished';
 import { Debugger } from 'utils/debugger';
 import { CloneValueDeep, isEmptyArray, Omit } from 'utils/object';
@@ -393,15 +393,7 @@ class BasicTableChart extends ReactChart {
                   ? context?.translator?.('viz.palette.graph.summary') + ': '
                   : '') +
                 toFormattedValue(
-                  total.reduce((acc, cur) => {
-                    const num: number =
-                      !isNumber(cur) || isNaN(cur)
-                        ? typeof cur === 'string' && !isNaN(Number(cur))
-                          ? Number(cur)
-                          : 0
-                        : cur;
-                    return acc + num;
-                  }, 0),
+                  precisionCalculation(CalculationType.ADD, total),
                   currentSummaryField.format,
                 )
               );

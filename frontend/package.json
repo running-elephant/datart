@@ -101,6 +101,7 @@
     "antd-theme-generator": "1.2.11",
     "axios": "^0.21.1",
     "classnames": "^2.3.1",
+    "currency.js": "^2.0.4",
     "debounce-promise": "3.1.2",
     "echarts": "5.3.1",
     "echarts-wordcloud": "^2.0.0",
