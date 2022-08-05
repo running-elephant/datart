@@ -236,6 +236,4 @@ export enum DatartFileSuffixes {
 export enum CalculationType {
   ADD = 'add',
   SUBTRACT = 'subtract',
-  MULTIPLY = 'multiply',
-  DIVIDE = 'divide',
 }
