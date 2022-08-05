@@ -440,13 +440,9 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                 jsonObject = jsonObject.getJSONObject("columns");
                 for (String key : jsonObject.keySet()) {
                     JSONObject item = jsonObject.getJSONObject(key);
-                    String nameString = item.getJSONArray("name").getString(0);
-                    String[] names;
-                    try {
-                        names = JSONObject.parseArray(nameString).toArray(new String[0]);
-                    } catch (JSONException e) {
-                        names = new String[]{nameString};
-                    }
+                    String[] names = item.get("name") instanceof JSONArray
+                            ? item.getJSONArray("name").stream().toArray(String[]::new)
+                            : new String[]{item.get("name").toString()};
                     Column column = Column.of(ValueType.valueOf(item.getString("type")), names);
                     schema.put(column.columnKey(), column);
                 }
