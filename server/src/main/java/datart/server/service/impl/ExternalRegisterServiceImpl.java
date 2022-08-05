@@ -101,7 +101,7 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
         registerParam.setPassword(BCrypt.hashpw(RandomStringUtils.randomAscii(32), BCrypt.gensalt()));
         registerParam.setEmail(email);
 
-        if (userService.register(registerParam, false)) {
+        if (userService.register(registerParam, false, true)) {
             PasswordToken passwordToken = new PasswordToken(registerParam.getUsername(),
                     registerParam.getPassword(),
                     System.currentTimeMillis());
@@ -131,7 +131,7 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
         if (emailMapping != null) {
             userRegisterParam.setEmail(JsonPath.read(jsonObj, emailMapping));
         }
-        if (userService.register(userRegisterParam, false)) {
+        if (userService.register(userRegisterParam, false, true)) {
             PasswordToken passwordToken = new PasswordToken(userRegisterParam.getUsername(),
                     userRegisterParam.getPassword(),
                     System.currentTimeMillis());

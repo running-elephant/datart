@@ -45,6 +45,8 @@ public interface UserService extends BaseCRUDService<User, UserMapperExt> {
 
     boolean register(UserRegisterParam user,boolean sendMail) throws MessagingException, UnsupportedEncodingException;
 
+    boolean register(UserRegisterParam user,boolean sendMail,boolean third) throws MessagingException, UnsupportedEncodingException;
+
     String activeUser(String activeString);
 
     boolean sendActiveMail(String usernameOrEmail) throws UnsupportedEncodingException, MessagingException;
