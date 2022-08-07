@@ -203,6 +203,9 @@ public class POIUtils {
                 return cell.getNumericCellValue();
             case BOOLEAN:
                 return cell.getBooleanCellValue();
+            case FORMULA:
+                cell.setCellType(CellType.STRING);
+                return cell.getStringCellValue();
             default:
                 return cell.getStringCellValue();
         }
