@@ -20,6 +20,7 @@
     "build:task": "rollup -c",
     "build:all": "npm run build:theme && npm run build:task && npm run build",
     "build:theme": "node scripts/extractAntdTheme",
+    "build:analyze": "craco build && source-map-explorer 'build/static/js/*.js'",
     "test": "craco test",
     "test:coverage": "npm run test -- --watchAll=false --coverage",
     "test:ci": "npm run test -- --watchAll=false --runInBand --silent",
