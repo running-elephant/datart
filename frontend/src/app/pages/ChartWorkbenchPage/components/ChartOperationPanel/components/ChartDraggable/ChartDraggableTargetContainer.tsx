@@ -205,7 +205,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               : true;
           }
 
-          if (aggregation) {
+          if (aggregation && items[0].type === DataViewFieldType.NUMERIC) {
             return true;
           }
 
