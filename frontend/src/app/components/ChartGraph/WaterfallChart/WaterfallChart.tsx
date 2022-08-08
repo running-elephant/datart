@@ -239,6 +239,7 @@ class WaterfallChart extends Chart {
       },
       data: ascendOrder,
       label,
+      labelLayout: { hideOverlap: true },
     };
 
     const descendOrderObj = {
@@ -252,6 +253,7 @@ class WaterfallChart extends Chart {
         ...this.getSeriesItemStyle(styles),
       },
       label,
+      labelLayout: { hideOverlap: true },
     };
     const axisInfo = {
       xAxis: this.getXAxis(styles, xAxisColumns),
