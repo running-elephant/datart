@@ -101,9 +101,11 @@ export class ChartSelectionManager {
 
   public echartsClickEventHandler(params: {
     componentIndex: string | number;
+    componentType?: string;
     dataIndex: string | number;
     data: any;
   }) {
+    if (params.componentType === 'geo') return;
     const item = {
       index: params.componentIndex + ',' + params.dataIndex,
       data: params.data,

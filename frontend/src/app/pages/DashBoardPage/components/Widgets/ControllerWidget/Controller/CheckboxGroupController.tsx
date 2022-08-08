@@ -49,10 +49,11 @@ export const CheckboxGroupSetter: React.FC<CheckboxGroupControllerProps> = memo(
     const renderOptions = useCallback(() => {
       return (options || []).map(o => ({
         label: o.label ?? o.value,
-        value: o.value,
+        value: o.value || '',
         key: o.label + o.value,
       }));
     }, [options]);
+
     return (
       <Wrapper>
         <Checkbox.Group

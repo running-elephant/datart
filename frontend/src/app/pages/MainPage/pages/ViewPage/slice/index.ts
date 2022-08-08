@@ -254,7 +254,7 @@ const slice = createSlice({
         v => v.id === action.meta.arg.id,
       );
 
-      if (currentEditingView && action.payload) {
+      if (currentEditingView && action.payload && action.payload.rows) {
         const { model, dataSource } = transformQueryResultToModelAndDataSource(
           action.payload,
           currentEditingView.model,

@@ -37,7 +37,7 @@ export const IndependentPermissionSetting = memo(
     onChange,
   }: IndependentPermissionSettingProps) => {
     return (
-      <Form.Item label={label} extra={extra}>
+      <Form.Item label={label} tooltip={extra}>
         <Radio.Group value={enabled} onChange={onChange}>
           {values.map(({ text, value }) => (
             <Radio key={value} value={value}>

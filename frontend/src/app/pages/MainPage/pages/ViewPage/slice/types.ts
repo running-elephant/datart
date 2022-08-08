@@ -138,14 +138,27 @@ export interface Column extends Schema {
   displayName?: string;
 }
 
+export interface ColumnsProps {
+  category?: ColumnCategories;
+  index?: number;
+  name: string[];
+  primaryKey?: boolean;
+  type: DataViewFieldType;
+  role?: ColumnRole;
+}
+
 export interface Model {
   [key: string]: Column;
+}
+
+export interface ColumnsModel {
+  [key: string]: ColumnsProps;
 }
 
 export type HierarchyModel = {
   version?: string;
   hierarchy?: Model;
-  columns?: Model;
+  columns?: ColumnsModel;
   path?: string[];
   computedFields?: ChartDataViewMeta[];
 };

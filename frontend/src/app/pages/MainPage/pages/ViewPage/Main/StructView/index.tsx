@@ -359,6 +359,17 @@ export const StructView = memo(
       }
     }, [sourceId, allDatabaseSchemas, actions, dispatch, structure]);
 
+    useEffect(() => {
+      structure.joins?.forEach((join, index) => {
+        join?.conditions?.forEach((condition, i) => {
+          form.setFieldsValue({
+            ['left' + index + i]: condition.left.slice(-1),
+            ['right' + index + i]: condition.right.slice(-1),
+          });
+        });
+      });
+    }, [structure.joins, form]);
+
     return (
       <StructContainer>
         {typeof structure === 'string' ? (
@@ -373,7 +384,7 @@ export const StructView = memo(
               allowEnableViz={allowEnableViz}
             />
             <ConfigPanel>
-              <Form form={form} name="dynamic_rule">
+              <Form form={form} name="StructViewForm">
                 <ProcessLine>
                   <ProcessItem>
                     <ProcessItemLabel>

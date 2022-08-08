@@ -19,9 +19,9 @@
 import { Select } from 'antd';
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { FC, memo, useMemo } from 'react';
-import { isEmpty } from 'utils/object';
+import { isEmpty, isFunc } from 'utils/object';
 import { ItemLayoutProps } from '../types';
-import { itemLayoutComparer, removeSomeObjectConfigByKey } from '../utils';
+import { itemLayoutComparer } from '../utils';
 import { BW } from './components/BasicWrapper';
 
 const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
@@ -33,8 +33,7 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     onChange,
   }) => {
     const { comType, options, ...rest } = row;
-    const hideLabel = !!options?.hideLabel;
-    const needTranslate = !!options?.translateItemLabel;
+    const { translateItemLabel, hideLabel, ...restOptions } = options || {};
 
     const handleSelectorValueChange = value => {
       onChange?.(ancestors, value, options?.needRefresh);
@@ -48,23 +47,18 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
     const safeInvokeAction = () => {
       let results: any[] = [];
       try {
-        results =
-          typeof row?.options?.getItems === 'function'
-            ? row?.options?.getItems.call(
-                Object.create(null),
-                cachedDataConfigs,
-              ) || []
-            : row?.options?.items || [];
+        results = isFunc(row?.options?.getItems)
+          ? row?.options?.getItems?.call(
+              Object.create(null),
+              cachedDataConfigs,
+            ) || []
+          : row?.options?.items || [];
       } catch (error) {
         console.error(`BasicSelector | invoke action error ---> `, error);
+      } finally {
+        return results;
       }
-      return results;
     };
-
-    const newOptions = useMemo(() => {
-      const removeKeyList = ['translateItemLabel'];
-      return removeSomeObjectConfigByKey(removeKeyList, options);
-    }, [options]);
 
     return (
       <BW label={!hideLabel ? t(row.label, true) : ''}>
@@ -72,22 +66,19 @@ const BasicSelector: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
           className="datart-ant-select"
           dropdownMatchSelectWidth
           {...rest}
-          {...newOptions}
+          {...restOptions}
           defaultValue={rest.default}
           placeholder={t('select')}
-          onChange={handleSelectorValueChange}
-        >
-          {safeInvokeAction()?.map((o, index) => {
-            const key = isEmpty(o['key']) ? index : o.key;
+          options={safeInvokeAction()?.map(o => {
             const label = isEmpty(o['label']) ? o : o.label;
             const value = isEmpty(o['value']) ? o : o.value;
-            return (
-              <Select.Option key={key} value={value}>
-                {needTranslate ? t(label, true) : label}
-              </Select.Option>
-            );
+            return {
+              label: !!translateItemLabel ? t(label, true) : label,
+              value,
+            };
           })}
-        </Select>
+          onChange={handleSelectorValueChange}
+        />
       </BW>
     );
   },

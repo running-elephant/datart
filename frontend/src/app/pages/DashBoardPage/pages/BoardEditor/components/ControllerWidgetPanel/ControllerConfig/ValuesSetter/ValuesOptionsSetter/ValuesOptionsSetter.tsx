@@ -22,22 +22,37 @@ import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import {
   OPERATOR_TYPE_OPTION,
   ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
+import { ViewSimple } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
 import { hasAggregationFunction } from 'app/utils/chartHelper';
 import { getDistinctFields } from 'app/utils/fetch';
 import { transformMeta } from 'app/utils/internalChartHelper';
-import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  FC,
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import styled from 'styled-components/macro';
 import { request2 } from 'utils/request';
 import { ControllerConfig } from '../../../types';
 import { AssistViewFields } from './AssistViewFields';
 import { CustomOptions } from './CustomOptions';
+
+export interface optionProps {
+  label: string;
+  value: string;
+}
 
 const ValuesOptionsSetter: FC<{
   controllerType: ControllerFacadeTypes;
@@ -45,19 +60,34 @@ const ValuesOptionsSetter: FC<{
   viewMap: Record<string, ChartDataView>;
 }> = memo(({ form, viewMap, controllerType }) => {
   const tc = useI18NPrefix(`viz.control`);
+  const { orgId } = useContext(BoardContext);
   const [optionValues, setOptionValues] = useState<RelationFilterValue[]>([]);
   const [targetKeys, setTargetKeys] = useState<string[]>([]);
   const [labelOptions, setLabelOptions] = useState<
     CascaderOptionType[] | undefined
   >([]);
   const [labelKey, setLabelKey] = useState<string | undefined>();
+  const [viewList, setViewList] = useState<optionProps[]>([]);
+
+  const getViewList = useCallback(async orgId => {
+    const { data } = await request2<ViewSimple[]>(`/views?orgId=${orgId}`);
+    const views = data.map(item => {
+      return {
+        value: item.id,
+        label: item.name,
+      };
+    });
+    setViewList(views);
+  }, []);
 
   const getControllerConfig = useCallback(() => {
     return form?.getFieldValue('config') as ControllerConfig;
   }, [form]);
+
   const isMultiple = useMemo(() => {
     return controllerType === ControllerFacadeTypes.MultiDropdownList;
   }, [controllerType]);
+
   const convertToList = useCallback(collection => {
     return collection.map((ele, index) => {
       const item: RelationFilterValue = {
@@ -69,6 +99,7 @@ const ValuesOptionsSetter: FC<{
       return item;
     });
   }, []);
+
   const getViewOption = useCallback(async (viewId: string) => {
     if (!viewId) return { option: [], dataView: undefined };
     let { data } = await request2<View>(`/views/${viewId}`);
@@ -102,6 +133,7 @@ const ValuesOptionsSetter: FC<{
       dataView: { ...data, meta, computedFields: viewComputedField },
     };
   }, []);
+
   const onTargetKeyChange = useCallback(
     nextTargetKeys => {
       setTargetKeys(nextTargetKeys);
@@ -115,6 +147,7 @@ const ValuesOptionsSetter: FC<{
     },
     [form, getControllerConfig],
   );
+
   const fetchNewDataset = useCallback(
     async (viewId: string, columns: string[], dataView?: ChartDataView) => {
       const fieldDataset = await getDistinctFields(
@@ -127,8 +160,9 @@ const ValuesOptionsSetter: FC<{
     },
     [],
   );
+
   const onViewFieldChange = useCallback(
-    async (value: string[]) => {
+    async (value: string[], type?) => {
       setOptionValues([]);
       setTargetKeys([]);
       setLabelOptions([]);
@@ -153,12 +187,16 @@ const ValuesOptionsSetter: FC<{
 
       const { option: options, dataView } = await getViewOption(value[0]);
       setLabelOptions(options);
-      const [viewId, ...columns] = value;
-      const dataset = await fetchNewDataset(viewId, columns, dataView);
-      setOptionValues(convertToList(dataset?.rows));
+
+      if (type !== 'view') {
+        const [viewId, ...columns] = value;
+        const dataset = await fetchNewDataset(viewId, columns, dataView);
+        setOptionValues(convertToList(dataset?.rows));
+      }
     },
     [convertToList, fetchNewDataset, form, getControllerConfig, getViewOption],
   );
+
   const onLabelChange = useCallback(
     (labelKey: string | undefined) => {
       const controllerConfig = getControllerConfig();
@@ -178,7 +216,6 @@ const ValuesOptionsSetter: FC<{
     },
     [form, getControllerConfig, onViewFieldChange],
   );
-  // const
 
   const onInitOptions = useCallback(
     async (value: string[]) => {
@@ -186,9 +223,11 @@ const ValuesOptionsSetter: FC<{
       const { option: options, dataView } = await getViewOption(viewId);
       const dataset = await fetchNewDataset(viewId, columns, dataView);
       const config: ControllerConfig = getControllerConfig();
+
       setOptionValues(convertToList(dataset?.rows));
+      setLabelOptions(options);
+
       if (config.valueOptionType === 'common') {
-        setLabelOptions(options);
         setLabelKey(config.assistViewFields?.[2]);
         if (config?.controllerValues) {
           setTargetKeys(config?.controllerValues);
@@ -197,6 +236,7 @@ const ValuesOptionsSetter: FC<{
     },
     [convertToList, fetchNewDataset, getControllerConfig, getViewOption],
   );
+
   const updateOptions = useCallback(() => {
     const config = getControllerConfig();
     if (!config?.valueOptionType) {
@@ -211,15 +251,19 @@ const ValuesOptionsSetter: FC<{
     }
   }, [form, getControllerConfig, onInitOptions]);
 
+  const getOptionType = useCallback(() => {
+    return getControllerConfig()?.valueOptionType as ValueOptionType;
+  }, [getControllerConfig]);
+
   useEffect(() => {
     setTimeout(() => {
       updateOptions();
     }, 500);
   }, [updateOptions]);
 
-  const getOptionType = useCallback(() => {
-    return getControllerConfig()?.valueOptionType as ValueOptionType;
-  }, [getControllerConfig]);
+  useEffect(() => {
+    getViewList(orgId);
+  }, [getViewList, orgId]);
 
   return (
     <Wrapper>
@@ -250,10 +294,9 @@ const ValuesOptionsSetter: FC<{
               <>
                 <Form.Item name={['config', 'assistViewFields']} noStyle>
                   <AssistViewFields
-                    allowClear
-                    placeholder="select viewField"
                     onChange={onViewFieldChange}
-                    getViewOption={getViewOption}
+                    viewList={viewList}
+                    viewFieldList={labelOptions}
                     style={{ margin: '6px 0' }}
                   />
                 </Form.Item>

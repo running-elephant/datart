@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import currency from 'currency.js';
+import { CalculationType } from 'globalConstants';
 import isFinite from 'lodash/isFinite';
 import { isEmpty } from 'utils/object';
 
@@ -66,4 +68,21 @@ export function toExponential(value: any, precision: number) {
 
 export function isNumber(value: any) {
   return !isEmpty(value) && !isNaN(value) && isFinite(value) && value !== '';
+}
+
+export function precisionCalculation(
+  type: CalculationType,
+  numberList: Array<string | number>,
+): number {
+  switch (type) {
+    default:
+      return 0;
+    case CalculationType.ADD:
+    case CalculationType.SUBTRACT:
+      return numberList.reduce((acc, cur) => {
+        const num = isNaN(Number(cur)) ? 0 : Number(cur);
+        const result = Number(currency(num)[type](acc).value);
+        return isNaN(result) ? 0 : result;
+      }, 0) as number;
+  }
 }

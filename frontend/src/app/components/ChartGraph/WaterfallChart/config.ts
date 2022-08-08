@@ -78,6 +78,9 @@ const config: ChartConfig = {
           label: 'bar.radius',
           key: 'radius',
           comType: 'inputNumber',
+          options: {
+            min: 0,
+          },
         },
         {
           label: 'bar.width',
@@ -438,6 +441,36 @@ const config: ChartConfig = {
           key: 'panel',
           comType: 'reference',
           options: { type: 'modal' },
+        },
+      ],
+    },
+  ],
+  interactions: [
+    {
+      label: 'drillThrough.title',
+      key: 'drillThrough',
+      comType: 'checkboxModal',
+      default: false,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'drillThrough.title',
+          key: 'setting',
+          comType: 'interaction.drillThrough',
+        },
+      ],
+    },
+    {
+      label: 'viewDetail.title',
+      key: 'viewDetail',
+      comType: 'checkboxModal',
+      default: false,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'viewDetail.title',
+          key: 'setting',
+          comType: 'interaction.viewDetail',
         },
       ],
     },

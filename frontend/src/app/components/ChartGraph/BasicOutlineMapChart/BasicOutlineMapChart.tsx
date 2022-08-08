@@ -321,7 +321,10 @@ class BasicOutlineMapChart extends Chart {
       regions: chartDataSet?.map((row, dcIndex) => {
         return Object.assign(
           {
-            name: this.mappingGeoName(row.getCell(groupConfigs[0])),
+            name: this.mappingGeoName(
+              row.getCell(groupConfigs[0]),
+              styleConfigs,
+            ),
           },
           this.isNormalGeoMap
             ? getSelectedItemStyles(0, dcIndex, selectedItems || [])
@@ -357,7 +360,10 @@ class BasicOutlineMapChart extends Chart {
           ?.map(row => {
             return {
               ...getExtraSeriesRowData(row),
-              name: this.mappingGeoName(row.getCell(groupConfigs[0])),
+              name: this.mappingGeoName(
+                row.getCell(groupConfigs[0]),
+                styleConfigs,
+              ),
               value: row.getCell(aggregateConfigs[0]),
               visualMap: show,
             };
@@ -395,8 +401,12 @@ class BasicOutlineMapChart extends Chart {
           ?.map((row, dcIndex) => {
             return {
               ...getExtraSeriesRowData(row),
-              name: this.mappingGeoName(row.getCell(groupConfigs[0])),
+              name: this.mappingGeoName(
+                row.getCell(groupConfigs[0]),
+                styleConfigs,
+              ),
               value: this.mappingGeoCoordination(
+                styleConfigs,
                 row.getCell(groupConfigs[0]),
                 row.getCell(aggregateConfigs[0]) || defaultColorValue,
                 row.getCell(sizeConfigs[0]) || defaultSizeValue,
@@ -448,19 +458,28 @@ class BasicOutlineMapChart extends Chart {
     };
   }
 
-  protected mappingGeoName(sourceName: string): string {
+  protected mappingGeoName(sourceName: string, styleConfigs): string {
+    const [mapLevelName] = getStyles(styleConfigs, ['map'], ['level']);
+    const isProvinceLevel = mapLevelName === 'china';
     const targetName = this.geoMap.features.find(f =>
-      f.properties.name.includes(sourceName),
+      isProvinceLevel
+        ? f.properties.name?.includes(sourceName)
+        : f.properties.name === sourceName,
     )?.properties.name;
     return targetName;
   }
 
   protected mappingGeoCoordination(
+    styleConfigs,
     sourceName: string,
     ...values: Array<number | string>
   ): Array<number[] | number | string> {
+    const [mapLevelName] = getStyles(styleConfigs, ['map'], ['level']);
+    const isProvinceLevel = mapLevelName === 'china';
     const properties = this.geoMap.features.find(f =>
-      f.properties.name.includes(sourceName),
+      isProvinceLevel
+        ? f.properties.name?.includes(sourceName)
+        : f.properties.name === sourceName,
     )?.properties;
 
     return (properties?.cp || properties?.center)?.concat(values) || [];

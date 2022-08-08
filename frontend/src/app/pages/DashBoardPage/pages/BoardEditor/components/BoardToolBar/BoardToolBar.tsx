@@ -17,9 +17,9 @@
  */
 
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import styled from 'styled-components/macro';
-import { LEVEL_1, SPACE, SPACE_XL } from 'styles/StyleConstants';
+import { LEVEL_5, SPACE, SPACE_XL } from 'styles/StyleConstants';
 import { BoardToolBarContext } from './context/BoardToolBarContext';
 import { ToolBar } from './ToolBar';
 
@@ -37,7 +37,7 @@ export const BoardToolBar = () => {
 };
 
 const Wrapper = styled.div`
-  z-index: ${LEVEL_1};
+  z-index: ${LEVEL_5};
   display: flex;
   flex-shrink: 0;
   align-items: center;
