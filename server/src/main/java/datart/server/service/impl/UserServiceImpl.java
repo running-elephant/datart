@@ -143,11 +143,6 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Override
     @Transactional
     public boolean register(UserRegisterParam userRegisterParam, boolean sendMail) throws MessagingException, UnsupportedEncodingException {
-        return register(userRegisterParam, sendMail, false);
-    }
-
-    @Override
-    public boolean register(UserRegisterParam userRegisterParam, boolean sendMail, boolean third) throws MessagingException, UnsupportedEncodingException {
         if (!checkUserName(userRegisterParam.getUsername())) {
             log.error("The username({}) has been registered", userRegisterParam.getUsername());
             Exceptions.tr(ParamException.class, "error.param.occupied", "resource.user.username");
@@ -158,7 +153,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
         User user = new User();
         BeanUtils.copyProperties(userRegisterParam, user);
-        user.setPassword(third ? userRegisterParam.getPassword() : BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
+        user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
         user.setId(UUIDGenerator.generate());
         user.setCreateBy(user.getId());
         user.setCreateTime(new Date());
