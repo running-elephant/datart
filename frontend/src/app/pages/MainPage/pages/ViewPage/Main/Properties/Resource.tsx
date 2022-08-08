@@ -15,23 +15,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {
   CalendarOutlined,
   DatabaseOutlined,
   FieldStringOutlined,
+  MoreOutlined,
   NumberOutlined,
   SearchOutlined,
   TableOutlined,
 } from '@ant-design/icons';
-import { Col, Input, Row } from 'antd';
+import {
+  Button,
+  Col,
+  Dropdown,
+  Input,
+  Menu,
+  Row,
+  Space,
+  TreeDataNode,
+} from 'antd';
 import { Tree } from 'app/components';
 import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
+import { updateBy } from 'app/utils/mutation';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
-import { memo, useCallback, useContext, useEffect, useMemo } from 'react';
+import { memo, useCallback, useContext, useEffect, useState } from 'react';
 import { monaco } from 'react-monaco-editor';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -58,6 +68,9 @@ export const Resource = memo(() => {
   ) as string;
   const databaseSchemas = useSelector(state =>
     selectSourceDatabaseSchemas(state, { id: sourceId }),
+  );
+  const [databaseTreeModel, setDatabaseTreeModel] = useState<TreeDataNode[]>(
+    [],
   );
 
   const { height, ref: treeWrapperRef } = useResizeObserver({
@@ -90,8 +103,8 @@ export const Resource = memo(() => {
     return buildAntdTreeNodeModel(ancestors, table.tableName, children, false);
   };
 
-  const databaseTreeModel = useMemo(() => {
-    return (databaseSchemas || []).map(buildTableNode);
+  useEffect(() => {
+    setDatabaseTreeModel((databaseSchemas || []).map(buildTableNode));
   }, [buildTableNode, databaseSchemas]);
 
   const { filteredData, onExpand, debouncedSearch, expandedRowKeys } =
@@ -139,17 +152,59 @@ export const Resource = memo(() => {
     }
   }, []);
 
+  const sortListOrTree = useCallback((list, sortType, sortKey) => {
+    return updateBy(list, draft => {
+      draft.sort((a, b) => {
+        let aname = a[sortKey],
+          bname = b[sortKey];
+        return String(aname).localeCompare(String(bname));
+      });
+      draft.forEach(item => {
+        if (item.children) {
+          item.children = sortListOrTree(item.children, sortType, sortKey);
+        }
+      });
+    });
+  }, []);
+
+  const handleMenuClick = useCallback(
+    ({ key }) => {
+      if (key === 'byNameSort') {
+        setDatabaseTreeModel(sortListOrTree(databaseTreeModel, key, 'title'));
+      } else {
+        setDatabaseTreeModel((databaseSchemas || []).map(buildTableNode));
+      }
+    },
+    [databaseTreeModel, sortListOrTree, databaseSchemas, buildTableNode],
+  );
+
+  const getOverlays = useCallback(() => {
+    return (
+      <Menu onClick={handleMenuClick}>
+        <Menu.SubMenu key="sort" title={t('sortType')}>
+          <Menu.Item key="byNameSort">{t('byName')}</Menu.Item>
+          <Menu.Item key="byOriginalFieldSort">{t('byField')}</Menu.Item>
+        </Menu.SubMenu>
+      </Menu>
+    );
+  }, [handleMenuClick, t]);
+
   return (
     <Container title="reference">
       <SearchBar>
         <Col span={24}>
-          <Input
-            prefix={<SearchOutlined className="icon" />}
-            placeholder={t('search')}
-            className="input"
-            bordered={false}
-            onChange={debouncedSearch}
-          />
+          <StyleSpace>
+            <Input
+              prefix={<SearchOutlined className="icon" />}
+              placeholder={t('search')}
+              className="input"
+              bordered={false}
+              onChange={debouncedSearch}
+            />
+            <Dropdown key="more" trigger={['click']} overlay={getOverlays()}>
+              <Button type="text" icon={<MoreOutlined />} />
+            </Dropdown>
+          </StyleSpace>
         </Col>
       </SearchBar>
       <TreeWrapper ref={treeWrapperRef}>
@@ -182,4 +237,11 @@ const TreeWrapper = styled.div`
   flex: 1;
   padding-bottom: ${SPACE_MD};
   overflow-y: auto;
+`;
+
+const StyleSpace = styled(Space)`
+  width: 100%;
+  > div:nth-child(1) {
+    flex: 1;
+  }
 `;

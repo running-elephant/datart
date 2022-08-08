@@ -195,7 +195,9 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
             if (include
                     .stream()
                     .noneMatch(selectColumn ->
-                            column.columnKey().equals(selectColumn.getColumnKey()) || column.columnKey().equals(selectColumn.getAlias()))) {
+                            column.columnKey().equals(selectColumn.getColumnKey())
+                                    || column.columnKey().equals(selectColumn.getAlias())
+                                    || column.columnKey().contains(selectColumn.getColumnKey()))) {
                 excludeIndex.add(i);
             }
         }

@@ -15,99 +15,66 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Cascader, CascaderProps } from 'antd';
-import { CascaderOptionType } from 'antd/lib/cascader';
+import { Select, Space } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
-import { ViewSimple } from 'app/pages/MainPage/pages/ViewPage/slice/types';
-import React, {
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
-import { request2 } from 'utils/request';
+import React, { memo, useCallback, useEffect, useState } from 'react';
+import styled from 'styled-components/macro';
 
-export interface AssistViewFieldsProps
-  extends Omit<CascaderProps, 'options' | 'onChange'> {
-  onChange?: (value: string[]) => void;
-  getViewOption: (
-    viewId: string,
-  ) => Promise<{ option: CascaderOptionType[] | undefined }>;
+export interface AssistViewFieldsProps {
+  onChange?: (value: string[], type) => void;
   value?: string[];
+  style: object;
+  viewList;
+  viewFieldList;
 }
 export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
-  ({ onChange, value: propsValue, getViewOption }) => {
+  ({ onChange, value: propsValue, style, viewList, viewFieldList }) => {
     const tc = useI18NPrefix(`viz.control`);
     const [val, setVal] = useState<string[]>([]);
-    const { orgId } = useContext(BoardContext);
-    const [options, setOptions] = useState<CascaderOptionType[]>([]);
+
+    const handleOnChange = useCallback(
+      (value, type) => {
+        setVal(value);
+        onChange?.(value || [], type);
+      },
+      [onChange],
+    );
+
     useEffect(() => {
       setVal(propsValue || []);
     }, [onChange, propsValue]);
 
-    const setViews = useCallback(
-      async orgId => {
-        const { data } = await request2<ViewSimple[]>(`/views?orgId=${orgId}`);
-        const views: CascaderOptionType[] = data.map(item => {
-          return {
-            value: item.id,
-            label: item.name,
-            isLeaf: false,
-          };
-        });
-        if (Array.isArray(propsValue) && propsValue.length) {
-          const { option } = await getViewOption(propsValue[0]);
-
-          views.forEach(view => {
-            if (view.value === propsValue[0]) {
-              view.children = option;
-            }
-          });
-        }
-        setOptions([...views]);
-      },
-      [getViewOption, propsValue],
-    );
-
-    useEffect(() => {
-      setViews(orgId);
-    }, [setViews, orgId]);
-
-    const loadData = useCallback(
-      async (selectedOptions: CascaderOptionType[]) => {
-        const targetOption = selectedOptions[selectedOptions.length - 1];
-        targetOption.loading = true;
-        const { option } = await getViewOption(targetOption.value as string);
-        targetOption.children = option;
-        targetOption.loading = false;
-        const nextOptions = [...options].map(item => {
-          if (item.value === targetOption.value) {
-            return targetOption;
-          } else {
-            return item;
-          }
-        });
-        setOptions(nextOptions);
-      },
-      [options, getViewOption],
-    );
-    const optionChange = value => {
-      setVal(value);
-      onChange?.(value || []);
-    };
-
     return (
-      <Cascader
-        allowClear
-        placeholder={tc('selectViewField')}
-        options={options}
-        onChange={optionChange}
-        value={[...val]}
-        style={{ margin: '6px 0' }}
-        loadData={loadData as any}
-      />
+      <StyleSpace style={style}>
+        <Select
+          optionFilterProp={'label'}
+          showSearch
+          placeholder={tc('selectView')}
+          value={val?.[0]}
+          onChange={value => {
+            handleOnChange([value], 'view');
+          }}
+          options={viewList}
+        ></Select>
+        <Select
+          optionFilterProp={'label'}
+          onChange={value => {
+            handleOnChange([val?.[0] || '', value], 'viewField');
+          }}
+          placeholder={tc('selectViewField')}
+          showSearch
+          value={val?.[1]}
+          loading={!viewFieldList}
+          options={viewFieldList}
+        ></Select>
+      </StyleSpace>
     );
   },
 );
+
+const StyleSpace = styled(Space)`
+  display: flex;
+  > div {
+    flex: 1;
+  }
+`;

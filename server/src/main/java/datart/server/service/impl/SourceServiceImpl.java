@@ -141,6 +141,8 @@ public class SourceServiceImpl extends BaseService implements SourceService {
 
     @Override
     public SchemaInfo getSourceSchemaInfo(String sourceId) {
+        Source retrieve = retrieve(sourceId);
+        requirePermission(retrieve, Const.READ);
         SourceSchemas sourceSchemas = sourceSchemasMapper.selectBySource(sourceId);
         if (sourceSchemas == null || StringUtils.isBlank(sourceSchemas.getSchemas())) {
             return SchemaInfo.empty();
@@ -148,6 +150,9 @@ public class SourceServiceImpl extends BaseService implements SourceService {
         SchemaInfo schemaInfo = new SchemaInfo();
         try {
             schemaInfo.setUpdateTime(sourceSchemas.getUpdateTime());
+            if (StringUtils.isEmpty(sourceSchemas.getSchemas())) {
+                return schemaInfo;
+            }
             schemaInfo.setSchemaItems(OBJECT_MAPPER.readerForListOf(SchemaItem.class).readValue(sourceSchemas.getSchemas()));
         } catch (Exception e) {
             log.error("source schema parse error ", e);
