@@ -484,6 +484,7 @@ class BasicDoubleYChart extends Chart {
           return labels.join('\n');
         },
       },
+      labelLayout: { hideOverlap: true },
     };
   }
 
