@@ -19,6 +19,7 @@
 import {
   AggregateFieldActionType,
   ChartDataSectionType,
+  ChartDataViewFieldCategory,
   DataViewFieldType,
   FilterConditionType,
   SortActionType,
@@ -565,6 +566,9 @@ export class ChartDataRequestBuilder {
     );
 
     return selectColumns
+      ?.filter(
+        c => c.category !== ChartDataViewFieldCategory.AggregateComputedField,
+      )
       ?.reduce<ChartDataSectionField[]>((acc, cur) => {
         if (acc.find(x => x?.colName === cur.colName)) {
           return acc;
