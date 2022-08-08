@@ -101,7 +101,7 @@ export class ChartSelectionManager {
 
   public echartsClickEventHandler(params: {
     componentIndex: string | number;
-    componentType: string | undefined;
+    componentType?: string;
     dataIndex: string | number;
     data: any;
   }) {
