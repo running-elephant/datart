@@ -132,7 +132,11 @@ const DataModelTree: FC = memo(() => {
       if (currentEditingView?.model?.columns) {
         setFields(
           Object.values(currentEditingView.model.columns).map(v => {
-            return { id: v.name, name: v.name, displayName: v.name };
+            return {
+              id: v.name,
+              name: v.name.join('.'),
+              displayName: v.name.join('.'),
+            };
           }),
         );
       }
