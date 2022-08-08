@@ -32,6 +32,7 @@ import {
 import {
   Column,
   ColumnRole,
+  ColumnsProps,
   DatabaseSchema,
   HierarchyModel,
   Model,
@@ -110,10 +111,11 @@ export function transformQueryResultToModelAndDataSource(
       lastModel?.hierarchy || {},
     );
     const key = viewType === 'STRUCT' ? JSON.parse(name).join('.') : name;
+    const _name = viewType === 'STRUCT' ? JSON.parse(name) : name;
     return {
       ...obj,
       [key]: {
-        name,
+        name: _name,
         type: hierarchyColumn?.type || type,
         primaryKey,
         category: hierarchyColumn?.category || ColumnCategories.UnCategorized, // FIXME: model 重构时一起改
@@ -153,7 +155,7 @@ export function getHierarchyColumn(
 }
 
 export function getColumnWidthMap(
-  model: { [key: string]: Omit<Column, 'name'> },
+  model: { [key: string]: Omit<ColumnsProps, 'name'> },
   dataSource: object[],
 ) {
   const HEADER_PADDING = SPACE_UNIT * (2 + 1);
