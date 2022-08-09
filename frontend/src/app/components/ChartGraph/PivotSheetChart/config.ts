@@ -594,7 +594,7 @@ const config: ChartConfig = {
           },
           subTotal: 'Sub Total',
           total: 'Total',
-          number: 'Number',
+          number: 'Metric',
         },
       },
     },
