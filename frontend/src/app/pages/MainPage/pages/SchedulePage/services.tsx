@@ -19,15 +19,6 @@
 import { request2 } from 'utils/request';
 import { IUserInfo } from './types';
 
-export const checkScheduleName = async (orgId: string, name: string) => {
-  const { data } = await request2<boolean>({
-    url: '/schedules/check/name',
-    method: 'POST',
-    data: { orgId, name },
-  });
-  return data;
-};
-
 export const searchUserEmails = async (keyword: string) => {
   const { data } = await request2<IUserInfo[]>({
     url: '/users/search',
