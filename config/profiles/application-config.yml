@@ -6,7 +6,9 @@ spring:
     username: ${datasource.username:root}
     password: ${datasource.password:123456}
 
-# security:
+
+  main:
+    allow-circular-references: true
 #   oauth2:
 #     client:
 #       registration:
@@ -82,7 +84,8 @@ server:
 datart:
   server:
     address: ${datart.address:http://127.0.0.1:8080}
-
+  migration:
+    enable: false
   # 租户管理模式：platform-平台(默认)，team-团队
   tenant-management-mode: platform
 

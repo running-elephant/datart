@@ -32,6 +32,7 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.net.URL;
+import java.time.Duration;
 
 
 @Slf4j
@@ -62,7 +63,7 @@ public class WebUtils {
         WebDriver webDriver = createWebDriver();
         webDriver.get(url);
 
-        WebDriverWait wait = new WebDriverWait(webDriver, getTimeout());
+        WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(getTimeout()));
 
         ExpectedCondition<WebElement> ConditionOfSign = ExpectedConditions.presenceOfElementLocated(By.id("headlessBrowserRenderSign"));
         ExpectedCondition<WebElement> ConditionOfWidth = ExpectedConditions.presenceOfElementLocated(By.id("width"));
