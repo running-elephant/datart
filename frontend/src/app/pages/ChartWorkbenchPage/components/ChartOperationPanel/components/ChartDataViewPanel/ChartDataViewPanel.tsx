@@ -582,6 +582,7 @@ const Header = styled.div`
 
   .view-selector {
     flex: 1;
+    overflow: hidden;
   }
 `;
 

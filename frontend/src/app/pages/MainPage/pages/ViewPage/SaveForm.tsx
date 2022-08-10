@@ -152,6 +152,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
       <Form.Item
         name="name"
         label={t('name')}
+        getValueFromEvent={event => event.target.value?.trim()}
         rules={[
           {
             required: true,

@@ -161,6 +161,10 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         } else {
             update.setRowPermissionBy(ShareRowPermissionBy.CREATOR.name());
         }
+
+        if (ShareAuthenticationMode.CODE.equals(updateParam.getAuthenticationMode()) && !ShareAuthenticationMode.CODE.name().equals(update.getAuthenticationMode())) {
+            update.setAuthenticationCode(SecurityUtils.randomPassword());
+        }
         update.setAuthenticationMode(updateParam.getAuthenticationMode().name());
 
         Set<String> roleIds = new HashSet<>();
@@ -176,10 +180,6 @@ public class ShareServiceImpl extends BaseService implements ShareService {
             }
         }
 
-        if (ShareAuthenticationMode.CODE.equals(updateParam.getAuthenticationMode())) {
-            update.setAuthenticationCode(SecurityUtils.randomPassword());
-        }
-
         update.setRoles(JSON.toJSONString(roleIds));
         update.setUpdateBy(getCurrentUser().getId());
         update.setUpdateTime(new Date());
@@ -189,6 +189,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         BeanUtils.copyProperties(update, shareInfo);
         shareInfo.setId(update.getId());
         shareInfo.setAuthenticationMode(updateParam.getAuthenticationMode());
+
         return shareInfo;
     }
 
@@ -482,7 +483,12 @@ public class ShareServiceImpl extends BaseService implements ShareService {
             BeanUtils.copyProperties(share, authorizedToken);
             authorizedToken.setVizType(ResourceType.valueOf(share.getVizType()));
             if (ShareRowPermissionBy.CREATOR.name().equals(share.getRowPermissionBy())) {
-                User user = retrieve(share.getCreateBy(), User.class, false);
+                String shareCreateBy = share.getCreateBy();
+                if (shareCreateBy.startsWith(AttachmentService.SHARE_USER)) {
+                    shareCreateBy = shareCreateBy.replace(AttachmentService.SHARE_USER, "");
+                    authorizedToken.setCreateBy(shareCreateBy);
+                }
+                User user = retrieve(shareCreateBy, User.class, false);
                 authorizedToken.setPermissionBy(user.getUsername());
             } else {
                 authorizedToken.setPermissionBy(shareToken.getUsername());

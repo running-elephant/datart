@@ -181,12 +181,7 @@ export class ChartDataRequestBuilder {
   private buildColumnName(col) {
     const row = findPathByNameInMeta(this.dataView.meta, col.colName);
     if (row) {
-      try {
-        return row?.path || [];
-      } catch (e) {
-        console.log('error buildColumnName row ' + col.colName);
-        return row?.path || [];
-      }
+      return row?.path || [];
     } else {
       return [col.colName];
     }

@@ -118,6 +118,7 @@ export function OrgSettingPage() {
           <Form.Item
             name="name"
             label={t('name')}
+            getValueFromEvent={event => event.target.value?.trim()}
             rules={[
               {
                 required: true,

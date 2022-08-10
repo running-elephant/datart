@@ -113,6 +113,10 @@ const VizHeader: FC<{
       setIsModalVisible(false);
     }, []);
 
+    const handleModalOpen = useCallback(() => {
+      setIsModalVisible(true);
+    }, []);
+
     const getOverlays = () => {
       return (
         <VizOperationMenu
@@ -194,6 +198,7 @@ const VizHeader: FC<{
             isModalVisible={isModalVisible}
             handleOk={handleModalOk}
             handleCancel={handleModalCancel}
+            handleOpen={handleModalOpen}
           ></SaveToDashboard>
         )}
         {mockDataModal && (

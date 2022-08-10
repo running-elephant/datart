@@ -84,6 +84,7 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
         <FormItem
           name="name"
           label={t('name')}
+          getValueFromEvent={event => event.target.value?.trim()}
           rules={[
             {
               required: true,

@@ -37,7 +37,7 @@ import {
 } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import { ColumnCategories } from '../constants';
-import { Column, Model } from '../slice/types';
+import { Column, ColumnsModel, Model } from '../slice/types';
 import { getColumnWidthMap, getHierarchyColumn } from '../utils';
 
 const ROW_KEY = 'DATART_ROW_KEY';
@@ -45,7 +45,7 @@ const ROW_KEY = 'DATART_ROW_KEY';
 interface SchemaTableProps extends TableProps<object> {
   height: number;
   width: number;
-  model: Model;
+  model: ColumnsModel;
   hierarchy: Model;
   dataSource?: object[];
   hasCategory?: boolean;

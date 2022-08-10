@@ -167,6 +167,7 @@ export const VariableForm = memo(
           name="name"
           label={t('name')}
           validateFirst
+          getValueFromEvent={event => event.target.value?.trim()}
           rules={[
             {
               required: true,

@@ -57,7 +57,7 @@ public class AttachmentPdfServiceImpl implements AttachmentService {
         shareCreateParam.setExpiryDate(DateUtils.addHours(new Date(), 1));
         shareCreateParam.setAuthenticationMode(ShareAuthenticationMode.NONE);
         shareCreateParam.setRowPermissionBy(ShareRowPermissionBy.CREATOR);
-        ShareToken share = shareService.createShare(SHARE_USER, shareCreateParam);
+        ShareToken share = shareService.createShare(SHARE_USER + securityManager.getCurrentUser().getId(), shareCreateParam);
 
         String url = Application.getWebRootURL() + "/" + shareCreateParam.getVizType().getShareRoute() + "/" + share.getId() + "?eager=true&type=" + share.getAuthenticationMode();
         log.info("share url {} ", url);
