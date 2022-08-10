@@ -122,7 +122,6 @@ const SelectJoinColumns = memo(
           name={'left' + joinIndex + conditionsIndex}
           rules={[{ required: true, message: t('selectField') }]}
           getValueFromEvent={e => (e ? e.slice(-1) : '')}
-          initialValue={joinTable.conditions?.[conditionsIndex]?.left.slice(-1)}
         >
           <ColumnSelect
             dropdownMatchSelectWidth={false}
@@ -142,9 +141,6 @@ const SelectJoinColumns = memo(
           name={'right' + joinIndex + conditionsIndex}
           rules={[{ required: true, message: t('selectField') }]}
           getValueFromEvent={e => (e ? e.slice(-1) : '')}
-          initialValue={joinTable.conditions?.[conditionsIndex]?.right.slice(
-            -1,
-          )}
         >
           <ColumnSelect
             dropdownMatchSelectWidth={false}

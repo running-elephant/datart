@@ -84,12 +84,12 @@ const ShareManageModal: FC<{
           setListData(
             produce(listData, draft => {
               const Index = draft.findIndex(v => v.id === id);
-              draft[Index] = paramsData;
+              draft[Index] = Object.assign(paramsData, data, { vizType });
             }),
           );
         }
       },
-      [listData],
+      [listData, vizType],
     );
 
     const creatShareLinkFn = useCallback(
@@ -98,8 +98,8 @@ const ShareManageModal: FC<{
         if (data) {
           setListData([
             {
-              ...data,
               ...paramsData,
+              ...data,
               vizType,
             },
             ...listData,

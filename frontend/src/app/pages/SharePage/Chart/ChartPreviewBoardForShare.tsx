@@ -26,9 +26,16 @@ import useDebouncedLoadingStatus from 'app/hooks/useDebouncedLoadingStatus';
 import useMount from 'app/hooks/useMount';
 import useResizeObserver from 'app/hooks/useResizeObserver';
 import ChartManager from 'app/models/ChartManager';
+import useDisplayJumpVizDialog from 'app/pages/MainPage/pages/VizPage/hooks/useDisplayJumpVizDialog';
 import useDisplayViewDetail from 'app/pages/MainPage/pages/VizPage/hooks/useDisplayViewDetail';
 import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
+import {
+  chartSelectionEventListener,
+  drillDownEventListener,
+  pivotTableDrillEventListener,
+  tablePagingAndSortEventListener,
+} from 'app/utils/ChartEventListenerHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
 import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -91,6 +98,8 @@ const ChartPreviewBoardForShare: FC<{
     const chartConfigRef = useRef(chartPreview?.chartConfig);
     const [openViewDetailPanel, viewDetailPanelContextHolder] =
       useDisplayViewDetail();
+    const [openJumpVizDialogModal, openJumpVizDialogModalContextHolder] =
+      useDisplayJumpVizDialog();
     const [jumpDialogModal, jumpDialogContextHolder] = useModal();
     const {
       getDrillThroughSetting,
@@ -98,8 +107,9 @@ const ChartPreviewBoardForShare: FC<{
       handleDrillThroughEvent,
       handleViewDataEvent,
     } = useChartInteractions({
-      openViewDetailPanel: openViewDetailPanel as any,
-      openJumpDialogModal: jumpDialogModal.info,
+      openViewDetailPanel: openViewDetailPanel as Function,
+      openJumpUrlDialogModal: jumpDialogModal.info,
+      openJumpVizDialogModal: openJumpVizDialogModal as Function,
     });
     const isLoadingData = useDebouncedLoadingStatus({
       isLoading: chartPreview?.isLoadingData,
@@ -274,51 +284,25 @@ const ChartPreviewBoardForShare: FC<{
             handleViewDataEvent(
               buildViewDataEventParams(param, InteractionMouseEvent.Left),
             );
-
-            if (
-              drillOptionRef.current?.isSelectedDrill &&
-              !drillOptionRef.current.isBottomLevel
-            ) {
-              const option = drillOptionRef.current;
-              option.drillDown(param.data.rowData);
-              drillOptionRef.current = option;
-              handleDrillOptionChange(option);
-              return;
-            }
-            if (
-              param.chartType === 'table' &&
-              param.interactionType === 'paging-sort-filter'
-            ) {
+            drillDownEventListener(drillOptionRef?.current, param, p => {
+              drillOptionRef.current = p;
+              handleDrillOptionChange?.(p);
+            });
+            tablePagingAndSortEventListener(param, p => {
               dispatch(
                 fetchShareDataSetByPreviewChartAction({
+                  ...p,
                   preview: chartPreview!,
-                  sorter: {
-                    column: param?.seriesName!,
-                    operator: param?.value?.direction,
-                    aggOperator: param?.value?.aggOperator,
-                  },
-                  pageInfo: {
-                    pageNo: param?.value?.pageNo,
-                  },
                   filterSearchParams,
                 }),
               );
-              return;
-            }
-
-            // NOTE 透视表树形结构展开下钻特殊处理方法
-            if (
-              param.chartType === 'pivotSheet' &&
-              param.interactionType === 'drilled'
-            ) {
-              handleDrillOptionChange?.(param.drillOption);
-              return;
-            }
-
-            // NOTE 直接修改selectedItems结果集处理方法
-            if (param.interactionType === 'select') {
-              dispatch(shareActions.changeSelectedItems(param.selectedItems));
-            }
+            });
+            pivotTableDrillEventListener(param, p => {
+              handleDrillOptionChange(p);
+            });
+            chartSelectionEventListener(param, p => {
+              dispatch(shareActions.changeSelectedItems(p));
+            });
           },
         },
       ]);
@@ -415,6 +399,7 @@ const ChartPreviewBoardForShare: FC<{
         </ChartDrillContext.Provider>
         {viewDetailPanelContextHolder}
         {jumpDialogContextHolder}
+        {openJumpVizDialogModalContextHolder}
         <HeadlessBrowserIdentifier
           renderSign={headlessBrowserRenderSign}
           width={Number(width) || 0}

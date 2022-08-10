@@ -31,7 +31,7 @@ export type Series = {
       type: string;
     };
   };
-  labelLayout?: { hideOverlap: true };
+  labelLayout?: { hideOverlap: boolean };
   sort: string;
   type: string;
 } & GridStyle;

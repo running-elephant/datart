@@ -18,17 +18,16 @@
 
 import { ChartDataSectionType } from 'app/constants';
 import Chart from 'app/models/Chart';
-import { ChartSelection } from 'app/models/ChartSelection';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import {
   ChartConfig,
-  ChartContext,
   ChartDataSectionField,
   ChartStyleConfig,
   SelectedItem,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
-  getChartSelection,
   getDataColumnMaxAndMin2,
   getExtraSeriesRowData,
   getScatterSymbolSizeFn,
@@ -59,9 +58,9 @@ registerMap('china-city', geoChinaCity as any);
 class BasicOutlineMapChart extends Chart {
   config = Config;
   chart: any = null;
+  selectionManager?: ChartSelectionManager;
 
   protected isNormalGeoMap = false;
-  private selection: null | ChartSelection = null;
   private geoMap;
   private container: HTMLElement | null = null;
   private geoConfig: GeoInfo = {
@@ -89,7 +88,7 @@ class BasicOutlineMapChart extends Chart {
     geoConfig.zoom = newOption?.geo?.[0].zoom;
   }
 
-  onMount(options, context?) {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (
       options.containerId === undefined ||
       !context.document ||
@@ -99,68 +98,45 @@ class BasicOutlineMapChart extends Chart {
     }
     this.container = context.document.getElementById(options.containerId);
     this.chart = init(this.container!, 'default');
-    this.selection = getChartSelection(context.window, {
-      chart: this.chart,
-      mouseEvents: this.mouseEvents,
-    });
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
+    this.selectionManager.attachWindowListeners(context.window);
+    this.selectionManager.attachZRenderListeners(this.chart);
+    this.selectionManager.attachEChartsListeners(this.chart);
     this.container?.addEventListener('mouseup', () =>
       this.getOptionsConfig(this.geoConfig, this.chart),
     );
-    this.mouseEvents?.forEach(event => {
-      switch (event.name) {
-        case 'click':
-          this.chart.on(event.name, (params: any) => {
-            if (params.componentType === 'series' || this.isNormalGeoMap) {
-              this.selection?.doSelect({
-                index: params.componentIndex + ',' + params.dataIndex,
-                data: params.data,
-              });
-              event.callback({
-                ...params,
-                interactionType: 'select',
-                selectedItems: this.selection?.selectedItems,
-              });
-            }
-          });
-          break;
-        default:
-          this.chart.on(event.name, event?.callback as any);
-          break;
-      }
-    });
   }
 
-  onUpdated(props, context?: ChartContext): void {
-    if (!props.dataset || !props.dataset.columns || !props.config) {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
+    if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
-    if (!this.isMatchRequirement(props.config)) {
+    if (!this.isMatchRequirement(options.config)) {
       this.chart?.clear();
       return;
     }
-    if (this.selection?.selectedItems.length && !props.selectedItems?.length) {
-      this.selection?.clearAll();
-    }
+    this.selectionManager?.updateSelectedItems(options?.selectedItems);
     const newOptions = this.getOptions(
-      props.dataset,
-      props.config,
-      props.selectedItems,
+      options.dataset,
+      options.config,
+      options.selectedItems,
       context,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext) {
     this.chart?.resize({ width: context?.width, height: context?.height });
     hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
-      this.onUpdated(opt, context);
+      this.onUpdated(options, context);
   }
 
-  onUnMount(options, context?) {
+  onUnMount(options: BrokerOption, context: BrokerContext) {
     this.container?.removeEventListener('mouseup', () =>
       this.getOptionsConfig(this.geoConfig, this.chart),
     );
-    this.selection?.removeEvent();
+    this.selectionManager?.removeWindowListeners(context.window);
+    this.selectionManager?.removeZRenderListeners(this.chart);
     this.chart?.dispose();
   }
 
@@ -168,7 +144,7 @@ class BasicOutlineMapChart extends Chart {
     dataset: ChartDataSetDTO,
     config: ChartConfig,
     selectedItems?: SelectedItem[],
-    context?: ChartContext,
+    context?: BrokerContext,
   ): MapOption {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -234,7 +210,7 @@ class BasicOutlineMapChart extends Chart {
     };
   }
 
-  private getToolbox(styles: ChartStyleConfig[], context?: ChartContext) {
+  private getToolbox(styles: ChartStyleConfig[], context?: BrokerContext) {
     return {
       show: true,
       orient: 'vertical',
@@ -243,7 +219,7 @@ class BasicOutlineMapChart extends Chart {
       feature: {
         myResetZoom: {
           show: true,
-          title: context?.translator('common.reset'),
+          title: context?.translator?.('common.reset'),
           onclick: () => {
             this.geoConfig = {
               center: undefined,
@@ -259,7 +235,7 @@ class BasicOutlineMapChart extends Chart {
         },
         myZoomIn: {
           show: true,
-          title: context?.translator('common.zoomIn'),
+          title: context?.translator?.('common.zoomIn'),
           onclick: () => {
             this.geoConfig = {
               center: this.geoConfig.center,
@@ -275,7 +251,7 @@ class BasicOutlineMapChart extends Chart {
         },
         myZoomOut: {
           show: true,
-          title: context?.translator('common.zoomOut'),
+          title: context?.translator?.('common.zoomOut'),
           onclick: () => {
             this.geoConfig = {
               center: this.geoConfig.center,
@@ -345,7 +321,10 @@ class BasicOutlineMapChart extends Chart {
       regions: chartDataSet?.map((row, dcIndex) => {
         return Object.assign(
           {
-            name: this.mappingGeoName(row.getCell(groupConfigs[0])),
+            name: this.mappingGeoName(
+              row.getCell(groupConfigs[0]),
+              styleConfigs,
+            ),
           },
           this.isNormalGeoMap
             ? getSelectedItemStyles(0, dcIndex, selectedItems || [])
@@ -381,7 +360,10 @@ class BasicOutlineMapChart extends Chart {
           ?.map(row => {
             return {
               ...getExtraSeriesRowData(row),
-              name: this.mappingGeoName(row.getCell(groupConfigs[0])),
+              name: this.mappingGeoName(
+                row.getCell(groupConfigs[0]),
+                styleConfigs,
+              ),
               value: row.getCell(aggregateConfigs[0]),
               visualMap: show,
             };
@@ -419,8 +401,12 @@ class BasicOutlineMapChart extends Chart {
           ?.map((row, dcIndex) => {
             return {
               ...getExtraSeriesRowData(row),
-              name: this.mappingGeoName(row.getCell(groupConfigs[0])),
+              name: this.mappingGeoName(
+                row.getCell(groupConfigs[0]),
+                styleConfigs,
+              ),
               value: this.mappingGeoCoordination(
+                styleConfigs,
                 row.getCell(groupConfigs[0]),
                 row.getCell(aggregateConfigs[0]) || defaultColorValue,
                 row.getCell(sizeConfigs[0]) || defaultSizeValue,
@@ -472,19 +458,28 @@ class BasicOutlineMapChart extends Chart {
     };
   }
 
-  protected mappingGeoName(sourceName: string): string {
+  protected mappingGeoName(sourceName: string, styleConfigs): string {
+    const [mapLevelName] = getStyles(styleConfigs, ['map'], ['level']);
+    const isProvinceLevel = mapLevelName === 'china';
     const targetName = this.geoMap.features.find(f =>
-      f.properties.name.includes(sourceName),
+      isProvinceLevel
+        ? f.properties.name?.includes(sourceName)
+        : f.properties.name === sourceName,
     )?.properties.name;
     return targetName;
   }
 
   protected mappingGeoCoordination(
+    styleConfigs,
     sourceName: string,
     ...values: Array<number | string>
   ): Array<number[] | number | string> {
+    const [mapLevelName] = getStyles(styleConfigs, ['map'], ['level']);
+    const isProvinceLevel = mapLevelName === 'china';
     const properties = this.geoMap.features.find(f =>
-      f.properties.name.includes(sourceName),
+      isProvinceLevel
+        ? f.properties.name?.includes(sourceName)
+        : f.properties.name === sourceName,
     )?.properties;
 
     return (properties?.cp || properties?.center)?.concat(values) || [];

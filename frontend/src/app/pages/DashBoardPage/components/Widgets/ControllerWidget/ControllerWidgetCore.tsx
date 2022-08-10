@@ -30,6 +30,7 @@ import { RelationFilterValue } from 'app/types/ChartConfig';
 import produce from 'immer';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
+import { isEmpty } from 'utils/object';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { getWidgetTitle } from '../../WidgetManager/utils/utils';
@@ -124,7 +125,11 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     if (values && typeof values === 'object' && !Array.isArray(values)) {
       return;
     }
-    const _values = values ? (Array.isArray(values) ? values : [values]) : [];
+    const _values = !isEmpty(values)
+      ? Array.isArray(values)
+        ? values
+        : [values]
+      : [];
     const nextContent = produce(content, draft => {
       draft.config.controllerValues = _values;
     });

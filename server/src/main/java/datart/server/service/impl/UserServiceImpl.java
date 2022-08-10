@@ -151,7 +151,6 @@ public class UserServiceImpl extends BaseService implements UserService {
             log.info("The email({}) has been registered", userRegisterParam.getEmail());
             Exceptions.tr(ParamException.class, "error.param.occupied", "resource.user.email");
         }
-        BCrypt.hashpw(userRegisterParam.getPassword(), BCrypt.gensalt());
         User user = new User();
         BeanUtils.copyProperties(userRegisterParam, user);
         user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));

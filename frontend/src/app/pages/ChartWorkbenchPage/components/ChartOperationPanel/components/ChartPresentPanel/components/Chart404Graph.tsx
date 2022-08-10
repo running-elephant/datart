@@ -64,7 +64,7 @@ const StyledChart404Graph = styled.div`
   align-items: center;
   justify-content: center;
   height: 100%;
-  color ${p => p.theme.normal};
+  color: ${p => p.theme.normal};
   opacity: 0.3;
 `;
 

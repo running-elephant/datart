@@ -19,7 +19,7 @@
 import { ChartDataSectionType } from 'app/constants';
 import Chart from 'app/models/Chart';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
-import { ChartSelection } from 'app/models/ChartSelection';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -32,9 +32,9 @@ import ChartDataSetDTO, {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getAutoFunnelTopPosition,
-  getChartSelection,
   getColumnRenderName,
   getDrillableRows,
   getExtraSeriesDataFormat,
@@ -54,8 +54,7 @@ import { Series, SeriesData } from './types';
 class BasicFunnelChart extends Chart {
   config = Config;
   chart: any = null;
-
-  private selection: null | ChartSelection = null;
+  selectionManager?: ChartSelectionManager;
 
   constructor() {
     super(
@@ -71,7 +70,7 @@ class BasicFunnelChart extends Chart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (
       options.containerId === undefined ||
       !context.document ||
@@ -81,36 +80,16 @@ class BasicFunnelChart extends Chart {
     }
 
     this.chart = init(
-      context.document.getElementById(options.containerId),
+      context.document.getElementById(options.containerId)!,
       'default',
     );
-    this.selection = getChartSelection(context.window, {
-      chart: this.chart,
-      mouseEvents: this.mouseEvents,
-    });
-    this.mouseEvents?.forEach(event => {
-      switch (event.name) {
-        case 'click':
-          this.chart.on(event.name, params => {
-            this.selection?.doSelect({
-              index: params.componentIndex + ',' + params.dataIndex,
-              data: params.data,
-            });
-            event.callback({
-              ...params,
-              interactionType: 'select',
-              selectedItems: this.selection?.selectedItems,
-            });
-          });
-          break;
-        default:
-          this.chart.on(event.name, event.callback);
-          break;
-      }
-    });
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
+    this.selectionManager.attachWindowListeners(context.window);
+    this.selectionManager.attachZRenderListeners(this.chart);
+    this.selectionManager.attachEChartsListeners(this.chart);
   }
 
-  onUpdated(options, context): void {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
     if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
@@ -119,12 +98,7 @@ class BasicFunnelChart extends Chart {
     if (!this.isMatchRequirement(options.config)) {
       return;
     }
-    if (
-      this.selection?.selectedItems.length &&
-      !options.selectedItems?.length
-    ) {
-      this.selection?.clearAll();
-    }
+    this.selectionManager?.updateSelectedItems(options?.selectedItems);
     const newOptions = this.getOptions(
       options.dataset,
       options.config,
@@ -134,12 +108,13 @@ class BasicFunnelChart extends Chart {
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {
-    this.selection?.removeEvent();
+  onUnMount(options: BrokerOption, context: BrokerContext) {
+    this.selectionManager?.removeWindowListeners(context.window);
+    this.selectionManager?.removeZRenderListeners(this.chart);
     this.chart?.dispose();
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext): void {
     this.chart?.resize({ width: context?.width, height: context?.height });
   }
 
@@ -426,6 +401,7 @@ class BasicFunnelChart extends Chart {
         shadowColor: 'rgba(0, 0, 0, 0.5)',
       },
       label: this.getLabelStyle(styles),
+      labelLayout: { hideOverlap: true },
       data: this.getFunnelSeriesData(flattenedDatas),
     };
     return series;

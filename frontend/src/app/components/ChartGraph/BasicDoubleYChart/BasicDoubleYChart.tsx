@@ -24,9 +24,11 @@ import {
   LabelStyle,
   LegendStyle,
   LineStyle,
+  SelectedItem,
   SeriesStyle,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getAxisLabel,
   getAxisLine,
@@ -36,6 +38,7 @@ import {
   getExtraSeriesRowData,
   getGridStyle,
   getReference2,
+  getSelectedItemStyles,
   getSeriesTooltips4Polar2,
   getSplitLine,
   getStyles,
@@ -46,6 +49,7 @@ import {
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
 import Chart from '../../../models/Chart';
+import { ChartSelectionManager } from '../../../models/ChartSelectionManager';
 import Config from './config';
 import { DoubleYChartXAxis, DoubleYChartYAxis, Series } from './types';
 import { getYAxisIntervalConfig } from './utils';
@@ -53,6 +57,7 @@ class BasicDoubleYChart extends Chart {
   dependency = [];
   config = Config;
   chart: any = null;
+  selectionManager?: ChartSelectionManager;
 
   constructor() {
     super('double-y', 'chartName', 'fsux_tubiao_shuangzhoutu');
@@ -64,41 +69,54 @@ class BasicDoubleYChart extends Chart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (options.containerId === undefined || !context.document) {
       return;
     }
 
     this.chart = init(
-      context.document.getElementById(options.containerId),
+      context.document.getElementById(options.containerId)!,
       'default',
     );
-    this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
-    });
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
+    this.selectionManager.attachWindowListeners(context.window);
+    this.selectionManager.attachZRenderListeners(this.chart);
+    this.selectionManager.attachEChartsListeners(this.chart);
   }
 
-  onUpdated(props): void {
-    if (!props.dataset || !props.dataset.columns || !props.config) {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
+    if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
-    if (!this.isMatchRequirement(props.config)) {
+    if (!this.isMatchRequirement(options.config)) {
       return this.chart?.clear();
     }
-    const newOptions = this.getOptions(props.dataset, props.config);
+    this.selectionManager?.updateSelectedItems(options?.selectedItems);
+    const newOptions = this.getOptions(
+      options.dataset,
+      options.config,
+      options.selectedItems,
+    );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {
+  onUnMount(options: BrokerOption, context: BrokerContext) {
+    this.selectionManager?.removeWindowListeners(context.window);
+    this.selectionManager?.removeZRenderListeners(this.chart);
     this.chart?.dispose();
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext) {
     this.chart?.resize(context);
-    hadAxisLabelOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
+    hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
+      this.onUpdated(options, context);
   }
 
-  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig) {
+  private getOptions(
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    selectedItems?: SelectedItem[],
+  ) {
     const dataConfigs = config.datas || [];
     const styleConfigs = config.styles || [];
     const settingConfigs = config.settings || [];
@@ -151,6 +169,7 @@ class BasicDoubleYChart extends Chart {
         leftMetricsConfigs,
         rightMetricsConfigs,
         chartDataSet,
+        selectedItems,
       ),
       yAxisNames,
     });
@@ -181,6 +200,7 @@ class BasicDoubleYChart extends Chart {
     leftDeminsionConfigs,
     rightDeminsionConfigs,
     chartDataSet: IChartDataSet<string>,
+    selectedItems?: SelectedItem[],
   ): Series[] {
     const _getSeriesByDemisionPostion =
       () =>
@@ -191,6 +211,7 @@ class BasicDoubleYChart extends Chart {
         data: IChartDataSet<string>,
         direction: string,
         yAxisIndex: number,
+        cIndex: number,
       ): Series => {
         const [graphType, graphStyle] = getStyles(
           styles,
@@ -202,10 +223,11 @@ class BasicDoubleYChart extends Chart {
           name: getColumnRenderName(config),
           type: graphType || 'line',
           sampling: 'average',
-          data: chartDataSet.map(dc => ({
+          data: chartDataSet.map((dc, dIndex) => ({
             ...config,
             ...getExtraSeriesRowData(dc),
             ...getExtraSeriesDataFormat(config?.format),
+            ...getSelectedItemStyles(cIndex, dIndex, selectedItems || []),
             value: dc.getCell(config),
           })),
           ...this.getItemStyle(config),
@@ -218,7 +240,7 @@ class BasicDoubleYChart extends Chart {
 
     const series = []
       .concat(
-        leftDeminsionConfigs.map(lc =>
+        leftDeminsionConfigs.map((lc, cIndex) =>
           _getSeriesByDemisionPostion()(
             lc,
             styles,
@@ -226,11 +248,12 @@ class BasicDoubleYChart extends Chart {
             chartDataSet,
             'leftY',
             0,
+            cIndex,
           ),
         ),
       )
       .concat(
-        rightDeminsionConfigs.map(rc =>
+        rightDeminsionConfigs.map((rc, cIndex) =>
           _getSeriesByDemisionPostion()(
             rc,
             styles,
@@ -238,6 +261,7 @@ class BasicDoubleYChart extends Chart {
             chartDataSet,
             'rightY',
             1,
+            cIndex + leftDeminsionConfigs.length,
           ),
         ),
       );
@@ -460,6 +484,7 @@ class BasicDoubleYChart extends Chart {
           return labels.join('\n');
         },
       },
+      labelLayout: { hideOverlap: true },
     };
   }
 

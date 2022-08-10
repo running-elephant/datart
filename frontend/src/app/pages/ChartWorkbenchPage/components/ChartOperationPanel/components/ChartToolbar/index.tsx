@@ -44,6 +44,6 @@ export default ChartToolbar;
 const Toolbar = styled.div`
   padding: ${SPACE_MD};
   margin-bottom: ${SPACE_MD};
-  border-radius: ${BORDER_RADIUS};
   background-color: ${p => p.theme.componentBackground};
+  border-radius: ${BORDER_RADIUS};
 `;

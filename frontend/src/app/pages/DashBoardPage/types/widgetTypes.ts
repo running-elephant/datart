@@ -3,6 +3,7 @@ import {
   ChartI18NSectionConfig,
   ChartStyleConfig,
 } from 'app/types/ChartConfig';
+import React from 'react';
 import {
   BoardType,
   JumpConfig,

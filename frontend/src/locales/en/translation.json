@@ -20,7 +20,8 @@
       "saveAs": "Save As",
       "cancel": "Cancel",
       "ok": "OK",
-      "shortcuts": "Shortcuts"
+      "shortcuts": "Shortcuts",
+      "saveConfirm": "After saving the changes, it cannot be undone. Are you sure you want to continue saving?"
     },
     "operation": {
       "archiveConfirm": "Archive confirm",
@@ -170,7 +171,8 @@
           "username": "Username",
           "email": "Email",
           "name": "Name",
-          "department": "Department"
+          "department": "Department",
+          "description": "Description"
         },
         "changePassword": {
           "title": "Password",
@@ -400,6 +402,21 @@
           "left": "Left",
           "center": "Center",
           "right": "Right"
+        },
+        "alignment": {
+          "center": "Center",
+          "left": "Left",
+          "right": "Right",
+          "top": "Top",
+          "bottom": "Bottom",
+          "start": "Start",
+          "end": "End"
+        },
+        "position": {
+          "left": "Left",
+          "right": "Right",
+          "top": "Top",
+          "bottom": "Bottom"
         }
       },
       "filter": {
@@ -538,7 +555,11 @@
         "byNameSort": "Sort by name",
         "noSort": "Sort by original field order",
         "Group": "Group",
-        "Sort": "Sort"
+        "Sort": "Sort",
+        "cancel": "Cancel",
+        "empty": "Empty",
+        "reserve": "Reserve",
+        "searchField": "Search Field Name"
       }
     },
     "palette": {
@@ -1032,7 +1053,7 @@
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",
-        "iframe": "iFrame",
+        "iframe": "IFrame",
         "video": "Video",
         "container": "Container",
         "tab": "Tab",
@@ -1135,7 +1156,7 @@
         "image": "Image",
         "richText": "Rich Text",
         "timer": "Timer",
-        "iframe": "iFrame",
+        "iframe": "IFrame",
         "video": "Video",
         "tab": "Tab"
       },
@@ -1144,6 +1165,7 @@
         "fullScreen": "FullScreen",
         "exitFullScreen": "Exit FullScreen",
         "lock": "Lock",
+        "unlock": "Unlock",
         "edit": "Edit",
         "delete": "Delete",
         "confirmDel": "Confirm Delete",
@@ -1160,7 +1182,8 @@
         "unlock": "Locking drag and click to unlock",
         "waiting": "Waiting for loadData",
         "cancelLinkage": "Cancel Linkage",
-        "canLinkage": "Click the Widget to link"
+        "canLinkage": "Click the Widget to link",
+        "dragChartFromLeftPanel": "Please drag one widget from left panel and drop here"
       }
     },
     "linkage": {
@@ -1237,6 +1260,7 @@
     "control": {
       "title": "Control Title",
       "valueConfig": "Value Config",
+      "selectView": "Select View",
       "selectViewField": "Select View Field",
       "selectDefaultValue": "Select Default Value",
       "defaultValue": "Default Value",
@@ -1343,7 +1367,10 @@
     },
     "resource": {
       "title": "Source info",
-      "search": "Search database / table / column"
+      "search": "Search database / table / column",
+      "sortType": "Sort",
+      "byName": "By Name",
+      "byField": "By Field"
     },
     "variable": {
       "title": "Variables",

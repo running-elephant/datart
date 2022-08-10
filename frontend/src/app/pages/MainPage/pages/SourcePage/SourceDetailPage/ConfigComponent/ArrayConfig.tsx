@@ -266,6 +266,7 @@ export function ArrayConfig({
             disabled={disabled}
             allowManage={allowManage}
             onTest={test}
+            dataTables={value}
           />
         ))}
       </ModalForm>

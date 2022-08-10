@@ -51,9 +51,9 @@ const ChartSelectedDrill: FC<{ fontSize?: string /** eg. 32px */ }> = memo(
 export default ChartSelectedDrill;
 
 const StyledChartSelectedDrill = styled(IW)<{ visibility: boolean }>`
-  visibility: ${p => (p.visibility ? 'visible' : 'hidden')};
   color: ${p => p.theme.textColorLight};
   cursor: pointer;
+  visibility: ${p => (p.visibility ? 'visible' : 'hidden')};
 
   &.active {
     color: ${p => p.theme.primary};

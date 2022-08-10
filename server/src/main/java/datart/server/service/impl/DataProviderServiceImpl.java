@@ -37,7 +37,6 @@ import datart.core.entity.RelSubjectColumns;
 import datart.core.entity.Source;
 import datart.core.entity.View;
 import datart.core.mappers.ext.RelSubjectColumnsMapperExt;
-import datart.core.data.provider.ScriptType;
 import datart.security.util.AESUtil;
 import datart.server.base.dto.VariableValue;
 import datart.server.base.params.TestExecuteParam;
@@ -440,12 +439,20 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                 jsonObject = jsonObject.getJSONObject("columns");
                 for (String key : jsonObject.keySet()) {
                     JSONObject item = jsonObject.getJSONObject(key);
-                    String nameString = item.getJSONArray("name").getString(0);
                     String[] names;
-                    try {
-                        names = JSONObject.parseArray(nameString).toArray(new String[0]);
-                    } catch (JSONException e) {
-                        names = new String[]{nameString};
+                    if (item.get("name") instanceof JSONArray) {
+                        if (item.getJSONArray("name").size() == 1) {
+                            String nameString = item.getJSONArray("name").getString(0);
+                            try {
+                                names = JSONObject.parseArray(nameString).toArray(new String[0]);
+                            } catch (JSONException e) {
+                                names = new String[]{nameString};
+                            }
+                        } else {
+                            names = item.getJSONArray("name").toArray(new String[0]);
+                        }
+                    } else {
+                        names = new String[]{item.getString("name")};
                     }
                     Column column = Column.of(ValueType.valueOf(item.getString("type")), names);
                     schema.put(column.columnKey(), column);

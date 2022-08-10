@@ -35,6 +35,7 @@ import { getWidgetMap } from 'app/pages/DashBoardPage/utils/widget';
 import { ChartConfig } from 'app/types/ChartConfig';
 import { ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDTO } from 'app/types/ChartDTO';
+import { convertToChartDto } from 'app/utils/ChartDtoHelper';
 
 // import 'core-js/stable/map';
 // need polyfill [Object.values,Array.prototype.find,new Map]
@@ -90,10 +91,11 @@ const getChartQueryData = (dataStr: string) => {
     (data.config as any) || '{}',
   );
   const chartConfig: ChartConfig = dataConfig.chartConfig as ChartConfig;
+  const chartData = convertToChartDto(data);
   const builder = new ChartDataRequestBuilder(
     {
-      ...data.view,
-      computedFields: dataConfig.computedFields || [],
+      ...chartData.view,
+      computedFields: chartData.config.computedFields,
     },
     chartConfig?.datas,
     chartConfig?.settings,

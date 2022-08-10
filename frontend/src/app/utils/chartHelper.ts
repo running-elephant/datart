@@ -27,10 +27,8 @@ import {
 } from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
 import { DrillMode } from 'app/models/ChartDrillOption';
-import { ChartSelection } from 'app/models/ChartSelection';
 import { FieldTemplate } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartDataViewPanel/components/utils';
 import { DATE_LEVELS } from 'app/pages/ChartWorkbenchPage/slice/constant';
-import { ChartMouseEvent } from 'app/types/Chart';
 import {
   AxisLabel,
   AxisLineStyle,
@@ -1752,20 +1750,6 @@ export const compareSelectedItems = (
     }).length;
   }
   return false;
-};
-
-/**
- * Get chart select option class.
- *
- * @param {Window} window
- * @param {ChartSelectionOptions} [options]
- * @return {Object}  ChartSelection
- */
-export const getChartSelection = (
-  window: Window,
-  options?: { chart: ECharts; mouseEvents?: ChartMouseEvent[] },
-) => {
-  return new ChartSelection(window, options);
 };
 
 export function getAllColumnInMeta(

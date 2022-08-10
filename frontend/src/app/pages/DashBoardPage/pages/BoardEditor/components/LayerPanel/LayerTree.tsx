@@ -22,9 +22,14 @@ import { WidgetActionContext } from 'app/pages/DashBoardPage/components/ActionPr
 import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import { FC, memo, useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { isEmptyArray } from 'utils/object';
 import { stopPPG } from 'utils/utils';
 import { dropLayerNodeAction } from '../../slice/actions/actions';
-import { selectLayerTree, selectSelectedIds } from '../../slice/selectors';
+import {
+  selectEditingWidgetIds,
+  selectLayerTree,
+  selectSelectedIds,
+} from '../../slice/selectors';
 import { LayerTreeItem } from './LayerTreeItem';
 
 export const LayerTree: FC<{}> = memo(() => {
@@ -32,6 +37,7 @@ export const LayerTree: FC<{}> = memo(() => {
   const treeData = useSelector(selectLayerTree);
   const renderTreeItem = useCallback(n => <LayerTreeItem node={n} />, []);
   const { onEditSelectWidget } = useContext(WidgetActionContext);
+  const editingWidgetIds = useSelector(selectEditingWidgetIds);
   const selectedKeys = useSelector(selectSelectedIds);
 
   const treeSelect = useCallback(
@@ -58,7 +64,7 @@ export const LayerTree: FC<{}> = memo(() => {
   return (
     <Tree
       className="medium"
-      draggable
+      draggable={isEmptyArray(editingWidgetIds)}
       multiple
       loading={false}
       titleRender={renderTreeItem}

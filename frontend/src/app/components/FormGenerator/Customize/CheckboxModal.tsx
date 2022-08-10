@@ -107,8 +107,8 @@ export default CheckboxModal;
 const StyledCheckboxModal = styled(Button)`
   display: flex;
   align-items: center;
-  height: ${SPACE_TIMES(20)};
   width: 100%;
+  height: ${SPACE_TIMES(20)};
 
   & > button {
     margin-right: ${SPACE_TIMES(4)};

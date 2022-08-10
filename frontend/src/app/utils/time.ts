@@ -61,7 +61,7 @@ export function recommendTimeRangeConverter(relativeTimeRange) {
       timeRange = getTimeRange([-1, 0], 'd')('d');
       break;
     case RECOMMEND_TIME.THIS_WEEK:
-      timeRange = getTimeRange()('w');
+      timeRange = getTimeRange()('W');
       break;
     case RECOMMEND_TIME.LAST_7_DAYS:
       timeRange = getTimeRange([-7, 0], 'd')('d');

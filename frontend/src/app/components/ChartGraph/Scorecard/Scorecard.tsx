@@ -16,18 +16,21 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionType } from 'app/constants';
+import { ChartDataSectionType, ChartInteractionEvent } from 'app/constants';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import ReactChart from 'app/models/ReactChart';
+import { ChartMouseEventParams, ChartsEventData } from 'app/types/Chart';
 import {
   ChartConfig,
-  ChartContext,
   ChartDataSectionField,
   ChartStyleConfig,
   FontStyle,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getColumnRenderName,
+  getExtraSeriesRowData,
   getStyles,
   toFormattedValue,
   transformToDataSet,
@@ -39,10 +42,12 @@ import ScorecardAdapter from './ScorecardAdapter';
 import { LabelConfig, PaddingConfig } from './types';
 
 class Scorecard extends ReactChart {
+  chart: any = null;
   isISOContainer = 'react-scorecard';
   config = Config;
   protected isAutoMerge = false;
   useIFrame = false;
+  selectionManager?: ChartSelectionManager;
 
   constructor(props?) {
     super(ScorecardAdapter, {
@@ -58,7 +63,7 @@ class Scorecard extends ReactChart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (options.containerId === undefined || !context.document) {
       return;
     }
@@ -67,25 +72,27 @@ class Scorecard extends ReactChart {
       options,
       context,
     );
+
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
   }
 
-  onUpdated(options, context): void {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
     if (!this.isMatchRequirement(options.config)) {
       this.adapter?.unmount();
       return;
     }
     this.adapter?.updated(
-      this.getOptions(context, options.dataset, options.config),
+      this.getOptions(context, options.dataset!, options.config!),
       context,
     );
   }
 
-  onResize(opt: any, context): void {
-    this.onUpdated(opt, context);
+  onResize(options: BrokerOption, context: BrokerContext) {
+    this.onUpdated(options, context);
   }
 
   getOptions(
-    context: ChartContext,
+    context: BrokerContext,
     dataset: ChartDataSetDTO,
     config: ChartConfig,
   ) {
@@ -102,7 +109,7 @@ class Scorecard extends ReactChart {
     );
     const { padding, width } = this.getPaddingConfig(
       styleConfigs,
-      context.width,
+      context.width!,
     );
     const fontSizeFn = this.getFontSize(width, styleConfigs);
     const aggColorConfig = this.getColorConfig(
@@ -110,7 +117,7 @@ class Scorecard extends ReactChart {
       aggregateConfigs,
       chartDataSet,
     );
-    const labelConfig = this.getLabelConfig(
+    const nameConfig = this.getNameConfig(
       aggColorConfig,
       styleConfigs,
       fontSizeFn,
@@ -120,13 +127,14 @@ class Scorecard extends ReactChart {
       styleConfigs,
       fontSizeFn,
     );
-    const data = [
+    const data: ChartsEventData[] = [
       {
-        label: getColumnRenderName(aggregateConfigs[0]),
+        name: getColumnRenderName(aggregateConfigs[0]),
         value: toFormattedValue(
           chartDataSet?.[0]?.getCell?.(aggregateConfigs[0]),
           aggregateConfigs[0]?.format,
         ),
+        ...getExtraSeriesRowData(chartDataSet?.[0]),
       },
     ];
     return {
@@ -135,10 +143,36 @@ class Scorecard extends ReactChart {
         height: context.height,
       },
       dataConfig,
-      labelConfig,
+      nameConfig,
       padding,
       data,
       background: aggColorConfig?.[0]?.backgroundColor || 'transparent',
+      event: data.map((d, i) => this.registerEvents(data[i], i)),
+    };
+  }
+
+  private registerEvents(data: ChartsEventData, index: number) {
+    const eventParams: ChartMouseEventParams = {
+      type: 'click',
+      chartType: 'scorecard',
+      interactionType: ChartInteractionEvent.Select,
+      data,
+      selectedItems: [
+        {
+          index,
+          data,
+        },
+      ],
+    };
+    return {
+      onClick: event => {
+        this.selectionManager?.echartsClickEventHandler({
+          ...eventParams,
+          dataIndex: index,
+          componentIndex: '',
+          data: eventParams.data,
+        });
+      },
     };
   }
 
@@ -195,7 +229,7 @@ class Scorecard extends ReactChart {
     };
   }
 
-  getLabelConfig(
+  getNameConfig(
     aggColorConfig: CSSProperties[],
     style: ChartStyleConfig[],
     fontSizeFn: (path: string[]) => string,

@@ -20,7 +20,8 @@
       "saveAs": "另存为",
       "cancel": "取消",
       "ok": "确定",
-      "shortcuts": "快捷键"
+      "shortcuts": "快捷键",
+      "saveConfirm": "保存修改后不能撤销，确定继续保存吗？"
     },
     "operation": {
       "archiveConfirm": "确定移至回收站？",
@@ -170,7 +171,8 @@
           "username": "用户名",
           "email": "邮箱",
           "name": "姓名",
-          "department": "部门"
+          "department": "部门",
+          "description": "描述"
         },
         "changePassword": {
           "title": "修改密码",
@@ -400,6 +402,19 @@
           "left": "左对齐",
           "center": "居中",
           "right": "右对齐"
+        },
+        "alignment": {
+          "center": "居中",
+          "left": "左对齐",
+          "right": "右对齐",
+          "start": "起始位置",
+          "end": "结束位置"
+        },
+        "position": {
+          "left": "左侧",
+          "right": "右侧",
+          "top": "上部",
+          "bottom": "底部"
         }
       },
       "filter": {
@@ -538,7 +553,11 @@
         "byNameSort": "按名称排序",
         "noSort": "按原始字段顺序排序",
         "Group": "分组方式",
-        "Sort": "排序方式"
+        "Sort": "排序方式",
+        "cancel": "取消",
+        "empty": "清空",
+        "reserve": "保留",
+        "searchField": "搜索字段名称"
       }
     },
     "palette": {
@@ -1032,7 +1051,7 @@
         "image": "图片",
         "richText": "富文本",
         "timer": "计时器",
-        "iframe": "iframe",
+        "iframe": "IFrame",
         "video": "视频",
         "container": "容器",
         "tab": "标签卡",
@@ -1135,7 +1154,7 @@
         "image": "图片",
         "richText": "富文本",
         "timer": "时间器",
-        "iframe": "iframe",
+        "iframe": "IFrame",
         "video": "视频",
         "tab": "Tab"
       },
@@ -1144,6 +1163,7 @@
         "fullScreen": "全屏",
         "exitFullScreen": "取消全屏",
         "lock": "锁定拖拽",
+        "unlock": "解锁拖拽",
         "edit": "编辑",
         "delete": "删除",
         "confirmDel": "确认删除",
@@ -1160,7 +1180,8 @@
         "unlock": "已锁定拖拽,点击解锁",
         "waiting": "等待加载",
         "cancelLinkage": "取消联动",
-        "canLinkage": "点击图表可联动"
+        "canLinkage": "点击图表可联动",
+        "dragChartFromLeftPanel": "请从左侧面板中拖拽一个图表到当前位置"
       }
     },
     "linkage": {
@@ -1237,7 +1258,8 @@
     "control": {
       "title": "控制器标题",
       "valueConfig": "取值配置",
-      "selectViewField": "选择数据源字段",
+      "selectView": "选择视图",
+      "selectViewField": "选择视图字段",
       "selectDefaultValue": "选择默认值",
       "defaultValue": "默认值",
       "visibility": "是否显示",
@@ -1344,7 +1366,10 @@
     },
     "resource": {
       "title": "数据源信息",
-      "search": "搜索数据库 / 表 / 字段关键字"
+      "search": "搜索数据库 / 表 / 字段关键字",
+      "sortType": "排序方式",
+      "byName": "按名称",
+      "byField": "按字段"
     },
     "variable": {
       "title": "变量配置",

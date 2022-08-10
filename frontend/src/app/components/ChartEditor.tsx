@@ -52,6 +52,13 @@ import { IChart } from 'app/types/Chart';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import {
+  chartSelectionEventListener,
+  drillDownEventListener,
+  pivotTableDrillEventListener,
+  richTextContextEventListener,
+  tablePagingAndSortEventListener,
+} from 'app/utils/ChartEventListenerHelper';
+import {
   clearRuntimeDateLevelFieldsInChartConfig,
   filterCurrentUsedComputedFields,
   getValue,
@@ -233,69 +240,26 @@ export const ChartEditor: FC<ChartEditorProps> = ({
         {
           name: 'click',
           callback: param => {
-            if (
-              drillOptionRef.current?.isSelectedDrill &&
-              !drillOptionRef.current.isBottomLevel
-            ) {
-              const option = drillOptionRef.current;
-              option.drillDown(param.data.rowData);
-              drillOptionRef.current = option;
-              handleDrillOptionChange?.(option);
-              return;
-            }
-            if (
-              param.chartType === 'table' &&
-              param.interactionType === 'paging-sort-filter'
-            ) {
-              dispatch(
-                refreshDatasetAction({
-                  sorter: {
-                    column: param?.seriesName!,
-                    operator: param?.value?.direction,
-                    aggOperator: param?.value?.aggOperator,
-                  },
-                  pageInfo: {
-                    pageNo: param?.value?.pageNo,
-                  },
-                }),
-              );
-              return;
-            }
-            if (
-              param.chartType === 'rich-text' &&
-              param.interactionType === 'rich-text-change-context'
-            ) {
-              dispatch(
-                updateChartConfigAndRefreshDatasetAction({
-                  type: ChartConfigReducerActionType.STYLE,
-                  payload: {
-                    ancestors: [1, 0],
-                    value: {
-                      ...chart.config.styles[1].rows[0],
-                      value: param.value,
-                    },
-                  },
-                  needRefresh: false,
-                  updateDrillOption: config => {
-                    return undefined;
-                  },
-                }),
-              );
-              return;
-            }
-            // NOTE 透视表树形结构展开下钻特殊处理方法
-            if (
-              param.chartType === 'pivotSheet' &&
-              param.interactionType === 'drilled'
-            ) {
-              handleDrillOptionChange?.(param.drillOption);
-              return;
-            }
-
-            // NOTE 直接修改selectedItems结果集处理方法
-            if (param.interactionType === 'select') {
-              dispatch(actions.changeSelectedItems(param.selectedItems));
-            }
+            drillDownEventListener(drillOptionRef?.current, param, p => {
+              drillOptionRef.current = p;
+              handleDrillOptionChange?.(p);
+            });
+            tablePagingAndSortEventListener(param, p => {
+              dispatch(refreshDatasetAction(p));
+            });
+            richTextContextEventListener(
+              chart.config.styles[1].rows[0] || {},
+              param,
+              p => {
+                dispatch(updateChartConfigAndRefreshDatasetAction(p));
+              },
+            );
+            pivotTableDrillEventListener(param, p => {
+              handleDrillOptionChange(p);
+            });
+            chartSelectionEventListener(param, p => {
+              dispatch(actions.changeSelectedItems(p));
+            });
           },
         },
       ]);
@@ -538,7 +502,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
       } else {
         // dataChart
         confirm({
-          title: '保存修改后不能撤销，确定继续保存吗？',
+          title: tg('button.saveConfirm'),
           icon: <ExclamationCircleOutlined />,
           async onOk() {
             dispatch(
@@ -576,6 +540,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     chartConfig,
     dataview?.computedFields,
     history,
+    tg,
   ]);
 
   const saveChartToDashBoard = useCallback(

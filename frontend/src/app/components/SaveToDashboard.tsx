@@ -52,21 +52,22 @@ import { Tree } from './Tree';
 
 interface SaveToDashboardTypes {
   isModalVisible: boolean;
-  handleOk: (id, type) => void;
-  handleCancel: () => void;
   title: string;
   orgId: string;
   backendChartId?: string;
+  handleOk: (id, type) => void;
+  handleCancel: () => void;
+  handleOpen: () => void;
 }
 
 const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
   ({
     isModalVisible,
+    title,
+    backendChartId,
     handleOk,
     handleCancel,
-    title,
-    orgId,
-    backendChartId,
+    handleOpen,
   }) => {
     const vizs = useSelector(selectVizs);
     const [vizData, setVizData] = useState<Folder[]>(vizs);
@@ -146,13 +147,17 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
       });
 
     const createDashboard = useCallback(() => {
+      handleCancel();
       addVizFn({
         vizType: 'DASHBOARD',
         type: CommonFormTypes.Add,
         visible: true,
         initialValues: undefined,
+        onAfterClose: () => {
+          handleOpen();
+        },
       });
-    }, [addVizFn]);
+    }, [addVizFn, handleCancel, handleOpen]);
 
     return (
       <Modal

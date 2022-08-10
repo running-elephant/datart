@@ -78,6 +78,10 @@ const ChartHeaderPanel: FC<{
       setIsModalVisible(false);
     }, []);
 
+    const handleModalOpen = useCallback(() => {
+      setIsModalVisible(true);
+    }, []);
+
     const onSetPolling = useCallback(
       (polling: boolean) => {
         dispatch(actions.setChartEditorDownloadPolling(polling));
@@ -129,9 +133,10 @@ const ChartHeaderPanel: FC<{
             orgId={orgId as string}
             title={t('saveToDashboard')}
             isModalVisible={isModalVisible}
+            backendChartId={backendChart?.id}
             handleOk={handleModalOk}
             handleCancel={handleModalCancel}
-            backendChartId={backendChart?.id}
+            handleOpen={handleModalOpen}
           ></SaveToDashboard>
         </Space>
       </Wrapper>

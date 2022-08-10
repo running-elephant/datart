@@ -197,7 +197,6 @@ const StyledChartPresentPanel = styled.div`
   flex-direction: column;
   background-color: ${p => p.theme.componentBackground};
   border-radius: ${BORDER_RADIUS};
-  min-height: 0;
 `;
 
 const StyledReusableChartContainer = styled.div`

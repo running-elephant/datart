@@ -17,29 +17,37 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
+import Chart from 'app/models/Chart';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
   FormatFieldAction,
   LabelStyle,
+  SelectedItem,
   XAxis,
   XAxisColumns,
   YAxis,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getColumnRenderName,
+  getExtraSeriesRowData,
   getGridStyle,
+  getSelectedItemStyles,
   getStyles,
   hadAxisLabelOverflowConfig,
   setOptionsByAxisLabelOverflow,
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
+import { precisionCalculation } from 'app/utils/number';
+import currency from 'currency.js';
 import { init } from 'echarts';
+import { CalculationType } from 'globalConstants';
 import { UniqArray } from 'utils/object';
-import Chart from '../../../models/Chart';
 import Config from './config';
 import {
   OrderConfig,
@@ -50,6 +58,11 @@ import {
 class WaterfallChart extends Chart {
   config = Config;
   chart: any = null;
+  selectionManager?: ChartSelectionManager;
+
+  protected rowDataList: {
+    rowData: { [x: string]: any };
+  }[] = [];
 
   constructor(props?) {
     super(
@@ -65,40 +78,68 @@ class WaterfallChart extends Chart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (options.containerId === undefined || !context.document) {
       return;
     }
 
     this.chart = init(
-      context.document.getElementById(options.containerId),
+      context.document.getElementById(options.containerId)!,
       'default',
     );
+
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
+    this.selectionManager.attachWindowListeners(context.window);
+    this.selectionManager.attachZRenderListeners(this.chart);
+    this.chart.on('click', ({ dataIndex, componentIndex, ...rest }) => {
+      // NOTE: 1. 累计不响应事件； 2. 下部透明柱状图不响应事件
+      if (this.rowDataList.length <= dataIndex || componentIndex === 0) return;
+      this.selectionManager?.echartsClickEventHandler({
+        ...rest,
+        dataIndex: dataIndex,
+        componentIndex: '',
+        data: { ...this.rowDataList[dataIndex] },
+      });
+    });
   }
 
-  onUpdated(props, context): void {
-    if (!props.dataset || !props.dataset.columns || !props.config) {
+  onUpdated(options: BrokerOption, context: BrokerContext): void {
+    if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
-    if (!this.isMatchRequirement(props.config)) {
+    if (!this.isMatchRequirement(options.config)) {
       this.chart?.clear();
       return;
     }
-    const newOptions = this.getOptions(props.dataset, props.config, context);
+    this.selectionManager?.updateSelectedItems(options?.selectedItems);
+    const newOptions = this.getOptions(
+      options.dataset,
+      options.config,
+      context,
+      options.selectedItems,
+    );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {
+  onUnMount(options: BrokerOption, context: BrokerContext): void {
+    this.selectionManager?.removeWindowListeners(context.window);
+    this.selectionManager?.removeZRenderListeners(this.chart);
+    this.rowDataList = [];
     this.chart?.dispose();
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext): void {
     this.chart?.resize({ width: context?.width, height: context?.height });
     hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
-      this.onUpdated(opt, context);
+      this.onUpdated(options, context);
   }
 
-  private getOptions(dataset: ChartDataSetDTO, config: ChartConfig, context) {
+  private getOptions(
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    context,
+    selectedItems?: SelectedItem[],
+  ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
     const groupConfigs = dataConfigs
@@ -120,15 +161,16 @@ class WaterfallChart extends Chart {
       aggregateConfigs,
       groupConfigs,
       context?.translator,
+      selectedItems,
     );
 
     return {
-      barWidth: this.getSerieBarWidth(styleConfigs),
+      barWidth: this.getSeriesBarWidth(styleConfigs),
       ...series,
     };
   }
 
-  private getSerieBarWidth(styles: ChartStyleConfig[]): number {
+  private getSeriesBarWidth(styles: ChartStyleConfig[]): number {
     const [width] = getStyles(styles, ['bar'], ['width']);
     return width;
   }
@@ -139,6 +181,7 @@ class WaterfallChart extends Chart {
     aggregateConfigs: ChartDataSectionField[],
     group: ChartDataSectionField[],
     t?: (key: string, disablePrefix?: boolean, options?: any) => any,
+    selectedItems?: SelectedItem[],
   ) {
     const xAxisColumns: XAxisColumns = {
       type: 'category',
@@ -152,8 +195,11 @@ class WaterfallChart extends Chart {
       ['isIncrement', 'ascendColor', 'descendColor'],
     );
     const label = this.getLabel(styles, aggregateConfigs[0].format);
-
-    const dataList = chartDataSet.map(dc => dc.getCell(aggregateConfigs[0]));
+    this.rowDataList = [];
+    const dataList = chartDataSet.map(dc => {
+      this.rowDataList.push(getExtraSeriesRowData(dc));
+      return dc.getCell(aggregateConfigs[0]);
+    });
 
     const { baseData, ascendOrder, descendOrder } = this.getDataList(
       isIncrement,
@@ -161,6 +207,7 @@ class WaterfallChart extends Chart {
       xAxisColumns,
       styles,
       t,
+      selectedItems,
     );
 
     const baseDataObj = {
@@ -192,6 +239,7 @@ class WaterfallChart extends Chart {
       },
       data: ascendOrder,
       label,
+      labelLayout: { hideOverlap: true },
     };
 
     const descendOrderObj = {
@@ -205,6 +253,7 @@ class WaterfallChart extends Chart {
         ...this.getSeriesItemStyle(styles),
       },
       label,
+      labelLayout: { hideOverlap: true },
     };
     const axisInfo = {
       xAxis: this.getXAxis(styles, xAxisColumns),
@@ -230,7 +279,10 @@ class WaterfallChart extends Chart {
           const text = param.map((pa, index) => {
             let data = pa.value;
             if (!index && typeof param[1].value === 'number') {
-              data += param[1].value;
+              data = precisionCalculation(CalculationType.ADD, [
+                data,
+                param[1].value,
+              ]);
             }
             return `${pa.seriesName}: ${toFormattedValue(
               data,
@@ -270,57 +322,95 @@ class WaterfallChart extends Chart {
     xAxisColumns: XAxisColumns,
     styles: ChartStyleConfig[],
     t?: (key: string, disablePrefix?: boolean, options?: any) => any,
+    selectedItems?: SelectedItem[],
   ): WaterfallDataListConfig {
     const [totalColor] = getStyles(styles, ['bar'], ['totalColor']);
-    const baseData: Array<number | string> = [];
+    const baseData: Array<number> = [];
     const ascendOrder: OrderConfig[] = [];
     const descendOrder: OrderConfig[] = [];
     dataList.forEach((data, index) => {
-      const newData: number = parseFloat(data);
+      const newData: number = isNaN(currency(data).value)
+        ? 0
+        : currency(data).value;
+      const lastData: number = isNaN(currency(dataList[index - 1]).value)
+        ? 0
+        : currency(dataList[index - 1]).value;
       if (index > 0) {
         if (isIncrement) {
-          const result: number | string =
-            Number(dataList[index - 1]) >= 0
-              ? parseFloat(dataList[index - 1] + baseData[index - 1])
+          const result: number =
+            lastData >= 0
+              ? precisionCalculation(CalculationType.ADD, [
+                  lastData,
+                  baseData[index - 1],
+                ])
               : baseData[index - 1];
           if (newData >= 0) {
             baseData.push(result);
-            ascendOrder.push(newData);
+            ascendOrder.push({
+              value: newData,
+              ...getSelectedItemStyles('', index, selectedItems || []),
+            });
             descendOrder.push('-');
           } else {
-            baseData.push(Number(result) + newData);
+            baseData.push(
+              precisionCalculation(CalculationType.ADD, [result, newData]),
+            );
             ascendOrder.push('-');
-            descendOrder.push(Math.abs(newData));
+            descendOrder.push({
+              value: Math.abs(newData),
+              ...getSelectedItemStyles('', index, selectedItems || []),
+            });
           }
         } else {
-          const result = Number(data) - parseFloat(dataList[index - 1]);
+          const result: number = precisionCalculation(
+            CalculationType.SUBTRACT,
+            [newData, lastData],
+          );
           if (result >= 0) {
-            ascendOrder.push(result);
+            ascendOrder.push({
+              value: result,
+              ...getSelectedItemStyles('', index, selectedItems || []),
+            });
             descendOrder.push('-');
-            baseData.push(parseFloat(dataList[index - 1]));
+            baseData.push(lastData);
           } else {
             ascendOrder.push('-');
-            descendOrder.push(Math.abs(result));
-            baseData.push(parseFloat(dataList[index - 1]) - Math.abs(result));
+            descendOrder.push({
+              value: Math.abs(result),
+              ...getSelectedItemStyles('', index, selectedItems || []),
+            });
+            baseData.push(
+              precisionCalculation(CalculationType.SUBTRACT, [
+                lastData,
+                Math.abs(result),
+              ]),
+            );
           }
         }
       } else {
         if (newData >= 0) {
-          ascendOrder.push(newData);
+          ascendOrder.push({
+            value: newData,
+            ...getSelectedItemStyles('', index, selectedItems || []),
+          });
           descendOrder.push('-');
           baseData.push(0);
         } else {
           ascendOrder.push('-');
-          descendOrder.push(Math.abs(newData));
+          descendOrder.push({
+            value: Math.abs(newData),
+            ...getSelectedItemStyles('', index, selectedItems || []),
+          });
           baseData.push(0);
         }
       }
     });
     if (isIncrement && xAxisColumns?.data?.length) {
       xAxisColumns.data.push(t?.('common.total'));
-      const resultData = parseFloat(
-        dataList[dataList.length - 1] + baseData[baseData.length - 1],
-      );
+      const resultData = precisionCalculation(CalculationType.ADD, [
+        dataList[dataList.length - 1],
+        baseData[baseData.length - 1],
+      ]);
       if (resultData > 0) {
         ascendOrder.push({
           value: resultData,

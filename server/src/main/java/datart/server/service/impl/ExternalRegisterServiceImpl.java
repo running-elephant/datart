@@ -36,7 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQueryBuilder;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -98,14 +97,14 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
 
         UserRegisterParam registerParam = new UserRegisterParam();
         registerParam.setUsername(filter);
-        registerParam.setPassword(BCrypt.hashpw(RandomStringUtils.randomAscii(32), BCrypt.gensalt()));
+        registerParam.setPassword(RandomStringUtils.randomAscii(32));
         registerParam.setEmail(email);
 
         if (userService.register(registerParam, false)) {
             PasswordToken passwordToken = new PasswordToken(registerParam.getUsername(),
                     registerParam.getPassword(),
                     System.currentTimeMillis());
-            return JwtUtils.toJwtString(passwordToken);
+            return userService.login(passwordToken);
         }
         return null;
     }
@@ -127,7 +126,7 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
 
         UserRegisterParam userRegisterParam = new UserRegisterParam();
         userRegisterParam.setUsername(oauthUser.getName());
-        userRegisterParam.setPassword(BCrypt.hashpw(RandomStringUtils.randomAscii(32), BCrypt.gensalt()));
+        userRegisterParam.setPassword(RandomStringUtils.randomAscii(32));
         if (emailMapping != null) {
             userRegisterParam.setEmail(JsonPath.read(jsonObj, emailMapping));
         }
@@ -135,7 +134,7 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
             PasswordToken passwordToken = new PasswordToken(userRegisterParam.getUsername(),
                     userRegisterParam.getPassword(),
                     System.currentTimeMillis());
-            return JwtUtils.toJwtString(passwordToken);
+            return userService.login(passwordToken);
         }
         return null;
 

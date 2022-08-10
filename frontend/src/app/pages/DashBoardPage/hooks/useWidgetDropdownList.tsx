@@ -27,6 +27,7 @@ import {
   LockOutlined,
   SyncOutlined,
   UngroupOutlined,
+  UnlockOutlined,
 } from '@ant-design/icons';
 import { VizRenderMode } from '../pages/Board/slice/types';
 import { WidgetActionListItem, widgetActionType } from '../types/widgetTypes';
@@ -69,7 +70,11 @@ export const useWidgetDropdownList = (
       label: 'lock',
       icon: <LockOutlined />,
     },
-
+    {
+      key: 'unlock',
+      label: 'unlock',
+      icon: <UnlockOutlined />,
+    },
     {
       key: 'makeLinkage',
       label: 'makeLinkage',

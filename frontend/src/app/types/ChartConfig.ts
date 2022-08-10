@@ -31,7 +31,6 @@ import {
   SortActionType,
 } from 'app/constants';
 import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
-import ChartDataSetDTO from 'app/types/ChartDataSet';
 import {
   FilterSqlOperator,
   NumberUnitKey,
@@ -39,7 +38,6 @@ import {
   RUNTIME_FILTER_KEY,
 } from 'globalConstants';
 import { ValueOf } from 'types';
-import { IChartDrillOption } from './ChartDrillOption';
 
 export type FilterFieldAction = {
   condition?: FilterCondition;
@@ -246,6 +244,12 @@ export type ChartStyleSectionRowOption = {
   translateItemLabel?: boolean;
 
   /**
+   * Only GroupLayout is used
+   * */
+  flatten?: boolean;
+  title?: string;
+
+  /**
    * Other Free Property
    */
   [key: string]: any;
@@ -274,22 +278,6 @@ export type ChartConfig = {
   interactions?: ChartStyleConfig[];
   i18ns?: ChartI18NSectionConfig[];
 };
-
-export interface ChartOptions {
-  config: ChartConfig;
-  dataset: ChartDataSetDTO;
-  widgetSpecialConfig: { env: string | undefined; [x: string]: any };
-  drillOption?: IChartDrillOption;
-  selectedItems?: SelectedItem[];
-}
-
-export interface ChartContext {
-  document: Document;
-  height: number;
-  width: number;
-  translator: (key: string, disablePrefix?: boolean, options?: any) => any;
-  window: Window;
-}
 
 export interface LineStyle {
   color: string;
@@ -322,6 +310,12 @@ export type AxisLabel = {
   font?: FontStyle;
 } & FontStyle;
 
+export type EmphasisStyle = {
+  label?: {
+    show?: boolean;
+  } & FontStyle;
+};
+
 export type LabelStyle = {
   label?: {
     position?: string;
@@ -330,6 +324,7 @@ export type LabelStyle = {
     formatter?: string | ((params) => string);
   } & FontStyle;
   labelLayout?: { hideOverlap: boolean };
+  emphasis?: EmphasisStyle;
 };
 
 export interface LegendStyle {
@@ -434,7 +429,7 @@ export interface GridStyle {
 }
 
 export interface SelectedItem {
-  index: string | number;
+  index: string;
   data: {
     rowData: {
       [p: string]: any;

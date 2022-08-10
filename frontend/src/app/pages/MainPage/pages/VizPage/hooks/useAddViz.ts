@@ -32,6 +32,7 @@ export interface addVizParams {
   visible: boolean;
   initialValues: any;
   callback?: (folder?: Folder) => void;
+  onAfterClose?: () => void;
 }
 
 /**
@@ -66,7 +67,14 @@ export function useAddViz({ showSaveForm }) {
   }, []);
 
   const addVizFn = useCallback(
-    ({ vizType, type, visible, initialValues, callback }: addVizParams) => {
+    ({
+      vizType,
+      type,
+      visible,
+      initialValues,
+      callback,
+      onAfterClose,
+    }: addVizParams) => {
       showSaveForm({
         vizType: vizType,
         type: type,
@@ -93,6 +101,7 @@ export function useAddViz({ showSaveForm }) {
             onClose();
           }
         },
+        onAfterClose,
       });
     },
     [showSaveForm, vizsData, dispatch, orgId, updateValue],

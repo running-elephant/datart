@@ -258,3 +258,11 @@ export enum AuthorizationStatus {
   Success = 'success',
   Error = 'error',
 }
+
+export enum ChartInteractionEvent {
+  Select = 'select',
+  UnSelect = 'unSelect',
+  Drilled = 'drilled',
+  PagingOrSort = 'paging-sort-filter',
+  ChangeContext = 'rich-text-change-context',
+}
