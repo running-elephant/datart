@@ -60,7 +60,6 @@ import {
 } from '../pages/Board/slice/types';
 import { StrControlTypes } from '../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { Widget, WidgetMapping } from '../types/widgetTypes';
-
 export const VALUE_SPLITTER = '###';
 
 // export const createInitWidgetConfig = (opt: {

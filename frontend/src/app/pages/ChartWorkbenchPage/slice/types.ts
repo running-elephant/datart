@@ -21,6 +21,7 @@ import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { ChartDTO } from 'app/types/ChartDTO';
+import { ChartDataViewFieldCategory } from 'app/constants';
 
 export type ChartConfigPayloadType = {
   init?: ChartConfig;

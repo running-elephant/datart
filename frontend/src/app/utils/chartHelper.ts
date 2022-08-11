@@ -62,7 +62,11 @@ import ChartMetadata from 'app/types/ChartMetadata';
 import { updateBy } from 'app/utils/mutation';
 import { ECharts } from 'echarts';
 import { ECBasicOption } from 'echarts/types/dist/shared';
-import { NumberUnitKey, NumericUnitDescriptions } from 'globalConstants';
+import {
+  DATE_LEVEL_DELIMITER,
+  NumberUnitKey,
+  NumericUnitDescriptions,
+} from 'globalConstants';
 import moment from 'moment';
 import { Debugger } from 'utils/debugger';
 import {
@@ -1835,7 +1839,7 @@ export function createDateLevelComputedFieldForConfigComputedFields(
     DATE_LEVELS.forEach(v => {
       allDateLevelComputedFields.push({
         category: ChartDataViewFieldCategory.DateLevelComputedField,
-        name: field.name + `（${v.name}）`,
+        name: field.name + DATE_LEVEL_DELIMITER + v.expression,
         type: field.type,
         expression: `${v.expression}(${FieldTemplate(field.path)})`,
       });

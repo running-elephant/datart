@@ -22,6 +22,8 @@ import { ColumnRole } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { updateBy } from 'app/utils/mutation';
+import { DATE_LEVEL_DELIMITER } from 'globalConstants';
+import i18n from 'i18next';
 import { CloneValueDeep } from 'utils/object';
 import { DATE_LEVELS } from '../../slice/constant';
 
@@ -103,7 +105,7 @@ export const buildDateLevelFields = (args: {
           availableSourceFunctions.includes(item.expression)
         ) {
           return {
-            name: v.name + `（${item.name}）`,
+            name: v.name + DATE_LEVEL_DELIMITER + item.expression,
             field: v.name,
             type: item.type,
             category: item.category,
@@ -216,4 +218,17 @@ export const findSameFieldInView = (
   if (item) return true;
 
   return false;
+};
+
+export const handleDateLevelsName = (col: {
+  name: string;
+  category: string;
+}): string => {
+  if (col.category === ChartDataViewFieldCategory.DateLevelComputedField) {
+    const prefix = 'viz.workbench.dataview.';
+    const colList = col.name.split(DATE_LEVEL_DELIMITER);
+    return `${colList[0]}（${i18n.t(prefix + colList[1])}）`;
+  } else {
+    return col.name;
+  }
 };

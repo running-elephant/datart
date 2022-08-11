@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import migrateChartConfig, { RC0 } from '../ChartConfig/migrateChartConfig';
-import { APP_VERSION_RC_0 } from '../constants';
+import { APP_VERSION_RC_0, APP_VERSION_RC_2 } from '../constants';
 
 describe('test RC0 Function ', () => {
   test('should add name fields for chartConfig computedFields', () => {
@@ -59,7 +59,7 @@ describe('test migrateChartConfig  ', () => {
     expect(result).toEqual(
       JSON.stringify({
         computedFields: [{ id: '1', name: '1' }],
-        version: APP_VERSION_RC_0,
+        version: APP_VERSION_RC_2,
       }),
     );
   });
@@ -73,7 +73,7 @@ describe('test migrateChartConfig  ', () => {
     expect(result).toEqual(
       JSON.stringify({
         computedFields: [{ name: '1' }],
-        version: APP_VERSION_RC_0,
+        version: APP_VERSION_RC_2,
       }),
     );
   });
@@ -82,6 +82,6 @@ describe('test migrateChartConfig  ', () => {
     const chartConfig = JSON.stringify({}) as any;
     const result = migrateChartConfig(chartConfig as any);
 
-    expect(result).toEqual(JSON.stringify({ version: APP_VERSION_RC_0 }));
+    expect(result).toEqual(JSON.stringify({ version: APP_VERSION_RC_2 }));
   });
 });
