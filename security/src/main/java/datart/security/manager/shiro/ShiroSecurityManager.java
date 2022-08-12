@@ -113,7 +113,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
         }
 
         if (jwtToken.getPwdHash() != user.getPassword().hashCode()) {
-            Exceptions.tr(BaseException.class, "login.fail.pwd.hash");
+            Exceptions.tr(AuthException.class, "login.fail.pwd.hash");
         }
 
         PasswordToken passwordToken = new PasswordToken(user.getUsername(), user.getPassword(), System.currentTimeMillis());
