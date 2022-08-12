@@ -91,7 +91,7 @@ export const RC2 = config => {
 
     return config;
   } catch (error) {
-    console.error('Migration config Errors | RC.0 | ', error);
+    console.error('Migration config Errors | RC.2 | ', error);
     return config;
   }
 };
@@ -102,14 +102,11 @@ const migrationChartConfig = (config: string): string => {
   }
   const chartConfig = JSON.parse(config);
   const event = new MigrationEvent(APP_VERSION_RC_0, RC0);
-  const dispatcher = new MigrationEventDispatcher(event);
+  const event2 = new MigrationEvent(APP_VERSION_RC_2, RC2);
+  const dispatcher = new MigrationEventDispatcher(event, event2);
   const result = dispatcher.process(chartConfig);
 
-  const event2 = new MigrationEvent(APP_VERSION_RC_2, RC2);
-  const dispatcher2 = new MigrationEventDispatcher(event2);
-  const result2 = dispatcher2.process(result);
-
-  return JSON.stringify(result2);
+  return JSON.stringify(result);
 };
 
 export default migrationChartConfig;

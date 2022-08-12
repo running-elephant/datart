@@ -15,8 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import migrateChartConfig, { RC0 } from '../ChartConfig/migrateChartConfig';
-import { APP_VERSION_RC_0, APP_VERSION_RC_2 } from '../constants';
+import { ChartDataViewFieldCategory } from 'app/constants';
+import { DATE_LEVEL_DELIMITER } from 'globalConstants';
+import migrateChartConfig, {
+  RC0,
+  RC2,
+} from '../ChartConfig/migrateChartConfig';
+import { APP_VERSION_RC_2 } from '../constants';
 
 describe('test RC0 Function ', () => {
   test('should add name fields for chartConfig computedFields', () => {
@@ -47,9 +52,29 @@ describe('test RC0 Function ', () => {
 
     expect(result).toMatchObject({});
   });
+  test('test chartConfig is null', () => {
+    const chartConfig = {
+      computedFields: '1111',
+    } as any;
+    const result = RC0(chartConfig as any);
+
+    expect(result).toEqual(chartConfig);
+  });
+  test('test RCO Try Catch function', () => {
+    const chartConfig = null as any;
+    const result = RC0(chartConfig as any);
+
+    expect(result).toEqual(null);
+  });
 });
 
 describe('test migrateChartConfig  ', () => {
+  test('test config is null', () => {
+    const chartConfig: any = null;
+    const result = migrateChartConfig(chartConfig);
+    expect(result).toEqual(null);
+  });
+
   test('should add name fields for chartConfig computedFields', () => {
     const chartConfig = JSON.stringify({
       computedFields: [{ id: '1' }],
@@ -83,5 +108,56 @@ describe('test migrateChartConfig  ', () => {
     const result = migrateChartConfig(chartConfig as any);
 
     expect(result).toEqual(JSON.stringify({ version: APP_VERSION_RC_2 }));
+  });
+});
+
+describe('test RC2 Function ', () => {
+  test('test if config if empty', () => {
+    const config = null;
+    const result = RC2(config);
+    expect(result).toEqual(config);
+  });
+
+  test('should return correct colName', () => {
+    const chartConfig = {
+      chartConfig: {
+        datas: [
+          {
+            rows: [
+              {
+                category: ChartDataViewFieldCategory.DateLevelComputedField,
+                colName: 'birthday（Year）',
+                expression: 'AGG_DATE_YEAR([birthday])',
+                field: 'birthday',
+              },
+            ],
+          },
+        ],
+      },
+      computedFields: [
+        {
+          category: ChartDataViewFieldCategory.DateLevelComputedField,
+          expression: 'AGG_DATE_YEAR([birthday])',
+          name: 'birthday（Year）',
+          type: 'DATE',
+        },
+      ],
+    } as any;
+    const result = RC2(chartConfig as any);
+    console.log(JSON.stringify(result), 'result');
+    expect(result.chartConfig.datas[0].rows[0].colName).toEqual(
+      'birthday' + DATE_LEVEL_DELIMITER + 'AGG_DATE_YEAR',
+    );
+    expect(result.computedFields[0].name).toEqual(
+      'birthday' + DATE_LEVEL_DELIMITER + 'AGG_DATE_YEAR',
+    );
+  });
+
+  test('test try catch function', () => {
+    const chartConfig = {
+      chartConfig: {},
+    } as any;
+    const result = RC2(chartConfig as any);
+    expect(result).toEqual(chartConfig);
   });
 });
