@@ -425,23 +425,26 @@ export const diffMergeHierarchyModel = (
 };
 
 export function addPathToHierarchyStructureAndChangeName(
-  Hierarchy: ColumnsModel,
+  hierarchy: ColumnsModel,
   viewType: ViewType,
 ): Model {
-  const _hierarchy = Object.keys(Hierarchy).reduce((acc, name) => {
-    acc[name] = Hierarchy[name];
+  if (!hierarchy) {
+    return hierarchy;
+  }
+  const _hierarchy = Object.keys(hierarchy).reduce((acc, name) => {
+    acc[name] = hierarchy[name];
     if (acc[name].children) {
       acc[name].children.forEach((children, i) => {
         if (!children['path']) {
           acc[name].children![i]['path'] = Array.isArray(children.name)
             ? children.name
             : viewType === 'STRUCT'
-            ? JSON.parse(children.name)
+            ? children.name && JSON.parse(children.name)
             : [children.name];
 
           acc[name].children![i]['name'] =
             viewType === 'STRUCT'
-              ? JSON.parse(children.name).join('.')
+              ? children.name && JSON.parse(children.name).join('.')
               : children.name;
         }
       });
@@ -449,7 +452,7 @@ export function addPathToHierarchyStructureAndChangeName(
       acc[name]['path'] = Array.isArray(acc[name]['name'])
         ? acc[name]['name']
         : viewType === 'STRUCT'
-        ? JSON.parse(acc[name]['name'])
+        ? acc[name]['name'] && JSON.parse(acc[name]['name'])
         : [name];
 
       acc[name]['name'] = name;
