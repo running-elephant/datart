@@ -173,7 +173,7 @@ public class JdbcDataProviderAdapter implements Closeable {
             try (ResultSet columns = metadata.getColumns(database, null, table, null)) {
                 while (columns.next()) {
                     Column column = readTableColumn(columns);
-                    column.setForeignKeys(importedKeys.get(column.getName()));
+                    column.setForeignKeys(importedKeys.get(column.columnKey()));
                     columnSet.add(column);
                 }
             }
