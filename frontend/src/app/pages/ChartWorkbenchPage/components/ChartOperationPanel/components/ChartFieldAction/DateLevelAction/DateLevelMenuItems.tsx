@@ -87,7 +87,7 @@ const DateLevelMenuItems = memo(
                 draft.field = config.colName;
                 draft.category =
                   ChartDataViewFieldCategory.DateLevelComputedField;
-                draft.colName = `${draft.colName}（${selectedConfig.colName}）`;
+                draft.colName = selectedConfig.colName;
                 draft[RUNTIME_DATE_LEVEL_KEY] = null;
               }),
             );
@@ -119,7 +119,6 @@ const DateLevelMenuItems = memo(
               config.category === ChartDataViewFieldCategory.Field
                 ? config.colName
                 : config.field;
-
             const row = getAllColumnInMeta(metas)?.find(
               v => v.name === configColName,
             );
@@ -134,7 +133,8 @@ const DateLevelMenuItems = memo(
                 onClick={() =>
                   handleChangeFn({
                     category: ChartDataViewFieldCategory.DateLevelComputedField,
-                    colName: row?.name + DATE_LEVEL_DELIMITER + item.expression,
+                    colName:
+                      configColName + DATE_LEVEL_DELIMITER + item.expression,
                     expression,
                   })
                 }

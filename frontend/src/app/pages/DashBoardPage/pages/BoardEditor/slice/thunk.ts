@@ -1,4 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import migrateWidgetChartConfig from 'app/migration/BoardConfig/migrateWidgetChartConfig';
 import migrateWidgetConfig from 'app/migration/BoardConfig/migrateWidgetConfig';
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
@@ -116,6 +117,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
     );
     let migratedWidgets = migrateWidgets(serverWidgets, boardType);
     migratedWidgets = migrateWidgetConfig(migratedWidgets);
+    migratedWidgets = migrateWidgetChartConfig(migratedWidgets);
     const { widgetMap, wrappedDataCharts } = getWidgetMap(
       migratedWidgets, //todo
       dataCharts,

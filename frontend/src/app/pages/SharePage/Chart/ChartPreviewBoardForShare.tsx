@@ -378,7 +378,10 @@ const ChartPreviewBoardForShare: FC<{
           }}
         >
           <div style={{ width: '100%', height: '100%' }} ref={ref}>
-            <ChartDrillContextMenu chartConfig={chartPreview?.chartConfig}>
+            <ChartDrillContextMenu
+              chartConfig={chartPreview?.chartConfig}
+              metas={chartPreview?.backendChart?.view?.meta}
+            >
               <ChartIFrameContainer
                 key={chartPreview?.backendChart?.id!}
                 containerId={chartPreview?.backendChart?.id!}

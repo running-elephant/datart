@@ -215,18 +215,19 @@ const ChartDrillContextMenu: FC<{
               ].includes(f.category),
           )
           ?.map((v, i) => {
+            const config = v[RUNTIME_DATE_LEVEL_KEY] || v;
             return (
               <Menu.SubMenu
                 key={i}
                 title={handleDateLevelsName({
-                  name: v.colName,
-                  category: ChartDataViewFieldCategory.DateLevelComputedField,
+                  ...config,
+                  name: config.colName,
                 })}
               >
                 <DateLevelMenuItems
                   metas={metas}
                   availableSourceFunctions={availableSourceFunctions}
-                  config={v[RUNTIME_DATE_LEVEL_KEY] || v}
+                  config={config}
                   onChange={handleDateLevelChange}
                 />
               </Menu.SubMenu>
