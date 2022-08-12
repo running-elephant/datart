@@ -45,7 +45,7 @@ import {
   SPACE_TIMES,
 } from 'styles/StyleConstants';
 import { request2 } from 'utils/request';
-import { uuidv4 } from 'utils/utils';
+import { errorHandle, uuidv4 } from 'utils/utils';
 import {
   selectDataProviderConfigTemplateLoading,
   selectDataProviderListLoading,
@@ -199,12 +199,16 @@ export function SourceDetailPage() {
     const { type, config } = form.getFieldsValue();
     const { name } = dataProviders[type];
     setTestLoading(true);
-    await request2<QueryResult>({
-      url: '/data-provider/test',
-      method: 'POST',
-      data: { name, type, properties: config },
-    });
-    message.success(t('testSuccess'));
+    try {
+      await request2<QueryResult>({
+        url: '/data-provider/test',
+        method: 'POST',
+        data: { name, type, properties: config },
+      });
+      message.success(t('testSuccess'));
+    } catch (error) {
+      errorHandle(error);
+    }
     setTestLoading(false);
   }, [form, dataProviders, t]);
 
@@ -212,21 +216,25 @@ export function SourceDetailPage() {
     async (config, callback) => {
       const { name } = dataProviders[providerType];
       setTestLoading(true);
-      const { data } = await request2<QueryResult>({
-        url: '/data-provider/test',
-        method: 'POST',
-        data: {
-          name,
-          type: providerType,
-          properties:
-            providerType === 'FILE'
-              ? { path: config.path, format: config.format }
-              : config,
-          sourceId: editingSource?.id,
-        },
-      });
+      try {
+        const { data } = await request2<QueryResult>({
+          url: '/data-provider/test',
+          method: 'POST',
+          data: {
+            name,
+            type: providerType,
+            properties:
+              providerType === 'FILE'
+                ? { path: config.path, format: config.format }
+                : config,
+            sourceId: editingSource?.id,
+          },
+        });
+        callback(data);
+      } catch (error) {
+        errorHandle(error);
+      }
       setTestLoading(false);
-      callback(data);
     },
     [dataProviders, providerType, editingSource],
   );
