@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { APP_VERSION_BETA_4 } from 'app/migration/constants';
+import { APP_VERSION_BETA_4, APP_VERSION_RC_2 } from 'app/migration/constants';
 import {
   buildUpdateChartRequest,
   convertToChartConfigDTO,
@@ -34,7 +34,7 @@ describe('chartDtoHelper Test', () => {
     };
     const dto = convertToChartDto(data);
     expect(dto).toEqual({
-      config: { id: 1, computedFields: [], version: '1.0.0-RC.0' },
+      config: { id: 1, computedFields: [], version: APP_VERSION_RC_2 },
       view: {
         meta: [
           {
@@ -100,7 +100,7 @@ describe('chartDtoHelper Test', () => {
             type: 'STRING',
           },
         ],
-        version: '1.0.0-RC.0',
+        version: APP_VERSION_RC_2,
       },
       view: {
         meta: [
