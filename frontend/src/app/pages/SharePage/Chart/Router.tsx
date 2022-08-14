@@ -17,16 +17,15 @@
  */
 
 import { ConfigProvider } from 'antd';
-import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
-import { registerTheme } from 'echarts';
 import { antdLocales } from 'locales/i18n';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { GlobalStyles } from 'styles/globalStyles';
+import { registerEChartThemes } from 'themeManager';
 import HelmetPageTitle from '../components/HelmetPageTitle';
 import { LazyShareChart } from './Loadable';
 
-registerTheme('default', echartsDefaultTheme);
+registerEChartThemes();
 
 export function Router() {
   const { i18n } = useTranslation();

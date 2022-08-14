@@ -17,7 +17,7 @@
  */
 
 import { Col, Popover, Row } from 'antd';
-import Theme from 'app/assets/theme/echarts_default_theme.json';
+import echartsDefaultTheme from 'app/assets/theme/default.theme.json';
 import {
   ColorTag,
   SingleColorSelection,
@@ -41,7 +41,7 @@ const AggregationColorizeAction: FC<{
   i18nPrefix?: string;
 }> = memo(({ config, dataset, onConfigChange, i18nPrefix }) => {
   const actionNeedNewRequest = true;
-  const [themeColors, setThemeColors] = useState(Theme.color);
+  const [themeColors, setThemeColors] = useState(echartsDefaultTheme.color);
   const [colors, setColors] = useState<{ key: string; value: string }[]>(
     setColorFn(config, dataset, themeColors),
   );

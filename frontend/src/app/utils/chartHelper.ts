@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
+import echartsDefaultTheme from 'app/assets/theme/default.theme.json';
 import {
   AggregateFieldActionType,
   ChartDataSectionType,

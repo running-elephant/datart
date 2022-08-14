@@ -17,8 +17,6 @@
  */
 
 import { ConfigProvider, message } from 'antd';
-import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
-import { registerTheme } from 'echarts';
 import { StorageKeys } from 'globalConstants';
 import { antdLocales } from 'locales/i18n';
 import { useEffect, useLayoutEffect } from 'react';
@@ -27,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { GlobalStyles } from 'styles/globalStyles';
+import { registerEChartThemes } from 'themeManager';
 import { getToken } from 'utils/auth';
 import useI18NPrefix from './hooks/useI18NPrefix';
 import { LoginAuthRoute } from './LoginAuthRoute';
@@ -39,7 +38,7 @@ import { LazySetupPage } from './pages/SetupPage/Loadable';
 import { useAppSlice } from './slice';
 import { getSystemInfo, logout, setLoggedInUser } from './slice/thunks';
 
-registerTheme('default', echartsDefaultTheme);
+registerEChartThemes();
 
 export function AppRouter() {
   const dispatch = useDispatch();
