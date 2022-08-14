@@ -18,7 +18,11 @@
 
 import { DataViewFieldType } from 'app/constants';
 import { Column, ColumnRole } from '../slice/types';
-import { dataModelColumnSorter, diffMergeHierarchyModel } from '../utils';
+import {
+  addPathToHierarchyStructureAndChangeName,
+  dataModelColumnSorter,
+  diffMergeHierarchyModel,
+} from '../utils';
 
 describe('dataModelColumnSorter test', () => {
   test('should sort by alphabet with the STRING column type', () => {
@@ -235,6 +239,223 @@ describe('diffMergeHierarchyModel test', () => {
           name: 'dealers',
           children: [{ name: 'address', type: 'STRING' }],
         },
+      },
+    });
+  });
+});
+
+describe('addPathToHierarchyStructureAndChangeName test', () => {
+  test('test if hierarchy is empty', () => {
+    const hierarchy: any = null;
+    const result = addPathToHierarchyStructureAndChangeName(hierarchy, 'SQL');
+    expect(result).toEqual(null);
+  });
+
+  test('test view type is SQL and have name', () => {
+    const hierarchy: any = {
+      QD_id: {
+        name: 'QD_id',
+      },
+    };
+    const result = addPathToHierarchyStructureAndChangeName(hierarchy, 'SQL');
+    expect(result).toEqual({
+      QD_id: {
+        name: 'QD_id',
+        path: ['QD_id'],
+      },
+    });
+  });
+
+  test('test view type is SQL and dont name', () => {
+    const hierarchy: any = {
+      QD_id: {},
+    };
+    const result = addPathToHierarchyStructureAndChangeName(hierarchy, 'SQL');
+    expect(result).toEqual({
+      QD_id: {
+        name: 'QD_id',
+        path: ['QD_id'],
+      },
+    });
+  });
+
+  test('test view type is SQL and have path', () => {
+    const hierarchy: any = {
+      QD_id: {
+        name: 'QD_id',
+        path: ['QD_id'],
+      },
+    };
+    const result = addPathToHierarchyStructureAndChangeName(hierarchy, 'SQL');
+    expect(result).toEqual({
+      QD_id: {
+        name: 'QD_id',
+        path: ['QD_id'],
+      },
+    });
+  });
+
+  test('test view type is SQL and path in undefined', () => {
+    const hierarchy: any = {
+      QD_id: {
+        name: 'QD_id',
+        path: undefined,
+      },
+    };
+    const result = addPathToHierarchyStructureAndChangeName(hierarchy, 'SQL');
+    expect(result).toEqual({
+      QD_id: {
+        name: 'QD_id',
+        path: ['QD_id'],
+      },
+    });
+  });
+
+  test('test view type is SQL and name is array', () => {
+    const hierarchy: any = {
+      QD_id: {
+        name: ['QD_id'],
+      },
+    };
+    const result = addPathToHierarchyStructureAndChangeName(hierarchy, 'SQL');
+    expect(result).toEqual({
+      QD_id: {
+        name: 'QD_id',
+        path: ['QD_id'],
+      },
+    });
+  });
+
+  test('test view type is SQL have children', () => {
+    const hierarchy: any = {
+      文件夹1: {
+        name: '文件夹1',
+        children: [
+          {
+            name: 'QD_id',
+          },
+        ],
+      },
+    };
+    const result = addPathToHierarchyStructureAndChangeName(hierarchy, 'SQL');
+    expect(result).toEqual({
+      文件夹1: {
+        name: '文件夹1',
+        children: [
+          {
+            name: 'QD_id',
+            path: ['QD_id'],
+          },
+        ],
+      },
+    });
+  });
+
+  test('test view type is SQL have children name is Array', () => {
+    const hierarchy: any = {
+      文件夹1: {
+        name: '文件夹1',
+        children: [
+          {
+            name: ['QD_id'],
+          },
+        ],
+      },
+    };
+    const result = addPathToHierarchyStructureAndChangeName(hierarchy, 'SQL');
+    expect(result).toEqual({
+      文件夹1: {
+        name: '文件夹1',
+        children: [
+          {
+            name: ['QD_id'],
+            path: ['QD_id'],
+          },
+        ],
+      },
+    });
+  });
+
+  test('test view type is STRUCT view - name is string array', () => {
+    const hierarchy: any = {
+      'dad.num': {
+        name: '["dad","num"]',
+      },
+    };
+
+    const result = addPathToHierarchyStructureAndChangeName(
+      hierarchy,
+      'STRUCT',
+    );
+    expect(result).toEqual({
+      'dad.num': {
+        name: 'dad.num',
+        path: ['dad', 'num'],
+      },
+    });
+  });
+
+  test('test view type is STRUCT view - name is array', () => {
+    const hierarchy: any = {
+      'dad.num': {
+        name: ['dad', 'num'],
+      },
+    };
+
+    const result = addPathToHierarchyStructureAndChangeName(
+      hierarchy,
+      'STRUCT',
+    );
+    expect(result).toEqual({
+      'dad.num': {
+        name: 'dad.num',
+        path: ['dad', 'num'],
+      },
+    });
+  });
+
+  test('test view type is STRUCT view is not have name', () => {
+    const hierarchy: any = {
+      'dad.num': {},
+    };
+
+    const result = addPathToHierarchyStructureAndChangeName(
+      hierarchy,
+      'STRUCT',
+    );
+    expect(result).toEqual({
+      'dad.num': {
+        name: 'dad.num',
+        path: undefined,
+      },
+    });
+  });
+
+  test('test view type is STRUCT view - have children', () => {
+    const hierarchy: any = {
+      file: {
+        name: 'file1',
+        children: [
+          {
+            name: '["dad", "num"]',
+          },
+        ],
+      },
+    };
+
+    const result = addPathToHierarchyStructureAndChangeName(
+      hierarchy,
+      'STRUCT',
+    );
+    expect(result).toEqual({
+      file: {
+        name: 'file1',
+        children: [
+          {
+            name: 'dad.num',
+            path: ['dad', 'num'],
+          },
+        ],
       },
     });
   });
