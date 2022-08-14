@@ -1,0 +1,23 @@
+apiVersion: v1
+appVersion: 5.7.31
+description: Fast, reliable, scalable, and easy to use open-source relational database
+  system.
+engine: gotpl
+home: https://www.mysql.com/
+icon: https://www.mysql.com/common/logos/powered-by-mysql-167x86.png
+keywords:
+- mysql
+- database
+- sql
+maintainers:
+- email: o.with@sportradar.com
+  name: olemarkus
+- email: viglesias@google.com
+  name: viglesiasce
+name: mysql
+sources:
+- https://github.com/kubernetes/charts
+- https://github.com/docker-library/mysql
+version: 1.6.8
+annotations:
+  "app.kubesphere.io/category": "Database & Cache"

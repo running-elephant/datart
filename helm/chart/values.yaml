@@ -1,0 +1,39 @@
+# Default values for ums.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+busybox:
+  image: "busybox"
+  tag: "1.32"
+
+datart:
+  type: ClusterIP
+  replicas: 1
+  image:
+    repository: "datart/datart"
+    tag: 1.0.0-rc.1
+    pullPolicy: IfNotPresent
+  # mysql:
+  #   host:
+  #   port:
+  #   dbname:
+  #   user:
+  #   pass:
+  http:
+    enabled: true
+    servicePort: 8080
+    containerPort: 8080
+  resources: {}
+  #  requests:
+  #    memory: 2000Mi
+  #    cpu: 1000m
+
+
+
+mysql:
+  enabled: true
+  service:
+    port: 3306
+  mysqlRootPassword: ""
+

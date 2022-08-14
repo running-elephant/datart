@@ -1,0 +1,22 @@
+{{- $fullName := include "datart.fullname" . -}}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ $fullName }}
+  name: {{ $fullName }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: {{ .Values.datart.type }}
+  ports:
+  {{- if .Values.datart.http.enabled }}
+  - name: datart
+    port: {{ .Values.datart.http.servicePort }}
+    targetPort: {{ .Values.datart.http.containerPort }}
+  {{- if (and (eq .Values.datart.type "NodePort") (not (empty .Values.datart.http.nodePort))) }}
+    nodePort: {{ .Values.datart.http.nodePort }}
+  {{- end }}
+    protocol: TCP
+  {{- end }}
+  selector:
+    app: {{ $fullName }}

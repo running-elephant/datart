@@ -1,0 +1,14 @@
+apiVersion: v2
+appVersion: 1.0.0-rc.1
+dependencies:
+- condition: mysql.enabled
+  name: mysql
+  repository: https://github.com/kubernetes/charts
+  version: 1.6.8
+description: datart
+icon: https://running-elephant.github.io/datart-docs/logo.svg
+maintainers:
+- name: 88fantasy
+name: datart
+type: application
+version: 0.1.0

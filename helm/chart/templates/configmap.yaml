@@ -1,0 +1,92 @@
+{{- if .Values.mysql.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "datart.fullname" . }}-configuration
+  namespace: {{ .Release.Namespace }}
+data:
+  datart.conf: |-
+    datasource.ip=datart-mysql
+    datasource.port={{ .Values.mysql.service.port }}
+    datasource.database=datart
+    datasource.username=root
+    datasource.password={{ .Values.mysql.mysqlRootPassword }}
+    server.port={{ .Values.datart.http.containerPort }}
+    server.address=0.0.0.0
+    datart.send-mail=false
+
+  application-config.yml: |-
+    spring:
+      datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        type: com.alibaba.druid.pool.DruidDataSource
+        url: jdbc:mysql://${datasource.ip:null}:${datasource.port:3306}/${datasource.database:datart}?&allowMultiQueries=true&characterEncoding=utf-8
+        username: ${datasource.username:root}
+        password: ${datasource.password:123456}
+    server:
+      port: ${server.port:8080}
+      address: ${server.ip:0.0.0.0}
+
+  logback.xml: |-
+    <configuration scan="true" scanPeriod="60 seconds" debug="false">
+
+        <property name="LOG_HOME" value="./logs"/>
+        <property name ="SQL_LEVEL" value="INFO"/>
+
+        <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{50} : %msg%n</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+        <appender name="error_db_appender" class="datart.core.log.AccessLogAppender">
+        </appender>
+
+        <appender name="root" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <FileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}.log</FileNamePattern>
+                <MaxHistory>30</MaxHistory>
+            </rollingPolicy>
+            <encoder>
+                <charset>UTF-8</charset>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} : %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <appender name="sql" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <FileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}-sql.log</FileNamePattern>
+                <MaxHistory>30</MaxHistory>
+            </rollingPolicy>
+            <encoder>
+                <charset>UTF-8</charset>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} : %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="console"/>
+            <appender-ref ref="root" />
+        </root>
+
+        <logger name="datart.data.provider.jdbc.adapters" level="${SQL_LEVEL}" addtivity="false">
+            <appender-ref ref="sql"/>
+        </logger>
+        <logger name="datart.data.provider.local.LocalDB" level="${SQL_LEVEL}" addtivity="false">
+            <appender-ref ref="sql"/>
+        </logger>
+
+    </configuration>
+
+  jdbc-driver-ext.yml: |-
+    IMPALA:
+      db-type: "impala"
+      name: "impala"
+      driver-class: "com.cloudera.impala.jdbc41.Driver"
+      literal-quote: "'"
+      identifier-quote: "`"
+      adapter-class: "datart.data.provider.jdbc.adapters.ImpalaDataProviderAdapter"
+      url-prefix: "jdbc:impala://"
+      sql-dialect: "datart.data.provider.calcite.dialect.ImpalaSqlDialectSupport"
+
+{{- end -}}

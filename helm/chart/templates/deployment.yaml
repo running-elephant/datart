@@ -1,0 +1,55 @@
+{{- $fullName := include "datart.fullname" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ $fullName }}
+  name: {{ $fullName }}
+spec:
+  replicas: {{ .Values.datart.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ $fullName }}
+  template:
+    metadata:
+      labels:
+        app: {{ $fullName }}
+    spec:
+      terminationGracePeriodSeconds: 10
+      {{- if .Values.mysql.enabled }}
+      initContainers:
+      - name: wait-mysql
+        image: "{{ .Values.busybox.image}}:{{ .Values.busybox.tag }}"
+        command: ['sh', '-c', "until nc -zv {{ $fullName }}-mysql {{ .Values.mysql.service.port }}; do echo waiting for mysql `date`; sleep 2; done;"]
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.datart.image.repository }}:{{ .Values.datart.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.datart.image.pullPolicy }}
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+          ports:
+            - name: http
+              containerPort: {{ .Values.datart.http.containerPort }}
+              protocol: TCP
+          {{- with .Values.datart.resources }}
+          resources:
+            requests:
+              memory: {{ .requests.memory | default "2000Mi" }}
+              cpu: {{ .requests.cpu | default "500m" }}
+          {{- end }}
+      restartPolicy: Always
+      {{- if .Values.mysql.enabled }}
+      volumes:
+          - name: config-volume
+            configMap:
+              name: {{ $fullName }}-configuration
+              items:
+              - key: "datart.conf"
+                path: "datart.conf"
+              - key: "application-config.yml"
+                path: "profiles/application-config.yml"
+              - key: "logback.xml"
+                path: "logback.xml"
+      {{- end }}
