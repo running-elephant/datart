@@ -64,6 +64,7 @@ import {
   NameLocation,
   PivotSheetTheme,
   ScorecardConditionalStylePanel,
+  ThemeSelector,
   TimerFormat,
   UnControlledTableHeaderPanel,
   ViewDetailPanel,
@@ -216,6 +217,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <DataZoomPanel {...props} />;
         case ChartStyleSectionComponentType.Y_AXIS_NUMBER_FORMAT_PANEL:
           return <YAxisNumberFormatPanel {...props} />;
+        case ChartStyleSectionComponentType.THEME_SELECTOR:
+          return <ThemeSelector {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

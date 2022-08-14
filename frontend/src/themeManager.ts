@@ -31,18 +31,117 @@ import westerosTheme from 'app/assets/theme/westeros.theme.json';
 import wonderlandTheme from 'app/assets/theme/wonderland.theme.json';
 import { registerTheme } from 'echarts';
 
+const themes = [
+  {
+    key: 'default',
+    i18n: {
+      zh: '默认',
+      en: 'default',
+    },
+    theme: defaultTheme,
+  },
+  {
+    key: 'dark',
+    i18n: {
+      zh: '暗黑色系',
+      en: 'dark',
+    },
+    theme: darkTheme,
+  },
+  {
+    key: 'purple-passion',
+    i18n: {
+      zh: '紫色激情色系',
+      en: 'purple-passion',
+    },
+    theme: purplePassionTheme,
+  },
+  {
+    key: 'macarons',
+    i18n: {
+      zh: 'macarons色系',
+      en: 'macarons',
+    },
+    theme: macaronsTheme,
+  },
+  {
+    key: 'chalk',
+    i18n: {
+      zh: 'chalk色系',
+      en: 'chalk',
+    },
+    theme: chalkTheme,
+  },
+  {
+    key: 'essos',
+    i18n: {
+      zh: 'essos色系',
+      en: 'essos',
+    },
+    theme: essosTheme,
+  },
+  {
+    key: 'infographic',
+    i18n: {
+      zh: 'infographic色系',
+      en: 'infographic',
+    },
+    theme: infographicTheme,
+  },
+  {
+    key: 'roma',
+    i18n: {
+      zh: 'roma色系',
+      en: 'roma',
+    },
+    theme: romaTheme,
+  },
+  {
+    key: 'shine',
+    i18n: {
+      zh: 'shine色系',
+      en: 'shine',
+    },
+    theme: shineTheme,
+  },
+  {
+    key: 'vintage',
+    i18n: {
+      zh: 'vintage色系',
+      en: 'vintage',
+    },
+    theme: vintageTheme,
+  },
+  {
+    key: 'walden',
+    i18n: {
+      zh: 'walden色系',
+      en: 'walden',
+    },
+    theme: waldenTheme,
+  },
+  {
+    key: 'westeros',
+    i18n: {
+      zh: 'westeros色系',
+      en: 'walden',
+    },
+    theme: westerosTheme,
+  },
+  {
+    key: 'wonderland',
+    i18n: {
+      zh: 'wonderland色系',
+      en: 'wonderland',
+    },
+    theme: wonderlandTheme,
+  },
+];
+
+export function getThemes() {
+  return themes;
+}
+
 export function registerEChartThemes() {
-  registerTheme('default', defaultTheme);
-  registerTheme('purple-passion', purplePassionTheme);
-  registerTheme('macarons', macaronsTheme);
-  registerTheme('chalk', chalkTheme);
-  registerTheme('dark', darkTheme);
-  registerTheme('essos', essosTheme);
-  registerTheme('infographic', infographicTheme);
-  registerTheme('roma', romaTheme);
-  registerTheme('shine', shineTheme);
-  registerTheme('vintage', vintageTheme);
-  registerTheme('walden', waldenTheme);
-  registerTheme('westeros', westerosTheme);
-  registerTheme('wonderland', wonderlandTheme);
+  themes.every(t => registerTheme(t.key, t.theme));
 }

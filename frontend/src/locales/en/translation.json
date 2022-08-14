@@ -713,7 +713,8 @@
           "zoomEndPercentage": "Zoom Slider End Percentage",
           "zoomStartIndex": "Zoom Slider Start Index",
           "zoomEndIndex": "Zoom Slider End Index"
-        }
+        },
+        "theme": { "title": "Theme" }
       },
       "data": {
         "column": "Column",

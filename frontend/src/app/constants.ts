@@ -233,6 +233,7 @@ export const ChartStyleSectionComponentType = {
   INTERACTION_VIEW_DETAIL_PANEL: 'interaction.viewDetail',
   DATA_ZOOM_PANEL: 'dataZoomPanel',
   Y_AXIS_NUMBER_FORMAT_PANEL: 'YAxisNumberFormatPanel',
+  THEME_SELECTOR: 'themeSelector',
 };
 
 export enum DownloadFileType {
