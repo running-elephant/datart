@@ -352,7 +352,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         variables.add(new ScriptVariable(VARIABLE_NAME,
                 VariableTypeEnum.PERMISSION,
                 ValueType.STRING,
-                Sets.newHashSet(getCurrentUser().getUsername()),
+                Sets.newHashSet(getCurrentUser().getName()),
                 false));
         variables.add(new ScriptVariable(VARIABLE_EMAIL,
                 VariableTypeEnum.PERMISSION,
