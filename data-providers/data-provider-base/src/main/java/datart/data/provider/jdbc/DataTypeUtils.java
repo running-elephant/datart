@@ -17,8 +17,8 @@
  */
 package datart.data.provider.jdbc;
 
-import datart.core.base.consts.ValueType;
 import datart.core.base.consts.JavaType;
+import datart.core.base.consts.ValueType;
 import datart.data.provider.calcite.custom.CustomSqlTypeName;
 import org.apache.calcite.sql.type.SqlTypeFamily;
 import org.apache.calcite.sql.type.SqlTypeName;
@@ -34,6 +34,28 @@ public class DataTypeUtils {
         SqlTypeFamily family;
         if (sqlTypeName == null) {
             family = CustomSqlTypeName.SQL_TYPE_FAMILY_MAP.getOrDefault(sqlType, CustomSqlTypeName.ANY).getFamily();
+        } else {
+            family = sqlTypeName.getFamily();
+        }
+        switch (family) {
+            case NUMERIC:
+                return ValueType.NUMERIC;
+            case DATE:
+            case TIME:
+            case TIMESTAMP:
+            case DATETIME:
+                return ValueType.DATE;
+            default:
+                return ValueType.STRING;
+        }
+    }
+
+
+    public static ValueType jdbcType2DataType(int jdbcType) {
+        SqlTypeName sqlTypeName = SqlTypeName.getNameForJdbcType(jdbcType);
+        SqlTypeFamily family;
+        if (sqlTypeName == null) {
+            family = SqlTypeFamily.getFamilyForJdbcType(jdbcType);
         } else {
             family = sqlTypeName.getFamily();
         }
