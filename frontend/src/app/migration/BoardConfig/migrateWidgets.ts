@@ -17,10 +17,7 @@
  */
 
 import { FONT_DEFAULT } from 'app/constants';
-import {
-  initInteractionTpl,
-  initWidgetThemeTpl,
-} from 'app/pages/DashBoardPage/components/WidgetManager/utils/init';
+import { initInteractionTpl } from 'app/pages/DashBoardPage/components/WidgetManager/utils/init';
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import {
   BoardType,
@@ -38,8 +35,6 @@ import {
   APP_VERSION_BETA_4,
   APP_VERSION_BETA_4_2,
   APP_VERSION_RC_0,
-  APP_VERSION_RC_1,
-  APP_VERSION_RC_2_1,
 } from './../constants';
 import { WidgetBeta3 } from './types';
 import {
