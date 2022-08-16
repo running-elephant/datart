@@ -27,7 +27,9 @@ import {
   APP_CURRENT_VERSION,
   APP_VERSION_BETA_0,
   APP_VERSION_BETA_1,
+  APP_VERSION_RC_2,
 } from '../constants';
+
 describe('test migrateBoard ', () => {
   test('parse board.config', () => {
     const config = '{}';
@@ -97,5 +99,43 @@ describe('test migrateBoard ', () => {
       type: 'auto',
       version: APP_CURRENT_VERSION,
     } as DashboardConfigBeta3);
+  });
+
+  test('should migrate board theme config', () => {
+    const config = JSON.stringify({
+      type: 'auto',
+      jsonConfig: {
+        props: [],
+      },
+    });
+    const result = migrateBoardConfig(config);
+    expect(result).toMatchObject({
+      type: 'auto',
+      version: APP_CURRENT_VERSION,
+    } as DashboardConfigBeta3);
+    expect(
+      result.jsonConfig.props?.find(p => p.key === 'themeGroup'),
+    ).not.toBeUndefined();
+  });
+
+  test('should not migrate board theme config when theme config already exist', () => {
+    const config = JSON.stringify({
+      type: 'auto',
+      version: APP_VERSION_RC_2,
+      jsonConfig: {
+        props: [
+          {
+            key: 'themeGroup',
+          },
+        ],
+      },
+    });
+    const result = migrateBoardConfig(config);
+    expect(result).toMatchObject({
+      version: APP_CURRENT_VERSION,
+    } as DashboardConfigBeta3);
+    expect(
+      result?.jsonConfig?.props?.find(p => p.key === 'themeGroup')?.comType,
+    ).toBeUndefined();
   });
 });

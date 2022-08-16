@@ -18,14 +18,17 @@
 import { MIN_MARGIN, MIN_PADDING } from 'app/pages/DashBoardPage/constants';
 import { BoardTypes } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { BoardConfig } from 'app/pages/DashBoardPage/types/boardTypes';
+import { boardThemeTemplate } from 'app/pages/DashBoardPage/utils/autoBoard';
 import {
   getInitBoardConfig,
   getInitBoardConfigBeta3,
 } from 'app/pages/DashBoardPage/utils/board';
+import { isEmptyArray } from 'utils/object';
 import {
   APP_VERSION_BETA_0,
   APP_VERSION_BETA_2,
   APP_VERSION_BETA_4,
+  APP_VERSION_RC_2_1,
 } from '../constants';
 import { setLatestVersion, versionCanDo } from '../utils';
 
@@ -171,11 +174,28 @@ export const beta4 = (config: any) => {
     return newConfig;
   }
 };
+
+export const rc2_1 = config => {
+  if (!versionCanDo(APP_VERSION_RC_2_1, config.version)) {
+    return config;
+  }
+  if (
+    !isEmptyArray(config?.jsonConfig?.props) &&
+    config?.jsonConfig?.props?.find(p => p.key === 'themeGroup')
+  ) {
+    return config;
+  }
+  config?.jsonConfig?.props.push({ ...boardThemeTemplate });
+  config.version = APP_VERSION_RC_2_1;
+  return config;
+};
+
 export const migrateBoardConfig = (boardConfig: string) => {
   let config = parseBoardConfig(boardConfig);
   config = beta0(config);
   config = beta2(config);
   config = beta4(config);
+  config = rc2_1(config);
   config = setLatestVersion(config);
   return config as BoardConfig;
 };

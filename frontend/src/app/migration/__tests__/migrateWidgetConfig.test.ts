@@ -18,7 +18,7 @@
 
 import { initWidgetThemeTpl } from 'app/pages/DashBoardPage/components/WidgetManager/utils/init';
 import migrateWidgetConfig from '../BoardConfig/migrateWidgetConfig';
-import { APP_VERSION_RC_1, APP_VERSION_RC_2_1 } from '../constants';
+import { APP_CURRENT_VERSION, APP_VERSION_RC_1, APP_VERSION_RC_2_1 } from '../constants';
 
 describe('Widget Config Migration Tests', () => {
   describe('RC.1 Custom Tab Config', () => {
@@ -192,7 +192,7 @@ describe('Widget Config Migration Tests', () => {
         },
       ];
       const result = migrateWidgetConfig(inputWidget as any[]);
-      expect((result?.[0] as any)?.version).toEqual(APP_VERSION_RC_1);
+      expect((result?.[0] as any)?.version).toEqual(APP_CURRENT_VERSION);
       expect(result?.[0]?.config?.customConfig?.props?.length).toBe(2);
       expect(result?.[0]?.config?.customConfig?.props?.[0]).toEqual({
         label: 'tab.tabGroup',

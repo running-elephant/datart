@@ -18,6 +18,19 @@
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import { BoardConfig } from '../types/boardTypes';
 
+export const boardThemeTemplate = {
+  label: 'viz.palette.style.theme.title',
+  key: 'themeGroup',
+  comType: 'group',
+  rows: [
+    {
+      label: 'viz.palette.style.theme.title',
+      key: 'theme',
+      comType: 'themeSelector',
+    },
+  ],
+};
+
 export const initAutoBoardConfig = () => {
   const config: BoardConfig = {
     type: 'auto',
@@ -138,18 +151,7 @@ export const initAutoBoardConfig = () => {
             },
           ],
         },
-        {
-          label: 'viz.palette.style.theme.title',
-          key: 'themeGroup',
-          comType: 'group',
-          rows: [
-            {
-              label: 'viz.palette.style.theme.title',
-              key: 'theme',
-              comType: 'themeSelector',
-            },
-          ],
-        },
+        { ...boardThemeTemplate },
       ],
       i18ns: [
         {
