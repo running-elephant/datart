@@ -30,10 +30,12 @@ import {
   initLoopFetchTpl,
   initPaddingTpl,
   initTitleTpl,
+  initWidgetThemeTpl,
   InteractionI18N,
   LoopFetchI18N,
   PaddingI18N,
   TitleI18N,
+  WidgetThemeI18N,
   widgetTpl,
 } from '../../WidgetManager/utils/init';
 
@@ -73,6 +75,7 @@ export const getMeta = (opt: {
           padding: PaddingI18N.zh,
           loopFetch: LoopFetchI18N.zh,
           border: { borderGroup: '边框' },
+          theme: WidgetThemeI18N.zh,
         },
       },
       {
@@ -87,6 +90,7 @@ export const getMeta = (opt: {
           padding: PaddingI18N.en,
           loopFetch: LoopFetchI18N.en,
           border: { borderGroup: 'Border' },
+          theme: WidgetThemeI18N.en,
         },
       },
     ],
@@ -110,6 +114,7 @@ export const dataChartCreator = (opt: WidgetCreateProps) => {
     { ...initPaddingTpl() },
     { ...initBackgroundTpl(opt.boardType === 'auto' ? WHITE : '') },
     { ...initBorderTpl() },
+    { ...initWidgetThemeTpl() },
   ];
   widget.config.customConfig.props.forEach(ele => {
     if (ele.key === 'titleGroup') {

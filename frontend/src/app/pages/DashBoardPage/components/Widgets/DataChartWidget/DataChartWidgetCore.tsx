@@ -47,6 +47,7 @@ import {
 import {
   getRuntimeComputedFields,
   getRuntimeDateLevelFields,
+  getStyles,
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
@@ -518,6 +519,13 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const config = useMemo(() => {
     if (!chart?.config) return undefined;
     if (!dataChart?.config) return undefined;
+
+    const [enableChartTheme] = getStyles(
+      widgetRef?.current?.config?.customConfig?.props || [],
+      ['themeGroup'],
+      ['enableChartTheme'],
+    );
+
     let chartConfig = produce(chart.config, draft => {
       mergeToChartConfig(
         draft,
@@ -529,7 +537,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         const themeConfig = draft.styles
           ?.find(s => s.key === 'themeGroup')
           ?.rows?.find(s => s.key === 'theme');
-        if (themeConfig) {
+        if (themeConfig && !enableChartTheme) {
           themeConfig.value = themeKey;
         }
       }

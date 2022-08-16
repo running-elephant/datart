@@ -317,6 +317,7 @@ export const TitleI18N = {
     },
   },
 };
+
 export const initPaddingTpl = () => {
   const paddingTpl: ChartStyleConfig = {
     label: 'padding.paddingGroup',
@@ -368,6 +369,7 @@ export const PaddingI18N = {
     right: 'Right',
   },
 };
+
 export const initLoopFetchTpl = () => {
   const loopFetchTpl: ChartStyleConfig = {
     label: 'loopFetch.loopFetchGroup',
@@ -403,6 +405,7 @@ export const LoopFetchI18N = {
     interval: 'Interval (s)',
   },
 };
+
 export const ImmediateQueryI18N = {
   zh: {
     immediateQueryGroup: '立即查询',
@@ -413,6 +416,7 @@ export const ImmediateQueryI18N = {
     enable: 'Enable',
   },
 };
+
 export const initBackgroundTpl = (color?: string) => {
   const backgroundTpl: ChartStyleConfig = {
     label: 'background.backgroundGroup',
@@ -434,6 +438,7 @@ export const initBackgroundTpl = (color?: string) => {
   };
   return backgroundTpl;
 };
+
 export const initBorderTpl = () => {
   const borderTpl: ChartStyleConfig = {
     label: 'border.borderGroup',
@@ -454,6 +459,34 @@ export const initBorderTpl = () => {
     ],
   };
   return borderTpl;
+};
+
+export const initWidgetThemeTpl = () => {
+  const borderTpl: ChartStyleConfig = {
+    label: 'theme.title',
+    key: 'themeGroup',
+    comType: 'group',
+    rows: [
+      {
+        label: 'theme.enableChartTheme',
+        key: 'enableChartTheme',
+        value: false,
+        comType: 'checkbox',
+      },
+    ],
+  };
+  return borderTpl;
+};
+
+export const WidgetThemeI18N = {
+  zh: {
+    title: '主题',
+    enableChartTheme: '启用图表主题',
+  },
+  en: {
+    title: 'Theme',
+    enableChartTheme: 'Enable Chart Theme',
+  },
 };
 
 // TODO(Stephen): set width/height same as free widget?
