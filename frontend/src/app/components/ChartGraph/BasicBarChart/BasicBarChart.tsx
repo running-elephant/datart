@@ -19,6 +19,7 @@
 import { ChartDataSectionType } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
+import ChartThemeManager from 'app/models/ChartThemeManager';
 import { IChartLifecycle } from 'app/types/Chart';
 import {
   ChartConfig,
@@ -63,6 +64,7 @@ class BasicBarChart extends Chart implements IChartLifecycle {
   config = Config;
   chart: any = null;
   selectionManager?: ChartSelectionManager;
+  themeManager = new ChartThemeManager();
 
   protected isHorizonDisplay = false;
   protected isStackMode = false;
@@ -102,10 +104,14 @@ class BasicBarChart extends Chart implements IChartLifecycle {
     ) {
       return;
     }
+    this.onMountImpl(options, context);
+  }
 
+  private onMountImpl(options, context) {
+    const theme = this.themeManager.getThemeByConfig(options?.config?.styles);
     this.chart = init(
       context.document.getElementById(options.containerId)!,
-      'default',
+      theme,
     );
 
     this.selectionManager = new ChartSelectionManager(this.mouseEvents);
@@ -130,6 +136,11 @@ class BasicBarChart extends Chart implements IChartLifecycle {
     if (!this.isMatchRequirement(options.config)) {
       this.chart?.clear();
       return;
+    }
+
+    if (this.themeManager.isThemeChanged(options?.config?.styles)) {
+      this.chart?.dispose();
+      this.onMountImpl(options, context);
     }
 
     this.selectionManager?.updateSelectedItems(options?.selectedItems);

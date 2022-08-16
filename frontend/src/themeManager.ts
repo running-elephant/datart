@@ -143,5 +143,7 @@ export function getThemes() {
 }
 
 export function registerEChartThemes() {
-  themes.every(t => registerTheme(t.key, t.theme));
+  themes.forEach(t => {
+    registerTheme(t.key, t.theme);
+  });
 }
