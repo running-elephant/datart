@@ -25,6 +25,7 @@ export interface BoardConfigValue {
   boardType: BoardType;
   initialQuery: boolean;
   background: BackgroundConfig;
+  themeKey?: string;
   // free
   width: number;
   height: number;
@@ -63,6 +64,7 @@ export const BoardConfigProvider: FC<{
     ['space'],
     ['paddingTB', 'paddingLR', 'marginTB', 'marginLR'],
   );
+  const [themeKey] = getJsonConfigs(props, ['themeGroup'], ['theme']);
   const configVal: BoardConfigValue = {
     boardType: config.type,
     initialQuery,
@@ -75,6 +77,7 @@ export const BoardConfigProvider: FC<{
     padding: [paddingLR, paddingTB],
     mMargin: [mMarginLR, mMarginTB],
     mPadding: [mPaddingLR, mPaddingTB],
+    themeKey,
   };
   return (
     <BoardConfigContext.Provider value={config}>

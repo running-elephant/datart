@@ -69,6 +69,7 @@ import {
   boardDrillManager,
   EDIT_PREFIX,
 } from '../../BoardDrillManager/BoardDrillManager';
+import { BoardConfigValContext } from '../../BoardProvider/BoardConfigProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { BoardScaleContext } from '../../FreeBoardBackground';
 import { WidgetChartContext } from '../../WidgetProvider/WidgetChartProvider';
@@ -80,6 +81,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const { dataChart, availableSourceFunctions, chartDataView } =
     useContext(WidgetChartContext);
   const dispatch = useDispatch();
+  const { themeKey } = useContext(BoardConfigValContext);
   const scale = useContext(BoardScaleContext);
   const { data: dataset } = useContext(WidgetDataContext);
   const { renderMode, orgId, queryVariables } = useContext(BoardContext);
@@ -523,9 +525,17 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
           migrateChartConfig(draft as ChartDetailConfigDTO);
         }) as ChartDetailConfigDTO,
       );
+      if (themeKey) {
+        const themeConfig = draft.styles
+          ?.find(s => s.key === 'themeGroup')
+          ?.rows?.find(s => s.key === 'theme');
+        if (themeConfig) {
+          themeConfig.value = themeKey;
+        }
+      }
     });
     return chartConfig as ChartConfig;
-  }, [chart?.config, dataChart?.config]);
+  }, [chart?.config, dataChart?.config, themeKey]);
 
   useEffect(() => {
     let drillOption = getChartDrillOption(
