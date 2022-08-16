@@ -18,6 +18,7 @@
 
 import { ChartDataSectionType, ChartInteractionEvent } from 'app/constants';
 import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
+import ChartThemeManager from 'app/models/ChartThemeManager';
 import ReactChart from 'app/models/ReactChart';
 import { ChartMouseEventParams, ChartsEventData } from 'app/types/Chart';
 import {
@@ -48,6 +49,7 @@ class Scorecard extends ReactChart {
   protected isAutoMerge = false;
   useIFrame = false;
   selectionManager?: ChartSelectionManager;
+  themeManager = new ChartThemeManager();
 
   constructor(props?) {
     super(ScorecardAdapter, {
@@ -67,13 +69,12 @@ class Scorecard extends ReactChart {
     if (options.containerId === undefined || !context.document) {
       return;
     }
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
     this.adapter?.mounted(
       context.document.getElementById(options.containerId),
       options,
       context,
     );
-
-    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
   }
 
   onUpdated(options: BrokerOption, context: BrokerContext) {

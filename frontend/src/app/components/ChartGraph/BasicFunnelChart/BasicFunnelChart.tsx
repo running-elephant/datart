@@ -84,7 +84,9 @@ class BasicFunnelChart extends Chart {
   }
 
   private onMountImpl(options, context) {
-    const theme = this.themeManager.getThemeByConfig(options?.config?.styles);
+    const theme = this.themeManager.getThemeKeyByConfig(
+      options?.config?.styles,
+    );
     this.chart = init(
       context.document.getElementById(options.containerId)!,
       theme,

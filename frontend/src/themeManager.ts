@@ -142,6 +142,10 @@ export function getThemes() {
   return themes;
 }
 
+export function getThemeByKey(key: string) {
+  return themes?.find(t => t.key === key)?.theme;
+}
+
 export function registerEChartThemes() {
   themes.forEach(t => {
     registerTheme(t.key, t.theme);

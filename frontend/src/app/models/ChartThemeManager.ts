@@ -18,6 +18,7 @@
 
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import { getStyles } from 'app/utils/chartHelper';
+import { getThemeByKey } from 'themeManager';
 
 export class ChartThemeManager {
   private themeKey?: string;
@@ -26,9 +27,14 @@ export class ChartThemeManager {
     return this.themeKey !== this.getChartThemeKey(styles || []);
   }
 
-  public getThemeByConfig(styles?: ChartStyleConfig[]) {
+  public getThemeKeyByConfig(styles?: ChartStyleConfig[]) {
     this.themeKey = this.getChartThemeKey(styles || []);
     return this.themeKey;
+  }
+
+  public getThemeByConfig(styles?: ChartStyleConfig[]) {
+    this.themeKey = this.getChartThemeKey(styles || []);
+    return getThemeByKey(this.themeKey || 'default');
   }
 
   private getChartThemeKey(styles: ChartStyleConfig[]) {
