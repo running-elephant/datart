@@ -20,6 +20,7 @@ import { ChartDataSectionType } from 'app/constants';
 import Chart from 'app/models/Chart';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
+import ChartThemeManager from 'app/models/ChartThemeManager';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -54,6 +55,7 @@ class BasicPieChart extends Chart {
   config = Config;
   chart: any = null;
   selectionManager?: ChartSelectionManager;
+  themeManager = new ChartThemeManager();
 
   protected isCircle = false;
   protected isRose = false;
@@ -77,10 +79,14 @@ class BasicPieChart extends Chart {
     ) {
       return;
     }
+    this.onMountImpl(options, context);
+  }
 
+  private onMountImpl(options, context) {
+    const theme = this.themeManager.getThemeByConfig(options?.config?.styles);
     this.chart = init(
       context.document.getElementById(options.containerId)!,
-      'default',
+      theme,
     );
     this.selectionManager = new ChartSelectionManager(this.mouseEvents);
     this.selectionManager.attachWindowListeners(context.window);
@@ -96,6 +102,11 @@ class BasicPieChart extends Chart {
       this.chart?.clear();
       return;
     }
+    if (this.themeManager.isThemeChanged(options?.config?.styles)) {
+      this.chart?.dispose();
+      this.onMountImpl(options, context);
+    }
+
     this.selectionManager?.updateSelectedItems(options?.selectedItems);
     const newOptions = this.getOptions(
       options.dataset,
