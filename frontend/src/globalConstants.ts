@@ -26,6 +26,7 @@ export const RUNTIME_FILTER_KEY = Symbol('@filters@');
 export const BOARD_COPY_CHART_SUFFIX = '_copy';
 export const BOARD_SELF_CHART_PREFIX = 'widget_';
 export const TABLE_DATA_INDEX = '@datartTableIndex@';
+export const DATE_LEVEL_DELIMITER = '@date_level_delimiter@';
 
 export enum StorageKeys {
   AuthorizationToken = 'AUTHORIZATION_TOKEN',

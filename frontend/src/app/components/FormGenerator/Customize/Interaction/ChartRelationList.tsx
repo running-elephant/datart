@@ -19,6 +19,7 @@
 import { Button, Radio, Select, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import useMount from 'app/hooks/useMount';
+import { handleDateLevelsName } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/utils';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import {
@@ -76,28 +77,38 @@ const ChartRelationList: FC<
     );
   };
 
-  const handleDeleteRelation = index => {
-    if (index > -1) {
+  const handleDeleteRelation = id => {
+    if (id) {
       const newRelations = updateBy(relations, draft => {
-        draft?.splice(index, 1);
+        const index = draft!.findIndex(v => v.id === id);
+        if (index > -1) {
+          draft?.splice(index, 1);
+        }
       });
       onRelationChange(newRelations);
     }
   };
 
-  const handleRelationChange = (index, key, value) => {
-    if (index > -1) {
+  const handleRelationChange = (id, key, value) => {
+    if (id) {
       const newRelations = updateBy(relations, draft => {
-        draft![index][key] = value;
+        const config = draft!.find(v => v.id === id);
+        config && (config[key] = value);
       });
       onRelationChange(newRelations);
     }
   };
 
-  const handleRelationTypeChange = (index, value) => {
-    if (index > -1) {
+  const handleRelationTypeChange = (id, value) => {
+    if (id) {
       const newRelations = updateBy(relations, draft => {
-        draft![index] = { id: uuidv4(), type: value };
+        const index = draft!.findIndex(v => v.id === id);
+        if (index > -1) {
+          draft![index] = {
+            id: uuidv4(),
+            type: value,
+          };
+        }
       });
       onRelationChange(newRelations);
     }
@@ -112,12 +123,12 @@ const ChartRelationList: FC<
       title: t('drillThrough.rule.relation.type'),
       dataIndex: 'type',
       key: 'type',
-      render: (value, _, index) => (
+      render: (value, record) => (
         <Radio.Group
           size="small"
           style={{ width: '100px' }}
           value={value}
-          onChange={e => handleRelationTypeChange(index, e.target.value)}
+          onChange={e => handleRelationTypeChange(record.id, e.target.value)}
         >
           <Radio value={InteractionRelationType.Field}>
             {t('drillThrough.rule.relation.field')}
@@ -132,15 +143,19 @@ const ChartRelationList: FC<
       title: t('drillThrough.rule.relation.source'),
       dataIndex: 'source',
       key: 'source',
-      render: (value, record, index) => (
+      render: (value, record) => (
         <Select
           style={{ width: '150px' }}
           value={value}
-          onChange={value => handleRelationChange(index, 'source', value)}
+          onChange={value => handleRelationChange(record.id, 'source', value)}
           dropdownMatchSelectWidth={false}
         >
           {(isFieldType(record) ? sourceFields : sourceVariables)?.map(sf => {
-            return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;
+            return (
+              <Select.Option value={sf?.name}>
+                {handleDateLevelsName(sf)}
+              </Select.Option>
+            );
           })}
         </Select>
       ),
@@ -149,15 +164,19 @@ const ChartRelationList: FC<
       title: t('drillThrough.rule.relation.target'),
       dataIndex: 'target',
       key: 'target',
-      render: (value, record, index) => (
+      render: (value, record) => (
         <Select
           style={{ width: '150px' }}
           value={value}
-          onChange={value => handleRelationChange(index, 'target', value)}
+          onChange={value => handleRelationChange(record.id, 'target', value)}
           dropdownMatchSelectWidth={false}
         >
           {(isFieldType(record) ? targetFields : targetVariables)?.map(sf => {
-            return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;
+            return (
+              <Select.Option value={sf?.name}>
+                {handleDateLevelsName(sf)}
+              </Select.Option>
+            );
           })}
         </Select>
       ),
@@ -165,8 +184,8 @@ const ChartRelationList: FC<
     {
       key: 'operation',
       width: 50,
-      render: (_1, _2, index) => (
-        <Button type="link" onClick={() => handleDeleteRelation(index)}>
+      render: (_, record) => (
+        <Button type="link" onClick={() => handleDeleteRelation(record.id)}>
           {t('drillThrough.rule.operation.delete')}
         </Button>
       ),
