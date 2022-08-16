@@ -21,7 +21,7 @@ import { DataViewFieldType } from 'app/constants';
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import { FONT_WEIGHT_MEDIUM, SPACE_UNIT } from 'styles/StyleConstants';
 import { Nullable } from 'types';
-import { CloneValueDeep, isEmptyArray, isEqualObject } from 'utils/object';
+import { isEmptyArray, isEqualObject } from 'utils/object';
 import { getDiffParams, getTextWidth } from 'utils/utils';
 import {
   ColumnCategories,
@@ -32,6 +32,7 @@ import {
 import {
   Column,
   ColumnRole,
+  ColumnsModel,
   ColumnsProps,
   DatabaseSchema,
   HierarchyModel,
@@ -415,7 +416,6 @@ export const diffMergeHierarchyModel = (
     }
     return acc;
   }, additionalObjs);
-
   newHierarchy = addPathToHierarchyStructureAndChangeName(
     newHierarchy,
     viewType,
@@ -425,34 +425,41 @@ export const diffMergeHierarchyModel = (
 };
 
 export function addPathToHierarchyStructureAndChangeName(
-  Hierarchy: Model,
+  hierarchy: ColumnsModel,
   viewType: ViewType,
 ): Model {
-  const _hierarchy = CloneValueDeep(Hierarchy);
-  Object.entries(_hierarchy || {}).forEach(
-    ([name, column]: [string, Column]) => {
-      if (column.children) {
-        column.children.forEach((children, i) => {
-          if (!children['path']) {
-            column.children![i]['path'] =
-              viewType === 'STRUCT'
-                ? JSON.parse(children.name)
-                : [children.name];
+  if (!hierarchy) {
+    return hierarchy;
+  }
+  const _hierarchy = Object.keys(hierarchy).reduce((acc, name) => {
+    acc[name] = hierarchy[name];
+    if (acc[name].children) {
+      acc[name].children.forEach((children, i) => {
+        if (!children['path']) {
+          acc[name].children![i]['path'] = Array.isArray(children.name)
+            ? children.name
+            : viewType === 'STRUCT'
+            ? children.name && JSON.parse(children.name)
+            : [children.name];
 
-            column.children![i]['name'] =
-              viewType === 'STRUCT'
-                ? JSON.parse(children.name).join('.')
-                : children.name;
-          }
-        });
-      } else if (!column['path']) {
-        column['path'] =
-          viewType === 'STRUCT' ? JSON.parse(column.name) : [name];
+          acc[name].children![i]['name'] =
+            viewType === 'STRUCT'
+              ? children.name && JSON.parse(children.name).join('.')
+              : children.name;
+        }
+      });
+    } else if (!acc[name]['path']) {
+      acc[name]['path'] = Array.isArray(acc[name]['name'])
+        ? acc[name]['name']
+        : viewType === 'STRUCT'
+        ? acc[name]['name'] && JSON.parse(acc[name]['name'])
+        : [name];
 
-        column['name'] = name;
-      }
-    },
-  );
+      acc[name]['name'] = name;
+    }
+    return acc;
+  }, {});
+
   return _hierarchy;
 }
 
