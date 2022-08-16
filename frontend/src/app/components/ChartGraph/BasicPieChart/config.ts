@@ -211,6 +211,7 @@ const config: ChartConfig = {
         {
           label: 'viz.palette.style.theme.title',
           key: 'theme',
+          default: 'default',
           comType: 'themeSelector',
         },
       ],
