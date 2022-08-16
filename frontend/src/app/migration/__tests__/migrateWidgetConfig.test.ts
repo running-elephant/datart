@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
+import { initWidgetThemeTpl } from 'app/pages/DashBoardPage/components/WidgetManager/utils/init';
 import migrateWidgetConfig from '../BoardConfig/migrateWidgetConfig';
-import { APP_VERSION_RC_1 } from '../constants';
+import { APP_VERSION_RC_1, APP_VERSION_RC_2_1 } from '../constants';
 
 describe('Widget Config Migration Tests', () => {
   describe('RC.1 Custom Tab Config', () => {
@@ -240,6 +241,64 @@ describe('Widget Config Migration Tests', () => {
       expect(result?.[1]?.config?.customConfig?.props?.[0]?.rows).toEqual([
         oldTabConfig,
       ]);
+    });
+  });
+
+  describe('RC.2 Theme Config', () => {
+    test('should migrate linkedChart widget when custom props has no theme group', () => {
+      const widgetThemeConfig = { ...initWidgetThemeTpl() };
+      const inputWidget = [
+        {
+          config: {
+            name: 'linked-chart',
+            originalType: 'linkedChart',
+            customConfig: {
+              props: [
+                {
+                  label: 'tab.tabGroup',
+                  key: 'tabGroup',
+                  comType: 'group',
+                  rows: [],
+                },
+              ],
+            },
+          },
+        },
+      ];
+      const result = migrateWidgetConfig(inputWidget as any[]);
+      expect((result?.[0] as any)?.version).toEqual(APP_VERSION_RC_2_1);
+      expect(result?.[0]?.config?.customConfig?.props?.length).toBe(2);
+      expect(result?.[0]?.config?.customConfig?.props?.[1]).toEqual(
+        widgetThemeConfig,
+      );
+    });
+
+    test('should migrate ownedChart widget when custom props has no theme group', () => {
+      const widgetThemeConfig = { ...initWidgetThemeTpl() };
+      const inputWidget = [
+        {
+          config: {
+            name: 'linked-chart',
+            originalType: 'ownedChart',
+            customConfig: {
+              props: [
+                {
+                  label: 'tab.tabGroup',
+                  key: 'tabGroup',
+                  comType: 'group',
+                  rows: [],
+                },
+              ],
+            },
+          },
+        },
+      ];
+      const result = migrateWidgetConfig(inputWidget as any[]);
+      expect((result?.[0] as any)?.version).toEqual(APP_VERSION_RC_2_1);
+      expect(result?.[0]?.config?.customConfig?.props?.length).toBe(2);
+      expect(result?.[0]?.config?.customConfig?.props?.[1]).toEqual(
+        widgetThemeConfig,
+      );
     });
   });
 });

@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
+import { initWidgetThemeTpl } from 'app/pages/DashBoardPage/components/WidgetManager/utils/init';
 import { initTabsTpl } from 'app/pages/DashBoardPage/components/Widgets/TabWidget/tabConfig';
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { isEmptyArray } from 'utils/object';
-import { APP_VERSION_RC_1 } from '../constants';
+import { APP_VERSION_RC_1, APP_VERSION_RC_2_1 } from '../constants';
 import MigrationEvent from '../MigrationEvent';
 import MigrationEventDispatcher from '../MigrationEventDispatcher';
 
@@ -48,6 +49,31 @@ export const RC1 = (widget?: Widget | any) => {
   }
 };
 
+export const rc2_1 = (widget?: Widget | any) => {
+  if (!widget) {
+    return widget;
+  }
+  if (
+    ![ORIGINAL_TYPE_MAP.linkedChart, ORIGINAL_TYPE_MAP.ownedChart].includes(
+      widget?.config?.originalType,
+    )
+  ) {
+    return widget;
+  }
+  try {
+    if (
+      !isEmptyArray(widget?.config?.customConfig?.props) &&
+      !widget?.config?.customConfig?.props?.find(p => p.key === 'themeGroup')
+    ) {
+      widget.config.customConfig.props.push({ ...initWidgetThemeTpl() });
+      return widget;
+    }
+  } catch (error) {
+    console.error('Migration Widget Config Errors | RC.2+1 | ', error);
+    return widget;
+  }
+};
+
 const migrateWidgetConfig = (widgets: Widget[]): Widget[] => {
   if (!Array.isArray(widgets)) {
     return [];
@@ -55,7 +81,8 @@ const migrateWidgetConfig = (widgets: Widget[]): Widget[] => {
   return widgets
     .map(widget => {
       const event_rc_1 = new MigrationEvent(APP_VERSION_RC_1, RC1);
-      const dispatcher = new MigrationEventDispatcher(event_rc_1);
+      const event_rc_2_1 = new MigrationEvent(APP_VERSION_RC_2_1, rc2_1);
+      const dispatcher = new MigrationEventDispatcher(event_rc_1, event_rc_2_1);
       return dispatcher.process(widget as any);
     })
     .filter(Boolean) as Widget[];
