@@ -449,7 +449,9 @@ export const widgetChartClickAction =
     const { boardId, editing, renderMode, widget, params, history } = obj;
     //is tableChart
     tablePagingAndSortEventListener(params, p => {
-      tableChartClickAction(boardId, editing, renderMode, widget, params);
+      dispatch(
+        tableChartClickAction(boardId, editing, renderMode, widget, params),
+      );
     });
     // jump
     const jumpConfig = widget.config?.jumpConfig;
