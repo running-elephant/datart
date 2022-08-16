@@ -19,6 +19,7 @@
 import { ChartDataSectionType } from 'app/constants';
 import Chart from 'app/models/Chart';
 import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
+import ChartThemeManager from 'app/models/ChartThemeManager';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -45,6 +46,7 @@ class WordCloudChart extends Chart {
   config = Config;
   dependency = [];
   selectionManager?: ChartSelectionManager;
+  themeManager = new ChartThemeManager();
 
   constructor(props?) {
     super(
@@ -64,10 +66,14 @@ class WordCloudChart extends Chart {
     if (options.containerId === undefined || !context.document) {
       return;
     }
+    this.onMountImpl(options, context);
+  }
 
+  private onMountImpl(options, context) {
+    const theme = this.themeManager.getThemeByConfig(options?.config?.styles);
     this.chart = init(
       context.document.getElementById(options.containerId)!,
-      'default',
+      theme,
     );
     this.selectionManager = new ChartSelectionManager(this.mouseEvents);
     this.selectionManager.attachWindowListeners(context.window);
@@ -83,6 +89,11 @@ class WordCloudChart extends Chart {
       this.chart?.clear();
       return;
     }
+    if (this.themeManager.isThemeChanged(options?.config?.styles)) {
+      this.chart?.dispose();
+      this.onMountImpl(options, context);
+    }
+
     this.selectionManager?.updateSelectedItems(options?.selectedItems);
     const newOptions = this.getOptions(
       options.dataset,
