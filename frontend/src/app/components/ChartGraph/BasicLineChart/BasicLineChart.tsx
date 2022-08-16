@@ -143,7 +143,10 @@ class BasicLineChart extends Chart {
       options.drillOption,
       options.selectedItems,
     );
-    this.chart?.setOption(Object.assign({}, newOptions), true);
+    this.chart?.setOption(
+      Object.assign({}, newOptions, { backgroundColor: 'transparent' }),
+      true,
+    );
   }
 
   onResize(options: BrokerOption, context: BrokerContext) {

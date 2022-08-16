@@ -152,7 +152,10 @@ class BasicBarChart extends Chart implements IChartLifecycle {
       options.drillOption,
       options.selectedItems,
     );
-    this.chart?.setOption(Object.assign({}, newOptions), true);
+    this.chart?.setOption(
+      Object.assign({}, newOptions, { backgroundColor: 'transparent' }),
+      true,
+    );
   }
 
   onUnMount(options: BrokerOption, context: BrokerContext) {

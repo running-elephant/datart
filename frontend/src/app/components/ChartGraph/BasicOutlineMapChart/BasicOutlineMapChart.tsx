@@ -139,7 +139,10 @@ class BasicOutlineMapChart extends Chart {
       options.selectedItems,
       context,
     );
-    this.chart?.setOption(Object.assign({}, newOptions), true);
+    this.chart?.setOption(
+      Object.assign({}, newOptions, { backgroundColor: 'transparent' }),
+      true,
+    );
   }
 
   onResize(options: BrokerOption, context: BrokerContext) {

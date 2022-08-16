@@ -118,7 +118,10 @@ class BasicFunnelChart extends Chart {
       options.drillOption,
       options.selectedItems,
     );
-    this.chart?.setOption(Object.assign({}, newOptions), true);
+    this.chart?.setOption(
+      Object.assign({}, newOptions, { backgroundColor: 'transparent' }),
+      true,
+    );
   }
 
   onUnMount(options: BrokerOption, context: BrokerContext) {

@@ -92,7 +92,10 @@ class BasicGaugeChart extends Chart {
       return;
     }
     const newOptions = this.getOptions(options.dataset, options.config);
-    this.chart?.setOption(Object.assign({}, newOptions), true);
+    this.chart?.setOption(
+      Object.assign({}, newOptions, { backgroundColor: 'transparent' }),
+      true,
+    );
   }
 
   onUnMount(options: BrokerOption, context: BrokerContext): void {

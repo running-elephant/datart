@@ -111,7 +111,10 @@ class BasicDoubleYChart extends Chart {
       options.config,
       options.selectedItems,
     );
-    this.chart?.setOption(Object.assign({}, newOptions), true);
+    this.chart?.setOption(
+      Object.assign({}, newOptions, { backgroundColor: 'transparent' }),
+      true,
+    );
   }
 
   onUnMount(options: BrokerOption, context: BrokerContext) {
