@@ -242,11 +242,17 @@
         },
         "sidebar": {
           "index": {
+            "addFolder": "Add Folder",
+            "addSuccess": "Add Success",
             "scheduledTaskList": "Scheduled task list",
             "newTimedTask": "Create scheduled task",
             "recycle": "Recycle"
           },
           "scheduleList": {
+            "parent": "Parent",
+            "success": "Success",
+            "delete": "Delete",
+            "moveToTrash": "Move to recycle bin",
             "successStarted": "Successfully started",
             "successStop": "Stopped successfully",
             "successImmediately": "Executed successfully immediately",
@@ -265,7 +271,6 @@
               "moveToTrash": "Move to recycle bin",
               "delete": "Delete",
               "newTimedTask": "New scheduled task",
-              "sureToRestore": "Are you sure to restore?",
               "restore": "Restore",
               "sureToDelete": "Confirm delete?",
               "allowModificationAfterStopping": "Allow modification after stopping",
@@ -275,7 +280,8 @@
               "basicSettings": "Basic settings",
               "emailSetting": "Email settings",
               "enterpriseWeChatSettings": "Enterprise WeChat Settings",
-              "sendContentSettings": "Send content settings"
+              "sendContentSettings": "Send content settings",
+              "parent": "Parent"
             },
             "weChartSetttingForm": {
               "RobotWebhookAddress": "Robot webhook address",
