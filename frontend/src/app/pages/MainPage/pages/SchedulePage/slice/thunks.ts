@@ -64,18 +64,18 @@ export const getScheduleDetails = createAsyncThunk<ScheduleSimple, string>(
   },
 );
 
-export const addSchedule = createAsyncThunk<Schedule, ScheduleParamsResolve>(
-  'schedule/addSchedule',
-  async ({ params, resolve }) => {
-    const { data } = await request2<Schedule>({
-      url: '/schedules',
-      method: 'POST',
-      data: params,
-    });
-    typeof resolve === 'function' && resolve(data?.id);
-    return data;
-  },
-);
+export const addSchedule = createAsyncThunk<
+  ScheduleSimple,
+  ScheduleParamsResolve
+>('schedule/addSchedule', async ({ params, resolve }) => {
+  const { data } = await request2<ScheduleSimple>({
+    url: '/schedules',
+    method: 'POST',
+    data: params,
+  });
+  typeof resolve === 'function' && resolve(data?.id);
+  return data;
+});
 
 export const editSchedule = createAsyncThunk<
   Schedule[],
@@ -132,7 +132,7 @@ export const updateScheduleBase = createAsyncThunk<
   ScheduleBase,
   UpdateScheduleBaseParams
 >('schedule/updateScheduleBase', async ({ schedule, resolve }) => {
-  await request2<boolean>({
+  await request2<ScheduleBase>({
     url: `/schedules/${schedule.id}/base`,
     method: 'PUT',
     data: schedule,

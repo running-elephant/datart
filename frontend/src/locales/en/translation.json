@@ -1486,6 +1486,14 @@
       "duplicateName": "Duplicate Name"
     }
   },
+  "schedule": {
+    "saveForm": {
+      "name": "Name",
+      "folder": "Folder",
+      "root": "Root",
+      "title": "Schedule"
+    }
+  },
   "member": {
     "memberDetail": {
       "titleAdd": "Add Member",

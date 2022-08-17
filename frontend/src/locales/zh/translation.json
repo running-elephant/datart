@@ -1485,6 +1485,14 @@
       "duplicateName": "名称重复"
     }
   },
+  "schedule": {
+    "saveForm": {
+      "name": "名称",
+      "folder": "目录",
+      "root": "根目录",
+      "title": "定时任务"
+    }
+  },
   "member": {
     "memberDetail": {
       "titleAdd": "新建成员",

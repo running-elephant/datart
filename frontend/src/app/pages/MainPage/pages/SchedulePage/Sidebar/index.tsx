@@ -28,7 +28,7 @@ import {
   selectArchived,
   selectSchedules,
 } from '../slice/selectors';
-import { addSchedule, getSchedules } from '../slice/thunks';
+import { addSchedule } from '../slice/thunks';
 import { ScheduleSimpleViewModel } from '../slice/types';
 import { Recycle } from './Recycle';
 import { ScheduleList } from './ScheduleList';
@@ -100,6 +100,7 @@ export const Sidebar = memo(
             break;
           case 'folder':
             showSaveForm({
+              scheduleType: 'folder',
               type: CommonFormTypes.Add,
               visible: true,
               simple: false,
@@ -118,7 +119,6 @@ export const Sidebar = memo(
                     resolve: () => {
                       onClose();
                       message.success(t('index.addSuccess'));
-                      dispatch(getSchedules(orgId));
                     },
                   }),
                 );
