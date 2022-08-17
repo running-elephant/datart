@@ -16,19 +16,21 @@
  * limitations under the License.
  */
 
-import { APP_VERSION_BETA_4 } from '../constants';
+import { APP_VERSION_RC_2 } from '../constants';
 import beginViewModelMigration from '../ViewConfig/migrationViewModelConfig';
 
 describe('migrationViewModelConfig Test', () => {
   test('should get latest version after migration', () => {
     const model = JSON.stringify({});
+    console.log('start');
     expect(beginViewModelMigration(model, 'SQL')).toEqual(
       JSON.stringify({
         hierarchy: {},
         columns: {},
-        version: APP_VERSION_BETA_4,
+        version: APP_VERSION_RC_2,
       }),
     );
+    console.log('end');
   });
 
   test('should get latest version even model is empty', () => {
@@ -45,7 +47,7 @@ describe('migrationViewModelConfig Test', () => {
     );
     expect(migrationResultObj.columns).toMatchObject(originalModel);
     expect(migrationResultObj.hierarchy).toMatchObject(originalModel);
-    expect(migrationResultObj.version).toEqual(APP_VERSION_BETA_4);
+    expect(migrationResultObj.version).toEqual(APP_VERSION_RC_2);
   });
 
   test('should migrate model name to columns', () => {
@@ -64,7 +66,7 @@ describe('migrationViewModelConfig Test', () => {
       column1: { name: 'column1', role: 'role', type: 'STRING' },
       column2: { name: 'column2', role: 'role', type: 'NUMBER' },
     });
-    expect(migrationResultObj.version).toEqual(APP_VERSION_BETA_4);
+    expect(migrationResultObj.version).toEqual(APP_VERSION_RC_2);
   });
 
   test('should migrate hierarchy name to path', () => {
@@ -90,7 +92,7 @@ describe('migrationViewModelConfig Test', () => {
       },
     });
 
-    expect(migrationResultObj.version).toEqual(APP_VERSION_BETA_4);
+    expect(migrationResultObj.version).toEqual(APP_VERSION_RC_2);
   });
   test('should migrate hierarchy name to path for STRUCT VIEW', () => {
     const originalModel = {
@@ -211,6 +213,63 @@ describe('migrationViewModelConfig Test', () => {
             type: 'NUMBER',
             name: 'dad.column2',
             path: ['dad', 'column2'],
+          },
+        ],
+      },
+    });
+  });
+
+  test('should migrate dateFormat to date Field', () => {
+    const originalModel = {
+      column1: { role: 'role', type: 'DATE' },
+      column2: { role: 'role', type: 'DATE', dateFormat: 'YYYY-MM-DD' },
+      file: {
+        name: 'file',
+        children: [
+          { role: 'role', type: 'DATE', name: 'column3' },
+          {
+            role: 'role',
+            type: 'DATE',
+            name: 'column4',
+            dateFormat: 'YYYY-MM-DD',
+          },
+        ],
+      },
+    };
+    const migrationResultObj = JSON.parse(
+      beginViewModelMigration(JSON.stringify(originalModel), 'SQL'),
+    );
+    expect(migrationResultObj.hierarchy).toEqual({
+      column1: {
+        name: 'column1',
+        path: ['column1'],
+        role: 'role',
+        type: 'DATE',
+        dateFormat: 'YYYY-MM-DD HH:mm:ss',
+      },
+      column2: {
+        name: 'column2',
+        path: ['column2'],
+        role: 'role',
+        type: 'DATE',
+        dateFormat: 'YYYY-MM-DD',
+      },
+      file: {
+        name: 'file',
+        children: [
+          {
+            role: 'role',
+            type: 'DATE',
+            name: 'column3',
+            path: ['column3'],
+            dateFormat: 'YYYY-MM-DD HH:mm:ss',
+          },
+          {
+            role: 'role',
+            type: 'DATE',
+            name: 'column4',
+            path: ['column4'],
+            dateFormat: 'YYYY-MM-DD',
           },
         ],
       },
