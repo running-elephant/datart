@@ -426,6 +426,11 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     }
 
     @Override
+    public boolean safeDelete(String id) {
+        return sourceMapper.checkReference(id) == 0;
+    }
+
+    @Override
     public void deleteStaticFiles(Source source) {
         fileService.deleteFiles(FileOwner.DATA_SOURCE, source.getId());
     }

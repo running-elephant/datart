@@ -38,4 +38,9 @@ public interface SourceMapperExt extends SourceMapper {
     })
     Organization getOrgById(@Param("sourceId") String sourceId);
 
+    @Select({
+            "SELECT COUNT(*) FROM `source` WHERE parent_id = #{sourceId} AND `status`!=0"
+    })
+    int checkReference(String sourceId);
+
 }
