@@ -307,9 +307,11 @@ export const PermissionForm = memo(
               />
             )}
             {viewpoint === Viewpoints.Subject &&
-              ![ResourceTypes.Viz, ResourceTypes.View].includes(
-                dataSourceType as ResourceTypes,
-              ) && (
+              ![
+                ResourceTypes.Viz,
+                ResourceTypes.View,
+                ResourceTypes.Schedule,
+              ].includes(dataSourceType as ResourceTypes) && (
                 <IndependentPermissionSetting
                   enabled={createEnabled}
                   label={`${t('add')}${t(

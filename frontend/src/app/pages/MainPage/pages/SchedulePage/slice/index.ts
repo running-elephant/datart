@@ -9,6 +9,7 @@ import {
   getScheduleErrorLogs,
   getSchedules,
   unarchiveSchedule,
+  updateScheduleBase,
 } from './thunks';
 import { ScheduleState } from './types';
 
@@ -24,6 +25,7 @@ export const initialState: ScheduleState = {
   deleteLoading: false,
   logs: [],
   logsLoading: false,
+  updateLoading: false,
 };
 
 const slice = createSlice({
@@ -49,7 +51,10 @@ const slice = createSlice({
     });
     builder.addCase(getSchedules.fulfilled, (state, action) => {
       state.scheduleListLoading = false;
-      state.schedules = action.payload;
+      state.schedules = action.payload.map(v => ({
+        ...v,
+        deleteLoading: false,
+      }));
     });
     builder.addCase(getSchedules.rejected, state => {
       state.scheduleListLoading = false;
@@ -60,7 +65,10 @@ const slice = createSlice({
     });
     builder.addCase(getArchivedSchedules.fulfilled, (state, action) => {
       state.archivedListLoading = false;
-      state.archived = action.payload;
+      state.archived = action.payload.map(v => ({
+        ...v,
+        deleteLoading: false,
+      }));
     });
     builder.addCase(getArchivedSchedules.rejected, state => {
       state.archivedListLoading = false;
@@ -71,7 +79,7 @@ const slice = createSlice({
     });
     builder.addCase(getScheduleDetails.fulfilled, (state, action) => {
       state.scheduleDetailsLoading = false;
-      state.editingSchedule = action.payload;
+      state.editingSchedule = { ...action.payload, deleteLoading: false };
     });
     builder.addCase(getScheduleDetails.rejected, state => {
       state.scheduleDetailsLoading = false;
@@ -105,7 +113,7 @@ const slice = createSlice({
     builder.addCase(unarchiveSchedule.fulfilled, (state, action) => {
       state.unarchiveScheduleLoading = false;
       state.archived = state.archived.filter(
-        ({ id }) => id !== action.meta.arg.id,
+        ({ id }) => id !== action.meta.arg.schedule.id,
       );
     });
     builder.addCase(unarchiveSchedule.rejected, state => {
@@ -142,6 +150,17 @@ const slice = createSlice({
     });
     builder.addCase(getScheduleErrorLogs.rejected, state => {
       state.logsLoading = false;
+    });
+
+    // updateScheduleBase
+    builder.addCase(updateScheduleBase.pending, state => {
+      state.updateLoading = true;
+    });
+    builder.addCase(updateScheduleBase.fulfilled, (state, action) => {
+      state.updateLoading = false;
+    });
+    builder.addCase(updateScheduleBase.rejected, state => {
+      state.updateLoading = false;
     });
   },
 });

@@ -11,19 +11,30 @@ import {
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { getFolders } from 'app/pages/MainPage/pages/VizPage/slice/thunks';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { CommonFormTypes } from 'globalConstants';
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG, SPACE_SM } from 'styles/StyleConstants';
+import { getInsertedNodeIndex } from 'utils/utils';
 import { DEFAULT_VALUES, FileTypes, JobTypes, TimeModes } from '../constants';
 import { useToScheduleDetails } from '../hooks';
+import { SaveFormContext } from '../SaveFormContext';
 import { useScheduleSlice } from '../slice';
 import {
   selectDeleteLoading,
   selectEditingSchedule,
   selectSaveLoading,
   selectScheduleDetailLoading,
+  selectSchedules,
   selectUnarchiveLoading,
 } from '../slice/selectors';
 import {
@@ -63,6 +74,8 @@ export const EditorPage: FC = () => {
   const saveLoading = useSelector(selectSaveLoading);
   const unarchiveLoading = useSelector(selectUnarchiveLoading);
   const deleteLoading = useSelector(selectDeleteLoading);
+  const schedules = useSelector(selectSchedules);
+  const { showSaveForm } = useContext(SaveFormContext);
   const { toDetails } = useToScheduleDetails();
   const isArchived = editingSchedule?.status === 0;
   const t = useI18NPrefix('main.pages.schedulePage.sidebar.editorPage.index');
@@ -84,18 +97,31 @@ export const EditorPage: FC = () => {
         message.error(t('tickToSendContent'));
         return;
       }
-      const params = toScheduleSubmitParams(values, orgId);
+      let index = getInsertedNodeIndex(values, schedules);
+      const params = toScheduleSubmitParams(
+        { ...values, index, parentId: editingSchedule?.parentId || null },
+        orgId,
+      );
       if (isAdd) {
-        dispatch(
-          addSchedule({
-            params,
-            resolve: (id: string) => {
-              message.success(t('addSuccess'));
-              toDetails(orgId, id);
-              refreshScheduleList();
-            },
-          }),
-        );
+        showSaveForm({
+          type: CommonFormTypes.Add,
+          visible: true,
+          simple: true,
+          parentIdLabel: t('parent'),
+          onSave: (val, onClose) => {
+            dispatch(
+              addSchedule({
+                params: { ...params, parentId: val.parentId },
+                resolve: (id: string) => {
+                  message.success(t('addSuccess'));
+                  toDetails(orgId, id);
+                  refreshScheduleList();
+                  onClose();
+                },
+              }),
+            );
+          },
+        });
       } else {
         dispatch(
           editSchedule({
@@ -112,13 +138,16 @@ export const EditorPage: FC = () => {
     });
   }, [
     form,
+    schedules,
+    editingSchedule?.parentId,
+    editingSchedule?.id,
     orgId,
     isAdd,
     t,
+    showSaveForm,
     dispatch,
     toDetails,
     refreshScheduleList,
-    editingSchedule?.id,
   ]);
 
   const onResetForm = useCallback(() => {
@@ -190,16 +219,38 @@ export const EditorPage: FC = () => {
   );
 
   const unarchive = useCallback(() => {
-    dispatch(
-      unarchiveSchedule({
-        id: editingSchedule!.id,
-        resolve: () => {
-          message.success(t('restoredSuccess'));
-          toDetails(orgId);
-        },
-      }),
-    );
-  }, [dispatch, toDetails, orgId, editingSchedule, t]);
+    if (unarchiveLoading) return;
+    const { id, name } = editingSchedule!;
+    showSaveForm({
+      type: CommonFormTypes.Edit,
+      visible: true,
+      simple: false,
+      initialValues: { id, name, parentId: null },
+      parentIdLabel: t('parent'),
+      onSave: (values, onClose) => {
+        let index = getInsertedNodeIndex(values, schedules);
+        dispatch(
+          unarchiveSchedule({
+            schedule: { ...values, id, index },
+            resolve: () => {
+              message.success(t('restoredSuccess'));
+              toDetails(orgId);
+              onClose();
+            },
+          }),
+        );
+      },
+    });
+  }, [
+    unarchiveLoading,
+    editingSchedule,
+    showSaveForm,
+    t,
+    schedules,
+    dispatch,
+    toDetails,
+    orgId,
+  ]);
 
   const del = useCallback(
     archive => () => {
@@ -244,9 +295,9 @@ export const EditorPage: FC = () => {
           actions={
             isArchived ? (
               <>
-                <Popconfirm title={t('sureToRestore')} onConfirm={unarchive}>
-                  <Button loading={unarchiveLoading}>{t('restore')}</Button>
-                </Popconfirm>
+                <Button loading={unarchiveLoading} onClick={unarchive}>
+                  {t('restore')}
+                </Button>
                 <Popconfirm title={t('sureToDelete')} onConfirm={del(false)}>
                   <Button loading={deleteLoading} danger>
                     {t('delete')}

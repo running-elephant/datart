@@ -242,11 +242,17 @@
         },
         "sidebar": {
           "index": {
+            "addFolder": "新建目录",
+            "addSuccess": "新增成功",
             "scheduledTaskList": "定时任务列表",
             "newTimedTask": "新建定时任务",
             "recycle": "回收站"
           },
           "scheduleList": {
+            "parent": "所属目录",
+            "success": "成功",
+            "delete": "删除",
+            "moveToTrash": "移至回收站",
             "successStarted": "启动成功",
             "successStop": "停止成功",
             "successImmediately": "立即执行成功",
@@ -265,7 +271,6 @@
               "moveToTrash": "移至回收站",
               "delete": "删除",
               "newTimedTask": "新建定时任务",
-              "sureToRestore": "确定还原？",
               "restore": "还原",
               "sureToDelete": "确定删除？",
               "allowModificationAfterStopping": "停止后允许修改",
@@ -275,7 +280,8 @@
               "basicSettings": "基本设置",
               "emailSetting": "邮件设置",
               "enterpriseWeChatSettings": "企业微信设置",
-              "sendContentSettings": "发送内容设置"
+              "sendContentSettings": "发送内容设置",
+              "parent": "所属目录"
             },
             "weChartSetttingForm": {
               "RobotWebhookAddress": "机器人webhook地址",
