@@ -172,7 +172,8 @@
           "email": "邮箱",
           "name": "姓名",
           "department": "部门",
-          "description": "描述"
+          "description": "描述",
+          "timezone": "时区"
         },
         "changePassword": {
           "title": "修改密码",

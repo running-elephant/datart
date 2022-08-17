@@ -172,7 +172,8 @@
           "email": "Email",
           "name": "Name",
           "department": "Department",
-          "description": "Description"
+          "description": "Description",
+          "timezone": "Timezone"
         },
         "changePassword": {
           "title": "Password",

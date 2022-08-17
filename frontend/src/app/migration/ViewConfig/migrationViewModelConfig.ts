@@ -16,12 +16,17 @@
  * limitations under the License.
  */
 
+import { DateFormat } from 'app/pages/MainPage/pages/ViewPage/constants';
 import { addPathToHierarchyStructureAndChangeName } from 'app/pages/MainPage/pages/ViewPage/utils';
+import { updateBy } from 'app/utils/mutation';
 import { CloneValueDeep } from 'utils/object';
-import { APP_VERSION_BETA_2, APP_VERSION_BETA_4 } from '../constants';
+import {
+  APP_VERSION_BETA_2,
+  APP_VERSION_BETA_4,
+  APP_VERSION_RC_2,
+} from '../constants';
 import MigrationEvent from '../MigrationEvent';
 import MigrationEventDispatcher from '../MigrationEventDispatcher';
-
 /**
  * Migrate @see View config in beta.2 version
  * Changes:
@@ -31,7 +36,7 @@ import MigrationEventDispatcher from '../MigrationEventDispatcher';
  * @param {object} [model]
  * @return {*}  {(object | undefined)}
  */
-const beta2 = (model?: object): object | undefined => {
+const beta2 = model => {
   const clonedModel = CloneValueDeep(model) || {};
   if (model) {
     Object.keys(clonedModel).forEach(name => {
@@ -45,8 +50,8 @@ const beta2 = (model?: object): object | undefined => {
   return model;
 };
 
-const beta4 = obj => {
-  const { viewType, result } = obj;
+const beta4 = view => {
+  const { viewType, result } = view;
   try {
     result.hierarchy = addPathToHierarchyStructureAndChangeName(
       result.hierarchy,
@@ -57,6 +62,25 @@ const beta4 = obj => {
     console.error('Migration view Errors | beta.4 | ', error);
     return result;
   }
+};
+
+const RC2 = model => {
+  model.hierarchy = updateBy(model.hierarchy, draft => {
+    Object.values(draft).forEach((field: any) => {
+      if (field.children) {
+        field.children.forEach(child => {
+          if (!child.dateFormat && child.type === 'DATE') {
+            child.dateFormat = DateFormat.DateTime;
+          }
+        });
+      } else {
+        if (!field.dateFormat && field.type === 'DATE') {
+          field.dateFormat = DateFormat.DateTime;
+        }
+      }
+    });
+  });
+  return model;
 };
 
 /**
@@ -71,15 +95,24 @@ const beginViewModelMigration = (model: string, viewType): string => {
   }
   const modelObj = JSON.parse(model);
   const event2 = new MigrationEvent(APP_VERSION_BETA_2, beta2);
-  const dispatcher = new MigrationEventDispatcher(event2);
-  const result = dispatcher.process(modelObj);
-
   const event4 = new MigrationEvent(APP_VERSION_BETA_4, beta4);
+  const eventRC2 = new MigrationEvent(APP_VERSION_RC_2, RC2);
+
+  const dispatcher2 = new MigrationEventDispatcher(event2);
+  const result2 = dispatcher2.process(modelObj);
+
   const dispatcher4 = new MigrationEventDispatcher(event4);
 
-  const result4 = dispatcher4.process({ result, viewType });
+  const result4 = dispatcher4.process({
+    result: result2,
+    viewType,
+  });
 
-  return JSON.stringify(result4);
+  const dispatcherRC2 = new MigrationEventDispatcher(eventRC2);
+
+  const resultRC2 = dispatcherRC2.process(result4);
+
+  return JSON.stringify(resultRC2);
 };
 
 export default beginViewModelMigration;

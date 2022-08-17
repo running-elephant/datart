@@ -43,7 +43,7 @@ import {
   SUCCESS,
   WARNING,
 } from 'styles/StyleConstants';
-import { ColumnCategories } from '../../../constants';
+import { ColumnCategories, DateFormat } from '../../../constants';
 import { Column, ColumnRole } from '../../../slice/types';
 import { ALLOW_COMBINE_COLUMN_TYPES } from './constant';
 
@@ -115,15 +115,38 @@ const DataModelNode: FC<{
             trigger={['click']}
             overlay={
               <Menu
-                selectedKeys={[node.type, `category-${node.category}`]}
+                selectedKeys={[
+                  node.type,
+                  `category-${node.category}`,
+                  node.dateFormat,
+                ]}
                 className="datart-schema-table-header-menu"
-                onClick={({ key }) => onNodeTypeChange(key, node?.name)}
+                onClick={({ keyPath }) => onNodeTypeChange(keyPath, node?.name)}
               >
-                {Object.values(DataViewFieldType).map(t => (
-                  <Menu.Item key={t}>
-                    {tg(`columnType.${t.toLowerCase()}`)}
-                  </Menu.Item>
-                ))}
+                {Object.values(DataViewFieldType).map(t => {
+                  if (t === DataViewFieldType.DATE) {
+                    return (
+                      <Menu.SubMenu
+                        key={t}
+                        title={tg(`columnType.${t.toLowerCase()}`)}
+                        popupClassName="datart-schema-table-header-menu"
+                      >
+                        {Object.values(DateFormat).map(timeFormate => {
+                          return (
+                            <Menu.Item key={timeFormate}>
+                              {timeFormate}
+                            </Menu.Item>
+                          );
+                        })}
+                      </Menu.SubMenu>
+                    );
+                  }
+                  return (
+                    <Menu.Item key={t}>
+                      {tg(`columnType.${t.toLowerCase()}`)}
+                    </Menu.Item>
+                  );
+                })}
                 {hasCategory && (
                   <>
                     <Menu.Divider />

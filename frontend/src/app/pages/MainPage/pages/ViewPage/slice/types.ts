@@ -131,7 +131,7 @@ export enum ColumnRole {
 export interface Column extends Schema {
   category?: ColumnCategories;
   index?: number;
-
+  dateFormat?: string;
   role?: ColumnRole;
   children?: Column[];
   path?: string[];
