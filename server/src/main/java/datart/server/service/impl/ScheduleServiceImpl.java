@@ -232,6 +232,11 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
     }
 
     @Override
+    public boolean safeDelete(String id) {
+        return scheduleMapper.checkReference(id) == 0;
+    }
+
+    @Override
     public boolean stop(String scheduleId) throws SchedulerException {
         Schedule schedule = retrieve(scheduleId);
         JobKey jobKey = JobKey.jobKey(schedule.getName(), schedule.getOrgId());

@@ -20,4 +20,9 @@ public interface ScheduleMapperExt extends ScheduleMapper {
     })
     List<Schedule> selectArchived(String orgId);
 
+    @Select({
+            "SELECT COUNT(*) FROM `schedule` WHERE parent_id = #{scheduleId} AND `status`!=0"
+    })
+    int checkReference(String scheduleId);
+
 }
