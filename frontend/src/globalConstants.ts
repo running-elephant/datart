@@ -139,7 +139,7 @@ export const TIME_UNIT_OPTIONS = [
   { name: 'minutes', value: 'm' },
   { name: 'hours', value: 'h' },
   { name: 'days', value: 'd' },
-  { name: 'weeks', value: 'w' },
+  { name: 'weeks', value: 'W' },
   { name: 'months', value: 'M' },
   { name: 'years', value: 'y' },
   { name: 'quarters', value: 'Q' },
