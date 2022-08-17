@@ -104,6 +104,7 @@ export const EditorPage: FC = () => {
       );
       if (isAdd) {
         showSaveForm({
+          scheduleType: 'title',
           type: CommonFormTypes.Add,
           visible: true,
           simple: true,
@@ -115,7 +116,6 @@ export const EditorPage: FC = () => {
                 resolve: (id: string) => {
                   message.success(t('addSuccess'));
                   toDetails(orgId, id);
-                  refreshScheduleList();
                   onClose();
                 },
               }),
@@ -222,6 +222,7 @@ export const EditorPage: FC = () => {
     if (unarchiveLoading) return;
     const { id, name } = editingSchedule!;
     showSaveForm({
+      scheduleType: 'folder',
       type: CommonFormTypes.Edit,
       visible: true,
       simple: false,

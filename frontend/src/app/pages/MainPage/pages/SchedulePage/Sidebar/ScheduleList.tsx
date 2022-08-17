@@ -14,7 +14,7 @@ import { CommonFormTypes } from 'globalConstants';
 import { FC, memo, useCallback, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { getInsertedNodeIndex, onDropTreeFn, stopPPG } from 'utils/utils';
+import { onDropTreeFn, stopPPG } from 'utils/utils';
 import { CascadeAccess, getCascadeAccess } from '../../../Access';
 import {
   selectIsOrgOwner,
@@ -70,12 +70,13 @@ export const ScheduleList: FC<{
   const tg = useI18NPrefix('global');
 
   const moreMenuClick = useCallback(
-    ({ id, name, parentId }) =>
+    ({ id, name, parentId, index }) =>
       ({ key, domEvent }) => {
         domEvent.stopPropagation();
         switch (key) {
           case 'info':
             showSaveForm({
+              scheduleType: 'folder',
               type: CommonFormTypes.Edit,
               visible: true,
               simple: false,
@@ -86,17 +87,16 @@ export const ScheduleList: FC<{
               },
               parentIdLabel: t('parent'),
               onSave: (values, onClose) => {
-                let index = getInsertedNodeIndex(values, list);
                 dispatch(
                   updateScheduleBase({
                     schedule: {
                       id,
                       index,
-                      ...values,
+                      name: values.name,
+                      parentId: values.parentId,
                     },
                     resolve: () => {
                       toDetails(orgId);
-                      dispatch(getSchedules(orgId));
                       onClose();
                     },
                   }),
@@ -147,7 +147,6 @@ export const ScheduleList: FC<{
                 .then(res => {
                   if (!!res) {
                     message.success(t('successImmediately'));
-                    onUpdateScheduleList();
                   }
                 })
                 .finally(() => {
@@ -166,7 +165,6 @@ export const ScheduleList: FC<{
       dispatch,
       editingSchedule?.id,
       executeLoading,
-      list,
       onUpdateScheduleList,
       orgId,
       showSaveForm,
@@ -189,7 +187,6 @@ export const ScheduleList: FC<{
               `${t('success')}${isFolder ? t('delete') : t('moveToTrash')}`,
             );
             toDetails(orgId);
-            dispatch(getSchedules(orgId));
           },
         }),
       );

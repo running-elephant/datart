@@ -61,6 +61,7 @@ export const Recycle = memo(({ scheduleId, list }: RecycleProps) => {
         switch (key) {
           case 'reset':
             showSaveForm({
+              scheduleType: 'folder',
               type: CommonFormTypes.Edit,
               visible: true,
               simple: false,

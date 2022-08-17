@@ -88,8 +88,9 @@ const slice = createSlice({
     builder.addCase(addSchedule.pending, state => {
       state.saveLoading = true;
     });
-    builder.addCase(addSchedule.fulfilled, state => {
+    builder.addCase(addSchedule.fulfilled, (state, action) => {
       state.saveLoading = false;
+      state.schedules?.unshift({ ...action.payload, deleteLoading: false });
     });
     builder.addCase(addSchedule.rejected, state => {
       state.saveLoading = false;
@@ -121,23 +122,29 @@ const slice = createSlice({
     });
 
     // deleteSchedule
-    builder.addCase(deleteSchedule.pending, state => {
-      state.deleteLoading = true;
-    });
-    builder.addCase(deleteSchedule.fulfilled, (state, action) => {
-      state.deleteLoading = false;
-      if (action.meta.arg.archive) {
-        state.schedules = state.schedules.filter(
-          ({ id }) => id !== action.meta.arg.id,
-        );
-      } else {
-        state.archived = state.archived.filter(
-          ({ id }) => id !== action.meta.arg.id,
-        );
+    builder.addCase(deleteSchedule.pending, (state, action) => {
+      const schedule =
+        state.schedules?.find(({ id }) => id === action.meta.arg.id) ||
+        state.archived?.find(({ id }) => id === action.meta.arg.id);
+      if (schedule) {
+        schedule.deleteLoading = true;
       }
     });
-    builder.addCase(deleteSchedule.rejected, state => {
-      state.deleteLoading = false;
+    builder.addCase(deleteSchedule.fulfilled, (state, action) => {
+      state.schedules = state.schedules.filter(
+        ({ id }) => id !== action.meta.arg.id,
+      );
+      state.archived = state.archived.filter(
+        ({ id }) => id !== action.meta.arg.id,
+      );
+    });
+    builder.addCase(deleteSchedule.rejected, (state, action) => {
+      const schedule =
+        state.schedules?.find(({ id }) => id === action.meta.arg.id) ||
+        state.archived?.find(({ id }) => id === action.meta.arg.id);
+      if (schedule) {
+        schedule.deleteLoading = false;
+      }
     });
 
     // getScheduleErrorLogs
@@ -158,6 +165,16 @@ const slice = createSlice({
     });
     builder.addCase(updateScheduleBase.fulfilled, (state, action) => {
       state.updateLoading = false;
+      state.schedules = state.schedules.map(v =>
+        v.id === action.payload.id
+          ? {
+              ...v,
+              ...action.payload,
+              parentId: action.payload.parentId || null,
+              deleteLoading: false,
+            }
+          : v,
+      );
     });
     builder.addCase(updateScheduleBase.rejected, state => {
       state.updateLoading = false;

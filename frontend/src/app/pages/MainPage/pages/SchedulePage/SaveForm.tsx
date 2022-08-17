@@ -40,6 +40,7 @@ type SaveFormProps = Omit<ModalFormProps, 'type' | 'visible' | 'onSave'>;
 export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
   const selectScheduleFolderTree = useMemo(makeSelectScheduleFolderTree, []);
   const {
+    scheduleType,
     type,
     visible,
     simple,
@@ -68,7 +69,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
   );
   const orgId = useSelector(selectOrgId);
   const formRef = useRef<FormInstance>();
-  const t = useI18NPrefix('view.saveForm');
+  const t = useI18NPrefix('schedule.saveForm');
   const tg = useI18NPrefix('global');
 
   useEffect(() => {
@@ -85,7 +86,10 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
       onSave(
         {
           ...values,
-          config: { version: APP_CURRENT_VERSION, ...values.config },
+          config: JSON.stringify({
+            version: APP_CURRENT_VERSION,
+            ...values.config,
+          }),
         },
         onCancel,
       );
@@ -101,7 +105,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     <ModalForm
       formProps={formProps}
       {...modalProps}
-      title={t(simple ? 'folder' : 'title')}
+      title={t(scheduleType)}
       type={type}
       visible={visible}
       onSave={save}

@@ -28,6 +28,7 @@ interface SaveFormModel {
 }
 
 interface SaveFormState {
+  scheduleType: string;
   type: CommonFormTypes;
   visible: boolean;
   simple?: boolean;
@@ -43,6 +44,7 @@ interface SaveFormContextValue extends SaveFormState {
 }
 
 const saveFormContextValue: SaveFormContextValue = {
+  scheduleType: 'title',
   type: CommonFormTypes.Add,
   visible: false,
   simple: false,
@@ -55,8 +57,9 @@ const saveFormContextValue: SaveFormContextValue = {
 export const SaveFormContext = createContext(saveFormContextValue);
 
 export const useSaveFormContext = (): SaveFormContextValue => {
-  const t = useI18NPrefix('view.saveForm');
+  const t = useI18NPrefix('schedule.saveForm');
   const [type, setType] = useState(CommonFormTypes.Add);
+  const [scheduleType, setScheduleType] = useState('title');
   const [visible, setVisible] = useState(false);
   const [simple, setSimple] = useState<boolean | undefined>(false);
   const [initialValues, setInitialValues] = useState<
@@ -72,6 +75,7 @@ export const useSaveFormContext = (): SaveFormContextValue => {
 
   const showSaveForm = useCallback(
     ({
+      scheduleType,
       type,
       visible,
       simple,
@@ -81,6 +85,7 @@ export const useSaveFormContext = (): SaveFormContextValue => {
       onAfterClose,
     }: SaveFormState) => {
       setType(type);
+      setScheduleType(scheduleType);
       setVisible(visible);
       setSimple(simple);
       setInitialValues(initialValues);
@@ -93,6 +98,7 @@ export const useSaveFormContext = (): SaveFormContextValue => {
 
   return useMemo(
     () => ({
+      scheduleType,
       type,
       visible,
       simple,
@@ -104,6 +110,7 @@ export const useSaveFormContext = (): SaveFormContextValue => {
       showSaveForm,
     }),
     [
+      scheduleType,
       type,
       visible,
       simple,

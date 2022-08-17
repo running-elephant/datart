@@ -61,9 +61,8 @@ export interface ScheduleBase {
 }
 
 export interface ScheduleSimple extends Schedule {
-  description?: string;
   isFolder: boolean;
-  sourceId: string;
+  orgId: string;
 }
 
 export interface ScheduleSimpleViewModel extends ScheduleSimple {
