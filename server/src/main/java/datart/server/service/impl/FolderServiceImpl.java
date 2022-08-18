@@ -221,6 +221,7 @@ public class FolderServiceImpl extends BaseService implements FolderService {
             } catch (Exception e) {
                 folder.setName(DateUtils.withTimeString(folder.getName()));
             }
+            folder.setOrgId(orgId);
             folderMapper.insert(folder);
         }
 //        Folder root = null;
