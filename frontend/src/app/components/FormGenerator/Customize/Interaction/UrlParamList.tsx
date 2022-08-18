@@ -18,6 +18,7 @@
 
 import { Button, Input, Radio, Select, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
+import { handleDateLevelsName } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/utils';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { updateBy } from 'app/utils/mutation';
 import { FC } from 'react';
@@ -122,7 +123,11 @@ const UrlParamList: FC<
           dropdownMatchSelectWidth={false}
         >
           {(isFieldType(record) ? sourceFields : sourceVariables)?.map(sf => {
-            return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;
+            return (
+              <Select.Option value={sf?.name}>
+                {handleDateLevelsName(sf)}
+              </Select.Option>
+            );
           })}
         </Select>
       ),
