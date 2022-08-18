@@ -518,8 +518,8 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
             final Map<String, String> widgetIdMapping = new HashMap<>();
             for (WidgetDetail widget : mainModel.getWidgets()) {
                 String widgetId = UUIDGenerator.generate();
-                widget.setId(widgetId);
                 widgetIdMapping.put(widget.getId(), widgetId);
+                widget.setId(widgetId);
             }
             for (WidgetDetail widget : mainModel.getWidgets()) {
                 widget.setDashboardId(newId);
@@ -537,6 +537,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
                 }
                 if (widget.getRelations() != null) {
                     for (RelWidgetWidget relation : widget.getRelations()) {
+                        relation.setId(UUIDGenerator.generate());
                         relation.setSourceId(widgetIdMapping.get(relation.getSourceId()));
                         relation.setTargetId(widgetIdMapping.get(relation.getTargetId()));
                     }
