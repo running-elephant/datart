@@ -141,7 +141,7 @@
     "redux-undo": "^1.0.1",
     "reveal.js": "^4.1.0",
     "split.js": "^1.6.4",
-    "sql-formatter": "^4.0.2",
+    "sql-formatter": "^9.2.0",
     "uuid": "^8.3.2",
     "video-react": "^0.15.0"
   },
