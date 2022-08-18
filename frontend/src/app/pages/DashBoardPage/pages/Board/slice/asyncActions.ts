@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { DownloadFileType } from 'app/constants';
+import migrateWidgetChartConfig from 'app/migration/BoardConfig/migrateWidgetChartConfig';
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
@@ -64,10 +65,9 @@ export const handleServerBoardAction =
       datacharts,
       serverViews,
     );
-    const migratedWidgets = migrateWidgets(
-      serverWidgets,
-      dashboard.config.type,
-    );
+    let migratedWidgets = migrateWidgets(serverWidgets, dashboard.config.type);
+    migratedWidgets = migrateWidgetChartConfig(migratedWidgets);
+
     const { widgetMap, wrappedDataCharts, controllerWidgets } = getWidgetMap(
       migratedWidgets,
       dataCharts,

@@ -28,6 +28,7 @@ import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { DrillMode } from 'app/models/ChartDrillOption';
 import DateLevelMenuItems from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/DateLevelAction/DateLevelMenuItems';
+import { handleDateLevelsName } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/utils';
 import { ChartConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { getRuntimeDateLevelFields } from 'app/utils/chartHelper';
@@ -214,12 +215,19 @@ const ChartDrillContextMenu: FC<{
               ].includes(f.category),
           )
           ?.map((v, i) => {
+            const config = v[RUNTIME_DATE_LEVEL_KEY] || v;
             return (
-              <Menu.SubMenu key={i} title={v.colName}>
+              <Menu.SubMenu
+                key={i}
+                title={handleDateLevelsName({
+                  ...config,
+                  name: config.colName,
+                })}
+              >
                 <DateLevelMenuItems
                   metas={metas}
                   availableSourceFunctions={availableSourceFunctions}
-                  config={v[RUNTIME_DATE_LEVEL_KEY] || v}
+                  config={config}
                   onChange={handleDateLevelChange}
                 />
               </Menu.SubMenu>

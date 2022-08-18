@@ -26,6 +26,7 @@ import { FieldTemplate } from 'app/pages/ChartWorkbenchPage/components/ChartOper
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
+import { DATE_LEVEL_DELIMITER } from 'globalConstants';
 import React, { memo, useCallback } from 'react';
 import { DATE_LEVELS } from '../../../../../slice/constant';
 interface DateLevelMenuItemsProps {
@@ -68,7 +69,7 @@ const DateLevelMenuItems = memo(
 
           return onChange({
             ...config,
-            colName: `${config.field}（${selectedConfig.colName}）`,
+            colName: selectedConfig.colName,
             expression: selectedConfig.expression,
             [RUNTIME_DATE_LEVEL_KEY]: null,
           });
@@ -86,7 +87,7 @@ const DateLevelMenuItems = memo(
                 draft.field = config.colName;
                 draft.category =
                   ChartDataViewFieldCategory.DateLevelComputedField;
-                draft.colName = `${draft.colName}（${selectedConfig.colName}）`;
+                draft.colName = selectedConfig.colName;
                 draft[RUNTIME_DATE_LEVEL_KEY] = null;
               }),
             );
@@ -118,14 +119,12 @@ const DateLevelMenuItems = memo(
               config.category === ChartDataViewFieldCategory.Field
                 ? config.colName
                 : config.field;
-
             const row = getAllColumnInMeta(metas)?.find(
               v => v.name === configColName,
             );
             const expression = `${item.expression}(${FieldTemplate(
               row?.path,
             )})`;
-
             return (
               <Menu.Item
                 key={expression}
@@ -134,7 +133,8 @@ const DateLevelMenuItems = memo(
                 onClick={() =>
                   handleChangeFn({
                     category: ChartDataViewFieldCategory.DateLevelComputedField,
-                    colName: item.name,
+                    colName:
+                      configColName + DATE_LEVEL_DELIMITER + item.expression,
                     expression,
                   })
                 }
