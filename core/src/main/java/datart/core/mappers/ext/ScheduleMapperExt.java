@@ -25,4 +25,17 @@ public interface ScheduleMapperExt extends ScheduleMapper {
     })
     int checkReference(String scheduleId);
 
+    @Select({
+            "<script>",
+            "SELECT * FROM  `schedule`  WHERE org_id=#{orgId} AND `name` = #{name}",
+            "<if test=\"parentId==null\">",
+            " AND parent_id IS NULL ",
+            "</if>",
+            "<if test=\"parentId!=null\">",
+            " AND parent_id=#{parentId} ",
+            "</if>",
+            "</script>",
+    })
+    List<Schedule> checkName(String orgId, String name, String parentId);
+
 }

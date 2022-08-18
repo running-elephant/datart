@@ -185,11 +185,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
 
         //check name
         if (!view.getName().equals(newName)) {
-            View check = new View();
-            check.setParentId(parentId);
-            check.setOrgId(view.getOrgId());
-            check.setName(newName);
-            checkUnique(check);
+            checkUnique(view.getOrgId(), parentId, newName);
         }
 
         // update status

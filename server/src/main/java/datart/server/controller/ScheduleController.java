@@ -128,8 +128,11 @@ public class ScheduleController extends BaseController {
 
     @ApiOperation(value = "unarchive schedule")
     @PutMapping(value = "/unarchive/{scheduleId}")
-    public ResponseData<Boolean> unarchiveSchedule(@PathVariable String scheduleId) {
-        return ResponseData.success(scheduleService.unarchive(scheduleId));
+    public ResponseData<Boolean> unarchiveSchedule(@PathVariable String scheduleId,
+                                                   @RequestParam String name,
+                                                   @RequestParam Double index,
+                                                   @RequestParam(required = false) String parentId) {
+        return ResponseData.success(scheduleService.unarchive(scheduleId, name, parentId, index));
     }
 
 }
