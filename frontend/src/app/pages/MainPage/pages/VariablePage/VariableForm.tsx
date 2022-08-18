@@ -79,7 +79,7 @@ export const VariableForm = memo(
           setType(type);
           setValueType(valueType);
           setExpression(expression || false);
-          setFormat(format);
+          setFormat(format || DateFormat.DateTime);
           formRef.current?.setFieldsValue({
             ...editingVariable,
             defaultValue,
