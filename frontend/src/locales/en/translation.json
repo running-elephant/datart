@@ -542,7 +542,7 @@
         "deleteField": "Delete",
         "editViewTip": "Going back to the view will lose the current edit state, continue?",
         "editView": "Edit View",
-        "toggleViewTip": "Switch data View Whether to clear the current chart configuration?",
+        "toggleViewTip": "Switching data view will clear the current chart configuration, continue?",
         "AGG_DATE_YEAR": "Year",
         "AGG_DATE_QUARTER": "Quarter",
         "AGG_DATE_MONTH": "Month",
@@ -557,8 +557,8 @@
         "Group": "Group",
         "Sort": "Sort",
         "cancel": "Cancel",
-        "empty": "Empty",
-        "reserve": "Reserve",
+        "empty": "Clear",
+        "reserve": "Retain",
         "searchField": "Search Field Name"
       }
     },
