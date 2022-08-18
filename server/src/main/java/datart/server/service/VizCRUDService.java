@@ -9,11 +9,13 @@ import datart.server.base.params.BaseCreateParam;
 import datart.server.base.params.VizCreateParam;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public interface VizCRUDService<E extends BaseEntity, M extends CRUDMapper> extends BaseCRUDService<E, M> {
 
@@ -39,7 +41,19 @@ public interface VizCRUDService<E extends BaseEntity, M extends CRUDMapper> exte
         M mapper = getDefaultMapper();
         try {
             Method listArchived = mapper.getClass().getDeclaredMethod("listArchived", String.class);
-            return (List<E>) listArchived.invoke(mapper, orgId);
+            List<E> eList = (List<E>) listArchived.invoke(mapper, orgId);
+            if (CollectionUtils.isEmpty(eList)) {
+                return eList;
+            }
+            return eList.stream()
+                    .filter(e -> {
+                        try {
+                            requirePermission(e, Const.MANAGE);
+                            return true;
+                        } catch (Exception ex) {
+                            return false;
+                        }
+                    }).collect(Collectors.toList());
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             Exceptions.msg(String.format("Object %s has no property listArchived", getEntityClz().getSimpleName()));
         }
