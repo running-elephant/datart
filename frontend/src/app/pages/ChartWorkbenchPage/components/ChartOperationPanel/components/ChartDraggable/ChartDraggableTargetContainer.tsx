@@ -175,6 +175,13 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             return false;
           }
 
+          if (
+            currentConfig?.disableAggregateComputedField &&
+            item.category === 'aggregateComputedField'
+          ) {
+            return false;
+          }
+
           if (currentConfig.allowSameField && !aggregation) {
             return true;
           }

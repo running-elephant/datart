@@ -177,6 +177,7 @@ export type ChartDataConfig = ChartConfigBase & {
   actions?: Array<ValueOf<typeof ChartDataSectionFieldActionType>> | object;
   limit?: null | number | string | number[] | string[];
   disableAggregate?: boolean;
+  disableAggregateComputedField?: boolean;
   drillable?: boolean;
   drillContextMenuVisible?: boolean;
   options?: {
