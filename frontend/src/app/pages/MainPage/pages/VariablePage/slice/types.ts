@@ -43,7 +43,7 @@ export interface Variable {
   createTime?: string;
   updateBy?: string;
   updateTime?: string;
-  dateFormat?: DateFormat;
+  format?: DateFormat;
 }
 
 export interface VariableViewModel extends Variable {

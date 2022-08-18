@@ -21,7 +21,6 @@ import { SchemaTable } from 'app/pages/MainPage/pages/ViewPage/components/Schema
 import { Schema } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { useCallback } from 'react';
 import styled from 'styled-components/macro';
-
 interface SchemaProps {
   value?: Schema[];
   dataSource?: object[];
@@ -37,13 +36,12 @@ export function SchemaComponent({ value, dataSource, onChange }: SchemaProps) {
     : {};
 
   const schemaTypeChange = useCallback(
-    name =>
-      ({ key }) => {
-        onChange &&
-          onChange(
-            value?.map(v => (v.name === name ? { ...v, type: key } : v)),
-          );
-      },
+    name => keyPath => {
+      onChange &&
+        onChange(
+          value?.map(v => (v.name === name ? { ...v, type: keyPath[0] } : v)),
+        );
+    },
     [value, onChange],
   );
 
@@ -57,6 +55,7 @@ export function SchemaComponent({ value, dataSource, onChange }: SchemaProps) {
       loading={false}
       hasCategory={false}
       pagination={false}
+      hasFormat={false}
       onSchemaTypeChange={schemaTypeChange}
       bordered
     />

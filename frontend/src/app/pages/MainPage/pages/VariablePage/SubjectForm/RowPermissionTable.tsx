@@ -100,8 +100,10 @@ export const RowPermissionTable = memo(
           render: (_, record) =>
             editingVariable && (
               <DefaultValue
+                format={editingVariable.format}
                 type={editingVariable.valueType}
                 expression={false}
+                hasDateFormat={false}
                 disabled={
                   !selectedRowKeys.includes(record.id) || record.useDefaultValue
                 }

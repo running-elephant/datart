@@ -182,7 +182,7 @@ export const Variables = memo(() => {
       let defaultValue: any = values.defaultValue;
       if (values.valueType === VariableValueTypes.Date && !values.expression) {
         defaultValue = values.defaultValue.map(d =>
-          (d as Moment).format(TIME_FORMATTER),
+          (d as Moment).format(values.format),
         );
       }
 
@@ -236,15 +236,20 @@ export const Variables = memo(() => {
   const saveRelations = useCallback(
     (changedRowPermissions: RowPermission[]) => {
       try {
-        const changedRowPermissionsRaw = changedRowPermissions.map(cr => ({
-          ...cr,
-          value: JSON.stringify(
-            cr.value &&
-              (editingVariable?.valueType === VariableValueTypes.Date
-                ? cr.value.map(d => (d as Moment).format(TIME_FORMATTER))
-                : cr.value),
-          ),
-        }));
+        const changedRowPermissionsRaw = changedRowPermissions.map(cr => {
+          const format =
+            variables.find(v => v.id === cr.variableId)?.format ||
+            TIME_FORMATTER;
+          return {
+            ...cr,
+            value: JSON.stringify(
+              cr.value &&
+                (editingVariable?.valueType === VariableValueTypes.Date
+                  ? cr.value.map(d => (d as Moment).format(format))
+                  : cr.value),
+            ),
+          };
+        });
         if (
           !comparePermissionChange(
             editingVariable?.relVariableSubjects || [],

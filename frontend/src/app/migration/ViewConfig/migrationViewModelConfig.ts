@@ -69,13 +69,13 @@ const RC2 = model => {
     Object.values(draft).forEach((field: any) => {
       if (field.children) {
         field.children.forEach(child => {
-          if (!child.dateFormat && child.type === 'DATE') {
-            child.dateFormat = DateFormat.DateTime;
+          if (!child.format && child.type === 'DATE') {
+            child.format = DateFormat.DateTime;
           }
         });
       } else {
-        if (!field.dateFormat && field.type === 'DATE') {
-          field.dateFormat = DateFormat.DateTime;
+        if (!field.format && field.type === 'DATE') {
+          field.format = DateFormat.DateTime;
         }
       }
     });

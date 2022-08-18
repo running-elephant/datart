@@ -40,8 +40,9 @@ interface DefaultValueProps {
   expression: boolean;
   disabled?: boolean;
   value?: null | any[];
-  dateFormat?: DateFormat;
-  onChangeDateFormat?: (value) => void;
+  format?: DateFormat;
+  hasDateFormat?: boolean;
+  onChangeFormat?: (value) => void;
   onChange?: (value) => void;
 }
 
@@ -51,9 +52,10 @@ export const DefaultValue = memo(
     expression,
     disabled,
     value = [],
-    dateFormat,
+    format,
+    hasDateFormat = true,
     onChange,
-    onChangeDateFormat,
+    onChangeFormat,
   }: DefaultValueProps) => {
     const [inputValue, setInputValue] = useState<any>(void 0);
     const t = useI18NPrefix('variable');
@@ -178,7 +180,7 @@ export const DefaultValue = memo(
                   const label =
                     type !== VariableValueTypes.Date
                       ? val
-                      : moment(val).format(TIME_FORMATTER);
+                      : moment(val).format(format);
                   return (
                     <Tag
                       key={label}
@@ -205,12 +207,12 @@ export const DefaultValue = memo(
             </Space>
           </>
         )}
-        {type === VariableValueTypes.Date && (
+        {type === VariableValueTypes.Date && hasDateFormat && (
           <Select
             placeholder="选择日期格式"
             className="input"
-            value={dateFormat}
-            onChange={onChangeDateFormat}
+            value={format}
+            onChange={onChangeFormat}
           >
             {Object.values(DateFormat).map(format => {
               return (

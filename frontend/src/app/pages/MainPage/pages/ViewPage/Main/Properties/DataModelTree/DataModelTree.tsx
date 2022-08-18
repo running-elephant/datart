@@ -175,7 +175,7 @@ const DataModelTree: FC = memo(() => {
         const category = type[0].split('-')[1];
         newNode = { ...targetNode, category };
       } else if (type.includes('DATE')) {
-        newNode = { ...targetNode, type: type[1], dateFormat: type[0] };
+        newNode = { ...targetNode, type: type[1], format: type[0] };
       } else {
         newNode = { ...targetNode, type: type[0] };
       }
@@ -205,7 +205,7 @@ const DataModelTree: FC = memo(() => {
             newNode = {
               ...newNode,
               type: type[1] as DataViewFieldType,
-              dateFormat: type[0],
+              format: type[0],
             };
           } else {
             newNode = { ...newNode, type: type[0] as DataViewFieldType };

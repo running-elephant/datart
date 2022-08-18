@@ -61,7 +61,7 @@ export const VariableForm = memo(
       VariableValueTypes.String,
     );
     const [expression, setExpression] = useState(false);
-    const [dateFormat, setDateFormat] = useState<DateFormat | undefined>();
+    const [format, setFormat] = useState<DateFormat | undefined>();
     const formRef = useRef<FormInstance<VariableFormModel>>();
     const t = useI18NPrefix('variable');
     const tg = useI18NPrefix('global');
@@ -69,7 +69,7 @@ export const VariableForm = memo(
     useEffect(() => {
       if (visible && editingVariable) {
         try {
-          const { type, valueType, expression, dateFormat } = editingVariable;
+          const { type, valueType, expression, format } = editingVariable;
           let defaultValue = editingVariable.defaultValue
             ? JSON.parse(editingVariable.defaultValue)
             : [];
@@ -79,7 +79,7 @@ export const VariableForm = memo(
           setType(type);
           setValueType(valueType);
           setExpression(expression || false);
-          setDateFormat(dateFormat);
+          setFormat(format);
           formRef.current?.setFieldsValue({
             ...editingVariable,
             defaultValue,
@@ -118,9 +118,9 @@ export const VariableForm = memo(
 
     const save = useCallback(
       values => {
-        onSave({ ...values, name: values.name.toUpperCase(), dateFormat });
+        onSave({ ...values, name: values.name.toUpperCase(), format });
       },
-      [onSave, dateFormat],
+      [onSave, format],
     );
 
     const nameValidator = useMemo(
@@ -150,10 +150,10 @@ export const VariableForm = memo(
             }, DEFAULT_DEBOUNCE_WAIT),
       [scope, editingVariable?.name, variables, orgId, t, tg],
     );
-    const onChangeDateFormat = useCallback(
+    const onChangeFormat = useCallback(
       format => {
-        setDateFormat(format);
-        formRef.current?.setFieldsValue({ dateFormat: format });
+        setFormat(format);
+        formRef.current?.setFieldsValue({ format });
       },
       [formRef],
     );
@@ -237,8 +237,8 @@ export const VariableForm = memo(
           <DefaultValue
             type={valueType}
             expression={expression}
-            onChangeDateFormat={onChangeDateFormat}
-            dateFormat={dateFormat}
+            onChangeFormat={onChangeFormat}
+            format={format}
           />
         </Form.Item>
 

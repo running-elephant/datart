@@ -22,7 +22,6 @@ import beginViewModelMigration from '../ViewConfig/migrationViewModelConfig';
 describe('migrationViewModelConfig Test', () => {
   test('should get latest version after migration', () => {
     const model = JSON.stringify({});
-    console.log('start');
     expect(beginViewModelMigration(model, 'SQL')).toEqual(
       JSON.stringify({
         hierarchy: {},
@@ -30,7 +29,6 @@ describe('migrationViewModelConfig Test', () => {
         version: APP_VERSION_RC_2,
       }),
     );
-    console.log('end');
   });
 
   test('should get latest version even model is empty', () => {
@@ -219,10 +217,10 @@ describe('migrationViewModelConfig Test', () => {
     });
   });
 
-  test('should migrate dateFormat to date Field', () => {
+  test('should migrate format to date Field', () => {
     const originalModel = {
       column1: { role: 'role', type: 'DATE' },
-      column2: { role: 'role', type: 'DATE', dateFormat: 'YYYY-MM-DD' },
+      column2: { role: 'role', type: 'DATE', format: 'YYYY-MM-DD' },
       file: {
         name: 'file',
         children: [
@@ -231,7 +229,7 @@ describe('migrationViewModelConfig Test', () => {
             role: 'role',
             type: 'DATE',
             name: 'column4',
-            dateFormat: 'YYYY-MM-DD',
+            format: 'YYYY-MM-DD',
           },
         ],
       },
@@ -245,14 +243,14 @@ describe('migrationViewModelConfig Test', () => {
         path: ['column1'],
         role: 'role',
         type: 'DATE',
-        dateFormat: 'YYYY-MM-DD HH:mm:ss',
+        format: 'YYYY-MM-DD HH:mm:ss',
       },
       column2: {
         name: 'column2',
         path: ['column2'],
         role: 'role',
         type: 'DATE',
-        dateFormat: 'YYYY-MM-DD',
+        format: 'YYYY-MM-DD',
       },
       file: {
         name: 'file',
@@ -262,14 +260,14 @@ describe('migrationViewModelConfig Test', () => {
             type: 'DATE',
             name: 'column3',
             path: ['column3'],
-            dateFormat: 'YYYY-MM-DD HH:mm:ss',
+            format: 'YYYY-MM-DD HH:mm:ss',
           },
           {
             role: 'role',
             type: 'DATE',
             name: 'column4',
             path: ['column4'],
-            dateFormat: 'YYYY-MM-DD',
+            format: 'YYYY-MM-DD',
           },
         ],
       },
