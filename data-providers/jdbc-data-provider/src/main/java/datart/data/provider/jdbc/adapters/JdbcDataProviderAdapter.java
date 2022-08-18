@@ -182,7 +182,7 @@ public class JdbcDataProviderAdapter implements Closeable {
     }
 
     public String getQueryKey(QueryScript script, ExecuteParam executeParam) throws SqlParseException {
-        SqlScriptRender render = new SqlScriptRender(script, executeParam, getSqlDialect(), jdbcProperties.isEnableSpecialSql());
+        SqlScriptRender render = new SqlScriptRender(script, executeParam, getSqlDialect(), jdbcProperties.isEnableSpecialSql(), driverInfo.getQuoteIdentifiers());
         return "Q" + DigestUtils.md5Hex(render.render(true, supportPaging(), true));
     }
 
@@ -427,7 +427,9 @@ public class JdbcDataProviderAdapter implements Closeable {
 
         SqlScriptRender render = new SqlScriptRender(script
                 , tempExecuteParam
-                , getSqlDialect());
+                , getSqlDialect()
+                , jdbcProperties.isEnableSpecialSql()
+                , driverInfo.getQuoteIdentifiers());
         String sql = render.render(true, false, false);
         Dataframe data = execute(sql);
 
@@ -451,7 +453,8 @@ public class JdbcDataProviderAdapter implements Closeable {
         SqlScriptRender render = new SqlScriptRender(script
                 , executeParam
                 , getSqlDialect()
-                , jdbcProperties.isEnableSpecialSql());
+                , jdbcProperties.isEnableSpecialSql()
+                , driverInfo.getQuoteIdentifiers());
 
         if (supportPaging()) {
             sql = render.render(true, true, false);
