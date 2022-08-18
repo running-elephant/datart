@@ -16,16 +16,7 @@
  * limitations under the License.
  */
 
-import {
-  Button,
-  Form,
-  Input,
-  message,
-  Modal,
-  ModalProps,
-  Select,
-  Upload,
-} from 'antd';
+import { Button, Form, Input, message, Modal, ModalProps, Upload } from 'antd';
 import { Avatar } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
@@ -33,18 +24,13 @@ import {
   selectSaveProfileLoading,
 } from 'app/slice/selectors';
 import { saveProfile, updateUser } from 'app/slice/thunks';
-import {
-  BASE_API_URL,
-  BASE_RESOURCE_URL,
-  TIME_ZONE_DELIMITER,
-} from 'globalConstants';
+import { BASE_API_URL, BASE_RESOURCE_URL } from 'globalConstants';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_LG, SPACE_MD, SPACE_UNIT } from 'styles/StyleConstants';
 import { APIResponse } from 'types';
 import { getToken } from 'utils/auth';
-import { timezoneList } from './constants';
 
 const FormItem = Form.Item;
 
@@ -114,14 +100,6 @@ export function Profile({ visible, onCancel }: ModalProps) {
     [dispatch, loggedInUser, onCancel, tg],
   );
 
-  const formatTimezone = useCallback(zone => {
-    const ensure2Digits = num => (num > 9 ? `${num}` : `0${num}`);
-
-    return `(${zone.value < 0 ? '-' : '+'}${ensure2Digits(
-      Math.floor(Math.abs(zone.value)),
-    )}:${ensure2Digits(Math.abs((zone.value % 1) * 60))}) ${zone.label}`;
-  }, []);
-
   return (
     <Modal
       title={t('title')}
@@ -167,20 +145,7 @@ export function Profile({ visible, onCancel }: ModalProps) {
         <FormItem label={t('description')} name="description">
           <Input />
         </FormItem>
-        <FormItem label={t('timezone')} name="timezone" initialValue={8}>
-          <Select showSearch optionFilterProp="children">
-            {timezoneList.map(timezone => {
-              return (
-                <Select.Option
-                  key={timezone.name}
-                  value={timezone.name + TIME_ZONE_DELIMITER + timezone.value}
-                >
-                  {formatTimezone(timezone)}
-                </Select.Option>
-              );
-            })}
-          </Select>
-        </FormItem>
+
         <Form.Item wrapperCol={{ offset: 7, span: 12 }}>
           <Button
             type="primary"
