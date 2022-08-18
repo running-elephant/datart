@@ -17,8 +17,17 @@
  */
 
 import { CheckOutlined } from '@ant-design/icons';
-import { Button, DatePicker, Input, InputNumber, Space, Tag } from 'antd';
+import {
+  Button,
+  DatePicker,
+  Input,
+  InputNumber,
+  Select,
+  Space,
+  Tag,
+} from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { DateFormat } from 'app/pages/MainPage/pages/ViewPage/constants';
 import { TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import { memo, useCallback, useEffect, useState } from 'react';
@@ -31,11 +40,21 @@ interface DefaultValueProps {
   expression: boolean;
   disabled?: boolean;
   value?: null | any[];
+  dateFormat?: DateFormat;
+  onChangeDateFormat?: (value) => void;
   onChange?: (value) => void;
 }
 
 export const DefaultValue = memo(
-  ({ type, expression, disabled, value = [], onChange }: DefaultValueProps) => {
+  ({
+    type,
+    expression,
+    disabled,
+    value = [],
+    dateFormat,
+    onChange,
+    onChangeDateFormat,
+  }: DefaultValueProps) => {
     const [inputValue, setInputValue] = useState<any>(void 0);
     const t = useI18NPrefix('variable');
 
@@ -142,7 +161,7 @@ export const DefaultValue = memo(
     }
 
     return (
-      <Wrapper direction="vertical" size={0}>
+      <Wrapper direction="vertical">
         {expression || type === VariableValueTypes.Expression ? (
           <Input.TextArea
             placeholder={t('enterExpression')}
@@ -185,6 +204,22 @@ export const DefaultValue = memo(
               )}
             </Space>
           </>
+        )}
+        {type === VariableValueTypes.Date && (
+          <Select
+            placeholder="选择日期格式"
+            className="input"
+            value={dateFormat}
+            onChange={onChangeDateFormat}
+          >
+            {Object.values(DateFormat).map(format => {
+              return (
+                <Select.Option value={format} key={format}>
+                  {format}
+                </Select.Option>
+              );
+            })}
+          </Select>
         )}
       </Wrapper>
     );
