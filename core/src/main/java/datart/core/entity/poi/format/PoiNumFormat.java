@@ -43,7 +43,7 @@ public class PoiNumFormat {
     }
 
     public Object parseValue(Object obj){
-        if (obj!=null && StringUtils.isNotBlank(this.unitKey)){
+        if (obj!=null && org.apache.commons.lang.math.NumberUtils.isNumber(obj.toString()) && StringUtils.isNotBlank(this.unitKey)){
             UnitKey unitKey = UnitKey.getUnitKeyByValue(this.unitKey);
             BigDecimal val = new BigDecimal(obj.toString()).divide(new BigDecimal(unitKey.getUnit()));
             obj = val.setScale(getDecimalPlacesNum(), BigDecimal.ROUND_HALF_UP);
