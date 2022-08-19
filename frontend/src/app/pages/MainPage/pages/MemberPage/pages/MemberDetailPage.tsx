@@ -348,6 +348,7 @@ export function MemberDetailPage() {
                 <Select
                   placeholder={t('assignRole')}
                   mode="multiple"
+                  optionFilterProp="children"
                   loading={roleListLoading}
                   onDropdownVisibleChange={roleListVisibleChange}
                 >

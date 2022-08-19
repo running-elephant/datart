@@ -46,6 +46,7 @@ const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
       {
         allowSameField: true,
         disableAggregate: false,
+        disableAggregateComputedField: true,
       },
       {
         actions: {
@@ -75,12 +76,12 @@ const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
 
       const handleExtraButtonConfirm = close => {
         handleConfigChange(ancestors, currentConfig);
-        close && close();
+        close?.();
       };
 
       const handleExtraButtonCancel = close => {
         setCurrentConfig(originalConfig);
-        close && close();
+        close?.();
       };
 
       // TODO(Stephen): fix to use useStateModal hook

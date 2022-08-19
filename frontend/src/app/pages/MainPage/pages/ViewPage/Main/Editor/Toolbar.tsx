@@ -122,7 +122,10 @@ export const Toolbar = memo(
     const formatSQL = useCallback(() => {
       dispatch(
         actions.changeCurrentEditingView({
-          script: format(script),
+          script: format(script, {
+            denseOperators: true,
+            logicalOperatorNewline: 'after',
+          }),
         }),
       );
     }, [dispatch, actions, script]);
