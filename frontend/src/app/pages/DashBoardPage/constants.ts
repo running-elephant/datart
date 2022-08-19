@@ -287,6 +287,10 @@ export const SQL_OPERATOR_OPTIONS_TYPES = {
     FilterSqlOperator.LessThanOrEqual,
     FilterSqlOperator.GreaterThanOrEqual,
   ],
+  [ControllerFacadeTypes.RangeTime]: [
+    FilterSqlOperator.LessThan,
+    FilterSqlOperator.LessThanOrEqual,
+  ],
 };
 
 export const WIDGET_TITLE_ALIGN_OPTIONS = [

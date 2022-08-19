@@ -18,9 +18,14 @@
 import { Form, FormInstance, Select } from 'antd';
 import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import {
+  ALL_SQL_OPERATOR_OPTIONS,
+  SQL_OPERATOR_OPTIONS_TYPES,
+} from 'app/pages/DashBoardPage/constants';
 import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { FilterSqlOperator } from 'globalConstants';
 import produce from 'immer';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   DateName,
   EndTimeExactName,
@@ -38,6 +43,7 @@ import {
   PickerTypeOptions,
   RelativeDate,
 } from '../../../types';
+import { SqlOperatorSet } from '../../OtherSetter/SqlOperator/SqlOperatorSet';
 import { RelativeTimeSetter } from './RelativeTimeSetter';
 import { SingleTimeSet } from './SingleTimeSet';
 
@@ -199,6 +205,17 @@ export const TimeSetter: React.FC<{
       </Form.Item>
     );
   }, []);
+
+  const options = useMemo(() => {
+    const optionKeys: FilterSqlOperator[] =
+      SQL_OPERATOR_OPTIONS_TYPES[controllerType] || [];
+    const options = ALL_SQL_OPERATOR_OPTIONS.filter(it =>
+      optionKeys.includes(it.value),
+    );
+
+    return options;
+  }, [controllerType]);
+
   return (
     <Form.Item noStyle shouldUpdate>
       {() => {
@@ -272,6 +289,7 @@ export const TimeSetter: React.FC<{
                     TimeFilterValueCategory.Relative && (
                     <RelativeTimeSetter relativeName={EndTimeRelativeName} />
                   )}
+                  <SqlOperatorSet options={options} />
                 </Form.Item>
               </Form.Item>
             )}
