@@ -294,30 +294,37 @@ public class JdbcDataProviderAdapter implements Closeable {
         if (sqlDialect != null) {
             return sqlDialect;
         }
-        if (StringUtils.isNotBlank(driverInfo.getSqlDialect())) {
-            try {
-                Class<?> clz = Class.forName(driverInfo.getSqlDialect());
-                Class<?> superclass = clz.getSuperclass();
-                if (superclass.equals(CustomSqlDialect.class)) {
-                    Constructor<?> constructor = clz.getConstructor(JdbcDriverInfo.class);
-                    sqlDialect = (CustomSqlDialect) constructor.newInstance(driverInfo);
-                } else {
-                    sqlDialect = (SqlDialect) clz.newInstance();
+        synchronized (this) {
+            // double check
+            if (sqlDialect != null) {
+                return sqlDialect;
+            }
+
+            if (StringUtils.isNotBlank(driverInfo.getSqlDialect())) {
+                try {
+                    Class<?> clz = Class.forName(driverInfo.getSqlDialect());
+                    Class<?> superclass = clz.getSuperclass();
+                    if (superclass.equals(CustomSqlDialect.class)) {
+                        Constructor<?> constructor = clz.getConstructor(JdbcDriverInfo.class);
+                        sqlDialect = (CustomSqlDialect) constructor.newInstance(driverInfo);
+                    } else {
+                        sqlDialect = (SqlDialect) clz.newInstance();
+                    }
+                } catch (Exception ignored) {
+                    log.warn("Sql dialect " + driverInfo.getSqlDialect() + " not found, use default sql dialect");
                 }
-            } catch (Exception ignored) {
-                log.warn("Sql dialect " + driverInfo.getSqlDialect() + " not found, use default sql dialect");
             }
-        }
-        if (sqlDialect == null) {
-            try {
-                sqlDialect = getDefaultSqlDialect(driverInfo);
-            } catch (Exception ignored) {
-                log.warn("DBType " + driverInfo.getDbType() + " mismatched, use custom sql dialect");
-                sqlDialect = new CustomSqlDialect(driverInfo);
+            if (sqlDialect == null) {
+                try {
+                    sqlDialect = getDefaultSqlDialect(driverInfo);
+                } catch (Exception ignored) {
+                    log.warn("DBType " + driverInfo.getDbType() + " mismatched, use custom sql dialect");
+                    sqlDialect = new CustomSqlDialect(driverInfo);
+                }
             }
+            configSqlDialect(sqlDialect, driverInfo);
+            return sqlDialect;
         }
-        configSqlDialect(sqlDialect, driverInfo);
-        return sqlDialect;
     }
 
     protected void configSqlDialect(SqlDialect sqlDialect, JdbcDriverInfo driverInfo) {

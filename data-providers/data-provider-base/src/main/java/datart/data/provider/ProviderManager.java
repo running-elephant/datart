@@ -226,7 +226,14 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
         ServiceLoader<DataProvider> load = ServiceLoader.load(DataProvider.class);
         for (DataProvider dataProvider : load) {
             try {
-                cachedDataProviders.put(dataProvider.getType(), dataProvider);
+                if (!cachedDataProviders.containsKey(dataProvider.getType())) {
+                    synchronized (ProviderManager.class) {
+                        // double check in sync
+                        if (!cachedDataProviders.containsKey(dataProvider.getType())) {
+                            cachedDataProviders.put(dataProvider.getType(), dataProvider);
+                        }
+                    }
+                }
             } catch (IOException e) {
                 log.error("", e);
             }
