@@ -674,11 +674,15 @@ export const getEditControllerOptions = createAsyncThunk<
     if (!Array.isArray(config.assistViewFields)) return null;
     if (config.assistViewFields.length < 2) return null;
 
+    const parentField = config?.parentField;
     const boardState = rootState.board as BoardState;
     const viewMap = boardState.viewMap;
     const [viewId, ...columns] = config.assistViewFields;
     const view = viewMap[viewId];
     if (!view) return null;
+    if (parentField) {
+      columns.push(parentField);
+    }
     const requestParams = getControlOptionQueryParams({
       view,
       columns: columns,

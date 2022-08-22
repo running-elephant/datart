@@ -97,6 +97,7 @@ export type RelationFilterValue = {
   index?: number;
   isSelected?: boolean;
   children?: RelationFilterValue[];
+  selectable?: boolean;
 };
 
 export type AggregateLimit = Pick<typeof AggregateFieldActionType, 'Count'>;

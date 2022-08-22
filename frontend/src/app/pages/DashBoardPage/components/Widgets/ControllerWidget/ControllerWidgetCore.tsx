@@ -31,6 +31,7 @@ import produce from 'immer';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
+import { convertToTreeData } from '../../../utils/widget';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { getWidgetTitle } from '../../WidgetManager/utils/utils';
@@ -46,6 +47,7 @@ import { SelectControllerForm } from './Controller/SelectController';
 import { SlideControllerForm } from './Controller/SliderController';
 import { TextControllerForm } from './Controller/TextController';
 import { TimeControllerForm } from './Controller/TimeController';
+import { TreeControllerForm } from './Controller/TreeController';
 
 export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   const widget = useContext(WidgetContext);
@@ -72,6 +74,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     controllerValues,
     valueOptions,
     valueOptionType,
+    parentField,
     // sqlOperator,
   } = useMemo(() => config as ControllerConfig, [config]);
   const title = getWidgetTitle(widget.config.customConfig.props);
@@ -100,7 +103,11 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
   }, [title]);
   const optionRows = useMemo(() => {
     const dataRows = dataset?.rows || [];
+
     if (valueOptionType === 'common') {
+      if (parentField) {
+        return convertToTreeData(dataRows);
+      }
       return dataRows.map(ele => {
         const item: RelationFilterValue = {
           key: ele?.[0],
@@ -114,7 +121,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     } else {
       return [];
     }
-  }, [dataset?.rows, valueOptionType, valueOptions]);
+  }, [dataset?.rows, valueOptionType, valueOptions, parentField]);
 
   const onControllerChange = useCallback(() => {
     form.submit();
@@ -349,6 +356,18 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           />
         );
 
+      case ControllerFacadeTypes.DropDownTree:
+        form.setFieldsValue({ value: controllerValues });
+        return (
+          <TreeControllerForm
+            parentField={parentField}
+            onChange={onControllerChange}
+            options={optionRows}
+            name={'value'}
+            label={leftControlLabel}
+          />
+        );
+
       default:
         break;
     }
@@ -361,6 +380,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     leftControlLabel,
     config,
     controllerDate,
+    parentField,
     onRangeTimeChange,
     onTimeChange,
   ]);

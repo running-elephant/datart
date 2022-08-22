@@ -25,6 +25,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ChartsEventData } from 'app/types/Chart';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
 import {
@@ -60,6 +61,7 @@ import {
 } from '../pages/Board/slice/types';
 import { StrControlTypes } from '../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { Widget, WidgetMapping } from '../types/widgetTypes';
+
 export const VALUE_SPLITTER = '###';
 
 // export const createInitWidgetConfig = (opt: {
@@ -777,3 +779,27 @@ export function cloneWidgets(args: {
     newWidgets,
   };
 }
+
+export const convertToTreeData = collection => {
+  const treeNode: { [key: string]: RelationFilterValue } = {};
+
+  collection.forEach(ele => {
+    const parentTitle = ele[ele.length - 1];
+    if (!treeNode[parentTitle]) {
+      treeNode[parentTitle] = {
+        key: parentTitle,
+        label: parentTitle,
+        children: [],
+      };
+    }
+    treeNode[parentTitle]['children'] = [
+      ...(treeNode[parentTitle]['children'] as []),
+      {
+        key: ele?.[0],
+        label: ele.length > 2 ? ele?.[1] : '',
+      },
+    ];
+  });
+
+  return Object.values(treeNode);
+};
