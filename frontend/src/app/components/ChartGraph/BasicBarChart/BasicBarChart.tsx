@@ -113,7 +113,7 @@ class BasicBarChart extends Chart implements IChartLifecycle {
     this.selectionManager.attachZRenderListeners(this.chart);
     this.selectionManager.attachEChartsListeners(this.chart);
 
-    // TODO(Stephen): refactor to chart data zoom manager model
+    // TODO(TL): refactor to chart data zoom manager model
     this.chart.on('datazoom', ({ end, start }) => {
       this.dataZoomConfig.showConfig = {
         end,

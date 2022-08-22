@@ -106,6 +106,8 @@ class BasicLineChart extends Chart {
     this.selectionManager.attachWindowListeners(context.window);
     this.selectionManager.attachZRenderListeners(this.chart);
     this.selectionManager.attachEChartsListeners(this.chart);
+
+    // TODO(TL): refactor to chart data zoom manager model
     this.chart.on('datazoom', ({ end, start }) => {
       this.dataZoomConfig.showConfig = {
         end,
