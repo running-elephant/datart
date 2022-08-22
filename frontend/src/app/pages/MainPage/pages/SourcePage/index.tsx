@@ -19,20 +19,24 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 import styled from 'styled-components/macro';
+import { SaveFormContext, useSaveFormContext } from './SaveFormContext';
 import { Sidebar } from './Sidebar';
 import { useSourceSlice } from './slice';
 import { SourceDetailPage } from './SourceDetailPage';
 
 export function SourcePage() {
   useSourceSlice();
+  const saveFormContextValue = useSaveFormContext();
   return (
-    <Container>
-      <Sidebar />
-      <Route
-        path="/organizations/:orgId/sources/:sourceId"
-        component={SourceDetailPage}
-      />
-    </Container>
+    <SaveFormContext.Provider value={saveFormContextValue}>
+      <Container>
+        <Sidebar />
+        <Route
+          path="/organizations/:orgId/sources/:sourceId"
+          component={SourceDetailPage}
+        />
+      </Container>
+    </SaveFormContext.Provider>
   );
 }
 
