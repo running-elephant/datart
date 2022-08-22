@@ -200,7 +200,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 !items
                   ?.map(i => i?.uid)
                   ?.filter(Boolean)
-                  .includes(r?.uid),
+                  ?.includes(r?.uid),
             )
             ?.map(col => col.colName);
 
