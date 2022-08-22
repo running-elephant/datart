@@ -252,6 +252,9 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     };
 
     const onDraggableItemMove = (dragIndex: number, hoverIndex: number) => {
+      if (!canDrop) {
+        return;
+      }
       const draggedItem = currentConfig.rows?.[dragIndex];
       if (draggedItem) {
         const newCurrentConfig = updateBy(currentConfig, draft => {
@@ -260,21 +263,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           columns.splice(hoverIndex, 0, draggedItem);
         });
         setCurrentConfig(newCurrentConfig);
-      } else {
-        // const placeholder = {
-        //   uid: CHARTCONFIG_FIELD_PLACEHOLDER_UID,
-        //   colName: 'Placeholder',
-        //   category: 'field',
-        //   type: 'STRING',
-        // } as any;
-        // const newCurrentConfig = updateBy(currentConfig, draft => {
-        //   const columns = draft.rows || [];
-        //   if (dragIndex) {
-        //     columns.splice(dragIndex, 1);
-        //   }
-        //   columns.splice(hoverIndex, 0, placeholder);
-        // });
-        // setCurrentConfig(newCurrentConfig);
       }
     };
 
