@@ -27,6 +27,7 @@ import {
   getSources,
   syncSourceSchema,
   unarchiveSource,
+  updateSourceBase,
 } from './thunks';
 import { SourceState } from './types';
 
@@ -41,6 +42,7 @@ export const initialState: SourceState = {
   unarchiveSourceLoading: false,
   deleteSourceLoading: false,
   syncSourceSchemaLoading: false,
+  updateLoading: false,
 };
 
 const slice = createSlice({
@@ -58,7 +60,7 @@ const slice = createSlice({
     });
     builder.addCase(getSources.fulfilled, (state, action) => {
       state.sourceListLoading = false;
-      state.sources = action.payload;
+      state.sources = action.payload.map(v => ({ ...v, deleteLoading: false }));
     });
     builder.addCase(getSources.rejected, state => {
       state.sourceListLoading = false;
@@ -70,7 +72,10 @@ const slice = createSlice({
     });
     builder.addCase(getArchivedSources.fulfilled, (state, action) => {
       state.archivedListLoading = false;
-      state.archived = action.payload;
+      state.archived = action.payload.map(v => ({
+        ...v,
+        deleteLoading: false,
+      }));
     });
     builder.addCase(getArchivedSources.rejected, state => {
       state.archivedListLoading = false;
@@ -83,7 +88,9 @@ const slice = createSlice({
     builder.addCase(getSource.fulfilled, (state, action) => {
       state.sourceDetailLoading = false;
       state.sources = state.sources.map(s =>
-        s.id === action.payload.id ? action.payload : s,
+        s.id === action.payload.id
+          ? { ...action.payload, deleteLoading: false }
+          : s,
       );
       state.editingSource = action.payload.id;
     });
@@ -97,7 +104,7 @@ const slice = createSlice({
     });
     builder.addCase(addSource.fulfilled, (state, action) => {
       state.saveSourceLoading = false;
-      state.sources.unshift(action.payload);
+      state.sources.unshift({ ...action.payload, deleteLoading: false });
     });
     builder.addCase(addSource.rejected, state => {
       state.saveSourceLoading = false;
@@ -110,7 +117,9 @@ const slice = createSlice({
     builder.addCase(editSource.fulfilled, (state, action) => {
       state.saveSourceLoading = false;
       state.sources = state.sources.map(s =>
-        s.id === action.payload.id ? action.payload : s,
+        s.id === action.payload.id
+          ? { ...action.payload, deleteLoading: false }
+          : s,
       );
     });
     builder.addCase(editSource.rejected, state => {
@@ -123,7 +132,9 @@ const slice = createSlice({
     });
     builder.addCase(unarchiveSource.fulfilled, (state, action) => {
       state.unarchiveSourceLoading = false;
-      state.archived = state.archived.filter(s => s.id !== action.meta.arg.id);
+      state.archived = state.archived.filter(
+        s => s.id !== action.meta.arg.source.id,
+      );
     });
     builder.addCase(unarchiveSource.rejected, state => {
       state.unarchiveSourceLoading = false;
@@ -135,13 +146,8 @@ const slice = createSlice({
     });
     builder.addCase(deleteSource.fulfilled, (state, action) => {
       state.deleteSourceLoading = false;
-      if (action.meta.arg.archive) {
-        state.sources = state.sources.filter(s => s.id !== action.meta.arg.id);
-      } else {
-        state.archived = state.archived.filter(
-          s => s.id !== action.meta.arg.id,
-        );
-      }
+      state.sources = state.sources.filter(s => s.id !== action.meta.arg.id);
+      state.archived = state.archived.filter(s => s.id !== action.meta.arg.id);
     });
     builder.addCase(deleteSource.rejected, state => {
       state.deleteSourceLoading = false;
@@ -156,6 +162,27 @@ const slice = createSlice({
     });
     builder.addCase(syncSourceSchema.rejected, state => {
       state.syncSourceSchemaLoading = false;
+    });
+
+    // updateSourceBase
+    builder.addCase(updateSourceBase.pending, state => {
+      state.updateLoading = true;
+    });
+    builder.addCase(updateSourceBase.fulfilled, (state, action) => {
+      state.updateLoading = false;
+      state.sources = state.sources.map(v =>
+        v.id === action.payload.id
+          ? {
+              ...v,
+              ...action.payload,
+              parentId: action.payload.parentId || null,
+              deleteLoading: false,
+            }
+          : v,
+      );
+    });
+    builder.addCase(updateSourceBase.rejected, state => {
+      state.updateLoading = false;
     });
   },
 });
