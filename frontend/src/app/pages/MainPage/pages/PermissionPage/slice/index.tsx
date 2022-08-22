@@ -141,16 +141,19 @@ const slice = createSlice({
       state.sourceListLoading = true;
     });
     builder.addCase(getSources.fulfilled, (state, action) => {
+      const root = generateRootNode(ResourceTypes.Source);
       state.sourceListLoading = false;
-      state.sources = action.payload.map(({ id, name }) => ({
-        id,
-        name,
-        type: ResourceTypes.Source,
-        parentId: null,
-        index: null,
-        isFolder: false,
-        permissionArray: getDefaultPermissionArray(),
-      }));
+      state.sources = [root].concat(
+        action.payload.map(({ id, name, parentId, index, isFolder }) => ({
+          id,
+          name,
+          index,
+          type: ResourceTypes.Source,
+          parentId: parentId === null ? root.id : parentId,
+          isFolder,
+          permissionArray: getDefaultPermissionArray(),
+        })),
+      );
     });
     builder.addCase(getSources.rejected, state => {
       state.sourceListLoading = false;

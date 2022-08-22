@@ -110,6 +110,10 @@ const StyledDirectoryTree = styled(AntTree)`
           color: ${p => p.theme.primary};
           background: none;
         }
+
+        .ant-tree-icon__docu {
+          display: none;
+        }
       }
 
       &:hover {

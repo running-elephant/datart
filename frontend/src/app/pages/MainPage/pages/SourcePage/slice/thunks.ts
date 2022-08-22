@@ -17,22 +17,22 @@
  */
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
-import { getLoggedInUserPermissions } from 'app/pages/MainPage/slice/thunks';
 import { RootState } from 'types';
 import { request2 } from 'utils/request';
 import {
-  AddSourceParams,
   DeleteSourceParams,
   EditSourceParams,
-  Source,
+  SourceBase,
+  SourceParamsResolve,
+  SourceSimple,
   UnarchiveSourceParams,
+  UpdateSourceBaseParams,
 } from './types';
 
-export const getSources = createAsyncThunk<Source[], string>(
+export const getSources = createAsyncThunk<SourceSimple[], string>(
   'source/getSources',
   async orgId => {
-    const { data } = await request2<Source[]>({
+    const { data } = await request2<SourceSimple[]>({
       url: '/sources',
       method: 'GET',
       params: { orgId },
@@ -41,10 +41,10 @@ export const getSources = createAsyncThunk<Source[], string>(
   },
 );
 
-export const getArchivedSources = createAsyncThunk<Source[], string>(
+export const getArchivedSources = createAsyncThunk<SourceSimple[], string>(
   'source/getArchivedSources',
   async orgId => {
-    const { data } = await request2<Source[]>({
+    const { data } = await request2<SourceSimple[]>({
       url: '/sources/archived',
       method: 'GET',
       params: { orgId },
@@ -53,34 +53,30 @@ export const getArchivedSources = createAsyncThunk<Source[], string>(
   },
 );
 
-export const getSource = createAsyncThunk<Source, string>(
+export const getSource = createAsyncThunk<SourceSimple, string>(
   'source/getSource',
   async id => {
-    const { data } = await request2<Source>(`/sources/${id}`);
+    const { data } = await request2<SourceSimple>(`/sources/${id}`);
     return data;
   },
 );
 
 export const addSource = createAsyncThunk<
-  Source,
-  AddSourceParams,
+  SourceSimple,
+  SourceParamsResolve,
   { state: RootState }
 >('source/addSource', async ({ source, resolve }, { getState, dispatch }) => {
-  const { data } = await request2<Source>({
+  const { data } = await request2<SourceSimple>({
     url: '/sources',
     method: 'POST',
     data: source,
   });
 
-  // FIXME 拥有Read权限等级的扁平结构资源新增后需要更新权限字典；后续如改造为目录结构则删除该逻辑
-  const orgId = selectOrgId(getState());
-  await dispatch(getLoggedInUserPermissions(orgId));
-
   resolve(data.id);
   return data;
 });
 
-export const editSource = createAsyncThunk<Source, EditSourceParams>(
+export const editSource = createAsyncThunk<SourceSimple, EditSourceParams>(
   'source/editSource',
   async ({ source, resolve, reject }) => {
     await request2<boolean>(
@@ -103,10 +99,11 @@ export const editSource = createAsyncThunk<Source, EditSourceParams>(
 
 export const unarchiveSource = createAsyncThunk<null, UnarchiveSourceParams>(
   'source/unarchiveSource',
-  async ({ id, resolve }) => {
+  async ({ source, resolve }) => {
     await request2<boolean>({
-      url: `/sources/unarchive/${id}`,
+      url: `/sources/unarchive/${source.id}`,
       method: 'PUT',
+      params: source,
     });
     resolve();
     return null;
@@ -136,3 +133,16 @@ export const syncSourceSchema = createAsyncThunk<null, { sourceId: string }>(
     return data;
   },
 );
+
+export const updateSourceBase = createAsyncThunk<
+  SourceBase,
+  UpdateSourceBaseParams
+>('source/updateSourceBase', async ({ source, resolve }) => {
+  await request2<SourceBase>({
+    url: `/sources/${source.id}/base`,
+    method: 'PUT',
+    data: source,
+  });
+  resolve();
+  return source;
+});

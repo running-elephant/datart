@@ -1365,7 +1365,16 @@
     "sidebar": {
       "title": "数据源列表",
       "add": "新建数据源",
-      "recycle": "回收站"
+      "addFolder": "新建目录",
+      "recycle": "回收站",
+      "parent": "所属目录",
+      "success": "成功",
+      "delete": "删除",
+      "moveToTrash": "移至回收站",
+      "addSuccess": "新增成功",
+      "restoredSuccess": "还原成功",
+      "restore": "还原",
+      "sureToDelete": "确定删除？"
     },
     "form": {
       "name": "名称",
@@ -1379,6 +1388,12 @@
       "editConfig": "编辑配置",
       "duplicateKey": "Key不能重复",
       "duplicateName": "名称重复"
+    },
+    "saveForm": {
+      "name": "名称",
+      "folder": "目录",
+      "root": "根目录",
+      "title": "数据源"
     }
   },
   "schedule": {

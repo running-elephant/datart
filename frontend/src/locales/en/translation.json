@@ -1366,7 +1366,16 @@
     "sidebar": {
       "title": "Sources",
       "add": "Create Source",
-      "recycle": "Recycle"
+      "recycle": "Recycle",
+      "addFolder": "Create Folder",
+      "parent": "Parent",
+      "success": "Success",
+      "delete": "Delete",
+      "moveToTrash": "Move to recycle bin",
+      "restoredSuccess": "Restored successfully",
+      "restore": "Restore",
+      "sureToDelete": "Confirm delete?",
+      "addSuccess": "Add Success"
     },
     "form": {
       "name": "Name",
@@ -1380,6 +1389,12 @@
       "editConfig": "Edit Configuration",
       "duplicate": "Duplicate Key",
       "duplicateName": "Duplicate Name"
+    },
+    "saveForm": {
+      "name": "Name",
+      "folder": "Folder",
+      "root": "Root",
+      "title": "Sources"
     }
   },
   "schedule": {
