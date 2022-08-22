@@ -87,7 +87,7 @@ public class SourceController extends BaseController {
     public ResponseData<Boolean> deleteSource(@PathVariable String sourceId,
                                               @RequestParam boolean archive) {
         checkBlank(sourceId, "sourceId");
-        return ResponseData.success(sourceService.delete(sourceId, archive));
+        return ResponseData.success(sourceService.delete(sourceId, archive, true));
     }
 
     @ApiOperation(value = "list archived source")

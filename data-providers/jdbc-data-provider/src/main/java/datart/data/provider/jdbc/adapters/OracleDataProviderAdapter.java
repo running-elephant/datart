@@ -53,7 +53,7 @@ public class OracleDataProviderAdapter extends JdbcDataProviderAdapter {
         Dataframe dataframe = new Dataframe();
         List<Column> columns = getColumns(rs);
         int start = 1;
-        if ("V_R_N".equals(columns.get(0).getName())) {
+        if ("V_R_N".equals(columns.get(0).columnKey())) {
             start = 2;
             columns.remove(0);
         }

@@ -18,17 +18,13 @@
 package datart.data.provider.calcite;
 
 import datart.core.base.exception.Exceptions;
-import datart.core.common.DateUtils;
 import datart.core.data.provider.ScriptVariable;
 import datart.core.data.provider.SingleTypedValue;
 import datart.data.provider.calcite.custom.SqlSimpleStringLiteral;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParserPos;
-import org.apache.calcite.util.DateString;
-import org.apache.calcite.util.TimestampString;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -132,15 +128,8 @@ public class SqlNodeUtils {
     }
 
     private static SqlNode createDateSqlNode(String value, String format) {
-        if (StringUtils.isBlank(format)) {
-            return SqlLiteral.createTimestamp(new TimestampString(value), 0, SqlParserPos.ZERO);
-        } else if (DateUtils.isDateFormat(format)) {
-            return SqlLiteral.createDate(new DateString(value), SqlParserPos.ZERO);
-        } else if (DateUtils.isDateTimeFormat(format)) {
-            return SqlLiteral.createTimestamp(new TimestampString(value), 0, SqlParserPos.ZERO);
-        } else {
-            return new SqlSimpleStringLiteral(value);
-        }
+        // After 1.0.0-RC.1, date type parameters are treated as strings directly
+        return new SqlSimpleStringLiteral(value);
     }
 
     /**
