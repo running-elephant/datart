@@ -189,7 +189,7 @@ public class JdbcDataProviderAdapter implements Closeable {
     protected Column readTableColumn(ResultSet columnMetadata) throws SQLException {
         Column column = new Column();
         column.setName(columnMetadata.getString(4));
-        column.setType(DataTypeUtils.sqlType2DataType(columnMetadata.getString(6)));
+        column.setType(DataTypeUtils.jdbcType2DataType(columnMetadata.getInt(5)));
         return column;
     }
 
