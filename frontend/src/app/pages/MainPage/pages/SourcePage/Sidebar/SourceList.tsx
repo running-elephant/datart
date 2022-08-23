@@ -31,7 +31,7 @@ import {
   selectPermissionMap,
 } from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';
-import { memo, useCallback, useContext, useEffect } from 'react';
+import { memo, useCallback, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import { errorHandle, onDropTreeFn, stopPPG, uuidv4 } from 'utils/utils';
@@ -64,6 +64,7 @@ export const SourceList = memo(({ sourceId, list }: SourceListProps) => {
   const { showSaveForm } = useContext(SaveFormContext);
   const isOwner = useSelector(selectIsOrgOwner);
   const permissionMap = useSelector(selectPermissionMap);
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
 
   useEffect(() => {
     dispatch(getSources(orgId));
@@ -260,15 +261,6 @@ export const SourceList = memo(({ sourceId, list }: SourceListProps) => {
     ],
   );
 
-  const treeSelect = useCallback(
-    (_, { node }) => {
-      if (!node.isFolder && node.id !== sourceId) {
-        history.push(`/organizations/${orgId}/sources/${node.id}`);
-      }
-    },
-    [history, orgId, sourceId],
-  );
-
   const onDrop = info => {
     onDropTreeFn({
       info,
@@ -289,14 +281,36 @@ export const SourceList = memo(({ sourceId, list }: SourceListProps) => {
     });
   };
 
+  const menuSelect = useCallback(
+    (_, { node }) => {
+      if (node.type === 'FOLDER') {
+        if (expandedKeys?.includes(node.key)) {
+          setExpandedKeys(expandedKeys.filter(k => k !== node.key));
+        } else {
+          setExpandedKeys([node.key].concat(expandedKeys));
+        }
+      } else {
+        history.push(`/organizations/${orgId}/sources/${node.id}`);
+      }
+    },
+    [expandedKeys, history, orgId],
+  );
+
+  const handleExpandTreeNode = expandedKeys => {
+    setExpandedKeys(expandedKeys);
+  };
+
   return (
     <Tree
       loading={loading}
       treeData={list}
       titleRender={renderTreeTitle}
-      selectedKeys={[sourceId || '']}
-      onSelect={treeSelect}
+      onSelect={menuSelect}
       onDrop={onDrop}
+      expandedKeys={expandedKeys}
+      onExpand={handleExpandTreeNode}
+      {...(sourceId && { selectedKeys: [sourceId] })}
+      draggable
     />
   );
 });
