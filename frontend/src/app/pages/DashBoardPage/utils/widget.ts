@@ -801,5 +801,19 @@ export const convertToTreeData = collection => {
     ];
   });
 
+  Object.entries(treeNode)?.forEach(([key, value], ind) => {
+    treeNode[key] = {
+      ...value,
+      index: ind,
+      children: value.children?.map((children, index) => {
+        return {
+          ...children,
+          index: ind,
+          childIndex: index,
+        };
+      }),
+    };
+  });
+
   return Object.values(treeNode);
 };

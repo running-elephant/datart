@@ -95,6 +95,7 @@ export type RelationFilterValue = {
   key: string;
   label: string;
   index?: number;
+  childIndex?: number;
   isSelected?: boolean;
   children?: RelationFilterValue[];
   selectable?: boolean;
