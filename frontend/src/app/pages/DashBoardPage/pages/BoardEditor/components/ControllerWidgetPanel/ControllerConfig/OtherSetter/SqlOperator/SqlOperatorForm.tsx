@@ -23,6 +23,7 @@ export interface SqlOperatorFormProps extends FormItemProps<any> {
 }
 export const SqlOperatorForm: React.FC<SqlOperatorFormProps> = memo(
   ({ options, ...rest }) => {
+    console.log(rest, 'rest');
     return (
       <Form.Item {...rest}>
         <SqlOperatorSet options={options} />
