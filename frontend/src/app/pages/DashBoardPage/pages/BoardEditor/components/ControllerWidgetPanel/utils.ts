@@ -168,6 +168,8 @@ export const getInitWidgetController = (
   type: ControllerFacadeTypes = ControllerFacadeTypes.DropdownList,
 ) => {
   switch (type) {
+    case ControllerFacadeTypes.DropDownTree:
+      return getDropdownTreeControllerConfig();
     case ControllerFacadeTypes.MultiDropdownList:
       return getMultiDropdownListControllerConfig();
     case ControllerFacadeTypes.Time:
@@ -281,6 +283,12 @@ export const getRangeSliderControllerConfig = () => {
 export const getRangeValueControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.Between;
+  return config;
+};
+
+export const getDropdownTreeControllerConfig = () => {
+  const config = getInitControllerConfig();
+  config.sqlOperator = FilterSqlOperator.In;
   return config;
 };
 
