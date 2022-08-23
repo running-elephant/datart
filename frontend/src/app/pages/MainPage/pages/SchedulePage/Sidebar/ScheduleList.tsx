@@ -53,6 +53,7 @@ export const ScheduleList: FC<{
   const [startLoading, setStartLoading] = useState(false);
   const [stopLoading, setStopLoading] = useState(false);
   const [executeLoading, setExecuteLoading] = useState(false);
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
 
   const onUpdateScheduleList = useCallback(() => {
     dispatch(getSchedules(orgId as string));
@@ -321,13 +322,19 @@ export const ScheduleList: FC<{
     ],
   );
 
-  const treeSelect = useCallback(
+  const menuSelect = useCallback(
     (_, { node }) => {
-      if (!node.isFolder && node.id !== scheduleId) {
+      if (node.type === 'FOLDER') {
+        if (expandedKeys?.includes(node.key)) {
+          setExpandedKeys(expandedKeys.filter(k => k !== node.key));
+        } else {
+          setExpandedKeys([node.key].concat(expandedKeys));
+        }
+      } else {
         history.push(`/organizations/${orgId}/schedules/${node.id}`);
       }
     },
-    [history, orgId, scheduleId],
+    [expandedKeys, history, orgId],
   );
 
   const onDrop = info => {
@@ -350,14 +357,21 @@ export const ScheduleList: FC<{
     });
   };
 
+  const handleExpandTreeNode = expandedKeys => {
+    setExpandedKeys(expandedKeys);
+  };
+
   return (
     <Tree
       loading={loading}
       treeData={list}
       titleRender={renderTreeTitle}
-      selectedKeys={[scheduleId || '']}
-      onSelect={treeSelect}
+      onSelect={menuSelect}
       onDrop={onDrop}
+      expandedKeys={expandedKeys}
+      onExpand={handleExpandTreeNode}
+      {...(scheduleId && { selectedKeys: [scheduleId] })}
+      draggable
     />
   );
 });
