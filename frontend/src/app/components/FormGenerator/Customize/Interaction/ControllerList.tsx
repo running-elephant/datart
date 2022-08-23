@@ -19,6 +19,7 @@
 import { Button, Radio, Select, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import useMount from 'app/hooks/useMount';
+import { handleDateLevelsName } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/utils';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { fetchDashboardDetail } from 'app/utils/fetch';
 import { updateBy } from 'app/utils/mutation';
@@ -27,7 +28,6 @@ import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
 import { InteractionRelationType } from '../../constants';
 import { CustomizeRelation, I18nTranslator } from './types';
-
 const ControllerList: FC<
   {
     targetRelId?: string;
@@ -140,7 +140,11 @@ const ControllerList: FC<
           dropdownMatchSelectWidth={false}
         >
           {(isFieldType(record) ? sourceFields : sourceVariables)?.map(sf => {
-            return <Select.Option value={sf?.name}>{sf?.name}</Select.Option>;
+            return (
+              <Select.Option value={sf?.name}>
+                {handleDateLevelsName(sf)}
+              </Select.Option>
+            );
           })}
         </Select>
       ),
