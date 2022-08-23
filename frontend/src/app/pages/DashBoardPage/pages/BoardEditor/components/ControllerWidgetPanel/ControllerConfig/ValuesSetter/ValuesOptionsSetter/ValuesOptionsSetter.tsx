@@ -247,7 +247,7 @@ const ValuesOptionsSetter: FC<{
   );
 
   const onInitOptions = useCallback(
-    async (value: string[], parentField: string) => {
+    async (value: string[], parentField?: string) => {
       const [viewId, ...columns] = value;
       const { option: options, dataView } = await getViewOption(viewId);
       if (parentField) {
@@ -283,12 +283,7 @@ const ValuesOptionsSetter: FC<{
 
     const assistViewFields = config?.assistViewFields;
     const parentField = config?.parentField;
-    if (
-      assistViewFields &&
-      assistViewFields[0] &&
-      assistViewFields[1] &&
-      parentField
-    ) {
+    if (assistViewFields && assistViewFields[0] && assistViewFields[1]) {
       onInitOptions(assistViewFields, parentField);
     }
   }, [form, getControllerConfig, onInitOptions]);
@@ -308,7 +303,7 @@ const ValuesOptionsSetter: FC<{
         },
       });
 
-      onViewFieldChange(config.assistViewFields || [], '');
+      onViewFieldChange(config.assistViewFields || []);
     },
     [getControllerConfig, form, onViewFieldChange],
   );
