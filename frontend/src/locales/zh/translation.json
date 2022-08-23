@@ -1278,7 +1278,8 @@
       "unsetDefault": "取消默认值",
       "setDefault": "设为默认值",
       "delete": "删除",
-      "populate": "从字段填充备选项"
+      "populate": "从字段填充备选项",
+      "parentFieldId": "父ID字段"
     },
     "date": {
       "year": "年",

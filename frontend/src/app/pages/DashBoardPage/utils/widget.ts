@@ -796,7 +796,7 @@ export const convertToTreeData = collection => {
       ...(treeNode[parentTitle]['children'] as []),
       {
         key: ele?.[0],
-        label: ele.length > 2 ? ele?.[1] : '',
+        label: ele.length > 2 ? ele?.[1] : undefined,
       },
     ];
   });

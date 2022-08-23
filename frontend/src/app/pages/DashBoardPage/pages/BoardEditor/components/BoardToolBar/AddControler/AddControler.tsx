@@ -81,7 +81,6 @@ export const AddController: React.FC<AddControlBtnProps> = () => {
     //   disabled: false,
     // },
     {
-      name: '多选下拉树',
       icon: '',
       type: ControllerFacadeTypes.DropDownTree,
     },

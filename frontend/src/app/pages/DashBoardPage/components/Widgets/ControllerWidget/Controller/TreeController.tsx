@@ -75,7 +75,7 @@ export const TreeSelectController: React.FC<SelectControllerProps> = memo(
                 <TreeSelect.TreeNode
                   key={children.key + children.label}
                   title={children.label ?? children.key ?? 'none'}
-                  value={children.key + children.label}
+                  value={children.key}
                 />
               );
             })}

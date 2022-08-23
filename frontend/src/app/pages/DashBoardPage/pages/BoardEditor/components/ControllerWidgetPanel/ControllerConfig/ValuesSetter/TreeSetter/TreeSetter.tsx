@@ -17,6 +17,7 @@
  */
 
 import { Select } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import styled from 'styled-components/macro';
 
 export interface TreeSetterProps {
@@ -32,13 +33,14 @@ function TreeSetter({
   style,
   onChange,
 }: TreeSetterProps) {
+  const tc = useI18NPrefix(`viz.control`);
   return (
     <TreeSetterWrapper>
       <Select
         style={style}
         optionFilterProp={'label'}
         onChange={onChange}
-        placeholder={'父ID字段'}
+        placeholder={tc('parentFieldId')}
         showSearch
         allowClear
         options={viewFieldList}
