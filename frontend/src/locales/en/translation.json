@@ -1281,7 +1281,7 @@
       "setDefault": "Set Default",
       "delete": "Delete",
       "populate": "Populate From Field Values",
-      "parentFieldId": "Parent Field"
+      "parentFieldId": "Select Parent Field"
     },
     "date": {
       "year": "Year",
