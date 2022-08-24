@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { APP_VERSION_RC_2 } from '../constants';
+import { APP_VERSION_BETA_4 } from '../constants';
 import beginViewModelMigration from '../ViewConfig/migrationViewModelConfig';
 
 describe('migrationViewModelConfig Test', () => {
@@ -26,7 +26,7 @@ describe('migrationViewModelConfig Test', () => {
       JSON.stringify({
         hierarchy: {},
         columns: {},
-        version: APP_VERSION_RC_2,
+        version: APP_VERSION_BETA_4,
       }),
     );
   });
@@ -45,7 +45,7 @@ describe('migrationViewModelConfig Test', () => {
     );
     expect(migrationResultObj.columns).toMatchObject(originalModel);
     expect(migrationResultObj.hierarchy).toMatchObject(originalModel);
-    expect(migrationResultObj.version).toEqual(APP_VERSION_RC_2);
+    expect(migrationResultObj.version).toEqual(APP_VERSION_BETA_4);
   });
 
   test('should migrate model name to columns', () => {
@@ -64,7 +64,7 @@ describe('migrationViewModelConfig Test', () => {
       column1: { name: 'column1', role: 'role', type: 'STRING' },
       column2: { name: 'column2', role: 'role', type: 'NUMBER' },
     });
-    expect(migrationResultObj.version).toEqual(APP_VERSION_RC_2);
+    expect(migrationResultObj.version).toEqual(APP_VERSION_BETA_4);
   });
 
   test('should migrate hierarchy name to path', () => {
@@ -90,7 +90,7 @@ describe('migrationViewModelConfig Test', () => {
       },
     });
 
-    expect(migrationResultObj.version).toEqual(APP_VERSION_RC_2);
+    expect(migrationResultObj.version).toEqual(APP_VERSION_BETA_4);
   });
   test('should migrate hierarchy name to path for STRUCT VIEW', () => {
     const originalModel = {
@@ -211,63 +211,6 @@ describe('migrationViewModelConfig Test', () => {
             type: 'NUMBER',
             name: 'dad.column2',
             path: ['dad', 'column2'],
-          },
-        ],
-      },
-    });
-  });
-
-  test('should migrate format to date Field', () => {
-    const originalModel = {
-      column1: { role: 'role', type: 'DATE' },
-      column2: { role: 'role', type: 'DATE', format: 'YYYY-MM-DD' },
-      file: {
-        name: 'file',
-        children: [
-          { role: 'role', type: 'DATE', name: 'column3' },
-          {
-            role: 'role',
-            type: 'DATE',
-            name: 'column4',
-            format: 'YYYY-MM-DD',
-          },
-        ],
-      },
-    };
-    const migrationResultObj = JSON.parse(
-      beginViewModelMigration(JSON.stringify(originalModel), 'SQL'),
-    );
-    expect(migrationResultObj.hierarchy).toEqual({
-      column1: {
-        name: 'column1',
-        path: ['column1'],
-        role: 'role',
-        type: 'DATE',
-        format: 'YYYY-MM-DD HH:mm:ss',
-      },
-      column2: {
-        name: 'column2',
-        path: ['column2'],
-        role: 'role',
-        type: 'DATE',
-        format: 'YYYY-MM-DD',
-      },
-      file: {
-        name: 'file',
-        children: [
-          {
-            role: 'role',
-            type: 'DATE',
-            name: 'column3',
-            path: ['column3'],
-            format: 'YYYY-MM-DD HH:mm:ss',
-          },
-          {
-            role: 'role',
-            type: 'DATE',
-            name: 'column4',
-            path: ['column4'],
-            format: 'YYYY-MM-DD',
           },
         ],
       },

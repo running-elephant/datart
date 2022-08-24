@@ -16,15 +16,9 @@
  * limitations under the License.
  */
 
-import { DateFormat } from 'app/pages/MainPage/pages/ViewPage/constants';
 import { addPathToHierarchyStructureAndChangeName } from 'app/pages/MainPage/pages/ViewPage/utils';
-import { updateBy } from 'app/utils/mutation';
 import { CloneValueDeep } from 'utils/object';
-import {
-  APP_VERSION_BETA_2,
-  APP_VERSION_BETA_4,
-  APP_VERSION_RC_2,
-} from '../constants';
+import { APP_VERSION_BETA_2, APP_VERSION_BETA_4 } from '../constants';
 import MigrationEvent from '../MigrationEvent';
 import MigrationEventDispatcher from '../MigrationEventDispatcher';
 /**
@@ -64,25 +58,6 @@ const beta4 = view => {
   }
 };
 
-const RC2 = model => {
-  model.hierarchy = updateBy(model.hierarchy, draft => {
-    Object.values(draft).forEach((field: any) => {
-      if (field.children) {
-        field.children.forEach(child => {
-          if (!child.format && child.type === 'DATE') {
-            child.format = DateFormat.DateTime;
-          }
-        });
-      } else {
-        if (!field.format && field.type === 'DATE') {
-          field.format = DateFormat.DateTime;
-        }
-      }
-    });
-  });
-  return model;
-};
-
 /**
  * main entry point of migration
  *
@@ -96,7 +71,6 @@ const beginViewModelMigration = (model: string, viewType): string => {
   const modelObj = JSON.parse(model);
   const event2 = new MigrationEvent(APP_VERSION_BETA_2, beta2);
   const event4 = new MigrationEvent(APP_VERSION_BETA_4, beta4);
-  const eventRC2 = new MigrationEvent(APP_VERSION_RC_2, RC2);
 
   const dispatcher2 = new MigrationEventDispatcher(event2);
   const result2 = dispatcher2.process(modelObj);
@@ -108,11 +82,7 @@ const beginViewModelMigration = (model: string, viewType): string => {
     viewType,
   });
 
-  const dispatcherRC2 = new MigrationEventDispatcher(eventRC2);
-
-  const resultRC2 = dispatcherRC2.process(result4);
-
-  return JSON.stringify(resultRC2);
+  return JSON.stringify(result4);
 };
 
 export default beginViewModelMigration;
