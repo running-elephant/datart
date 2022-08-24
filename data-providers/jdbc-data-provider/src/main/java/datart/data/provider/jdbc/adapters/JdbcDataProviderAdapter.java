@@ -173,7 +173,7 @@ public class JdbcDataProviderAdapter implements Closeable {
             try (ResultSet columns = metadata.getColumns(database, null, table, null)) {
                 while (columns.next()) {
                     Column column = readTableColumn(columns);
-                    column.setForeignKeys(importedKeys.get(column.getName()));
+                    column.setForeignKeys(importedKeys.get(column.columnKey()));
                     columnSet.add(column);
                 }
             }
@@ -182,14 +182,14 @@ public class JdbcDataProviderAdapter implements Closeable {
     }
 
     public String getQueryKey(QueryScript script, ExecuteParam executeParam) throws SqlParseException {
-        SqlScriptRender render = new SqlScriptRender(script, executeParam, getSqlDialect(), jdbcProperties.isEnableSpecialSql());
+        SqlScriptRender render = new SqlScriptRender(script, executeParam, getSqlDialect(), jdbcProperties.isEnableSpecialSql(), driverInfo.getQuoteIdentifiers());
         return "Q" + DigestUtils.md5Hex(render.render(true, supportPaging(), true));
     }
 
     protected Column readTableColumn(ResultSet columnMetadata) throws SQLException {
         Column column = new Column();
         column.setName(columnMetadata.getString(4));
-        column.setType(DataTypeUtils.sqlType2DataType(columnMetadata.getString(6)));
+        column.setType(DataTypeUtils.jdbcType2DataType(columnMetadata.getInt(5)));
         return column;
     }
 
@@ -427,7 +427,9 @@ public class JdbcDataProviderAdapter implements Closeable {
 
         SqlScriptRender render = new SqlScriptRender(script
                 , tempExecuteParam
-                , getSqlDialect());
+                , getSqlDialect()
+                , jdbcProperties.isEnableSpecialSql()
+                , driverInfo.getQuoteIdentifiers());
         String sql = render.render(true, false, false);
         Dataframe data = execute(sql);
 
@@ -451,7 +453,8 @@ public class JdbcDataProviderAdapter implements Closeable {
         SqlScriptRender render = new SqlScriptRender(script
                 , executeParam
                 , getSqlDialect()
-                , jdbcProperties.isEnableSpecialSql());
+                , jdbcProperties.isEnableSpecialSql()
+                , driverInfo.getQuoteIdentifiers());
 
         if (supportPaging()) {
             sql = render.render(true, true, false);

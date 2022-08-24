@@ -60,8 +60,9 @@ export const RC2 = config => {
               ChartDataViewFieldCategory.DateLevelComputedField &&
             !row.colName.includes(DATE_LEVEL_DELIMITER)
           ) {
+            const field = row.field || row.id?.split('（')?.[0];
             row.colName =
-              row.field + DATE_LEVEL_DELIMITER + row.expression.split('(')[0];
+              field + DATE_LEVEL_DELIMITER + row.expression.split('(')[0];
           }
         });
       });
@@ -77,10 +78,13 @@ export const RC2 = config => {
           const currenrRowFiledForComputed = allRows.find(
             row => row.expression === computedField.expression,
           );
+          const field =
+            currenrRowFiledForComputed?.field ||
+            currenrRowFiledForComputed?.id?.split('（')?.[0];
           return {
             ...computedField,
             name:
-              currenrRowFiledForComputed.field +
+              field +
               DATE_LEVEL_DELIMITER +
               computedField.expression.split('(')[0],
           };

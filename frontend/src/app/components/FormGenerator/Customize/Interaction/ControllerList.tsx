@@ -28,7 +28,6 @@ import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
 import { InteractionRelationType } from '../../constants';
 import { CustomizeRelation, I18nTranslator } from './types';
-
 const ControllerList: FC<
   {
     targetRelId?: string;

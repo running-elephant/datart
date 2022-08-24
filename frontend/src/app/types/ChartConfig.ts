@@ -96,8 +96,10 @@ export type RelationFilterValue = {
   key: string;
   label: string;
   index?: number;
+  childIndex?: number;
   isSelected?: boolean;
   children?: RelationFilterValue[];
+  selectable?: boolean;
 };
 
 export type AggregateLimit = Pick<typeof AggregateFieldActionType, 'Count'>;
@@ -179,6 +181,7 @@ export type ChartDataConfig = ChartConfigBase & {
   actions?: Array<ValueOf<typeof ChartDataSectionFieldActionType>> | object;
   limit?: null | number | string | number[] | string[];
   disableAggregate?: boolean;
+  disableAggregateComputedField?: boolean;
   drillable?: boolean;
   drillContextMenuVisible?: boolean;
   options?: {

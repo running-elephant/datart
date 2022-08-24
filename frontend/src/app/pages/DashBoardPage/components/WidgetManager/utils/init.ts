@@ -456,7 +456,7 @@ export const initBorderTpl = () => {
   return borderTpl;
 };
 
-// TODO(Stephen): set width/height same as free widget?
+// TODO(Stephen): to be check if width/height setting same as free widget?
 export const initAutoWidgetRect = (): RectConfig => ({
   x: 0,
   y: 0,

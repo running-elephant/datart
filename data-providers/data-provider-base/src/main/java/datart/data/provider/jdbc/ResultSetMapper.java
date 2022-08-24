@@ -32,10 +32,10 @@ public class ResultSetMapper {
     public static List<Column> getColumns(ResultSet rs) throws SQLException {
         ArrayList<Column> columns = new ArrayList<>();
         for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-            String columnTypeName = rs.getMetaData().getColumnTypeName(i);
+            int columnType = rs.getMetaData().getColumnType(i);
             String columnName = rs.getMetaData().getColumnLabel(i);
-            ValueType valueType = DataTypeUtils.sqlType2DataType(columnTypeName);
-            columns.add(Column.of(valueType,columnName));
+            ValueType valueType = DataTypeUtils.jdbcType2DataType(columnType);
+            columns.add(Column.of(valueType, columnName));
         }
         return columns;
     }

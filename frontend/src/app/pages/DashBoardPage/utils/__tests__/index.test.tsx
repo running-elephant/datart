@@ -32,12 +32,13 @@ import {
 } from 'app/pages/DashBoardPage/pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { ChartDataConfig } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
-import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
+import { FilterSqlOperator } from 'globalConstants';
 import moment from 'moment';
 import {
   adaptBoardImageUrl,
   adjustRangeDataEndValue,
   convertImageUrl,
+  dateFormatObj,
   fillPx,
   getBackgroundImage,
   getBoardChartRequests,
@@ -1033,11 +1034,11 @@ describe('getWidgetControlValues', () => {
     const opt = { type, relatedViewItem, config };
     const res = [
       {
-        value: '2021-09-01 00:00:00',
+        value: '2021-09-01',
         valueType: 'DATE',
       },
       {
-        value: '2022-01-16 00:00:00',
+        value: '2022-01-16',
         valueType: 'DATE',
       },
     ];
@@ -1081,7 +1082,10 @@ describe('getControllerDateValues', () => {
       },
       execute: true,
     } as Params;
-    const time = moment().add('-1', 'd').startOf('d').format(TIME_FORMATTER);
+    const time = moment()
+      .add('-1', 'd')
+      .startOf('d')
+      .format(dateFormatObj[obj.filterDate.pickerType]);
     const res = [time, ''];
     expect(getControllerDateValues(obj)).toEqual(res);
   });
@@ -1133,8 +1137,8 @@ describe('getControllerDateValues', () => {
       .add('-1', 'd')
       .add(1, 'd')
       .startOf('d')
-      .format(TIME_FORMATTER);
-    const res2 = ['2022-03-01 00:00:00', time];
+      .format(dateFormatObj[obj2.filterDate.pickerType]);
+    const res2 = ['2022-03-01', time];
 
     expect(getControllerDateValues(obj2)).toEqual(res2);
   });

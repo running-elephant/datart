@@ -16,12 +16,16 @@
  * limitations under the License.
  */
 
+import { setLang } from '@antv/s2';
 import { SheetComponent } from '@antv/s2-react';
 import '@antv/s2-react/dist/style.min.css';
+import { getLang } from 'locales/i18n';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { FONT_SIZE_LABEL } from 'styles/StyleConstants';
 import { AndvS2Config } from './types';
+
+setLang(['zh_CN', 'en_US'].find(lang => lang.includes(getLang()!)) as any);
 
 const AntVS2Wrapper: FC<AndvS2Config> = memo(
   ({

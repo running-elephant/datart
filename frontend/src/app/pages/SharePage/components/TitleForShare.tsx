@@ -43,7 +43,7 @@ interface TitleHeaderProps {
 }
 const IconStyle = {
   marginLeft: '20px',
-  fontSize: 20,
+  fontSize: 14,
   cursor: 'pointer',
 };
 
@@ -95,6 +95,7 @@ const TitleForShare: FC<TitleHeaderProps> = memo(
 );
 
 export default TitleForShare;
+
 const FixedButton = styled.div`
   position: fixed;
   top: 8px;
@@ -102,7 +103,10 @@ const FixedButton = styled.div`
   z-index: ${LEVEL_100};
   cursor: pointer;
 `;
+
 const Wrapper = styled.div`
+  position: fixed;
+  z-index: ${LEVEL_100};
   display: flex;
   flex-shrink: 0;
   align-items: center;

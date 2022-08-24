@@ -98,6 +98,7 @@ export const ORIGINAL_TYPE_MAP = {
   rangeValue: ControllerFacadeTypes.RangeValue,
   value: ControllerFacadeTypes.Value,
   slider: ControllerFacadeTypes.Slider,
+  dropDownTree: ControllerFacadeTypes.DropDownTree,
 
   // custom: 'custom', TODO:
 };
@@ -290,6 +291,10 @@ export const SQL_OPERATOR_OPTIONS_TYPES = {
   [ControllerFacadeTypes.RangeTime]: [
     FilterSqlOperator.LessThan,
     FilterSqlOperator.LessThanOrEqual,
+  ],
+  [ControllerFacadeTypes.DropDownTree]: [
+    FilterSqlOperator.In,
+    FilterSqlOperator.NotIn,
   ],
 };
 

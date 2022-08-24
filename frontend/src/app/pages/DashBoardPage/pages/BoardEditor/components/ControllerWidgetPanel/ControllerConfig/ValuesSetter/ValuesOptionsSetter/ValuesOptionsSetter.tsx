@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Form, FormInstance, Radio, Select, Space } from 'antd';
+import { Form, FormInstance, Radio, Select, Space, TreeSelect } from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
 import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -45,10 +45,11 @@ import {
 } from 'react';
 import styled from 'styled-components/macro';
 import { request2 } from 'utils/request';
+import { convertToTreeData } from '../../../../../../../utils/widget';
 import { ControllerConfig } from '../../../types';
+import TreeSetter from '../TreeSetter';
 import { AssistViewFields } from './AssistViewFields';
 import { CustomOptions } from './CustomOptions';
-
 export interface optionProps {
   label: string;
   value: string;
@@ -69,6 +70,10 @@ const ValuesOptionsSetter: FC<{
   const [labelKey, setLabelKey] = useState<string | undefined>();
   const [viewList, setViewList] = useState<optionProps[]>([]);
 
+  const isTree = useMemo(() => {
+    return controllerType === ControllerFacadeTypes.DropDownTree;
+  }, [controllerType]);
+
   const getViewList = useCallback(async orgId => {
     const { data } = await request2<ViewSimple[]>(`/views?orgId=${orgId}`);
     const views = data.map(item => {
@@ -84,8 +89,15 @@ const ValuesOptionsSetter: FC<{
     return form?.getFieldValue('config') as ControllerConfig;
   }, [form]);
 
+  const getParentField = useCallback(() => {
+    return form?.getFieldValue('config')?.parentField as string;
+  }, [form]);
+
   const isMultiple = useMemo(() => {
-    return controllerType === ControllerFacadeTypes.MultiDropdownList;
+    return (
+      controllerType === ControllerFacadeTypes.MultiDropdownList ||
+      controllerType === ControllerFacadeTypes.DropDownTree
+    );
   }, [controllerType]);
 
   const convertToList = useCallback(collection => {
@@ -166,10 +178,11 @@ const ValuesOptionsSetter: FC<{
       setOptionValues([]);
       setTargetKeys([]);
       setLabelOptions([]);
+      const config = getControllerConfig();
       if (!value || !value?.[0]) {
         form?.setFieldsValue({
           config: {
-            ...getControllerConfig(),
+            ...config,
             assistViewFields: [],
             controllerValues: [],
           },
@@ -179,7 +192,7 @@ const ValuesOptionsSetter: FC<{
 
       form?.setFieldsValue({
         config: {
-          ...getControllerConfig(),
+          ...config,
           assistViewFields: value,
           controllerValues: [],
         },
@@ -189,12 +202,28 @@ const ValuesOptionsSetter: FC<{
       setLabelOptions(options);
 
       if (type !== 'view') {
+        const parentField = getParentField();
         const [viewId, ...columns] = value;
+        if (parentField) {
+          columns.push(parentField);
+        }
         const dataset = await fetchNewDataset(viewId, columns, dataView);
-        setOptionValues(convertToList(dataset?.rows));
+
+        setOptionValues(
+          parentField
+            ? convertToTreeData(dataset?.rows)
+            : convertToList(dataset?.rows),
+        );
       }
     },
-    [convertToList, fetchNewDataset, form, getControllerConfig, getViewOption],
+    [
+      convertToList,
+      fetchNewDataset,
+      form,
+      getControllerConfig,
+      getViewOption,
+      getParentField,
+    ],
   );
 
   const onLabelChange = useCallback(
@@ -218,13 +247,20 @@ const ValuesOptionsSetter: FC<{
   );
 
   const onInitOptions = useCallback(
-    async (value: string[]) => {
+    async (value: string[], parentField?: string) => {
       const [viewId, ...columns] = value;
       const { option: options, dataView } = await getViewOption(viewId);
+      if (parentField) {
+        columns.push(parentField);
+      }
       const dataset = await fetchNewDataset(viewId, columns, dataView);
       const config: ControllerConfig = getControllerConfig();
 
-      setOptionValues(convertToList(dataset?.rows));
+      setOptionValues(
+        parentField
+          ? convertToTreeData(dataset?.rows)
+          : convertToList(dataset?.rows),
+      );
       setLabelOptions(options);
 
       if (config.valueOptionType === 'common') {
@@ -246,14 +282,31 @@ const ValuesOptionsSetter: FC<{
     }
 
     const assistViewFields = config?.assistViewFields;
+    const parentField = config?.parentField;
     if (assistViewFields && assistViewFields[0] && assistViewFields[1]) {
-      onInitOptions(assistViewFields);
+      onInitOptions(assistViewFields, parentField);
     }
   }, [form, getControllerConfig, onInitOptions]);
 
   const getOptionType = useCallback(() => {
     return getControllerConfig()?.valueOptionType as ValueOptionType;
   }, [getControllerConfig]);
+
+  const onParentFieldChange = useCallback(
+    parentField => {
+      const config: ControllerConfig = getControllerConfig();
+
+      form?.setFieldsValue({
+        config: {
+          ...config,
+          parentField,
+        },
+      });
+
+      onViewFieldChange(config.assistViewFields || []);
+    },
+    [getControllerConfig, form, onViewFieldChange],
+  );
 
   useEffect(() => {
     setTimeout(() => {
@@ -300,6 +353,16 @@ const ValuesOptionsSetter: FC<{
                     style={{ margin: '6px 0' }}
                   />
                 </Form.Item>
+                {isTree && (
+                  <Form.Item name={['config', 'parentField']} noStyle>
+                    <TreeSetter
+                      onChange={onParentFieldChange}
+                      viewFieldList={labelOptions}
+                      style={{ margin: '6px 0' }}
+                    />
+                  </Form.Item>
+                )}
+
                 {getOptionType() === 'common' && (
                   <Space direction="vertical" style={{ width: '100%' }}>
                     <Select
@@ -319,32 +382,73 @@ const ValuesOptionsSetter: FC<{
                         </Select.Option>
                       ))}
                     </Select>
-                    <Select
-                      showSearch
-                      placeholder={tc('selectDefaultValue')}
-                      value={targetKeys}
-                      allowClear
-                      {...(isMultiple && { mode: 'multiple' })}
-                      onChange={onTargetKeyChange}
-                      style={{ width: '100%' }}
-                    >
-                      {optionValues.map(item => (
-                        <Select.Option
-                          key={String(item.key) + String(item.label)}
-                          value={item.key}
-                        >
-                          <div
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                            }}
+                    {getParentField() ? (
+                      <TreeSelect
+                        showSearch
+                        placeholder={tc('selectDefaultValue')}
+                        value={targetKeys}
+                        multiple
+                        allowClear
+                        onChange={onTargetKeyChange}
+                        style={{ width: '100%' }}
+                      >
+                        {optionValues.map(item => (
+                          <TreeSelect.TreeNode
+                            value={item.key}
+                            title={item.key}
+                            selectable={false}
                           >
-                            <span>{item.label || item.key}</span>
-                            <FieldKey>{item.key}</FieldKey>
-                          </div>
-                        </Select.Option>
-                      ))}
-                    </Select>
+                            {item.children?.map(children => {
+                              return (
+                                <TreeSelect.TreeNode
+                                  value={children.key}
+                                  title={
+                                    <div
+                                      style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                      }}
+                                    >
+                                      <span>
+                                        {children.label || children.key}
+                                      </span>
+                                      <FieldKey>{children.key}</FieldKey>
+                                    </div>
+                                  }
+                                ></TreeSelect.TreeNode>
+                              );
+                            })}
+                          </TreeSelect.TreeNode>
+                        ))}
+                      </TreeSelect>
+                    ) : (
+                      <Select
+                        showSearch
+                        placeholder={tc('selectDefaultValue')}
+                        value={targetKeys}
+                        allowClear
+                        {...(isMultiple && { mode: 'multiple' })}
+                        onChange={onTargetKeyChange}
+                        style={{ width: '100%' }}
+                      >
+                        {optionValues.map(item => (
+                          <Select.Option
+                            key={String(item.key) + String(item.label)}
+                            value={item.key}
+                          >
+                            <div
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                              }}
+                            >
+                              <span>{item.label || item.key}</span>
+                              <FieldKey>{item.key}</FieldKey>
+                            </div>
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
                   </Space>
                 )}
                 {getOptionType() === 'custom' && (

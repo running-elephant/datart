@@ -94,7 +94,7 @@ public class SqlQueryScriptProcessor implements QueryScriptProcessor {
         selectSql = StringUtils.prependIfMissing(selectSql, " ", " ");
 
         SqlBasicCall sqlBasicCall = new SqlBasicCall(SqlStdOperatorTable.AS
-                , new SqlNode[]{new SqlFragment("(" + selectSql + ")"), new SqlIdentifier(T, SqlParserPos.ZERO.withQuoting(true))}
+                , new SqlNode[]{new SqlFragment("(" + selectSql + ")"), new SqlIdentifier(T, SqlParserPos.ZERO)}
                 , SqlParserPos.ZERO);
         QueryScriptProcessResult result = new QueryScriptProcessResult();
         result.setFrom(sqlBasicCall);

@@ -27,6 +27,7 @@ export enum TenantManagementMode {
 export enum ControllerFacadeTypes {
   DropdownList = 'dropdownList',
   MultiDropdownList = 'multiDropdownList',
+  DropDownTree = 'dropDownTree',
 
   RadioGroup = 'radioGroup',
   CheckboxGroup = 'checkboxGroup',

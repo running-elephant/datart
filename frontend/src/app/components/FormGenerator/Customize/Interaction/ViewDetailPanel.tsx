@@ -107,6 +107,7 @@ const ViewDetailPanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
             <Form.Item label=" " colon={false} name="custom">
               <Select
                 mode="multiple"
+                optionFilterProp="children"
                 allowClear
                 onChange={handleViewDetailCustomFieldsChange}
               >
