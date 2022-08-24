@@ -18,8 +18,8 @@
 
 import { Checkbox, Form, FormInstance, Input, Radio } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
+import { DateFormat } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { DateFormat } from 'app/pages/MainPage/pages/ViewPage/constants';
 import { fetchCheckName } from 'app/utils/fetch';
 import debounce from 'debounce-promise';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
@@ -61,7 +61,7 @@ export const VariableForm = memo(
       VariableValueTypes.String,
     );
     const [expression, setExpression] = useState(false);
-    const [format, setFormat] = useState<DateFormat | undefined>();
+    const [dateFormat, setDateFormat] = useState<DateFormat | undefined>();
     const formRef = useRef<FormInstance<VariableFormModel>>();
     const t = useI18NPrefix('variable');
     const tg = useI18NPrefix('global');
@@ -69,7 +69,7 @@ export const VariableForm = memo(
     useEffect(() => {
       if (visible && editingVariable) {
         try {
-          const { type, valueType, expression, format } = editingVariable;
+          const { type, valueType, expression, dateFormat } = editingVariable;
           let defaultValue = editingVariable.defaultValue
             ? JSON.parse(editingVariable.defaultValue)
             : [];
@@ -79,7 +79,7 @@ export const VariableForm = memo(
           setType(type);
           setValueType(valueType);
           setExpression(expression || false);
-          setFormat(format || DateFormat.DateTime);
+          setDateFormat(dateFormat || DateFormat.DateTime);
           formRef.current?.setFieldsValue({
             ...editingVariable,
             defaultValue,
@@ -118,9 +118,9 @@ export const VariableForm = memo(
 
     const save = useCallback(
       values => {
-        onSave({ ...values, name: values.name.toUpperCase(), format });
+        onSave({ ...values, name: values.name.toUpperCase(), dateFormat });
       },
-      [onSave, format],
+      [onSave, dateFormat],
     );
 
     const nameValidator = useMemo(
@@ -150,10 +150,10 @@ export const VariableForm = memo(
             }, DEFAULT_DEBOUNCE_WAIT),
       [scope, editingVariable?.name, variables, orgId, t, tg],
     );
-    const onChangeFormat = useCallback(
-      format => {
-        setFormat(format);
-        formRef.current?.setFieldsValue({ format });
+    const onChangeDateFormat = useCallback(
+      dateFormat => {
+        setDateFormat(dateFormat);
+        formRef.current?.setFieldsValue({ dateFormat });
       },
       [formRef],
     );
@@ -237,8 +237,8 @@ export const VariableForm = memo(
           <DefaultValue
             type={valueType}
             expression={expression}
-            onChangeFormat={onChangeFormat}
-            format={format}
+            onChangeDateFormat={onChangeDateFormat}
+            dateFormat={dateFormat}
           />
         </Form.Item>
 

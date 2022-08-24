@@ -17,7 +17,7 @@
  */
 
 import { TreeDataNode, TreeNodeProps } from 'antd';
-import { DataViewFieldType } from 'app/constants';
+import { DataViewFieldType, DateFormat } from 'app/constants';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { ReactElement } from 'react';
 import { View } from '../../../../../types/View';
@@ -131,7 +131,7 @@ export enum ColumnRole {
 export interface Column extends Schema {
   category?: ColumnCategories;
   index?: number;
-  format?: string;
+  dateFormat?: DateFormat;
   role?: ColumnRole;
   children?: Column[];
   path?: string[];

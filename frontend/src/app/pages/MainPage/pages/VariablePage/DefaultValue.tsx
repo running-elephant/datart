@@ -26,8 +26,8 @@ import {
   Space,
   Tag,
 } from 'antd';
+import { DateFormat } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { DateFormat } from 'app/pages/MainPage/pages/ViewPage/constants';
 import { TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
 import { memo, useCallback, useEffect, useState } from 'react';
@@ -40,9 +40,9 @@ interface DefaultValueProps {
   expression: boolean;
   disabled?: boolean;
   value?: null | any[];
-  format?: DateFormat;
+  dateFormat?: DateFormat;
   hasDateFormat?: boolean;
-  onChangeFormat?: (value) => void;
+  onChangeDateFormat?: (value) => void;
   onChange?: (value) => void;
 }
 
@@ -52,10 +52,10 @@ export const DefaultValue = memo(
     expression,
     disabled,
     value = [],
-    format,
+    dateFormat,
     hasDateFormat = true,
     onChange,
-    onChangeFormat,
+    onChangeDateFormat,
   }: DefaultValueProps) => {
     const [inputValue, setInputValue] = useState<any>(void 0);
     const t = useI18NPrefix('variable');
@@ -180,7 +180,7 @@ export const DefaultValue = memo(
                   const label =
                     type !== VariableValueTypes.Date
                       ? val
-                      : moment(val).format(format);
+                      : moment(val).format(dateFormat);
                   return (
                     <Tag
                       key={label}
@@ -211,8 +211,8 @@ export const DefaultValue = memo(
           <Select
             placeholder="选择日期格式"
             className="input"
-            value={format}
-            onChange={onChangeFormat}
+            value={dateFormat}
+            onChange={onChangeDateFormat}
           >
             {Object.values(DateFormat).map(format => {
               return (

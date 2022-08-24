@@ -132,6 +132,7 @@ export const ChartDraggableSourceGroupContainer: FC<{
               onSelectionChange={onDataItemSelectionChange}
               onClearCheckedList={onClearCheckedList}
               isActive={selectedItemsIds.includes(item.name)}
+              dateFormat={item.dateFormat}
             />
           </Item>
         )}

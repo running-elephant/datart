@@ -100,7 +100,7 @@ export const RowPermissionTable = memo(
           render: (_, record) =>
             editingVariable && (
               <DefaultValue
-                format={editingVariable.format}
+                dateFormat={editingVariable.dateFormat}
                 type={editingVariable.valueType}
                 expression={false}
                 hasDateFormat={false}

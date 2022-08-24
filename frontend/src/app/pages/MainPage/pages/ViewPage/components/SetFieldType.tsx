@@ -17,10 +17,10 @@
  */
 
 import { Dropdown, Menu, Tooltip } from 'antd';
-import { DataViewFieldType } from 'app/constants';
+import { DataViewFieldType, DateFormat } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { memo, ReactNode } from 'react';
-import { ColumnCategories, DateFormat } from '../constants';
+import { ColumnCategories } from '../constants';
 import { Column } from '../slice/types';
 
 interface SetFieldTypeProps {
@@ -49,7 +49,7 @@ const SetFieldType = memo(
             selectedKeys={[
               field.type,
               `category-${field.category}`,
-              field.format || '',
+              field.dateFormat || '',
             ]}
             className="datart-schema-table-header-menu"
             onClick={({ keyPath }) => onChange(keyPath, field?.name)}
@@ -62,10 +62,8 @@ const SetFieldType = memo(
                     title={tg(`columnType.${t.toLowerCase()}`)}
                     popupClassName="datart-schema-table-header-menu"
                   >
-                    {Object.values(DateFormat).map(timeFormate => {
-                      return (
-                        <Menu.Item key={timeFormate}>{timeFormate}</Menu.Item>
-                      );
+                    {Object.values(DateFormat).map(format => {
+                      return <Menu.Item key={format}>{format}</Menu.Item>;
                     })}
                   </Menu.SubMenu>
                 );

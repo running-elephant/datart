@@ -87,7 +87,7 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
           const category = keyPath[0].split('-')[1];
           value = { ...column, category };
         } else if (keyPath.includes('DATE')) {
-          value = { ...column, type: keyPath[1], format: keyPath[0] };
+          value = { ...column, type: keyPath[1], dateFormat: keyPath[0] };
         } else {
           value = { ...column, type: keyPath[0] };
         }

@@ -25,6 +25,7 @@ import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,
   DataViewFieldType,
+  DateFormat,
   FieldFormatType,
   FilterConditionType,
   FilterRelationType,
@@ -117,6 +118,7 @@ export type ChartDataSectionField = {
   color?: ColorFieldAction;
   size?: number;
   path?: string[];
+  dateFormat?: DateFormat;
 };
 
 export type SortFieldAction = {

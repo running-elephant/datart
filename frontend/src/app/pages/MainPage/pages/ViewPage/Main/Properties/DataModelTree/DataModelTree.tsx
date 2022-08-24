@@ -17,7 +17,7 @@
  */
 
 import { Form, Input, message, Select } from 'antd';
-import { DataViewFieldType } from 'app/constants';
+import { DataViewFieldType, DateFormat } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
@@ -175,7 +175,7 @@ const DataModelTree: FC = memo(() => {
         const category = type[0].split('-')[1];
         newNode = { ...targetNode, category };
       } else if (type.includes('DATE')) {
-        newNode = { ...targetNode, type: type[1], format: type[0] };
+        newNode = { ...targetNode, type: type[1], dateFormat: type[0] };
       } else {
         newNode = { ...targetNode, type: type[0] };
       }
@@ -205,7 +205,7 @@ const DataModelTree: FC = memo(() => {
             newNode = {
               ...newNode,
               type: type[1] as DataViewFieldType,
-              format: type[0],
+              dateFormat: type[0] as DateFormat,
             };
           } else {
             newNode = { ...newNode, type: type[0] as DataViewFieldType };

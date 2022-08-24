@@ -187,7 +187,7 @@ export function VariablePage() {
       let defaultValue: any = values.defaultValue;
       if (values.valueType === VariableValueTypes.Date && !values.expression) {
         defaultValue = values.defaultValue.map(d =>
-          (d as Moment).format(values.format),
+          (d as Moment).format(values.dateFormat),
         );
       }
 
@@ -227,14 +227,15 @@ export function VariablePage() {
   const saveRelations = useCallback(
     async (changedRowPermissions: RowPermission[]) => {
       let changedRowPermissionsRaw = changedRowPermissions.map(cr => {
-        const format =
-          variables.find(v => v.id === cr.variableId)?.format || TIME_FORMATTER;
+        const dateFormat =
+          variables.find(v => v.id === cr.variableId)?.dateFormat ||
+          TIME_FORMATTER;
         return {
           ...cr,
           value:
             cr.value &&
             (editingVariable?.valueType === VariableValueTypes.Date
-              ? cr.value.map(m => (m as Moment).format(format))
+              ? cr.value.map(m => (m as Moment).format(dateFormat))
               : cr.value),
         };
       });
