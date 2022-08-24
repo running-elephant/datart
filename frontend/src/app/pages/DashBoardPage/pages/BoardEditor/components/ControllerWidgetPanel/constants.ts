@@ -57,4 +57,5 @@ export const HasOptionsControlTypes = [
   ControllerFacadeTypes.MultiDropdownList,
   ControllerFacadeTypes.RadioGroup,
   ControllerFacadeTypes.CheckboxGroup,
+  ControllerFacadeTypes.DropDownTree,
 ];

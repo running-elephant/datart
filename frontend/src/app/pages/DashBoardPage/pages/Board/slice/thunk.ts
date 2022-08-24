@@ -494,10 +494,16 @@ export const getControllerOptions = createAsyncThunk<
 
     const [viewId, ...columns] = config.assistViewFields;
 
+    const parentField = config?.parentField;
+
     const executeToken = executeTokenMap?.[viewId];
 
     const view = viewMap[viewId];
     if (!view) return null;
+    if (parentField) {
+      columns.push(parentField);
+    }
+
     const requestParams = getControlOptionQueryParams({
       view,
       columns: columns,

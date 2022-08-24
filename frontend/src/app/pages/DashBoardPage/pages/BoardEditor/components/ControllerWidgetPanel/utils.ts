@@ -27,6 +27,7 @@ import {
   ValueOptionTypes,
 } from 'app/pages/DashBoardPage/constants';
 import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import i18next from 'i18next';
 import moment, { Moment } from 'moment';
 import { FilterSqlOperator } from '../../../../../../../globalConstants';
@@ -37,6 +38,7 @@ import {
   RangeControlTypes,
 } from './constants';
 import { ControllerConfig, PickerType } from './types';
+
 export const getStringFacadeOptions = (type: ValueOptionType) => {
   switch (type) {
     case 'common':
@@ -44,13 +46,14 @@ export const getStringFacadeOptions = (type: ValueOptionType) => {
         ControllerFacadeTypes.MultiDropdownList,
         ControllerFacadeTypes.DropdownList,
         ControllerFacadeTypes.RadioGroup,
-        // Opt.Tree,
+        ControllerFacadeTypes.DropDownTree,
       ];
     case 'custom':
       return [
         ControllerFacadeTypes.MultiDropdownList,
         ControllerFacadeTypes.DropdownList,
         ControllerFacadeTypes.RadioGroup,
+        ControllerFacadeTypes.DropDownTree,
       ];
     default:
       return [];
@@ -97,7 +100,15 @@ export const postControlConfig = (
   controllerType: ControllerFacadeTypes,
 ) => {
   if (config.valueOptions.length > 0) {
-    config.controllerValues = config.valueOptions
+    let valueOptions: RelationFilterValue[] = [];
+
+    if (controllerType === ControllerFacadeTypes.DropDownTree) {
+      valueOptions = config.valueOptions.flatMap(v => v.children || []);
+    } else {
+      valueOptions = config.valueOptions;
+    }
+
+    config.controllerValues = valueOptions
       .filter(ele => ele.isSelected)
       .map(ele => ele.key);
   }
@@ -157,6 +168,8 @@ export const getInitWidgetController = (
   type: ControllerFacadeTypes = ControllerFacadeTypes.DropdownList,
 ) => {
   switch (type) {
+    case ControllerFacadeTypes.DropDownTree:
+      return getDropdownTreeControllerConfig();
     case ControllerFacadeTypes.MultiDropdownList:
       return getMultiDropdownListControllerConfig();
     case ControllerFacadeTypes.Time:
@@ -270,6 +283,12 @@ export const getRangeSliderControllerConfig = () => {
 export const getRangeValueControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.Between;
+  return config;
+};
+
+export const getDropdownTreeControllerConfig = () => {
+  const config = getInitControllerConfig();
+  config.sqlOperator = FilterSqlOperator.In;
   return config;
 };
 

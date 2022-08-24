@@ -37,7 +37,11 @@ import ChartDataView from 'app/types/ChartDataView';
 import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
 import { findPathByNameInMeta, getStyles } from 'app/utils/chartHelper';
 import { getTime, splitRangerDateFilters } from 'app/utils/time';
-import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
+import {
+  DATE_FORMATTER,
+  FilterSqlOperator,
+  TIME_FORMATTER,
+} from 'globalConstants';
 import moment from 'moment';
 import { CloneValueDeep } from 'utils/object';
 import { boardDrillManager } from '../components/BoardDrillManager/BoardDrillManager';
@@ -57,6 +61,15 @@ import { Widget } from '../types/widgetTypes';
 import { DateControllerTypes } from './../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
+
+export const dateFormatObj = {
+  week: 'YYYY-WW',
+  year: 'YYYY',
+  month: 'YYYY-MM',
+  dateTime: TIME_FORMATTER,
+  date: DATE_FORMATTER,
+  quarter: 'YYYY-Q',
+};
 
 export const convertImageUrl = (urlKey: string = ''): string => {
   if (urlKey.startsWith(BOARD_FILE_IMG_PREFIX)) {
@@ -342,6 +355,12 @@ export const getControllerDateValues = (obj: {
       const time = getTime(+(direction + amount), unit)(unit, isStart);
       timeValues[1] = time.format(TIME_FORMATTER);
     }
+  }
+
+  if (obj.execute) {
+    timeValues.forEach((v, i) => {
+      timeValues[i] = v ? moment(v).format(dateFormatObj[pickerType]) : v;
+    });
   }
 
   return timeValues;

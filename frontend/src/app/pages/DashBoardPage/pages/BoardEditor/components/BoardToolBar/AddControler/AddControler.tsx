@@ -80,12 +80,10 @@ export const AddController: React.FC<AddControlBtnProps> = () => {
     //   type: ControllerFacadeTypes.RadioGroup,
     //   disabled: false,
     // },
-    // {
-    //   name: '多选下拉树',
-    //   icon: '',
-    //   type: ControllerFacadeTypes.RadioGroup,
-    //   disabled: false,
-    // },
+    {
+      icon: '',
+      type: ControllerFacadeTypes.DropDownTree,
+    },
   ];
   const dateControllers: ButtonItemType<ControllerFacadeTypes>[] = [
     {

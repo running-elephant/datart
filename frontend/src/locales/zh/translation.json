@@ -382,7 +382,8 @@
           "value": "数值",
           "time": "日期",
           "slider": "滑块",
-          "rangeSlider": "范围滑块"
+          "rangeSlider": "范围滑块",
+          "dropDownTree": "下拉树"
         },
         "controllerPlaceHolders": {
           "multiSelectController": "请选择",
@@ -390,7 +391,8 @@
           "rangeNumberControllerMin": "最小值",
           "rangeNumberControllerMax": "最大值",
           "selectController": "请选择",
-          "textController": "请输入"
+          "textController": "请输入",
+          "treeSelectController": "请选择"
         },
         "controllerVisibilityTypes": {
           "hide": "隐藏",
@@ -1276,7 +1278,8 @@
       "unsetDefault": "取消默认值",
       "setDefault": "设为默认值",
       "delete": "删除",
-      "populate": "从字段填充备选项"
+      "populate": "从字段填充备选项",
+      "parentFieldId": "父ID字段"
     },
     "date": {
       "year": "年",

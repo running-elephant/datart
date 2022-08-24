@@ -382,7 +382,8 @@
           "value": "Value",
           "time": "Time",
           "slider": "Slider",
-          "rangeSlider": "Range Slider"
+          "rangeSlider": "Range Slider",
+          "dropDownTree": "Dropdown tree"
         },
         "controllerPlaceHolders": {
           "multiSelectController": "Select ..",
@@ -390,7 +391,8 @@
           "rangeNumberControllerMin": "Min",
           "rangeNumberControllerMax": "Max",
           "selectController": "Select ..",
-          "textController": "Enter text"
+          "textController": "Enter text",
+          "treeSelectController": "Select .."
         },
         "controllerVisibilityTypes": {
           "hide": "Hide",
@@ -1278,7 +1280,8 @@
       "unsetDefault": "Unset Default",
       "setDefault": "Set Default",
       "delete": "Delete",
-      "populate": "Populate From Field Values"
+      "populate": "Populate From Field Values",
+      "parentFieldId": "Select Parent Field"
     },
     "date": {
       "year": "Year",
