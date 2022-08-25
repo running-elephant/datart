@@ -267,7 +267,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
     @Override
     public void runAs(String userNameOrEmail) {
         User user = userMapper.selectByNameOrEmail(userNameOrEmail);
-        login(new PasswordToken(user.getUsername(), user.getPassword(), System.currentTimeMillis()));
+        login(JwtUtils.toJwtString(JwtUtils.createJwtToken(user)));
     }
 
     @Override
