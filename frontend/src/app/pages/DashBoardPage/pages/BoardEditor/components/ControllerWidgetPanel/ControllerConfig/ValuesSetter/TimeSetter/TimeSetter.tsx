@@ -248,6 +248,7 @@ export const TimeSetter: React.FC<{
                 validateTrigger={['onChange', 'onBlur']}
                 shouldUpdate
                 rules={[{ required: true, validator: RangeTimeValidator }]}
+                style={{ marginBottom: 0 }}
               >
                 <Form.Item label={filterDataT('startTime')} shouldUpdate>
                   {renderROE(StartTimeROEName, onStartRelativeChange)}
