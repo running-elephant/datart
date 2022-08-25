@@ -49,6 +49,11 @@ const JumpToChart: FC<
   return (
     <Space>
       <Select
+        virtual
+        showSearch
+        optionFilterProp="children"
+        style={{ minWidth: 100, maxWidth: 200 }}
+        dropdownMatchSelectWidth={false}
         value={value?.relId}
         placeholder={t('drillThrough.rule.reference.title')}
         onChange={relId => onValueChange({ ...value, ...{ relId } })}
