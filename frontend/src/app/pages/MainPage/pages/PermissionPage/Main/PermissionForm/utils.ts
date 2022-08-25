@@ -62,6 +62,7 @@ export function setTreeDataWithPrivilege(
   viewpoint: Viewpoints,
   viewpointType: SubjectTypes | ResourceTypes,
   dataSourceType: SubjectTypes | ResourceTypes,
+  vizSubTypes?: VizResourceSubTypes,
 ): DataSourceTreeNode[] {
   return getTreeNodeWithPermission(
     treeData,
@@ -78,6 +79,7 @@ export function setTreeDataWithPrivilege(
             permissionArray = parsePermission(
               privileges[i].permission,
               privileges[i].resourceType,
+              vizSubTypes,
             );
             fastDeleteArrayElement(privileges, i);
             break;
@@ -88,6 +90,7 @@ export function setTreeDataWithPrivilege(
           permissionArray = parsePermission(
             privileges[i].permission,
             getPrivilegeSettingType(viewpoint, viewpointType, dataSourceType)!,
+            vizSubTypes,
           );
           fastDeleteArrayElement(privileges, i);
           break;
@@ -113,15 +116,18 @@ export function calcPermission(permissionViewModel: PermissionLevels[]) {
 export function parsePermission(
   permission: number,
   resourceType: ResourceTypes,
+  vizSubTypes?: VizResourceSubTypes,
 ) {
   let permissionViewModel: PermissionLevels[] = [];
-  RESOURCE_TYPE_PERMISSION_MAPPING[resourceType].forEach(p => {
-    if ((permission & (p as PermissionLevels)) === p) {
-      permissionViewModel.push(p);
-    } else {
-      permissionViewModel.push(PermissionLevels.Disable);
-    }
-  });
+  RESOURCE_TYPE_PERMISSION_MAPPING[resourceType + (vizSubTypes || '')].forEach(
+    p => {
+      if ((permission & (p as PermissionLevels)) === p) {
+        permissionViewModel.push(p);
+      } else {
+        permissionViewModel.push(PermissionLevels.Disable);
+      }
+    },
+  );
   return permissionViewModel;
 }
 
@@ -267,9 +273,13 @@ export function getPrivilegeSettingWidth(
   viewpoint: Viewpoints,
   viewpointType: SubjectTypes | ResourceTypes,
   dataSourceType: SubjectTypes | ResourceTypes,
+  vizSubTypes?: VizResourceSubTypes,
 ) {
   switch (getPrivilegeSettingType(viewpoint, viewpointType, dataSourceType)) {
     case ResourceTypes.Viz:
+      if (vizSubTypes === VizResourceSubTypes.Storyboard) {
+        return 3 * 80 + 40;
+      }
       return 4 * 80 + 40;
     case ResourceTypes.Schedule:
       return 1 * 80 + 40;

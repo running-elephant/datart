@@ -27,18 +27,12 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   selectIsOrgOwner,
   selectOrgId,
-  selectPermissionMap,
 } from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';
 import { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
-import { getInsertedNodeIndex, getPath, stopPPG } from 'utils/utils';
-import { getCascadeAccess } from '../../../Access';
-import {
-  PermissionLevels,
-  ResourceTypes,
-} from '../../PermissionPage/constants';
+import { getInsertedNodeIndex, stopPPG } from 'utils/utils';
 import { SaveFormContext } from '../SaveFormContext';
 import { selectArchivedListLoading } from '../slice/selectors';
 import {
@@ -65,7 +59,6 @@ export const Recycle = memo(({ sourceId, list }: RecycleProps) => {
   const t = useI18NPrefix('source.sidebar');
   const { showSaveForm } = useContext(SaveFormContext);
   const isOwner = useSelector(selectIsOrgOwner);
-  const permissionMap = useSelector(selectPermissionMap);
 
   useEffect(() => {
     dispatch(getArchivedSources(orgId));
@@ -144,25 +137,11 @@ export const Recycle = memo(({ sourceId, list }: RecycleProps) => {
   );
 
   const renderTreeTitle = useCallback(
-    ({ key, title, parentId }) => {
-      const path = list
-        ? getPath(
-            list as Array<{ id: string; parentId: string }>,
-            { id: key, parentId },
-            ResourceTypes.Schedule,
-          )
-        : [];
-      const allowManage = getCascadeAccess(
-        isOwner,
-        permissionMap,
-        ResourceTypes.Schedule,
-        path,
-        PermissionLevels.Manage,
-      );
+    ({ key, title }) => {
       return (
         <TreeTitle>
           <h4>{`${title}`}</h4>
-          {allowManage && (
+          {isOwner && (
             <Popup
               trigger={['click']}
               placement="bottomRight"
@@ -197,7 +176,7 @@ export const Recycle = memo(({ sourceId, list }: RecycleProps) => {
         </TreeTitle>
       );
     },
-    [list, isOwner, permissionMap, moreMenuClick, t, del],
+    [isOwner, moreMenuClick, t, del],
   );
 
   return (

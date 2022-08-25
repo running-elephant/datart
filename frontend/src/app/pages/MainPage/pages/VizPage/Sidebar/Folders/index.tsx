@@ -18,17 +18,17 @@ import { SPACE_XS } from 'styles/StyleConstants';
 import { useAddViz } from '../../hooks/useAddViz';
 import { SaveFormContext } from '../../SaveFormContext';
 import {
+  makeSelectArchivedDashboardsTree,
+  makeSelectArchivedDatachartsTree,
   makeSelectVizTree,
   selectArchivedDashboardLoading,
-  selectArchivedDashboards,
   selectArchivedDatachartLoading,
-  selectArchivedDatacharts,
 } from '../../slice/selectors';
 import {
   getArchivedDashboards,
   getArchivedDatacharts,
 } from '../../slice/thunks';
-import { FolderViewModel } from '../../slice/types';
+import { ArchivedViz, FolderViewModel } from '../../slice/types';
 import { Recycle } from '../Recycle';
 import { FolderTree } from './FolderTree';
 
@@ -70,8 +70,27 @@ export const Folders = memo(
       useDebouncedSearch(treeData, (keywords, d) =>
         d.title.toLowerCase().includes(keywords.toLowerCase()),
       );
-    const archivedDatacharts = useSelector(selectArchivedDatacharts);
-    const archivedDashboards = useSelector(selectArchivedDashboards);
+
+    const selectArchivedDatachartsTree = useMemo(
+      makeSelectArchivedDatachartsTree,
+      [],
+    );
+    const selectArchivedDashboardsTree = useMemo(
+      makeSelectArchivedDashboardsTree,
+      [],
+    );
+
+    const getArchivedDisabled = useCallback(
+      ({ deleteLoading }: ArchivedViz) => deleteLoading,
+      [],
+    );
+
+    const archivedDatachartsTreeData = useSelector(state =>
+      selectArchivedDatachartsTree(state, { getDisabled: getArchivedDisabled }),
+    );
+    const archivedDashboardsTreeData = useSelector(state =>
+      selectArchivedDashboardsTree(state, { getDisabled: getArchivedDisabled }),
+    );
     const archivedDataChartLoading = useSelector(
       selectArchivedDatachartLoading,
     );
@@ -80,8 +99,8 @@ export const Folders = memo(
     );
     const { filteredData: filteredListData, debouncedSearch: listSearch } =
       useDebouncedSearch(
-        archivedDatacharts.concat(archivedDashboards),
-        (keywords, d) => d.name.toLowerCase().includes(keywords.toLowerCase()),
+        (archivedDatachartsTreeData || []).concat(archivedDashboardsTreeData),
+        (keywords, d) => d.title.toLowerCase().includes(keywords.toLowerCase()),
       );
 
     const recycleInit = useCallback(() => {

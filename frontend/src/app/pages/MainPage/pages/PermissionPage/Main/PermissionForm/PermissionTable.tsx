@@ -28,6 +28,7 @@ import {
   ResourceTypes,
   SubjectTypes,
   Viewpoints,
+  VizResourceSubTypes,
 } from '../../constants';
 import {
   DataSourceTreeNode,
@@ -41,6 +42,7 @@ interface PermissionTableProps {
   viewpoint: Viewpoints;
   viewpointType: ResourceTypes | SubjectTypes;
   dataSourceType: ResourceTypes | SubjectTypes;
+  vizSubTypes?: VizResourceSubTypes;
   dataSource: DataSourceViewModel[] | undefined;
   resourceLoading: boolean;
   privileges: Privilege[] | undefined;
@@ -63,6 +65,7 @@ export const PermissionTable = memo(
     resourceLoading,
     privileges,
     onPrivilegeChange,
+    vizSubTypes,
   }: PermissionTableProps) => {
     const t = useI18NPrefix('permission');
 
@@ -79,11 +82,19 @@ export const PermissionTable = memo(
           viewpoint,
           viewpointType,
           dataSourceType,
+          vizSubTypes,
         );
       } else {
         return [];
       }
-    }, [viewpoint, viewpointType, dataSourceType, dataSource, privileges]);
+    }, [
+      viewpoint,
+      viewpointType,
+      dataSourceType,
+      dataSource,
+      privileges,
+      vizSubTypes,
+    ]);
 
     const {
       filteredData,
@@ -122,6 +133,7 @@ export const PermissionTable = memo(
             viewpoint,
             viewpointType,
             dataSourceType,
+            vizSubTypes,
           ),
           render: (_, record) => (
             <PrivilegeSetting
@@ -130,12 +142,20 @@ export const PermissionTable = memo(
               viewpointType={viewpointType}
               dataSourceType={dataSourceType}
               onChange={privilegeChange}
+              vizSubTypes={vizSubTypes}
             />
           ),
         },
       ];
       return columns;
-    }, [viewpoint, viewpointType, dataSourceType, privilegeChange, t]);
+    }, [
+      viewpoint,
+      viewpointType,
+      dataSourceType,
+      privilegeChange,
+      t,
+      vizSubTypes,
+    ]);
 
     return (
       <>
