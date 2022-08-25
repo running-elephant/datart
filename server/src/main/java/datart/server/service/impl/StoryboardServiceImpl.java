@@ -19,9 +19,7 @@ package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
 import datart.core.base.exception.Exceptions;
-import datart.core.entity.BaseEntity;
-import datart.core.entity.Role;
-import datart.core.entity.Storyboard;
+import datart.core.entity.*;
 import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.core.mappers.ext.StoryboardMapperExt;
 import datart.security.base.PermissionInfo;
@@ -77,8 +75,12 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
 
         List<Storyboard> permitted = storyboards.stream().filter(storyboard -> {
             try {
-                requirePermission(storyboard, Const.READ);
-                return true;
+                if (hasReadPermission(storyboard)) {
+                    return true;
+                } else {
+                    filtered.put(storyboard.getId(), storyboard);
+                    return false;
+                }
             } catch (Exception e) {
                 filtered.put(storyboard.getId(), storyboard);
                 return false;
@@ -203,4 +205,18 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
     public void deleteReference(Storyboard storyboard) {
         storypageService.deleteByStoryboard(storyboard.getId());
     }
+
+    private boolean hasReadPermission(Storyboard storyboard) {
+        try {
+            requirePermission(storyboard, Const.MANAGE);
+            return true;
+        } catch (Exception ignored) {
+        }
+        try {
+            requirePermission(storyboard, Const.READ);
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
 }
