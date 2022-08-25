@@ -296,7 +296,6 @@ export class ChartDataRequestBuilder {
         );
         return formatTime(time, dateFormat);
       }
-      console.log(dateFormat, 'dateFormat');
       return formatTime(value, dateFormat);
     };
 
