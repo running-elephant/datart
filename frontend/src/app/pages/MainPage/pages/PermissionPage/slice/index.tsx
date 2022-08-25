@@ -215,16 +215,22 @@ const slice = createSlice({
       state.storyboardListLoading = true;
     });
     builder.addCase(getStoryboards.fulfilled, (state, action) => {
+      const root = generateRootNode(
+        ResourceTypes.Viz,
+        VizResourceSubTypes.Storyboard,
+      );
       state.storyboardListLoading = false;
-      state.storyboards = action.payload.map(({ id, name }) => ({
-        id,
-        name,
-        type: ResourceTypes.Viz,
-        parentId: null,
-        index: null,
-        isFolder: false,
-        permissionArray: getDefaultPermissionArray(),
-      }));
+      state.storyboards = [root].concat(
+        action.payload.map(({ id, name, parentId, index, isFolder }) => ({
+          id,
+          name,
+          type: root.type,
+          parentId: parentId === null ? root.id : parentId,
+          index,
+          isFolder,
+          permissionArray: getDefaultPermissionArray(),
+        })),
+      );
     });
     builder.addCase(getStoryboards.rejected, state => {
       state.storyboardListLoading = false;

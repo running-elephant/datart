@@ -1126,6 +1126,7 @@
       "storyboards": {
         "title": "Storyboards",
         "add": "Create Storyboard",
+        "addFolder": "Create Folder",
         "recycle": "Recycle"
       }
     },
@@ -1619,6 +1620,17 @@
         "1": "Download",
         "2": "Share",
         "3": "Manage"
+      },
+      "vizfolder": {
+        "0": "View",
+        "1": "Download",
+        "2": "Share",
+        "3": "Manage"
+      },
+      "vizstoryboard": {
+        "0": "View",
+        "1": "Share",
+        "2": "Manage"
       },
       "view": {
         "0": "Access",
