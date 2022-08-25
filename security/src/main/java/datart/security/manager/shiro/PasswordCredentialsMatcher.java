@@ -18,6 +18,7 @@
 
 package datart.security.manager.shiro;
 
+import datart.security.util.JwtUtils;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.BearerToken;
@@ -37,7 +38,7 @@ public class PasswordCredentialsMatcher extends SimpleCredentialsMatcher {
             return BCrypt.checkpw(password, info.getCredentials().toString());
         } else {
             BearerToken bearerToken = (BearerToken) token;
-            return null != bearerToken;
+            return JwtUtils.validTimeout(bearerToken.getToken());
         }
 
     }
