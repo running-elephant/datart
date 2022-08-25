@@ -17,7 +17,7 @@
  */
 
 import { Form, Input, message, Select } from 'antd';
-import { DataViewFieldType } from 'app/constants';
+import { DataViewFieldType, DateFormat } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
 import { APP_CURRENT_VERSION } from 'app/migration/constants';
@@ -33,7 +33,7 @@ import { SPACE_LG } from 'styles/StyleConstants';
 import { Nullable } from 'types';
 import { CloneValueDeep, isEmpty, isEmptyArray } from 'utils/object';
 import { modelListFormsTreeByTableName } from 'utils/utils';
-import { ViewViewModelStages } from '../../../constants';
+import { ColumnCategories, ViewViewModelStages } from '../../../constants';
 import { useViewSlice } from '../../../slice';
 import {
   selectCurrentEditingView,
@@ -167,15 +167,17 @@ const DataModelTree: FC = memo(() => {
     handleDataModelHierarchyChange(newHierarchy);
   };
 
-  const handleNodeTypeChange = (type, name) => {
+  const handleNodeTypeChange = (type: string[], name) => {
     const targetNode = tableColumns?.find(n => n.name === name);
     if (targetNode) {
       let newNode;
-      if (type.includes('category')) {
-        const category = type.split('-')[1];
+      if (type[0].includes('category')) {
+        const category = type[0].split('-')[1];
         newNode = { ...targetNode, category };
+      } else if (type.includes('DATE')) {
+        newNode = { ...targetNode, type: type[1], dateFormat: type[0] };
       } else {
-        newNode = { ...targetNode, type: type };
+        newNode = { ...targetNode, type: type[0] };
       }
       const newHierarchy = updateNode(
         tableColumns,
@@ -196,11 +198,17 @@ const DataModelTree: FC = memo(() => {
         const newTargetBranch = CloneValueDeep(targetBranch);
         if (newTargetBranch.children) {
           let newNode = newTargetBranch.children[newNodeIndex];
-          if (type.includes('category')) {
-            const category = type.split('-')[1];
+          if (type[0].includes('category')) {
+            const category = type[0].split('-')[1] as ColumnCategories;
             newNode = { ...newNode, category };
+          } else if (type.includes('DATE')) {
+            newNode = {
+              ...newNode,
+              type: type[1] as DataViewFieldType,
+              dateFormat: type[0] as DateFormat,
+            };
           } else {
-            newNode = { ...newNode, type: type };
+            newNode = { ...newNode, type: type[0] as DataViewFieldType };
           }
           newTargetBranch.children[newNodeIndex] = newNode;
           const newHierarchy = updateNode(

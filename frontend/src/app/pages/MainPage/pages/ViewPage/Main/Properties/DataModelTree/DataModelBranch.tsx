@@ -43,7 +43,7 @@ import DataModelNode from './DataModelNode';
 
 const DataModelBranch: FC<{
   node: Column;
-  onNodeTypeChange: (type: any, name: string) => void;
+  onNodeTypeChange: (type: string[], name: string) => void;
   onMoveToHierarchy: (node: Column) => void;
   onEditBranch;
   onDelete: (node: Column) => void;

@@ -36,6 +36,7 @@ export interface User {
   name: string | null;
   description: string;
   orgOwner?: boolean;
+  timezone?: string;
 }
 
 export interface SystemInfo {

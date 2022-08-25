@@ -28,11 +28,14 @@ import moment, { Moment, unitOfTime } from 'moment';
 export function getTimeRange(
   amount?: [number, number],
   unit?,
-): (unitTime) => [string, string] {
-  return unitOfTime => {
+): (unitTime, dateFormat?) => [string, string] {
+  return (unitOfTime, dateFormat?) => {
     const startTime = moment().add(amount?.[0], unit).startOf(unitOfTime);
     const endTime = moment().add(amount?.[1], unit).endOf(unitOfTime);
-    return [startTime.format(TIME_FORMATTER), endTime.format(TIME_FORMATTER)];
+    return [
+      startTime.format(dateFormat || TIME_FORMATTER),
+      endTime.format(dateFormat || TIME_FORMATTER),
+    ];
   };
 }
 
@@ -52,33 +55,34 @@ export function formatTime(time: string | Moment, format?): string {
   return moment(time).format(format || TIME_FORMATTER);
 }
 
-export function recommendTimeRangeConverter(relativeTimeRange) {
-  let timeRange = getTimeRange()('d');
+export function recommendTimeRangeConverter(relativeTimeRange, dateFormat?) {
+  let timeRange = getTimeRange()('d', dateFormat);
   switch (relativeTimeRange) {
     case RECOMMEND_TIME.TODAY:
       break;
     case RECOMMEND_TIME.YESTERDAY:
-      timeRange = getTimeRange([-1, 0], 'd')('d');
+      timeRange = getTimeRange([-1, 0], 'd')('d', dateFormat);
       break;
     case RECOMMEND_TIME.THIS_WEEK:
-      timeRange = getTimeRange()('W');
+      timeRange = getTimeRange()('W', dateFormat);
       break;
     case RECOMMEND_TIME.LAST_7_DAYS:
-      timeRange = getTimeRange([-7, 0], 'd')('d');
+      timeRange = getTimeRange([-7, 0], 'd')('d', dateFormat);
       break;
     case RECOMMEND_TIME.LAST_30_DAYS:
-      timeRange = getTimeRange([-30, 0], 'd')('d');
+      timeRange = getTimeRange([-30, 0], 'd')('d', dateFormat);
       break;
     case RECOMMEND_TIME.LAST_90_DAYS:
-      timeRange = getTimeRange([-90, 0], 'd')('d');
+      timeRange = getTimeRange([-90, 0], 'd')('d', dateFormat);
       break;
     case RECOMMEND_TIME.LAST_1_MONTH:
-      timeRange = getTimeRange()('M');
+      timeRange = getTimeRange()('M', dateFormat);
       break;
     case RECOMMEND_TIME.LAST_1_YEAR:
-      timeRange = getTimeRange()('y');
+      timeRange = getTimeRange()('y', dateFormat);
       break;
   }
+
   return timeRange;
 }
 

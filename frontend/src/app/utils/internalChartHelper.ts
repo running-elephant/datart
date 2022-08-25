@@ -710,6 +710,7 @@ export const buildDragItem = (item, children: any[] = []) => {
     type: item?.type,
     subType: item?.subType,
     category: item?.category,
+    dateFormat: item?.dateFormat,
     children: children.map(c => buildDragItem(c)),
   };
 };

@@ -80,6 +80,7 @@ export const ValuesSetter: React.FC<{
       showMarks: config?.sliderConfig?.showMarks || false,
     };
   };
+
   return (
     <>
       <Form.Item hidden noStyle preserve name={ControllerValuesName}>

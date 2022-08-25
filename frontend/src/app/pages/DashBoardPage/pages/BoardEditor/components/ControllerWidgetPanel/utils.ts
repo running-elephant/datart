@@ -28,10 +28,9 @@ import {
 } from 'app/pages/DashBoardPage/constants';
 import { VariableValueTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
 import { RelationFilterValue } from 'app/types/ChartConfig';
+import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
 import i18next from 'i18next';
 import moment, { Moment } from 'moment';
-import { FilterSqlOperator } from '../../../../../../../globalConstants';
-import { TIME_FORMATTER } from './../../../../../../../globalConstants';
 import {
   DateControllerTypes,
   NumericalControllerTypes,
