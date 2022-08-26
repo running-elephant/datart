@@ -1476,7 +1476,9 @@
       "addSuccess": "新增成功",
       "restoredSuccess": "还原成功",
       "restore": "还原",
-      "sureToDelete": "确定删除？"
+      "sureToDelete": "确定删除？",
+      "open": "展开",
+      "close": "收起"
     },
     "form": {
       "name": "名称",

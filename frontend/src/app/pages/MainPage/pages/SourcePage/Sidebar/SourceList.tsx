@@ -179,10 +179,8 @@ export const SourceList = memo(({ sourceId, list }: SourceListProps) => {
 
       return (
         <TreeTitle>
-          <h4>
-            {title}
-            {type !== 'FOLDER' ? <Tag>{getLabel(type, config)}</Tag> : null}
-          </h4>
+          <h4>{title}</h4>
+          {type !== 'FOLDER' ? <Tag>{getLabel(type, config)}</Tag> : null}
           <CascadeAccess
             module={ResourceTypes.Source}
             path={path}
