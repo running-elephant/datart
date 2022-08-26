@@ -162,7 +162,7 @@ export const EditorPage: FC = () => {
     setPeriodInput(false);
     setFileType([FileTypes.Image]);
     dispatch(actions.clearEditingSchedule());
-  }, [form, dispatch, actions?.clearEditingSchedule]);
+  }, [form, dispatch, actions]);
 
   useEffect(() => {
     dispatch(getFolders(orgId));
