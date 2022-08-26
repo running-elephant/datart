@@ -21,9 +21,10 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import styled from 'styled-components/macro';
 
 export interface TreeSetterProps {
-  onChange?: (value: string) => void;
+  onChange?: (value: string | string[]) => void;
   value?: string;
   style: object;
+  mode?: 'multiple' | 'tags';
   viewFieldList;
 }
 
@@ -31,6 +32,7 @@ function TreeSetter({
   viewFieldList,
   value: val,
   style,
+  mode,
   onChange,
 }: TreeSetterProps) {
   const tc = useI18NPrefix(`viz.control`);
@@ -38,6 +40,7 @@ function TreeSetter({
     <TreeSetterWrapper>
       <Select
         style={style}
+        mode={mode}
         optionFilterProp={'label'}
         onChange={onChange}
         placeholder={tc('parentFieldId')}

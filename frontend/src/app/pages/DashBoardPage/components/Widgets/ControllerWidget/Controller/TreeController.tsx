@@ -30,7 +30,7 @@ export interface SelectControllerProps {
   label?: React.ReactNode;
   name?: string;
   required?: boolean;
-  parentField?: string;
+  parentField?: string[];
 }
 
 export const TreeControllerForm: React.FC<SelectControllerProps> = memo(
@@ -63,25 +63,8 @@ export const TreeSelectController: React.FC<SelectControllerProps> = memo(
         onChange={onChange}
         multiple
         bordered={false}
-      >
-        {options?.map(item => (
-          <TreeSelect.TreeNode
-            value={item.key}
-            title={item.key}
-            selectable={!parentField}
-          >
-            {item.children?.map(children => {
-              return (
-                <TreeSelect.TreeNode
-                  key={children.key + children.label}
-                  title={children.label ?? children.key ?? 'none'}
-                  value={children.key}
-                />
-              );
-            })}
-          </TreeSelect.TreeNode>
-        ))}
-      </StyledTreeSelect>
+        treeData={options}
+      />
     );
   },
 );

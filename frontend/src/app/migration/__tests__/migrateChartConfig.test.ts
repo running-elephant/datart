@@ -144,7 +144,7 @@ describe('test RC2 Function ', () => {
       ],
     } as any;
     const result = RC2(chartConfig as any);
-    console.log(JSON.stringify(result), 'result');
+
     expect(result.chartConfig.datas[0].rows[0].colName).toEqual(
       'birthday' + DATE_LEVEL_DELIMITER + 'AGG_DATE_YEAR',
     );

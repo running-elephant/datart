@@ -1281,7 +1281,12 @@
       "setDefault": "Set Default",
       "delete": "Delete",
       "populate": "Populate From Field Values",
-      "parentFieldId": "Select Parent Field"
+      "parentFieldId": "Select Parent Field",
+      "treeSelectType": "Select Tree Type",
+      "treeControl": "Tree Control",
+      "treeControlTip": "Multi-level structure list (folders, organizational structures, categories, countries, etc. Use tree controls to fully display hierarchical relationships.)",
+      "treeSelect": "Tree Select",
+      "treeSelectTip": "Tree selection control (can be used when the optional data structure is a tree structure, such as company hierarchy, subject system, taxonomy, etc.)"
     },
     "date": {
       "year": "Year",
