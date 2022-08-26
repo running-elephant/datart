@@ -1376,7 +1376,9 @@
       "restoredSuccess": "Restored successfully",
       "restore": "Restore",
       "sureToDelete": "Confirm delete?",
-      "addSuccess": "Add Success"
+      "addSuccess": "Add Success",
+      "open": "Open",
+      "close": "Close"
     },
     "form": {
       "name": "Name",
