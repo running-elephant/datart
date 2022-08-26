@@ -267,3 +267,8 @@ export enum ChartInteractionEvent {
   PagingOrSort = 'paging-sort-filter',
   ChangeContext = 'rich-text-change-context',
 }
+
+export enum DateFormat {
+  DateTime = 'YYYY-MM-DD HH:mm:ss',
+  Date = 'YYYY-MM-DD',
+}

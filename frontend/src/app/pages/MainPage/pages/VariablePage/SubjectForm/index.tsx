@@ -80,6 +80,7 @@ export const SubjectForm = memo(
           const permission = roleRowPermissions.find(
             ({ subjectId }) => subjectId === id,
           );
+
           rowPermissionSubjects.push({
             id,
             name,

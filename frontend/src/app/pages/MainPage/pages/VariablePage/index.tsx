@@ -187,7 +187,7 @@ export function VariablePage() {
       let defaultValue: any = values.defaultValue;
       if (values.valueType === VariableValueTypes.Date && !values.expression) {
         defaultValue = values.defaultValue.map(d =>
-          (d as Moment).format(TIME_FORMATTER),
+          (d as Moment).format(values.dateFormat),
         );
       }
 
@@ -226,14 +226,19 @@ export function VariablePage() {
 
   const saveRelations = useCallback(
     async (changedRowPermissions: RowPermission[]) => {
-      let changedRowPermissionsRaw = changedRowPermissions.map(cr => ({
-        ...cr,
-        value:
-          cr.value &&
-          (editingVariable?.valueType === VariableValueTypes.Date
-            ? cr.value.map(m => (m as Moment).format(TIME_FORMATTER))
-            : cr.value),
-      }));
+      let changedRowPermissionsRaw = changedRowPermissions.map(cr => {
+        const dateFormat =
+          variables.find(v => v.id === cr.variableId)?.dateFormat ||
+          TIME_FORMATTER;
+        return {
+          ...cr,
+          value:
+            cr.value &&
+            (editingVariable?.valueType === VariableValueTypes.Date
+              ? cr.value.map(m => (m as Moment).format(dateFormat))
+              : cr.value),
+        };
+      });
 
       if (rowPermissions) {
         const { created, updated, deleted } = getDiffParams(
@@ -270,7 +275,7 @@ export function VariablePage() {
         }
       }
     },
-    [rowPermissions, editingVariable, tg],
+    [rowPermissions, editingVariable, tg, variables],
   );
 
   const columns: TableColumnProps<VariableViewModel>[] = useMemo(

@@ -31,6 +31,7 @@ import styled from 'styled-components/macro';
 import { SPACE_LG, SPACE_MD, SPACE_UNIT } from 'styles/StyleConstants';
 import { APIResponse } from 'types';
 import { getToken } from 'utils/auth';
+
 const FormItem = Form.Item;
 
 export function Profile({ visible, onCancel }: ModalProps) {
@@ -144,6 +145,7 @@ export function Profile({ visible, onCancel }: ModalProps) {
         <FormItem label={t('description')} name="description">
           <Input />
         </FormItem>
+
         <Form.Item wrapperCol={{ offset: 7, span: 12 }}>
           <Button
             type="primary"

@@ -33,7 +33,13 @@ import {
   selectPermissionMap,
 } from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';
-import React, { memo, useCallback, useContext, useEffect } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { getInsertedNodeIndex, onDropTreeFn, stopPPG } from 'utils/utils';
@@ -63,6 +69,7 @@ interface FolderTreeProps {
 
 export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
   const dispatch = useDispatch();
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
   const history = useHistory();
   const { showSaveForm } = useContext(SaveFormContext);
   const loading = useSelector(selectViewListLoading);
@@ -253,11 +260,18 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
 
   const treeSelect = useCallback(
     (_, { node }) => {
+      if (node.isFolder) {
+        if (expandedKeys?.includes(node.key)) {
+          setExpandedKeys(expandedKeys.filter(k => k !== node.key));
+        } else {
+          setExpandedKeys([node.key].concat(expandedKeys));
+        }
+      }
       if (!node.isFolder && node.id !== currentEditingViewKey) {
         history.push(`/organizations/${orgId}/views/${node.id}`);
       }
     },
-    [history, orgId, currentEditingViewKey],
+    [history, orgId, currentEditingViewKey, expandedKeys],
   );
 
   const onDrop = info => {
@@ -280,6 +294,10 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
     });
   };
 
+  const handleExpandTreeNode = expandedKeys => {
+    setExpandedKeys(expandedKeys);
+  };
+
   return (
     <Tree
       loading={loading}
@@ -287,8 +305,9 @@ export const FolderTree = memo(({ treeData }: FolderTreeProps) => {
       titleRender={renderTreeTitle}
       selectedKeys={[currentEditingViewKey]}
       onSelect={treeSelect}
-      defaultExpandAll
       onDrop={onDrop}
+      expandedKeys={expandedKeys}
+      onExpand={handleExpandTreeNode}
       draggable
     />
   );

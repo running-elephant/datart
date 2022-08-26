@@ -21,11 +21,10 @@ import {
   FieldStringOutlined,
   NumberOutlined,
 } from '@ant-design/icons';
-import { Dropdown, Menu, TableColumnType, TableProps, Tooltip } from 'antd';
+import { TableColumnType, TableProps } from 'antd';
 import { ToolbarButton } from 'app/components';
 import { VirtualTable } from 'app/components/VirtualTable';
 import { DataViewFieldType } from 'app/constants';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { TABLE_DATA_INDEX } from 'globalConstants';
 import { memo, ReactElement, useMemo } from 'react';
 import styled from 'styled-components/macro';
@@ -36,9 +35,9 @@ import {
   WARNING,
 } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
-import { ColumnCategories } from '../constants';
 import { Column, ColumnsModel, Model } from '../slice/types';
 import { getColumnWidthMap, getHierarchyColumn } from '../utils';
+import SetFieldType from './SetFieldType';
 
 const ROW_KEY = 'DATART_ROW_KEY';
 
@@ -49,14 +48,15 @@ interface SchemaTableProps extends TableProps<object> {
   hierarchy: Model;
   dataSource?: object[];
   hasCategory?: boolean;
+  hasFormat?: boolean;
   getExtraHeaderActions?: (
     name: string,
     column: Omit<Column, 'name'>,
   ) => ReactElement[];
   onSchemaTypeChange: (
-    name: string,
+    namePath: string,
     column: Omit<Column, 'name'>,
-  ) => (e) => void;
+  ) => (namePath: string[]) => void;
 }
 
 export const SchemaTable = memo(
@@ -66,6 +66,7 @@ export const SchemaTable = memo(
     model,
     hierarchy,
     dataSource,
+    hasFormat,
     hasCategory,
     getExtraHeaderActions,
     onSchemaTypeChange,
@@ -84,8 +85,6 @@ export const SchemaTable = memo(
       () => getColumnWidthMap(model, dataSource || []),
       [model, dataSource],
     );
-    const t = useI18NPrefix('view.schemaTable');
-    const tg = useI18NPrefix('global');
     const indexColumnWidth = 50;
     const {
       columns,
@@ -120,50 +119,20 @@ export const SchemaTable = memo(
         const title = (
           <>
             <span className="content">{name}</span>
-            <Dropdown
-              trigger={['click']}
-              overlay={
-                <Menu
-                  selectedKeys={[
-                    hierarchyColumn.type,
-                    `category-${hierarchyColumn.category}`,
-                  ]}
-                  className="datart-schema-table-header-menu"
-                  onClick={onSchemaTypeChange(name, hierarchyColumn)}
-                >
-                  {Object.values(DataViewFieldType).map(t => (
-                    <Menu.Item key={t}>
-                      {tg(`columnType.${t.toLowerCase()}`)}
-                    </Menu.Item>
-                  ))}
-                  {hasCategory && (
-                    <>
-                      <Menu.Divider />
-                      <Menu.SubMenu
-                        key="categories"
-                        title={t('category')}
-                        popupClassName="datart-schema-table-header-menu"
-                      >
-                        {Object.values(ColumnCategories).map(t => (
-                          <Menu.Item key={`category-${t}`}>
-                            {tg(`columnCategory.${t.toLowerCase()}`)}
-                          </Menu.Item>
-                        ))}
-                      </Menu.SubMenu>
-                    </>
-                  )}
-                </Menu>
-              }
-            >
-              <Tooltip title={hasCategory ? t('typeAndCategory') : t('type')}>
+            <SetFieldType
+              field={hierarchyColumn as Column}
+              hasCategory={hasCategory}
+              hasFormat={hasFormat}
+              onChange={onSchemaTypeChange(name, hierarchyColumn)}
+              icon={
                 <ToolbarButton
                   size="small"
                   iconSize={FONT_SIZE_BASE}
                   className="suffix"
                   icon={icon}
                 />
-              </Tooltip>
-            </Dropdown>
+              }
+            />
             {extraActions}
           </>
         );
@@ -195,10 +164,9 @@ export const SchemaTable = memo(
       hierarchy,
       columnWidthMap,
       hasCategory,
+      hasFormat,
       getExtraHeaderActions,
       onSchemaTypeChange,
-      t,
-      tg,
     ]);
 
     return (

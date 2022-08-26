@@ -278,13 +278,14 @@ export class ChartDataRequestBuilder {
         }
       })
       .map(col => col);
+
     return this.normalizeFilters(fields)
       .concat(this.normalizeDrillFilters())
       .concat(this.normalizeRuntimeFilters());
   }
 
   private normalizeFilters = (fields: ChartDataSectionField[]) => {
-    const _timeConverter = (visualType, value) => {
+    const _timeConverter = (visualType, value, dateFormat = TIME_FORMATTER) => {
       if (visualType !== 'DATE') {
         return value;
       }
@@ -293,13 +294,14 @@ export class ChartDataRequestBuilder {
           value.unit,
           value.isStart,
         );
-        return formatTime(time, TIME_FORMATTER);
+        return formatTime(time, dateFormat);
       }
-      return formatTime(value, TIME_FORMATTER);
+      return formatTime(value, dateFormat);
     };
 
     const _transformFieldValues = (field: ChartDataSectionField) => {
       const conditionValue = field.filter?.condition?.value;
+      const dateFormat = field.dateFormat;
       if (!conditionValue) {
         return null;
       }
@@ -317,7 +319,11 @@ export class ChartDataRequestBuilder {
               };
             } else {
               return {
-                value: _timeConverter(field.filter?.condition?.visualType, v),
+                value: _timeConverter(
+                  field.filter?.condition?.visualType,
+                  v,
+                  dateFormat,
+                ),
                 valueType: field.type,
               };
             }
@@ -327,7 +333,10 @@ export class ChartDataRequestBuilder {
       if (
         field?.filter?.condition?.type === FilterConditionType.RecommendTime
       ) {
-        const timeRange = recommendTimeRangeConverter(conditionValue);
+        const timeRange = recommendTimeRangeConverter(
+          conditionValue,
+          dateFormat,
+        );
         return timeRange.map(t => ({
           value: t,
           valueType: field.type,
@@ -338,6 +347,7 @@ export class ChartDataRequestBuilder {
           value: _timeConverter(
             field.filter?.condition?.visualType,
             conditionValue,
+            dateFormat,
           ),
           valueType: field.type,
         },

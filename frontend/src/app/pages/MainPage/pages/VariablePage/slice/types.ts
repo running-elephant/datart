@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { DateFormat } from 'app/constants';
 import { SubjectTypes } from '../../PermissionPage/constants';
 import { VariableTypes, VariableValueTypes } from '../constants';
 
@@ -42,6 +43,7 @@ export interface Variable {
   createTime?: string;
   updateBy?: string;
   updateTime?: string;
+  dateFormat?: DateFormat;
 }
 
 export interface VariableViewModel extends Variable {
