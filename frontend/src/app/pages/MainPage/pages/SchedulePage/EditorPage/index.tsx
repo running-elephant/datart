@@ -161,7 +161,7 @@ export const EditorPage: FC = () => {
     setPeriodUnit(TimeModes.Minute);
     setPeriodInput(false);
     setFileType([FileTypes.Image]);
-    dispatch(actions.clearEditingSchedule);
+    dispatch(actions.clearEditingSchedule());
   }, [form, dispatch, actions?.clearEditingSchedule]);
 
   useEffect(() => {
@@ -288,7 +288,7 @@ export const EditorPage: FC = () => {
     }
     return () => {
       setJobType(DEFAULT_VALUES.jobType as JobTypes);
-      dispatch(actions.clearEditingSchedule);
+      dispatch(actions.clearEditingSchedule());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingSchedule]);
