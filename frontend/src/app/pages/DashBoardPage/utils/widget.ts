@@ -836,11 +836,11 @@ export const convertToTree = (col, type) => {
 
   let data: RelationFilterValue[] = [];
   let copyCol = CloneValueDeep(col);
-  let emptyParentObj = ['null', 'undefined', 'false'];
+  let emptyParentList = ['null', 'undefined', 'false'];
 
   if (type === 'treeControl') {
     const parent = copyCol?.find(
-      v => !v[v.length - 1] || emptyParentObj.includes(v[v.length - 1]),
+      v => !v[v.length - 1] || emptyParentList.includes(v[v.length - 1]),
     ) || [null];
     data = converListToTree(
       copyCol?.map(v => {
