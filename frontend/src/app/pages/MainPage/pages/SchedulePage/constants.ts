@@ -1,6 +1,6 @@
 import { prefixI18N } from 'app/hooks/useI18NPrefix';
 import { FormValues } from './types';
-const Prefix = 'main.pages.schedulePage.constants.';
+const Prefix = 'schedule.constants.';
 export enum JobTypes {
   Email = 'EMAIL',
   WeChart = 'WECHART',

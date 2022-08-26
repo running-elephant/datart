@@ -32,7 +32,7 @@ interface CommonRichTextProps {
 export const CommonRichText: FC<CommonRichTextProps> = ({
   children,
   placeholder = prefixI18N(
-    'main.pages.schedulePage.sidebar.editorPage.emailSettingForm.commonRichText.pleaseEnter',
+    'schedule.editor.emailSettingForm.commonRichText.pleaseEnter',
   ),
   ...restProps
 }) => {

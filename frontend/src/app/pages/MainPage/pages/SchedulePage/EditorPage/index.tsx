@@ -56,7 +56,7 @@ import { BasicBaseForm } from './BasicBaseForm';
 import { EmailSettingForm } from './EmailSettingForm';
 import { ScheduleErrorLog } from './ScheduleErrorLog';
 import { SendContentForm } from './SendContentForm';
-import { WeChartSetttingForm } from './WeChartSetttingForm';
+import { WeChartSettingForm } from './WeChartSettingForm';
 
 export const EditorPage: FC = () => {
   const [form] = Form.useForm();
@@ -78,7 +78,7 @@ export const EditorPage: FC = () => {
   const { showSaveForm } = useContext(SaveFormContext);
   const { toDetails } = useToScheduleDetails();
   const isArchived = editingSchedule?.status === 0;
-  const t = useI18NPrefix('main.pages.schedulePage.sidebar.editorPage.index');
+  const t = useI18NPrefix('schedule.editor.index');
 
   const { actions } = useScheduleSlice();
   const { scheduleId, orgId } = params;
@@ -126,7 +126,11 @@ export const EditorPage: FC = () => {
         dispatch(
           editSchedule({
             scheduleId: editingSchedule?.id as string,
-            params: { ...params, id: editingSchedule?.id as string },
+            params: {
+              ...params,
+              index: editingSchedule?.index || null,
+              id: editingSchedule?.id as string,
+            },
             resolve: () => {
               message.success(t('saveSuccess'));
               dispatch(getScheduleDetails(editingSchedule?.id!));
@@ -141,6 +145,7 @@ export const EditorPage: FC = () => {
     schedules,
     editingSchedule?.parentId,
     editingSchedule?.id,
+    editingSchedule?.index,
     orgId,
     isAdd,
     t,
@@ -381,7 +386,7 @@ export const EditorPage: FC = () => {
               ) : (
                 <FormCard title={t('enterpriseWeChatSettings')}>
                   <FormWrapper>
-                    <WeChartSetttingForm />
+                    <WeChartSettingForm />
                   </FormWrapper>
                 </FormCard>
               )}

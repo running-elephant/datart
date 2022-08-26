@@ -15,9 +15,7 @@ export const EmailSettingForm: FC<EmailSettingFormProps> = ({
   onFileTypeChange,
 }) => {
   const [showBcc, setShowBcc] = useState(false);
-  const t = useI18NPrefix(
-    'main.pages.schedulePage.sidebar.editorPage.emailSettingForm.index',
-  );
+  const t = useI18NPrefix('schedule.editor.emailSettingForm.index');
   const hasImageWidth = useMemo(() => {
     return fileType && fileType?.length > 0
       ? fileType?.includes(FileTypes.Image)

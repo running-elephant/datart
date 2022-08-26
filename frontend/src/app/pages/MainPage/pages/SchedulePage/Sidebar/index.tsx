@@ -5,19 +5,22 @@ import {
   FolderOpenFilled,
   FolderOutlined,
   MailOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
   WechatOutlined,
 } from '@ant-design/icons';
 import { message } from 'antd';
 import { ListNav, ListPane, ListTitle } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
+import { dispatchResize } from 'app/utils/dispatchResize';
 import { CommonFormTypes } from 'globalConstants';
 import { memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouteMatch } from 'react-router';
 import styled from 'styled-components/macro';
-import { SPACE_XS } from 'styles/StyleConstants';
+import { LEVEL_5, SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
 import { getInsertedNodeIndex } from 'utils/utils';
 import { JobTypes } from '../constants';
 import { useToScheduleDetails } from '../hooks';
@@ -33,8 +36,15 @@ import { ScheduleSimpleViewModel } from '../slice/types';
 import { Recycle } from './Recycle';
 import { ScheduleList } from './ScheduleList';
 
+interface SidebarProps extends I18NComponentProps {
+  isDragging: boolean;
+  width: number;
+  sliderVisible: boolean;
+  handleSliderVisible: (status: boolean) => void;
+}
+
 export const Sidebar = memo(
-  ({ handleSliderVisible }: { handleSliderVisible?: (boo) => void }) => {
+  ({ width, isDragging, sliderVisible, handleSliderVisible }: SidebarProps) => {
     const dispatch = useDispatch();
     const matchScheduleDetail = useRouteMatch<{
       scheduleId: string;
@@ -44,7 +54,7 @@ export const Sidebar = memo(
     const archived = useSelector(selectArchived);
     const scheduleData = useSelector(selectSchedules);
     const { showSaveForm } = useContext(SaveFormContext);
-    const t = useI18NPrefix('main.pages.schedulePage.sidebar');
+    const t = useI18NPrefix('schedule.sidebar');
     const tg = useI18NPrefix('global');
 
     const selectScheduleTree = useMemo(makeSelectScheduleTree, []);
@@ -132,13 +142,20 @@ export const Sidebar = memo(
       [toDetails, orgId, showSaveForm, scheduleData, dispatch, t],
     );
 
-    const moreMenuClick = useCallback((key, _, onNext) => {
-      switch (key) {
-        case 'recycle':
-          onNext();
-          break;
-      }
-    }, []);
+    const moreMenuClick = useCallback(
+      (key, _, onNext) => {
+        switch (key) {
+          case 'recycle':
+            onNext();
+            break;
+          case 'collapse':
+            handleSliderVisible(!sliderVisible);
+            dispatchResize();
+            break;
+        }
+      },
+      [handleSliderVisible, sliderVisible],
+    );
 
     const titles = useMemo(
       () => [
@@ -161,6 +178,15 @@ export const Sidebar = memo(
                 text: t('index.recycle'),
                 prefix: <DeleteOutlined className="icon" />,
               },
+              {
+                key: 'collapse',
+                text: t(sliderVisible ? 'index.open' : 'index.close'),
+                prefix: sliderVisible ? (
+                  <MenuUnfoldOutlined className="icon" />
+                ) : (
+                  <MenuFoldOutlined className="icon" />
+                ),
+              },
             ],
             callback: moreMenuClick,
           },
@@ -173,12 +199,22 @@ export const Sidebar = memo(
           onSearch: archivedSearch,
         },
       ],
-      [toAdd, moreMenuClick, listSearch, archivedSearch, t],
+      [t, listSearch, toAdd, sliderVisible, moreMenuClick, archivedSearch],
     );
 
     return (
-      <>
-        <Wrapper defaultActiveKey="list">
+      <Wrapper
+        sliderVisible={sliderVisible}
+        className={sliderVisible ? 'close' : ''}
+        isDragging={isDragging}
+        width={width}
+      >
+        {sliderVisible ? (
+          <MenuUnfoldOutlined className="menuUnfoldOutlined" />
+        ) : (
+          ''
+        )}
+        <ListNavWrapper defaultActiveKey="list">
           <ListPane key="list">
             <ListTitle {...titles[0]} />
             <ScheduleList
@@ -191,7 +227,7 @@ export const Sidebar = memo(
             <ListTitle {...titles[1]} />
             <Recycle scheduleId={scheduleId} list={archivedList} />
           </ListPane>
-        </Wrapper>
+        </ListNavWrapper>
         <SaveForm
           formProps={{
             labelAlign: 'left',
@@ -200,17 +236,66 @@ export const Sidebar = memo(
           }}
           okText={tg('button.save')}
         />
-      </>
+      </Wrapper>
     );
   },
 );
 
-const Wrapper = styled(ListNav)`
+const Wrapper = styled.div<{
+  sliderVisible: boolean;
+  isDragging: boolean;
+  width: number;
+}>`
+  z-index: ${LEVEL_5};
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  width: 320px;
-  padding: ${SPACE_XS} 0;
+  min-height: 0;
   background-color: ${p => p.theme.componentBackground};
   box-shadow: ${p => p.theme.shadowSider};
+  transition: ${p => (!p.isDragging ? 'width 0.3s ease' : 'none')};
+  .hidden {
+    display: none;
+  }
+  > ul {
+    display: ${p => (p.sliderVisible ? 'none' : 'block')};
+  }
+  > div {
+    display: ${p => (p.sliderVisible ? 'none' : 'flex')};
+  }
+  &.close {
+    position: absolute;
+    width: ${SPACE_TIMES(7.5)} !important;
+    height: 100%;
+    .menuUnfoldOutlined {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    &:hover {
+      width: ${p => p.width + '%'} !important;
+      .menuUnfoldOutlined {
+        display: none;
+      }
+      > ul {
+        display: block;
+      }
+      > div {
+        display: flex;
+        &.hidden {
+          display: none;
+        }
+      }
+    }
+  }
+`;
+
+const ListNavWrapper = styled(ListNav)`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  flex-shrink: 0;
+  padding: ${SPACE_XS} 0;
+  background-color: ${p => p.theme.componentBackground};
 `;

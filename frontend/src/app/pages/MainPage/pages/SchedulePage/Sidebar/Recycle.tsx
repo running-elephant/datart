@@ -39,7 +39,7 @@ export const Recycle = memo(({ scheduleId, list }: RecycleProps) => {
   const history = useHistory();
   const loading = useSelector(selectArchivedListLoading);
   const orgId = useSelector(selectOrgId);
-  const t = useI18NPrefix('main.pages.schedulePage.sidebar.editorPage.index');
+  const t = useI18NPrefix('schedule.editor.index');
   const { toDetails } = useToScheduleDetails();
   const isOwner = useSelector(selectIsOrgOwner);
   const { showSaveForm } = useContext(SaveFormContext);

@@ -67,7 +67,7 @@ export const ScheduleList: FC<{
   const { showSaveForm } = useContext(SaveFormContext);
   const isOwner = useSelector(selectIsOrgOwner);
   const permissionMap = useSelector(selectPermissionMap);
-  const t = useI18NPrefix('main.pages.schedulePage.sidebar.scheduleList');
+  const t = useI18NPrefix('schedule.sidebar.scheduleList');
   const tg = useI18NPrefix('global');
 
   const moreMenuClick = useCallback(

@@ -21,11 +21,9 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC } from 'react';
 import { WECHART_FILE_TYPE_OPTIONS } from '../constants';
 
-interface WeChartSetttingFormProps {}
-export const WeChartSetttingForm: FC<WeChartSetttingFormProps> = () => {
-  const t = useI18NPrefix(
-    'main.pages.schedulePage.sidebar.editorPage.weChartSetttingForm',
-  );
+interface WeChartSettingFormProps {}
+export const WeChartSettingForm: FC<WeChartSettingFormProps> = () => {
+  const t = useI18NPrefix('schedule.editor.weChartSettingForm');
 
   return (
     <>
