@@ -780,7 +780,7 @@ export function cloneWidgets(args: {
   };
 }
 /**
- *
+ * @describe list[grandpa dad son...] to List[{id:'',parentId:''}]
  * @param collection [[grandpa dad son,....]]
  * @returns [{id:'',parentId:'',value:''}....]
  */
