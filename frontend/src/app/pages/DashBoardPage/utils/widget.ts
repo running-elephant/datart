@@ -792,7 +792,6 @@ export const handleRowDataForTree = collection => {
         obj[val] = {
           id: val,
           parentId: ind ? v[ind - 1] : null,
-          isLeaf: ind === v.length - 1 ? true : false,
         };
       }
     });
@@ -814,9 +813,8 @@ export const converListToTree = (
       treeNodes.push({
         id: o['id'],
         parentId: o['parentId'],
-        value: o['id'],
+        key: o['id'],
         title: o['label'] || o['id'],
-        label: o['label'] || o['id'],
       });
     } else {
       childrenList.push(o);

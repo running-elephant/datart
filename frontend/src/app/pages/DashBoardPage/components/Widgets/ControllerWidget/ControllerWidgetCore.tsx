@@ -363,7 +363,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           <TreeControllerForm
             parentField={parentField}
             onChange={onControllerChange}
-            options={optionRows}
+            treeData={optionRows}
             name={'value'}
             label={leftControlLabel}
           />

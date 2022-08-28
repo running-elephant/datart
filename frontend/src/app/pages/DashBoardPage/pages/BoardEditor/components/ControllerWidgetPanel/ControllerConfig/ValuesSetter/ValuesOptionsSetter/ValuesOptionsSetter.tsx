@@ -16,7 +16,15 @@
  * limitations under the License.
  */
 
-import { Form, FormInstance, Radio, Select, Space, TreeSelect } from 'antd';
+import {
+  Form,
+  FormInstance,
+  Radio,
+  Select,
+  Space,
+  Tree,
+  TreeSelect,
+} from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
 import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -50,6 +58,7 @@ import { ControllerConfig } from '../../../types';
 import TreeSetter from '../TreeSetter';
 import { AssistViewFields } from './AssistViewFields';
 import { CustomOptions } from './CustomOptions';
+
 export interface optionProps {
   label: string;
   value: string;
@@ -150,9 +159,20 @@ const ValuesOptionsSetter: FC<{
     };
   }, []);
 
-  const onTargetKeyChange = useCallback(nextTargetKeys => {
-    setTargetKeys(nextTargetKeys);
-  }, []);
+  const onTargetKeyChange = useCallback(
+    nextTargetKeys => {
+      const config: ControllerConfig = getControllerConfig();
+
+      form?.setFieldsValue({
+        config: {
+          ...config,
+          controllerValues: nextTargetKeys,
+        },
+      });
+      setTargetKeys(nextTargetKeys);
+    },
+    [form, getControllerConfig],
+  );
 
   const fetchNewDataset = useCallback(
     async (viewId: string, columns: string[], dataView?: ChartDataView) => {
@@ -399,15 +419,40 @@ const ValuesOptionsSetter: FC<{
                     <Form.Item name={['config', 'controllerValues']}>
                       {getParentField()?.length ? (
                         <TreeSelect
-                          showSearch
                           placeholder={tc('selectDefaultValue')}
-                          value={targetKeys}
                           multiple
                           allowClear
-                          onChange={onTargetKeyChange}
-                          style={{ width: '100%' }}
                           treeData={optionValues}
-                        ></TreeSelect>
+                          style={{ width: '100%' }}
+                          dropdownStyle={{ height: '300px', overflowY: 'auto' }}
+                          dropdownRender={() => {
+                            return (
+                              <TreeSelectProps
+                                checkedKeys={targetKeys}
+                                onCheck={(checkedObj: any) =>
+                                  onTargetKeyChange(checkedObj?.checked)
+                                }
+                                checkable
+                                checkStrictly
+                                titleRender={node => {
+                                  return (
+                                    <div
+                                      style={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                      }}
+                                    >
+                                      <span>{node.title || node.key}</span>
+                                      <FieldKey>{node.key}</FieldKey>
+                                    </div>
+                                  );
+                                }}
+                                treeData={optionValues}
+                              />
+                            );
+                          }}
+                        />
                       ) : (
                         <Select
                           showSearch
@@ -465,4 +510,13 @@ const Wrapper = styled.div`
 
 const FieldKey = styled.span`
   color: ${p => p.theme.textColorDisabled};
+`;
+
+const TreeSelectProps = styled(Tree)`
+  .ant-tree-node-content-wrapper {
+    width: 100%;
+  }
+  .ant-tree-treenode {
+    width: 100%;
+  }
 `;

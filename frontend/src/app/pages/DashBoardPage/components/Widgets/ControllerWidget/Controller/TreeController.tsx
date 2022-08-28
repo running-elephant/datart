@@ -15,16 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Form, TreeSelect } from 'antd';
-import { SelectValue } from 'antd/lib/select';
+import { Form, Tree, TreeSelect } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { RelationFilterValue } from 'app/types/ChartConfig';
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 
-export interface SelectControllerProps {
-  options?: RelationFilterValue[];
-  value?: SelectValue;
+export interface TreeControllerFormProps {
+  treeData?: RelationFilterValue[];
+  value?: string[];
   placeholder?: string;
   onChange: (values) => void;
   label?: React.ReactNode;
@@ -33,7 +32,7 @@ export interface SelectControllerProps {
   parentField?: string[];
 }
 
-export const TreeControllerForm: React.FC<SelectControllerProps> = memo(
+export const TreeControllerForm: React.FC<TreeControllerFormProps> = memo(
   ({ label, name, required, ...rest }) => {
     return (
       <Form.Item
@@ -47,23 +46,43 @@ export const TreeControllerForm: React.FC<SelectControllerProps> = memo(
     );
   },
 );
-export const TreeSelectController: React.FC<SelectControllerProps> = memo(
-  ({ options, onChange, value, parentField }) => {
+export const TreeSelectController: React.FC<TreeControllerFormProps> = memo(
+  ({ treeData, onChange, value }) => {
     const t = useI18NPrefix(`viz.common.enum.controllerPlaceHolders`);
+    const handleonChange = useCallback(
+      checkedObj => {
+        onChange(checkedObj?.checked);
+      },
+      [onChange],
+    );
+
     return (
       <StyledTreeSelect
-        showSearch
         allowClear
         value={value}
         style={{ width: '100%' }}
         placeholder={t('treeSelectController')}
         maxTagTextLength={4}
         maxTagCount={3}
-        optionFilterProp="label"
         onChange={onChange}
         multiple
         bordered={false}
-        treeData={options}
+        treeData={treeData}
+        dropdownStyle={{ height: '300px', overflowY: 'auto' }}
+        dropdownRender={() => {
+          return (
+            <Tree
+              checkedKeys={value}
+              onCheck={handleonChange}
+              checkable
+              checkStrictly
+              titleRender={node => {
+                return node.title || node.key;
+              }}
+              treeData={treeData}
+            />
+          );
+        }}
       />
     );
   },
@@ -73,6 +92,5 @@ const StyledTreeSelect = styled(TreeSelect)`
 
   &.ant-select .ant-select-selector {
     background-color: transparent !important;
-    /* border: none; */
   }
 `;
