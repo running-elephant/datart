@@ -1435,7 +1435,7 @@
         "sendContentSettings": "发送内容设置",
         "parent": "所属目录"
       },
-      "weChartSettingForm": {
+      "weChatSettingForm": {
         "RobotWebhookAddress": "机器人webhook地址",
         "RobotWebhookAddressIsRequired": "机器人webhook地址为必填项",
         "fileType": "文件类型",

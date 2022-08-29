@@ -25,7 +25,7 @@ export const MailTagFormItem: FC<MailTagFormItemProps> = ({
   const t = useI18NPrefix('schedule.editor.emailSettingForm.mailTagFormItem');
 
   const emails = useMemo(() => {
-    return value ? value.split(';').filter(v => !!v) : [];
+    return value ? value.split(';').filter(Boolean) : [];
   }, [value]);
 
   const onSearch = useCallback(async keyword => {

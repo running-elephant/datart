@@ -21,9 +21,9 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC } from 'react';
 import { WECHART_FILE_TYPE_OPTIONS } from '../constants';
 
-interface WeChartSettingFormProps {}
-export const WeChartSettingForm: FC<WeChartSettingFormProps> = () => {
-  const t = useI18NPrefix('schedule.editor.weChartSettingForm');
+interface WeChatSettingFormProps {}
+export const WeChatSettingForm: FC<WeChatSettingFormProps> = () => {
+  const t = useI18NPrefix('schedule.editor.weChatSettingForm');
 
   return (
     <>

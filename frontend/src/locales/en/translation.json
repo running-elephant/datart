@@ -1436,7 +1436,7 @@
         "sendContentSettings": "Send content settings",
         "parent": "Parent"
       },
-      "weChartSettingForm": {
+      "weChatSettingForm": {
         "RobotWebhookAddress": "Robot webhook address",
         "RobotWebhookAddressIsRequired": "Robot webhook address is required",
         "fileType": "File type",

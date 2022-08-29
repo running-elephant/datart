@@ -56,7 +56,7 @@ import { BasicBaseForm } from './BasicBaseForm';
 import { EmailSettingForm } from './EmailSettingForm';
 import { ScheduleErrorLog } from './ScheduleErrorLog';
 import { SendContentForm } from './SendContentForm';
-import { WeChartSettingForm } from './WeChartSettingForm';
+import { WeChatSettingForm } from './WeChatSettingForm';
 
 export const EditorPage: FC = () => {
   const [form] = Form.useForm();
@@ -163,6 +163,13 @@ export const EditorPage: FC = () => {
     setFileType([FileTypes.Image]);
     dispatch(actions.clearEditingSchedule());
   }, [form, dispatch, actions]);
+
+  useEffect(() => {
+    return () => {
+      onResetForm();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     dispatch(getFolders(orgId));
@@ -288,7 +295,6 @@ export const EditorPage: FC = () => {
     }
     return () => {
       setJobType(DEFAULT_VALUES.jobType as JobTypes);
-      dispatch(actions.clearEditingSchedule());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingSchedule]);
@@ -386,7 +392,7 @@ export const EditorPage: FC = () => {
               ) : (
                 <FormCard title={t('enterpriseWeChatSettings')}>
                   <FormWrapper>
-                    <WeChartSettingForm />
+                    <WeChatSettingForm />
                   </FormWrapper>
                 </FormCard>
               )}
