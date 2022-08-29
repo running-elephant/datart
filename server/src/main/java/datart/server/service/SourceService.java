@@ -46,4 +46,6 @@ public interface SourceService extends BaseCRUDService<Source, SourceMapperExt>,
 
     boolean updateBase(SourceBaseUpdateParam updateParam);
 
+    boolean unarchive(String id, String newName, String parentId, double index);
+
 }

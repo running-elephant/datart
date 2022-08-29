@@ -98,8 +98,11 @@ public class SourceController extends BaseController {
 
     @ApiOperation(value = "unarchive a source")
     @PutMapping(value = "/unarchive/{sourceId}")
-    public ResponseData<Boolean> unarchive(@PathVariable String sourceId) {
-        return ResponseData.success(sourceService.unarchive(sourceId));
+    public ResponseData<Boolean> unarchive(@PathVariable String sourceId,
+                                           @RequestParam String name,
+                                           @RequestParam Double index,
+                                           @RequestParam(required = false) String parentId) {
+        return ResponseData.success(sourceService.unarchive(sourceId, name, parentId, index));
     }
 
     @ApiOperation(value = "get source schemas ")

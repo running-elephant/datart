@@ -22,15 +22,17 @@ import {
   DeleteScheduleParams,
   EditScheduleParamsResolve,
   ErrorLog,
-  FoldersTreeItem,
   Schedule,
+  ScheduleBase,
   ScheduleParamsResolve,
+  ScheduleSimple,
+  UpdateScheduleBaseParams,
 } from './types';
 
-export const getSchedules = createAsyncThunk<Schedule[], string>(
+export const getSchedules = createAsyncThunk<ScheduleSimple[], string>(
   'schedule/getSchedules',
   async orgId => {
-    const { data } = await request2<Schedule[]>({
+    const { data } = await request2<ScheduleSimple[]>({
       url: '/schedules',
       method: 'GET',
       params: { orgId },
@@ -39,10 +41,10 @@ export const getSchedules = createAsyncThunk<Schedule[], string>(
   },
 );
 
-export const getArchivedSchedules = createAsyncThunk<Schedule[], string>(
+export const getArchivedSchedules = createAsyncThunk<ScheduleSimple[], string>(
   'schedule/getArchivedSchedules',
   async orgId => {
-    const { data } = await request2<Schedule[]>({
+    const { data } = await request2<ScheduleSimple[]>({
       url: '/schedules/archived',
       method: 'GET',
       params: { orgId },
@@ -51,10 +53,10 @@ export const getArchivedSchedules = createAsyncThunk<Schedule[], string>(
   },
 );
 
-export const getScheduleDetails = createAsyncThunk<Schedule, string>(
+export const getScheduleDetails = createAsyncThunk<ScheduleSimple, string>(
   'schedule/getScheduleDetails',
   async scheduleId => {
-    const { data } = await request2<Schedule>({
+    const { data } = await request2<ScheduleSimple>({
       url: `/schedules/${scheduleId}`,
       method: 'GET',
     });
@@ -62,18 +64,18 @@ export const getScheduleDetails = createAsyncThunk<Schedule, string>(
   },
 );
 
-export const addSchedule = createAsyncThunk<Schedule, ScheduleParamsResolve>(
-  'schedule/addSchedule',
-  async ({ params, resolve }) => {
-    const { data } = await request2<Schedule>({
-      url: '/schedules',
-      method: 'POST',
-      data: params,
-    });
-    typeof resolve === 'function' && resolve(data?.id);
-    return data;
-  },
-);
+export const addSchedule = createAsyncThunk<
+  ScheduleSimple,
+  ScheduleParamsResolve
+>('schedule/addSchedule', async ({ params, resolve }) => {
+  const { data } = await request2<ScheduleSimple>({
+    url: '/schedules',
+    method: 'POST',
+    data: params,
+  });
+  typeof resolve === 'function' && resolve(data?.id);
+  return data;
+});
 
 export const editSchedule = createAsyncThunk<
   Schedule[],
@@ -90,11 +92,12 @@ export const editSchedule = createAsyncThunk<
 
 export const unarchiveSchedule = createAsyncThunk<
   null,
-  { id: string; resolve: () => void }
->('schedule/unarchiveSchedule', async ({ id, resolve }) => {
+  UpdateScheduleBaseParams
+>('schedule/unarchiveSchedule', async ({ schedule, resolve }) => {
   await request2<boolean>({
-    url: `/schedules/unarchive/${id}`,
+    url: `/schedules/unarchive/${schedule.id}`,
     method: 'PUT',
+    params: schedule,
   });
   resolve();
   return null;
@@ -113,18 +116,6 @@ export const deleteSchedule = createAsyncThunk<null, DeleteScheduleParams>(
   },
 );
 
-export const getSendContentFolders = createAsyncThunk<
-  FoldersTreeItem[],
-  string
->('schedule/getSendContentFolders', async orgId => {
-  const { data } = await request2<FoldersTreeItem[]>({
-    url: '/viz/folders',
-    method: 'GET',
-    params: { orgId },
-  });
-  return data;
-});
-
 export const getScheduleErrorLogs = createAsyncThunk<
   ErrorLog[],
   { scheduleId: string; count: number }
@@ -135,4 +126,17 @@ export const getScheduleErrorLogs = createAsyncThunk<
     params: { scheduleId, count },
   });
   return data;
+});
+
+export const updateScheduleBase = createAsyncThunk<
+  ScheduleBase,
+  UpdateScheduleBaseParams
+>('schedule/updateScheduleBase', async ({ schedule, resolve }) => {
+  await request2<ScheduleBase>({
+    url: `/schedules/${schedule.id}/base`,
+    method: 'PUT',
+    data: schedule,
+  });
+  resolve();
+  return schedule;
 });

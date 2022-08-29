@@ -301,6 +301,7 @@ const ControllerWidgetPanel: React.FC<WidgetControllerPanelParams> = memo(
       setRelatedWidgets(relatedWidgets);
       setFormRelatedViews(setViewsRelatedView(relatedWidgets));
     };
+
     return (
       <Modal
         title={`${tGMT(type)}${t(controllerType || '')}`}

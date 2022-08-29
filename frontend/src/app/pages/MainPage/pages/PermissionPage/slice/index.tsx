@@ -118,16 +118,19 @@ const slice = createSlice({
       state.scheduleListLoading = true;
     });
     builder.addCase(getSchedules.fulfilled, (state, action) => {
+      const root = generateRootNode(ResourceTypes.Schedule);
       state.scheduleListLoading = false;
-      state.schedules = action.payload.map(({ id, name }) => ({
-        id,
-        name,
-        type: ResourceTypes.Schedule,
-        parentId: null,
-        index: null,
-        isFolder: false,
-        permissionArray: getDefaultPermissionArray(),
-      }));
+      state.schedules = [root].concat(
+        action.payload.map(({ id, name, parentId, index, isFolder }) => ({
+          id,
+          name,
+          index,
+          type: root.type,
+          parentId: parentId === null ? root.id : parentId,
+          isFolder,
+          permissionArray: getDefaultPermissionArray(),
+        })),
+      );
     });
     builder.addCase(getSchedules.rejected, state => {
       state.scheduleListLoading = false;

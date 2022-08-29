@@ -57,9 +57,7 @@ export const ExecuteFormItem: FC<ExecuteFormItemProps> = ({
   periodInput: isInput,
   onPeriodInputChange,
 }) => {
-  const t = useI18NPrefix(
-    'main.pages.schedulePage.sidebar.editorPage.basicBaseForm.executeFormItem',
-  );
+  const t = useI18NPrefix('schedule.editor.basicBaseForm.executeFormItem');
 
   const modeSelect = useMemo(() => {
     return (
