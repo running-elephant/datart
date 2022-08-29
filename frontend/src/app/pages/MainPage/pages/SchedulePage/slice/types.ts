@@ -1,10 +1,31 @@
+/**
+ * Datart
+ *
+ * Copyright 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { TreeNodeProps } from 'antd';
+import { ReactElement } from 'react';
 import { JobTypes } from '../constants';
+
 export interface FoldersTreeItem {}
 export interface DemosTreeItem {}
 export interface ScheduleState {
-  schedules: Schedule[];
-  archived: Schedule[];
-  editingSchedule: Schedule | null;
+  schedules: ScheduleSimpleViewModel[];
+  archived: ScheduleSimpleViewModel[];
+  editingSchedule: ScheduleSimpleViewModel | null;
   scheduleListLoading: boolean;
   archivedListLoading: boolean;
   scheduleDetailsLoading: boolean;
@@ -13,15 +34,22 @@ export interface ScheduleState {
   deleteLoading: boolean;
   logs: ErrorLog[];
   logsLoading: boolean;
+  updateLoading: boolean;
 }
 
-export interface Schedule {
-  id: string;
-  index: number;
-  isFolder: boolean | null;
-  name: string;
-  parentId: string;
-  orgId: string;
+export interface SelectScheduleTreeProps {
+  getIcon: (
+    o: ScheduleSimpleViewModel,
+  ) => ReactElement | ((props: TreeNodeProps) => ReactElement) | undefined;
+  getDisabled: (o: ScheduleSimpleViewModel) => boolean;
+}
+
+export interface SelectScheduleFolderTreeProps {
+  id?: string;
+  getDisabled: (o: ScheduleSimpleViewModel, path: string[]) => boolean;
+}
+
+export interface Schedule extends ScheduleBase {
   status: number;
   type: JobTypes;
   startDate?: string;
@@ -34,6 +62,27 @@ export interface Schedule {
   updateTime: string;
   active: boolean; // true->started
   cronExpression: string;
+}
+
+export interface UpdateScheduleBaseParams {
+  schedule: ScheduleBase;
+  resolve: () => void;
+}
+
+export interface ScheduleBase {
+  id: string;
+  name: string;
+  parentId: string | null;
+  index: number | null;
+}
+
+export interface ScheduleSimple extends Schedule {
+  isFolder: boolean;
+  orgId: string;
+}
+
+export interface ScheduleSimpleViewModel extends ScheduleSimple {
+  deleteLoading: boolean;
 }
 
 export interface VizContentsItem {
@@ -54,13 +103,16 @@ export interface JobConfig {
   textContent?: string;
 }
 export interface AddScheduleParams {
-  cronExpression: string;
+  cronExpression?: string;
   endDate?: string;
   startDate?: string;
   name: string;
-  type: JobTypes;
+  type?: JobTypes;
   orgId: string;
-  config: string;
+  config?: string;
+  isFolder?: boolean;
+  parentId: string | null;
+  index: number | null;
   description?: string;
   id?: string;
 }

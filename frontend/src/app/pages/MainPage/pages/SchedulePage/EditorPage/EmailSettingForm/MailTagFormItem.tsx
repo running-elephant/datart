@@ -10,8 +10,6 @@ import { EMAIL_REG } from '../../constants';
 import { searchUserEmails } from '../../services';
 import { IUserInfo } from '../../types';
 
-const { Option } = AutoComplete;
-
 interface MailTagFormItemProps {
   onFocus?: () => void;
   onBlur?: () => void;
@@ -24,12 +22,10 @@ export const MailTagFormItem: FC<MailTagFormItemProps> = ({
 }) => {
   const [dataSource, setDataSource] = useState<IUserInfo[]>([]);
   const [keyword, setKeyword] = useState('');
-  const t = useI18NPrefix(
-    'main.pages.schedulePage.sidebar.editorPage.emailSettingForm.mailTagFormItem',
-  );
+  const t = useI18NPrefix('schedule.editor.emailSettingForm.mailTagFormItem');
 
   const emails = useMemo(() => {
-    return value ? value.split(';').filter(v => !!v) : [];
+    return value ? value.split(';').filter(Boolean) : [];
   }, [value]);
 
   const onSearch = useCallback(async keyword => {
@@ -65,15 +61,16 @@ export const MailTagFormItem: FC<MailTagFormItemProps> = ({
 
   const options = useMemo(() => {
     const items = dataSource.filter(v => !emails.includes(v?.email));
-    return items.map(({ id, username, email, avatar }) => (
-      <Option key={id} value={email}>
+    return items.map(({ username, email }) => ({
+      value: email,
+      label: (
         <Space>
           <Avatar src={''} size="small" icon={<UserOutlined />} />
           <span>{username}</span>
           <span>{email}</span>
         </Space>
-      </Option>
-    ));
+      ),
+    }));
   }, [dataSource, emails]);
 
   const appendOptions = useMemo(() => {
@@ -85,13 +82,16 @@ export const MailTagFormItem: FC<MailTagFormItemProps> = ({
       return [];
     }
     return [
-      <Option key={newEmail} value={newEmail}>
-        <Space>
-          <Avatar size="small" icon={<UserOutlined />} />
-          <span>{newEmail.split('@')[0]}</span>
-          <span>{newEmail}</span>
-        </Space>
-      </Option>,
+      {
+        value: newEmail,
+        label: (
+          <Space>
+            <Avatar size="small" icon={<UserOutlined />} />
+            <span>{newEmail.split('@')[0]}</span>
+            <span>{newEmail}</span>
+          </Space>
+        ),
+      },
     ];
   }, [keyword, dataSource]);
   const autoCompleteOptions = useMemo(
@@ -114,7 +114,7 @@ export const MailTagFormItem: FC<MailTagFormItemProps> = ({
       <AutoComplete
         value={keyword}
         onChange={setKeyword}
-        dataSource={autoCompleteOptions}
+        options={autoCompleteOptions}
         onSearch={onDebouncedSearch}
         onSelect={onSelectOrRemoveEmail}
         onBlur={() => onSearch('')}
