@@ -295,7 +295,7 @@ const ListNavWrapper = styled(ListNav)`
   display: flex;
   flex: 1;
   flex-direction: column;
-  flex-shrink: 0;
+  min-height: 0;
   padding: ${SPACE_XS} 0;
   background-color: ${p => p.theme.componentBackground};
 `;
