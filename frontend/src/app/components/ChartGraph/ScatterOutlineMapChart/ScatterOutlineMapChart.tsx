@@ -27,7 +27,7 @@ class ScatterOutlineMapChart extends BasicOutlineMapChart {
     super({
       id: 'scatter-outline-map-chart',
       name: 'viz.palette.graph.names.scatterOutlineMap',
-      icon: 'fsux_tubiao_ditu',
+      icon: 'a-3Dqipaoditu',
       requirements: [
         {
           group: 1,

@@ -52,7 +52,7 @@ export interface Source {
 export interface SelectSourceTreeProps {
   getIcon: (
     o: SourceSimpleViewModel,
-  ) => ReactElement | ((props: TreeNodeProps) => ReactElement) | undefined;
+  ) => ReactElement | ((props: TreeNodeProps) => ReactElement);
   getDisabled: (o: SourceSimpleViewModel) => boolean;
 }
 

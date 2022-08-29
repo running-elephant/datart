@@ -22,7 +22,7 @@ import {
   LoadingOutlined,
   MoreOutlined,
 } from '@ant-design/icons';
-import { Menu, message, Popconfirm, Tag, TreeDataNode } from 'antd';
+import { Menu, message, Popconfirm, TreeDataNode } from 'antd';
 import { MenuListItem, Popup, Tree, TreeTitle } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
@@ -34,7 +34,7 @@ import { CommonFormTypes } from 'globalConstants';
 import { memo, useCallback, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
-import { errorHandle, onDropTreeFn, stopPPG, uuidv4 } from 'utils/utils';
+import { onDropTreeFn, stopPPG, uuidv4 } from 'utils/utils';
 import { CascadeAccess, getCascadeAccess } from '../../../Access';
 import {
   PermissionLevels,
@@ -76,22 +76,6 @@ export const SourceList = memo(({ sourceId, list }: SourceListProps) => {
     },
     [history, orgId],
   );
-
-  const getLabel = useCallback((type: string, config: string) => {
-    if (type === 'JDBC') {
-      let desc = '';
-      try {
-        const { dbType } = JSON.parse(config);
-        desc = dbType;
-      } catch (error) {
-        errorHandle(error);
-        throw error;
-      }
-      return desc;
-    } else {
-      return type;
-    }
-  }, []);
 
   const moreMenuClick = useCallback(
     ({ id, name, parentId, index }) =>
@@ -168,7 +152,7 @@ export const SourceList = memo(({ sourceId, list }: SourceListProps) => {
 
   const renderTreeTitle = useCallback(
     node => {
-      const { title, path, isFolder, id, type, config } = node;
+      const { title, path, isFolder, id, type } = node;
       const isAuthorized = getCascadeAccess(
         isOwner,
         permissionMap,
@@ -180,7 +164,6 @@ export const SourceList = memo(({ sourceId, list }: SourceListProps) => {
       return (
         <TreeTitle>
           <h4>{title}</h4>
-          {type !== 'FOLDER' ? <Tag>{getLabel(type, config)}</Tag> : null}
           <CascadeAccess
             module={ResourceTypes.Source}
             path={path}
@@ -247,16 +230,7 @@ export const SourceList = memo(({ sourceId, list }: SourceListProps) => {
         </TreeTitle>
       );
     },
-    [
-      isOwner,
-      permissionMap,
-      getLabel,
-      moreMenuClick,
-      tg,
-      t,
-      deleteLoading,
-      del,
-    ],
+    [isOwner, permissionMap, moreMenuClick, tg, t, deleteLoading, del],
   );
 
   const onDrop = info => {

@@ -17,14 +17,13 @@
  */
 import {
   DeleteOutlined,
-  FolderFilled,
-  FolderOpenFilled,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import { message } from 'antd';
 import { ListNav, ListPane, ListTitle } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
+import useGetSourceDbTypeIcon from 'app/hooks/useGetSourceDbTypeIcon';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { dispatchResize } from 'app/utils/dispatchResize';
@@ -69,13 +68,7 @@ export const Sidebar = memo(
     const selectSourceTree = useMemo(makeSelectSourceTree, []);
     const { showSaveForm } = useContext(SaveFormContext);
 
-    const getIcon = useCallback(
-      ({ isFolder, type }: SourceSimpleViewModel) =>
-        isFolder
-          ? p => (p.expanded ? <FolderOpenFilled /> : <FolderFilled />)
-          : undefined,
-      [],
-    );
+    const getIcon = useGetSourceDbTypeIcon();
     const getDisabled = useCallback(
       ({ deleteLoading }: SourceSimpleViewModel) => deleteLoading,
       [],
@@ -84,18 +77,21 @@ export const Sidebar = memo(
     const treeData = useSelector(state =>
       selectSourceTree(state, { getIcon, getDisabled }),
     );
-
     const recycleList = useMemo(
       () =>
-        archived?.map(({ id, name, parentId, isFolder, deleteLoading }) => ({
-          id,
-          key: id,
-          title: name,
-          parentId,
-          isFolder,
-          disabled: deleteLoading,
-        })),
-      [archived],
+        archived?.map(config => {
+          const { id, name, parentId, isFolder, deleteLoading } = config;
+          return {
+            id,
+            key: id,
+            title: name,
+            icon: getIcon(config),
+            parentId,
+            isFolder,
+            disabled: deleteLoading,
+          };
+        }),
+      [archived, getIcon],
     );
 
     const { filteredData: sourceList, debouncedSearch: listSearch } =
@@ -288,8 +284,7 @@ const ListNavWrapper = styled(ListNav)`
   display: flex;
   flex: 1;
   flex-direction: column;
-  flex-shrink: 0;
+  min-height: 0;
   padding: ${SPACE_XS} 0;
   background-color: ${p => p.theme.componentBackground};
-  box-shadow: ${p => p.theme.shadowSider};
 `;
