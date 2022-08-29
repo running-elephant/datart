@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Form, FormInstance, Radio, Tooltip } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ControllerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
@@ -52,12 +52,19 @@ function TreeTypeSetter({ form }: TreeTypeSetterProps) {
       name={['config', 'treeType']}
     >
       <Radio.Group onChange={handleChangeFn}>
-        <Tooltip title={t('treeControlTip')}>
-          <Radio.Button value="treeControl">{t('treeControl')}</Radio.Button>
-        </Tooltip>
-        <Tooltip title={t('treeSelectTip')}>
-          <Radio.Button value="treeSelect">{t('treeSelect')}</Radio.Button>
-        </Tooltip>
+        <Radio.Button value="treeControl">
+          {t('treeControl') + ' '}
+          <Tooltip title={t('treeControlTip')}>
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Radio.Button>
+
+        <Radio.Button value="treeSelect">
+          {t('treeSelect') + ' '}
+          <Tooltip title={t('treeSelectTip')}>
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Radio.Button>
       </Radio.Group>
     </Form.Item>
   );
