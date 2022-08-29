@@ -1279,7 +1279,12 @@
       "setDefault": "设为默认值",
       "delete": "删除",
       "populate": "从字段填充备选项",
-      "parentFieldId": "父ID字段"
+      "parentFieldId": "父ID字段",
+      "treeSelectType": "树类型选择",
+      "treeControl": "树形控件",
+      "treeControlTip": "多层次的结构列表（文件夹、组织架构、生物分类、国家地区等等。使用 树控件 可以完整展现其中的层级关系。）",
+      "treeSelect": "树选择",
+      "treeSelectTip": "树型选择控件（可选择的数据结构是一个树形结构时，可以使用，例如公司层级、学科系统、分类目录等等。）"
     },
     "date": {
       "year": "年",

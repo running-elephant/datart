@@ -681,7 +681,7 @@ export const getEditControllerOptions = createAsyncThunk<
     const view = viewMap[viewId];
     if (!view) return null;
     if (parentField) {
-      columns.push(parentField);
+      columns.push(...parentField);
     }
     const requestParams = getControlOptionQueryParams({
       view,

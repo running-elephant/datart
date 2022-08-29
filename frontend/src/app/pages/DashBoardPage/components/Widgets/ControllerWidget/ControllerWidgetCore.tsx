@@ -31,7 +31,7 @@ import produce from 'immer';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import { isEmpty } from 'utils/object';
-import { convertToTreeData } from '../../../utils/widget';
+import { convertToTree } from '../../../utils/widget';
 import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { WidgetTitle } from '../../WidgetComponents/WidgetTitle';
 import { getWidgetTitle } from '../../WidgetManager/utils/utils';
@@ -75,6 +75,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     valueOptions,
     valueOptionType,
     parentField,
+    treeType,
     // sqlOperator,
   } = useMemo(() => config as ControllerConfig, [config]);
   const title = getWidgetTitle(widget.config.customConfig.props);
@@ -105,8 +106,8 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     const dataRows = dataset?.rows || [];
 
     if (valueOptionType === 'common') {
-      if (parentField) {
-        return convertToTreeData(dataRows);
+      if (parentField?.length) {
+        return convertToTree(dataRows, treeType);
       }
       return dataRows.map(ele => {
         const item: RelationFilterValue = {
@@ -121,7 +122,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     } else {
       return [];
     }
-  }, [dataset?.rows, valueOptionType, valueOptions, parentField]);
+  }, [dataset?.rows, valueOptionType, valueOptions, parentField, treeType]);
 
   const onControllerChange = useCallback(() => {
     form.submit();
@@ -362,7 +363,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
           <TreeControllerForm
             parentField={parentField}
             onChange={onControllerChange}
-            options={optionRows}
+            treeData={optionRows}
             name={'value'}
             label={leftControlLabel}
           />

@@ -779,41 +779,82 @@ export function cloneWidgets(args: {
     newWidgets,
   };
 }
+/**
+ * @describe list[grandpa dad son...] to List[{id:'',parentId:''}]
+ * @param collection [[grandpa dad son,....]]
+ * @returns [{id:'',parentId:'',value:''}....]
+ */
+export const handleRowDataForTree = collection => {
+  let obj = {};
+  collection?.forEach(v => {
+    v.forEach((val, ind) => {
+      if (!obj[val] || obj[val]?.isLeaf) {
+        obj[val] = {
+          id: val,
+          parentId: ind ? v[ind - 1] : null,
+        };
+      }
+    });
+  });
+  return Object.values(obj);
+};
 
-export const convertToTreeData = collection => {
-  const treeNode: { [key: string]: RelationFilterValue } = {};
-
-  collection.forEach(ele => {
-    const parentTitle = ele[ele.length - 1];
-    if (!treeNode[parentTitle]) {
-      treeNode[parentTitle] = {
-        key: parentTitle,
-        label: parentTitle,
-        children: [],
-      };
+export const converListToTree = (
+  list,
+  parentId: null | string = null,
+): any[] => {
+  if (!list) {
+    return list;
+  }
+  const treeNodes: any[] = [];
+  const childrenList: any = [];
+  list.forEach(o => {
+    if (o['parentId'] === parentId) {
+      treeNodes.push({
+        id: o['id'],
+        parentId: o['parentId'],
+        key: o['id'],
+        title: o['label'] || o['id'],
+      });
+    } else {
+      childrenList.push(o);
     }
-    treeNode[parentTitle]['children'] = [
-      ...(treeNode[parentTitle]['children'] as []),
-      {
-        key: ele?.[0],
-        label: ele.length > 2 ? ele?.[1] : undefined,
-      },
-    ];
   });
 
-  Object.entries(treeNode)?.forEach(([key, value], ind) => {
-    treeNode[key] = {
-      ...value,
-      index: ind,
-      children: value.children?.map((children, index) => {
+  return treeNodes.map(node => {
+    const children = converListToTree(childrenList, node.id);
+    return children?.length ? { ...node, children } : { ...node, isLeaf: true };
+  });
+};
+
+export const convertToTree = (col, type) => {
+  if (!col && !col.length) {
+    return col;
+  }
+
+  let data: RelationFilterValue[] = [];
+  let copyCol = CloneValueDeep(col);
+  let emptyParentList = ['null', 'undefined', 'false'];
+
+  if (type === 'treeControl') {
+    const parent = copyCol?.find(
+      v => !v[v.length - 1] || emptyParentList.includes(v[v.length - 1]),
+    ) || [null];
+    data = converListToTree(
+      copyCol?.map(v => {
         return {
-          ...children,
-          index: ind,
-          childIndex: index,
+          id: v[0],
+          parentId: v[v.length - 1],
+          label: v.length > 2 ? v[1] : v[0],
         };
       }),
-    };
-  });
+      parent[parent.length - 1],
+    );
+  } else {
+    copyCol?.forEach(arr => arr.reverse());
 
-  return Object.values(treeNode);
+    data = converListToTree(handleRowDataForTree(copyCol));
+  }
+
+  return data;
 };
