@@ -110,6 +110,7 @@ export interface QueryResult {
   pageInfo: PageInfo;
   script?: string;
   warnings?: string[] | null;
+  reqColumns?: { column: []; alias: string }[];
 }
 export interface PageInfo {
   pageNo: number;

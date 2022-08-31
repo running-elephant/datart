@@ -105,17 +105,23 @@ export function transformQueryResultToModelAndDataSource(
   model: HierarchyModel;
   dataSource: object[];
 } {
-  const { rows = [], columns = [] } = data || {};
+  const { rows = [], columns = [], reqColumns } = data || {};
   const newColumns = columns.reduce((obj, { name, type, primaryKey }) => {
     const hierarchyColumn = getHierarchyColumn(
       name,
       lastModel?.hierarchy || {},
     );
-    const key = viewType === 'STRUCT' ? JSON.parse(name).join('.') : name;
-    const _name = viewType === 'STRUCT' ? JSON.parse(name) : name;
+
+    let _name: any = [];
+    if (viewType === 'STRUCT') {
+      _name = reqColumns?.find(column => column.alias === name[0])?.column;
+    } else {
+      _name = name;
+    }
+
     return {
       ...obj,
-      [key]: {
+      [name]: {
         name: _name,
         type: hierarchyColumn?.type || type,
         primaryKey,
@@ -125,10 +131,7 @@ export function transformQueryResultToModelAndDataSource(
   }, {});
   const dataSource = rows.map(arr =>
     arr.reduce((obj, val, index) => {
-      const key =
-        viewType === 'STRUCT'
-          ? JSON.parse(columns[index].name).join('.')
-          : columns[index].name;
+      const key = columns[index].name;
       return {
         ...obj,
         [key]: val,
@@ -389,6 +392,7 @@ export const diffMergeHierarchyModel = (
 ) => {
   const hierarchy = model?.hierarchy || {};
   const columns = model?.columns || {};
+
   const allHierarchyColumnNames = Object.keys(hierarchy).flatMap(name => {
     if (!isEmptyArray(hierarchy[name].children)) {
       return hierarchy[name].children!.map(child => child.name);
@@ -485,7 +489,7 @@ export function buildRequestColumns(tableJSON: StructViewQueryProps) {
   tableJSON.columns.forEach((v, i) => {
     const table = tableJSON.table || [];
     columns.push({
-      alias: JSON.stringify([...table, v]),
+      alias: [...table, v].join('.'),
       column: [...table, v],
     });
   });
@@ -493,7 +497,7 @@ export function buildRequestColumns(tableJSON: StructViewQueryProps) {
     const table = join.table || [];
     join.columns?.forEach(column => {
       columns.push({
-        alias: JSON.stringify([...table, column]),
+        alias: [...table, column].join('.'),
         column: [...table, column],
       });
     });
