@@ -1,6 +1,6 @@
 import { prefixI18N } from 'app/hooks/useI18NPrefix';
 import { FormValues } from './types';
-const Prefix = 'main.pages.schedulePage.constants.';
+const Prefix = 'schedule.constants.';
 export enum JobTypes {
   Email = 'EMAIL',
   WeChart = 'WECHART',
@@ -39,6 +39,7 @@ export const EMAIL_REG =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 export const DEFAULT_VALUES: FormValues = {
+  name: '',
   jobType: JobTypes.Email,
   type: [FileTypes.Image],
   imageWidth: 1920,
@@ -49,6 +50,8 @@ export const DEFAULT_VALUES: FormValues = {
   month: 1,
   cronExpression: ' 0 0 0 * * ?',
   textContent: '',
+  parentId: null,
+  index: null,
 };
 
 export const DefaultSchedulePeriodExpression: {
