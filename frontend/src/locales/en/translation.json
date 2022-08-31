@@ -1126,6 +1126,7 @@
       "storyboards": {
         "title": "Storyboards",
         "add": "Create Storyboard",
+        "addFolder": "Create Folder",
         "recycle": "Recycle"
       }
     },
@@ -1366,7 +1367,18 @@
     "sidebar": {
       "title": "Sources",
       "add": "Create Source",
-      "recycle": "Recycle"
+      "recycle": "Recycle",
+      "addFolder": "Create Folder",
+      "parent": "Parent",
+      "success": "Success",
+      "delete": "Delete",
+      "moveToTrash": "Move to recycle bin",
+      "restoredSuccess": "Restored successfully",
+      "restore": "Restore",
+      "sureToDelete": "Confirm delete?",
+      "addSuccess": "Add Success",
+      "open": "Open",
+      "close": "Close"
     },
     "form": {
       "name": "Name",
@@ -1380,6 +1392,12 @@
       "editConfig": "Edit Configuration",
       "duplicate": "Duplicate Key",
       "duplicateName": "Duplicate Name"
+    },
+    "saveForm": {
+      "name": "Name",
+      "folder": "Folder",
+      "root": "Root",
+      "title": "Sources"
     }
   },
   "schedule": {
@@ -1604,6 +1622,17 @@
         "1": "Download",
         "2": "Share",
         "3": "Manage"
+      },
+      "vizfolder": {
+        "0": "View",
+        "1": "Download",
+        "2": "Share",
+        "3": "Manage"
+      },
+      "vizstoryboard": {
+        "0": "View",
+        "1": "Share",
+        "2": "Manage"
       },
       "view": {
         "0": "Access",

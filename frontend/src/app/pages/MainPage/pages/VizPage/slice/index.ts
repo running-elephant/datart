@@ -199,7 +199,10 @@ const slice = createSlice({
         id,
         name,
         vizType: 'DATACHART',
-        loading: false,
+        deleteLoading: false,
+        index: null,
+        isFolder: false,
+        parentId: null,
       }));
     });
     builder.addCase(getArchivedDatacharts.rejected, state => {
@@ -216,7 +219,10 @@ const slice = createSlice({
         id,
         name,
         vizType: 'DASHBOARD',
-        loading: false,
+        deleteLoading: false,
+        index: null,
+        isFolder: false,
+        parentId: null,
       }));
     });
     builder.addCase(getArchivedDashboards.rejected, state => {
@@ -233,7 +239,10 @@ const slice = createSlice({
         id,
         name,
         vizType: 'STORYBOARD',
-        loading: false,
+        deleteLoading: false,
+        index: null,
+        isFolder: false,
+        parentId: null,
       }));
     });
     builder.addCase(getArchivedStoryboards.rejected, state => {
@@ -332,7 +341,7 @@ const slice = createSlice({
           break;
       }
       if (viz) {
-        viz.loading = true;
+        viz.deleteLoading = true;
       }
     });
     builder.addCase(unarchiveViz.fulfilled, (state, action) => {
@@ -370,7 +379,7 @@ const slice = createSlice({
           break;
       }
       if (viz) {
-        viz.loading = false;
+        viz.deleteLoading = false;
       }
     });
 
@@ -396,17 +405,23 @@ const slice = createSlice({
         if (type === 'DASHBOARD') {
           const dashboard = state.archivedDashboards.find(a => a.id === id);
           if (dashboard) {
-            dashboard.loading = true;
+            dashboard.deleteLoading = true;
           }
         } else if (type === 'DATACHART') {
           const datachart = state.archivedDatacharts.find(a => a.id === id);
           if (datachart) {
-            datachart.loading = true;
+            datachart.deleteLoading = true;
           }
         } else if (type === 'STORYBOARD') {
-          const storyboard = state.archivedStoryboards.find(a => a.id === id);
+          const storyboard = state.storyboards.find(a => a.id === id);
           if (storyboard) {
-            storyboard.loading = true;
+            storyboard.deleteLoading = true;
+          }
+          const archivedStoryboard = state.archivedStoryboards.find(
+            a => a.id === id,
+          );
+          if (archivedStoryboard) {
+            archivedStoryboard.deleteLoading = true;
           }
         } else {
           const folder = state.vizs.find(v => v.id === id);
@@ -437,6 +452,7 @@ const slice = createSlice({
             a => a.id !== id,
           );
         } else if (type === 'STORYBOARD') {
+          state.storyboards = state.storyboards.filter(a => a.id !== id);
           state.archivedStoryboards = state.archivedStoryboards.filter(
             a => a.id !== id,
           );
@@ -466,17 +482,23 @@ const slice = createSlice({
         if (type === 'DASHBOARD') {
           const dashboard = state.archivedDashboards.find(a => a.id === id);
           if (dashboard) {
-            dashboard.loading = false;
+            dashboard.deleteLoading = false;
           }
         } else if (type === 'DATACHART') {
           const datachart = state.archivedDatacharts.find(a => a.id === id);
           if (datachart) {
-            datachart.loading = false;
+            datachart.deleteLoading = false;
           }
         } else if (type === 'STORYBOARD') {
-          const storyboard = state.archivedStoryboards.find(a => a.id === id);
+          const storyboard = state.storyboards.find(s => s.id === id);
           if (storyboard) {
-            storyboard.loading = false;
+            storyboard.deleteLoading = false;
+          }
+          const archivedStoryboard = state.archivedStoryboards.find(
+            a => a.id === id,
+          );
+          if (archivedStoryboard) {
+            archivedStoryboard.deleteLoading = false;
           }
         } else {
           const folder = state.vizs.find(v => v.id === id);
@@ -518,7 +540,9 @@ const slice = createSlice({
     builder.addCase(editStoryboard.fulfilled, (state, action) => {
       state.saveStoryboardLoading = false;
       state.storyboards = state.storyboards.map(s =>
-        s.id === action.meta.arg.storyboard.id ? action.payload : s,
+        s.id === action.meta.arg.storyboard.id
+          ? { ...s, ...action.payload, deleteLoading: false }
+          : s,
       );
     });
     builder.addCase(editStoryboard.rejected, state => {

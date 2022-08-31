@@ -3,7 +3,13 @@ import { RootState } from 'types';
 import { listToTree } from 'utils/utils';
 import { initialState } from '.';
 import { VizResourceSubTypes } from '../../PermissionPage/constants';
-import { SelectVizFolderTree, SelectVizTree } from './types';
+import {
+  SelectArchivedTree,
+  SelectStoryboardTree,
+  SelectVizFolderTree,
+  SelectVizStoryboardTree,
+  SelectVizTree,
+} from './types';
 
 const selectDomain = (state: RootState) => state.viz || initialState;
 
@@ -19,13 +25,14 @@ export const makeSelectVizTree = () =>
       (_, props: SelectVizTree) => props.getIcon,
       (_, props: SelectVizTree) => props.getDisabled,
     ],
-    (vizs, getIcon, getDisabled) =>
-      listToTree(
+    (vizs, getIcon, getDisabled) => {
+      return listToTree(
         vizs.map(v => ({ ...v, isFolder: v.relType === 'FOLDER' })),
         null,
         [VizResourceSubTypes.Folder],
         { getIcon, getDisabled },
-      ),
+      );
+    },
   );
 
 export const makeSelectVizFolderTree = () =>
@@ -52,6 +59,85 @@ export const selectStoryboards = createSelector(
   vizState => vizState.storyboards,
 );
 
+export const makeSelectStoryboradTree = () =>
+  createSelector(
+    [
+      selectStoryboards,
+      (_, props: SelectStoryboardTree) => props.getIcon,
+      (_, props: SelectStoryboardTree) => props.getDisabled,
+    ],
+    (storyboards, getIcon, getDisabled) =>
+      listToTree(storyboards, null, [VizResourceSubTypes.Storyboard], {
+        getIcon,
+        getDisabled,
+      }),
+  );
+
+export const selectArchivedDatacharts = createSelector(
+  [selectDomain],
+  vizState => vizState.archivedDatacharts,
+);
+
+export const selectArchivedDashboards = createSelector(
+  [selectDomain],
+  vizState => vizState.archivedDashboards,
+);
+
+export const selectArchivedStoryboards = createSelector(
+  [selectDomain],
+  vizState => vizState.archivedStoryboards,
+);
+
+export const makeSelectArchivedStoryboradsTree = () =>
+  createSelector(
+    [
+      selectArchivedStoryboards,
+      (_, props: SelectArchivedTree) => props.getDisabled,
+    ],
+    (archivedStoryboards, getDisabled) =>
+      listToTree(archivedStoryboards, null, [VizResourceSubTypes.Storyboard], {
+        getDisabled,
+      }),
+  );
+export const makeSelectArchivedDashboardsTree = () =>
+  createSelector(
+    [
+      selectArchivedDashboards,
+      (_, props: SelectArchivedTree) => props.getDisabled,
+    ],
+    (archivedDashboards, getDisabled) =>
+      listToTree(archivedDashboards, null, [VizResourceSubTypes.Storyboard], {
+        getDisabled,
+      }),
+  );
+export const makeSelectArchivedDatachartsTree = () =>
+  createSelector(
+    [
+      selectArchivedDatacharts,
+      (_, props: SelectArchivedTree) => props.getDisabled,
+    ],
+    (archivedDatacharts, getDisabled) =>
+      listToTree(archivedDatacharts, null, [VizResourceSubTypes.Storyboard], {
+        getDisabled,
+      }),
+  );
+
+export const makeSelectStoryboradFolderTree = () =>
+  createSelector(
+    [
+      selectStoryboards,
+      (_, props: SelectVizStoryboardTree) => props.id,
+      (_, props: SelectVizStoryboardTree) => props.getDisabled,
+    ],
+    (storyboards, id, getDisabled) =>
+      listToTree(
+        storyboards && storyboards.filter(v => v.isFolder && v.id !== id),
+        null,
+        [VizResourceSubTypes.Storyboard],
+        { getDisabled },
+      ),
+  );
+
 export const selectVizListLoading = createSelector(
   [selectDomain],
   vizState => vizState.vizListLoading,
@@ -75,21 +161,6 @@ export const selectSaveStoryboardLoading = createSelector(
 export const selectPublishLoading = createSelector(
   [selectDomain],
   vizState => vizState.publishLoading,
-);
-
-export const selectArchivedDatacharts = createSelector(
-  [selectDomain],
-  vizState => vizState.archivedDatacharts,
-);
-
-export const selectArchivedDashboards = createSelector(
-  [selectDomain],
-  vizState => vizState.archivedDashboards,
-);
-
-export const selectArchivedStoryboards = createSelector(
-  [selectDomain],
-  vizState => vizState.archivedStoryboards,
 );
 
 export const selectArchivedDatachartLoading = createSelector(

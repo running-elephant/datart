@@ -16,9 +16,12 @@
  * limitations under the License.
  */
 
+import { TreeNodeProps } from 'antd';
+import { ReactElement } from 'react';
+
 export interface SourceState {
-  sources: Source[];
-  archived: Source[];
+  sources: SourceSimpleViewModel[];
+  archived: SourceSimpleViewModel[];
   editingSource: string;
   sourceListLoading: boolean;
   archivedListLoading: boolean;
@@ -27,40 +30,90 @@ export interface SourceState {
   unarchiveSourceLoading: boolean;
   deleteSourceLoading: boolean;
   syncSourceSchemaLoading: boolean;
+  updateLoading: boolean;
 }
 
 export interface Source {
   config: string;
-  createBy: string;
-  createTime: string;
+  createBy?: string;
+  createTime?: string;
   id: string;
   name: string;
   orgId: string;
-  status: number;
+  status?: number;
   type: string;
-  updateBy: string;
-  updateTime: string;
-  schemaUpdateDate: string;
+  index: number | null;
+  updateBy?: string;
+  updateTime?: string;
+  permission?: number;
+  schemaUpdateDate?: string;
 }
 
-export interface SourceFormModel extends Pick<Source, 'name' | 'type'> {
+export interface SelectSourceTreeProps {
+  getIcon: (
+    o: SourceSimpleViewModel,
+  ) => ReactElement | ((props: TreeNodeProps) => ReactElement);
+  getDisabled: (o: SourceSimpleViewModel) => boolean;
+}
+
+export interface SelectSourceFolderTreeProps {
   id?: string;
+  getDisabled: (o: SourceSimpleViewModel, path: string[]) => boolean;
+}
+
+export interface UpdateSourceBaseParams {
+  source: SourceBase;
+  resolve: () => void;
+}
+
+export interface SourceBase {
+  id: string;
+  name: string;
+  parentId: string | null;
+  index: number | null;
+}
+
+export interface SourceSimple extends Source {
+  isFolder: boolean;
+  parentId: string | null;
+}
+
+export interface SourceSimpleViewModel extends SourceSimple {
+  deleteLoading: boolean;
+}
+
+export interface SourceFormModel
+  extends Pick<
+    SourceSimple,
+    'isFolder' | 'name' | 'type' | 'parentId' | 'orgId' | 'index'
+  > {
   config: object;
 }
 
 export interface AddSourceParams {
-  source: Pick<Source, 'name' | 'type' | 'orgId' | 'config'>;
+  config: string;
+  parentId: string | null;
+  index: number | null;
+  orgId: string;
+  isFolder: boolean;
+  id?: string | undefined;
+  name: string;
+  type?: string;
+}
+
+export interface SourceParamsResolve {
+  source: AddSourceParams;
   resolve: (redirectId: string) => void;
 }
 
 export interface EditSourceParams {
-  source: Source;
+  source: SourceSimple;
   resolve: () => void;
   reject?: () => void;
 }
 
 export interface UnarchiveSourceParams {
-  id: string;
+  source: SourceBase;
   resolve: () => void;
 }
 
