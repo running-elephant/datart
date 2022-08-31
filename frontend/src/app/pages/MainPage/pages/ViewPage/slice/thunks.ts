@@ -202,6 +202,12 @@ export const runSql = createAsyncThunk<
     );
   }
 
+  let reqColumns = '';
+
+  if (type === 'STRUCT') {
+    reqColumns = buildRequestColumns(structure!);
+  }
+
   const response = await request2<QueryResult>(
     {
       url: '/data-provider/execute/test',
@@ -211,7 +217,7 @@ export const runSql = createAsyncThunk<
         sourceId,
         size,
         scriptType: type,
-        columns: type === 'STRUCT' ? buildRequestColumns(structure!) : '',
+        columns: reqColumns,
         variables: variables.map(
           ({ name, type, valueType, defaultValue, expression }) => ({
             name,
@@ -235,7 +241,11 @@ export const runSql = createAsyncThunk<
       },
     },
   );
-  return { ...response?.data, warnings: response?.warnings };
+  return {
+    ...response?.data,
+    warnings: response?.warnings,
+    reqColumns: reqColumns,
+  };
 });
 
 export const saveView = createAsyncThunk<
