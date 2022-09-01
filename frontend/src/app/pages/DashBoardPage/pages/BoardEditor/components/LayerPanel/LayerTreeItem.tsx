@@ -106,5 +106,5 @@ const Item = styled.div`
 
 const TitleBlock = styled.div`
   position: relative;
-  width: 100%;
+  width: calc(100% - 24px);
 `;
