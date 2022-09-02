@@ -12,7 +12,6 @@ import {
 import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { APP_CURRENT_VERSION } from '../../../../migration/constants';
 import { getCascadeAccess } from '../../Access';
 import {
   selectIsOrgOwner,
@@ -76,13 +75,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
 
   const save = useCallback(
     values => {
-      onSave(
-        {
-          ...values,
-          config: { version: APP_CURRENT_VERSION, ...values.config },
-        },
-        onCancel,
-      );
+      onSave(values, onCancel);
     },
     [onSave, onCancel],
   );
