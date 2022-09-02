@@ -214,6 +214,7 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
         }
         try {
             requirePermission(storyboard, Const.READ);
+            return retrieve(storyboard.getId()).getStatus() == Const.VIZ_PUBLISH;
         } catch (Exception ignored) {
         }
         return false;
