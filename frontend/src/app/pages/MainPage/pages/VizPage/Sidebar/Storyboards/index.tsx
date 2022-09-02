@@ -1,5 +1,8 @@
 import {
   DeleteOutlined,
+  FolderFilled,
+  FolderOpenFilled,
+  FundProjectionScreenOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   PlusOutlined,
@@ -7,21 +10,23 @@ import {
 import { ListNav, ListPane, ListTitle } from 'app/components';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import useI18NPrefix, { I18NComponentProps } from 'app/hooks/useI18NPrefix';
-import { useAccess } from 'app/pages/MainPage/Access';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { SPACE_XS } from 'styles/StyleConstants';
+import { getInsertedNodeIndex } from 'utils/utils';
+import { VizResourceSubTypes } from '../../../PermissionPage/constants';
 import { SaveFormContext } from '../../SaveFormContext';
 import {
+  makeSelectArchivedStoryboradsTree,
+  makeSelectStoryboradTree,
   selectArchivedStoryboardLoading,
-  selectArchivedStoryboards,
   selectStoryboards,
 } from '../../slice/selectors';
 import { addStoryboard, getArchivedStoryboards } from '../../slice/thunks';
-import { allowCreateStoryboard } from '../../utils';
+import { ArchivedViz, StoryboardViewModel } from '../../slice/types';
 import { Recycle } from '../Recycle';
 import { List } from './List';
 
@@ -43,55 +48,124 @@ export const Storyboards = memo(
     const dispatch = useDispatch();
     const orgId = useSelector(selectOrgId);
     const { showSaveForm } = useContext(SaveFormContext);
-    const list = useSelector(selectStoryboards);
-    const allowCreate = useAccess(allowCreateStoryboard());
+    const storyborads = useSelector(selectStoryboards);
+    const selectStoryboradTree = useMemo(makeSelectStoryboradTree, []);
     const t = useI18NPrefix(i18nPrefix);
 
+    const getIcon = useCallback(
+      ({ isFolder }: StoryboardViewModel) =>
+        isFolder ? (
+          p => (p.expanded ? <FolderOpenFilled /> : <FolderFilled />)
+        ) : (
+          <FundProjectionScreenOutlined />
+        ),
+      [],
+    );
+
+    const getDisabled = useCallback(
+      ({ deleteLoading }: StoryboardViewModel) => deleteLoading,
+      [],
+    );
+
+    const treeData = useSelector(state =>
+      selectStoryboradTree(state, { getIcon, getDisabled }),
+    );
+
     const { filteredData: filteredListData, debouncedSearch: listSearch } =
-      useDebouncedSearch(list, (keywords, d) =>
-        d.name.toLowerCase().includes(keywords.toLowerCase()),
+      useDebouncedSearch(treeData, (keywords, d) =>
+        d.title.toLowerCase().includes(keywords.toLowerCase()),
       );
-    const archived = useSelector(selectArchivedStoryboards);
+
+    const selectArchivedStoryboradsTree = useMemo(
+      makeSelectArchivedStoryboradsTree,
+      [],
+    );
     const archivedListLoading = useSelector(selectArchivedStoryboardLoading);
+    const getArchivedDisabled = useCallback(
+      ({ deleteLoading }: ArchivedViz) => deleteLoading,
+      [],
+    );
+    const archivedTreeData = useSelector(state =>
+      selectArchivedStoryboradsTree(state, {
+        getDisabled: getArchivedDisabled,
+      }),
+    );
     const {
       filteredData: filteredRecycleData,
       debouncedSearch: recycleSearch,
-    } = useDebouncedSearch(archived, (keywords, d) =>
-      d.name.toLowerCase().includes(keywords.toLowerCase()),
+    } = useDebouncedSearch(archivedTreeData, (keywords, d) =>
+      d.title.toLowerCase().includes(keywords.toLowerCase()),
     );
-
     const recycleInit = useCallback(() => {
       dispatch(getArchivedStoryboards(orgId));
     }, [dispatch, orgId]);
 
-    const add = useCallback(() => {
-      showSaveForm({
-        vizType: 'STORYBOARD',
-        type: CommonFormTypes.Add,
-        visible: true,
-        onSave: (values, onClose) => {
-          dispatch(
-            addStoryboard({
-              storyboard: { name: values.name, orgId },
-              resolve: onClose,
-            }),
-          );
-        },
-      });
-    }, [showSaveForm, dispatch, orgId]);
+    const add = useCallback(
+      ({ key }) => {
+        switch (key) {
+          case 'add':
+            showSaveForm({
+              vizType: VizResourceSubTypes.Storyboard,
+              type: CommonFormTypes.Add,
+              visible: true,
+              onSave: (values, onClose) => {
+                const index = getInsertedNodeIndex(values, storyborads);
+                dispatch(
+                  addStoryboard({
+                    storyboard: {
+                      ...values,
+                      parentId: values.parentId || null,
+                      orgId,
+                      isFolder: false,
+                      index,
+                    },
+                    resolve: onClose,
+                  }),
+                );
+              },
+            });
+            break;
+          case 'folder':
+            showSaveForm({
+              vizType: VizResourceSubTypes.Storyboard,
+              type: CommonFormTypes.Add,
+              visible: true,
+              onSave: (values, onClose) => {
+                const index = getInsertedNodeIndex(values, storyborads);
+                dispatch(
+                  addStoryboard({
+                    storyboard: {
+                      ...values,
+                      parentId: values.parentId || null,
+                      orgId,
+                      isFolder: true,
+                      index,
+                    },
+                    resolve: onClose,
+                  }),
+                );
+              },
+            });
+            break;
+          default:
+        }
+      },
+      [showSaveForm, storyborads, dispatch, orgId],
+    );
 
     const titles = useMemo(
       () => [
         {
           subTitle: t('storyboards.title'),
           search: true,
-          ...allowCreate({
-            add: {
-              items: [{ key: 'STORYBOARD', text: t('storyboards.add') }],
-              icon: <PlusOutlined />,
-              callback: add,
-            },
-          }),
+          add: {
+            items: [
+              { key: 'add', text: t('storyboards.add') },
+              { key: 'folder', text: t('storyboards.addFolder') },
+            ],
+            icon: <PlusOutlined />,
+            callback: add,
+          },
           more: {
             items: [
               {
@@ -130,15 +204,7 @@ export const Storyboards = memo(
           onSearch: recycleSearch,
         },
       ],
-      [
-        add,
-        allowCreate,
-        listSearch,
-        recycleSearch,
-        t,
-        handleSliderVisible,
-        sliderVisible,
-      ],
+      [add, listSearch, recycleSearch, t, handleSliderVisible, sliderVisible],
     );
 
     return (

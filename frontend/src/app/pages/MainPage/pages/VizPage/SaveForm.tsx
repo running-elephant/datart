@@ -12,6 +12,7 @@ import {
 import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
+import { APP_CURRENT_VERSION } from '../../../../migration/constants';
 import { getCascadeAccess } from '../../Access';
 import {
   selectIsOrgOwner,
@@ -22,6 +23,7 @@ import { PermissionLevels, ResourceTypes } from '../PermissionPage/constants';
 import { FileUpload } from '../ResourceMigrationPage/FileUpload';
 import { SaveFormContext } from './SaveFormContext';
 import {
+  makeSelectStoryboradFolderTree,
   makeSelectVizFolderTree,
   selectSaveFolderLoading,
   selectSaveStoryboardLoading,
@@ -40,6 +42,10 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     onAfterClose,
   } = useContext(SaveFormContext);
   const selectVizFolderTree = useMemo(makeSelectVizFolderTree, []);
+  const selectStoryboradFolderTree = useMemo(
+    makeSelectStoryboradFolderTree,
+    [],
+  );
   const saveFolderLoading = useSelector(selectSaveFolderLoading);
   const saveStoryboardLoading = useSelector(selectSaveStoryboardLoading);
   const orgId = useSelector(selectOrgId);
@@ -61,13 +67,22 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     [isOwner, permissionMap],
   );
 
-  const treeData = useSelector(state =>
+  const folderTreeData = useSelector(state =>
     selectVizFolderTree(state, { id: initialValues?.id, getDisabled }),
+  );
+  const storyboardTreeData = useSelector(state =>
+    selectStoryboradFolderTree(state, { id: initialValues?.id, getDisabled }),
   );
 
   const save = useCallback(
     values => {
-      onSave(values, onCancel);
+      onSave(
+        {
+          ...values,
+          config: { version: APP_CURRENT_VERSION, ...values.config },
+        },
+        onCancel,
+      );
     },
     [onSave, onCancel],
   );
@@ -132,7 +147,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
               const data = {
                 name: value,
                 orgId,
-                vizType: 'FOLDER',
+                vizType,
                 parentId: parentId || null,
               };
               return fetchCheckName('viz', data);
@@ -191,7 +206,19 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
         <Form.Item name="parentId" label={t('parent')}>
           <TreeSelect
             placeholder={t('root')}
-            treeData={treeData}
+            treeData={folderTreeData}
+            allowClear
+            onChange={() => {
+              formRef.current?.validateFields();
+            }}
+          />
+        </Form.Item>
+      )}
+      {vizType === 'STORYBOARD' && (
+        <Form.Item name="parentId" label={t('parent')}>
+          <TreeSelect
+            placeholder={t('root')}
+            treeData={storyboardTreeData}
             allowClear
             onChange={() => {
               formRef.current?.validateFields();

@@ -24,21 +24,15 @@ import {
 import { Menu, message, Popconfirm, TreeDataNode } from 'antd';
 import { MenuListItem, Popup, Tree, TreeTitle } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { getCascadeAccess } from 'app/pages/MainPage/Access';
 import {
   selectIsOrgOwner,
   selectOrgId,
-  selectPermissionMap,
 } from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';
 import { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { getInsertedNodeIndex, getPath, stopPPG } from 'utils/utils';
-import {
-  PermissionLevels,
-  ResourceTypes,
-} from '../../PermissionPage/constants';
+import { getInsertedNodeIndex, stopPPG } from 'utils/utils';
 import { SaveFormContext } from '../SaveFormContext';
 import {
   selectArchivedListLoading,
@@ -65,7 +59,6 @@ export const Recycle = memo(({ list }: RecycleProps) => {
   const currentEditingViewKey = useSelector(selectCurrentEditingViewKey);
   const views = useSelector(selectViews);
   const isOwner = useSelector(selectIsOrgOwner);
-  const permissionMap = useSelector(selectPermissionMap);
   const t = useI18NPrefix('view.saveForm');
   const tg = useI18NPrefix('global');
 
@@ -137,25 +130,11 @@ export const Recycle = memo(({ list }: RecycleProps) => {
   );
 
   const renderTreeTitle = useCallback(
-    ({ key, title, parentId }) => {
-      const path = views
-        ? getPath(
-            views as Array<{ id: string; parentId: string }>,
-            { id: key, parentId },
-            ResourceTypes.View,
-          )
-        : [];
-      const allowManage = getCascadeAccess(
-        isOwner,
-        permissionMap,
-        ResourceTypes.View,
-        path,
-        PermissionLevels.Manage,
-      );
+    ({ key, title }) => {
       return (
         <TreeTitle>
           <h4>{`${title}`}</h4>
-          {allowManage && (
+          {isOwner && (
             <Popup
               trigger={['click']}
               placement="bottomRight"
@@ -193,7 +172,7 @@ export const Recycle = memo(({ list }: RecycleProps) => {
         </TreeTitle>
       );
     },
-    [moreMenuClick, del, views, isOwner, permissionMap, tg],
+    [moreMenuClick, del, isOwner, tg],
   );
 
   const treeSelect = useCallback(

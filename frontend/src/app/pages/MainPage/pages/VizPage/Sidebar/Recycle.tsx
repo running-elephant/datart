@@ -1,39 +1,26 @@
 import {
   DeleteOutlined,
-  LoadingOutlined,
   MoreOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
-import { Button, List, Menu, message, Popconfirm } from 'antd';
-import { ListItem, MenuListItem, Popup } from 'app/components';
+import { Menu, message, Popconfirm, TreeDataNode } from 'antd';
+import { MenuListItem, Popup, Tree, TreeTitle } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { calcAc, getCascadeAccess } from 'app/pages/MainPage/Access';
-import {
-  selectIsOrgOwner,
-  selectPermissionMap,
-} from 'app/pages/MainPage/slice/selectors';
-import classnames from 'classnames';
+import { selectIsOrgOwner } from 'app/pages/MainPage/slice/selectors';
 import { CommonFormTypes } from 'globalConstants';
 import { memo, useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import styled from 'styled-components/macro';
-import { getInsertedNodeIndex, getPath, stopPPG } from 'utils/utils';
-import {
-  PermissionLevels,
-  ResourceTypes,
-  VizResourceSubTypes,
-} from '../../PermissionPage/constants';
+import { getInsertedNodeIndex, stopPPG } from 'utils/utils';
 import { SaveFormContext } from '../SaveFormContext';
 import { selectVizs } from '../slice/selectors';
 import { deleteViz, removeTab, unarchiveViz } from '../slice/thunks';
-import { ArchivedViz } from '../slice/types';
 
 interface RecycleProps {
   type: 'viz' | 'storyboard';
   orgId: string;
   selectedId?: string;
-  list?: ArchivedViz[];
+  list?: TreeDataNode[];
   listLoading: boolean;
   onInit: () => void;
 }
@@ -45,7 +32,6 @@ export const Recycle = memo(
     const { showSaveForm } = useContext(SaveFormContext);
     const vizs = useSelector(selectVizs);
     const isOwner = useSelector(selectIsOrgOwner);
-    const permissionMap = useSelector(selectPermissionMap);
     const tg = useI18NPrefix('global');
 
     useEffect(() => {
@@ -120,105 +106,68 @@ export const Recycle = memo(
       [dispatch, showSaveForm, redirect, vizs, tg],
     );
 
-    const toDetail = useCallback(
-      id => () => {
-        history.push(`/organizations/${orgId}/vizs/${id}`);
+    const treeSelect = useCallback(
+      (_, { node }) => {
+        if (node.id !== selectedId) {
+          history.push(`/organizations/${orgId}/vizs/${node.id}`);
+        }
       },
-      [history, orgId],
+      [history, orgId, selectedId],
+    );
+
+    const renderTreeTitle = useCallback(
+      ({ key, title, vizType }) => {
+        return (
+          <TreeTitle>
+            <h4>{`${title}`}</h4>
+            {isOwner && (
+              <Popup
+                trigger={['click']}
+                placement="bottomRight"
+                content={
+                  <Menu
+                    prefixCls="ant-dropdown-menu"
+                    selectable={false}
+                    onClick={moreMenuClick(key, title, vizType)}
+                  >
+                    <MenuListItem
+                      key="reset"
+                      prefix={<ReloadOutlined className="icon" />}
+                    >
+                      {tg('button.restore')}
+                    </MenuListItem>
+                    <MenuListItem
+                      key="delelte"
+                      prefix={<DeleteOutlined className="icon" />}
+                    >
+                      <Popconfirm
+                        title={tg('operation.deleteConfirm')}
+                        onConfirm={del(key, vizType)}
+                      >
+                        {tg('button.delete')}
+                      </Popconfirm>
+                    </MenuListItem>
+                  </Menu>
+                }
+              >
+                <span className="action" onClick={stopPPG}>
+                  <MoreOutlined />
+                </span>
+              </Popup>
+            )}
+          </TreeTitle>
+        );
+      },
+      [isOwner, moreMenuClick, tg, del],
     );
 
     return (
-      <Wrapper>
-        <List
-          dataSource={list}
-          loading={listLoading && { indicator: <LoadingOutlined /> }}
-          renderItem={({ id, name, vizType, loading }) => {
-            let allowManage = false;
-            if (type === 'viz') {
-              const viz = vizs.find(v => v.id === id);
-              const path = viz
-                ? getPath(
-                    vizs as Array<{ id: string; parentId: string }>,
-                    { id, parentId: viz.parentId },
-                    VizResourceSubTypes.Folder,
-                  )
-                : [id];
-              allowManage = getCascadeAccess(
-                isOwner,
-                permissionMap,
-                ResourceTypes.View,
-                path,
-                PermissionLevels.Manage,
-              );
-            } else {
-              allowManage = !!calcAc(
-                isOwner,
-                permissionMap,
-                ResourceTypes.Viz,
-                PermissionLevels.Manage,
-                id,
-              );
-            }
-            return (
-              <ListItem
-                selected={selectedId === id}
-                className={classnames({
-                  recycle: true,
-                  disabled: loading,
-                })}
-                onClick={toDetail(id)}
-                actions={[
-                  allowManage && (
-                    <Popup
-                      trigger={['click']}
-                      placement="bottomRight"
-                      content={
-                        <Menu
-                          prefixCls="ant-dropdown-menu"
-                          selectable={false}
-                          onClick={moreMenuClick(id, name, vizType)}
-                        >
-                          <MenuListItem
-                            key="reset"
-                            prefix={<ReloadOutlined className="icon" />}
-                          >
-                            {tg('button.restore')}
-                          </MenuListItem>
-                          <MenuListItem
-                            key="delelte"
-                            prefix={<DeleteOutlined className="icon" />}
-                          >
-                            <Popconfirm
-                              title={tg('operation.deleteConfirm')}
-                              onConfirm={del(id, vizType)}
-                            >
-                              {tg('button.delete')}
-                            </Popconfirm>
-                          </MenuListItem>
-                        </Menu>
-                      }
-                    >
-                      <Button
-                        type="link"
-                        icon={<MoreOutlined />}
-                        className="btn-hover"
-                        onClick={stopPPG}
-                      />
-                    </Popup>
-                  ),
-                ]}
-              >
-                <List.Item.Meta title={name} />
-              </ListItem>
-            );
-          }}
-        />
-      </Wrapper>
+      <Tree
+        loading={listLoading}
+        treeData={list}
+        titleRender={renderTreeTitle}
+        onSelect={treeSelect}
+      />
     );
   },
 );
-
-const Wrapper = styled.div`
-  flex: 1;
-  overflow-y: auto;
-`;

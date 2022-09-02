@@ -25,6 +25,7 @@ import {
   RESOURCE_TYPE_PERMISSION_MAPPING,
   SubjectTypes,
   Viewpoints,
+  VizResourceSubTypes,
 } from '../../constants';
 import { DataSourceTreeNode } from '../../slice/types';
 import { getDefaultPermissionArray } from '../../utils';
@@ -35,6 +36,7 @@ interface PrivilegeSettingProps {
   viewpoint: Viewpoints;
   viewpointType: ResourceTypes | SubjectTypes;
   dataSourceType: ResourceTypes | SubjectTypes;
+  vizSubTypes?: VizResourceSubTypes;
   onChange: (
     record: DataSourceTreeNode,
     newPermissionArray: PermissionLevels[],
@@ -49,10 +51,11 @@ export const PrivilegeSetting = memo(
     viewpoint,
     viewpointType,
     dataSourceType,
+    vizSubTypes,
     onChange,
   }: PrivilegeSettingProps) => {
     const [values, setValues] = useState<PermissionLevels[]>(
-      getDefaultPermissionArray(),
+      getDefaultPermissionArray(vizSubTypes),
     );
     const t = useI18NPrefix('permission');
 
@@ -78,18 +81,25 @@ export const PrivilegeSetting = memo(
     useEffect(() => {
       setValues(record.permissionArray);
     }, [record]);
-
     return (
       <Space>
-        {RESOURCE_TYPE_PERMISSION_MAPPING[resourceType!].map((level, index) => (
-          <Checkbox
-            key={PermissionLevels[level]}
-            checked={level === values[index]}
-            onChange={privilegeChange(index, level)}
-          >
-            {t(`privilegeLabel.${resourceType!.toLowerCase()}.${index}`)}
-          </Checkbox>
-        ))}
+        {RESOURCE_TYPE_PERMISSION_MAPPING[
+          resourceType! + (vizSubTypes || '')
+        ].map((level, index) => {
+          return (
+            <Checkbox
+              key={PermissionLevels[level]}
+              checked={level === values[index]}
+              onChange={privilegeChange(index, level)}
+            >
+              {t(
+                `privilegeLabel.${(
+                  resourceType! + (vizSubTypes || '')
+                ).toLowerCase()}.${index}`,
+              )}
+            </Checkbox>
+          );
+        })}
       </Space>
     );
   },

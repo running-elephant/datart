@@ -124,7 +124,7 @@ export const Toolbar = memo(
         actions.changeCurrentEditingView({
           script: format(script, {
             denseOperators: true,
-            logicalOperatorNewline: 'after',
+            logicalOperatorNewline: 'before',
           }),
         }),
       );

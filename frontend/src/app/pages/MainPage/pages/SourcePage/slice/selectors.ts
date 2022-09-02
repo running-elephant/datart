@@ -18,7 +18,10 @@
 
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from 'types';
+import { listToTree } from 'utils/utils';
 import { initialState } from '.';
+import { ResourceTypes } from '../../PermissionPage/constants';
+import { SelectSourceFolderTreeProps, SelectSourceTreeProps } from './types';
 
 const selectDomain = (state: RootState) => state.source || initialState;
 
@@ -26,6 +29,36 @@ export const selectSources = createSelector(
   [selectDomain],
   sourceState => sourceState.sources,
 );
+
+export const makeSelectSourceTree = () =>
+  createSelector(
+    [
+      selectSources,
+      (_, props: SelectSourceTreeProps) => props.getIcon,
+      (_, props: SelectSourceTreeProps) => props.getDisabled,
+    ],
+    (sources, getIcon, getDisabled) =>
+      listToTree(sources, null, [ResourceTypes.Source], {
+        getIcon,
+        getDisabled,
+      }),
+  );
+
+export const makeSelectSourceFolderTree = () =>
+  createSelector(
+    [
+      selectSources,
+      (_, props: SelectSourceFolderTreeProps) => props.id,
+      (_, props: SelectSourceFolderTreeProps) => props.getDisabled,
+    ],
+    (sources, id, getDisabled) =>
+      listToTree(
+        sources && sources.filter(v => v.isFolder && v.id !== id),
+        null,
+        [ResourceTypes.Source],
+        { getDisabled },
+      ),
+  );
 
 export const selectArchived = createSelector(
   [selectDomain],

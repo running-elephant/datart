@@ -25,13 +25,19 @@ import {
 } from './constants';
 import { DataSourceViewModel } from './slice/types';
 
-export function getDefaultPermissionArray() {
-  return [
-    PermissionLevels.Disable,
-    PermissionLevels.Disable,
-    PermissionLevels.Disable,
-    PermissionLevels.Disable,
-  ];
+export function getDefaultPermissionArray(vizSubTypes?: VizResourceSubTypes) {
+  return vizSubTypes !== VizResourceSubTypes.Storyboard
+    ? [
+        PermissionLevels.Disable,
+        PermissionLevels.Disable,
+        PermissionLevels.Disable,
+        PermissionLevels.Disable,
+      ]
+    : [
+        PermissionLevels.Disable,
+        PermissionLevels.Disable,
+        PermissionLevels.Disable,
+      ];
 }
 
 export function generateRootNode(
@@ -45,7 +51,7 @@ export function generateRootNode(
     parentId: null,
     index: null,
     isFolder: true,
-    permissionArray: getDefaultPermissionArray(),
+    permissionArray: getDefaultPermissionArray(vizId),
   };
 }
 

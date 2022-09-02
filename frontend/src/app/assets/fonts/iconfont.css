@@ -1,8 +1,8 @@
 @font-face {
   font-family: 'iconfont'; /* Project id 2869064 */
-  src: url('iconfont.woff2?t=1653903844873') format('woff2'),
-    url('iconfont.woff?t=1653903844873') format('woff'),
-    url('iconfont.ttf?t=1653903844873') format('truetype');
+  src: url('iconfont.woff2?t=1661773321580') format('woff2'),
+    url('iconfont.woff?t=1661773321580') format('woff'),
+    url('iconfont.ttf?t=1661773321580') format('truetype');
 }
 
 .iconfont {
@@ -12,6 +12,110 @@
   line-height: 20px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-HTTP:before {
+  content: '\e892';
+}
+
+.icon-ORACLE:before {
+  content: '\ec48';
+}
+
+.icon-SPARK:before {
+  content: '\ed2e';
+}
+
+.icon-a-3Dqipaoditu:before {
+  content: '\e7d6';
+}
+
+.icon-ditu:before {
+  content: '\e62d';
+}
+
+.icon-MYSQL:before {
+  content: '\ec6d';
+}
+
+.icon-DB2:before {
+  content: '\e610';
+}
+
+.icon-MSSQL:before {
+  content: '\e664';
+}
+
+.icon-BIG_QUERY:before {
+  content: '\e759';
+}
+
+.icon-NEOVIEW:before {
+  content: '\ebc0';
+}
+
+.icon-ACCESS:before {
+  content: '\ec16';
+}
+
+.icon-POSTGRESQL:before {
+  content: '\ec5d';
+}
+
+.icon-H2:before {
+  content: '\e6f6';
+}
+
+.icon-HIVE:before {
+  content: '\e891';
+}
+
+.icon-SYBASE:before {
+  content: '\e682';
+}
+
+.icon-INFORMIX:before {
+  content: '\e61c';
+}
+
+.icon-CLICKHOUSE:before {
+  content: '\e61d';
+}
+
+.icon-DERBY:before {
+  content: '\e61e';
+}
+
+.icon-DORIS:before {
+  content: '\e61f';
+}
+
+.icon-PRESTO:before {
+  content: '\e622';
+}
+
+.icon-SQLSTREAM:before {
+  content: '\e624';
+}
+
+.icon-PHOENIX:before {
+  content: '\e626';
+}
+
+.icon-NETEZZA:before {
+  content: '\e627';
+}
+
+.icon-IMPALA:before {
+  content: '\e629';
+}
+
+.icon-FIREBIRD:before {
+  content: '\e62a';
+}
+
+.icon-INTERBASE:before {
+  content: '\e62c';
 }
 
 .icon-group-widget:before {
@@ -136,14 +240,6 @@
 
 .icon-areachart2:before {
   content: '\e7af';
-}
-
-.icon-fsux_tubiao_ditu:before {
-  content: '\e610';
-}
-
-.icon-ditu:before {
-  content: '\e72e';
 }
 
 .icon-fsux_tubiao_ciyun:before {
