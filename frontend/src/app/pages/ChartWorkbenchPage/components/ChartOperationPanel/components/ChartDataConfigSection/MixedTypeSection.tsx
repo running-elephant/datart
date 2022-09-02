@@ -33,6 +33,7 @@ const MixedTypeSection: FC<ChartDataConfigSectionProps> = memo(
         actions: {
           [DataViewFieldType.NUMERIC]: [
             ChartDataSectionFieldActionType.Aggregate,
+            ChartDataSectionFieldActionType.AdvanceCalc,
             ChartDataSectionFieldActionType.Alias,
             ChartDataSectionFieldActionType.Format,
             ChartDataSectionFieldActionType.Sortable,

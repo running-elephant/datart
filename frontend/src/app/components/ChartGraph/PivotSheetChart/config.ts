@@ -43,7 +43,7 @@ const config: ChartConfig = {
       key: 'metrics',
       type: 'aggregate',
       actions: {
-        NUMERIC: ['aggregate', 'alias', 'format', 'sortable'],
+        NUMERIC: ['aggregate', 'advanceCalc', 'alias', 'format', 'sortable'],
         STRING: ['aggregate', 'alias', 'format', 'sortable'],
       },
       options: {

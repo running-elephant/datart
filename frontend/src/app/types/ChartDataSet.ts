@@ -65,6 +65,8 @@ export type ChartDatasetPageInfo = Partial<PageInfo>;
 export type ChartDatasetMeta = {
   name?: string;
   type?: string;
+  fmt?: string;
+  calc?: string;
   primaryKey?: boolean;
 };
 

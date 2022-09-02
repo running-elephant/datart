@@ -118,6 +118,12 @@ export enum AggregateFieldActionType {
   Min = 'MIN',
 }
 
+export enum AdvanceCalcFieldActionType {
+  None = 'NONE',
+  Ratio_Year = 'RATIO_YEAR',
+  Ratio_Last = 'RATIO_LAST',
+}
+
 export enum ChartDataSectionType {
   Group = 'group',
   Aggregate = 'aggregate',
@@ -159,6 +165,7 @@ export const ChartDataSectionFieldActionType = {
   Format: 'format',
   Aggregate: 'aggregate',
   AggregateLimit: 'aggregateLimit',
+  AdvanceCalc: 'advanceCalc',
   Filter: 'filter',
   CategoryFilter: 'categoryFilter',
   Colorize: 'colorize',
@@ -187,6 +194,14 @@ export const AggregateFieldSubAggregateType = {
   [ChartDataSectionFieldActionType.AggregateLimit]: [
     AggregateFieldActionType.Count,
     AggregateFieldActionType.Count_Distinct,
+  ],
+};
+
+export const AdvanceCalcFieldSubAggregateType = {
+  [ChartDataSectionFieldActionType.AdvanceCalc]: [
+    AdvanceCalcFieldActionType.None,
+    AdvanceCalcFieldActionType.Ratio_Year,
+    AdvanceCalcFieldActionType.Ratio_Last,
   ],
 };
 
