@@ -61,6 +61,7 @@ import {
   selectDataProviderConfigTemplateLoading,
   selectDataProviderListLoading,
   selectDataProviders,
+  selectIsOrgOwner,
   selectOrgId,
 } from '../../../slice/selectors';
 import { getDataProviderConfigTemplate } from '../../../slice/thunks';
@@ -97,6 +98,7 @@ export function SourceDetailPage() {
   const dispatch = useDispatch();
   const history = useHistory();
   const orgId = useSelector(selectOrgId);
+  const isOwner = useSelector(selectIsOrgOwner);
   const editingSource = useSelector(selectEditingSource);
   const dataProviders = useSelector(selectDataProviders);
   const dataProviderListLoading = useSelector(selectDataProviderListLoading);
@@ -452,7 +454,7 @@ export function SourceDetailPage() {
                   </Popconfirm>
                 )}
               </>
-            ) : (
+            ) : isOwner ? (
               <>
                 <Button loading={unarchiveSourceLoading} onClick={unarchive}>
                   {tg('button.restore')}
@@ -466,6 +468,8 @@ export function SourceDetailPage() {
                   </Button>
                 </Popconfirm>
               </>
+            ) : (
+              <></>
             )
           }
         />

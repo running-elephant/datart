@@ -25,6 +25,7 @@ import { useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { BORDER_RADIUS, SPACE_LG, SPACE_SM } from 'styles/StyleConstants';
 import { getInsertedNodeIndex } from 'utils/utils';
+import { selectIsOrgOwner } from '../../../slice/selectors';
 import { DEFAULT_VALUES, FileTypes, JobTypes, TimeModes } from '../constants';
 import { useToScheduleDetails } from '../hooks';
 import { SaveFormContext } from '../SaveFormContext';
@@ -79,7 +80,7 @@ export const EditorPage: FC = () => {
   const { toDetails } = useToScheduleDetails();
   const isArchived = editingSchedule?.status === 0;
   const t = useI18NPrefix('schedule.editor.index');
-
+  const isOwner = useSelector(selectIsOrgOwner);
   const { actions } = useScheduleSlice();
   const { scheduleId, orgId } = params;
   const isAdd = useMemo(() => {
@@ -306,16 +307,20 @@ export const EditorPage: FC = () => {
           title={isAdd ? t('newTimedTask') : editingSchedule?.name}
           actions={
             isArchived ? (
-              <>
-                <Button loading={unarchiveLoading} onClick={unarchive}>
-                  {t('restore')}
-                </Button>
-                <Popconfirm title={t('sureToDelete')} onConfirm={del(false)}>
-                  <Button loading={deleteLoading} danger>
-                    {t('delete')}
+              isOwner ? (
+                <>
+                  <Button loading={unarchiveLoading} onClick={unarchive}>
+                    {t('restore')}
                   </Button>
-                </Popconfirm>
-              </>
+                  <Popconfirm title={t('sureToDelete')} onConfirm={del(false)}>
+                    <Button loading={deleteLoading} danger>
+                      {t('delete')}
+                    </Button>
+                  </Popconfirm>
+                </>
+              ) : (
+                <></>
+              )
             ) : (
               <>
                 <Tooltip
