@@ -19,7 +19,6 @@
 import { Form, FormInstance, Input, TreeSelect } from 'antd';
 import { ModalForm, ModalFormProps } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { APP_CURRENT_VERSION } from 'app/migration/constants';
 import { fetchCheckName } from 'app/utils/fetch';
 import debounce from 'debounce-promise';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
@@ -86,10 +85,6 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
       onSave(
         {
           ...values,
-          config: {
-            version: APP_CURRENT_VERSION,
-            ...values.config,
-          },
         },
         onCancel,
       );
