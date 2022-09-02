@@ -1,6 +1,6 @@
 import { ChartDataSectionType, ControllerFacadeTypes } from 'app/constants';
 import { ChartConfig } from 'app/types/ChartConfig';
-import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { RUNTIME_FILTER_KEY } from 'globalConstants';
 import { isEmptyArray } from 'utils/object';
 import { FilterSearchParams } from './types';
@@ -41,7 +41,7 @@ export const transferChartConfig = (
   chartConfig?: ChartConfig,
   params?: FilterSearchParams,
   matchByName?: boolean,
-  jumpFilterParams?: ChartDataRequestFilter[],
+  jumpFilterParams?: PendingChartDataRequestFilter[],
 ): ChartConfig => {
   if (!chartConfig) {
     return {};

@@ -31,7 +31,7 @@ import {
   FilterRelationType,
   SortActionType,
 } from 'app/constants';
-import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import {
   FilterSqlOperator,
   NumberUnitKey,
@@ -193,7 +193,7 @@ export type ChartDataConfig = ChartConfigBase & {
   // NOTE: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
   // Runtime filters
-  [RUNTIME_FILTER_KEY]?: ChartDataRequestFilter[];
+  [RUNTIME_FILTER_KEY]?: PendingChartDataRequestFilter[];
 };
 
 export type ChartStyleSectionTemplate = {
