@@ -25,7 +25,7 @@ import {
 } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { transferChartConfig } from 'app/pages/MainPage/pages/VizPage/slice/utils';
 import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
-import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { FilterSqlOperator } from 'globalConstants';
@@ -106,11 +106,11 @@ export const slice = createSlice({
         chartConfigDTO?.chartGraphId,
       );
       let chartConfig = currentChart?.config as ChartConfig;
-      const jumpFilters: ChartDataRequestFilter[] = Object.entries(
+      const jumpFilters: PendingChartDataRequestFilter[] = Object.entries(
         Omit(filterSearchParams, ['type', 'isMatchByName']),
       ).map(entity => {
         return {
-          column: entity[0]?.split('.'),
+          column: entity[0],
           sqlOperator: FilterSqlOperator.In,
           values: entity[1]?.map(v => ({
             value: v,

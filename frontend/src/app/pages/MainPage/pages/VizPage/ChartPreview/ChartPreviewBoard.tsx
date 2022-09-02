@@ -35,7 +35,7 @@ import { selectAvailableSourceFunctions } from 'app/pages/ChartWorkbenchPage/sli
 import { fetchAvailableSourceFunctionsForChart } from 'app/pages/ChartWorkbenchPage/slice/thunks';
 import { useMainSlice } from 'app/pages/MainPage/slice';
 import { IChart } from 'app/types/Chart';
-import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import {
   chartSelectionEventListener,
@@ -154,7 +154,7 @@ const ChartPreviewBoard: FC<{
     });
 
     useEffect(() => {
-      const jumpFilterParams: ChartDataRequestFilter[] = parse(
+      const jumpFilterParams: PendingChartDataRequestFilter[] = parse(
         filterSearchUrl,
         { ignoreQueryPrefix: true },
       )?.filters;

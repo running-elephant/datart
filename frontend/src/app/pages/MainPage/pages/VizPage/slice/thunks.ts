@@ -26,7 +26,7 @@ import { mainActions } from 'app/pages/MainPage/slice';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import { getLoggedInUserPermissions } from 'app/pages/MainPage/slice/thunks';
 import { StoryBoard } from 'app/pages/StoryBoardPage/slice/types';
-import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { convertToChartDto } from 'app/utils/ChartDtoHelper';
@@ -270,7 +270,7 @@ export const initChartPreviewData = createAsyncThunk<
     backendChartId: string;
     orgId: string;
     filterSearchParams?: FilterSearchParams;
-    jumpFilterParams?: ChartDataRequestFilter[];
+    jumpFilterParams?: PendingChartDataRequestFilter[];
     jumpVariableParams?: Record<string, any[]>;
   }
 >(
@@ -308,7 +308,7 @@ export const fetchVizChartAction = createAsyncThunk(
   async (arg: {
     backendChartId;
     filterSearchParams?: FilterSearchParams;
-    jumpFilterParams?: ChartDataRequestFilter[];
+    jumpFilterParams?: PendingChartDataRequestFilter[];
   }) => {
     const response = await request2<
       Omit<ChartDTO, 'config'> & { config: string }
