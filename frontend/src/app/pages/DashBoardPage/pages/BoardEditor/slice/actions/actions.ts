@@ -438,13 +438,17 @@ export const widgetClearLinkageAction =
     const linkTargetWidgets = Object.values(boardWidgetInfoRecord || {}).filter(
       widgetInfo => widgetInfo?.linkInfo?.sourceWidgetId === id,
     );
-    linkTargetWidgets.forEach(targetWidget => {
+    linkTargetWidgets.forEach(widgetInfo => {
+      const filters = widgetInfo?.linkInfo?.filters || [];
+      const variables = widgetInfo?.linkInfo?.variables;
       dispatch(
         syncBoardWidgetChartDataAsync({
           boardId: dashboardId,
           sourceWidgetId: '',
-          widgetId: targetWidget.id,
+          widgetId: widgetInfo.id,
           executeToken,
+          extraFilters: filters,
+          variableParams: variables,
         }),
       );
     });
@@ -475,12 +479,16 @@ export const editorWidgetClearLinkageAction =
     const linkTargetWidgets = Object.values(boardWidgetInfoRecord || {}).filter(
       widgetInfo => widgetInfo?.linkInfo?.sourceWidgetId === id,
     );
-    linkTargetWidgets.forEach(targetWidget => {
+    linkTargetWidgets.forEach(widgetInfo => {
+      const filters = widgetInfo?.linkInfo?.filters || [];
+      const variables = widgetInfo?.linkInfo?.variables;
       dispatch(
         syncEditBoardWidgetChartDataAsync({
           boardId: dashboardId,
           sourceWidgetId: '',
-          widgetId: targetWidget.id,
+          widgetId: widgetInfo.id,
+          extraFilters: filters,
+          variableParams: variables,
         }),
       );
     });

@@ -304,11 +304,10 @@ export const widgetLinkEventAction =
         sourceWidgetId: widget.id,
         widgetId: targetWidget.id,
         option: widgetInfo,
-        extraFilters: isUnSelectedAll
-          ? controllerFilters || []
-          : (clickFilters || [])
-              .concat(controllerFilters || [])
-              .concat(sourceLinkAndControllerFilterByRule || []),
+        extraFilters: controllerFilters,
+        tempFilters: isUnSelectedAll
+          ? []
+          : (clickFilters || []).concat(sourceLinkAndControllerFilterByRule),
         variableParams: isUnSelectedAll
           ? variableParams || {}
           : Object.assign(
