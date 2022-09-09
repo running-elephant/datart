@@ -513,9 +513,10 @@ class BasicTableChart extends ReactChart {
           headerFont?.fontSize,
           headerFont?.fontFamily,
         );
-        const currentSummaryField = aggregateConfigs.find(
-          ac => ac.uid === c.uid,
-        );
+        const currentSummaryField = aggregateConfigs
+          // 快速计算不参与总计
+          .filter(config => !config.calc)
+          .find(ac => ac.uid === c.uid);
         const total = chartDataSet?.map((dc: any) =>
           dc.getCell(currentSummaryField),
         );

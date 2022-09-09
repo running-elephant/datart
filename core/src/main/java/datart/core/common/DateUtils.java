@@ -63,4 +63,9 @@ public class DateUtils {
         return name + DateFormatUtils.format(new Date(), DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"));
     }
 
+
+    public static String quarterToMonth(String quarterDate) {
+        int quarter = quarterDate.charAt(quarterDate.length() - 1) - '0';
+        return quarterDate.substring(0, quarterDate.length() - 2) + "-" + String.format("%02d", 1 + (quarter - 1) * 3);
+    }
 }

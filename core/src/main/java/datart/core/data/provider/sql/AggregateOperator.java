@@ -28,6 +28,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 public class AggregateOperator extends ColumnOperator implements Alias {
 
+    private CalcOperator calcOperator;
     private SqlOperator sqlOperator;
 
     private String alias;
@@ -47,10 +48,18 @@ public class AggregateOperator extends ColumnOperator implements Alias {
         COUNT_DISTINCT,
     }
 
+    public enum CalcOperator implements Serializable {
+
+        RATIO_YEAR,
+
+        RATIO_LAST,
+    }
+
     @Override
     public String toString() {
         return "AggregateOperator{" +
                 "sqlOperator=" + sqlOperator +
+                ", calcOperator=" + calcOperator +
                 ", column='" + getColumnKey() + '\'' +
                 '}';
     }

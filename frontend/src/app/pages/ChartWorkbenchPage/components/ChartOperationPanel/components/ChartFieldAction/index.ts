@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import AdvanceCalcAction from './AdvanceCalcAction';
 import AggregationAction from './AggregationAction';
 import AggregationColorizeAction from './AggregationColorizeAction';
 import AggregationLimitAction from './AggregationLimitAction';
@@ -35,6 +36,7 @@ const actions = {
   NumberFormatAction,
   SortAction,
   AggregationLimitAction,
+  AdvanceCalcAction,
   FilterAction,
   AggregationColorizeAction,
   SizeOptionsAction,

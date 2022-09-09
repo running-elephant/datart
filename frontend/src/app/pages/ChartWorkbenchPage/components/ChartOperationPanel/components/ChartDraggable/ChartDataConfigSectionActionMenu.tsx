@@ -27,6 +27,7 @@ import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { FC } from 'react';
+import AdvanceCalcAction from '../ChartFieldAction/AdvanceCalcAction';
 import AggregationAction from '../ChartFieldAction/AggregationAction';
 import AggregationLimitAction from '../ChartFieldAction/AggregationLimitAction';
 import DateLevelAction from '../ChartFieldAction/DateLevelAction/DateLevelAction';
@@ -57,6 +58,7 @@ const ChartDataConfigSectionActionMenu: FC<
     ChartDataSectionFieldActionType.Sortable,
     ChartDataSectionFieldActionType.Aggregate,
     ChartDataSectionFieldActionType.AggregateLimit,
+    ChartDataSectionFieldActionType.AdvanceCalc,
     ChartDataSectionFieldActionType.DateLevel,
   ];
 
@@ -105,6 +107,7 @@ const ChartDataConfigSectionActionMenu: FC<
           ![
             ChartDataSectionFieldActionType.Aggregate,
             ChartDataSectionFieldActionType.AggregateLimit,
+            ChartDataSectionFieldActionType.AdvanceCalc,
           ].includes(action),
       );
     }
@@ -156,6 +159,17 @@ const ChartDataConfigSectionActionMenu: FC<
     if (actionName === ChartDataSectionFieldActionType.AggregateLimit) {
       return (
         <AggregationLimitAction
+          config={fieldConfig}
+          onConfigChange={(config, needRefresh) => {
+            handleFieldConfigChanged(uid, config, needRefresh);
+          }}
+          mode="menu"
+        />
+      );
+    }
+    if (actionName === ChartDataSectionFieldActionType.AdvanceCalc) {
+      return (
+        <AdvanceCalcAction
           config={fieldConfig}
           onConfigChange={(config, needRefresh) => {
             handleFieldConfigChanged(uid, config, needRefresh);

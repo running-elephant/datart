@@ -262,6 +262,11 @@
           "MAX": "Max",
           "MIN": "Min"
         },
+        "advanceCalc": {
+          "NONE": "None",
+          "RATIO_YEAR": "Ratio_Year",
+          "RATIO_LAST": "Ratio_Last"
+        },
         "controllerFacadeTypes": {
           "dropdownList": "Dropdown List",
           "radioGroup": "Radio Group",
@@ -682,6 +687,7 @@
             "format": "Format",
             "aggregate": "Aggregate",
             "aggregateLimit": "Aggregate",
+            "advanceCalc": "Calculator",
             "filter": "Filter",
             "categoryFilter": "Category Filter",
             "colorize": "Colorize",

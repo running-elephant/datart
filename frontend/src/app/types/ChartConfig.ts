@@ -17,6 +17,7 @@
  */
 
 import {
+  AdvanceCalcFieldActionType,
   AggregateFieldActionType,
   ChartDataSectionFieldActionType,
   ChartDataSectionType,
@@ -116,6 +117,7 @@ export type ChartDataSectionField = {
   alias?: AliasFieldAction;
   format?: FormatFieldAction;
   aggregate?: AggregateFieldActionType;
+  calc?: AdvanceCalcFieldActionType;
   filter?: FilterFieldAction;
   color?: ColorFieldAction;
   size?: number;

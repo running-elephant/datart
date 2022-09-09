@@ -66,6 +66,8 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
         return <FieldActions.AggregationAction {...props} />;
       case ChartDataSectionFieldActionType.AggregateLimit:
         return <FieldActions.AggregationLimitAction {...props} />;
+      case ChartDataSectionFieldActionType.AdvanceCalc:
+        return <FieldActions.AdvanceCalcAction {...props} />;
       case ChartDataSectionFieldActionType.Filter:
         return <FieldActions.FilterAction {...props} />;
       case ChartDataSectionFieldActionType.Colorize:

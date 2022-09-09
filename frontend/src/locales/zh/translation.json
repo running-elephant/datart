@@ -262,6 +262,11 @@
           "MAX": "最大值",
           "MIN": "最小值"
         },
+        "advanceCalc": {
+          "NONE": "无",
+          "RATIO_YEAR": "同比",
+          "RATIO_LAST": "环比"
+        },
         "controllerFacadeTypes": {
           "dropdownList": "下拉列表",
           "radioGroup": "单选按钮",
@@ -680,6 +685,7 @@
             "format": "格式",
             "aggregate": "聚合",
             "aggregateLimit": "聚合",
+            "advanceCalc": "高级计算",
             "filter": "过滤",
             "categoryFilter": "类别过滤",
             "colorize": "着色",
