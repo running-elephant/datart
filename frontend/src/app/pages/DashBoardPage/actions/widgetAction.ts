@@ -304,11 +304,10 @@ export const widgetLinkEventAction =
         sourceWidgetId: widget.id,
         widgetId: targetWidget.id,
         option: widgetInfo,
-        extraFilters: isUnSelectedAll
-          ? controllerFilters || []
-          : (clickFilters || [])
-              .concat(controllerFilters || [])
-              .concat(sourceLinkAndControllerFilterByRule || []),
+        extraFilters: controllerFilters,
+        tempFilters: isUnSelectedAll
+          ? []
+          : (clickFilters || []).concat(sourceLinkAndControllerFilterByRule),
         variableParams: isUnSelectedAll
           ? variableParams || {}
           : Object.assign(
@@ -446,34 +445,13 @@ export const widgetChartClickAction =
     history: any;
   }) =>
   dispatch => {
-    const { boardId, editing, renderMode, widget, params, history } = obj;
+    const { boardId, editing, renderMode, widget, params } = obj;
     //is tableChart
     tablePagingAndSortEventListener(params, p => {
       dispatch(
         tableChartClickAction(boardId, editing, renderMode, widget, params),
       );
     });
-    // jump
-    const jumpConfig = widget.config?.jumpConfig;
-    if (jumpConfig && jumpConfig.open) {
-      dispatch(
-        widgetClickJumpAction({
-          renderMode,
-          widget,
-          params,
-          history,
-        }),
-      );
-      return;
-    }
-    // linkage
-    const linkageConfig = widget.config.linkageConfig;
-    if (linkageConfig?.open && widget.relations.length) {
-      dispatch(
-        widgetClickLinkageAction(boardId, editing, renderMode, widget, params),
-      );
-      return;
-    }
   };
 
 export const widgetLinkEventActionCreator =

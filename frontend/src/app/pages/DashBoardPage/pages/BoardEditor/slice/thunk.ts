@@ -452,13 +452,22 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
     widgetId: string;
     option?: getDataOption;
     extraFilters?: PendingChartDataRequestFilter[];
+    tempFilters?: PendingChartDataRequestFilter[];
     variableParams?: Record<string, any[]>;
   },
   { state: RootState }
 >(
   'board/syncEditBoardWidgetChartDataAsync',
   async (
-    { boardId, sourceWidgetId, widgetId, option, extraFilters, variableParams },
+    {
+      boardId,
+      sourceWidgetId,
+      widgetId,
+      option,
+      extraFilters,
+      tempFilters,
+      variableParams,
+    },
     { getState, dispatch },
   ) => {
     const boardState = getState() as { board: BoardState };
@@ -492,7 +501,7 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
     )
       .addVariableParams(variableParams)
       .addExtraSorters(option?.sorters as any[])
-      .addRuntimeFilters(extraFilters)
+      .addRuntimeFilters((extraFilters || []).concat(tempFilters || []))
       .addDrillOption(drillOption)
       .build();
 
@@ -536,6 +545,7 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
         linkInfo: {
           sourceWidgetId,
           filters: extraFilters,
+          tempFilters: tempFilters,
           variables: variableParams,
         },
       }),

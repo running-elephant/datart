@@ -23,6 +23,7 @@ import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
 import { VizHeader } from 'app/components/VizHeader';
+import { ChartInteractionEvent } from 'app/constants';
 import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
 import useChartInteractions from 'app/hooks/useChartInteractions';
@@ -384,6 +385,20 @@ const ChartPreviewBoard: FC<{
           {
             name: 'click',
             callback: param => {
+              if (
+                param?.interactionType === ChartInteractionEvent.PagingOrSort
+              ) {
+                tablePagingAndSortEventListener(param, p => {
+                  dispatch(
+                    fetchDataSetByPreviewChartAction({
+                      ...p,
+                      backendChartId,
+                    }),
+                  );
+                });
+                return;
+              }
+
               handleDrillThroughEvent(
                 buildDrillThroughEventParams(param, InteractionMouseEvent.Left),
               );
@@ -393,14 +408,6 @@ const ChartPreviewBoard: FC<{
               drillDownEventListener(drillOptionRef?.current, param, p => {
                 drillOptionRef.current = p;
                 handleDrillOptionChange?.(p);
-              });
-              tablePagingAndSortEventListener(param, p => {
-                dispatch(
-                  fetchDataSetByPreviewChartAction({
-                    ...p,
-                    backendChartId,
-                  }),
-                );
               });
               pivotTableDrillEventListener(param, p => {
                 handleDrillOptionChange(p);
