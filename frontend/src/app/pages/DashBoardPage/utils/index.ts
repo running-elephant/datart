@@ -112,9 +112,10 @@ export const getDataChartRequestParams = (obj: {
   dataChart: DataChart;
   view: ChartDataView;
   drillOption?: ChartDrillOption;
+  tempFilters?: PendingChartDataRequestFilter[];
   option;
 }) => {
-  const { dataChart, view, option, drillOption } = obj;
+  const { dataChart, view, option, drillOption, tempFilters } = obj;
   const migratedChartConfig = migrateChartConfig(
     CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
   );
@@ -137,6 +138,7 @@ export const getDataChartRequestParams = (obj: {
   let requestParams = builder
     .addExtraSorters((option?.sorters as any) || [])
     .addDrillOption(drillOption)
+    .addRuntimeFilters(tempFilters || [])
     .build();
   return requestParams;
 };
@@ -438,6 +440,7 @@ export const getChartWidgetRequestParams = (obj: {
     view: chartDataView,
     option: option,
     drillOption,
+    tempFilters: widgetInfo?.linkInfo?.tempFilters,
   });
   const { filterParams, variableParams } =
     getTheWidgetFiltersAndParams<ChartDataRequestFilter>({
