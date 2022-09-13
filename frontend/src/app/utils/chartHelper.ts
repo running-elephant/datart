@@ -1094,7 +1094,7 @@ export function getValueByColumnKey(field?: {
   if (!field.calc) {
     return `${field.aggregate}(${field.colName})`;
   }
-  return `${field.aggregate}(${field.colName})-${field.calc}`;
+  return `${field.aggregate}(${field.colName})-${field.calc.key}`;
 }
 
 /**

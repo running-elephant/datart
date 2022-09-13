@@ -167,6 +167,7 @@ export type AliasFieldAction = {
 };
 
 export type AdvanceCalcFieldAction = {
+  key: string;
   type: AdvanceCalcFieldActionType;
   config?: any;
 };

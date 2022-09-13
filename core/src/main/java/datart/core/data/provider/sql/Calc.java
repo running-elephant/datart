@@ -11,6 +11,8 @@ import lombok.Data;
 @Data
 public class Calc {
 
+    private String key;
+
     private String type;
 
     private Object config;
