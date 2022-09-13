@@ -369,9 +369,8 @@
           "MIN": "Min"
         },
         "advanceCalc": {
-          "NONE": "None",
-          "RATIO_YEAR": "Ratio_Year",
-          "RATIO_LAST": "Ratio_Last"
+          "none": "None",
+          "dateRatio": "Date Ratio"
         },
         "controllerFacadeTypes": {
           "dropdownList": "Dropdown List",
@@ -799,8 +798,19 @@
             "colorSingle": "Colorize",
             "size": "Size",
             "chooseTheme": "Choose Theme",
-            "dateLevel": "Date Level"
+            "dateLevel": "Date Level",
+            "dateRatio": "Date Ratio"
           }
+        },
+        "dateRatio": {
+          "field": "Date Field",
+          "ratioType": "Ratio Type",
+          "valueType": "Value Type",
+          "ratioLast": "On Last",
+          "ratioYear": "On Year",
+          "diff": "Diff",
+          "percent": "Percent",
+          "select": "Select"
         }
       },
       "setting": {

@@ -119,9 +119,8 @@ export enum AggregateFieldActionType {
 }
 
 export enum AdvanceCalcFieldActionType {
-  None = 'NONE',
-  Ratio_Year = 'RATIO_YEAR',
-  Ratio_Last = 'RATIO_LAST',
+  None = 'none',
+  Ratio = 'dateRatio',
 }
 
 export enum ChartDataSectionType {
@@ -173,6 +172,7 @@ export const ChartDataSectionFieldActionType = {
   ColorizeSingle: 'colorSingle',
   Size: 'size',
   DateLevel: 'dateLevel',
+  DateRatio: 'dateRatio',
 };
 
 export const FilterRelationType = {
@@ -194,14 +194,6 @@ export const AggregateFieldSubAggregateType = {
   [ChartDataSectionFieldActionType.AggregateLimit]: [
     AggregateFieldActionType.Count,
     AggregateFieldActionType.Count_Distinct,
-  ],
-};
-
-export const AdvanceCalcFieldSubAggregateType = {
-  [ChartDataSectionFieldActionType.AdvanceCalc]: [
-    AdvanceCalcFieldActionType.None,
-    AdvanceCalcFieldActionType.Ratio_Year,
-    AdvanceCalcFieldActionType.Ratio_Last,
   ],
 };
 
@@ -248,6 +240,7 @@ export const ChartStyleSectionComponentType = {
   INTERACTION_VIEW_DETAIL_PANEL: 'interaction.viewDetail',
   DATA_ZOOM_PANEL: 'dataZoomPanel',
   Y_AXIS_NUMBER_FORMAT_PANEL: 'YAxisNumberFormatPanel',
+  DATE_RATIO_PANEL: 'dateRatioPanel',
 };
 
 export enum DownloadFileType {
@@ -280,4 +273,30 @@ export enum ChartInteractionEvent {
   Drilled = 'drilled',
   PagingOrSort = 'paging-sort-filter',
   ChangeContext = 'rich-text-change-context',
+}
+
+export enum DateLevelType {
+  AggDateYear = 'AGG_DATE_YEAR',
+  AggDateQuarter = 'AGG_DATE_QUARTER',
+  AggDateMonth = 'AGG_DATE_MONTH',
+  AggDateWeek = 'AGG_DATE_WEEK',
+  AggDateDay = 'AGG_DATE_DAY',
+}
+
+export const DateLevelTypes: string[] = [
+  DateLevelType.AggDateYear,
+  DateLevelType.AggDateQuarter,
+  DateLevelType.AggDateMonth,
+  DateLevelType.AggDateWeek,
+  DateLevelType.AggDateDay,
+];
+
+export enum DateRatioType {
+  Year = 'year',
+  Last = 'last',
+}
+
+export enum DateRatioValueType {
+  Diff = 'diff',
+  Percent = 'percent',
 }

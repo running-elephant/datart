@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ChartDataViewFieldCategory } from 'app/constants';
+import { ChartDataViewFieldCategory, DateLevelType } from 'app/constants';
 import i18n from 'i18next';
 
 const prefix = 'viz.workbench.dataview.';
@@ -32,32 +32,32 @@ export const ChartConfigReducerActionType = {
 export const DATE_LEVELS = [
   {
     category: ChartDataViewFieldCategory.DateLevelComputedField,
-    expression: 'AGG_DATE_YEAR',
-    name: i18n.t(prefix + 'AGG_DATE_YEAR'),
+    expression: DateLevelType.AggDateYear,
+    name: i18n.t(prefix + DateLevelType.AggDateYear),
     type: 'DATE',
   },
   {
     category: ChartDataViewFieldCategory.DateLevelComputedField,
-    expression: 'AGG_DATE_QUARTER',
-    name: i18n.t(prefix + 'AGG_DATE_QUARTER'),
+    expression: DateLevelType.AggDateQuarter,
+    name: i18n.t(prefix + DateLevelType.AggDateQuarter),
     type: 'DATE',
   },
   {
     category: ChartDataViewFieldCategory.DateLevelComputedField,
-    expression: 'AGG_DATE_MONTH',
-    name: i18n.t(prefix + 'AGG_DATE_MONTH'),
+    expression: DateLevelType.AggDateMonth,
+    name: i18n.t(prefix + DateLevelType.AggDateMonth),
     type: 'DATE',
   },
   {
     category: ChartDataViewFieldCategory.DateLevelComputedField,
-    expression: 'AGG_DATE_WEEK',
-    name: i18n.t(prefix + 'AGG_DATE_WEEK'),
+    expression: DateLevelType.AggDateWeek,
+    name: i18n.t(prefix + DateLevelType.AggDateWeek),
     type: 'DATE',
   },
   {
     category: ChartDataViewFieldCategory.DateLevelComputedField,
-    expression: 'AGG_DATE_DAY',
-    name: i18n.t(prefix + 'AGG_DATE_DAY'),
+    expression: DateLevelType.AggDateDay,
+    name: i18n.t(prefix + DateLevelType.AggDateDay),
     type: 'DATE',
   },
 ];

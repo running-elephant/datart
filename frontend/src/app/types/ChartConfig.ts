@@ -114,7 +114,7 @@ export type ChartDataSectionField = {
   alias?: AliasFieldAction;
   format?: FormatFieldAction;
   aggregate?: AggregateFieldActionType;
-  calc?: AdvanceCalcFieldActionType;
+  calc?: AdvanceCalcFieldAction;
   filter?: FilterFieldAction;
   color?: ColorFieldAction;
   size?: number;
@@ -164,6 +164,11 @@ export type FormatFieldAction = {
 export type AliasFieldAction = {
   name?: string;
   desc?: string;
+};
+
+export type AdvanceCalcFieldAction = {
+  type: AdvanceCalcFieldActionType;
+  config?: any;
 };
 
 export type ChartConfigBase = {

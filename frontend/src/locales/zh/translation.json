@@ -369,9 +369,8 @@
           "MIN": "最小值"
         },
         "advanceCalc": {
-          "NONE": "无",
-          "RATIO_YEAR": "同比",
-          "RATIO_LAST": "环比"
+          "none": "无",
+          "dateRatio": "同比/环比"
         },
         "controllerFacadeTypes": {
           "dropdownList": "下拉列表",
@@ -790,6 +789,7 @@
             "aggregate": "聚合",
             "aggregateLimit": "聚合",
             "advanceCalc": "高级计算",
+            "dateRatio": "同比/环比",
             "filter": "过滤",
             "categoryFilter": "类别过滤",
             "colorize": "着色",
@@ -799,6 +799,16 @@
             "chooseTheme": "选择主题",
             "dateLevel": "日期级别"
           }
+        },
+        "dateRatio": {
+          "field": "选择日期",
+          "ratioType": "计算类型",
+          "valueType": "结果类型",
+          "ratioLast": "环比",
+          "ratioYear": "同比",
+          "diff": "差值",
+          "percent": "百分比",
+          "select": "请选择"
         }
       },
       "setting": {

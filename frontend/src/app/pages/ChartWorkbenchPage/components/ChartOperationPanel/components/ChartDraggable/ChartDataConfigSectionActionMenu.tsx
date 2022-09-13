@@ -170,11 +170,14 @@ const ChartDataConfigSectionActionMenu: FC<
     if (actionName === ChartDataSectionFieldActionType.AdvanceCalc) {
       return (
         <AdvanceCalcAction
+          uid={uid}
           config={fieldConfig}
           onConfigChange={(config, needRefresh) => {
             handleFieldConfigChanged(uid, config, needRefresh);
           }}
-          mode="menu"
+          onOpenModal={onOpenModal}
+          metas={metas}
+          availableSourceFunctions={availableSourceFunctions}
         />
       );
     }

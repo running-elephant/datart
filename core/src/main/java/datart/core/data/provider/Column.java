@@ -19,7 +19,7 @@
 package datart.core.data.provider;
 
 import datart.core.base.consts.ValueType;
-import datart.core.data.provider.sql.AggregateOperator;
+import datart.core.data.provider.sql.Calc;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -36,7 +36,7 @@ public class Column implements Serializable {
 
     private List<ForeignKey> foreignKeys;
 
-    private AggregateOperator.CalcOperator calc;
+    private Calc calc;
 
     public Column(String[] name, ValueType type) {
         this.name = name;

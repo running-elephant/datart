@@ -57,6 +57,7 @@ import {
   RUNTIME_FILTER_KEY,
   TIME_FORMATTER,
 } from 'globalConstants';
+import isEqual from 'lodash/isEqual';
 import {
   isEmptyArray,
   isEmptyString,
@@ -162,12 +163,12 @@ export class ChartDataRequestBuilder {
         alias: this.buildAliasName(aggCol),
         column: this.buildColumnName(aggCol),
         sqlOperator: aggCol.aggregate!,
-        calcOperator: aggCol.calc!,
+        calc: aggCol.calc!,
       })),
       (a, b) =>
         isEqualObject(a.column, b.column) &&
         a.sqlOperator === b.sqlOperator &&
-        a.calcOperator === b.calcOperator,
+        isEqual(a.calc, b.calc),
     );
   }
 

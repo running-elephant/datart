@@ -17,106 +17,84 @@
  */
 
 import { CheckOutlined } from '@ant-design/icons';
-import { Menu, Radio, Space } from 'antd';
+import { Menu } from 'antd';
 import {
   AdvanceCalcFieldActionType,
-  AdvanceCalcFieldSubAggregateType,
-  ChartDataSectionFieldActionType,
-  ChartDataSectionType,
   DataViewFieldType,
+  DateLevelTypes,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { updateBy } from 'app/utils/mutation';
-import { FC, useContext, useState } from 'react';
-import ChartPaletteContext from '../../../../contexts/ChartPaletteContext';
+import { FC, useState } from 'react';
 
 const AdvanceCalcAction: FC<{
+  uid?: string;
   config: ChartDataSectionField;
   onConfigChange: (
     config: ChartDataSectionField,
     needRefresh?: boolean,
   ) => void;
-  mode?: 'menu';
-}> = ({ config, onConfigChange, mode, ...rest }) => {
+  onOpenModal?;
+  metas?: ChartDataViewMeta[];
+  availableSourceFunctions?: string[];
+}> = ({
+  uid,
+  config,
+  onConfigChange,
+  onOpenModal,
+  metas,
+  availableSourceFunctions,
+  ...rest
+}) => {
   const t = useI18NPrefix(`viz.common.enum.advanceCalc`);
 
-  const { datas } = useContext(ChartPaletteContext);
   const actionNeedNewRequest = true;
   const [calc, setCalc] = useState(config?.calc);
 
-  const onChange = selectedValue => {
-    selectedValue = selectedValue === 'NONE' ? undefined : selectedValue;
-    const newConfig = updateBy(config, draft => {
-      draft.calc = selectedValue;
-    });
-    setCalc(selectedValue);
-    onConfigChange?.(newConfig, actionNeedNewRequest);
-  };
+  const items: AdvanceCalcFieldActionType[] = [];
 
-  let items =
-    AdvanceCalcFieldSubAggregateType[
-      ChartDataSectionFieldActionType.AdvanceCalc
-    ] || [];
-
-  // 同环比需要日期维度才能计算
+  // 同环比需要数据视图包含日期维度且支持日期聚合才能计算
   if (
-    datas &&
-    datas
-      .filter(
-        c =>
-          c.type === ChartDataSectionType.Group ||
-          c.type === ChartDataSectionType.Mixed,
-      )
-      .filter(
-        c => c.rows?.findIndex(s => s.type === DataViewFieldType.DATE) !== -1,
-      ).length === 0
+    metas &&
+    metas.filter(meta => meta.type === DataViewFieldType.DATE).length > 0 &&
+    availableSourceFunctions &&
+    availableSourceFunctions.filter(f => DateLevelTypes.includes(f)).length > 0
   ) {
-    items = items.filter(
-      t =>
-        ![
-          AdvanceCalcFieldActionType.Ratio_Year,
-          AdvanceCalcFieldActionType.Ratio_Last,
-        ].includes(t),
-    );
+    items.push(AdvanceCalcFieldActionType.Ratio);
   }
 
-  const renderOptions = mode => {
-    if (mode === 'menu') {
-      return (
-        <>
-          {items.map(agg => {
-            return (
-              <Menu.Item
-                key={agg}
-                eventKey={agg}
-                icon={calc === agg ? <CheckOutlined /> : ''}
-                onClick={() => onChange(agg)}
-              >
-                {t(agg)}
-              </Menu.Item>
-            );
-          })}
-        </>
-      );
-    }
-
-    return (
-      <Radio.Group onChange={e => onChange(e.target?.value)} value={calc}>
-        <Space direction="vertical">
-          {items.map(agg => {
-            return (
-              <Radio key={agg} value={agg}>
-                {t(agg)}
-              </Radio>
-            );
-          })}
-        </Space>
-      </Radio.Group>
-    );
-  };
-
-  return renderOptions(mode);
+  return (
+    <>
+      <Menu.Item
+        key={AdvanceCalcFieldActionType.None}
+        eventKey={AdvanceCalcFieldActionType.None}
+        icon={!calc ? <CheckOutlined /> : ''}
+        onClick={() => {
+          const newConfig = updateBy(config, draft => {
+            draft.calc = undefined;
+          });
+          setCalc(undefined);
+          onConfigChange?.(newConfig, actionNeedNewRequest);
+        }}
+      >
+        {t(AdvanceCalcFieldActionType.None)}
+      </Menu.Item>
+      {items.map(agg => {
+        return (
+          <Menu.Item
+            key={agg}
+            eventKey={agg}
+            icon={calc?.type === agg ? <CheckOutlined /> : ''}
+            onClick={() => onOpenModal(uid)(agg)}
+          >
+            {t(agg)}
+          </Menu.Item>
+        );
+      })}
+    </>
+  );
 };
 
 export default AdvanceCalcAction;
