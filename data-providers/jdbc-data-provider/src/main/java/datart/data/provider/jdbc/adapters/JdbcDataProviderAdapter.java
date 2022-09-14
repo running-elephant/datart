@@ -478,6 +478,9 @@ public class JdbcDataProviderAdapter implements Closeable {
             obj = rs.getObject(columnIndex).toString();
         } else if (obj instanceof LocalDateTime) {
             obj = rs.getTimestamp(columnIndex);
+        } else if (obj instanceof Long){
+            // Long型数据转字符串，否则长度超过17时前端会丢失精度
+            obj = String.valueOf(obj);
         }
         return obj;
     }
