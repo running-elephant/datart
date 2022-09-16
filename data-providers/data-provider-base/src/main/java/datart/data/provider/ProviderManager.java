@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
@@ -45,8 +44,7 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
 
     private static final Map<String, DataProvider> cachedDataProviders = new ConcurrentHashMap<>();
 
-    @PostConstruct
-    public void loadDataProviders() {
+    public Map<String, DataProvider> getDataProviders() {
         if (cachedDataProviders.isEmpty()) {
             synchronized (ProviderManager.class) {
                 if (cachedDataProviders.isEmpty()) {
@@ -61,12 +59,13 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
                 }
             }
         }
+        return cachedDataProviders;
     }
 
     @Override
     public List<DataProviderInfo> getSupportedDataProviders() {
         ArrayList<DataProviderInfo> providerInfos = new ArrayList<>();
-        for (DataProvider dataProvider : cachedDataProviders.values()) {
+        for (DataProvider dataProvider : getDataProviders().values()) {
             try {
                 providerInfos.add(dataProvider.getBaseInfo());
             } catch (IOException e) {
@@ -230,7 +229,7 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
 
 
     private DataProvider getDataProviderService(String type) {
-        DataProvider dataProvider = cachedDataProviders.get(type);
+        DataProvider dataProvider = getDataProviders().get(type);
         if (dataProvider == null) {
             Exceptions.msg("No data provider type " + type);
         }
