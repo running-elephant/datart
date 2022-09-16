@@ -230,6 +230,12 @@ public class LocalDB {
 
             }
             return execute(connection, queryScript, executeParam);
+        } finally {
+            if (!dataframes.isEmpty()) {
+                for (Dataframe dataframe : dataframes.getDataframes()) {
+                    unregisterData(dataframe.getId());
+                }
+            }
         }
     }
 
