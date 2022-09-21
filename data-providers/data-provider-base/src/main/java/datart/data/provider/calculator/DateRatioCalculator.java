@@ -20,12 +20,6 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * 同比环比计算器
- *
- * @author rwe
- * @date 2022/9/6 17:13
- **/
 public class DateRatioCalculator extends AbstractCalculator {
 
     private static final EnumSet<StdSqlOperator> DATE_OPERATORS = EnumSet.of(StdSqlOperator.AGG_DATE_YEAR, StdSqlOperator.AGG_DATE_QUARTER, StdSqlOperator.AGG_DATE_MONTH, StdSqlOperator.AGG_DATE_WEEK, StdSqlOperator.AGG_DATE_DAY);
@@ -65,7 +59,7 @@ public class DateRatioCalculator extends AbstractCalculator {
         StdSqlOperator stdSqlOperator;
 
         //判断维度是否包含日期
-        if (StringUtils.isBlank(config.getColumnKey())) {
+        if (StringUtils.isBlank(config.getSelect())) {
             //判断是否存在日期聚合维度,并搜索最小维度
             List<FunctionColumn> functionColumns = executeParam.getFunctionColumns();
             List<Integer> ordinals = functionColumns.stream().map(functionColumn -> {
