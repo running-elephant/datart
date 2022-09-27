@@ -114,6 +114,12 @@ const config: ChartConfig = {
             ],
           },
         },
+        {
+          label: 'style.slashHeader',
+          key: 'enableSlash',
+          default: false,
+          comType: 'checkbox',
+        },
       ],
     },
     {
@@ -448,6 +454,7 @@ const config: ChartConfig = {
           tableSize: '表格大小',
           tableHeaderStyle: '表头样式',
           tableBodyStyle: '表体样式',
+          slashHeader: '斜线表头',
           bgColor: '背景颜色',
           font: '字体',
           align: '对齐方式',
@@ -532,6 +539,7 @@ const config: ChartConfig = {
           tableSize: 'Table Size',
           tableHeaderStyle: 'Table Header Style',
           tableBodyStyle: 'Table Body Style',
+          slashHeader: 'Slash Header',
           bgColor: 'Background Color',
           font: 'Font',
           align: 'Align',
