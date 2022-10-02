@@ -362,6 +362,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         }
     }
 
+    @Override
     public Folder createWithFolder(DashboardCreateParam createParam) {
         if (!CollectionUtils.isEmpty(folderMapper.checkVizName(createParam.getOrgId(), createParam.getParentId(), createParam.getName()))) {
             Exceptions.tr(ParamException.class, "error.param.exists.name");
@@ -467,6 +468,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         return widgetDetails;
     }
 
+    @Override
     public boolean importResource(DashboardResourceModel model, ImportStrategy strategy, String orgId) {
         if (model == null) {
             return true;

@@ -1,7 +1,6 @@
 package datart.core.mappers.ext;
 
 import datart.core.entity.RelWidgetWidget;
-import datart.core.entity.Widget;
 import datart.core.mappers.RelWidgetWidgetMapper;
 import org.apache.ibatis.annotations.*;
 
