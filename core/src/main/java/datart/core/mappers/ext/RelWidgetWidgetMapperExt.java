@@ -60,4 +60,14 @@ public interface RelWidgetWidgetMapperExt extends RelWidgetWidgetMapper {
     })
     List<RelWidgetWidget> listTargetWidgets(String sourceId);
 
+    @Select({
+            "<script>",
+            "SELECT rww.* " +
+                    "FROM rel_widget_widget rww " +
+                    "WHERE rww.source_id IN " +
+                    "<foreach collection='sourceIds' item='item' index='index' open='(' close=')' separator=','>  #{item} </foreach> ;",
+            "</script>",
+    })
+    List<RelWidgetWidget> listTargetWidgetsByIds(List<String> sourceIds);
+
 }
