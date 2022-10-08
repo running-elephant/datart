@@ -392,14 +392,6 @@ const config: ChartConfig = {
             step: 1,
             min: 0,
           },
-          watcher: {
-            deps: ['enablePaging'],
-            action: props => {
-              return {
-                disabled: !props.enablePaging,
-              };
-            },
-          },
         },
       ],
     },
