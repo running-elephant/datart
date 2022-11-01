@@ -22,6 +22,7 @@ import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlWriter;
+import org.apache.calcite.sql.dialect.Db2SqlDialect;
 import org.apache.calcite.sql.dialect.H2SqlDialect;
 import org.apache.calcite.sql.dialect.MysqlSqlDialect;
 
@@ -50,7 +51,7 @@ public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, Fe
     }
 
     public H2Dialect() {
-        this(MysqlSqlDialect.DEFAULT_CONTEXT.withUnquotedCasing(Casing.UNCHANGED).withUnquotedCasing(Casing.UNCHANGED));
+        this(H2Dialect.DEFAULT_CONTEXT.withUnquotedCasing(Casing.UNCHANGED).withUnquotedCasing(Casing.UNCHANGED));
     }
 
     @Override
@@ -66,11 +67,11 @@ public class H2Dialect extends H2SqlDialect implements SqlStdOperatorSupport, Fe
         StdSqlOperator operator = symbolOf(call.getOperator().getName());
         switch (operator) {
             case AGG_DATE_YEAR:
-                writer.print("YEAR(" + call.getOperandList().get(0).toSqlString(this).getSql() + ")");
+                writer.print("EXTRACT(YEAR FROM " + call.getOperandList().get(0).toSqlString(this).getSql() + ")");
                 return true;
             case AGG_DATE_QUARTER: {
                 String columnName = call.getOperandList().get(0).toSqlString(this).getSql();
-                writer.print("CONCAT(FORMATDATETIME("+columnName+",'Y-'),QUARTER("+columnName+"))");
+                writer.print("CONCAT(EXTRACT(YEAR FROM "+columnName+"),'-',EXTRACT(QUARTER FROM "+columnName+"))");
                 return true;
             }
             case AGG_DATE_MONTH:

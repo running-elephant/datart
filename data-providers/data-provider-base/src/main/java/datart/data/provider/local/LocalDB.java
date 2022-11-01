@@ -46,7 +46,7 @@ public class LocalDB {
 
     private static final String MEM_URL = "jdbc:h2:mem:/";
 
-    private static final String H2_PARAM = ";LOG=0;DATABASE_TO_UPPER=false;MODE=MySQL;CASE_INSENSITIVE_IDENTIFIERS=TRUE;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0";
+    private static final String H2_PARAM = ";LOG=0;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE;CACHE_SIZE=65536;LOCK_MODE=0;UNDO_LOG=0";
 
 
     public static final SqlDialect SQL_DIALECT = new H2Dialect();
