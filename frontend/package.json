@@ -213,7 +213,7 @@
     "stylelint-config-recommended": "6.0.0",
     "stylelint-config-styled-components": "0.1.1",
     "stylelint-processor-styled-components": "1.10.0",
-    "typescript": "^4.2.2",
+    "typescript": "4.5.4",
     "webpack-cli": "^4.7.2",
     "webpackbar": "^5.0.0-3"
   },
