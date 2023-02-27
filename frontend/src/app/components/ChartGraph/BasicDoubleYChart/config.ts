@@ -657,7 +657,7 @@ const config: ChartConfig = {
         splitLine: {
           title: '分割线',
           showHorizonLine: '显示横向分割线',
-          showVerticalLine: '显示纵向风格线',
+          showVerticalLine: '显示纵向分割线',
         },
         reference: {
           title: '参考线',
