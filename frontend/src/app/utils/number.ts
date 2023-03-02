@@ -70,8 +70,10 @@ export function isNumber(value: any) {
   return !isEmpty(value) && !isNaN(value) && isFinite(value) && value !== '';
 }
 
-function getPrecision(num: string|number) {
-  return typeof num === 'number' ? num.toString().split('.')?.[1]?.length || 0 : num.split('.')?.[1]?.length || 0;
+function getPrecision(num: string | number) {
+  return typeof num === 'number'
+    ? num.toString().split('.')?.[1]?.length || 0
+    : num.split('.')?.[1]?.length || 0;
 }
 
 export function precisionCalculation(
@@ -86,7 +88,7 @@ export function precisionCalculation(
       return numberList.reduce((acc, cur) => {
         const num = isNaN(Number(cur)) ? 0 : Number(cur);
         const precision = Math.max(getPrecision(acc), getPrecision(num));
-        const result = Number(currency(num, {precision})[type](acc).value);
+        const result = Number(currency(num, { precision })[type](acc).value);
         return isNaN(result) ? 0 : result;
       }, 0) as number;
   }
