@@ -68,7 +68,9 @@ export function Background() {
   } else if (error) {
     content = (
       <Hint>
-        <ReloadOutlined className="img" />
+        <a href="/">
+          <ReloadOutlined className="img" />
+        </a>
         <p>{t('initError')}</p>
       </Hint>
     );
@@ -122,6 +124,7 @@ const Hint = styled.div`
   }
 
   .img {
+    display: block;
     font-size: ${SPACE_TIMES(16)};
     color: ${p => p.theme.textColorLight};
 
