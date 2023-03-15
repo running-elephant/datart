@@ -206,8 +206,8 @@ export function getTheWidgetFiltersAndParams<
       relatedViewItem,
       config: controllerConfig,
     });
+
     if (!values) {
-      console.log(`has no FilterValues return on ${chartWidget.id}`);
       return;
     }
 
