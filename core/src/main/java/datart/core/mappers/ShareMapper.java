@@ -85,6 +85,7 @@ public interface ShareMapper extends CRUDMapper {
           "viz_type = #{vizType,jdbcType=VARCHAR},",
           "viz_id = #{vizId,jdbcType=VARCHAR},",
           "authentication_mode = #{authenticationMode,jdbcType=VARCHAR},",
+          "roles = #{roles,jdbcType=VARCHAR},",
           "row_permission_by = #{rowPermissionBy,jdbcType=VARCHAR},",
           "authentication_code = #{authenticationCode,jdbcType=VARCHAR},",
           "expiry_date = #{expiryDate,jdbcType=TIMESTAMP},",
