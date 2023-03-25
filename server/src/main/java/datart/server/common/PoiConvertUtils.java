@@ -53,7 +53,7 @@ public class PoiConvertUtils {
         }
         POISettings poiSettings = buildTableHeaderInfo(chartColumns, groupColumns); //构造表头
         poiSettings.setColumnSetting(columnSetting);
-        if (columnSetting.size() != chartColumns.size()) {
+        if (columnSetting.size() != chartColumns.size() || CollectionUtils.isEmpty(chartColumns)) {
             log.warn("column setting parse failed, download with no style.");
             Map<Integer, List<Column>> map = new HashMap<>();
             map.put(0, dataframe.getColumns());
