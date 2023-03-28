@@ -246,6 +246,7 @@ class PivotSheetChart extends ReactChart {
           hoverHighlight: Boolean(enableHoverHighlight),
           selectedCellsSpotlight: Boolean(enableSelectedHighlight),
           autoResetSheetStyle: false,
+          enableCopy: true,
         },
         totals: {
           row: {
