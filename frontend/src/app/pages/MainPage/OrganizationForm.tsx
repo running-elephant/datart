@@ -92,6 +92,9 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
             },
             {
               validator: debounce((_, value) => {
+                if (!value) {
+                  return Promise.resolve();
+                }
                 if (!value.trim()) {
                   return Promise.reject(
                     `${t('name')}${tg('validation.required')}`,
