@@ -37,3 +37,13 @@ DORIS:
   adapter-class: "datart.data.provider.jdbc.adapters.DorisDataProviderAdapter"
   url-prefix: "jdbc:mysql://"
 
+STARROCKS:
+  db-type: "starrocks"
+  name: "starrocks"
+  driver-class: "com.mysql.cj.jdbc.Driver"
+  literal-quote: "'"
+  identifier-quote: "`"
+  adapter-class: "datart.data.provider.jdbc.adapters.StarRocksDataProviderAdapter"
+  url-prefix: "jdbc:mysql://"
+
+
