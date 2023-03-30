@@ -359,6 +359,7 @@ const ValuesOptionsSetter: FC<{
           validateTrigger={['onChange', 'onBlur']}
           rules={[{ required: true }]}
           style={{ marginBottom: '0' }}
+          hidden={isTree}
         >
           <Radio.Group>
             {OPERATOR_TYPE_OPTION.map(ele => {
