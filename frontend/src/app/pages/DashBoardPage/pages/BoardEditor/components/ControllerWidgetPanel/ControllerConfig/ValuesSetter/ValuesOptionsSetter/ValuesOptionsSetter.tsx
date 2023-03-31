@@ -338,7 +338,7 @@ const ValuesOptionsSetter: FC<{
 
         if ((val as string[]).length) {
           mergedConfig.assistViewFields = mergedConfig.assistViewFields.concat(
-            (val as string[])[val.length - 1],
+            (val as string[])[0],
           );
         }
       }
