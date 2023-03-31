@@ -43,7 +43,7 @@ function TreeSetter({
         mode={mode}
         optionFilterProp={'label'}
         onChange={onChange}
-        placeholder={tc('parentFieldId')}
+        placeholder={mode ? tc('parentFieldsHierarchy') : tc('parentFields')}
         showSearch
         allowClear
         options={viewFieldList}

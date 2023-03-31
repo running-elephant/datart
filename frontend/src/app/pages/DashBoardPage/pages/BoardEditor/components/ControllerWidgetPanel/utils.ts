@@ -289,7 +289,7 @@ export const getDropdownTreeControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.In;
   config.buildingMethod = 'byParent';
-  config.parentField = [];
+  config.parentFields = [];
   return config;
 };
 

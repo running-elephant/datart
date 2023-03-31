@@ -37,7 +37,7 @@ function TreeTypeSetter({ form }: TreeTypeSetterProps) {
     form?.setFieldsValue({
       config: {
         ...getControllerConfig,
-        parentField: undefined,
+        parentFields: undefined,
         controllerValues: [],
         valueOptions: [],
         assistViewFields: [],

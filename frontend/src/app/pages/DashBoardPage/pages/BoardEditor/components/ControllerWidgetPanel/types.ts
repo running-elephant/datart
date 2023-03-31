@@ -41,7 +41,7 @@ export interface ControllerConfig {
   canChangeSqlOperator?: boolean; // 是否显示 sqlOperator 切换
   assistViewFields?: string[]; //辅助添加view字段
   controllerDate?: ControllerDate; //存储时间
-  parentField?: string[]; //父节点字段
+  parentFields?: string[]; //父节点字段
   buildingMethod?: 'byParent' | 'byHierarchy'; //树控制器类型
 
   minValue?: number; // slider min
