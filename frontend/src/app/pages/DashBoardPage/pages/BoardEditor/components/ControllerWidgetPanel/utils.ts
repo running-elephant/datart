@@ -288,7 +288,7 @@ export const getRangeValueControllerConfig = () => {
 export const getDropdownTreeControllerConfig = () => {
   const config = getInitControllerConfig();
   config.sqlOperator = FilterSqlOperator.In;
-  config.treeType = 'treeControl';
+  config.buildingMethod = 'byParent';
   config.parentField = [];
   return config;
 };

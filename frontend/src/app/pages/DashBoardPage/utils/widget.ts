@@ -836,7 +836,7 @@ export const convertToTree = (col, type) => {
   let copyCol = CloneValueDeep(col);
   let emptyParentList = ['null', 'undefined', 'false'];
 
-  if (type === 'treeControl') {
+  if (type === 'byParent') {
     const parent = copyCol?.find(
       v => !v[v.length - 1] || emptyParentList.includes(v[v.length - 1]),
     ) || [null];

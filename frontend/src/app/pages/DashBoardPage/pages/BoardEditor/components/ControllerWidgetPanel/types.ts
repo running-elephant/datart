@@ -42,7 +42,7 @@ export interface ControllerConfig {
   assistViewFields?: string[]; //辅助添加view字段
   controllerDate?: ControllerDate; //存储时间
   parentField?: string[]; //父节点字段
-  treeType?: 'treeControl' | 'treeSelect'; //树控制器类型
+  buildingMethod?: 'byParent' | 'byHierarchy'; //树控制器类型
 
   minValue?: number; // slider min
   maxValue?: number; // slider max
