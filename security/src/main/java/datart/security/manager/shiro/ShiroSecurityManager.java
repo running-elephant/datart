@@ -40,6 +40,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
@@ -266,6 +267,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
 
     @Override
     public void runAs(String userNameOrEmail) {
+        ThreadContext.unbindSubject();
         User user = userMapper.selectByNameOrEmail(userNameOrEmail);
         login(JwtUtils.toJwtString(JwtUtils.createJwtToken(user)));
     }
