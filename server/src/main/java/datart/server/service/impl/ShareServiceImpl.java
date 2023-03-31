@@ -188,6 +188,10 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         BeanUtils.copyProperties(update, shareInfo);
         shareInfo.setId(update.getId());
         shareInfo.setAuthenticationMode(updateParam.getAuthenticationMode());
+        //返回基本信息,防止用户更新后再次点击操作基础信息丢失
+        shareInfo.setRowPermissionBy(updateParam.getRowPermissionBy());
+        shareInfo.setRoles(updateParam.getRoles());
+        shareInfo.setUsers(updateParam.getUsers());
 
         return shareInfo;
     }
