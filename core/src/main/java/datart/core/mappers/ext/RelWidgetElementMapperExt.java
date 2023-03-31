@@ -15,6 +15,16 @@ public interface RelWidgetElementMapperExt extends RelWidgetElementMapper {
     })
     List<RelWidgetElement> listWidgetElements(String widgetId);
 
+    @Select({
+            "<script>",
+            "SELECT * FROM rel_widget_element WHERE widget_id IN " +
+                    "<foreach collection='widgetIds' item='item' index='index' open='(' close=')' separator=','> " +
+                    " #{item} " +
+                    "</foreach>",
+            "</script>"
+    })
+    List<RelWidgetElement> listWidgetElementsByIds(@Param("widgetIds") List<String> widgetId);
+
     @Insert({
             "<script>",
             "INSERT INTO rel_widget_element (id, widget_id, rel_type, rel_id) VALUES " +

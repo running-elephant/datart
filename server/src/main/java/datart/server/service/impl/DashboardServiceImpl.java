@@ -439,6 +439,8 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     }
 
     private List<WidgetDetail> getWidgets(String dashboardId, Set<String> datachartIds, Set<String> viewIds) {
+        List<String> widgetIds = new ArrayList<>();
+
         // get all widgets details
         List<Widget> widgets = widgetMapper.listByDashboard(dashboardId);
         List<WidgetDetail> widgetDetails = widgets.stream().map(widget -> {
@@ -446,11 +448,20 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
             BeanUtils.copyProperties(widget, widgetDetail);
             widgetDetail.setViewIds(new LinkedList<>());
             widgetDetail.setRelations(new LinkedList<>());
+            widgetIds.add(widgetDetail.getId());
             return widgetDetail;
         }).collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(widgetIds)) {
+            return new ArrayList<>(0);
+        }
+        Map<String, List<RelWidgetWidget>> relWidgetWidgetsMap = rwwMapper.listTargetWidgetsByIds(widgetIds).stream().collect(Collectors.groupingBy(RelWidgetWidget::getSourceId));
+        Map<String, List<RelWidgetElement>> elementsMap = rweMapper.listWidgetElementsByIds(widgetIds).stream().collect(Collectors.groupingBy(RelWidgetElement::getWidgetId));
+
+
         for (WidgetDetail widgetDetail : widgetDetails) {
-            widgetDetail.setRelations(rwwMapper.listTargetWidgets(widgetDetail.getId()));
-            List<RelWidgetElement> elements = rweMapper.listWidgetElements(widgetDetail.getId());
+            widgetDetail.setRelations(Optional.ofNullable(relWidgetWidgetsMap.get(widgetDetail.getId())).orElse(new ArrayList<>(0)));
+            List<RelWidgetElement> elements = Optional.ofNullable(elementsMap.get(widgetDetail.getId())).orElse(new ArrayList<>(0));
             for (RelWidgetElement element : elements) {
                 if (ResourceType.DATACHART.name().equals(element.getRelType())) {
                     if (datachartIds != null) {
