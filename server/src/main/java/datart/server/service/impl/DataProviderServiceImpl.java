@@ -453,7 +453,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                             names = item.getJSONArray("name").toArray(new String[0]);
                         }
                     } else {
-                        names = new String[]{item.getString("name")};
+                        names = new String[]{Optional.ofNullable(item.getString("name")).orElse(key)};
                     }
                     Column column = Column.of(ValueType.valueOf(item.getString("type")), names);
                     schema.put(column.columnKey(), column);
