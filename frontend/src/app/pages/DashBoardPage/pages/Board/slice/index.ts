@@ -352,7 +352,7 @@ const boardSlice = createSlice({
       if (errInfo) {
         widgetInfo.errInfo[errorType] = errInfo;
       } else {
-        delete widgetInfo[errorType];
+        delete widgetInfo.errInfo[errorType];
       }
     },
     resetControlWidgets(

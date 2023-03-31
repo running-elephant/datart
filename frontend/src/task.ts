@@ -87,11 +87,11 @@ const getBoardQueryData = (dataStr: string) => {
 const getChartQueryData = (dataStr: string) => {
   // see  handleCreateDownloadDataTask
   const data: ChartDTO = JSON.parse(dataStr || '{}');
-  const dataConfig: ChartDetailConfigDTO = JSON.parse(
-    (data.config as any) || '{}',
-  );
-  const chartConfig: ChartConfig = dataConfig.chartConfig as ChartConfig;
+
   const chartData = convertToChartDto(data);
+  const dataConfig: ChartDetailConfigDTO = chartData.config;
+
+  const chartConfig: ChartConfig = dataConfig.chartConfig as ChartConfig;
   const builder = new ChartDataRequestBuilder(
     {
       ...chartData.view,

@@ -9,6 +9,7 @@ import {
   getScheduleErrorLogs,
   getSchedules,
   unarchiveSchedule,
+  updateScheduleBase,
 } from './thunks';
 import { ScheduleState } from './types';
 
@@ -24,6 +25,7 @@ export const initialState: ScheduleState = {
   deleteLoading: false,
   logs: [],
   logsLoading: false,
+  updateLoading: false,
 };
 
 const slice = createSlice({
@@ -49,7 +51,10 @@ const slice = createSlice({
     });
     builder.addCase(getSchedules.fulfilled, (state, action) => {
       state.scheduleListLoading = false;
-      state.schedules = action.payload;
+      state.schedules = action.payload.map(v => ({
+        ...v,
+        deleteLoading: false,
+      }));
     });
     builder.addCase(getSchedules.rejected, state => {
       state.scheduleListLoading = false;
@@ -60,7 +65,10 @@ const slice = createSlice({
     });
     builder.addCase(getArchivedSchedules.fulfilled, (state, action) => {
       state.archivedListLoading = false;
-      state.archived = action.payload;
+      state.archived = action.payload.map(v => ({
+        ...v,
+        deleteLoading: false,
+      }));
     });
     builder.addCase(getArchivedSchedules.rejected, state => {
       state.archivedListLoading = false;
@@ -71,7 +79,7 @@ const slice = createSlice({
     });
     builder.addCase(getScheduleDetails.fulfilled, (state, action) => {
       state.scheduleDetailsLoading = false;
-      state.editingSchedule = action.payload;
+      state.editingSchedule = { ...action.payload, deleteLoading: false };
     });
     builder.addCase(getScheduleDetails.rejected, state => {
       state.scheduleDetailsLoading = false;
@@ -80,8 +88,9 @@ const slice = createSlice({
     builder.addCase(addSchedule.pending, state => {
       state.saveLoading = true;
     });
-    builder.addCase(addSchedule.fulfilled, state => {
+    builder.addCase(addSchedule.fulfilled, (state, action) => {
       state.saveLoading = false;
+      state.schedules?.unshift({ ...action.payload, deleteLoading: false });
     });
     builder.addCase(addSchedule.rejected, state => {
       state.saveLoading = false;
@@ -105,7 +114,7 @@ const slice = createSlice({
     builder.addCase(unarchiveSchedule.fulfilled, (state, action) => {
       state.unarchiveScheduleLoading = false;
       state.archived = state.archived.filter(
-        ({ id }) => id !== action.meta.arg.id,
+        ({ id }) => id !== action.meta.arg.schedule.id,
       );
     });
     builder.addCase(unarchiveSchedule.rejected, state => {
@@ -113,23 +122,29 @@ const slice = createSlice({
     });
 
     // deleteSchedule
-    builder.addCase(deleteSchedule.pending, state => {
-      state.deleteLoading = true;
-    });
-    builder.addCase(deleteSchedule.fulfilled, (state, action) => {
-      state.deleteLoading = false;
-      if (action.meta.arg.archive) {
-        state.schedules = state.schedules.filter(
-          ({ id }) => id !== action.meta.arg.id,
-        );
-      } else {
-        state.archived = state.archived.filter(
-          ({ id }) => id !== action.meta.arg.id,
-        );
+    builder.addCase(deleteSchedule.pending, (state, action) => {
+      const schedule =
+        state.schedules?.find(({ id }) => id === action.meta.arg.id) ||
+        state.archived?.find(({ id }) => id === action.meta.arg.id);
+      if (schedule) {
+        schedule.deleteLoading = true;
       }
     });
-    builder.addCase(deleteSchedule.rejected, state => {
-      state.deleteLoading = false;
+    builder.addCase(deleteSchedule.fulfilled, (state, action) => {
+      state.schedules = state.schedules.filter(
+        ({ id }) => id !== action.meta.arg.id,
+      );
+      state.archived = state.archived.filter(
+        ({ id }) => id !== action.meta.arg.id,
+      );
+    });
+    builder.addCase(deleteSchedule.rejected, (state, action) => {
+      const schedule =
+        state.schedules?.find(({ id }) => id === action.meta.arg.id) ||
+        state.archived?.find(({ id }) => id === action.meta.arg.id);
+      if (schedule) {
+        schedule.deleteLoading = false;
+      }
     });
 
     // getScheduleErrorLogs
@@ -142,6 +157,27 @@ const slice = createSlice({
     });
     builder.addCase(getScheduleErrorLogs.rejected, state => {
       state.logsLoading = false;
+    });
+
+    // updateScheduleBase
+    builder.addCase(updateScheduleBase.pending, state => {
+      state.updateLoading = true;
+    });
+    builder.addCase(updateScheduleBase.fulfilled, (state, action) => {
+      state.updateLoading = false;
+      state.schedules = state.schedules.map(v =>
+        v.id === action.payload.id
+          ? {
+              ...v,
+              ...action.payload,
+              parentId: action.payload.parentId || null,
+              deleteLoading: false,
+            }
+          : v,
+      );
+    });
+    builder.addCase(updateScheduleBase.rejected, state => {
+      state.updateLoading = false;
     });
   },
 });

@@ -445,5 +445,6 @@ export type WidgetErrorType = 'request' | 'interaction';
 export type WidgetLinkInfo = {
   sourceWidgetId?: string;
   filters?: PendingChartDataRequestFilter[];
+  tempFilters?: PendingChartDataRequestFilter[];
   variables?: Record<string, any[]>;
 };

@@ -224,6 +224,7 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
     widgetId: string;
     option?: getDataOption;
     extraFilters?: PendingChartDataRequestFilter[];
+    tempFilters?: PendingChartDataRequestFilter[];
     variableParams?: Record<string, any[]>;
   } & {
     executeToken?: any;
@@ -238,6 +239,7 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
       widgetId,
       option,
       extraFilters,
+      tempFilters,
       variableParams,
       executeToken,
     },
@@ -273,7 +275,7 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
     )
       .addVariableParams(variableParams)
       .addExtraSorters(option?.sorters as any[])
-      .addRuntimeFilters(extraFilters)
+      .addRuntimeFilters((extraFilters || []).concat(tempFilters || []))
       .addDrillOption(drillOption)
       .build();
 
@@ -295,6 +297,7 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
           linkInfo: {
             sourceWidgetId,
             filters: extraFilters,
+            tempFilters: tempFilters,
             variables: variableParams,
           },
         }),
@@ -494,10 +497,16 @@ export const getControllerOptions = createAsyncThunk<
 
     const [viewId, ...columns] = config.assistViewFields;
 
+    const parentFields = config?.parentFields;
+
     const executeToken = executeTokenMap?.[viewId];
 
     const view = viewMap[viewId];
     if (!view) return null;
+    if (parentFields) {
+      columns.push(...parentFields);
+    }
+
     const requestParams = getControlOptionQueryParams({
       view,
       columns: columns,

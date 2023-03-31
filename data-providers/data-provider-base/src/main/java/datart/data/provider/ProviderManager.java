@@ -18,8 +18,8 @@
 
 package datart.data.provider;
 
-import datart.core.base.processor.ExtendProcessor;
 import datart.core.base.exception.Exceptions;
+import datart.core.base.processor.ExtendProcessor;
 import datart.core.base.processor.ProcessorResponse;
 import datart.core.data.provider.*;
 import datart.core.data.provider.processor.DataProviderPostProcessor;
@@ -33,7 +33,7 @@ import org.springframework.util.CollectionUtils;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Slf4j
@@ -42,13 +42,30 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
     @Autowired(required = false)
     private List<ExtendProcessor> extendProcessors = new ArrayList<ExtendProcessor>();
 
-    private static final Map<String, DataProvider> cachedDataProviders = new ConcurrentSkipListMap<>();
+    private static final Map<String, DataProvider> cachedDataProviders = new ConcurrentHashMap<>();
+
+    public Map<String, DataProvider> getDataProviders() {
+        if (cachedDataProviders.isEmpty()) {
+            synchronized (ProviderManager.class) {
+                if (cachedDataProviders.isEmpty()) {
+                    ServiceLoader<DataProvider> load = ServiceLoader.load(DataProvider.class);
+                    for (DataProvider dataProvider : load) {
+                        try {
+                            cachedDataProviders.put(dataProvider.getType(), dataProvider);
+                        } catch (IOException e) {
+                            log.error("", e);
+                        }
+                    }
+                }
+            }
+        }
+        return cachedDataProviders;
+    }
 
     @Override
     public List<DataProviderInfo> getSupportedDataProviders() {
         ArrayList<DataProviderInfo> providerInfos = new ArrayList<>();
-        loadDataProviders();
-        for (DataProvider dataProvider : cachedDataProviders.values()) {
+        for (DataProvider dataProvider : getDataProviders().values()) {
             try {
                 providerInfos.add(dataProvider.getBaseInfo());
             } catch (IOException e) {
@@ -212,26 +229,13 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
 
 
     private DataProvider getDataProviderService(String type) {
-        if (cachedDataProviders.size() == 0) {
-            loadDataProviders();
-        }
-        DataProvider dataProvider = cachedDataProviders.get(type);
+        DataProvider dataProvider = getDataProviders().get(type);
         if (dataProvider == null) {
             Exceptions.msg("No data provider type " + type);
         }
         return dataProvider;
     }
 
-    private void loadDataProviders() {
-        ServiceLoader<DataProvider> load = ServiceLoader.load(DataProvider.class);
-        for (DataProvider dataProvider : load) {
-            try {
-                cachedDataProviders.put(dataProvider.getType(), dataProvider);
-            } catch (IOException e) {
-                log.error("", e);
-            }
-        }
-    }
 
     @Override
     public Dataframe run(DataProviderSource source, QueryScript queryScript, ExecuteParam param) throws Exception {

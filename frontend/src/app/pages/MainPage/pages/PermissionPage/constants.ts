@@ -62,6 +62,17 @@ export const RESOURCE_TYPE_PERMISSION_MAPPING = {
     PermissionLevels.Share,
     PermissionLevels.Create,
   ],
+  [ResourceTypes.Viz + VizResourceSubTypes.Folder]: [
+    PermissionLevels.Read,
+    PermissionLevels.Download,
+    PermissionLevels.Share,
+    PermissionLevels.Create,
+  ],
+  [ResourceTypes.Viz + VizResourceSubTypes.Storyboard]: [
+    PermissionLevels.Read,
+    PermissionLevels.Share,
+    PermissionLevels.Create,
+  ],
   [ResourceTypes.View]: [PermissionLevels.Read, PermissionLevels.Create],
   [ResourceTypes.Source]: [PermissionLevels.Read, PermissionLevels.Create],
   [ResourceTypes.Schedule]: [PermissionLevels.Create],

@@ -201,7 +201,6 @@ const Wrapper = styled.div<{}>`
   align-items: center;
   width: 100px;
   min-height: 0;
-  overflow-y: auto;
 
   .react-resizable-handle {
     z-index: ${LEVEL_100};
@@ -216,6 +215,7 @@ const StyledContainer = styled(StyledBackground)<{ curWH: number[] }>`
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow-y: auto;
 
   &.desktop {
     flex: 1;

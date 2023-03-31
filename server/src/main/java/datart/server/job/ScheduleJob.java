@@ -16,7 +16,6 @@ import datart.core.entity.User;
 import datart.core.mappers.ext.ScheduleLogMapperExt;
 import datart.core.mappers.ext.ScheduleMapperExt;
 import datart.core.mappers.ext.UserMapperExt;
-import datart.security.base.PasswordToken;
 import datart.security.base.ResourceType;
 import datart.security.manager.DatartSecurityManager;
 import datart.server.base.dto.DashboardDetail;
@@ -159,7 +158,7 @@ public abstract class ScheduleJob implements Job, Closeable {
 
         if (ResourceType.DATACHART.name().equals(folder.getRelType())
                 && !CollectionUtils.isEmpty(result.getDownloadParams())
-                && result.getDownloadParams().size()==1) {
+                && result.getDownloadParams().size() == 1) {
             ViewExecuteParam viewExecuteParam = result.getDownloadParams().get(0);
             if (attachmentType.equals(AttachmentType.EXCEL)) {
                 viewExecuteParam.setVizId(folder.getRelId());
@@ -168,7 +167,7 @@ public abstract class ScheduleJob implements Job, Closeable {
                 viewExecuteParam.setVizId(folder.getId());
             }
         } else if (ResourceType.DASHBOARD.name().equals(folder.getRelType())
-                && (attachmentType.equals(AttachmentType.IMAGE) || attachmentType.equals(AttachmentType.PDF)) ) {
+                && (attachmentType.equals(AttachmentType.IMAGE) || attachmentType.equals(AttachmentType.PDF))) {
             ViewExecuteParam viewExecuteParam = new ViewExecuteParam();
             viewExecuteParam.setVizId(folder.getId());
             viewExecuteParam.setVizType(ResourceType.DASHBOARD);
@@ -212,7 +211,7 @@ public abstract class ScheduleJob implements Job, Closeable {
 
     private void login(String userId) {
         User user = Application.getBean(UserMapperExt.class).selectByPrimaryKey(userId);
-        securityManager.login(new PasswordToken(user.getUsername(), user.getPassword(), System.currentTimeMillis()));
+        securityManager.runAs(user.getUsername());
     }
 
 }

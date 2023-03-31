@@ -21,9 +21,7 @@ export const BasicBaseForm: FC<BasicBaseFormProps> = ({
   children,
   ...restProps
 }) => {
-  const t = useI18NPrefix(
-    'main.pages.schedulePage.sidebar.editorPage.basicBaseForm.index',
-  );
+  const t = useI18NPrefix('schedule.editor.basicBaseForm.index');
   const checkNameUnique = useCallback(
     async (_, name) => {
       if (!isAdd && initialName === name) {

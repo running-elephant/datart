@@ -32,7 +32,6 @@ import datart.core.data.provider.StdSqlOperator;
 import datart.core.entity.*;
 import datart.core.mappers.ext.ShareMapperExt;
 import datart.core.mappers.ext.UserMapperExt;
-import datart.security.base.PasswordToken;
 import datart.security.base.ResourceType;
 import datart.security.exception.PermissionDeniedException;
 import datart.security.util.AESUtil;
@@ -189,6 +188,10 @@ public class ShareServiceImpl extends BaseService implements ShareService {
         BeanUtils.copyProperties(update, shareInfo);
         shareInfo.setId(update.getId());
         shareInfo.setAuthenticationMode(updateParam.getAuthenticationMode());
+        //返回基本信息,防止用户更新后再次点击操作基础信息丢失
+        shareInfo.setRowPermissionBy(updateParam.getRowPermissionBy());
+        shareInfo.setRoles(updateParam.getRoles());
+        shareInfo.setUsers(updateParam.getUsers());
 
         return shareInfo;
     }
@@ -409,7 +412,7 @@ public class ShareServiceImpl extends BaseService implements ShareService {
                 if (ShareRowPermissionBy.CREATOR.name().equals(share.getRowPermissionBy())) {
                     return;
                 }
-                getSecurityManager().login(new PasswordToken(shareToken.getUsername(), shareToken.getPassword(), System.currentTimeMillis()));
+                getSecurityManager().runAs(shareToken.getUsername());
                 if (getSecurityManager().isOrgOwner(share.getOrgId())) {
                     return;
                 }

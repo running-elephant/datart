@@ -27,6 +27,7 @@ export enum TenantManagementMode {
 export enum ControllerFacadeTypes {
   DropdownList = 'dropdownList',
   MultiDropdownList = 'multiDropdownList',
+  DropDownTree = 'dropDownTree',
 
   RadioGroup = 'radioGroup',
   CheckboxGroup = 'checkboxGroup',
@@ -265,4 +266,9 @@ export enum ChartInteractionEvent {
   Drilled = 'drilled',
   PagingOrSort = 'paging-sort-filter',
   ChangeContext = 'rich-text-change-context',
+}
+
+export enum DateFormat {
+  DateTime = 'YYYY-MM-DD HH:mm:ss',
+  Date = 'YYYY-MM-DD',
 }

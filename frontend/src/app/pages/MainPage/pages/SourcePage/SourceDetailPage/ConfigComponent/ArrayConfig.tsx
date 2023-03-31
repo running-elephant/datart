@@ -141,9 +141,7 @@ export function ArrayConfig({
     (formValues: SourceFormModel) => {
       const configRowKey = attr.key;
       if (value && configRowKey) {
-        const index = value.findIndex(
-          o => o[configRowKey] === formValues.config[configRowKey],
-        );
+        const index = value.findIndex(o => o[configRowKey] === editingRowKey);
         if (index >= 0) {
           onChange &&
             onChange([
@@ -159,7 +157,7 @@ export function ArrayConfig({
       }
       setFormVisible(false);
     },
-    [attr, value, onChange],
+    [attr.key, value, editingRowKey, onChange],
   );
 
   const editConfig = useCallback(

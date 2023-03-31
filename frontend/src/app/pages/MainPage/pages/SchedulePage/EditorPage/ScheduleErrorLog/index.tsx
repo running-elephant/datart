@@ -21,9 +21,7 @@ export const ScheduleErrorLog: FC<ScheduleErrorLogProps> = ({ scheduleId }) => {
   const logs = useSelector(selectScheduleLogs),
     loading = useSelector(selectScheduleLogsLoading);
   const { actions } = useScheduleSlice();
-  const t = useI18NPrefix(
-    'main.pages.schedulePage.sidebar.editorPage.scheduleErrorLog.index',
-  );
+  const t = useI18NPrefix('schedule.editor.scheduleErrorLog.index');
   useEffect(() => {
     if (scheduleId) {
       dispatch(getScheduleErrorLogs({ scheduleId, count: 100 }));

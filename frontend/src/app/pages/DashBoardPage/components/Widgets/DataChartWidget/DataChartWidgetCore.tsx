@@ -23,6 +23,7 @@ import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
 import {
   ChartDataSectionType,
   ChartDataViewFieldCategory,
+  ChartInteractionEvent,
 } from 'app/constants';
 import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import { useCacheWidthHeight } from 'app/hooks/useCacheWidthHeight';
@@ -455,6 +456,14 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                 if (!params) {
                   return;
                 }
+
+                if (
+                  params?.interactionType === ChartInteractionEvent.PagingOrSort
+                ) {
+                  onWidgetChartClick(widgetRef.current, params);
+                  return;
+                }
+
                 handleDrillThroughEvent(
                   buildDrillThroughEventParams(
                     params,
@@ -481,7 +490,6 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
                 chartSelectionEventListener(params, p => {
                   changeSelectedItems(dispatch, renderMode, p, wid);
                 });
-                onWidgetChartClick(widgetRef.current, params);
               },
             },
             {

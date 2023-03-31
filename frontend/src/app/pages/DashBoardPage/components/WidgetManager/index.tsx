@@ -18,6 +18,7 @@
 import type { WidgetProto } from '../../types/widgetTypes';
 import checkboxGroupProto from '../Widgets/ControllerWidget/config/checkboxGroup';
 import dropdownListProto from '../Widgets/ControllerWidget/config/dropdownList';
+import dropDownTree from '../Widgets/ControllerWidget/config/dropDownTree';
 import multiDropdownListProto from '../Widgets/ControllerWidget/config/multiDropdownList';
 import radioGroupProto from '../Widgets/ControllerWidget/config/radioGroup';
 import rangeTimeProto from '../Widgets/ControllerWidget/config/rangeTimeProto';
@@ -56,6 +57,7 @@ const protoList: WidgetProto[] = [
   radioGroupProto,
   textProto,
   timeProto,
+  dropDownTree,
   rangeTimeProto,
   rangeValueProto,
   valueProto,

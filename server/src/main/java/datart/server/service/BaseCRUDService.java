@@ -228,7 +228,7 @@ public interface BaseCRUDService<E extends BaseEntity, M extends CRUDMapper> {
         return null;
     }
 
-    default boolean safeDelete(String viewId) {
+    default boolean safeDelete(String id) {
         return true;
     }
 

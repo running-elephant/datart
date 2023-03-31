@@ -294,7 +294,9 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     @Override
     public Source createSource(SourceCreateParam createParam) {
         Source source = create(createParam);
-        updateJdbcSourceSyncJob(source);
+        if (!source.getIsFolder()) {
+            updateJdbcSourceSyncJob(source);
+        }
         return source;
     }
 
@@ -303,20 +305,19 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     public Source create(BaseCreateParam createParam) {
         // encrypt property
         SourceCreateParam sourceCreateParam = (SourceCreateParam) createParam;
-        try {
-            sourceCreateParam.setConfig(encryptConfig(sourceCreateParam.getType(), sourceCreateParam.getConfig()));
-        } catch (Exception e) {
-            Exceptions.e(e);
-        }
-
         if (Objects.equals(sourceCreateParam.getIsFolder(), Boolean.TRUE)) {
             sourceCreateParam.setType(ResourceType.FOLDER.name());
         } else {
             sourceCreateParam.setIsFolder(Boolean.FALSE);
         }
-
+        if (!sourceCreateParam.getIsFolder()) {
+            try {
+                sourceCreateParam.setConfig(encryptConfig(sourceCreateParam.getType(), sourceCreateParam.getConfig()));
+            } catch (Exception e) {
+                Exceptions.e(e);
+            }
+        }
         Source source = SourceService.super.create(createParam);
-
         grantDefaultPermission(source);
         return source;
 
@@ -345,17 +346,30 @@ public class SourceServiceImpl extends BaseService implements SourceService {
             check.setName(updateParam.getName());
             checkUnique(check);
         }
-
-        // update base info
-        if (source.getIsFolder()) {
-            source.setType(ResourceType.FOLDER.name());
-        }
         source.setId(updateParam.getId());
         source.setUpdateBy(getCurrentUser().getId());
         source.setUpdateTime(new Date());
         source.setName(updateParam.getName());
         source.setParentId(updateParam.getParentId());
         source.setIndex(updateParam.getIndex());
+        return 1 == sourceMapper.updateByPrimaryKey(source);
+    }
+
+    @Override
+    public boolean unarchive(String id, String newName, String parentId, double index) {
+        Source source = retrieve(id);
+        requirePermission(source, Const.MANAGE);
+
+        //check name
+        if (!source.getName().equals(newName)) {
+            checkUnique(source.getOrgId(), parentId, newName);
+        }
+
+        // update status
+        source.setName(newName);
+        source.setParentId(parentId);
+        source.setStatus(Const.DATA_STATUS_ACTIVE);
+        source.setIndex(index);
         return 1 == sourceMapper.updateByPrimaryKey(source);
     }
 
@@ -423,6 +437,11 @@ public class SourceServiceImpl extends BaseService implements SourceService {
     public void deleteReference(Source source) {
         deleteJdbcSourceSyncJob(source);
         sourceSchemasMapper.deleteBySource(source.getId());
+    }
+
+    @Override
+    public boolean safeDelete(String id) {
+        return sourceMapper.checkReference(id) == 0;
     }
 
     @Override

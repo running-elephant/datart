@@ -38,6 +38,9 @@ export function errorHandle(error) {
 }
 
 export function getErrorMessage(error) {
+  if (typeof error === 'string') {
+    return error;
+  }
   if (error?.response) {
     const { response } = error as AxiosError;
     switch (response?.status) {
@@ -93,7 +96,9 @@ export function listToTree<
   parentId: null | string = null,
   parentPath: string[] = [],
   options?: {
-    getIcon?: (o: T) => ReactElement | ((props: TreeNodeProps) => ReactElement);
+    getIcon?: (
+      o: T,
+    ) => ReactElement | ((props: TreeNodeProps) => ReactElement) | undefined;
     getDisabled?: (o: T, path: string[]) => boolean;
     getSelectable?: (o: T) => boolean;
     filter?: (path: string[], o: T) => boolean;

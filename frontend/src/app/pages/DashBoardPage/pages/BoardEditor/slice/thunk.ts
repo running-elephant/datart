@@ -1,4 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import migrateWidgetChartConfig from 'app/migration/BoardConfig/migrateWidgetChartConfig';
 import migrateWidgetConfig from 'app/migration/BoardConfig/migrateWidgetConfig';
 import { migrateWidgets } from 'app/migration/BoardConfig/migrateWidgets';
 import { ChartDataRequestBuilder } from 'app/models/ChartDataRequestBuilder';
@@ -116,6 +117,7 @@ export const fetchEditBoardDetail = createAsyncThunk<
     );
     let migratedWidgets = migrateWidgets(serverWidgets, boardType);
     migratedWidgets = migrateWidgetConfig(migratedWidgets);
+    migratedWidgets = migrateWidgetChartConfig(migratedWidgets);
     const { widgetMap, wrappedDataCharts } = getWidgetMap(
       migratedWidgets, //todo
       dataCharts,
@@ -450,13 +452,22 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
     widgetId: string;
     option?: getDataOption;
     extraFilters?: PendingChartDataRequestFilter[];
+    tempFilters?: PendingChartDataRequestFilter[];
     variableParams?: Record<string, any[]>;
   },
   { state: RootState }
 >(
   'board/syncEditBoardWidgetChartDataAsync',
   async (
-    { boardId, sourceWidgetId, widgetId, option, extraFilters, variableParams },
+    {
+      boardId,
+      sourceWidgetId,
+      widgetId,
+      option,
+      extraFilters,
+      tempFilters,
+      variableParams,
+    },
     { getState, dispatch },
   ) => {
     const boardState = getState() as { board: BoardState };
@@ -490,7 +501,7 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
     )
       .addVariableParams(variableParams)
       .addExtraSorters(option?.sorters as any[])
-      .addRuntimeFilters(extraFilters)
+      .addRuntimeFilters((extraFilters || []).concat(tempFilters || []))
       .addDrillOption(drillOption)
       .build();
 
@@ -534,6 +545,7 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
         linkInfo: {
           sourceWidgetId,
           filters: extraFilters,
+          tempFilters: tempFilters,
           variables: variableParams,
         },
       }),
@@ -672,11 +684,15 @@ export const getEditControllerOptions = createAsyncThunk<
     if (!Array.isArray(config.assistViewFields)) return null;
     if (config.assistViewFields.length < 2) return null;
 
+    const parentFields = config?.parentFields;
     const boardState = rootState.board as BoardState;
     const viewMap = boardState.viewMap;
     const [viewId, ...columns] = config.assistViewFields;
     const view = viewMap[viewId];
     if (!view) return null;
+    if (parentFields) {
+      columns.push(...parentFields);
+    }
     const requestParams = getControlOptionQueryParams({
       view,
       columns: columns,

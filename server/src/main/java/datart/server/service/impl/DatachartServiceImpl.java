@@ -303,8 +303,8 @@ public class DatachartServiceImpl extends BaseService implements DatachartServic
     }
 
     @Override
-    public boolean safeDelete(String datachartId) {
-        return datachartMapper.countWidgetRels(datachartId) == 0;
+    public boolean safeDelete(String id) {
+        return datachartMapper.countWidgetRels(id) == 0;
     }
 
     @Override

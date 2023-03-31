@@ -84,6 +84,7 @@ export const WidgetMapper: React.FC<{
     case ORIGINAL_TYPE_MAP.rangeValue:
     case ORIGINAL_TYPE_MAP.value:
     case ORIGINAL_TYPE_MAP.slider:
+    case ORIGINAL_TYPE_MAP.dropDownTree:
       return (
         <WidgetDataProvider
           widgetId={widget.id}

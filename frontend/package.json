@@ -27,8 +27,8 @@
     "eslint": "eslint --ext js,ts,tsx",
     "lint": "npm run eslint src",
     "lint:fix": "npm run eslint --fix src",
-    "lint:css": "npx stylelint 'src/**/*.css'",
-    "lint:style": "npx stylelint 'src/**/*.{js,ts,jsx,tsx}'",
+    "lint:css": "npx stylelint \"src/**/*.css\"",
+    "lint:style": "npx stylelint \"src/**/*.{js,ts,jsx,tsx}\"",
     "prettify": "prettier --write src",
     "prepare": "cd .. && husky install frontend/.husky",
     "eject": "react-scripts eject",
@@ -92,7 +92,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.5.0",
     "@ant-design/pro-table": "2.60.1",
-    "@antv/s2": "1.18",
+    "@antv/s2": "1.19.0",
     "@antv/s2-react": "1.18.0",
     "@dinero.js/currencies": "^2.0.0-alpha.8",
     "@reduxjs/toolkit": "^1.8.0",
@@ -141,7 +141,7 @@
     "redux-undo": "^1.0.1",
     "reveal.js": "^4.1.0",
     "split.js": "^1.6.4",
-    "sql-formatter": "^4.0.2",
+    "sql-formatter": "9.2.0",
     "uuid": "^8.3.2",
     "video-react": "^0.15.0"
   },

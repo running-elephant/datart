@@ -118,16 +118,19 @@ const slice = createSlice({
       state.scheduleListLoading = true;
     });
     builder.addCase(getSchedules.fulfilled, (state, action) => {
+      const root = generateRootNode(ResourceTypes.Schedule);
       state.scheduleListLoading = false;
-      state.schedules = action.payload.map(({ id, name }) => ({
-        id,
-        name,
-        type: ResourceTypes.Schedule,
-        parentId: null,
-        index: null,
-        isFolder: false,
-        permissionArray: getDefaultPermissionArray(),
-      }));
+      state.schedules = [root].concat(
+        action.payload.map(({ id, name, parentId, index, isFolder }) => ({
+          id,
+          name,
+          index,
+          type: root.type,
+          parentId: parentId === null ? root.id : parentId,
+          isFolder,
+          permissionArray: getDefaultPermissionArray(),
+        })),
+      );
     });
     builder.addCase(getSchedules.rejected, state => {
       state.scheduleListLoading = false;
@@ -138,16 +141,19 @@ const slice = createSlice({
       state.sourceListLoading = true;
     });
     builder.addCase(getSources.fulfilled, (state, action) => {
+      const root = generateRootNode(ResourceTypes.Source);
       state.sourceListLoading = false;
-      state.sources = action.payload.map(({ id, name }) => ({
-        id,
-        name,
-        type: ResourceTypes.Source,
-        parentId: null,
-        index: null,
-        isFolder: false,
-        permissionArray: getDefaultPermissionArray(),
-      }));
+      state.sources = [root].concat(
+        action.payload.map(({ id, name, parentId, index, isFolder }) => ({
+          id,
+          name,
+          index,
+          type: ResourceTypes.Source,
+          parentId: parentId === null ? root.id : parentId,
+          isFolder,
+          permissionArray: getDefaultPermissionArray(),
+        })),
+      );
     });
     builder.addCase(getSources.rejected, state => {
       state.sourceListLoading = false;
@@ -209,16 +215,22 @@ const slice = createSlice({
       state.storyboardListLoading = true;
     });
     builder.addCase(getStoryboards.fulfilled, (state, action) => {
+      const root = generateRootNode(
+        ResourceTypes.Viz,
+        VizResourceSubTypes.Storyboard,
+      );
       state.storyboardListLoading = false;
-      state.storyboards = action.payload.map(({ id, name }) => ({
-        id,
-        name,
-        type: ResourceTypes.Viz,
-        parentId: null,
-        index: null,
-        isFolder: false,
-        permissionArray: getDefaultPermissionArray(),
-      }));
+      state.storyboards = [root].concat(
+        action.payload.map(({ id, name, parentId, index, isFolder }) => ({
+          id,
+          name,
+          type: root.type,
+          parentId: parentId === null ? root.id : parentId,
+          index,
+          isFolder,
+          permissionArray: getDefaultPermissionArray(),
+        })),
+      );
     });
     builder.addCase(getStoryboards.rejected, state => {
       state.storyboardListLoading = false;

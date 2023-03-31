@@ -87,7 +87,7 @@ public class SourceController extends BaseController {
     public ResponseData<Boolean> deleteSource(@PathVariable String sourceId,
                                               @RequestParam boolean archive) {
         checkBlank(sourceId, "sourceId");
-        return ResponseData.success(sourceService.delete(sourceId, archive));
+        return ResponseData.success(sourceService.delete(sourceId, archive, true));
     }
 
     @ApiOperation(value = "list archived source")
@@ -98,8 +98,11 @@ public class SourceController extends BaseController {
 
     @ApiOperation(value = "unarchive a source")
     @PutMapping(value = "/unarchive/{sourceId}")
-    public ResponseData<Boolean> unarchive(@PathVariable String sourceId) {
-        return ResponseData.success(sourceService.unarchive(sourceId));
+    public ResponseData<Boolean> unarchive(@PathVariable String sourceId,
+                                           @RequestParam String name,
+                                           @RequestParam Double index,
+                                           @RequestParam(required = false) String parentId) {
+        return ResponseData.success(sourceService.unarchive(sourceId, name, parentId, index));
     }
 
     @ApiOperation(value = "get source schemas ")

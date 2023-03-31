@@ -17,7 +17,7 @@
  */
 
 import { TreeDataNode, TreeNodeProps } from 'antd';
-import { DataViewFieldType } from 'app/constants';
+import { DataViewFieldType, DateFormat } from 'app/constants';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { ReactElement } from 'react';
 import { View } from '../../../../../types/View';
@@ -110,6 +110,7 @@ export interface QueryResult {
   pageInfo: PageInfo;
   script?: string;
   warnings?: string[] | null;
+  reqColumns?: { column: []; alias: string }[];
 }
 export interface PageInfo {
   pageNo: number;
@@ -131,7 +132,7 @@ export enum ColumnRole {
 export interface Column extends Schema {
   category?: ColumnCategories;
   index?: number;
-
+  dateFormat?: DateFormat;
   role?: ColumnRole;
   children?: Column[];
   path?: string[];

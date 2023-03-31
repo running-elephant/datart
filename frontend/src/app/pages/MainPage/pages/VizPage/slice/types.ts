@@ -54,27 +54,52 @@ export interface FolderViewModel extends Folder {
 }
 
 export interface Storyboard {
-  config: string;
-  createBy: string;
-  createTime: string;
+  config?: string;
+  createBy?: string;
+  createTime?: string;
   id: string;
   name: string;
   orgId: string;
-  permission: number;
-  status: number;
+  parentId: string | null;
+  permission?: number;
+  status?: number;
   updateBy?: string;
   updateTime?: string;
 }
 
-export interface StoryboardViewModel extends Storyboard {
+export interface StoryboardSimple extends Storyboard {
+  isFolder: boolean;
+  index: number | null;
+}
+
+export interface StoryboardViewModel extends StoryboardSimple {
   deleteLoading: boolean;
+}
+
+export interface SelectStoryboardTree {
+  getIcon: (
+    o: StoryboardViewModel,
+  ) => ReactElement | ((props: TreeNodeProps) => ReactElement);
+  getDisabled?: (o: StoryboardViewModel) => boolean;
+}
+
+export interface SelectVizStoryboardTree {
+  id?: string;
+  getDisabled: (o: StoryboardViewModel, path: string[]) => boolean;
+}
+
+export interface SelectArchivedTree {
+  getDisabled?: (o: ArchivedViz) => boolean;
 }
 
 export interface ArchivedViz {
   id: string;
   name: string;
   vizType: VizType;
-  loading: boolean;
+  deleteLoading: boolean;
+  parentId: string | null;
+  isFolder: boolean;
+  index: number | null;
 }
 
 export interface ChartPreview {
@@ -139,13 +164,23 @@ export interface PublishVizParams {
   resolve: () => void;
 }
 
+export interface StoryboardBase {
+  index: number;
+  name: string;
+  parentId: string | null;
+  id: string;
+}
+
 export interface AddStoryboardParams {
-  storyboard: Pick<Storyboard, 'name' | 'orgId'>;
+  storyboard: Pick<
+    StoryboardSimple,
+    'name' | 'parentId' | 'index' | 'config' | 'orgId' | 'isFolder'
+  >;
   resolve: () => void;
 }
 
 export interface EditStoryboardParams {
-  storyboard: StoryboardViewModel;
+  storyboard: StoryboardBase;
   resolve: () => void;
 }
 

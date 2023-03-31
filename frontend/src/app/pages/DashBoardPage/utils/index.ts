@@ -37,7 +37,11 @@ import ChartDataView from 'app/types/ChartDataView';
 import { convertToChartConfigDTO } from 'app/utils/ChartDtoHelper';
 import { findPathByNameInMeta, getStyles } from 'app/utils/chartHelper';
 import { getTime, splitRangerDateFilters } from 'app/utils/time';
-import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
+import {
+  DATE_FORMATTER,
+  FilterSqlOperator,
+  TIME_FORMATTER,
+} from 'globalConstants';
 import moment from 'moment';
 import { CloneValueDeep } from 'utils/object';
 import { boardDrillManager } from '../components/BoardDrillManager/BoardDrillManager';
@@ -57,6 +61,15 @@ import { Widget } from '../types/widgetTypes';
 import { DateControllerTypes } from './../pages/BoardEditor/components/ControllerWidgetPanel/constants';
 import { PickerType } from './../pages/BoardEditor/components/ControllerWidgetPanel/types';
 import { getLinkedColumn } from './widget';
+
+export const dateFormatObj = {
+  week: 'YYYY-WW',
+  year: 'YYYY',
+  month: 'YYYY-MM',
+  dateTime: TIME_FORMATTER,
+  date: DATE_FORMATTER,
+  quarter: 'YYYY-Q',
+};
 
 export const convertImageUrl = (urlKey: string = ''): string => {
   if (urlKey.startsWith(BOARD_FILE_IMG_PREFIX)) {
@@ -99,9 +112,10 @@ export const getDataChartRequestParams = (obj: {
   dataChart: DataChart;
   view: ChartDataView;
   drillOption?: ChartDrillOption;
+  tempFilters?: PendingChartDataRequestFilter[];
   option;
 }) => {
-  const { dataChart, view, option, drillOption } = obj;
+  const { dataChart, view, option, drillOption, tempFilters } = obj;
   const migratedChartConfig = migrateChartConfig(
     CloneValueDeep(dataChart?.config) as ChartDetailConfigDTO,
   );
@@ -124,6 +138,7 @@ export const getDataChartRequestParams = (obj: {
   let requestParams = builder
     .addExtraSorters((option?.sorters as any) || [])
     .addDrillOption(drillOption)
+    .addRuntimeFilters(tempFilters || [])
     .build();
   return requestParams;
 };
@@ -191,8 +206,8 @@ export function getTheWidgetFiltersAndParams<
       relatedViewItem,
       config: controllerConfig,
     });
+
     if (!values) {
-      console.log(`has no FilterValues return on ${chartWidget.id}`);
       return;
     }
 
@@ -344,6 +359,12 @@ export const getControllerDateValues = (obj: {
     }
   }
 
+  if (obj.execute) {
+    timeValues.forEach((v, i) => {
+      timeValues[i] = v ? moment(v).format(dateFormatObj[pickerType]) : v;
+    });
+  }
+
   return timeValues;
 };
 export const adjustRangeDataEndValue = (
@@ -419,6 +440,7 @@ export const getChartWidgetRequestParams = (obj: {
     view: chartDataView,
     option: option,
     drillOption,
+    tempFilters: widgetInfo?.linkInfo?.tempFilters,
   });
   const { filterParams, variableParams } =
     getTheWidgetFiltersAndParams<ChartDataRequestFilter>({

@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
@@ -139,14 +140,14 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         return dataProviderManager.readTableColumns(parseDataProviderConfig(source), database, table);
     }
 
-
+    @Override
     public DataProviderSource parseDataProviderConfig(Source source) {
         DataProviderSource providerSource = new DataProviderSource();
         try {
             providerSource.setSourceId(source.getId());
             providerSource.setType(source.getType());
             providerSource.setName(source.getName());
-            Map<String, Object> properties = new HashMap<>();
+            Map<String, Object> properties = new HashMap<>(16);
             if (StringUtils.isNotBlank(source.getConfig())) {
                 properties = objectMapper.readValue(source.getConfig(), HashMap.class);
             }
@@ -352,7 +353,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         variables.add(new ScriptVariable(VARIABLE_NAME,
                 VariableTypeEnum.PERMISSION,
                 ValueType.STRING,
-                Sets.newHashSet(getCurrentUser().getUsername()),
+                getCurrentUser().getName() == null ? Collections.emptySet() : Sets.newHashSet(getCurrentUser().getName()),
                 false));
         variables.add(new ScriptVariable(VARIABLE_EMAIL,
                 VariableTypeEnum.PERMISSION,
@@ -428,12 +429,12 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
      * @param model view.model
      */
     private Map<String, Column> parseSchema(String model) {
-        HashMap<String, Column> schema = new HashMap<>();
+        Map<String, Column> schema = new LinkedHashMap<>();
         if (StringUtils.isBlank(model)) {
             return schema;
         }
 
-        JSONObject jsonObject = JSON.parseObject(model);
+        JSONObject jsonObject = JSON.parseObject(model, Feature.OrderedField);
         try {
             if (jsonObject.containsKey("columns")) {
                 jsonObject = jsonObject.getJSONObject("columns");
@@ -452,7 +453,7 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
                             names = item.getJSONArray("name").toArray(new String[0]);
                         }
                     } else {
-                        names = new String[]{item.getString("name")};
+                        names = new String[]{Optional.ofNullable(item.getString("name")).orElse(key)};
                     }
                     Column column = Column.of(ValueType.valueOf(item.getString("type")), names);
                     schema.put(column.columnKey(), column);

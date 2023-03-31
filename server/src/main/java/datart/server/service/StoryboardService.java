@@ -15,4 +15,8 @@ public interface StoryboardService extends VizCRUDService<Storyboard, Storyboard
 
     boolean updateBase(StoryboardBaseUpdateParam updateParam);
 
+    boolean unarchive(String id, String newName, String parentId, double index);
+
+    boolean checkUnique(String orgId, String parentId, String name);
+
 }

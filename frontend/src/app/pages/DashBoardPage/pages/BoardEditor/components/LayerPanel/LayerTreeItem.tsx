@@ -65,8 +65,10 @@ export const TreeItem: FC<{ node: LayerNode }> = memo(({ node }) => {
 
   return (
     <Item>
-      <h4 title={title as string}>{String(title) || 'untitled-widget'}</h4>
-      <WidgetDndHandleMask widgetId={widget?.id} canWrapped={canWrapped} />
+      <TitleBlock>
+        <h4 title={title as string}>{String(title) || 'untitled-widget'}</h4>
+        <WidgetDndHandleMask widgetId={widget?.id} canWrapped={canWrapped} />
+      </TitleBlock>
       <WidgetDropdownList
         widget={widget}
         buttonProps={{
@@ -100,4 +102,9 @@ const Item = styled.div`
       display: block;
     }
   }
+`;
+
+const TitleBlock = styled.div`
+  position: relative;
+  width: calc(100% - 24px);
 `;

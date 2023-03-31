@@ -34,6 +34,7 @@ import {
   DataViewFieldType,
 } from 'app/constants';
 import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { handleDateLevelsName } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/utils';
 import { VariableTypes } from 'app/pages/MainPage/pages/VariablePage/constants';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import {
@@ -341,6 +342,9 @@ export function getColumnRenderOriginName(c?: ChartDataSectionField) {
   }
   if (c.aggregate) {
     return `${c.aggregate}(${c.colName})`;
+  }
+  if (c.category === ChartDataViewFieldCategory.DateLevelComputedField) {
+    return handleDateLevelsName({ ...c, name: c.colName });
   }
   return c.colName;
 }
@@ -706,6 +710,7 @@ export const buildDragItem = (item, children: any[] = []) => {
     type: item?.type,
     subType: item?.subType,
     category: item?.category,
+    dateFormat: item?.dateFormat,
     children: children.map(c => buildDragItem(c)),
   };
 };

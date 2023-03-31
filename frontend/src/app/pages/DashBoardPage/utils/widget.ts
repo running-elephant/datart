@@ -25,6 +25,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ChartsEventData } from 'app/types/Chart';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
 import {
@@ -778,3 +779,80 @@ export function cloneWidgets(args: {
     newWidgets,
   };
 }
+/**
+ * @describe list[grandpa dad son...] to List[{id:'',parentId:''}]
+ * @param collection [[grandpa dad son,....]]
+ * @returns [{id:'',parentId:'',value:''}....]
+ */
+export const handleRowDataForTree = collection => {
+  let obj = {};
+  collection?.forEach(v => {
+    v.forEach((val, ind) => {
+      if (!obj[val] || obj[val]?.isLeaf) {
+        obj[val] = {
+          id: val,
+          parentId: ind ? v[ind - 1] : null,
+        };
+      }
+    });
+  });
+  return Object.values(obj);
+};
+
+export const convertListToTree = (
+  list,
+  parentId: null | string = null,
+): any[] => {
+  if (!list) {
+    return list;
+  }
+  const treeNodes: any[] = [];
+  const childrenList: any = [];
+  list.forEach(o => {
+    if (o['parentId'] === parentId) {
+      treeNodes.push({
+        id: o['id'],
+        parentId: o['parentId'],
+        key: o['id'],
+        title: o['label'] || o['id'],
+      });
+    } else {
+      childrenList.push(o);
+    }
+  });
+
+  return treeNodes.map(node => {
+    const children = convertListToTree(childrenList, node.id);
+    return children?.length ? { ...node, children } : { ...node, isLeaf: true };
+  });
+};
+
+export const convertToTree = (col, buildingMethod) => {
+  if (!col && !col.length) {
+    return col;
+  }
+
+  let data: RelationFilterValue[] = [];
+  let copyCol = CloneValueDeep(col);
+  let emptyParentList = ['null', 'undefined', 'false'];
+
+  if (buildingMethod === 'byParent') {
+    const parent = copyCol?.find(
+      v => !v[v.length - 1] || emptyParentList.includes(v[v.length - 1]),
+    ) || [null];
+    data = convertListToTree(
+      copyCol?.map(v => {
+        return {
+          id: v[0],
+          parentId: v[v.length - 1],
+          label: v.length > 2 ? v[1] : v[0],
+        };
+      }),
+      parent[parent.length - 1],
+    );
+  } else {
+    data = convertListToTree(handleRowDataForTree(copyCol));
+  }
+
+  return data;
+};

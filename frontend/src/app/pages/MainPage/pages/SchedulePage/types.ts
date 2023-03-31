@@ -3,7 +3,7 @@ import { FileTypes, JobTypes, TimeModes } from './constants';
 import { VizContentsItem } from './slice/types';
 
 export interface FormValues {
-  name?: string;
+  name: string;
   jobType?: JobTypes;
   description?: string;
   type?: FileTypes[];
@@ -25,6 +25,8 @@ export interface FormValues {
   folderContent?: VizContentsItem[];
   demoContent?: VizContentsItem[];
   setCronExpressionManually?: boolean;
+  index: number | null;
+  parentId: string | null;
 }
 
 export interface IUserInfo {

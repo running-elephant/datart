@@ -21,6 +21,7 @@ import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMe
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainer } from 'app/components/ChartIFrameContainer';
 import { InteractionMouseEvent } from 'app/components/FormGenerator/constants';
+import { ChartInteractionEvent } from 'app/constants';
 import useChartInteractions from 'app/hooks/useChartInteractions';
 import useDebouncedLoadingStatus from 'app/hooks/useDebouncedLoadingStatus';
 import useMount from 'app/hooks/useMount';
@@ -278,6 +279,18 @@ const ChartPreviewBoardForShare: FC<{
         {
           name: 'click',
           callback: param => {
+            if (param?.interactionType === ChartInteractionEvent.PagingOrSort) {
+              tablePagingAndSortEventListener(param, p => {
+                dispatch(
+                  fetchShareDataSetByPreviewChartAction({
+                    ...p,
+                    preview: chartPreview!,
+                    filterSearchParams,
+                  }),
+                );
+              });
+              return;
+            }
             handleDrillThroughEvent(
               buildDrillThroughEventParams(param, InteractionMouseEvent.Left),
             );
@@ -287,15 +300,6 @@ const ChartPreviewBoardForShare: FC<{
             drillDownEventListener(drillOptionRef?.current, param, p => {
               drillOptionRef.current = p;
               handleDrillOptionChange?.(p);
-            });
-            tablePagingAndSortEventListener(param, p => {
-              dispatch(
-                fetchShareDataSetByPreviewChartAction({
-                  ...p,
-                  preview: chartPreview!,
-                  filterSearchParams,
-                }),
-              );
             });
             pivotTableDrillEventListener(param, p => {
               handleDrillOptionChange(p);
@@ -378,7 +382,10 @@ const ChartPreviewBoardForShare: FC<{
           }}
         >
           <div style={{ width: '100%', height: '100%' }} ref={ref}>
-            <ChartDrillContextMenu chartConfig={chartPreview?.chartConfig}>
+            <ChartDrillContextMenu
+              chartConfig={chartPreview?.chartConfig}
+              metas={chartPreview?.backendChart?.view?.meta}
+            >
               <ChartIFrameContainer
                 key={chartPreview?.backendChart?.id!}
                 containerId={chartPreview?.backendChart?.id!}

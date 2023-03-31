@@ -40,7 +40,7 @@ public class ScheduleBaseInfo {
 
     private Boolean isFolder;
 
-    private Integer index;
+    private Double index;
 
 
     public ScheduleBaseInfo(Schedule schedule) {

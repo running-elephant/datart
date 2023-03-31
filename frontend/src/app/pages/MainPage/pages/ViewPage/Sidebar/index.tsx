@@ -19,10 +19,8 @@
 import {
   CodeFilled,
   DeleteOutlined,
-  FileOutlined,
   FolderFilled,
   FolderOpenFilled,
-  FolderOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
@@ -95,7 +93,6 @@ export const Sidebar = memo(
           key: id,
           title: name,
           parentId,
-          icon: isFolder ? <FolderOutlined /> : <FileOutlined />,
           isFolder,
           disabled: deleteLoading,
         })),

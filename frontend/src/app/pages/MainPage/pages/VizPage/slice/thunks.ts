@@ -23,10 +23,7 @@ import {
   DataChart,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { mainActions } from 'app/pages/MainPage/slice';
-import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
-import { getLoggedInUserPermissions } from 'app/pages/MainPage/slice/thunks';
-import { StoryBoard } from 'app/pages/StoryBoardPage/slice/types';
-import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { convertToChartDto } from 'app/utils/ChartDtoHelper';
@@ -48,8 +45,8 @@ import {
   FolderViewModel,
   PublishVizParams,
   SaveAsDashboardParams,
-  Storyboard,
-  StoryboardViewModel,
+  StoryboardBase,
+  StoryboardSimple,
   UnarchiveVizParams,
   VizState,
 } from './types';
@@ -62,10 +59,10 @@ export const getFolders = createAsyncThunk<Folder[], string>(
   },
 );
 
-export const getStoryboards = createAsyncThunk<Storyboard[], string>(
+export const getStoryboards = createAsyncThunk<StoryboardSimple[], string>(
   'viz/getStoryboards',
   async orgId => {
-    const { data } = await request2<Storyboard[]>(
+    const { data } = await request2<StoryboardSimple[]>(
       `viz/storyboards?orgId=${orgId}`,
     );
     return data;
@@ -92,43 +89,36 @@ export const getArchivedDashboards = createAsyncThunk<Dashboard[], string>(
   },
 );
 
-export const getArchivedStoryboards = createAsyncThunk<StoryBoard[], string>(
-  'viz/getArchivedStoryboards',
-  async orgId => {
-    const { data } = await request2<StoryBoard[]>(
-      `/viz/archived/storyboard/${orgId}`,
-    );
-    return data;
-  },
-);
+export const getArchivedStoryboards = createAsyncThunk<
+  StoryboardSimple[],
+  string
+>('viz/getArchivedStoryboards', async orgId => {
+  const { data } = await request2<StoryboardSimple[]>(
+    `/viz/archived/storyboard/${orgId}`,
+  );
+  return data;
+});
 
 export const addStoryboard = createAsyncThunk<
-  Storyboard,
+  StoryboardSimple,
   AddStoryboardParams,
   { state: RootState }
->(
-  'viz/addStoryboard',
-  async ({ storyboard, resolve }, { getState, dispatch, rejectWithValue }) => {
-    const { data } = await request2<Storyboard>({
-      url: `/viz/storyboards`,
-      method: 'POST',
-      data: storyboard,
-    });
+>('viz/addStoryboard', async ({ storyboard, resolve }) => {
+  const { data } = await request2<StoryboardSimple>({
+    url: `/viz/storyboards`,
+    method: 'POST',
+    data: storyboard,
+  });
 
-    // FIXME 拥有Read权限等级的扁平结构资源新增后需要更新权限字典；后续如改造为目录结构则删除该逻辑
-    const orgId = selectOrgId(getState());
-    await dispatch(getLoggedInUserPermissions(orgId));
-
-    resolve();
-    return data;
-  },
-);
+  resolve();
+  return data;
+});
 
 export const editStoryboard = createAsyncThunk<
-  StoryboardViewModel,
+  StoryboardBase,
   EditStoryboardParams
 >('viz/editStoryboard', async ({ storyboard, resolve }) => {
-  await request2<boolean>({
+  await request2<StoryboardBase>({
     url: `/viz/storyboards/${storyboard.id}`,
     method: 'PUT',
     data: storyboard,
@@ -270,7 +260,7 @@ export const initChartPreviewData = createAsyncThunk<
     backendChartId: string;
     orgId: string;
     filterSearchParams?: FilterSearchParams;
-    jumpFilterParams?: ChartDataRequestFilter[];
+    jumpFilterParams?: PendingChartDataRequestFilter[];
     jumpVariableParams?: Record<string, any[]>;
   }
 >(
@@ -308,7 +298,7 @@ export const fetchVizChartAction = createAsyncThunk(
   async (arg: {
     backendChartId;
     filterSearchParams?: FilterSearchParams;
-    jumpFilterParams?: ChartDataRequestFilter[];
+    jumpFilterParams?: PendingChartDataRequestFilter[];
   }) => {
     const response = await request2<
       Omit<ChartDTO, 'config'> & { config: string }

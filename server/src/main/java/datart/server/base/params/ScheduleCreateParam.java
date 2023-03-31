@@ -46,6 +46,6 @@ public class ScheduleCreateParam extends BaseCreateParam {
 
     private Boolean isFolder;
 
-    private Integer index;
+    private Double index;
 
 }

@@ -27,10 +27,11 @@ import ChartDataView from 'app/types/ChartDataView';
 import React, { memo, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import ControllerVisibility from './ControllerVisibility';
-import { RadioStyleForm } from './OtherSet.tsx/RadioStyle/RadioStyleForm';
-import { SliderMarks } from './OtherSet.tsx/SliderStyle/SliderMarks';
-import { SliderStep } from './OtherSet.tsx/SliderStyle/SliderStep';
-import { SqlOperator } from './OtherSet.tsx/SqlOperator';
+import { RadioStyleForm } from './OtherSetter/RadioStyle/RadioStyleForm';
+import { SliderMarks } from './OtherSetter/SliderStyle/SliderMarks';
+import { SliderStep } from './OtherSetter/SliderStyle/SliderStep';
+import { SqlOperator } from './OtherSetter/SqlOperator';
+import TreeTypeSetter from './ValuesSetter/TreeTypeSetter';
 import { ValuesSetter } from './ValuesSetter/ValuesSetter';
 
 export const ControllerValuesName = ['config', 'controllerValues'];
@@ -88,6 +89,10 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
       return controllerType === ControllerFacadeTypes.RadioGroup;
     }, [controllerType]);
 
+    const isTree = useMemo(() => {
+      return controllerType === ControllerFacadeTypes.DropDownTree;
+    }, [controllerType]);
+
     const boardAllWidgetNames = useMemo(() => {
       return (boardVizs || [])
         .filter(bvz => bvz?.id !== wid)
@@ -102,6 +107,7 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
       ];
       return sliderTypes.includes(controllerType);
     }, [controllerType]);
+
     return (
       <Wrapper>
         <Form.Item
@@ -128,6 +134,8 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
         >
           <Input />
         </Form.Item>
+        {isTree && <TreeTypeSetter form={form} />}
+
         <ValuesSetter
           controllerType={controllerType}
           form={form}

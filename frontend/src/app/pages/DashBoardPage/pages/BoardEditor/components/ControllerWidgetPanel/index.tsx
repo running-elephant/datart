@@ -220,6 +220,7 @@ const ControllerWidgetPanel: React.FC<WidgetControllerPanelParams> = memo(
             config: postControlConfig(config, controllerType!),
           };
           const viewIds = getViewIdsInControlConfig(config);
+
           let newWidget = widgetManagerInstance.toolkit(controllerType).create({
             boardType,
             name: name,
@@ -300,6 +301,7 @@ const ControllerWidgetPanel: React.FC<WidgetControllerPanelParams> = memo(
       setRelatedWidgets(relatedWidgets);
       setFormRelatedViews(setViewsRelatedView(relatedWidgets));
     };
+
     return (
       <Modal
         title={`${tGMT(type)}${t(controllerType || '')}`}

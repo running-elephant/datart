@@ -161,7 +161,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         },
         canDrop: (item: ChartDataSectionField, monitor) => {
           let items = Array.isArray(item) ? item : [item];
-          const currentRowNames = currentConfig.rows?.map(col => col.colName);
+
           if (
             [CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN_GROUP].includes(
               monitor.getItemType() as any,
@@ -171,6 +171,13 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               ChartDataSectionType.Color,
               ChartDataSectionType.Mixed,
             ].includes(currentConfig.type as ChartDataSectionType)
+          ) {
+            return false;
+          }
+
+          if (
+            currentConfig?.disableAggregateComputedField &&
+            item.category === 'aggregateComputedField'
           ) {
             return false;
           }
@@ -187,6 +194,16 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             return false;
           }
 
+          const currentSectionDimensionRowNames = currentConfig.rows
+            ?.filter(
+              r =>
+                !items
+                  ?.map(i => i?.uid)
+                  ?.filter(Boolean)
+                  ?.includes(r?.uid),
+            )
+            ?.map(col => col.colName);
+
           if (
             items[0].category ===
             ChartDataViewFieldCategory.DateLevelComputedField
@@ -200,8 +217,10 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             ) {
               return false;
             }
-            return currentRowNames
-              ? currentRowNames.every(v => !v?.includes(items[0].colName))
+            return currentSectionDimensionRowNames
+              ? currentSectionDimensionRowNames.every(
+                  v => !v?.includes(items[0].colName),
+                )
               : true;
           }
 
@@ -210,7 +229,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           }
 
           const isNotExist = items.every(
-            i => !currentRowNames?.includes(i.colName),
+            i => !currentSectionDimensionRowNames?.includes(i.colName),
           );
           return isNotExist;
         },
@@ -233,6 +252,9 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     };
 
     const onDraggableItemMove = (dragIndex: number, hoverIndex: number) => {
+      if (!canDrop) {
+        return;
+      }
       const draggedItem = currentConfig.rows?.[dragIndex];
       if (draggedItem) {
         const newCurrentConfig = updateBy(currentConfig, draft => {
@@ -241,21 +263,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           columns.splice(hoverIndex, 0, draggedItem);
         });
         setCurrentConfig(newCurrentConfig);
-      } else {
-        // const placeholder = {
-        //   uid: CHARTCONFIG_FIELD_PLACEHOLDER_UID,
-        //   colName: 'Placeholder',
-        //   category: 'field',
-        //   type: 'STRING',
-        // } as any;
-        // const newCurrentConfig = updateBy(currentConfig, draft => {
-        //   const columns = draft.rows || [];
-        //   if (dragIndex) {
-        //     columns.splice(dragIndex, 1);
-        //   }
-        //   columns.splice(hoverIndex, 0, placeholder);
-        // });
-        // setCurrentConfig(newCurrentConfig);
       }
     };
 

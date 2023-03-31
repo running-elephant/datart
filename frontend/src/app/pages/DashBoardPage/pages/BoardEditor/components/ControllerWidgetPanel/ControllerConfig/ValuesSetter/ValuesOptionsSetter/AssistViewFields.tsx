@@ -23,12 +23,20 @@ import styled from 'styled-components/macro';
 export interface AssistViewFieldsProps {
   onChange?: (value: string[], type) => void;
   value?: string[];
+  isHierarchyTree?: boolean;
   style: object;
   viewList;
   viewFieldList;
 }
 export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
-  ({ onChange, value: propsValue, style, viewList, viewFieldList }) => {
+  ({
+    onChange,
+    value: propsValue,
+    isHierarchyTree,
+    style,
+    viewList,
+    viewFieldList,
+  }) => {
     const tc = useI18NPrefix(`viz.control`);
     const [val, setVal] = useState<string[]>([]);
 
@@ -56,17 +64,19 @@ export const AssistViewFields: React.FC<AssistViewFieldsProps> = memo(
           }}
           options={viewList}
         ></Select>
-        <Select
-          optionFilterProp={'label'}
-          onChange={value => {
-            handleOnChange([val?.[0] || '', value], 'viewField');
-          }}
-          placeholder={tc('selectViewField')}
-          showSearch
-          value={val?.[1]}
-          loading={!viewFieldList}
-          options={viewFieldList}
-        ></Select>
+        {!isHierarchyTree && (
+          <Select
+            optionFilterProp={'label'}
+            onChange={value => {
+              handleOnChange([val?.[0] || '', value], 'viewField');
+            }}
+            placeholder={tc('selectViewField')}
+            showSearch
+            value={val?.[1]}
+            loading={!viewFieldList}
+            options={viewFieldList}
+          ></Select>
+        )}
       </StyleSpace>
     );
   },

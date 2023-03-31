@@ -25,12 +25,13 @@ import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,
   DataViewFieldType,
+  DateFormat,
   FieldFormatType,
   FilterConditionType,
   FilterRelationType,
   SortActionType,
 } from 'app/constants';
-import { ChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
 import {
   FilterSqlOperator,
   NumberUnitKey,
@@ -95,8 +96,10 @@ export type RelationFilterValue = {
   key: string;
   label: string;
   index?: number;
+  childIndex?: number;
   isSelected?: boolean;
   children?: RelationFilterValue[];
+  selectable?: boolean;
 };
 
 export type AggregateLimit = Pick<typeof AggregateFieldActionType, 'Count'>;
@@ -117,6 +120,7 @@ export type ChartDataSectionField = {
   color?: ColorFieldAction;
   size?: number;
   path?: string[];
+  dateFormat?: DateFormat;
 };
 
 export type SortFieldAction = {
@@ -177,6 +181,7 @@ export type ChartDataConfig = ChartConfigBase & {
   actions?: Array<ValueOf<typeof ChartDataSectionFieldActionType>> | object;
   limit?: null | number | string | number[] | string[];
   disableAggregate?: boolean;
+  disableAggregateComputedField?: boolean;
   drillable?: boolean;
   drillContextMenuVisible?: boolean;
   options?: {
@@ -188,7 +193,7 @@ export type ChartDataConfig = ChartConfigBase & {
   // NOTE: keep field's filter relation for filter arrangement feature
   fieldRelation?: FilterCondition;
   // Runtime filters
-  [RUNTIME_FILTER_KEY]?: ChartDataRequestFilter[];
+  [RUNTIME_FILTER_KEY]?: PendingChartDataRequestFilter[];
 };
 
 export type ChartStyleSectionTemplate = {

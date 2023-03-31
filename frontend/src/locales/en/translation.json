@@ -228,112 +228,6 @@
       "loading": "Loading...",
       "initError": "Initialization error, please refresh the page and try again",
       "createOrg": "You have not joined any organization, click to create"
-    },
-    "pages": {
-      "schedulePage": {
-        "constants": {
-          "email": "Email",
-          "weChat": "WeChat",
-          "picture": "Picture",
-          "taskExecution": "Task execution",
-          "configurationAnalysis": "Configure the parsing",
-          "getData": "Data collection",
-          "send": "Send"
-        },
-        "sidebar": {
-          "index": {
-            "scheduledTaskList": "Scheduled task list",
-            "newTimedTask": "Create scheduled task",
-            "recycle": "Recycle"
-          },
-          "scheduleList": {
-            "successStarted": "Successfully started",
-            "successStop": "Stopped successfully",
-            "successImmediately": "Executed successfully immediately",
-            "start": "Start",
-            "stop": "Stop",
-            "executeItNow": "Are you sure to execute it now?",
-            "executeImmediately": "Execute immediately"
-          },
-          "editorPage": {
-            "index": {
-              "tickToSendContent": "Please tick to send content",
-              "addSuccess": "Added successfully",
-              "saveSuccess": "Saved successfully",
-              "restoredSuccess": "Restored successfully",
-              "success": "Success",
-              "moveToTrash": "Move to recycle bin",
-              "delete": "Delete",
-              "newTimedTask": "New scheduled task",
-              "sureToRestore": "Are you sure to restore?",
-              "restore": "Restore",
-              "sureToDelete": "Confirm delete?",
-              "allowModificationAfterStopping": "Allow modification after stopping",
-              "save": "Save",
-              "allowMoveAfterStopping": "Allow moving to the recycle bin after stopping",
-              "sureMoveRecycleBin": "Are you sure to move to the recycle bin?",
-              "basicSettings": "Basic settings",
-              "emailSetting": "Email settings",
-              "enterpriseWeChatSettings": "Enterprise WeChat Settings",
-              "sendContentSettings": "Send content settings"
-            },
-            "weChartSetttingForm": {
-              "RobotWebhookAddress": "Robot webhook address",
-              "RobotWebhookAddressIsRequired": "Robot webhook address is required",
-              "fileType": "File type",
-              "picWidth": "Width",
-              "px": "px"
-            },
-            "scheduleErrorLog": {
-              "index": {
-                "startTime": "Start",
-                "endTime": "End",
-                "logPhase": "Log phase",
-                "executionInformation": "Execution information",
-                "success": "Success",
-                "log": "Log"
-              }
-            },
-            "emailSettingForm": {
-              "commonRichText": {
-                "pleaseEnter": "Please enter"
-              },
-              "index": {
-                "CC": "CC",
-                "theme": "Theme",
-                "subjectIsRequired": "Theme is required",
-                "fileType": "File type",
-                "picWidth": "Width",
-                "px": "px",
-                "recipient": "Recipient",
-                "recipientIsRequired": "Recipient is required",
-                "bcc": "BCC",
-                "contentOfEmail": "Content of email"
-              },
-              "mailTagFormItem": {
-                "placeholder": "Enter email address or name keyword search..."
-              }
-            },
-            "basicBaseForm": {
-              "index": {
-                "nameAlreadyExists": "Name already exists",
-                "name": "Name",
-                "nameRequired": "Name is required",
-                "type": "Type",
-                "effectiveTimeRange": "Effective time range"
-              },
-              "executeFormItem": {
-                "per": "Each",
-                "of": "",
-                "executionTimeSetting": "Execution time setting",
-                "expressionIsRequired": "Expression is required",
-                "pleaseEnterCronExpression": "Please enter cron expression",
-                "manualInput": "Manual input"
-              }
-            }
-          }
-        }
-      }
     }
   },
   "viz": {
@@ -382,7 +276,8 @@
           "value": "Value",
           "time": "Time",
           "slider": "Slider",
-          "rangeSlider": "Range Slider"
+          "rangeSlider": "Range Slider",
+          "dropDownTree": "Dropdown tree"
         },
         "controllerPlaceHolders": {
           "multiSelectController": "Select ..",
@@ -390,7 +285,8 @@
           "rangeNumberControllerMin": "Min",
           "rangeNumberControllerMax": "Max",
           "selectController": "Select ..",
-          "textController": "Enter text"
+          "textController": "Enter text",
+          "treeSelectController": "Select .."
         },
         "controllerVisibilityTypes": {
           "hide": "Hide",
@@ -542,7 +438,7 @@
         "deleteField": "Delete",
         "editViewTip": "Going back to the view will lose the current edit state, continue?",
         "editView": "Edit View",
-        "toggleViewTip": "Switch data View Whether to clear the current chart configuration?",
+        "toggleViewTip": "Switching data view will clear the current chart configuration, continue?",
         "AGG_DATE_YEAR": "Year",
         "AGG_DATE_QUARTER": "Quarter",
         "AGG_DATE_MONTH": "Month",
@@ -557,8 +453,8 @@
         "Group": "Group",
         "Sort": "Sort",
         "cancel": "Cancel",
-        "empty": "Empty",
-        "reserve": "Reserve",
+        "empty": "Clear",
+        "reserve": "Retain",
         "searchField": "Search Field Name"
       }
     },
@@ -1230,6 +1126,7 @@
       "storyboards": {
         "title": "Storyboards",
         "add": "Create Storyboard",
+        "addFolder": "Create Folder",
         "recycle": "Recycle"
       }
     },
@@ -1278,7 +1175,14 @@
       "unsetDefault": "Unset Default",
       "setDefault": "Set Default",
       "delete": "Delete",
-      "populate": "Populate From Field Values"
+      "populate": "Populate From Field Values",
+      "parentFields": "Select Parent Field",
+      "parentFieldsHierarchy": "Select Fields by Hierarchy",
+      "treeBuildingMethod": "Building Method",
+      "byParent": "By Parent",
+      "byParentTip": "Automatically build a tree by specifying a value field (ID) and a parent field (Parent ID); for example: folder tree",
+      "byHierarchy": "By Hierarchy",
+      "byHierarchyTip": "Build a tree from multiple dimension fields with natural hierarchical attributes; for example: country, province, city"
     },
     "date": {
       "year": "Year",
@@ -1464,7 +1368,18 @@
     "sidebar": {
       "title": "Sources",
       "add": "Create Source",
-      "recycle": "Recycle"
+      "recycle": "Recycle",
+      "addFolder": "Create Folder",
+      "parent": "Parent",
+      "success": "Success",
+      "delete": "Delete",
+      "moveToTrash": "Move to recycle bin",
+      "restoredSuccess": "Restored successfully",
+      "restore": "Restore",
+      "sureToDelete": "Confirm delete?",
+      "addSuccess": "Add Success",
+      "open": "Open",
+      "close": "Close"
     },
     "form": {
       "name": "Name",
@@ -1478,6 +1393,130 @@
       "editConfig": "Edit Configuration",
       "duplicate": "Duplicate Key",
       "duplicateName": "Duplicate Name"
+    },
+    "saveForm": {
+      "name": "Name",
+      "folder": "Folder",
+      "root": "Root",
+      "title": "Sources"
+    }
+  },
+  "schedule": {
+    "saveForm": {
+      "name": "Name",
+      "folder": "Folder",
+      "root": "Root",
+      "title": "Schedule"
+    },
+    "constants": {
+      "email": "Email",
+      "weChat": "WeChat",
+      "picture": "Picture",
+      "taskExecution": "Task execution",
+      "configurationAnalysis": "Configure the parsing",
+      "getData": "Data collection",
+      "send": "Send"
+    },
+    "sidebar": {
+      "index": {
+        "addFolder": "Add Folder",
+        "addSuccess": "Add Success",
+        "scheduledTaskList": "Scheduled task list",
+        "newTimedTask": "Create scheduled task",
+        "recycle": "Recycle",
+        "open": "Open",
+        "close": "Close"
+      },
+      "scheduleList": {
+        "parent": "Parent",
+        "success": "Success",
+        "delete": "Delete",
+        "moveToTrash": "Move to recycle bin",
+        "successStarted": "Successfully started",
+        "successStop": "Stopped successfully",
+        "successImmediately": "Executed successfully immediately",
+        "start": "Start",
+        "stop": "Stop",
+        "executeItNow": "Are you sure to execute it now?",
+        "executeImmediately": "Execute immediately"
+      }
+    },
+    "editor": {
+      "index": {
+        "tickToSendContent": "Please tick to send content",
+        "addSuccess": "Added successfully",
+        "saveSuccess": "Saved successfully",
+        "restoredSuccess": "Restored successfully",
+        "success": "Success",
+        "moveToTrash": "Move to recycle bin",
+        "delete": "Delete",
+        "newTimedTask": "New scheduled task",
+        "restore": "Restore",
+        "sureToDelete": "Confirm delete?",
+        "allowModificationAfterStopping": "Allow modification after stopping",
+        "save": "Save",
+        "allowMoveAfterStopping": "Allow moving to the recycle bin after stopping",
+        "sureMoveRecycleBin": "Are you sure to move to the recycle bin?",
+        "basicSettings": "Basic settings",
+        "emailSetting": "Email settings",
+        "enterpriseWeChatSettings": "Enterprise WeChat Settings",
+        "sendContentSettings": "Send content settings",
+        "parent": "Parent"
+      },
+      "weChatSettingForm": {
+        "RobotWebhookAddress": "Robot webhook address",
+        "RobotWebhookAddressIsRequired": "Robot webhook address is required",
+        "fileType": "File type",
+        "picWidth": "Width",
+        "px": "px"
+      },
+      "scheduleErrorLog": {
+        "index": {
+          "startTime": "Start",
+          "endTime": "End",
+          "logPhase": "Log phase",
+          "executionInformation": "Execution information",
+          "success": "Success",
+          "log": "Log"
+        }
+      },
+      "emailSettingForm": {
+        "commonRichText": {
+          "pleaseEnter": "Please enter"
+        },
+        "index": {
+          "CC": "CC",
+          "theme": "Theme",
+          "subjectIsRequired": "Theme is required",
+          "fileType": "File type",
+          "picWidth": "Width",
+          "px": "px",
+          "recipient": "Recipient",
+          "recipientIsRequired": "Recipient is required",
+          "bcc": "BCC",
+          "contentOfEmail": "Content of email"
+        },
+        "mailTagFormItem": {
+          "placeholder": "Enter email address or name keyword search..."
+        }
+      },
+      "basicBaseForm": {
+        "index": {
+          "nameAlreadyExists": "Name already exists",
+          "name": "Name",
+          "nameRequired": "Name is required",
+          "type": "Type",
+          "effectiveTimeRange": "Effective time range"
+        },
+        "executeFormItem": {
+          "per": "Each",
+          "of": "",
+          "executionTimeSetting": "Execution time setting",
+          "expressionIsRequired": "Expression is required",
+          "pleaseEnterCronExpression": "Please enter cron expression",
+          "manualInput": "Manual input"
+        }
+      }
     }
   },
   "member": {
@@ -1584,6 +1623,17 @@
         "1": "Download",
         "2": "Share",
         "3": "Manage"
+      },
+      "vizfolder": {
+        "0": "View",
+        "1": "Download",
+        "2": "Share",
+        "3": "Manage"
+      },
+      "vizstoryboard": {
+        "0": "View",
+        "1": "Share",
+        "2": "Manage"
       },
       "view": {
         "0": "Access",

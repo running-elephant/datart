@@ -80,13 +80,16 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
     [widget.id],
   );
   const moveEnd = useCallback(() => {
+    if (!selectedIds.includes(widget.id)) {
+      return;
+    }
     const nextRect = {
       ...widget.config.rect,
       x: Number(curXY[0].toFixed(1)),
       y: Number(curXY[1].toFixed(1)),
     };
     onEditFreeWidgetRect(nextRect, widget.id, false);
-  }, [curXY, onEditFreeWidgetRect, widget.config.rect, widget.id]);
+  }, [curXY, onEditFreeWidgetRect, selectedIds, widget.config.rect, widget.id]);
   useEffect(() => {
     widgetMove.on(move);
     widgetMoveEnd.on(moveEnd);
