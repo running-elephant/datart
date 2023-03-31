@@ -25,4 +25,17 @@ public interface StoryboardMapperExt extends StoryboardMapper {
     })
     List<Storyboard> selectByOrg(String orgId);
 
+    @Select({
+            "<script>",
+            "SELECT * FROM storyboard  WHERE org_id=#{orgId} AND `name` = #{name}",
+            "<if test=\"parentId==null\">",
+            " AND parent_id IS NULL ",
+            "</if>",
+            "<if test=\"parentId!=null\">",
+            " AND parent_id=#{parentId} ",
+            "</if>",
+            "</script>",
+    })
+    List<Storyboard> checkName(String orgId, String parentId, String name);
+
 }
