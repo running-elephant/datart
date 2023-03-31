@@ -295,16 +295,6 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         if (model == null || model.getMainModels() == null) {
             return;
         }
-        for (ViewResourceModel.MainModel mainModel : model.getMainModels()) {
-            String newId = UUIDGenerator.generate();
-            viewIdMapping.put(mainModel.getView().getId(), newId);
-            mainModel.getView().setId(newId);
-            mainModel.getView().setSourceId(sourceIdMapping.get(mainModel.getView().getSourceId()));
-            for (Variable variable : mainModel.getVariables()) {
-                variable.setId(UUIDGenerator.generate());
-                variable.setViewId(newId);
-            }
-        }
         Map<String, String> parentIdMapping = new HashMap<>();
         for (View parent : model.getParents()) {
             String newId = UUIDGenerator.generate();
@@ -313,6 +303,17 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         }
         for (View parent : model.getParents()) {
             parent.setParentId(parentIdMapping.get(parent.getParentId()));
+        }
+        for (ViewResourceModel.MainModel mainModel : model.getMainModels()) {
+            String newId = UUIDGenerator.generate();
+            viewIdMapping.put(mainModel.getView().getId(), newId);
+            mainModel.getView().setId(newId);
+            mainModel.getView().setSourceId(sourceIdMapping.get(mainModel.getView().getSourceId()));
+            mainModel.getView().setParentId(parentIdMapping.get(mainModel.getView().getParentId()));
+            for (Variable variable : mainModel.getVariables()) {
+                variable.setId(UUIDGenerator.generate());
+                variable.setViewId(newId);
+            }
         }
     }
 
