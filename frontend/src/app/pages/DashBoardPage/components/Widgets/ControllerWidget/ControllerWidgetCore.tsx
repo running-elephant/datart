@@ -74,8 +74,8 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     controllerValues,
     valueOptions,
     valueOptionType,
-    parentField,
-    treeType,
+    parentFields,
+    buildingMethod,
     // sqlOperator,
   } = useMemo(() => config as ControllerConfig, [config]);
   const title = getWidgetTitle(widget.config.customConfig.props);
@@ -106,8 +106,8 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     const dataRows = dataset?.rows || [];
 
     if (valueOptionType === 'common') {
-      if (parentField?.length) {
-        return convertToTree(dataRows, treeType);
+      if (parentFields?.length) {
+        return convertToTree(dataRows, buildingMethod);
       }
       return dataRows.map(ele => {
         const item: RelationFilterValue = {
@@ -122,7 +122,13 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     } else {
       return [];
     }
-  }, [dataset?.rows, valueOptionType, valueOptions, parentField, treeType]);
+  }, [
+    dataset?.rows,
+    valueOptionType,
+    valueOptions,
+    parentFields,
+    buildingMethod,
+  ]);
 
   const onControllerChange = useCallback(() => {
     form.submit();
@@ -361,7 +367,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
         form.setFieldsValue({ value: controllerValues });
         return (
           <TreeControllerForm
-            parentField={parentField}
+            parentFields={parentFields}
             onChange={onControllerChange}
             treeData={optionRows}
             name={'value'}
@@ -381,7 +387,7 @@ export const ControllerWidgetCore: React.FC<{}> = memo(() => {
     leftControlLabel,
     config,
     controllerDate,
-    parentField,
+    parentFields,
     onRangeTimeChange,
     onTimeChange,
   ]);

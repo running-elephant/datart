@@ -98,12 +98,12 @@ const ValuesOptionsSetter: FC<{
     return form?.getFieldValue('config') as ControllerConfig;
   }, [form]);
 
-  const getParentField = useCallback(() => {
-    return form?.getFieldValue('config')?.parentField as string[];
+  const getParentFields = useCallback(() => {
+    return form?.getFieldValue('config')?.parentFields as string[];
   }, [form]);
 
-  const getTreeType = useCallback(() => {
-    return form?.getFieldValue('config')?.treeType as string;
+  const getTreeBuildingMethod = useCallback(() => {
+    return form?.getFieldValue('config')?.buildingMethod as string;
   }, [form]);
 
   const isMultiple = useMemo(() => {
@@ -194,17 +194,17 @@ const ValuesOptionsSetter: FC<{
 
       if (type !== 'view') {
         const [viewId, ...columns] = value;
-        const parentField = getParentField();
-        const treeType = getTreeType();
+        const parentFields = getParentFields();
+        const buildingMethod = getTreeBuildingMethod();
 
-        if (parentField) {
-          columns.push(...parentField);
+        if (parentFields) {
+          columns.push(...parentFields);
         }
         const dataset = await fetchNewDataset(viewId, columns, dataView);
 
         setOptionValues(
-          parentField?.length > 0
-            ? convertToTree(dataset?.rows, treeType)
+          parentFields?.length > 0
+            ? convertToTree(dataset?.rows, buildingMethod)
             : convertToList(dataset?.rows),
         );
       }
@@ -212,9 +212,9 @@ const ValuesOptionsSetter: FC<{
     [
       convertToList,
       fetchNewDataset,
-      getParentField,
+      getParentFields,
       getViewOption,
-      getTreeType,
+      getTreeBuildingMethod,
     ],
   );
 
@@ -231,7 +231,7 @@ const ValuesOptionsSetter: FC<{
             ...config,
             assistViewFields: [],
             controllerValues: [],
-            parentField: undefined,
+            parentFields: undefined,
           },
         });
         return;
@@ -242,7 +242,7 @@ const ValuesOptionsSetter: FC<{
           ...config,
           assistViewFields: value,
           controllerValues: [],
-          parentField: undefined,
+          parentFields: undefined,
         },
       });
       getViewData(value, type);
@@ -271,19 +271,19 @@ const ValuesOptionsSetter: FC<{
   );
 
   const onInitOptions = useCallback(
-    async (value: string[], parentField?: string[]) => {
+    async (value: string[], parentFields?: string[]) => {
       const [viewId, ...columns] = value;
       const { option: options, dataView } = await getViewOption(viewId);
-      if (parentField) {
-        columns.push(...parentField);
+      if (parentFields) {
+        columns.push(...parentFields);
       }
       const dataset = await fetchNewDataset(viewId, columns, dataView);
       const config: ControllerConfig = getControllerConfig();
-      const treeType = getTreeType();
+      const buildingMethod = getTreeBuildingMethod();
 
       setOptionValues(
-        parentField
-          ? convertToTree(dataset?.rows, treeType)
+        parentFields
+          ? convertToTree(dataset?.rows, buildingMethod)
           : convertToList(dataset?.rows),
       );
       setLabelOptions(options);
@@ -300,7 +300,7 @@ const ValuesOptionsSetter: FC<{
       fetchNewDataset,
       getControllerConfig,
       getViewOption,
-      getTreeType,
+      getTreeBuildingMethod,
     ],
   );
 
@@ -313,9 +313,9 @@ const ValuesOptionsSetter: FC<{
     }
 
     const assistViewFields = config?.assistViewFields;
-    const parentField = config?.parentField;
+    const parentFields = config?.parentFields;
     if (assistViewFields && assistViewFields[0] && assistViewFields[1]) {
-      onInitOptions(assistViewFields, parentField);
+      onInitOptions(assistViewFields, parentFields);
     }
   }, [form, getControllerConfig, onInitOptions]);
 
@@ -323,18 +323,30 @@ const ValuesOptionsSetter: FC<{
     return getControllerConfig()?.valueOptionType as ValueOptionType;
   }, [getControllerConfig]);
 
-  const onParentFieldChange = useCallback(
+  const onParentFieldsChange = useCallback(
     (val: string | string[]) => {
-      const config: ControllerConfig = getControllerConfig();
-      form?.setFieldsValue({
-        config: {
-          ...config,
-          parentField: Array.isArray(val) ? val : [val],
-        },
-      });
-      getViewData(config.assistViewFields || []);
+      let mergedConfig: ControllerConfig = {
+        ...getControllerConfig(),
+        parentFields: Array.isArray(val) ? val : [val],
+      };
+
+      if (getTreeBuildingMethod() === 'byHierarchy') {
+        mergedConfig.assistViewFields = mergedConfig.assistViewFields!.slice(
+          0,
+          1,
+        );
+
+        if ((val as string[]).length) {
+          mergedConfig.assistViewFields = mergedConfig.assistViewFields.concat(
+            (val as string[])[0],
+          );
+        }
+      }
+
+      form?.setFieldsValue({ config: mergedConfig });
+      getViewData(mergedConfig.assistViewFields || []);
     },
-    [getControllerConfig, getViewData, form],
+    [getControllerConfig, getTreeBuildingMethod, getViewData, form],
   );
 
   useEffect(() => {
@@ -380,16 +392,21 @@ const ValuesOptionsSetter: FC<{
                     onChange={onViewFieldChange}
                     viewList={viewList}
                     viewFieldList={labelOptions}
+                    isHierarchyTree={
+                      isTree && getTreeBuildingMethod() === 'byHierarchy'
+                    }
                     style={{ margin: '6px 0' }}
                   />
                 </Form.Item>
                 {isTree && (
-                  <Form.Item name={['config', 'parentField']} noStyle>
+                  <Form.Item name={['config', 'parentFields']} noStyle>
                     <TreeSetter
                       mode={
-                        getTreeType() === 'treeSelect' ? 'multiple' : undefined
+                        getTreeBuildingMethod() === 'byHierarchy'
+                          ? 'multiple'
+                          : undefined
                       }
-                      onChange={onParentFieldChange}
+                      onChange={onParentFieldsChange}
                       viewFieldList={labelOptions}
                       style={{ margin: '6px 0' }}
                     />
@@ -398,7 +415,7 @@ const ValuesOptionsSetter: FC<{
 
                 {getOptionType() === 'common' && (
                   <Space direction="vertical" style={{ width: '100%' }}>
-                    {!(isTree && getTreeType() === 'treeSelect') && (
+                    {!(isTree && getTreeBuildingMethod() === 'byHierarchy') && (
                       <Select
                         showSearch
                         placeholder={tc('optionLabelField')}
@@ -418,7 +435,7 @@ const ValuesOptionsSetter: FC<{
                       </Select>
                     )}
                     <Form.Item name={['config', 'controllerValues']}>
-                      {getParentField()?.length ? (
+                      {getParentFields()?.length ? (
                         <TreeSelect
                           placeholder={tc('selectDefaultValue')}
                           multiple

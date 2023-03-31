@@ -37,7 +37,7 @@ function TreeTypeSetter({ form }: TreeTypeSetterProps) {
     form?.setFieldsValue({
       config: {
         ...getControllerConfig,
-        parentField: undefined,
+        parentFields: undefined,
         controllerValues: [],
         valueOptions: [],
         assistViewFields: [],
@@ -48,20 +48,20 @@ function TreeTypeSetter({ form }: TreeTypeSetterProps) {
   return (
     <Form.Item
       shouldUpdate
-      label={t('treeSelectType')}
-      name={['config', 'treeType']}
+      label={t('treeBuildingMethod')}
+      name={['config', 'buildingMethod']}
     >
       <Radio.Group onChange={handleChangeFn}>
-        <Radio.Button value="treeControl">
-          {t('treeControl') + ' '}
-          <Tooltip title={t('treeControlTip')}>
+        <Radio.Button value="byParent">
+          {t('byParent') + ' '}
+          <Tooltip title={t('byParentTip')}>
             <QuestionCircleOutlined />
           </Tooltip>
         </Radio.Button>
 
-        <Radio.Button value="treeSelect">
-          {t('treeSelect') + ' '}
-          <Tooltip title={t('treeSelectTip')}>
+        <Radio.Button value="byHierarchy">
+          {t('byHierarchy') + ' '}
+          <Tooltip title={t('byHierarchyTip')}>
             <QuestionCircleOutlined />
           </Tooltip>
         </Radio.Button>

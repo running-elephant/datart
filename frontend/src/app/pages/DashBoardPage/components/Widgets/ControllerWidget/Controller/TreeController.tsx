@@ -29,7 +29,7 @@ export interface TreeControllerFormProps {
   label?: React.ReactNode;
   name?: string;
   required?: boolean;
-  parentField?: string[];
+  parentFields?: string[];
 }
 
 export const TreeControllerForm: React.FC<TreeControllerFormProps> = memo(

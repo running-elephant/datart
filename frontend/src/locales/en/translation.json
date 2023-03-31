@@ -1176,12 +1176,13 @@
       "setDefault": "Set Default",
       "delete": "Delete",
       "populate": "Populate From Field Values",
-      "parentFieldId": "Select Parent Field",
-      "treeSelectType": "Select Tree Type",
-      "treeControl": "Tree Control",
-      "treeControlTip": "Multi-level structure list (folders, organizational structures, categories, countries, etc. Use tree controls to fully display hierarchical relationships.)",
-      "treeSelect": "Tree Select",
-      "treeSelectTip": "Tree selection control (can be used when the optional data structure is a tree structure, such as company hierarchy, subject system, taxonomy, etc.)"
+      "parentFields": "Select Parent Field",
+      "parentFieldsHierarchy": "Select Fields by Hierarchy",
+      "treeBuildingMethod": "Building Method",
+      "byParent": "By Parent",
+      "byParentTip": "Automatically build a tree by specifying a value field (ID) and a parent field (Parent ID); for example: folder tree",
+      "byHierarchy": "By Hierarchy",
+      "byHierarchyTip": "Build a tree from multiple dimension fields with natural hierarchical attributes; for example: country, province, city"
     },
     "date": {
       "year": "Year",

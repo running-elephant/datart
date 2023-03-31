@@ -799,7 +799,7 @@ export const handleRowDataForTree = collection => {
   return Object.values(obj);
 };
 
-export const converListToTree = (
+export const convertListToTree = (
   list,
   parentId: null | string = null,
 ): any[] => {
@@ -822,12 +822,12 @@ export const converListToTree = (
   });
 
   return treeNodes.map(node => {
-    const children = converListToTree(childrenList, node.id);
+    const children = convertListToTree(childrenList, node.id);
     return children?.length ? { ...node, children } : { ...node, isLeaf: true };
   });
 };
 
-export const convertToTree = (col, type) => {
+export const convertToTree = (col, buildingMethod) => {
   if (!col && !col.length) {
     return col;
   }
@@ -836,11 +836,11 @@ export const convertToTree = (col, type) => {
   let copyCol = CloneValueDeep(col);
   let emptyParentList = ['null', 'undefined', 'false'];
 
-  if (type === 'treeControl') {
+  if (buildingMethod === 'byParent') {
     const parent = copyCol?.find(
       v => !v[v.length - 1] || emptyParentList.includes(v[v.length - 1]),
     ) || [null];
-    data = converListToTree(
+    data = convertListToTree(
       copyCol?.map(v => {
         return {
           id: v[0],
@@ -851,9 +851,7 @@ export const convertToTree = (col, type) => {
       parent[parent.length - 1],
     );
   } else {
-    copyCol?.forEach(arr => arr.reverse());
-
-    data = converListToTree(handleRowDataForTree(copyCol));
+    data = convertListToTree(handleRowDataForTree(copyCol));
   }
 
   return data;
