@@ -19,6 +19,7 @@ package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
 import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.ParamException;
 import datart.core.entity.*;
 import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.core.mappers.ext.StoryboardMapperExt;
@@ -38,6 +39,7 @@ import datart.server.service.StorypageService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -220,4 +222,29 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
         return false;
     }
 
+    @Override
+    public boolean unarchive(String id, String newName, String parentId, double index) {
+        Storyboard storyboard = retrieve(id);
+        requirePermission(storyboard, Const.MANAGE);
+
+        //check name
+        if (!storyboard.getName().equals(newName)) {
+            checkUnique(storyboard.getOrgId(), parentId, newName);
+        }
+
+        // update status
+        storyboard.setName(newName);
+        storyboard.setParentId(parentId);
+        storyboard.setStatus(Const.DATA_STATUS_ACTIVE);
+        storyboard.setIndex(index);
+        return 1 == storyboardMapper.updateByPrimaryKey(storyboard);
+    }
+
+    @Override
+    public boolean checkUnique(String orgId, String parentId, String name) {
+        if (!CollectionUtils.isEmpty(storyboardMapper.checkName(orgId, parentId, name))) {
+            Exceptions.tr(ParamException.class, "error.param.exists.name");
+        }
+        return true;
+    }
 }

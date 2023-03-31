@@ -568,18 +568,7 @@ public class VizServiceImpl extends BaseService implements VizService {
                 createFolder(vizType, vizId, newName, datachart.getOrgId(), parentId, index);
                 return 1 == datachartService.getDefaultMapper().updateByPrimaryKey(datachart);
             case STORYBOARD:
-                Storyboard storyboard = storyboardService.retrieve(vizId);
-                storyboardService.requirePermission(storyboard, Const.MANAGE);
-                // check name
-                if (!storyboard.getName().equals(newName)) {
-                    Storyboard check = new Storyboard();
-                    check.setOrgId(storyboard.getOrgId());
-                    check.setName(newName);
-                    storyboardService.checkUnique(check);
-                }
-                storyboard.setName(newName);
-                storyboard.setStatus(Const.DATA_STATUS_ACTIVE);
-                return 1 == storyboardService.getDefaultMapper().updateByPrimaryKey(storyboard);
+                return storyboardService.unarchive(vizId, newName, parentId, 0D);
             default:
                 Exceptions.msg("unknown viz type");
                 return false;
