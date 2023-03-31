@@ -38,7 +38,7 @@ export function errorHandle(error) {
 }
 
 export function getErrorMessage(error) {
-  if(typeof error === 'string') {
+  if (typeof error === 'string') {
     return error;
   }
   if (error?.response) {
