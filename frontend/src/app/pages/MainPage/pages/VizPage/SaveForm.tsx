@@ -140,7 +140,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
               const data = {
                 name: value,
                 orgId,
-                vizType,
+                vizType: vizType === 'TEMPLATE' ? 'FOLDER' : vizType,
                 parentId: parentId || null,
               };
               return fetchCheckName('viz', data);
