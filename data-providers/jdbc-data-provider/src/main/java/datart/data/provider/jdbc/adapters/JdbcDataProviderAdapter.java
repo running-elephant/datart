@@ -18,6 +18,7 @@
 
 package datart.data.provider.jdbc.adapters;
 
+import com.alibaba.fastjson.JSON;
 import datart.core.base.PageInfo;
 import datart.core.base.consts.ValueType;
 import datart.core.base.exception.Exceptions;
@@ -183,7 +184,7 @@ public class JdbcDataProviderAdapter implements Closeable {
 
     public String getQueryKey(QueryScript script, ExecuteParam executeParam) throws SqlParseException {
         SqlScriptRender render = new SqlScriptRender(script, executeParam, getSqlDialect(), jdbcProperties.isEnableSpecialSql(), driverInfo.getQuoteIdentifiers());
-        return "Q" + DigestUtils.md5Hex(render.render(true, supportPaging(), true));
+        return "Q" + DigestUtils.md5Hex(render.render(true, supportPaging(), true) + ";includeColumns:" + JSON.toJSONString(executeParam.getIncludeColumns()) + ";viewId:" + script.getViewId() + ";pageInfo:" + JSON.toJSONString(executeParam.getPageInfo()));
     }
 
     protected Column readTableColumn(ResultSet columnMetadata) throws SQLException {
