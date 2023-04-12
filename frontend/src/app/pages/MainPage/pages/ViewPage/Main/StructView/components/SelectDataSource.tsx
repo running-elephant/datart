@@ -452,7 +452,7 @@ const SmallDivider = styled(Divider)`
 const ColumnList = styled(CheckboxGroup)`
   display: flex;
   flex-direction: column;
-
+  overflow-y: auto;
   .ant-checkbox-group-item {
     padding: ${SPACE_TIMES(0.5)} 0;
   }
