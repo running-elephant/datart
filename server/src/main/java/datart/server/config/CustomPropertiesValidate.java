@@ -117,7 +117,7 @@ public class CustomPropertiesValidate implements EnvironmentPostProcessor {
                     environment.getPropertySources().remove(defaultConfig);
                 }
                 // add demo propertySource
-                List<PropertySource<?>> propertySources = new YamlPropertySourceLoader().load("demo", new ClassPathResource("application-demo.yml"));
+                List<PropertySource<?>> propertySources = new YamlPropertySourceLoader().load("demo", new ClassPathResource("-application-demo.yml"));
                 if (propertySources != null && propertySources.size() > 0) {
                     for (PropertySource<?> propertySource : propertySources) {
                         environment.getPropertySources().addFirst(propertySource);
