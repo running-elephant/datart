@@ -16,6 +16,7 @@
         <module>jdbc-data-provider</module>
         <module>file-data-provider</module>
         <module>http-data-provider</module>
+        <module>document-data-provider</module>
     </modules>
 <!--    <dependencies>-->
 <!--        <dependency>-->
