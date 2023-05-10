@@ -180,11 +180,20 @@ public class POIUtils {
                 Exceptions.msg("empty excel :" + path);
             }
             int columns = row0.getPhysicalNumberOfCells();
+            int rowId = 0;
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
+                rowId += 1;
                 LinkedList<Object> cellValues = new LinkedList<>();
-                for (int i = 0; i < columns; i++)
-                    cellValues.add(readCellValue(row.getCell(i)));
+                for (int i = 0; i < columns; i++) {
+                    try {
+                        cellValues.add(readCellValue(row.getCell(i)));
+                    } catch (Exception e) {
+                        Exceptions.msg("read cell value error, row: " + String.valueOf(rowId)
+                                + ", column: " + String.valueOf(i) + ". errmsg: " + e.toString()
+                        );
+                    }
+                }
                 rows.add(cellValues);
             }
         }
