@@ -96,25 +96,25 @@ const StyledTable = styled(Table)<{ tableStyleConfig?: TableStyleConfigProps }>`
   }
 
   .ant-table-summary .ant-table-cell {
-    background-color: ${p =>
-      p?.tableStyleConfig?.summaryStyle?.backgroundColor};
     font-family: ${p => p?.tableStyleConfig?.summaryStyle?.fontFamily};
     font-size: ${p => p?.tableStyleConfig?.summaryStyle?.fontSize + 'px'};
-    font-weight: ${p => p?.tableStyleConfig?.summaryStyle?.fontWeight};
     font-style: ${p => p?.tableStyleConfig?.summaryStyle?.fontStyle};
+    font-weight: ${p => p?.tableStyleConfig?.summaryStyle?.fontWeight};
     color: ${p => p?.tableStyleConfig?.summaryStyle?.color};
+    background-color: ${p =>
+      p?.tableStyleConfig?.summaryStyle?.backgroundColor};
   }
 
   .ant-table .ant-table-container .ant-table-body .datart-basic-table-odd {
+    color: ${p => p?.tableStyleConfig?.odd?.color || 'inherit'};
     background: ${p =>
       p?.tableStyleConfig?.odd?.backgroundColor || 'transparent'};
-    color: ${p => p?.tableStyleConfig?.odd?.color || 'auto'};
   }
 
   .ant-table .ant-table-container .ant-table-body .datart-basic-table-even {
+    color: ${p => p?.tableStyleConfig?.even?.color || 'inherit'};
     background: ${p =>
       p?.tableStyleConfig?.even?.backgroundColor || 'transparent'};
-    color: ${p => p?.tableStyleConfig?.even?.color || 'auto'};
   }
 `;
 

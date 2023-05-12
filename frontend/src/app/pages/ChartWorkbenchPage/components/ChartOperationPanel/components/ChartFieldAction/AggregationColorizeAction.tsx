@@ -143,7 +143,7 @@ function setColorFn(
 ): { key: string; value: string }[] {
   const colorizedColumnName = config.colName;
   const colorizeIndex =
-    dataset?.columns?.findIndex(r => r.name === colorizedColumnName) || 0;
+    dataset?.columns?.findIndex(r => r.name[0] === colorizedColumnName) || 0;
   const colorizedGroupValues = Array.from(
     new Set(dataset?.rows?.map(r => String(r[colorizeIndex]))),
   );
@@ -164,8 +164,8 @@ function setColorFn(
 }
 
 const StyledUL = styled.ul`
-  padding-inline-start: 0;
   max-height: 300px;
+  padding-inline-start: 0;
   overflow: auto;
   li {
     display: flex;

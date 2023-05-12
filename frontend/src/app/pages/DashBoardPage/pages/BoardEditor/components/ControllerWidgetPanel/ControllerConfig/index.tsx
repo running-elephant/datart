@@ -21,16 +21,17 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import {
   BoardType,
   ControllerWidgetContent,
-  Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import ChartDataView from 'app/types/ChartDataView';
 import React, { memo, useMemo } from 'react';
 import styled from 'styled-components/macro';
 import ControllerVisibility from './ControllerVisibility';
-import { RadioStyleForm } from './OtherSet.tsx/RadioStyle/RadioStyleForm';
-import { SliderMarks } from './OtherSet.tsx/SliderStyle/SliderMarks';
-import { SliderStep } from './OtherSet.tsx/SliderStyle/SliderStep';
-import { SqlOperator } from './OtherSet.tsx/SqlOperator';
+import { RadioStyleForm } from './OtherSetter/RadioStyle/RadioStyleForm';
+import { SliderMarks } from './OtherSetter/SliderStyle/SliderMarks';
+import { SliderStep } from './OtherSetter/SliderStyle/SliderStep';
+import { SqlOperator } from './OtherSetter/SqlOperator';
+import TreeTypeSetter from './ValuesSetter/TreeTypeSetter';
 import { ValuesSetter } from './ValuesSetter/ValuesSetter';
 
 export const ControllerValuesName = ['config', 'controllerValues'];
@@ -68,15 +69,36 @@ export interface RelatedViewFormProps {
   viewMap: Record<string, ChartDataView>;
   otherStrFilterWidgets: Widget[];
   boardType: BoardType;
+  boardVizs?: Widget[];
+  wid?: string;
 }
 
 export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
-  ({ controllerType, form, viewMap, otherStrFilterWidgets }) => {
+  ({
+    controllerType,
+    form,
+    viewMap,
+    otherStrFilterWidgets,
+    boardVizs,
+    wid,
+  }) => {
+    const t = useI18NPrefix(`viz.board.setting`);
     const tc = useI18NPrefix('viz.control');
     const tgb = useI18NPrefix('global.button');
     const hasRadio = useMemo(() => {
       return controllerType === ControllerFacadeTypes.RadioGroup;
     }, [controllerType]);
+
+    const isTree = useMemo(() => {
+      return controllerType === ControllerFacadeTypes.DropDownTree;
+    }, [controllerType]);
+
+    const boardAllWidgetNames = useMemo(() => {
+      return (boardVizs || [])
+        .filter(bvz => bvz?.id !== wid)
+        .map(bvz => bvz?.config?.name)
+        .filter(Boolean);
+    }, [boardVizs, wid]);
 
     const sliderTypes = useMemo(() => {
       const sliderTypes = [
@@ -85,11 +107,35 @@ export const WidgetControlForm: React.FC<RelatedViewFormProps> = memo(
       ];
       return sliderTypes.includes(controllerType);
     }, [controllerType]);
+
     return (
       <Wrapper>
-        <Form.Item name="name" label={tc('title')} rules={[{ required: true }]}>
+        <Form.Item
+          name="name"
+          label={tc('title')}
+          rules={[
+            {
+              required: true,
+              message: t('requiredWidgetName'),
+            },
+            () => ({
+              validator(_, value) {
+                if (
+                  value &&
+                  boardAllWidgetNames?.some(name => name === value)
+                ) {
+                  return Promise.reject(new Error(t('duplicateWidgetName')));
+                } else {
+                  return Promise.resolve();
+                }
+              },
+            }),
+          ]}
+        >
           <Input />
         </Form.Item>
+        {isTree && <TreeTypeSetter form={form} />}
+
         <ValuesSetter
           controllerType={controllerType}
           form={form}

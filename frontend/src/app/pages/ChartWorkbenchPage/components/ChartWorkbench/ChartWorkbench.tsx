@@ -21,14 +21,14 @@ import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartData
 import ChartDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
 import TimeConfigContext from 'app/pages/ChartWorkbenchPage/contexts/TimeConfigContext';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import ChartDataView from 'app/types/ChartDataView';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { FC, memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import ChartDrillContext from '../../contexts/ChartDrillContext';
+import ChartDrillContext from '../../../../contexts/ChartDrillContext';
 import { dateFormatSelector, languageSelector } from '../../slice/selectors';
 import ChartHeaderPanel from '../ChartHeaderPanel';
 import ChartOperationPanel from '../ChartOperationPanel';
@@ -40,6 +40,7 @@ const ChartWorkbench: FC<{
   chart?: IChart;
   aggregation?: boolean;
   drillOption?: IChartDrillOption;
+  selectedItems?: SelectedItem[];
   defaultViewId?: string;
   expensiveQuery: boolean;
   allowQuery: boolean;
@@ -55,7 +56,7 @@ const ChartWorkbench: FC<{
   };
   onChartChange: (c: IChart) => void;
   onChartConfigChange: (type, payload) => void;
-  onDataViewChange?: () => void;
+  onDataViewChange?: (clear?: boolean) => void;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
   onChartDrillOptionChange?: (option: IChartDrillOption) => void;
@@ -68,6 +69,7 @@ const ChartWorkbench: FC<{
     chart,
     aggregation,
     drillOption,
+    selectedItems,
     header,
     defaultViewId,
     expensiveQuery,
@@ -136,6 +138,7 @@ const ChartWorkbench: FC<{
                       onChartConfigChange={onChartConfigChange}
                       onDataViewChange={onDataViewChange}
                       onCreateDownloadDataTask={onCreateDownloadDataTask}
+                      selectedItems={selectedItems}
                     />
                   </StyledChartOperationPanel>
                 </StyledChartWorkbench>

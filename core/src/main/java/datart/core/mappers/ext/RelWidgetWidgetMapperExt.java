@@ -1,7 +1,6 @@
 package datart.core.mappers.ext;
 
 import datart.core.entity.RelWidgetWidget;
-import datart.core.entity.Widget;
 import datart.core.mappers.RelWidgetWidgetMapper;
 import org.apache.ibatis.annotations.*;
 
@@ -59,5 +58,15 @@ public interface RelWidgetWidgetMapperExt extends RelWidgetWidgetMapper {
                     "WHERE rww.source_id = #{sourceId}"
     })
     List<RelWidgetWidget> listTargetWidgets(String sourceId);
+
+    @Select({
+            "<script>",
+            "SELECT rww.* " +
+                    "FROM rel_widget_widget rww " +
+                    "WHERE rww.source_id IN " +
+                    "<foreach collection='sourceIds' item='item' index='index' open='(' close=')' separator=','>  #{item} </foreach> ;",
+            "</script>",
+    })
+    List<RelWidgetWidget> listTargetWidgetsByIds(List<String> sourceIds);
 
 }

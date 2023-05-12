@@ -17,12 +17,12 @@
  */
 
 import { BarsOutlined } from '@ant-design/icons';
-import { Button, Modal } from 'antd';
+import { Button } from 'antd';
 import {
   ChartDataSectionFieldActionType,
   DataViewFieldType,
 } from 'app/constants';
-import { StateModalSize } from 'app/hooks/useStateModal';
+import useStateModal, { StateModalSize } from 'app/hooks/useStateModal';
 import FilterActions from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/FilterAction';
 import { ChartDataConfig } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
@@ -39,6 +39,7 @@ const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
     onConfigChanged,
     aggregation,
   }) => {
+    const [openStateModal, contextHolder] = useStateModal({});
     const [currentConfig, setCurrentConfig] = useState(config);
     const [originalConfig, setOriginalConfig] = useState(config);
     const [enableExtraAction] = useState(false);
@@ -46,6 +47,7 @@ const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
       {
         allowSameField: true,
         disableAggregate: false,
+        disableAggregateComputedField: true,
       },
       {
         actions: {
@@ -75,44 +77,47 @@ const FilterTypeSection: FC<ChartDataConfigSectionProps> = memo(
 
       const handleExtraButtonConfirm = close => {
         handleConfigChange(ancestors, currentConfig);
-        close && close();
+        close?.();
       };
 
       const handleExtraButtonCancel = close => {
         setCurrentConfig(originalConfig);
-        close && close();
+        close?.();
       };
 
-      // TODO(Stephen): fix to use useStateModal hook
-      Modal.confirm({
+      (openStateModal as Function)({
         title: translate('title'),
         width: { small: 600, middle: 1000, large: 1600 }['middle'],
         style: { maxHeight: 1000, overflowY: 'scroll', overflowX: 'auto' },
-        content: <FilterActions.ArrangeFilterAction {...props} />,
+        modalSize: StateModalSize.SMALL,
         onOk: handleExtraButtonConfirm,
+        content: <FilterActions.ArrangeFilterAction {...props} />,
         onCancel: handleExtraButtonCancel,
       });
     };
 
     return (
-      <BaseDataConfigSection
-        ancestors={ancestors}
-        modalSize={StateModalSize.MIDDLE}
-        translate={translate}
-        config={extendedConfig}
-        onConfigChanged={handleConfigChange}
-        extra={() =>
-          enableExtraAction ? (
-            <Button
-              size="small"
-              icon={<BarsOutlined />}
-              onClick={handleShowExtraFunctionDialog}
-            >
-              {translate('arrange')}
-            </Button>
-          ) : null
-        }
-      />
+      <>
+        <BaseDataConfigSection
+          ancestors={ancestors}
+          modalSize={StateModalSize.MIDDLE}
+          translate={translate}
+          config={extendedConfig}
+          onConfigChanged={handleConfigChange}
+          extra={() =>
+            enableExtraAction ? (
+              <Button
+                size="small"
+                icon={<BarsOutlined />}
+                onClick={handleShowExtraFunctionDialog}
+              >
+                {translate('arrange')}
+              </Button>
+            ) : null
+          }
+        />
+        {contextHolder}
+      </>
     );
   },
   dataConfigSectionComparer,

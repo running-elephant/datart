@@ -4,7 +4,11 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { BoardTypes } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { fetchCheckName } from 'app/utils/fetch';
 import debounce from 'debounce-promise';
-import { CommonFormTypes, DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
+import {
+  CommonFormTypes,
+  DatartFileSuffixes,
+  DEFAULT_DEBOUNCE_WAIT,
+} from 'globalConstants';
 import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
@@ -15,8 +19,10 @@ import {
   selectPermissionMap,
 } from '../../slice/selectors';
 import { PermissionLevels, ResourceTypes } from '../PermissionPage/constants';
+import { FileUpload } from '../ResourceMigrationPage/FileUpload';
 import { SaveFormContext } from './SaveFormContext';
 import {
+  makeSelectStoryboradFolderTree,
   makeSelectVizFolderTree,
   selectSaveFolderLoading,
   selectSaveStoryboardLoading,
@@ -35,6 +41,10 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     onAfterClose,
   } = useContext(SaveFormContext);
   const selectVizFolderTree = useMemo(makeSelectVizFolderTree, []);
+  const selectStoryboradFolderTree = useMemo(
+    makeSelectStoryboradFolderTree,
+    [],
+  );
   const saveFolderLoading = useSelector(selectSaveFolderLoading);
   const saveStoryboardLoading = useSelector(selectSaveStoryboardLoading);
   const orgId = useSelector(selectOrgId);
@@ -56,8 +66,11 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
     [isOwner, permissionMap],
   );
 
-  const treeData = useSelector(state =>
+  const folderTreeData = useSelector(state =>
     selectVizFolderTree(state, { id: initialValues?.id, getDisabled }),
+  );
+  const storyboardTreeData = useSelector(state =>
+    selectStoryboradFolderTree(state, { id: initialValues?.id, getDisabled }),
   );
 
   const save = useCallback(
@@ -107,6 +120,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
       <Form.Item
         name="name"
         label={t('name')}
+        getValueFromEvent={event => event.target.value?.trim()}
         rules={[
           {
             required: true,
@@ -126,7 +140,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
               const data = {
                 name: value,
                 orgId,
-                vizType,
+                vizType: vizType === 'TEMPLATE' ? 'FOLDER' : vizType,
                 parentId: parentId || null,
               };
               return fetchCheckName('viz', data);
@@ -163,11 +177,41 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
           </Radio.Group>
         </Form.Item>
       )}
+      {vizType === 'TEMPLATE' && type === CommonFormTypes.Add && (
+        <Form.Item
+          rules={[
+            {
+              required: true,
+              message: t('template.requiredMessage'),
+            },
+          ]}
+          name="file"
+          label={t('template.label')}
+        >
+          <FileUpload
+            suffix={DatartFileSuffixes.Template}
+            uploadText={t('template.upload')}
+          />
+        </Form.Item>
+      )}
+
       {vizType !== 'STORYBOARD' && (
         <Form.Item name="parentId" label={t('parent')}>
           <TreeSelect
             placeholder={t('root')}
-            treeData={treeData}
+            treeData={folderTreeData}
+            allowClear
+            onChange={() => {
+              formRef.current?.validateFields();
+            }}
+          />
+        </Form.Item>
+      )}
+      {vizType === 'STORYBOARD' && (
+        <Form.Item name="parentId" label={t('parent')}>
+          <TreeSelect
+            placeholder={t('root')}
+            treeData={storyboardTreeData}
             allowClear
             onChange={() => {
               formRef.current?.validateFields();

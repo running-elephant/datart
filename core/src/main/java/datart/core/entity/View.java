@@ -16,6 +16,8 @@ public class View extends BaseEntity {
 
     private String script;
 
+    private String type;
+
     private String model;
 
     private String config;

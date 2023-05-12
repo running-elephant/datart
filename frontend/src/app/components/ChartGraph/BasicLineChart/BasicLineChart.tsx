@@ -17,18 +17,22 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
   LabelStyle,
   LegendStyle,
+  SelectedItem,
   SeriesStyle,
   XAxis,
   XAxisColumns,
   YAxis,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getAxisLabel,
   getAxisLine,
@@ -50,18 +54,26 @@ import {
   transformToDataSet,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
+import { transparentize } from 'polished';
 import { UniqArray } from 'utils/object';
 import Chart from '../../../models/Chart';
-import { ChartDrillOption } from '../../../models/ChartDrillOption';
 import Config from './config';
 import { Series } from './types';
 
 class BasicLineChart extends Chart {
   config = Config;
   chart: any = null;
+  selectionManager?: ChartSelectionManager;
 
   protected isArea = false;
   protected isStack = false;
+  protected dataZoomConfig: {
+    setConfig: any;
+    showConfig: any;
+  } = {
+    setConfig: null,
+    showConfig: null,
+  };
 
   constructor(props?) {
     super(
@@ -77,49 +89,68 @@ class BasicLineChart extends Chart {
     ];
   }
 
-  onMount(options, context): void {
-    if (options.containerId === undefined || !context.document) {
+  onMount(options: BrokerOption, context: BrokerContext) {
+    if (
+      options.containerId === undefined ||
+      !context.document ||
+      !context.window
+    ) {
       return;
     }
 
     this.chart = init(
-      context.document.getElementById(options.containerId),
+      context.document.getElementById(options.containerId)!,
       'default',
     );
-    this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
+    this.selectionManager.attachWindowListeners(context.window);
+    this.selectionManager.attachZRenderListeners(this.chart);
+    this.selectionManager.attachEChartsListeners(this.chart);
+
+    // TODO(TL): refactor to chart data zoom manager model
+    this.chart.on('datazoom', ({ end, start }) => {
+      this.dataZoomConfig.showConfig = {
+        end,
+        start,
+      };
     });
   }
 
-  onUpdated(props): void {
-    if (!props.dataset || !props.dataset.columns || !props.config) {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
+    if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
-    if (!this.isMatchRequirement(props.config)) {
+    if (!this.isMatchRequirement(options.config)) {
       this.chart?.clear();
       return;
     }
+    this.selectionManager?.updateSelectedItems(options?.selectedItems);
     const newOptions = this.getOptions(
-      props.dataset,
-      props.config,
-      props.drillOption,
+      options.dataset,
+      options.config,
+      options.drillOption,
+      options.selectedItems,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext) {
     this.chart?.resize({ width: context?.width, height: context?.height });
-    hadAxisLabelOverflowConfig(this.chart?.getOption()) && this.onUpdated(opt);
+    hadAxisLabelOverflowConfig(this.chart?.getOption()) &&
+      this.onUpdated(options, context);
   }
 
-  onUnMount(): void {
+  onUnMount(options: BrokerOption, context: BrokerContext) {
+    this.selectionManager?.removeWindowListeners(context.window);
+    this.selectionManager?.removeZRenderListeners(this.chart);
     this.chart?.dispose();
   }
 
   private getOptions(
     dataset: ChartDataSetDTO,
     config: ChartConfig,
-    drillOption: ChartDrillOption,
+    drillOption?: ChartDrillOption,
+    selectedItems?: SelectedItem[],
   ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -129,13 +160,13 @@ class BasicLineChart extends Chart {
       drillOption,
     );
     const aggregateConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
     const colorConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.COLOR)
+      .filter(c => c.type === ChartDataSectionType.Color)
       .flatMap(config => config.rows || []);
     const infoConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.INFO)
+      .filter(c => c.type === ChartDataSectionType.Info)
       .flatMap(config => config.rows || []);
 
     const chartDataSet = transformToDataSet(
@@ -164,6 +195,7 @@ class BasicLineChart extends Chart {
       aggregateConfigs,
       infoConfigs,
       xAxisColumns,
+      selectedItems,
     );
     const yAxisNames: string[] = aggregateConfigs.map(getColumnRenderName);
 
@@ -192,8 +224,100 @@ class BasicLineChart extends Chart {
         styleConfigs,
         series?.map(s => s.name),
       ),
+      dataZoom: this.getDataZoom(styleConfigs),
       ...option,
     };
+  }
+
+  private getDataZoom(styles: ChartStyleConfig[]) {
+    const [
+      showZoomSlider,
+      zoomSliderColor,
+      usePercentage,
+      start,
+      end,
+      startValue,
+      endValue,
+    ] = getStyles(
+      styles,
+      ['xAxis', 'dataZoomPanel'],
+      [
+        'showZoomSlider',
+        'zoomSliderColor',
+        'usePercentage',
+        'zoomStartPercentage',
+        'zoomEndPercentage',
+        'zoomStartIndex',
+        'zoomEndIndex',
+      ],
+    );
+
+    const _getDataZoomStartAndEnd = setConfig => {
+      if (
+        JSON.stringify(this.dataZoomConfig.setConfig) !==
+          JSON.stringify(setConfig) ||
+        !this.dataZoomConfig.showConfig
+      ) {
+        this.dataZoomConfig.setConfig = {
+          ...setConfig,
+        };
+        return setConfig.usePercentage
+          ? {
+              start: setConfig.start,
+              end: setConfig.end,
+            }
+          : {
+              startValue: setConfig.startValue,
+              endValue: setConfig.endValue,
+            };
+      }
+      return this.dataZoomConfig.showConfig;
+    };
+
+    return showZoomSlider
+      ? [
+          {
+            type: 'slider',
+            handleSize: '100%',
+            show: true,
+            dataBackground: {
+              lineStyle: {
+                color: transparentize(0.7, zoomSliderColor),
+              },
+              areaStyle: {
+                color: transparentize(0.7, zoomSliderColor),
+              },
+            },
+            selectedDataBackground: {
+              lineStyle: {
+                color: zoomSliderColor,
+              },
+              areaStyle: {
+                color: zoomSliderColor,
+              },
+            },
+            brushStyle: {
+              color: transparentize(0.85, zoomSliderColor),
+            },
+            emphasis: {
+              handleStyle: {
+                color: zoomSliderColor,
+              },
+              moveHandleStyle: {
+                color: zoomSliderColor,
+              },
+            },
+            fillerColor: transparentize(0.85, zoomSliderColor),
+            ..._getDataZoomStartAndEnd({
+              usePercentage,
+              start,
+              end,
+              startValue,
+              endValue,
+            }),
+          },
+        ]
+      : [];
   }
 
   private getSeries(
@@ -205,23 +329,37 @@ class BasicLineChart extends Chart {
     aggregateConfigs: ChartDataSectionField[],
     infoConfigs: ChartDataSectionField[],
     xAxisColumns: XAxisColumns[],
+    selectedItems?: SelectedItem[],
   ): Series[] {
     if (!colorConfigs?.length) {
-      return aggregateConfigs.map(aggConfig => {
+      return aggregateConfigs.map((aggConfig, acIndex) => {
         const color = aggConfig?.color?.start;
         return {
           name: getColumnRenderName(aggConfig),
           type: 'line',
           sampling: 'average',
-          areaStyle: this.isArea ? { color } : undefined,
+          areaStyle: this.isArea
+            ? {
+                color,
+                opacity: selectedItems?.length ? 0.4 : undefined,
+              }
+            : undefined,
           stack: this.isStack ? 'total' : undefined,
-          data: chartDataSet.map(dc => ({
+          data: chartDataSet.map((dc, dcIndex) => ({
             ...getExtraSeriesRowData(dc),
             ...getExtraSeriesDataFormat(aggConfig?.format),
+            ...this.getLineSelectItemStyle(
+              acIndex,
+              dcIndex,
+              selectedItems || [],
+            ),
             value: dc.getCell(aggConfig),
           })),
           itemStyle: {
             color,
+          },
+          lineStyle: {
+            opacity: selectedItems?.length ? 0.5 : 1,
           },
           ...this.getLabelStyle(styleConfigs),
           ...this.getSeriesStyle(styleConfigs),
@@ -234,9 +372,8 @@ class BasicLineChart extends Chart {
       chartDataSet,
       colorConfigs[0],
     );
-
-    return aggregateConfigs.flatMap(aggConfig => {
-      return secondGroupInfos.map(sgCol => {
+    return aggregateConfigs.flatMap((aggConfig, acIndex) => {
+      return secondGroupInfos.map((sgCol, sgcIndex) => {
         const k = Object.keys(sgCol)[0];
         const dataSet = sgCol[k];
 
@@ -252,13 +389,19 @@ class BasicLineChart extends Chart {
           itemStyle: {
             normal: { color: itemStyleColor?.value },
           },
-          data: xAxisColumns[0].data.map(d => {
+          data: xAxisColumns[0].data.map((d, dcIndex) => {
             const row = dataSet.find(
-              r => r.getMultiCell(...groupConfigs) === d,
+              r =>
+                groupConfigs?.map(gc => String(r.getCell(gc))).join('-') === d,
             )!;
             return {
               ...getExtraSeriesRowData(row),
               ...getExtraSeriesDataFormat(aggConfig?.format),
+              ...this.getLineSelectItemStyle(
+                sgcIndex,
+                acIndex * secondGroupInfos.length + dcIndex,
+                selectedItems || [],
+              ),
               name: getColumnRenderName(aggConfig),
               value: row?.getCell(aggConfig),
             };
@@ -268,6 +411,17 @@ class BasicLineChart extends Chart {
         };
       });
     });
+  }
+
+  getLineSelectItemStyle(
+    comIndex: string | number,
+    dcIndex: string | number,
+    selectList: SelectedItem[],
+  ) {
+    const findIndex = selectList.findIndex(
+      v => v.index === comIndex + ',' + dcIndex,
+    );
+    return findIndex >= 0 ? { symbol: 'circle', symbolSize: 10 } : {};
   }
 
   private getYAxis(styles, yAxisNames): YAxis {
@@ -307,6 +461,11 @@ class BasicLineChart extends Chart {
       ['splitLine'],
       ['showHorizonLine', 'horizonLineStyle'],
     );
+    const [format] = getStyles(
+      styles,
+      ['yAxis', 'modal'],
+      ['YAxisNumberFormat'],
+    );
     const name = showTitleAndUnit ? yAxisNames.join(' / ') : null;
 
     return {
@@ -318,7 +477,11 @@ class BasicLineChart extends Chart {
       inverse,
       min,
       max,
-      axisLabel: getAxisLabel(showLabel, font),
+      axisLabel: {
+        show: showLabel,
+        formatter: v => toFormattedValue(v, format),
+        ...font,
+      },
       axisLine: getAxisLine(showAxis, lineStyle),
       axisTick: getAxisTick(showLabel, lineStyle),
       nameTextStyle: getNameTextStyle(
@@ -423,6 +586,12 @@ class BasicLineChart extends Chart {
       selected,
       data: seriesNames,
       textStyle: font,
+      itemStyle: {
+        opacity: 1,
+      },
+      lineStyle: {
+        opacity: 1,
+      },
     };
   }
 

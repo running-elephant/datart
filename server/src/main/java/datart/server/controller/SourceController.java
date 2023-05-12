@@ -22,9 +22,7 @@ package datart.server.controller;
 import datart.core.data.provider.SchemaInfo;
 import datart.core.entity.Source;
 import datart.server.base.dto.ResponseData;
-import datart.server.base.params.CheckNameParam;
-import datart.server.base.params.SourceCreateParam;
-import datart.server.base.params.SourceUpdateParam;
+import datart.server.base.params.*;
 import datart.server.service.SourceService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
@@ -46,10 +44,7 @@ public class SourceController extends BaseController {
     @ApiOperation(value = "check source name is unique")
     @PostMapping("/check/name")
     public ResponseData<Boolean> checkSourceName(@Validated @RequestBody CheckNameParam param) {
-        Source source = new Source();
-        source.setName(param.getName());
-        source.setOrgId(param.getOrgId());
-        return ResponseData.success(sourceService.checkUnique(source));
+        return ResponseData.success(sourceService.checkUnique(param.getOrgId(), param.getParentId(), param.getName()));
     }
 
     @ApiOperation(value = "Get Org available sources")
@@ -79,12 +74,20 @@ public class SourceController extends BaseController {
         return ResponseData.success(sourceService.updateSource(updateParam));
     }
 
+    @ApiOperation(value = "update a source base info")
+    @PutMapping(value = "/{sourceId}/base")
+    public ResponseData<Boolean> updateSourceBaseInfo(@PathVariable String sourceId,
+                                                      @Validated @RequestBody SourceBaseUpdateParam updateParam) {
+        checkBlank(sourceId, "sourceId");
+        return ResponseData.success(sourceService.updateBase(updateParam));
+    }
+
     @ApiOperation(value = "delete a source")
     @DeleteMapping("/{sourceId}")
     public ResponseData<Boolean> deleteSource(@PathVariable String sourceId,
                                               @RequestParam boolean archive) {
         checkBlank(sourceId, "sourceId");
-        return ResponseData.success(sourceService.delete(sourceId, archive));
+        return ResponseData.success(sourceService.delete(sourceId, archive, true));
     }
 
     @ApiOperation(value = "list archived source")
@@ -95,8 +98,11 @@ public class SourceController extends BaseController {
 
     @ApiOperation(value = "unarchive a source")
     @PutMapping(value = "/unarchive/{sourceId}")
-    public ResponseData<Boolean> unarchive(@PathVariable String sourceId) {
-        return ResponseData.success(sourceService.unarchive(sourceId));
+    public ResponseData<Boolean> unarchive(@PathVariable String sourceId,
+                                           @RequestParam String name,
+                                           @RequestParam Double index,
+                                           @RequestParam(required = false) String parentId) {
+        return ResponseData.success(sourceService.unarchive(sourceId, name, parentId, index));
     }
 
     @ApiOperation(value = "get source schemas ")
@@ -107,7 +113,7 @@ public class SourceController extends BaseController {
 
     @ApiOperation(value = "sync source schemas ")
     @GetMapping(value = "/sync/schemas/{sourceId}")
-    public ResponseData<SchemaInfo> syncSourceSchemas(@PathVariable String sourceId) throws Exception{
+    public ResponseData<SchemaInfo> syncSourceSchemas(@PathVariable String sourceId) throws Exception {
         return ResponseData.success(sourceService.syncSourceSchema(sourceId));
     }
 

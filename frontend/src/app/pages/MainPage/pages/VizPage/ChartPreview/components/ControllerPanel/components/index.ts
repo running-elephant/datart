@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { ExecuteToken } from 'app/pages/SharePage/slice/types';
 import { FilterCondition } from 'app/types/ChartConfig';
 import { ChartDTO } from 'app/types/ChartDTO';
 import DropdownListFilter from './DropdownListFilter';
@@ -37,6 +38,7 @@ export type PresentControllerFilterProps = {
   condition?: FilterCondition;
   onConditionChange: (condition: FilterCondition) => void;
   options: any;
+  executeToken?: Record<string, ExecuteToken>;
 };
 
 const Filters = {

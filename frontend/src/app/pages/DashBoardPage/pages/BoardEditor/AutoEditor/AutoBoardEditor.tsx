@@ -18,21 +18,23 @@
 
 import { Empty } from 'antd';
 import { useGridWidgetHeight } from 'app/hooks/useGridWidgetHeight';
-import { BoardConfigContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
+import { BoardConfigValContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardConfigProvider';
 import { BoardInfoContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardInfoProvider';
 import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
+import StyledBackground from 'app/pages/DashBoardPage/components/WidgetComponents/StyledBackground';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import {
   LAYOUT_COLS_MAP,
   WIDGET_DRAG_HANDLE,
 } from 'app/pages/DashBoardPage/constants';
 import useBoardScroll from 'app/pages/DashBoardPage/hooks/useBoardScroll';
+import useEditAutoLayoutMap from 'app/pages/DashBoardPage/hooks/useEditAutoLayoutMap';
 import useGridLayoutMap from 'app/pages/DashBoardPage/hooks/useGridLayoutMap';
 import { DeviceType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { getBoardMarginPadding } from 'app/pages/DashBoardPage/utils/board';
 import { dispatchResize } from 'app/utils/dispatchResize';
 import debounce from 'lodash/debounce';
-import React, {
+import {
   memo,
   useCallback,
   useContext,
@@ -48,13 +50,15 @@ import styled from 'styled-components/macro';
 import {
   BORDER_RADIUS,
   LEVEL_100,
+  LEVEL_DASHBOARD_EDIT_OVERLAY,
   SPACE_MD,
   SPACE_XS,
 } from 'styles/StyleConstants';
-import StyledBackground from '../../Board/components/StyledBackground';
+import { isEmptyArray } from 'utils/object';
+import BoardOverlay from '../components/BoardOverlay';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
-import { selectLayoutWidgetMap } from '../slice/selectors';
+import { selectEditingWidgetIds } from '../slice/selectors';
 import { WidgetOfAutoEditor } from './WidgetOfAutoEditor';
 
 const ReactGridLayout = WidthProvider(RGL);
@@ -62,12 +66,10 @@ const ReactGridLayout = WidthProvider(RGL);
 export const AutoBoardEditor: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const { boardId } = useContext(BoardContext);
-  const boardConfig = useContext(BoardConfigContext);
+  const boardConfig = useContext(BoardConfigValContext);
   const { background, allowOverlap } = boardConfig;
   const { deviceType } = useContext(BoardInfoContext);
-
-  const layoutWidgetMap = useSelector(selectLayoutWidgetMap);
-  const layoutMap = useGridLayoutMap(layoutWidgetMap);
+  const editingWidgetIds = useSelector(selectEditingWidgetIds);
   const { ref, widgetRowHeight, colsKey } = useGridWidgetHeight();
 
   const { curMargin, curPadding } = useMemo(() => {
@@ -87,14 +89,8 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
     });
   }, []);
 
-  const sortedLayoutWidgets = useMemo(
-    () =>
-      Object.values(layoutWidgetMap).sort(
-        (a, b) => a.config.index - b.config.index,
-      ),
-
-    [layoutWidgetMap],
-  );
+  const sortedLayoutWidgets = useEditAutoLayoutMap(boardId);
+  const layoutMap = useGridLayoutMap(sortedLayoutWidgets);
 
   const changeWidgetLayouts = debounce((layouts: Layout[]) => {
     dispatch(
@@ -127,8 +123,16 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
 
   const boardChildren = useMemo(() => {
     return sortedLayoutWidgets.map(item => {
+      // TODO(Stephen): 将外层div与内层WidgetWrapProvider合并，同时修改FreeBoardEditor
       return (
-        <div key={item.id}>
+        <div
+          style={{
+            zIndex: editingWidgetIds?.includes(item?.id)
+              ? LEVEL_DASHBOARD_EDIT_OVERLAY + 1
+              : 'auto',
+          }}
+          key={item.id}
+        >
           <WidgetWrapProvider
             id={item.id}
             boardEditing={true}
@@ -139,7 +143,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
         </div>
       );
     });
-  }, [boardId, sortedLayoutWidgets]);
+  }, [boardId, editingWidgetIds, sortedLayoutWidgets]);
 
   /**
    * https://www.npmjs.com/package/react-grid-layout
@@ -156,26 +160,29 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
         ref={ref}
       >
         {sortedLayoutWidgets.length ? (
-          <div className="grid-wrap" ref={gridWrapRef}>
-            <ReactGridLayout
-              layout={layoutMap[colsKey]}
-              cols={LAYOUT_COLS_MAP[colsKey]}
-              margin={curMargin}
-              containerPadding={curPadding}
-              rowHeight={widgetRowHeight}
-              useCSSTransforms={true}
-              measureBeforeMount={false}
-              onDragStop={changeWidgetLayouts}
-              onResizeStop={changeWidgetLayouts}
-              isBounded={false}
-              onLayoutChange={onLayoutChange}
-              isDraggable={true}
-              isResizable={true}
-              allowOverlap={allowOverlap}
-              draggableHandle={`.${WIDGET_DRAG_HANDLE}`}
-            >
-              {boardChildren}
-            </ReactGridLayout>
+          <div style={{ position: 'relative' }}>
+            <div className="grid-wrap" ref={gridWrapRef}>
+              <ReactGridLayout
+                layout={layoutMap[colsKey]}
+                cols={LAYOUT_COLS_MAP[colsKey]}
+                margin={curMargin}
+                containerPadding={curPadding}
+                rowHeight={widgetRowHeight}
+                useCSSTransforms={true}
+                measureBeforeMount={false}
+                onDragStop={changeWidgetLayouts}
+                onResizeStop={changeWidgetLayouts}
+                isBounded={false}
+                onLayoutChange={onLayoutChange}
+                isDraggable={true}
+                isResizable={true}
+                allowOverlap={allowOverlap}
+                draggableHandle={`.${WIDGET_DRAG_HANDLE}`}
+              >
+                {boardChildren}
+              </ReactGridLayout>
+            </div>
+            {!isEmptyArray(editingWidgetIds) && <BoardOverlay />}
           </div>
         ) : (
           <div className="empty">
@@ -194,7 +201,6 @@ const Wrapper = styled.div<{}>`
   align-items: center;
   width: 100px;
   min-height: 0;
-  overflow-y: auto;
 
   .react-resizable-handle {
     z-index: ${LEVEL_100};
@@ -209,6 +215,7 @@ const StyledContainer = styled(StyledBackground)<{ curWH: number[] }>`
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow-y: auto;
 
   &.desktop {
     flex: 1;

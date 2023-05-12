@@ -85,6 +85,8 @@ export const toScheduleSubmitParams = (
     subject,
     webHookUrl,
     textContent,
+    parentId,
+    index,
   } = values;
   const jobConfig = {
       subject,
@@ -108,6 +110,8 @@ export const toScheduleSubmitParams = (
     startDate: dateRange[0] ? dateRange[0].format(TIME_FORMATTER) : undefined,
     endDate: dateRange[1] ? dateRange[1].format(TIME_FORMATTER) : undefined,
     orgId,
+    parentId,
+    index,
     config: jobConfigStr,
   };
 };
@@ -118,8 +122,10 @@ export const toEchoFormValues = ({
   config,
   endDate,
   cronExpression,
+  parentId,
+  index,
 }: Schedule): FormValues => {
-  const configObj: any = config ? JSON.parse(config) : {},
+  const configObj: any = config ? JSON.parse(config || '{}') : {},
     vizContents: VizContentsItem[] = configObj?.vizContents || [],
     folderContent = vizContents.filter(v => v?.vizType !== VizTypes.StoryBoard),
     demoContent = vizContents.filter(v => v?.vizType === VizTypes.StoryBoard),
@@ -129,6 +135,8 @@ export const toEchoFormValues = ({
     : getTimeValues(cronExpression);
   return {
     name,
+    parentId,
+    index,
     jobType: type as JobTypes,
     dateRange:
       startDate && endDate ? [moment(startDate), moment(endDate)] : undefined,

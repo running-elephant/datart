@@ -19,10 +19,8 @@
 import {
   CodeFilled,
   DeleteOutlined,
-  FileOutlined,
   FolderFilled,
   FolderOpenFilled,
-  FolderOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
@@ -35,7 +33,7 @@ import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { LEVEL_10, SPACE_TIMES, SPACE_XS } from 'styles/StyleConstants';
+import { LEVEL_10, SPACE_TIMES, SPACE_XS, WHITE } from 'styles/StyleConstants';
 import { getInsertedNodeIndex, uuidv4 } from 'utils/utils';
 import { UNPERSISTED_ID_PREFIX } from '../constants';
 import { SaveFormContext } from '../SaveFormContext';
@@ -95,7 +93,6 @@ export const Sidebar = memo(
           key: id,
           title: name,
           parentId,
-          icon: isFolder ? <FolderOutlined /> : <FileOutlined />,
           isFolder,
           disabled: deleteLoading,
         })),
@@ -234,7 +231,7 @@ const Wrapper = styled.div<{
     position: absolute;
     width: ${SPACE_TIMES(7.5)} !important;
     height: 100%;
-    background: #fff;
+    background: ${WHITE};
     border-right: 1px solid #e9ecef;
     .menuUnfoldOutlined {
       position: absolute;

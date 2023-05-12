@@ -16,26 +16,53 @@
  * limitations under the License.
  */
 
-import { Data, DefaultCellTheme, Meta, SortParam, Style } from '@antv/s2';
-import { ChartDataSectionType, SortActionType } from 'app/constants';
+import {
+  Data,
+  DataCell,
+  DefaultCellTheme,
+  Meta,
+  S2CellType,
+  SortParam,
+  SpreadSheet,
+  Style,
+  TargetCellInfo,
+  ViewMeta,
+} from '@antv/s2';
+import {
+  ChartDataSectionType,
+  ChartInteractionEvent,
+  SortActionType,
+} from 'app/constants';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
 import ReactChart from 'app/models/ReactChart';
 import {
   ChartConfig,
   ChartDataConfig,
   ChartDataSectionField,
   ChartStyleConfig,
+  SelectedItem,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
+  compareSelectedItems,
   getColumnRenderName,
   getStyles,
   toFormattedValue,
   transformToDataSet,
 } from 'app/utils/chartHelper';
+import { isUndefined } from 'utils/object';
 import { PIVOT_THEME_LIST } from '../../FormGenerator/Customize/PivotSheetTheme/theme';
 import AntVS2Wrapper from './AntVS2Wrapper';
 import Config from './config';
 import { AndvS2Config } from './types';
+
+enum BolderFontWeight {
+  lighter = 'normal',
+  normal = 'bold',
+  bold = 'bolder',
+  bolder = 'bolder',
+}
 
 class PivotSheetChart extends ReactChart {
   static icon = `<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' aria-hidden='true' role='img' width='1em' height='1em' preserveAspectRatio='xMidYMid meet' viewBox='0 0 24 24'><path d='M10 8h11V5c0-1.1-.9-2-2-2h-9v5zM3 8h5V3H5c-1.1 0-2 .9-2 2v3zm2 13h3V10H3v9c0 1.1.9 2 2 2zm8 1l-4-4l4-4zm1-9l4-4l4 4zm.58 6H13v-2h1.58c1.33 0 2.42-1.08 2.42-2.42V13h2v1.58c0 2.44-1.98 4.42-4.42 4.42z' fill='gray'/></svg>`;
@@ -43,8 +70,13 @@ class PivotSheetChart extends ReactChart {
   useIFrame = false;
   isISOContainer = 'piovt-sheet';
   config = Config;
-  chart: any = null;
-  updateOptions: any = {};
+  chart: null | SpreadSheet = null;
+  private updateOptions: any = {};
+  private lastRowsConfig: ChartDataSectionField[] = [];
+  private hierarchyCollapse: boolean = true;
+  private drillLevel: number = 0;
+  private collapsedRows: Record<string, boolean> = {};
+  private selectedItems: SelectedItem[] = [];
 
   constructor() {
     super(AntVS2Wrapper, {
@@ -55,7 +87,7 @@ class PivotSheetChart extends ReactChart {
     this.meta.requirements = [{}];
   }
 
-  onUpdated(options, context): void {
+  onUpdated(options: BrokerOption, context: BrokerContext): void {
     if (!this.isMatchRequirement(options.config)) {
       this.adapter?.unmount();
       return;
@@ -63,13 +95,15 @@ class PivotSheetChart extends ReactChart {
 
     this.updateOptions = this.getOptions(
       context,
-      options.dataset,
-      options.config,
+      options.dataset!,
+      options.config!,
+      options.drillOption!,
+      options.selectedItems,
     );
     this.adapter?.updated(this.updateOptions);
   }
 
-  onResize(_, context) {
+  onResize(options: BrokerOption, context: BrokerContext) {
     if (this.updateOptions?.options) {
       this.updateOptions.options = Object.assign(
         {
@@ -81,15 +115,28 @@ class PivotSheetChart extends ReactChart {
     }
   }
 
+  onUnMount(options: BrokerOption, context: BrokerContext): void {
+    this.lastRowsConfig = [];
+    this.hierarchyCollapse = true;
+    this.drillLevel = 0;
+    this.collapsedRows = {};
+    this.adapter?.unmount();
+  }
+
   getOptions(
     context,
-    dataset?: ChartDataSetDTO,
-    config?: ChartConfig,
+    dataset: ChartDataSetDTO,
+    config: ChartConfig,
+    drillOption: ChartDrillOption,
+    selectedItems?: SelectedItem[],
   ): AndvS2Config {
     if (!dataset || !config) {
       return {
         options: {},
       };
+    }
+    if (!selectedItems?.length && this.selectedItems.length && this.chart) {
+      this.chart.interaction.reset();
     }
 
     const dataConfigs: ChartDataConfig[] = config.datas || [];
@@ -102,21 +149,21 @@ class PivotSheetChart extends ReactChart {
     );
 
     const rowSectionConfigRows: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
+      .filter(c => c.type === ChartDataSectionType.Group)
       .filter(c => c.key === 'row')
       .flatMap(config => config.rows || []);
 
     const columnSectionConfigRows: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
+      .filter(c => c.type === ChartDataSectionType.Group)
       .filter(c => c.key === 'column')
       .flatMap(config => config.rows || []);
 
     const metricsSectionConfigRows: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
 
     const infoSectionConfigRows: ChartDataSectionField[] = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.INFO)
+      .filter(c => c.type === ChartDataSectionType.Info)
       .flatMap(config => config.rows || []);
 
     const [
@@ -137,6 +184,11 @@ class PivotSheetChart extends ReactChart {
     const [summaryAggregation] = getStyles(
       settingConfigs,
       ['summaryAggregation'],
+      ['aggregation'],
+    );
+    const [calcSubAggregation] = getStyles(
+      settingConfigs,
+      ['calcSubAggregation'],
       ['aggregation'],
     );
     const [
@@ -160,17 +212,41 @@ class PivotSheetChart extends ReactChart {
       ['enableTotal', 'totalPosition', 'enableSubTotal', 'subTotalPosition'],
     );
 
+    if (!!enableExpandRow) {
+      if (
+        this.lastRowsConfig.map(lrc => lrc.uid).join('-') !==
+        rowSectionConfigRows.map(lrc => lrc.uid).join('-')
+      ) {
+        this.drillLevel = 0;
+        this.collapsedRows = {};
+        this.getCollapsedRows(rowSectionConfigRows, chartDataSet, true);
+        this.lastRowsConfig = rowSectionConfigRows;
+      } else {
+        this.getCollapsedRows(rowSectionConfigRows, chartDataSet);
+      }
+    } else {
+      if (Object.keys(this.collapsedRows).length) {
+        this.lastRowsConfig = [];
+        this.hierarchyCollapse = true;
+        this.drillLevel = 0;
+        this.collapsedRows = {};
+      }
+    }
     return {
       options: {
         hierarchyType: enableExpandRow ? 'tree' : 'grid',
+        hierarchyCollapse: this.hierarchyCollapse,
         width: context?.width,
         height: context?.height,
         tooltip: {
           showTooltip: true,
         },
+        cornerExtraFieldText: context.translator('summary.number'),
         interaction: {
           hoverHighlight: Boolean(enableHoverHighlight),
           selectedCellsSpotlight: Boolean(enableSelectedHighlight),
+          autoResetSheetStyle: false,
+          enableCopy: true,
         },
         totals: {
           row: {
@@ -189,6 +265,9 @@ class PivotSheetChart extends ReactChart {
             calcTotals: {
               aggregation: summaryAggregation,
             },
+            calcSubTotals: {
+              aggregation: calcSubAggregation,
+            },
           },
           col: {
             showGrandTotals: Boolean(enableColTotal),
@@ -205,6 +284,9 @@ class PivotSheetChart extends ReactChart {
             subLabel: context.translator('summary.subTotal'),
             calcTotals: {
               aggregation: summaryAggregation,
+            },
+            calcSubTotals: {
+              aggregation: calcSubAggregation,
             },
           },
         },
@@ -227,7 +309,7 @@ class PivotSheetChart extends ReactChart {
           values: metricsSectionConfigRows.map(config =>
             chartDataSet.getFieldKey(config),
           ),
-          valueInCols: !!metricNameShowIn,
+          valueInCols: !!enableExpandRow || !!metricNameShowIn,
         },
         meta: rowSectionConfigRows
           .concat(columnSectionConfigRows)
@@ -268,12 +350,179 @@ class PivotSheetChart extends ReactChart {
       },
       palette: {
         basicColors: this.getThemeColorList(styleConfigs),
-        semanticColors: {
-          red: '#FF4D4F',
-          green: '#29A294',
-        },
+        semanticColors: {},
+        brandColor: '#3471F9',
+        basicColorRelations: [],
+      },
+      onRowCellCollapseTreeRows: ({ isCollapsed, node }) => {
+        this.collapsedRows[node.id] = isCollapsed;
+        this.changeDrillConfig(rowSectionConfigRows, drillOption);
+      },
+      onCollapseRowsAll: hierarchyCollapse => {
+        this.hierarchyCollapse = !hierarchyCollapse;
+        Object.keys(this.collapsedRows).forEach(k => {
+          this.collapsedRows[k] = this.hierarchyCollapse;
+        });
+        this.changeDrillConfig(rowSectionConfigRows, drillOption, true);
+      },
+      onSelected: (cells: DataCell[]) => {
+        const state = this.chart?.interaction.getState();
+        this.changeSelectedItems(state?.interactedCells || [], chartDataSet);
+      },
+      onDataCellClick: (cell: TargetCellInfo) => {
+        const state = this.chart?.interaction.getState();
+        this.changeSelectedItems(state?.interactedCells || [], chartDataSet);
+      },
+      getSpreadSheet: getSpreadSheet => {
+        this.chart = getSpreadSheet;
       },
     };
+  }
+
+  changeSelectedItems(
+    cells: S2CellType<ViewMeta>[],
+    chartDataSet: IChartDataSet<string>,
+  ) {
+    const selectedItems: SelectedItem[] = [];
+
+    const _getDataConfig = (data?) => {
+      if (!data) return;
+      const dataConfig = Object.keys(data).reduce((acc, cur) => {
+        if (chartDataSet.getOriginFieldInfo(cur)) {
+          return {
+            ...acc,
+            [getColumnRenderName(chartDataSet.getOriginFieldInfo(cur))]:
+              data[cur],
+          };
+        }
+        return acc;
+      }, {});
+      return Object.keys(dataConfig).length ? dataConfig : undefined;
+    };
+
+    const _getIndex = (colConfig?) => {
+      const config = _getDataConfig(colConfig);
+      if (config) {
+        return Object.values(config).join(',');
+      }
+      return '';
+    };
+
+    cells.forEach(v => {
+      const { data, rowQuery, colQuery } = v.getMeta();
+      const index: string = _getIndex(rowQuery) + ',' + _getIndex(colQuery);
+      const selectedItemIndex = selectedItems.findIndex(v => v.index === index);
+      if (
+        selectedItemIndex < 0 &&
+        data &&
+        (_getDataConfig(rowQuery) || _getDataConfig(colQuery))
+      ) {
+        selectedItems.push({
+          index,
+          data: {
+            rowData: _getDataConfig(data)!,
+          },
+        });
+      } else if (selectedItemIndex >= 0) {
+        selectedItems[selectedItemIndex] = {
+          index: selectedItems[selectedItemIndex].index,
+          data: {
+            rowData: {
+              ...selectedItems[selectedItemIndex].data.rowData,
+              ..._getDataConfig(data)!,
+            },
+          },
+        };
+      }
+    });
+    if (compareSelectedItems(selectedItems, this.selectedItems)) {
+      this.selectedItems = selectedItems;
+      this.mouseEvents
+        ?.find(v => v.name === 'click')
+        ?.callback({
+          selectedItems,
+          interactionType: ChartInteractionEvent.Select,
+          type: 'click',
+          chartType: 'pivotSheet',
+        });
+    }
+  }
+
+  changeDrillConfig(
+    rowSectionConfigRows: ChartDataSectionField[],
+    drillOption: ChartDrillOption,
+    isCollapse: boolean = false,
+  ) {
+    const collapsedConfig: Record<string, boolean[]> = {};
+    Object.keys(this.collapsedRows).forEach(k => {
+      const pathArr = k.split('[&]');
+      if (isUndefined(collapsedConfig[pathArr.length])) {
+        collapsedConfig[pathArr.length] = [this.collapsedRows[k]];
+      } else {
+        collapsedConfig[pathArr.length].push(this.collapsedRows[k]);
+      }
+    });
+    let level: number = 0;
+    while (level < rowSectionConfigRows.length - 1) {
+      if (
+        (!isCollapse && !collapsedConfig[level + 2]) ||
+        collapsedConfig[level + 2]?.every(c => c) ||
+        (isCollapse &&
+          collapsedConfig[level + 2] &&
+          collapsedConfig[level + 2].every(c => c))
+      ) {
+        break;
+      }
+      level++;
+    }
+
+    if (this.drillLevel === level) return;
+    if (this.drillLevel < level) {
+      let index = 0;
+      while (level - this.drillLevel > index) {
+        drillOption?.expandDown();
+        index++;
+      }
+    } else if (this.drillLevel > level) {
+      drillOption?.expandUp(rowSectionConfigRows[level]);
+    }
+    this.drillLevel = level;
+    this.mouseEvents
+      ?.find(v => v.name === 'click')
+      ?.callback({
+        interactionType: ChartInteractionEvent.Drilled,
+        drillOption,
+        type: 'click',
+        chartType: 'pivotSheet',
+      });
+  }
+
+  getCollapsedRows(
+    rowSectionConfigRows: ChartDataSectionField[],
+    chartDataSet: IChartDataSet<string>,
+    initState?: boolean,
+  ) {
+    chartDataSet.forEach(dc => {
+      let path = 'root';
+      rowSectionConfigRows.forEach((rc, index) => {
+        if (
+          !isUndefined(dc.getCell(rc)) &&
+          index < rowSectionConfigRows.length - 1
+        ) {
+          path = path + '[&]' + dc.getCell(rc);
+          this.collapsedRows[path] = !isUndefined(initState)
+            ? Boolean(initState)
+            : isUndefined(this.collapsedRows?.[path])
+            ? this.hierarchyCollapse
+            : this.collapsedRows[path];
+        }
+      });
+    });
+    if (Object.values(this.collapsedRows).every(v => v)) {
+      this.hierarchyCollapse = true;
+    } else if (Object.values(this.collapsedRows).every(v => !v)) {
+      this.hierarchyCollapse = false;
+    }
   }
 
   private getThemeColorList(style: ChartStyleConfig[]): Array<string> {
@@ -298,30 +547,30 @@ class PivotSheetChart extends ReactChart {
       ['tableHeaderStyle'],
       ['height', 'width'],
     );
-    const [metricNameShowIn] = getStyles(
+    const [enableExpandRow, metricNameShowIn] = getStyles(
       style,
       ['style'],
-      ['metricNameShowIn'],
+      ['enableExpandRow', 'metricNameShowIn'],
     );
-
     return {
       colCfg: {
         height: headerHeight || 30,
-        widthByFieldValue: metricNameShowIn
-          ? metricsSectionConfigRows.reduce((allConfig, config) => {
-              return {
-                ...allConfig,
-                [chartDataSet.getFieldKey(config)]: bodyWidth,
-              };
-            }, {})
-          : chartDataSet.reduce((dataSetAllConfig, dataSetConfig) => {
-              return {
-                ...dataSetAllConfig,
-                [dataSetConfig?.getCell(
-                  columnSectionConfigRows[columnSectionConfigRows.length - 1],
-                )]: bodyWidth,
-              };
-            }, {}),
+        widthByFieldValue:
+          !!enableExpandRow || !!metricNameShowIn
+            ? metricsSectionConfigRows.reduce((allConfig, config) => {
+                return {
+                  ...allConfig,
+                  [chartDataSet.getFieldKey(config)]: bodyWidth,
+                };
+              }, {})
+            : chartDataSet.reduce((dataSetAllConfig, dataSetConfig) => {
+                return {
+                  ...dataSetAllConfig,
+                  [dataSetConfig?.getCell(
+                    columnSectionConfigRows[columnSectionConfigRows.length - 1],
+                  )]: bodyWidth,
+                };
+              }, {}),
       },
       rowCfg: {
         width: headerWidth,
@@ -329,6 +578,7 @@ class PivotSheetChart extends ReactChart {
       cellCfg: {
         height: bodyHeight || 30,
       },
+      collapsedRows: enableExpandRow ? this.collapsedRows : {},
     };
   }
 
@@ -338,7 +588,7 @@ class PivotSheetChart extends ReactChart {
   ): Array<SortParam> {
     return sectionConfigRows
       .map(config => {
-        if (!config?.sort?.type || config?.sort?.type === SortActionType.NONE) {
+        if (!config?.sort?.type || config?.sort?.type === SortActionType.None) {
           return null;
         }
         const isASC = config.sort.type === SortActionType.ASC;
@@ -359,13 +609,28 @@ class PivotSheetChart extends ReactChart {
     const [bodyFont, bodyTextAlign] = getStyles(
       styleConfigs,
       ['tableBodyStyle'],
-      ['font', 'align'],
+      ['font', 'tableAlign'],
     );
+
+    const _getBolderFontWeight = (
+      weightName: string,
+    ): number | BolderFontWeight => {
+      return BolderFontWeight[weightName]
+        ? BolderFontWeight[weightName]
+        : parseInt(weightName) + 100;
+    };
+
     return {
       text: {
         fontFamily: bodyFont?.fontFamily,
         fontSize: bodyFont?.fontSize,
         fontWeight: bodyFont?.fontWeight,
+        textAlign: bodyTextAlign,
+      },
+      bolderText: {
+        fontFamily: bodyFont?.fontFamily,
+        fontSize: bodyFont?.fontSize,
+        fontWeight: _getBolderFontWeight(bodyFont?.fontWeight),
         textAlign: bodyTextAlign,
       },
     };

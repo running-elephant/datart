@@ -81,6 +81,9 @@ public class FileDataProvider extends DefaultDataProvider {
             schemas = Collections.singletonList(properties);
         }
         for (Map<String, Object> schema : schemas) {
+            if (schema.get(FILE_PATH) == null || StringUtils.isEmpty(schema.get(FILE_PATH).toString())) {
+                Exceptions.msg("message.file.notfound", schema.getOrDefault(TABLE, "").toString());
+            }
             String path = schema.get(FILE_PATH).toString();
             FileFormat fileFormat = FileFormat.valueOf(schema.get(FILE_FORMAT).toString().toUpperCase());
             List<Column> columns = parseColumns(schema);

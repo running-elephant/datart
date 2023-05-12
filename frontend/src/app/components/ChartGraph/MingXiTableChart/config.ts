@@ -392,14 +392,6 @@ const config: ChartConfig = {
             step: 1,
             min: 0,
           },
-          watcher: {
-            deps: ['enablePaging'],
-            action: props => {
-              return {
-                disabled: !props.enablePaging,
-              };
-            },
-          },
         },
       ],
     },
@@ -448,6 +440,36 @@ const config: ChartConfig = {
             fontStyle: 'normal',
             color: 'black',
           },
+        },
+      ],
+    },
+  ],
+  interactions: [
+    {
+      label: 'drillThrough.title',
+      key: 'drillThrough',
+      comType: 'checkboxModal',
+      default: false,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'drillThrough.title',
+          key: 'setting',
+          comType: 'interaction.drillThrough',
+        },
+      ],
+    },
+    {
+      label: 'viewDetail.title',
+      key: 'viewDetail',
+      comType: 'checkboxModal',
+      default: false,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'viewDetail.title',
+          key: 'setting',
+          comType: 'interaction.viewDetail',
         },
       ],
     },

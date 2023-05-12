@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ChartDataSectionType } from 'app/constants';
 import { migrateChartConfig } from 'app/migration';
 import ChartManager from 'app/models/ChartManager';
+import { SelectedItem } from 'app/types/ChartConfig';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { CloneValueDeep } from 'utils/object';
@@ -47,6 +48,7 @@ export const initialState: VizState = {
   selectedTab: '',
   dataChartListLoading: false,
   chartPreviews: [],
+  selectedItems: {} as Record<string, SelectedItem[]>,
 };
 
 const slice = createSlice({
@@ -72,6 +74,15 @@ const slice = createSlice({
             : '';
       }
     },
+    closeOtherTabs(state: VizState, action: PayloadAction<string>) {
+      const currentTab = state.tabs.find(t => t.id === action.payload);
+      state.tabs = state.tabs.filter(t => t.id === action.payload);
+      state.selectedTab = currentTab?.id || '';
+    },
+    closeAllTabs(state) {
+      state.tabs = [];
+      state.selectedTab = '';
+    },
     updateChartPreviewFilter(
       state,
       action: PayloadAction<{ backendChartId: string; payload }>,
@@ -81,7 +92,7 @@ const slice = createSlice({
       );
       if (chartPreview) {
         const filterSection = chartPreview?.chartConfig?.datas?.find(
-          section => section.type === ChartDataSectionType.FILTER,
+          section => section.type === ChartDataSectionType.Filter,
         );
         if (filterSection) {
           const filterRowIndex = filterSection.rows?.findIndex(
@@ -111,7 +122,7 @@ const slice = createSlice({
 
       if (chartPreview) {
         const groupSection = chartPreview?.chartConfig?.datas?.find(
-          section => section.type === ChartDataSectionType.GROUP,
+          section => section.type === ChartDataSectionType.Group,
         );
         if (groupSection) {
           groupSection.rows = action.payload.payload?.value?.rows;
@@ -138,6 +149,14 @@ const slice = createSlice({
       Object.entries(initialState).forEach(([key, value]) => {
         state[key] = value;
       });
+    },
+    changeSelectedItems(
+      state,
+      {
+        payload,
+      }: PayloadAction<{ backendChartId: string; data: SelectedItem[] }>,
+    ) {
+      state.selectedItems[payload.backendChartId] = payload.data;
     },
   },
   extraReducers: builder => {
@@ -180,7 +199,10 @@ const slice = createSlice({
         id,
         name,
         vizType: 'DATACHART',
-        loading: false,
+        deleteLoading: false,
+        index: null,
+        isFolder: false,
+        parentId: null,
       }));
     });
     builder.addCase(getArchivedDatacharts.rejected, state => {
@@ -197,7 +219,10 @@ const slice = createSlice({
         id,
         name,
         vizType: 'DASHBOARD',
-        loading: false,
+        deleteLoading: false,
+        index: null,
+        isFolder: false,
+        parentId: null,
       }));
     });
     builder.addCase(getArchivedDashboards.rejected, state => {
@@ -214,7 +239,10 @@ const slice = createSlice({
         id,
         name,
         vizType: 'STORYBOARD',
-        loading: false,
+        deleteLoading: false,
+        index: null,
+        isFolder: false,
+        parentId: null,
       }));
     });
     builder.addCase(getArchivedStoryboards.rejected, state => {
@@ -313,7 +341,7 @@ const slice = createSlice({
           break;
       }
       if (viz) {
-        viz.loading = true;
+        viz.deleteLoading = true;
       }
     });
     builder.addCase(unarchiveViz.fulfilled, (state, action) => {
@@ -351,7 +379,7 @@ const slice = createSlice({
           break;
       }
       if (viz) {
-        viz.loading = false;
+        viz.deleteLoading = false;
       }
     });
 
@@ -377,17 +405,23 @@ const slice = createSlice({
         if (type === 'DASHBOARD') {
           const dashboard = state.archivedDashboards.find(a => a.id === id);
           if (dashboard) {
-            dashboard.loading = true;
+            dashboard.deleteLoading = true;
           }
         } else if (type === 'DATACHART') {
           const datachart = state.archivedDatacharts.find(a => a.id === id);
           if (datachart) {
-            datachart.loading = true;
+            datachart.deleteLoading = true;
           }
         } else if (type === 'STORYBOARD') {
-          const storyboard = state.archivedStoryboards.find(a => a.id === id);
+          const storyboard = state.storyboards.find(a => a.id === id);
           if (storyboard) {
-            storyboard.loading = true;
+            storyboard.deleteLoading = true;
+          }
+          const archivedStoryboard = state.archivedStoryboards.find(
+            a => a.id === id,
+          );
+          if (archivedStoryboard) {
+            archivedStoryboard.deleteLoading = true;
           }
         } else {
           const folder = state.vizs.find(v => v.id === id);
@@ -418,6 +452,7 @@ const slice = createSlice({
             a => a.id !== id,
           );
         } else if (type === 'STORYBOARD') {
+          state.storyboards = state.storyboards.filter(a => a.id !== id);
           state.archivedStoryboards = state.archivedStoryboards.filter(
             a => a.id !== id,
           );
@@ -447,17 +482,23 @@ const slice = createSlice({
         if (type === 'DASHBOARD') {
           const dashboard = state.archivedDashboards.find(a => a.id === id);
           if (dashboard) {
-            dashboard.loading = false;
+            dashboard.deleteLoading = false;
           }
         } else if (type === 'DATACHART') {
           const datachart = state.archivedDatacharts.find(a => a.id === id);
           if (datachart) {
-            datachart.loading = false;
+            datachart.deleteLoading = false;
           }
         } else if (type === 'STORYBOARD') {
-          const storyboard = state.archivedStoryboards.find(a => a.id === id);
+          const storyboard = state.storyboards.find(s => s.id === id);
           if (storyboard) {
-            storyboard.loading = false;
+            storyboard.deleteLoading = false;
+          }
+          const archivedStoryboard = state.archivedStoryboards.find(
+            a => a.id === id,
+          );
+          if (archivedStoryboard) {
+            archivedStoryboard.deleteLoading = false;
           }
         } else {
           const folder = state.vizs.find(v => v.id === id);
@@ -499,7 +540,9 @@ const slice = createSlice({
     builder.addCase(editStoryboard.fulfilled, (state, action) => {
       state.saveStoryboardLoading = false;
       state.storyboards = state.storyboards.map(s =>
-        s.id === action.meta.arg.storyboard.id ? action.payload : s,
+        s.id === action.meta.arg.storyboard.id
+          ? { ...s, ...action.payload, deleteLoading: false }
+          : s,
       );
     });
     builder.addCase(editStoryboard.rejected, state => {
@@ -521,14 +564,16 @@ const slice = createSlice({
     });
     builder.addCase(fetchVizChartAction.fulfilled, (state, action) => {
       const newChartDto = CloneValueDeep(action.payload.data);
-
+      const jumpFilterParams = action.payload.jumpFilterParams;
       const filterSearchParams = action.payload.filterSearchParams;
       const index = state.chartPreviews?.findIndex(
         c => c.backendChartId === newChartDto?.id,
       );
+
       const currentChart = ChartManager.instance().getById(
         newChartDto?.config?.chartGraphId,
       );
+
       if (index < 0) {
         state.chartPreviews.push({
           backendChartId: newChartDto?.id,
@@ -540,6 +585,8 @@ const slice = createSlice({
                   migrateChartConfig(newChartDto?.config),
                 ),
                 filterSearchParams,
+                false,
+                jumpFilterParams,
               )
             : undefined,
         });
@@ -550,23 +597,51 @@ const slice = createSlice({
           backendChart: newChartDto,
           chartConfig: transferChartConfig(
             mergeToChartConfig(
-              prevChartPreview?.chartConfig || currentChart?.config,
+              currentChart?.config,
               migrateChartConfig(newChartDto?.config),
             ),
             filterSearchParams,
+            false,
+            jumpFilterParams,
           ),
         };
       }
     });
+    builder.addCase(
+      fetchDataSetByPreviewChartAction.pending,
+      (state, action: { meta: { arg: { backendChartId: string } } }) => {
+        const index = state.chartPreviews?.findIndex(
+          c => c.backendChartId === action?.meta?.arg?.backendChartId,
+        );
+        if (index !== undefined) {
+          state.chartPreviews[index].isLoadingData = true;
+          state.chartPreviews[index].version = uuidv4();
+        }
+      },
+    );
+    builder.addCase(
+      fetchDataSetByPreviewChartAction.rejected,
+      (state, action: { meta: { arg: { backendChartId: string } } }) => {
+        const index = state.chartPreviews?.findIndex(
+          c => c.backendChartId === action?.meta?.arg?.backendChartId,
+        );
+        if (index !== undefined) {
+          state.chartPreviews[index].isLoadingData = false;
+          state.chartPreviews[index].version = uuidv4();
+        }
+      },
+    );
     builder.addCase(
       fetchDataSetByPreviewChartAction.fulfilled,
       (state, action: PayloadAction<{ backendChartId; data }>) => {
         const index = state.chartPreviews?.findIndex(
           c => c.backendChartId === action.payload?.backendChartId,
         );
+        state.selectedItems[action.payload?.backendChartId] = [];
         if (index < 0) {
           state.chartPreviews.push({
             backendChartId: action.payload?.backendChartId,
+            isLoadingData: false,
             dataset: action.payload?.data,
           });
           return;
@@ -574,6 +649,7 @@ const slice = createSlice({
         state.chartPreviews[index] = {
           ...state.chartPreviews[index],
           dataset: action.payload?.data,
+          isLoadingData: false,
           version: uuidv4(),
         };
       },

@@ -21,10 +21,9 @@ import datart.core.base.consts.Const;
 import datart.core.base.consts.JobType;
 import datart.core.base.exception.BaseException;
 import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.ParamException;
 import datart.core.common.UUIDGenerator;
-import datart.core.entity.Role;
-import datart.core.entity.Schedule;
-import datart.core.entity.ScheduleLog;
+import datart.core.entity.*;
 import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.core.mappers.ext.ScheduleLogMapperExt;
 import datart.core.mappers.ext.ScheduleMapperExt;
@@ -35,10 +34,7 @@ import datart.security.exception.PermissionDeniedException;
 import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.PermissionHelper;
 import datart.server.base.dto.ScheduleBaseInfo;
-import datart.server.base.params.BaseCreateParam;
-import datart.server.base.params.BaseUpdateParam;
-import datart.server.base.params.ScheduleCreateParam;
-import datart.server.base.params.ScheduleUpdateParam;
+import datart.server.base.params.*;
 import datart.server.job.EmailJob;
 import datart.server.job.ScheduleJob;
 import datart.server.job.WeChartJob;
@@ -50,6 +46,7 @@ import org.quartz.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -143,9 +140,16 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
 
     @Override
     public List<ScheduleBaseInfo> listArchivedSchedules(String orgId) {
-        securityManager.requireOrgOwner(orgId);
         return scheduleMapper.selectArchived(orgId)
                 .stream()
+                .filter(schedule -> {
+                    try {
+                        requirePermission(schedule, Const.MANAGE);
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
                 .map(ScheduleBaseInfo::new)
                 .collect(Collectors.toList());
     }
@@ -160,7 +164,12 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
         requirePermission(schedule, Const.CREATE);
 
         schedule.setCreateBy(getCurrentUser().getId());
-        schedule.setType(scheduleCreateParam.getType().name());
+        if (Objects.equals(schedule.getIsFolder(), Boolean.TRUE)) {
+            schedule.setType(ResourceType.FOLDER.name());
+        } else {
+            schedule.setIsFolder(Boolean.FALSE);
+            schedule.setType(scheduleCreateParam.getType().name());
+        }
         schedule.setCreateTime(new Date());
         schedule.setId(UUIDGenerator.generate());
         schedule.setStatus((byte) 1);
@@ -177,10 +186,15 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
     public boolean update(BaseUpdateParam updateParam) {
         ScheduleUpdateParam scheduleUpdateParam = (ScheduleUpdateParam) updateParam;
         Schedule schedule = retrieve(updateParam.getId());
+        requirePermission(schedule, Const.MANAGE);
         BeanUtils.copyProperties(updateParam, schedule);
         schedule.setUpdateBy(getCurrentUser().getId());
         schedule.setUpdateTime(new Date());
-        schedule.setType(scheduleUpdateParam.getType().name());
+        if (Objects.equals(schedule.getIsFolder(), Boolean.TRUE)) {
+            schedule.setType(ResourceType.FOLDER.name());
+        } else {
+            schedule.setType(scheduleUpdateParam.getType().name());
+        }
         return scheduleMapper.updateByPrimaryKey(schedule) == 1;
     }
 
@@ -228,6 +242,11 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
     }
 
     @Override
+    public boolean safeDelete(String id) {
+        return scheduleMapper.checkReference(id) == 0;
+    }
+
+    @Override
     public boolean stop(String scheduleId) throws SchedulerException {
         Schedule schedule = retrieve(scheduleId);
         JobKey jobKey = JobKey.jobKey(schedule.getName(), schedule.getOrgId());
@@ -242,6 +261,55 @@ public class ScheduleServiceImpl extends BaseService implements ScheduleService 
     @Override
     public List<ScheduleLog> getScheduleLogs(String scheduleId, int count) {
         return scheduleLogMapper.selectByScheduleId(scheduleId, count);
+    }
+
+    @Override
+    public boolean updateBase(ScheduleBaseUpdateParam updateParam) {
+        Schedule schedule = retrieve(updateParam.getId());
+        requirePermission(schedule, Const.MANAGE);
+        if (!schedule.getName().equals(updateParam.getName())) {
+            //check name
+            Schedule check = new Schedule();
+            check.setParentId(updateParam.getParentId());
+            check.setOrgId(schedule.getOrgId());
+            check.setName(updateParam.getName());
+            checkUnique(check);
+        }
+
+        // update base info
+        schedule.setId(updateParam.getId());
+        schedule.setUpdateBy(getCurrentUser().getId());
+        schedule.setUpdateTime(new Date());
+        schedule.setName(updateParam.getName());
+        schedule.setParentId(updateParam.getParentId());
+        schedule.setIndex(updateParam.getIndex());
+        return 1 == scheduleMapper.updateByPrimaryKey(schedule);
+    }
+
+    @Override
+    public boolean unarchive(String id, String newName, String parentId, double index) {
+        Schedule schedule = retrieve(id);
+        requirePermission(schedule, Const.MANAGE);
+
+        //check name
+        if (!schedule.getName().equals(newName)) {
+            checkUnique(schedule.getOrgId(), parentId, newName);
+        }
+
+        // update status
+        schedule.setName(newName);
+        schedule.setParentId(parentId);
+        schedule.setStatus(Const.DATA_STATUS_ACTIVE);
+        schedule.setIndex(index);
+        return 1 == scheduleMapper.updateByPrimaryKey(schedule);
+    }
+
+    @Override
+    public boolean checkUnique(String orgId, String parentId, String name) {
+        if (!CollectionUtils.isEmpty(scheduleMapper.checkName(orgId, parentId, name))) {
+            Exceptions.tr(ParamException.class, "error.param.exists.name");
+        }
+        return true;
     }
 
     @Override

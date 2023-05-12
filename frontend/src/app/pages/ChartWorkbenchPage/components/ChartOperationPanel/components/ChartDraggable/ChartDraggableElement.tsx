@@ -42,12 +42,11 @@ import {
 } from 'styles/StyleConstants';
 
 interface ChartDraggableElementObject {
-  id: string;
+  id?: string;
   index: number;
 }
 
 interface ChartDraggableElementProps {
-  id: any;
   content: string | Function;
   index: number;
   isDragging: boolean;
@@ -179,9 +178,8 @@ export default DropTarget(
     CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN,
     {
       beginDrag: (props: ChartDraggableElementProps) => ({
-        id: props.id,
-        index: props.index,
         ...props.config,
+        index: props.index,
       }),
       endDrag: (props, monitor) => {
         const dropResult = monitor.getDropResult();

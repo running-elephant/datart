@@ -22,9 +22,7 @@ import datart.core.entity.Schedule;
 import datart.core.entity.ScheduleLog;
 import datart.server.base.dto.ResponseData;
 import datart.server.base.dto.ScheduleBaseInfo;
-import datart.server.base.params.CheckNameParam;
-import datart.server.base.params.ScheduleCreateParam;
-import datart.server.base.params.ScheduleUpdateParam;
+import datart.server.base.params.*;
 import datart.server.service.ScheduleService;
 import io.swagger.annotations.ApiOperation;
 import org.quartz.SchedulerException;
@@ -85,10 +83,18 @@ public class ScheduleController extends BaseController {
         return ResponseData.success(scheduleService.update(updateParam));
     }
 
+    @ApiOperation(value = "update a schedule base info")
+    @PutMapping(value = "/{scheduleId}/base")
+    public ResponseData<Boolean> updateScheduleBaseInfo(@PathVariable String scheduleId,
+                                                        @Validated @RequestBody ScheduleBaseUpdateParam updateParam) {
+        checkBlank(scheduleId, "scheduleId");
+        return ResponseData.success(scheduleService.updateBase(updateParam));
+    }
+
     @ApiOperation(value = "delete a schedule")
     @DeleteMapping(value = "/{scheduleId}")
     public ResponseData<Boolean> deleteSchedule(@PathVariable String scheduleId, @RequestParam boolean archive) {
-        return ResponseData.success(scheduleService.delete(scheduleId, archive));
+        return ResponseData.success(scheduleService.delete(scheduleId, archive, true));
     }
 
     @ApiOperation(value = "execute a schedule")
@@ -122,8 +128,11 @@ public class ScheduleController extends BaseController {
 
     @ApiOperation(value = "unarchive schedule")
     @PutMapping(value = "/unarchive/{scheduleId}")
-    public ResponseData<Boolean> unarchiveSchedule(@PathVariable String scheduleId) {
-        return ResponseData.success(scheduleService.unarchive(scheduleId));
+    public ResponseData<Boolean> unarchiveSchedule(@PathVariable String scheduleId,
+                                                   @RequestParam String name,
+                                                   @RequestParam Double index,
+                                                   @RequestParam(required = false) String parentId) {
+        return ResponseData.success(scheduleService.unarchive(scheduleId, name, parentId, index));
     }
 
 }

@@ -49,7 +49,8 @@ export function itemLayoutComparer<T>(
   if (
     prevProps.data !== nextProps.data ||
     prevProps.translate !== nextProps.translate ||
-    prevProps.dataConfigs !== nextProps.dataConfigs
+    prevProps.dataConfigs !== nextProps.dataConfigs ||
+    prevProps.context !== nextProps.context
   ) {
     return false;
   }
@@ -67,23 +68,4 @@ export function groupLayoutComparer<T>(
     return false;
   }
   return itemLayoutComparer(prevProps, nextProps);
-}
-
-export function removeSomeObjectConfigByKey(
-  removeKeyList: string[],
-  obj?: object,
-) {
-  return (
-    obj &&
-    Object.keys(obj).reduce((data, key) => {
-      if (removeKeyList.includes(key)) {
-        return data;
-      } else {
-        return {
-          ...data,
-          key: obj?.[key],
-        };
-      }
-    }, {})
-  );
 }

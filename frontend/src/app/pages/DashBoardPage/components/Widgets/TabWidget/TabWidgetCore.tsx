@@ -16,84 +16,112 @@
  * limitations under the License.
  */
 import { Tabs } from 'antd';
-import { ContainerWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { memo, useCallback, useContext, useState } from 'react';
+import { TabWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
+import { memo, useCallback, useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 import { PRIMARY } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import { editBoardStackActions } from '../../../pages/BoardEditor/slice';
+import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
+import { DropHolder } from '../../WidgetComponents/DropHolder';
+import { WidgetMapper } from '../../WidgetMapper/WidgetMapper';
 import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
 import { WidgetWrapProvider } from '../../WidgetProvider/WidgetWrapProvider';
-import { DropHolder } from './components/DropHolder';
-import { TabWidgetMapper } from './components/TabWidgetMapper';
+import tabProto, { TabToolkit } from './tabConfig';
 
 const { TabPane } = Tabs;
 
 export const TabWidgetCore: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const widget = useContext(WidgetContext);
+  const { align, position } = (tabProto.toolkit as TabToolkit).getCustomConfig(
+    widget.config.customConfig.props,
+  );
   const { editing } = useContext(WidgetInfoContext);
+  const { onEditSelectWidget } = useContext(WidgetActionContext);
   const {
     boardType,
     editing: boardEditing,
     boardId,
   } = useContext(BoardContext);
-  const { itemMap } = widget.config.content as ContainerWidgetContent;
-  const tabsCons = Object.values(itemMap);
-  const [activeKey, SetActiveKey] = useState(tabsCons[0]?.tabId || '');
-  const onTabClick = useCallback((activeKey: string, event) => {
+  const { itemMap } = widget.config.content as TabWidgetContent;
+  const tabsCons = Object.values(itemMap).sort((a, b) => a.index - b.index);
+  const [activeKey, SetActiveKey] = useState<string | number>(
+    tabsCons[0]?.index || 0,
+  );
+
+  useEffect(() => {
+    const tab = tabsCons?.find(t => String(t.index) === String(activeKey));
+    if (tab && editing) {
+      onEditSelectWidget({
+        multipleKey: false,
+        id: tab.childWidgetId,
+        selected: true,
+      });
+    }
+  }, [activeKey, editing, onEditSelectWidget, tabsCons]);
+
+  const onTabClick = useCallback((activeKey: any, event) => {
     SetActiveKey(activeKey);
   }, []);
 
   const tabAdd = useCallback(() => {
-    const newTabId = uuidv4();
+    const newTabId = `tab_${uuidv4()}`;
+    const maxIndex = tabsCons[tabsCons.length - 1]?.index || 0;
+    const nextIndex = maxIndex + 1;
     dispatch(
       editBoardStackActions.tabsWidgetAddTab({
         parentId: widget.id,
         tabItem: {
-          tabId: newTabId,
+          index: nextIndex,
           name: 'tab',
+          tabId: newTabId,
           childWidgetId: '',
-          config: {},
         },
       }),
     );
     setImmediate(() => {
-      SetActiveKey(newTabId);
+      SetActiveKey(nextIndex);
     });
-  }, [dispatch, widget.id]);
+  }, [dispatch, tabsCons, widget.id]);
+
   const tabRemove = useCallback(
     targetKey => {
+      const tabId =
+        tabsCons.find(tab => String(tab.index) === targetKey)?.tabId || '';
       dispatch(
         editBoardStackActions.tabsWidgetRemoveTab({
           parentId: widget.id,
-          sourceTabId: targetKey,
+          sourceTabId: tabId,
           mode: boardType,
         }),
       );
       setImmediate(() => {
-        SetActiveKey(tabsCons[0].tabId || '');
+        SetActiveKey(tabsCons[0].index);
       });
     },
 
     [dispatch, widget.id, boardType, tabsCons],
   );
+
   const tabEdit = useCallback(
     (targetKey, action: 'add' | 'remove') => {
       action === 'add' ? tabAdd() : tabRemove(targetKey);
     },
     [tabAdd, tabRemove],
   );
+
   return (
-    <TabsBoxWrap className="TabsBoxWrap">
+    <TabsBoxWrap className="TabsBoxWrap" tabsAlign={align}>
       <Tabs
         onTabClick={editing ? onTabClick : undefined}
         size="small"
-        activeKey={editing ? activeKey : undefined}
-        centered
+        tabBarGutter={1}
+        tabPosition={position as any}
+        activeKey={editing ? String(activeKey) : undefined}
         tabBarStyle={{ fontSize: '16px' }}
         type={editing ? 'editable-card' : undefined}
         onEdit={editing ? tabEdit : undefined}
@@ -102,7 +130,7 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
         {tabsCons.map(tab => (
           <TabPane
             tab={tab.name || 'tab'}
-            key={tab.tabId}
+            key={tab.index}
             className="TabPane"
             forceRender
           >
@@ -113,14 +141,13 @@ export const TabWidgetCore: React.FC<{}> = memo(() => {
                 boardId={boardId}
               >
                 <MapWrapper>
-                  <TabWidgetMapper
-                    boardEditing={boardEditing}
-                    boardType={boardType}
-                  />
+                  <WidgetMapper boardEditing={boardEditing} hideTitle={true} />
                 </MapWrapper>
               </WidgetWrapProvider>
             ) : (
-              boardEditing && <DropHolder tabItem={tab} parentId={widget.id} />
+              boardEditing && (
+                <DropHolder tabItem={tab} tabWidgetId={widget.id} />
+              )
             )}
           </TabPane>
         ))}
@@ -136,7 +163,7 @@ const MapWrapper = styled.div`
   width: 100%;
   height: 100%;
 `;
-const TabsBoxWrap = styled.div<{}>`
+const TabsBoxWrap = styled.div<{ tabsAlign: string }>`
   width: 100%;
   height: 100%;
 
@@ -167,7 +194,7 @@ const TabsBoxWrap = styled.div<{}>`
     height: 100%;
   }
   & .ant-tabs-tab-remove {
-    background-color: #fff;
+    background-color: ${PRIMARY};
   }
 
   & .ant-tabs > .ant-tabs-nav .ant-tabs-nav-add {
@@ -176,5 +203,13 @@ const TabsBoxWrap = styled.div<{}>`
     margin: 0 20px;
     background: none;
     border: none;
+  }
+
+  & .ant-tabs .ant-tabs-nav-wrap {
+    justify-content: ${p => p.tabsAlign};
+
+    & > .ant-tabs-nav-list {
+      flex: none;
+    }
   }
 `;

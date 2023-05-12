@@ -20,6 +20,9 @@ package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
 import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.NotFoundException;
+import datart.core.base.exception.ParamException;
+import datart.core.common.Application;
 import datart.core.common.DateUtils;
 import datart.core.common.UUIDGenerator;
 import datart.core.entity.*;
@@ -32,9 +35,9 @@ import datart.server.base.dto.ViewDetailDTO;
 import datart.server.base.params.*;
 import datart.server.base.transfer.ImportStrategy;
 import datart.server.base.transfer.TransferConfig;
-import datart.server.base.transfer.model.ViewTransferModel;
+import datart.server.base.transfer.model.ViewResourceModel;
 import datart.server.service.*;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -46,8 +49,6 @@ import java.util.stream.Collectors;
 public class ViewServiceImpl extends BaseService implements ViewService {
 
     private final ViewMapperExt viewMapper;
-
-    private final SourceService sourceService;
 
     private final RelSubjectColumnsMapperExt rscMapper;
 
@@ -62,7 +63,6 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     private final RelVariableSubjectMapperExt rvsMapper;
 
     public ViewServiceImpl(ViewMapperExt viewMapper,
-                           SourceService sourceService,
                            RelSubjectColumnsMapperExt rscMapper,
                            RelRoleResourceMapperExt rrrMapper,
                            RoleService roleService,
@@ -70,7 +70,6 @@ public class ViewServiceImpl extends BaseService implements ViewService {
                            VariableMapperExt variableMapper,
                            RelVariableSubjectMapperExt rvsMapper) {
         this.viewMapper = viewMapper;
-        this.sourceService = sourceService;
         this.rscMapper = rscMapper;
         this.rrrMapper = rrrMapper;
         this.roleService = roleService;
@@ -83,9 +82,18 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     @Transactional
     public View create(BaseCreateParam createParam) {
 
-        View view = ViewService.super.create(createParam);
-
         ViewCreateParam viewCreateParam = (ViewCreateParam) createParam;
+        View view = new View();
+        BeanUtils.copyProperties(createParam, view);
+        view.setType(viewCreateParam.getType() == null ? null : viewCreateParam.getType().name());
+        view.setCreateBy(getCurrentUser().getId());
+        view.setCreateTime(new Date());
+        view.setId(UUIDGenerator.generate());
+        view.setStatus(Const.DATA_STATUS_ACTIVE);
+        requirePermission(view, Const.CREATE);
+        viewMapper.insert(view);
+
+        getRoleService().grantPermission(viewCreateParam.getPermissions());
 
         if (!CollectionUtils.isEmpty(viewCreateParam.getVariablesToCreate())) {
             List<VariableCreateParam> variablesToCreate = viewCreateParam.getVariablesToCreate();
@@ -98,6 +106,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         List<RelSubjectColumns> columnPermission = viewCreateParam.getColumnPermission();
         if (!CollectionUtils.isEmpty(columnPermission)) {
             for (RelSubjectColumns relSubjectColumns : columnPermission) {
+                relSubjectColumns.setViewId(view.getId());
                 relSubjectColumns.setId(UUIDGenerator.generate());
                 relSubjectColumns.setCreateBy(getCurrentUser().getId());
                 relSubjectColumns.setCreateTime(new Date());
@@ -157,6 +166,12 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     }
 
     @Override
+    public View updateView(BaseUpdateParam updateParam) {
+        boolean update = update(updateParam);
+        return getViewDetail(updateParam.getId());
+    }
+
+    @Override
     public RoleService getRoleService() {
         return roleService;
     }
@@ -170,11 +185,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
 
         //check name
         if (!view.getName().equals(newName)) {
-            View check = new View();
-            check.setParentId(parentId);
-            check.setOrgId(view.getOrgId());
-            check.setName(newName);
-            checkUnique(check);
+            checkUnique(view.getOrgId(), parentId, newName);
         }
 
         // update status
@@ -221,21 +232,22 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     }
 
     @Override
-    public ViewTransferModel exportResource(TransferConfig transferConfig, String... ids) {
+    public ViewResourceModel exportResource(TransferConfig transferConfig, Set<String> ids) {
 
-        if (ids == null || ids.length == 0) {
+        if (ids == null || ids.size() == 0) {
             return null;
         }
 
-        ViewTransferModel viewTransferModel = new ViewTransferModel();
-        List<ViewTransferModel.MainModel> mainModels = new LinkedList<>();
-        viewTransferModel.setMainModels(mainModels);
+        ViewResourceModel viewResourceModel = new ViewResourceModel();
+        List<ViewResourceModel.MainModel> mainModels = new LinkedList<>();
+        viewResourceModel.setMainModels(mainModels);
         Map<String, View> parentMap = new HashMap<>();
         Set<String> sourceIds = new HashSet<>();
 
         for (String viewId : ids) {
-            ViewTransferModel.MainModel mainModel = new ViewTransferModel.MainModel();
+            ViewResourceModel.MainModel mainModel = new ViewResourceModel.MainModel();
             View view = retrieve(viewId);
+            securityManager.requireOrgOwner(view.getOrgId());
             mainModel.setView(view);
             // variables
             mainModel.setVariables(variableService.listByView(viewId));
@@ -250,41 +262,68 @@ public class ViewServiceImpl extends BaseService implements ViewService {
                 }
             }
         }
-        viewTransferModel.setParents(new LinkedList<>(parentMap.values()));
+        viewResourceModel.setParents(new LinkedList<>(parentMap.values()));
         // source
-        viewTransferModel.setSourceExportModel(sourceService.exportResource(transferConfig, sourceIds.toArray(new String[0])));
-
-        return viewTransferModel;
+        viewResourceModel.setSources(sourceIds);
+        return viewResourceModel;
     }
 
     @Override
-    public boolean importResource(ViewTransferModel model, ImportStrategy strategy, String orgId, Set<String> requireTransfer) {
+    public boolean importResource(ViewResourceModel model, ImportStrategy strategy, String orgId) {
         if (model == null) {
             return true;
         }
-        Set<String> requiredSources = new HashSet<>();
         switch (strategy) {
             case OVERWRITE:
-                importView(model, orgId, true, true, requireTransfer, requiredSources);
+                importView(model, orgId, true);
                 break;
-            case IGNORE:
-                importView(model, orgId, false, true, requireTransfer, requiredSources);
+            case ROLLBACK:
+                importView(model, orgId, false);
                 break;
             default:
-                importView(model, orgId, false, false, requireTransfer, requiredSources);
+                importView(model, orgId, false);
         }
-        return sourceService.importResource(model.getSourceExportModel(), strategy, orgId, requiredSources);
+        return true;
+    }
+
+    @Override
+    public void replaceId(ViewResourceModel model
+            , final Map<String, String> sourceIdMapping
+            , final Map<String, String> viewIdMapping
+            , final Map<String, String> chartIdMapping, Map<String, String> boardIdMapping, Map<String, String> folderIdMapping) {
+
+        if (model == null || model.getMainModels() == null) {
+            return;
+        }
+        Map<String, String> parentIdMapping = new HashMap<>();
+        for (View parent : model.getParents()) {
+            String newId = UUIDGenerator.generate();
+            parentIdMapping.put(parent.getId(), newId);
+            parent.setId(newId);
+        }
+        for (View parent : model.getParents()) {
+            parent.setParentId(parentIdMapping.get(parent.getParentId()));
+        }
+        for (ViewResourceModel.MainModel mainModel : model.getMainModels()) {
+            String newId = UUIDGenerator.generate();
+            viewIdMapping.put(mainModel.getView().getId(), newId);
+            mainModel.getView().setId(newId);
+            mainModel.getView().setSourceId(sourceIdMapping.get(mainModel.getView().getSourceId()));
+            mainModel.getView().setParentId(parentIdMapping.get(mainModel.getView().getParentId()));
+            for (Variable variable : mainModel.getVariables()) {
+                variable.setId(UUIDGenerator.generate());
+                variable.setViewId(newId);
+            }
+        }
     }
 
 
     @Override
-    public boolean checkUnique(BaseEntity entity) {
-        View v = (View) entity;
-        View check = new View();
-        check.setParentId(v.getParentId());
-        check.setOrgId(v.getOrgId());
-        check.setName(v.getName());
-        return ViewService.super.checkUnique(check);
+    public boolean checkUnique(String orgId, String parentId, String name) {
+        if (!CollectionUtils.isEmpty(viewMapper.checkName(orgId, parentId, name))) {
+            Exceptions.tr(ParamException.class, "error.param.exists.name");
+        }
+        return true;
     }
 
     @Override
@@ -292,6 +331,7 @@ public class ViewServiceImpl extends BaseService implements ViewService {
     public boolean update(BaseUpdateParam updateParam) {
         ViewUpdateParam viewUpdateParam = (ViewUpdateParam) updateParam;
         View view = retrieve(viewUpdateParam.getId());
+        requirePermission(view, Const.MANAGE);
         if (!CollectionUtils.isEmpty(viewUpdateParam.getVariablesToCreate())) {
             List<VariableCreateParam> variablesToCreate = viewUpdateParam.getVariablesToCreate();
             for (VariableCreateParam variableCreateParam : variablesToCreate) {
@@ -323,7 +363,12 @@ public class ViewServiceImpl extends BaseService implements ViewService {
                 rscMapper.batchInsert(columnPermission);
             }
         }
-        return ViewService.super.update(updateParam);
+        Application.getBean(DataProviderService.class).updateSource(retrieve(view.getSourceId(), Source.class, false));
+        BeanUtils.copyProperties(updateParam, view);
+        view.setType(viewUpdateParam.getType().name());
+        view.setUpdateBy(getCurrentUser().getId());
+        view.setUpdateTime(new Date());
+        return 1 == viewMapper.updateByPrimaryKey(view);
     }
 
     @Override
@@ -352,53 +397,43 @@ public class ViewServiceImpl extends BaseService implements ViewService {
         }
     }
 
-    public boolean safeDelete(String viewId) {
+    public boolean safeDelete(String id) {
         // check children
-        if (viewMapper.checkReference(viewId) != 0) {
+        if (viewMapper.checkReference(id) != 0) {
             return false;
         }
         // check charts reference
         Datachart datachart = new Datachart();
-        datachart.setViewId(viewId);
+        datachart.setViewId(id);
         //check widget reference
         RelWidgetElement relWidgetElement = new RelWidgetElement();
-        relWidgetElement.setRelId(viewId);
+        relWidgetElement.setRelId(id);
         return viewMapper.checkUnique(datachart) && viewMapper.checkUnique(relWidgetElement);
     }
 
-    private void importView(ViewTransferModel model,
+    private void importView(ViewResourceModel model,
                             String orgId,
-                            boolean deleteFirst,
-                            boolean skipExists,
-                            Set<String> requireTransfer,
-                            Set<String> requiredSources) {
+                            boolean deleteFirst) {
         if (model == null || CollectionUtils.isEmpty(model.getMainModels())) {
             return;
         }
-        for (ViewTransferModel.MainModel mainModel : model.getMainModels()) {
+        for (ViewResourceModel.MainModel mainModel : model.getMainModels()) {
             View view = mainModel.getView();
             if (view == null) {
                 continue;
             }
-            if (requireTransfer != null && !requireTransfer.contains(view.getId())) {
-                continue;
-            }
             if (deleteFirst) {
                 try {
-                    delete(view.getId());
-                } catch (Exception ignore) {
-                }
-            } else if (skipExists) {
-                try {
-                    if (retrieve(view.getId()) != null) {
-                        continue;
+                    View retrieve = retrieve(view.getId(), false);
+                    if (retrieve != null && !retrieve.getOrgId().equals(orgId)) {
+                        Exceptions.msg("message.viz.import.database.conflict");
                     }
+                } catch (NotFoundException ignored) {
+                }
+                try {
+                    delete(view.getId(), false, false);
                 } catch (Exception ignore) {
                 }
-            }
-
-            if (StringUtils.isNotBlank(view.getSourceId())) {
-                requiredSources.add(view.getSourceId());
             }
             // check name
             try {
@@ -429,6 +464,15 @@ public class ViewServiceImpl extends BaseService implements ViewService {
             if (!CollectionUtils.isEmpty(model.getParents())) {
                 for (View parent : model.getParents()) {
                     try {
+                        View check = new View();
+                        check.setOrgId(orgId);
+                        check.setName(parent.getName());
+                        check.setParentId(check.getParentId());
+                        checkUnique(check);
+                    } catch (Exception e) {
+                        parent.setName(DateUtils.withTimeString(parent.getName()));
+                    }
+                    try {
                         parent.setOrgId(orgId);
                         viewMapper.insert(parent);
                     } catch (Exception ignore) {
@@ -436,7 +480,6 @@ public class ViewServiceImpl extends BaseService implements ViewService {
                 }
             }
         }
-
     }
 
     @Override

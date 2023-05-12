@@ -80,7 +80,9 @@ export const VizPermissionForm = memo(
     storyboardListLoading,
     permissionLoading,
   }: PermissionFormProps) => {
-    const [vizType, setVizType] = useState<'folder' | 'persentation'>('folder');
+    const [vizType, setVizType] = useState<VizResourceSubTypes>(
+      VizResourceSubTypes.Folder,
+    );
     const dispatch = useDispatch();
     const selectPrivileges = useMemo(makeSelectPrivileges, []);
     const privileges = useSelector(state =>
@@ -101,6 +103,7 @@ export const VizPermissionForm = memo(
           viewpoint,
           viewpointType,
           dataSourceType,
+          vizType,
         );
       } else {
         return [];
@@ -112,24 +115,21 @@ export const VizPermissionForm = memo(
       folders,
       storyboards,
       privileges,
+      vizType,
     ]);
 
     const vizTypeChange = useCallback(e => {
       setVizType(e.target.value);
     }, []);
 
-    const { moduleEnabled, storyboardCreateEnabled } = useMemo(() => {
+    const { moduleEnabled } = useMemo(() => {
       let moduleEnabled = PermissionLevels.Disable;
-      let storyboardCreateEnabled = PermissionLevels.Disable;
       privileges?.forEach(({ resourceId, permission }) => {
         if (resourceId === '*') {
           moduleEnabled = permission;
         }
-        if (resourceId === VizResourceSubTypes.Storyboard) {
-          storyboardCreateEnabled = permission;
-        }
       });
-      return { moduleEnabled, storyboardCreateEnabled };
+      return { moduleEnabled };
     }, [privileges]);
 
     const independentPermissionChange = useCallback(
@@ -306,28 +306,6 @@ export const VizPermissionForm = memo(
       ],
       [t],
     );
-    const createPermissionValues = useMemo(
-      () => [
-        {
-          text: t(
-            `createPermissionLabel.${
-              PermissionLevels[PermissionLevels.Disable]
-            }`,
-          ),
-          value: PermissionLevels.Disable,
-        },
-        {
-          text: t(
-            `createPermissionLabel.${
-              PermissionLevels[PermissionLevels.Create]
-            }`,
-          ),
-          value: PermissionLevels.Create,
-        },
-      ],
-      [t],
-    );
-
     return (
       <Wrapper className={classnames({ selected })}>
         <LoadingMask loading={permissionLoading}>
@@ -345,8 +323,10 @@ export const VizPermissionForm = memo(
             />
             <Form.Item label={t('resourceDetail')}>
               <Radio.Group value={vizType} onChange={vizTypeChange}>
-                <Radio value="folder">{t('folder')}</Radio>
-                <Radio value="persentation">{t('presentation')}</Radio>
+                <Radio value={VizResourceSubTypes.Folder}>{t('folder')}</Radio>
+                <Radio value={VizResourceSubTypes.Storyboard}>
+                  {t('presentation')}
+                </Radio>
               </Radio.Group>
             </Form.Item>
             <Form.Item
@@ -354,41 +334,33 @@ export const VizPermissionForm = memo(
               colon={false}
               className={classnames({
                 vizTable: true,
-                selected: vizType === 'folder',
+                selected: vizType === VizResourceSubTypes.Folder,
               })}
             >
               <PermissionTable
                 viewpoint={viewpoint}
                 viewpointType={viewpointType}
                 dataSourceType={dataSourceType}
+                vizSubTypes={vizType}
                 dataSource={folders}
                 resourceLoading={folderListLoading}
                 privileges={privileges}
                 onPrivilegeChange={privilegeChange}
               />
             </Form.Item>
-            {vizType === 'persentation' && (
-              <IndependentPermissionSetting
-                enabled={storyboardCreateEnabled}
-                label={t('createStoryboard')}
-                values={createPermissionValues}
-                onChange={independentPermissionChange(
-                  VizResourceSubTypes.Storyboard,
-                )}
-              />
-            )}
             <Form.Item
               label=" "
               colon={false}
               className={classnames({
                 vizTable: true,
-                selected: vizType === 'persentation',
+                selected: vizType === VizResourceSubTypes.Storyboard,
               })}
             >
               <PermissionTable
                 viewpoint={viewpoint}
                 viewpointType={viewpointType}
                 dataSourceType={dataSourceType}
+                vizSubTypes={vizType}
                 dataSource={storyboards}
                 resourceLoading={storyboardListLoading}
                 privileges={privileges}

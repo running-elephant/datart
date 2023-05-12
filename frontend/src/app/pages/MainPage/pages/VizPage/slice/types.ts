@@ -1,5 +1,5 @@
 import { TreeNodeProps } from 'antd';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { ReactElement } from 'react';
@@ -9,6 +9,7 @@ export type VizType = [
   'DASHBOARD',
   'FOLDER',
   'STORYBOARD',
+  'TEMPLATE',
 ][number];
 
 export interface VizState {
@@ -30,6 +31,7 @@ export interface VizState {
   selectedTab: string;
   dataChartListLoading: boolean;
   chartPreviews: ChartPreview[];
+  selectedItems: Record<string, SelectedItem[]>;
 }
 
 export interface Folder {
@@ -52,27 +54,52 @@ export interface FolderViewModel extends Folder {
 }
 
 export interface Storyboard {
-  config: string;
-  createBy: string;
-  createTime: string;
+  config?: string;
+  createBy?: string;
+  createTime?: string;
   id: string;
   name: string;
   orgId: string;
-  permission: number;
-  status: number;
+  parentId: string | null;
+  permission?: number;
+  status?: number;
   updateBy?: string;
   updateTime?: string;
 }
 
-export interface StoryboardViewModel extends Storyboard {
+export interface StoryboardSimple extends Storyboard {
+  isFolder: boolean;
+  index: number | null;
+}
+
+export interface StoryboardViewModel extends StoryboardSimple {
   deleteLoading: boolean;
+}
+
+export interface SelectStoryboardTree {
+  getIcon: (
+    o: StoryboardViewModel,
+  ) => ReactElement | ((props: TreeNodeProps) => ReactElement);
+  getDisabled?: (o: StoryboardViewModel) => boolean;
+}
+
+export interface SelectVizStoryboardTree {
+  id?: string;
+  getDisabled: (o: StoryboardViewModel, path: string[]) => boolean;
+}
+
+export interface SelectArchivedTree {
+  getDisabled?: (o: ArchivedViz) => boolean;
 }
 
 export interface ArchivedViz {
   id: string;
   name: string;
   vizType: VizType;
-  loading: boolean;
+  deleteLoading: boolean;
+  parentId: string | null;
+  isFolder: boolean;
+  index: number | null;
 }
 
 export interface ChartPreview {
@@ -81,6 +108,7 @@ export interface ChartPreview {
   backendChart?: ChartDTO;
   dataset?: ChartDataSetDTO;
   chartConfig?: ChartConfig;
+  isLoadingData?: boolean;
 }
 
 export interface VizTab {
@@ -99,6 +127,7 @@ export interface AddVizParams {
     description?: string;
     parentId?: string | null;
     orgId: string;
+    file?: FormData;
   };
   type: VizType;
 }
@@ -135,13 +164,23 @@ export interface PublishVizParams {
   resolve: () => void;
 }
 
+export interface StoryboardBase {
+  index: number;
+  name: string;
+  parentId: string | null;
+  id: string;
+}
+
 export interface AddStoryboardParams {
-  storyboard: Pick<Storyboard, 'name' | 'orgId'>;
+  storyboard: Pick<
+    StoryboardSimple,
+    'name' | 'parentId' | 'index' | 'config' | 'orgId' | 'isFolder'
+  >;
   resolve: () => void;
 }
 
 export interface EditStoryboardParams {
-  storyboard: StoryboardViewModel;
+  storyboard: StoryboardBase;
   resolve: () => void;
 }
 

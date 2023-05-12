@@ -19,215 +19,92 @@
 import { ControllerFacadeTypes, TimeFilterValueCategory } from 'app/constants';
 import {
   ContainerItem,
+  TabWidgetContent,
+  WidgetOfCopy,
   WidgetType,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { FilterSearchParamsWithMatch } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import { ChartsEventData } from 'app/types/Chart';
+import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
-import { formatTime } from 'app/utils/time';
-import { FilterSqlOperator, TIME_FORMATTER } from 'globalConstants';
-import produce from 'immer';
-import { DeltaStatic } from 'quill';
-import { CSSProperties } from 'react';
-import { FONT_FAMILY, G90, WHITE } from 'styles/StyleConstants';
-import { uuidv4 } from 'utils/utils';
-import { fillPx, getBackgroundImage } from '.';
+import { View } from 'app/types/View';
 import {
-  AutoBoardWidgetBackgroundDefault,
-  BackgroundDefault,
-  BorderDefault,
-  ButtonBorderDefault,
-  LAYOUT_COLS_MAP,
-  QueryButtonWidgetBackgroundDefault,
-} from '../constants';
+  filterCurrentUsedComputedFields,
+  mergeChartAndViewComputedField,
+} from 'app/utils/chartHelper';
+import { updateBy } from 'app/utils/mutation';
+import { formatTime } from 'app/utils/time';
+import {
+  BOARD_COPY_CHART_SUFFIX,
+  FilterSqlOperator,
+  TIME_FORMATTER,
+} from 'globalConstants';
+import produce from 'immer';
+import { CSSProperties } from 'react';
+import { CloneValueDeep } from 'utils/object';
+import { adaptBoardImageUrl, fillPx, getBackgroundImage } from '.';
+import { initClientId } from '../components/WidgetManager/utils/init';
+import { LAYOUT_COLS_MAP, ORIGINAL_TYPE_MAP } from '../constants';
 import {
   BackgroundConfig,
   BoardType,
   BorderConfig,
   ChartWidgetContent,
-  ContainerWidgetContent,
-  ContainerWidgetType,
   ControllerWidgetContent,
-  DashboardConfig,
   DataChart,
-  MediaWidgetContent,
-  MediaWidgetType,
-  RectConfig,
-  RelatedView,
   Relation,
   ServerRelation,
   ServerWidget,
-  Widget,
-  WidgetConf,
-  WidgetContent,
   WidgetContentChartType,
   WidgetInfo,
   WidgetPadding,
 } from '../pages/Board/slice/types';
 import { StrControlTypes } from '../pages/BoardEditor/components/ControllerWidgetPanel/constants';
-import { ControllerConfig } from '../pages/BoardEditor/components/ControllerWidgetPanel/types';
-import { BtnActionParams } from '../pages/BoardEditor/slice/actions/controlActions';
+import { Widget, WidgetMapping } from '../types/widgetTypes';
 
 export const VALUE_SPLITTER = '###';
 
-export const createControllerWidget = (opt: {
-  boardId: string;
-  boardType: BoardType;
-  relations: Relation[];
-  name?: string;
-  controllerType: ControllerFacadeTypes;
-  views: RelatedView[];
-  config: ControllerConfig;
-  viewIds: string[];
-}) => {
-  const {
-    boardId,
-    boardType,
-    views,
-    config,
-    controllerType,
-    relations,
-    name = 'newController',
-  } = opt;
-  const content: ControllerWidgetContent = {
-    type: controllerType,
-    relatedViews: views,
-    name: name,
-    config: config,
-  };
-
-  const widgetConf = createInitWidgetConfig({
-    name: name,
-    type: 'controller',
-    content: content,
-    boardType: boardType,
-  });
-
-  const widgetId = relations[0]?.sourceId || uuidv4();
-  const widget: Widget = createWidget({
-    id: widgetId,
-    dashboardId: boardId,
-    config: widgetConf,
-    relations,
-  });
-  return widget;
-};
-export const createMediaWidget = (opt: {
-  dashboardId: string;
-  boardType: BoardType;
-  type: MediaWidgetType;
-}) => {
-  const content = createMediaContent(opt.type);
-  const widgetConf = createInitWidgetConfig({
-    type: 'media',
-    content: content,
-    boardType: opt.boardType,
-  });
-  const widget: Widget = createWidget({
-    dashboardId: opt.dashboardId,
-    config: widgetConf,
-  });
-  return widget;
-};
-export const createContainerWidget = (opt: {
-  dashboardId: string;
-  boardType: BoardType;
-  type: ContainerWidgetType;
-}) => {
-  const content = createContainerWidgetContent(opt.type);
-  const widgetConf = createInitWidgetConfig({
-    type: 'container',
-    content: content,
-    boardType: opt.boardType,
-  });
-  const widget: Widget = createWidget({
-    dashboardId: opt.dashboardId,
-    config: widgetConf,
-  });
-  return widget;
-};
-export const createControlBtn = (opt: BtnActionParams) => {
-  const content = { type: opt.type };
-  const widgetConf = createInitWidgetConfig({
-    name: '',
-    type: opt.type as WidgetType,
-    content: content,
-    boardType: opt.boardType,
-  });
-  const widget: Widget = createWidget({
-    dashboardId: opt.boardId,
-    config: widgetConf,
-  });
-  return widget;
-};
-export const createInitWidgetConfig = (opt: {
-  type: WidgetType;
-  content: WidgetContent;
-  boardType: BoardType;
-  index?: number;
-  name?: string;
-  autoUpdate?: boolean;
-  frequency?: number;
-}): WidgetConf => {
-  return {
-    version: '',
-    type: opt.type,
-    index: opt.index || 0,
-    name: opt.name || '',
-    linkageConfig: {
-      open: false,
-      chartGroupColumns: [],
-    },
-    autoUpdate: opt.autoUpdate || false,
-    lock: false,
-    frequency: opt.frequency || 60, // 60秒
-    rect: createWidgetRect(opt.boardType, opt.type),
-    background:
-      opt.boardType === 'auto'
-        ? opt.type === 'query'
-          ? QueryButtonWidgetBackgroundDefault
-          : AutoBoardWidgetBackgroundDefault
-        : BackgroundDefault,
-    border: ['query', 'reset'].includes(opt.type)
-      ? ButtonBorderDefault
-      : BorderDefault,
-    content: opt.content,
-    nameConfig: {
-      show: true,
-      textAlign: 'left',
-      ...fontDefault,
-      color: opt.type === 'query' ? WHITE : G90,
-    },
-    padding: createWidgetPadding(opt.type),
-  };
-};
-export const createWidget = (option: {
-  dashboardId: string;
-  config: WidgetConf;
-  datachartId?: string;
-  id?: string;
-  viewIds?: string[];
-  parentId?: string;
-  relations?: Relation[];
-}) => {
-  const widget: Widget = {
-    id: option.id || 'newWidget_' + uuidv4(),
-    dashboardId: option.dashboardId,
-    config: option.config,
-    datachartId: option.datachartId || '',
-    viewIds: option.viewIds || [],
-    parentId: option.parentId || '',
-    relations: option.relations || [],
-  };
-  return widget;
-};
-export const fontDefault = {
-  fontFamily: FONT_FAMILY,
-  fontSize: '14',
-  fontWeight: 'normal',
-  fontStyle: 'normal',
-  color: G90,
-};
+// export const createInitWidgetConfig = (opt: {
+//   type: WidgetType;
+//   content: WidgetContent;
+//   boardType: BoardType;
+//   index?: number;
+//   name?: string;
+//   autoUpdate?: boolean;
+//   frequency?: number;
+// }): WidgetConf => {
+//   return {
+//     version: '',
+//     type: opt.type,
+//     index: opt.index || 0,
+//     name: opt.name || '',
+//     linkageConfig: {
+//       open: false,
+//       chartGroupColumns: [],
+//     },
+//     autoUpdate: opt.autoUpdate || false,
+//     lock: false,
+//     frequency: opt.frequency || 60, // 60秒
+//     rect: createWidgetRect(opt.boardType, opt.type),
+//     background:
+//       opt.boardType === 'auto'
+//         ? opt.type === 'query'
+//           ? QueryButtonWidgetBackgroundDefault
+//           : AutoBoardWidgetBackgroundDefault
+//         : BackgroundDefault,
+//     border: ['query', 'reset'].includes(opt.type)
+//       ? ButtonBorderDefault
+//       : BorderDefault,
+//     content: opt.content,
+//     nameConfig: {
+//       show: true,
+//       textAlign: 'left',
+//       ...FontDefault,
+//       color: opt.type === 'query' ? WHITE : G90,
+//     } as any,
+//     padding: createWidgetPadding(opt.type),
+//   };
+// };
 
 export const createWidgetInfo = (id: string): WidgetInfo => {
   const widgetInfo: WidgetInfo = {
@@ -245,7 +122,7 @@ export const createWidgetInfo = (id: string): WidgetInfo => {
   return widgetInfo;
 };
 export const createWidgetPadding = (widgetType: WidgetType) => {
-  if (widgetType === 'query' || widgetType === 'reset') {
+  if (widgetType === 'button') {
     return {
       left: 0,
       right: 0,
@@ -267,137 +144,29 @@ export const createWidgetPadding = (widgetType: WidgetType) => {
     bottom: 8,
   };
 };
-export const createWidgetRect = (
-  boardType: BoardType,
-  widgetType: WidgetType,
-): RectConfig => {
-  if (widgetType === 'controller') {
-    return getInitControllerWidgetRect(boardType);
-  }
-  if (widgetType === 'query' || widgetType === 'reset') {
-    return getInitButtonWidgetRect(boardType);
-  }
-  if (boardType === 'auto') {
-    return {
-      x: 0,
-      y: 0,
-      width: 6,
-      height: 6,
-    };
-  } else {
-    // free
-    return {
-      x: 0,
-      y: 0,
-      width: 400,
-      height: 300,
-    };
-  }
-};
 
-export const getInitButtonWidgetRect = (boardType: BoardType): RectConfig => {
-  if (boardType === 'auto') {
-    return {
-      x: 0,
-      y: 0,
-      width: 1,
-      height: 1,
-    };
-  } else {
-    // free
-    return {
-      x: 0,
-      y: 0,
-      width: 128,
-      height: 32,
-    };
-  }
-};
-export const getInitControllerWidgetRect = (
-  boardType: BoardType,
-): RectConfig => {
-  if (boardType === 'auto') {
-    return {
-      x: 0,
-      y: 0,
-      width: 3,
-      height: 1,
-    };
-  } else {
-    // free
-    return {
-      x: 0,
-      y: 0,
-      width: 300,
-      height: 32,
-    };
-  }
-};
-export const createContainerWidgetContent = (type: ContainerWidgetType) => {
-  let content: ContainerWidgetContent = {
-    type: type,
-    itemMap: {},
-  };
-  switch (type) {
-    case 'tab':
-      content.tabConfig = {};
-      break;
-    case 'carousel':
-      content.carouselConfig = {};
-      break;
-    default:
-      break;
-  }
-  return content;
-};
+// export const createContainerWidgetContent = (type: ContainerWidgetType) => {
+//   let content: ContainerWidgetContent = {
+//     type: type,
+//     itemMap: {},
+//   };
+//   switch (type) {
+//     case 'tab':
+//       content.tabConfig = {};
+//       break;
+//     case 'carousel':
+//       content.carouselConfig = {};
+//       break;
+//     default:
+//       break;
+//   }
+//   return content;
+// };
 
 export const createChartWidgetContent = (subType: WidgetContentChartType) => {
   let content: ChartWidgetContent = {
     type: subType,
   };
-  return content;
-};
-
-export const createMediaContent = (type: MediaWidgetType) => {
-  let content: MediaWidgetContent = {
-    type: type,
-  };
-  switch (type) {
-    case 'richText':
-      content.richTextConfig = {
-        content: {
-          ops: [
-            {
-              insert: '\n',
-            },
-          ],
-        } as DeltaStatic,
-      };
-      break;
-    case 'image':
-      content.imageConfig = {
-        type: 'WIDGET_SIZE',
-        src: '',
-      };
-      break;
-    case 'iframe':
-      content.iframeConfig = {
-        src: '',
-      };
-      break;
-    case 'timer':
-      content.iframeConfig = {
-        src: '',
-      };
-      break;
-    case 'video':
-      content.videoConfig = {
-        src: '',
-      };
-      break;
-    default:
-      break;
-  }
   return content;
 };
 
@@ -409,14 +178,17 @@ export const getWidgetInfoMapByServer = (widgetMap: Record<string, Widget>) => {
   return widgetInfoMap;
 };
 
-export const updateWidgetsRect = (
-  widgets: Widget[],
-  boardConfig: DashboardConfig,
-  layouts?: ReactGridLayout.Layout[],
-) => {
-  if (boardConfig.type === 'auto') {
+export const adjustWidgetsToBoard = (args: {
+  widgets: Widget[];
+  boardType: BoardType;
+  boardId: string;
+  layouts?: ReactGridLayout.Layout[];
+}) => {
+  const { widgets, boardType, layouts } = args;
+
+  if (boardType === 'auto') {
     return updateAutoWidgetsRect(widgets, layouts || []);
-  } else if (boardConfig.type === 'free') {
+  } else if (boardType === 'free') {
     return updateFreeWidgetsRect(widgets);
   }
   return widgets;
@@ -432,15 +204,15 @@ export const updateAutoWidgetsRect = (
   let itemYs = [...dashWidgetRectYs];
   widgets.forEach(widget => {
     const itemX =
-      (widgetsCount * widget.config.rect.width) % LAYOUT_COLS_MAP.lg;
+      (widgetsCount * widget.config.pRect.width) % LAYOUT_COLS_MAP.lg;
     const itemY = Math.max(...itemYs, 0);
     const nextRect = {
-      ...widget.config.rect,
+      ...widget.config.pRect,
       x: itemX,
       y: itemY,
     };
     widget = produce(widget, draft => {
-      draft.config.rect = nextRect;
+      draft.config.pRect = nextRect;
     });
     upDatedWidgets.push(widget);
     widgetsCount++;
@@ -472,6 +244,22 @@ export const createToSaveWidgetGroup = (
   widgets: Widget[],
   widgetIds: string[],
 ) => {
+  widgets = updateBy(widgets, draft => {
+    draft.forEach(v => {
+      if (
+        v.config.type === 'chart' &&
+        v.config?.content?.dataChart?.config?.computedFields
+      ) {
+        v.config.content.dataChart.config.computedFields =
+          filterCurrentUsedComputedFields(
+            v.config?.content?.dataChart?.config?.chartConfig,
+            v.config?.content?.dataChart?.config?.computedFields.filter(
+              v => !v.isViewComputedFields,
+            ),
+          );
+      }
+    });
+  });
   const curWidgetIds = widgets.map(widget => widget.id);
 
   // 删除的
@@ -534,7 +322,7 @@ export const convertWrapChartWidget = (params: {
 }) => {
   const { widgetMap, dataChartMap } = params;
   const widgets = Object.values(widgetMap).map(widget => {
-    if (widget.config.content.type !== 'widgetChart') {
+    if (widget.config.originalType !== ORIGINAL_TYPE_MAP.ownedChart) {
       return widget;
     }
     // widgetChart wrapChartWidget
@@ -745,6 +533,8 @@ export const getLinkedColumn = (
 export const getWidgetMap = (
   widgets: Widget[],
   dataCharts: DataChart[],
+  boardType: BoardType,
+  serverViews: View[],
   filterSearchParamsMap?: FilterSearchParamsWithMatch,
 ) => {
   const filterSearchParams = filterSearchParamsMap?.params,
@@ -757,6 +547,17 @@ export const getWidgetMap = (
     // issues #601
     const chartViewId = dataChartMap[cur.datachartId]?.viewId;
     const viewIds = chartViewId ? [chartViewId] : cur.viewIds;
+    const viewComputerFields =
+      JSON.parse(serverViews.find(v => v.id === viewIds[0])?.model || '{}')
+        ?.computedFields || [];
+    if (cur.config.type === 'chart' && cur.config?.content?.dataChart?.config) {
+      cur.config.content.dataChart.config.computedFields =
+        mergeChartAndViewComputedField(
+          viewComputerFields,
+          cur.config?.content?.dataChart?.config?.computedFields,
+        );
+    }
+
     acc[cur.id] = {
       ...cur,
       viewIds,
@@ -767,30 +568,6 @@ export const getWidgetMap = (
   const wrappedDataCharts: DataChart[] = [];
   const controllerWidgets: Widget[] = []; // use for reset button
   const widgetList = Object.values(widgetMap);
-
-  // 处理 widget包含关系 containerWidget 被包含的 widget.parentId 不为空
-  widgetList
-    .filter(w => w.parentId)
-    .forEach(widget => {
-      const parentWidgetId = widget.parentId!;
-      const childTabId = widget.config.tabId as string;
-      const curItem = (
-        widgetMap[parentWidgetId].config.content as ContainerWidgetContent
-      ).itemMap[childTabId];
-      if (curItem) {
-        curItem.childWidgetId = widget.id;
-        curItem.name = widget.config.name;
-      } else {
-        let newItem: ContainerItem = {
-          tabId: childTabId,
-          name: widget.config.name,
-          childWidgetId: widget.id,
-        };
-        (
-          widgetMap[parentWidgetId].config.content as ContainerWidgetContent
-        ).itemMap[childTabId] = newItem;
-      }
-    });
 
   // 处理 controller config visibility依赖关系 id, url参数修改filter
   widgetList
@@ -851,15 +628,80 @@ export const getWidgetMap = (
 
   // 处理 自有 chart widgetControl
   widgetList
-    .filter(w => w.config.content.type === 'widgetChart')
+    .filter(w => w.config.originalType === ORIGINAL_TYPE_MAP.ownedChart)
     .forEach(widget => {
-      let content = widget.config.content as ChartWidgetContent;
-      const self_dataChartId = `widget_${widget.dashboardId}_${widget.id}`;
-      content.dataChart!.id = self_dataChartId;
-      widget.datachartId = self_dataChartId;
-      wrappedDataCharts.push(content.dataChart!);
-      delete content.dataChart;
+      let dataChart = (widget.config.content as any).dataChart as DataChart;
+      if (dataChart) {
+        wrappedDataCharts.push(dataChart!);
+      }
+      widget.datachartId = dataChart?.id;
     });
+
+  // 处理 widget包含关系 tab Widget 被包含的 widget.parentId 不为空
+  widgetList
+    .filter(w => w.parentId)
+    .forEach(widget => {
+      const parentWidgetId = widget.parentId!;
+      const parentWidget = widgetMap[parentWidgetId];
+      if (!parentWidget) {
+        widget.parentId = '';
+        return;
+      }
+      if (parentWidget.config.originalType !== ORIGINAL_TYPE_MAP.tab) {
+        return;
+      }
+      const tabContent = parentWidget.config.content as TabWidgetContent;
+      if (!tabContent.itemMap) {
+        widget.parentId = '';
+        return;
+      }
+
+      const targetTabItem = tabContent.itemMap?.[widget.config.clientId];
+      if (!targetTabItem) {
+        widget.parentId = '';
+        return;
+      }
+      targetTabItem.childWidgetId = widget.id;
+    });
+  // clear Group children
+  widgetList
+    .filter(w => w.config.originalType === ORIGINAL_TYPE_MAP.group)
+    .forEach(widget => {
+      widget.config.children = [];
+    });
+  // set Group children
+  widgetList
+    .filter(w => w.parentId)
+    .forEach(widget => {
+      const parentWidgetId = widget.parentId!;
+      const parentWidget = widgetMap[parentWidgetId];
+      if (!parentWidget) {
+        widget.parentId = '';
+        return;
+      }
+      if (parentWidget.config.originalType !== ORIGINAL_TYPE_MAP.group) {
+        return;
+      }
+      if (!Array.isArray(parentWidget.config.children)) {
+        parentWidget.config.children = [];
+      }
+      parentWidget.config.children.push(widget.id);
+    });
+  // preprocess widget
+  widgetList.forEach(widget => {
+    widget.config.boardType = boardType;
+    widget.config.customConfig.props?.forEach(item => {
+      if (item.key === 'backgroundGroup') {
+        const rowsValue = item?.rows?.[0]?.value;
+        if (rowsValue?.image) {
+          rowsValue.image = adaptBoardImageUrl(
+            rowsValue.image,
+            widget.dashboardId,
+          );
+        }
+      }
+    });
+  });
 
   return {
     widgetMap,
@@ -872,6 +714,145 @@ export const getValueByRowData = (
   data: ChartsEventData | undefined,
   fieldName: string,
 ) => {
-  let toCaseField = fieldName;
+  // TODO: Not used for now, you can delete it
+  let toCaseField = JSON.parse(fieldName).join('.');
+
   return data?.rowData[toCaseField];
+};
+
+export function cloneWidgets(args: {
+  widgets: WidgetOfCopy[];
+  dataChartMap: Record<string, DataChart>;
+  newWidgetMapping: WidgetMapping;
+}) {
+  const newDataCharts: DataChart[] = [];
+  const newWidgets: Widget[] = [];
+  const { widgets, dataChartMap, newWidgetMapping } = args;
+  widgets.forEach(widget => {
+    const newWidget = CloneValueDeep(widget);
+    delete newWidget.selectedCopy;
+    newWidget.id = newWidgetMapping[newWidget.id]?.newId;
+    newWidget.parentId = newWidgetMapping[widget.parentId]?.newId || '';
+    newWidget.config.clientId =
+      newWidgetMapping[widget.id]?.newClientId || initClientId();
+    newWidget.relations = [];
+    newWidget.config.name += BOARD_COPY_CHART_SUFFIX;
+    // group
+    newWidget.config.children = newWidget.config.children?.map(id => {
+      return newWidgetMapping[id].newId;
+    });
+    // tab
+    if (newWidget.config.type === 'container') {
+      const content = newWidget.config.content as TabWidgetContent;
+      const itemList = Object.values(content.itemMap);
+      const newItemMap = itemList.reduce((acc, cur) => {
+        const newTabId =
+          newWidgetMapping[cur.childWidgetId]?.newClientId || initClientId();
+        acc[newTabId] = {
+          index: cur.index,
+          name: cur.name,
+          tabId: newTabId,
+          childWidgetId: newWidgetMapping[cur.childWidgetId]?.newId || '',
+        };
+        return acc;
+      }, {} as Record<string, ContainerItem>);
+      content.itemMap = newItemMap;
+    }
+    //chart
+    if (newWidget.config.type === 'chart') {
+      let dataChart = dataChartMap[newWidget.datachartId];
+      const newDataChart: DataChart = CloneValueDeep({
+        ...dataChart,
+        id: dataChart.id + Date.now() + BOARD_COPY_CHART_SUFFIX,
+      });
+      newWidget.config.originalType = ORIGINAL_TYPE_MAP.ownedChart;
+      newWidget.datachartId = newDataChart.id;
+      newDataCharts.push(newDataChart);
+      // TODO fix
+
+      // dispatch(boardActions.setDataChartToMap([newDataChart]));
+    }
+    newWidgets.push(newWidget);
+  });
+  return {
+    newDataCharts,
+    newWidgets,
+  };
+}
+/**
+ * @describe list[grandpa dad son...] to List[{id:'',parentId:''}]
+ * @param collection [[grandpa dad son,....]]
+ * @returns [{id:'',parentId:'',value:''}....]
+ */
+export const handleRowDataForTree = collection => {
+  let obj = {};
+  collection?.forEach(v => {
+    v.forEach((val, ind) => {
+      if (!obj[val] || obj[val]?.isLeaf) {
+        obj[val] = {
+          id: val,
+          parentId: ind ? v[ind - 1] : null,
+        };
+      }
+    });
+  });
+  return Object.values(obj);
+};
+
+export const convertListToTree = (
+  list,
+  parentId: null | string = null,
+): any[] => {
+  if (!list) {
+    return list;
+  }
+  const treeNodes: any[] = [];
+  const childrenList: any = [];
+  list.forEach(o => {
+    if (o['parentId'] === parentId) {
+      treeNodes.push({
+        id: o['id'],
+        parentId: o['parentId'],
+        key: o['id'],
+        title: o['label'] || o['id'],
+      });
+    } else {
+      childrenList.push(o);
+    }
+  });
+
+  return treeNodes.map(node => {
+    const children = convertListToTree(childrenList, node.id);
+    return children?.length ? { ...node, children } : { ...node, isLeaf: true };
+  });
+};
+
+export const convertToTree = (col, buildingMethod) => {
+  if (!col && !col.length) {
+    return col;
+  }
+
+  let data: RelationFilterValue[] = [];
+  let copyCol = CloneValueDeep(col);
+  let emptyParentList = ['null', 'undefined', 'false'];
+
+  if (buildingMethod === 'byParent') {
+    const parent = copyCol?.find(
+      v => !v[v.length - 1] || emptyParentList.includes(v[v.length - 1]),
+    ) || [null];
+    data = convertListToTree(
+      copyCol?.map(v => {
+        return {
+          id: v[0],
+          parentId: v[v.length - 1],
+          label: v.length > 2 ? v[1] : v[0],
+        };
+      }),
+      parent[parent.length - 1],
+    );
+  } else {
+    data = convertListToTree(handleRowDataForTree(copyCol));
+  }
+
+  return data;
 };

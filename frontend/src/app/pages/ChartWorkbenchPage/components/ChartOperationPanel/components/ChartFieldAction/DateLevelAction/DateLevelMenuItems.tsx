@@ -22,18 +22,27 @@ import {
   RUNTIME_DATE_LEVEL_KEY,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { FieldTemplate } from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartDataViewPanel/components/utils';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
+import { getAllColumnInMeta } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
+import { DATE_LEVEL_DELIMITER } from 'globalConstants';
 import React, { memo, useCallback } from 'react';
 import { DATE_LEVELS } from '../../../../../slice/constant';
-
 interface DateLevelMenuItemsProps {
   availableSourceFunctions?: string[];
   config;
+  metas?: ChartDataViewMeta[];
   onChange;
 }
 
 const DateLevelMenuItems = memo(
-  ({ availableSourceFunctions, config, onChange }: DateLevelMenuItemsProps) => {
+  ({
+    availableSourceFunctions,
+    config,
+    metas,
+    onChange,
+  }: DateLevelMenuItemsProps) => {
     const t = useI18NPrefix(`viz.workbench.dataview`);
     const handleChangeFn = useCallback(
       selectedConfig => {
@@ -60,7 +69,7 @@ const DateLevelMenuItems = memo(
 
           return onChange({
             ...config,
-            colName: `${config.field}（${selectedConfig.colName}）`,
+            colName: selectedConfig.colName,
             expression: selectedConfig.expression,
             [RUNTIME_DATE_LEVEL_KEY]: null,
           });
@@ -78,7 +87,7 @@ const DateLevelMenuItems = memo(
                 draft.field = config.colName;
                 draft.category =
                   ChartDataViewFieldCategory.DateLevelComputedField;
-                draft.colName = `${draft.colName}（${selectedConfig.colName}）`;
+                draft.colName = selectedConfig.colName;
                 draft[RUNTIME_DATE_LEVEL_KEY] = null;
               }),
             );
@@ -92,6 +101,8 @@ const DateLevelMenuItems = memo(
       <>
         <Menu.Item
           icon={!config.expression ? <CheckOutlined /> : ''}
+          key="defaultDateComputerField"
+          eventKey="defaultDateComputerField"
           onClick={() => {
             config.field &&
               handleChangeFn({
@@ -104,13 +115,16 @@ const DateLevelMenuItems = memo(
         </Menu.Item>
         {DATE_LEVELS.map(item => {
           if (availableSourceFunctions?.includes(item.expression)) {
-            const colName = t(item.expression);
-            const expression = `${item.expression}(${
+            const configColName =
               config.category === ChartDataViewFieldCategory.Field
                 ? config.colName
-                : config.field
-            })`;
-
+                : config.field;
+            const row = getAllColumnInMeta(metas)?.find(
+              v => v.name === configColName,
+            );
+            const expression = `${item.expression}(${FieldTemplate(
+              row?.path,
+            )})`;
             return (
               <Menu.Item
                 key={expression}
@@ -119,12 +133,13 @@ const DateLevelMenuItems = memo(
                 onClick={() =>
                   handleChangeFn({
                     category: ChartDataViewFieldCategory.DateLevelComputedField,
-                    colName,
+                    colName:
+                      configColName + DATE_LEVEL_DELIMITER + item.expression,
                     expression,
                   })
                 }
               >
-                {colName}
+                {item.name}
               </Menu.Item>
             );
           }

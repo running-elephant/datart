@@ -21,7 +21,7 @@ import { Button, Card, Form, Input, message, Popconfirm, Select } from 'antd';
 import { Authorized, EmptyFiller } from 'app/components';
 import { DetailPageHeader } from 'app/components/DetailPageHeader';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { useAccess } from 'app/pages/MainPage/Access';
+import { useAccess, useCascadeAccess } from 'app/pages/MainPage/Access';
 import {
   PermissionLevels,
   ResourceTypes,
@@ -34,7 +34,13 @@ import {
   TIME_FORMATTER,
 } from 'globalConstants';
 import moment from 'moment';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components/macro';
@@ -44,22 +50,30 @@ import {
   SPACE_MD,
   SPACE_TIMES,
 } from 'styles/StyleConstants';
-import { request } from 'utils/request';
-import { errorHandle, uuidv4 } from 'utils/utils';
+import { request2 } from 'utils/request';
+import {
+  errorHandle,
+  getInsertedNodeIndex,
+  getPath,
+  uuidv4,
+} from 'utils/utils';
 import {
   selectDataProviderConfigTemplateLoading,
   selectDataProviderListLoading,
   selectDataProviders,
+  selectIsOrgOwner,
   selectOrgId,
 } from '../../../slice/selectors';
 import { getDataProviderConfigTemplate } from '../../../slice/thunks';
 import { UNPERSISTED_ID_PREFIX } from '../../ViewPage/constants';
 import { QueryResult } from '../../ViewPage/slice/types';
+import { SaveFormContext } from '../SaveFormContext';
 import { useSourceSlice } from '../slice';
 import {
   selectDeleteSourceLoading,
   selectEditingSource,
   selectSaveSourceLoading,
+  selectSources,
   selectSyncSourceSchemaLoading,
   selectUnarchiveSourceLoading,
 } from '../slice/selectors';
@@ -71,8 +85,8 @@ import {
   syncSourceSchema,
   unarchiveSource,
 } from '../slice/thunks';
-import { Source, SourceFormModel } from '../slice/types';
-import { allowCreateSource, allowManageSource } from '../utils';
+import { SourceFormModel, SourceSimple } from '../slice/types';
+import { allowManageSource } from '../utils';
 import { ConfigComponent } from './ConfigComponent';
 
 export function SourceDetailPage() {
@@ -84,6 +98,7 @@ export function SourceDetailPage() {
   const dispatch = useDispatch();
   const history = useHistory();
   const orgId = useSelector(selectOrgId);
+  const isOwner = useSelector(selectIsOrgOwner);
   const editingSource = useSelector(selectEditingSource);
   const dataProviders = useSelector(selectDataProviders);
   const dataProviderListLoading = useSelector(selectDataProviderListLoading);
@@ -94,16 +109,28 @@ export function SourceDetailPage() {
   const unarchiveSourceLoading = useSelector(selectUnarchiveSourceLoading);
   const deleteSourceLoading = useSelector(selectDeleteSourceLoading);
   const syncSourceSchemaLoading = useSelector(selectSyncSourceSchemaLoading);
+  const sourceData = useSelector(selectSources);
   const { params } = useRouteMatch<{ sourceId: string }>();
   const { sourceId } = params;
   const [form] = Form.useForm<SourceFormModel>();
+  const { showSaveForm } = useContext(SaveFormContext);
   const t = useI18NPrefix('source');
   const tg = useI18NPrefix('global');
   const isArchived = editingSource?.status === 0;
-  const allowCreate =
-    useAccess(allowCreateSource())(true) && sourceId === 'add';
+  const allowCreate = sourceId === 'add';
+  const path = useMemo(
+    () =>
+      sourceData
+        ? getPath(
+            sourceData as Array<{ id: string; parentId: string }>,
+            { id: sourceId, parentId: editingSource?.parentId || null },
+            ResourceTypes.Source,
+          )
+        : [],
+    [sourceData, sourceId, editingSource?.parentId],
+  );
   const allowManage =
-    useAccess(allowManageSource(sourceId))(true) && sourceId !== 'add';
+    useCascadeAccess(allowManageSource(path))(true) && sourceId !== 'add';
   const allowEnableView = useAccess({
     type: 'module',
     module: ResourceTypes.View,
@@ -198,10 +225,9 @@ export function SourceDetailPage() {
     await form.validateFields();
     const { type, config } = form.getFieldsValue();
     const { name } = dataProviders[type];
-
+    setTestLoading(true);
     try {
-      setTestLoading(true);
-      await request<QueryResult>({
+      await request2<QueryResult>({
         url: '/data-provider/test',
         method: 'POST',
         data: { name, type, properties: config },
@@ -209,18 +235,16 @@ export function SourceDetailPage() {
       message.success(t('testSuccess'));
     } catch (error) {
       errorHandle(error);
-      throw error;
-    } finally {
-      setTestLoading(false);
     }
+    setTestLoading(false);
   }, [form, dataProviders, t]);
 
   const subFormTest = useCallback(
     async (config, callback) => {
       const { name } = dataProviders[providerType];
+      setTestLoading(true);
       try {
-        setTestLoading(true);
-        const { data } = await request<QueryResult>({
+        const { data } = await request2<QueryResult>({
           url: '/data-provider/test',
           method: 'POST',
           data: {
@@ -236,10 +260,8 @@ export function SourceDetailPage() {
         callback(data);
       } catch (error) {
         errorHandle(error);
-        throw error;
-      } finally {
-        setTestLoading(false);
       }
+      setTestLoading(false);
     },
     [dataProviders, providerType, editingSource],
   );
@@ -258,21 +280,36 @@ export function SourceDetailPage() {
 
       switch (formType) {
         case CommonFormTypes.Add:
-          dispatch(
-            addSource({
-              source: { ...rest, orgId, config: configStr },
-              resolve: id => {
-                message.success(t('createSuccess'));
-                history.push(`/organizations/${orgId}/sources/${id}`);
-              },
-            }),
-          );
+          showSaveForm({
+            sourceType: 'title',
+            type: CommonFormTypes.Add,
+            visible: true,
+            simple: true,
+            parentIdLabel: t('sidebar.parent'),
+            onSave: (val, onClose) => {
+              dispatch(
+                addSource({
+                  source: {
+                    ...rest,
+                    parentId: val.parentId,
+                    orgId,
+                    config: configStr,
+                  },
+                  resolve: (id: string) => {
+                    message.success(t('createSuccess'));
+                    history.push(`/organizations/${orgId}/sources/${id}`);
+                    onClose();
+                  },
+                }),
+              );
+            },
+          });
           break;
         case CommonFormTypes.Edit:
           dispatch(
             editSource({
               source: {
-                ...(editingSource as Source),
+                ...(editingSource as SourceSimple),
                 ...rest,
                 orgId,
                 config: configStr,
@@ -287,7 +324,7 @@ export function SourceDetailPage() {
           break;
       }
     },
-    [dispatch, history, orgId, editingSource, formType, t, tg],
+    [formType, showSaveForm, t, dispatch, editingSource, orgId, history, tg],
   );
 
   const del = useCallback(
@@ -311,16 +348,43 @@ export function SourceDetailPage() {
   );
 
   const unarchive = useCallback(() => {
-    dispatch(
-      unarchiveSource({
-        id: editingSource!.id,
-        resolve: () => {
-          message.success(tg('operation.restoreSuccess'));
-          history.replace(`/organizations/${orgId}/sources`);
-        },
-      }),
-    );
-  }, [dispatch, history, orgId, editingSource, tg]);
+    const { id, name } = editingSource!;
+    showSaveForm({
+      sourceType: 'folder',
+      type: CommonFormTypes.Edit,
+      visible: true,
+      simple: false,
+      initialValues: { id, name, parentId: null },
+      parentIdLabel: t('sidebar.parent'),
+      onSave: (values, onClose) => {
+        let index = getInsertedNodeIndex(values, sourceData);
+        dispatch(
+          unarchiveSource({
+            source: {
+              name: values.name,
+              parentId: values.parentId || null,
+              id,
+              index,
+            },
+            resolve: () => {
+              message.success(tg('operation.restoreSuccess'));
+              history.replace(`/organizations/${orgId}/sources`);
+              onClose();
+            },
+          }),
+        );
+      },
+    });
+  }, [
+    editingSource,
+    showSaveForm,
+    t,
+    sourceData,
+    dispatch,
+    tg,
+    history,
+    orgId,
+  ]);
 
   const titleLabelPrefix = useMemo(
     () => (isArchived ? t('archived') : tg(`modal.title.${formType}`)),
@@ -390,16 +454,11 @@ export function SourceDetailPage() {
                   </Popconfirm>
                 )}
               </>
-            ) : (
+            ) : isOwner ? (
               <>
-                <Popconfirm
-                  title={tg('operation.restoreConfirm')}
-                  onConfirm={unarchive}
-                >
-                  <Button loading={unarchiveSourceLoading}>
-                    {tg('button.restore')}
-                  </Button>
-                </Popconfirm>
+                <Button loading={unarchiveSourceLoading} onClick={unarchive}>
+                  {tg('button.restore')}
+                </Button>
                 <Popconfirm
                   title={tg('operation.deleteConfirm')}
                   onConfirm={del(false)}
@@ -409,6 +468,8 @@ export function SourceDetailPage() {
                   </Button>
                 </Popconfirm>
               </>
+            ) : (
+              <></>
             )
           }
         />
@@ -434,6 +495,7 @@ export function SourceDetailPage() {
                 name="name"
                 label={t('form.name')}
                 validateFirst
+                getValueFromEvent={event => event.target.value?.trim()}
                 rules={[
                   {
                     required: true,
@@ -481,21 +543,20 @@ export function SourceDetailPage() {
               </Form.Item>
               {dataProviderConfigTemplateLoading && <LoadingOutlined />}
 
-              {(providerType !== 'FILE' || formType === CommonFormTypes.Edit) &&
-                config?.attributes.map(attr => (
-                  <ConfigComponent
-                    key={`${providerType}_${attr.name}`}
-                    attr={attr}
-                    form={form}
-                    sourceId={editingSource?.id}
-                    testLoading={testLoading}
-                    disabled={isArchived}
-                    allowManage={allowManage}
-                    onTest={test}
-                    onSubFormTest={subFormTest}
-                    onDbTypeChange={dbTypeChange}
-                  />
-                ))}
+              {config?.attributes.map(attr => (
+                <ConfigComponent
+                  key={`${providerType}_${attr.name}`}
+                  attr={attr}
+                  form={form}
+                  sourceId={editingSource?.id}
+                  testLoading={testLoading}
+                  disabled={isArchived}
+                  allowManage={allowManage}
+                  onTest={test}
+                  onSubFormTest={subFormTest}
+                  onDbTypeChange={dbTypeChange}
+                />
+              ))}
             </Form>
           </Card>
         </Content>
@@ -527,7 +588,7 @@ const Content = styled.div`
   }
 
   .detailForm {
-    max-width: ${SPACE_TIMES(240)};
+    max-width: ${SPACE_TIMES(400)};
     padding-top: ${SPACE_MD};
   }
 `;

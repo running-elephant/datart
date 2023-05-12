@@ -152,6 +152,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
       <Form.Item
         name="name"
         label={t('name')}
+        getValueFromEvent={event => event.target.value?.trim()}
         rules={[
           {
             required: true,
@@ -234,7 +235,7 @@ export function SaveForm({ formProps, ...modalProps }: SaveFormProps) {
               label={t('cacheExpires')}
               initialValue={0}
             >
-              <InputNumber disabled={!cache} />
+              <InputNumber disabled={!cache} min={0} />
             </Form.Item>
             <Form.Item
               wrapperCol={{ span: 13, offset: 9 }}

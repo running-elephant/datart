@@ -15,17 +15,17 @@ const {
 const rewireEntries = [
   {
     name: 'shareChart',
-    entry: path.resolve(__dirname, './src/shareChart.tsx'),
+    entry: path.resolve(__dirname, './src/shareChart.entry.ts'),
     outPath: 'shareChart.html',
   },
   {
     name: 'shareDashboard',
-    entry: path.resolve(__dirname, './src/shareDashboard.tsx'),
+    entry: path.resolve(__dirname, './src/shareDashboard.entry.ts'),
     outPath: 'shareDashboard.html',
   },
   {
     name: 'shareStoryPlayer',
-    entry: path.resolve(__dirname, './src/shareStoryPlayer.tsx'),
+    entry: path.resolve(__dirname, './src/shareStoryPlayer.entry.ts'),
     outPath: 'shareStoryPlayer.html',
   },
 ];
@@ -136,6 +136,13 @@ module.exports = {
         },
       };
 
+      const instanceOfMiniCssExtractPlugin = webpackConfig.plugins.filter(
+        plugin => plugin.constructor.name === 'MiniCssExtractPlugin',
+      )[0];
+      if (instanceOfMiniCssExtractPlugin) {
+        instanceOfMiniCssExtractPlugin.options.ignoreOrder = true;
+      }
+
       const defaultEntryHTMLPlugin = webpackConfig.plugins.filter(plugin => {
         return plugin.constructor.name === 'HtmlWebpackPlugin';
       })[0];
@@ -189,7 +196,6 @@ module.exports = {
     },
     modulePaths: ['../'],
   },
-
   devServer: {
     before: function (app, server, compiler) {
       app.get('/api/v1/plugins/custom/charts', function (req, res) {
@@ -197,7 +203,7 @@ module.exports = {
         const dir = fs.readdirSync(`./public/${pluginPath}`);
         res.json({
           data: (dir || [])
-            .filter(file => path.extname(file) == '.js')
+            .filter(file => path.extname(file) === '.js')
             .map(file => `${pluginPath}/${file}`),
           errCode: 0,
           success: true,

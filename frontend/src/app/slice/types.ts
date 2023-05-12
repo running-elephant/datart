@@ -20,6 +20,7 @@ import { TenantManagementMode } from 'app/constants';
 export interface AppState {
   loggedInUser: null | User;
   systemInfo: null | SystemInfo;
+  setupLoading: boolean;
   loginLoading: boolean;
   registerLoading: boolean;
   saveProfileLoading: boolean;
@@ -35,9 +36,11 @@ export interface User {
   name: string | null;
   description: string;
   orgOwner?: boolean;
+  timezone?: string;
 }
 
 export interface SystemInfo {
+  initialized: boolean;
   mailEnable: boolean;
   registerEnable: boolean;
   tenantManagementMode: TenantManagementMode;
@@ -51,6 +54,16 @@ export interface ModifyUserPassword {
   confirmPassword: string;
 }
 
+export interface SetupParams {
+  params: {
+    email: string;
+    username: string;
+    password: string;
+    name?: string;
+  };
+  resolve: () => void;
+}
+
 export interface LoginParams {
   params: {
     username: string;
@@ -58,9 +71,11 @@ export interface LoginParams {
   };
   resolve: () => void;
 }
+
 export interface UserInfoByTokenParams {
   token: string;
   resolve: () => void;
+  reject: () => void;
 }
 
 export interface RegisterParams {

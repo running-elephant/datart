@@ -57,13 +57,13 @@ public class AttachmentPdfServiceImpl implements AttachmentService {
         shareCreateParam.setExpiryDate(DateUtils.addHours(new Date(), 1));
         shareCreateParam.setAuthenticationMode(ShareAuthenticationMode.NONE);
         shareCreateParam.setRowPermissionBy(ShareRowPermissionBy.CREATOR);
-        ShareToken share = shareService.createShare(securityManager.getCurrentUser().getId(), shareCreateParam);
+        ShareToken share = shareService.createShare(SHARE_USER + securityManager.getCurrentUser().getId(), shareCreateParam);
 
-        String url = Application.getWebRootURL()+"/"+shareCreateParam.getVizType().getShareRoute()+"/"+share.getId()+"?eager=true&type="+share.getAuthenticationMode();
+        String url = Application.getWebRootURL() + "/" + shareCreateParam.getVizType().getShareRoute() + "/" + share.getId() + "?eager=true&type=" + share.getAuthenticationMode();
         log.info("share url {} ", url);
 
         File imageFile = WebUtils.screenShot2File(url, FileUtils.withBasePath(path), downloadCreateParam.getImageWidth());
-        File file = new File(generateFileName(path,fileName,attachmentType));
+        File file = new File(generateFileName(path, fileName, attachmentType));
         createPDFFromImage(file.getPath(), imageFile.getPath());
 
         log.info("create pdf file complete.");
@@ -74,6 +74,7 @@ public class AttachmentPdfServiceImpl implements AttachmentService {
 
     /**
      * 使用Apache pdfbox将图片生成pdf
+     *
      * @param pdfPath
      * @param imagePath
      * @throws Exception

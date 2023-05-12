@@ -17,13 +17,15 @@
  */
 
 import { TreeDataNode, TreeNodeProps } from 'antd';
-import { DataViewFieldType } from 'app/constants';
+import { DataViewFieldType, DateFormat } from 'app/constants';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { ReactElement } from 'react';
 import { View } from '../../../../../types/View';
 import { SubjectTypes } from '../../PermissionPage/constants';
 import { RowPermissionRaw, Variable } from '../../VariablePage/slice/types';
 import {
   ColumnCategories,
+  StructViewJoinType,
   ViewStatus,
   ViewViewModelStages,
 } from '../constants';
@@ -78,7 +80,7 @@ export interface ViewSimpleViewModel extends ViewSimple {
 }
 
 export interface ViewViewModel<T = object>
-  extends Pick<View, 'name' | 'script'> {
+  extends Pick<View, 'name' | 'script' | 'type'> {
   id: string;
   description?: string;
   index: number | null;
@@ -108,6 +110,7 @@ export interface QueryResult {
   pageInfo: PageInfo;
   script?: string;
   warnings?: string[] | null;
+  reqColumns?: { column: []; alias: string }[];
 }
 export interface PageInfo {
   pageNo: number;
@@ -123,24 +126,42 @@ export interface Schema {
 export enum ColumnRole {
   Role = 'role',
   Hierarchy = 'hierachy',
+  Table = 'table',
 }
 
 export interface Column extends Schema {
   category?: ColumnCategories;
   index?: number;
-
+  dateFormat?: DateFormat;
   role?: ColumnRole;
   children?: Column[];
+  path?: string[];
+  displayName?: string;
+}
+
+export interface ColumnsProps {
+  category?: ColumnCategories;
+  index?: number;
+  name: string[];
+  primaryKey?: boolean;
+  type: DataViewFieldType;
+  role?: ColumnRole;
 }
 
 export interface Model {
   [key: string]: Column;
 }
 
+export interface ColumnsModel {
+  [key: string]: ColumnsProps;
+}
+
 export type HierarchyModel = {
   version?: string;
   hierarchy?: Model;
-  columns?: Model;
+  columns?: ColumnsModel;
+  path?: string[];
+  computedFields?: ChartDataViewMeta[];
 };
 
 export interface ColumnPermissionRaw {
@@ -207,3 +228,31 @@ export interface SelectViewFolderTreeProps {
   id?: string;
   getDisabled: (o: ViewSimpleViewModel, path: string[]) => boolean;
 }
+
+export interface StructViewQueryProps {
+  table: Array<string>;
+  columns: Array<string>;
+  joins: Array<JoinTableProps>;
+}
+
+export interface JoinTableProps {
+  table?: Array<string>;
+  joinType?: StructViewJoinType;
+  columns?: Array<string>;
+  conditions?: Array<{ left: Array<string>; right: Array<string> }>;
+}
+
+export interface StructViewRequestProps {
+  table: Array<string>;
+  columns: string;
+  joins: JoinTableRequestProps;
+}
+
+export interface JoinTableRequestProps {
+  table?: Array<string>;
+  joinType?: StructViewJoinType;
+  columns?: string;
+  conditions?: Array<{ left: Array<string>; right: Array<string> }>;
+}
+
+export type ViewType = 'SQL' | 'STRUCT';

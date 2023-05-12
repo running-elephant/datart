@@ -16,10 +16,20 @@
  * limitations under the License.
  */
 
+import migrateChartConfig from 'app/migration/ChartConfig/migrateChartConfig';
+import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
-import { ChartConfig, ChartStyleConfig } from 'app/types/ChartConfig';
+import {
+  ChartConfig,
+  ChartDataConfig,
+  ChartStyleConfig,
+} from 'app/types/ChartConfig';
 import { ChartConfigDTO, ChartDetailConfigDTO } from 'app/types/ChartConfigDTO';
 import { ChartDTO } from 'app/types/ChartDTO';
+import {
+  createDateLevelComputedFieldForConfigComputedFields,
+  mergeChartAndViewComputedField,
+} from 'app/utils/chartHelper';
 import {
   mergeChartDataConfigs,
   mergeChartStyleConfigs,
@@ -28,14 +38,30 @@ import {
 import { Omit } from 'utils/object';
 
 export function convertToChartDto(data): ChartDTO {
-  if (data?.view?.model) {
-    data.view.model = beginViewModelMigration(data.view.model);
+  if (data?.view) {
+    data.view = migrationViewConfig(data.view);
   }
+  if (data?.view?.model) {
+    data.view.model = beginViewModelMigration(data.view.model, data.view.type);
+  }
+  data.config = migrateChartConfig(data?.config);
+
+  const config = JSON.parse(data?.config || '{}');
+  const meta = transformHierarchyMeta(data?.view?.model);
+
+  config.computedFields = createDateLevelComputedFieldForConfigComputedFields(
+    meta,
+    mergeChartAndViewComputedField(
+      config.computedFields,
+      JSON.parse(data?.view?.model || '{}').computedFields,
+    ),
+  );
+
   return Object.assign({}, data, {
-    config: JSON.parse(data?.config),
+    config,
     view: {
       ...Omit(data?.view, ['model']),
-      meta: transformHierarchyMeta(data?.view?.model),
+      meta,
     },
   });
 }
@@ -76,6 +102,7 @@ function extractChartConfigValueModel(config: ChartConfig): ChartConfigDTO {
     datas: config?.datas,
     styles: getStyleValueModel(config?.styles),
     settings: getStyleValueModel(config?.settings),
+    interactions: getStyleValueModel(config?.interactions),
   };
 }
 
@@ -101,10 +128,10 @@ export function mergeToChartConfig(
   if (!source) {
     return target;
   }
-  target.datas = mergeChartDataConfigs(
+  target.datas = mergeChartDataConfigs<ChartDataConfig>(
     target?.datas,
     source?.chartConfig?.datas,
-  );
+  ) as ChartDataConfig[];
   target.styles = mergeChartStyleConfigs(
     target?.styles,
     source?.chartConfig?.styles,
@@ -112,6 +139,10 @@ export function mergeToChartConfig(
   target.settings = mergeChartStyleConfigs(
     target?.settings,
     source?.chartConfig?.settings,
+  );
+  target.interactions = mergeChartStyleConfigs(
+    target?.interactions,
+    source?.chartConfig?.interactions,
   );
   return target;
 }
@@ -123,5 +154,6 @@ export function convertToChartConfigDTO(
     datas: source?.chartConfig?.datas,
     styles: source?.chartConfig?.styles,
     settings: source?.chartConfig?.settings,
+    interactions: source?.chartConfig?.interactions,
   };
 }

@@ -22,6 +22,7 @@ import {
   ControllerFacadeTypes,
   ControllerVisibilityTypes,
 } from 'app/constants';
+import { ExecuteToken } from 'app/pages/SharePage/slice/types';
 import {
   ChartConfig,
   ChartDataSectionField,
@@ -51,12 +52,13 @@ const ControllerPanel: FC<{
   viewId?: string;
   view?: ChartDTO['view'];
   chartConfig?: ChartConfig;
+  executeToken?: Record<string, ExecuteToken>;
   onChange: (type, payload) => void;
-}> = memo(({ viewId, view, chartConfig, onChange }) => {
+}> = memo(({ viewId, view, chartConfig, executeToken, onChange }) => {
   const [filters, setFilters] = useState<ChartDataSectionField[]>([]);
   useEffect(() => {
     const newFilters = (chartConfig?.datas || [])
-      .filter(c => c.type === ChartDataSectionType.FILTER)
+      .filter(c => c.type === ChartDataSectionType.Filter)
       .flatMap(c => c.rows || []);
     setFilters(newFilters);
   }, [chartConfig?.datas]);
@@ -115,6 +117,7 @@ const ControllerPanel: FC<{
     const props: PresentControllerFilterProps = {
       viewId,
       view,
+      executeToken,
       condition: config?.filter?.condition,
       options: config?.filter?.facade,
       onConditionChange: condition =>
@@ -124,6 +127,7 @@ const ControllerPanel: FC<{
       typeof config?.filter?.facade === 'object'
         ? config?.filter?.facade?.facade
         : config?.filter?.facade;
+
     switch (facade) {
       case ControllerFacadeTypes.DropdownList:
         return <Filters.DropdownListFilter {...props} />;

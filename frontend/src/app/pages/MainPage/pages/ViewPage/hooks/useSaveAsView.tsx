@@ -20,11 +20,15 @@ import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailC
 import { CommonFormTypes } from 'globalConstants';
 import { useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle, getInsertedNodeIndex } from 'utils/utils';
 import { View } from '../../../../../types/View';
 import { SaveFormContext } from '../SaveFormContext';
-import { selectViews } from '../slice/selectors';
+import {
+  selectAllSourceDatabaseSchemas,
+  selectCurrentEditingViewAttr,
+  selectViews,
+} from '../slice/selectors';
 import { saveView } from '../slice/thunks';
 import { ViewViewModel } from '../slice/types';
 import { transformModelToViewModel } from '../utils';
@@ -33,12 +37,17 @@ export function useSaveAsView() {
   const t = useI18NPrefix('view.editor');
   const tg = useI18NPrefix('global');
   const { showSaveForm } = useContext(SaveFormContext);
-  const viewsData = useSelector(selectViews);
   const dispatch = useDispatch();
+
+  const viewsData = useSelector(selectViews);
+  const allDatabaseSchemas = useSelector(selectAllSourceDatabaseSchemas);
+  const sourceId = useSelector(state =>
+    selectCurrentEditingViewAttr(state, { name: 'sourceId' }),
+  ) as string;
 
   const getViewData = useCallback(async (viewId): Promise<View> => {
     try {
-      const { data } = await request<View>(`/views/${viewId}`);
+      const { data } = await request2<View>(`/views/${viewId}`);
       data.config = migrateViewConfig(data.config);
       return data;
     } catch (error) {
@@ -50,7 +59,7 @@ export function useSaveAsView() {
   const saveAsView = useCallback(
     async (viewId: string) => {
       let viewData: ViewViewModel = await getViewData(viewId).then(data => {
-        return transformModelToViewModel(data);
+        return transformModelToViewModel(data, allDatabaseSchemas[sourceId]);
       });
 
       const { name, parentId, config } = viewData;
@@ -84,7 +93,16 @@ export function useSaveAsView() {
         },
       });
     },
-    [dispatch, getViewData, showSaveForm, t, tg, viewsData],
+    [
+      dispatch,
+      getViewData,
+      showSaveForm,
+      t,
+      tg,
+      viewsData,
+      allDatabaseSchemas,
+      sourceId,
+    ],
   );
   return saveAsView;
 }

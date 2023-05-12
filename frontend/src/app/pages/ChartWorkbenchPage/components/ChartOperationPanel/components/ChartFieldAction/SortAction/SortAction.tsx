@@ -20,10 +20,8 @@ import { CheckOutlined } from '@ant-design/icons';
 import { Col, Menu, Radio, Row, Space } from 'antd';
 import { SortActionType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import DraggableList from 'app/pages/ChartWorkbenchPage/components/ChartOperationPanel/components/ChartFieldAction/SortAction/DraggableList';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
-import { transformToDataSet } from 'app/utils/chartHelper';
 import { updateBy } from 'app/utils/mutation';
 import { FC, useState } from 'react';
 import styled from 'styled-components/macro';
@@ -44,20 +42,13 @@ const SortAction: FC<{
     : Boolean(options?.backendSort);
   const t = useI18NPrefix(`viz.palette.data.actions`);
   const [direction, setDirection] = useState(
-    config?.sort?.type || SortActionType.NONE,
+    config?.sort?.type || SortActionType.None,
   );
-  const [sortValue, setSortValue] = useState(() => {
-    const objDataColumns = transformToDataSet(dataset?.rows, dataset?.columns);
-    return (
-      config?.sort?.value ||
-      Array.from(new Set(objDataColumns?.map(c => c.getCell(config))))
-    );
-  });
 
   const handleSortTypeChange = direction => {
     setDirection(direction);
 
-    if (SortActionType.CUSTOMIZE !== direction) {
+    if (SortActionType.Customize !== direction) {
       onConfigChange &&
         onConfigChange(
           updateBy(config, draft => {
@@ -68,41 +59,11 @@ const SortAction: FC<{
     }
   };
 
-  const handleCustomSortListChange = values => {
-    setSortValue(values);
-    onConfigChange &&
-      onConfigChange(
-        updateBy(config, draft => {
-          draft.sort = { type: SortActionType.CUSTOMIZE, value: values };
-        }),
-        !actionNeedNewRequest,
-      );
-  };
-
-  const renderColumnsDataList = () => {
-    if (
-      !config.colName ||
-      SortActionType.CUSTOMIZE !== direction ||
-      !Array.isArray(sortValue)
-    ) {
-      return null;
-    }
-
-    const items =
-      sortValue.map((value, index) => ({
-        id: index,
-        text: value,
-      })) || [];
-    return (
-      <DraggableList source={items} onChange={handleCustomSortListChange} />
-    );
-  };
-
   const renderOptions = mode => {
     if (mode === 'menu') {
       return (
         <>
-          {[SortActionType.NONE, SortActionType.ASC, SortActionType.DESC].map(
+          {[SortActionType.None, SortActionType.ASC, SortActionType.DESC].map(
             sort => {
               return (
                 <Menu.Item
@@ -128,7 +89,7 @@ const SortAction: FC<{
             value={direction}
           >
             <Space direction="vertical">
-              <Radio key={SortActionType.NONE} value={SortActionType.NONE}>
+              <Radio key={SortActionType.None} value={SortActionType.None}>
                 {t('sort.none')}
               </Radio>
               <Radio key={SortActionType.ASC} value={SortActionType.ASC}>

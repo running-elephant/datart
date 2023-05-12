@@ -16,23 +16,27 @@
  * limitations under the License.
  */
 import { createSelector } from '@reduxjs/toolkit';
-import { DefaultWidgetData } from 'app/pages/DashBoardPage/constants';
+import {
+  DefaultWidgetData,
+  ORIGINAL_TYPE_MAP,
+} from 'app/pages/DashBoardPage/constants';
 import {
   DeviceType,
-  Widget,
   WidgetInfo,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   EditBoardState,
   HistoryEditBoard,
 } from 'app/pages/DashBoardPage/pages/BoardEditor/slice/types';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { StateWithHistory } from 'redux-undo';
+import { widgetMapToTree } from '../components/LayerPanel/utils';
 import { getLayoutWidgets } from './../../../utils/widget';
 import { EditBoardStack } from './types';
 
 // First select the relevant part from the state
 // record
-
+const DefaultObject = {};
 export const editBoardStackState = (state: { editBoard: HistoryEditBoard }) =>
   state.editBoard.stack.present;
 
@@ -45,12 +49,12 @@ export const selectEditWidgetRecord = createSelector(
     return state.widgetRecord;
   },
 );
-export const selectWidgetRecord = createSelector(
+export const selectAllWidgetMap = createSelector(
   [editBoardStackState],
-  state => state.widgetRecord || {},
+  state => state.widgetRecord || DefaultObject,
 );
 export const selectEditWidgetById = createSelector(
-  selectWidgetRecord,
+  selectAllWidgetMap,
   (_, widgetId: string) => widgetId,
   (widgetRecord, widgetId) => {
     if (!widgetId) {
@@ -65,15 +69,32 @@ export const selectEditWidgetById = createSelector(
 );
 
 export const selectSortAllWidgets = createSelector(
-  [selectWidgetRecord],
+  [selectAllWidgetMap],
   WidgetConfig =>
     Object.values(WidgetConfig).sort((w1, w2) => {
       return w1.config.index! - w2.config.index!;
     }),
 );
-
+export const selectHasQueryBtn = createSelector(
+  [selectSortAllWidgets],
+  allWidgets => {
+    let target = allWidgets.find(
+      it => it.config.originalType === ORIGINAL_TYPE_MAP.queryBtn,
+    );
+    return !!target;
+  },
+);
+export const selectHasResetBtn = createSelector(
+  [selectSortAllWidgets],
+  allWidgets => {
+    let target = allWidgets.find(
+      it => it.config.originalType === ORIGINAL_TYPE_MAP.resetBtn,
+    );
+    return !!target;
+  },
+);
 export const selectLayoutWidgetMap = createSelector(
-  [selectWidgetRecord],
+  [selectAllWidgetMap],
   allWidgetMap => {
     const layoutWidgets = getLayoutWidgets(allWidgetMap);
     const LayoutWidgetMap: Record<string, Widget> = {};
@@ -86,14 +107,19 @@ export const selectLayoutWidgetMap = createSelector(
 
 // widgetsInfo
 export const selectAllWidgetInfoMap = (state: { editBoard: EditBoardState }) =>
-  state.editBoard.widgetInfoRecord || {};
+  state.editBoard.widgetInfoRecord || undefined;
+
+export const selectEditingWidgetIds = (state: { editBoard: EditBoardState }) =>
+  Object.values(state.editBoard.widgetInfoRecord)
+    ?.filter(r => r.editing)
+    ?.map(r => r.id) || [];
 
 export const selectWidgetInfoById = createSelector(
   [selectAllWidgetInfoMap, (_, widgetId: string) => widgetId],
   (allWidgetInfoMap, wId) => allWidgetInfoMap[wId] || undefined,
 );
 export const selectLayoutWidgetInfoMap = createSelector(
-  [selectWidgetRecord, selectAllWidgetInfoMap],
+  [selectAllWidgetMap, selectAllWidgetInfoMap],
   (allWidgetMap, allWidgetInfo) => {
     const layoutWidgets = getLayoutWidgets(allWidgetMap);
     const layoutWidgetInfoMap: Record<string, WidgetInfo> = {};
@@ -113,13 +139,24 @@ export const selectSelectedIds = createSelector(
 );
 
 export const selectWidgetInfoDatachartId = createSelector(
-  [selectWidgetRecord],
+  [selectAllWidgetMap],
   WidgetsInfo =>
     Object.values(WidgetsInfo).map(widgetInfo => {
       return widgetInfo.datachartId || undefined;
     }) || [],
 );
 
+export const selectLayerTree = createSelector(
+  [selectAllWidgetMap, selectAllWidgetInfoMap],
+  (widgetMap, widgetInfoMap) => {
+    return widgetMapToTree({
+      widgetMap,
+      widgetInfoMap,
+      parentId: '',
+      tree: [],
+    });
+  },
+);
 // boardInfo
 export const boardInfoState = (state: { editBoard: EditBoardState }) =>
   state.editBoard.boardInfo;
@@ -133,14 +170,7 @@ export const selectControllerPanel = createSelector(
   [boardInfoState],
   boardInfo => boardInfo.controllerPanel,
 );
-export const selectLinkagePanel = createSelector(
-  [boardInfoState],
-  boardInfo => boardInfo.linkagePanel,
-);
-export const selectJumpPanel = createSelector(
-  [boardInfoState],
-  boardInfo => boardInfo.jumpPanel,
-);
+
 export const selectBoardChartEditorProps = createSelector(
   [boardInfoState],
   boardInfo => boardInfo.chartEditorProps,
@@ -160,7 +190,7 @@ export const selectShowBlockMask = createSelector(
 // record Clipboard
 export const selectClipboardWidgets = createSelector(
   [boardInfoState],
-  boardInfo => boardInfo.clipboardWidgets || [],
+  boardInfo => boardInfo.clipboardWidgetMap || [],
 );
 // editWidgetData
 export const editWidgetDataState = (state: { editBoard: EditBoardState }) =>
@@ -170,7 +200,7 @@ export const selectEditWidgetData = createSelector(
   (widgetDataMap, wid) => {
     if (!widgetDataMap) return DefaultWidgetData;
     if (!widgetDataMap[wid]) return DefaultWidgetData;
-    return widgetDataMap[wid];
+    return widgetDataMap[wid] || DefaultWidgetData;
   },
 );
 // past
@@ -191,3 +221,14 @@ export const selectFutureState = createSelector(
   [recordFutureState],
   state => state,
 );
+
+// SelectedItems
+export const selectEditSelectedItems = (state: { editBoard: EditBoardState }) =>
+  state.editBoard.selectedItemsMap;
+export const makeSelectSelectedItemsInEditor = () => {
+  return createSelector(
+    selectEditSelectedItems,
+    (_, widgetId: string) => widgetId,
+    (selectedItemsMap, wId) => selectedItemsMap.selectedItems?.[wId],
+  );
+};

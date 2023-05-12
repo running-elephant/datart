@@ -201,8 +201,8 @@ const StyledRelationCol = styled(Col)`
 `;
 
 const StyledOperatorCol = styled(Col)`
-  width: 100px;
   align-self: center;
+  width: 100px;
   padding: 0 !important;
   text-align: center;
 `;

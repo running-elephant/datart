@@ -63,6 +63,6 @@ export const DraggableContainer: FC<{ source: Source[]; onChange }> = ({
 export default DraggableContainer;
 
 const StyledDiv = styled.div`
-  border: 1px dashed gray;
   width: 100%;
+  border: 1px dashed gray;
 `;

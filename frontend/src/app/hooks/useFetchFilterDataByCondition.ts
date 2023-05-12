@@ -17,6 +17,7 @@
  */
 
 import { FilterConditionType } from 'app/constants';
+import { ExecuteToken } from 'app/pages/SharePage/slice/types';
 import { FilterCondition, RelationFilterValue } from 'app/types/ChartConfig';
 import { ChartDTO } from 'app/types/ChartDTO';
 import { getDistinctFields } from 'app/utils/fetch';
@@ -27,12 +28,14 @@ export const useFetchFilterDataByCondition = (
   condition?: FilterCondition,
   onFinish?: (datas: RelationFilterValue[]) => void,
   view?: ChartDTO['view'],
+  executeToken?: Record<string, ExecuteToken>,
 ) => {
   useMount(() => {
     if (!viewId || condition?.type !== FilterConditionType.List) {
       return;
     }
-    getDistinctFields?.(viewId, [condition?.name!], view, undefined)?.then(
+
+    getDistinctFields?.(viewId, [condition?.name!], view, executeToken)?.then(
       dataset => {
         const _convertToList = collection => {
           const items: string[] = (collection || []).flatMap(c => c);

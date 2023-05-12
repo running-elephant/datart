@@ -1,10 +1,18 @@
 #EXAPLE:
 #  db-type: "example"
 #  name: "example"
-#  driver-class: "com.example.jdbc.Driver"
 #  literal-quote: "'"
 #  identifier-quote: "`"
-#  url-prefix: jdbc:example://
+#  driver-class: "com.example.jdbc.Driver" # optional
+#  url-prefix: "jdbc:example://" # optional
+#  sql-dialect: "datart.data.provider.calcite.dialect.ExampleSqlDialectSupport"  # optional
+#  identifier-end-quote: "`"  # optional
+#  literal-end-quote: "'"  # optional
+#  identifier-escaped-quote: "`"  # optional
+#  adapter-class: 'datart.data.provider.jdbc.adapters.ExampleDataProviderAdapter'  # optional
+#  quote-identifiers: true  # optional
+#  support-sql-limit: true  # optional
+#
 
 IMPALA:
   db-type: "impala"
@@ -28,4 +36,14 @@ DORIS:
   identifier-quote: "`"
   adapter-class: "datart.data.provider.jdbc.adapters.DorisDataProviderAdapter"
   url-prefix: "jdbc:mysql://"
+
+STARROCKS:
+  db-type: "starrocks"
+  name: "starrocks"
+  driver-class: "com.mysql.cj.jdbc.Driver"
+  literal-quote: "'"
+  identifier-quote: "`"
+  adapter-class: "datart.data.provider.jdbc.adapters.StarRocksDataProviderAdapter"
+  url-prefix: "jdbc:mysql://"
+
 

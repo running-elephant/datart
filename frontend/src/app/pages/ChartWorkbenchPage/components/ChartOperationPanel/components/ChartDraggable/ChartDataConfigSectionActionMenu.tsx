@@ -25,6 +25,7 @@ import {
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { FC } from 'react';
 import AggregationAction from '../ChartFieldAction/AggregationAction';
 import AggregationLimitAction from '../ChartFieldAction/AggregationLimitAction';
@@ -36,6 +37,7 @@ const ChartDataConfigSectionActionMenu: FC<
   {
     uid: string;
     type: string;
+    metas?: ChartDataViewMeta[];
     onOpenModal;
     availableSourceFunctions?: string[];
   } & ChartDataConfigSectionProps
@@ -47,6 +49,7 @@ const ChartDataConfigSectionActionMenu: FC<
   config,
   availableSourceFunctions,
   category,
+  metas,
   onConfigChanged,
 }) => {
   const t = useI18NPrefix(`viz.palette.data.enum.actionType`);
@@ -61,7 +64,7 @@ const ChartDataConfigSectionActionMenu: FC<
     columnUid: string,
     fieldConfig: ChartDataSectionField,
     needRefresh?: boolean,
-    replacedColName?: string,
+    replacedConfig?: ChartDataSectionField,
   ) => {
     if (!fieldConfig) {
       return;
@@ -70,7 +73,7 @@ const ChartDataConfigSectionActionMenu: FC<
       columnUid,
       config,
       fieldConfig,
-      replacedColName,
+      replacedConfig,
     );
 
     onConfigChanged?.(ancestors, newConfig, needRefresh);
@@ -105,6 +108,19 @@ const ChartDataConfigSectionActionMenu: FC<
           ].includes(action),
       );
     }
+
+    if (
+      type === 'DATE' &&
+      ![
+        ChartDataViewFieldCategory.Field,
+        ChartDataViewFieldCategory.DateLevelComputedField,
+      ].includes(category)
+    ) {
+      modalActions = modalActions.filter(
+        action => ![ChartDataSectionFieldActionType.DateLevel].includes(action),
+      );
+    }
+
     return modalActions;
   };
 
@@ -151,10 +167,11 @@ const ChartDataConfigSectionActionMenu: FC<
     if (actionName === ChartDataSectionFieldActionType.DateLevel) {
       return (
         <DateLevelAction
+          metas={metas}
           availableSourceFunctions={availableSourceFunctions}
           config={fieldConfig}
-          onConfigChange={(config, needRefresh, replacedColName) => {
-            handleFieldConfigChanged(uid, config, needRefresh, replacedColName);
+          onConfigChange={(config, needRefresh, replacedConfig) => {
+            handleFieldConfigChanged(uid, config, needRefresh, replacedConfig);
           }}
           mode="menu"
         />

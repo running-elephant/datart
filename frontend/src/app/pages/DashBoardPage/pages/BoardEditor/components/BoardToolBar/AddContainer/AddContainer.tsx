@@ -19,28 +19,26 @@ import { ContainerOutlined } from '@ant-design/icons';
 import { Dropdown, Menu, Tooltip } from 'antd';
 import { ToolbarButton } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import widgetManagerInstance from 'app/pages/DashBoardPage/components/WidgetManager';
 import { LightWidgetType } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { widgetToolKit } from 'app/pages/DashBoardPage/utils/widgetToolKit/widgetToolKit';
 import React, { useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
+import { ORIGINAL_TYPE_MAP } from '../../../../../constants';
 import { addWidgetsToEditBoard } from '../../../slice/thunk';
 import { BoardToolBarContext } from '../context/BoardToolBarContext';
 
 export const AddContainer: React.FC<{}> = () => {
   const t = useI18NPrefix(`viz.board.action`);
   const dispatch = useDispatch();
-  const { boardId, boardType } = useContext(BoardToolBarContext);
+  const { boardType } = useContext(BoardToolBarContext);
   const onSelectContainerWidget = useCallback(
     ({ keyPath }) => {
-      const [type] = keyPath;
-      const widget = widgetToolKit.container.create({
-        dashboardId: boardId,
+      let widget = widgetManagerInstance.toolkit(ORIGINAL_TYPE_MAP.tab).create({
         boardType: boardType,
-        type: type,
       });
       dispatch(addWidgetsToEditBoard([widget]));
     },
-    [boardId, boardType, dispatch],
+    [boardType, dispatch],
   );
   type ContainerWidgetItems = {
     name: string;

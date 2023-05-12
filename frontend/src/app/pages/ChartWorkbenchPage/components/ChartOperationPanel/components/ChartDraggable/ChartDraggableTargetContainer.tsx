@@ -17,17 +17,16 @@
  */
 
 import {
-  AggregateFieldSubAggregateType,
   ChartDataSectionFieldActionType,
   ChartDataSectionType,
   ChartDataViewFieldCategory,
   DataViewFieldType,
 } from 'app/constants';
+import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import useFieldActionModal from 'app/hooks/useFieldActionModal';
 import ChartAggregationContext from 'app/pages/ChartWorkbenchPage/contexts/ChartAggregationContext';
 import ChartDatasetContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDatasetContext';
 import VizDataViewContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDataViewContext';
-import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
 import { ChartDataConfigSectionProps } from 'app/types/ChartDataConfigSection';
 import { getColumnRenderName } from 'app/utils/chartHelper';
@@ -52,7 +51,7 @@ import { uuidv4 } from 'utils/utils';
 import ChartDraggableElement from './ChartDraggableElement';
 import ChartDraggableElementField from './ChartDraggableElementField';
 import ChartDraggableElementHierarchy from './ChartDraggableElementHierarchy';
-import { updateDataConfigByField } from './utils';
+import { getDefaultAggregate, updateDataConfigByField } from './utils';
 
 type DragItem = {
   index?: number;
@@ -101,16 +100,9 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
                 let config: ChartDataSectionField = {
                   uid: uuidv4(),
                   ...val,
-                  aggregate: getDefaultAggregate(val),
+                  aggregate: getDefaultAggregate(val, currentConfig),
                 };
-                if (
-                  val.category ===
-                  ChartDataViewFieldCategory.DateLevelComputedField
-                ) {
-                  config.colName = `${val.colName}（${t(val.expression)}）`;
-                  config.expression = `${val.expression}(${val.colName})`;
-                  config.field = val.colName;
-                }
+
                 return config;
               }),
             );
@@ -126,7 +118,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               hierarchyChildFields.map(val => ({
                 uid: uuidv4(),
                 ...val,
-                aggregate: getDefaultAggregate(val),
+                aggregate: getDefaultAggregate(val, currentConfig),
               })),
             );
             updateCurrentConfigColumns(currentConfig, currentColumns, true);
@@ -138,13 +130,13 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             );
             if (originItemIndex > -1) {
               const needRefreshData =
-                currentConfig?.type === ChartDataSectionType.GROUP;
+                currentConfig?.type === ChartDataSectionType.Group;
               needDelete = false;
               const currentColumns = updateBy(
                 currentConfig?.rows || [],
                 draft => {
                   draft.splice(originItemIndex, 1);
-                  item.aggregate = getDefaultAggregate(item);
+                  item.aggregate = getDefaultAggregate(item, currentConfig);
                   return draft.splice(item?.index!, 0, item);
                 },
               );
@@ -157,7 +149,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
               const currentColumns = updateBy(
                 currentConfig?.rows || [],
                 draft => {
-                  item.aggregate = getDefaultAggregate(item);
+                  item.aggregate = getDefaultAggregate(item, currentConfig);
                   return draft.splice(item?.index!, 0, item);
                 },
               );
@@ -169,17 +161,29 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         },
         canDrop: (item: ChartDataSectionField, monitor) => {
           let items = Array.isArray(item) ? item : [item];
+
           if (
             [CHART_DRAG_ELEMENT_TYPE.DATASET_COLUMN_GROUP].includes(
               monitor.getItemType() as any,
             ) &&
             ![
-              ChartDataSectionType.GROUP,
-              ChartDataSectionType.COLOR,
-              ChartDataSectionType.MIXED,
+              ChartDataSectionType.Group,
+              ChartDataSectionType.Color,
+              ChartDataSectionType.Mixed,
             ].includes(currentConfig.type as ChartDataSectionType)
           ) {
             return false;
+          }
+
+          if (
+            currentConfig?.disableAggregateComputedField &&
+            item.category === 'aggregateComputedField'
+          ) {
+            return false;
+          }
+
+          if (currentConfig.allowSameField && !aggregation) {
+            return true;
           }
 
           if (
@@ -190,35 +194,44 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             return false;
           }
 
-          // if (
-          //   typeof currentConfig.actions === 'object' &&
-          //   !(item.type in currentConfig.actions)
-          // ) {
-          //   return false;
-          // }
-
-          if (currentConfig.allowSameField) {
-            return true;
-          }
-
-          if (
-            monitor.getItemType() === CHART_DRAG_ELEMENT_TYPE.DATA_CONFIG_COLUMN
-          ) {
-            return true;
-          }
+          const currentSectionDimensionRowNames = currentConfig.rows
+            ?.filter(
+              r =>
+                !items
+                  ?.map(i => i?.uid)
+                  ?.filter(Boolean)
+                  ?.includes(r?.uid),
+            )
+            ?.map(col => col.colName);
 
           if (
             items[0].category ===
             ChartDataViewFieldCategory.DateLevelComputedField
           ) {
-            const colNames = currentConfig.rows?.map(col => col.colName);
-            return colNames
-              ? colNames.every(v => !v?.includes(items[0].colName))
+            if (
+              ![
+                ChartDataSectionType.Group,
+                ChartDataSectionType.Color,
+                ChartDataSectionType.Mixed,
+              ].includes(currentConfig.type as ChartDataSectionType)
+            ) {
+              return false;
+            }
+            return currentSectionDimensionRowNames
+              ? currentSectionDimensionRowNames.every(
+                  v => !v?.includes(items[0].colName),
+                )
               : true;
           }
 
-          const exists = currentConfig.rows?.map(col => col.colName);
-          return items.every(i => !exists?.includes(i.colName));
+          if (aggregation && items[0].type === DataViewFieldType.NUMERIC) {
+            return true;
+          }
+
+          const isNotExist = items.every(
+            i => !currentSectionDimensionRowNames?.includes(i.colName),
+          );
+          return isNotExist;
         },
         collect: (monitor: DropTargetMonitor) => ({
           isOver: monitor.isOver(),
@@ -238,44 +251,10 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
       onConfigChanged?.(ancestors, newCurrentConfig, refreshDataset);
     };
 
-    const getDefaultAggregate = (item: ChartDataSectionField) => {
-      if (
-        currentConfig?.type === ChartDataSectionType.AGGREGATE ||
-        currentConfig?.type === ChartDataSectionType.SIZE ||
-        currentConfig?.type === ChartDataSectionType.INFO ||
-        currentConfig?.type === ChartDataSectionType.MIXED
-      ) {
-        if (
-          currentConfig.disableAggregate ||
-          item.category === ChartDataViewFieldCategory.AggregateComputedField
-        ) {
-          return;
-        }
-        if (item.aggregate) {
-          return item.aggregate;
-        }
-
-        let aggType: string = '';
-        if (currentConfig?.actions instanceof Array) {
-          currentConfig?.actions?.find(
-            type =>
-              type === ChartDataSectionFieldActionType.Aggregate ||
-              type === ChartDataSectionFieldActionType.AggregateLimit,
-          );
-        } else if (currentConfig?.actions instanceof Object) {
-          aggType = currentConfig?.actions?.[item?.type]?.find(
-            type =>
-              type === ChartDataSectionFieldActionType.Aggregate ||
-              type === ChartDataSectionFieldActionType.AggregateLimit,
-          );
-        }
-        if (aggType) {
-          return AggregateFieldSubAggregateType?.[aggType]?.[0];
-        }
-      }
-    };
-
     const onDraggableItemMove = (dragIndex: number, hoverIndex: number) => {
+      if (!canDrop) {
+        return;
+      }
       const draggedItem = currentConfig.rows?.[dragIndex];
       if (draggedItem) {
         const newCurrentConfig = updateBy(currentConfig, draft => {
@@ -284,21 +263,6 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
           columns.splice(hoverIndex, 0, draggedItem);
         });
         setCurrentConfig(newCurrentConfig);
-      } else {
-        // const placeholder = {
-        //   uid: CHARTCONFIG_FIELD_PLACEHOLDER_UID,
-        //   colName: 'Placeholder',
-        //   category: 'field',
-        //   type: 'STRING',
-        // } as any;
-        // const newCurrentConfig = updateBy(currentConfig, draft => {
-        //   const columns = draft.rows || [];
-        //   if (dragIndex) {
-        //     columns.splice(dragIndex, 1);
-        //   }
-        //   columns.splice(hoverIndex, 0, placeholder);
-        // });
-        // setCurrentConfig(newCurrentConfig);
       }
     };
 
@@ -310,7 +274,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
             config.category ===
             ChartDataViewFieldCategory.DateLevelComputedField
           ) {
-            draft.replacedColName = config.colName;
+            draft.replacedConfig = config;
           }
         });
         setCurrentConfig(newCurrentConfig);
@@ -333,18 +297,18 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
         }
         return <DropPlaceholder>{t('drop')}</DropPlaceholder>;
       }
+
       return currentConfig.rows?.map((columnConfig, index) => {
         return (
           <ChartDraggableElement
             key={columnConfig.uid}
-            id={columnConfig.uid}
             index={index}
             config={columnConfig}
             content={() => {
               const contentProps = {
                 modalSize: modalSize,
                 config: currentConfig,
-                columnConfig: columnConfig,
+                columnConfig,
                 ancestors: ancestors,
                 aggregation: aggregation,
                 availableSourceFunctions,
@@ -366,7 +330,7 @@ export const ChartDraggableTargetContainer: FC<ChartDataConfigSectionProps> =
     };
 
     const renderDrillFilters = () => {
-      if (currentConfig?.type !== ChartDataSectionType.FILTER) {
+      if (currentConfig?.type !== ChartDataSectionType.Filter) {
         return;
       }
       return getDillConditions()?.map(drill => {

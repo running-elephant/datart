@@ -84,6 +84,7 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
         <FormItem
           name="name"
           label={t('name')}
+          getValueFromEvent={event => event.target.value?.trim()}
           rules={[
             {
               required: true,
@@ -91,6 +92,9 @@ export function OrganizationForm({ visible, onCancel }: OrganizationFormProps) {
             },
             {
               validator: debounce((_, value) => {
+                if (!value) {
+                  return Promise.resolve();
+                }
                 if (!value.trim()) {
                   return Promise.reject(
                     `${t('name')}${tg('validation.required')}`,

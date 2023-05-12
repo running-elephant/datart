@@ -20,10 +20,12 @@ package datart.core.data.provider;
 
 import datart.core.base.consts.ValueType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SingleTypedValue extends TypedValue {
 
     private Object value;

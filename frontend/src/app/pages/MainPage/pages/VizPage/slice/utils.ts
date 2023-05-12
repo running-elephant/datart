@@ -1,5 +1,8 @@
 import { ChartDataSectionType, ControllerFacadeTypes } from 'app/constants';
 import { ChartConfig } from 'app/types/ChartConfig';
+import { PendingChartDataRequestFilter } from 'app/types/ChartDataRequest';
+import { RUNTIME_FILTER_KEY } from 'globalConstants';
+import { isEmptyArray } from 'utils/object';
 import { FilterSearchParams } from './types';
 
 const valueTransder = {
@@ -37,7 +40,8 @@ const valueTransder = {
 export const transferChartConfig = (
   chartConfig?: ChartConfig,
   params?: FilterSearchParams,
-  mactchByName?: boolean,
+  matchByName?: boolean,
+  jumpFilterParams?: PendingChartDataRequestFilter[],
 ): ChartConfig => {
   if (!chartConfig) {
     return {};
@@ -47,15 +51,15 @@ export const transferChartConfig = (
     const idKeys = Object.keys(params);
     chartConfig.datas = datas.map(item => {
       if (
-        item.type === ChartDataSectionType.FILTER &&
+        item.type === ChartDataSectionType.Filter &&
         item.rows &&
         item.rows?.length > 0
       ) {
         item.rows = item.rows.map(v => {
-          const isMatch = mactchByName
+          const isMatch = matchByName
             ? v.colName && idKeys.includes(v.colName)
             : v.uid && idKeys.includes(v.uid);
-          const value = mactchByName
+          const value = matchByName
             ? v.colName && params[v.colName]
             : v.uid && params[v.uid];
           if (isMatch && v.filter && v.filter.condition) {
@@ -99,10 +103,14 @@ export const transferChartConfig = (
           }
           return { ...v };
         });
-        return item;
-      } else {
-        return item;
       }
+      if (
+        item.type === ChartDataSectionType.Filter &&
+        !isEmptyArray(jumpFilterParams)
+      ) {
+        item[RUNTIME_FILTER_KEY] = jumpFilterParams;
+      }
+      return item;
     });
     return { ...chartConfig };
   } else {

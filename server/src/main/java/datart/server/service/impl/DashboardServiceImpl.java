@@ -21,6 +21,7 @@ package datart.server.service.impl;
 import datart.core.base.consts.Const;
 import datart.core.base.consts.FileOwner;
 import datart.core.base.exception.Exceptions;
+import datart.core.base.exception.NotFoundException;
 import datart.core.base.exception.ParamException;
 import datart.core.common.DateUtils;
 import datart.core.common.FileUtils;
@@ -35,8 +36,8 @@ import datart.server.base.dto.WidgetDetail;
 import datart.server.base.params.*;
 import datart.server.base.transfer.ImportStrategy;
 import datart.server.base.transfer.TransferConfig;
-import datart.server.base.transfer.model.DashboardTransferModel;
-import datart.server.base.transfer.model.DatachartTransferModel;
+import datart.server.base.transfer.model.DashboardResourceModel;
+import datart.server.base.transfer.model.DashboardTemplateModel;
 import datart.server.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -84,6 +85,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     private final ViewService viewService;
 
     private final DatachartService datachartService;
+
 
     public DashboardServiceImpl(DashboardMapperExt dashboardMapper,
                                 WidgetMapperExt widgetMapper,
@@ -165,33 +167,6 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         Set<String> datachartIds = new HashSet<>();
         // get all widgets details
         List<WidgetDetail> widgetDetails = getWidgets(dashboardId, datachartIds, viewIds);
-//        List<Widget> widgets = widgetMapper.listByDashboard(dashboardId);
-//        List<WidgetDetail> widgetDetails = widgets.stream().map(widget -> {
-//            WidgetDetail widgetDetail = new WidgetDetail();
-//            BeanUtils.copyProperties(widget, widgetDetail);
-//            widgetDetail.setViewIds(new LinkedList<>());
-//            widgetDetail.setRelations(new LinkedList<>());
-//            return widgetDetail;
-//        }).collect(Collectors.toList());
-//
-//
-//        for (WidgetDetail widgetDetail : widgetDetails) {
-//
-//            widgetDetail.setRelations(rwwMapper.listTargetWidgets(widgetDetail.getId()));
-//
-//            List<RelWidgetElement> elements = rweMapper.listWidgetElements(widgetDetail.getId());
-//
-//            for (RelWidgetElement element : elements) {
-//                if (ResourceType.DATACHART.name().equals(element.getRelType())) {
-//                    datachartIds.add(element.getRelId());
-//                    widgetDetail.setDatachartId(element.getRelId());
-//                } else if (ResourceType.VIEW.name().equals(element.getRelType())) {
-//                    viewIds.add(element.getRelId());
-//                    widgetDetail.getViewIds().add(element.getRelId());
-//                }
-//            }
-//        }
-
         dashboardDetail.setWidgets(widgetDetails);
 
         // charts
@@ -283,18 +258,18 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     }
 
     @Override
-    public DashboardTransferModel exportResource(TransferConfig transferConfig, String... dashboardIds) {
+    public DashboardResourceModel exportResource(TransferConfig transferConfig, Set<String> dashboardIds) {
 
-        DashboardTransferModel dashboardExportModel = new DashboardTransferModel();
+        DashboardResourceModel dashboardExportModel = new DashboardResourceModel();
         dashboardExportModel.setMainModels(new ArrayList<>());
-        Map<String, Folder> parentMap = new HashMap<>();
-
+        Set<String> parents = new HashSet<>();
         Set<String> viewIds = new HashSet<>();
         Set<String> datachartIds = new HashSet<>();
 
         for (String dashboardId : dashboardIds) {
-            DashboardTransferModel.MainModel mainModel = new DashboardTransferModel.MainModel();
+            DashboardResourceModel.MainModel mainModel = new DashboardResourceModel.MainModel();
             Dashboard dashboard = retrieve(dashboardId);
+            securityManager.requireOrgOwner(dashboard.getOrgId());
             mainModel.setDashboard(dashboard);
             Folder folder = folderService.getVizFolder(dashboardId, ResourceType.DASHBOARD.name());
             mainModel.setFolder(folder);
@@ -303,7 +278,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
                 List<Folder> allParents = getAllParents(folder.getParentId());
                 if (CollectionUtils.isNotEmpty(allParents)) {
                     for (Folder parent : allParents) {
-                        parentMap.put(parent.getId(), parent);
+                        parents.add(parent.getId());
                     }
                 }
             }
@@ -314,26 +289,57 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
             mainModel.setFiles(FileUtils.walkDirAsStream(new File(fileService.getBasePath(FileOwner.DASHBOARD, dashboardId)), null, false));
             dashboardExportModel.getMainModels().add(mainModel);
         }
-        dashboardExportModel.setParents(new LinkedList<>(parentMap.values()));
+        dashboardExportModel.setParents(parents);
         // datacharts
-        TransferConfig datachartConfig = TransferConfig.builder().onlyMainModel(true).withParents(transferConfig.isWithParents()).build();
-        dashboardExportModel.setDatachartTransferModel(datachartService.exportResource(datachartConfig, datachartIds.toArray(new String[0])));
-        // merge views
-        if (dashboardExportModel.getDatachartTransferModel() != null) {
-            List<DatachartTransferModel.MainModel> mainModels = dashboardExportModel.getDatachartTransferModel().getMainModels();
-            if (CollectionUtils.isNotEmpty(mainModels)) {
-                for (DatachartTransferModel.MainModel mainViewModel : mainModels) {
-                    String viewId = mainViewModel.getDatachart().getViewId();
-                    if (StringUtils.isNotBlank(viewId)) {
-                        viewIds.add(viewId);
-                    }
+        dashboardExportModel.setDatacharts(datachartIds);
+        // views
+        dashboardExportModel.setViews(viewIds);
+        dashboardExportModel.setOrgId(dashboardExportModel.getMainModels().get(0).getDashboard().getOrgId());
+        return dashboardExportModel;
+    }
+
+
+    @Override
+    public Folder importTemplate(DashboardTemplateModel model, String orgId, String name, Folder parent) {
+        securityManager.requireOrgOwner(orgId);
+        DashboardCreateParam createParam = new DashboardCreateParam();
+        createParam.setOrgId(orgId);
+        createParam.setConfig(model.getDashboard().getConfig());
+        createParam.setName(name);
+        if (parent != null) {
+            createParam.setParentId(parent.getId());
+        }
+        createParam.setStatus((short) Const.DATA_STATUS_ACTIVE);
+        Folder folder = createWithFolder(createParam);
+        if (CollectionUtils.isNotEmpty(model.getWidgets())) {
+            DashboardUpdateParam updateParam = new DashboardUpdateParam();
+            BeanUtils.copyProperties(createParam, updateParam);
+            List<WidgetCreateParam> widgetCreateParams = model.getWidgets()
+                    .stream()
+                    .map(widget -> {
+                        WidgetCreateParam widgetCreateParam = new WidgetCreateParam();
+                        BeanUtils.copyProperties(widget, widgetCreateParam);
+                        widgetCreateParam.setDashboardId(folder.getRelId());
+                        return widgetCreateParam;
+                    }).collect(Collectors.toList());
+            updateParam.setWidgetToCreate(widgetCreateParams);
+            updateParam.setId(folder.getRelId());
+            update(updateParam);
+        }
+
+        Map<String, byte[]> files = model.getFiles();
+        if (files != null && files.size() > 0) {
+            for (Map.Entry<String, byte[]> fileEntry : files.entrySet()) {
+                String fileName = fileEntry.getKey();
+                String basePath = fileService.getBasePath(FileOwner.DASHBOARD, folder.getRelId());
+                String filePath = FileUtils.concatPath(basePath, fileName);
+                try {
+                    FileUtils.save(filePath, fileEntry.getValue(), false);
+                } catch (Exception ignored) {
                 }
             }
         }
-        // views
-        dashboardExportModel.setViewTransferModel(viewService.exportResource(transferConfig, viewIds.toArray(new String[0])));
-        dashboardExportModel.setOrgId(dashboardExportModel.getMainModels().get(0).getDashboard().getOrgId());
-        return dashboardExportModel;
+        return folder;
     }
 
     @Override
@@ -356,6 +362,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         }
     }
 
+    @Override
     public Folder createWithFolder(DashboardCreateParam createParam) {
         if (!CollectionUtils.isEmpty(folderMapper.checkVizName(createParam.getOrgId(), createParam.getParentId(), createParam.getName()))) {
             Exceptions.tr(ParamException.class, "error.param.exists.name");
@@ -384,34 +391,40 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         HashMap<String, String> widgetIdMapping = new HashMap<>();
 
         // generate widget id
-        for (WidgetCreateParam widgetCreateParam : param.getWidgetToCreate()) {
-            String uuid = UUIDGenerator.generate();
-            widgetIdMapping.put(widgetCreateParam.getId(), uuid);
-            widgetCreateParam.setId(uuid);
-        }
-
-
-        //replace widget relation id and parent id
-        for (WidgetCreateParam widgetCreateParam : param.getWidgetToCreate()) {
-            if (widgetIdMapping.containsKey(widgetCreateParam.getParentId())) {
-                widgetCreateParam.setParentId(widgetIdMapping.get(widgetCreateParam.getParentId()));
+        if (CollectionUtils.isNotEmpty(param.getWidgetToCreate())) {
+            for (WidgetCreateParam widgetCreateParam : param.getWidgetToCreate()) {
+                String uuid = UUIDGenerator.generate();
+                widgetIdMapping.put(widgetCreateParam.getId(), uuid);
+                widgetCreateParam.setId(uuid);
             }
-            for (WidgetRelParam relation : widgetCreateParam.getRelations()) {
-                relation.setSourceId(widgetCreateParam.getId());
-                if (widgetIdMapping.containsKey(relation.getTargetId())) {
-                    relation.setTargetId(widgetIdMapping.get(relation.getTargetId()));
+            //replace widget relation id and parent id
+            for (WidgetCreateParam widgetCreateParam : param.getWidgetToCreate()) {
+                if (widgetIdMapping.containsKey(widgetCreateParam.getParentId())) {
+                    widgetCreateParam.setParentId(widgetIdMapping.get(widgetCreateParam.getParentId()));
+                }
+                if (CollectionUtils.isNotEmpty(widgetCreateParam.getRelations())) {
+                    for (WidgetRelParam relation : widgetCreateParam.getRelations()) {
+                        relation.setSourceId(widgetCreateParam.getId());
+                        if (widgetIdMapping.containsKey(relation.getTargetId())) {
+                            relation.setTargetId(widgetIdMapping.get(relation.getTargetId()));
+                        }
+                    }
                 }
             }
         }
 
-        for (WidgetUpdateParam widgetUpdateParam : param.getWidgetToUpdate()) {
-            if (widgetIdMapping.containsKey(widgetUpdateParam.getParentId())) {
-                widgetUpdateParam.setParentId(widgetIdMapping.get(widgetUpdateParam.getParentId()));
-            }
-            for (WidgetRelParam relation : widgetUpdateParam.getRelations()) {
-                relation.setSourceId(widgetUpdateParam.getId());
-                if (widgetIdMapping.containsKey(relation.getTargetId())) {
-                    relation.setTargetId(widgetIdMapping.get(relation.getTargetId()));
+        if (CollectionUtils.isNotEmpty(param.getWidgetToUpdate())) {
+            for (WidgetUpdateParam widgetUpdateParam : param.getWidgetToUpdate()) {
+                if (widgetIdMapping.containsKey(widgetUpdateParam.getParentId())) {
+                    widgetUpdateParam.setParentId(widgetIdMapping.get(widgetUpdateParam.getParentId()));
+                }
+                if (CollectionUtils.isNotEmpty(widgetUpdateParam.getRelations())) {
+                    for (WidgetRelParam relation : widgetUpdateParam.getRelations()) {
+                        relation.setSourceId(widgetUpdateParam.getId());
+                        if (widgetIdMapping.containsKey(relation.getTargetId())) {
+                            relation.setTargetId(widgetIdMapping.get(relation.getTargetId()));
+                        }
+                    }
                 }
             }
         }
@@ -426,6 +439,8 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     }
 
     private List<WidgetDetail> getWidgets(String dashboardId, Set<String> datachartIds, Set<String> viewIds) {
+        List<String> widgetIds = new ArrayList<>();
+
         // get all widgets details
         List<Widget> widgets = widgetMapper.listByDashboard(dashboardId);
         List<WidgetDetail> widgetDetails = widgets.stream().map(widget -> {
@@ -433,11 +448,20 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
             BeanUtils.copyProperties(widget, widgetDetail);
             widgetDetail.setViewIds(new LinkedList<>());
             widgetDetail.setRelations(new LinkedList<>());
+            widgetIds.add(widgetDetail.getId());
             return widgetDetail;
         }).collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(widgetIds)) {
+            return new ArrayList<>(0);
+        }
+        Map<String, List<RelWidgetWidget>> relWidgetWidgetsMap = rwwMapper.listTargetWidgetsByIds(widgetIds).stream().collect(Collectors.groupingBy(RelWidgetWidget::getSourceId));
+        Map<String, List<RelWidgetElement>> elementsMap = rweMapper.listWidgetElementsByIds(widgetIds).stream().collect(Collectors.groupingBy(RelWidgetElement::getWidgetId));
+
+
         for (WidgetDetail widgetDetail : widgetDetails) {
-            widgetDetail.setRelations(rwwMapper.listTargetWidgets(widgetDetail.getId()));
-            List<RelWidgetElement> elements = rweMapper.listWidgetElements(widgetDetail.getId());
+            widgetDetail.setRelations(Optional.ofNullable(relWidgetWidgetsMap.get(widgetDetail.getId())).orElse(new ArrayList<>(0)));
+            List<RelWidgetElement> elements = Optional.ofNullable(elementsMap.get(widgetDetail.getId())).orElse(new ArrayList<>(0));
             for (RelWidgetElement element : elements) {
                 if (ResourceType.DATACHART.name().equals(element.getRelType())) {
                     if (datachartIds != null) {
@@ -456,24 +480,21 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
     }
 
     @Override
-    public boolean importResource(DashboardTransferModel model, ImportStrategy strategy, String orgId, Set<String> requireTransfer) {
-
-        Set<String> requiredViews = new HashSet<>();
-
-        Set<String> requiredDatacharts = new HashSet<>();
-
+    public boolean importResource(DashboardResourceModel model, ImportStrategy strategy, String orgId) {
+        if (model == null) {
+            return true;
+        }
         switch (strategy) {
             case OVERWRITE:
-                importDashboard(model, orgId, false, true, true, requireTransfer, requiredViews, requiredDatacharts);
+                importDashboard(model, orgId, true);
                 break;
-            case IGNORE:
-                importDashboard(model, orgId, false, false, true, requireTransfer, requiredViews, requiredDatacharts);
+            case ROLLBACK:
+                importDashboard(model, orgId, false);
                 break;
             default:
-                importDashboard(model, orgId, false, false, false, requireTransfer, requiredViews, requiredDatacharts);
+                importDashboard(model, orgId, false);
         }
-        return viewService.importResource(model.getViewTransferModel(), strategy, orgId, requiredViews)
-                && datachartService.importResource(model.getDatachartTransferModel(), strategy, orgId, requiredDatacharts);
+        return true;
     }
 
     @Override
@@ -488,39 +509,86 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         return folderService.getAllParents(id);
     }
 
-    private void importDashboard(DashboardTransferModel model,
+    @Override
+    public void replaceId(DashboardResourceModel model
+            , final Map<String, String> sourceIdMapping
+            , final Map<String, String> viewIdMapping
+            , final Map<String, String> chartIdMapping
+            , final Map<String, String> boardIdMapping
+            , final Map<String, String> folderIdMapping) {
+        if (model == null || model.getMainModels() == null) {
+            return;
+        }
+
+        for (DashboardResourceModel.MainModel mainModel : model.getMainModels()) {
+            String newId = UUIDGenerator.generate();
+            boardIdMapping.put(mainModel.getDashboard().getId(), newId);
+            mainModel.getDashboard().setId(newId);
+            mainModel.getFolder().setRelId(newId);
+            mainModel.getFolder().setId(UUIDGenerator.generate());
+            mainModel.getFolder().setParentId(folderIdMapping.get(mainModel.getFolder().getParentId()));
+
+            final Map<String, String> widgetIdMapping = new HashMap<>();
+            for (WidgetDetail widget : mainModel.getWidgets()) {
+                String widgetId = UUIDGenerator.generate();
+                widgetIdMapping.put(widget.getId(), widgetId);
+                widget.setId(widgetId);
+            }
+            for (WidgetDetail widget : mainModel.getWidgets()) {
+                widget.setDashboardId(newId);
+                widget.setParentId(widgetIdMapping.get(widget.getParentId()));
+                widget.setDatachartId(chartIdMapping.get(widget.getDatachartId()));
+                if (StringUtils.isNotBlank(widget.getConfig())) {
+                    for (Map.Entry<String, String> entry : viewIdMapping.entrySet()) {
+                        widget.setConfig(widget.getConfig().replaceAll(entry.getKey(), entry.getValue()));
+                    }
+                }
+                if (CollectionUtils.isNotEmpty(widget.getViewIds())) {
+                    widget.setViewIds(widget.getViewIds().stream()
+                            .map(viewIdMapping::get)
+                            .collect(Collectors.toList()));
+                }
+                if (widget.getRelations() != null) {
+                    for (RelWidgetWidget relation : widget.getRelations()) {
+                        relation.setId(UUIDGenerator.generate());
+                        relation.setSourceId(widgetIdMapping.get(relation.getSourceId()));
+                        relation.setTargetId(widgetIdMapping.get(relation.getTargetId()));
+                    }
+                }
+            }
+
+        }
+
+
+    }
+
+    private void importDashboard(DashboardResourceModel model,
                                  String orgId,
-                                 boolean asNwe,
-                                 boolean deleteFirst,
-                                 boolean skipExists,
-                                 Set<String> requiredDashboard,
-                                 Set<String> requiredView,
-                                 Set<String> requiredDatachart) {
-        List<DashboardTransferModel.MainModel> mainModels = model.getMainModels();
+                                 boolean deleteOld) {
+        List<DashboardResourceModel.MainModel> mainModels = model.getMainModels();
+
         if (CollectionUtils.isNotEmpty(mainModels)) {
-            for (DashboardTransferModel.MainModel mainModel : mainModels) {
+            for (DashboardResourceModel.MainModel mainModel : mainModels) {
                 Dashboard dashboard = mainModel.getDashboard();
-                if (requiredDashboard != null && !requiredDashboard.contains(dashboard.getId())) {
-                    continue;
-                }
-                if (deleteFirst) {
+                if (deleteOld) {
                     try {
-                        delete(dashboard.getId(), false);
-                    } catch (Exception ignore) {
-                    }
-                } else if (skipExists) {
-                    try {
-                        if (retrieve(dashboard.getId()) != null) {
-                            continue;
+                        Dashboard retrieve = retrieve(dashboard.getId(), false);
+                        if (retrieve != null && !retrieve.getOrgId().equals(orgId)) {
+                            Exceptions.msg("message.viz.import.database.conflict");
                         }
+                    } catch (NotFoundException ignored) {
+                    }
+                    try {
+                        delete(dashboard.getId(), false, false);
                     } catch (Exception ignore) {
                     }
                 }
+
                 // dashboard folder
                 Folder folder = mainModel.getFolder();
                 folder.setOrgId(orgId);
                 try {
-                    folderService.checkUnique(ResourceType.DASHBOARD, orgId, folder.getParentId(), folder.getName());
+                    folderService.checkUnique(orgId, folder.getParentId(), folder.getName());
                 } catch (Exception e) {
                     folder.setName(DateUtils.withTimeString(folder.getName()));
                     dashboard.setName(folder.getName());
@@ -544,7 +612,6 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
                             element.setRelType(ResourceType.DATACHART.name());
                             element.setId(UUIDGenerator.generate());
                             elements.add(element);
-                            requiredDatachart.add(widget.getDatachartId());
                         }
                         if (CollectionUtils.isNotEmpty(widget.getViewIds())) {
                             for (String viewId : widget.getViewIds()) {
@@ -554,7 +621,6 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
                                 element.setRelType(ResourceType.VIEW.name());
                                 element.setId(UUIDGenerator.generate());
                                 elements.add(element);
-                                requiredView.add(viewId);
                             }
                         }
                         if (CollectionUtils.isNotEmpty(elements)) {
@@ -565,7 +631,6 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
                         }
                     }
                 }
-
                 // copy files
                 Map<String, byte[]> files = mainModel.getFiles();
                 if (files != null && files.size() > 0) {
@@ -575,25 +640,12 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
                         String filePath = FileUtils.concatPath(basePath, name);
                         try {
                             FileUtils.save(filePath, fileEntry.getValue(), false);
-                        } catch (Exception e) {
-                            if (!skipExists) {
-                                throw new RuntimeException(e);
-                            }
+                        } catch (Exception ignored) {
                         }
                     }
                 }
             }
 
-            // insert parents
-            if (CollectionUtils.isNotEmpty(model.getParents())) {
-                for (Folder parent : model.getParents()) {
-                    try {
-                        parent.setOrgId(orgId);
-                        folderMapper.insert(parent);
-                    } catch (Exception ignore) {
-                    }
-                }
-            }
         }
     }
 

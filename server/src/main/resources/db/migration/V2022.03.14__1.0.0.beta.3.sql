@@ -18,27 +18,13 @@ CREATE TABLE `share`  (
                           `create_time` timestamp NULL DEFAULT NULL,
                           PRIMARY KEY (`id`) USING BTREE,
                           KEY `viz_id` (`viz_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 ALTER TABLE `source`
     ADD COLUMN `parent_id` varchar(32) NULL AFTER `org_id`,
     ADD COLUMN `is_folder` tinyint(1) NULL AFTER `parent_id`,
     ADD COLUMN `index` double(16, 8) NULL AFTER `is_folder`;
 
-DROP PROCEDURE IF EXISTS drop_source_prj_index;
-DELIMITER $$
-CREATE PROCEDURE drop_source_prj_index()
-BEGIN
-	IF EXISTS (SELECT * FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'source' AND index_name = 'prj_name')
-	THEN
-	    set @statement = "ALTER TABLE source DROP INDEX prj_name";
-        PREPARE STMT FROM @statement;
-        EXECUTE STMT;
-    END IF;
-END $$
-DELIMITER ;
-CALL drop_source_prj_index();
-DROP PROCEDURE IF EXISTS drop_source_prj_index;
 
 ALTER TABLE `schedule`
     MODIFY COLUMN `index` double(16, 8) NULL DEFAULT NULL AFTER `is_folder`;

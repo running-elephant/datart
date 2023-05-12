@@ -49,8 +49,13 @@ import {
   BasicUnControlledTabPanel,
 } from '../Basic';
 import {
+  Background,
+  CheckboxModal,
   ConditionalStylePanel,
+  CrossFilteringPanel,
   DataReferencePanel,
+  DataZoomPanel,
+  DrillThroughPanel,
   FontAlignment,
   LabelPosition,
   LegendPosition,
@@ -59,7 +64,11 @@ import {
   NameLocation,
   PivotSheetTheme,
   ScorecardConditionalStylePanel,
+  TimerFormat,
   UnControlledTableHeaderPanel,
+  ViewDetailPanel,
+  WidgetBorder,
+  YAxisNumberFormatPanel,
 } from '../Customize';
 import { FormGeneratorLayoutProps } from '../types';
 import { groupLayoutComparer, invokeDependencyWatcher } from '../utils';
@@ -141,33 +150,33 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <BasicUnControlledTabPanel {...props} />;
         case ChartStyleSectionComponentType.FONT:
           return <BasicFont {...props} />;
-        case ChartStyleSectionComponentType.FONTFAMILY:
+        case ChartStyleSectionComponentType.FONT_FAMILY:
           return <BasicFontFamilySelector {...props} />;
-        case ChartStyleSectionComponentType.FONTSIZE:
+        case ChartStyleSectionComponentType.FONT_SIZE:
           return <BasicFontSizeSelector {...props} />;
-        case ChartStyleSectionComponentType.FONTCOLOR:
+        case ChartStyleSectionComponentType.FONT_COLOR:
           return <BasicColorSelector {...props} />;
-        case ChartStyleSectionComponentType.FONTSTYLE:
+        case ChartStyleSectionComponentType.FONT_STYLE:
           return <BasicFontStyle {...props} />;
-        case ChartStyleSectionComponentType.FONTWEIGHT:
+        case ChartStyleSectionComponentType.FONT_WEIGHT:
           return <BasicFontWeight {...props} />;
-        case ChartStyleSectionComponentType.INPUTNUMBER:
+        case ChartStyleSectionComponentType.INPUT_NUMBER:
           return <BasicInputNumber {...props} />;
-        case ChartStyleSectionComponentType.INPUTPERCENTAGE:
+        case ChartStyleSectionComponentType.INPUT_PERCENTAGE:
           return <BasicInputPercentage {...props} />;
         case ChartStyleSectionComponentType.SLIDER:
           return <BasicSlider {...props} />;
         case ChartStyleSectionComponentType.MARGIN_WIDTH:
           return <BasicMarginWidth {...props} />;
-        case ChartStyleSectionComponentType.LISTTEMPLATE:
+        case ChartStyleSectionComponentType.LIST_TEMPLATE:
           return <ListTemplatePanel {...props} />;
         case ChartStyleSectionComponentType.LINE:
           return <BasicLine {...props} />;
         case ChartStyleSectionComponentType.REFERENCE:
           return <DataReferencePanel {...props} />;
-        case ChartStyleSectionComponentType.TABLEHEADER:
+        case ChartStyleSectionComponentType.TABLE_HEADER:
           return <UnControlledTableHeaderPanel {...props} />;
-        case ChartStyleSectionComponentType.CONDITIONALSTYLE:
+        case ChartStyleSectionComponentType.CONDITIONAL_STYLE:
           return <ConditionalStylePanel {...props} />;
         case ChartStyleSectionComponentType.GROUP:
           return <GroupLayout {...props} />;
@@ -175,27 +184,45 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <BasicText {...props} />;
         case ChartStyleSectionComponentType.RADIO:
           return <BasicRadio {...props} />;
-        case ChartStyleSectionComponentType.FontAlignment:
+        case ChartStyleSectionComponentType.FONT_ALIGNMENT:
           return <FontAlignment {...props} />;
-        case ChartStyleSectionComponentType.NameLocation:
+        case ChartStyleSectionComponentType.NAME_LOCATION:
           return <NameLocation {...props} />;
-        case ChartStyleSectionComponentType.LabelPosition:
+        case ChartStyleSectionComponentType.LABEL_POSITION:
           return <LabelPosition {...props} />;
-        case ChartStyleSectionComponentType.LegendType:
+        case ChartStyleSectionComponentType.LEGEND_TYPE:
           return <LegendType {...props} />;
-        case ChartStyleSectionComponentType.LegendPosition:
+        case ChartStyleSectionComponentType.LEGEND_POSITION:
           return <LegendPosition {...props} />;
-        case ChartStyleSectionComponentType.ScorecardConditionalStyle:
+        case ChartStyleSectionComponentType.SCORECARD_CONDITIONAL_STYLE:
           return <ScorecardConditionalStylePanel {...props} />;
-        case ChartStyleSectionComponentType.PivotSheetTheme:
+        case ChartStyleSectionComponentType.PIVOT_SHEET_THEME:
           return <PivotSheetTheme {...props} />;
+        case ChartStyleSectionComponentType.BACKGROUND:
+          return <Background {...props} />;
+        case ChartStyleSectionComponentType.WIDGET_BORDER:
+          return <WidgetBorder {...props} />;
+        case ChartStyleSectionComponentType.TIMER_FORMAT:
+          return <TimerFormat {...props} />;
+        case ChartStyleSectionComponentType.CHECKBOX_MODAL:
+          return <CheckboxModal {...props} />;
+        case ChartStyleSectionComponentType.INTERACTION_DRILL_THROUGH_PANEL:
+          return <DrillThroughPanel {...props} />;
+        case ChartStyleSectionComponentType.INTERACTION_CROSS_FILTERING:
+          return <CrossFilteringPanel {...props} />;
+        case ChartStyleSectionComponentType.INTERACTION_VIEW_DETAIL_PANEL:
+          return <ViewDetailPanel {...props} />;
+        case ChartStyleSectionComponentType.DATA_ZOOM_PANEL:
+          return <DataZoomPanel {...props} />;
+        case ChartStyleSectionComponentType.Y_AXIS_NUMBER_FORMAT_PANEL:
+          return <YAxisNumberFormatPanel {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }
     };
 
     return (
-      <StyledItemLayout className="chart-config-item-layout" flatten={flatten}>
+      <StyledItemLayout className="chart-config-item-layout">
         {renderBasicComponent()}
       </StyledItemLayout>
     );
@@ -205,7 +232,7 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
 
 export default ItemLayout;
 
-const StyledItemLayout = styled.div<{ flatten?: boolean }>`
-  padding: ${p => (p.flatten ? 0 : SPACE)};
+const StyledItemLayout = styled.div`
+  padding: ${SPACE} 0;
   user-select: none;
 `;

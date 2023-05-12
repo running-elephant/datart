@@ -3,6 +3,8 @@ import { Empty, Tree as AntTree, TreeProps as AntTreeProps } from 'antd';
 import classnames from 'classnames';
 import styled from 'styled-components/macro';
 import {
+  FONT_SIZE_BODY,
+  FONT_SIZE_TITLE,
   FONT_WEIGHT_MEDIUM,
   FONT_WEIGHT_REGULAR,
   SPACE,
@@ -60,14 +62,27 @@ const StyledDirectoryTree = styled(AntTree)`
       line-height: 38px;
     }
 
+    .ant-tree-switcher-noop:before {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: ${SPACE};
+      height: ${SPACE};
+      content: '';
+      background-color: ${p => p.theme.borderColorEmphasis};
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
     .ant-tree-treenode {
       align-items: center;
-      padding: 0 0 ${SPACE} ${SPACE_XS};
+      padding: 2px 0 2px ${SPACE_XS};
 
       .ant-tree-node-content-wrapper {
         display: flex;
         align-items: center;
         min-width: 0;
+        padding-left: 0;
         line-height: 38px;
 
         &:hover {
@@ -84,13 +99,20 @@ const StyledDirectoryTree = styled(AntTree)`
 
         .ant-tree-title {
           flex: 1;
+          padding: 0 0 0 ${SPACE};
           overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         &.ant-tree-node-selected {
           font-weight: ${FONT_WEIGHT_MEDIUM};
           color: ${p => p.theme.primary};
           background: none;
+        }
+
+        .ant-tree-icon__docu {
+          display: none;
         }
       }
 
@@ -125,31 +147,79 @@ const StyledDirectoryTree = styled(AntTree)`
       margin-top: 0;
     }
 
-    &.dropdown {
+    &.check-list {
       min-width: ${SPACE_TIMES(40)};
       padding: ${SPACE};
-      font-weight: ${FONT_WEIGHT_REGULAR};
       color: ${p => p.theme.textColor};
 
       .ant-tree-switcher {
         display: none;
       }
-
-      .ant-tree-treenode {
-        .ant-tree-node-content-wrapper {
-          line-height: 32px;
-        }
-      }
     }
 
     &.medium {
+      font-weight: ${FONT_WEIGHT_REGULAR};
+
       .ant-tree-switcher {
-        line-height: 32px;
+        width: ${SPACE_TIMES(5)};
+        line-height: 28px;
       }
+
+      .ant-tree-switcher-noop:before {
+        width: 3px;
+        height: 3px;
+      }
+
       .ant-tree-treenode {
         .ant-tree-node-content-wrapper {
-          line-height: 32px;
+          line-height: 28px;
+
+          .ant-tree-iconEle {
+            width: ${SPACE_TIMES(5)};
+
+            .iconfont,
+            .anticon {
+              font-size: ${FONT_SIZE_TITLE};
+            }
+          }
         }
+      }
+
+      .ant-tree-indent-unit {
+        width: ${SPACE_TIMES(5)};
+      }
+    }
+
+    &.small {
+      font-weight: ${FONT_WEIGHT_REGULAR};
+
+      .ant-tree-switcher {
+        width: ${SPACE_TIMES(4)};
+        line-height: 24px;
+      }
+
+      .ant-tree-switcher-noop:before {
+        width: 3px;
+        height: 3px;
+      }
+
+      .ant-tree-treenode {
+        .ant-tree-node-content-wrapper {
+          line-height: 24px;
+
+          .ant-tree-iconEle {
+            width: ${SPACE_TIMES(4)};
+
+            .iconfont,
+            .anticon {
+              font-size: ${FONT_SIZE_BODY};
+            }
+          }
+        }
+      }
+
+      .ant-tree-indent-unit {
+        width: ${SPACE_TIMES(4)};
       }
     }
   }

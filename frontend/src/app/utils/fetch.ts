@@ -30,21 +30,42 @@ import {
   transformToViewConfig,
 } from 'app/utils/internalChartHelper';
 import { saveAs } from 'file-saver';
-import { request, request2, requestWithHeader } from 'utils/request';
-import { errorHandle } from 'utils/utils';
+import i18next from 'i18next';
+import qs from 'qs';
+import { request2, requestWithHeader } from 'utils/request';
+import { convertToChartDto } from './ChartDtoHelper';
+import { getAllColumnInMeta } from './chartHelper';
 
 export const getDistinctFields = async (
   viewId: string,
   columns: string[],
   view: ChartDTO['view'] | undefined,
-  executeToken: ExecuteToken | undefined,
+  executeToken: Record<string, ExecuteToken> | undefined,
 ) => {
   const viewConfigs = transformToViewConfig(view?.config);
+  const _columns = [...new Set(columns)];
   const requestParams: ChartDataRequest = {
     aggregators: [],
     filters: [],
     groups: [],
-    columns: [...new Set(columns)],
+    functionColumns:
+      view?.computedFields
+        ?.filter(v => _columns.includes(v.name))
+        ?.map(field => {
+          return {
+            alias: field?.name || '',
+            snippet: field?.expression || '',
+          };
+        }) || [],
+    columns: _columns.map(columnName => {
+      const row = getAllColumnInMeta(view?.meta)?.find(
+        v => v.name === columnName,
+      );
+      return {
+        alias: columnName,
+        column: row?.path || [columnName],
+      };
+    }),
     pageInfo: {
       pageNo: 1,
       pageSize: 99999999,
@@ -60,18 +81,18 @@ export const getDistinctFields = async (
       method: 'POST',
       url: `shares/execute`,
       params: {
-        executeToken: executeToken?.authorizedToken,
+        executeToken: executeToken[viewId].authorizedToken,
       },
       data: requestParams,
     });
     return filterSqlOperatorName(requestParams, data);
   } else {
-    const { data } = await request2<ChartDataSetDTO>({
+    const response = await request2<ChartDataSetDTO>({
       method: 'POST',
       url: `data-provider/execute`,
       data: requestParams,
     });
-    return filterSqlOperatorName(requestParams, data);
+    return filterSqlOperatorName(requestParams, response?.data);
   }
 };
 
@@ -86,7 +107,7 @@ export const makeDownloadDataTask =
   async () => {
     const { downloadParams, fileName, resolve, downloadType, imageWidth } =
       params;
-    const res = await request<{}>({
+    const res = await request2<{}>({
       url: `download/submit/task`,
       method: 'POST',
       data: {
@@ -97,7 +118,7 @@ export const makeDownloadDataTask =
       },
     });
     if (res?.success) {
-      message.success('下载任务创建成功');
+      message.success(i18next.t('viz.action.downloadTaskSuccess'));
     }
     resolve();
   };
@@ -122,7 +143,7 @@ export const makeShareDownloadDataTask =
       password,
       shareToken,
     } = params;
-    const { success } = await request<{}>({
+    const { success } = await request2<{}>({
       url: `shares/download`,
       method: 'POST',
       data: {
@@ -137,33 +158,44 @@ export const makeShareDownloadDataTask =
       },
     });
     if (success) {
-      message.success('下载任务创建成功');
+      message.success(i18next.t('viz.action.downloadTaskSuccess'));
     }
     resolve();
   };
 
 export async function checkComputedFieldAsync(sourceId, expression) {
-  const _removeSquareBrackets = expression => {
-    if (!expression) {
-      return '';
-    }
-    return expression.replaceAll('[', '').replaceAll(']', '');
-  };
   const response = await request2<boolean>({
     method: 'POST',
     url: `data-provider/function/validate`,
     params: {
       sourceId,
-      snippet: _removeSquareBrackets(expression),
+      snippet: expression,
+    },
+    paramsSerializer: function (params) {
+      return qs.stringify(params, { arrayFormat: 'brackets' });
     },
   });
-  return !!response?.data;
+  return !!response;
 }
 
 export async function fetchAvailableSourceFunctionsAsync(sourceId) {
-  const response = await request<string[]>({
+  const response = await request2<string[]>({
     method: 'POST',
     url: `data-provider/function/support/${sourceId}`,
+  });
+  return response?.data;
+}
+
+export async function fetchAvailableSourceFunctionsAsyncForShare(
+  sourceId,
+  executeToken,
+) {
+  const response = await request2<string[]>({
+    method: 'POST',
+    url: `shares/function/support/${sourceId}`,
+    data: {
+      authorizedToken: executeToken,
+    },
   });
   return response?.data;
 }
@@ -235,23 +267,18 @@ export async function getChartPluginPaths() {
 }
 
 export async function loadShareTask(params) {
-  try {
-    const { data } = await request2<DownloadTask[]>({
-      url: `/shares/download/task`,
-      method: 'GET',
-      params,
-    });
-    const isNeedStopPolling = !(data || []).some(
-      v => v.status === DownloadTaskState.CREATED,
-    );
-    return {
-      isNeedStopPolling,
-      data: data || [],
-    };
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
+  const { data } = await request2<DownloadTask[]>({
+    url: `/shares/download/task`,
+    method: 'GET',
+    params,
+  });
+  const isNeedStopPolling = !(data || []).some(
+    v => v.status === DownloadTaskState.CREATED,
+  );
+  return {
+    isNeedStopPolling,
+    data: data || [],
+  };
 }
 interface DownloadShareDashChartFileParams {
   downloadId: string;
@@ -276,4 +303,38 @@ export async function fetchCheckName(url, data: any) {
     method: 'POST',
     data: data,
   });
+}
+
+export async function fetchDataChart(id: string) {
+  const response = await request2<ChartDTO>(`/viz/datacharts/${id}`);
+  return convertToChartDto(response?.data);
+}
+
+export async function fetchChartDataSet(
+  requestParams,
+  authorizedToken?: ExecuteToken,
+) {
+  if (authorizedToken) {
+    const { data } = await request2<ChartDataSetDTO>({
+      method: 'POST',
+      url: `shares/execute`,
+      params: {
+        executeToken: authorizedToken,
+      },
+      data: requestParams,
+    });
+    return data;
+  }
+
+  const { data } = await request2<ChartDataSetDTO>({
+    method: 'POST',
+    url: `data-provider/execute`,
+    data: requestParams,
+  });
+  return data;
+}
+
+export async function fetchDashboardDetail(boardId: string) {
+  const { data } = await request2(`/viz/dashboards/${boardId}`);
+  return data;
 }

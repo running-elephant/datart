@@ -18,16 +18,23 @@
 
 package datart.server.service.impl;
 
+import datart.core.base.exception.Exceptions;
 import datart.core.common.Application;
 import datart.server.base.dto.SystemInfo;
+import datart.server.base.params.SetupParams;
 import datart.server.service.SysService;
+import datart.server.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+@Slf4j
 @Service
 public class SysServiceImpl implements SysService {
 
@@ -45,6 +52,7 @@ public class SysServiceImpl implements SysService {
         systemInfo.setVersion(getVersion());
         systemInfo.setTenantManagementMode(Application.getCurrMode().name());
         systemInfo.setRegisterEnable(Application.canRegister());
+        systemInfo.setInitialized(Application.isInitialized());
         return systemInfo;
     }
 
@@ -59,4 +67,18 @@ public class SysServiceImpl implements SysService {
             return "dev";
         }
     }
+
+    @Override
+    public boolean setup(SetupParams params) throws MessagingException, UnsupportedEncodingException {
+        Application.updateInitialized();
+        if (Application.isInitialized()) {
+            Exceptions.msg("The application already initialized.");
+        }
+        UserService userService = Application.getBean(UserService.class);
+        boolean res = userService.setupUser(params.getUser());
+        Application.updateInitialized();
+        log.info("The application is initialized with User({}).", params.getUser().getUsername());
+        return res;
+    }
+
 }

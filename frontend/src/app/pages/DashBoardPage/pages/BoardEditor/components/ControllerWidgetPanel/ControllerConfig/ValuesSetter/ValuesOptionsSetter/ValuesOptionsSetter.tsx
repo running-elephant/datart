@@ -16,26 +16,53 @@
  * limitations under the License.
  */
 
-import { Form, FormInstance, Radio, Select, Space } from 'antd';
+import {
+  Form,
+  FormInstance,
+  Radio,
+  Select,
+  Space,
+  Tree,
+  TreeSelect,
+} from 'antd';
 import { CascaderOptionType } from 'antd/lib/cascader';
 import { ControllerFacadeTypes } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
+import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
+import { BoardContext } from 'app/pages/DashBoardPage/components/BoardProvider/BoardProvider';
 import {
   OPERATOR_TYPE_OPTION,
   ValueOptionType,
 } from 'app/pages/DashBoardPage/constants';
+import { ViewSimple } from 'app/pages/MainPage/pages/ViewPage/slice/types';
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
+import { hasAggregationFunction } from 'app/utils/chartHelper';
 import { getDistinctFields } from 'app/utils/fetch';
 import { transformMeta } from 'app/utils/internalChartHelper';
-import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  FC,
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import styled from 'styled-components/macro';
 import { request2 } from 'utils/request';
-import { errorHandle } from 'utils/utils';
+import { convertToTree } from '../../../../../../../utils/widget';
 import { ControllerConfig } from '../../../types';
+import TreeSetter from '../TreeSetter';
 import { AssistViewFields } from './AssistViewFields';
 import { CustomOptions } from './CustomOptions';
+
+export interface optionProps {
+  label: string;
+  value: string;
+}
 
 const ValuesOptionsSetter: FC<{
   controllerType: ControllerFacadeTypes;
@@ -43,19 +70,49 @@ const ValuesOptionsSetter: FC<{
   viewMap: Record<string, ChartDataView>;
 }> = memo(({ form, viewMap, controllerType }) => {
   const tc = useI18NPrefix(`viz.control`);
+  const { orgId } = useContext(BoardContext);
   const [optionValues, setOptionValues] = useState<RelationFilterValue[]>([]);
   const [targetKeys, setTargetKeys] = useState<string[]>([]);
   const [labelOptions, setLabelOptions] = useState<
     CascaderOptionType[] | undefined
   >([]);
   const [labelKey, setLabelKey] = useState<string | undefined>();
+  const [viewList, setViewList] = useState<optionProps[]>([]);
+
+  const isTree = useMemo(() => {
+    return controllerType === ControllerFacadeTypes.DropDownTree;
+  }, [controllerType]);
+
+  const getViewList = useCallback(async orgId => {
+    const { data } = await request2<ViewSimple[]>(`/views?orgId=${orgId}`);
+    const views = data.map(item => {
+      return {
+        value: item.id,
+        label: item.name,
+      };
+    });
+    setViewList(views);
+  }, []);
 
   const getControllerConfig = useCallback(() => {
     return form?.getFieldValue('config') as ControllerConfig;
   }, [form]);
+
+  const getParentFields = useCallback(() => {
+    return form?.getFieldValue('config')?.parentFields as string[];
+  }, [form]);
+
+  const getTreeBuildingMethod = useCallback(() => {
+    return form?.getFieldValue('config')?.buildingMethod as string;
+  }, [form]);
+
   const isMultiple = useMemo(() => {
-    return controllerType === ControllerFacadeTypes.MultiDropdownList;
+    return (
+      controllerType === ControllerFacadeTypes.MultiDropdownList ||
+      controllerType === ControllerFacadeTypes.DropDownTree
+    );
   }, [controllerType]);
+
   const convertToList = useCallback(collection => {
     return collection.map((ele, index) => {
       const item: RelationFilterValue = {
@@ -67,59 +124,114 @@ const ValuesOptionsSetter: FC<{
       return item;
     });
   }, []);
+
   const getViewOption = useCallback(async (viewId: string) => {
-    if (!viewId) return [];
-    try {
-      const { data } = await request2<View>(`/views/${viewId}`);
-      let meta = transformMeta(data?.model);
-      if (!meta) return [];
-      const option: CascaderOptionType[] = meta.map(item => {
+    if (!viewId) return { option: [], dataView: undefined };
+    let { data } = await request2<View>(`/views/${viewId}`);
+    if (!data) {
+      return { option: [], data: undefined };
+    }
+    if (data) {
+      data = migrationViewConfig(data);
+    }
+    if (data?.model) {
+      data.model = beginViewModelMigration(data.model, data.type);
+    }
+    let meta = transformMeta(data?.model);
+    const viewComputedField =
+      JSON.parse(data.model || '{}')?.computedFields?.filter(
+        field => !hasAggregationFunction(field?.expression),
+      ) || [];
+
+    if (!meta) return { option: [], dataView: undefined };
+    const option: CascaderOptionType[] = meta
+      .concat(viewComputedField)
+      .map(item => {
         return {
-          value: item.id,
-          label: item.id,
+          value: item.name,
+          label: item.name,
         };
       });
-      return option;
-    } catch (error) {
-      errorHandle(error);
-    }
+
+    return {
+      option,
+      dataView: { ...data, meta, computedFields: viewComputedField },
+    };
   }, []);
+
   const onTargetKeyChange = useCallback(
     nextTargetKeys => {
-      setTargetKeys(nextTargetKeys);
-      const nextControllerOpt: ControllerConfig = {
-        ...getControllerConfig(),
-        controllerValues: nextTargetKeys,
-      };
+      const config: ControllerConfig = getControllerConfig();
+
       form?.setFieldsValue({
-        config: nextControllerOpt,
+        config: {
+          ...config,
+          controllerValues: nextTargetKeys,
+        },
       });
+      setTargetKeys(nextTargetKeys);
     },
     [form, getControllerConfig],
   );
+
   const fetchNewDataset = useCallback(
-    async (viewId: string, columns: string[]) => {
+    async (viewId: string, columns: string[], dataView?: ChartDataView) => {
       const fieldDataset = await getDistinctFields(
         viewId,
         columns,
-        viewMap[viewId],
+        dataView,
         undefined,
       );
       return fieldDataset;
     },
-    [viewMap],
+    [],
   );
+
+  const getViewData = useCallback(
+    async (value: string[], type?) => {
+      const { option: options, dataView } = await getViewOption(value[0]);
+      setLabelOptions(options);
+
+      if (type !== 'view') {
+        const [viewId, ...columns] = value;
+        const parentFields = getParentFields();
+        const buildingMethod = getTreeBuildingMethod();
+
+        if (parentFields) {
+          columns.push(...parentFields);
+        }
+        const dataset = await fetchNewDataset(viewId, columns, dataView);
+
+        setOptionValues(
+          parentFields?.length > 0
+            ? convertToTree(dataset?.rows, buildingMethod)
+            : convertToList(dataset?.rows),
+        );
+      }
+    },
+    [
+      convertToList,
+      fetchNewDataset,
+      getParentFields,
+      getViewOption,
+      getTreeBuildingMethod,
+    ],
+  );
+
   const onViewFieldChange = useCallback(
-    async (value: string[]) => {
+    async (value: string[], type?) => {
       setOptionValues([]);
       setTargetKeys([]);
       setLabelOptions([]);
+      setLabelKey(undefined);
+      const config = getControllerConfig();
       if (!value || !value?.[0]) {
         form?.setFieldsValue({
           config: {
-            ...getControllerConfig(),
+            ...config,
             assistViewFields: [],
             controllerValues: [],
+            parentFields: undefined,
           },
         });
         return;
@@ -127,21 +239,17 @@ const ValuesOptionsSetter: FC<{
 
       form?.setFieldsValue({
         config: {
-          ...getControllerConfig(),
+          ...config,
           assistViewFields: value,
           controllerValues: [],
+          parentFields: undefined,
         },
       });
-
-      const options = await getViewOption(value[0]);
-      setLabelOptions(options);
-
-      const [viewId, ...columns] = value;
-      const dataset = await fetchNewDataset(viewId, columns);
-      setOptionValues(convertToList(dataset?.rows));
+      getViewData(value, type);
     },
-    [convertToList, fetchNewDataset, form, getControllerConfig, getViewOption],
+    [form, getControllerConfig, getViewData],
   );
+
   const onLabelChange = useCallback(
     (labelKey: string | undefined) => {
       const controllerConfig = getControllerConfig();
@@ -157,29 +265,45 @@ const ValuesOptionsSetter: FC<{
       form?.setFieldsValue({
         config: nextControllerOpt,
       });
-      onViewFieldChange(nextAssistViewFields);
+      getViewData(nextAssistViewFields);
     },
-    [form, getControllerConfig, onViewFieldChange],
+    [form, getControllerConfig, getViewData],
   );
-  // const
 
   const onInitOptions = useCallback(
-    async (value: string[]) => {
+    async (value: string[], parentFields?: string[]) => {
       const [viewId, ...columns] = value;
-      const dataset = await fetchNewDataset(viewId, columns);
+      const { option: options, dataView } = await getViewOption(viewId);
+      if (parentFields) {
+        columns.push(...parentFields);
+      }
+      const dataset = await fetchNewDataset(viewId, columns, dataView);
       const config: ControllerConfig = getControllerConfig();
-      setOptionValues(convertToList(dataset?.rows));
+      const buildingMethod = getTreeBuildingMethod();
+
+      setOptionValues(
+        parentFields
+          ? convertToTree(dataset?.rows, buildingMethod)
+          : convertToList(dataset?.rows),
+      );
+      setLabelOptions(options);
+
       if (config.valueOptionType === 'common') {
-        const options = await getViewOption(value[0]);
-        setLabelOptions(options);
         setLabelKey(config.assistViewFields?.[2]);
         if (config?.controllerValues) {
           setTargetKeys(config?.controllerValues);
         }
       }
     },
-    [convertToList, fetchNewDataset, getControllerConfig, getViewOption],
+    [
+      convertToList,
+      fetchNewDataset,
+      getControllerConfig,
+      getViewOption,
+      getTreeBuildingMethod,
+    ],
   );
+
   const updateOptions = useCallback(() => {
     const config = getControllerConfig();
     if (!config?.valueOptionType) {
@@ -189,10 +313,41 @@ const ValuesOptionsSetter: FC<{
     }
 
     const assistViewFields = config?.assistViewFields;
+    const parentFields = config?.parentFields;
     if (assistViewFields && assistViewFields[0] && assistViewFields[1]) {
-      onInitOptions(assistViewFields);
+      onInitOptions(assistViewFields, parentFields);
     }
   }, [form, getControllerConfig, onInitOptions]);
+
+  const getOptionType = useCallback(() => {
+    return getControllerConfig()?.valueOptionType as ValueOptionType;
+  }, [getControllerConfig]);
+
+  const onParentFieldsChange = useCallback(
+    (val: string | string[]) => {
+      let mergedConfig: ControllerConfig = {
+        ...getControllerConfig(),
+        parentFields: Array.isArray(val) ? val : [val],
+      };
+
+      if (getTreeBuildingMethod() === 'byHierarchy') {
+        mergedConfig.assistViewFields = mergedConfig.assistViewFields!.slice(
+          0,
+          1,
+        );
+
+        if ((val as string[]).length) {
+          mergedConfig.assistViewFields = mergedConfig.assistViewFields.concat(
+            (val as string[])[0],
+          );
+        }
+      }
+
+      form?.setFieldsValue({ config: mergedConfig });
+      getViewData(mergedConfig.assistViewFields || []);
+    },
+    [getControllerConfig, getTreeBuildingMethod, getViewData, form],
+  );
 
   useEffect(() => {
     setTimeout(() => {
@@ -200,9 +355,9 @@ const ValuesOptionsSetter: FC<{
     }, 500);
   }, [updateOptions]);
 
-  const getOptionType = useCallback(() => {
-    return getControllerConfig()?.valueOptionType as ValueOptionType;
-  }, [getControllerConfig]);
+  useEffect(() => {
+    getViewList(orgId);
+  }, [getViewList, orgId]);
 
   return (
     <Wrapper>
@@ -216,6 +371,7 @@ const ValuesOptionsSetter: FC<{
           validateTrigger={['onChange', 'onBlur']}
           rules={[{ required: true }]}
           style={{ marginBottom: '0' }}
+          hidden={isTree}
         >
           <Radio.Group>
             {OPERATOR_TYPE_OPTION.map(ele => {
@@ -233,58 +389,117 @@ const ValuesOptionsSetter: FC<{
               <>
                 <Form.Item name={['config', 'assistViewFields']} noStyle>
                   <AssistViewFields
-                    allowClear
-                    placeholder="select viewField"
                     onChange={onViewFieldChange}
-                    getViewOption={getViewOption}
+                    viewList={viewList}
+                    viewFieldList={labelOptions}
+                    isHierarchyTree={
+                      isTree && getTreeBuildingMethod() === 'byHierarchy'
+                    }
                     style={{ margin: '6px 0' }}
                   />
                 </Form.Item>
+                {isTree && (
+                  <Form.Item name={['config', 'parentFields']} noStyle>
+                    <TreeSetter
+                      mode={
+                        getTreeBuildingMethod() === 'byHierarchy'
+                          ? 'multiple'
+                          : undefined
+                      }
+                      onChange={onParentFieldsChange}
+                      viewFieldList={labelOptions}
+                      style={{ margin: '6px 0' }}
+                    />
+                  </Form.Item>
+                )}
+
                 {getOptionType() === 'common' && (
                   <Space direction="vertical" style={{ width: '100%' }}>
-                    <Select
-                      showSearch
-                      placeholder={tc('optionLabelField')}
-                      value={labelKey}
-                      allowClear
-                      onChange={onLabelChange}
-                      style={{ width: '100%' }}
-                    >
-                      {labelOptions?.map(item => (
-                        <Select.Option
-                          key={item.value}
-                          value={item.value as string}
-                        >
-                          {item.value}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                    <Select
-                      showSearch
-                      placeholder={tc('selectDefaultValue')}
-                      value={targetKeys}
-                      allowClear
-                      {...(isMultiple && { mode: 'multiple' })}
-                      onChange={onTargetKeyChange}
-                      style={{ width: '100%' }}
-                    >
-                      {optionValues.map(item => (
-                        <Select.Option
-                          key={item.key + item.label}
-                          value={item.key}
-                        >
-                          <div
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                            }}
+                    {!(isTree && getTreeBuildingMethod() === 'byHierarchy') && (
+                      <Select
+                        showSearch
+                        placeholder={tc('optionLabelField')}
+                        value={labelKey}
+                        allowClear
+                        onChange={onLabelChange}
+                        style={{ width: '100%' }}
+                      >
+                        {labelOptions?.map(item => (
+                          <Select.Option
+                            key={item.value}
+                            value={item.value as string}
                           >
-                            <span>{item.label || item.key}</span>
-                            <FieldKey>{item.key}</FieldKey>
-                          </div>
-                        </Select.Option>
-                      ))}
-                    </Select>
+                            {item.label}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                    <Form.Item name={['config', 'controllerValues']}>
+                      {getParentFields()?.length ? (
+                        <TreeSelect
+                          placeholder={tc('selectDefaultValue')}
+                          multiple
+                          allowClear
+                          treeData={optionValues}
+                          style={{ width: '100%' }}
+                          dropdownStyle={{ height: '300px', overflowY: 'auto' }}
+                          dropdownRender={() => {
+                            return (
+                              <TreeSelectProps
+                                checkedKeys={targetKeys}
+                                onCheck={(checkedObj: any) =>
+                                  onTargetKeyChange(checkedObj?.checked)
+                                }
+                                checkable
+                                checkStrictly
+                                titleRender={node => {
+                                  return (
+                                    <div
+                                      style={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                      }}
+                                    >
+                                      <span>{node.title || node.key}</span>
+                                      <FieldKey>{node.key}</FieldKey>
+                                    </div>
+                                  );
+                                }}
+                                treeData={optionValues}
+                              />
+                            );
+                          }}
+                        />
+                      ) : (
+                        <Select
+                          showSearch
+                          placeholder={tc('selectDefaultValue')}
+                          value={targetKeys}
+                          allowClear
+                          {...(isMultiple && { mode: 'multiple' })}
+                          onChange={onTargetKeyChange}
+                          style={{ width: '100%' }}
+                        >
+                          {optionValues.map(item => (
+                            <Select.Option
+                              key={String(item.key) + String(item.label)}
+                              value={item.key}
+                            >
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                }}
+                              >
+                                <span>{item.label || item.key}</span>
+                                <FieldKey>{item.key}</FieldKey>
+                              </div>
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Form.Item>
                   </Space>
                 )}
                 {getOptionType() === 'custom' && (
@@ -313,4 +528,13 @@ const Wrapper = styled.div`
 
 const FieldKey = styled.span`
   color: ${p => p.theme.textColorDisabled};
+`;
+
+const TreeSelectProps = styled(Tree)`
+  .ant-tree-node-content-wrapper {
+    width: 100%;
+  }
+  .ant-tree-treenode {
+    width: 100%;
+  }
 `;

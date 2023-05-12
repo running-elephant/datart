@@ -17,37 +17,43 @@
  */
 
 import { ChartDataSectionType } from 'app/constants';
+import Chart from 'app/models/Chart';
+import { ChartDrillOption } from 'app/models/ChartDrillOption';
+import { ChartSelectionManager } from 'app/models/ChartSelectionManager';
 import {
   ChartConfig,
   ChartDataSectionField,
   ChartStyleConfig,
+  EmphasisStyle,
   LabelStyle,
   LegendStyle,
+  SelectedItem,
 } from 'app/types/ChartConfig';
 import ChartDataSetDTO, {
   IChartDataSet,
   IChartDataSetRow,
 } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getColumnRenderName,
   getDrillableRows,
   getExtraSeriesDataFormat,
   getExtraSeriesRowData,
   getGridStyle,
+  getSelectedItemStyles,
   getStyles,
   toFormattedValue,
   transformToDataSet,
   valueFormatter,
 } from 'app/utils/chartHelper';
 import { init } from 'echarts';
-import Chart from '../../../models/Chart';
-import { ChartDrillOption } from '../../../models/ChartDrillOption';
 import Config from './config';
 import { PieSeries, PieSeriesImpl, PieSeriesStyle } from './types';
 
 class BasicPieChart extends Chart {
   config = Config;
   chart: any = null;
+  selectionManager?: ChartSelectionManager;
 
   protected isCircle = false;
   protected isRose = false;
@@ -63,48 +69,58 @@ class BasicPieChart extends Chart {
     ];
   }
 
-  onMount(options, context): void {
-    if (options.containerId === undefined || !context.document) {
+  onMount(options: BrokerOption, context: BrokerContext) {
+    if (
+      options.containerId === undefined ||
+      !context.document ||
+      !context.window
+    ) {
       return;
     }
 
     this.chart = init(
-      context.document.getElementById(options.containerId),
+      context.document.getElementById(options.containerId)!,
       'default',
     );
-    this.mouseEvents?.forEach(event => {
-      this.chart.on(event.name, event.callback);
-    });
+    this.selectionManager = new ChartSelectionManager(this.mouseEvents);
+    this.selectionManager.attachWindowListeners(context.window);
+    this.selectionManager.attachZRenderListeners(this.chart);
+    this.selectionManager.attachEChartsListeners(this.chart);
   }
 
-  onUpdated(props): void {
-    if (!props.dataset || !props.dataset.columns || !props.config) {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
+    if (!options.dataset || !options.dataset.columns || !options.config) {
       return;
     }
-    if (!this.isMatchRequirement(props.config)) {
+    if (!this.isMatchRequirement(options.config)) {
       this.chart?.clear();
       return;
     }
+    this.selectionManager?.updateSelectedItems(options?.selectedItems);
     const newOptions = this.getOptions(
-      props.dataset,
-      props.config,
-      props.drillOption,
+      options.dataset,
+      options.config,
+      options.drillOption,
+      options.selectedItems,
     );
     this.chart?.setOption(Object.assign({}, newOptions), true);
   }
 
-  onUnMount(): void {
+  onUnMount(options: BrokerOption, context: BrokerContext) {
+    this.selectionManager?.removeWindowListeners(context.window);
+    this.selectionManager?.removeZRenderListeners(this.chart);
     this.chart?.dispose();
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext) {
     this.chart?.resize(context);
   }
 
   private getOptions(
     dataset: ChartDataSetDTO,
     config: ChartConfig,
-    drillOption: ChartDrillOption,
+    drillOption?: ChartDrillOption,
+    selectedItems?: SelectedItem[],
   ) {
     const styleConfigs = config.styles || [];
     const dataConfigs = config.datas || [];
@@ -113,10 +129,10 @@ class BasicPieChart extends Chart {
       drillOption,
     );
     const aggregateConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
     const infoConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.INFO)
+      .filter(c => c.type === ChartDataSectionType.Info)
       .flatMap(config => config.rows || []);
 
     const chartDataSet = transformToDataSet(
@@ -130,6 +146,7 @@ class BasicPieChart extends Chart {
       groupConfigs,
       aggregateConfigs,
       infoConfigs,
+      selectedItems,
     );
 
     return {
@@ -152,19 +169,25 @@ class BasicPieChart extends Chart {
     groupConfigs: ChartDataSectionField[],
     aggregateConfigs: ChartDataSectionField[],
     infoConfigs: ChartDataSectionField[],
+    selectedItems?: SelectedItem[],
   ): PieSeriesStyle[] | PieSeriesStyle {
     if (!groupConfigs?.length) {
       const row = chartDataSet?.[0];
       return {
         ...this.getPieSeriesImpl(styleConfigs),
-        data: aggregateConfigs.map(config => {
+        data: aggregateConfigs.map((config, dcIndex) => {
           return {
             ...config,
             name: getColumnRenderName(config),
             value: [config]
               .concat(infoConfigs)
               .map(config => row?.getCell(config)),
-            itemStyle: this.getDataItemStyle(config, groupConfigs, row),
+            ...getSelectedItemStyles(
+              0,
+              dcIndex,
+              selectedItems || [],
+              this.getDataItemStyle(config, groupConfigs, row),
+            ),
             ...getExtraSeriesRowData(row),
             ...getExtraSeriesDataFormat(config?.format),
           };
@@ -172,16 +195,21 @@ class BasicPieChart extends Chart {
       };
     }
 
-    const flatSeries = aggregateConfigs.map(config => {
+    const flatSeries = aggregateConfigs.map((config, acIndex) => {
       return {
         ...this.getPieSeriesImpl(styleConfigs),
         name: getColumnRenderName(config),
-        data: chartDataSet?.map(row => {
+        data: chartDataSet?.map((row, dcIndex) => {
           return {
             ...config,
             name: groupConfigs.map(row.getCell, row).join('-'),
             value: aggregateConfigs.concat(infoConfigs).map(row.getCell, row),
-            itemStyle: this.getDataItemStyle(config, groupConfigs, row),
+            ...getSelectedItemStyles(
+              acIndex,
+              dcIndex,
+              selectedItems || [],
+              this.getDataItemStyle(config, groupConfigs, row),
+            ),
             ...getExtraSeriesRowData(row),
             ...getExtraSeriesDataFormat(config?.format),
           };
@@ -277,6 +305,9 @@ class BasicPieChart extends Chart {
       orient,
       selected,
       textStyle: font,
+      itemStyle: {
+        opacity: 1,
+      },
     };
   }
 
@@ -287,6 +318,8 @@ class BasicPieChart extends Chart {
       ['showLabel', 'position', 'font'],
     );
     const formatter = this.getLabelFormatter(styles);
+    const emphasisStyle = this.getEmphasisStyle(styles);
+
     return {
       label: {
         show: position === 'center' ? false : show,
@@ -295,6 +328,7 @@ class BasicPieChart extends Chart {
         formatter,
       },
       labelLayout: { hideOverlap: true },
+      emphasis: emphasisStyle,
     };
   }
 
@@ -312,7 +346,14 @@ class BasicPieChart extends Chart {
 
       //处理 label 旧数据中没有 showValue, showPercent, showName 数据  alpha.3版本之后是 boolean 类型 后续版本稳定之后 可以移除此逻辑
       // TODO migration start
-      if (showName === null || showPercent === null || showValue === null) {
+      if (
+        showName === null ||
+        showPercent === null ||
+        showValue === null ||
+        showName === void 0 ||
+        showPercent === void 0 ||
+        showValue === void 0
+      ) {
         return `${seriesParams?.name}: ${seriesParams?.percent + '%'}`;
       }
       // TODO migration end --tl
@@ -329,6 +370,24 @@ class BasicPieChart extends Chart {
           : ''
       }`;
     };
+  }
+
+  private getEmphasisStyle(styles: ChartStyleConfig[]): EmphasisStyle {
+    const [show, position, font] = getStyles(
+      styles,
+      ['label'],
+      ['showLabel', 'position', 'font'],
+    );
+    const needEmphasisStyle = position === 'center' && show;
+    const emphasisStyle = needEmphasisStyle
+      ? {
+          label: {
+            show: true,
+            ...font,
+          },
+        }
+      : {};
+    return emphasisStyle;
   }
 
   private getSeriesStyle(styles: ChartStyleConfig[]): PieSeries {

@@ -32,10 +32,11 @@ export interface addVizParams {
   visible: boolean;
   initialValues: any;
   callback?: (folder?: Folder) => void;
+  onAfterClose?: () => void;
 }
 
 /**
- * Creat vizs
+ * Create vizs
  *
  */
 
@@ -51,15 +52,29 @@ export function useAddViz({ showSaveForm }) {
         dataValues.config = JSON.stringify(
           getInitBoardConfig(values.boardType),
         );
+        dataValues.subType = dataValues.boardType;
       } catch (error) {
         throw error;
       }
+    }
+    if (relType === 'TEMPLATE') {
+      let formData = new FormData();
+      //@ts-ignore
+      formData.append('file', dataValues?.file);
+      dataValues.file = formData;
     }
     return dataValues;
   }, []);
 
   const addVizFn = useCallback(
-    ({ vizType, type, visible, initialValues, callback }: addVizParams) => {
+    ({
+      vizType,
+      type,
+      visible,
+      initialValues,
+      callback,
+      onAfterClose,
+    }: addVizParams) => {
       showSaveForm({
         vizType: vizType,
         type: type,
@@ -73,9 +88,9 @@ export function useAddViz({ showSaveForm }) {
               viz: {
                 ...initialValues,
                 ...dataValues,
+                name: values?.name,
                 orgId: orgId,
                 index: index,
-                subType: vizType === 'DASHBOARD' ? dataValues.boardType : null,
                 avatar: vizType === 'DATACHART' ? initialValues.avatar : null,
               },
               type: vizType,
@@ -86,6 +101,7 @@ export function useAddViz({ showSaveForm }) {
             onClose();
           }
         },
+        onAfterClose,
       });
     },
     [showSaveForm, vizsData, dispatch, orgId, updateValue],

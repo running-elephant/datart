@@ -19,11 +19,13 @@
 package datart.server.config;
 
 import datart.core.base.consts.Const;
+import datart.core.base.exception.Exceptions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -34,9 +36,17 @@ public class ExternalRegisterRedirectStrategy {
     private static final String redirectUrl = "/authorization";
 
     public void redirect(HttpServletRequest request, HttpServletResponse response, String token) throws Exception {
-        String target = redirectUrl + "/" + URLEncoder.encode(token, StandardCharsets.UTF_8.name());
+        String target = redirectUrl + "?authorization_token=" + URLEncoder.encode(token, StandardCharsets.UTF_8.name());
         response.setHeader(Const.TOKEN, token);
         response.sendRedirect(target);
     }
 
+    public void redirectError(HttpServletRequest request, HttpServletResponse response, String message) {
+        try {
+            String target = redirectUrl + "?error_message=" + URLEncoder.encode(message, StandardCharsets.UTF_8.name());
+            response.sendRedirect(target);
+        } catch (IOException e) {
+            Exceptions.e(e);
+        }
+    }
 }

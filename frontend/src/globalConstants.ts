@@ -22,6 +22,11 @@ export const DATARTSEPERATOR = '@datart@';
 export const CHARTCONFIG_FIELD_PLACEHOLDER_UID = '@placeholder@';
 export const DATART_TRANSLATE_HOLDER = '@global@';
 export const EVENT_ACTION_DELAY_MS = 200;
+export const RUNTIME_FILTER_KEY = Symbol('@filters@');
+export const BOARD_COPY_CHART_SUFFIX = '_copy';
+export const BOARD_SELF_CHART_PREFIX = 'widget_';
+export const TABLE_DATA_INDEX = '@datartTableIndex@';
+export const DATE_LEVEL_DELIMITER = '@date_level_delimiter@';
 
 export enum StorageKeys {
   AuthorizationToken = 'AUTHORIZATION_TOKEN',
@@ -31,6 +36,7 @@ export enum StorageKeys {
   Locale = 'LOCALE',
   Theme = 'THEME',
 }
+
 export const BASE_API_URL = '/api/v1';
 export const BASE_RESOURCE_URL = '/';
 // 1 hour
@@ -96,15 +102,15 @@ export const FONT_WEIGHT = [
   { name: 'viz.palette.style.fontWeight.bold', value: 'bold' },
   { name: 'viz.palette.style.fontWeight.bolder', value: 'bolder' },
   { name: 'viz.palette.style.fontWeight.lighter', value: 'lighter' },
-  { name: '100', value: '100' },
-  { name: '200', value: '200' },
-  { name: '300', value: '300' },
-  { name: '400', value: '400' },
-  { name: '500', value: '500' },
-  { name: '600', value: '600' },
-  { name: '700', value: '700' },
-  { name: '800', value: '800' },
-  { name: '900', value: '900' },
+  { name: 'viz.palette.style.fontWeight.100', value: '100' },
+  { name: 'viz.palette.style.fontWeight.200', value: '200' },
+  { name: 'viz.palette.style.fontWeight.300', value: '300' },
+  { name: 'viz.palette.style.fontWeight.400', value: '400' },
+  { name: 'viz.palette.style.fontWeight.500', value: '500' },
+  { name: 'viz.palette.style.fontWeight.600', value: '600' },
+  { name: 'viz.palette.style.fontWeight.700', value: '700' },
+  { name: 'viz.palette.style.fontWeight.800', value: '800' },
+  { name: 'viz.palette.style.fontWeight.900', value: '900' },
 ];
 
 export const FONT_STYLE = [
@@ -132,7 +138,7 @@ export const TIME_UNIT_OPTIONS = [
   { name: 'minutes', value: 'm' },
   { name: 'hours', value: 'h' },
   { name: 'days', value: 'd' },
-  { name: 'weeks', value: 'w' },
+  { name: 'weeks', value: 'W' },
   { name: 'months', value: 'M' },
   { name: 'years', value: 'y' },
   { name: 'quarters', value: 'Q' },
@@ -146,7 +152,7 @@ export const TIME_DIRECTION = [
 export const RECOMMEND_TIME = {
   TODAY: 'today',
   YESTERDAY: 'yesterday',
-  THISWEEK: 'this_week',
+  THIS_WEEK: 'this_week',
   LAST_7_DAYS: 'last_7_days',
   LAST_30_DAYS: 'last_30_days',
   LAST_90_DAYS: 'last_90_days',
@@ -179,6 +185,7 @@ export enum FilterSqlOperator {
   LessThanOrEqual = 'LTE',
   GreaterThanOrEqual = 'GTE',
 }
+
 export const DATE_FORMATTER = 'YYYY-MM-DD';
 export const TIME_FORMATTER = 'YYYY-MM-DD HH:mm:ss';
 
@@ -209,8 +216,25 @@ export const NumericUnitDescriptions = new Map<NumberUnitKey, [number, string]>(
     [NumberUnitKey.None, [1, '']],
     [NumberUnitKey.Thousand, [10 ** 3, 'K']],
     [NumberUnitKey.Million, [10 ** 6, 'M']],
-    [NumberUnitKey.Billion, [10 ** 10, 'B']],
+    [NumberUnitKey.Billion, [10 ** 9, 'B']],
     [NumberUnitKey.Wan, [10 ** 4, '万']],
     [NumberUnitKey.Yi, [10 ** 8, '亿']],
   ],
 );
+
+export const KEYBOARD_EVENT_NAME = {
+  CTRL: 'Control',
+  COMMAND: 'Meta',
+};
+
+// .drt = datart template file
+// .drr = datart resources file
+export enum DatartFileSuffixes {
+  Template = '.drt',
+  Resource = '.drr',
+}
+
+export enum CalculationType {
+  ADD = 'add',
+  SUBTRACT = 'subtract',
+}

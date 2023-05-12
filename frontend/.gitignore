@@ -4,7 +4,6 @@
 /node_modules
 /.pnp
 .pnp.js
-package-lock.json
 yarn.lock
 
 # testing
@@ -35,5 +34,6 @@ yarn-error.log*
 # docs
 /types
 
+/public/custom-chart-plugins/
 /public/task
 /public/antd/theme.less

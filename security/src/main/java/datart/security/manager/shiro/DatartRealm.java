@@ -26,6 +26,7 @@ import datart.core.mappers.ext.RoleMapperExt;
 import datart.core.mappers.ext.UserMapperExt;
 import datart.security.base.RoleType;
 import datart.security.manager.PermissionDataCache;
+import datart.security.util.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
@@ -101,8 +102,7 @@ public class DatartRealm extends AuthorizingRealm {
             return authenticationInfo;
         }
 
-        UsernamePasswordToken upToken = (UsernamePasswordToken) token;
-        String username = upToken.getUsername();
+        String username = getUsername(token);
         User user = userMapper.selectByNameOrEmail(username);
         if (user == null)
             return null;
@@ -125,6 +125,14 @@ public class DatartRealm extends AuthorizingRealm {
         //添加组织拥有者权限
         String allPermission = ShiroSecurityManager.toShiroPermissionString(role.getOrgId(), "*", "*", "*");
         simpleAuthorizationInfo.addStringPermission(allPermission);
+    }
+
+    private String getUsername(AuthenticationToken token) {
+        if (token instanceof BearerToken) {
+            return JwtUtils.toJwtToken((String) token.getPrincipal()).getSubject();
+        } else {
+            return (String) token.getPrincipal();
+        }
     }
 
 }

@@ -19,9 +19,8 @@ package datart.server.service.impl;
 
 import datart.core.base.consts.Const;
 import datart.core.base.exception.Exceptions;
-import datart.core.entity.BaseEntity;
-import datart.core.entity.Role;
-import datart.core.entity.Storyboard;
+import datart.core.base.exception.ParamException;
+import datart.core.entity.*;
 import datart.core.mappers.ext.RelRoleResourceMapperExt;
 import datart.core.mappers.ext.StoryboardMapperExt;
 import datart.security.base.PermissionInfo;
@@ -32,6 +31,7 @@ import datart.security.manager.shiro.ShiroSecurityManager;
 import datart.security.util.PermissionHelper;
 import datart.server.base.dto.StoryboardDetail;
 import datart.server.base.params.BaseCreateParam;
+import datart.server.base.params.StoryboardBaseUpdateParam;
 import datart.server.service.BaseService;
 import datart.server.service.RoleService;
 import datart.server.service.StoryboardService;
@@ -39,9 +39,9 @@ import datart.server.service.StorypageService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,16 +71,40 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
 
     @Override
     public List<Storyboard> listStoryBoards(String orgId) {
-        return storyboardMapper.selectByOrg(orgId)
-                .stream()
-                .filter(storyboard -> {
-                    try {
-                        requirePermission(storyboard, Const.READ);
-                        return true;
-                    } catch (Exception e) {
-                        return false;
-                    }
-                }).collect(Collectors.toList());
+        List<Storyboard> storyboards = storyboardMapper.selectByOrg(orgId);
+
+        Map<String, Storyboard> filtered = new HashMap<>();
+
+        List<Storyboard> permitted = storyboards.stream().filter(storyboard -> {
+            try {
+                if (hasReadPermission(storyboard)) {
+                    return true;
+                } else {
+                    filtered.put(storyboard.getId(), storyboard);
+                    return false;
+                }
+            } catch (Exception e) {
+                filtered.put(storyboard.getId(), storyboard);
+                return false;
+            }
+        }).collect(Collectors.toList());
+
+        while (!filtered.isEmpty()) {
+            boolean updated = false;
+            for (Storyboard storyboard : permitted) {
+                Storyboard parent = filtered.remove(storyboard.getParentId());
+                if (parent != null) {
+                    permitted.add(parent);
+                    updated = true;
+                    break;
+                }
+            }
+            if (!updated) {
+                break;
+            }
+        }
+
+        return permitted;
     }
 
     @Override
@@ -95,6 +119,29 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
                 .hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), "*", storyboardId, Const.DOWNLOAD)));
 
         return storyboardDetail;
+    }
+
+    @Override
+    public boolean updateBase(StoryboardBaseUpdateParam updateParam) {
+        Storyboard storyboard = retrieve(updateParam.getId(), Storyboard.class);
+        requirePermission(storyboard, Const.MANAGE);
+        if (!storyboard.getName().equals(updateParam.getName())) {
+            //check name
+            Storyboard check = new Storyboard();
+            check.setParentId(updateParam.getParentId());
+            check.setOrgId(storyboard.getOrgId());
+            check.setName(updateParam.getName());
+            checkUnique(check);
+        }
+
+        // update base info
+        storyboard.setId(updateParam.getId());
+        storyboard.setUpdateBy(getCurrentUser().getId());
+        storyboard.setUpdateTime(new Date());
+        storyboard.setName(updateParam.getName());
+        storyboard.setParentId(updateParam.getParentId());
+        storyboard.setIndex(updateParam.getIndex());
+        return 1 == storyboardMapper.updateByPrimaryKey(storyboard);
     }
 
     @Override
@@ -120,8 +167,13 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
     }
 
     private boolean hasPermission(Role role, Storyboard storyboard, int permission) {
-        if (storyboard.getId() == null || (permission & Const.CREATE) == Const.CREATE) {
-            return securityManager.hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), role.getId(), ResourceType.STORYBOARD.name(), permission));
+        if (storyboard.getId() == null || rrrMapper.countRolePermission(storyboard.getId(), role.getId()) == 0) {
+            Storyboard parent = storyboardMapper.selectByPrimaryKey(storyboard.getParentId());
+            if (parent == null) {
+                return securityManager.hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), role.getId(), ResourceType.STORYBOARD.name(), permission));
+            } else {
+                return hasPermission(role, parent, permission);
+            }
         } else {
             return securityManager.hasPermission(PermissionHelper.vizPermission(storyboard.getOrgId(), role.getId(), storyboard.getId(), permission));
         }
@@ -154,5 +206,45 @@ public class StoryboardServiceImpl extends BaseService implements StoryboardServ
     @Override
     public void deleteReference(Storyboard storyboard) {
         storypageService.deleteByStoryboard(storyboard.getId());
+    }
+
+    private boolean hasReadPermission(Storyboard storyboard) {
+        try {
+            requirePermission(storyboard, Const.MANAGE);
+            return true;
+        } catch (Exception ignored) {
+        }
+        try {
+            requirePermission(storyboard, Const.READ);
+            return retrieve(storyboard.getId()).getStatus() == Const.VIZ_PUBLISH;
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
+    @Override
+    public boolean unarchive(String id, String newName, String parentId, double index) {
+        Storyboard storyboard = retrieve(id);
+        requirePermission(storyboard, Const.MANAGE);
+
+        //check name
+        if (!storyboard.getName().equals(newName)) {
+            checkUnique(storyboard.getOrgId(), parentId, newName);
+        }
+
+        // update status
+        storyboard.setName(newName);
+        storyboard.setParentId(parentId);
+        storyboard.setStatus(Const.DATA_STATUS_ACTIVE);
+        storyboard.setIndex(index);
+        return 1 == storyboardMapper.updateByPrimaryKey(storyboard);
+    }
+
+    @Override
+    public boolean checkUnique(String orgId, String parentId, String name) {
+        if (!CollectionUtils.isEmpty(storyboardMapper.checkName(orgId, parentId, name))) {
+            Exceptions.tr(ParamException.class, "error.param.exists.name");
+        }
+        return true;
     }
 }

@@ -16,19 +16,21 @@
  * limitations under the License.
  */
 
-import {
-  Relation,
-  ServerRelation,
-  ServerWidget,
-  Widget,
-} from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import { fontDefault } from 'app/pages/DashBoardPage/utils/widget';
+import { FONT_DEFAULT } from 'app/constants';
+import { ServerRelation } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import {
   beta0,
+  beta4_2,
   convertWidgetRelationsToObj,
-  migrateWidgets,
+  RC0,
 } from '../BoardConfig/migrateWidgets';
-import { APP_CURRENT_VERSION, APP_VERSION_BETA_0 } from '../constants';
+import { WidgetBeta3 } from '../BoardConfig/types';
+import {
+  APP_VERSION_BETA_0,
+  APP_VERSION_BETA_4_1,
+  APP_VERSION_BETA_4_2,
+  APP_VERSION_RC_0,
+} from '../constants';
 
 describe('test migrateWidgets ', () => {
   test('should return undefined  when widget.config.type === filter', () => {
@@ -37,28 +39,28 @@ describe('test migrateWidgets ', () => {
         type: 'filter',
       },
     };
-    expect(beta0(widget1 as Widget)).toBeUndefined();
+    expect(beta0(widget1 as WidgetBeta3)).toBeUndefined();
   });
   test('should return self  when widget.config.type !== filter', () => {
     const widget2 = {
       config: {
         type: 'chart',
       },
-    } as Widget;
-    expect(beta0(widget2 as Widget)).toEqual(widget2);
+    } as WidgetBeta3;
+    expect(beta0(widget2 as WidgetBeta3)).toEqual(widget2);
   });
 
   test('should return widget.config.nameConfig', () => {
     const widget1 = {
       config: {},
-    } as Widget;
+    } as WidgetBeta3;
     const widget2 = {
       config: {
-        nameConfig: fontDefault,
+        nameConfig: FONT_DEFAULT,
         version: APP_VERSION_BETA_0,
       },
-    } as Widget;
-    expect(beta0(widget1 as Widget)).toMatchObject(widget2);
+    } as any;
+    expect(beta0(widget1 as WidgetBeta3)).toMatchObject(widget2);
   });
 
   test('should return Array Type about assistViewFields', () => {
@@ -82,7 +84,7 @@ describe('test migrateWidgets ', () => {
         },
       },
     };
-    expect(beta0(widget1 as unknown as Widget)).toMatchObject(widget2);
+    expect(beta0(widget1 as unknown as WidgetBeta3)).toMatchObject(widget2);
   });
 
   test('convertWidgetRelationsToObj parse Relation.config', () => {
@@ -103,38 +105,106 @@ describe('test migrateWidgets ', () => {
     expect(convertWidgetRelationsToObj(relations1)).toMatchObject(relations2);
   });
 
-  test('should get new target version after adjust widgets before save', () => {
+  test('should migrate when widget is owned chart for version APP_VERSION_BETA_4_2', () => {
     const widget1 = {
-      config: '{}',
-    } as ServerWidget;
-    const widget2 = {
-      config: `{"version":"1.0.0-beta.0"}`,
-    } as ServerWidget;
-    const widget3 = {
-      config: '{"version":"rrr"}',
-    } as ServerWidget;
-    const widget4 = {
-      config: '{"version":"1.0.0-beta.1"}',
-    } as ServerWidget;
-    const resWidget = {
       config: {
-        version: APP_CURRENT_VERSION,
+        version: APP_VERSION_BETA_4_1,
+        originalType: 'ownedChart',
+        customConfig: {},
       },
-      relations: [] as Relation[],
-    } as Widget;
-    const resWidget2 = {
-      config: {
-        version: APP_CURRENT_VERSION,
-      },
-      relations: [] as Relation[],
-    } as Widget;
-    const widgets: ServerWidget[] = [widget1, widget2, widget3, widget4];
+    } as any;
+    const result = beta4_2('auto', widget1 as any);
+    expect(result?.config?.version).toBe(APP_VERSION_BETA_4_2);
+    expect(result?.config?.customConfig?.interactions?.length).toBe(3);
+  });
 
-    expect(migrateWidgets(widgets)).toMatchObject([
-      resWidget,
-      resWidget,
-      resWidget,
-      resWidget2,
-    ]);
+  test('should migrate when widget is linked chart for version APP_VERSION_BETA_4_2', () => {
+    const widget1 = {
+      config: {
+        version: APP_VERSION_BETA_4_1,
+        originalType: 'linkedChart',
+        customConfig: {},
+      },
+    } as any;
+    const result = beta4_2('auto', widget1 as any);
+    expect(result?.config?.version).toBe(APP_VERSION_BETA_4_2);
+    expect(result?.config?.customConfig?.interactions?.length).toBe(3);
+  });
+
+  test('should not migrate when widget version is APP_VERSION_BETA_4_2', () => {
+    const widget1 = {
+      config: {
+        version: APP_VERSION_BETA_4_2,
+        originalType: 'linkedChart',
+        customConfig: {},
+      },
+    } as any;
+    const result = beta4_2('auto', widget1 as any);
+    expect(result?.config?.version).toBe(APP_VERSION_BETA_4_2);
+    expect(result?.config?.customConfig?.interactions?.length).toBe(undefined);
+  });
+
+  test('should not migrate when widget is not chart', () => {
+    const widget1 = {
+      config: {
+        version: APP_VERSION_BETA_4_2,
+        originalType: 'controller',
+        customConfig: {},
+      },
+    } as any;
+    const result = beta4_2('auto', widget1 as any);
+    expect(result?.config?.version).toBe(APP_VERSION_BETA_4_2);
+    expect(result?.config?.customConfig?.interactions?.length).toBe(undefined);
+  });
+
+  test('should add name fields for widget computedFields ', () => {
+    const widget = {
+      config: {
+        content: {
+          dataChart: {
+            config: {
+              computedFields: [{ id: '1' }],
+            },
+          },
+        },
+      },
+    };
+    const result = RC0(widget as any);
+    expect(result?.config?.content?.dataChart?.config?.version).toBe(
+      APP_VERSION_RC_0,
+    );
+    expect(result).toMatchObject({
+      config: {
+        content: {
+          dataChart: {
+            config: {
+              computedFields: [{ id: '1', name: '1' }],
+              version: APP_VERSION_RC_0,
+            },
+          },
+        },
+      },
+    });
+
+    const widget1 = {
+      config: {
+        content: {
+          dataChart: {
+            config: {},
+          },
+        },
+      },
+    };
+    const result1 = RC0(widget1 as any);
+
+    expect(result1).toMatchObject({
+      config: {
+        content: {
+          dataChart: {
+            config: {},
+          },
+        },
+      },
+    });
   });
 });

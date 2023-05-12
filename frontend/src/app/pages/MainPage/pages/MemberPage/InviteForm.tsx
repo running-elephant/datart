@@ -23,7 +23,7 @@ import { User } from 'app/slice/types';
 import { DEFAULT_DEBOUNCE_WAIT } from 'globalConstants';
 import debounce from 'lodash/debounce';
 import { memo, ReactNode, useCallback, useMemo, useRef, useState } from 'react';
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 
 interface ValueType {
   key?: string;
@@ -43,7 +43,7 @@ export const InviteForm = memo(
         if (!val.trim()) {
           setOptions([]);
         } else {
-          const { data } = await request<User[]>(
+          const { data } = await request2<User[]>(
             `/users/search?keyword=${val}`,
           );
           setOptions(

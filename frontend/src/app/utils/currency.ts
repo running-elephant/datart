@@ -15,8 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AUD, CAD, CNY, EUR, GBP, JPY, USD } from '@dinero.js/currencies';
-import { Currency } from 'types';
+import {
+  AUD,
+  CAD,
+  CNY,
+  Currency,
+  EUR,
+  GBP,
+  JPY,
+  USD,
+} from '@dinero.js/currencies';
 
 export const CURRENCIES: Currency<number>[] = [
   CNY,

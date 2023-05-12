@@ -19,7 +19,6 @@
 import { SearchOutlined } from '@ant-design/icons';
 import { Col, Input, Row, Table, TableColumnProps } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import useResizeObserver from 'app/hooks/useResizeObserver';
 import { useSearchAndExpand } from 'app/hooks/useSearchAndExpand';
 import { memo, useEffect, useMemo } from 'react';
 import styled from 'styled-components/macro';
@@ -29,6 +28,7 @@ import {
   ResourceTypes,
   SubjectTypes,
   Viewpoints,
+  VizResourceSubTypes,
 } from '../../constants';
 import {
   DataSourceTreeNode,
@@ -42,6 +42,7 @@ interface PermissionTableProps {
   viewpoint: Viewpoints;
   viewpointType: ResourceTypes | SubjectTypes;
   dataSourceType: ResourceTypes | SubjectTypes;
+  vizSubTypes?: VizResourceSubTypes;
   dataSource: DataSourceViewModel[] | undefined;
   resourceLoading: boolean;
   privileges: Privilege[] | undefined;
@@ -64,8 +65,8 @@ export const PermissionTable = memo(
     resourceLoading,
     privileges,
     onPrivilegeChange,
+    vizSubTypes,
   }: PermissionTableProps) => {
-    const { height, ref } = useResizeObserver();
     const t = useI18NPrefix('permission');
 
     const treeData = useMemo(() => {
@@ -81,11 +82,19 @@ export const PermissionTable = memo(
           viewpoint,
           viewpointType,
           dataSourceType,
+          vizSubTypes,
         );
       } else {
         return [];
       }
-    }, [viewpoint, viewpointType, dataSourceType, dataSource, privileges]);
+    }, [
+      viewpoint,
+      viewpointType,
+      dataSourceType,
+      dataSource,
+      privileges,
+      vizSubTypes,
+    ]);
 
     const {
       filteredData,
@@ -124,6 +133,7 @@ export const PermissionTable = memo(
             viewpoint,
             viewpointType,
             dataSourceType,
+            vizSubTypes,
           ),
           render: (_, record) => (
             <PrivilegeSetting
@@ -132,12 +142,20 @@ export const PermissionTable = memo(
               viewpointType={viewpointType}
               dataSourceType={dataSourceType}
               onChange={privilegeChange}
+              vizSubTypes={vizSubTypes}
             />
           ),
         },
       ];
       return columns;
-    }, [viewpoint, viewpointType, dataSourceType, privilegeChange, t]);
+    }, [
+      viewpoint,
+      viewpointType,
+      dataSourceType,
+      privilegeChange,
+      t,
+      vizSubTypes,
+    ]);
 
     return (
       <>

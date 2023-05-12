@@ -17,7 +17,16 @@
  */
 
 import { CheckOutlined } from '@ant-design/icons';
-import { Button, DatePicker, Input, InputNumber, Space, Tag } from 'antd';
+import {
+  Button,
+  DatePicker,
+  Input,
+  InputNumber,
+  Select,
+  Space,
+  Tag,
+} from 'antd';
+import { DateFormat } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { TIME_FORMATTER } from 'globalConstants';
 import moment from 'moment';
@@ -31,11 +40,23 @@ interface DefaultValueProps {
   expression: boolean;
   disabled?: boolean;
   value?: null | any[];
+  dateFormat?: DateFormat;
+  hasDateFormat?: boolean;
+  onChangeDateFormat?: (value) => void;
   onChange?: (value) => void;
 }
 
 export const DefaultValue = memo(
-  ({ type, expression, disabled, value = [], onChange }: DefaultValueProps) => {
+  ({
+    type,
+    expression,
+    disabled,
+    value = [],
+    dateFormat,
+    hasDateFormat = true,
+    onChange,
+    onChangeDateFormat,
+  }: DefaultValueProps) => {
     const [inputValue, setInputValue] = useState<any>(void 0);
     const t = useI18NPrefix('variable');
 
@@ -142,7 +163,7 @@ export const DefaultValue = memo(
     }
 
     return (
-      <Wrapper direction="vertical" size={0}>
+      <Wrapper direction="vertical">
         {expression || type === VariableValueTypes.Expression ? (
           <Input.TextArea
             placeholder={t('enterExpression')}
@@ -159,7 +180,7 @@ export const DefaultValue = memo(
                   const label =
                     type !== VariableValueTypes.Date
                       ? val
-                      : moment(val).format(TIME_FORMATTER);
+                      : moment(val).format(dateFormat);
                   return (
                     <Tag
                       key={label}
@@ -185,6 +206,22 @@ export const DefaultValue = memo(
               )}
             </Space>
           </>
+        )}
+        {type === VariableValueTypes.Date && hasDateFormat && (
+          <Select
+            placeholder="选择日期格式"
+            className="input"
+            value={dateFormat}
+            onChange={onChangeDateFormat}
+          >
+            {Object.values(DateFormat).map(format => {
+              return (
+                <Select.Option value={format} key={format}>
+                  {format}
+                </Select.Option>
+              );
+            })}
+          </Select>
         )}
       </Wrapper>
     );

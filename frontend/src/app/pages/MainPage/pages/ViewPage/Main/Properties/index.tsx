@@ -43,9 +43,10 @@ import { VerticalTabs } from './VerticalTabs';
 
 interface PropertiesProps {
   allowManage: boolean;
+  viewType: string;
 }
 
-export const Properties = memo(({ allowManage }: PropertiesProps) => {
+export const Properties = memo(({ allowManage, viewType }: PropertiesProps) => {
   const [selectedTab, setSelectedTab] = useState('');
   const { editorInstance } = useContext(EditorContext);
   const t = useI18NPrefix('view.properties');
@@ -54,8 +55,8 @@ export const Properties = memo(({ allowManage }: PropertiesProps) => {
     editorInstance?.layout();
   }, [editorInstance, selectedTab]);
 
-  const tabTitle = useMemo(
-    () => [
+  const tabTitle = useMemo(() => {
+    const tabTitle = [
       { name: 'reference', title: t('reference'), icon: <DatabaseOutlined /> },
       { name: 'variable', title: t('variable'), icon: <FunctionOutlined /> },
       { name: 'model', title: t('model'), icon: <ApartmentOutlined /> },
@@ -64,9 +65,11 @@ export const Properties = memo(({ allowManage }: PropertiesProps) => {
         title: t('columnPermissions'),
         icon: <SafetyCertificateOutlined />,
       },
-    ],
-    [t],
-  );
+    ];
+    return viewType === 'STRUCT'
+      ? tabTitle.slice(2, tabTitle.length)
+      : tabTitle;
+  }, [t, viewType]);
 
   const tabSelect = useCallback(tab => {
     setSelectedTab(tab);
@@ -92,8 +95,8 @@ export const Properties = memo(({ allowManage }: PropertiesProps) => {
 });
 
 const Container = styled.div`
+  z-index: ${LEVEL_1};
   display: flex;
   flex-shrink: 0;
   background-color: ${p => p.theme.componentBackground};
-  z-index: ${LEVEL_1};
 `;

@@ -18,6 +18,7 @@
 
 import React from 'react';
 import styled from 'styled-components/macro';
+import { WHITE } from 'styles/StyleConstants';
 import ChartDraggableSourceContainer from './ChartDraggableSourceContainer';
 
 const DragPreview = ({ dataItem }) => {
@@ -31,11 +32,7 @@ const DragPreview = ({ dataItem }) => {
             transform: `rotateZ(${-i * 1.5}deg)`,
           }}
         >
-          <ChartDraggableSourceContainer
-            type={v.type}
-            id={v.colName}
-            name={v.colName}
-          />
+          <ChartDraggableSourceContainer type={v.type} name={v.colName} />
         </Preview>
       ))}
     </div>
@@ -48,7 +45,7 @@ const Preview = styled.div`
   position: absolute;
   width: 256px;
   background: #f2f2f2;
-  border: 1px solid #fff;
+  border: 1px solid ${WHITE};
   transform-origin: bottom left;
   backface-visibility: hidden;
 `;

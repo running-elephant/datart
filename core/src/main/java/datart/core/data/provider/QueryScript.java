@@ -41,6 +41,8 @@ public class QueryScript implements Serializable {
 
     private boolean test;
 
+    private ScriptType scriptType;
+
     private String script;
 
     private List<ScriptVariable> variables;

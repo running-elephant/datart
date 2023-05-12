@@ -3,9 +3,11 @@ package datart.server.service;
 import datart.core.entity.*;
 import datart.security.base.ResourceType;
 import datart.server.base.dto.*;
-import datart.server.base.transfer.ImportStrategy;
-import datart.server.base.transfer.model.ResourceTransferModel;
 import datart.server.base.params.*;
+import datart.server.base.transfer.DashboardTemplateParam;
+import datart.server.base.transfer.DatachartTemplateParam;
+import datart.server.base.transfer.ImportStrategy;
+import datart.server.base.transfer.ResourceTransferParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -78,8 +80,15 @@ public interface VizService {
 
     String getChartConfigByVizId(ResourceType resourceType, String vizId);
 
-    ResourceTransferModel exportViz(ResourceType vizType, boolean onlyViz, String... vizIds) throws IOException;
+    Download exportResource(ResourceTransferParam transferParam) throws IOException;
 
-    boolean importViz(MultipartFile file, ImportStrategy importStrategy, String orgId) throws IOException;
+    boolean importResource(MultipartFile file, ImportStrategy importStrategy, String orgId) throws IOException;
 
+    Download exportDatachartTemplate(DatachartTemplateParam templateModel);
+
+    Download exportDashboardTemplate(DashboardTemplateParam templateModel);
+
+    Folder importVizTemplate(MultipartFile file, String orgId, String parentId, String name) throws Exception;
+
+    boolean updateStoryboardBase(StoryboardBaseUpdateParam updateParam);
 }

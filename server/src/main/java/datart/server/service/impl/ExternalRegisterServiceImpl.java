@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jayway.jsonpath.JsonPath;
 import datart.core.base.exception.Exceptions;
 import datart.core.base.exception.ParamException;
+import datart.core.common.Application;
 import datart.core.entity.User;
 import datart.core.mappers.ext.UserMapperExt;
 import datart.security.base.PasswordToken;
@@ -35,7 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQueryBuilder;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -68,8 +68,9 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
 
     @Override
     public String ldapRegister(String filter, String password) throws MessagingException, UnsupportedEncodingException {
+        String usernameAttr = getLdapUsernameAttr();
         try {
-            ldapTemplate.authenticate(LdapQueryBuilder.query().filter(String.format("(|(uid=%s)(cn=%s))", filter, filter)), password);
+            ldapTemplate.authenticate(LdapQueryBuilder.query().filter(String.format("(|(uid=%s)("+usernameAttr+"=%s))", filter, filter)), password);
         } catch (Exception e) {
             return null;
         }
@@ -85,7 +86,7 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
         String email = null;
 
         try {
-            email = ldapTemplate.searchForContext(LdapQueryBuilder.query().where("uid").is(filter).or("cn").is(filter))
+            email = ldapTemplate.searchForContext(LdapQueryBuilder.query().where("uid").is(filter).or(usernameAttr).is(filter))
                     .getAttributes().get("mail").get().toString();
         } catch (Exception ignored) {
         }
@@ -96,16 +97,14 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
 
         UserRegisterParam registerParam = new UserRegisterParam();
         registerParam.setUsername(filter);
-        registerParam.setPassword(BCrypt.hashpw(RandomStringUtils.randomAscii(32), BCrypt.gensalt()));
+        registerParam.setPassword(RandomStringUtils.randomAscii(32));
         registerParam.setEmail(email);
 
         if (userService.register(registerParam, false)) {
             PasswordToken passwordToken = new PasswordToken(registerParam.getUsername(),
-                    null,
+                    registerParam.getPassword(),
                     System.currentTimeMillis());
-
-            passwordToken.setPassword(registerParam.getPassword());
-            return JwtUtils.toJwtString(passwordToken);
+            return userService.login(passwordToken);
         }
         return null;
     }
@@ -117,7 +116,7 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
         User user = userMapper.selectByNameOrEmail(oauthUser.getName());
         if (user != null) {
             PasswordToken passwordToken = new PasswordToken(user.getUsername(),
-                    null,
+                    user.getPassword(),
                     System.currentTimeMillis());
             return JwtUtils.toJwtString(passwordToken);
         }
@@ -127,19 +126,21 @@ public class ExternalRegisterServiceImpl implements ExternalRegisterService {
 
         UserRegisterParam userRegisterParam = new UserRegisterParam();
         userRegisterParam.setUsername(oauthUser.getName());
-        userRegisterParam.setPassword(BCrypt.hashpw(RandomStringUtils.randomAscii(32), BCrypt.gensalt()));
+        userRegisterParam.setPassword(RandomStringUtils.randomAscii(32));
         if (emailMapping != null) {
             userRegisterParam.setEmail(JsonPath.read(jsonObj, emailMapping));
         }
         if (userService.register(userRegisterParam, false)) {
             PasswordToken passwordToken = new PasswordToken(userRegisterParam.getUsername(),
-                    null,
+                    userRegisterParam.getPassword(),
                     System.currentTimeMillis());
-
-            passwordToken.setPassword(userRegisterParam.getPassword());
-            return JwtUtils.toJwtString(passwordToken);
+            return userService.login(passwordToken);
         }
         return null;
 
+    }
+
+    private String getLdapUsernameAttr() {
+        return Application.getProperty("spring.ldap.attribute-mapping.username", "cn");
     }
 }

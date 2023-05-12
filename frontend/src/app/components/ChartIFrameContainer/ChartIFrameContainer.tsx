@@ -16,19 +16,22 @@
  * limitations under the License.
  */
 
+import { ReactComponent as Loading } from 'app/assets/images/loading.svg';
 import {
   Frame,
   FrameContextConsumer,
 } from 'app/components/ReactFrameComponent';
 import ChartI18NContext from 'app/pages/ChartWorkbenchPage/contexts/Chart18NContext';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
 import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
 import { FC, memo } from 'react';
-import { StyleSheetManager } from 'styled-components/macro';
+import styled, { StyleSheetManager } from 'styled-components/macro';
+import { LEVEL_1000 } from 'styles/StyleConstants';
 import { isEmpty } from 'utils/object';
 import ChartIFrameLifecycleAdapter from './ChartIFrameLifecycleAdapter';
+
 const ChartIFrameContainer: FC<{
   dataset: any;
   chart: IChart;
@@ -38,8 +41,10 @@ const ChartIFrameContainer: FC<{
   height?: any;
   isShown?: boolean;
   drillOption?: IChartDrillOption;
+  selectedItems?: SelectedItem[];
   widgetSpecialConfig?: any;
   scale?: [number, number];
+  isLoadingData?: boolean;
 }> = memo(props => {
   const iframeContainerId = `chart-iframe-root-${props.containerId}`;
   const config = setRuntimeDateLevelFieldsInChartConfig(props.config);
@@ -80,6 +85,8 @@ const ChartIFrameContainer: FC<{
               widgetSpecialConfig={props.widgetSpecialConfig}
               isShown={props.isShown}
               drillOption={props?.drillOption}
+              selectedItems={props?.selectedItems}
+              isLoadingData={props?.isLoadingData}
             />
           </div>
         </div>
@@ -142,6 +149,8 @@ const ChartIFrameContainer: FC<{
                   widgetSpecialConfig={props.widgetSpecialConfig}
                   isShown={props.isShown}
                   drillOption={props.drillOption}
+                  selectedItems={props?.selectedItems}
+                  isLoadingData={props?.isLoadingData}
                 />
               </div>
             </StyleSheetManager>
@@ -153,9 +162,30 @@ const ChartIFrameContainer: FC<{
 
   return (
     <ChartI18NContext.Provider value={{ i18NConfigs: props?.config?.i18ns }}>
-      {render()}
+      <StyledDataLoadingContainer isLoading={props.isLoadingData}>
+        {props.isLoadingData && <Loading />}
+      </StyledDataLoadingContainer>
+      <StyledChartRendererContainer isLoading={props.isLoadingData}>
+        {render()}
+      </StyledChartRendererContainer>
     </ChartI18NContext.Provider>
   );
 });
 
 export default ChartIFrameContainer;
+
+const StyledDataLoadingContainer = styled.div<{ isLoading?: boolean }>`
+  position: absolute;
+  z-index: ${LEVEL_1000};
+  display: ${p => (p.isLoading ? 'flex' : 'none')};
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+`;
+
+const StyledChartRendererContainer = styled.div<{ isLoading?: boolean }>`
+  width: 100%;
+  height: 100%;
+  opacity: ${p => (p.isLoading ? 0.3 : 1)};
+`;

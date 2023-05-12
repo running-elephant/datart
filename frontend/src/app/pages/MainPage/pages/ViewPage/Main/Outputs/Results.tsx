@@ -70,6 +70,7 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
   const previewResults = useSelector(state =>
     selectCurrentEditingViewAttr(state, { name: 'previewResults' }),
   ) as ViewViewModel['previewResults'];
+
   const roles = useSelector(selectRoles);
   const t = useI18NPrefix('view');
 
@@ -80,13 +81,15 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
 
   const modelChange = useCallback(
     (columnName: string, column: Omit<Column, 'name'>) =>
-      ({ key }) => {
+      (keyPath: string[]) => {
         let value;
-        if (key.includes('category')) {
-          const category = key.split('-')[1];
+        if (keyPath[0].includes('category')) {
+          const category = keyPath[0].split('-')[1];
           value = { ...column, category };
+        } else if (keyPath.includes('DATE')) {
+          value = { ...column, type: keyPath[1], dateFormat: keyPath[0] };
         } else {
-          value = { ...column, type: key };
+          value = { ...column, type: keyPath[0] };
         }
         const clonedHierarchyModel = CloneValueDeep(model.hierarchy || {});
         if (columnName in clonedHierarchyModel) {
@@ -206,11 +209,12 @@ export const Results = memo(({ height = 0, width = 0 }: ResultsProps) => {
           placement="bottomRight"
           content={
             <Tree
-              className="dropdown"
+              className="check-list medium"
               treeData={roleDropdownData}
               checkedKeys={checkedKeys}
               loading={false}
               selectable={false}
+              showIcon={false}
               onCheck={checkRoleColumnPermission(name)}
               blockNode
               checkable

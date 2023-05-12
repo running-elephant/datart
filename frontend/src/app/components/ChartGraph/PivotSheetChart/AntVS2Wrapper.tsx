@@ -16,15 +16,29 @@
  * limitations under the License.
  */
 
+import { setLang } from '@antv/s2';
 import { SheetComponent } from '@antv/s2-react';
 import '@antv/s2-react/dist/style.min.css';
+import { getLang } from 'locales/i18n';
 import { FC, memo } from 'react';
 import styled from 'styled-components/macro';
 import { FONT_SIZE_LABEL } from 'styles/StyleConstants';
 import { AndvS2Config } from './types';
 
+setLang(['zh_CN', 'en_US'].find(lang => lang.includes(getLang()!)) as any);
+
 const AntVS2Wrapper: FC<AndvS2Config> = memo(
-  ({ dataCfg, options, theme, palette }) => {
+  ({
+    dataCfg,
+    options,
+    theme,
+    palette,
+    onCollapseRowsAll,
+    onRowCellCollapseTreeRows,
+    onSelected,
+    getSpreadSheet,
+    onDataCellClick,
+  }) => {
     if (!dataCfg) {
       return <div></div>;
     }
@@ -50,7 +64,12 @@ const AntVS2Wrapper: FC<AndvS2Config> = memo(
         dataCfg={dataCfg}
         options={options}
         themeCfg={{ theme, palette }}
+        onCollapseRowsAll={onCollapseRowsAll}
+        onRowCellCollapseTreeRows={onRowCellCollapseTreeRows}
         onDataCellHover={onDataCellHover}
+        onSelected={onSelected}
+        getSpreadSheet={getSpreadSheet}
+        onDataCellClick={onDataCellClick}
       />
     );
   },

@@ -16,173 +16,56 @@
  * limitations under the License.
  */
 
-import { Form } from 'antd';
-import {
-  BasicFont,
-  BasicInput,
-  BasicInputNumber,
-} from 'app/components/FormGenerator/Basic';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
-import { MediaWidgetContent } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { TIME_FORMATTER } from 'globalConstants';
-import produce from 'immer';
 import moment from 'moment';
-import { memo, useContext, useEffect, useMemo, useState } from 'react';
+import { memo, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import { G90 } from 'styles/StyleConstants';
-import { WidgetActionContext } from '../../ActionProvider/WidgetActionProvider';
-import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
+import { IFontDefault } from '../../../../../../types';
 import { WidgetContext } from '../../WidgetProvider/WidgetProvider';
+import { timerWidgetToolkit } from './timerConfig';
 
-const FONT_DATA = {
-  comType: 'font',
-  default: {
-    fontFamily: 'PingFang SC',
-    fontSize: '18',
-    fontWeight: 'normal',
-    fontStyle: 'normal',
-    color: G90,
-  },
-  disabled: undefined,
-  key: 'font',
-  label: '字体',
-};
-const FORMAT_DATA = {
-  comType: 'input',
-  default: TIME_FORMATTER,
-  disabled: undefined,
-  key: 'timeFormat',
-  label: '格式',
-};
-const DURATION_DATA = {
-  comType: 'inputNumber',
-  default: 1000,
-  disabled: undefined,
-  key: 'timeDuration',
-  label: '时间间隔',
-};
-export type TimerConfig = NonNullable<MediaWidgetContent['timerConfig']>;
 export const TimerWidgetCore: React.FC = memo(() => {
   const widget = useContext(WidgetContext);
-
-  const { editing } = useContext(WidgetInfoContext);
-  const { onWidgetUpdate } = useContext(WidgetActionContext);
-  const [form] = Form.useForm();
-  const preTimerConfig = (widget.config.content as MediaWidgetContent)
-    .timerConfig;
-  const [timerConfig, setTimerConfig] = useState<TimerConfig>(
-    {} as TimerConfig,
+  const { time, font } = timerWidgetToolkit.getTimer(
+    widget.config.customConfig.props,
   );
-
   const [currentTime, setCurrentTime] = useState(
-    moment().format(timerConfig?.time?.timeFormat || TIME_FORMATTER),
-  );
-
-  const t = useI18NPrefix();
-
-  useEffect(() => {
-    const timerConfig: TimerConfig = {
-      time: preTimerConfig?.time || {
-        timeFormat: FORMAT_DATA.default,
-        timeDuration: DURATION_DATA.default,
-      },
-      font: preTimerConfig?.font || FONT_DATA.default,
-    };
-    setTimerConfig(timerConfig);
-    form.setFieldsValue({ ...timerConfig });
-  }, [form, preTimerConfig]);
-
-  const fontData = useMemo(() => {
-    const data = { ...FONT_DATA, value: timerConfig.font };
-    return data;
-  }, [timerConfig.font]);
-  const formatData = useMemo(() => {
-    const data = { ...FORMAT_DATA, value: timerConfig?.time?.timeFormat };
-    return data;
-  }, [timerConfig?.time?.timeFormat]);
-  const durationData = useMemo(() => {
-    const data = { ...DURATION_DATA, value: timerConfig?.time?.timeDuration };
-    return data;
-  }, [timerConfig?.time?.timeDuration]);
-  const onFontChange = (ancestors, data, needRefresh) => {
-    const font = { ...timerConfig.font, ...data.value };
-    const newTimerConfig = { ...timerConfig, font: font };
-    const nextWidget = produce(widget, draft => {
-      (draft.config.content as MediaWidgetContent).timerConfig = newTimerConfig;
-    });
-    onWidgetUpdate(nextWidget);
-  };
-
-  const onTimeChange = (ancestors, data, needRefresh) => {
-    const time = { ...timerConfig.time, ...data };
-    const newTimerConfig = { ...timerConfig, time: time };
-    const nextWidget = produce(widget, draft => {
-      (draft.config.content as MediaWidgetContent).timerConfig = newTimerConfig;
-    });
-    onWidgetUpdate(nextWidget);
-  };
-  const onFormatChange = (ancestors, data) => {
-    onTimeChange([], { timeFormat: data }, false);
-  };
-  const onDurationChange = (ancestors, data) => {
-    onTimeChange([], { timeDuration: data }, false);
-  };
-  const setter = (
-    <div className="wrap-form">
-      <BasicInput
-        ancestors={[0, 0]}
-        data={formatData}
-        onChange={onFormatChange}
-      />
-      <BasicInputNumber
-        ancestors={[0, 0]}
-        data={durationData}
-        onChange={onDurationChange}
-      />
-      <BasicFont
-        translate={t}
-        ancestors={[0, 0]}
-        data={fontData}
-        onChange={onFontChange}
-      />
-    </div>
+    moment().format(time?.format || TIME_FORMATTER),
   );
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentTime(moment().format(timerConfig?.time?.timeFormat));
-    }, timerConfig?.time?.timeDuration);
+      setCurrentTime(moment().format(time?.format || TIME_FORMATTER));
+    }, time?.duration);
     return () => {
       clearInterval(timer);
     };
-  }, [timerConfig]);
+  }, [time]);
 
   return (
-    <Wrapper {...timerConfig}>
-      {editing && setter}
+    <Wrapper {...font}>
       <div className="time-text">{currentTime}</div>
     </Wrapper>
   );
 });
 
-const Wrapper = styled.div<TimerConfig>`
+const Wrapper = styled.div<IFontDefault>`
   display: flex;
-  /* flex-direction: column; */
+  flex: 1;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   overflow-y: hidden;
   .time-text {
+    display: flex;
     flex: 1;
-    font-family: ${p => p.font?.fontFamily};
-    font-size: ${p => p.font?.fontSize}px;
-    font-style: ${p => p.font?.fontStyle};
-    font-weight: ${p => p.font?.fontWeight};
-    color: ${p => p.font?.color};
-  }
-  .wrap-form {
-    width: 340px;
-    padding: 4px;
-    margin-bottom: 4px;
-    overflow-y: auto;
-    background-color: ${p => p.theme.bodyBackground};
+    justify-content: center;
+
+    font-family: ${p => p?.fontFamily};
+    font-size: ${p => p?.fontSize}px;
+    font-style: ${p => p?.fontStyle};
+    font-weight: ${p => p?.fontWeight};
+    color: ${p => p?.color};
+    text-align: center;
   }
 `;

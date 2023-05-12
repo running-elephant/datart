@@ -1,4 +1,5 @@
 import { CloseOutlined } from '@ant-design/icons';
+import { Dropdown, Menu } from 'antd';
 import { EmptyFiller, TabPane, Tabs } from 'app/components';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import BoardEditor from 'app/pages/DashBoardPage/pages/BoardEditor';
@@ -25,7 +26,7 @@ import {
   selectTabs,
   selectVizs,
 } from '../slice/selectors';
-import { removeTab } from '../slice/thunks';
+import { closeAllTabs, closeOtherTabs, removeTab } from '../slice/thunks';
 import { ArchivedViz, Folder, Storyboard } from '../slice/types';
 import { VizContainer } from './VizContainer';
 
@@ -157,6 +158,56 @@ export function Main({ sliderVisible }: { sliderVisible: boolean }) {
     [dispatch, history, orgId, tabs],
   );
 
+  const handleClickMenu = (e: any, id: string) => {
+    e.domEvent.stopPropagation();
+    if (e.key === 'CLOSE_ALL') {
+      dispatch(
+        closeAllTabs({
+          resolve() {
+            history.push(`/organizations/${orgId}/vizs`);
+          },
+        }),
+      );
+      return;
+    }
+    dispatch(
+      closeOtherTabs({
+        id,
+        resolve: activeKey => {
+          const activeTab = tabs.find(v => v.id === activeKey);
+          if (activeTab) {
+            history.push(
+              `/organizations/${orgId}/vizs/${activeKey}${
+                activeTab.search || ''
+              }`,
+            );
+          } else {
+            history.push(`/organizations/${orgId}/vizs`);
+          }
+        },
+      }),
+    );
+  };
+
+  const menu = (id: string) => (
+    <Menu onClick={e => handleClickMenu(e, id)}>
+      <Menu.Item key="CLOSE_OTHER">
+        <span>{t('closeOther')}</span>
+      </Menu.Item>
+      <Menu.Item key="CLOSE_ALL">
+        <span>{t('closeAll')}</span>
+      </Menu.Item>
+    </Menu>
+  );
+
+  const Tab = (id: string, name: string) => (
+    <span>
+      <Dropdown overlay={menu(id)} trigger={['contextMenu']}>
+        <span className="ant-dropdown-link">{name}</span>
+      </Dropdown>
+    </span>
+  );
+
   return (
     <Wrapper className={sliderVisible ? 'close datart-viz' : 'datart-viz'}>
       <TabsWrapper>
@@ -171,7 +222,7 @@ export function Main({ sliderVisible }: { sliderVisible: boolean }) {
           {tabs.map(({ id, name }) => (
             <TabPane
               key={id}
-              tab={name}
+              tab={Tab(id, name)}
               closeIcon={
                 <CloseIconWrapper>
                   <CloseOutlined />

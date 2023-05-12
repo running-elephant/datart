@@ -49,7 +49,7 @@ import {
   SPACE_MD,
   WARNING,
 } from 'styles/StyleConstants';
-import { request } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle, getDiffParams } from 'utils/utils';
 import { selectOrgId } from '../../slice/selectors';
 import { useMemberSlice } from '../MemberPage/slice';
@@ -137,23 +137,17 @@ export function VariablePage() {
       setEditingVariable(variable);
       setSubjectFormVisible(true);
 
-      try {
-        setRowPermissionLoading(true);
-        const { data } = await request<RowPermissionRaw[]>(
-          `/variables/value?variableId=${id}`,
-        );
-        setRowPermissions(
-          data.map(d => ({
-            ...d,
-            value: d.value && JSON.parse(d.value),
-          })),
-        );
-      } catch (error) {
-        errorHandle(error);
-        throw error;
-      } finally {
-        setRowPermissionLoading(false);
-      }
+      setRowPermissionLoading(true);
+      const { data } = await request2<RowPermissionRaw[]>(
+        `/variables/value?variableId=${id}`,
+      );
+      setRowPermissions(
+        data.map(d => ({
+          ...d,
+          value: d.value && JSON.parse(d.value),
+        })),
+      );
+      setRowPermissionLoading(false);
     },
     [variables],
   );
@@ -193,7 +187,7 @@ export function VariablePage() {
       let defaultValue: any = values.defaultValue;
       if (values.valueType === VariableValueTypes.Date && !values.expression) {
         defaultValue = values.defaultValue.map(d =>
-          (d as Moment).format(TIME_FORMATTER),
+          (d as Moment).format(values.dateFormat),
         );
       }
 
@@ -232,14 +226,19 @@ export function VariablePage() {
 
   const saveRelations = useCallback(
     async (changedRowPermissions: RowPermission[]) => {
-      let changedRowPermissionsRaw = changedRowPermissions.map(cr => ({
-        ...cr,
-        value:
-          cr.value &&
-          (editingVariable?.valueType === VariableValueTypes.Date
-            ? cr.value.map(m => (m as Moment).format(TIME_FORMATTER))
-            : cr.value),
-      }));
+      let changedRowPermissionsRaw = changedRowPermissions.map(cr => {
+        const dateFormat =
+          variables.find(v => v.id === cr.variableId)?.dateFormat ||
+          TIME_FORMATTER;
+        return {
+          ...cr,
+          value:
+            cr.value &&
+            (editingVariable?.valueType === VariableValueTypes.Date
+              ? cr.value.map(m => (m as Moment).format(dateFormat))
+              : cr.value),
+        };
+      });
 
       if (rowPermissions) {
         const { created, updated, deleted } = getDiffParams(
@@ -252,37 +251,31 @@ export function VariablePage() {
         );
 
         if (created.length > 0 || updated.length > 0 || deleted.length > 0) {
-          try {
-            setUpdateRowPermissionLoading(true);
-            await request<null>({
-              url: '/variables/rel',
-              method: 'PUT',
-              data: {
-                relToCreate: created.map(r => ({
-                  ...r,
-                  value: JSON.stringify(r.value),
-                })),
-                relToUpdate: updated.map(r => ({
-                  ...r,
-                  value: JSON.stringify(r.value),
-                })),
-                relToDelete: deleted.map(({ id }) => id),
-              },
-            });
-            message.success(tg('operation.updateSuccess'));
-            setSubjectFormVisible(false);
-          } catch (error) {
-            errorHandle(error);
-            throw error;
-          } finally {
-            setUpdateRowPermissionLoading(false);
-          }
+          setUpdateRowPermissionLoading(true);
+          await request2<null>({
+            url: '/variables/rel',
+            method: 'PUT',
+            data: {
+              relToCreate: created.map(r => ({
+                ...r,
+                value: JSON.stringify(r.value),
+              })),
+              relToUpdate: updated.map(r => ({
+                ...r,
+                value: JSON.stringify(r.value),
+              })),
+              relToDelete: deleted.map(({ id }) => id),
+            },
+          });
+          message.success(tg('operation.updateSuccess'));
+          setUpdateRowPermissionLoading(false);
+          setSubjectFormVisible(false);
         } else {
           setSubjectFormVisible(false);
         }
       }
     },
-    [rowPermissions, editingVariable, tg],
+    [rowPermissions, editingVariable, tg, variables],
   );
 
   const columns: TableColumnProps<VariableViewModel>[] = useMemo(

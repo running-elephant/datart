@@ -16,13 +16,19 @@
  * limitations under the License.
  */
 
-import { ChartMouseEvent, ChartStatus, IChart } from 'app/types/Chart';
+import {
+  ChartMouseEvent,
+  ChartStatus,
+  IChart,
+  IChartLifecycle,
+} from 'app/types/Chart';
 import { ChartConfig, ChartDataConfig } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import ChartMetadata from 'app/types/ChartMetadata';
 import { isInRange } from 'app/utils/internalChartHelper';
 
-class Chart implements IChart {
+class Chart implements IChart, IChartLifecycle {
   private _state: ChartStatus = 'init';
   private _stateHistory: ChartStatus[] = [];
 
@@ -75,19 +81,19 @@ class Chart implements IChart {
     return this.dependency;
   }
 
-  public onMount(options, context?): void {
-    throw new Error(`${this.meta.name} - Method not implemented.`);
+  public onMount(options: BrokerOption, context: BrokerContext): void {
+    throw new Error(`${this.meta.name} - onMount Method Not Implemented.`);
   }
 
-  public onUpdated(options, context?): void {
-    throw new Error(`${this.meta.name} - Method not implemented.`);
+  public onUpdated(options: BrokerOption, context: BrokerContext): void {
+    throw new Error(`${this.meta.name} - onUpdated Method Not Implemented.`);
   }
 
-  public onUnMount(options, context?): void {
-    throw new Error(`${this.meta.name} - Method not implemented.`);
+  public onUnMount(options: BrokerOption, context: BrokerContext): void {
+    throw new Error(`${this.meta.name} - onUnMount Method Not Implemented.`);
   }
 
-  public onResize(options, context?): void {}
+  public onResize(options: BrokerOption, context: BrokerContext): void {}
 
   private isMatchRequiredSectionLimitation(
     current?: ChartDataConfig[],

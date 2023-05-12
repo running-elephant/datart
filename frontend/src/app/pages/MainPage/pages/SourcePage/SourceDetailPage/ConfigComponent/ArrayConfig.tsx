@@ -102,7 +102,7 @@ export function ArrayConfig({
                   ...model,
                   [column.name]: {
                     ...column,
-                    category: ColumnCategories.Uncategorized, // FIXEME
+                    category: ColumnCategories.UnCategorized, // FIXEME
                   },
                 }),
                 {},
@@ -141,9 +141,7 @@ export function ArrayConfig({
     (formValues: SourceFormModel) => {
       const configRowKey = attr.key;
       if (value && configRowKey) {
-        const index = value.findIndex(
-          o => o[configRowKey] === formValues.config[configRowKey],
-        );
+        const index = value.findIndex(o => o[configRowKey] === editingRowKey);
         if (index >= 0) {
           onChange &&
             onChange([
@@ -159,7 +157,7 @@ export function ArrayConfig({
       }
       setFormVisible(false);
     },
-    [attr, value, onChange],
+    [attr.key, value, editingRowKey, onChange],
   );
 
   const editConfig = useCallback(
@@ -266,6 +264,7 @@ export function ArrayConfig({
             disabled={disabled}
             allowManage={allowManage}
             onTest={test}
+            dataTables={value}
           />
         ))}
       </ModalForm>

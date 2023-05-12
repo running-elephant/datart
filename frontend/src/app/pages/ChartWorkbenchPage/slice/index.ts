@@ -20,22 +20,26 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { migrateChartConfig } from 'app/migration';
 import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailConfig';
 import ChartManager from 'app/models/ChartManager';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataView from 'app/types/ChartDataView';
 import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { mergeToChartConfig } from 'app/utils/ChartDtoHelper';
+import {
+  createDateLevelComputedFieldForConfigComputedFields,
+  mergeChartAndViewComputedField,
+} from 'app/utils/chartHelper';
 import { transformHierarchyMeta } from 'app/utils/internalChartHelper';
 import { updateCollectionByAction } from 'app/utils/mutation';
 import { useInjectReducer } from 'utils/@reduxjs/injectReducer';
 import { ChartConfigReducerActionType } from './constant';
 import {
-  fetchAvailableSourceFunctions,
+  fetchAvailableSourceFunctionsForChart,
   fetchChartAction,
   fetchDataSetAction,
   fetchDataViewsAction,
   fetchViewDetailAction,
 } from './thunks';
-import { ChartConfigPayloadType, WorkbenchState } from './type';
+import { ChartConfigPayloadType, WorkbenchState } from './types';
 
 export const initState: WorkbenchState = {
   lang: 'zh',
@@ -45,6 +49,7 @@ export const initState: WorkbenchState = {
   aggregation: true,
   datasetLoading: false,
   chartEditorDownloadPolling: false,
+  selectedItems: [],
 };
 
 // Reducers
@@ -108,6 +113,14 @@ const workbenchSlice = createSlice({
                 value: action.payload.value,
               }),
             };
+          case ChartConfigReducerActionType.INTERACTION:
+            return {
+              ...state,
+              interactions: updateCollectionByAction(state.interactions || [], {
+                ancestors: action.payload.ancestors!,
+                value: action.payload.value,
+              }),
+            };
           case ChartConfigReducerActionType.I18N:
             return {
               ...state,
@@ -144,6 +157,12 @@ const workbenchSlice = createSlice({
     setChartEditorDownloadPolling(state, { payload }: PayloadAction<boolean>) {
       state.chartEditorDownloadPolling = payload;
     },
+    changeSelectedItems(
+      state,
+      { payload }: PayloadAction<Array<SelectedItem>>,
+    ) {
+      state.selectedItems = payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -154,22 +173,36 @@ const workbenchSlice = createSlice({
         const index = state.dataviews?.findIndex(
           view => view.id === payload.id,
         );
+        const meta = transformHierarchyMeta(payload.model);
         let computedFields: ChartDataViewMeta[] = [];
         if (payload.id === state?.backendChart?.view?.id) {
           computedFields = state?.backendChart?.config?.computedFields || [];
+        }
+        computedFields = createDateLevelComputedFieldForConfigComputedFields(
+          meta,
+          computedFields,
+        );
+        if (payload.model) {
+          const model = JSON.parse(payload.model || '{}');
+          const viewComputerFields = model.computedFields || [];
+          computedFields = mergeChartAndViewComputedField(
+            computedFields,
+            viewComputerFields,
+          );
         }
 
         if (index !== undefined) {
           state.currentDataView = {
             ...payload,
             config: migrateViewConfig(payload.config),
-            meta: transformHierarchyMeta(payload.model),
+            meta,
             computedFields,
           };
         }
         state.dataset = initState.dataset;
       })
       .addCase(fetchDataSetAction.fulfilled, (state, { payload }) => {
+        state.selectedItems = [];
         state.dataset = payload as any;
         state.datasetLoading = false;
       })
@@ -192,7 +225,8 @@ const workbenchSlice = createSlice({
         }
         state.currentDataView = {
           ...payload.view,
-          computedFields: chartConfigDTO?.computedFields || [],
+          variables: payload.queryVariables || [],
+          computedFields: chartConfigDTO?.computedFields,
         };
         state.backendChart = payload;
         state.aggregation =
@@ -201,7 +235,7 @@ const workbenchSlice = createSlice({
             : chartConfigDTO.aggregation;
       })
       .addCase(
-        fetchAvailableSourceFunctions.fulfilled,
+        fetchAvailableSourceFunctionsForChart.fulfilled,
         (state, { payload }) => {
           state.availableSourceFunctions = payload;
         },

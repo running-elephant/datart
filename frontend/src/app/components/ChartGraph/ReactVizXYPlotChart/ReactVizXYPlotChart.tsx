@@ -17,6 +17,7 @@
  */
 
 import ReactChart from 'app/models/ReactChart';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import Config from './config';
 import ReactXYPlot from './ReactVizXYPlot';
 
@@ -36,12 +37,12 @@ class ReactVizXYPlotChart extends ReactChart {
     });
   }
 
-  onMount(options, context): void {
-    if (!context.window.reactVis) {
+  onMount(options: BrokerOption, context: BrokerContext) {
+    if (!context.window['reactVis']) {
       return;
     }
     const { XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries } =
-      context.window.reactVis;
+      context.window['reactVis'];
     this.adapter.init(ReactXYPlot);
     this.adapter.registerImportDependencies({
       XYPlot,
@@ -53,7 +54,7 @@ class ReactVizXYPlotChart extends ReactChart {
     this.adapter.mounted(context.document.getElementById(options.containerId));
   }
 
-  onUpdated(props): void {
+  onUpdated(options: BrokerOption, context: BrokerContext): void {
     // this.adapter.updated(props);
   }
 }

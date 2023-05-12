@@ -17,10 +17,12 @@
  */
 import { Button, FormInstance, Space } from 'antd';
 import { DragSortEditTable } from 'app/components/DragSortEditTable';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { RelationFilterValue } from 'app/types/ChartConfig';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ControllerConfig } from '../../../types';
+
 export interface CustomOptionsProps {
   form: FormInstance<{ config: ControllerConfig }> | undefined;
   fieldRowData: RelationFilterValue[];
@@ -29,12 +31,13 @@ export interface CustomOptionsProps {
 export const CustomOptions: React.FC<CustomOptionsProps> = memo(
   ({ fieldRowData, form, getControllerConfig }) => {
     const [rows, setRows] = useState<RelationFilterValue[]>([]);
-
+    const t = useI18NPrefix(`viz.control`);
     const onChangeFilterOptions = useCallback(
       (rows: RelationFilterValue[]) => {
         setRows(rows);
         const config = getControllerConfig();
         const valueOptions = [...rows.slice()];
+
         form?.setFieldsValue({
           config: {
             ...config,
@@ -54,7 +57,12 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
       (row: RelationFilterValue) => {
         const newRows = [...rows];
         const targetIndex = newRows.findIndex(r => r.index === row.index);
-        newRows.splice(targetIndex, 1, row);
+
+        if (row.childIndex !== undefined) {
+          newRows[targetIndex]?.children?.splice(row.childIndex, 1, row);
+        } else {
+          newRows.splice(targetIndex, 1, row);
+        }
         onChangeFilterOptions(newRows);
       },
       [onChangeFilterOptions, rows],
@@ -82,7 +90,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
     };
     const columns = [
       {
-        title: '备选项值',
+        title: t('value'),
         dataIndex: 'key',
         width: '30%',
         sorter: (rowA, rowB) => {
@@ -91,7 +99,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
         editable: true,
       },
       {
-        title: '备选项标签',
+        title: t('label'),
         dataIndex: 'label',
         width: '40%',
         sorter: (rowA, rowB) => {
@@ -100,7 +108,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
         editable: true,
       },
       {
-        title: '操作',
+        title: t('action'),
         dataIndex: 'action',
         width: '30%',
         render: (_, record: RelationFilterValue) => (
@@ -115,11 +123,11 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
                 });
               }}
             >
-              {record.isSelected ? '取消默认值' : '设为默认值'}
+              {record.isSelected ? t('unsetDefault') : t('setDefault')}
             </a>
 
             <a href="#!" onClick={() => handleDelete(record.key)}>
-              删除
+              {t('delete')}
             </a>
           </Space>
         ),
@@ -130,6 +138,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
       if (!col.editable) {
         return col;
       }
+
       return {
         ...col,
         onCell: (record: RelationFilterValue) => ({
@@ -155,7 +164,7 @@ export const CustomOptions: React.FC<CustomOptionsProps> = memo(
       <Wrapper>
         <div>
           <Space>
-            <Button onClick={addRowByField}>从字段填充备选项</Button>
+            <Button onClick={addRowByField}>{t('populate')}</Button>
             <Button onClick={handleAdd} type="primary">
               +
             </Button>

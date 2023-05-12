@@ -15,7 +15,7 @@ public interface ViewMapperExt extends ViewMapper {
 
 
     @Select({
-            "SELECT id,`name`,org_id,`index`,is_folder,parent_id,source_id,description FROM view WHERE org_id=#{orgId} AND `status`=1 ORDER BY create_time ASC "
+            "SELECT id,`name`,org_id,`index`,`type`, is_folder,parent_id,source_id,description FROM view WHERE org_id=#{orgId} AND `status`=1 ORDER BY create_time ASC "
     })
     List<View> listByOrgId(String orgId);
 
@@ -49,5 +49,18 @@ public interface ViewMapperExt extends ViewMapper {
             "SELECT COUNT(*) FROM `view` WHERE parent_id = #{viewId} AND `status`!=0"
     })
     int checkReference(String viewId);
+
+    @Select({
+            "<script>",
+            "SELECT * FROM  `view`  WHERE org_id=#{orgId} AND `name` = #{name}",
+            "<if test=\"parentId==null\">",
+            " AND parent_id IS NULL ",
+            "</if>",
+            "<if test=\"parentId!=null\">",
+            " AND parent_id=#{parentId} ",
+            "</if>",
+            "</script>",
+    })
+    List<View> checkName(String orgId, String parentId, String name);
 
 }

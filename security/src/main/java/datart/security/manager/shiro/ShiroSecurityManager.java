@@ -24,6 +24,7 @@ import datart.core.base.exception.Exceptions;
 import datart.core.common.MessageResolver;
 import datart.core.entity.User;
 import datart.core.mappers.ext.UserMapperExt;
+import datart.security.base.JwtToken;
 import datart.security.base.PasswordToken;
 import datart.security.base.Permission;
 import datart.security.base.RoleType;
@@ -34,10 +35,12 @@ import datart.security.manager.PermissionDataCache;
 import datart.security.util.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.BearerToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
@@ -82,7 +85,7 @@ public class ShiroSecurityManager implements DatartSecurityManager {
         try {
             subject.login(usernamePasswordToken);
         } catch (Exception e) {
-            log.error("Login error ({} {})", token.getSubject(), token.getPassword());
+            log.error("Login error ({})", token.getSubject());
             Exceptions.msg("login.fail");
         }
     }
@@ -97,22 +100,33 @@ public class ShiroSecurityManager implements DatartSecurityManager {
     }
 
     @Override
-    public String login(String jwtToken) throws AuthException {
+    public String login(String tokenString) throws AuthException {
         logoutCurrent();
-        PasswordToken passwordToken = JwtUtils.toPasswordToken(jwtToken);
-        if (!JwtUtils.validTimeout(passwordToken)) {
+        JwtToken jwtToken = JwtUtils.toJwtToken(tokenString);
+        if (!JwtUtils.validTimeout(jwtToken)) {
             Exceptions.tr(AuthException.class, "login.session.timeout");
         }
-        User user = userMapper.selectByNameOrEmail(passwordToken.getSubject());
+        User user = userMapper.selectByNameOrEmail(jwtToken.getSubject());
         if (user == null) {
             Exceptions.tr(AuthException.class, "login.session.timeout");
         }
         if (!user.getActive()) {
             Exceptions.tr(BaseException.class, "message.user.not.active");
         }
-        passwordToken = new PasswordToken(user.getUsername(), user.getPassword(), System.currentTimeMillis());
-        login(passwordToken);
-        return JwtUtils.toJwtString(passwordToken);
+
+        if (jwtToken.getPwdHash() != user.getPassword().hashCode()) {
+            Exceptions.tr(AuthException.class, "login.fail.pwd.hash");
+        }
+
+        BearerToken bearerToken = new BearerToken(tokenString);
+        try {
+            Subject subject = SecurityUtils.getSubject();
+            subject.login(bearerToken);
+        } catch (Exception e) {
+            log.error("Login error ({})", user.getUsername());
+            Exceptions.msg("login.fail");
+        }
+        return JwtUtils.toJwtString(JwtUtils.createJwtToken(user));
     }
 
     @Override
@@ -253,8 +267,9 @@ public class ShiroSecurityManager implements DatartSecurityManager {
 
     @Override
     public void runAs(String userNameOrEmail) {
+        ThreadContext.unbindSubject();
         User user = userMapper.selectByNameOrEmail(userNameOrEmail);
-        login(new PasswordToken(user.getUsername(), user.getPassword(), System.currentTimeMillis()));
+        login(JwtUtils.toJwtString(JwtUtils.createJwtToken(user)));
     }
 
     @Override

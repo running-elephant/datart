@@ -32,6 +32,9 @@ import datart.data.provider.jdbc.JdbcDriverInfo;
 import datart.data.provider.jdbc.JdbcProperties;
 import datart.data.provider.jdbc.SqlScriptRender;
 import datart.data.provider.local.LocalDB;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +49,9 @@ import javax.sql.DataSource;
 import java.io.Closeable;
 import java.lang.reflect.Constructor;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Setter
@@ -105,30 +110,48 @@ public class JdbcDataProviderAdapter implements Closeable {
     }
 
     public Set<String> readAllDatabases() throws SQLException {
-
-        Set<String> catalogs = new HashSet<>();
-
+        Set<String> databases = new HashSet<>();
         try (Connection conn = getConn()) {
-            String catalog = conn.getCatalog();
-            if (StringUtils.isNotBlank(catalog)) {
-                return Collections.singleton(catalog);
+            DatabaseMetaData metaData = conn.getMetaData();
+            boolean isCatalog = isReadFromCatalog(conn);
+            ResultSet rs = null;
+            if (isCatalog) {
+                rs = metaData.getCatalogs();
+            } else {
+                rs = metaData.getSchemas();
+                log.info("Database 'catalogs' is empty, get databases with 'schemas'");
             }
-            DatabaseMetaData metadata = conn.getMetaData();
-            try (ResultSet rs = metadata.getCatalogs()) {
-                while (rs.next()) {
-                    String catalogName = rs.getString(1);
-                    catalogs.add(catalogName);
-                }
+
+            String currDatabase = readCurrDatabase(conn, isCatalog);
+            if (StringUtils.isNotBlank(currDatabase)) {
+                return Collections.singleton(currDatabase);
             }
-            return catalogs;
+
+            while (rs.next()) {
+                String database = rs.getString(1);
+                databases.add(database);
+            }
+            return databases;
         }
+    }
+
+    protected String readCurrDatabase(Connection conn, boolean isCatalog) throws SQLException {
+        return isCatalog ? conn.getCatalog() : conn.getSchema();
     }
 
     public Set<String> readAllTables(String database) throws SQLException {
         try (Connection conn = getConn()) {
             Set<String> tables = new HashSet<>();
             DatabaseMetaData metadata = conn.getMetaData();
-            try (ResultSet rs = metadata.getTables(database, conn.getSchema(), "%", new String[]{"TABLE", "VIEW"})) {
+            String catalog = null;
+            String schema = null;
+            if (isReadFromCatalog(conn)) {
+                catalog = database;
+                schema = conn.getSchema();
+            } else {
+                schema = database;
+            }
+            try (ResultSet rs = metadata.getTables(catalog, schema, "%", new String[]{"TABLE", "VIEW"})) {
                 while (rs.next()) {
                     String tableName = rs.getString(3);
                     tables.add(tableName);
@@ -136,6 +159,10 @@ public class JdbcDataProviderAdapter implements Closeable {
             }
             return tables;
         }
+    }
+
+    protected boolean isReadFromCatalog(Connection conn) throws SQLException {
+        return conn.getMetaData().getCatalogs().next();
     }
 
     public Set<Column> readTableColumn(String database, String table) throws SQLException {
@@ -146,7 +173,7 @@ public class JdbcDataProviderAdapter implements Closeable {
             try (ResultSet columns = metadata.getColumns(database, null, table, null)) {
                 while (columns.next()) {
                     Column column = readTableColumn(columns);
-                    column.setForeignKeys(importedKeys.get(column.getName()));
+                    column.setForeignKeys(importedKeys.get(column.columnKey()));
                     columnSet.add(column);
                 }
             }
@@ -155,14 +182,14 @@ public class JdbcDataProviderAdapter implements Closeable {
     }
 
     public String getQueryKey(QueryScript script, ExecuteParam executeParam) throws SqlParseException {
-        SqlScriptRender render = new SqlScriptRender(script, executeParam, getSqlDialect());
-        return "Q" + DigestUtils.md5Hex(render.render(true, true, true));
+        SqlScriptRender render = new SqlScriptRender(script, executeParam, getSqlDialect(), jdbcProperties.isEnableSpecialSql(), driverInfo.getQuoteIdentifiers());
+        return "Q" + DigestUtils.md5Hex(render.render(true, supportPaging(), true));
     }
 
     protected Column readTableColumn(ResultSet columnMetadata) throws SQLException {
         Column column = new Column();
         column.setName(columnMetadata.getString(4));
-        column.setType(DataTypeUtils.sqlType2DataType(columnMetadata.getString(6)));
+        column.setType(DataTypeUtils.jdbcType2DataType(columnMetadata.getInt(5)));
         return column;
     }
 
@@ -179,6 +206,8 @@ public class JdbcDataProviderAdapter implements Closeable {
                 foreignKey.setColumn(importedKeys.getString(PKCOLUMN_NAME));
                 keyMap.computeIfAbsent(importedKeys.getString(FKCOLUMN_NAME), key -> new ArrayList<>()).add(foreignKey);
             }
+        } catch (SQLFeatureNotSupportedException e) {
+            log.warn(e.getMessage());
         }
         return keyMap;
     }
@@ -257,10 +286,11 @@ public class JdbcDataProviderAdapter implements Closeable {
     }
 
     public boolean supportPaging() {
-        return sqlDialect instanceof FetchAndOffsetSupport;
+        return driverInfo.supportSqlLimit() || (sqlDialect instanceof FetchAndOffsetSupport);
     }
 
     public SqlDialect getSqlDialect() {
+
         if (sqlDialect != null) {
             return sqlDialect;
         }
@@ -280,7 +310,7 @@ public class JdbcDataProviderAdapter implements Closeable {
         }
         if (sqlDialect == null) {
             try {
-                sqlDialect = SqlDialect.DatabaseProduct.valueOf(driverInfo.getDbType().toUpperCase()).getDialect();
+                sqlDialect = getDefaultSqlDialect(driverInfo);
             } catch (Exception ignored) {
                 log.warn("DBType " + driverInfo.getDbType() + " mismatched, use custom sql dialect");
                 sqlDialect = new CustomSqlDialect(driverInfo);
@@ -297,11 +327,11 @@ public class JdbcDataProviderAdapter implements Closeable {
             if (StringUtils.isNotBlank(driverInfo.getIdentifierQuote())) {
                 fieldValues.put("identifierQuoteString", driverInfo.getIdentifierQuote());
                 fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierQuote());
-                fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierQuote()+driverInfo.getIdentifierQuote());
+                fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierQuote() + driverInfo.getIdentifierQuote());
             }
             if (StringUtils.isNotBlank(driverInfo.getIdentifierEndQuote())) {
                 fieldValues.put("identifierEndQuoteString", driverInfo.getIdentifierEndQuote());
-                fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierEndQuote()+driverInfo.getIdentifierEndQuote());
+                fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierEndQuote() + driverInfo.getIdentifierEndQuote());
             }
             if (StringUtils.isNotBlank(driverInfo.getIdentifierEscapedQuote())) {
                 fieldValues.put("identifierEscapedQuote", driverInfo.getIdentifierEscapedQuote());
@@ -317,6 +347,23 @@ public class JdbcDataProviderAdapter implements Closeable {
         } catch (Exception e) {
             log.warn("sql dialect config error for " + driverInfo.getSqlDialect());
         }
+    }
+
+    protected SqlDialect getDefaultSqlDialect(JdbcDriverInfo driverInfo) throws Exception {
+        sqlDialect = SqlDialect.DatabaseProduct.valueOf(driverInfo.getDbType().toUpperCase()).getDialect();
+        Class<? extends SqlDialect> dialectClass = sqlDialect.getClass();
+        ClassPool classPool = ClassPool.getDefault();
+        CtClass superClass = classPool.get(dialectClass.getName());
+        CtClass ctClass = classPool.makeClass(dialectClass.getName().toLowerCase(Locale.ROOT) + ".Proxy", superClass);
+        if (driverInfo.supportSqlLimit()) {
+            ctClass.addMethod(CtMethod.make("    public void unparseOffsetFetch(org.apache.calcite.sql.SqlWriter writer, org.apache.calcite.sql.SqlNode offset, org.apache.calcite.sql.SqlNode fetch) {\n" +
+                    "        unparseFetchUsingLimit(writer, offset, fetch);\n" +
+                    "    }", ctClass));
+        }
+        Class<?> aClass = ctClass.toClass();
+        Constructor<?> constructor = aClass.getConstructor(SqlDialect.Context.class);
+        SqlDialect.Context context = ReflectUtils.getFieldValue(dialectClass, "DEFAULT_CONTEXT");
+        return (SqlDialect) constructor.newInstance(context);
     }
 
     protected Dataframe parseResultSet(ResultSet rs) throws SQLException {
@@ -347,10 +394,10 @@ public class JdbcDataProviderAdapter implements Closeable {
     protected List<Column> getColumns(ResultSet rs) throws SQLException {
         ArrayList<Column> columns = new ArrayList<>();
         for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-            String columnTypeName = rs.getMetaData().getColumnTypeName(i);
+            int columnType = rs.getMetaData().getColumnType(i);
             String columnName = rs.getMetaData().getColumnLabel(i);
-            ValueType valueType = DataTypeUtils.sqlType2DataType(columnTypeName);
-            columns.add(new Column(columnName, valueType));
+            ValueType valueType = DataTypeUtils.jdbcType2DataType(columnType);
+            columns.add(Column.of(valueType, columnName));
         }
         return columns;
     }
@@ -359,18 +406,40 @@ public class JdbcDataProviderAdapter implements Closeable {
      * 本地执行，从数据源拉取全量数据，在本地执行聚合操作
      */
     public Dataframe executeInLocal(QueryScript script, ExecuteParam executeParam) throws Exception {
+
+        List<SelectColumn> selectColumns = null;
+        // 构建执行参数，查询源表全量数据
+        if (!CollectionUtils.isEmpty(script.getSchema())) {
+            selectColumns = script.getSchema().values().parallelStream().map(column -> {
+                SelectColumn selectColumn = new SelectColumn();
+                selectColumn.setColumn(column.getName());
+                selectColumn.setAlias(column.columnKey());
+                return selectColumn;
+            }).collect(Collectors.toList());
+        }
+        ExecuteParam tempExecuteParam = ExecuteParam.builder()
+                .columns(selectColumns)
+                .concurrencyOptimize(true)
+                .cacheEnable(executeParam.isCacheEnable())
+                .cacheExpires(executeParam.getCacheExpires())
+                .concurrencyOptimize(executeParam.isConcurrencyOptimize())
+                .build();
+
         SqlScriptRender render = new SqlScriptRender(script
-                , executeParam
-                , getSqlDialect());
-        String sql = render.render(false, false, false);
+                , tempExecuteParam
+                , getSqlDialect()
+                , jdbcProperties.isEnableSpecialSql()
+                , driverInfo.getQuoteIdentifiers());
+        String sql = render.render(true, false, false);
         Dataframe data = execute(sql);
+
         if (!CollectionUtils.isEmpty(script.getSchema())) {
             for (Column column : data.getColumns()) {
-                column.setType(script.getSchema().getOrDefault(column.getName(), column).getType());
+                column.setType(script.getSchema().getOrDefault(column.columnKey(), column).getType());
             }
         }
         data.setName(script.toQueryKey());
-        return LocalDB.executeLocalQuery(null, executeParam, Dataframes.of(script.getSourceId(), data));
+        return LocalDB.executeLocalQuery(script, executeParam, data.splitByTable(script.getSchema()));
     }
 
     /**
@@ -384,7 +453,8 @@ public class JdbcDataProviderAdapter implements Closeable {
         SqlScriptRender render = new SqlScriptRender(script
                 , executeParam
                 , getSqlDialect()
-                , jdbcProperties.isEnableSpecialSql());
+                , jdbcProperties.isEnableSpecialSql()
+                , driverInfo.getQuoteIdentifiers());
 
         if (supportPaging()) {
             sql = render.render(true, true, false);
@@ -408,9 +478,10 @@ public class JdbcDataProviderAdapter implements Closeable {
     protected Object getObjFromResultSet(ResultSet rs, int columnIndex) throws SQLException {
         Object obj = rs.getObject(columnIndex);
         if (obj instanceof Boolean) {
-            obj = rs.getInt(columnIndex);
+            obj = rs.getObject(columnIndex).toString();
+        } else if (obj instanceof LocalDateTime) {
+            obj = rs.getTimestamp(columnIndex);
         }
         return obj;
     }
-
 }

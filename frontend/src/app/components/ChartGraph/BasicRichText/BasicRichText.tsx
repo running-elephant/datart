@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-import { ChartDataSectionType } from 'app/constants';
+import { ChartDataSectionType, ChartInteractionEvent } from 'app/constants';
 import ReactChart from 'app/models/ReactChart';
 import { ChartConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import ChartDataSetDTO, { IChartDataSet } from 'app/types/ChartDataSet';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
 import {
   getColumnRenderName,
   getStyles,
@@ -55,7 +56,7 @@ class BasicRichText extends ReactChart {
     ];
   }
 
-  onMount(options, context): void {
+  onMount(options: BrokerOption, context: BrokerContext) {
     if (options.containerId === undefined || !context.document) {
       return;
     }
@@ -67,7 +68,7 @@ class BasicRichText extends ReactChart {
     );
   }
 
-  onUpdated(options, context): void {
+  onUpdated(options: BrokerOption, context: BrokerContext) {
     this.richTextOptions = Object.assign(this.richTextOptions, options);
     if (!this.isMatchRequirement(options.config)) {
       this.adapter?.unmount();
@@ -80,7 +81,7 @@ class BasicRichText extends ReactChart {
     );
   }
 
-  onResize(opt: any, context): void {
+  onResize(options: BrokerOption, context: BrokerContext) {
     this.onUpdated(this.richTextOptions, context);
   }
 
@@ -92,10 +93,10 @@ class BasicRichText extends ReactChart {
     const dataConfigs = config.datas || [];
     const stylesConfigs = config.styles || [];
     const groupConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.GROUP)
+      .filter(c => c.type === ChartDataSectionType.Group)
       .flatMap(config => config.rows || []);
     const aggregateConfigs = dataConfigs
-      .filter(c => c.type === ChartDataSectionType.AGGREGATE)
+      .filter(c => c.type === ChartDataSectionType.Aggregate)
       .flatMap(config => config.rows || []);
     const chartDataSet = transformToDataSet(
       dataset.rows,
@@ -146,7 +147,9 @@ class BasicRichText extends ReactChart {
         Object.assign(acc, {
           onChange: delta =>
             cur.callback?.({
-              seriesName: 'richText',
+              type: 'change',
+              chartType: 'rich-text',
+              interactionType: ChartInteractionEvent.ChangeContext,
               value: delta,
             }),
         });

@@ -3,7 +3,7 @@ import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { FC, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { BORDER_RADIUS, SPACE_MD } from 'styles/StyleConstants';
+import { BORDER_RADIUS } from 'styles/StyleConstants';
 import { LogStatus, LOG_STATUS_TEXT } from '../../constants';
 import { useScheduleSlice } from '../../slice';
 import {
@@ -21,9 +21,7 @@ export const ScheduleErrorLog: FC<ScheduleErrorLogProps> = ({ scheduleId }) => {
   const logs = useSelector(selectScheduleLogs),
     loading = useSelector(selectScheduleLogsLoading);
   const { actions } = useScheduleSlice();
-  const t = useI18NPrefix(
-    'main.pages.schedulePage.sidebar.editorPage.scheduleErrorLog.index',
-  );
+  const t = useI18NPrefix('schedule.editor.scheduleErrorLog.index');
   useEffect(() => {
     if (scheduleId) {
       dispatch(getScheduleErrorLogs({ scheduleId, count: 100 }));
@@ -55,7 +53,8 @@ export const ScheduleErrorLog: FC<ScheduleErrorLogProps> = ({ scheduleId }) => {
         },
       },
     ];
-  }, []);
+  }, [t]);
+
   if (logs?.length > 0) {
     return (
       <FormCard title={t('log')}>

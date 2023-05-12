@@ -18,13 +18,14 @@
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import sqlReservedWords from 'app/assets/javascripts/sqlReservedWords';
+import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
 import { migrateViewConfig } from 'app/migration/ViewConfig/migrationViewDetailConfig';
 import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import { selectOrgId } from 'app/pages/MainPage/slice/selectors';
 import i18n from 'i18next';
 import { monaco } from 'react-monaco-editor';
 import { RootState } from 'types';
-import { request, request2 } from 'utils/request';
+import { request2 } from 'utils/request';
 import { errorHandle, getErrorMessage, rejectHandle } from 'utils/utils';
 import { viewActions } from '.';
 import { View } from '../../../../../types/View';
@@ -32,13 +33,16 @@ import { selectVariables } from '../../VariablePage/slice/selectors';
 import { Variable } from '../../VariablePage/slice/types';
 import { ViewViewModelStages } from '../constants';
 import {
+  buildRequestColumns,
   generateEditingView,
   generateNewEditingViewName,
   getSaveParamsFromViewModel,
+  handleObjectScriptToString,
   isNewView,
   transformModelToViewModel,
 } from '../utils';
 import {
+  selectAllSourceDatabaseSchemas,
   selectCurrentEditingView,
   selectCurrentEditingViewAttr,
   selectCurrentEditingViewKey,
@@ -51,6 +55,7 @@ import {
   QueryResult,
   SaveFolderParams,
   SaveViewParams,
+  StructViewQueryProps,
   UnarchiveViewParams,
   UpdateViewBaseParams,
   VariableHierarchy,
@@ -62,38 +67,28 @@ import {
 export const getViews = createAsyncThunk<ViewSimple[], string>(
   'view/getViews',
   async orgId => {
-    try {
-      const { data } = await request<ViewSimple[]>(`/views?orgId=${orgId}`);
-      return data;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    const { data } = await request2<ViewSimple[]>(`/views?orgId=${orgId}`);
+    return data;
   },
 );
 
 export const getArchivedViews = createAsyncThunk<ViewSimple[], string>(
   'view/getArchivedViews',
   async orgId => {
-    try {
-      const { data } = await request<ViewSimple[]>(
-        `/views/archived?orgId=${orgId}`,
-      );
-      return data;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    const { data } = await request2<ViewSimple[]>(
+      `/views/archived?orgId=${orgId}`,
+    );
+    return data;
   },
 );
 
 export const getViewDetail = createAsyncThunk<
   ViewViewModel,
-  string,
+  { viewId: string },
   { state: RootState }
 >(
   'view/getViewDetail',
-  async (viewId, { dispatch, getState, rejectWithValue }) => {
+  async ({ viewId }, { dispatch, getState, rejectWithValue }) => {
     const views = selectViews(getState());
     const editingViews = selectEditingViews(getState());
     const selected = editingViews.find(v => v.id === viewId);
@@ -121,14 +116,15 @@ export const getViewDetail = createAsyncThunk<
 
     dispatch(viewActions.addEditingView(tempViewModel));
 
-    try {
-      const { data } = await request<View>(`/views/${viewId}`);
-      data.config = migrateViewConfig(data.config);
-      data.model = beginViewModelMigration(data?.model);
-      return transformModelToViewModel(data, tempViewModel);
-    } catch (error) {
-      return rejectHandle(error, rejectWithValue);
-    }
+    let { data } = await request2<View>(`/views/${viewId}`, undefined, {
+      onRejected: error => {
+        return rejectHandle(error, rejectWithValue);
+      },
+    });
+    data = migrationViewConfig(data);
+    data.config = migrateViewConfig(data.config);
+    data.model = beginViewModelMigration(data?.model, data.type);
+    return transformModelToViewModel(data, null, tempViewModel);
   },
 );
 
@@ -154,30 +150,74 @@ export const getSchemaBySourceId = createAsyncThunk<any, string>(
 
 export const runSql = createAsyncThunk<
   QueryResult | null,
-  { id: string; isFragment: boolean },
+  { id: string; isFragment: boolean; script?: StructViewQueryProps },
   { state: RootState }
->('view/runSql', async (_, { getState, dispatch }) => {
+>('view/runSql', async ({ script: scriptProps }, { getState, dispatch }) => {
   const currentEditingView = selectCurrentEditingView(
     getState(),
   ) as ViewViewModel;
-  const { script, sourceId, size, fragment, variables } = currentEditingView;
+  const allDatabaseSchemas = selectAllSourceDatabaseSchemas(getState());
 
-  try {
-    if (!sourceId) {
-      throw Error(i18n.t('view.selectSource'));
+  const { sourceId, size, fragment, variables, type } = currentEditingView;
+  let sql = '';
+  let structure: StructViewQueryProps | null = null;
+  let script = '';
+
+  if (scriptProps) {
+    structure = scriptProps;
+  } else {
+    if (type === 'SQL') {
+      sql = currentEditingView.script as string;
+    } else {
+      structure = currentEditingView.script as StructViewQueryProps;
     }
+  }
 
-    if (!script.trim()) {
-      throw Error(i18n.t('view.sqlRequired'));
-    }
+  if (!sourceId) {
+    dispatch(
+      viewActions.changeCurrentEditingView({
+        stage: ViewViewModelStages.Initialized,
+        error: getErrorMessage(Error(i18n.t('view.selectSource'))),
+      }),
+    );
+    return {} as any;
+  }
 
-    const { data, warnings } = await request2<QueryResult>({
+  if (type === 'SQL' && !(sql as string).trim()) {
+    dispatch(
+      viewActions.changeCurrentEditingView({
+        stage: ViewViewModelStages.Initialized,
+        error: getErrorMessage(Error(i18n.t('view.sqlRequired'))),
+      }),
+    );
+    return {} as any;
+  }
+
+  if (type === 'SQL') {
+    script = fragment || sql;
+  } else {
+    script = handleObjectScriptToString(
+      structure!,
+      allDatabaseSchemas[currentEditingView.sourceId!],
+    );
+  }
+
+  let reqColumns = '';
+
+  if (type === 'STRUCT') {
+    reqColumns = buildRequestColumns(structure!);
+  }
+
+  const response = await request2<QueryResult>(
+    {
       url: '/data-provider/execute/test',
       method: 'POST',
       data: {
-        script: fragment || script,
+        script,
         sourceId,
         size,
+        scriptType: type,
+        columns: reqColumns,
         variables: variables.map(
           ({ name, type, valueType, defaultValue, expression }) => ({
             name,
@@ -188,17 +228,24 @@ export const runSql = createAsyncThunk<
           }),
         ),
       },
-    });
-    return { ...data, warnings };
-  } catch (error) {
-    dispatch(
-      viewActions.changeCurrentEditingView({
-        stage: ViewViewModelStages.Initialized,
-        error: getErrorMessage(error),
-      }),
-    );
-    return null;
-  }
+    },
+    undefined,
+    {
+      onRejected: error => {
+        dispatch(
+          viewActions.changeCurrentEditingView({
+            stage: ViewViewModelStages.Initialized,
+            error: getErrorMessage(error),
+          }),
+        );
+      },
+    },
+  );
+  return {
+    ...response?.data,
+    warnings: response?.warnings,
+    reqColumns: reqColumns,
+  };
 });
 
 export const saveView = createAsyncThunk<
@@ -210,39 +257,50 @@ export const saveView = createAsyncThunk<
     ? (currentView as ViewViewModel)
     : (selectCurrentEditingView(getState()) as ViewViewModel);
   const orgId = selectOrgId(getState());
+  const allDatabaseSchemas = selectAllSourceDatabaseSchemas(getState());
 
-  try {
-    if (isNewView(currentEditingView.id) || isSaveAs) {
-      const { data } = await request<View>({
-        url: '/views',
-        method: 'POST',
-        data: getSaveParamsFromViewModel(orgId, currentEditingView),
-      });
-      resolve && resolve();
+  const transformResponse = (currentView, data, isSaveAs) => {
+    return {
+      ...currentView,
+      ...data,
+      config: currentView.config,
+      model: currentView.model,
+      variables: (data.variables || []).map(v => ({
+        ...v,
+        relVariableSubjects: data.relVariableSubjects,
+      })),
+      isSaveAs,
+    };
+  };
 
-      return {
-        ...currentEditingView,
-        ...data,
-        config: currentEditingView.config,
-        model: currentEditingView.model,
-        variables: data.variables.map(v => ({
-          ...v,
-          relVariableSubjects: data.relVariableSubjects,
-        })),
+  if (isNewView(currentEditingView.id) || isSaveAs) {
+    const { data } = await request2<View>({
+      url: '/views',
+      method: 'POST',
+      data: getSaveParamsFromViewModel(
+        orgId,
+        currentEditingView,
+        false,
+        allDatabaseSchemas[currentEditingView.sourceId!],
         isSaveAs,
-      };
-    } else {
-      await request<View>({
-        url: `/views/${currentEditingView.id}`,
-        method: 'PUT',
-        data: getSaveParamsFromViewModel(orgId, currentEditingView, true),
-      });
-      resolve && resolve();
-      return currentEditingView;
-    }
-  } catch (error) {
-    errorHandle(error);
-    throw error;
+      ),
+    });
+    resolve && resolve();
+    return transformResponse(currentEditingView, data, isSaveAs);
+  } else {
+    const { data } = await request2<View>({
+      url: `/views/${currentEditingView.id}`,
+      method: 'PUT',
+      data: getSaveParamsFromViewModel(
+        orgId,
+        currentEditingView,
+        true,
+        allDatabaseSchemas[currentEditingView.sourceId!],
+        isSaveAs,
+      ),
+    });
+    resolve && resolve();
+    return transformResponse(currentEditingView, data, isSaveAs);
   }
 });
 
@@ -252,45 +310,35 @@ export const saveFolder = createAsyncThunk<
   { state: RootState }
 >('view/saveFolder', async ({ folder, resolve }, { getState }) => {
   const orgId = selectOrgId(getState());
-  try {
-    if (!(folder as ViewSimple).id) {
-      const { data } = await request<View>({
-        url: '/views',
-        method: 'POST',
-        data: { orgId, isFolder: true, ...folder },
-      });
-      resolve && resolve();
-      return data;
-    } else {
-      await request<View>({
-        url: `/views/${(folder as ViewSimple).id}`,
-        method: 'PUT',
-        data: folder,
-      });
-      resolve && resolve();
-      return folder as ViewSimple;
-    }
-  } catch (error) {
-    errorHandle(error);
-    throw error;
+  if (!(folder as ViewSimple).id) {
+    const { data } = await request2<View>({
+      url: '/views',
+      method: 'POST',
+      data: { orgId, isFolder: true, ...folder },
+    });
+    resolve && resolve();
+    return data;
+  } else {
+    await request2<View>({
+      url: `/views/${(folder as ViewSimple).id}`,
+      method: 'PUT',
+      data: folder,
+    });
+    resolve && resolve();
+    return folder as ViewSimple;
   }
 });
 
 export const updateViewBase = createAsyncThunk<ViewBase, UpdateViewBaseParams>(
   'view/updateViewBase',
   async ({ view, resolve }) => {
-    try {
-      await request<boolean>({
-        url: `/views/${view.id}/base`,
-        method: 'PUT',
-        data: view,
-      });
-      resolve();
-      return view;
-    } catch (error) {
-      errorHandle(error);
-      throw error;
-    }
+    await request2<boolean>({
+      url: `/views/${view.id}/base`,
+      method: 'PUT',
+      data: view,
+    });
+    resolve();
+    return view;
   },
 );
 
@@ -305,6 +353,30 @@ export const removeEditingView = createAsyncThunk<
   return null;
 });
 
+export const closeOtherEditingViews = createAsyncThunk<
+  null,
+  { id: string; resolve: (currentEditingViewKey: string) => void },
+  { state: RootState }
+>(
+  'view/closeOtherEditingViews',
+  async ({ id, resolve }, { dispatch, getState }) => {
+    dispatch(viewActions.closeOtherEditingViews(id));
+    const currentEditingViewKey = selectCurrentEditingViewKey(getState());
+    resolve(currentEditingViewKey);
+    return null;
+  },
+);
+
+export const closeAllEditingViews = createAsyncThunk<
+  null,
+  { resolve: () => void },
+  { state: RootState }
+>('view/closeAllEditingViews', async ({ resolve }, { dispatch, getState }) => {
+  dispatch(viewActions.closeAllEditingViews());
+  resolve();
+  return null;
+});
+
 export const unarchiveView = createAsyncThunk<
   string,
   UnarchiveViewParams,
@@ -313,7 +385,7 @@ export const unarchiveView = createAsyncThunk<
   'view/unarchiveView',
   async ({ view: { id, name, parentId, index }, resolve }, { dispatch }) => {
     try {
-      await request<null>({
+      await request2<null>({
         url: `/views/unarchive/${id}`,
         method: 'PUT',
         params: { name, parentId, index },

@@ -25,6 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -38,7 +39,7 @@ public class ExecuteParam implements Serializable {
 
     private List<SelectKeyword> keywords;
 
-    private List<String> columns;
+    private List<SelectColumn> columns;
 
     private List<AggregateOperator> aggregators;
 
@@ -50,7 +51,7 @@ public class ExecuteParam implements Serializable {
 
     private List<FunctionColumn> functionColumns;
 
-    private Set<String> includeColumns;
+    private Set<SelectColumn> includeColumns;
 
     private PageInfo pageInfo;
 
@@ -71,6 +72,16 @@ public class ExecuteParam implements Serializable {
         ExecuteParam executeParam = new ExecuteParam();
         executeParam.setPageInfo(PageInfo.builder().pageNo(1).pageSize(Integer.MAX_VALUE).build());
         return executeParam;
+    }
+
+    public static boolean isEmpty(ExecuteParam executeParam){
+        return executeParam == null || (CollectionUtils.isEmpty(executeParam.getAggregators()) &&
+                CollectionUtils.isEmpty(executeParam.getColumns()) &&
+                CollectionUtils.isEmpty(executeParam.getFunctionColumns()) &&
+                CollectionUtils.isEmpty(executeParam.getFilters()) &&
+                CollectionUtils.isEmpty(executeParam.getGroups()) &&
+                CollectionUtils.isEmpty(executeParam.getKeywords()) &&
+                CollectionUtils.isEmpty(executeParam.getOrders()));
     }
 
 }

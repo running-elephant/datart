@@ -46,23 +46,18 @@ public class AESUtil {
         return null;
     }
 
-    public static String decrypt(String src, String securityKey) {
-        try {
-            SecretKeySpec secretKeySpec = keyGen(securityKey);
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
-            return new String(cipher.doFinal(Base64.decodeBase64(src)));
-        } catch (Exception e) {
-            Exceptions.e(e);
-        }
-        return null;
+    public static String decrypt(String src, String securityKey) throws Exception {
+        SecretKeySpec secretKeySpec = keyGen(securityKey);
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+        return new String(cipher.doFinal(Base64.decodeBase64(src)));
     }
 
     public static String encrypt(String src) {
         return encrypt(src, Application.getTokenSecret());
     }
 
-    public static String decrypt(String src) {
+    public static String decrypt(String src) throws Exception {
         return decrypt(src, Application.getTokenSecret());
     }
 
@@ -71,8 +66,13 @@ public class AESUtil {
     }
 
     public static <T> T decrypt(String src, String securityKey, Class<T> clz) {
-        String json = decrypt(src, securityKey);
-        return JSON.parseObject(json, clz);
+        try {
+            String json = decrypt(src, securityKey);
+            return JSON.parseObject(json, clz);
+        } catch (Exception e) {
+            Exceptions.e(e);
+        }
+        return null;
     }
 
 

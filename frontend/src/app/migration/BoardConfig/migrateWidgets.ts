@@ -15,19 +15,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { FONT_DEFAULT } from 'app/constants';
+import { initInteractionTpl } from 'app/pages/DashBoardPage/components/WidgetManager/utils/init';
+import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import {
+  BoardType,
   ControllerWidgetContent,
   Relation,
   ServerRelation,
   ServerWidget,
-  Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
-import {
-  fontDefault,
-  VALUE_SPLITTER,
-} from 'app/pages/DashBoardPage/utils/widget';
+import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
+import { VALUE_SPLITTER } from 'app/pages/DashBoardPage/utils/widget';
 import { setLatestVersion, versionCanDo } from '../utils';
-import { APP_VERSION_BETA_0, APP_VERSION_BETA_2 } from './../constants';
+import {
+  APP_VERSION_BETA_0,
+  APP_VERSION_BETA_2,
+  APP_VERSION_BETA_4,
+  APP_VERSION_BETA_4_2,
+  APP_VERSION_RC_0,
+} from './../constants';
+import { WidgetBeta3 } from './types';
+import {
+  convertToBeta4AutoWidget,
+  convertWidgetToBeta4,
+} from './utils/beta4utils';
 
 /**
  *
@@ -55,10 +68,10 @@ export const convertWidgetRelationsToObj = (
 /**
  *
  * migrate beta0
- * @param {Widget} [widget]
+ * @param {WidgetBeta3} [widget]
  * @return {*}
  */
-export const beta0 = (widget?: Widget) => {
+export const beta0 = (widget?: WidgetBeta3) => {
   if (!widget) return undefined;
   if (!versionCanDo(APP_VERSION_BETA_0, widget?.config.version)) return widget;
 
@@ -68,7 +81,7 @@ export const beta0 = (widget?: Widget) => {
   }
   // 2.migration about font 5 旧数据没有 widget.config.nameConfig。统一把旧数据填充上fontDefault
   widget.config.nameConfig = {
-    ...fontDefault,
+    ...FONT_DEFAULT,
     ...widget.config.nameConfig,
   };
 
@@ -85,7 +98,7 @@ export const beta0 = (widget?: Widget) => {
   return widget;
 };
 
-export const beta2 = (widget?: Widget) => {
+export const beta2 = (widget?: WidgetBeta3) => {
   if (!widget) return undefined;
   if (!versionCanDo(APP_VERSION_BETA_2, widget?.config.version)) return widget;
   // widget.lock
@@ -94,6 +107,75 @@ export const beta2 = (widget?: Widget) => {
   }
   widget.config.version = APP_VERSION_BETA_2;
   return widget;
+};
+// beta3 没有变动
+
+// beta4 widget 重构 支持group
+export const beta4 = (boardType: BoardType, widget?: Widget | WidgetBeta3) => {
+  if (!widget) return undefined;
+  if (!versionCanDo(APP_VERSION_BETA_4, widget?.config.version))
+    return widget as Widget;
+  let beta4Widget = widget as any;
+  beta4Widget = convertToBeta4AutoWidget(boardType, beta4Widget);
+  if (widget.config.version !== APP_VERSION_BETA_4) {
+    beta4Widget = convertWidgetToBeta4(beta4Widget as WidgetBeta3);
+  }
+
+  return beta4Widget as Widget;
+};
+
+export const beta4_2 = (
+  boardType: BoardType,
+  widget?: Widget | WidgetBeta3,
+) => {
+  if (!widget) {
+    return undefined;
+  }
+  if (!versionCanDo(APP_VERSION_BETA_4_2, widget?.config.version)) {
+    return widget as Widget;
+  }
+  let beta4Widget = widget as any;
+  const allowedOriginalTypes = [
+    ORIGINAL_TYPE_MAP.ownedChart,
+    ORIGINAL_TYPE_MAP.linkedChart,
+  ];
+  if (!allowedOriginalTypes.includes(beta4Widget?.config?.originalType)) {
+    return beta4Widget as Widget;
+  }
+  if (!beta4Widget?.config?.customConfig?.interactions) {
+    if (beta4Widget?.config?.customConfig) {
+      beta4Widget.config.customConfig.interactions = [...initInteractionTpl()];
+      beta4Widget.config.version = APP_VERSION_BETA_4_2;
+    }
+  }
+  return beta4Widget as Widget;
+};
+
+export const RC0 = (widget?: Widget) => {
+  if (!widget) {
+    return undefined;
+  }
+  if (
+    !versionCanDo(APP_VERSION_RC_0, widget?.config?.content?.dataChart?.config)
+  ) {
+    return widget as Widget;
+  }
+  let RC0Widget = widget as any;
+
+  if (RC0Widget?.config?.content?.dataChart?.config?.computedFields) {
+    RC0Widget.config.content.dataChart.config.computedFields =
+      RC0Widget.config.content.dataChart.config.computedFields.map(v => {
+        if (!v.name) {
+          return {
+            ...v,
+            name: v.id,
+          };
+        }
+        return v;
+      });
+    RC0Widget.config.content.dataChart.config.version = APP_VERSION_RC_0;
+  }
+  return RC0Widget as Widget;
 };
 
 const finaleWidget = (widget?: Widget) => {
@@ -110,7 +192,7 @@ export const parseServerWidget = (sWidget: ServerWidget) => {
   sWidget.relations = convertWidgetRelationsToObj(
     sWidget.relations,
   ) as unknown as ServerRelation[];
-  return sWidget as unknown as Widget;
+  return sWidget as unknown as WidgetBeta3;
 };
 /**
  *
@@ -118,7 +200,10 @@ export const parseServerWidget = (sWidget: ServerWidget) => {
  * @param {ServerWidget[]} widgets
  * @return {*}
  */
-export const migrateWidgets = (widgets: ServerWidget[]) => {
+export const migrateWidgets = (
+  widgets: ServerWidget[],
+  boardType: BoardType,
+) => {
   if (!Array.isArray(widgets)) {
     return [];
   }
@@ -132,8 +217,14 @@ export const migrateWidgets = (widgets: ServerWidget[]) => {
       let resWidget = beta0(widget);
 
       resWidget = beta2(resWidget);
-      resWidget = finaleWidget(resWidget);
-      return resWidget;
+
+      let beta4Widget = beta4(boardType, resWidget);
+
+      beta4_2(boardType, resWidget);
+
+      RC0(beta4Widget);
+
+      return finaleWidget(beta4Widget as Widget);
     })
     .filter(widget => !!widget);
   return targetWidgets as Widget[];

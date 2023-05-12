@@ -121,8 +121,8 @@ const Word = styled.span<{ rotate: string; height?: number }>`
   display: block;
   width: ${FONT_SIZE_TITLE};
   height: ${p => (p.height ? `${p.height}px` : FONT_SIZE_TITLE)};
-  line-height: ${p => (p.height ? `${p.height}px` : FONT_SIZE_TITLE)};
   font-size: ${FONT_SIZE_TITLE};
+  line-height: ${p => (p.height ? `${p.height}px` : FONT_SIZE_TITLE)};
   text-align: center;
   transform: ${p => `rotate(${p.rotate})`};
 

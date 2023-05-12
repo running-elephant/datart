@@ -51,9 +51,7 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
     allowManage,
   }) => {
     const t = useI18NPrefix(`viz.action`);
-
     const title = useStatusTitle(name, status);
-
     const isArchived = Number(status) === 0;
     const [showShareLinkModal, setShowShareLinkModal] = useState(false);
     const { storyId: stroyBoardId } = useContext(StoryContext);
@@ -88,13 +86,18 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
       },
       [stroyBoardId],
     );
+
+    if (isArchived) {
+      return <div></div>;
+    }
+
     return (
       <DetailPageHeader
         title={title}
         disabled={Number(status) < 2}
         actions={
           <>
-            {allowManage && !isArchived && Number(status) === 1 && (
+            {allowManage && Number(status) === 1 && (
               <Button
                 key="publish"
                 icon={<SendOutlined />}
@@ -104,7 +107,7 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
                 {t('publish')}
               </Button>
             )}
-            {allowManage && !isArchived && (
+            {allowManage && (
               <Button key="edit" onClick={toggleEdit}>
                 {t('edit')}
               </Button>
@@ -119,7 +122,6 @@ export const StoryHeader: FC<StoryHeaderProps> = memo(
                     allowShare={allowShare}
                     allowManage={allowManage}
                     onOpenShareLink={onOpenShareLink}
-                    isArchived={isArchived}
                     onPublish={Number(status) === 2 ? onPublish : ''}
                   />
                 }

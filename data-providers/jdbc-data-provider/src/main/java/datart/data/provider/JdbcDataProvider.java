@@ -8,9 +8,12 @@ import datart.core.common.FileUtils;
 import datart.core.common.MessageResolver;
 import datart.core.data.provider.*;
 import datart.data.provider.base.DataProviderException;
-import datart.data.provider.jdbc.*;
 import datart.data.provider.calcite.SqlParserUtils;
 import datart.data.provider.calcite.dialect.SqlStdOperatorSupport;
+import datart.data.provider.jdbc.DataSourceFactory;
+import datart.data.provider.jdbc.DataSourceFactoryDruidImpl;
+import datart.data.provider.jdbc.JdbcDriverInfo;
+import datart.data.provider.jdbc.JdbcProperties;
 import datart.data.provider.jdbc.adapters.JdbcDataProviderAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlDialect;
@@ -86,7 +89,7 @@ public class JdbcDataProvider extends DataProvider {
     public Dataframe execute(DataProviderSource source, QueryScript script, ExecuteParam executeParam) throws Exception {
         JdbcDataProviderAdapter adapter = matchProviderAdapter(source);
         //If server aggregation is enabled, query the full data before performing server aggregation
-        if (executeParam.isServerAggregate()) {
+        if (executeParam.isServerAggregate() && !script.isTest()) {
             return adapter.executeInLocal(script, executeParam);
         } else {
             return adapter.executeOnSource(script, executeParam);
@@ -237,6 +240,10 @@ public class JdbcDataProvider extends DataProvider {
                 Exceptions.msg("Duplicated dbType " + prop.getDbType());
             }
             JdbcDriverInfo driverInfo = driverInfos.get(0);
+
+            if (StringUtils.isNotBlank(prop.getDriverClass())) {
+                driverInfo.setDriverClass(prop.getDriverClass());
+            }
             JdbcDataProviderAdapter adapter = null;
             try {
                 if (StringUtils.isNotBlank(driverInfo.getAdapterClass())) {

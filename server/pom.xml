@@ -5,7 +5,7 @@
     <parent>
         <artifactId>datart-parent</artifactId>
         <groupId>datart</groupId>
-        <version>1.0.0-beta.3</version>
+        <version>1.0.0-rc.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -68,11 +68,6 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-client</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-ldap</artifactId>
         </dependency>
 
@@ -80,10 +75,6 @@
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
             <version>2.7.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
         </dependency>
 
         <dependency>
@@ -112,7 +103,7 @@
         </dependency>
         <dependency>
             <groupId>datart</groupId>
-            <artifactId>datart-data-provider</artifactId>
+            <artifactId>datart-data-provider-base</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
@@ -186,6 +177,7 @@
             <scope>test</scope>
         </dependency>
 
+
     </dependencies>
 
     <repositories>
@@ -242,9 +234,31 @@
                 </configuration>
             </plugin>
 
+<!--            <plugin>-->
+<!--                <groupId>com.github.eirslett</groupId>-->
+<!--                <artifactId>frontend-maven-plugin</artifactId>-->
+<!--                <version>1.6</version>-->
+<!--                <configuration>-->
+<!--                    <workingDirectory>${project.parent.basedir}/frontend</workingDirectory>-->
+<!--                </configuration>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>initialize</phase>-->
+<!--                        <id>install node and npm</id>-->
+<!--                        <goals>-->
+<!--                            <goal>install-node-and-npm</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <nodeVersion>v14.2.0</nodeVersion>-->
+<!--                            <npmVersion>6.14.15</npmVersion>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
                 <executions>
 
                     <execution>

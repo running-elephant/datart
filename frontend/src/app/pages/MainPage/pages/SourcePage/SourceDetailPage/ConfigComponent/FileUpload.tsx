@@ -28,17 +28,24 @@ interface FileUploadProps {
   form?: FormInstance;
   sourceId?: string;
   loading?: boolean;
+  dataTables?: table[];
   onTest?: () => void;
+}
+
+interface table {
+  tableName?: string;
 }
 
 export function FileUpload({
   form,
   sourceId,
   loading,
+  dataTables,
   onTest,
 }: FileUploadProps) {
   const [uploadFileLoading, setUploadFileLoading] = useState(false);
   const t = useI18NPrefix('source');
+  const tg = useI18NPrefix('global');
 
   const normFile = useCallback(e => {
     if (Array.isArray(e)) {
@@ -46,6 +53,35 @@ export function FileUpload({
     }
     return e && e.fileList;
   }, []);
+
+  const getUniqueName = useCallback(
+    (name: string, names: (string | undefined)[]) => {
+      if (names.includes(name)) {
+        return getUniqueName(name + '_' + tg('copy'), names);
+      }
+      return name;
+    },
+    [tg],
+  );
+
+  const beforeUpload = useCallback(
+    file => {
+      const tableName = form?.getFieldValue('config')?.tableName;
+      if (tableName) {
+        return;
+      }
+
+      const fileName = file.name.substring(0, file.name.lastIndexOf('.'));
+      let tableNames = (dataTables || []).map(table => table.tableName);
+      let uniqueTableName = getUniqueName(fileName, tableNames);
+      form?.setFieldsValue({
+        config: {
+          tableName: uniqueTableName,
+        },
+      });
+    },
+    [dataTables, form, getUniqueName],
+  );
 
   const uploadChange = useCallback(
     async ({ file }) => {
@@ -56,7 +92,12 @@ export function FileUpload({
         const response = file.response as APIResponse<string>;
         if (response.success) {
           form &&
-            form.setFieldsValue({ config: { path: response.data, format } });
+            form.setFieldsValue({
+              config: {
+                path: response.data,
+                format,
+              },
+            });
           onTest && onTest();
         }
         setUploadFileLoading(false);
@@ -80,7 +121,9 @@ export function FileUpload({
           action={`${BASE_API_URL}/files/datasource/?sourceId=${sourceId}`}
           headers={{ authorization: getToken()! }}
           showUploadList={false}
+          beforeUpload={beforeUpload}
           onChange={uploadChange}
+          disabled={uploadFileLoading || loading}
         >
           <Button
             icon={<UploadOutlined />}

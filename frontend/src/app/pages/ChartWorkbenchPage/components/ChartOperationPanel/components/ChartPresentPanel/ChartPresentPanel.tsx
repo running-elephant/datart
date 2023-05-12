@@ -21,13 +21,15 @@ import { Col, Row, Table } from 'antd';
 import ChartDrillContextMenu from 'app/components/ChartDrill/ChartDrillContextMenu';
 import ChartDrillPaths from 'app/components/ChartDrill/ChartDrillPaths';
 import { ChartIFrameContainerDispatcher } from 'app/components/ChartIFrameContainer';
+import ChartDrillContext from 'app/contexts/ChartDrillContext';
+import useDebouncedLoadingStatus from 'app/hooks/useDebouncedLoadingStatus';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import useMount from 'app/hooks/useMount';
-import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
 import { datasetLoadingSelector } from 'app/pages/ChartWorkbenchPage/slice/selectors';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import ChartDataSetDTO from 'app/types/ChartDataSet';
+import ChartDataView from 'app/types/ChartDataView';
 import { setRuntimeDateLevelFieldsInChartConfig } from 'app/utils/chartHelper';
 import { FC, memo, useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -58,6 +60,8 @@ const ChartPresentPanel: FC<{
   allowQuery: boolean;
   onRefreshDataset?: () => void;
   onCreateDownloadDataTask?: () => void;
+  selectedItems?: SelectedItem[];
+  dataView?: ChartDataView;
 }> = memo(
   ({
     containerHeight,
@@ -69,12 +73,17 @@ const ChartPresentPanel: FC<{
     allowQuery,
     onRefreshDataset,
     onCreateDownloadDataTask,
+    selectedItems,
+    dataView,
   }) => {
     const translate = useI18NPrefix(`viz.palette.present`);
     const chartDispatcher = ChartIFrameContainerDispatcher.instance();
     const [chartType, setChartType] = useState(ChartPresentType.GRAPH);
     const datasetLoadingStatus = useSelector(datasetLoadingSelector);
     const { drillOption } = useContext(ChartDrillContext);
+    const isLoadingData = useDebouncedLoadingStatus({
+      isLoading: datasetLoadingStatus,
+    });
 
     useMount(undefined, () => {
       Debugger.instance.measure(`ChartPresentPanel | Dispose Event`, () => {
@@ -87,6 +96,7 @@ const ChartPresentPanel: FC<{
         return <Chart404Graph chart={chart} chartConfig={chartConfig} />;
       }
       chartConfig = setRuntimeDateLevelFieldsInChartConfig(chartConfig);
+
       return (
         !!chart &&
         chartDispatcher.getContainers(
@@ -96,6 +106,8 @@ const ChartPresentPanel: FC<{
           chartConfig!,
           style,
           drillOption,
+          selectedItems,
+          isLoadingData,
         )
       );
     };
@@ -117,10 +129,13 @@ const ChartPresentPanel: FC<{
         <StyledReusableChartContainer>
           {ChartPresentType.GRAPH === chartType && (
             <>
-              <ChartDrillContextMenu chartConfig={chartConfig}>
+              <ChartDrillContextMenu
+                chartConfig={chartConfig}
+                metas={dataView?.meta}
+              >
                 {renderGraph(containerId, chart, chartConfig, style)}
               </ChartDrillContextMenu>
-              <ChartDrillPaths />
+              <ChartDrillPaths chartConfig={chartConfig} />
             </>
           )}
           {ChartPresentType.RAW === chartType && (
@@ -184,7 +199,10 @@ const StyledChartPresentPanel = styled.div`
   border-radius: ${BORDER_RADIUS};
 `;
 
-const StyledReusableChartContainer = styled.div``;
+const StyledReusableChartContainer = styled.div`
+  flex: 1;
+  overflow-y: auto;
+`;
 
 const TableWrapper = styled.div`
   padding: ${SPACE_LG};
@@ -194,7 +212,6 @@ const SqlWrapper = styled.div`
   flex: 1;
   padding: ${SPACE_MD};
   margin: 0 ${SPACE_LG} ${SPACE_LG};
-  overflow-y: auto;
   background-color: ${p => p.theme.emphasisBackground};
   border-radius: ${BORDER_RADIUS};
   > code {

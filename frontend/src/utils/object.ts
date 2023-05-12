@@ -19,6 +19,7 @@
 import { ChartStyleConfig } from 'app/types/ChartConfig';
 import camelCase from 'lodash/camelCase';
 import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 import isFunction from 'lodash/isFunction';
 import isObject from 'lodash/isObject';
 import lowerCase from 'lodash/lowerCase';
@@ -187,6 +188,10 @@ export function isEmpty(o?: null | any): boolean {
   return o === null || isUndefined(o);
 }
 
+export function isEmptyString(o?: null | any): boolean {
+  return isEmpty(o) || o === '';
+}
+
 export function isFunc(f) {
   return isFunction(f);
 }
@@ -274,4 +279,8 @@ export function isPromise(obj?) {
     (typeof obj === 'object' || typeof obj === 'function') &&
     typeof obj.then === 'function'
   );
+}
+
+export function isEqualObject(obj, cObj) {
+  return isEqual(obj, cObj);
 }

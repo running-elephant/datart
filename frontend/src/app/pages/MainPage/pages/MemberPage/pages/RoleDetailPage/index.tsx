@@ -184,6 +184,7 @@ export function RoleDetailPage() {
               name="name"
               label={t('roleName')}
               validateFirst
+              getValueFromEvent={event => event.target.value?.trim()}
               rules={[
                 {
                   required: true,

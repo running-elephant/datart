@@ -26,6 +26,7 @@ import {
 } from '@ant-design/icons';
 import { Button, List, Popconfirm } from 'antd';
 import { ListItem } from 'app/components';
+import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { getRoles } from 'app/pages/MainPage/pages/MemberPage/slice/thunks';
 import {
@@ -181,7 +182,7 @@ export const Variables = memo(() => {
       let defaultValue: any = values.defaultValue;
       if (values.valueType === VariableValueTypes.Date && !values.expression) {
         defaultValue = values.defaultValue.map(d =>
-          (d as Moment).format(TIME_FORMATTER),
+          (d as Moment).format(values.dateFormat),
         );
       }
 
@@ -235,15 +236,20 @@ export const Variables = memo(() => {
   const saveRelations = useCallback(
     (changedRowPermissions: RowPermission[]) => {
       try {
-        const changedRowPermissionsRaw = changedRowPermissions.map(cr => ({
-          ...cr,
-          value: JSON.stringify(
-            cr.value &&
-              (editingVariable?.valueType === VariableValueTypes.Date
-                ? cr.value.map(d => (d as Moment).format(TIME_FORMATTER))
-                : cr.value),
-          ),
-        }));
+        const changedRowPermissionsRaw = changedRowPermissions.map(cr => {
+          const dateFormat =
+            variables.find(v => v.id === cr.variableId)?.dateFormat ||
+            TIME_FORMATTER;
+          return {
+            ...cr,
+            value: JSON.stringify(
+              cr.value &&
+                (editingVariable?.valueType === VariableValueTypes.Date
+                  ? cr.value.map(d => (d as Moment).format(dateFormat))
+                  : cr.value),
+            ),
+          };
+        });
         if (
           !comparePermissionChange(
             editingVariable?.relVariableSubjects || [],
@@ -292,6 +298,13 @@ export const Variables = memo(() => {
     [variables, publicVariables, t],
   );
 
+  const { filteredData, debouncedSearch } = useDebouncedSearch(
+    listSource,
+    (keywords, data) => {
+      return data.name.includes(keywords);
+    },
+  );
+
   const titleProps = useMemo(
     () => ({
       title: 'variable',
@@ -300,15 +313,16 @@ export const Variables = memo(() => {
         items: [{ key: 'variable', text: t('add') }],
         callback: showAddForm,
       },
+      onSearch: debouncedSearch,
     }),
-    [showAddForm, t],
+    [showAddForm, t, debouncedSearch],
   );
 
   return (
     <Container {...titleProps}>
       <ListWrapper>
         <List
-          dataSource={listSource}
+          dataSource={filteredData}
           loading={
             stage === ViewViewModelStages.Loading && {
               indicator: <LoadingOutlined />,

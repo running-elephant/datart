@@ -40,13 +40,17 @@ export type NameCard = {
 };
 export interface PageThumbnailListProps {
   sortedPages: StoryPage[];
+  canDrag: boolean;
   onPageClick: (index: number, pageId: string, multiple: boolean) => void;
   onDeletePages?: (ids: string[]) => void;
+  onMoveCard?: (dragId, dropId) => void;
 }
 const PageThumbnailList: React.FC<PageThumbnailListProps> = ({
   sortedPages,
+  canDrag,
   onPageClick,
   onDeletePages,
+  onMoveCard,
 }) => {
   const { storyId: stroyBoardId } = useContext(StoryContext);
   const pageInfoMap = useSelector((state: { storyBoard: StoryBoardState }) =>
@@ -72,6 +76,10 @@ const PageThumbnailList: React.FC<PageThumbnailListProps> = ({
     }));
     setCards(card);
   }, [pageInfoMap, sortedPages, stroyBoardId]);
+  const [cardMoveEvent, setCardMoveEvent] = useState<{
+    dragId?: string;
+    dropId?: string;
+  }>({});
 
   useEffect(() => {
     const deleteSlides = (e: KeyboardEvent) => {
@@ -97,9 +105,17 @@ const PageThumbnailList: React.FC<PageThumbnailListProps> = ({
     },
     [onPageClick],
   );
-  const moveCard = useCallback((dragPageId: string, hoverPageId: string) => {},
-  []);
-  const moveEnd = useCallback(() => {}, []);
+
+  const moveCard = useCallback((dragPageId: string, hoverPageId: string) => {
+    setCardMoveEvent({
+      dragId: dragPageId,
+      dropId: hoverPageId,
+    });
+  }, []);
+
+  const moveEnd = useCallback(() => {
+    onMoveCard?.(cardMoveEvent?.dragId, cardMoveEvent?.dropId);
+  }, [cardMoveEvent, onMoveCard]);
 
   return (
     <>
@@ -110,6 +126,7 @@ const PageThumbnailList: React.FC<PageThumbnailListProps> = ({
             index={index}
             selected={page.selected}
             page={page}
+            canDrag={canDrag}
             moveCard={moveCard}
             moveEnd={moveEnd}
           />

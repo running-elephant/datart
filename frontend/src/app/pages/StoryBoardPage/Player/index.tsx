@@ -35,7 +35,7 @@ import Reveal from 'reveal.js';
 import 'reveal.js/dist/reveal.css';
 import RevealZoom from 'reveal.js/plugin/zoom/plugin';
 import styled from 'styled-components/macro';
-import { LEVEL_20 } from 'styles/StyleConstants';
+import { LEVEL_20, WHITE } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import StoryPageItem from '../components/StoryPageItem';
 import { storyActions, useStoryBoardSlice } from '../slice';
@@ -189,7 +189,7 @@ const Wrapper = styled.div`
   z-index: ${LEVEL_20};
   display: flex;
   flex-direction: column;
-  background-color: #fff;
+  background-color: ${WHITE};
 
   .tool-bar {
     height: 100px;

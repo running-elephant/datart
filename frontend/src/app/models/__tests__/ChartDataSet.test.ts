@@ -86,11 +86,11 @@ describe('ChartDataSet Tests', () => {
     const dataset = new ChartDataSet(columns, metas, fields);
     dataset.sortBy([
       {
-        type: ChartDataSectionType.AGGREGATE,
+        type: ChartDataSectionType.Aggregate,
         rows: [
           {
             colName: 'column1',
-            sort: { type: SortActionType.CUSTOMIZE, value: [4, 3, 2, 1] },
+            sort: { type: SortActionType.Customize, value: [4, 3, 2, 1] },
           },
         ],
       },
@@ -120,11 +120,11 @@ describe('ChartDataSet Tests', () => {
     const dataset = new ChartDataSet(columns, metas, fields);
     dataset.sortBy([
       {
-        type: ChartDataSectionType.MIXED,
+        type: ChartDataSectionType.Mixed,
         rows: [
           {
             colName: 'column1',
-            sort: { type: SortActionType.CUSTOMIZE, value: [4, 3, 2, 1] },
+            sort: { type: SortActionType.Customize, value: [4, 3, 2, 1] },
           },
         ],
       },
@@ -147,7 +147,7 @@ describe('ChartDataSet Tests', () => {
     const dataset = new ChartDataSet(columns, metas, fields);
     dataset.sortBy([
       {
-        type: ChartDataSectionType.MIXED,
+        type: ChartDataSectionType.Mixed,
         rows: [
           {
             colName: 'column1',

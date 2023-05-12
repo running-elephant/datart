@@ -29,6 +29,7 @@ export default function useBoardEditorHotkeys() {
     onEditLayerToBottom,
     onEditCopyWidgets,
     onEditPasteWidgets,
+    onEditComposeGroup,
   } = useContext(WidgetActionContext);
 
   useHotkeys('delete,backspace', () => onEditDeleteActiveWidgets(), []);
@@ -42,10 +43,15 @@ export default function useBoardEditorHotkeys() {
   useHotkeys('ctrl+c,command+c', () => onEditCopyWidgets());
   useHotkeys('ctrl+v,command+v', () => onEditPasteWidgets());
 
+  useHotkeys('ctrl+g,command+g', e => {
+    onEditComposeGroup();
+    e.preventDefault();
+  });
   //
   useHotkeys('up', () => {
     console.log('__ widgets up1');
   });
+
   useHotkeys('shift+up', () => {
     console.log('__ widgets up10');
   });

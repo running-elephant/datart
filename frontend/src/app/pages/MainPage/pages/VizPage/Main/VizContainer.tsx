@@ -10,7 +10,7 @@ import {
   ResourceTypes,
   VizResourceSubTypes,
 } from '../../PermissionPage/constants';
-import { ChartPreview } from '../ChartPreview';
+import { ChartPreviewBoard } from '../ChartPreview';
 import { FolderViewModel, VizTab } from '../slice/types';
 
 interface VizContainerProps {
@@ -18,10 +18,11 @@ interface VizContainerProps {
   orgId: string;
   vizs: FolderViewModel[];
   selectedId?: string;
+  hideTitle?: boolean;
 }
 
 export const VizContainer = memo(
-  ({ tab, orgId, vizs, selectedId }: VizContainerProps) => {
+  ({ tab, orgId, vizs, selectedId, hideTitle }: VizContainerProps) => {
     const { id, name, type, search, parentId, permissionId } = tab;
     const path = useMemo(
       () =>
@@ -65,12 +66,13 @@ export const VizContainer = memo(
             showZoomCtrl={true}
             allowManage={allowManage}
             renderMode="read"
+            hideTitle={hideTitle}
           />
         );
         break;
       case 'DATACHART':
         content = (
-          <ChartPreview
+          <ChartPreviewBoard
             key={id}
             backendChartId={id}
             orgId={orgId}
@@ -78,6 +80,7 @@ export const VizContainer = memo(
             allowDownload={allowDownload}
             allowShare={allowShare}
             allowManage={allowManage}
+            hideTitle={hideTitle}
           />
         );
         break;
@@ -114,6 +117,7 @@ const Container = styled.div`
   display: none;
   flex: 1;
   flex-direction: column;
+  height: 100%;
 
   &.selected {
     display: flex;

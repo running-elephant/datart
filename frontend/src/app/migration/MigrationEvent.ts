@@ -17,6 +17,7 @@
  */
 
 import { APP_VERSION_INIT } from './constants';
+import SemVer from './Semver';
 import { IDomainEvent, Task } from './types';
 
 /**
@@ -28,10 +29,12 @@ class MigrationEvent<TDomainModel extends { version?: string }>
   implements IDomainEvent<TDomainModel>
 {
   version: string = APP_VERSION_INIT;
+  semver?: SemVer;
   task?: Task<TDomainModel>;
 
   constructor(version: string, task: Task<TDomainModel>) {
     this.version = version;
+    this.semver = new SemVer(this.version);
     this.task = task;
   }
 

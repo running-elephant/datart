@@ -25,7 +25,7 @@ import {
   NumberOutlined,
   SisternodeOutlined,
 } from '@ant-design/icons';
-import { Button, Dropdown, Menu, Tooltip } from 'antd';
+import { Button, Tooltip } from 'antd';
 import { IW } from 'app/components';
 import { DataViewFieldType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -43,14 +43,14 @@ import {
   SUCCESS,
   WARNING,
 } from 'styles/StyleConstants';
-import { ColumnCategories } from '../../../constants';
-import { Column } from '../../../slice/types';
+import SetFieldType from '../../../components/SetFieldType';
+import { Column, ColumnRole } from '../../../slice/types';
 import { ALLOW_COMBINE_COLUMN_TYPES } from './constant';
-
 const DataModelNode: FC<{
   node: Column;
   className?: string;
-  onNodeTypeChange: (type: any, name: string) => void;
+  branchRole?: ColumnRole;
+  onNodeTypeChange: (type: string[], name: string) => void;
   onMoveToHierarchy: (node: Column) => void;
   onCreateHierarchy?: (node: Column) => void;
   onDeleteFromHierarchy?: (node: Column) => void;
@@ -58,13 +58,13 @@ const DataModelNode: FC<{
   ({
     node,
     className,
+    branchRole,
     onCreateHierarchy,
     onMoveToHierarchy,
     onNodeTypeChange,
     onDeleteFromHierarchy,
   }) => {
     const t = useI18NPrefix('view.model');
-    const tg = useI18NPrefix('global');
     const [isHover, setIsHover] = useState(false);
     const hasCategory = true;
 
@@ -109,46 +109,15 @@ const DataModelNode: FC<{
             setIsHover(false);
           }}
         >
-          <Dropdown
-            trigger={['click']}
-            overlay={
-              <Menu
-                selectedKeys={[node.type, `category-${node.category}`]}
-                className="datart-schema-table-header-menu"
-                onClick={({ key }) => onNodeTypeChange(key, node?.name)}
-              >
-                {Object.values(DataViewFieldType).map(t => (
-                  <Menu.Item key={t}>
-                    {tg(`columnType.${t.toLowerCase()}`)}
-                  </Menu.Item>
-                ))}
-                {hasCategory && (
-                  <>
-                    <Menu.Divider />
-                    <Menu.SubMenu
-                      key="categories"
-                      title={t('category')}
-                      popupClassName="datart-schema-table-header-menu"
-                    >
-                      {Object.values(ColumnCategories).map(t => (
-                        <Menu.Item key={`category-${t}`}>
-                          {tg(`columnCategory.${t.toLowerCase()}`)}
-                        </Menu.Item>
-                      ))}
-                    </Menu.SubMenu>
-                  </>
-                )}
-              </Menu>
-            }
-          >
-            <Tooltip
-              title={hasCategory ? t('typeAndCategory') : t('category')}
-              placement="left"
-            >
-              <StyledIW fontSize={FONT_SIZE_TITLE}>{icon}</StyledIW>
-            </Tooltip>
-          </Dropdown>
-          <span>{node.name}</span>
+          <SetFieldType
+            field={node}
+            onChange={onNodeTypeChange}
+            hasCategory={hasCategory}
+            icon={<StyledIW fontSize={FONT_SIZE_TITLE}>{icon}</StyledIW>}
+          />
+          <span>
+            {branchRole === ColumnRole.Hierarchy ? node.name : node.displayName}
+          </span>
           <div className="action">
             {isHover &&
               !isDragging &&

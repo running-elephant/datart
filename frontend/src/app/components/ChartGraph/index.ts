@@ -41,7 +41,6 @@ export { default as PivotSheetChart } from './PivotSheetChart';
 export { default as RoseChart } from './RoseChart';
 export { default as ScatterOutlineMapChart } from './ScatterOutlineMapChart';
 export { default as Scorecard } from './Scorecard';
-export { default as ScoreChart } from './ScoreChart';
 export { default as StackAreaChart } from './StackAreaChart';
 export { default as StackBarChart } from './StackBarChart';
 export { default as StackColumnChart } from './StackColumnChart';

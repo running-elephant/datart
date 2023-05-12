@@ -18,6 +18,7 @@
 
 package datart.server.base.params;
 
+import datart.core.data.provider.ScriptType;
 import datart.core.entity.RelSubjectColumns;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -41,6 +42,8 @@ public class ViewCreateParam extends VizCreateParam {
     private Double index;
 
     private String script;
+
+    private ScriptType type;
 
     private String model;
 

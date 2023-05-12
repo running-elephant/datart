@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Input, message, Modal } from 'antd';
+import { Button, Input, message, Modal, Space } from 'antd';
 import { useDebouncedSearch } from 'app/hooks/useDebouncedSearch';
 import useGetVizIcon from 'app/hooks/useGetVizIcon';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
@@ -26,13 +26,24 @@ import {
   PermissionLevels,
   ResourceTypes,
 } from 'app/pages/MainPage/pages/PermissionPage/constants';
+import { useAddViz } from 'app/pages/MainPage/pages/VizPage/hooks/useAddViz';
+import { SaveFormContext } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import {
   selectIsOrgOwner,
   selectPermissionMap,
 } from 'app/pages/MainPage/slice/selectors';
-import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { CommonFormTypes } from 'globalConstants';
+import {
+  FC,
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { request2 } from 'utils/request';
@@ -41,29 +52,33 @@ import { Tree } from './Tree';
 
 interface SaveToDashboardTypes {
   isModalVisible: boolean;
-  handleOk: (id, type) => void;
-  handleCancel: () => void;
   title: string;
   orgId: string;
   backendChartId?: string;
+  handleOk: (id, type) => void;
+  handleCancel: () => void;
+  handleOpen: () => void;
 }
 
 const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
   ({
     isModalVisible,
+    title,
+    backendChartId,
     handleOk,
     handleCancel,
-    title,
-    orgId,
-    backendChartId,
+    handleOpen,
   }) => {
     const vizs = useSelector(selectVizs);
     const [vizData, setVizData] = useState<Folder[]>(vizs);
     const [selectId, setSelectId] = useState<string>('');
     const t = useI18NPrefix('components.saveToDashOrStory');
+    const tgb = useI18NPrefix('global.button');
     const getIcon = useGetVizIcon();
     const isOwner = useSelector(selectIsOrgOwner);
     const permissionMap = useSelector(selectPermissionMap);
+    const { showSaveForm } = useContext(SaveFormContext);
+    const addVizFn = useAddViz({ showSaveForm });
 
     const selectDashboard = useCallback((dashboardData, event) => {
       setSelectId(event.node.relId);
@@ -83,7 +98,7 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
           return false;
         }
         try {
-          handleOk(selectId, JSON.parse(data?.config)?.type);
+          handleOk(selectId, JSON.parse(data?.config || '{}')?.type);
         } catch (error) {
           console.log(error);
         }
@@ -131,15 +146,39 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
         return d.name.toLowerCase().includes(keywords.toLowerCase());
       });
 
+    const createDashboard = useCallback(() => {
+      handleCancel();
+      addVizFn({
+        vizType: 'DASHBOARD',
+        type: CommonFormTypes.Add,
+        visible: true,
+        initialValues: undefined,
+        onAfterClose: () => {
+          handleOpen();
+        },
+      });
+    }, [addVizFn, handleCancel, handleOpen]);
+
     return (
       <Modal
         title={title}
         visible={isModalVisible}
-        onOk={() => {
-          saveToDashboard(selectId);
-        }}
+        footer={
+          <Space>
+            <Button onClick={createDashboard}>{t('createDashboard')}</Button>
+            <Button onClick={handleCancel}>{tgb('cancel')}</Button>
+            <Button
+              onClick={() => {
+                saveToDashboard(selectId);
+              }}
+              disabled={!selectId}
+              type="primary"
+            >
+              {tgb('ok')}
+            </Button>
+          </Space>
+        }
         onCancel={handleCancel}
-        okButtonProps={{ disabled: !selectId }}
       >
         <InputWrap>
           <Input onChange={treeSearch} placeholder={t('searchValue')} />

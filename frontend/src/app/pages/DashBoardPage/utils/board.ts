@@ -16,57 +16,66 @@
  * limitations under the License.
  */
 import { migrateBoardConfig } from 'app/migration/BoardConfig/migrateBoardConfig';
+import migrateChartConfig from 'app/migration/ChartConfig/migrateChartConfig';
+import migrationViewConfig from 'app/migration/ViewConfig/migrationViewConfig';
+import beginViewModelMigration from 'app/migration/ViewConfig/migrationViewModelConfig';
 import {
   BoardInfo,
   BoardType,
   ColsKeyType,
   Dashboard,
-  DashboardConfig,
+  DashboardConfigBeta3,
   DataChart,
   DeviceType,
   ServerDashboard,
   ServerDatachart,
-  Widget,
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { ChartDataView } from 'app/types/ChartDataView';
 import { View } from 'app/types/View';
+import {
+  createDateLevelComputedFieldForConfigComputedFields,
+  mergeChartAndViewComputedField,
+} from 'app/utils/chartHelper';
 import { transformMeta } from 'app/utils/internalChartHelper';
+import { adaptBoardImageUrl } from '.';
+import { BoardConfigValue } from '../components/BoardProvider/BoardConfigProvider';
 import {
   AutoBoardWidgetBackgroundDefault,
   BackgroundDefault,
   LAYOUT_COLS_MAP,
   MIN_MARGIN,
   MIN_PADDING,
-  NeedFetchWidgetTypes,
 } from '../constants';
+import { BoardConfig } from '../types/boardTypes';
+import { Widget } from '../types/widgetTypes';
+import { initAutoBoardConfig } from './autoBoard';
+import { initFreeBoardConfig } from './freeBoard';
 
 export const getDashBoardByResBoard = (data: ServerDashboard): Dashboard => {
-  const {
-    id,
-    name,
-    orgId,
-    parentId,
-    status,
-    thumbnail,
-    index,
-    config,
-    permissions,
-    queryVariables,
-  } = data;
   return {
-    id,
-    queryVariables,
-    name,
-    orgId,
-    parentId,
-    status,
-    thumbnail,
-    index,
-    config: migrateBoardConfig(config),
-    permissions,
+    id: data.id,
+    queryVariables: data.queryVariables,
+    name: data.name,
+    orgId: data.orgId,
+    parentId: data.parentId,
+    status: data.status,
+    thumbnail: data.thumbnail,
+    index: data.index,
+    config: preprocessBoardConfig(migrateBoardConfig(data.config), data.id),
+    permissions: data.permissions,
   };
 };
-
+export const preprocessBoardConfig = (config: BoardConfig, boardId: string) => {
+  config.jsonConfig.props.forEach(item => {
+    if (item.key === 'background') {
+      const rowsValue = item?.rows?.[0]?.value;
+      if (rowsValue?.image) {
+        rowsValue.image = adaptBoardImageUrl(rowsValue.image, boardId);
+      }
+    }
+  });
+  return config;
+};
 export const getScheduleBoardInfo = (
   boardInfo: BoardInfo,
   widgetMap: Record<string, Widget>,
@@ -74,11 +83,7 @@ export const getScheduleBoardInfo = (
   let newBoardInfo: BoardInfo = { ...boardInfo };
   const needFetchItems = Object.values(widgetMap)
     .filter(widget => {
-      if (
-        widget.viewIds &&
-        widget.viewIds.length > 0 &&
-        NeedFetchWidgetTypes.includes(widget.config.type)
-      ) {
+      if (widget.viewIds && widget.viewIds.length > 0) {
         return true;
       }
       return false;
@@ -107,22 +112,15 @@ export const getInitBoardInfo = (obj: {
     fullScreenItemId: '',
     layouts: [],
     isDroppable: false,
-    clipboardWidgets: {},
+    clipboardWidgetMap: {},
     widgetIds: obj.widgetIds || [],
     controllerPanel: {
       type: 'hide',
       widgetId: '',
     },
-    linkagePanel: {
-      type: 'hide',
-      widgetId: '',
-    },
+
     linkFilter: [],
-    jumpPanel: {
-      visible: false,
-      type: 'add',
-      widgetId: '',
-    },
+
     deviceType: DeviceType.Desktop,
     needFetchItems: [],
     hasFetchItems: [],
@@ -132,8 +130,8 @@ export const getInitBoardInfo = (obj: {
   return boardInfo;
 };
 
-export const getInitBoardConfig = (boardType?: BoardType) => {
-  const dashboardConfig: DashboardConfig = {
+export const getInitBoardConfigBeta3 = (boardType?: BoardType) => {
+  const dashboardConfig: DashboardConfigBeta3 = {
     type: boardType || 'auto',
     version: '',
     background: BackgroundDefault,
@@ -161,12 +159,37 @@ export const getInitBoardConfig = (boardType?: BoardType) => {
   };
   return dashboardConfig;
 };
-
+export const getInitBoardConfig = (boardType?: BoardType) => {
+  if (boardType === 'auto') {
+    return initAutoBoardConfig();
+  } else {
+    return initFreeBoardConfig();
+  }
+};
 // dataCharts
-export const getDataChartsByServer = (serverDataCharts: ServerDatachart[]) => {
+export const getDataChartsByServer = (
+  serverDataCharts: ServerDatachart[],
+  view: View[],
+) => {
   const dataCharts: DataChart[] = serverDataCharts.map(item => {
-    return { ...item, config: JSON.parse(item.config) };
+    item.config = migrateChartConfig(item.config);
+
+    const config = JSON.parse(item.config || '{}');
+    const viewComputerFields =
+      JSON.parse(view.find(v => v.id === item.viewId)?.model || '{}')
+        ?.computedFields || [];
+
+    config.computedFields = mergeChartAndViewComputedField(
+      viewComputerFields,
+      config.computedFields,
+    );
+
+    return {
+      ...item,
+      config,
+    };
   });
+
   return dataCharts;
 };
 export const getDataChartMap = (dataCharts: DataChart[]) => {
@@ -180,11 +203,28 @@ export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
   const viewViews: ChartDataView[] = [];
   views.forEach(view => {
     const dataChart = dataCharts.find(dc => dc.viewId === view.id);
+
+    if (view) {
+      view = migrationViewConfig(view);
+    }
+    if (view?.model) {
+      view.model = beginViewModelMigration(view.model, view.type);
+    }
+    const meta = transformMeta(view.model);
+    const viewComputedFields =
+      JSON.parse(view.model || '{}').computedFields || [];
+    const computedFields = createDateLevelComputedFieldForConfigComputedFields(
+      meta,
+      mergeChartAndViewComputedField(
+        viewComputedFields,
+        dataChart?.config.computedFields,
+      ),
+    );
     let viewView = {
       ...view,
-      meta: transformMeta(view.model),
+      meta,
       model: '',
-      computedFields: dataChart?.config.computedFields || [],
+      computedFields,
     };
     viewViews.push(viewView);
   });
@@ -192,20 +232,19 @@ export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
 };
 
 export const getBoardMarginPadding = (
-  boardConfig: DashboardConfig,
+  boardConfig: BoardConfigValue,
   colsKey: ColsKeyType,
 ) => {
-  const { margin, containerPadding, mobileMargin, mobileContainerPadding } =
-    boardConfig;
+  const { margin, padding, mMargin, mPadding } = boardConfig;
   const isMobile = colsKey === 'sm';
   return isMobile
     ? {
-        curMargin: mobileMargin || [MIN_MARGIN, MIN_MARGIN],
-        curPadding: mobileContainerPadding || [MIN_PADDING, MIN_PADDING],
+        curMargin: mMargin || [MIN_MARGIN, MIN_MARGIN],
+        curPadding: mPadding || [MIN_PADDING, MIN_PADDING],
       }
     : {
         curMargin: margin,
-        curPadding: containerPadding,
+        curPadding: padding,
       };
 };
 

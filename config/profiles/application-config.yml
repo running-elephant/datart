@@ -37,6 +37,8 @@ spring:
 #   base: xxx
 #   username: {username}
 #   password: {password}
+#   attribute-mapping:
+#     username: cn # 自定义登录用户名对应属性名
 
 # mail config
 
@@ -78,15 +80,13 @@ server:
     keyAlias: tomcat
 
 datart:
+  migration:
+    enable: true # 是否开启数据库自动升级
   server:
     address: ${datart.address:http://127.0.0.1:8080}
 
   # 租户管理模式：platform-平台(默认)，team-团队
   tenant-management-mode: platform
-  # 团队管理员用户名/密码: 仅team模式且两者都不为空时重置
-  admin:
-    username:
-    password:
 
   user:
     register: true # 是否允许注册

@@ -17,6 +17,7 @@
  */
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button, Menu } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetWrapProvider';
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
@@ -28,12 +29,12 @@ import { memo, useCallback, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { LEVEL_10, LEVEL_100, SPACE_LG, SPACE_SM } from 'styles/StyleConstants';
-import { CanFullScreenWidgetTypes } from '../../constants';
 import { BoardContext } from '../BoardProvider/BoardProvider';
-import { FullScreenWidgetMapper } from './FullScreenWidgetMapper';
+import widgetManager from '../WidgetManager/index';
+import { WidgetMapper } from '../WidgetMapper/WidgetMapper';
 
 export const FullScreenPanel: React.FC<{}> = memo(() => {
-  const { boardId, boardType } = useContext(BoardContext);
+  const { boardId } = useContext(BoardContext);
   const dispatch = useDispatch();
 
   const itemId = useSelector((state: { board: BoardState }) =>
@@ -45,8 +46,8 @@ export const FullScreenPanel: React.FC<{}> = memo(() => {
   );
 
   const widgets = useMemo(() => {
-    return Object.values(widgetMap).filter(item =>
-      CanFullScreenWidgetTypes.includes(item.config.type),
+    return Object.values(widgetMap).filter(
+      item => widgetManager.meta(item.config.originalType).canFullScreen,
     );
   }, [widgetMap]);
 
@@ -81,11 +82,13 @@ export const FullScreenPanel: React.FC<{}> = memo(() => {
           boardEditing={false}
           boardId={boardId}
         >
-          <FullScreenWidgetMapper boardEditing={false} boardType={boardType} />
+          <WidgetMapper boardEditing={false} hideTitle={true} />
         </WidgetWrapProvider>
       );
     }
-  }, [boardId, boardType, itemId, widgetMap]);
+  }, [boardId, itemId, widgetMap]);
+
+  const t = useI18NPrefix(`viz.widget.action`);
 
   return (
     <>
@@ -94,10 +97,15 @@ export const FullScreenPanel: React.FC<{}> = memo(() => {
           <FullHeader>
             <div onClick={toggle}>
               {collapsed ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+              &nbsp;
               <span>{widgetMap[itemId].config.name}</span>
             </div>
-            <Button className="close-fullscreen" onClick={closeFullScreen}>
-              取消全屏
+            <Button
+              size="small"
+              className="close-fullscreen"
+              onClick={closeFullScreen}
+            >
+              {t('exitFullScreen')}
             </Button>
           </FullHeader>
           <div className="full-container">
@@ -137,13 +145,13 @@ const FullScreenWrap = styled.div<{ show: boolean }>`
   transition: all 3s ease-out;
 
   .full-container {
+    position: relative;
     display: flex;
     flex: 1;
   }
 
   .full-menu {
     position: absolute;
-    top: 64px;
     left: ${p => (p.show ? '0' : '-300px')};
     z-index: ${LEVEL_10};
     width: 300px;

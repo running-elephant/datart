@@ -16,18 +16,13 @@
  * limitations under the License.
  */
 
-import { request } from 'utils/request';
-import { errorHandle } from 'utils/utils';
+import { request2 } from 'utils/request';
+
 export const sendEmail = async usernameOrEmail => {
-  try {
-    const { data } = await request<string>({
-      url: '/users/sendmail',
-      method: 'POST',
-      params: { usernameOrEmail },
-    });
-    return data;
-  } catch (error) {
-    errorHandle(error);
-    throw error;
-  }
+  const { data } = await request2<string>({
+    url: '/users/sendmail',
+    method: 'POST',
+    params: { usernameOrEmail },
+  });
+  return data;
 };

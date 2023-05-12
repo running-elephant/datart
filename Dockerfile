@@ -8,4 +8,4 @@ COPY static /datart/static
 ENV TZ=Asia/Shanghai
 EXPOSE 8080
 WORKDIR /datart
-ENTRYPOINT java -cp "lib/*" datart.DatartServerApplication
+ENTRYPOINT java -server -Xms2G -Xmx2G -Dspring.profiles.active=config -Dfile.encoding=UTF-8 -cp "lib/*" datart.DatartServerApplication

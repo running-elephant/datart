@@ -315,6 +315,36 @@ const config: ChartConfig = {
       ],
     },
   ],
+  interactions: [
+    {
+      label: 'drillThrough.title',
+      key: 'drillThrough',
+      comType: 'checkboxModal',
+      default: false,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'drillThrough.title',
+          key: 'setting',
+          comType: 'interaction.drillThrough',
+        },
+      ],
+    },
+    {
+      label: 'viewDetail.title',
+      key: 'viewDetail',
+      comType: 'checkboxModal',
+      default: false,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'viewDetail.title',
+          key: 'setting',
+          comType: 'interaction.viewDetail',
+        },
+      ],
+    },
+  ],
   i18ns: [
     {
       lang: 'zh-CN',
@@ -350,7 +380,7 @@ const config: ChartConfig = {
         common: {
           position: 'Position',
           conditionalStyle: 'Conditional Style',
-          autoFontSize: 'Automatically adjust font size',
+          autoFontSize: 'Automatically Adjust Font Size',
           scale: 'Scale',
           fixedFontSize: 'Font Size',
           alignment: 'Alignment',
@@ -362,7 +392,7 @@ const config: ChartConfig = {
         },
         label: {
           title: 'Label',
-          show: 'showTitle',
+          show: 'Show Title',
         },
         data: {
           title: 'Data',

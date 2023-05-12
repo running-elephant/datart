@@ -80,19 +80,15 @@ export const PermissionForm = memo(
     );
     const t = useI18NPrefix('permission');
 
-    const { moduleEnabled, createEnabled } = useMemo(() => {
+    const { moduleEnabled } = useMemo(() => {
       let moduleEnabled = PermissionLevels.Disable;
-      let createEnabled = PermissionLevels.Disable;
       privileges?.forEach(({ resourceId, permission }) => {
         if (resourceId === '*') {
           moduleEnabled = permission;
         }
-        if (resourceId === dataSourceType) {
-          createEnabled = permission;
-        }
       });
-      return { moduleEnabled, createEnabled };
-    }, [privileges, dataSourceType]);
+      return { moduleEnabled };
+    }, [privileges]);
 
     const independentPermissionChange = useCallback(
       resourceId => e => {
@@ -267,27 +263,6 @@ export const PermissionForm = memo(
       ],
       [t],
     );
-    const createPermissionValues = useMemo(
-      () => [
-        {
-          text: t(
-            `createPermissionLabel.${
-              PermissionLevels[PermissionLevels.Disable]
-            }`,
-          ),
-          value: PermissionLevels.Disable,
-        },
-        {
-          text: t(
-            `createPermissionLabel.${
-              PermissionLevels[PermissionLevels.Create]
-            }`,
-          ),
-          value: PermissionLevels.Create,
-        },
-      ],
-      [t],
-    );
 
     return (
       <Wrapper className={classnames({ selected })}>
@@ -306,19 +281,6 @@ export const PermissionForm = memo(
                 onChange={independentPermissionChange('*')}
               />
             )}
-            {viewpoint === Viewpoints.Subject &&
-              ![ResourceTypes.Viz, ResourceTypes.View].includes(
-                dataSourceType as ResourceTypes,
-              ) && (
-                <IndependentPermissionSetting
-                  enabled={createEnabled}
-                  label={`${t('add')}${t(
-                    `module.${dataSourceType.toLowerCase()}`,
-                  )}`}
-                  values={createPermissionValues}
-                  onChange={independentPermissionChange(dataSourceType)}
-                />
-              )}
             <Form.Item label={t('resourceDetail')}>
               <PermissionTable
                 viewpoint={viewpoint}

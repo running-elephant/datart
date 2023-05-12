@@ -41,7 +41,7 @@ export interface IProps {
   page: NameCard;
   index: number;
   selected: boolean;
-  className?: string;
+  canDrag: boolean;
   moveCard: (dragPageId: string, hoverPageId: string) => void;
   moveEnd: () => void;
 }
@@ -54,6 +54,7 @@ const ThumbnailItem: React.FC<IProps> = ({
   page,
   index,
   selected,
+  canDrag,
   moveCard,
   moveEnd,
 }) => {
@@ -73,7 +74,9 @@ const ThumbnailItem: React.FC<IProps> = ({
           thumbnail,
         }),
       );
-    } catch (error) {}
+    } catch (error) {
+      // TODO(Stephen): why the original code eat error, try to remove catch
+    }
     // storyActions.updateStoryPageNameAndThumbnail
   }, [dashboard, dispatch, page.id, page.storyId]);
   const [{ handlerId }, drop] = useDrop({
@@ -143,6 +146,9 @@ const ThumbnailItem: React.FC<IProps> = ({
         index: page.index,
         selected: selected,
       };
+    },
+    canDrag: () => {
+      return canDrag;
     },
     collect: (monitor: any) => ({
       isDragging: monitor.isDragging(),

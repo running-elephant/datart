@@ -17,28 +17,31 @@
  */
 
 import { ChartDataSectionField } from 'app/types/ChartConfig';
+import { ChartDataViewMeta } from 'app/types/ChartDataViewMeta';
 import { FC } from 'react';
 import DateLevelMenuItems from './DateLevelMenuItems';
 
 const DateLevelAction: FC<{
   config: ChartDataSectionField;
   availableSourceFunctions?: string[];
+  metas?: ChartDataViewMeta[];
   onConfigChange: (
     config: ChartDataSectionField,
     needRefresh?: boolean,
-    replacedColName?: string,
+    replacedConfig?: ChartDataSectionField,
   ) => void;
   mode?: 'menu';
-}> = ({ config, onConfigChange, availableSourceFunctions }) => {
+}> = ({ config, metas, onConfigChange, availableSourceFunctions }) => {
   const actionNeedNewRequest = true;
   const onChange = newConfig => {
-    onConfigChange?.(newConfig, actionNeedNewRequest, config.colName);
+    onConfigChange?.(newConfig, actionNeedNewRequest, config);
   };
 
   return (
     <DateLevelMenuItems
       availableSourceFunctions={availableSourceFunctions}
       config={config}
+      metas={metas}
       onChange={onChange}
     />
   );

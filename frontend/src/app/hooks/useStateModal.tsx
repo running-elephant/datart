@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Form, FormInstance, Modal } from 'antd';
+import { Form, FormInstance, Modal, ModalFuncProps } from 'antd';
 import { useRef } from 'react';
 import { isPromise } from 'utils/object';
 
@@ -43,10 +43,10 @@ function useStateModal({ initState }: { initState?: any }) {
   const [modal, contextHolder] = Modal.useModal();
   const okCallbackRef = useRef<Function>();
   const cancelCallbackRef = useRef<Function>();
-  const stateRef = useRef<any>(initState);
+  const stateRef = useRef<any[]>(initState ? [initState] : []);
 
-  const handleSaveCacheValue = (...rest) => {
-    stateRef.current = rest;
+  const handleSaveCacheValue = (...args: any[]) => {
+    stateRef.current = args || [];
   };
 
   const handleClickOKButton = closeFn => {
@@ -54,17 +54,15 @@ function useStateModal({ initState }: { initState?: any }) {
       .validateFields()
       .then(() => {
         try {
-          const spreadParmas =
-            Object.keys(stateRef.current || {}).length > 0
-              ? stateRef.current
-              : [];
           const okCBResult = okCallbackRef.current?.call(
             Object.create(null),
-            ...spreadParmas,
+            ...stateRef.current,
           );
           if (isPromise(okCBResult)) return okCBResult;
         } catch (e) {
           console.error('useStateModal | exception message ---> ', e);
+        } finally {
+          stateRef.current = [];
         }
         return closeFn;
       })
@@ -74,6 +72,7 @@ function useStateModal({ initState }: { initState?: any }) {
   };
 
   const handleClickCancelButton = () => {
+    stateRef.current = [];
     cancelCallbackRef.current?.call(Object.create(null), null);
   };
 
@@ -108,6 +107,7 @@ function useStateModal({ initState }: { initState?: any }) {
     modalSize?: string | number | StateModalSize;
     onOk?: typeof handleClickOKButton;
     onCancel?: typeof handleClickCancelButton;
+    okButtonProps?: ModalFuncProps['okButtonProps'];
   }) => {
     okCallbackRef.current = props.onOk;
     cancelCallbackRef.current = props.onCancel;
@@ -128,6 +128,7 @@ function useStateModal({ initState }: { initState?: any }) {
       maskClosable: true,
       icon: null,
       centered: true,
+      okButtonProps: props.okButtonProps,
     });
   };
 

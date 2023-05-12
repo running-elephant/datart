@@ -8,8 +8,6 @@ import java.util.Set;
 @Data
 public class TableInfo {
 
-//    private String dbName;
-
     private String tableName;
 
     private List<String> primaryKeys;

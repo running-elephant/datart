@@ -85,3 +85,13 @@ export const selectAvailableSourceFunctions = createSelector(
   [selectDomain],
   shareState => shareState.availableSourceFunctions,
 );
+
+export const selectSelectedItems = createSelector(
+  [selectDomain],
+  shareState => shareState.selectedItems,
+);
+
+export const selectPageTitle = createSelector(
+  [selectDomain],
+  shareState => shareState.title,
+);

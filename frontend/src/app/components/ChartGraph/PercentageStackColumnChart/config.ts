@@ -74,6 +74,9 @@ const config: ChartConfig = {
           label: 'bar.radius',
           key: 'radius',
           comType: 'inputNumber',
+          options: {
+            min: 0,
+          },
         },
         {
           label: 'bar.width',
@@ -250,6 +253,11 @@ const config: ChartConfig = {
           default: 0,
           comType: 'inputNumber',
         },
+        {
+          label: 'common.dataZoomPanel',
+          key: 'dataZoomPanel',
+          comType: 'dataZoomPanel',
+        },
       ],
     },
     {
@@ -342,6 +350,24 @@ const config: ChartConfig = {
           label: 'common.max',
           key: 'max',
           comType: 'inputNumber',
+        },
+        {
+          label: 'yAxis.open',
+          key: 'modal',
+          comType: 'group',
+          options: {
+            type: 'modal',
+            modalSize: 'middle',
+            flatten: true,
+            title: 'yAxis.numberFormat',
+          },
+          rows: [
+            {
+              label: 'yAxis.open',
+              key: 'YAxisNumberFormat',
+              comType: 'YAxisNumberFormatPanel',
+            },
+          ],
         },
       ],
     },
@@ -455,6 +481,36 @@ const config: ChartConfig = {
       ],
     },
   ],
+  interactions: [
+    {
+      label: 'drillThrough.title',
+      key: 'drillThrough',
+      comType: 'checkboxModal',
+      default: false,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'drillThrough.title',
+          key: 'setting',
+          comType: 'interaction.drillThrough',
+        },
+      ],
+    },
+    {
+      label: 'viewDetail.title',
+      key: 'viewDetail',
+      comType: 'checkboxModal',
+      default: false,
+      options: { modalSize: 'middle' },
+      rows: [
+        {
+          label: 'viewDetail.title',
+          key: 'setting',
+          comType: 'interaction.viewDetail',
+        },
+      ],
+    },
+  ],
   i18ns: [
     {
       lang: 'zh-CN',
@@ -523,6 +579,8 @@ const config: ChartConfig = {
         },
         yAxis: {
           title: 'Y轴',
+          numberFormat: '数据格式设置',
+          open: '打开',
         },
         splitLine: {
           title: '分割线',
@@ -603,6 +661,8 @@ const config: ChartConfig = {
         },
         yAxis: {
           title: 'Y Axis',
+          numberFormat: 'Number Format',
+          open: 'Open',
         },
         splitLine: {
           title: 'Split Line',

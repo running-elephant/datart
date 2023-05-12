@@ -16,13 +16,14 @@
  * limitations under the License.
  */
 import ChartEditor from 'app/components/ChartEditor';
+import { BOARD_SELF_CHART_PREFIX } from 'globalConstants';
 import React, { memo, useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { LEVEL_50 } from 'styles/StyleConstants';
+import { LEVEL_10 } from 'styles/StyleConstants';
 import { uuidv4 } from 'utils/utils';
 import {
   boardDrillManager,
@@ -33,12 +34,10 @@ import { BoardLoading } from '../../components/BoardLoading';
 import { BoardInitProvider } from '../../components/BoardProvider/BoardInitProvider';
 import { fetchBoardDetail } from '../Board/slice/thunk';
 import { DataChart, WidgetContentChartType } from '../Board/slice/types';
-import AutoEditor from './AutoEditor/index';
+import { AutoEditor } from './AutoEditor';
 import ControllerWidgetPanel from './components/ControllerWidgetPanel';
-import { LinkagePanel } from './components/LinkagePanel';
-import { SettingJumpModal } from './components/SettingJumpModal';
-import FreeEditor from './FreeEditor/index';
-import { editDashBoardInfoActions } from './slice';
+import { FreeEditor } from './FreeEditor';
+import { editDashBoardInfoActions, useEditBoardSlice } from './slice';
 import {
   addVariablesToBoard,
   clearEditBoardState,
@@ -46,6 +45,7 @@ import {
 } from './slice/actions/actions';
 import {
   selectBoardChartEditorProps,
+  selectControllerPanel,
   selectEditBoard,
   selectEditBoardLoading,
 } from './slice/selectors';
@@ -54,12 +54,13 @@ import { addChartWidget, fetchEditBoardDetail } from './slice/thunk';
 export const BoardEditor: React.FC<{
   boardId: string;
 }> = memo(({ boardId }) => {
+  useEditBoardSlice();
   const dispatch = useDispatch();
   const history = useHistory();
   const board = useSelector(selectEditBoard);
   const boardLoading = useSelector(selectEditBoardLoading);
   const boardChartEditorProps = useSelector(selectBoardChartEditorProps);
-
+  const widgetControllerPanelParams = useSelector(selectControllerPanel);
   const onCloseChartEditor = useCallback(() => {
     dispatch(editDashBoardInfoActions.changeChartEditorProps(undefined));
   }, [dispatch]);
@@ -94,9 +95,9 @@ export const BoardEditor: React.FC<{
         <EditorHeader />
         {boardType === 'auto' && <AutoEditor />}
         {boardType === 'free' && <FreeEditor />}
-        <ControllerWidgetPanel />
-        <LinkagePanel />
-        <SettingJumpModal />
+        {widgetControllerPanelParams.type !== 'hide' && (
+          <ControllerWidgetPanel {...widgetControllerPanelParams} />
+        )}
         {boardChartEditorProps && (
           <ChartEditor
             {...boardChartEditorProps}
@@ -107,9 +108,10 @@ export const BoardEditor: React.FC<{
       </BoardInitProvider>
     );
   }, [
-    boardChartEditorProps,
     board,
     boardId,
+    widgetControllerPanelParams,
+    boardChartEditorProps,
     onCloseChartEditor,
     onSaveToWidget,
   ]);
@@ -118,12 +120,15 @@ export const BoardEditor: React.FC<{
     const histState = history.location.state as any;
     try {
       if (histState?.widgetInfo) {
+        // TODO(Stephen): to be confirm if use history state widget info and for what
+        console.error(
+          'if you see the error on board editor, please contact to administrator',
+        );
         const widgetInfo = JSON.parse(histState.widgetInfo);
-
         if (widgetInfo) {
           let subType: 'widgetChart' | 'dataChart' = 'dataChart';
           if (!widgetInfo.dataChart.id) {
-            widgetInfo.dataChart.id = 'widget_' + uuidv4();
+            widgetInfo.dataChart.id = `${BOARD_SELF_CHART_PREFIX}${boardId}_${uuidv4()}`;
             subType = 'widgetChart';
           }
           dispatch(
@@ -158,22 +163,23 @@ export const BoardEditor: React.FC<{
   }, [onCloseChartEditor]);
 
   return (
-    <Wrapper>
+    <StyledBoardEditor>
       <DndProvider backend={HTML5Backend}>
         {boardEditor}
         {boardLoading && <BoardLoading />}
       </DndProvider>
-    </Wrapper>
+    </StyledBoardEditor>
   );
 });
 export default BoardEditor;
-const Wrapper = styled.div`
+
+const StyledBoardEditor = styled.div`
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: ${LEVEL_50};
+  z-index: ${LEVEL_10};
   display: flex;
   flex-direction: column;
   padding-bottom: 0;

@@ -22,9 +22,17 @@ import { useFrame } from 'app/components/ReactFrameComponent';
 import { ChartLifecycle } from 'app/constants';
 import usePrefixI18N from 'app/hooks/useI18NPrefix';
 import { IChart } from 'app/types/Chart';
-import { ChartConfig } from 'app/types/ChartConfig';
+import { ChartConfig, SelectedItem } from 'app/types/ChartConfig';
 import { IChartDrillOption } from 'app/types/ChartDrillOption';
-import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
+import { BrokerContext, BrokerOption } from 'app/types/ChartLifecycleBroker';
+import {
+  CSSProperties,
+  FC,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import styled from 'styled-components/macro';
 import { uuidv4 } from 'utils/utils';
 import ChartIFrameEventBroker from './ChartIFrameEventBroker';
@@ -44,7 +52,9 @@ const ChartIFrameLifecycleAdapter: FC<{
   style: CSSProperties;
   isShown?: boolean;
   drillOption?: IChartDrillOption;
+  selectedItems?: SelectedItem[];
   widgetSpecialConfig?: any;
+  isLoadingData?: boolean;
 }> = ({
   dataset,
   chart,
@@ -52,18 +62,48 @@ const ChartIFrameLifecycleAdapter: FC<{
   style,
   isShown = true,
   drillOption,
+  selectedItems,
   widgetSpecialConfig,
+  isLoadingData = false,
 }) => {
   const [chartResourceLoader] = useState(() => new ChartIFrameResourceLoader());
+  const eventBrokerRef = useRef<ChartIFrameEventBroker>();
   const [containerStatus, setContainerStatus] = useState(ContainerStatus.INIT);
   const { document, window } = useFrame();
-  const [containerId] = useState(() => uuidv4());
-  const eventBrokerRef = useRef<ChartIFrameEventBroker>();
+  const [containerId] = useState(() => `datart-${uuidv4()}`);
   const translator = usePrefixI18N();
+
+  const buildBrokerOption = useCallback(() => {
+    return {
+      containerId,
+      dataset,
+      config,
+      widgetSpecialConfig,
+      drillOption,
+      selectedItems,
+    } as BrokerOption;
+  }, [
+    config,
+    containerId,
+    dataset,
+    drillOption,
+    selectedItems,
+    widgetSpecialConfig,
+  ]);
+
+  const buildBrokerContext = useCallback(() => {
+    return {
+      document,
+      window,
+      width: style?.width,
+      height: style?.height,
+      translator,
+    } as BrokerContext;
+  }, [document, style?.height, style?.width, translator, window]);
 
   /**
    * Chart Mount Event
-   * Dependency: 'chart?.meta?.id', 'eventBrokerRef', 'isShown'
+   * Dependency: 'chart?.meta?.id', 'isShown'
    */
   useEffect(() => {
     if (
@@ -86,15 +126,9 @@ const ChartIFrameLifecycleAdapter: FC<{
           const newBrokerRef = new ChartIFrameEventBroker();
           newBrokerRef.register(chart);
           newBrokerRef.publish(
-            ChartLifecycle.MOUNTED,
-            { containerId, dataset, config, widgetSpecialConfig, drillOption },
-            {
-              document,
-              window,
-              width: style?.width,
-              height: style?.height,
-              translator,
-            },
+            ChartLifecycle.Mounted,
+            buildBrokerOption(),
+            buildBrokerContext(),
           );
           eventBrokerRef.current = newBrokerRef;
           setContainerStatus(ContainerStatus.SUCCESS);
@@ -106,16 +140,20 @@ const ChartIFrameLifecycleAdapter: FC<{
 
     return function cleanup() {
       setContainerStatus(ContainerStatus.INIT);
-      eventBrokerRef?.current?.publish(ChartLifecycle.UNMOUNTED, {});
+      eventBrokerRef?.current?.publish(
+        ChartLifecycle.UnMount,
+        buildBrokerOption(),
+        buildBrokerContext(),
+      );
       eventBrokerRef?.current?.dispose();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chart?.meta?.id, eventBrokerRef, isShown, translator]);
+  }, [chart?.meta?.id, isShown]);
 
   /**
    * Chart Update Event
    * Dependency: 'config', 'dataset', 'widgetSpecialConfig',
-   * 'containerStatus', 'document', 'window', 'isShown', 'drillOption'
+   * 'containerStatus', 'document', 'window', 'isShown', 'drillOption', 'selectedItems'
    */
   useEffect(() => {
     if (
@@ -124,25 +162,15 @@ const ChartIFrameLifecycleAdapter: FC<{
       !window ||
       !config ||
       !dataset ||
+      isLoadingData ||
       containerStatus !== ContainerStatus.SUCCESS
     ) {
       return;
     }
     eventBrokerRef.current?.publish(
-      ChartLifecycle.UPDATED,
-      {
-        dataset,
-        config,
-        widgetSpecialConfig,
-        drillOption,
-      },
-      {
-        document,
-        window,
-        width: style?.width,
-        height: style?.height,
-        translator,
-      },
+      ChartLifecycle.Updated,
+      buildBrokerOption(),
+      buildBrokerContext(),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -153,8 +181,9 @@ const ChartIFrameLifecycleAdapter: FC<{
     document,
     window,
     isShown,
-    translator,
     drillOption,
+    selectedItems,
+    isLoadingData,
   ]);
 
   /**
@@ -168,26 +197,16 @@ const ChartIFrameLifecycleAdapter: FC<{
       !window ||
       !config ||
       !dataset ||
+      isLoadingData ||
       containerStatus !== ContainerStatus.SUCCESS
     ) {
       return;
     }
 
     eventBrokerRef.current?.publish(
-      ChartLifecycle.RESIZE,
-      {
-        dataset,
-        config,
-        widgetSpecialConfig,
-        drillOption,
-      },
-      {
-        document,
-        window,
-        width: style?.width,
-        height: style?.height,
-        translator,
-      },
+      ChartLifecycle.Resize,
+      buildBrokerOption(),
+      buildBrokerContext(),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -196,8 +215,8 @@ const ChartIFrameLifecycleAdapter: FC<{
     document,
     window,
     isShown,
-    translator,
-    drillOption,
+    containerStatus,
+    isLoadingData,
   ]);
 
   return (

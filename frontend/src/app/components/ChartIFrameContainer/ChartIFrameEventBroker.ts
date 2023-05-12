@@ -18,36 +18,30 @@
 
 import { ChartLifecycle } from 'app/constants';
 import { IChart } from 'app/types/Chart';
+import {
+  BrokerContext,
+  BrokerLifecycleEvent,
+  BrokerOption,
+} from 'app/types/ChartLifecycleBroker';
 import { EVENT_ACTION_DELAY_MS } from 'globalConstants';
 import debounce from 'lodash/debounce';
-import { ValueOf } from 'types';
 import { Debugger } from 'utils/debugger';
 
-type BrokerContext = {
-  window?: any;
-  document?: any;
-  width?: any;
-  height?: any;
-  translator?: (key, disablePrefix, options) => string;
-};
-
-type HooksEvent = ValueOf<typeof ChartLifecycle>;
-
 class ChartIFrameEventBroker {
-  private _listeners: Map<HooksEvent, Function> = new Map();
+  private _listeners: Map<BrokerLifecycleEvent, Function> = new Map();
   private _eventCache: Map<
-    HooksEvent,
-    { options?: any; context?: BrokerContext }
+    BrokerLifecycleEvent,
+    { options: BrokerOption; context: BrokerContext }
   > = new Map();
   private _chart?: IChart;
   private _eventActions = {
-    [ChartLifecycle.MOUNTED]: this.createImmediatelyAction(
-      ChartLifecycle.MOUNTED,
+    [ChartLifecycle.Mounted]: this.createImmediatelyAction(
+      ChartLifecycle.Mounted,
     ),
-    [ChartLifecycle.UPDATED]: this.createDebounceAction(ChartLifecycle.UPDATED),
-    [ChartLifecycle.RESIZE]: this.createDebounceAction(ChartLifecycle.RESIZE),
-    [ChartLifecycle.UNMOUNTED]: this.createImmediatelyAction(
-      ChartLifecycle.UNMOUNTED,
+    [ChartLifecycle.Updated]: this.createDebounceAction(ChartLifecycle.Updated),
+    [ChartLifecycle.Resize]: this.createDebounceAction(ChartLifecycle.Resize),
+    [ChartLifecycle.UnMount]: this.createImmediatelyAction(
+      ChartLifecycle.UnMount,
     ),
   };
 
@@ -56,18 +50,22 @@ class ChartIFrameEventBroker {
     this.registerListener(c);
   }
 
-  public subscribe(event: HooksEvent, callback?: Function) {
+  public subscribe(event: BrokerLifecycleEvent, callback?: Function) {
     if (!callback || this._listeners.has(event)) {
       return;
     }
     this._listeners.set(event, callback);
   }
 
-  public publish(event: HooksEvent, options, context?: BrokerContext) {
+  public publish(
+    event: BrokerLifecycleEvent,
+    options: BrokerOption,
+    context: BrokerContext,
+  ) {
     if (!this._listeners.has(event) || !this._listeners.get(event)) {
       return;
     }
-    this._eventCache[event] = { options, context };
+    this._eventCache.set(event, { options, context });
     return this._eventActions[event]?.();
   }
 
@@ -83,47 +81,42 @@ class ChartIFrameEventBroker {
     }
   }
 
-  private createImmediatelyAction(event: HooksEvent) {
-    return () => this.actionCreator(event);
-  }
-
-  private createDebounceAction(event: HooksEvent) {
-    return debounce(() => this.actionCreator(event), EVENT_ACTION_DELAY_MS, {
-      // NOTE: in order to get a better optimization, we set `EVENT_ACTION_DELAY_MS` milliseconds delay in first time
-      // see more information with lodash doc https://www.lodashjs.com/docs/lodash.debounce
-      leading: false,
-    });
-  }
-
-  private actionCreator(event: HooksEvent) {
-    const options = this._eventCache[event]?.options;
-    const context = this._eventCache[event]?.context;
+  private actionCreator(event: BrokerLifecycleEvent) {
+    if (!this._eventCache.has(event)) {
+      return;
+    }
+    const options = this._eventCache.get(event)!.options;
+    const context = this._eventCache.get(event)!.context;
     return this.invokeEvent(event, options, context);
   }
 
-  private invokeEvent(event: HooksEvent, options, context?: BrokerContext) {
+  private invokeEvent(
+    event: BrokerLifecycleEvent,
+    options: BrokerOption,
+    context: BrokerContext,
+  ) {
     if (!this._chart) {
       return;
     }
 
     switch (event) {
-      case ChartLifecycle.MOUNTED:
+      case ChartLifecycle.Mounted:
         this._chart.state = 'mounting';
         this.safeInvoke(event, options, context);
         break;
-      case ChartLifecycle.UPDATED:
+      case ChartLifecycle.Updated:
         if (this._chart.state === 'ready') {
           this._chart.state = 'updating';
           this.safeInvoke(event, options, context);
         }
         break;
-      case ChartLifecycle.RESIZE:
+      case ChartLifecycle.Resize:
         if (this._chart.state === 'ready') {
           this._chart.state = 'updating';
           this.safeInvoke(event, options, context);
         }
         break;
-      case ChartLifecycle.UNMOUNTED:
+      case ChartLifecycle.UnMount:
         if (this._chart.state === 'ready') {
           this._chart.state = 'unmounting';
           this.safeInvoke(event, options, context);
@@ -132,10 +125,14 @@ class ChartIFrameEventBroker {
     }
   }
 
-  private safeInvoke(event: HooksEvent, options: any, context?: BrokerContext) {
+  private safeInvoke(
+    event: BrokerLifecycleEvent,
+    options: any,
+    context?: BrokerContext,
+  ) {
     try {
       Debugger.instance.measure(
-        `ChartEventBroker | ${event} `,
+        `ChartEventBroker | ${this._chart?.meta?.id} | ${event} `,
         () => {
           this._listeners.get(event)?.call?.(this._chart, options, context);
         },
@@ -144,15 +141,29 @@ class ChartIFrameEventBroker {
     } catch (e) {
       console.error(`ChartEventBroker | ${event} exception ----> `, e);
     } finally {
-      this._chart!.state = 'ready';
+      if (this._chart) {
+        this._chart.state = 'ready';
+      }
     }
   }
 
   private registerListener(c: IChart): void {
-    this.subscribe(ChartLifecycle.MOUNTED, c?.onMount);
-    this.subscribe(ChartLifecycle.UPDATED, c?.onUpdated);
-    this.subscribe(ChartLifecycle.RESIZE, c?.onResize);
-    this.subscribe(ChartLifecycle.UNMOUNTED, c?.onUnMount);
+    this.subscribe(ChartLifecycle.Mounted, c?.onMount);
+    this.subscribe(ChartLifecycle.Updated, c?.onUpdated);
+    this.subscribe(ChartLifecycle.Resize, c?.onResize);
+    this.subscribe(ChartLifecycle.UnMount, c?.onUnMount);
+  }
+
+  private createImmediatelyAction(event: BrokerLifecycleEvent) {
+    return () => this.actionCreator(event);
+  }
+
+  private createDebounceAction(event: BrokerLifecycleEvent) {
+    return debounce(() => this.actionCreator(event), EVENT_ACTION_DELAY_MS, {
+      // NOTE: in order to get a better optimization, we set `EVENT_ACTION_DELAY_MS` milliseconds delay in first time
+      // see more information with lodash doc https://www.lodashjs.com/docs/lodash.debounce
+      leading: false,
+    });
   }
 }
 

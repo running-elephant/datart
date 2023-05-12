@@ -1,26 +1,33 @@
-import { EmptyFiller } from 'app/components/EmptyFiller';
-import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { Alert } from 'app/components/Alert';
+import { AuthorizationStatus } from 'app/constants';
 import { getUserInfoByToken } from 'app/slice/thunks';
 import { StorageKeys } from 'globalConstants';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useHistory, useRouteMatch } from 'react-router';
-import styled from 'styled-components/macro';
+import { useHistory } from 'react-router';
 import persistence from 'utils/persistence';
 
 export const AuthorizationPage = () => {
+  const [status, setStatus] = useState<AuthorizationStatus>(
+    AuthorizationStatus.Initialized,
+  );
+  const [errorMessage, setErrorMessage] = useState('');
   const dispatch = useDispatch();
   const history = useHistory();
-  const paramsMatch = useRouteMatch<{ token: string }>();
-  const token = paramsMatch.params.token;
-  const t = useI18NPrefix('authorization');
 
   useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const token = searchParams.get('authorization_token');
+    const errorMessage = searchParams.get('error_message');
+
     if (token) {
+      setStatus(AuthorizationStatus.Pending);
+
       dispatch(
         getUserInfoByToken({
           token,
           resolve: () => {
+            // share page oauth login redirect
             const redirectUrl = persistence.session.get(
               StorageKeys.AuthRedirectUrl,
             );
@@ -31,24 +38,18 @@ export const AuthorizationPage = () => {
               history.replace('/');
             }
           },
+          reject: () => {
+            setStatus(AuthorizationStatus.Error);
+          },
         }),
       );
     }
-  }, [token, dispatch, history]);
-  return (
-    <Wrapper>
-      <EmptyFiller loading title={t('processing')} />
-    </Wrapper>
-  );
+
+    if (errorMessage) {
+      setStatus(AuthorizationStatus.Error);
+      setErrorMessage(errorMessage);
+    }
+  }, [dispatch, history]);
+
+  return <Alert status={status} errorMessage={errorMessage} />;
 };
-const Wrapper = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-`;

@@ -48,10 +48,16 @@ describe('Chart Tests', () => {
     const chartId = 'some chart id';
     const chartName = 'chart name';
     const chart = new Chart(chartId, chartName);
-    expect(() => chart.onMount(null, null)).toThrow(/Method not implemented/);
-    expect(() => chart.onUpdated(null, null)).toThrow(/Method not implemented/);
-    expect(() => chart.onUnMount(null, null)).toThrow(/Method not implemented/);
-    expect(() => chart.onResize(null, null)).not.toThrow(
+    expect(() => chart.onMount({} as any, {} as any)).toThrow(
+      /onMount Method Not Implemented/,
+    );
+    expect(() => chart.onUpdated({} as any, {} as any)).toThrow(
+      /onUpdated Method Not Implemented/,
+    );
+    expect(() => chart.onUnMount({} as any, {} as any)).toThrow(
+      /onUnMount Method Not Implemented/,
+    );
+    expect(() => chart.onResize({} as any, {} as any)).not.toThrow(
       /Method not implemented/,
     );
   });

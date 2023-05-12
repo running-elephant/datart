@@ -17,7 +17,7 @@
  */
 
 import { ArrowDownOutlined } from '@ant-design/icons';
-import ChartDrillContext from 'app/pages/ChartWorkbenchPage/contexts/ChartDrillContext';
+import ChartDrillContext from 'app/contexts/ChartDrillContext';
 import classnames from 'classnames';
 import { FC, memo, useContext } from 'react';
 import styled from 'styled-components/macro';
@@ -51,9 +51,9 @@ const ChartSelectedDrill: FC<{ fontSize?: string /** eg. 32px */ }> = memo(
 export default ChartSelectedDrill;
 
 const StyledChartSelectedDrill = styled(IW)<{ visibility: boolean }>`
-  visibility: ${p => (p.visibility ? 'visible' : 'hidden')};
   color: ${p => p.theme.textColorLight};
   cursor: pointer;
+  visibility: ${p => (p.visibility ? 'visible' : 'hidden')};
 
   &.active {
     color: ${p => p.theme.primary};

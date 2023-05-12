@@ -1,11 +1,10 @@
 import { DatePicker, Form, Input, Radio } from 'antd';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
+import { fetchCheckName } from 'app/utils/fetch';
 import { TIME_FORMATTER } from 'globalConstants';
 import { FC, useCallback } from 'react';
 import { JobTypes, JOB_TYPES_OPTIONS } from '../../constants';
-import { checkScheduleName } from '../../services';
 import { ExecuteFormItem, ExecuteFormItemProps } from './ExecuteFormItem';
-
 const { RangePicker } = DatePicker;
 
 interface BasicBaseFormProps extends ExecuteFormItemProps {
@@ -22,9 +21,7 @@ export const BasicBaseForm: FC<BasicBaseFormProps> = ({
   children,
   ...restProps
 }) => {
-  const t = useI18NPrefix(
-    'main.pages.schedulePage.sidebar.editorPage.basicBaseForm.index',
-  );
+  const t = useI18NPrefix('schedule.editor.basicBaseForm.index');
   const checkNameUnique = useCallback(
     async (_, name) => {
       if (!isAdd && initialName === name) {
@@ -33,7 +30,7 @@ export const BasicBaseForm: FC<BasicBaseFormProps> = ({
       if (!name) {
         return Promise.resolve();
       } else {
-        const res = await checkScheduleName(orgId, name);
+        const res = await fetchCheckName('schedules', { orgId, name });
         return res ? Promise.resolve() : Promise.reject(t('nameAlreadyExists'));
       }
     },
@@ -46,6 +43,7 @@ export const BasicBaseForm: FC<BasicBaseFormProps> = ({
         hasFeedback
         name="name"
         validateTrigger={'onBlur'}
+        getValueFromEvent={event => event.target.value?.trim()}
         rules={[
           { required: true, message: t('nameRequired') },
           { validator: checkNameUnique },

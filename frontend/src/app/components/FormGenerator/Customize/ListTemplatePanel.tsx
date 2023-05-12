@@ -17,7 +17,7 @@
  */
 
 import { DeleteOutlined } from '@ant-design/icons';
-import { Col, Divider, List, Row, Select } from 'antd';
+import { Col, Divider, List, Row, Select, Typography } from 'antd';
 import {
   ChartStyleConfig,
   ChartStyleSelectorItem,
@@ -29,6 +29,8 @@ import { FormGroupLayoutMode } from '../constants';
 import GroupLayout from '../Layout/GroupLayout';
 import { ItemLayoutProps } from '../types';
 import { itemLayoutComparer } from '../utils';
+
+const { Text } = Typography;
 
 const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
   ({
@@ -147,6 +149,7 @@ const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         <Row>
           <Col span={8}>
             <Select
+              style={{ width: '100%' }}
               dropdownMatchSelectWidth
               placeholder={t('select')}
               value={currentSelectedItem?.label}
@@ -184,7 +187,13 @@ const ListTemplatePanel: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
                         : 'white',
                   }}
                 >
-                  {item.label}
+                  <Text
+                    // @FIX 48px icon的marginLeft 22px icon的宽度
+                    style={{ width: 'calc(100% - 48px - 22px)' }}
+                    ellipsis={{ tooltip: item.label }}
+                  >
+                    {item.label}
+                  </Text>
                 </List.Item>
               )}
             />

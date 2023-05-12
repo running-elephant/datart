@@ -5,7 +5,7 @@ import {
   FundFilled,
 } from '@ant-design/icons';
 import ChartManager from 'app/models/ChartManager';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { FONT_SIZE_TITLE } from 'styles/StyleConstants';
 

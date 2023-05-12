@@ -55,6 +55,9 @@ public interface OrganizationMapperExt extends OrganizationMapper {
     })
     void deleteOrg(@Param("orgId") String orgId);
 
+    @Select("SELECT o.* FROM organization o WHERE id = #{orgId} FOR UPDATE")
+    Organization selectForUpdate(@Param("orgId") String orgId);
+
     @Select({
             "SELECT o.* FROM organization o WHERE o.name=#{name}"
     })

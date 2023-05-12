@@ -138,11 +138,12 @@ export const ColumnPermissions = memo(() => {
               placement="bottomRight"
               content={
                 <Tree
-                  className="dropdown"
+                  className="check-list medium"
                   treeData={columnDropdownData}
                   checkedKeys={checkedKeys}
                   loading={false}
                   selectable={false}
+                  showIcon={false}
                   onCheck={checkColumnPermission(id)}
                   disabled={status === ViewStatus.Archived}
                   blockNode
@@ -173,7 +174,7 @@ export const ColumnPermissions = memo(() => {
 
   return (
     <Container title="columnPermissions">
-      <Searchbar>
+      <SearchBar>
         <Col span={24}>
           <Input
             prefix={<SearchOutlined className="icon" />}
@@ -183,7 +184,7 @@ export const ColumnPermissions = memo(() => {
             onChange={debouncedSearch}
           />
         </Col>
-      </Searchbar>
+      </SearchBar>
       <ListWrapper>
         <List
           dataSource={filteredData}
@@ -199,7 +200,7 @@ export const ColumnPermissions = memo(() => {
   );
 });
 
-const Searchbar = styled(Row)`
+const SearchBar = styled(Row)`
   .input {
     padding-bottom: ${SPACE_XS};
   }

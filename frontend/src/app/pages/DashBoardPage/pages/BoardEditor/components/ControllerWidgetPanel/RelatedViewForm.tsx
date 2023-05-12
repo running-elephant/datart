@@ -34,6 +34,7 @@ import {
 } from 'app/pages/DashBoardPage/pages/Board/slice/types';
 import { Variable } from 'app/pages/MainPage/pages/VariablePage/slice/types';
 import ChartDataView from 'app/types/ChartDataView';
+import { hasAggregationFunction } from 'app/utils/chartHelper';
 import React, { memo, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import { filterValueTypeByControl, isRangeTypeController } from './utils';
@@ -107,6 +108,7 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
         if (!relatedViews) {
           return null;
         }
+
         if (
           relatedViews[index].relatedCategory ===
           ChartDataViewFieldCategory.Variable
@@ -134,21 +136,35 @@ export const RelatedViewForm: React.FC<RelatedViewFormProps> = memo(
               </Option>
             ));
         } else {
+          let viewComputedField =
+            viewMap?.[relatedViews[index].viewId]?.computedFields?.filter(
+              field =>
+                !hasAggregationFunction(field?.expression) &&
+                field.isViewComputedFields,
+            ) || [];
+
           // 字段
           return viewMap?.[relatedViews[index].viewId]?.meta
+            ?.concat(viewComputedField)
             ?.filter(v => {
               return filterValueTypeByControl(controllerType, v.type);
             })
-            .map(item => (
-              <Option key={item.id} fieldvaluetype={item.type} value={item.id}>
-                <div
-                  style={{ display: 'flex', justifyContent: 'space-between' }}
+            .map(item => {
+              return (
+                <Option
+                  key={item.name}
+                  fieldvaluetype={item.type}
+                  value={item.name}
                 >
-                  <span>{item.id}</span>
-                  <FieldType>{item.type}</FieldType>
-                </div>
-              </Option>
-            ));
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between' }}
+                  >
+                    <span>{item.name}</span>
+                    <FieldType>{item.type}</FieldType>
+                  </div>
+                </Option>
+              );
+            });
         }
       },
       [controllerType, getFormRelatedViews, queryVariables, viewMap],

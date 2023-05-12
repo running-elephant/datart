@@ -21,7 +21,9 @@ import { migrateStoryPageConfig } from 'app/migration/StoryConfig/migrateStoryPa
 import { getBoardDetail } from 'app/pages/DashBoardPage/pages/Board/slice/thunk';
 import { selectVizs } from 'app/pages/MainPage/pages/VizPage/slice/selectors';
 import { ExecuteToken } from 'app/pages/SharePage/slice/types';
+import { updateBy } from 'app/utils/mutation';
 import { RootState } from 'types';
+import { isEmpty } from 'utils/object';
 import { request2 } from 'utils/request';
 import { storyActions } from '.';
 import { getInitStoryPageConfig } from '../utils';
@@ -178,6 +180,31 @@ export const updateStoryPage = createAsyncThunk<
     });
     if (data) {
       dispatch(storyActions.updateStoryPage(storyPage));
+    }
+    return null;
+  },
+);
+export const updateStroyBoardPagesByMoveEvent = createAsyncThunk<
+  null,
+  { storyId: string; sortedPages: StoryPage[]; event: { dragId; dropId } },
+  { state: RootState }
+>(
+  'storyBoard/updateStroyBoardPagesByMoveEvent',
+  async ({ storyId, sortedPages, event }, { getState, dispatch }) => {
+    const dropPageIndex = sortedPages?.findIndex(p => p.id === event.dropId);
+    const dragPageIndex = sortedPages?.find(p => p.id === event.dragId);
+    if (dragPageIndex && dropPageIndex && dropPageIndex > -1) {
+      const newSortedPages = sortedPages.filter(p => p.id !== event?.dragId);
+      newSortedPages.splice(dropPageIndex, 0, dragPageIndex);
+
+      newSortedPages?.forEach((p, index) => {
+        if (!isEmpty(p.config.index)) {
+          const newPage = updateBy(p, draft => {
+            draft.config.index = index;
+          });
+          dispatch(updateStoryPage({ storyId, storyPage: newPage }));
+        }
+      });
     }
     return null;
   },

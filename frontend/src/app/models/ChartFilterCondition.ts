@@ -35,7 +35,6 @@ class ChartFilterCondition implements FilterCondition {
       this.value = condition.value;
       this.visualType = condition.visualType;
       this.operator = condition.operator;
-      // TODO(Stephen): really need this? to be avoid recursive constructor
       this.children = (condition.children || []).map(
         child => new ChartFilterCondition(child),
       );

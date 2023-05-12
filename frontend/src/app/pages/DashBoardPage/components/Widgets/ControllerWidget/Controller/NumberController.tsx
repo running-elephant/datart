@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { Form, InputNumber } from 'antd';
+import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import React, { memo, useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 
@@ -60,13 +61,14 @@ export const NumberController: React.FC<TextControllerProps> = memo(
     useEffect(() => {
       setVal(value);
     }, [value]);
+    const t = useI18NPrefix(`viz.common.enum.controllerPlaceHolders`);
     return (
       <StyledWrap>
         <InputNumber
           style={{ width: '100%' }}
           className="control-number-input"
           value={val}
-          placeholder="请输入数值"
+          placeholder={t('numberController')}
           onChange={_onChange}
           onPressEnter={_onChangeEnter}
           onBlur={_onBlur}
