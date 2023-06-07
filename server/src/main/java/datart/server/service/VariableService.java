@@ -34,6 +34,8 @@ public interface VariableService extends BaseCRUDService<Variable, VariableMappe
 
     List<Variable> listViewQueryVariables(String viewId);
 
+    List<Variable> listViewQueryVariablesByViewIds(Set<String> viewIds);
+
     boolean deleteByIds(Set<String> variableIds);
 
     boolean batchUpdate(List<VariableUpdateParam> updateParams);
