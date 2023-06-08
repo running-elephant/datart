@@ -46,7 +46,7 @@ public class ChartColumn {
 
     public String getDisplayName() {
         return isGroup ? label :
-                StringUtils.isNotBlank(aggregate) ? aggregate+"("+colName+")" : colName;
+                StringUtils.isNotBlank(aggregate) ? aggregate+"_"+colName+"" : colName;
     }
 
     public PoiNumFormat getNumFormat(){

@@ -341,7 +341,7 @@ export function getColumnRenderOriginName(c?: ChartDataSectionField) {
     return c.colName;
   }
   if (c.aggregate) {
-    return `${c.aggregate}(${c.colName})`;
+    return `${c.aggregate}_${c.colName}`;
   }
   if (c.category === ChartDataViewFieldCategory.DateLevelComputedField) {
     return handleDateLevelsName({ ...c, name: c.colName });

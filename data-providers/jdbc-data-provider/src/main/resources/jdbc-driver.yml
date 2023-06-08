@@ -7,6 +7,10 @@ ACCESS:
 BIG_QUERY:
   db-type: BIG_QUERY
   name: BIG_QUERY
+  literal-quote: "`"
+  identifier-quote: "'"
+  literal-end-quote: "`"
+  identifier-end-quote: "'"
   driver-class: com.simba.googlebigquery.jdbc.Driver
   url-prefix: jdbc:bigquery://
 
