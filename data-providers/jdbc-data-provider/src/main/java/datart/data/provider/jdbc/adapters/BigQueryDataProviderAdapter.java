@@ -31,7 +31,7 @@ public class BigQueryDataProviderAdapter extends JdbcDataProviderAdapter {
                 rs = metaData.getCatalogs();
             } else {
                 rs = metaData.getSchemas();
-                log.info("Database 'catalogs' is empty, get databases with 'schemas'");
+                log.info("Database 'catalogs' is true, but get databases with 'schemas'");
             }
 
             // String currDatabase = readCurrDatabase(conn, !isCatalog);
