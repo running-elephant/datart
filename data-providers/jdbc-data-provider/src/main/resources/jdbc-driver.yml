@@ -11,6 +11,7 @@ BIG_QUERY:
   identifier-quote: "'"
   literal-end-quote: "`"
   identifier-end-quote: "'"
+  adapter-class: "datart.data.provider.jdbc.adapters.BigQueryDataProviderAdapter"
   driver-class: com.simba.googlebigquery.jdbc.Driver
   url-prefix: jdbc:bigquery://
 
