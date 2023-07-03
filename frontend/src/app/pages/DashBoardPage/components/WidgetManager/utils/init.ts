@@ -317,7 +317,18 @@ export const TitleI18N = {
     },
   },
 };
-export const initPaddingTpl = () => {
+export const initPaddingTpl = (obj?: {
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+}) => {
+  const { top, bottom, left, right } = obj || {
+    top: 8,
+    bottom: 8,
+    left: 8,
+    right: 8,
+  };
   const paddingTpl: ChartStyleConfig = {
     label: 'padding.paddingGroup',
     key: 'paddingGroup',
@@ -326,25 +337,25 @@ export const initPaddingTpl = () => {
       {
         label: 'padding.top',
         key: 'top',
-        value: 8,
+        value: top,
         comType: 'inputNumber',
       },
       {
         label: 'padding.bottom',
         key: 'bottom',
-        value: 8,
+        value: bottom,
         comType: 'inputNumber',
       },
       {
         label: 'padding.left',
         key: 'left',
-        value: 8,
+        value: left,
         comType: 'inputNumber',
       },
       {
         label: 'padding.right',
         key: 'right',
-        value: 8,
+        value: right,
         comType: 'inputNumber',
       },
     ],

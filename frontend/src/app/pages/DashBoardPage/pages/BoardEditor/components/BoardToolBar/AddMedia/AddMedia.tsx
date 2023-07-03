@@ -72,6 +72,11 @@ export const AddMedia: React.FC<{}> = () => {
       icon: '',
       type: 'video',
     },
+    {
+      name: '按钮',
+      icon: '',
+      type: 'customBtn',
+    },
   ];
   const mediaWidgetItems = (
     <Menu onClick={onSelectMediaWidget}>
