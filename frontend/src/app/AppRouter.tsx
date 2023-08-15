@@ -19,7 +19,7 @@
 import { ConfigProvider, message } from 'antd';
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import { registerTheme } from 'echarts';
-import { StorageKeys } from 'globalConstants';
+import { PUBLIC_URL, StorageKeys } from 'globalConstants';
 import { antdLocales } from 'locales/i18n';
 import { useEffect, useLayoutEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -65,7 +65,7 @@ export function AppRouter() {
 
   return (
     <ConfigProvider locale={antdLocales[i18n.language]}>
-      <BrowserRouter>
+      <BrowserRouter basename={PUBLIC_URL}>
         <Helmet
           titleTemplate="%s - Datart"
           defaultTitle="Datart"

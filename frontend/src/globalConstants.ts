@@ -37,8 +37,9 @@ export enum StorageKeys {
   Theme = 'THEME',
 }
 
-export const BASE_API_URL = '/api/v1';
-export const BASE_RESOURCE_URL = '/';
+export const PUBLIC_URL = process?.env?.PUBLIC_URL || '';
+export const BASE_API_URL = `${PUBLIC_URL}/api/v1`;
+export const BASE_RESOURCE_URL = `${PUBLIC_URL}/`;
 // 1 hour
 export const DEFAULT_AUTHORIZATION_TOKEN_EXPIRATION = 1000 * 60 * 60;
 

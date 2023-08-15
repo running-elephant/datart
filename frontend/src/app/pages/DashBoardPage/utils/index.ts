@@ -40,6 +40,7 @@ import { getTime, splitRangerDateFilters } from 'app/utils/time';
 import {
   DATE_FORMATTER,
   FilterSqlOperator,
+  PUBLIC_URL,
   TIME_FORMATTER,
 } from 'globalConstants';
 import moment from 'moment';
@@ -73,7 +74,7 @@ export const dateFormatObj = {
 
 export const convertImageUrl = (urlKey: string = ''): string => {
   if (urlKey.startsWith(BOARD_FILE_IMG_PREFIX)) {
-    return `${window.location.origin}/${urlKey}`;
+    return `${window.location.origin}${PUBLIC_URL}/${urlKey}`;
   }
   return urlKey;
 };
