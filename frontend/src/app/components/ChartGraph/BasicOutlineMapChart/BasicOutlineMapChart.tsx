@@ -291,14 +291,22 @@ class BasicOutlineMapChart extends Chart {
       areaEmphasisColor,
       enableFocus,
       borderStyle,
+      roam,
     ] = getStyles(
       styleConfigs,
       ['map'],
-      ['level', 'areaColor', 'areaEmphasisColor', 'focusArea', 'borderStyle'],
+      [
+        'level',
+        'areaColor',
+        'areaEmphasisColor',
+        'focusArea',
+        'borderStyle',
+        'roam',
+      ],
     );
     return {
       map: mapLevelName,
-      roam: 'move',
+      roam: roam && 'move',
       emphasis: {
         focus: enableFocus ? 'self' : 'none',
         itemStyle: {
