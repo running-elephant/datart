@@ -243,10 +243,11 @@ class BasicPieChart extends Chart {
   }
 
   private getPieSeriesImpl(styleConfigs: ChartStyleConfig[]): PieSeriesImpl {
+    const [avoidOverlap] = getStyles(styleConfigs, ['label'], ['avoidOverlap']);
     return {
       type: 'pie',
       sampling: 'average',
-      avoidLabelOverlap: false,
+      avoidLabelOverlap: avoidOverlap,
       ...this.getLabelStyle(styleConfigs),
       ...this.getSeriesStyle(styleConfigs),
       ...getGridStyle(styleConfigs),

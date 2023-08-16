@@ -111,6 +111,12 @@ const config: ChartConfig = {
           default: true,
           comType: 'checkbox',
         },
+        {
+          label: 'label.avoidOverlap',
+          key: 'avoidOverlap',
+          default: false,
+          comType: 'checkbox',
+        },
       ],
     },
     {
@@ -284,6 +290,7 @@ const config: ChartConfig = {
           showName: '维度值',
           showPercent: '百分比',
           showValue: '指标值',
+          avoidOverlap: '强制显示所有标签',
         },
         legend: {
           title: '图例',
@@ -333,6 +340,7 @@ const config: ChartConfig = {
           showName: 'Show Name',
           showPercent: 'Show Percentage',
           showValue: 'Show Value',
+          avoidOverlap: 'Force display of all labels',
         },
         legend: {
           title: 'Legend',
