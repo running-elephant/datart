@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-import { Table } from 'antd';
+import { ConfigProvider, Table } from 'antd';
+import { antdLocales } from 'locales/i18n';
 import { FC, memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components/macro';
 
 interface TableStyleConfigProps {
@@ -47,6 +49,8 @@ const AntdTableWrapper: FC<{
   summaryFn?: (data) => { total: number; summarys: [] };
 }> = memo(
   ({ dataSource, columns, children, summaryFn, tableStyleConfig, ...rest }) => {
+    const { i18n } = useTranslation();
+
     const getTableSummaryRow = pageData => {
       if (!summaryFn) {
         return undefined;
@@ -68,13 +72,15 @@ const AntdTableWrapper: FC<{
     };
 
     return (
-      <StyledTable
-        {...rest}
-        tableStyleConfig={tableStyleConfig}
-        dataSource={dataSource}
-        columns={columns}
-        summary={getTableSummaryRow}
-      />
+      <ConfigProvider locale={antdLocales[i18n.language]}>
+        <StyledTable
+          {...rest}
+          tableStyleConfig={tableStyleConfig}
+          dataSource={dataSource}
+          columns={columns}
+          summary={getTableSummaryRow}
+        />
+      </ConfigProvider>
     );
   },
 );
