@@ -18,7 +18,7 @@
 
 import { message } from 'antd';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { BASE_API_URL } from 'globalConstants';
+import { BASE_API_URL, PUBLIC_URL } from 'globalConstants';
 import i18next from 'i18next';
 import { APIResponse } from 'types';
 import { getToken, removeToken, setToken } from './auth';
@@ -93,7 +93,7 @@ export function requestWithHeader(
 }
 
 export const getServerDomain = () => {
-  return `${window.location.protocol}//${window.location.host}`;
+  return `${window.location.protocol}//${window.location.host}${PUBLIC_URL}`;
 };
 
 function unAuthorizationErrorHandler(error) {
