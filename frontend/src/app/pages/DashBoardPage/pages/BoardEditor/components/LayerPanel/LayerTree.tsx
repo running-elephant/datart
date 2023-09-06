@@ -30,7 +30,7 @@ import {
   selectLayerTree,
   selectSelectedIds,
 } from '../../slice/selectors';
-import { LayerTreeItem } from './LayerTreeItem';
+import { EventLayerNode, LayerTreeItem } from './LayerTreeItem';
 
 export const LayerTree: FC<{}> = memo(() => {
   const dispatch = useDispatch();
@@ -57,7 +57,20 @@ export const LayerTree: FC<{}> = memo(() => {
   );
 
   const onDrop = useCallback(
-    info => dispatch(dropLayerNodeAction(info)),
+    info => {
+      const dragNode = info.dragNode as EventLayerNode;
+      const targetNode = info.node as EventLayerNode;
+      let dropPosition = 'NORMAL';
+
+      if (targetNode.dragOverGapTop) {
+        dropPosition = 'TOP';
+      }
+      if (targetNode.dragOver && !targetNode.isLeaf) {
+        dropPosition = 'FOLDER';
+      }
+
+      dispatch(dropLayerNodeAction(dragNode, targetNode, dropPosition));
+    },
     [dispatch],
   );
 
