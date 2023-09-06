@@ -1,0 +1,32 @@
+version: '3.7'
+services:
+  datart:
+    image: eoi/datart
+    container_name: eoi-datart
+    restart: always
+    volumes:
+      - datart-config-data:/datart/config
+    ports:
+      - 8765:8080
+    depends_on:
+      - selenium
+    networks:
+      datart_network:
+
+  selenium:
+    image: selenium/standalone-chrome
+    container_name: eoi-selenium
+    restart: always
+    ports:
+      - 4444
+    shm_size: 2147483648
+    networks:
+      datart_network:
+
+networks:
+  datart_network:
+
+volumes:
+  datart-config-data:
+    name: datart-config-data
+    driver: local

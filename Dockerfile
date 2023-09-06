@@ -1,4 +1,4 @@
-FROM java:8
+FROM amazoncorretto:8-alpine-jre
 LABEL "author"="tl"
 RUN mkdir /datart
 COPY ./bin/ /datart/bin/

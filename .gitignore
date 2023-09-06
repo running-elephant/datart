@@ -10,3 +10,8 @@
 
 *.iml
 *.zip
+
+frontend/node
+lib
+logs
+files
