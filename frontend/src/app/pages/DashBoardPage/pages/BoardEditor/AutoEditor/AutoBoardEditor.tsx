@@ -160,7 +160,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
         ref={ref}
       >
         {sortedLayoutWidgets.length ? (
-          <div style={{ position: 'relative' }}>
+          <>
             <div className="grid-wrap" ref={gridWrapRef}>
               <ReactGridLayout
                 layout={layoutMap[colsKey]}
@@ -183,7 +183,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
               </ReactGridLayout>
             </div>
             {!isEmptyArray(editingWidgetIds) && <BoardOverlay />}
-          </div>
+          </>
         ) : (
           <div className="empty">
             <Empty description="" />
@@ -212,6 +212,7 @@ const Wrapper = styled.div<{}>`
 `;
 
 const StyledContainer = styled(StyledBackground)<{ curWH: number[] }>`
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 0;
