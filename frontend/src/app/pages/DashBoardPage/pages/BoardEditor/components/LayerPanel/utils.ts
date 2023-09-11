@@ -18,16 +18,15 @@
 
 import { ORIGINAL_TYPE_MAP } from 'app/pages/DashBoardPage/constants';
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
-import { TabWidgetContent, WidgetInfo } from '../../../Board/slice/types';
+import { TabWidgetContent } from '../../../Board/slice/types';
 import { LayerNode } from './LayerTreeItem';
 
 export const widgetMapToTree = (args: {
   widgetMap: Record<string, Widget>;
-  widgetInfoMap: Record<string, WidgetInfo>;
   parentId: string;
   tree: LayerNode[] | undefined;
 }) => {
-  const { widgetMap, widgetInfoMap, parentId, tree } = args;
+  const { widgetMap, parentId, tree } = args;
 
   const widgets = Object.values(widgetMap).filter(widget => {
     if (!parentId && !widget.parentId) {
@@ -70,14 +69,12 @@ export const widgetMapToTree = (args: {
       boardId: widget.dashboardId,
       content: widget.config.content,
       originalType: widget.config.originalType,
-      selected: widgetInfoMap[widget.id].selected,
     };
 
     if (widget.config.originalType === ORIGINAL_TYPE_MAP.group) {
       treeNode.isLeaf = false;
       treeNode.children = widgetMapToTree({
         widgetMap,
-        widgetInfoMap,
         parentId: widget.id,
         tree: treeNode.children,
       });
@@ -85,7 +82,6 @@ export const widgetMapToTree = (args: {
       treeNode.isLeaf = false;
       treeNode.children = widgetMapToTree({
         widgetMap,
-        widgetInfoMap,
         parentId: widget.id,
         tree: treeNode.children,
       });

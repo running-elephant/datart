@@ -73,7 +73,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
   }, [height, width, x, y]);
 
   const move = useCallback(
-    (selectedIds: string[], deltaX: number, deltaY: number) => {
+    (selectedIds: string, deltaX: number, deltaY: number) => {
       if (!selectedIds.includes(widget.id)) return;
       setCurXY(c => [c[0] + deltaX, c[1] + deltaY]);
     },
@@ -115,7 +115,11 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
     (e, data) => {
       e.stopPropagation();
       const { deltaX, deltaY } = data;
-      widgetMove.emit(selectedIds.concat(widget.id), deltaX, deltaY);
+      widgetMove.emit(
+        !!selectedIds ? `${selectedIds},${widget.id}` : widget.id,
+        deltaX,
+        deltaY,
+      );
     },
     [selectedIds, widget.id],
   );
@@ -161,7 +165,7 @@ export const WidgetOfFreeEdit: React.FC<{}> = () => {
     e.stopPropagation();
   };
 
-  if (editingWidgetIds?.includes(widget?.id)) {
+  if (editingWidgetIds.includes(widget?.id)) {
     style['zIndex'] = LEVEL_DASHBOARD_EDIT_OVERLAY + 1;
   }
 

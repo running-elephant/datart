@@ -29,7 +29,6 @@ import { stopPPG } from 'utils/utils';
 export interface LayerNode extends TreeDataNode {
   key: string;
   parentId: string;
-  selected: boolean;
   children: LayerNode[];
   content: any;
   widgetIndex: number;

@@ -54,7 +54,6 @@ import {
   SPACE_MD,
   SPACE_XS,
 } from 'styles/StyleConstants';
-import { isEmptyArray } from 'utils/object';
 import BoardOverlay from '../components/BoardOverlay';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
@@ -127,7 +126,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
       return (
         <div
           style={{
-            zIndex: editingWidgetIds?.includes(item?.id)
+            zIndex: editingWidgetIds.includes(item?.id)
               ? LEVEL_DASHBOARD_EDIT_OVERLAY + 1
               : 'auto',
           }}
@@ -182,7 +181,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
                 {boardChildren}
               </ReactGridLayout>
             </div>
-            {!isEmptyArray(editingWidgetIds) && <BoardOverlay />}
+            {!!editingWidgetIds && <BoardOverlay />}
           </>
         ) : (
           <div className="empty">

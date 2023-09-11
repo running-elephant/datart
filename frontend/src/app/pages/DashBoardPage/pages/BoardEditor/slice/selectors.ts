@@ -111,8 +111,10 @@ export const selectAllWidgetInfoMap = (state: { editBoard: EditBoardState }) =>
 
 export const selectEditingWidgetIds = (state: { editBoard: EditBoardState }) =>
   Object.values(state.editBoard.widgetInfoRecord)
-    ?.filter(r => r.editing)
-    ?.map(r => r.id) || [];
+    .filter(r => r.editing)
+    .map(r => r.id)
+    .sort()
+    .join(',');
 
 export const selectWidgetInfoById = createSelector(
   [selectAllWidgetInfoMap, (_, widgetId: string) => widgetId],
@@ -135,7 +137,9 @@ export const selectSelectedIds = createSelector(
   WidgetsInfo =>
     Object.values(WidgetsInfo)
       .filter(widgetInfo => widgetInfo.selected)
-      .map(widgetInfo => widgetInfo.id) || [],
+      .map(widgetInfo => widgetInfo.id)
+      .sort()
+      .join(','),
 );
 
 export const selectWidgetInfoDatachartId = createSelector(
@@ -147,11 +151,10 @@ export const selectWidgetInfoDatachartId = createSelector(
 );
 
 export const selectLayerTree = createSelector(
-  [selectAllWidgetMap, selectAllWidgetInfoMap],
-  (widgetMap, widgetInfoMap) => {
+  [selectAllWidgetMap],
+  widgetMap => {
     return widgetMapToTree({
       widgetMap,
-      widgetInfoMap,
       parentId: '',
       tree: [],
     });

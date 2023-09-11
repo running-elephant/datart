@@ -32,12 +32,12 @@ export const CopyBtn: FC<{
   const selectedIds = useSelector(selectSelectedIds);
 
   const onCopy = () => {
-    fn(selectedIds);
+    fn();
   };
   return (
     <Tooltip title={title}>
       <ToolbarButton
-        disabled={!selectedIds.length}
+        disabled={!selectedIds}
         onClick={onCopy}
         icon={<CopyOutlined />}
       />

@@ -22,7 +22,6 @@ import { WidgetWrapProvider } from 'app/pages/DashBoardPage/components/WidgetPro
 import { memo, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
-import { isEmptyArray } from 'utils/object';
 import SlideBackground from '../../../components/FreeBoardBackground';
 import useClientRect from '../../../hooks/useClientRect';
 import useSlideStyle from '../../../hooks/useSlideStyle';
@@ -76,7 +75,7 @@ export const FreeBoardEditor: React.FC<{}> = memo(() => {
               <WidgetOfFreeEdit />
             </WidgetWrapProvider>
           ))}
-          {!isEmptyArray(editingWidgetIds) && <BoardOverlay />}
+          {!!editingWidgetIds && <BoardOverlay />}
         </SlideBackground>
       </div>
 
