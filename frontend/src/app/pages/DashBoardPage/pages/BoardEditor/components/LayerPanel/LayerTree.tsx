@@ -18,6 +18,7 @@
 
 import { Tree } from 'app/components';
 import { renderIcon } from 'app/hooks/useGetVizIcon';
+import useResizeObserver from 'app/hooks/useResizeObserver';
 import { WidgetActionContext } from 'app/pages/DashBoardPage/components/ActionProvider/WidgetActionProvider';
 import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import { FC, memo, useCallback, useContext } from 'react';
@@ -38,6 +39,11 @@ export const LayerTree: FC<{}> = memo(() => {
   const { onEditSelectWidget } = useContext(WidgetActionContext);
   const editingWidgetIds = useSelector(selectEditingWidgetIds);
   const selectedIds = useSelector(selectSelectedIds);
+
+  const { height, ref } = useResizeObserver({
+    refreshMode: 'debounce',
+    refreshRate: 200,
+  });
 
   const treeSelect = useCallback(
     (_, { node, nativeEvent }) => {
@@ -86,6 +92,8 @@ export const LayerTree: FC<{}> = memo(() => {
       onDrop={onDrop}
       treeData={treeData}
       selectedKeys={selectedIds ? selectedIds.split(',') : []}
+      height={height}
+      wrapperRef={ref}
       defaultExpandAll
     />
   );
