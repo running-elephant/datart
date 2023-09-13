@@ -42,7 +42,7 @@ export const LayerTreePanel: FC<{}> = memo(() => {
 const Panel = styled.div`
   display: flex;
   flex-direction: column;
-  width: 200px;
+  height: 100%;
   background-color: ${p => p.theme.componentBackground};
   box-shadow: ${p => p.theme.shadowSider};
 `;

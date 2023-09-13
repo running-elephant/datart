@@ -53,8 +53,7 @@ export default SlideSetting;
 const Wrapper = styled.div<{}>`
   display: flex;
   flex-direction: column;
-  width: 330px;
-  min-width: 330px;
+  height: 100%;
   min-height: 0;
   background-color: ${p => p.theme.componentBackground};
   box-shadow: ${p => p.theme.shadowSider};
