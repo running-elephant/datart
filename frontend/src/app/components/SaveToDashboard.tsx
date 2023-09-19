@@ -25,6 +25,7 @@ import { getCascadeAccess } from 'app/pages/MainPage/Access';
 import {
   PermissionLevels,
   ResourceTypes,
+  VizResourceSubTypes,
 } from 'app/pages/MainPage/pages/PermissionPage/constants';
 import { useAddViz } from 'app/pages/MainPage/pages/VizPage/hooks/useAddViz';
 import { SaveFormContext } from 'app/pages/MainPage/pages/VizPage/SaveFormContext';
@@ -136,7 +137,7 @@ const SaveToDashboard: FC<SaveToDashboardTypes> = memo(
           selectable: v.relType !== 'FOLDER',
         })),
         null,
-        [],
+        [VizResourceSubTypes.Folder],
         { getIcon, filter: filterTreeNode },
       );
     }, [vizData, getIcon, filterTreeNode]);
