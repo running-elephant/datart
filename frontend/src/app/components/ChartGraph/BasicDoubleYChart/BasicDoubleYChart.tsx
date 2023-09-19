@@ -180,6 +180,7 @@ class BasicDoubleYChart extends Chart {
         axisPointer: {
           type: 'cross',
         },
+        confine: true,
         formatter: this.getTooltipFormmaterFunc(
           styleConfigs,
           groupConfigs,
@@ -365,10 +366,10 @@ class BasicDoubleYChart extends Chart {
     );
 
     const _yAxisTemplate = (position, name): DoubleYChartYAxis => {
-      const [showAxis, inverse, font, showLabel] = getStyles(
+      const [showAxis, inverse, font, showLabel, showTitleAndUnit] = getStyles(
         styles,
         [`${position}Y`],
-        ['showAxis', 'inverseAxis', 'font', 'showLabel'],
+        ['showAxis', 'inverseAxis', 'font', 'showLabel', 'showTitleAndUnit'],
       );
       const [format] = getStyles(
         styles,
@@ -379,7 +380,7 @@ class BasicDoubleYChart extends Chart {
         type: 'value',
         position,
         showTitleAndUnit: true,
-        name,
+        name: showTitleAndUnit ? name : null,
         nameLocation: 'middle',
         nameGap: 50,
         nameRotate: 90,

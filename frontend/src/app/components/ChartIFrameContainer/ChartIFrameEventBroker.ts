@@ -149,8 +149,8 @@ class ChartIFrameEventBroker {
 
   private registerListener(c: IChart): void {
     this.subscribe(ChartLifecycle.Mounted, c?.onMount);
-    this.subscribe(ChartLifecycle.Updated, c?.onUpdated);
     this.subscribe(ChartLifecycle.Resize, c?.onResize);
+    this.subscribe(ChartLifecycle.Updated, c?.onUpdated);
     this.subscribe(ChartLifecycle.UnMount, c?.onUnMount);
   }
 

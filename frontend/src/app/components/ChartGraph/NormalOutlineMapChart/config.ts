@@ -97,6 +97,12 @@ const config: ChartConfig = {
             color: '#ced4da',
           },
         },
+        {
+          label: 'map.roam',
+          key: 'roam',
+          default: true,
+          comType: 'checkbox',
+        },
       ],
     },
     {
@@ -310,6 +316,7 @@ const config: ChartConfig = {
           focusArea: '聚焦选中区域',
           areaColor: '区域颜色',
           areaEmphasisColor: '选中区域高亮颜色',
+          roam: '鼠标平移',
         },
         levelType: {
           china: '中国-省级地图',
@@ -362,6 +369,7 @@ const config: ChartConfig = {
           focusArea: 'Focus Area',
           areaColor: 'Area Color',
           areaEmphasisColor: 'Area Emphasis Color',
+          roam: 'Mouse translating',
         },
         levelType: {
           china: 'China',

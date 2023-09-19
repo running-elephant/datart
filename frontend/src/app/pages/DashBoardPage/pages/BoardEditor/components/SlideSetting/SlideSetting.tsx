@@ -27,16 +27,17 @@ import WidgetSetting from './WidgetSetting';
 export const SlideSetting: FC<{}> = memo(() => {
   const { boardId } = useContext(BoardContext);
   const selectedIds = useSelector(selectSelectedIds);
-  const setType = useMemo(
-    () => (selectedIds.length === 1 ? 'widget' : 'board'),
-    [selectedIds.length],
-  );
+  const { type, selectedIdArr } = useMemo(() => {
+    const selectedIdArr = selectedIds ? selectedIds.split(',') : [];
+    const type = selectedIdArr.length === 1 ? 'widget' : 'board';
+    return { type, selectedIdArr };
+  }, [selectedIds]);
   return (
     <Wrapper>
-      {setType === 'board' && <BoardConfigPanel />}
-      {setType === 'widget' && (
+      {type === 'board' && <BoardConfigPanel />}
+      {type === 'widget' && (
         <WidgetWrapProvider
-          id={selectedIds[0]}
+          id={selectedIdArr[0]}
           boardEditing={true}
           boardId={boardId}
         >
@@ -52,8 +53,7 @@ export default SlideSetting;
 const Wrapper = styled.div<{}>`
   display: flex;
   flex-direction: column;
-  width: 330px;
-  min-width: 330px;
+  height: 100%;
   min-height: 0;
   background-color: ${p => p.theme.componentBackground};
   box-shadow: ${p => p.theme.shadowSider};

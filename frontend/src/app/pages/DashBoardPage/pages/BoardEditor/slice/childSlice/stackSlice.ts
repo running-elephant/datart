@@ -440,84 +440,64 @@ export const editBoardStackSlice = createSlice({
       }
     },
 
-    dropWidgetToGroup(
+    dropWidgetLayer(
       state,
-      action: PayloadAction<{
-        sourceId: string;
-        newIndex: number;
-        targetId: string;
+      {
+        payload: { id, currentParentId, newParentId, children, inTabs },
+      }: PayloadAction<{
+        id: string;
+        currentParentId: string;
+        newParentId: string;
+        children: string[];
+        inTabs: boolean;
       }>,
     ) {
       const widgetMap = state.widgetRecord;
-      const { sourceId, newIndex, targetId } = action.payload;
+      const currentParent = widgetMap[currentParentId];
+      const newParent = widgetMap[newParentId];
 
-      const dragWidget = widgetMap[sourceId];
-      //
-      const dragParent = widgetMap[dragWidget.parentId || ''];
-      if (dragParent) {
-        dragParent.config.children = dragParent.config.children?.filter(
-          t => t !== dragWidget.id,
+      if (currentParent) {
+        currentParent.config.children = currentParent.config.children?.filter(
+          c => c !== id,
         );
 
-        if (dragParent.config.originalType === ORIGINAL_TYPE_MAP.tab) {
-          const srcTabItemMap = (dragParent.config.content as TabWidgetContent)
-            .itemMap;
-
-          const srcItem = Object.values(srcTabItemMap).find(
-            item => item.childWidgetId === dragWidget.id,
+        if (currentParent.config.originalType === ORIGINAL_TYPE_MAP.tab) {
+          const currentParentItemMap = (
+            currentParent.config.content as TabWidgetContent
+          ).itemMap;
+          const draggedItem = Object.values(currentParentItemMap).find(
+            ({ childWidgetId }) => childWidgetId === id,
           );
-          if (srcItem) {
-            delete srcTabItemMap[srcItem.tabId];
-          }
-        }
-      }
-      //
-      dragWidget.config.index = newIndex;
-      dragWidget.parentId = targetId;
-      if (widgetMap[targetId]) {
-        widgetMap[targetId].config.children?.push(dragWidget.id);
-      }
-      //
-    },
-
-    dropWidgetToTab(
-      state,
-      action: PayloadAction<{
-        newItem: ContainerItem;
-        targetId: string;
-      }>,
-    ) {
-      const { newItem, targetId } = action.payload;
-      const widgetMap = state.widgetRecord;
-      const dragWidget = widgetMap[newItem.childWidgetId];
-      //
-      const dragParent = widgetMap[dragWidget.parentId || ''];
-      if (dragParent) {
-        dragParent.config.children = dragParent.config.children?.filter(
-          t => t !== dragWidget.id,
-        );
-        if (dragParent.config.originalType === ORIGINAL_TYPE_MAP.tab) {
-          const srcTabItemMap = (dragParent.config.content as TabWidgetContent)
-            .itemMap;
-
-          const srcItem = Object.values(srcTabItemMap).find(
-            item => item.childWidgetId === dragWidget.id,
-          );
-          if (srcItem) {
-            delete srcTabItemMap[srcItem.tabId];
+          if (draggedItem) {
+            delete currentParentItemMap[draggedItem.tabId];
           }
         }
       }
 
-      //
-      const targetTabWidget = widgetMap[targetId];
-      const targetTabItemMap = (
-        targetTabWidget.config.content as TabWidgetContent
-      ).itemMap;
-      targetTabItemMap[dragWidget.config.clientId] = newItem;
-      dragWidget.parentId = targetId;
+      if (inTabs) {
+        (newParent.config.content as TabWidgetContent).itemMap = {};
+      } else {
+        if (newParent) {
+          newParent.config.children = [...children];
+        }
+      }
 
-      //
+      children.forEach((id, index) => {
+        const childWidget = widgetMap[id];
+        childWidget.config.index = children.length - 1 - index;
+        childWidget.parentId = newParentId;
+
+        if (inTabs) {
+          (newParent.config.content as TabWidgetContent).itemMap[
+            childWidget.config.clientId
+          ] = {
+            index: childWidget.config.index,
+            name: childWidget.config.name,
+            tabId: childWidget.config.clientId,
+            childWidgetId: childWidget.id,
+          };
+        }
+      });
     },
     /* MediaWidgetConfig */
     changeMediaWidgetConfig(

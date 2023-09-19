@@ -80,6 +80,7 @@ const ChartDrillContextMenu: FC<{
     } else {
       rows = groupSection?.rows?.filter(v => v.uid === allFields[0].uid);
     }
+    rows = rows?.filter(row => row.type === DataViewFieldType.DATE);
     return getRuntimeDateLevelFields(rows);
   }, [drillOption, chartConfig?.datas, currentFields]);
 
