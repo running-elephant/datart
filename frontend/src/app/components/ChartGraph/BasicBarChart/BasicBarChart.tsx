@@ -242,6 +242,7 @@ class BasicBarChart extends Chart implements IChartLifecycle {
     return {
       tooltip: {
         trigger: 'item',
+        confine: true,
         formatter: this.getTooltipFormatterFunc(
           chartDataSet,
           groupConfigs,

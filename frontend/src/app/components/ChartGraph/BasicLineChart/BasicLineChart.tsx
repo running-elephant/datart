@@ -212,6 +212,7 @@ class BasicLineChart extends Chart {
     return {
       tooltip: {
         trigger: 'item',
+        confine: true,
         formatter: this.getTooltipFormmaterFunc(
           chartDataSet,
           groupConfigs,

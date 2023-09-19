@@ -180,6 +180,7 @@ class BasicDoubleYChart extends Chart {
         axisPointer: {
           type: 'cross',
         },
+        confine: true,
         formatter: this.getTooltipFormmaterFunc(
           styleConfigs,
           groupConfigs,
