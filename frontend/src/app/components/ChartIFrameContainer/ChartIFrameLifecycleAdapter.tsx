@@ -151,6 +151,39 @@ const ChartIFrameLifecycleAdapter: FC<{
   }, [chart?.meta?.id, isShown]);
 
   /**
+   * Chart Resize Event
+   * Dependency: 'style.width', 'style.height', 'document', 'window', 'isShown'
+   */
+  useEffect(() => {
+    if (
+      !isShown ||
+      !document ||
+      !window ||
+      !config ||
+      !dataset ||
+      isLoadingData ||
+      containerStatus !== ContainerStatus.SUCCESS
+    ) {
+      return;
+    }
+
+    eventBrokerRef.current?.publish(
+      ChartLifecycle.Resize,
+      buildBrokerOption(),
+      buildBrokerContext(),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    style.width,
+    style.height,
+    document,
+    window,
+    isShown,
+    containerStatus,
+    isLoadingData,
+  ]);
+
+  /**
    * Chart Update Event
    * Dependency: 'config', 'dataset', 'widgetSpecialConfig',
    * 'containerStatus', 'document', 'window', 'isShown', 'drillOption', 'selectedItems'
@@ -183,39 +216,6 @@ const ChartIFrameLifecycleAdapter: FC<{
     isShown,
     drillOption,
     selectedItems,
-    isLoadingData,
-  ]);
-
-  /**
-   * Chart Resize Event
-   * Dependency: 'style.width', 'style.height', 'document', 'window', 'isShown'
-   */
-  useEffect(() => {
-    if (
-      !isShown ||
-      !document ||
-      !window ||
-      !config ||
-      !dataset ||
-      isLoadingData ||
-      containerStatus !== ContainerStatus.SUCCESS
-    ) {
-      return;
-    }
-
-    eventBrokerRef.current?.publish(
-      ChartLifecycle.Resize,
-      buildBrokerOption(),
-      buildBrokerContext(),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    style.width,
-    style.height,
-    document,
-    window,
-    isShown,
-    containerStatus,
     isLoadingData,
   ]);
 
