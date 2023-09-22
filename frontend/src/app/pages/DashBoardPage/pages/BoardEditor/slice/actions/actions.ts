@@ -224,7 +224,7 @@ export const copyWidgetsAction = (wIds?: string[]) => (dispatch, getState) => {
 export const pasteWidgetsAction = () => (dispatch, getState) => {
   const state = getState();
   const {
-    boardInfo: { clipboardWidgetMap },
+    boardInfo: { id, clipboardWidgetMap },
   } = state.editBoard as EditBoardState;
   const boardState = state.board as BoardState;
 
@@ -243,14 +243,19 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
 
   const { newDataCharts, newWidgets } = cloneWidgets({
     widgets: clipboardWidgetList,
-    dataChartMap,
+    dashboardDataChartMap: dataChartMap[id],
     newWidgetMapping,
   });
   const widgetInfos = newWidgets.map(widget => {
     const widgetInfo = createWidgetInfo(widget.id);
     return widgetInfo;
   });
-  dispatch(boardActions.setDataChartToMap(newDataCharts));
+  dispatch(
+    boardActions.setDataChartToMap({
+      dashboardId: id,
+      dataCharts: newDataCharts,
+    }),
+  );
   dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfos));
   dispatch(editBoardStackActions.addWidgets(newWidgets));
 };
@@ -258,6 +263,7 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
 export const editChartInWidgetAction =
   (props: {
     orgId: string;
+    dashboardId: string;
     widgetId: string;
     chartName?: string;
     dataChartId: string;
@@ -266,6 +272,7 @@ export const editChartInWidgetAction =
   async (dispatch, getState) => {
     const {
       orgId,
+      dashboardId,
       widgetId,
       dataChartId,
       chartType,
@@ -274,7 +281,7 @@ export const editChartInWidgetAction =
     const board = (getState() as RootState).board!;
 
     const dataChartMap = board.dataChartMap;
-    const dataChart = dataChartMap[dataChartId];
+    const dataChart = dataChartMap[dashboardId][dataChartId];
     const viewMap = board?.viewMap;
     const withViewDataChart = produce(dataChart, draft => {
       draft.view = viewMap[draft.viewId];
@@ -301,10 +308,13 @@ export const editHasChartWidget =
       draft.viewIds = [dataChart.viewId];
     });
     dispatch(editBoardStackActions.updateWidget(nextWidget));
-    const dataCharts = [dataChart];
-    const viewViews = [view];
-    dispatch(boardActions.setDataChartToMap(dataCharts));
-    dispatch(boardActions.setViewMap(viewViews));
+    dispatch(
+      boardActions.setDataChartToMap({
+        dashboardId: curWidget.dashboardId,
+        dataCharts: [dataChart],
+      }),
+    );
+    dispatch(boardActions.setViewMap([view]));
     dispatch(getEditChartWidgetDataAsync({ widgetId: curWidget.id }));
   };
 

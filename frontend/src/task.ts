@@ -71,14 +71,14 @@ const getBoardQueryData = (dataStr: string) => {
     return obj;
   }, {});
 
-  const dataChartMap = allDataCharts.reduce((obj, dataChart) => {
+  const dashboardDataChartMap = allDataCharts.reduce((obj, dataChart) => {
     obj[dataChart.id] = dataChart;
     return obj;
   }, {});
   let downloadParams = getBoardChartRequests({
     widgetMap,
     viewMap,
-    dataChartMap,
+    dashboardDataChartMap,
   });
   let fileName = dashboard.name;
   return JSON.stringify({ downloadParams, fileName });

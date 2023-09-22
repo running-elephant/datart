@@ -16,34 +16,15 @@
  * limitations under the License.
  */
 import { ORIGINAL_TYPE_MAP } from '../../constants';
-import {
-  BoardState,
-  Dashboard,
-  DataChart,
-} from '../../pages/Board/slice/types';
+import { Dashboard, DataChart } from '../../pages/Board/slice/types';
 import { Widget } from '../../types/widgetTypes';
-const emptyWidgets = [];
-export const getChartWidgets = (
-  state: { board: BoardState },
-  boardId: string,
-) => {
-  const widgetMap = state.board.widgetRecord;
-
-  if (!widgetMap[boardId]) {
-    return emptyWidgets;
-  }
-  let chartWidgets = Object.values(widgetMap[boardId]).filter(
-    widget => widget.config.type === 'chart',
-  );
-  return chartWidgets;
-};
 
 export const getBoardTplData = (
   dataMap: Record<string, { id: string; name: string; data }>,
   boardTplData: {
     board: Dashboard;
     widgetMap: Record<string, Widget>;
-    dataChartMap: Record<string, DataChart>;
+    dataChartMap: Record<string, Record<string, DataChart>>;
   },
 ) => {
   const { board, widgetMap, dataChartMap } = boardTplData;
@@ -59,7 +40,7 @@ export const getBoardTplData = (
     };
     if (newWidgetConf.type === 'chart') {
       newWidgetConf.originalType = ORIGINAL_TYPE_MAP.ownedChart;
-      const datachart = dataChartMap[w.datachartId || ''];
+      const datachart = dataChartMap[board.id][w.datachartId || ''];
 
       if (datachart) {
         let newChart = {

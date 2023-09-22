@@ -240,6 +240,7 @@ export const WidgetActionProvider: FC<{
           dispatch(
             editChartInWidgetAction({
               orgId,
+              dashboardId: widget.dashboardId,
               widgetId: widget.id,
               chartName: widget.config.name,
               dataChartId: widget.datachartId,
@@ -270,17 +271,24 @@ export const WidgetActionProvider: FC<{
         onEditWidgetUnLock: (id: string) => {
           dispatch(editBoardStackActions.toggleLockWidget({ id, lock: false }));
         },
-        onWidgetDataUpdate: ({ computedFields, payload, widgetId }) => {
+        onWidgetChartDataConfigUpdate: ({
+          dashboardId,
+          datachartId,
+          computedFields,
+          options,
+        }) => {
           dispatch(
-            boardActions.updateDataChartGroup({
-              id: widgetId,
-              payload,
+            boardActions.updateDataChartDataConfigGroupRows({
+              dashboardId,
+              datachartId,
+              options,
             }),
           );
 
           dispatch(
-            boardActions.updateDataChartComputedFields({
-              id: widgetId,
+            boardActions.updateDataChartDataConfigComputedFields({
+              dashboardId,
+              datachartId,
               computedFields,
             }),
           );
@@ -323,14 +331,16 @@ export interface WidgetActionContextProps {
   onWidgetLinkEvent: (widget: Widget) => (params) => void;
   onUpdateWidgetSelectedItems: (widget: Widget, selectedItems) => void;
 
-  onWidgetDataUpdate: ({
+  onWidgetChartDataConfigUpdate: ({
+    dashboardId,
+    datachartId,
     computedFields,
-    payload,
-    widgetId,
+    options,
   }: {
+    dashboardId: string;
+    datachartId: string;
     computedFields: any;
-    payload: ChartConfig;
-    widgetId: string;
+    options: ChartConfig;
   }) => void;
 
   // read

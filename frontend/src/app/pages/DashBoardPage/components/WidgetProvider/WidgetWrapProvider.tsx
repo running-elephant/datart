@@ -35,7 +35,11 @@ export const WidgetWrapProvider: FC<{
         widgetId={id}
       >
         <WidgetSelectionProvider boardEditing={boardEditing} widgetId={id}>
-          <WidgetChartProvider boardEditing={boardEditing} widgetId={id}>
+          <WidgetChartProvider
+            boardId={boardId}
+            boardEditing={boardEditing}
+            widgetId={id}
+          >
             {children}
           </WidgetChartProvider>
         </WidgetSelectionProvider>

@@ -192,12 +192,6 @@ export const getDataChartsByServer = (
 
   return dataCharts;
 };
-export const getDataChartMap = (dataCharts: DataChart[]) => {
-  return dataCharts.reduce((acc, cur) => {
-    acc[cur.id] = cur;
-    return acc;
-  }, {} as Record<string, DataChart>);
-};
 
 export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {
   const viewViews: ChartDataView[] = [];

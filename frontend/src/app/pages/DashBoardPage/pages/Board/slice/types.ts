@@ -48,7 +48,7 @@ export interface BoardState {
   boardInfoRecord: Record<string, BoardInfo>;
   widgetRecord: Record<string, Record<string, Widget>>;
   widgetInfoRecord: Record<string, Record<string, WidgetInfo>>;
-  dataChartMap: Record<string, DataChart>;
+  dataChartMap: Record<string, Record<string, DataChart>>;
   viewMap: Record<string, ChartDataView>; // View
   widgetDataMap: Record<string, WidgetData | undefined>;
   availableSourceFunctionsMap: Record<string, string[]>;
