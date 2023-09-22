@@ -49,15 +49,15 @@ import {
 import { BoardInfo, BoardState } from './types';
 
 export const boardInit: BoardState = {
-  boardRecord: {} as Record<string, Dashboard>,
-  boardInfoRecord: {} as Record<string, BoardInfo>,
-  widgetRecord: {} as Record<string, Record<string, Widget>>,
-  widgetInfoRecord: {} as Record<string, Record<string, WidgetInfo>>,
-  widgetDataMap: {} as Record<string, WidgetData | undefined>,
-  dataChartMap: {} as Record<string, DataChart>,
-  viewMap: {} as Record<string, ChartDataView>, // View
-  availableSourceFunctionsMap: {} as Record<string, string[]>,
-  selectedItems: {} as Record<string, SelectedItem[]>,
+  boardRecord: {},
+  boardInfoRecord: {},
+  widgetRecord: {},
+  widgetInfoRecord: {},
+  widgetDataMap: {},
+  dataChartMap: {},
+  viewMap: {},
+  availableSourceFunctionsMap: {},
+  selectedItems: {},
 };
 // boardActions
 const boardSlice = createSlice({
@@ -94,10 +94,17 @@ const boardSlice = createSlice({
       }
       state.widgetInfoRecord[boardId] = widgetInfoMap;
     },
-    setDataChartToMap(state, action: PayloadAction<DataChart[]>) {
-      const dataCharts = action.payload;
+    setDataChartToMap(
+      state,
+      {
+        payload: { dashboardId, dataCharts },
+      }: PayloadAction<{ dashboardId: string; dataCharts: DataChart[] }>,
+    ) {
       dataCharts.forEach(dc => {
-        state.dataChartMap[dc.id] = dc;
+        if (!state.dataChartMap[dashboardId]) {
+          state.dataChartMap[dashboardId] = {};
+        }
+        state.dataChartMap[dashboardId][dc.id] = dc;
       });
     },
 
@@ -109,12 +116,13 @@ const boardSlice = createSlice({
     },
 
     clearBoardStateById(state, action: PayloadAction<string>) {
-      const boardId = action.payload;
-      delete state.boardRecord[boardId];
-      delete state.boardInfoRecord[boardId];
-      delete state.widgetRecord[boardId];
-      delete state.widgetInfoRecord[boardId];
-      // can not del :dataCharts、views
+      const dashboardId = action.payload;
+      delete state.boardRecord[dashboardId];
+      delete state.boardInfoRecord[dashboardId];
+      delete state.widgetRecord[dashboardId];
+      delete state.widgetInfoRecord[dashboardId];
+      delete state.dataChartMap[dashboardId];
+      // can't del: views
     },
     setGroupWidgetsById(
       state,
@@ -371,35 +379,43 @@ const boardSlice = createSlice({
         state.widgetRecord[boardId][widget.id] = widget;
       });
     },
-    updateDataChartGroup(
+    updateDataChartDataConfigGroupRows(
       state,
-      action: PayloadAction<{ id: string; payload }>,
+      {
+        payload: { dashboardId, datachartId, options },
+      }: PayloadAction<{ dashboardId: string; datachartId: string; options }>,
     ) {
-      const dataChart = state.dataChartMap[action.payload.id];
+      const dataChart = state.dataChartMap[dashboardId][datachartId];
 
       if (dataChart?.config) {
         const index = dataChart?.config?.chartConfig?.datas?.findIndex(
           section => section.type === ChartDataSectionType.Group,
         );
-        if (index !== undefined && dataChart.config.chartConfig.datas) {
-          dataChart.config.chartConfig.datas[index].rows =
-            action.payload.payload?.value?.rows;
+        if (
+          index !== undefined &&
+          index >= 0 &&
+          dataChart.config.chartConfig.datas
+        ) {
+          dataChart.config.chartConfig.datas[index].rows = options?.value?.rows;
         }
-        state.dataChartMap[action.payload.id] = dataChart;
+        state.dataChartMap[dashboardId][datachartId] = dataChart;
       }
     },
-    updateDataChartComputedFields(
+    updateDataChartDataConfigComputedFields(
       state,
-      action: PayloadAction<{
-        id: string;
+      {
+        payload: { dashboardId, datachartId, computedFields },
+      }: PayloadAction<{
+        dashboardId: string;
+        datachartId: string;
         computedFields: any;
       }>,
     ) {
-      const dataChart = state.dataChartMap[action.payload.id];
+      const dataChart = state.dataChartMap[dashboardId][datachartId];
 
       if (dataChart?.config) {
-        dataChart.config.computedFields = action.payload.computedFields;
-        state.dataChartMap[action.payload.id] = dataChart;
+        dataChart.config.computedFields = computedFields;
+        state.dataChartMap[dashboardId][datachartId] = dataChart;
       }
     },
     changeSelectedItems(

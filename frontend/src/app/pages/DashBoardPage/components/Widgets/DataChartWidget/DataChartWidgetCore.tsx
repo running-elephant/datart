@@ -83,7 +83,8 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   const dispatch = useDispatch();
   const scale = useContext(BoardScaleContext);
   const { data: dataset } = useContext(WidgetDataContext);
-  const { renderMode, orgId, queryVariables } = useContext(BoardContext);
+  const { boardId, renderMode, orgId, queryVariables } =
+    useContext(BoardContext);
   const selectedItems = useContext(WidgetSelectionContext);
   const executeTokenMap = useSelector(selectShareExecuteTokenMap);
   const widget = useContext(WidgetContext);
@@ -101,7 +102,7 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
     onWidgetChartClick,
     onWidgetLinkEvent,
     onWidgetGetData,
-    onWidgetDataUpdate,
+    onWidgetChartDataConfigUpdate,
     onUpdateWidgetSelectedItems,
   } = useContext(WidgetActionContext);
   const { cacheWhRef, cacheW, cacheH } = useCacheWidthHeight();
@@ -171,12 +172,12 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
   }, [widget]);
 
   const handleDateLevelChange = useCallback(
-    (type, payload) => {
-      const rows = getRuntimeDateLevelFields(payload.value?.rows);
+    (type, options) => {
+      const rows = getRuntimeDateLevelFields(options.value?.rows);
       const dateLevelComputedFields = rows.filter(
         v => v.category === ChartDataViewFieldCategory.DateLevelComputedField,
       );
-      const replacedConfig = payload.value.replacedConfig;
+      const replacedConfig = options.value.replacedConfig;
       // TODO delete computedFields,
       const computedFields = getRuntimeComputedFields(
         dateLevelComputedFields,
@@ -185,18 +186,20 @@ export const DataChartWidgetCore: React.FC<{}> = memo(() => {
         true,
       );
       if (dataChart?.id) {
-        onWidgetDataUpdate({
+        onWidgetChartDataConfigUpdate({
+          dashboardId: boardId,
+          datachartId: dataChart.id,
           computedFields,
-          payload,
-          widgetId: dataChart.id,
+          options,
         });
       }
       onWidgetGetData(widgetRef.current);
     },
     [
-      onWidgetDataUpdate,
+      boardId,
       dataChart?.config?.computedFields,
       dataChart?.id,
+      onWidgetChartDataConfigUpdate,
       onWidgetGetData,
     ],
   );

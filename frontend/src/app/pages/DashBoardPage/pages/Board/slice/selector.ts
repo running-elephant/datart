@@ -21,7 +21,6 @@ import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import { RootState } from 'types';
 import { boardInit } from '.';
 import { getLayoutWidgets } from '../../../utils/widget';
-import { WidgetInfo } from './types';
 const DefaultObject = {};
 export const selectPropsId = (_: unknown, id: string) => id;
 
@@ -119,24 +118,6 @@ export const selectWidgetInfoBy2Id = createSelector(
     }
   },
 );
-export const selectLayoutWidgetInfoMapById = createSelector(
-  selectBoardWidgetMap,
-  selectWidgetInfoGroupMap,
-  selectPropsId,
-  (allWidgetMap, allWidgetInfoMap, id) => {
-    if (!allWidgetMap[id]) return DefaultObject;
-    if (!allWidgetInfoMap[id]) return DefaultObject;
-
-    const layoutWidgets = getLayoutWidgets(allWidgetMap[id]);
-    const widgetInfoMap = allWidgetInfoMap[id];
-    const layoutWidgetsInfo: Record<string, WidgetInfo> = DefaultObject;
-
-    layoutWidgets.forEach(w => {
-      layoutWidgetsInfo[w.id] = widgetInfoMap[w.id];
-    });
-    return layoutWidgetsInfo;
-  },
-);
 
 export const makeSelectBoardConfigById = () =>
   createSelector(selectBoardRecord, selectPropsId, (boardRecord, id) => {
@@ -160,8 +141,13 @@ export const selectDataChartMap = createSelector(
 );
 
 export const selectDataChartById = createSelector(
-  [selectDataChartMap, (_, chartId: string) => chartId],
-  (dataChartMap, id) => dataChartMap[id] || undefined,
+  [
+    selectDataChartMap,
+    (_, dashboardId: string) => dashboardId,
+    (_, __, datachartId: string) => datachartId,
+  ],
+  (dataChartMap, dashboardId, datachartId) =>
+    dataChartMap[dashboardId]?.[datachartId],
 );
 
 export const selectViewMap = createSelector(
@@ -174,7 +160,6 @@ export const selectAvailableSourceFunctionsMap = createSelector(
   state => state.availableSourceFunctionsMap,
 );
 
-// dataChartMap
 export const selectWidgetDataById = createSelector(
   [boardState, selectPropsId],
   (state, wid) => state.widgetDataMap[wid] || DefaultWidgetData,

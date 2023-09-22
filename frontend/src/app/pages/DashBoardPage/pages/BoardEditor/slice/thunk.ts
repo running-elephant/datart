@@ -50,7 +50,6 @@ import {
   editWidgetSelectedItemsActions,
 } from '.';
 import { BoardInfo, BoardType, ServerDashboard } from '../../Board/slice/types';
-import { getDataChartMap } from './../../../utils/board';
 import { adjustWidgetsToBoard } from './../../../utils/widget';
 import { addVariablesToBoard } from './actions/actions';
 import {
@@ -134,7 +133,12 @@ export const fetchEditBoardDetail = createAsyncThunk<
     // datacharts
 
     const allDataCharts: DataChart[] = dataCharts.concat(wrappedDataCharts);
-    dispatch(boardActions.setDataChartToMap(allDataCharts));
+    dispatch(
+      boardActions.setDataChartToMap({
+        dashboardId: dashboard.id,
+        dataCharts: allDataCharts,
+      }),
+    );
     const viewViews = getChartDataView(serverViews, allDataCharts);
 
     dispatch(boardActions.updateViewMap(viewViews));
@@ -177,7 +181,7 @@ export const toUpdateDashboard = createAsyncThunk<
     const { dataChartMap, viewMap } = boardState.board;
     const widgets = convertWrapChartWidget({
       widgetMap: widgetRecord,
-      dataChartMap,
+      dashboardDataChartMap: dataChartMap[boardId],
       viewMap,
     });
 
@@ -275,20 +279,27 @@ export const addDataChartWidgets = createAsyncThunk<
       method: 'get',
     });
     const dataCharts: DataChart[] = getDataChartsByServer(datacharts, views);
-    const dataChartMap = getDataChartMap(dataCharts);
+    const dashboardDataChartMap = datacharts.reduce<
+      Record<string, ServerDatachart>
+    >((acc, cur) => {
+      acc[cur.id] = cur;
+      return acc;
+    }, {});
     const viewViews = getChartDataView(views, dataCharts);
-    dispatch(boardActions.setDataChartToMap(dataCharts));
+    dispatch(
+      boardActions.setDataChartToMap({ dashboardId: boardId, dataCharts }),
+    );
     dispatch(boardActions.setViewMap(viewViews));
 
     const widgets = chartIds.map(dcId => {
-      const dataChart = dataChartMap[dcId];
+      const dataChart = dashboardDataChartMap[dcId];
       const viewIds = dataChart.viewId ? [dataChart.viewId] : [];
       let widget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.linkedChart).create({
         boardType: boardType,
         datachartId: dcId,
         relations: [],
         name: dataChart.name,
-        content: dataChartMap[dcId],
+        content: dashboardDataChartMap[dcId],
         viewIds: viewIds,
       });
       return widget;
@@ -321,7 +332,9 @@ export const addWrapChartWidget = createAsyncThunk<
   ) => {
     const dataCharts = [dataChart];
     const viewViews = view ? [view] : [];
-    dispatch(boardActions.setDataChartToMap(dataCharts));
+    dispatch(
+      boardActions.setDataChartToMap({ dashboardId: boardId, dataCharts }),
+    );
     dispatch(boardActions.setViewMap(viewViews));
     let widget = widgetManager.toolkit(ORIGINAL_TYPE_MAP.ownedChart).create({
       boardType: boardType,
@@ -357,7 +370,9 @@ export const addChartWidget = createAsyncThunk<
   ) => {
     const dataCharts = [dataChart];
     const viewViews = [view];
-    dispatch(boardActions.setDataChartToMap(dataCharts));
+    dispatch(
+      boardActions.setDataChartToMap({ dashboardId: boardId, dataCharts }),
+    );
     dispatch(boardActions.setViewMap(viewViews));
 
     const originalType =
@@ -484,7 +499,7 @@ export const syncEditBoardWidgetChartDataAsync = createAsyncThunk<
       bid: curWidget.dashboardId,
       wid: widgetId,
     });
-    const dataChart = dataChartMap?.[curWidget.datachartId];
+    const dataChart = dataChartMap[boardId]?.[curWidget.datachartId];
     const chartDataView = viewMap?.[dataChart?.viewId];
     const requestParams = new ChartDataRequestBuilder(
       {
@@ -603,7 +618,7 @@ export const getEditChartWidgetDataAsync = createAsyncThunk<
       viewMap,
       option,
       widgetInfo,
-      dataChartMap,
+      dashboardDataChartMap: dataChartMap[curWidget.dashboardId],
       boardLinkFilters,
       drillOption,
     });

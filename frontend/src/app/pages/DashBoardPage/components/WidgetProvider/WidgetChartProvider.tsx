@@ -63,20 +63,26 @@ export const WidgetChartContext = createContext<{
 });
 
 export const WidgetChartProvider: FC<{
+  boardId: string;
   boardEditing: boolean;
   widgetId: string;
-}> = memo(({ boardEditing, widgetId, children }) => {
+}> = memo(({ boardId, boardEditing, widgetId, children }) => {
   const { datachartId } = useContext(WidgetContext);
   const dispatch = useDispatch();
   useEffect(() => {
     if (!datachartId) return;
     if (!widgetId) return;
     dispatch(
-      setWidgetSampleDataAction({ boardEditing, datachartId, wid: widgetId }),
+      setWidgetSampleDataAction({
+        boardId,
+        boardEditing,
+        datachartId,
+        wid: widgetId,
+      }),
     );
-  }, [boardEditing, datachartId, dispatch, widgetId]);
+  }, [boardId, boardEditing, datachartId, dispatch, widgetId]);
   const dataChart = useSelector((state: { board: BoardState }) =>
-    selectDataChartById(state, datachartId),
+    selectDataChartById(state, boardId, datachartId),
   );
   const availableSourceFunctionsMap = useSelector(
     selectAvailableSourceFunctionsMap,

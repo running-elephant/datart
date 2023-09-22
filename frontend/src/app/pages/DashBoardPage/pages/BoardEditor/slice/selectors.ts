@@ -43,12 +43,7 @@ export const editBoardStackState = (state: { editBoard: HistoryEditBoard }) =>
 export const selectEditBoard = createSelector([editBoardStackState], state => {
   return state.dashBoard;
 });
-export const selectEditWidgetRecord = createSelector(
-  [editBoardStackState],
-  state => {
-    return state.widgetRecord;
-  },
-);
+
 export const selectAllWidgetMap = createSelector(
   [editBoardStackState],
   state => state.widgetRecord || DefaultObject,
