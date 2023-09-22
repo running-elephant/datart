@@ -108,7 +108,9 @@ export const DefaultValue = memo(
 
     const datePickerConfirm = useCallback(
       val => {
-        saveRegular(val);
+        if (val) {
+          saveRegular(val);
+        }
       },
       [saveRegular],
     );
@@ -142,7 +144,7 @@ export const DefaultValue = memo(
             format={TIME_FORMATTER}
             className="input"
             disabled={!!disabled}
-            onOk={datePickerConfirm}
+            onChange={datePickerConfirm}
             showNow
             showTime
           />
