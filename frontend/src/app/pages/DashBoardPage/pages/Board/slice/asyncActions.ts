@@ -115,7 +115,12 @@ export const handleServerBoardAction =
       }),
     );
     dispatch(boardActions.setViewMap(viewViews));
-    dispatch(boardActions.setDataChartToMap(allDataCharts));
+    dispatch(
+      boardActions.setDataChartToMap({
+        dashboardId: dashboard.id,
+        dataCharts: allDataCharts,
+      }),
+    );
     dispatch(
       boardActions.setWidgetMapState({
         boardId: dashboard.id,
@@ -207,7 +212,7 @@ export const getBoardDownloadParams =
     let requestParams = getBoardChartRequests({
       widgetMap,
       viewMap,
-      dataChartMap,
+      dashboardDataChartMap: dataChartMap[boardId],
     }) as ChartDataRequest[];
 
     return { requestParams, fileName };

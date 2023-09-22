@@ -54,7 +54,6 @@ import {
   SPACE_MD,
   SPACE_XS,
 } from 'styles/StyleConstants';
-import { isEmptyArray } from 'utils/object';
 import BoardOverlay from '../components/BoardOverlay';
 import DeviceList from '../components/DeviceList';
 import { editBoardStackActions, editDashBoardInfoActions } from '../slice';
@@ -127,7 +126,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
       return (
         <div
           style={{
-            zIndex: editingWidgetIds?.includes(item?.id)
+            zIndex: editingWidgetIds.includes(item?.id)
               ? LEVEL_DASHBOARD_EDIT_OVERLAY + 1
               : 'auto',
           }}
@@ -160,7 +159,7 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
         ref={ref}
       >
         {sortedLayoutWidgets.length ? (
-          <div style={{ position: 'relative' }}>
+          <>
             <div className="grid-wrap" ref={gridWrapRef}>
               <ReactGridLayout
                 layout={layoutMap[colsKey]}
@@ -182,8 +181,8 @@ export const AutoBoardEditor: React.FC<{}> = memo(() => {
                 {boardChildren}
               </ReactGridLayout>
             </div>
-            {!isEmptyArray(editingWidgetIds) && <BoardOverlay />}
-          </div>
+            {!!editingWidgetIds && <BoardOverlay />}
+          </>
         ) : (
           <div className="empty">
             <Empty description="" />
@@ -212,6 +211,7 @@ const Wrapper = styled.div<{}>`
 `;
 
 const StyledContainer = styled(StyledBackground)<{ curWH: number[] }>`
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 0;

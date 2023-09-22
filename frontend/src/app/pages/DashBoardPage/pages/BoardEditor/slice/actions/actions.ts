@@ -25,7 +25,6 @@ import {
 import { boardActions } from 'app/pages/DashBoardPage/pages/Board/slice';
 import {
   BoardState,
-  ContainerItem,
   Dashboard,
   DataChart,
   TabWidgetContent,
@@ -58,7 +57,7 @@ import { ORIGINAL_TYPE_MAP } from '../../../../constants';
 import { selectWidgetInfoMap } from '../../../Board/slice/selector';
 import { syncBoardWidgetChartDataAsync } from '../../../Board/slice/thunk';
 import { EventLayerNode } from '../../components/LayerPanel/LayerTreeItem';
-import { getNewDragNodeValue } from '../../components/LayerPanel/utils';
+import { getDropInfo } from '../../components/LayerPanel/utils';
 import { selectAllWidgetInfoMap } from '../selectors';
 import {
   getEditChartWidgetDataAsync,
@@ -225,7 +224,7 @@ export const copyWidgetsAction = (wIds?: string[]) => (dispatch, getState) => {
 export const pasteWidgetsAction = () => (dispatch, getState) => {
   const state = getState();
   const {
-    boardInfo: { clipboardWidgetMap },
+    boardInfo: { id, clipboardWidgetMap },
   } = state.editBoard as EditBoardState;
   const boardState = state.board as BoardState;
 
@@ -244,14 +243,19 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
 
   const { newDataCharts, newWidgets } = cloneWidgets({
     widgets: clipboardWidgetList,
-    dataChartMap,
+    dashboardDataChartMap: dataChartMap[id],
     newWidgetMapping,
   });
   const widgetInfos = newWidgets.map(widget => {
     const widgetInfo = createWidgetInfo(widget.id);
     return widgetInfo;
   });
-  dispatch(boardActions.setDataChartToMap(newDataCharts));
+  dispatch(
+    boardActions.setDataChartToMap({
+      dashboardId: id,
+      dataCharts: newDataCharts,
+    }),
+  );
   dispatch(editWidgetInfoActions.addWidgetInfos(widgetInfos));
   dispatch(editBoardStackActions.addWidgets(newWidgets));
 };
@@ -259,6 +263,7 @@ export const pasteWidgetsAction = () => (dispatch, getState) => {
 export const editChartInWidgetAction =
   (props: {
     orgId: string;
+    dashboardId: string;
     widgetId: string;
     chartName?: string;
     dataChartId: string;
@@ -267,6 +272,7 @@ export const editChartInWidgetAction =
   async (dispatch, getState) => {
     const {
       orgId,
+      dashboardId,
       widgetId,
       dataChartId,
       chartType,
@@ -275,7 +281,7 @@ export const editChartInWidgetAction =
     const board = (getState() as RootState).board!;
 
     const dataChartMap = board.dataChartMap;
-    const dataChart = dataChartMap[dataChartId];
+    const dataChart = dataChartMap[dashboardId][dataChartId];
     const viewMap = board?.viewMap;
     const withViewDataChart = produce(dataChart, draft => {
       draft.view = viewMap[draft.viewId];
@@ -302,10 +308,13 @@ export const editHasChartWidget =
       draft.viewIds = [dataChart.viewId];
     });
     dispatch(editBoardStackActions.updateWidget(nextWidget));
-    const dataCharts = [dataChart];
-    const viewViews = [view];
-    dispatch(boardActions.setDataChartToMap(dataCharts));
-    dispatch(boardActions.setViewMap(viewViews));
+    dispatch(
+      boardActions.setDataChartToMap({
+        dashboardId: curWidget.dashboardId,
+        dataCharts: [dataChart],
+      }),
+    );
+    dispatch(boardActions.setViewMap([view]));
     dispatch(getEditChartWidgetDataAsync({ widgetId: curWidget.id }));
   };
 
@@ -494,45 +503,48 @@ export const editorWidgetClearLinkageAction =
     });
   };
 
-export const dropLayerNodeAction = info => (dispatch, getState) => {
-  const dragNode = info.dragNode as EventLayerNode;
-  const targetNode = info.node as EventLayerNode;
-  const editBoard = getState().editBoard as HistoryEditBoard;
-  const widgetMap = editBoard.stack.present.widgetRecord;
+export const dropLayerNodeAction =
+  (
+    dragNode: EventLayerNode,
+    targetNode: EventLayerNode,
+    dropPosition: string,
+  ) =>
+  (dispatch, getState) => {
+    const editBoard = getState().editBoard as HistoryEditBoard;
+    const widgetMap = editBoard.stack.present.widgetRecord;
+    const newParentId =
+      dropPosition === 'FOLDER' ? targetNode.key : targetNode.parentId;
+    const { siblings, inTabs } = getDropInfo(
+      widgetMap,
+      dragNode.key,
+      newParentId,
+    );
+    let reorderedChildren: string[] = [];
 
-  /*
-  1 -> group
-  2 -> container
-  */
-  //拖拽节点来自 group
-  const newDragVal = getNewDragNodeValue({ widgetMap, dragNode, targetNode });
-  if (newDragVal.parentIsGroup) {
-    // 拖进 group
+    switch (dropPosition) {
+      case 'TOP':
+        reorderedChildren = [dragNode.key, ...siblings];
+        break;
+      case 'FOLDER':
+        reorderedChildren = [dragNode.key, ...siblings];
+        break;
+      default:
+        const targetIndex = siblings.findIndex(s => s === targetNode.key);
+        siblings.splice(targetIndex + 1, 0, dragNode.key);
+        reorderedChildren = [...siblings];
+        break;
+    }
+
     dispatch(
-      editBoardStackActions.dropWidgetToGroup({
-        sourceId: dragNode.key,
-        newIndex: newDragVal.index,
-        targetId: newDragVal.parentId,
+      editBoardStackActions.dropWidgetLayer({
+        id: dragNode.key,
+        currentParentId: dragNode.parentId,
+        newParentId,
+        children: reorderedChildren,
+        inTabs,
       }),
     );
-  } else {
-    // 拖进 tab
-    const dragWidget = widgetMap[dragNode.key];
-    const newItem: ContainerItem = {
-      index: newDragVal.index,
-      name: dragWidget.config.name,
-      tabId: dragWidget.config.clientId,
-      childWidgetId: dragWidget.id,
-    };
-    dispatch(
-      editBoardStackActions.dropWidgetToTab({
-        newItem,
-        targetId: newDragVal.parentId,
-      }),
-    );
-    return;
-  }
-};
+  };
 
 export const selectWidgetAction =
   (args: { multipleKey: boolean; id: string; selected: boolean }) =>

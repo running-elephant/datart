@@ -30,6 +30,7 @@ import {
   transformToViewConfig,
 } from 'app/utils/internalChartHelper';
 import { saveAs } from 'file-saver';
+import { BASE_RESOURCE_URL } from 'globalConstants';
 import i18next from 'i18next';
 import qs from 'qs';
 import { request2, requestWithHeader } from 'utils/request';
@@ -250,7 +251,7 @@ export async function downloadFile(id) {
 
 export async function fetchPluginChart(path) {
   const result = await request2(path, {
-    baseURL: '/',
+    baseURL: BASE_RESOURCE_URL,
     headers: { Accept: 'application/javascript' },
   }).catch(error => {
     console.error(error);

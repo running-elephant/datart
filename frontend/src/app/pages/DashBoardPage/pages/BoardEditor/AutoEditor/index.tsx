@@ -16,24 +16,46 @@
  * limitations under the License.
  */
 
+import { SplitPane } from 'app/components/SplitPane';
+import { dispatchResize } from 'app/utils/dispatchResize';
 import { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
-import { LEVEL_1 } from 'styles/StyleConstants';
 import { WidgetActionContext } from '../../../components/ActionProvider/WidgetActionProvider';
 import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
 import { LayerTreePanel } from '../components/LayerPanel/LayerTreePanel';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
 import { AutoBoardEditor } from './AutoBoardEditor';
+
 export const AutoEditor: React.FC<{}> = memo(() => {
   const { onEditClearActiveWidgets } = useContext(WidgetActionContext);
+  const clearSelectedWidgets = e => {
+    e.stopPropagation();
+    onEditClearActiveWidgets();
+  };
+
   return (
-    <Wrapper onClick={onEditClearActiveWidgets}>
+    <Wrapper onClick={clearSelectedWidgets}>
       <BoardToolBar />
-      <Editor>
+      <SplitPane
+        defaultSize={256}
+        minSize={200}
+        maxSize={400}
+        pane2Style={{ minWidth: 0 }}
+        onDragFinished={dispatchResize}
+      >
         <LayerTreePanel />
-        <AutoBoardEditor />
-        <SlideSetting />
-      </Editor>
+        <SplitPane
+          defaultSize={300}
+          minSize={200}
+          maxSize={400}
+          primary="second"
+          pane1Style={{ display: 'flex', minWidth: 0 }}
+          onDragFinished={dispatchResize}
+        >
+          <AutoBoardEditor />
+          <SlideSetting />
+        </SplitPane>
+      </SplitPane>
     </Wrapper>
   );
 });
@@ -44,12 +66,4 @@ const Wrapper = styled.div`
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
-`;
-
-const Editor = styled.div`
-  z-index: ${LEVEL_1};
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  overflow-x: auto;
 `;

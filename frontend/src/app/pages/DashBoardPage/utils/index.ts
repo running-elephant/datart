@@ -40,6 +40,7 @@ import { getTime, splitRangerDateFilters } from 'app/utils/time';
 import {
   DATE_FORMATTER,
   FilterSqlOperator,
+  PUBLIC_URL,
   TIME_FORMATTER,
 } from 'globalConstants';
 import moment from 'moment';
@@ -73,7 +74,7 @@ export const dateFormatObj = {
 
 export const convertImageUrl = (urlKey: string = ''): string => {
   if (urlKey.startsWith(BOARD_FILE_IMG_PREFIX)) {
-    return `${window.location.origin}/${urlKey}`;
+    return `${window.location.origin}${PUBLIC_URL}/${urlKey}`;
   }
   return urlKey;
 };
@@ -406,7 +407,7 @@ export const getChartWidgetRequestParams = (obj: {
   widgetInfo: WidgetInfo | undefined;
   option: getDataOption | undefined;
   viewMap: Record<string, ChartDataView>;
-  dataChartMap: Record<string, DataChart>;
+  dashboardDataChartMap: Record<string, DataChart>;
   boardLinkFilters?: BoardLinkFilter[];
   drillOption: ChartDrillOption | undefined;
 }) => {
@@ -415,7 +416,7 @@ export const getChartWidgetRequestParams = (obj: {
     widgetMap,
     viewMap,
     widgetInfo,
-    dataChartMap,
+    dashboardDataChartMap,
     option,
     boardLinkFilters,
     drillOption,
@@ -425,7 +426,7 @@ export const getChartWidgetRequestParams = (obj: {
   if (!curWidget) return null;
   if (curWidget.config.type !== 'chart') return null;
   if (!curWidget.datachartId) return null;
-  const dataChart = dataChartMap[curWidget.datachartId];
+  const dataChart = dashboardDataChartMap[curWidget.datachartId];
   if (!dataChart) {
     // errorHandle(`can\`t find Chart ${curWidget.datachartId}`);
     return null;
@@ -501,9 +502,9 @@ export const getChartWidgetRequestParams = (obj: {
 export const getBoardChartRequests = (params: {
   widgetMap: Record<string, Widget>;
   viewMap: Record<string, ChartDataView>;
-  dataChartMap: Record<string, DataChart>;
+  dashboardDataChartMap: Record<string, DataChart>;
 }) => {
-  const { widgetMap, viewMap, dataChartMap } = params;
+  const { widgetMap, viewMap, dashboardDataChartMap } = params;
   const chartWidgetIds = Object.values(widgetMap)
     .filter(w => w.config.type === 'chart')
     .map(w => w.id);
@@ -523,7 +524,7 @@ export const getBoardChartRequests = (params: {
           viewMap,
           option: undefined,
           widgetInfo: undefined,
-          dataChartMap,
+          dashboardDataChartMap,
           drillOption,
         }),
         ...{

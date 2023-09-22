@@ -4,17 +4,17 @@ const eventBus = new EventEmitter();
 const WIDGET_MOVE = 'widgetMove';
 const WIDGET_MOVE_END = 'widgetMoveEnd';
 const BOARD_SCROLL = 'boardScroll';
-eventBus.setMaxListeners(100);
+eventBus.setMaxListeners(1000);
 interface FnWidgetMove {
-  (selectedIds: string[], deltaX: number, deltaY: number): void;
+  (selectedIdStr: string, deltaX: number, deltaY: number): void;
 }
 
 export const widgetMove = {
   on: (fn: FnWidgetMove) => {
     eventBus.addListener(WIDGET_MOVE, fn);
   },
-  emit: (selectedIds: string[], deltaX: number, deltaY: number) => {
-    eventBus.emit(WIDGET_MOVE, selectedIds, deltaX, deltaY);
+  emit: (selectedIdStr: string, deltaX: number, deltaY: number) => {
+    eventBus.emit(WIDGET_MOVE, selectedIdStr, deltaX, deltaY);
   },
   off: (fn: FnWidgetMove) => {
     eventBus.removeListener(WIDGET_MOVE, fn);

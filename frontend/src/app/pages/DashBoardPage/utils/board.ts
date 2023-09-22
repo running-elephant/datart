@@ -83,7 +83,7 @@ export const getScheduleBoardInfo = (
   let newBoardInfo: BoardInfo = { ...boardInfo };
   const needFetchItems = Object.values(widgetMap)
     .filter(widget => {
-      if (widget.viewIds && widget.viewIds.length > 0) {
+      if (widget.viewIds && widget.viewIds.length > 0 && widget.viewIds[0]) {
         return true;
       }
       return false;
@@ -191,12 +191,6 @@ export const getDataChartsByServer = (
   });
 
   return dataCharts;
-};
-export const getDataChartMap = (dataCharts: DataChart[]) => {
-  return dataCharts.reduce((acc, cur) => {
-    acc[cur.id] = cur;
-    return acc;
-  }, {} as Record<string, DataChart>);
 };
 
 export const getChartDataView = (views: View[], dataCharts: DataChart[]) => {

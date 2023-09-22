@@ -254,6 +254,12 @@ const config: ChartConfig = {
           },
         },
         {
+          label: 'common.showTitleAndUnit',
+          key: 'showTitleAndUnit',
+          default: true,
+          comType: 'checkbox',
+        },
+        {
           label: 'yAxis.open',
           key: 'modal',
           comType: 'group',
@@ -330,6 +336,12 @@ const config: ChartConfig = {
             fontStyle: 'normal',
             color: '#495057',
           },
+        },
+        {
+          label: 'common.showTitleAndUnit',
+          key: 'showTitleAndUnit',
+          default: true,
+          comType: 'checkbox',
         },
         {
           label: 'yAxis.open',

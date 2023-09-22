@@ -16,36 +16,44 @@
  * limitations under the License.
  */
 
-import { Layout } from 'antd';
-import { memo } from 'react';
-import { useDispatch } from 'react-redux';
+import { SplitPane } from 'app/components/SplitPane';
+import { WidgetActionContext } from 'app/pages/DashBoardPage/components/ActionProvider/WidgetActionProvider';
+import { memo, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { BoardToolBar } from '../components/BoardToolBar/BoardToolBar';
 import { LayerTreePanel } from '../components/LayerPanel/LayerTreePanel';
 import SlideSetting from '../components/SlideSetting/SlideSetting';
-import { editDashBoardInfoActions, editWidgetInfoActions } from '../slice';
 import { FreeBoardEditor } from './FreeBoardEditor';
 
 export const FreeEditor: React.FC = memo(() => {
-  const dispatch = useDispatch();
+  const { onEditClearActiveWidgets } = useContext(WidgetActionContext);
   const clearSelectedWidgets = e => {
     e.stopPropagation();
-    dispatch(editWidgetInfoActions.clearSelectedWidgets());
-    dispatch(editDashBoardInfoActions.changeShowBlockMask(true));
+    onEditClearActiveWidgets();
   };
 
   return (
-    <Layout onClick={clearSelectedWidgets}>
-      <Wrapper>
-        <BoardToolBar />
-        <Editor>
-          {/* <LayerList /> */}
-          <LayerTreePanel />
+    <Wrapper onClick={clearSelectedWidgets}>
+      <BoardToolBar />
+      <SplitPane
+        defaultSize={256}
+        minSize={200}
+        maxSize={400}
+        pane2Style={{ minWidth: 0 }}
+      >
+        <LayerTreePanel />
+        <SplitPane
+          defaultSize={300}
+          minSize={200}
+          maxSize={400}
+          primary="second"
+          pane1Style={{ display: 'flex', minWidth: 0 }}
+        >
           <FreeBoardEditor />
           <SlideSetting />
-        </Editor>
-      </Wrapper>
-    </Layout>
+        </SplitPane>
+      </SplitPane>
+    </Wrapper>
   );
 });
 
@@ -56,10 +64,4 @@ const Wrapper = styled.div`
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-`;
-
-const Editor = styled.div`
-  display: flex;
-  flex: 1;
-  min-height: 0;
 `;

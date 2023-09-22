@@ -225,13 +225,12 @@ export const widgetLinkEventAction =
       widgetMap: widgetMap,
       params: undefined,
     });
-    const boardLinkWidgets = Object.entries(widgetMapMap || {})
-      .filter(([k, v]) => {
-        return targetLinkDataChartIds.includes(v.datachartId);
-      })
-      .map(([k, v]) => v);
+    const boardLinkWidgets = Object.values(widgetMapMap || {}).filter(w =>
+      targetLinkDataChartIds.includes(w.datachartId),
+    );
     boardLinkWidgets.forEach(targetWidget => {
-      const dataChart = dataChartMap?.[targetWidget.datachartId];
+      const dataChart =
+        dataChartMap[widget.dashboardId]?.[targetWidget.datachartId];
       const dimensionNames = dataChart?.config?.chartConfig?.datas?.flatMap(
         d => {
           if (
@@ -503,14 +502,19 @@ export const showJumpErrorAction =
     }
   };
 export const setWidgetSampleDataAction =
-  (args: { boardEditing: boolean; datachartId: string; wid: string }) =>
+  (args: {
+    boardId: string;
+    boardEditing: boolean;
+    datachartId: string;
+    wid: string;
+  }) =>
   (dispatch, getState) => {
-    const { boardEditing, datachartId, wid } = args;
+    const { boardId, boardEditing, datachartId, wid } = args;
     const rootState = getState() as RootState;
     const viewBoardState = rootState.board as BoardState;
     const editBoardState = rootState.editBoard as EditBoardState;
     const dataChartMap = viewBoardState.dataChartMap;
-    const curChart = dataChartMap[datachartId];
+    const curChart = dataChartMap[boardId][datachartId];
     if (!curChart) return;
     if (curChart.viewId) return;
     if (!curChart.config.sampleData) return;

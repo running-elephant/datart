@@ -317,16 +317,16 @@ export const createWidgetInfoMap = (widgets: Widget[]) => {
 
 export const convertWrapChartWidget = (params: {
   widgetMap: Record<string, Widget>;
-  dataChartMap: Record<string, DataChart>;
+  dashboardDataChartMap: Record<string, DataChart>;
   viewMap: Record<string, ChartDataView>;
 }) => {
-  const { widgetMap, dataChartMap } = params;
+  const { widgetMap, dashboardDataChartMap } = params;
   const widgets = Object.values(widgetMap).map(widget => {
     if (widget.config.originalType !== ORIGINAL_TYPE_MAP.ownedChart) {
       return widget;
     }
     // widgetChart wrapChartWidget
-    const dataChart = dataChartMap[widget.datachartId];
+    const dataChart = dashboardDataChartMap[widget.datachartId];
     const newWidget = produce(widget, draft => {
       draft.datachartId = '';
       (draft.config.content as ChartWidgetContent).dataChart = dataChart;
@@ -539,13 +539,13 @@ export const getWidgetMap = (
 ) => {
   const filterSearchParams = filterSearchParamsMap?.params,
     isMatchByName = filterSearchParamsMap?.isMatchByName;
-  const dataChartMap = dataCharts.reduce((acc, cur) => {
+  const dashboardDataChartMap = dataCharts.reduce((acc, cur) => {
     acc[cur.id] = cur;
     return acc;
   }, {} as Record<string, DataChart>);
   const widgetMap = widgets.reduce((acc, cur) => {
     // issues #601
-    const chartViewId = dataChartMap[cur.datachartId]?.viewId;
+    const chartViewId = dashboardDataChartMap[cur.datachartId]?.viewId;
     const viewIds = chartViewId ? [chartViewId] : cur.viewIds;
     const viewComputerFields =
       JSON.parse(serverViews.find(v => v.id === viewIds[0])?.model || '{}')
@@ -722,12 +722,12 @@ export const getValueByRowData = (
 
 export function cloneWidgets(args: {
   widgets: WidgetOfCopy[];
-  dataChartMap: Record<string, DataChart>;
+  dashboardDataChartMap: Record<string, DataChart>;
   newWidgetMapping: WidgetMapping;
 }) {
   const newDataCharts: DataChart[] = [];
   const newWidgets: Widget[] = [];
-  const { widgets, dataChartMap, newWidgetMapping } = args;
+  const { widgets, dashboardDataChartMap, newWidgetMapping } = args;
   widgets.forEach(widget => {
     const newWidget = CloneValueDeep(widget);
     delete newWidget.selectedCopy;
@@ -760,7 +760,7 @@ export function cloneWidgets(args: {
     }
     //chart
     if (newWidget.config.type === 'chart') {
-      let dataChart = dataChartMap[newWidget.datachartId];
+      let dataChart = dashboardDataChartMap[newWidget.datachartId];
       const newDataChart: DataChart = CloneValueDeep({
         ...dataChart,
         id: dataChart.id + Date.now() + BOARD_COPY_CHART_SUFFIX,

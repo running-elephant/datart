@@ -19,6 +19,7 @@
 import { ConfigProvider } from 'antd';
 import echartsDefaultTheme from 'app/assets/theme/echarts_default_theme.json';
 import { registerTheme } from 'echarts';
+import { PUBLIC_URL } from 'globalConstants';
 import { antdLocales } from 'locales/i18n';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
@@ -33,13 +34,11 @@ export function Router() {
 
   return (
     <ConfigProvider locale={antdLocales[i18n.language]}>
-      <BrowserRouter>
+      <BrowserRouter basename={PUBLIC_URL}>
         <HelmetPageTitle lang={i18n.language} />
-        <BrowserRouter>
-          <Switch>
-            <Route path="/shareChart/:token" component={LazyShareChart} />
-          </Switch>
-        </BrowserRouter>
+        <Switch>
+          <Route path="/shareChart/:token" component={LazyShareChart} />
+        </Switch>
         <GlobalStyles />
       </BrowserRouter>
     </ConfigProvider>

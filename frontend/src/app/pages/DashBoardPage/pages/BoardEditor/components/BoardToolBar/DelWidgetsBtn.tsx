@@ -30,7 +30,7 @@ export const DelWidgetsBtn: FC<{
   return (
     <Tooltip title={title}>
       <ToolbarButton
-        disabled={!selectedIds.length}
+        disabled={!selectedIds}
         onClick={fn}
         icon={<DeleteOutlined />}
       />

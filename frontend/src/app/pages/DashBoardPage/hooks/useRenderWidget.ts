@@ -36,10 +36,10 @@ export default function useRenderWidget(
 
   const renderWidget = useCallback(() => {
     const canView = isElView(cacheWhRef.current);
-    if (canView) {
+    if (canView || boardType === 'free') {
       onRenderedWidgetById(widget.id);
     }
-  }, [cacheWhRef, onRenderedWidgetById, widget.id]);
+  }, [cacheWhRef, onRenderedWidgetById, widget.id, boardType]);
 
   //监听board滚动
   useEffect(() => {

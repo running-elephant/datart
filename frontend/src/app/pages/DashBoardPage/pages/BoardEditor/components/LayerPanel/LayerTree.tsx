@@ -18,11 +18,11 @@
 
 import { Tree } from 'app/components';
 import { renderIcon } from 'app/hooks/useGetVizIcon';
+import useResizeObserver from 'app/hooks/useResizeObserver';
 import { WidgetActionContext } from 'app/pages/DashBoardPage/components/ActionProvider/WidgetActionProvider';
 import widgetManager from 'app/pages/DashBoardPage/components/WidgetManager';
 import { FC, memo, useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { isEmptyArray } from 'utils/object';
 import { stopPPG } from 'utils/utils';
 import { dropLayerNodeAction } from '../../slice/actions/actions';
 import {
@@ -30,7 +30,7 @@ import {
   selectLayerTree,
   selectSelectedIds,
 } from '../../slice/selectors';
-import { LayerTreeItem } from './LayerTreeItem';
+import { EventLayerNode, LayerTreeItem } from './LayerTreeItem';
 
 export const LayerTree: FC<{}> = memo(() => {
   const dispatch = useDispatch();
@@ -38,7 +38,12 @@ export const LayerTree: FC<{}> = memo(() => {
   const renderTreeItem = useCallback(n => <LayerTreeItem node={n} />, []);
   const { onEditSelectWidget } = useContext(WidgetActionContext);
   const editingWidgetIds = useSelector(selectEditingWidgetIds);
-  const selectedKeys = useSelector(selectSelectedIds);
+  const selectedIds = useSelector(selectSelectedIds);
+
+  const { height, ref } = useResizeObserver({
+    refreshMode: 'debounce',
+    refreshRate: 200,
+  });
 
   const treeSelect = useCallback(
     (_, { node, nativeEvent }) => {
@@ -57,14 +62,27 @@ export const LayerTree: FC<{}> = memo(() => {
   );
 
   const onDrop = useCallback(
-    info => dispatch(dropLayerNodeAction(info)),
+    info => {
+      const dragNode = info.dragNode as EventLayerNode;
+      const targetNode = info.node as EventLayerNode;
+      let dropPosition = 'NORMAL';
+
+      if (targetNode.dragOverGapTop) {
+        dropPosition = 'TOP';
+      }
+      if (targetNode.dragOver && !targetNode.isLeaf) {
+        dropPosition = 'FOLDER';
+      }
+
+      dispatch(dropLayerNodeAction(dragNode, targetNode, dropPosition));
+    },
     [dispatch],
   );
 
   return (
     <Tree
       className="medium"
-      draggable={isEmptyArray(editingWidgetIds)}
+      draggable={!editingWidgetIds}
       multiple
       loading={false}
       titleRender={renderTreeItem}
@@ -73,7 +91,9 @@ export const LayerTree: FC<{}> = memo(() => {
       onClick={stopPPG}
       onDrop={onDrop}
       treeData={treeData}
-      selectedKeys={selectedKeys}
+      selectedKeys={selectedIds ? selectedIds.split(',') : []}
+      height={height}
+      wrapperRef={ref}
       defaultExpandAll
     />
   );

@@ -61,7 +61,7 @@ module.exports = {
           chunkFilename: 'static/js/[name].[contenthash:8].js',
         },
         // path: path.resolve(__dirname, 'dist'), // 修改输出文件目录
-        publicPath: '/',
+        publicPath: `${process.env.PUBLIC_URL || ''}/`,
       };
       /**
        * webpack split chunks

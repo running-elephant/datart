@@ -258,7 +258,7 @@ export const syncBoardWidgetChartDataAsync = createAsyncThunk<
       bid: curWidget.dashboardId,
       wid: widgetId,
     });
-    const dataChart = dataChartMap?.[curWidget.datachartId];
+    const dataChart = dataChartMap[boardId][curWidget.datachartId];
     const chartDataView = viewMap?.[dataChart?.viewId];
     const requestParams = new ChartDataRequestBuilder(
       {
@@ -380,7 +380,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
       viewMap,
       option,
       widgetInfo,
-      dataChartMap,
+      dashboardDataChartMap: dataChartMap[boardId],
       boardLinkFilters,
       drillOption,
     });
@@ -401,7 +401,7 @@ export const getChartWidgetDataAsync = createAsyncThunk<
         const executeTokenMap = (getState() as RootState)?.share
           ?.executeTokenMap;
 
-        const dataChart = dataChartMap[curWidget.datachartId];
+        const dataChart = dataChartMap[boardId][curWidget.datachartId];
         const viewId = viewMap[dataChart.viewId].id;
         const executeToken = executeTokenMap?.[viewId];
         const { data } = await request2<WidgetData>({
