@@ -1,4 +1,5 @@
 import { Avatar as AntdAvatar, AvatarProps } from 'antd';
+import endsWith from 'lodash/endsWith';
 import { CSSProperties, useState } from 'react';
 import styled from 'styled-components/macro';
 
@@ -12,7 +13,7 @@ export function Avatar(props: AvatarProps) {
   }
   if (
     typeof safeSrc === 'string' &&
-    (safeSrc.endsWith('null') || safeSrc.endsWith('undefined'))
+    (endsWith(safeSrc, 'null') || endsWith(safeSrc, 'undefined'))
   ) {
     setSafeSrc('');
   }
