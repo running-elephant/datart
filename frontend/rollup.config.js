@@ -7,6 +7,7 @@ import replace from '@rollup/plugin-replace';
 import typescript from '@rollup/plugin-typescript';
 import path from 'path';
 import cleanup from 'rollup-plugin-cleanup';
+
 export default {
   input: 'src/task.ts', // 打包入口
   output: {
@@ -36,6 +37,7 @@ export default {
     cleanup(),
     replace({
       'console.log': '//console.log',
+      'process.env.PUBLIC_URL': JSON.stringify(process.env.PUBLIC_URL),
     }),
   ],
 };

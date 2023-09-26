@@ -37,7 +37,7 @@ export enum StorageKeys {
   Theme = 'THEME',
 }
 
-export const PUBLIC_URL = process?.env?.PUBLIC_URL || '';
+export const PUBLIC_URL = process.env.PUBLIC_URL || '';
 export const BASE_API_URL = `${PUBLIC_URL}/api/v1`;
 export const BASE_RESOURCE_URL = `${PUBLIC_URL}/`;
 // 1 hour
