@@ -997,6 +997,7 @@
         "color": "颜色",
         "image": "图片",
         "uploadTip": "点击上传",
+        "dbClickToUpload": "双击上传图片",
         "padding": "内边距",
         "paddingTop": "上边距",
         "paddingRight": "右边距",
