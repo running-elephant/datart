@@ -269,7 +269,7 @@ export const addDataChartWidgets = createAsyncThunk<
   'editBoard/addDataChartWidgets',
   async ({ boardId, chartIds, boardType }, { getState, dispatch }) => {
     const {
-      data: { datacharts, views, viewVariables },
+      data: { datacharts: serverDataCharts, views, viewVariables },
     } = await request2<{
       datacharts: ServerDatachart[];
       views: View[];
@@ -278,13 +278,17 @@ export const addDataChartWidgets = createAsyncThunk<
       url: `viz/datacharts?datachartIds=${chartIds.join()}`,
       method: 'get',
     });
-    const dataCharts: DataChart[] = getDataChartsByServer(datacharts, views);
-    const dashboardDataChartMap = datacharts.reduce<
-      Record<string, ServerDatachart>
-    >((acc, cur) => {
-      acc[cur.id] = cur;
-      return acc;
-    }, {});
+    const dataCharts: DataChart[] = getDataChartsByServer(
+      serverDataCharts,
+      views,
+    );
+    const dashboardDataChartMap = dataCharts.reduce<Record<string, DataChart>>(
+      (acc, cur) => {
+        acc[cur.id] = cur;
+        return acc;
+      },
+      {},
+    );
     const viewViews = getChartDataView(views, dataCharts);
     dispatch(
       boardActions.setDataChartToMap({ dashboardId: boardId, dataCharts }),

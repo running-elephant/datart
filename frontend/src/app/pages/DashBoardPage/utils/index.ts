@@ -43,6 +43,7 @@ import {
   PUBLIC_URL,
   TIME_FORMATTER,
 } from 'globalConstants';
+import startsWith from 'lodash/startsWith';
 import moment from 'moment';
 import { CloneValueDeep } from 'utils/object';
 import { boardDrillManager } from '../components/BoardDrillManager/BoardDrillManager';
@@ -73,7 +74,7 @@ export const dateFormatObj = {
 };
 
 export const convertImageUrl = (urlKey: string = ''): string => {
-  if (urlKey.startsWith(BOARD_FILE_IMG_PREFIX)) {
+  if (startsWith(urlKey, BOARD_FILE_IMG_PREFIX)) {
     return `${window.location.origin}${PUBLIC_URL}/${urlKey}`;
   }
   return urlKey;
@@ -88,7 +89,7 @@ export const getBackgroundImage = (url: string = ''): string => {
  */
 export const adaptBoardImageUrl = (url: string = '', curBoardId: string) => {
   const splitter = BOARD_FILE_IMG_PREFIX;
-  if (!url.startsWith(splitter)) return url;
+  if (!startsWith(url, splitter)) return url;
   if (!curBoardId) return url;
   const originalBoardId = url.split(splitter)[1].split('/')[0];
   const nextUrl = url.replace(originalBoardId, curBoardId);

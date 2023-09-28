@@ -63,6 +63,7 @@ export const UploadDragger: React.FC<{
   return (
     <StyleUpload
       name={'upload-image'}
+      accept=".jpg,.jpeg,.png,.gif,.svg"
       className="datart-ant-upload"
       beforeUpload={beforeUpload}
       multiple={false}
