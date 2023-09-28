@@ -27,7 +27,7 @@ import type {
 import { Widget } from 'app/pages/DashBoardPage/types/widgetTypes';
 import type { ChartStyleConfig } from 'app/types/ChartConfig';
 import { getInitialLocale } from 'locales/utils';
-import { uuidv4 } from 'utils/utils';
+import { universalUUID } from 'utils/utils';
 
 export const initTitleTpl = () => {
   const titleTpl: ChartStyleConfig = {
@@ -472,7 +472,7 @@ export const initFreeWidgetRect = (): RectConfig => ({
 
 export const widgetTpl = (): Widget => {
   return {
-    id: uuidv4(),
+    id: universalUUID(),
     dashboardId: '',
     datachartId: '',
     relations: [],
@@ -502,7 +502,7 @@ export const widgetTpl = (): Widget => {
 };
 
 export const initClientId = () => {
-  return 'client_' + uuidv4();
+  return 'client_' + universalUUID();
 };
 export const initWidgetName = (i18nMap: object, local?: string) => {
   if (local && i18nMap[local]) {

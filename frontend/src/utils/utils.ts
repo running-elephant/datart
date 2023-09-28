@@ -10,10 +10,18 @@ import {
   FONT_WEIGHT_REGULAR,
 } from 'styles/StyleConstants';
 import { APIResponse } from 'types';
+import { default as uuidv4 } from 'uuid/dist/umd/uuidv4.min';
 import { SaveFormModel } from '../app/pages/MainPage/pages/VizPage/SaveFormContext';
 import { removeToken } from './auth';
 
-export { default as uuidv4 } from 'uuid/dist/umd/uuidv4.min';
+export { uuidv4 };
+
+// For environments that do not support crypto.getRandomValues, such as nashorn.
+export function universalUUID() {
+  return typeof crypto === 'undefined'
+    ? `_${Math.random().toString(36).substring(2)}`
+    : uuidv4();
+}
 
 export function errorHandle(error) {
   if (error?.response) {

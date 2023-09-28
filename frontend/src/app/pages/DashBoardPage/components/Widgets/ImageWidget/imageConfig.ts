@@ -96,15 +96,6 @@ export const widgetToolkit: ImageToolkit = {
       { ...initPaddingTpl() },
       { ...initBorderTpl() },
     ];
-    widget.config.customConfig.props?.forEach(ele => {
-      if (ele.key === 'backgroundGroup') {
-        ele.rows?.forEach(row => {
-          if (row.key === 'background') {
-            row.value.image = '/images/example.png';
-          }
-        });
-      }
-    });
 
     return widget;
   },

@@ -999,6 +999,7 @@
         "color": "Color",
         "image": "Image",
         "uploadTip": "Click to Upload",
+        "dbClickToUpload": "Double Click To Upload",
         "padding": "Padding",
         "paddingTop": "Padding Top",
         "paddingRight": "Padding Right",

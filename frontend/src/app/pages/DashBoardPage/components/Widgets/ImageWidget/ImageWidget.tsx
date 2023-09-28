@@ -15,9 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import { Space } from 'antd';
 import { WidgetContext } from 'app/pages/DashBoardPage/components/WidgetProvider/WidgetProvider';
-import { memo, useContext } from 'react';
+import {
+  editBoardStackActions,
+  editWidgetInfoActions,
+} from 'app/pages/DashBoardPage/pages/BoardEditor/slice';
+import { memo, useCallback, useContext, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
+import styled from 'styled-components/macro';
 import { BoardContext } from '../../BoardProvider/BoardProvider';
 import { FlexStyle, ZIndexStyle } from '../../WidgetComponents/constants';
 import { EditMask } from '../../WidgetComponents/EditMask';
@@ -30,38 +37,99 @@ import {
   getWidgetBaseStyle,
   getWidgetTitle,
 } from '../../WidgetManager/utils/utils';
+import { WidgetInfoContext } from '../../WidgetProvider/WidgetInfoProvider';
+import { HiddenUploader } from './HiddenUploader';
 import { ImageWidgetCore } from './ImageWidgetCore';
+import { Picture } from './Picture';
 
 export const ImageWidget: React.FC<{ hideTitle: boolean }> = memo(
   ({ hideTitle }) => {
+    const dispatch = useDispatch();
     const widget = useContext(WidgetContext);
+    const widgetInfo = useContext(WidgetInfoContext);
     const { editing } = useContext(BoardContext);
     const title = getWidgetTitle(widget.config.customConfig.props);
     title.title = widget.config.name;
     const { background, border, padding } = getWidgetBaseStyle(
       widget.config.customConfig.props,
     );
-    return (
-      <WidgetWrapper background={background} border={border} padding={padding}>
-        <div style={ZIndexStyle}>
-          {!hideTitle && <WidgetTitle title={title} />}
+    const showBackground =
+      !background.image && background.color === 'transparent';
+    const uploaderRef = useRef<any>();
 
-          <div style={FlexStyle}>
-            <ImageWidgetCore />
+    useEffect(() => {
+      if (widgetInfo.editing) {
+        uploaderRef.current?.onClick();
+      }
+    }, [widgetInfo.editing]);
+
+    const uploaderChange = useCallback(
+      (url: string) => {
+        dispatch(
+          editBoardStackActions.updateWidgetStyleConfigByPath({
+            ancestors: [0, 0],
+            configItem: {
+              key: 'background',
+              comType: 'background',
+              label: 'background.background',
+              value: { ...background, image: url },
+            },
+            wid: widget.id,
+          }),
+        );
+        dispatch(editWidgetInfoActions.closeWidgetEditing(widget.id));
+      },
+      [dispatch, widget.id, background],
+    );
+
+    return (
+      <>
+        <WidgetWrapper
+          background={background}
+          border={border}
+          padding={padding}
+        >
+          <div style={ZIndexStyle}>
+            {!hideTitle && <WidgetTitle title={title} />}
+
+            <div style={FlexStyle}>
+              <ImageWidgetCore />
+            </div>
           </div>
-        </div>
-        {editing && <EditMask />}
-        <StyledWidgetToolBar>
-          <Space size={0}>
-            <LockIconFn
-              boardEditing={editing}
-              wid={widget.id}
-              lock={widget.config?.lock}
-            />
-            <WidgetDropdownList widget={widget} />
-          </Space>
-        </StyledWidgetToolBar>
-      </WidgetWrapper>
+          {editing && <EditMask />}
+          <StyledWidgetToolBar>
+            <Space size={0}>
+              <LockIconFn
+                boardEditing={editing}
+                wid={widget.id}
+                lock={widget.config?.lock}
+              />
+              <WidgetDropdownList widget={widget} />
+            </Space>
+          </StyledWidgetToolBar>
+        </WidgetWrapper>
+        {editing && (
+          <HiddenUploader onChange={uploaderChange} ref={uploaderRef} />
+        )}
+        {editing && showBackground && (
+          <ImageWidgetBackground>
+            <Picture />
+          </ImageWidgetBackground>
+        )}
+      </>
     );
   },
 );
+
+const ImageWidgetBackground = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
