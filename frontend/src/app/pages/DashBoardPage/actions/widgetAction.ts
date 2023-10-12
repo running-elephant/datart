@@ -514,7 +514,7 @@ export const setWidgetSampleDataAction =
     const viewBoardState = rootState.board as BoardState;
     const editBoardState = rootState.editBoard as EditBoardState;
     const dataChartMap = viewBoardState.dataChartMap;
-    const curChart = dataChartMap[boardId][datachartId];
+    const curChart = dataChartMap[boardId]?.[datachartId];
     if (!curChart) return;
     if (curChart.viewId) return;
     if (!curChart.config.sampleData) return;
