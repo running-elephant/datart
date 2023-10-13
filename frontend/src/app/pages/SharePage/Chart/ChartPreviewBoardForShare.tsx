@@ -38,7 +38,7 @@ import {
   tablePagingAndSortEventListener,
 } from 'app/utils/ChartEventListenerHelper';
 import { getChartDrillOption } from 'app/utils/internalChartHelper';
-import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
+import { FC, memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import { isEmptyArray } from 'utils/object';
@@ -130,8 +130,11 @@ const ChartPreviewBoardForShare: FC<{
           filterSearchParams,
         }),
       );
-      registerChartEvents(chart);
     });
+
+    useEffect(() => {
+      registerChartEvents(chart);
+    }, [chartPreview,chart]);
 
     const buildDrillThroughEventParams = useCallback(
       (
