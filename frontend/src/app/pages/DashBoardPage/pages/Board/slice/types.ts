@@ -335,6 +335,7 @@ export declare const MediaWidgetTypes: [
   'image',
   'video',
   'iframe',
+  'customBtn',
 ];
 
 export type MediaWidgetType = typeof MediaWidgetTypes[number];

@@ -74,3 +74,15 @@ export interface IFontDefault {
   fontStyle: string;
   color: string;
 }
+export interface ICustomBtnDefault {
+  content: string;
+  btnType: 'primary' | 'default' | 'text' | 'dashed' | 'link';
+  btnSize: 'large' | 'middle' | 'small';
+  danger: boolean;
+  icon?: string;
+  jumpType?: 'dashboard' | 'datachart' | 'url';
+  dashboardId?: string;
+  datachartId?: string;
+  href?: string;
+  target?: '_blank' | '_self' | '_parent' | '_top';
+}

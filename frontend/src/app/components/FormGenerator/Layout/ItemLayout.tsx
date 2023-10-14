@@ -69,6 +69,7 @@ import {
   ViewDetailPanel,
   WidgetBorder,
   YAxisNumberFormatPanel,
+  BtnFormat,
 } from '../Customize';
 import { FormGeneratorLayoutProps } from '../types';
 import { groupLayoutComparer, invokeDependencyWatcher } from '../utils';
@@ -216,6 +217,8 @@ const ItemLayout: FC<FormGeneratorLayoutProps<ChartStyleConfig>> = memo(
           return <DataZoomPanel {...props} />;
         case ChartStyleSectionComponentType.Y_AXIS_NUMBER_FORMAT_PANEL:
           return <YAxisNumberFormatPanel {...props} />;
+        case ChartStyleSectionComponentType.BTN_FORMAT:
+          return <BtnFormat {...props} />;
         default:
           return <div>{`no matched component comType of ${data.comType}`}</div>;
       }

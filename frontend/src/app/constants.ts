@@ -17,7 +17,7 @@
  */
 
 import { FONT_FAMILY, G90 } from 'styles/StyleConstants';
-import { IFontDefault } from 'types';
+import { ICustomBtnDefault, IFontDefault } from 'types';
 
 export enum TenantManagementMode {
   Team = 'TEAM',
@@ -215,6 +215,7 @@ export const ChartStyleSectionComponentType = {
   TEXT: 'text',
   CONDITIONAL_STYLE: 'conditionalStylePanel',
   RADIO: 'radio',
+  BTN_FORMAT: 'btnFormat',
 
   // Customize Component
   FONT_ALIGNMENT: 'fontAlignment',
@@ -251,6 +252,13 @@ export const FONT_DEFAULT: IFontDefault = {
   fontWeight: 'normal',
   fontStyle: 'normal',
   color: G90,
+};
+
+export const CUSTOM_BTN_DEFAULT: ICustomBtnDefault = {
+  btnSize: 'middle',
+  btnType: 'default',
+  content: '按钮',
+  danger: false,
 };
 
 export enum AuthorizationStatus {

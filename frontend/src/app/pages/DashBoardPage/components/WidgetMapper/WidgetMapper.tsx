@@ -30,6 +30,7 @@ import { RichTextWidget } from '../Widgets/RichTextWidget/RichTextWidget';
 import { TabWidget } from '../Widgets/TabWidget/TabWidget';
 import { TimerWidget } from '../Widgets/TimerWidget/TimerWidget';
 import { VideoWidget } from '../Widgets/VideoWidget/VideoWidget';
+import { CustomBtnWidget } from '../Widgets/CustomBtnWidget/CustomBtnWidget';
 
 export const WidgetMapper: React.FC<{
   boardEditing: boolean;
@@ -63,7 +64,8 @@ export const WidgetMapper: React.FC<{
       return <IframeWidget hideTitle={hideTitle} />;
     case ORIGINAL_TYPE_MAP.timer:
       return <TimerWidget hideTitle={hideTitle} />;
-
+    case ORIGINAL_TYPE_MAP.customBtn:
+      return <CustomBtnWidget hideTitle={hideTitle} />;
     // tab
     case ORIGINAL_TYPE_MAP.tab:
       return <TabWidget hideTitle={hideTitle} />;

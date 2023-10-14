@@ -39,6 +39,7 @@ import tabProto from '../Widgets/TabWidget/tabConfig';
 import timerProto from '../Widgets/TimerWidget/timerConfig';
 import videoProto from '../Widgets/VideoWidget/videoConfig';
 import { widgetManagerInstance as widgetManager } from './WidgetManager';
+import customBtnProto from '../Widgets/CustomBtnWidget/customBtnConfig';
 
 const protoList: WidgetProto[] = [
   linkedChartProto, // chart
@@ -57,6 +58,7 @@ const protoList: WidgetProto[] = [
   radioGroupProto,
   textProto,
   timeProto,
+  customBtnProto,
   dropDownTree,
   rangeTimeProto,
   rangeValueProto,
