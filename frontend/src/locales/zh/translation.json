@@ -1028,6 +1028,7 @@
         "enterHere": "请输入",
         "storyName": "名称",
         "storyDescription": "描述",
+        "addStoryPage": "添加故事页面",
         "format": "格式",
         "interval": "间隔",
         "requiredWidgetName": "组件名称不允许为空，请修改",

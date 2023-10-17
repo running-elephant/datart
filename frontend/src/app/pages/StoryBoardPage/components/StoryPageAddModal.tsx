@@ -19,14 +19,16 @@ import { Modal, Table } from 'antd';
 import { RowSelectionType } from 'antd/lib/table/interface';
 import { Folder } from 'app/pages/MainPage/pages/VizPage/slice/types';
 import i18next from 'i18next';
-import React, { useEffect, useState } from 'react';
-
+import difference from 'lodash/difference';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { StoryPage } from '../slice/types';
 export interface IProps {
   // dataCharts: DataChart[];
   pageContents: Folder[];
   visible: boolean;
   onSelectedPages: (selectedIds: string[]) => void;
   onCancel: () => void;
+  sortedPages: StoryPage[];
 }
 
 const StoryPageAddModal: React.FC<IProps> = props => {
@@ -35,41 +37,61 @@ const StoryPageAddModal: React.FC<IProps> = props => {
     onSelectedPages,
     onCancel,
     pageContents: dataCharts,
+    sortedPages,
   } = props;
   const [selectedDataChartIds, setSelectedDataChartIds] = useState<string[]>(
     [],
   );
-  const onOk = () => {
-    onSelectedPages(selectedDataChartIds);
-  };
+  const onOk = useCallback(() => {
+    onSelectedPages(
+      difference(
+        selectedDataChartIds,
+        sortedPages.map(v => v.relId),
+      ),
+    );
+  }, [onSelectedPages, sortedPages, selectedDataChartIds]);
+
   useEffect(() => {
     if (!visible) {
-      setSelectedDataChartIds([]);
+      const defaultSelectedIds = sortedPages.map(v => v.relId);
+      setSelectedDataChartIds(defaultSelectedIds);
     }
-  }, [visible]);
-  const columns = [
-    {
-      title: i18next.t('viz.board.setting.storyName'),
-      dataIndex: 'name',
-      render: (text: string) => text,
-    },
-    {
-      title: i18next.t('viz.board.setting.storyDescription'),
-      dataIndex: 'description',
-      render: (text: string) => text,
-    },
-  ];
-  const rowSelection = {
-    type: 'checkbox' as RowSelectionType,
-    selectedRowKeys: selectedDataChartIds,
-    onChange: (keys: React.Key[]) => {
-      setSelectedDataChartIds(keys as string[]);
-    },
-  };
+  }, [visible, sortedPages]);
+
+  const columns = useMemo(
+    () => [
+      {
+        title: i18next.t('viz.board.setting.storyName'),
+        dataIndex: 'name',
+        render: (text: string) => text,
+      },
+      {
+        title: i18next.t('viz.board.setting.storyDescription'),
+        dataIndex: 'description',
+        render: (text: string) => text,
+      },
+    ],
+    [],
+  );
+  const rowSelection = useMemo(
+    () => ({
+      type: 'checkbox' as RowSelectionType,
+      selectedRowKeys: selectedDataChartIds,
+      getCheckboxProps: record => {
+        return {
+          disabled: !!sortedPages.find(page => page.relId === record.relId),
+        };
+      },
+      onChange: (keys: React.Key[]) => {
+        setSelectedDataChartIds(keys as string[]);
+      },
+    }),
+    [selectedDataChartIds, sortedPages],
+  );
 
   return (
     <Modal
-      title="Add Story Page"
+      title={i18next.t('viz.board.setting.addStoryPage')}
       visible={visible}
       onOk={onOk}
       centered
