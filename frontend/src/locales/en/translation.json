@@ -1030,6 +1030,7 @@
         "enterHere": "Enter here",
         "storyName": "Name",
         "storyDescription": "Description",
+        "addStoryPage": "Add Story Page",
         "format": "Format",
         "interval": "Interval",
         "requiredWidgetName": "Widget name cannot be empty, please input a name",
