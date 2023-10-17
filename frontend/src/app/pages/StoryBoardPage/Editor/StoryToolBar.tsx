@@ -32,56 +32,59 @@ import {
 import StoryPageAddModal from '../components/StoryPageAddModal';
 import { StoryContext } from '../contexts/StoryContext';
 import { addStoryPages } from '../slice/thunks';
+import { StoryPage } from '../slice/types';
 import { StoryPageSetting } from './StoryPageSetting';
 import { StorySetting } from './StorySetting';
 
-export const StoryToolBar: React.FC<{ onCloseEditor?: () => void }> = memo(
-  ({ onCloseEditor }) => {
-    const dispatch = useDispatch();
+export const StoryToolBar: React.FC<{
+  onCloseEditor?: () => void;
+  sortedPages: StoryPage[];
+}> = memo(({ onCloseEditor, sortedPages }) => {
+  const dispatch = useDispatch();
 
-    const closeEditor = useCallback(() => {
-      onCloseEditor?.();
-    }, [onCloseEditor]);
-    const { storyId, name } = useContext(StoryContext);
-    const [visible, setVisible] = useState(false);
-    const chartOptionsMock = useSelector(selectVizs);
-    const chartOptions = chartOptionsMock.filter(
-      item => item.relType === 'DASHBOARD',
-    );
+  const closeEditor = useCallback(() => {
+    onCloseEditor?.();
+  }, [onCloseEditor]);
+  const { storyId, name } = useContext(StoryContext);
+  const [visible, setVisible] = useState(false);
+  const chartOptionsMock = useSelector(selectVizs);
+  const chartOptions = chartOptionsMock.filter(
+    item => item.relType === 'DASHBOARD',
+  );
 
-    const onSelectedPages = useCallback(
-      (relIds: string[]) => {
-        dispatch(addStoryPages({ storyId, relIds }));
-        setVisible(false);
-      },
-      [storyId, dispatch],
-    );
-    return (
-      <Wrapper>
-        <LeftOutlined
-          onClick={closeEditor}
-          style={{ marginRight: '10px', fontSize: '1.2rem' }}
-        />
-        <Title>{name}</Title>
-        <AddButton
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setVisible(true)}
-        />
-        <Settings>
-          <StoryPageSetting />
-          <StorySetting />
-        </Settings>
-        <StoryPageAddModal
-          pageContents={chartOptions}
-          visible={visible}
-          onSelectedPages={onSelectedPages}
-          onCancel={() => setVisible(false)}
-        />
-      </Wrapper>
-    );
-  },
-);
+  const onSelectedPages = useCallback(
+    (relIds: string[]) => {
+      dispatch(addStoryPages({ storyId, relIds }));
+      setVisible(false);
+    },
+    [storyId, dispatch],
+  );
+  return (
+    <Wrapper>
+      <LeftOutlined
+        onClick={closeEditor}
+        style={{ marginRight: '10px', fontSize: '1.2rem' }}
+      />
+      <Title>{name}</Title>
+      <AddButton
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={() => setVisible(true)}
+      />
+      <Settings>
+        <StoryPageSetting />
+        <StorySetting />
+      </Settings>
+      <StoryPageAddModal
+        sortedPages={sortedPages}
+        pageContents={chartOptions}
+        visible={visible}
+        onSelectedPages={onSelectedPages}
+        onCancel={() => setVisible(false)}
+      />
+    </Wrapper>
+  );
+});
 
 const Wrapper = styled.div`
   display: flex;

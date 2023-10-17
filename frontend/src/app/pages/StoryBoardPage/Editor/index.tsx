@@ -263,7 +263,10 @@ export const StoryEditor: React.FC<{}> = memo(() => {
         }}
       >
         <Wrapper>
-          <StoryToolBar onCloseEditor={onCloseEditor} />
+          <StoryToolBar
+            onCloseEditor={onCloseEditor}
+            sortedPages={sortedPages}
+          />
           <Container
             sizes={sizes}
             minSize={[256, 0]}
