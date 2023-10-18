@@ -193,6 +193,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
+                    <outputDirectory>
+                        ${project.parent.basedir}/lib
+                    </outputDirectory>
                     <archive>
                         <manifest>
                             <mainClass>datart.DatartServerApplication</mainClass>
@@ -208,8 +211,33 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.parent.basedir}/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.0.0</version>
+                <configuration>
+                    <!-- 生产压缩包名称 -->
+                    <finalName>${project.name}-${project.version}</finalName>
+                    <!-- 追加id 按照assembly文件打出不同的归档包文件-->
+                    <appendAssemblyId>true</appendAssemblyId>
+                    <!-- assembly配置文件 -->
+                    <descriptors>
+                        <descriptor>src/main/resources/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                    <outputDirectory>${project.parent.basedir}</outputDirectory>
+                </configuration>
                 <executions>
                     <execution>
                         <id>dist</id>
@@ -217,12 +245,6 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>src/main/resources/assembly/assembly.xml</descriptor>
-                            </descriptors>
-                            <outputDirectory>${project.parent.basedir}</outputDirectory>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -234,110 +256,105 @@
                 </configuration>
             </plugin>
 
-<!--            <plugin>-->
-<!--                <groupId>com.github.eirslett</groupId>-->
-<!--                <artifactId>frontend-maven-plugin</artifactId>-->
-<!--                <version>1.6</version>-->
-<!--                <configuration>-->
-<!--                    <workingDirectory>${project.parent.basedir}/frontend</workingDirectory>-->
-<!--                </configuration>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>initialize</phase>-->
-<!--                        <id>install node and npm</id>-->
-<!--                        <goals>-->
-<!--                            <goal>install-node-and-npm</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <nodeVersion>v14.2.0</nodeVersion>-->
-<!--                            <npmVersion>6.14.15</npmVersion>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-
-                    <execution>
-                        <id>exec-npm-install</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>npm</executable>
-                            <arguments>
-                                <argument>run</argument>
-                                <argument>bootstrap</argument>
-                                <argument>--registry=https://registry.npm.taobao.org</argument>
-                            </arguments>
-                            <workingDirectory>${project.parent.basedir}/frontend</workingDirectory>
-                        </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>exec-npm-run-build</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>npm</executable>
-                            <arguments>
-                                <argument>run</argument>
-                                <argument>build:all</argument>
-                            </arguments>
-                            <workingDirectory>${project.parent.basedir}/frontend</workingDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-resource</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.parent.basedir}/static</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.parent.basedir}/frontend/build</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>com.coderplus.maven.plugins</groupId>
-                <artifactId>copy-rename-maven-plugin</artifactId>
-                <version>1.0.1</version>
-                <executions>
-                    <execution>
-                        <id>rename-file</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>rename</goal>
-                        </goals>
-                        <configuration>
-                            <sourceFile>${project.parent.basedir}/frontend/build/task/index.js</sourceFile>
-                            <destinationFile>${project.basedir}/src/main/resources/javascript/parser.js
-                            </destinationFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>frontend</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>1.13.4</version>
+                        <executions>
+                            <!-- 安装node和npm环境 -->
+                            <execution>
+                                <id>install node and npm</id>
+                                <goals>
+                                    <goal>install-node-and-npm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                            </execution>
+                            <!-- npm安装前端依赖 -->
+                            <execution>
+                                <id>npm install</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <arguments>install --registry=https://registry.npmmirror.com/</arguments>
+                                </configuration>
+                            </execution>
+                            <!-- 前端打包 -->
+                            <execution>
+                                <id>npm run build</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <arguments>run build:all</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <!-- 插件配置 -->
+                        <configuration>
+                            <workingDirectory>${project.parent.basedir}/frontend</workingDirectory>
+                            <nodeVersion>v14.21.3</nodeVersion>
+                            <npmVersion>6.14.18</npmVersion>
+                            <nodeDownloadRoot>https://npmmirror.com/mirrors/node/</nodeDownloadRoot>
+                            <pnpmDownloadRoot>https://registry.npm.taobao.org/pnpm/-/</pnpmDownloadRoot>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-resource</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.parent.basedir}/static</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.parent.basedir}/frontend/build</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.coderplus.maven.plugins</groupId>
+                        <artifactId>copy-rename-maven-plugin</artifactId>
+                        <version>1.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>rename-file</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>rename</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.parent.basedir}/frontend/build/task/index.js</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/resources/javascript/parser.js
+                                    </destinationFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
