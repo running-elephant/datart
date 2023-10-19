@@ -34,6 +34,7 @@ public class ClientRegistrationRepositoryImpl implements ClientRegistrationRepos
 
     private Map<String, ClientRegistration> registrations;
 
+
     @Override
     public ClientRegistration findByRegistrationId(String registrationId) {
         return registrations.get(registrationId);
@@ -60,10 +61,10 @@ public class ClientRegistrationRepositoryImpl implements ClientRegistrationRepos
     }
 
     private void addDefaultProviders(OAuth2ClientProperties properties) {
-        //ding talk
-        DingTalkOauth2Client.addClientRegistration(properties);
-        // wechart
-        WeChartOauth2Client.addClientRegistration(properties);
+
+        for (String registrationId : CustomOAuth2ClientFactory.getAllRegistrationId()) {
+            CustomOAuth2ClientFactory.get(registrationId).addClientRegistration(properties);
+        }
     }
 
     @Autowired(required = false)
@@ -72,5 +73,8 @@ public class ClientRegistrationRepositoryImpl implements ClientRegistrationRepos
         List<ClientRegistration> clientList = new ArrayList<>(
                 OAuth2ClientPropertiesRegistrationAdapter.getClientRegistrations(oAuth2ClientProperties).values());
         registrations = createRegistrationsMap(clientList);
+        for (String registrationId : CustomOAuth2ClientFactory.getAllRegistrationId()) {
+            CustomOAuth2ClientFactory.get(registrationId).setClientRegistration(registrations.get(registrationId));
+        }
     }
 }
