@@ -1,0 +1,25 @@
+{
+  "type": "DOCUMENT",
+  "name": "document-data-provider",
+  "attributes": [
+    {
+      "code": "dbType",
+      "name": "dbType",
+      "type": "string",
+      "required": true,
+      "defaultValue": ""
+    },
+    {
+      "name": "url",
+      "type": "string",
+      "required": true,
+      "defaultValue": ""
+    },
+    {
+      "name": "properties",
+      "type": "object",
+      "required": false,
+      "defaultValue": ""
+    }
+  ]
+}
