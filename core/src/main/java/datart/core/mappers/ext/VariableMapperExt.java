@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.*;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Mapper
 public interface VariableMapperExt extends VariableMapper {
@@ -40,6 +41,14 @@ public interface VariableMapperExt extends VariableMapper {
             "SELECT * FROM variable WHERE view_id = #{viewId} AND `type`='QUERY'"
     })
     List<Variable> selectViewQueryVariables(String viewId);
+
+    @Select({
+            "<script>",
+            "SELECT * FROM variable WHERE  `type`='QUERY' AND view_id in  ",
+            "<foreach collection='viewIds' item='item' index='index' open='(' close=')' separator=','>  #{item} </foreach> ;",
+            "</script>"
+    })
+    List<Variable> selectViewQueryVariablesByViewIds(Set<String> viewIds);
 
     @Select({
             "SELECT * FROM variable WHERE org_id = #{orgId} AND view_id is NULL"

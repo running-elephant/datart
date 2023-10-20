@@ -187,9 +187,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         //variables
         LinkedList<Variable> variables = new LinkedList<>(variableService.listOrgQueryVariables(dashboard.getOrgId()));
         if (!CollectionUtils.isEmpty(viewIds)) {
-            for (String viewId : viewIds) {
-                variables.addAll(variableService.listViewQueryVariables(viewId));
-            }
+            variables.addAll(variableService.listViewQueryVariablesByViewIds(viewIds));
         }
         dashboardDetail.setQueryVariables(variables);
         // download permission

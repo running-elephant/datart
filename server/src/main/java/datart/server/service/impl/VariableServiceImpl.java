@@ -135,6 +135,10 @@ public class VariableServiceImpl extends BaseService implements VariableService 
         return variableMapper.selectViewQueryVariables(viewId);
     }
 
+    @Override
+    public List<Variable> listViewQueryVariablesByViewIds(Set<String> viewIds) {
+        return variableMapper.selectViewQueryVariablesByViewIds(viewIds);
+    }
 
     @Override
     @Transactional
