@@ -10,13 +10,19 @@ import datart.core.entity.poi.POISettings;
 import datart.server.base.params.DownloadCreateParam;
 import datart.server.base.params.ViewExecuteParam;
 import datart.server.common.PoiConvertUtils;
-import datart.server.service.*;
+import datart.server.service.AttachmentService;
+import datart.server.service.DataProviderService;
+import datart.server.service.OrgSettingService;
+import datart.server.service.ViewService;
+import datart.server.service.VizService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service("excelAttachmentService")
 @Slf4j
@@ -37,6 +43,7 @@ public class AttachmentExcelServiceImpl implements AttachmentService {
         ViewService viewService = Application.getBean(ViewService.class);
 
         Workbook workbook = POIUtils.createEmpty();
+        Map<String, Integer> sheetNameMap = new HashMap<>(16);
         for (int i = 0; i < downloadParams.getDownloadParams().size(); i++) {
             ViewExecuteParam viewExecuteParam = downloadParams.getDownloadParams().get(i);
             View view = viewService.retrieve(viewExecuteParam.getViewId(), false);
@@ -44,10 +51,19 @@ public class AttachmentExcelServiceImpl implements AttachmentService {
             Dataframe dataframe = dataProviderService.execute(downloadParams.getDownloadParams().get(i));
             String chartConfigStr = vizService.getChartConfigByVizId(viewExecuteParam.getVizType(), viewExecuteParam.getVizId());
             POISettings poiSettings = PoiConvertUtils.covertToPoiSetting(chartConfigStr, dataframe);
-            String sheetName = StringUtils.isNotBlank(viewExecuteParam.getVizName()) ? viewExecuteParam.getVizName() : "Sheet"+i;
+            String sheetName = StringUtils.isNotBlank(viewExecuteParam.getVizName()) ? viewExecuteParam.getVizName() : "Sheet" + i;
+
+            //avoid same sheetName
+            if (sheetNameMap.containsKey(sheetName)) {
+                sheetNameMap.put(sheetName, sheetNameMap.get(sheetName) + 1);
+                sheetName += sheetNameMap.get(sheetName);
+            } else {
+                sheetNameMap.put(sheetName, 0);
+            }
+
             POIUtils.withSheet(workbook, sheetName, dataframe, poiSettings);
         }
-        path = generateFileName(path,fileName,attachmentType);
+        path = generateFileName(path, fileName, attachmentType);
         File file = new File(path);
         POIUtils.save(workbook, file.getPath(), true);
         log.info("create excel file complete.");
