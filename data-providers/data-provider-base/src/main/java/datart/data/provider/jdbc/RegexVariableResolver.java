@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 
 public class RegexVariableResolver {
 
-    public static final String REG_VARIABLE_EXPRESSION_TEMPLATE = "\\S+\\s*(IN|NOT\\s+IN|IS\\s+NULL|NOT\\s+NULL|LIKE|NOT\\s+LIKE|EXISTS|>|<|=|!=|<>|>=|<=){1}\\s*\\S*\\({0,1}(%s){1}\\){0,1}";
+    public static final String REG_VARIABLE_EXPRESSION_TEMPLATE = "\\S+\\s*(IN|NOT\\s+IN|IS\\s+NULL|NOT\\s+NULL|LIKE|NOT\\s+LIKE|EXISTS|>|<|=|!=|<>|>=|<=\\s+,|\\(|\\s+){1}\\s*\\S*\\({0,1}(%s){1}\\){0,1}\\S*\\s*(\\)){0,1}";
 
     public static List<VariablePlaceholder> resolve(SqlDialect sqlDialect, String srcSql, Map<String, ScriptVariable> variableMap) {
 
