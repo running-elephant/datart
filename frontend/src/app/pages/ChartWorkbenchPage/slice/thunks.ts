@@ -29,7 +29,10 @@ import {
   buildUpdateChartRequest,
   convertToChartDto,
 } from 'app/utils/ChartDtoHelper';
-import { filterCurrentUsedComputedFields } from 'app/utils/chartHelper';
+import {
+  createDateLevelComputedFieldForConfigComputedFields,
+  filterCurrentUsedComputedFields
+} from 'app/utils/chartHelper';
 import { fetchAvailableSourceFunctionsAsync } from 'app/utils/fetch';
 import { filterSqlOperatorName } from 'app/utils/internalChartHelper';
 import { request2 } from 'utils/request';
@@ -207,6 +210,19 @@ export const fetchChartAction = createAsyncThunk<
       url: `viz/datacharts/${arg.chartId}`,
     });
     return convertToChartDto(response?.data);
+  }
+
+  if (arg.backendChart?.config) {
+    return {
+      ...arg.backendChart,
+      config: {
+        ...arg.backendChart.config,
+        computedFields: createDateLevelComputedFieldForConfigComputedFields(
+          arg.backendChart?.view.meta,
+          arg.backendChart?.config.computedFields,
+        )
+      }
+    }
   }
   return arg.backendChart as any;
 });
