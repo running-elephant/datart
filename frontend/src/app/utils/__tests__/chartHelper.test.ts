@@ -304,7 +304,7 @@ describe('Chart Helper ', () => {
         colName: 'a',
         aggregate: 'SUM',
       } as any;
-      expect(getColumnRenderName(field)).toEqual('SUM(a)');
+      expect(getColumnRenderName(field)).toEqual('SUM_a');
     });
 
     test('should get alias name by data field when there is alias and colName', () => {
@@ -439,7 +439,7 @@ describe('Chart Helper ', () => {
       ];
       const metas = [
         { name: 'name' },
-        { name: 'current(profession)' },
+        { name: 'current_profession' },
         { name: 'age' },
       ];
       const chartDataSet = transformToDataSet(columns, metas, [
@@ -519,14 +519,14 @@ describe('Chart Helper ', () => {
 
     test('should get dataset model when meta have aggregation', () => {
       const columns = [['r1-c1-v', 'r1-c2-v']];
-      const metas = [{ name: 'name' }, { name: 'AVG(age)' }];
+      const metas = [{ name: 'name' }, { name: 'AVG_age' }];
       const chartDataSet = transformToDataSet(columns, metas);
 
       expect(chartDataSet?.length).toEqual(1);
       expect(chartDataSet[0] instanceof ChartDataSetRow).toBeTruthy();
       expect(chartDataSet[0].convertToObject()).toEqual({
         NAME: 'r1-c1-v',
-        'AVG(AGE)': 'r1-c2-v',
+        'AVG_AGE': 'r1-c2-v',
       });
       expect(
         chartDataSet[0].getCell({ colName: 'age', aggregate: 'AVG' } as any),
@@ -536,19 +536,19 @@ describe('Chart Helper ', () => {
           colName: 'age',
           aggregate: 'AVG',
         } as any),
-      ).toEqual('AVG(AGE)');
+      ).toEqual('AVG_AGE');
       expect(
         chartDataSet[0].getFieldIndex({
           colName: 'age',
           aggregate: 'AVG',
         } as any),
       ).toEqual(1);
-      expect(chartDataSet[0].getCellByKey('AVG(age)')).toEqual('r1-c2-v');
+      expect(chartDataSet[0].getCellByKey('AVG_age')).toEqual('r1-c2-v');
     });
 
     test('should get dataset row data with case sensitive', () => {
       const columns = [['r1-c1-v', 'r1-c2-v']];
-      const metas = [{ name: 'name' }, { name: 'avg(age)' }];
+      const metas = [{ name: 'name' }, { name: 'avg_age' }];
       const chartDataSet = transformToDataSet(columns, metas, [
         {
           rows: [
@@ -567,7 +567,7 @@ describe('Chart Helper ', () => {
       expect(chartDataSet[0] instanceof ChartDataSetRow).toBeTruthy();
       expect(chartDataSet[0].convertToCaseSensitiveObject()).toEqual({
         Name: 'r1-c1-v',
-        'AVG(Age)': 'r1-c2-v',
+        'AVG_Age': 'r1-c2-v',
       });
     });
   });
@@ -971,7 +971,7 @@ describe('Chart Helper ', () => {
         category: 'field',
       },
       55,
-      `SUM(name): 55`,
+      `SUM_name: 55`,
     ],
     [
       {
@@ -987,7 +987,7 @@ describe('Chart Helper ', () => {
         category: 'field',
       },
       55,
-      `SUM(name): 5.500e+1`,
+      `SUM_name: 5.500e+1`,
     ],
   ])('valueFormatter Test - ', (config, value, expected) => {
     test(`Get chart render string with field name and value`, () => {
@@ -1026,14 +1026,14 @@ describe('Chart Helper ', () => {
           aggregate: 'SUM',
           colName: '',
         },
-        'SUM()',
+        'SUM_',
       ],
       [
         {
           aggregate: 'SUM',
           colName: 'c',
         },
-        'SUM(c)',
+        'SUM_c',
       ],
     ])('getValueByColumnKey Test - ', (config, expected) => {
       test(`Get column key by data config`, () => {
@@ -1578,7 +1578,7 @@ describe('Chart Helper ', () => {
         ],
         [
           {
-            name: 'SUM(num)',
+            name: 'SUM_num',
             type: 'NUMERIC',
           },
           {
@@ -1757,7 +1757,7 @@ describe('Chart Helper ', () => {
     ],
   ])('getDataColumnMaxAndMin2 Test - ', (data, config, expected) => {
     test(`Get column max and min value`, () => {
-      const chartDataSet = transformToDataSet(data, [{ name: 'sum(num)' }], [
+      const chartDataSet = transformToDataSet(data, [{ name: 'sum_num' }], [
         {
           rows: [
             {
@@ -1803,10 +1803,10 @@ describe('Chart Helper ', () => {
       const columns = [['r1-c1-v', 'r1-c2-v', '#fff', '10', '20']];
       const metas = [
         { name: 'name' },
-        { name: 'avg(age)' },
+        { name: 'avg_age' },
         { name: 'color' },
-        { name: 'sum(info)' },
-        { name: 'count(size)' },
+        { name: 'sum_info' },
+        { name: 'count_size' },
       ];
       const rows = [
         {
@@ -1876,13 +1876,13 @@ describe('Chart Helper ', () => {
             seriesName: '',
             componentType: 'series',
             data: {
-              name: 'AVG(Age)',
+              name: 'AVG_Age',
               rowData: {
                 Name: 'r1-c1-v',
                 Color: '#fff',
-                'AVG(Age)': 'r1-c2-v',
-                'SUM(Info)': '10',
-                'COUNT(Size)': '20',
+                'AVG_Age': 'r1-c2-v',
+                'SUM_Info': '10',
+                'COUNT_Size': '20',
               },
             },
           },
@@ -1893,7 +1893,7 @@ describe('Chart Helper ', () => {
           [rows[4]] as ChartDataSectionField[],
         ),
       ).toEqual(
-        'Name: r1-c1-v<br />Color: #fff<br />AVG(Age): r1-c2-v<br />COUNT(Size): 20<br />SUM(Info): 10',
+        'Name: r1-c1-v<br />Color: #fff<br />AVG_Age: r1-c2-v<br />COUNT_Size: 20<br />SUM_Info: 10',
       );
 
       expect(
@@ -1907,9 +1907,9 @@ describe('Chart Helper ', () => {
               rowData: {
                 Name: 'r1-c1-v',
                 Color: '#fff',
-                'AVG(Age)': 'r1-c2-v',
-                'SUM(Info)': '10',
-                'COUNT(Size)': '20',
+                'AVG_Age': 'r1-c2-v',
+                'SUM_Info': '10',
+                'COUNT_Size': '20',
               },
             },
           },
@@ -1920,7 +1920,7 @@ describe('Chart Helper ', () => {
           [rows[4]] as ChartDataSectionField[],
         ),
       ).toEqual(
-        'Name: r1-c1-v<br />Color: #fff<br />Name: r1-c1-v<br />COUNT(Size): 20<br />SUM(Info): 10',
+        'Name: r1-c1-v<br />Color: #fff<br />Name: r1-c1-v<br />COUNT_Size: 20<br />SUM_Info: 10',
       );
     });
   });
@@ -1930,10 +1930,10 @@ describe('Chart Helper ', () => {
       const columns = [['r1-c1-v', 'r1-c2-v', '#fff', '10', '20']];
       const metas = [
         { name: 'name' },
-        { name: 'avg(age)' },
+        { name: 'avg_age' },
         { name: 'color' },
-        { name: 'sum(info)' },
-        { name: 'count(size)' },
+        { name: 'sum_info' },
+        { name: 'count_size' },
       ];
       const rows = [
         {
@@ -1976,9 +1976,9 @@ describe('Chart Helper ', () => {
           rowData: {
             Name: 'r1-c1-v',
             Color: '#fff',
-            'AVG(Age)': 'r1-c2-v',
-            'SUM(Info)': '10',
-            'COUNT(Size)': '20',
+            'AVG_Age': 'r1-c2-v',
+            'SUM_Info': '10',
+            'COUNT_Size': '20',
           },
         },
       };
@@ -1994,7 +1994,7 @@ describe('Chart Helper ', () => {
           [rows[4]] as ChartDataSectionField[],
         ),
       ).toEqual(
-        'Name: r1-c1-v<br />Color: #fff<br />AVG(Age): r1-c2-v<br />COUNT(Size): 20<br />SUM(Info): 10',
+        'Name: r1-c1-v<br />Color: #fff<br />AVG_Age: r1-c2-v<br />COUNT_Size: 20<br />SUM_Info: 10',
       );
     });
   });

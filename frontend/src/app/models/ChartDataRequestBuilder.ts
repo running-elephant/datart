@@ -173,7 +173,7 @@ export class ChartDataRequestBuilder {
       return c.colName;
     }
     if (c.aggregate) {
-      return `${c.aggregate}(${c.colName})`;
+      return `${c.aggregate}_${c.colName}`;
     }
     return c.colName;
   }

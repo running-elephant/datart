@@ -1535,7 +1535,7 @@ describe('Internal Chart Helper ', () => {
         aggregate: 'AVG',
       };
       const result = getColumnRenderOriginName(config as ChartDataSectionField);
-      expect(result).toEqual('AVG(a)');
+      expect(result).toEqual('AVG_a');
     });
   });
 

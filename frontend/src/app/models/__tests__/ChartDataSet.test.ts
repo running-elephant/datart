@@ -68,7 +68,7 @@ describe('ChartDataSet Tests', () => {
     );
     expect(
       dataset.getFieldKey({ colName: 'columnName', aggregate: 'AVG' } as any),
-    ).toEqual('AVG(COLUMNNAME)');
+    ).toEqual('AVG_COLUMNNAME');
     expect(dataset.getFieldIndex({ colName: 'column1' } as any)).toEqual(0);
     expect(
       dataset.getFieldIndex({ colName: 'column1', aggregate: 'AVG' } as any),
