@@ -61,7 +61,7 @@ public class CSVParse {
         if (!file.exists()) {
             Exceptions.notFound(path);
         }
-        List<CSVRecord> records = CSVParser.parse(file, StandardCharsets.UTF_8, CSVFormat.DEFAULT).getRecords();
+        List<CSVRecord> records = CSVParser.parse(file, StandardCharsets.UTF_8, CSVFormat.DEFAULT.withTrim()).getRecords();
         if (CollectionUtils.isEmpty(records)) {
             return Collections.emptyList();
         }
