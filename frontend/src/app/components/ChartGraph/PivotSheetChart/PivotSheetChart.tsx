@@ -16,7 +16,11 @@
  * limitations under the License.
  */
 
+import { Group } from '@antv/g-canvas';
 import {
+  CornerCell,
+  CornerHeader,
+  CornerHeaderConfig,
   Data,
   DataCell,
   DefaultCellTheme,
@@ -62,6 +66,114 @@ enum BolderFontWeight {
   normal = 'bold',
   bold = 'bolder',
   bolder = 'bolder',
+}
+
+class SlashCorner extends Group {
+  node: S2CellType;
+  headerStyle: DefaultCellTheme;
+  columns: string[];
+  rows: string[];
+  values: string[];
+  constructor(
+    node: S2CellType,
+    headerStyle: DefaultCellTheme,
+    columns?: string[],
+    rows?: string[],
+    values?: string[],
+  ) {
+    super({});
+    this.node = node;
+    this.headerStyle = headerStyle;
+    this.columns = columns || [];
+    this.rows = rows || [];
+    this.values = values || [];
+    this.initCornerHeader();
+  }
+  initCornerHeader() {
+    this.initBg();
+    this.initText();
+  }
+
+  initBg() {
+    this.node.add(
+      this.addShape('polygon', {
+        attrs: {
+          points: [
+            [0, 0],
+            [0, this.node.cfg.height],
+            [this.node.cfg.width, this.node.cfg.height],
+            [this.node.cfg.width, 0],
+          ],
+          fill: this.headerStyle.cell?.backgroundColor,
+        },
+      }),
+    );
+    this.node.add(
+      this.addShape('line', {
+        attrs: {
+          x1: 0,
+          y1: 0,
+          x2: this.node.cfg.width,
+          y2: this.node.cfg.height,
+          stroke: this.headerStyle.text?.fill || 'black',
+          lineWidth: 1,
+          // lineAppendWidth: 1,
+        },
+      }),
+    );
+  }
+
+  initText() {
+    this.node.add(
+      this.addShape('text', {
+        zIndex: 100,
+        attrs: {
+          x: (this.node.cfg.width / 3) * 1.2,
+          y: this.node.cfg.height / 3,
+          text: this.columns.filter(c => !['$$extra$$'].includes(c)).join('/'),
+          fontFamily: this.headerStyle.text?.fontFamily,
+          fontSize: this.headerStyle.text?.fontSize,
+          fill: this.headerStyle.text?.fill || 'black',
+          stroke: this.headerStyle.text?.fill || 'black',
+        },
+      }),
+    );
+
+    this.node.add(
+      this.addShape('text', {
+        zIndex: 100,
+        attrs: {
+          x: this.node.cfg.width / 9,
+          y: (this.node.cfg.height / 5) * 4.8,
+          text: this.rows.join('/'),
+          fontFamily: this.headerStyle.text?.fontFamily,
+          fontSize: this.headerStyle.text?.fontSize,
+          fill: this.headerStyle.text?.fill || 'black',
+          stroke: this.headerStyle.text?.fill || 'black',
+        },
+      }),
+    );
+  }
+}
+
+class OriginCornerHeader extends CornerHeader {
+  node: S2CellType;
+  constructor(node: S2CellType, headConfig: CornerHeaderConfig) {
+    super(headConfig);
+    this.node = node;
+  }
+  renderHeader() {
+    const _this = this;
+    this.headerConfig.data.forEach(function (item) {
+      _this.node.add(
+        new CornerCell(
+          item,
+          _this.headerConfig.spreadsheet,
+          _this.headerConfig,
+        ),
+      );
+    });
+  }
 }
 
 class PivotSheetChart extends ReactChart {
@@ -171,6 +283,7 @@ class PivotSheetChart extends ReactChart {
       enableHoverHighlight,
       enableSelectedHighlight,
       metricNameShowIn,
+      enableSlash,
     ] = getStyles(
       styleConfigs,
       ['style'],
@@ -179,6 +292,7 @@ class PivotSheetChart extends ReactChart {
         'enableHoverHighlight',
         'enableSelectedHighlight',
         'metricNameShowIn',
+        'enableSlash',
       ],
     );
     const [summaryAggregation] = getStyles(
@@ -247,6 +361,23 @@ class PivotSheetChart extends ReactChart {
           selectedCellsSpotlight: Boolean(enableSelectedHighlight),
           autoResetSheetStyle: false,
           enableCopy: true,
+        },
+        cornerHeader: (node, s2, headConfig) => {
+          const config = headConfig as CornerHeaderConfig;
+          if (enableSlash) {
+            new SlashCorner(
+              node,
+              Object.assign(
+                this.getHeaderStyle(styleConfigs),
+                s2.theme.cornerCell,
+              ),
+              config.data.filter(n => n.cornerType === 'col').map(n => n.value),
+              config.data.filter(n => n.cornerType === 'row').map(n => n.value),
+            );
+          } else {
+            const custom = new OriginCornerHeader(node, config);
+            custom.renderHeader();
+          }
         },
         totals: {
           row: {
