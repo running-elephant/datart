@@ -72,6 +72,7 @@ const BasicMarginWidth: FC<ItemLayoutProps<ChartStyleConfig>> = memo(
         <Space>
           <InputNumber
             className="datart-ant-input-number"
+            min={0}
             value={getNumber(mixedValue)}
             onChange={handleValueChange}
           />
