@@ -262,8 +262,14 @@ public class SqlBuilder {
         }
         if (operator.getAggOperator() != null) {
             SqlOperator aggOperator = mappingSqlAggFunction(operator.getAggOperator());
-            sqlNode = new SqlBasicCall(aggOperator,
-                    new SqlNode[]{sqlNode}, SqlParserPos.ZERO);
+            if (operator.getAggOperator() == AggregateOperator.SqlOperator.COUNT_DISTINCT) {
+                sqlNode = SqlNodeUtils
+                        .createSqlBasicCall(aggOperator, Collections.singletonList(sqlNode),
+                                SqlLiteral.createSymbol(SqlSelectKeyword.DISTINCT, SqlParserPos.ZERO));
+            } else {
+                sqlNode = new SqlBasicCall(aggOperator,
+                        new SqlNode[]{sqlNode}, SqlParserPos.ZERO);
+            }
         }
         if (operator.getOperator() == OrderOperator.SqlOperator.DESC) {
             return new SqlBasicCall(SqlStdOperatorTable.DESC,
