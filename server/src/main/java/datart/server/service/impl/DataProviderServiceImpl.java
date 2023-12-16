@@ -406,6 +406,11 @@ public class DataProviderServiceImpl extends BaseService implements DataProvider
         try {
             Set<SelectColumn> columns = new HashSet<>();
             List<RelSubjectColumns> relSubjectColumns = rscMapper.listByUser(view.getId(), getCurrentUser().getId());
+            if(relSubjectColumns.isEmpty()){
+                return Collections.singleton(SelectColumn.of(null, "*"));
+            }else if(relSubjectColumns.size() == 1 && relSubjectColumns.get(0).getColumnPermission().equals("[]")){
+                return Collections.singleton(SelectColumn.of(null, "''"));
+            }
             for (RelSubjectColumns relSubjectColumn : relSubjectColumns) {
                 List<String> cols = (List<String>) objectMapper.readValue(relSubjectColumn.getColumnPermission(), ArrayList.class);
                 if (!CollectionUtils.isEmpty(cols)) {

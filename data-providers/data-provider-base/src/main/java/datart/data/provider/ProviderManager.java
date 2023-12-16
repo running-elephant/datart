@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -214,7 +215,8 @@ public class ProviderManager extends DataProviderExecuteOptimizer implements Dat
                     .noneMatch(selectColumn ->
                             column.columnKey().equals(selectColumn.getColumnKey())
                                     || column.columnKey().equals(selectColumn.getAlias())
-                                    || column.columnKey().contains(selectColumn.getColumnKey()))) {
+                                    // 用正则做聚合函数权限的判断 剔除原来的contains判断
+                                    ||  Pattern.matches("(\\w+\\(" + selectColumn.getColumnKey() +"\\))",column.columnKey()) ))  {
                 excludeIndex.add(i);
             }
         }
