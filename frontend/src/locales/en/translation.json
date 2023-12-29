@@ -637,7 +637,8 @@
             "none": "Default",
             "asc": "Ascending",
             "desc": "Descending",
-            "customize": "Customized"
+            "customize": "Customized",
+            "customizeTip": "Only allows custom sorting on a single non-numeric field"
           },
           "format": {
             "title": "Format Setting",

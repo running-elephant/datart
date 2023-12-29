@@ -194,6 +194,7 @@ export type ChartDataConfig = ChartConfigBase & {
   fieldRelation?: FilterCondition;
   // Runtime filters
   [RUNTIME_FILTER_KEY]?: PendingChartDataRequestFilter[];
+  allowFieldCustomizeSort?: boolean;
 };
 
 export type ChartStyleSectionTemplate = {

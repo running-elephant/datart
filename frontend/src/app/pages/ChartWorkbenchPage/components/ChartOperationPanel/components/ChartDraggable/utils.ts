@@ -20,7 +20,7 @@ import {
   AggregateFieldSubAggregateType,
   ChartDataSectionFieldActionType,
   ChartDataSectionType,
-  ChartDataViewFieldCategory,
+  ChartDataViewFieldCategory, SortActionType,
 } from 'app/constants';
 import { ChartDataConfig, ChartDataSectionField } from 'app/types/ChartConfig';
 import { updateBy } from 'app/utils/mutation';
@@ -83,3 +83,13 @@ export const getDefaultAggregate = (
     }
   }
 };
+
+export const isUpdate2CustomizeSort = (
+  uid: string,
+  config: ChartDataConfig,
+  field: ChartDataSectionField,
+) => {
+  const originField = config?.rows?.find(r => r.uid === uid);
+  const type = field?.sort?.type;
+  return type === SortActionType.Customize && originField?.sort?.type !== type;
+}

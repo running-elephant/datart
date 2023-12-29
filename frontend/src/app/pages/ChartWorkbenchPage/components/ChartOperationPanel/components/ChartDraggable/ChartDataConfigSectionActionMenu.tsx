@@ -21,6 +21,8 @@ import SubMenu from 'antd/lib/menu/SubMenu';
 import {
   ChartDataSectionFieldActionType,
   ChartDataViewFieldCategory,
+  DataViewFieldType,
+  SortActionType,
 } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
@@ -30,7 +32,7 @@ import { FC } from 'react';
 import AggregationAction from '../ChartFieldAction/AggregationAction';
 import AggregationLimitAction from '../ChartFieldAction/AggregationLimitAction';
 import DateLevelAction from '../ChartFieldAction/DateLevelAction/DateLevelAction';
-import SortAction from '../ChartFieldAction/SortAction';
+import { SortAction } from '../ChartFieldAction/SortAction';
 import { updateDataConfigByField } from './utils';
 
 const ChartDataConfigSectionActionMenu: FC<
@@ -53,12 +55,7 @@ const ChartDataConfigSectionActionMenu: FC<
   onConfigChanged,
 }) => {
   const t = useI18NPrefix(`viz.palette.data.enum.actionType`);
-  const subMenuAction = [
-    ChartDataSectionFieldActionType.Sortable,
-    ChartDataSectionFieldActionType.Aggregate,
-    ChartDataSectionFieldActionType.AggregateLimit,
-    ChartDataSectionFieldActionType.DateLevel,
-  ];
+
 
   const handleFieldConfigChanged = (
     columnUid: string,
@@ -131,14 +128,20 @@ const ChartDataConfigSectionActionMenu: FC<
     }
     const options = config?.options?.[actionName];
     if (actionName === ChartDataSectionFieldActionType.Sortable) {
+      const allowCustomSort = config?.allowFieldCustomizeSort && type !== DataViewFieldType.NUMERIC;
       return (
         <SortAction
           config={fieldConfig}
           onConfigChange={(config, needRefresh) => {
-            handleFieldConfigChanged(uid, config, needRefresh);
+            if (config.sort?.type === SortActionType.Customize) {
+              onOpenModal(uid)(ChartDataSectionFieldActionType.CustomizeSort);
+            } else {
+              handleFieldConfigChanged(uid, config, needRefresh);
+            }
           }}
           options={options}
           mode="menu"
+          allowCustomSort={allowCustomSort}
         />
       );
     }
@@ -198,4 +201,10 @@ const ChartDataConfigSectionActionMenu: FC<
   );
 };
 
+const subMenuAction = [
+  ChartDataSectionFieldActionType.Sortable,
+  ChartDataSectionFieldActionType.Aggregate,
+  ChartDataSectionFieldActionType.AggregateLimit,
+  ChartDataSectionFieldActionType.DateLevel,
+];
 export default ChartDataConfigSectionActionMenu;

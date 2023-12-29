@@ -167,6 +167,7 @@ export const ChartDataSectionFieldActionType = {
   ColorizeSingle: 'colorSingle',
   Size: 'size',
   DateLevel: 'dateLevel',
+  CustomizeSort: 'customizeSort',
 };
 
 export const FilterRelationType = {

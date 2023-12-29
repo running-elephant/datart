@@ -60,6 +60,7 @@ import {
 } from 'app/utils/ChartEventListenerHelper';
 import {
   clearRuntimeDateLevelFieldsInChartConfig,
+  clearUnsupportedChartConfig,
   filterCurrentUsedComputedFields,
   getValue,
 } from 'app/utils/chartHelper';
@@ -315,8 +316,10 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     setChart(c);
 
     const targetChartConfig = CloneValueDeep(c.config);
-    const finalChartConfig = clearRuntimeDateLevelFieldsInChartConfig(
-      transferChartConfigs(targetChartConfig, shadowChartConfig || chartConfig),
+    const finalChartConfig = clearUnsupportedChartConfig(
+      clearRuntimeDateLevelFieldsInChartConfig(
+        transferChartConfigs(targetChartConfig, shadowChartConfig || chartConfig)
+      )
     );
 
     const computedFields = updateBy(dataview?.computedFields || [], draft => {
@@ -591,7 +594,7 @@ export const ChartEditor: FC<ChartEditorProps> = ({
           {
             ...builder.build(),
             ...{
-              analytics: dataChartId ? false : true,
+              analytics: !dataChartId,
               vizName: backendChart?.name || 'chart',
               vizId: isWidget ? widgetId : dataChartId,
               vizType: isWidget ? 'widget' : 'dataChart',

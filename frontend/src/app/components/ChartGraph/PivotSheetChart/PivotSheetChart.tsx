@@ -588,16 +588,16 @@ class PivotSheetChart extends ReactChart {
   ): Array<SortParam> {
     return sectionConfigRows
       .map(config => {
-        if (!config?.sort?.type || config?.sort?.type === SortActionType.None) {
+        const type = config?.sort?.type;
+        if (!type || type === SortActionType.None || type === SortActionType.Customize) {
           return null;
         }
-        const isASC = config.sort.type === SortActionType.ASC;
         return {
           sortFieldId: chartDataSet.getFieldKey(config),
           sortFunc: params => {
             const { data } = params;
             return data?.sort((a, b) =>
-              isASC ? a?.localeCompare(b) : b?.localeCompare(a),
+              type === SortActionType.ASC ? a?.localeCompare(b) : b?.localeCompare(a),
             );
           },
         };

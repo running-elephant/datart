@@ -26,6 +26,7 @@ const config: ChartConfig = {
       key: 'mixed',
       required: true,
       type: 'mixed',
+      allowFieldCustomizeSort: true,
     },
     {
       label: 'filter',

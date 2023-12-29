@@ -27,6 +27,7 @@ const config: ChartConfig = {
       options: {
         sortable: { backendSort: false },
       },
+      allowFieldCustomizeSort: true,
     },
     {
       label: 'row',
@@ -37,6 +38,7 @@ const config: ChartConfig = {
       },
       drillable: false,
       drillContextMenuVisible: true,
+      allowFieldCustomizeSort: true,
     },
     {
       label: 'metrics',

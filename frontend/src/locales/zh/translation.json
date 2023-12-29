@@ -635,7 +635,8 @@
             "none": "默认排序",
             "asc": "升序排列",
             "desc": "降序排列",
-            "customize": "自定义"
+            "customize": "自定义",
+            "customizeTip": "只允许对单个非数值型字段自定义排序"
           },
           "format": {
             "title": "格式设置",

@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-import { CheckOutlined } from '@ant-design/icons';
-import { Col, Menu, Radio, Row, Space } from 'antd';
+import { CheckOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Col, Menu, Radio, Row, Space, Tooltip } from 'antd';
 import { SortActionType } from 'app/constants';
 import useI18NPrefix from 'app/hooks/useI18NPrefix';
 import { ChartDataSectionField } from 'app/types/ChartConfig';
@@ -36,7 +36,8 @@ const SortAction: FC<{
   ) => void;
   mode?: 'menu';
   options?;
-}> = ({ config, dataset, mode, options, onConfigChange }) => {
+  allowCustomSort?: boolean;
+}> = ({ config, dataset, mode, options, onConfigChange, allowCustomSort }) => {
   const actionNeedNewRequest = isEmpty(options?.backendSort)
     ? true
     : Boolean(options?.backendSort);
@@ -47,23 +48,26 @@ const SortAction: FC<{
 
   const handleSortTypeChange = direction => {
     setDirection(direction);
-
-    if (SortActionType.Customize !== direction) {
-      onConfigChange &&
-        onConfigChange(
-          updateBy(config, draft => {
-            draft.sort = { type: direction };
-          }),
-          actionNeedNewRequest,
-        );
-    }
+    onConfigChange?.(
+      updateBy(config, draft => {
+        draft.sort = { type: direction };
+      }),
+      actionNeedNewRequest,
+    );
   };
 
   const renderOptions = mode => {
     if (mode === 'menu') {
+      let sortTypeOptions = BASE_SORT_OPTIONS;
+      if (allowCustomSort) {
+        sortTypeOptions = [
+          ...sortTypeOptions,
+          SortActionType.Customize
+        ];
+      }
       return (
         <>
-          {[SortActionType.None, SortActionType.ASC, SortActionType.DESC].map(
+          {sortTypeOptions.map(
             sort => {
               return (
                 <Menu.Item
@@ -72,7 +76,16 @@ const SortAction: FC<{
                   icon={direction === sort ? <CheckOutlined /> : ''}
                   onClick={() => handleSortTypeChange(sort)}
                 >
-                  {t(`sort.${sort?.toLowerCase()}`)}
+                  {
+                    sort === SortActionType.Customize ?
+                      (
+                        <Tooltip title={t(`sort.customizeTip`)} placement='bottom'>
+                          {t(`sort.${sort?.toLowerCase()}`)} <InfoCircleOutlined />
+                        </Tooltip>
+                      )
+                      :
+                      t(`sort.${sort?.toLowerCase()}`)
+                  }
                 </Menu.Item>
               );
             },
@@ -111,6 +124,7 @@ const SortAction: FC<{
   return renderOptions(mode);
 };
 
+const BASE_SORT_OPTIONS = [SortActionType.None, SortActionType.ASC, SortActionType.DESC];
 export default SortAction;
 
 const StyledRow = styled(Row)`

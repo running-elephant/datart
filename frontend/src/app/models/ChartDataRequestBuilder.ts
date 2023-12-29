@@ -442,15 +442,24 @@ export class ChartDataRequestBuilder {
         return acc;
       }, [])
       .filter(
-        col =>
-          col?.sort?.type &&
-          [SortActionType.ASC, SortActionType.DESC].includes(col?.sort?.type),
+        col => {
+          const type = col?.sort?.type;
+          if (!type) {
+            return false;
+          } else if (type === SortActionType.Customize) {
+            const value = col.sort!.value;
+            return Array.isArray(value) && value.length > 0;
+          } else {
+            return [SortActionType.ASC, SortActionType.DESC].includes(type);
+          }
+        }
       );
 
     const originalSorters = sortColumns.map(aggCol => ({
       column: this.buildColumnName(aggCol),
       operator: aggCol.sort?.type!,
       aggOperator: aggCol.aggregate,
+      value: aggCol.sort?.type === SortActionType.Customize ? aggCol.sort.value! : undefined,
     }));
 
     const _extraSorters = this.extraSorters
