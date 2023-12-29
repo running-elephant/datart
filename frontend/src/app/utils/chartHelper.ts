@@ -24,6 +24,7 @@ import {
   DataViewFieldType,
   FieldFormatType,
   RUNTIME_DATE_LEVEL_KEY,
+  SortActionType,
 } from 'app/constants';
 import { ChartDataSet, ChartDataSetRow } from 'app/models/ChartDataSet';
 import { DrillMode } from 'app/models/ChartDrillOption';
@@ -1882,3 +1883,25 @@ export function hasAggregationFunction(exp?: string) {
     AggregateFieldActionType.Sum,
   ].some(agg => new RegExp(`${agg}\\(`, 'i').test(exp || ''));
 }
+
+export function removeCustomizeSortConfig(config: ChartDataConfig): ChartDataConfig {
+  return updateBy(config, draft => {
+    draft.rows?.forEach(r => {
+      if (r?.sort?.type === SortActionType.Customize) {
+        delete r.sort;
+      }
+    });
+  });
+}
+
+export function clearUnsupportedChartConfig(chartConfig: ChartConfig): ChartConfig {
+  return updateBy(chartConfig, draft => {
+    draft.datas = (draft?.datas || []).map(item => {
+      if (!item.allowFieldCustomizeSort) {
+        return removeCustomizeSortConfig(item);
+      }
+      return item;
+    });
+  });
+};
+
