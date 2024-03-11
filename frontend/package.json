@@ -15,7 +15,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "bootstrap": "npm install --legacy-peer-deps",
-    "start": "craco start",
+    "start": "export NODE_OPTIONS=--openssl-legacy-provider && craco start",
     "build": "cross-env GENERATE_SOURCEMAP=false craco build",
     "build:task": "rollup -c",
     "build:all": "npm run build:theme && npm run build:task && npm run build",
