@@ -600,7 +600,7 @@ export const getWidgetMap = (
                 ...(content.config.controllerDate as any),
                 startTime: {
                   relativeOrExact: TimeFilterValueCategory.Exact,
-                  exactValue: formatTime(_value as any, TIME_FORMATTER),
+                  exactValue: formatTime(_value?.[0], TIME_FORMATTER),
                 },
               };
               break;
