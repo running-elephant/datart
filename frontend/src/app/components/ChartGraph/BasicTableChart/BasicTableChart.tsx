@@ -899,6 +899,11 @@ class BasicTableChart extends ReactChart {
         },
         onCell: (record, rowIndex) => {
           const row = chartDataSet[rowIndex];
+          // 检查row是否为空
+          if (!row) {
+            // row为空时直接返回，避免进一步渲染逻辑，然后导致死循环
+            return {};
+          }
           const cellValue = row.getCell(c);
           const seriesName = chartDataSet.getFieldOriginKey(c);
           const { rowData } = getExtraSeriesRowData(row);
