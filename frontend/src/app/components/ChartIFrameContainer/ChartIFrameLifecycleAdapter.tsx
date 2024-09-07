@@ -180,7 +180,6 @@ const ChartIFrameLifecycleAdapter: FC<{
     window,
     isShown,
     containerStatus,
-    isLoadingData,
   ]);
 
   /**
