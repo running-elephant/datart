@@ -143,12 +143,31 @@ public class JdbcDataProvider extends DataProvider {
     private JdbcDataProviderAdapter matchProviderAdapter(DataProviderSource source) {
         JdbcDataProviderAdapter adapter;
         adapter = cachedProviders.get(source.getSourceId());
-        if (adapter != null) {
-            return adapter;
+        boolean needCreateNewDataProvider = (adapter == null || !equalJdbcPropertiesAndDataProviderSource(adapter.getJdbcProperties(), source));
+        if (needCreateNewDataProvider) {
+            if (adapter != null) {
+                resetSource(source);
+            }
+            adapter = ProviderFactory.createDataProvider(conv2JdbcProperties(source), true);
+            cachedProviders.put(source.getSourceId(), adapter);
         }
-        adapter = ProviderFactory.createDataProvider(conv2JdbcProperties(source), true);
-        cachedProviders.put(source.getSourceId(), adapter);
         return adapter;
+    }
+
+    private boolean equalJdbcPropertiesAndDataProviderSource(JdbcProperties jdbcProperties, DataProviderSource source) {
+        Map<String, Object> dataSourceProperties = source.getProperties();
+        if (jdbcProperties == null || dataSourceProperties == null) {
+            return false;
+        }
+        return Objects.equals(jdbcProperties.getDbType(), Optional.ofNullable(dataSourceProperties.get(DB_TYPE)).orElse("").toString().toUpperCase())
+                && Objects.equals(jdbcProperties.getUrl(), Optional.ofNullable(dataSourceProperties.get(URL)).orElse("").toString())
+                && Objects.equals(jdbcProperties.getUser(), Optional.ofNullable(dataSourceProperties.get(USER)).orElse("").toString())
+                && Objects.equals(jdbcProperties.getPassword(), Optional.ofNullable(dataSourceProperties.get(PASSWORD)).orElse("").toString())
+                && Objects.equals(jdbcProperties.getDriverClass(), Optional.ofNullable(dataSourceProperties.get(DRIVER_CLASS)).orElse("").toString())
+                && Objects.equals(String.valueOf(jdbcProperties.isEnableSpecialSql())
+                , Optional.ofNullable(dataSourceProperties.get(ENABLE_SPECIAL_SQL)).orElse("false").toString())
+                && Objects.equals(new HashMap<String, String>((Map) Optional.ofNullable(jdbcProperties.getProperties()).orElse(new Properties())).toString()
+                , (new HashMap<String, String>((Map) Optional.ofNullable(dataSourceProperties.get("properties")).orElse(new HashMap<>(0)))).toString());
     }
 
     @Override
