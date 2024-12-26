@@ -143,11 +143,15 @@ public class JdbcDataProvider extends DataProvider {
     private JdbcDataProviderAdapter matchProviderAdapter(DataProviderSource source) {
         JdbcDataProviderAdapter adapter;
         adapter = cachedProviders.get(source.getSourceId());
-        if (adapter != null) {
-            return adapter;
+        JdbcProperties newJdbcProperties = conv2JdbcProperties(source);
+        boolean needCreateNewDataProvider = (adapter == null || !Objects.equals(adapter.getJdbcProperties(), newJdbcProperties));
+        if (needCreateNewDataProvider) {
+            if (adapter != null) {
+                resetSource(source);
+            }
+            adapter = ProviderFactory.createDataProvider(newJdbcProperties, true);
+            cachedProviders.put(source.getSourceId(), adapter);
         }
-        adapter = ProviderFactory.createDataProvider(conv2JdbcProperties(source), true);
-        cachedProviders.put(source.getSourceId(), adapter);
         return adapter;
     }
 
