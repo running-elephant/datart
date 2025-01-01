@@ -19,6 +19,7 @@
 package datart.server.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import datart.core.base.consts.Const;
 import datart.core.common.Application;
 import datart.core.common.TransactionHelper;
 import datart.core.common.UUIDGenerator;
@@ -41,6 +42,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.Objects;
 
 @Slf4j
 public class SchemaSyncJob implements Job, Closeable {
@@ -62,8 +64,8 @@ public class SchemaSyncJob implements Job, Closeable {
                 source = Application.getBean(SourceService.class).retrieve(sourceId, false);
             } catch (Exception ignored) {
             }
-            // remove job if source not exists
-            if (source == null) {
+            // remove job if source not exists or status is archived
+            if (source == null || Objects.equals(Const.DATA_STATUS_ARCHIVED, source.getStatus())) {
                 JobKey key = context.getJobDetail().getKey();
                 Application.getBean(Scheduler.class).deleteJob(key);
                 log.warn("source {} not exists , the job has been deleted ", sourceId);
