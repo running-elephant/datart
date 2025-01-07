@@ -33,8 +33,8 @@ public class DataSourceFactoryDruidImpl implements DataSourceFactory<DruidDataSo
     public DruidDataSource createDataSource(JdbcProperties jdbcProperties) throws Exception {
         Properties properties = configDataSource(jdbcProperties);
         DruidDataSource druidDataSource = (DruidDataSource) DruidDataSourceFactory.createDataSource(properties);
-        druidDataSource.setBreakAfterAcquireFailure(true);
-        druidDataSource.setConnectionErrorRetryAttempts(0);
+        druidDataSource.setBreakAfterAcquireFailure(false);
+        druidDataSource.setConnectionErrorRetryAttempts(3);
         log.info("druid data source created ({})", druidDataSource.getName());
         return druidDataSource;
     }
