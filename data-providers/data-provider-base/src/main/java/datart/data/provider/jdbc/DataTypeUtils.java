@@ -58,6 +58,9 @@ public class DataTypeUtils {
         } else {
             family = sqlTypeName.getFamily();
         }
+        if(family == null) {
+            return ValueType.STRING;
+        }
         switch (family) {
             case NUMERIC:
                 return ValueType.NUMERIC;
