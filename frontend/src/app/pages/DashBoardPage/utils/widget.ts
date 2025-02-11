@@ -591,7 +591,7 @@ export const getWidgetMap = (
               ) {
                 content.config.controllerDate.startTime.exactValue =
                   _value?.[0];
-                content.config.controllerDate.endTime.exactValue = _value?.[0];
+                content.config.controllerDate.endTime.exactValue = _value?.[1] ?? _value?.[0];
               }
               break;
 
@@ -600,7 +600,7 @@ export const getWidgetMap = (
                 ...(content.config.controllerDate as any),
                 startTime: {
                   relativeOrExact: TimeFilterValueCategory.Exact,
-                  exactValue: formatTime(_value as any, TIME_FORMATTER),
+                  exactValue: formatTime(_value?.[0] as any, TIME_FORMATTER),
                 },
               };
               break;

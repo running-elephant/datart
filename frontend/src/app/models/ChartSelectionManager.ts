@@ -27,6 +27,9 @@ export class ChartSelectionManager {
   private _selectedItems: Array<SelectedItem> = [];
   private _multipleSelect: boolean = false;
   private _clickCallbacks: Function[] = [];
+  private windowKeyEventHandlerRef: (this: Window, ev: KeyboardEvent) => any = this.windowKeyEventHandler.bind(this)
+  private zRenderMouseEventHandlerRef: (this: Window, ev: KeyboardEvent) => any = this.zRenderMouseEventHandler.bind(this)
+
 
   constructor(events?: ChartMouseEvent[]) {
     this._clickCallbacks =
@@ -46,24 +49,24 @@ export class ChartSelectionManager {
   }
 
   public attachWindowListeners(window: Window) {
-    window?.addEventListener('keydown', this.windowKeyEventHandler.bind(this));
-    window?.addEventListener('keyup', this.windowKeyEventHandler.bind(this));
+    window?.addEventListener('keydown', this.windowKeyEventHandlerRef);
+    window?.addEventListener('keyup', this.windowKeyEventHandlerRef);
   }
 
   public removeWindowListeners(window: Window) {
     window?.removeEventListener(
       'keydown',
-      this.windowKeyEventHandler.bind(this),
+      this.windowKeyEventHandlerRef,
     );
-    window?.removeEventListener('keyup', this.windowKeyEventHandler.bind(this));
+    window?.removeEventListener('keyup', this.windowKeyEventHandlerRef);
   }
 
   public attachZRenderListeners(chart: EChartsType) {
-    chart?.getZr().on('click', this.zRenderMouseEventHandler.bind(this));
+    chart?.getZr().on('click', this.zRenderMouseEventHandlerRef);
   }
 
   public removeZRenderListeners(chart: EChartsType) {
-    chart?.getZr().off('click', this.zRenderMouseEventHandler.bind(this));
+    chart?.getZr().off('click', this.zRenderMouseEventHandlerRef);
   }
 
   public attachEChartsListeners(chart: EChartsType) {
