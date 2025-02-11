@@ -56,6 +56,8 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
     };
 
     switch (actionType) {
+      case ChartDataSectionFieldActionType.CustomizeSort:
+        return <FieldActions.CustomizeSortAction {...props} />;
       case ChartDataSectionFieldActionType.Sortable:
         return <FieldActions.SortAction {...props} />;
       case ChartDataSectionFieldActionType.Alias:
@@ -97,11 +99,18 @@ function useFieldActionModal({ i18nPrefix }: I18NComponentProps) {
     aggregation?: boolean,
   ) => {
     const currentConfig = dataConfig.rows?.find(c => c.uid === columnUid);
-    let _modalSize = StateModalSize.MIDDLE;
-    if (actionType === ChartDataSectionFieldActionType.Colorize) {
-      _modalSize = StateModalSize.XSMALL;
-    } else if (actionType === ChartDataSectionFieldActionType.ColorizeSingle) {
-      _modalSize = StateModalSize.XSMALL;
+    let _modalSize: StateModalSize;
+    switch (actionType) {
+      case ChartDataSectionFieldActionType.Colorize:
+      case ChartDataSectionFieldActionType.ColorizeSingle:
+      case ChartDataSectionFieldActionType.Sortable:
+        _modalSize = StateModalSize.XSMALL;
+        break;
+      case ChartDataSectionFieldActionType.CustomizeSort:
+        _modalSize = StateModalSize.SMALL;
+        break;
+      default:
+        _modalSize = StateModalSize.MIDDLE;
     }
     return (show as Function)({
       title: t(actionType),

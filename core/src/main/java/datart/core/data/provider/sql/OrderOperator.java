@@ -21,6 +21,8 @@ package datart.core.data.provider.sql;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class OrderOperator extends ColumnOperator {
@@ -29,9 +31,12 @@ public class OrderOperator extends ColumnOperator {
 
     private SqlOperator operator;
 
+    private List<String> value;
+
     public enum SqlOperator {
         ASC,
-        DESC
+        DESC,
+        CUSTOMIZE
     }
 
     @Override

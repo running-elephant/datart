@@ -26,6 +26,7 @@ import {
   GroupOutlined,
   SortAscendingOutlined,
   SortDescendingOutlined,
+  DragOutlined,
 } from '@ant-design/icons';
 import Dropdown from 'antd/lib/dropdown';
 import { SortActionType } from 'app/constants';
@@ -136,6 +137,9 @@ const ChartDraggableElementField: FC<{
         }
         if (col.sort.type === SortActionType.DESC) {
           icons.push(<SortDescendingOutlined key="sort" />);
+        }
+        if (col.sort.type === SortActionType.Customize) {
+          icons.push(<DragOutlined key="sort" />);
         }
       }
       if (col.format) {
