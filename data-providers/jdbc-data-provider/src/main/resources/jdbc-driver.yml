@@ -7,6 +7,11 @@ ACCESS:
 BIG_QUERY:
   db-type: BIG_QUERY
   name: BIG_QUERY
+  literal-quote: "`"
+  identifier-quote: "'"
+  literal-end-quote: "`"
+  identifier-end-quote: "'"
+  adapter-class: "datart.data.provider.jdbc.adapters.BigQueryDataProviderAdapter"
   driver-class: com.simba.googlebigquery.jdbc.Driver
   url-prefix: jdbc:bigquery://
 

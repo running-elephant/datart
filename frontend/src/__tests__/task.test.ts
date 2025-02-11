@@ -78,11 +78,11 @@ describe('Test getQueryData', () => {
         viewId: 'e83684bc8e92431dbfb164195abe443e',
         aggregators: [
           {
-            alias: 'COUNT(education)',
+            alias: 'COUNT_education',
             column: ['education'],
             sqlOperator: 'COUNT',
           },
-          { alias: 'SUM(chartAge)', column: ['chartAge'], sqlOperator: 'SUM' },
+          { alias: 'SUM_chartAge', column: ['chartAge'], sqlOperator: 'SUM' },
         ],
         groups: [{ alias: 'age', column: ['age'] }],
         filters: [
@@ -163,12 +163,12 @@ describe('Test getQueryData', () => {
         viewId: '6236737d64954c8bac6cbaf478e17ff2',
         aggregators: [
           {
-            alias: 'SUM(viewComputerField_age)',
+            alias: 'SUM_viewComputerField_age',
             column: ['viewComputerField_age'],
             sqlOperator: 'SUM',
           },
           {
-            alias: 'SUM(root.salary)',
+            alias: 'SUM_root.salary',
             column: ['root', 'salary'],
             sqlOperator: 'SUM',
           },

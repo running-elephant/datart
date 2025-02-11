@@ -153,9 +153,9 @@ describe('ChartDataRequestBuild Test', () => {
     const requestParams = builder.build();
 
     expect(requestParams.aggregators).toEqual([
-      { alias: 'AVG(amount)', column: ['amount'], sqlOperator: 'AVG' },
-      { alias: 'SUM(sub-amount)', column: ['sub-amount'], sqlOperator: 'SUM' },
-      { alias: 'COUNT(total)', column: ['total'], sqlOperator: 'COUNT' },
+      { alias: 'AVG_amount', column: ['amount'], sqlOperator: 'AVG' },
+      { alias: 'SUM_sub-amount', column: ['sub-amount'], sqlOperator: 'SUM' },
+      { alias: 'COUNT_total', column: ['total'], sqlOperator: 'COUNT' },
       { alias: 'sex', column: ['sex'], sqlOperator: undefined },
       { alias: 'age', column: ['age'], sqlOperator: undefined },
     ]);
@@ -258,17 +258,17 @@ describe('ChartDataRequestBuild Test', () => {
 
     expect(requestParams.aggregators).toEqual([
       {
-        alias: 'AVG(dad.amount)',
+        alias: 'AVG_dad.amount',
         column: ['dad', 'amount'],
         sqlOperator: 'AVG',
       },
       {
-        alias: 'SUM(sub-amount)',
+        alias: 'SUM_sub-amount',
         column: ['sub-amount'],
         sqlOperator: 'SUM',
       },
       {
-        alias: 'COUNT(total)',
+        alias: 'COUNT_total',
         column: ['total'],
         sqlOperator: 'COUNT',
       },
@@ -355,7 +355,7 @@ describe('ChartDataRequestBuild Test', () => {
     const requestParams = builder.build();
 
     expect(requestParams.aggregators).toEqual([
-      { alias: 'AVG(amount)', column: ['amount'], sqlOperator: 'AVG' },
+      { alias: 'AVG_amount', column: ['amount'], sqlOperator: 'AVG' },
     ]);
   });
 
@@ -408,7 +408,7 @@ describe('ChartDataRequestBuild Test', () => {
 
     expect(requestParams.aggregators).toEqual([
       {
-        alias: 'AVG(dad.amount)',
+        alias: 'AVG_dad.amount',
         column: ['dad', 'amount'],
         sqlOperator: 'AVG',
       },
